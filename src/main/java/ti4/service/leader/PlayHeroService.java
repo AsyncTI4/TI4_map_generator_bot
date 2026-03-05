@@ -591,6 +591,17 @@ public class PlayHeroService {
                         event.getMessageChannel(),
                         player.getFactionEmoji()
                                 + " has been offered buttons to gain command tokens and look at Shrines.");
+                for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                    if (p2.getSoScored() < player.getSoScored()) {
+                        List<Button> shrineButtons = ButtonHelperHeroes.getShrineButtons(player, p2, game);
+                        MessageHelper.sendMessageToChannelWithButtons(
+                                player.getCorrectChannel(),
+                                player.getRepresentationUnfogged() + " you have scored more secret objectives than "
+                                        + p2.getRepresentation()
+                                        + ", and so here are buttons to look at one of their shrines. You can decline to gain 2 CC instead, using the CC buttons above.",
+                                shrineButtons);
+                    }
+                }
             }
             case "toldarhero" -> ButtonHelperHeroes.resolveToldarHero(game, player);
             case "nivynhero" -> {
