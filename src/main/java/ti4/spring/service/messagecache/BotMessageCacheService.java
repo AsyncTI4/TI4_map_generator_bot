@@ -30,7 +30,7 @@ public class BotMessageCacheService {
         String content = message.getContentRaw();
         return content.contains("privately used the command:")
                 || content.contains("A command string message was deleted.")
-                || content.contains("```fix");
+                || content.contains("```sus");
     }
 
     @Nullable
