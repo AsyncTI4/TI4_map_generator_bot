@@ -52,8 +52,9 @@ public class CreateGameButtonHandler {
         int completedAndOngoingAmount =
                 SearchGameHelper.searchGames(member.getUser(), null, false, true, false, true, false, true, true, true);
         if (completedAndOngoingAmount < 1 && !owner) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), """
-                    You need to have completed at least one game (or be currently in a game) to create new games via this button. \
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), member.getUser().getAsMention() + """
+                     You need to have completed at least one game (or be currently in a game) to create new games via this button. \
                     This is to prevent mistakes by people who don't know what they're doing. There are a few ways to get around this:
                     1) Have someone else who has completed a game press the button for you; or
                     2) Ping a bothelper for help; or
