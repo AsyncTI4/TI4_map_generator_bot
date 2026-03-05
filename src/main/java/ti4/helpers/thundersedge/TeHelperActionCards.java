@@ -522,7 +522,7 @@ public class TeHelperActionCards {
         });
     }
 
-    private static void resolvePiratesGeneric(
+    public static void resolvePiratesGeneric(
             ButtonInteractionEvent event, Game game, Player player, Tile tile, String units) {
         Player neutral = game.getPlayerFromColorOrFaction("neutral");
         tile = FlipTileService.flipTileIfNeeded(event, tile, game);

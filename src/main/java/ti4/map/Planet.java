@@ -161,6 +161,10 @@ public class Planet extends UnitHolder {
         return Helper.getPlanetRepresentation(getName(), game);
     }
 
+    public String getRepresentationWithEmojis(Game game) {
+        return Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(getName(), game);
+    }
+
     public boolean hasGroundForces(Player player) {
         return getUnits().keySet().stream()
                 .filter(player::unitBelongsToPlayer)

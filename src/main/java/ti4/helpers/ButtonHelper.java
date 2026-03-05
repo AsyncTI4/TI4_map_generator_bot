@@ -1796,6 +1796,24 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButtons(
                         nonActivePlayer.getCardsInfoThread(), cyberMessage, reverseButtons);
             }
+            if (CommandCounterHelper.hasCC(nonActivePlayer, activeSystem)
+                    && nonActivePlayer.getPlayableActionCards().contains("tk-riposte")) {
+                List<Button> reverseButtons = new ArrayList<>();
+                String key = "tk-riposte";
+                Integer riposteValue = nonActivePlayer.getActionCards().get(key);
+                if (riposteValue == null) {
+                    riposteValue = game.getDiscardActionCards().get(key);
+                }
+                reverseButtons.add(Buttons.green(
+                        Constants.AC_PLAY_FROM_HAND + riposteValue + "_riposte_" + activeSystem.getPosition(),
+                        "Riposte in " + activeSystem.getRepresentationForButtons(game, nonActivePlayer)));
+                reverseButtons.add(Buttons.red("deleteButtons", "Decline"));
+                String cyberMessage = nonActivePlayer.getRepresentationUnfogged()
+                        + ", a reminder that you may use _Riposte_ in "
+                        + activeSystem.getRepresentationForButtons(game, nonActivePlayer) + ".";
+                MessageHelper.sendMessageToChannelWithButtons(
+                        nonActivePlayer.getCardsInfoThread(), cyberMessage, reverseButtons);
+            }
             if (nonActivePlayer.ownsUnit("nivyn_mech")
                     && CheckUnitContainmentService.getTilesContainingPlayersUnits(game, nonActivePlayer, UnitType.Mech)
                             .contains(activeSystem)) {

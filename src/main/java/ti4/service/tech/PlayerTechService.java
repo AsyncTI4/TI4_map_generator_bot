@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.collections4.CollectionUtils;
@@ -48,6 +47,7 @@ import ti4.service.RemoveCommandCounterService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.VisionariaSelectService;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -383,23 +383,7 @@ public class PlayerTechService {
             }
             case "mi" -> { // Mageon
                 deleteIfButtonEvent(event);
-                List<Button> buttons = new ArrayList<>();
-                for (Player p2 : game.getRealPlayers()) {
-                    if (p2 == player || p2.getAcCount() == 0) {
-                        continue;
-                    }
-                    if (game.isFowMode()) {
-                        buttons.add(Buttons.gray(
-                                player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(), p2.getColor()));
-                    } else {
-                        Button button = Buttons.gray(
-                                player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(),
-                                p2.getFactionModel().getShortName());
-                        String factionEmojiString = p2.getFactionEmoji();
-                        button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
-                        buttons.add(button);
-                    }
-                }
+                List<Button> buttons = getMageonImplantsButtons(game, player);
                 String message = player.getRepresentationUnfogged()
                         + ", please choose who you wish to target with _Mageon Implants_.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
@@ -563,6 +547,25 @@ public class PlayerTechService {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(), "> This technology is not automated. Please resolve manually.");
         }
+    }
+
+    public static List<Button> getMageonImplantsButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2 == player || p2.getAcCount() == 0) continue;
+
+            String id = player.finChecker() + "getACFrom_" + p2.getFaction();
+            String label = p2.getFactionModel().getShortName();
+            String emoji = p2.getFactionEmoji();
+
+            if (game.isFowMode()) {
+                label = p2.getColor();
+                emoji = ColorEmojis.getColorEmoji(p2.getColor()).toString();
+            }
+
+            buttons.add(Buttons.gray(id, label, emoji));
+        }
+        return buttons;
     }
 
     public static void checkAndApplyCombatMods(GenericInteractionCreateEvent event, Player player, String techID) {
