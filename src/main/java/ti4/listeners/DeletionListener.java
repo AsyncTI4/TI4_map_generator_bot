@@ -67,19 +67,16 @@ public class DeletionListener extends ListenerAdapter {
 
         String logMessage =
                 String.format("""
-                **Bot message deleted.**
-                Message: %s
-                Game: %s
-                Deleted from: %s
-                Table talk: %s
-                Main game: %s
-                """, sanitizedCachedMessage, game.getName(), channelLink, tableTalkLink, mainChannelLink);
+                **%s**
+                From: %s Talk Channel: %s Actions Channel: %s
+                %s
+                """, game.getName(), channelLink, tableTalkLink, mainChannelLink, sanitizedCachedMessage);
 
         MessageHelper.sendMessageToChannel(deletionLogChannel, logMessage);
 
         MessageHelper.sendMessageToChannel(
                 game.getActionsChannel(),
                 "A command string message was deleted. If someone confesses to doing this intentionally, "
-                        + "nothing further needs to be done. The admins have been alerted.");
+                        + "nothing further needs to be done. The admins have been alerted. Do not delete this message.");
     }
 }
