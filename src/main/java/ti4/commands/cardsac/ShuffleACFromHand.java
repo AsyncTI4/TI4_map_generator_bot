@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -40,5 +41,6 @@ class ShuffleACFromHand extends GameStateSubcommand {
         String message = "Card shuffled back into deck from hand: "
                 + Mapper.getActionCard(acID).getRepresentation();
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        ActionCardHelper.sendActionCardInfo(game, player);
     }
 }
