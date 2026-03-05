@@ -36,12 +36,7 @@ class ShuffleACFromHand extends GameStateSubcommand {
                     event.getChannel(), "No such action card ID found in your hand, please retry.");
             return;
         }
-        boolean shuffled = game.shuffleActionCardFromHandIntoDeck(player.getUserID(), acIndex);
-        if (!shuffled) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "No such action card ID found in your hand, please retry.");
-            return;
-        }
+        game.shuffleActionCardFromHandIntoDeck(player.getUserID(), acIndex);
         String message = "Card shuffled back into deck from hand: "
                 + Mapper.getActionCard(acID).getRepresentation();
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
