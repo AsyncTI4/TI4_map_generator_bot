@@ -1183,11 +1183,15 @@ public class CombatRollService {
         if (game.isConventionsOfWarAbandonedMode() && rollType == CombatRollType.bombardment) {
             totalHits *= 3;
         }
-        boolean x89applies = usesX89c4;
-        if (totalHits < 1) {
-            x89applies = false;
+        boolean useDoubleBoomEmoji = usesX89c4;
+        if (player.hasStoredValue("RazeFaction") && rollType == CombatRollType.bombardment) {
+            useDoubleBoomEmoji = true;
+            totalHits *= 2;
         }
-        result += CombatMessageHelper.displayHitResults(totalHits, x89applies);
+        if (totalHits < 1) {
+            useDoubleBoomEmoji = false;
+        }
+        result += CombatMessageHelper.displayHitResults(totalHits, useDoubleBoomEmoji);
 
         if (totalHits > 0 && usesX89c4) {
             result += "\n" + player.getFactionEmoji() + " produced " + (totalHits / 2) + " additional hit"

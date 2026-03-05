@@ -166,34 +166,41 @@ class ActionCardHandButtonHandler {
         if (acID.contains("reverse_")) {
             String actionCardTitle = acID.split("_")[2];
             acID = acID.split("_")[0];
-            List<Button> scButtons = new ArrayList<>();
-            scButtons.add(Buttons.green(
-                    "resolveReverse_" + actionCardTitle, "Pick Up " + actionCardTitle + " From The Discard"));
-            MessageHelper.sendMessageToChannelWithButtons(
+            Button button = Buttons.green(
+                    "resolveReverse_" + actionCardTitle, "Pick Up " + actionCardTitle + " From The Discard");
+            MessageHelper.sendMessageToChannelWithButton(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + ", after checking for Sabos, use buttons to resolve _Reverse Engineer_.",
-                    scButtons);
+                            + ", after checking for Sabos, use the button to resolve _Reverse Engineer_.",
+                    button);
         }
         if (acID.contains("twinning_")) {
             String actionCardTitle = acID.split("_")[2];
             acID = acID.split("_")[0];
-            List<Button> scButtons = new ArrayList<>();
-            scButtons.add(Buttons.green("resolveTwin_" + actionCardTitle, "Play " + actionCardTitle + " Immediately"));
-            MessageHelper.sendMessageToChannelWithButtons(
+            Button button = Buttons.green("resolveTwin_" + actionCardTitle, "Play " + actionCardTitle + " Immediately");
+            MessageHelper.sendMessageToChannelWithButton(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", after checking for Sabos, use buttons to resolve _Twinning_.",
-                    scButtons);
+                    player.getRepresentation() + ", after checking for Sabos, use the button to resolve _Twinning_.",
+                    button);
         }
         if (acID.contains("counterstroke_")) {
             String tilePos = acID.split("_")[2];
             acID = acID.split("_")[0];
-            List<Button> scButtons = new ArrayList<>();
-            scButtons.add(Buttons.green("resolveCounterStroke_" + tilePos, "Counterstroke in " + tilePos));
-            MessageHelper.sendMessageToChannelWithButtons(
+            Button button = Buttons.green("resolveCounterStroke_" + tilePos, "Counterstroke in " + tilePos);
+            MessageHelper.sendMessageToChannelWithButton(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", after checking for Sabos, use buttons to resolve _Counterstroke_.",
-                    scButtons);
+                    player.getRepresentation()
+                            + ", after checking for Sabos, use the button to resolve _Counterstroke_.",
+                    button);
+        }
+        if (acID.contains("riposte_")) {
+            String tilePos = acID.split("_")[2];
+            acID = acID.split("_")[0];
+            Button button = Buttons.green("resolveRiposte_" + tilePos, "Riposte in " + tilePos);
+            MessageHelper.sendMessageToChannelWithButton(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", after checking for Sabos, use the button to resolve _Riposte_.",
+                    button);
         }
         if (channel == null) {
             event.getChannel()

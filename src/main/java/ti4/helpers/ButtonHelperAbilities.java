@@ -2498,6 +2498,7 @@ public class ButtonHelperAbilities {
         switch (reason) {
             case "mitosis" -> reason = "**Mitosis**";
             case "refit" -> reason = "_Refit Troops_";
+            default -> reason = "_" + capitalize(reason) + "_";
         }
         String successMessage;
         if ("space".equalsIgnoreCase(uH)) {

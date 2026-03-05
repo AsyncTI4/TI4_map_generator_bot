@@ -2,49 +2,141 @@ package ti4.helpers.twilight_kart;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
+import ti4.buttons.handlers.agenda.EdictPhaseHandler;
+import ti4.commands.special.SetupNeutralPlayer;
+import ti4.helpers.ActionCardHelper;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.Helper;
+import ti4.helpers.NewStuffHelper;
+import ti4.helpers.RegexHelper;
+import ti4.helpers.StringHelper;
+import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
+import ti4.map.Planet;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.ColorModel;
+import ti4.service.RemoveCommandCounterService;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.UnitEmojis;
+import ti4.service.regex.RegexService;
+import ti4.service.tech.PlayerTechService;
 
 @UtilityClass
 public class TkHelperActionCards {
 
     public static void nop() {}
 
+    public List<String> tkCombatCards() {
+        return List.of("tk-avenge", "tk-daunt", "tk-evade", "tk-exhort");
+    }
+
     public static boolean resolveTkActionCard(ActionCardModel card, Player player, String introMsg) {
+        Game game = player.getGame();
         String resolve = "Resolve " + card.getName();
+        String ffcc = player.finChecker();
         List<Button> buttons = new ArrayList<>();
 
+        // Done
+        // tk-amalgamate
+        // tk-avenge
+        // tk-bestow
+        // tk-commission
+        // tk-conscript
+        // tk-daunt // this is just intercept + rout, neither of which need automation
+        // tk-evade 2x
+        // tk-exhort 2x
+        // tk-fortify
+        // tk-initiate
+        // tk-oppress // mageon
+        // tk-orchestrate // also add preset
+        // tk-posture
+        // tk-preside
+        // tk-raze
+        // tk-riposte
+        // tk-thwart
+
+        // kinda 1
+        // tk-graft
+
+        // TODO 5
+        // tk-contract
+        // tk-incubate
+        // tk-ordain
+        // tk-spite
+        // tk-succor
+
         switch (card.getAutomationID()) {
-            case "tk-amalgamate" -> buttons.add(Buttons.green(player.finChecker() + "resolveAmalgamate", resolve));
-            case "tk-avenge" -> nop();
-            case "tk-bestow" -> nop();
-            case "tk-commission" -> nop();
-            case "tk-conscript" -> nop();
-            case "tk-contract" -> nop();
-            case "tk-daunt" -> nop();
-            case "tk-evade" -> nop();
-            case "tk-exhort" -> nop();
-            case "tk-fortify" -> nop();
-            case "tk-graft" -> nop();
-            case "tk-incubate" -> nop();
-            case "tk-initiate" -> nop();
-            case "tk-oppress" -> nop();
-            case "tk-orchestrate" -> nop();
-            case "tk-ordain" -> nop();
-            case "tk-posture" -> nop();
-            case "tk-preside" -> nop();
-            case "tk-raze" -> nop();
-            case "tk-riposte" -> nop();
-            case "tk-spite" -> nop();
-            case "tk-succor" -> nop();
-            case "tk-thwart" -> nop();
+            case "tk-amalgamate" -> buttons.add(Buttons.green(ffcc + "drawSingularNewSpliceCard_genome", "Draw 1 Genome (Agent)"));
+            case "tk-avenge" -> buttons.add(Buttons.green(ffcc + "courageousStarter", resolve));
+            case "tk-bestow" -> buttons.addAll(getTkBestowButtons(player, resolve));
+            case "tk-commission" -> buttons.add(Buttons.green(ffcc + "tkCommission_page0", resolve));
+            case "tk-conscript" -> buttons.add(Buttons.green(ffcc + "beginTkConscript", resolve));
+            case "tk-contract" -> {
+                // TODO
+                nop();
+            }
+            case "tk-daunt" -> nop(); // No automation required, just ignore or force the retreat
+            case "tk-evade" -> nop(); // No automation required, just ignore the hits :)
+            case "tk-exhort" -> nop(); // Automated via the Combat Modifier system
+            case "tk-fortify" -> {
+                buttons.add(Buttons.green("construction_spacedock", "Place A Space Dock", UnitEmojis.spacedock));
+                buttons.add(Buttons.green("construction_pds", "Place A PDS", UnitEmojis.pds));
+                buttons.add(Buttons.DONE_DELETE_BUTTONS);
+            }
+            case "tk-graft" -> {
+                buttons.add(Buttons.green(ffcc + "transaction_BMD", "Start Graft Transaction"));
+                introMsg += "\n-# NOTE: This is currently using Black Market automation.";
+                introMsg += " Resolve trading spliced cards manually.";
+            }
+            case "tk-incubate" -> {
+                // TODO
+                nop();
+            }
+            case "tk-initiate" -> buttons.addAll(getTkInitiateButtons(game, player));
+            case "tk-oppress" -> buttons.addAll(PlayerTechService.getMageonImplantsButtons(game, player));
+            case "tk-orchestrate" -> {
+                buttons.add(Buttons.green(player.finChecker() + "resolveSummit", "Gain 2 Command Tokens"));
+                ActionCardHelper.serveManipulateInvestmentButtons(game, player);
+            }
+            case "tk-ordain" -> {
+                // TODO
+                nop();
+            }
+            case "tk-posture" -> buttons.add(Buttons.green(player.finChecker() + "non_sc_draw_so", resolve));
+            case "tk-preside" -> {
+                List<String> edicts = EdictPhaseHandler.getEdictDeck(game);
+                buttons.add(Buttons.green(ffcc + "resolveEdict_" + edicts.getFirst(), "Resolve 1 Edict"));
+            }
+            case "tk-raze" -> buttons.add(Buttons.green(ffcc + "resolveRaze_" + game.getActiveSystem(), resolve));
+            case "tk-riposte" -> {
+                // TODO
+                nop();
+            }
+            case "tk-spite" -> {
+                // TODO
+                nop();
+            }
+            case "tk-succor" -> {
+                // TODO
+                nop();
+            }
+            case "tk-thwart" -> buttons.add(Buttons.green(ffcc + "startThwart", "Start Thwart"));
         }
 
         if (buttons != null && !buttons.isEmpty()) {
@@ -55,8 +147,258 @@ public class TkHelperActionCards {
         return false;
     }
 
-    @ButtonHandler("resolveAmalgamate")
-    private void drawOneGenome(ButtonInteractionEvent event, Game game, Player player) {
-        game.getGenomeSpliceDeck(false);
+    private static List<Button> getTkBestowButtons(Player player, String resolve) {
+        String id = player.finChecker() + "resolveTkBestow_";
+        List<Button> buttons = List.of(1, 2, 3, 4).stream()
+                .map(n -> Buttons.green(id + n, "Resolve " + StringHelper.ordinal(n) + " Bestow"))
+                .collect(Collectors.toCollection(() -> new ArrayList<>()));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
+        return buttons;
+    }
+
+    @ButtonHandler("resolveTkBestow")
+    private static void tkBestowStep2(ButtonInteractionEvent event, Game game, Player player) {
+        String message = player.getRepresentationUnfogged() + ", use buttons to replace 1 infantry with 1 mech.";
+        List<Button> buttons2 = ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game, "bestow");
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons2);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    // Basically a copy paste of Mercenary Contract
+    @ButtonHandler("tkCommission_")
+    private static void beginTkCommission(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        List<Button> buttons = game.getPlanetsInfo().values().stream()
+                .filter(p -> !p.isHomePlanet(game)
+                        && !p.hasUnits()
+                        && !player.getPlanetsAllianceMode().contains(p.getName()))
+                .filter(p -> game.getTileFromPlanet(p.getName()) != null)
+                .filter(p -> game.getUnitHolderFromPlanet(p.getName()) != null
+                        && !game.getUnitHolderFromPlanet(p.getName()).isSpaceStation()
+                        && !p.getTokenList().contains("dmz")
+                        && !p.getTokenList().contains("dmz_large"))
+                .map(p -> {
+                    String id = player.finChecker() + "resolveTkCommission_" + p.getName();
+                    String label = Helper.getPlanetRepresentation(p.getName(), game);
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (p2.hasPlanet(p.getName())) {
+                            return Buttons.red(id, label, p2.getFactionEmoji());
+                        }
+                    }
+                    return Buttons.gray(id, label);
+                })
+                .filter(Objects::nonNull)
+                .toList();
+
+        String prefix = player.finChecker() + "resolveTkCommission__";
+        String message = player.getRepresentation() + ", please choose a planet to place 1 neutral mech on.";
+        Player neutral = game.getPlayerFromColorOrFaction("neutral");
+        if (neutral == null) {
+            List<String> unusedColors =
+                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
+            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+            game.setupNeutralPlayer(color);
+            neutral = game.getPlayerFromColorOrFaction("neutral");
+        }
+        NewStuffHelper.checkAndHandlePaginationChange(
+                event, player.getCorrectChannel(), buttons, message, prefix, buttonID);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveTkCommission_")
+    private static void resolveTeMercenaryContract(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String regex = "resolveTkCommission_" + RegexHelper.unitHolderRegex(game, "planet");
+        RegexService.runMatcher(regex, buttonID, matcher -> {
+            String planet = matcher.group("planet");
+            Tile tile = game.getTileFromPlanet(planet);
+            TeHelperActionCards.resolvePiratesGeneric(event, game, player, tile, "mech " + planet);
+            String message = player.getRepresentation() + " 'commissioned' some mercenaries to post up at "
+                    + Helper.getPlanetRepresentation(planet, game) + ".";
+            if (tile != null && tile.getPosition().contains("frac")) {
+                Planet uh = game.getUnitHolderFromPlanet(planet);
+                if (uh != null) {
+                    uh.addToken("token_relictoken.png");
+                }
+            }
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+            ButtonHelper.deleteMessage(event);
+        });
+    }
+
+    @ButtonHandler("beginTkConscript")
+    private static void beginTkConscript(ButtonInteractionEvent event, Game game, Player player) {
+        TeHelperActionCards.beginPirates(game, player, "resolveTkConscript", 0, false);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveTkConscript_")
+    private static void resolvePirateContract(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String regex = "resolveTkConscript_" + RegexHelper.posRegex();
+        Player neutral = game.getPlayerFromColorOrFaction("neutral");
+        if (neutral == null) {
+            List<String> unusedColors =
+                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
+            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+            game.setupNeutralPlayer(color);
+            neutral = game.getPlayerFromColorOrFaction("neutral");
+        }
+        RegexService.runMatcher(regex, buttonID, matcher -> {
+            Tile tile = game.getTileByPosition(matcher.group("pos"));
+            TeHelperActionCards.resolvePiratesGeneric(event, game, player, tile, "dd, 2 ff");
+
+            String message = player.getRepresentation() + " conscripted some pirates to post up at "
+                    + tile.getRepresentationForButtons(game, player) + ".";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+            ButtonHelper.deleteMessage(event);
+        });
+    }
+
+    private static List<Button> getTkInitiateButtons(Game game, Player player) {
+        int cr = 0, ci = 0;
+        int ir = 0, ii = 0;
+        int hr = 0, hi = 0;
+        for (String p : player.getExhaustedPlanets()) {
+            Planet planet = game.getPlanetsInfo().get(p);
+            for (String type : planet.getPlanetTypes()) {
+                switch (type) {
+                    case "cultural" -> {
+                        cr += planet.getResources();
+                        ci += planet.getInfluence();
+                    }
+                    case "industrial" -> {
+                        ir += planet.getResources();
+                        ii += planet.getInfluence();
+                    }
+                    case "hazardous" -> {
+                        hr += planet.getResources();
+                        hi += planet.getInfluence();
+                    }
+                }
+            }
+        }
+
+        int c = ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural", false);
+        int i = ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial", false);
+        int h = ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous", false);
+        int tgs = Math.max(c, Math.max(i, h));
+
+        String idPre = player.finChecker() + "tkInitiate_";
+        List<Button> buttons = new ArrayList<>();
+        if (cr + ci > 0)
+            buttons.add(Buttons.blue(
+                    idPre + "cultural", "Ready Cultural for (" + cr + "/" + ci + ")", ExploreEmojis.Cultural));
+        if (cr + ci > 0)
+            buttons.add(Buttons.green(
+                    idPre + "industrial", "Ready Industrial for (" + ir + "/" + ii + ")", ExploreEmojis.Industrial));
+        if (cr + ci > 0)
+            buttons.add(Buttons.red(
+                    idPre + "hazardous", "Ready Hazardous for (" + hr + "/" + hi + ")", ExploreEmojis.Hazardous));
+        buttons.add(Buttons.gray(idPre + "tgs", "Gain " + tgs + " Trade Goods", MiscEmojis.tg));
+        return buttons;
+    }
+
+    @ButtonHandler("tkInitiate_")
+    private static void resolveTkInitiate(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String type = buttonID.split("_")[1];
+
+        String msg = player.getRepresentation() + " chose to ";
+        switch (type) {
+            case "tgs" -> {
+                int c = ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural", false);
+                int i = ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial", false);
+                int h = ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous", false);
+                int tgs = Math.max(c, Math.max(i, h));
+
+                msg += "gain " + tgs + " Trade Goods. " + player.gainTG(tgs, true);
+                ButtonHelperAgents.resolveArtunoCheck(player, tgs);
+            }
+            default -> {
+                int res = 0, inf = 0;
+                List<String> refreshed = new ArrayList<>();
+                for (String p : List.copyOf(player.getExhaustedPlanets())) {
+                    Planet planet = game.getPlanetsInfo().get(p);
+                    for (String t2 : planet.getPlanetTypes()) {
+                        if (t2.equals(type)) {
+                            player.refreshPlanet(p);
+                            refreshed.add(planet.getRepresentationWithEmojis(game));
+                            res += planet.getResources();
+                            inf += planet.getInfluence();
+                            break;
+                        }
+                    }
+                }
+                msg += " refresh all of their " + StringUtils.capitalize(type) + " planets:\n> ";
+                msg += String.join("\n> ", refreshed);
+                msg += "\nFor a total of " + MiscEmojis.getResourceEmoji(res) + "/" + MiscEmojis.getInfluenceEmoji(inf);
+            }
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveRaze_")
+    private static void resolveRaze(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        game.setStoredValue("BlitzFaction", player.getFaction());
+        player.addStoredValue("RazeFaction", "y");
+        if (buttonID.contains("_")) {
+            ButtonHelper.resolveCombatRoll(
+                    player, game, event, "combatRoll_" + buttonID.split("_")[1] + "_space_bombardment");
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "Could not find active system. You will need to roll using `/roll`.");
+        }
+        game.removeStoredValue("BlitzFaction");
+        player.removeStoredValue("RazeFaction");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveRiposte_")
+    public static void resolveRiposte(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        RemoveCommandCounterService.fromTile(player.getColor(), game.getTileByPosition(buttonID.split("_")[1]), game);
+        String message = player.getFactionEmoji() + " removed their command token from tile " + buttonID.split("_")[1]
+                + " using _Riposte_ and gained it to their tactic pool.";
+        player.setTacticalCC(player.getTacticalCC() + 1);
+        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+
+        Player active = game.getActivePlayer();
+        int tact = active.getTacticalCC();
+        if (tact > 0 && !"1".equals(active.getStoredValue("TactStartOfAction"))) {
+            String msg2 = active.getRepresentation() + " has had 1 command token removed from their tactics pool. ";
+            msg2 += "(" + tact + " ->" + (tact - 1) + ")";
+            active.setTacticalCC(tact - 1);
+
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
+            if (game.isFowMode()) {
+                msg2 = active.getRepresentationUnfogged()
+                        + " 1 command token has been removed from your tactics pool. ";
+                msg2 += "(" + tact + " ->" + (tact - 1) + ")";
+                MessageHelper.sendMessageToChannel(active.getCorrectChannel(), msg2);
+            }
+        } else {
+            String msg2 = active.getRepresentationNoPing()
+                    + " does not have any tactics tokens remaining on their command sheet, so no token was removed.";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("startThwart")
+    public static void startThwart(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String pos = game.getActiveSystem();
+        String message =
+                ", please choose the system that you wish to move the ship from. Reminder that it CAN contain a command counter.";
+        List<Button> buttons = new ArrayList<>();
+        List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, game);
+        for (Tile tile : tiles) {
+            if (tile.getPosition().equalsIgnoreCase(pos)) {
+                continue;
+            }
+            buttons.add(Buttons.gray(
+                    player.finChecker() + "rescuePart2_" + pos + "_" + tile.getPosition(),
+                    tile.getRepresentationForButtons()));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(), player.getRepresentationUnfogged() + message, buttons);
+        ButtonHelper.deleteMessage(event);
     }
 }
