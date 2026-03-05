@@ -708,6 +708,7 @@ public final class ButtonHelperActionCards {
 
     public static List<Button> getCourageousOptions(Player player, Game game, boolean nekro, String type) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
+        nekro |= game.isTwilightKart() && game.isTwilightsFallMode();
         List<Button> buttons = new ArrayList<>();
 
         List<String> allowedUnits = Stream.of(
@@ -1105,7 +1106,7 @@ public final class ButtonHelperActionCards {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "Could not find active system. You will need to roll using `/roll`.");
         }
-        game.setStoredValue("BlitzFaction", "");
+        game.removeStoredValue("BlitzFaction");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -2215,6 +2216,16 @@ public final class ButtonHelperActionCards {
                     + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("resolvePreassignment_Tartarus", "Pre-Play Tartarus"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        }
+        if (player.getPlayableActionCards().contains("tk-orchestrate")) {
+            String msg = player.getRepresentation()
+                    + ", you have the option to pre-play _Orchestrate_."
+                    + " Start-of-strategy-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                    + " Feel free to ignore this message if you don't intend to play it any time soon.";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("resolvePreassignment_Orchestrate", "Pre-Play Orchestrate"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }

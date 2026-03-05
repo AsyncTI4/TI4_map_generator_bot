@@ -1,0 +1,21 @@
+[
+    
+    {
+        "alias": "plus2_1round_all",
+        "type": "DIE_MOD",
+        "value": "+2",
+        "scope": "",
+        "forCombatAbility": "combatround",
+        "persistenceType": "ONE_ROUND",
+        "related": [
+            {
+                "type": "action_cards",
+                "alias": "tk-exhort"
+            },
+            {
+                "type": "action_cards",
+                "alias": "tk-exhort2"
+            }
+        ]
+    }
+]
