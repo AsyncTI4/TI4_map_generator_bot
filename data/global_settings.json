@@ -1,4 +1,4 @@
 {
   "bot_log_webhook_url" : "https://discord.com/api/v10/webhooks/1479340321107214346/a4NWAq6HO-_i9FsNqvWvjjHZJ6P39KvMq58cKvwiVaZm7yvbHyPV5N1kdXXF_sQ7Ob6U",
-  "ready_to_receive_commands" : true
+  "ready_to_receive_commands" : false
 }

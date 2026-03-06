@@ -320,7 +320,8 @@ public class CreateGameButtonHandler {
         }
 
         if (gameOwner == null) gameOwner = event.getMember();
-        if (gameOwner == null) gameOwner = event.getGuild().getMemberById(event.getUser().getId());
+        if (gameOwner == null)
+            gameOwner = event.getGuild().getMemberById(event.getUser().getId());
         if (gameOwner == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not determine game owner. Please try again.");
             return;
