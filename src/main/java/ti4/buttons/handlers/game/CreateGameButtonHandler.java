@@ -326,6 +326,7 @@ public class CreateGameButtonHandler {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not determine game owner. Please try again.");
             return;
         }
+        if (members.isEmpty()) members.add(gameOwner);
 
         if (isLikelyDoublePressedButton(gameName, members, lastGameName, event)
                 && !CommandHelper.hasRole(event, JdaService.bothelperRoles)
@@ -407,6 +408,7 @@ public class CreateGameButtonHandler {
     private static boolean isLikelyDoublePressedButton(
             String gameName, List<Member> members, String lastGameName, ButtonInteractionEvent event) {
         if ("pbd1".equalsIgnoreCase(gameName)) return false;
+        if (GameManager.getManagedGame(lastGameName) == null) return false;
 
         Game lastGame = GameManager.getManagedGame(lastGameName).getGame();
         for (Member member : members) {

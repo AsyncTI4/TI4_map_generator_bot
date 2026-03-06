@@ -553,6 +553,7 @@ public class JdaService {
         bothelperRoles.add(jda.getRoleById("1150031360610799676")); // Will's server
         bothelperRoles.add(jda.getRoleById("1335331011147595929")); // Jabberwocky's Server
         bothelperRoles.add(jda.getRoleById("1465619810577678442")); // Ariel's server
+        bothelperRoles.add(jda.getRoleById("1479398244214640771")); // lau's server
 
         bothelperRoles.removeIf(Objects::isNull);
     }
