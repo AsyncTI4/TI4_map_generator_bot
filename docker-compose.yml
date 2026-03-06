@@ -7,8 +7,8 @@ services:
       dockerfile: Dockerfile
     container_name: asyncti4-bot
     restart: unless-stopped
+    command: ["${BOT_TOKEN}", "1479318931641733291", "901547041866526800"]
     environment:
-      - BOT_TOKEN=${BOT_TOKEN}
       - DB_PATH=/app/data/
     volumes:
       - ./data:/app/data
