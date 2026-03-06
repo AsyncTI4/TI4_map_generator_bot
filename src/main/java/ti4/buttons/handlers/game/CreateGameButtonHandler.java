@@ -319,6 +319,13 @@ public class CreateGameButtonHandler {
             }
         }
 
+        if (gameOwner == null) gameOwner = event.getMember();
+        if (gameOwner == null) gameOwner = event.getGuild().getMemberById(event.getUser().getId());
+        if (gameOwner == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not determine game owner. Please try again.");
+            return;
+        }
+
         if (isLikelyDoublePressedButton(gameName, members, lastGameName, event)
                 && !CommandHelper.hasRole(event, JdaService.bothelperRoles)
                 && !CommandHelper.hasRole(event, JdaService.developerRoles)) return;

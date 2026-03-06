@@ -1,0 +1,288 @@
+533058401882603530
+Lau
+pbd2
+-mapinfo-
+-gameinfo-
+latest_command Game created
+phase_of_game 
+latest_outcome_voted_for 
+secret_objectives fc,dts,mp,uf,otf,btv,hrm,mrm,dp,faa,fsn,fwp,bam,sar,ose,mlp,dyp,eh,btgk,syc,sai,fwm,pem,mtm,sb,pe,gamf,lsc,eap,mew,ans,te,baf,dfat,ttfd,dtgs,dtd,dhw,csl,ctr
+action_cards disable,s_retreat3,war_rider,rally,f_researched,ghost_ship,reparations,fs3,sh2,hack,s_retreat1,fs2,war_machine3,upgrade,intercept,tactical,veto,tech_rider,courageous,salvage,waylay,scramble,dh2,lost_star,sh3,economic_initiative,insub,ghost_squad,s_retreat4,plague,lucky,sh1,dp4,disgrace,repeal,dp2,sabo3,fs1,emergency,decoy,refit,deadly_plot,s_retreat2,divert_funding,mb1,bribery,uprising,unstable,fire_team,fsb,sabo1,probe,lead_rider,investments,infiltrate,war_effort,sh4,fs4,const_rider,sanction,abs,cripple,assassin,plagiarize,solar_flare,f_deployment,unexpected,meltdown,messiah,war_machine1,mjets3,war_machine2,confusing,mjets1,mb2,dh1,sabo2,silence_space,arch_expedition,f_conscription,distinguished,dh4,experimental,diplo_rider,industrial_initiative,coup,dp1,f_prototype,impersonation,trade_rider,harness,rout,mb4,sabo4,bunker,jamming,dh3,master_plan,imp_rider,mjets2,parley,dp3,mjets4,summit,stability,reflective,spy,confounding,blitz,insider,reverse_engineer,nav_suite,scuttle,mb3,politic_rider,reveal_prototype,war_machine4,counterstroke,mining_initiative,seize
+action_cards_discarded 
+action_cards_status 
+explore pw,lc1,rw,ed2,hrf5,aw1,ls,ds,lf2,lf1,frln1,aw2,crf6,vfs2,urf3,dw,mw,irf1,hrf7,lf4,hrf4,hrf3,crf5,minent,dmz,biotic,fb3,propulsion,vfs1,ed1,exp1,ent,irf2,urf1,hrf6,majent,kel1,crf8,irf3,exp2,hrf1,crf7,fb1,mo3,frln3,gamma,kel2,mo1,frln2,gw,lf3,cm1,ms1,irf4,urf2,crf2,hrf2,irf5,aw4,dv1,cm2,crf1,crf4,warfare,mo2,dv2,fb4,fb2,crf3,ms2,vfs3,cm3,lc2,ion,aw3,crf9,exp3,mirage,toe,cybernetic
+relics nanoforge,codex,metalivoidarmaments,thetriad,lightrailordnance,dynamiscore,dominusorb,circletofthevoid,stellarconverter,bookoflatvinia,emphidia,titanprototype,obsidian,mawofworlds,thalnos,heartofixth,shard,emelpar,quantumcore,prophetstears,thesilverflame,metalivoidshielding,neuraloop
+discarded_explores 
+speaker 
+tyrant 
+active_player null
+active_system null
+auto_ping 12
+players_who_hit_persistent_no_after 
+players_who_hit_persistent_no_when 
+current_agenda_info 
+current_acdrawstatus_info 
+last_active_player_change 0
+sc_played 
+agenda_vote_info 
+check_reacts_info 
+thalnos_units 
+slash_command_string 
+acs_sabod 
+displaced_units_activation_new {}
+agendas crisis,standardization,mutiny,prophecy,sanctions,conventions,grant_reallocation,minister_antiquities,committee,seed_empire,classified,artifact,minister_peace,arms_reduction,minister_war,schematics,execution,rep_govt,covert,unconventional,shared_research,cladenstine,abolishment,minister_commerce,articles_war,nexus,arbiter,minister_sciences,secret,revolution,plowshares,minister_exploration,censure,constitution,defense_act,checks,wormhole_research,redistribution,incentive,disarmament,minister_policy,conscription,travel_ban,economic_equality,wormhole_recon,regulations,warrant,miscount,minister_industry,rearmament
+discarded_agendas 
+sent_agenda 
+law 
+events_in_effect 
+events 
+discarded_events 
+law_info 
+sc_trade_goods 1,0;2,0;3,0;4,0;5,0;6,0;7,0;8,0;
+revealedPublicObjectives Custodian/Imperial,0;
+customPublicVP Custodian/Imperial,1;
+publicObjectives1 infrastructure,build_defenses,lead,corner,expand_borders,outer_rim,deep_space,engineer_marvel,intimidate,raise_fleet,research_outposts,push_boundaries,trade_routes,lost_outposts,sway_council
+publicObjectives2 subdue,distant_lands,vast_territories,vast_reserves,command_armada,galvanize,revolutionize,ancient_monuments,massive_cities,unify_colonies,centralize_trade,master_science,supremacy,manipulate_law,protect_border
+so_to_po 
+purged_pn 
+publicObjectives1peakable monument,amass_wealth,develop,make_history,diversify
+saved_buttons 
+pinged_systems 
+publicObjectives2peakable golden_age,conquer,brain_trust,control_borderlands,become_legend
+publicObjectives1Peeked 
+publicObjectives2Peeked 
+sc_count_for_map 1
+player_count_for_map 6
+vp_count 10
+max_so_count 3
+scoredPublicObjectives 
+customAdjacentTiles 
+customHyperlaneData 
+reverse_speaker_order false
+adjacencyOverrides 
+creation_date 2026.03.06
+creation_date_time 1772789429193
+started_date 0
+last_modified_date 1772789429195
+ended_date 0
+round 1
+button_press_count 0
+slash_command_count 0
+game_custom_name 
+table_talk_channel null
+main_game_channel null
+saved_channel null
+saved_message null
+bot_map_channel null
+game_launch_thread_id null
+is_tigl_game false
+community_mode false
+alliance_mode false
+fow_mode false
+replacement_made false
+fow_options 
+naalu_agent false
+warfare_action false
+l1_hero false
+nomad_coin false
+fast_sc_follow false
+queue_so true
+show_bubbles true
+transaction_method true
+homebrew_mode false
+show_gears true
+show_banners true
+show_hex_borders off
+purged_fragment 0
+temporary_ping_disable false
+dominus_orb false
+component_action false
+just_played_component_ac false
+activation_count 0
+base_game_mode false
+thunders_edge_mode false
+twilights_fall_mode false
+light_fog_mode false
+cpti_explore_mode false
+red_tape_mode false
+omega_phase_mode false
+strat_pings true
+absol_mode false
+votc_mode false
+miltymod_mode false
+promises_promises false
+flagshipping false
+show_map_setup false
+text_size medium
+discordant_stars_mode false
+uncharted_space_stuff false
+verbosity verbose
+beta_test_mode false
+age_of_exploration_mode false
+facilities_mode false
+minor_factions_mode false
+hidden_agenda_mode false
+total_war_mode false
+dangerous_wilds_mode false
+stellar_atomics_mode false
+age_of_fighters_mode false
+zealous_orthodoxy_mode false
+advent_of_the_warsun_mode false
+cultural_exchange_program_mode false
+conventions_of_war_abandoned_mode false
+rapid_mobilization_mode false
+monuments_to_the_ages_mode false
+weird_wormholes_mode false
+no_fracture false
+call_of_the_void_mode false
+wild_wild_galaxy_mode false
+cosmic_phenomenae_mode false
+mercenaries_for_hire_mode false
+civilized_society_mode false
+no_swap_mode false
+veiled_heart_mode false
+limited_whispers_mode false
+age_of_commerce_mode false
+ordinian_c1_mode false
+liberation_c4_mode false
+show_full_component_text false
+hack_election_status false
+cc_n_plastic_limit true
+bot_faction_reacts false
+bot_color_reacts false
+bot_strat_reacts false
+has_had_a_status_phase false
+bot_shushing false
+homebrew_sc_mode false
+inject_rules_links true
+spin_mode OFF
+show_unit_tags false
+show_owned_pns_in_player_area false
+ac_deck_id action_cards_pok
+so_deck_id secret_objectives_pok
+stage_1_public_deck_id public_stage_1_objectives_pok
+stage_2_public_deck_id public_stage_2_objectives_pok
+map_template null
+tech_deck_id techs_pok_c4
+relic_deck_id relics_pok_te
+agenda_deck_id agendas_pok
+event_deck_id 
+exploration_deck_id explores_pok
+bag_draft 
+game_tags 
+milty_draft_manager null
+strategy_card_set te
+border_anomalies []
+game_has_ended false
+image_gen_count 0
+run_data_migrations 
+priority_track_mode NONE
+debt_pool 
+-endgameinfo-
+-playerinfo-
+-player-
+533058401882603530
+Lau
+faction null
+faction_emoji null
+faction_display_name null
+color null
+decal_set null
+stats_anchor_location null
+stats_tracked_user_id 533058401882603530
+stats_tracked_user_name lau2628
+hs_tile_position null
+alliance_members 
+roleForCommunity null
+playerPrivateChannel null
+fog_filter default
+passed false
+ready_to_pass_bag false
+auto_pass_whens_n_afters false
+search_warrant false
+dummy false
+npc false
+eliminated false
+notepad 
+has_found_cfrag false
+has_found_hfrag false
+has_found_ifrag false
+has_found_ufrag false
+ats_count 0
+pillage_count 0
+sarween_count 0
+ghost_commander_count 0
+magen_infantry_count 0
+path_token_count 0
+honor_count 0
+dishonor_count 0
+steelbalance_count 0
+starbalance_count 0
+harvest_count 0
+action_cards 
+events 
+promissory_notes 
+promissory_notes_owned 
+promissory_notes_play_area 
+units_owned 
+lizho_trap_cards 
+lizho_trap_planets 
+plot_cards 
+plot_factions 
+fragments 
+relics 
+exhausted_relics 
+mahact_cc 
+franken_bag_to_pass 
+franken_personal_bag 
+franken_items_to_draft 
+faction_tech 
+tech 
+spent_things 
+bombard_units 
+transaction_items 
+teammate_ids 533058401882603530
+tech_exhausted 
+tech_purged 
+planets 
+planets_exhausted 
+planets_ability_exhausted 
+tactical_cc 3
+fleet_cc 3
+strategy_cc 2
+abilities 
+trade_goods 0
+expected_hits_times_10 0
+total_expenses 0
+bonus_scored_secrets 0
+turn_count 0
+actual_hits 0
+stasis_infantry 0
+auto_sabo_pass_median 0
+capture 
+unit_cap 
+secret_objectives 
+produced_units 
+secret_objectives_scored 
+number_of_turns 0
+total_turn_time 0
+strategy_card 
+followed_sc 
+player_stored_values 
+breakthroughs 
+breakthrough_unl_map 
+breakthrough_exh_map 
+breakthrough_actv_map 
+breakthrough_tgs_map 
+leaders none
+fow_systems 
+cards_info_thread_channel_id null
+draft_bag_info_thread_channel_id null
+PLAYER_NEW_TEMP_MODS 
+PLAYER_TEMP_MODS 
+commodities_total 0
+commodities_base 0
+commodities 0
+-endplayer-
+-endplayerinfo-
+-endmapinfo-
