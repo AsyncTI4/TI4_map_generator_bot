@@ -66,9 +66,9 @@ public class SlashCommandListener extends ListenerAdapter {
         Command command = CommandManager.getCommand(event.getName());
         if (command.accept(event)) {
             try {
-                logSlashCommand(event);
                 command.preExecute(event);
                 command.execute(event);
+                logSlashCommand(event);
                 command.postExecute(event);
                 if (!isModalCommand(event)) {
                     event.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
