@@ -13,6 +13,7 @@ public interface ParentCommand extends Command {
     @Override
     default boolean accept(SlashCommandInteractionEvent event) {
         if (!Command.super.accept(event)) return false;
+
         String subcommandGroupName = event.getInteraction().getSubcommandGroup();
         if (subcommandGroupName == null) {
             String subcommandName = event.getInteraction().getSubcommandName();
@@ -20,36 +21,35 @@ public interface ParentCommand extends Command {
             return subcommand == null
                     || getSubcommands().containsKey(event.getInteraction().getSubcommandName());
         }
+
         SubcommandGroup subcommandGroup = getSubcommandGroups().get(subcommandGroupName);
         return subcommandGroup == null || getSubcommandGroups().containsKey(subcommandGroupName);
     }
 
+    default void preExecute(SlashCommandInteractionEvent event) {
+        getSubcommand(event).preExecute(event);
+    }
+
     default void execute(SlashCommandInteractionEvent event) {
+        getSubcommand(event).execute(event);
+    }
+
+    default void postExecute(SlashCommandInteractionEvent event) {
+        getSubcommand(event).postExecute(event);
+    }
+
+    private Command getSubcommand(SlashCommandInteractionEvent event) {
         String subcommandGroupName = event.getInteraction().getSubcommandGroup();
-        if (subcommandGroupName == null) {
-            String subcommandName = event.getInteraction().getSubcommandName();
-            Subcommand subcommand = getSubcommands().get(subcommandName);
-            subcommand.preExecute(event);
-            subcommand.execute(event);
-            subcommand.postExecute(event);
-        } else {
-            SubcommandGroup subcommandGroup = getSubcommandGroups().get(subcommandGroupName);
-            subcommandGroup.preExecute(event);
-            subcommandGroup.execute(event);
-            subcommandGroup.postExecute(event);
+        if (subcommandGroupName != null) {
+            return getSubcommandGroups().get(subcommandGroupName);
         }
+        String subcommandName = event.getInteraction().getSubcommandName();
+        return getSubcommands().get(subcommandName);
     }
 
     @Override
     default boolean isSuspicious(SlashCommandInteractionEvent event) {
-        String subcommandGroupName = event.getInteraction().getSubcommandGroup();
-        if (subcommandGroupName != null) {
-            SubcommandGroup subcommandGroup = getSubcommandGroups().get(subcommandGroupName);
-            return subcommandGroup != null && subcommandGroup.isSuspicious(event);
-        }
-        String subcommandName = event.getInteraction().getSubcommandName();
-        Subcommand subcommand = getSubcommands().get(subcommandName);
-        return subcommand != null && subcommand.isSuspicious(event);
+        return getSubcommand(event).isSuspicious(event);
     }
 
     default void register(CommandListUpdateAction commands) {
