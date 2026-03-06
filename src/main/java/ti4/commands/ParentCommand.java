@@ -27,15 +27,18 @@ public interface ParentCommand extends Command {
     }
 
     default void preExecute(SlashCommandInteractionEvent event) {
-        getSubcommand(event).preExecute(event);
+        Command subcommand = getSubcommand(event);
+        if (subcommand != null) subcommand.preExecute(event);
     }
 
     default void execute(SlashCommandInteractionEvent event) {
-        getSubcommand(event).execute(event);
+        Command subcommand = getSubcommand(event);
+        if (subcommand != null) subcommand.execute(event);
     }
 
     default void postExecute(SlashCommandInteractionEvent event) {
-        getSubcommand(event).postExecute(event);
+        Command subcommand = getSubcommand(event);
+        if (subcommand != null) subcommand.postExecute(event);
     }
 
     private Command getSubcommand(SlashCommandInteractionEvent event) {
@@ -49,7 +52,8 @@ public interface ParentCommand extends Command {
 
     @Override
     default boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return getSubcommand(event).isSuspicious(event);
+        Command subcommand = getSubcommand(event);
+        return subcommand != null && subcommand.isSuspicious(event);
     }
 
     default void register(CommandListUpdateAction commands) {
