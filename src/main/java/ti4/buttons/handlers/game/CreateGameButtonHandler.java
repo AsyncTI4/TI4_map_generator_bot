@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
@@ -38,10 +37,6 @@ public class CreateGameButtonHandler {
     @ButtonHandler("createGameChannels")
     @ButtonHandler("launchGame")
     public static void createGameChannelsButton(ButtonInteractionEvent event) {
-        List<Member> members = new ArrayList<>();
-        members.add(event.getMember());
-        Member member = event.getMember();
-
         createGameChannels(event);
     }
 
