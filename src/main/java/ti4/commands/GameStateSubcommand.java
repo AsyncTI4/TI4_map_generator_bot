@@ -39,6 +39,7 @@ public abstract class GameStateSubcommand extends Subcommand {
     @Override
     public void onException(SlashCommandInteractionEvent event, Throwable throwable) {
         commandGameState.clear();
+        super.onException(event, throwable);
     }
 
     @NotNull
