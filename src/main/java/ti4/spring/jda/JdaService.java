@@ -476,6 +476,7 @@ public class JdaService {
         adminRoles.add(jda.getRoleById("1149705227625316352")); // Will's server
         adminRoles.add(jda.getRoleById("1335330636935987343")); // Jabberwocky's server
         adminRoles.add(jda.getRoleById("1465619434839347276")); // Ariel's server
+        adminRoles.add(jda.getRoleById("1479398244214640771")); // Lau's Server
 
         adminRoles.removeIf(Objects::isNull);
 

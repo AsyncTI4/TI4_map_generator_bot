@@ -280,7 +280,8 @@ public class CreateGameButtonHandler {
         String gameName = CreateGameService.getNextGameName();
         String lastGameName = CreateGameService.getLastGameName();
 
-        if (!GameManager.isValid(lastGameName)) {
+        boolean hasPbdGames = GameManager.getGameNames().stream().anyMatch(n -> n.startsWith("pbd"));
+        if (hasPbdGames && !GameManager.isValid(lastGameName)) {
             BotLogger.error(
                     new LogOrigin(event),
                     "**Unable to create new games because the last game `" + lastGameName + "` cannot be found."
