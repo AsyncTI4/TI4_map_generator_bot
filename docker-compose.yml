@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  asyncti4-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: asyncti4-bot
+    restart: unless-stopped
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - DB_PATH=/app/data/
+    volumes:
+      - ./data:/app/data
+      - ./data/games:/app/games
+      - ./data/maps:/app/maps
+      - ./data/storage:/app/storage
+    ports:
+      - "8271:8081"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
