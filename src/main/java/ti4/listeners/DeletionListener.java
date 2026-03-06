@@ -76,8 +76,8 @@ public class DeletionListener extends ListenerAdapter {
 
         MessageHelper.sendMessageToChannel(
                 game.getActionsChannel(),
-                ":warning:**A command string message was deleted."
+                "**A command string message was deleted."
                         + " If someone confesses to doing this intentionally, nothing further needs to be done."
-                        + " The admins have been alerted. Do not delete this message.**:warning:");
+                        + " The admins have been alerted. :warning:Do not delete this message.:warning:**");
     }
 }
