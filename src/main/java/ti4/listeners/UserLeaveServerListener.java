@@ -205,7 +205,6 @@ public class UserLeaveServerListener extends ListenerAdapter {
 
         try {
             String msg = generateBothelperReport(guild, player, games);
-            StringBuilder gs = new StringBuilder();
             if (!"dud".equalsIgnoreCase(msg)) {
                 var userSettings = UserSettingsManager.get(player.getId());
                 String prevRecord = userSettings.getTrackRecord();
@@ -218,17 +217,6 @@ public class UserLeaveServerListener extends ListenerAdapter {
                     msg += "\nUser had a previous track record of the following: " + prevRecord;
                 }
                 MessageHelper.sendMessageToChannel(moderationLogChannel, msg);
-            } else {
-                // No longer necessary to report dud games
-                // for (Game game : games) {
-                //     gs.append(game.getActionsChannel().getJumpUrl()).append("\n");
-                // }
-                // String gss = gs.toString();
-                // MessageHelper.sendMessageToChannel(
-                //         moderationLogChannel,
-                //         player.getName()
-                //                 + " left some games, but the games were ruled to be duds. Games were as follows: "
-                //                 + gss);
             }
         } catch (Exception e) {
             MessageHelper.sendMessageToChannel(

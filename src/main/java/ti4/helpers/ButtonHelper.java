@@ -1357,7 +1357,7 @@ public class ButtonHelper {
         }
         int slumberBonus = getSlumberstateBonusACs(game, player);
         if (slumberBonus > 0) {
-            String howmany = "(+" + slumberBonus + " action card" + (slumberBonus > 0 ? "s)" : ")");
+            String howmany = "(+" + slumberBonus + " action cards)";
             modifiers.add(FactionEmojis.Titans + " _Slumberstate Computing_ " + howmany);
             amount += slumberBonus;
         }

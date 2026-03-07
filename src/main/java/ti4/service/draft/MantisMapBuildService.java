@@ -728,7 +728,6 @@ public class MantisMapBuildService {
             int desiredAmount) {
         if (toDiscard <= 0) return;
         if (tileIds == null || tileIds.isEmpty()) return;
-        if (toDiscard > tileIds.size()) toDiscard = tileIds.size();
         List<Button> discardButtons = new ArrayList<>();
         for (String tileId : tileIds) {
             String buttonId = mapBuildContext.makeButtonId().apply(ACTION_PREFIX + "discard_" + tileId);

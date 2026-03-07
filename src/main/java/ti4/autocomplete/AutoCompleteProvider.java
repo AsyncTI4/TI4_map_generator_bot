@@ -682,23 +682,25 @@ public class AutoCompleteProvider {
             }
             case Constants.PROMOTE_TARGET -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = ServerPromoteCommand.Servers.keySet().stream()
-                        .filter(key -> ServerPromoteCommand.Servers.get(key)
+                List<Command.Choice> options = ServerPromoteCommand.servers.keySet().stream()
+                        .filter(key -> ServerPromoteCommand.servers
+                                .get(key)
                                 .toLowerCase()
                                 .contains(enteredValue))
                         .limit(25)
-                        .map(key -> new Command.Choice(key, ServerPromoteCommand.Servers.get(key)))
+                        .map(key -> new Command.Choice(key, ServerPromoteCommand.servers.get(key)))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case Constants.PROMOTE_RANK -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = ServerPromoteCommand.Servers.keySet().stream()
-                        .filter(key -> ServerPromoteCommand.Ranks.get(key)
+                List<Command.Choice> options = ServerPromoteCommand.servers.keySet().stream()
+                        .filter(key -> ServerPromoteCommand.ranks
+                                .get(key)
                                 .toLowerCase()
                                 .contains(enteredValue))
                         .limit(25)
-                        .map(key -> new Command.Choice(key, ServerPromoteCommand.Ranks.get(key)))
+                        .map(key -> new Command.Choice(key, ServerPromoteCommand.ranks.get(key)))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
