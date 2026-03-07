@@ -13,6 +13,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.function.Consumers;
+import org.jetbrains.annotations.NotNull;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
@@ -25,8 +29,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.function.Consumers;
-import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.buttons.handlers.phases.TurnEndButtonHandler;
 import ti4.commands.planet.PlanetExhaust;
@@ -3238,6 +3240,7 @@ public class UnfiledButtonHandlers {
         String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
                 + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
         event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
+        ButtonHelper.checkFleetInEveryTile(player, game);
     }
 
     @ButtonHandler("decrease_tactic_cc")

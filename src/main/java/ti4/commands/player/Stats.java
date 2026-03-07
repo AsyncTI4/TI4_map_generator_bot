@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+import org.apache.commons.lang3.function.Consumers;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -13,7 +16,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
@@ -315,6 +317,10 @@ class Stats extends GameStateSubcommand {
         OptionMapping optionNPC = event.getOption(Constants.NPC);
         if (optionNPC != null) {
             boolean value = optionNPC.getAsBoolean();
+            if(game.isCompetitiveTIGLGame() && value) {
+                MessageHelper.sendMessageToEventChannel(event, "NPC status is not allowed in competitive TIGL games. Please see the game out or petition a bothelper for permission to seek a replacement.");
+                return;
+            }
             player.setNpc(value);
             MessageHelper.sendMessageToEventChannel(event, getGeneralMessage(optionNPC));
             if (value) {

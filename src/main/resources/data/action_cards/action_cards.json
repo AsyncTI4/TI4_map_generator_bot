@@ -684,6 +684,7 @@
         "window": "Action",
         "text": "Destroy 1 space dock in a non-home system.",
         "automationID": "meltdown",
+        "notes": "As with most action cards, you cannot target your own units for destruction with this action card.",
         "flavorText": "Flames engulfed the shipyard, a vortex of fire and shrapnel that left nothing untouched.",
         "source": "base"
     },

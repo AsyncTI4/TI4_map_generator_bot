@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.function.Consumers;
+
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.container.Container;
@@ -16,7 +19,6 @@ import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.draft.FrankenButtonHandler;
 import ti4.draft.DraftBag;
@@ -118,7 +120,7 @@ public class ButtonHelperTwilightsFall {
         if (alreadyQueued.isEmpty()) {
             numQueued = 0;
         }
-        StringBuilder msg = new StringBuilder(player.getRepresentationNoPing() + " you have " + number
+        StringBuilder msg = new StringBuilder(player.getRepresentationNoPing() + " you have " + (number-1)
                 + " people ahead of you to pick in this splice and so can queue " + number + " cards."
                 + " So far you have queued " + numQueued + " cards. ");
         if (numQueued > 0) {
