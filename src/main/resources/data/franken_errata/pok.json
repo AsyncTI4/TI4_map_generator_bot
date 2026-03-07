@@ -436,7 +436,6 @@
             "ABILITY:scheming"
         ], 
         "optionalSwaps": [
-            "MECH:yssaril_mech",
             "BREAKTHROUGH:yssarilbt"
         ],
         "source": "pok"
