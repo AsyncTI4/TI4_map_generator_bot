@@ -17,7 +17,7 @@ import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.discord.interactions.buttons.handlers.agenda.EdictPhaseHandler;
+import ti4.discord.interactions.buttons.handlers.edict.EdictPhaseHandler;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
