@@ -1292,8 +1292,9 @@
         "alias": "truce",
         "name": "Truce",
         "phase": "Action",
-        "window": "At the start of a ground combat you are participating in on a planet you control",
+        "window": "At the start of a ground combat on a planet you control",
         "text": "Place each of your units on that planet into coexistence and end that combat.",
+        "note": "The attacking player cannot choose to attack you again during this invasion.",
         "flavorText": "When the ink dried, Mot knew he would be remembered as a traitor. However, as irony would have it, he had bought the Nomad precisely what he needed: time.",
         "source": "action_deck_2"
     }
