@@ -47,6 +47,10 @@ class CommandGameState {
             Game game = CommandGameState.game.get();
             GameManager.save(game, EventAuditService.getReason(event, game.isFowMode()));
         }
+        clear();
+    }
+
+    void clear() {
         game.remove();
         player.remove();
     }

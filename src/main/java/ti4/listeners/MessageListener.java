@@ -31,6 +31,7 @@ import ti4.service.fow.WhisperService;
 import ti4.service.game.CreateGameService;
 import ti4.service.game.GameNameService;
 import ti4.spring.jda.JdaService;
+import ti4.spring.service.messagecache.BotMessageCacheService;
 
 public class MessageListener extends ListenerAdapter {
 
@@ -69,6 +70,12 @@ public class MessageListener extends ListenerAdapter {
 
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
         try {
+            String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
+            boolean isValidGameMessage = GameManager.isValid(gameName);
+            if (isValidGameMessage) {
+                BotMessageCacheService.getBean().cache(message);
+            }
+
             if (!event.getAuthor().isBot()) {
                 if (respondToBotHelperPing(message)) return;
                 if (checkForFogOfWarInvitePrompt(message)) return;
@@ -83,8 +90,7 @@ public class MessageListener extends ListenerAdapter {
                     }
                 }
 
-                String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
-                if (GameManager.isValid(gameName)) {
+                if (isValidGameMessage) {
                     if (handleWhispers(event, message, gameName)) return;
                     if (endOfRoundSummary(event, message, gameName)) return;
                     if (addFactionEmojiReactionsToMessages(event, gameName)) return;

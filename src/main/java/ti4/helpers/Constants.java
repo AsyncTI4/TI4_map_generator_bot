@@ -902,6 +902,7 @@ public class Constants {
     public static final String PICK_AC_FROM_DISCARD = "pick_from_discard";
     public static final String PICK_AC_FROM_PURGED = "pick_from_purged";
     public static final String SHUFFLE_AC_BACK_INTO_DECK = "shuffle_back_into_deck";
+    public static final String SHUFFLE_AC_FROM_HAND = "shuffle_from_hand";
     public static final String REVEAL_AND_PUT_AC_INTO_DISCARD = "reveal_and_put_into_discard";
     public static final String SEND_AC = "send";
     public static final String SEND_AC_RANDOM = "send_random";
