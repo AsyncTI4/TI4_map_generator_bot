@@ -6,7 +6,6 @@ import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
@@ -64,21 +63,18 @@ public class SlashCommandListener extends ListenerAdapter {
         long startTime = System.currentTimeMillis();
 
         Command command = CommandManager.getCommand(event.getName());
-        if (command.accept(event)) {
-            try {
-                logSlashCommand(event);
+        try {
+            if (command.accept(event)) {
                 command.preExecute(event);
+                logSlashCommand(event);
                 command.execute(event);
                 command.postExecute(event);
                 if (!isModalCommand(event)) {
                     event.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
                 }
-            } catch (Exception e) {
-                String messageText = "Error trying to execute command: " + command.getName();
-                String errorMessage = ExceptionUtils.getMessage(e);
-                event.getHook().editOriginal(errorMessage).queue(Consumers.nop(), BotLogger::catchRestError);
-                BotLogger.error(new LogOrigin(event), messageText, e);
             }
+        } catch (Exception e) {
+            command.onException(event, e);
         }
 
         long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
