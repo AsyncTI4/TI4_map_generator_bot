@@ -1,8 +1,12 @@
 package ti4.spring.api.image;
 
 import lombok.RequiredArgsConstructor;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -104,18 +108,16 @@ public class GameImageController {
     private ResponseEntity<String> getFullMapUrl(String gameName) {
         MapImageData mapImageData =
                 gameImageService.getLatestMapImageData(gameName).orElse(null);
-        if (mapImageData == null) {
-            return ResponseEntity.notFound().build();
+
+        Long messageId = mapImageData != null ? mapImageData.getLatestDiscordMessageId() : null;
+        Long channelId = mapImageData != null ? mapImageData.getLatestDiscordChannelId() : null;
+
+        if (messageId != null && messageId != 0 && channelId != null && channelId != 0) {
+            return fetchDiscordAttachmentUrl(messageId, channelId, gameName);
         }
 
-        Long messageId = mapImageData.getLatestDiscordMessageId();
-        Long channelId = mapImageData.getLatestDiscordChannelId();
-
-        if (messageId == null || messageId == 0 || channelId == null || channelId == 0) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return fetchDiscordAttachmentUrl(messageId, channelId, gameName);
+        // Image data not in database - generate and post to old-game-images thread
+        return generateAndPostImage(gameName);
     }
 
     /**
@@ -136,6 +138,92 @@ public class GameImageController {
         }
 
         return fetchDiscordAttachmentUrl(messageId, channelId, gameName);
+    }
+
+    /**
+     * Generate a map image, post it to the old-game-images thread in bot-log,
+     * save the message data, and return the attachment URL.
+     */
+    private ResponseEntity<String> generateAndPostImage(String gameName) {
+        ManagedGame managedGame = GameManager.getManagedGame(gameName);
+        if (managedGame == null) {
+            return ResponseEntity.notFound().build();
+        }
+        Game game = managedGame.getGame();
+        if (game == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Guild guild = JdaService.guildPrimary;
+        if (guild == null) {
+            return ResponseEntity.notFound().build();
+        }
+        TextChannel botLog = guild.getTextChannelsByName("bot-log", false).stream()
+                .findFirst()
+                .orElse(null);
+        if (botLog == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        ThreadChannel thread = findOrCreateThread(botLog, "old-game-images");
+        if (thread == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        try (FileUpload fileUpload = MapRenderPipeline.renderSynchronously(game, DisplayType.all)) {
+            if (fileUpload == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Message message = thread.sendFiles(fileUpload).complete();
+            if (message == null || message.getAttachments().isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            gameImageService.saveDiscordMessageId(game, message.getIdLong(), guild.getIdLong(), thread.getIdLong());
+
+            return ResponseEntity.ok(message.getAttachments().getFirst().getUrl());
+        } catch (Exception e) {
+            BotLogger.error("Failed to generate and post image for game " + gameName, e);
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * Find an existing thread by name in the channel, or create a new one.
+     */
+    private ThreadChannel findOrCreateThread(TextChannel channel, String threadName) {
+        try {
+            // Check active threads
+            ThreadChannel thread = channel.getThreadChannels().stream()
+                    .filter(t -> t.getName().equals(threadName))
+                    .findFirst()
+                    .orElse(null);
+            if (thread != null) {
+                if (thread.isArchived()) {
+                    thread.getManager().setArchived(false).complete();
+                }
+                return thread;
+            }
+
+            // Check archived public threads
+            thread = channel.retrieveArchivedPublicThreadChannels().complete().stream()
+                    .filter(t -> t.getName().equals(threadName))
+                    .findFirst()
+                    .orElse(null);
+            if (thread != null) {
+                if (thread.isArchived()) {
+                    thread.getManager().setArchived(false).complete();
+                }
+                return thread;
+            }
+
+            // Create the thread
+            return channel.createThreadChannel(threadName).complete();
+        } catch (Exception e) {
+            BotLogger.error("Failed to find or create thread " + threadName, e);
+            return null;
+        }
     }
 
     /**

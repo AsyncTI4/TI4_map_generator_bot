@@ -61,6 +61,24 @@ public class MapRenderPipeline {
         }
     }
 
+    /**
+     * Render a map image synchronously and return the FileUpload.
+     * The caller is responsible for closing the returned FileUpload.
+     */
+    @Nullable
+    public static FileUpload renderSynchronously(Game game, @Nullable DisplayType displayType) {
+        if (game == null) {
+            return null;
+        }
+        try (var mapGenerator = new MapGenerator(game, displayType, null)) {
+            mapGenerator.draw();
+            return mapGenerator.createFileUpload();
+        } catch (Exception e) {
+            BotLogger.error("Failed to render map synchronously for " + game.getName(), e);
+            return null;
+        }
+    }
+
     public static void renderToWebsiteOnly(Game game, @Nullable GenericInteractionCreateEvent event) {
         if (GlobalSettings.getSetting(
                 GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) {
