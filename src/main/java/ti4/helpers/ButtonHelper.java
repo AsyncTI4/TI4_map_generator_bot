@@ -24,13 +24,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nullable;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.springframework.util.StringUtils;
-
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
@@ -65,7 +59,6 @@ import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
-import ti4.commands.special.SetupNeutralPlayer;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -1804,8 +1797,13 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButtons(
                         nonActivePlayer.getCardsInfoThread(), msg, reverseButtons);
             }
-            boolean hasNonFF = activeSystem.getSpaceUnitHolder()
-                .countPlayersUnitsWithModelCondition(nonActivePlayer, model -> model.getIsShip() && !model.getUnitType().equals(UnitType.Fighter)) > 0;
+            boolean hasNonFF = activeSystem
+                            .getSpaceUnitHolder()
+                            .countPlayersUnitsWithModelCondition(
+                                    nonActivePlayer,
+                                    model -> model.getIsShip()
+                                            && !model.getUnitType().equals(UnitType.Fighter))
+                    > 0;
             if (nonActivePlayer.getPlayableActionCards().contains("tk-incubate") && hasNonFF) {
                 List<Button> buttons = new ArrayList<>();
                 String key = "tk-incubate";

@@ -1,7 +1,7 @@
 package ti4.commands.tf;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.buttons.handlers.agenda.EdictPhaseHandler;
+import ti4.buttons.handlers.edict.EdictPhaseHandler;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 

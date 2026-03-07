@@ -3240,6 +3240,7 @@ public class Game extends GameProperties implements TwilightFallDeckFuncs {
         return null;
     }
 
+    /** List of Relics remaining in the deck */
     public List<String> getAllRelics() {
         return relics;
     }

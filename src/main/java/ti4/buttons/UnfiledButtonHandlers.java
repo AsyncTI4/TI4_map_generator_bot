@@ -1605,7 +1605,7 @@ public class UnfiledButtonHandlers {
                 EndGameService.secondHalfOfGameEnd(event, game, true, true, false);
             } else {
                 var speakerPlayer = game.getSpeaker();
-                ObjectiveHelper.secondHalfOfPeakStage1(game, speakerPlayer, 1, true);
+                ObjectiveHelper.secondHalfOfPeakStage1(game, speakerPlayer, 1);
                 if (!game.isFowMode() && game.getTableTalkChannel() != null) {
                     MessageHelper.sendMessageToChannel(
                             game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
