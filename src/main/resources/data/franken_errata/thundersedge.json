@@ -120,6 +120,12 @@
         "itemId": "galvanize",
         "undraftable": true,
         "source": "thunders_edge"
+    }, 
+    {
+        "itemCategory": "TECH",
+        "itemId": "proxima",
+        "undraftable": true,
+        "source": "thunders_edge"
     },
     {
         "itemCategory": "ABILITY",
@@ -140,6 +146,9 @@
         "itemId": "raisethestandard",
         "additionalComponents": [
             "ABILITY:galvanize"
+        ],
+        "optionalSwaps": [
+            "TECH:proxima"
         ],
         "source": "thunders_edge"
     },
