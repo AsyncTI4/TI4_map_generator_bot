@@ -141,7 +141,7 @@
         "name": "Collusion",
         "phase": "Action",
         "window": "After you resolve the primary ability of your strategy card",
-        "text": "Gain 1 command token. Then, remove 1 of another player's command tokens from the game board and place it in their strategy pool.",
+        "text": "Remove 1 of another player's command tokens from the game board and place it in their strategy pool. Then, gain 1 command token.",
         "flavorText": "Gambit? The magi laughed. Hardly.",
         "source": "action_deck_2"
     },
