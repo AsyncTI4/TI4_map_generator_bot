@@ -50,7 +50,7 @@
         "name": "Betrayal",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Give 1 promissory note to another player. Then, that player and each player with 1 of your promissory notes in their play area gives you 1 random action card.",
+        "text": "Give 1 promissory note to another player. Then, that player and each other player with 1 of your promissory notes in their play area gives you 1 random action card.",
         "flavorText": "Communications were jammed. Supply lines were harried. Staffing officers were found dead in their bunks. The grandeur of the scheme shocked Claire to her core.",
         "source": "action_deck_2"
     },
@@ -140,8 +140,8 @@
         "alias": "collusion",
         "name": "Collusion",
         "phase": "Action",
-        "window": "When another player resolves the secondary ability of your strategy card",
-        "text": "Return 1 of that player's command tokens from the game board to their strategy pool.",
+        "window": "After you resolve the primary ability of your strategy card",
+        "text": "Remove 1 of another player's command tokens from the game board and place it in their strategy pool. Then, gain 1 command token.",
         "flavorText": "Gambit? The magi laughed. Hardly.",
         "source": "action_deck_2"
     },
@@ -875,7 +875,7 @@
         "name": "Swindle",
         "phase": "Action",
         "window": "When another player gains 2 or more trade goods",
-        "text": "Take 2 of those trade goods and gain 2 commodities.",
+        "text": "Take 2 of those trade goods and gain 1 trade good.",
         "notes": "Gaining trade goods includes any time your number of trade goods go up, other than converting your own commodities. This includes from transactions.",
         "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
         "source": "action_deck_2"
@@ -1292,9 +1292,10 @@
         "alias": "truce",
         "name": "Truce",
         "phase": "Action",
-        "window": "At the start of a ground combat you are participating in on a planet you control",
-        "text": "Place each of your units on that planet into coexistence and end that combat.",
-        "flavorText": "",
+        "window": "At the start of a ground combat on a planet you control",
+        "text": "Place each of your units on that planet into coexistence; the ground combat ends in a draw.",
+        "note": "The attacking player cannot choose to engage any coexisting units in combat after the combat ends in a draw.",
+        "flavorText": "When the ink dried, Mot knew he would be remembered as a traitor. However, as irony would have it, he had bought the Nomad precisely what he needed: time.",
         "source": "action_deck_2"
     }
 ]
