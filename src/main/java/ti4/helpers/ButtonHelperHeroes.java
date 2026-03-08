@@ -242,8 +242,8 @@ public class ButtonHelperHeroes {
             unitName = unitName.replace("damaged", "");
         }
         destination = FlipTileService.flipTileIfNeeded(event, destination, game);
-        RemoveUnitService.removeUnits(event, origin, game, player.getColor(), unitName + " " + unitHolderName);
-        AddUnitService.addUnits(event, destination, game, player.getColor(), unitName);
+        var removed = RemoveUnitService.removeUnits(event, origin, game, player.getColor(), unitName + " " + unitHolderName);
+        AddUnitService.addUnits(event, destination, game, player.getColor(), unitName, removed);
         List<Button> buttons = getArgentHeroStep3Buttons(game, player, buttonID);
         String msg2 = player.getFactionEmoji() + " moved 1 " + unitName + " from "
                 + origin.getRepresentationForButtons(game, player) + " to "
