@@ -60,6 +60,7 @@ public class PlayerTitleHelper {
             buttons.add(Buttons.red("bestowTitleStep1_A Warlord", "A Warlord"));
             buttons.add(Buttons.red("bestowTitleStep1_Word Breaker", "Word Breaker"));
             buttons.add(Buttons.red("bestowTitleStep1_One To Be Feared", "One To Be Feared"));
+            buttons.add(Buttons.red("bestowTitleStep1_Agent Of Chaos", "Agent Of Chaos"));
             buttons.add(Buttons.red("bestowTitleStep1_Spice Bringer", "Spice Bringer"));
 
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
