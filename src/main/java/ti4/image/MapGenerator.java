@@ -2311,7 +2311,8 @@ public class MapGenerator implements AutoCloseable {
                 agendaTitle = Mapper.getAgendaJustNames().get(lawID);
             }
             if (agendaTitle == null) {
-                agendaTitle = lawID;
+                BotLogger.error("Unable to find law with id '" + lawID + "' during map generation. Skipping.");
+                continue;
             }
             if (optionalText != null
                     && !optionalText.isEmpty()
