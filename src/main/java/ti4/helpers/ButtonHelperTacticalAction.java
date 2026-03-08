@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -654,6 +655,35 @@ public final class ButtonHelperTacticalAction {
                 String magenMsg = magenPlayer.getRepresentation()
                         + " you can, and must, use _Magen Defense Grid_ to place an infantry with each of your structures in the active system.";
                 MessageHelper.sendMessageToChannelWithButton(magenPlayer.getCorrectChannel(), magenMsg, useMagen);
+            }
+
+            for (Player remnant : game.getRealPlayers()) {
+                if (!remnant.ownsUnit("tk-saturnremnant")) continue;
+
+                UnitKey key = Units.getUnitKey(UnitType.Cruiser, remnant.getColor());
+                if (ButtonHelperFactionSpecific.vortexButtonAvailable(game, key)) {
+                    String id = remnant.finChecker() + "placeOneNDone_skipbuild_cruiser_" + activeSystem.getPosition();
+                    String label = "Deploy Saturn Remnant";
+                    Button deploy = Buttons.green(id, label, FactionEmojis.Titans);
+                    String msg = remnant.getRepresentationUnfogged() + ", you can deploy a Saturn Remnant in the active system:";
+                    List<Button> buttons = List.of(deploy, Buttons.DONE_DELETE_BUTTONS.withLabel("Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(remnant.getCorrectChannel(), msg, buttons);
+                }
+            }
+
+            for (Player flaah : game.getRealPlayers()) {
+                if (ButtonHelper.doesPlayerHaveUnitHere("tk-flaahhyphae", flaah, activeSystem)) {
+                    List<Button> buttons = new ArrayList<>();
+                    String buildID = flaah.finChecker() + "umbatTile_" + activeSystem.getPosition();
+                    int amt = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Carrier, flaah) * 2;
+                    buttons.add(Buttons.green(buildID, "Build " + amt + " units with Flaah Hyphae", FactionEmojis.Arborec));
+                    buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            flaah.getCorrectChannel(),
+                            flaah.getRepresentation()
+                                    + " use buttons to resolve a build for Flaah Hyphae.",
+                            buttons);
+                }
             }
 
             Set<String> tokens = activeSystem.getSpaceUnitHolder().getTokenList();

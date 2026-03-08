@@ -5,7 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+
 import javax.annotation.Nullable;
+
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -16,7 +20,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
@@ -29,6 +32,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.TileGenerator;
@@ -43,6 +47,7 @@ import ti4.model.UnitModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.statistics.round.RoundStatsTracker;
@@ -942,10 +947,13 @@ public class StartCombatService {
                         + ", a reminder that if you win this combat, you may use the button to add a trade good to _The Reaping_.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, reap);
             }
-            if ("space".equalsIgnoreCase(type) && player.hasTech("so")) {
+            
+            boolean salvage = player.hasTech("so");
+            salvage |= player.hasUnit("tk-salvagebarge") & tile.getSpaceUnitHolder().getUnitCount(UnitType.Dreadnought, player) > 0;
+            if ("space".equalsIgnoreCase(type) && salvage) {
                 buttons = new ArrayList<>();
-                buttons.add(
-                        Buttons.gray("salvageOps_" + tile.getPosition(), "Salvage Operations", FactionEmojis.Mentak));
+                String label = game.isTwilightKart() ? "Salvage Barge" : "Salvage Operations";
+                buttons.add(Buttons.gray("salvageOps_" + tile.getPosition(), label, FactionEmojis.Mentak));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         msg
@@ -1149,6 +1157,20 @@ public class StartCombatService {
         return spaceCannonButtons;
     }
 
+    private static boolean hasAssaultEscort(Player player, Tile tile) {
+        int nonDestroyerShips = 0;
+        boolean hasDestroyer = false;
+        for (UnitKey unit : tile.getSpaceUnitHolder().getUnitKeysForPlayer(player)) {
+            UnitModel model = player.getUnitFromUnitKey(unit);
+            if (unit.getUnitType().equals(UnitType.Destroyer)) {
+                hasDestroyer = true;
+            } else if (model.isNonFighterShip()) {
+                nonDestroyerShips += tile.getSpaceUnitHolder().getUnitCount(unit);
+            }
+        }
+        return player.hasUnit("tk-assaultescort") && hasDestroyer && nonDestroyerShips >= 2;
+    }
+
     private static List<Button> getStartOfSpaceCombatButtons(Game game, Player p1, Player p2, Tile tile) {
         List<Button> buttons = new ArrayList<>();
         if (game.isFowMode()) return buttons;
@@ -1164,6 +1186,12 @@ public class StartCombatService {
                                 || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_2", p2, tile)))) {
             buttons.add(Buttons.blue(
                     "assCannonNDihmohn_asc_" + tile.getPosition(), "Use Assault Cannon", TechEmojis.WarfareTech));
+        }
+
+        // Assault Escort
+        if (hasAssaultEscort(p1, tile) || hasAssaultEscort(p2, tile)) {
+            buttons.add(Buttons.blue(
+                    "assCannonNDihmohn_assEsc_" + tile.getPosition(), "Use Assault Escort", UnitEmojis.destroyer));
         }
 
         // Dimensional Splicer

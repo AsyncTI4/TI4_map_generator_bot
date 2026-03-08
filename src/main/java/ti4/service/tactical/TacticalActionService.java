@@ -415,7 +415,8 @@ public class TacticalActionService {
         boolean belkoFF = player.hasUnit("belkosea_fighter")
                 || player.hasUnit("belkosea_fighter2")
                 || player.hasUnit("tf-morphwing");
-        if (naaluFS || belkoFF) committable.add(UnitType.Fighter);
+        boolean hierarch = player.hasUnit("tk-hierarch") && space.getUnitCount(UnitType.Cruiser, player) > 0;
+        if (naaluFS || belkoFF || hierarch) committable.add(UnitType.Fighter);
         return committable;
     }
 

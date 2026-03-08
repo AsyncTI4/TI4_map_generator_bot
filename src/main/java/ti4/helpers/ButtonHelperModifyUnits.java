@@ -10,13 +10,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.function.Consumers;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
@@ -461,6 +463,7 @@ public final class ButtonHelperModifyUnits {
                 hits > 0
                         && (player.hasUnit("naalu_flagship")
                                 || player.hasUnit("tf-morphwing")
+                                || player.hasUnit("tk-hierarch")
                                 || player.hasUnit("sigma_naalu_flagship_2")
                                 || player.hasUnit("belkosea_fighter")
                                 || player.hasUnit("belkosea_fighter2"))
@@ -2440,6 +2443,12 @@ public final class ButtonHelperModifyUnits {
             msg = opponent.getRepresentationUnfogged()
                     + ", your opponent used the Ascendancy to produce a hit against your non-fighter ships. Please assign it with buttons.";
             buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "combat");
+        } else if (cause.contains("assEsc")) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), player.getRepresentation(false, false) + " used _Assault Escort_.");
+            msg = opponent.getRepresentationUnfogged()
+                    + ", your opponent used _Assault Escort_, forcing you to destroy a non-fighter ship. Please assign it with buttons.";
+            buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "assaultcannoncombat");
         } else {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), player.getRepresentation(false, false) + " used _Assault Cannon_.");

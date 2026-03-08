@@ -3195,12 +3195,13 @@ public class PlayerAreaGenerator {
             playerUnitModels.add(Mapper.getUnit("nowarsun"));
         }
 
-        int tfMechCount = 0;
-        int tfMechIndex = 0;
+        int tfMechCount = 0, tfMechIndex = 0;
+        int tfFlagCount = 0, tfFlagIndex = 0;
         if (game.isTwilightsFallMode()) {
             for (UnitModel unit : playerUnitModels) {
-                if ("mf".equals(unit.getAsyncId())) {
-                    tfMechCount++;
+                switch (unit.getAsyncId()) {
+                    case "mf" -> tfMechCount++;
+                    case "fs" -> tfFlagCount++;
                 }
             }
         }
@@ -3215,6 +3216,7 @@ public class PlayerAreaGenerator {
 
                 if ("fs".equals(unit.getAsyncId())) {
                     String unitFaction = unit.getFaction().orElse("nekro").toLowerCase();
+
                     if (player.hasUnlockedBreakthrough("nekrobt")) {
                         List<String> flagships = new ArrayList<>(
                                 Arrays.asList(game.getStoredValue("valefarZ").split("\\|")));
@@ -3245,8 +3247,19 @@ public class PlayerAreaGenerator {
                         graphics.drawImage(
                                 valefarZ, deltaX + x + unitFactionOffset.x - 10, y + unitFactionOffset.y + 10, null);
                         unitFactionOffset.translate(-24, -24);
-                    } else if ("tf-echoofascension".equals(unit.getAlias())) {
-                        unitFactionOffset.translate(-24, -24);
+                    } else if (game.isTwilightsFallMode() && tfFlagCount >= 2) {
+                        if (unit.getAlias().endsWith("tf_flagship")) {
+                            if (tfFlagCount >= 3) unitFactionOffset.translate(0, 8);
+                        } else {
+                            if (tfFlagCount >= 3) unitFactionOffset.translate(0, -8);
+                            switch (++tfFlagIndex) {
+                                case 1 -> unitFactionOffset.translate(-24, -24);
+                                case 2 -> unitFactionOffset.translate(-8, -16);
+                                case 3 -> unitFactionOffset.translate(8, -8);
+                                case 4 -> unitFactionOffset.translate(24, 0);
+                                case 5 -> unitFactionOffset.translate(40, 8);
+                            }
+                        }
                     }
                 }
 

@@ -361,7 +361,7 @@
         "alias": "nivyn_commander",
         "type": "extrarolls",
         "value": "+1",
-        "valueScalingType": "damaged_units_same_type",
+        "valueScalingType": "damaged_units_max_2",
         "persistenceType": "CONDITIONAL",
         "condition": "nivyn_commander_damaged",
         "scope": "",
