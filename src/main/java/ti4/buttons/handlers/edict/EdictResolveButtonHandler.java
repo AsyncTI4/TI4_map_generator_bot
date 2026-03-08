@@ -19,6 +19,11 @@ import ti4.buttons.handlers.edict.resolver.TfExecuteResolver;
 import ti4.buttons.handlers.edict.resolver.TfForetellResolver;
 import ti4.buttons.handlers.edict.resolver.TfLegacyOfIxthResolver;
 import ti4.buttons.handlers.edict.resolver.TfSpliceResolver;
+import ti4.buttons.handlers.edict.resolver.TkCatalyzeResolver;
+import ti4.buttons.handlers.edict.resolver.TkEndorseResolver;
+import ti4.buttons.handlers.edict.resolver.TkEnfiladeResolver;
+import ti4.buttons.handlers.edict.resolver.TkSanctuaryResolver;
+import ti4.buttons.handlers.edict.resolver.TkSpoilResolver;
 import ti4.helpers.ButtonHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -46,18 +51,23 @@ public class EdictResolveButtonHandler {
     static {
         List<EdictResolver> resolvers = List.of(
                 // Twilight's Fall
-                new TfArbitrateResolver(),
-                new TfAriseResolver(),
-                new TfArtificeResolver(),
-                new TfBlessResolver(),
-                new TfCensureResolver(),
-                new TfConveneResolver(),
-                new TfExecuteResolver(),
-                new TfForetellResolver(),
-                new TfLegacyOfIxthResolver(),
-                new TfSpliceResolver()
+                new TfArbitrateResolver(), //
+                new TfAriseResolver(), //
+                new TfArtificeResolver(), //
+                new TfBlessResolver(), //
+                new TfCensureResolver(), //
+                new TfConveneResolver(), //
+                new TfExecuteResolver(), //
+                new TfForetellResolver(), //
+                new TfLegacyOfIxthResolver(), //
+                new TfSpliceResolver(), //
+
                 // Twilight Kart
-                );
+                new TkCatalyzeResolver(), //
+                new TkEndorseResolver(),
+                new TkEnfiladeResolver(), //
+                new TkSanctuaryResolver(), //
+                new TkSpoilResolver()); //
         resolvers.forEach(handler -> EDICT_HANDLERS.put(handler.getEdict(), handler));
     }
 

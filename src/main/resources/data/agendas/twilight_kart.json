@@ -23,7 +23,7 @@
         "category": "edict",
         "type": "Directive",
         "target": "Edict",
-        "text1": "Perform the following effect, twice: Place 1 structure on a planet you control or destroy 1 structure. Then, each other player may place 1 PDS on a planet they control.",
+        "text1": "Place 1 structure on a planet you control, or destroy 1 structure. Then, each player may place 1 PDS on a planet they control.",
         "source": "twilight_kart"
     },
     {
@@ -41,7 +41,7 @@
         "category": "edict",
         "type": "Directive",
         "target": "Edict",
-        "text1": "Gain 5 trade goods. Then, each other player loses trade goods equal to their commodity value.",
+        "text1": "Gain 3 trade goods. Then, each other player returns 1 of their trade goods to the supply.",
         "source": "twilight_kart"
     }
 ]
