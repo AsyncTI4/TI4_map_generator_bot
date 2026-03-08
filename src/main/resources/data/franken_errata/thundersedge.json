@@ -203,6 +203,13 @@
         "source": "thunders_edge"
     },
     {
+        "itemCategory": "STARTINGFLEET",
+        "itemId": "obsidian",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    
+    {
         "itemCategory": "PLOT",
         "itemId": "enervate",
         "undraftable": true,
