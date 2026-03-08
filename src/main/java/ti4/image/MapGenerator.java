@@ -2310,6 +2310,9 @@ public class MapGenerator implements AutoCloseable {
             if (agendaTitle == null) {
                 agendaTitle = Mapper.getAgendaJustNames().get(lawID);
             }
+            if (agendaTitle == null) {
+                agendaTitle = lawID;
+            }
             if (optionalText != null
                     && !optionalText.isEmpty()
                     && game.getPlayerFromColorOrFaction(optionalText) == null) {
