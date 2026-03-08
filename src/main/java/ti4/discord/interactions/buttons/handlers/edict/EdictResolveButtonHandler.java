@@ -36,18 +36,23 @@ public class EdictResolveButtonHandler {
     static {
         List<EdictResolver> resolvers = List.of(
                 // Twilight's Fall
-                new TfArbitrateResolver(),
-                new TfAriseResolver(),
-                new TfArtificeResolver(),
-                new TfBlessResolver(),
-                new TfCensureResolver(),
-                new TfConveneResolver(),
-                new TfExecuteResolver(),
-                new TfForetellResolver(),
-                new TfLegacyOfIxthResolver(),
-                new TfSpliceResolver()
+                new TfArbitrateResolver(), //
+                new TfAriseResolver(), //
+                new TfArtificeResolver(), //
+                new TfBlessResolver(), //
+                new TfCensureResolver(), //
+                new TfConveneResolver(), //
+                new TfExecuteResolver(), //
+                new TfForetellResolver(), //
+                new TfLegacyOfIxthResolver(), //
+                new TfSpliceResolver(), //
+
                 // Twilight Kart
-                );
+                new TkCatalyzeResolver(), //
+                new TkEndorseResolver(),
+                new TkEnfiladeResolver(), //
+                new TkSanctuaryResolver(), //
+                new TkSpoilResolver()); //
         resolvers.forEach(handler -> EDICT_HANDLERS.put(handler.getEdict(), handler));
     }
 
