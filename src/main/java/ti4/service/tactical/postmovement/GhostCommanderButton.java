@@ -9,7 +9,8 @@ import ti4.service.tactical.PostMovementButtonContext;
 
 public final class GhostCommanderButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return ctx.game.playerHasLeaderUnlockedOrAlliance(ctx.player, "ghostcommander");
+        return ctx.game.playerHasLeaderUnlockedOrAlliance(ctx.player, "ghostcommander")
+                || ctx.player.hasUnit("tk-iffsupportwing");
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {

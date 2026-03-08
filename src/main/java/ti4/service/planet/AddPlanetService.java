@@ -611,7 +611,7 @@ public class AddPlanetService {
             }
         }
 
-        if (player.hasUnlockedBreakthrough("l1z1xbt") && tile != null && !setup) {
+        if (!setup && tile != null && FealtyUplinkService.canUseFealty(game, player, tile)) {
             Planet p = tile.getUnitHolderFromPlanet(planet);
             if (p != null && !alreadyOwned) {
                 FealtyUplinkService.postInitialButtons(game, player, planet);

@@ -17,5 +17,20 @@
                 "alias": "tk-exhort2"
             }
         ]
+    },
+    {
+        "alias": "erelim_extra_die_when_damaged",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "damaged_units",
+        "persistenceType": "ALWAYS",
+        "scope": "dn",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "tk-erelim"
+            }
+        ]
     }
 ]
