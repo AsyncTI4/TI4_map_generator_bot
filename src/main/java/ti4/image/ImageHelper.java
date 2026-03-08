@@ -130,24 +130,15 @@ public class ImageHelper {
         return null;
     }
 
-    private static BufferedImage readImage(InputStream inputStream) {
-        try {
-            return ImageIO.read(inputStream);
-        } catch (IOException e) {
-            BotLogger.error("Failed to read image: ", e);
-        }
-        return null;
-    }
-
     @Nullable
     private static BufferedImage readImageURL(String imageURL) {
         if (imageURL == null) {
             return null;
         }
         try (InputStream inputStream = URI.create(imageURL).toURL().openStream()) {
-            return readImage(inputStream);
+            return ImageIO.read(inputStream);
         } catch (IOException e) {
-            BotLogger.error("Failed to read image URL'" + imageURL + "': ", e);
+            BotLogger.error("Failed to read image URL '" + imageURL + "': ", e);
         }
         return null;
     }
