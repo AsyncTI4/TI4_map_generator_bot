@@ -444,7 +444,7 @@ public class Player extends PlayerProperties {
 
     @Nullable
     public BreakthroughModel getBreakthroughModel(String bt) {
-        if (!hasBreakthrough(bt)) return null;
+        if (bt == null || !hasBreakthrough(bt)) return null;
         return Mapper.getBreakthrough(bt);
     }
 

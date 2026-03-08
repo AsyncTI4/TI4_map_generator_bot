@@ -14,6 +14,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.RandomHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -57,7 +58,7 @@ public class FractureService {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 spawnFracture(event, game);
                 spawnIngressTokens(event, game, player, bt);
-            } else if (result == 6) {
+            } else if (result == 6 && RandomHelper.isOneInX(10)) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         "> \"Thunder rolled...\n> It rolled a " + DiceEmojis.getGrayDieEmoji(6)

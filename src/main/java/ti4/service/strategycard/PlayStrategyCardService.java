@@ -33,6 +33,7 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.model.StrategyCardModel;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.MindsieveService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -348,6 +349,14 @@ public class PlayStrategyCardService {
                 if (player3 == player) {
                     continue;
                 }
+                if (IsPlayerElectedService.isPlayerElected(game, player3, "tk-endorse")) {
+                    MessageHelper.sendMessageToChannel(
+                            player3.getCardsInfoThread(),
+                            player3.getRepresentationUnfogged() + ", you may follow **" + stratCardName
+                                    + "** without spending a token because of _Endorse_.");
+                    continue;
+                }
+
                 MindsieveService.serveMindsieveButtons(game, player3, scToPlay);
                 List<Button> empNMahButtons = new ArrayList<>();
                 Button deleteB = Buttons.red("deleteButtons", "Delete These Buttons");

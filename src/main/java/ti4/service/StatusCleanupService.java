@@ -80,6 +80,9 @@ public class StatusCleanupService {
         if (ButtonHelper.isLawInPlay(game, "tf-censure")) {
             game.removeLaw("tf-censure");
         }
+        if (ButtonHelper.isLawInPlay(game, "tf-endorse")) {
+            game.removeLaw("tf-endorse");
+        }
         for (Player player : players.values()) {
 
             player.setPassed(false);

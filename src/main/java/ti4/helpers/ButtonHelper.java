@@ -8181,11 +8181,15 @@ public class ButtonHelper {
             }
             Tile tile = game.getTileFromPlanet(planet);
             String message;
+            String action = " Diplo ";
+            if (game.isTwilightKart()) {
+                action = " make _Sanctuary_ in ";
+            }
             if (tile != null) {
-                message = player.getFactionEmoji() + " chose to Diplo the " + tile.getRepresentationForButtons()
+                message = player.getFactionEmoji() + " chose to" + action + "the " + tile.getRepresentationForButtons()
                         + " system.";
             } else {
-                message = player.getFactionEmoji() + " chose to Diplo the system containing "
+                message = player.getFactionEmoji() + " chose to" + action + "the system containing "
                         + Helper.getPlanetRepresentation(planet, game) + ".";
             }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
