@@ -242,24 +242,13 @@ public class ButtonHelperHeroes {
             unitName = unitName.replace("damaged", "");
         }
         destination = FlipTileService.flipTileIfNeeded(event, destination, game);
-        var removed = RemoveUnitService.removeUnits(event, origin, game, player.getColor(), unitName + " " + unitHolderName);
+        var removed = RemoveUnitService.removeUnits(
+                event, origin, game, player.getColor(), unitName + " " + unitHolderName, damaged);
         AddUnitService.addUnits(event, destination, game, player.getColor(), unitName, removed);
         List<Button> buttons = getArgentHeroStep3Buttons(game, player, buttonID);
         String msg2 = player.getFactionEmoji() + " moved 1 " + unitName + " from "
                 + origin.getRepresentationForButtons(game, player) + " to "
                 + destination.getRepresentationForButtons(game, player);
-        if (damaged) {
-            origin.getUnitHolders()
-                    .get(unitHolderName)
-                    .removeDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unitName), player.getColorID()), 1);
-            destination
-                    .getUnitHolders()
-                    .get("space")
-                    .addDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unitName), player.getColorID()), 1);
-            msg2 = player.getFactionEmoji() + " moved 1 damaged " + unitName + " from "
-                    + origin.getRepresentationForButtons(game, player) + " to "
-                    + destination.getRepresentationForButtons(game, player);
-        }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
         String msg =
