@@ -1,7 +1,6 @@
 package ti4.commands.player;
 
 import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -51,7 +50,8 @@ class ChangeColor extends GameStateSubcommand {
         }
 
         if (ColorChangeHelper.colorIsExclusive(newColor, player)) {
-            MessageHelper.sendMessageToEventChannel(event, "You cannot use this color. It has been made solely for its creator's usage. Sorry!");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "You cannot use this color. It has been made solely for its creator's usage. Sorry!");
             return;
         }
 

@@ -57,6 +57,9 @@ public class ParseUnitService {
     }
 
     private ParsedUnit parseUnit(String unitListToken, String color, Tile tile, GenericInteractionCreateEvent event) {
+        if (unitListToken != null) {
+            unitListToken = unitListToken.replace("space dock", "spacedock");
+        }
         StringTokenizer unitInfoTokenizer = new StringTokenizer(unitListToken, " ");
 
         String firstToken = unitInfoTokenizer.nextToken();

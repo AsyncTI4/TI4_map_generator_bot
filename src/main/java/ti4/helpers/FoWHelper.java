@@ -10,16 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nullable;
-
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
+import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;

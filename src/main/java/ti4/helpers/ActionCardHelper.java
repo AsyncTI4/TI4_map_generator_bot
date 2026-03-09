@@ -682,7 +682,7 @@ public class ActionCardHelper {
         if ("blackmarketdealing".equals(acID)
                 && game.getPhaseOfGame().toLowerCase().contains("agenda")
                 && game.isHiddenAgendaMode()
-                && !game.getStoredValue("executiveOrder").isEmpty()) {
+                && game.getStoredValue("executiveOrder").isEmpty()) {
             return "You cannot make transactions during the agenda phase in Hidden Agenda mode. Cancelling this action card automatically";
         }
 

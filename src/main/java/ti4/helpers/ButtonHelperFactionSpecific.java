@@ -1,8 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -2369,6 +2367,32 @@ public class ButtonHelperFactionSpecific {
         return buttons;
     }
 
+    @ButtonHandler("orangeTFMechRepair")
+    public static void resolveEmergencyRepairs(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        player.setStrategicCC(player.getStrategicCC() - 1);
+        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
+        for (Tile tile : game.getTileMap().values()) {
+            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                int damaged = unitHolder.getDamagedUnitCount(UnitType.Mech, player.getColorID());
+                if (damaged > 0) {
+                    tile.removeUnitDamage(
+                            unitHolder.getName(),
+                            Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()),
+                            damaged);
+                    MessageHelper.sendMessageToChannel(
+                            event.getChannel(),
+                            player.getFactionEmoji() + " has repaired " + damaged + " damaged mech"
+                                    + (damaged == 1 ? "" : "s") + " on "
+                                    + tile.getRepresentationForButtons(game, player) + ".");
+                }
+            }
+        }
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                player.getFactionEmoji() + " has spent a strategy command token to repair all their damaged mechs.");
+    }
+
     @ButtonHandler("redCreussWashPartial")
     public static void redCreussWashPartial(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         if (player.getCommodities() == 0) {
@@ -2396,6 +2420,8 @@ public class ButtonHelperFactionSpecific {
             int wash = Math.min(player.getCommodities(), p2.getCommodities());
             player.setCommodities(player.getCommodities() - wash);
             p2.setCommodities(p2.getCommodities() - wash);
+            resolveDarkPactCheck(game, player, p2, wash);
+            resolveDarkPactCheck(game, p2, player, wash);
             String message = "";
             if (player.getCommodities() == 0) {
                 message += player.getRepresentationUnfogged() + " has washed all " + wash + " of their commodit"
@@ -2459,6 +2485,8 @@ public class ButtonHelperFactionSpecific {
             }
             int commP1 = player.getCommodities();
             int commP2 = p2.getCommodities();
+            resolveDarkPactCheck(game, player, p2, commP1);
+            resolveDarkPactCheck(game, p2, player, commP2);
             int wash = Math.min(commP1 + player.getTg(), commP2 + p2.getTg());
             player.setCommodities(Math.max(commP1 - wash, 0));
             p2.setCommodities(Math.max(commP2 - wash, 0));

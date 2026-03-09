@@ -1,7 +1,6 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -878,6 +877,57 @@ public class CombatRollService {
                             hitRolls += 2;
                         }
                         maximumHits += 2;
+                    }
+                }
+                if (rollType == CombatRollType.bombardment && "tf-thedragonfreed".equalsIgnoreCase(unitModel.getId())) {
+                    if (!game.isFowMode() && hitRolls > 0) {
+                        List<Button> buttons = new ArrayList<>();
+                        String bombardPlanet2 = game.getStoredValue("bombardmentTarget" + player.getFaction());
+                        Tile tile = game.getTileByPosition(game.getActiveSystem());
+                        if (!bombardPlanet2.isEmpty()) {
+                            tile = game.getTileFromPlanet(bombardPlanet2);
+                        }
+                        for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+                            Tile tile2 = game.getTileByPosition(pos);
+                            for (UnitHolder uh : tile2.getPlanetUnitHolders()) {
+                                if (uh.getName().equalsIgnoreCase(bombardPlanet2)) {
+                                    continue;
+                                }
+                                buttons.add(Buttons.red(
+                                        "getDamageButtons_" + tile2.getPosition() + "_bombardment",
+                                        "Assign Hit" + (hitRolls == 1 ? "" : "s")));
+                                for (Player p2 : game.getRealPlayersNNeutral()) {
+                                    if (FoWHelper.playerHasUnitsOnPlanet(p2, uh)) {
+                                        if (p2.isRealPlayer()) {
+                                            MessageHelper.sendMessageToChannelWithButtons(
+                                                    game.isFowMode()
+                                                            ? p2.getCorrectChannel()
+                                                            : event.getMessageChannel(),
+                                                    p2.getRepresentation()
+                                                            + ", please assign the Dragon BOMBARDMENT hit"
+                                                            + (hitRolls == 1 ? "" : "s") + " on "
+                                                            + Helper.getPlanetRepresentation(uh.getName(), game) + ".",
+                                                    buttons);
+                                        } else {
+                                            List<Button> buttons2 = new ArrayList<>();
+                                            buttons2.add(Buttons.green(
+                                                    p2.dummyPlayerSpoof() + "autoAssignGroundHits_" + uh.getName() + "_"
+                                                            + hitRolls,
+                                                    "Auto-assign Hit" + (hitRolls == 1 ? "" : "s") + " For Dummy"));
+                                            MessageHelper.sendMessageToChannelWithButtons(
+                                                    game.isFowMode()
+                                                            ? player.getCorrectChannel()
+                                                            : event.getMessageChannel(),
+                                                    player.getRepresentation()
+                                                            + ", please assign the Dragon BOMBARDMENT hit"
+                                                            + (hitRolls == 1 ? "" : "s") + " for the dummy player on "
+                                                            + Helper.getPlanetRepresentation(uh.getName(), game) + ".",
+                                                    buttons2);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 

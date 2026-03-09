@@ -151,7 +151,7 @@ public class UserSettings {
         }
 
         if (heat < 150) {
-            return null;
+            return "Not enough data.";
         }
 
         StringBuilder result = new StringBuilder();
