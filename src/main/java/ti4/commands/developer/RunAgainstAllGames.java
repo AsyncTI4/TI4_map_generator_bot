@@ -69,13 +69,21 @@ class RunAgainstAllGames extends Subcommand {
     }
 
     private static <K, V> boolean replaceKey(Map<K, V> map, K toReplace, K replacement) {
-        if (map.containsKey(toReplace)) {
-            V value = map.get(toReplace);
-            map.put(replacement, value);
+        if (!map.containsKey(toReplace)) {
+            return false;
+        }
+
+        // If the replacement key already exists, avoid overwriting its value.
+        // In that case, simply remove the old/misspelled key to normalize the map.
+        if (map.containsKey(replacement)) {
             map.remove(toReplace);
             return true;
         }
-        return false;
+
+        V value = map.get(toReplace);
+        map.put(replacement, value);
+        map.remove(toReplace);
+        return true;
     }
 
     private static <K> boolean replace(List<K> list, K toReplace, K replacement) {
