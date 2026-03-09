@@ -13,7 +13,7 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.service.game.GameNameService;
 import ti4.spring.jda.JdaService;
-import ti4.spring.service.messagecache.BotMessageCacheService;
+import ti4.spring.service.messagecache.SavedBotMessagesService;
 
 public class DeletionListener extends ListenerAdapter {
 
@@ -43,7 +43,7 @@ public class DeletionListener extends ListenerAdapter {
             if (deletionLogChannel == null) return;
 
             long messageId = event.getMessageIdLong();
-            String cachedMessage = BotMessageCacheService.getBean().getContent(messageId);
+            String cachedMessage = SavedBotMessagesService.getBean().getContent(messageId);
             if (cachedMessage == null) return;
 
             Game game = GameManager.getManagedGame(gameName).getGame();

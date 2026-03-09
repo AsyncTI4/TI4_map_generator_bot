@@ -14,8 +14,6 @@ import ti4.message.logging.BotLogger;
 
 class RunAgainstAllGames extends Subcommand {
 
-    private static final long ONE_SECOND_MILLIS = 1000L;
-
     RunAgainstAllGames() {
         super("run_against_all_games", "Runs this custom code against all games.");
     }
