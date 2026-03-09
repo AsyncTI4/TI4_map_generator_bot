@@ -26,6 +26,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
@@ -117,6 +118,8 @@ public class Mapper {
     private static final Map<String, TokenModel> tokens = new HashMap<>();
     private static final Map<String, GalacticEventModel> galacticevents = new HashMap<>();
     private static final Map<String, UnitModel> units = new HashMap<>();
+
+    @Getter
     private static final Map<String, BreakthroughModel> breakthroughs = new HashMap<>();
 
     private static final Cache<String, ColorModel> colorToColorModelCache =
@@ -437,10 +440,6 @@ public class Mapper {
     }
     // breakthroughs
 
-    public static Map<String, BreakthroughModel> getBreakthroughs() {
-        return breakthroughs;
-    }
-
     public static BreakthroughModel getBreakthrough(String id) {
         return breakthroughs.get(id);
     }
@@ -480,11 +479,10 @@ public class Mapper {
         return agendaModel.getName().toUpperCase();
     }
 
+    @Nullable
     public static String getAgendaTitleNoCap(String id) {
         AgendaModel agendaModel = agendas.get(id);
-        if (agendaModel == null) {
-            return null;
-        }
+        if (agendaModel == null) return null;
         return agendaModel.getName();
     }
 
@@ -496,25 +494,10 @@ public class Mapper {
         return agendaList;
     }
 
-    public static Map<String, String> getAgendaJustNames(Game game) {
-        Map<String, String> agendaList = new HashMap<>();
-        for (AgendaModel agenda : agendas.values()) {
-            if (game.isAbsolMode() && agenda.getAlias().contains("absol_")) {
-                agendaList.put(agenda.getAlias(), agenda.getName());
-            }
-            if (!game.isAbsolMode() && !agenda.getAlias().contains("absol_")) {
-                agendaList.put(agenda.getAlias(), agenda.getName());
-            }
-        }
-        return agendaList;
-    }
-
     @Nullable
     public static String getAgendaText(String id) {
         AgendaModel agendaModel = agendas.get(id);
-        if (agendaModel == null) {
-            return null;
-        }
+        if (agendaModel == null) return null;
         return agendaModel.getMapText();
     }
 
@@ -526,8 +509,11 @@ public class Mapper {
         return agendaModel.displayElectedFaction() ? "0" : "1";
     }
 
+    @Nullable
     public static String getAgendaForOnly(String id) {
         AgendaModel agenda = agendas.get(id);
+        if (agenda == null) return null;
+
         StringBuilder sb = new StringBuilder();
         sb.append(agenda.getName()).append(";");
         sb.append(agenda.getType()).append(";");
@@ -548,10 +534,6 @@ public class Mapper {
 
     public static Map<String, AttachmentModel> getAttachments() {
         return new HashMap<>(attachments);
-    }
-
-    public static List<AttachmentModel> getAttachmentsValues() {
-        return new ArrayList<>(attachments.values());
     }
 
     public static boolean isValidAttachment(String id) {
