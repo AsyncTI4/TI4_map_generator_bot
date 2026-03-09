@@ -219,7 +219,6 @@ class ActionCardDeck2ButtonHandler {
                 event.getMessageChannel(), player.getRepresentation() + ", use the buttons to resolve.", scButtons);
     }
 
-
     @ButtonHandler("resolveIntrigue")
     public static void resolveIntrigue(Player player, Game game, ButtonInteractionEvent event) {
         AgendaHelper.drawAgenda(2, true, game, player);
