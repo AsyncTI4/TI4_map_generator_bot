@@ -40,11 +40,11 @@ class RunAgainstAllGames extends Subcommand {
 
     private static boolean makeChanges(Game game) {
         Map<String, String> replacements = Map.of(
-            "disarmamament", "disarmament",
-            "absol_disarmamament", "absol_disarmament",
-            "cryypter_disarmamament", "cryypter_disarmament",
-            "minister_commrece", "minister_commerce",
-            "senate_sancuary", "senate_sanctuary");
+                "disarmamament", "disarmament",
+                "absol_disarmamament", "absol_disarmament",
+                "cryypter_disarmamament", "cryypter_disarmament",
+                "minister_commrece", "minister_commerce",
+                "senate_sancuary", "senate_sanctuary");
 
         return replaceAgendaCards(game, List.of(game.getAgendaDeckID()), replacements);
     }
