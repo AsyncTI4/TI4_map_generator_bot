@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
+import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -216,6 +217,13 @@ class ActionCardDeck2ButtonHandler {
         scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), player.getRepresentation() + ", use the buttons to resolve.", scButtons);
+    }
+
+    @ButtonHandler("resolveIntrigue")
+    public static void resolveIntrigue(Player player, Game game, ButtonInteractionEvent event) {
+        AgendaHelper.drawAgenda(2, true, game, player);
+        AgendaHelper.drawAgenda(2, game, player);
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("resolveAncientTradeRoutes")
