@@ -1434,7 +1434,7 @@ public class AgendaHelper {
                 realIdentity = nextInLine.getRepresentationUnfogged();
                 String pFaction = nextInLine.getFlexibleDisplayName();
                 String finChecker = "FFCC_" + nextInLine.getFaction() + "_";
-                Button Vote = Buttons.green(finChecker + "vote", pFaction + " Choose To Vote");
+                Button Vote = Buttons.blue(finChecker + "vote", pFaction + " Choose To Vote");
                 Button Abstain;
                 if (nextInLine.hasAbility("future_sight")) {
                     Abstain = Buttons.red(
@@ -1954,7 +1954,7 @@ public class AgendaHelper {
                     + " up to vote! Please use the buttons to choose the outcome you wish to vote for.";
             String pFaction = StringUtils.capitalize(nextInLine.getFaction());
             String finChecker = "FFCC_" + nextInLine.getFaction() + "_";
-            Button Vote = Buttons.green(finChecker + "vote", pFaction + " Choose To Vote");
+            Button Vote = Buttons.blue(finChecker + "vote", pFaction + " Choose To Vote");
             Button Abstain;
             if (nextInLine.hasAbility("future_sight")) {
                 Abstain = Buttons.red(
@@ -4784,7 +4784,7 @@ public class AgendaHelper {
         String eraseMsg = "Erased previous votes made by " + player.getFactionEmoji()
                 + " and readied the planets they previously exhausted\n\n" + getSummaryOfVotes(game, true);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), eraseMsg);
-        Button vote = Buttons.green(
+        Button vote = Buttons.blue(
                 player.getFinsFactionCheckerPrefix() + "vote", player.getFlexibleDisplayName() + " Choose To Vote");
         Button abstain = Buttons.red(
                 player.getFinsFactionCheckerPrefix() + "resolveAgendaVote_0",

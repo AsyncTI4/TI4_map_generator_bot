@@ -724,7 +724,7 @@ public class FoWHelper {
                 && player.hasTech("tf-lazaxgatefolding")) {
             boolean hasUncontrolledLeg = false;
             for (Planet planet : tile.getPlanetUnitHolders()) {
-                if (planet.isLegendary() && player.getPlanets().contains(planet.getName())) {
+                if (planet.isLegendary() && !player.getPlanets().contains(planet.getName())) {
                     hasUncontrolledLeg = true;
                 }
             }

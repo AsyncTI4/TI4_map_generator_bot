@@ -118,7 +118,7 @@ public class ButtonHelperTwilightsFall {
         if (alreadyQueued.isEmpty()) {
             numQueued = 0;
         }
-        StringBuilder msg = new StringBuilder(player.getRepresentationNoPing() + " you have " + number
+        StringBuilder msg = new StringBuilder(player.getRepresentationNoPing() + " you have " + (number - 1)
                 + " people ahead of you to pick in this splice and so can queue " + number + " cards."
                 + " So far you have queued " + numQueued + " cards. ");
         if (numQueued > 0) {

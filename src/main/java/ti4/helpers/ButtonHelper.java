@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1945,6 +1942,13 @@ public class ButtonHelper {
                             ident + ", please use buttons to resolve So Ata, the Yssaril commander. ",
                             buttons);
                 }
+            }
+            if (nonActivePlayer.hasTech("tf-stymie")
+                    && !game.isFowMode()
+                    && FoWHelper.playerHasUnitsInSystem(nonActivePlayer, activeSystem)) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " this is a reminder that your opponent has the Stymie ability.");
             }
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
             for (String pn : pns) {
@@ -7294,6 +7298,9 @@ public class ButtonHelper {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         List<Tile> tilesWithBombard = getTilesOfUnitsWithBombard(player, game);
+        if (tilesWithBombard.isEmpty()) {
+            return buttons;
+        }
         Set<String> adjacentTiles = FoWHelper.getAdjacentTilesAndNotThisTile(
                 game, tilesWithBombard.getFirst().getPosition(), player, false);
         for (Tile tile : tilesWithBombard) {

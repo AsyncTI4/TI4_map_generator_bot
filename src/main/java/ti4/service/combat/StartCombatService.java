@@ -492,9 +492,23 @@ public class StartCombatService {
                     }
                 }
                 if (playersWithGF.size() > 1) {
+                    Player p1 = playersWithGF.get(0);
+                    Player p2 = playersWithGF.get(1);
+                    if (game.getActivePlayer() != null && playersWithGF.contains(game.getActivePlayer())) {
+                        p1 = game.getActivePlayer();
+                        if (p2 == p1) {
+                            p2 = playersWithGF.get(0);
+                        }
+                    }
+                    for (Player player : playersWithGF) {
+                        if (player.getPlanets().contains(unitHolderName) && player != p1) {
+                            p2 = player;
+                        }
+                    }
+
                     Button automate = Buttons.green(
-                            "automateGroundCombat_" + playersWithGF.get(0).getFaction() + "_"
-                                    + playersWithGF.get(1).getFaction() + "_" + unitHolderName + "_unconfirmed",
+                            "automateGroundCombat_" + p1.getFaction() + "_" + p2.getFaction() + "_" + unitHolderName
+                                    + "_unconfirmed",
                             "Automate Combat For " + Helper.getPlanetRepresentation(unitHolderName, game));
                     autoButtons.add(automate);
                 }
@@ -1541,11 +1555,37 @@ public class StartCombatService {
                     "Resolve Sardakk Breakthrough (Upon Win)",
                     FactionEmojis.Sardakk));
         }
-        if (p1.hasUnit("pinktf_mech") && isGroundCombat) {
+        if (p1.hasUnit("pinktf_mech")
+                && isGroundCombat
+                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Mech)
+                        .contains(tile)) {
             buttons.add(Buttons.gray(
                     p1.getFinsFactionCheckerPrefix() + "drawSingularNewSpliceCard_units_pinktfmech",
                     "Draw 1 Unit Upgrade (Upon Win)",
                     FactionEmojis.pinktf));
+        }
+
+        if (p1.hasUnit("orangetf_mech")
+                && isGroundCombat
+                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Mech)
+                        .contains(tile)
+                && p1.getStrategicCC() > 0) {
+            buttons.add(Buttons.gray(
+                    p1.getFinsFactionCheckerPrefix() + "orangeTFMechRepair",
+                    "Spend Strat CC to Repair Mechs",
+                    FactionEmojis.orangetf));
+        }
+
+        if (p2.hasUnit("orangetf_mech")
+                && isGroundCombat
+                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Mech)
+                        .contains(tile)
+                && p2.getStrategicCC() > 0
+                && !game.isFowMode()) {
+            buttons.add(Buttons.gray(
+                    p2.getFinsFactionCheckerPrefix() + "orangeTFMechRepair",
+                    "Spend Strat CC to Repair Mechs",
+                    FactionEmojis.orangetf));
         }
 
         if (p2.hasUnlockedBreakthrough("sardakkbt") && !game.isFowMode()) {
@@ -1554,7 +1594,11 @@ public class StartCombatService {
                     "Resolve Sardakk Breakthrough (Upon Win)",
                     FactionEmojis.Sardakk));
         }
-        if (p2.hasUnit("pinktf_mech") && isGroundCombat && !game.isFowMode()) {
+        if (p2.hasUnit("pinktf_mech")
+                && isGroundCombat
+                && !game.isFowMode()
+                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Mech)
+                        .contains(tile)) {
             buttons.add(Buttons.gray(
                     p2.getFinsFactionCheckerPrefix() + "drawSingularNewSpliceCard_units_pinktfmech",
                     "Draw 1 Unit Upgrade (Upon Win)",

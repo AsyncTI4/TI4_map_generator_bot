@@ -3238,6 +3238,7 @@ public class UnfiledButtonHandlers {
         String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
                 + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
         event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
+        ButtonHelper.checkFleetInEveryTile(player, game);
     }
 
     @ButtonHandler("decrease_tactic_cc")

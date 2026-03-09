@@ -44,6 +44,7 @@ public class TeHelperPromissories {
                     && !techModel.getFaction().orElse("").isEmpty()) continue; // no faction techs
             if (techModel.isUnitUpgrade()) continue;
             if (player.hasTech(tech)) continue;
+            if (player.getPurgedTechs().contains(tech)) continue;
             techsToAdd.add(techModel);
         }
         List<Button> buttons = ListTechService.getTechButtons(techsToAdd, player, "shareKnowledge");
