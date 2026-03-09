@@ -31,7 +31,7 @@ import ti4.service.fow.WhisperService;
 import ti4.service.game.CreateGameService;
 import ti4.service.game.GameNameService;
 import ti4.spring.jda.JdaService;
-import ti4.spring.service.messagecache.BotMessageCacheService;
+import ti4.spring.service.messagecache.SavedBotMessagesService;
 
 public class MessageListener extends ListenerAdapter {
 
@@ -73,7 +73,7 @@ public class MessageListener extends ListenerAdapter {
             String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
             boolean isValidGameMessage = GameManager.isValid(gameName);
             if (isValidGameMessage) {
-                BotMessageCacheService.getBean().cache(message);
+                SavedBotMessagesService.getBean().cache(message);
             }
 
             if (!event.getAuthor().isBot()) {
