@@ -7298,6 +7298,9 @@ public class ButtonHelper {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         List<Tile> tilesWithBombard = getTilesOfUnitsWithBombard(player, game);
+        if (tilesWithBombard.isEmpty()) {
+            return buttons;
+        }
         Set<String> adjacentTiles = FoWHelper.getAdjacentTilesAndNotThisTile(
                 game, tilesWithBombard.getFirst().getPosition(), player, false);
         for (Tile tile : tilesWithBombard) {

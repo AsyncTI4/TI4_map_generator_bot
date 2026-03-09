@@ -314,6 +314,10 @@ public class ComponentActionHelper {
                         rButton = Buttons.red(finChecker + prefix + "relic_" + relic, "Purge " + relicData.getName());
                     }
                 }
+                if ("stellar_converter".equalsIgnoreCase(relic)
+                        && ButtonHelper.getButtonsForStellar(p1, game).isEmpty()) {
+                    continue;
+                }
                 compButtons.add(rButton);
             }
         }
