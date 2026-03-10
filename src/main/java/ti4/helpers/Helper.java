@@ -1655,9 +1655,7 @@ public class Helper {
             } else {
                 msg.append("Producing a total of ")
                         .append(unitCount)
-                        .append(" unit")
-                        .append(unitCount == 1 ? "" : "s")
-                        .append(" for a total cost of ")
+                        .append(" units for a total cost of ")
                         .append(cost)
                         .append(" resource")
                         .append(cost == 1 ? "" : "s")
