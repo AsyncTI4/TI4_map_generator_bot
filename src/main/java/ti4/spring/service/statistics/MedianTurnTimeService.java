@@ -54,11 +54,11 @@ public class MedianTurnTimeService {
 
         String result = toResultString(sortedResults);
 
-        MessageHelper.sendMessageToThread(event.getChannel(), "Median Turn Time", result);
+        MessageHelper.sendMessageToThread(event.getChannel(), "Median Of Average Turn Times", result);
     }
 
     private String toResultString(List<PlayerStatsAccumulator> sortedResults) {
-        StringBuilder sb = new StringBuilder("## __**Median Turn Time:**__\n");
+        StringBuilder sb = new StringBuilder("## __**Median Of Average Turn Times:**__\n");
         int index = 1;
         for (var stats : sortedResults) {
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
