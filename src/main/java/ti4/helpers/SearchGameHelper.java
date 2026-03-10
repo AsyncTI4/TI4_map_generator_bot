@@ -99,8 +99,6 @@ public class SearchGameHelper {
         if (wantNum) {
             return filteredManagedGames.size();
         }
-        int days = 0;
-
         StringBuilder sb = new StringBuilder("**__").append(user.getName()).append("'s Games__**\n");
         for (var managedGame : filteredManagedGames) {
             sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
@@ -108,9 +106,6 @@ public class SearchGameHelper {
             sb.append(
                     getPlayerMapListRepresentation(game, userID, showAverageTurnTime, showSecondaries, showGameModes));
             sb.append("\n");
-            if (game.isHasEnded()) {
-                days += Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString());
-            }
             index++;
         }
         if (event instanceof SlashCommandInteractionEvent slash) {
@@ -208,7 +203,11 @@ public class SearchGameHelper {
             }
         }
         if (showGameModes) sb.append(" | Game Modes: ").append(game.getGameModesText());
-        if (game.isHasEnded()) sb.append(" [GAME IS OVER]");
+        if (game.isHasEnded()) {
+            int days = Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString());
+            String endedStatus = game.hasWinner() ? "COMPLETED" : "ABORTED";
+            sb.append(" [").append(days).append(" DAYS, ").append(endedStatus).append("]");
+        }
         return sb.toString();
     }
 
