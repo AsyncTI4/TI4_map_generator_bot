@@ -205,8 +205,9 @@ public class SearchGameHelper {
         if (showGameModes) sb.append(" | Game Modes: ").append(game.getGameModesText());
         if (game.isHasEnded()) {
             int days = Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString());
+            String dayLabel = (days == 1) ? "DAY" : "DAYS";
             String endedStatus = game.hasWinner() ? "COMPLETED" : "ABORTED";
-            sb.append(" [").append(days).append(" DAYS, ").append(endedStatus).append("]");
+            sb.append(" [").append(days).append(" ").append(dayLabel).append(", ").append(endedStatus).append("]");
         }
         return sb.toString();
     }
