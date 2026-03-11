@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
@@ -33,7 +34,8 @@ import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
-public final class DestroyUnitService {
+@UtilityClass
+public class DestroyUnitService {
 
     public static void destroyAllUnitsInSystem(
             GenericInteractionCreateEvent event, Tile tile, Game game, boolean combat) {
