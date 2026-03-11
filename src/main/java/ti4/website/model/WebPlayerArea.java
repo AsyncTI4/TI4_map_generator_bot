@@ -40,8 +40,7 @@ public class WebPlayerArea {
         private final String breakthroughId;
         private final boolean unlocked;
         private final boolean exhausted;
-        // TODO: MemePhilosopher uncomment this
-        // private final boolean active;
+        private final boolean active;
         private final int tradeGoodsStored;
     }
 
@@ -179,9 +178,8 @@ public class WebPlayerArea {
     // Debt tokens: debt that this player is OWED by other players (faction/color -> count)
     private Map<String, Integer> debtTokens;
 
-    // Breakthrough (Thunder's Edge)
-    // TODO: MemePhilosopher make this a list
-    private BreakthroughInfo breakthrough;
+    // Breakthroughs (Thunder's Edge)
+    private List<BreakthroughInfo> breakthroughs;
 
     // Plot cards (Firmament/Obsidian)
     private List<PlotCardInfo> plotCards;
@@ -378,20 +376,16 @@ public class WebPlayerArea {
                 boolean act = player.isBreakthroughActive(btID);
                 int tgs = player.getBreakthroughTGs(btID);
 
-                // TODO: MemePhilosopher replace this ...
-                breakthroughs.add(new BreakthroughInfo(btID, unl, exh, tgs));
-                // ... with this
-                // breakthroughs.add(new BreakthroughInfo(btID, unl, exh, act, tgs));
+                breakthroughs.add(new BreakthroughInfo(btID, unl, exh, act, tgs));
             }
 
-            // TODO: MemePhilosopher make this a list
             if (!breakthroughs.isEmpty()) {
-                webPlayerArea.setBreakthrough(breakthroughs.getFirst());
+                webPlayerArea.setBreakthroughs(breakthroughs);
             } else {
-                webPlayerArea.setBreakthrough(null);
+                webPlayerArea.setBreakthroughs(null);
             }
         } else {
-            webPlayerArea.setBreakthrough(null);
+            webPlayerArea.setBreakthroughs(null);
         }
 
         // Plot cards (Firmament/Obsidian)
