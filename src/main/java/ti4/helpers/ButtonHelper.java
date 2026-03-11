@@ -4276,6 +4276,44 @@ public class ButtonHelper {
         return buttons;
     }
 
+    @ButtonHandler("takeMonument_")
+    public static void resolveTakeMonument(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.split("_")[1];
+        String customPOName = "Monument on " + Helper.getPlanetName(planet) + "";
+        if (game.getCustomPublicVP().containsKey(customPOName)) {
+            int poIndex = game.getCustomPublicVP().get(customPOName);
+            for (Player p : game.getRealPlayers()) {
+                if (p.getPlanets().contains(planet)) {
+                    game.unscorePublicObjective(p.getUserID(), poIndex);
+                    break;
+                }
+            }
+            game.scorePublicObjective(player.getUserID(), poIndex);
+            Helper.checkEndGame(game, player);
+        }
+        AddPlanetService.addPlanet(player, planet, game);
+        deleteMessage(event);
+    }
+
+    @ButtonHandler("destroyMonument_")
+    public static void resolveDestroyMonument(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.split("_")[1];
+        String customPOName = "Monument on " + Helper.getPlanetName(planet) + "";
+        if (game.getCustomPublicVP().containsKey(customPOName)) {
+            int poIndex = game.getCustomPublicVP().get(customPOName);
+            for (Player p : game.getRealPlayers()) {
+                if (p.getPlanets().contains(planet)) {
+                    game.unscorePublicObjective(p.getUserID(), poIndex);
+                    break;
+                }
+            }
+        }
+        UnitHolder uH = game.getUnitHolderFromPlanet(planet);
+        uH.removeAllUnits(game.getPlayerFromColorOrFaction("neutral").getColor());
+        AddPlanetService.addPlanet(player, planet, game);
+        deleteMessage(event);
+    }
+
     @ButtonHandler("echoPlaceFrontier_")
     public static void resolveEchoPlaceFrontier(
             Game game, Player player, ButtonInteractionEvent event, String buttonID) {

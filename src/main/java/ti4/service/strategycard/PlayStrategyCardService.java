@@ -182,9 +182,7 @@ public class PlayStrategyCardService {
         } else {
             Player propagationPlayer = Helper.getPlayerFromAbility(game, "propagation");
             if (propagationPlayer != null) {
-                boolean shouldAddNekroTechButton = scModel.usesAutomationForSCID("pok7technology")
-                        && !game.isFowMode()
-                        && !player.equals(propagationPlayer);
+                boolean shouldAddNekroTechButton = scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode();
                 if (shouldAddNekroTechButton) {
                     String ffcc = propagationPlayer.getFinsFactionCheckerPrefix();
                     scButtons.add(Buttons.gray(ffcc + "nekroFollowTech", "Get Command Tokens", FactionEmojis.Nekro));
@@ -196,8 +194,7 @@ public class PlayStrategyCardService {
                 boolean shouldAddTitansMechDeployButton = (scModel.usesAutomationForSCID("pok4construction")
                                 || scModel.usesAutomationForSCID("te4construction"))
                         && !game.isFowMode()
-                        && !ButtonHelper.isLawInPlay(game, "articles_war")
-                        && !player.equals(titansMechPlayer);
+                        && !ButtonHelper.isLawInPlay(game, "articles_war");
                 if (shouldAddTitansMechDeployButton) {
                     String ffcc = titansMechPlayer.getFinsFactionCheckerPrefix();
                     scButtons.add(Buttons.gray(
@@ -777,7 +774,7 @@ public class PlayStrategyCardService {
         Button pdsButton = Buttons.green("construction_pds", "Place a PDS", UnitEmojis.pds);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         if (game.isMonumentToTheAgesMode()) {
-            Button facilityButton = Buttons.green("construction_agesmonument", "Place A Monument (Cost 5 Resources)");
+            Button facilityButton = Buttons.green("construction_agesmonument", "Place A Monument (Cost 5 TG)");
             return List.of(followButton, buildButton, sdButton, pdsButton, facilityButton, noFollowButton);
         }
         return List.of(followButton, buildButton, sdButton, pdsButton, noFollowButton);
@@ -994,7 +991,7 @@ public class PlayStrategyCardService {
             return List.of(followButton, sdButton, pdsButton, facilityButton, noFollowButton);
         }
         if (game.isMonumentToTheAgesMode()) {
-            Button facilityButton = Buttons.green("construction_agesmonument", "Place A Monument (Cost 5 Resources)");
+            Button facilityButton = Buttons.green("construction_agesmonument", "Place A Monument (Cost 5 TG)");
             return List.of(followButton, sdButton, pdsButton, facilityButton, noFollowButton);
         }
         return List.of(followButton, sdButton, pdsButton, noFollowButton);

@@ -778,6 +778,32 @@ public class ButtonHelperCommanders {
     }
 
     public static void resolveNekroCommanderCheck(Player player, String tech, Game game) {
+        TechnologyModel techModel = Mapper.getTech(AliasHandler.resolveTech(tech));
+        String techID = tech;
+        Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
+        if (techModel.getFaction().isEmpty()
+                && obsidian != null
+                && !obsidian.is(player)
+                && obsidian.getPuppetedFactionsForPlot("extract").contains(player.getFaction())
+                && !obsidian.getTechs().contains(techID)) {
+            String msg = obsidian.getRepresentation() + ", _"
+                    + Mapper.getTech(techID).getName() + "_ has just been gained by " + player.getRepresentationNoPing()
+                    + ". Your _Extract_ plot card allows you to gain this technology for yourself by paying 4 resources.";
+
+            List<Button> buttons2 = new ArrayList<>();
+            buttons2.add(Buttons.green(
+                    "getTech_" + Mapper.getTech(techID).getAlias() + "__noPay",
+                    Mapper.getTech(techID).getName()));
+            buttons2.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(obsidian.getCardsInfoThread(), msg, buttons2);
+            List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, obsidian, "res");
+            Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+            buttons.add(doneExhausting);
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    obsidian.getCardsInfoThread(), "You can use these buttons to pay the 4 resources.", buttons);
+        }
+
         if (game.playerHasLeaderUnlockedOrAlliance(player, "nekrocommander")) {
             if (Mapper.getTech(AliasHandler.resolveTech(tech))
                             .getFaction()
@@ -805,7 +831,7 @@ public class ButtonHelperCommanders {
                         if ("vax".equalsIgnoreCase(nekroTech) || "vay".equalsIgnoreCase(nekroTech)) {
                             continue;
                         }
-                        TechnologyModel techModel = Mapper.getTech(AliasHandler.resolveTech(nekroTech));
+                        techModel = Mapper.getTech(AliasHandler.resolveTech(nekroTech));
                         if (!techModel.getFaction().orElse("").isEmpty()) {
                             removeTechButtons.add(
                                     Buttons.blue("removeValefar_" + nekroTech, "Remove " + techModel.getName()));

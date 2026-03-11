@@ -986,6 +986,22 @@ public class ButtonHelperSCs {
             MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
         } else {
             if ("agesmonument".equalsIgnoreCase(unit)) {
+                if (player.getTg() < 5) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationUnfogged()
+                                    + ", you do not have enough trade goods to place the monument (5 needed).");
+                    return;
+                }
+                if (ButtonHelper.getNumberOfUnitsOnTheBoard(
+                                game, game.getPlayerFromColorOrFaction("neutral"), "sd", true)
+                        > 2) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationUnfogged()
+                                    + ", there are already 3 monuments on the board, so you cannot place another one.");
+                    return;
+                }
                 String message = player.getRepresentationUnfogged()
                         + ", please choose the planet you wish to put your monument on for **Construction**.";
                 if (!player.getSCs().contains(4) && !"te4construction".equals(scModel.getBotSCAutomationID())) {
@@ -1032,12 +1048,9 @@ public class ButtonHelperSCs {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation(true, false) + " dropped a monument on "
-                        + Helper.getPlanetRepresentation(planet, game) + " for the cost of 5 resources.");
-        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-        Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
-        buttons.add(DoneExhausting);
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(), "Use Buttons to Pay For The Monument", buttons);
+                        + Helper.getPlanetRepresentation(planet, game)
+                        + " for the cost of 5 tg. They have been automatically deducted.");
+        player.setTg(player.getTg() - 5);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 

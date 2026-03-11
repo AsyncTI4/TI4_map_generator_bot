@@ -769,8 +769,12 @@ public class ButtonHelperTwilightsFall {
                     sendPlayerSpliceOptions(game, participants.getFirst());
                 }
             } else {
-                MessageHelper.sendMessageToChannel(
-                        game.getMainGameChannel(), game.getPing() + ", the splice is complete.");
+                List<String> cards = getSpliceCards(game);
+                List<MessageEmbed> embeds = getSpliceEmbeds(game, type, cards, null);
+                MessageHelper.sendMessageToChannelWithEmbeds(
+                        game.getMainGameChannel(),
+                        game.getPing() + ", the splice is complete. The remaining splice cards were as follows",
+                        embeds);
                 if (!game.getStoredValue("endTurnWhenSpliceEnds").isEmpty()) {
                     Player p2 = game.getActivePlayer();
                     if (game.getStoredValue("endTurnWhenSpliceEnds").contains(p2.getFaction())) {
