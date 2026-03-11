@@ -572,6 +572,7 @@ public class StatusHelper {
 
         // Optional abilities
         sendMitosisButtons(game);
+        handleMonumentToTheAges(game);
         sendYinCloneButtons(game);
         sendHoldingCompanyButtons(game);
         sendEntropicScarButtons(game);
@@ -662,6 +663,28 @@ public class StatusHelper {
 
                     String msg = "A commodity was placed upon the Monument to the Ages at " + planet.getName() + ".";
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+                    if (remaining % 3 == 0) {
+                        String msg2 = "The Monument to the Ages on the planet of "
+                                + Helper.getPlanetRepresentation(planet.getName(), game)
+                                + " has reached a multiple of 3 commodities, so the owner has earned a VP!";
+                        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg2);
+                        String customPOName = "Monument on " + Helper.getPlanetName(planet.getName()) + "";
+                        int vp = 1;
+                        if (game.getCustomPublicVP().containsKey(customPOName)) {
+                            vp = game.getCustomPublicVP().get(customPOName) + 1;
+                            game.removeCustomPO(customPOName);
+                        }
+                        Player p1 = neutral;
+                        for (Player p : game.getRealPlayers()) {
+                            if (p.getPlanets().contains(planet.getName())) {
+                                p1 = p;
+                                break;
+                            }
+                        }
+                        Integer poIndex = game.addCustomPO(customPOName, vp);
+                        game.scorePublicObjective(p1.getUserID(), poIndex);
+                        Helper.checkEndGame(game, p1);
+                    }
                 }
             }
         }

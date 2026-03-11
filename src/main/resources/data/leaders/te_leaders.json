@@ -56,6 +56,7 @@
         "abilityWindow": "When another player researches a technology",
         "abilityText": "You may exhaust this card to allow that player to ignore 1 prerequisite; if they do, you may place 1 infantry from your reinforcements into coexistence on a non-home planet they control.",
         "unlockCondition": "Always Unlocked",
+        "notes": "You can ignore a prerequisite even if you can already meet the prerequisite.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/deepwroughtagent.png?raw=true",
         "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/deepwroughtagent.png?raw=true",
         "source": "thunders_edge"

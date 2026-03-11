@@ -995,9 +995,9 @@ public class ButtonHelperHeroes {
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
         StringBuilder destroyedUnits = new StringBuilder();
         for (Player p2 : game.getRealPlayers()) {
-            unitHolder.removeAllUnits(p2.getColor());
             destroyedUnits.append(unitHolder.getPlayersUnitListEmojisOnHolder(p2));
         }
+        DestroyUnitService.destroyAllUnits(event, game.getTileFromPlanet(planetName), game, unitHolder, false);
         String planetRep = Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game);
         String msg = player.getFactionEmoji() + " destroyed all units (" + destroyedUnits + ") on the planet "
                 + planetRep + " using the The Lady, a Ghemina hero.";
