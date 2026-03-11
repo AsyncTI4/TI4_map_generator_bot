@@ -9,6 +9,7 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.milty.MiltyService;
 
 @UtilityClass
@@ -48,12 +49,11 @@ public class FrankenHomeService {
             MessageHelper.sendEphemeralMessageToEventChannel(event, player.getRepresentation() + msg);
             return;
         }
-        System.out.println("Replacing home system for player " + player.getUserName() + " at location " + ringPos);
+        BotLogger.warning("Replacing home system for player " + player.getUserName() + " at location " + ringPos);
 
         String oldHomeFaction = getPlayerHsFaction(player);
         String newHomeFaction = newHS.getItemId();
-        System.out.println(" - " + oldHomeFaction + " HS -> " + newHomeFaction + " HS");
-        // if (Objects.equals(oldHomeFaction, newHomeFaction) && getPlayerHs(player) != null) return;
+        BotLogger.warning(" - " + oldHomeFaction + " HS -> " + newHomeFaction + " HS");
 
         // Remove the old tile, removes the planets etc
         player.getGame().removeTile(ringPos);

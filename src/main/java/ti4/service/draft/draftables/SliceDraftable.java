@@ -34,9 +34,9 @@ import ti4.service.draft.SliceImageGeneratorService;
 import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.milty.MiltyDraftSlice;
 
+@Getter
 public class SliceDraftable extends SinglePickDraftable {
 
-    @Getter
     private List<MiltyDraftSlice> slices = new ArrayList<>();
 
     public void initialize(List<MiltyDraftSlice> slices) {

@@ -40,7 +40,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.DestroyUnitService;
 
-public class TeHelperTechs {
+public final class TeHelperTechs {
 
     // Generic Tech
     @ButtonHandler("useMagenDefense_")

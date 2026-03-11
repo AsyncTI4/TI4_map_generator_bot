@@ -14,8 +14,8 @@ class LeaderModelTest extends ModelTest<LeaderModel> {
 
     @Override
     public void loadData() {
-        this.type = "LeaderModel";
-        this.models = Mapper.getLeaders();
+        type = "LeaderModel";
+        models = Mapper.getLeaders();
     }
 
     @Test

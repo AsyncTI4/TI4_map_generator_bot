@@ -100,6 +100,7 @@ public class Units {
         }
     }
 
+    @Getter
     public enum UnitType {
         Infantry("gf"),
         Mech("mf"),
@@ -121,7 +122,6 @@ public class Units {
         StarfallPds("starfallpds"),
         MetaliVoidArmaments("metalivoidarmaments");
 
-        @Getter
         public final String value;
 
         UnitType(String value) {

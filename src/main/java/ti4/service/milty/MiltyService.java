@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -777,12 +778,11 @@ public class MiltyService {
 
     private static String addAnotherCornerTile(Game game, String tileID, String anchorPos) {
         record TileAndAnchor(Tile tile, String pos) {}
-        List<TileAndAnchor> tilesWithAnchors = List.of("tl", "tr", "bl", "br").stream()
+        List<TileAndAnchor> tilesWithAnchors = Stream.of("tl", "tr", "bl", "br")
                 .map(game::getTileByPosition)
                 .filter(Objects::nonNull)
                 .map(t -> new TileAndAnchor(t, getAnchorPositionForTile(game, t)))
-                .collect(Collectors.toCollection(() -> new ArrayList<>()));
-        System.out.println(" - Found " + tilesWithAnchors.size() + " other corner tiles to rearrange.");
+                .collect(Collectors.toCollection(ArrayList::new));
         tilesWithAnchors.add(new TileAndAnchor(new Tile(tileID, "tl"), anchorPos));
         if (tilesWithAnchors.size() > 4) {
             String err = "# " + game.getPing() + " UNABLE TO ADD ANOTHER CORNER TILE. PLEASE RESOLVE.";

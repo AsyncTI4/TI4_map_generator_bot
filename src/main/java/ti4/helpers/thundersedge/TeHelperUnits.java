@@ -32,7 +32,7 @@ import ti4.service.regex.RegexService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
-public class TeHelperUnits {
+public final class TeHelperUnits {
 
     /* ---------------------------------------------------------------------------|--------------------------------------------------------------------------- */
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- Firmament & Obsidian - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

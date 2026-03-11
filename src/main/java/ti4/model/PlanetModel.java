@@ -147,7 +147,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        return getEmoji() + " _" + getName() + "_ " + getPlanetTypeEmoji();
+        return getEmoji() + " _" + name + "_ " + getPlanetTypeEmoji();
     }
 
     @JsonIgnore

@@ -39,7 +39,7 @@ public class DraftSetupService {
         }
     }
 
-    public String startMiltyFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
+    private String startMiltyFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
         Game game = specs.game;
 
         if (specs.presetSlices != null) {

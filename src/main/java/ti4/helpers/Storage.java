@@ -11,7 +11,7 @@ import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import ti4.message.logging.BotLogger;
 
-public class Storage {
+public final class Storage {
 
     public static final String ENV_VAR_RESOURCE_PATH = "RESOURCE_PATH";
     private static final String ENV_VAR_DB_PATH = "DB_PATH";

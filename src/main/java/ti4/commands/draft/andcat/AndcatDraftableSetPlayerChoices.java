@@ -17,7 +17,7 @@ import ti4.service.draft.draftables.AndcatReferenceCardsDraftable.ReferenceCardP
 
 class AndcatDraftableSetPlayerChoices extends GameStateSubcommand {
 
-    protected AndcatDraftableSetPlayerChoices() {
+    AndcatDraftableSetPlayerChoices() {
         super(Constants.DRAFT_ANDCAT_SET_PLAYER_CHOICES, "Set which faction does what", true, true);
         addOption(OptionType.USER, Constants.PLAYER, "Player to make the pick for", true);
         addOption(

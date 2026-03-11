@@ -1,6 +1,8 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.File;
 import java.io.IOException;
@@ -984,11 +986,10 @@ public class UnfiledButtonHandlers {
 
     public static List<String> getBombardablePlanets(Player player, Game game, Tile tile) {
         List<String> planets = new ArrayList<>();
-        for (UnitHolder planetUH : tile.getPlanetUnitHolders()) {
+        for (Planet planetUH : tile.getPlanetUnitHolders()) {
             if (!player.getPlanetsAllianceMode().contains(planetUH.getName())
                     || FoWHelper.otherPlayersHaveUnitsOnPlanet(player, planetUH)) {
-                if (!((Planet) planetUH).getPlanetTypes().contains("cultural")
-                        || !ButtonHelper.isLawInPlay(game, "conventions")) {
+                if (!planetUH.getPlanetTypes().contains("cultural") || !ButtonHelper.isLawInPlay(game, "conventions")) {
                     planets.add(planetUH.getName());
                 }
             }
@@ -2324,7 +2325,7 @@ public class UnfiledButtonHandlers {
                         UnitModel producedUnit =
                                 player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
 
-                        if (UnitType.Flagship == producedUnit.getUnitType() && player.ownsUnit("creuss_flagship")) {
+                        if (producedUnit.getUnitType() == UnitType.Flagship && player.ownsUnit("creuss_flagship")) {
                             adjust = 1;
                         }
                     }
@@ -2644,7 +2645,7 @@ public class UnfiledButtonHandlers {
                 } else {
                     Button flipAgenda = Buttons.blue("startStrategyPhase", "Start Strategy Phase");
                     List<Button> buttons = List.of(flipAgenda);
-                    String condition = "the conditions for an Agenda Phase has not yet been met";
+                    String condition;
                     if (game.isOrdinianC1Mode()) {
                         condition = "the _Coatl_ is still damaged";
                     } else if (game.isTwilightsFallMode()) {

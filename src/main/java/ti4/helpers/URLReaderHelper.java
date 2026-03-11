@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.message.MessageHelper;
 import ti4.website.EgressClientManager;
 
-public class URLReaderHelper {
+public final class URLReaderHelper {
 
     private static final int MAX_FILE_SIZE_BYTES = 500_000; // 500 kB
 

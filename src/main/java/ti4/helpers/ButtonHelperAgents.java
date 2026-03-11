@@ -57,7 +57,7 @@ import ti4.service.unit.GalvanizeService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
-public class ButtonHelperAgents {
+public final class ButtonHelperAgents {
 
     private static List<Button> getTilesToArboAgent(Player player, Game game) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
@@ -540,8 +540,8 @@ public class ButtonHelperAgents {
         for (String pos : tiles) {
             Tile tile2 = game.getTileByPosition(pos);
 
-            for (UnitHolder unitHolder : tile2.getPlanetUnitHolders()) {
-                Planet planetReal = (Planet) unitHolder;
+            for (Planet unitHolder : tile2.getPlanetUnitHolders()) {
+                Planet planetReal = unitHolder;
                 String planet = planetReal.getName();
                 if (player.getPlanetsAllianceMode().contains(planet)) {
                     String pp = unitHolder.getName();

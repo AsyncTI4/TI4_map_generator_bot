@@ -102,11 +102,17 @@ public class Mapper {
     private static final Map<String, EventModel> events = new HashMap<>();
     private static final Map<String, ExploreModel> explores = new HashMap<>();
     private static final Map<String, FactionModel> factions = new HashMap<>();
+
+    @Getter
     private static final Map<String, DraftErrataModel> frankenErrata = new HashMap<>();
+
     private static final Map<String, GenericCardModel> genericCards = new HashMap<>();
     private static final Map<String, LeaderModel> leaders = new HashMap<>();
     private static final Map<String, MapTemplateModel> mapTemplates = new HashMap<>();
+
+    @Getter
     private static final Map<String, PromissoryNoteModel> promissoryNotes = new HashMap<>();
+
     private static final Map<String, PublicObjectiveModel> publicObjectives = new HashMap<>();
     private static final Map<String, RelicModel> relics = new HashMap<>();
     private static final Map<String, SpaceTokenModel> spaceTokens = new HashMap<>();
@@ -117,6 +123,8 @@ public class Mapper {
     private static final Map<String, TechnologyModel> technologies = new HashMap<>();
     private static final Map<String, TokenModel> tokens = new HashMap<>();
     private static final Map<String, GalacticEventModel> galacticevents = new HashMap<>();
+
+    @Getter
     private static final Map<String, UnitModel> units = new HashMap<>();
 
     @Getter
@@ -733,10 +741,6 @@ public class Mapper {
     // ####################
     // Franken Errata
 
-    public static Map<String, DraftErrataModel> getFrankenErrata() {
-        return frankenErrata;
-    }
-
     public static DraftErrataModel getFrankenErrata(String alias) {
         return frankenErrata.getOrDefault(alias, null);
     }
@@ -857,10 +861,6 @@ public class Mapper {
 
     // ####################
     // Promissory Notes
-
-    public static Map<String, PromissoryNoteModel> getPromissoryNotes() {
-        return promissoryNotes;
-    }
 
     public static PromissoryNoteModel getPromissoryNote(String id) {
         return promissoryNotes.get(id);
@@ -1180,7 +1180,6 @@ public class Mapper {
             String val = token.getValue().getImagePath();
             if (tokenID.equalsIgnoreCase(val) || tokenID.equalsIgnoreCase(key)) return key;
         }
-        System.out.println("Could not resolve token: " + tokenID);
         return tokenID;
     }
 
@@ -1231,10 +1230,6 @@ public class Mapper {
 
     // ####################
     // Units
-
-    public static Map<String, UnitModel> getUnits() {
-        return units;
-    }
 
     public static UnitModel getUnit(String unitID) {
         return units.get(unitID);

@@ -9,7 +9,7 @@ import ti4.service.draft.draftables.FactionDraftable;
 
 class FactionDraftableAddFaction extends GameStateSubcommand {
 
-    protected FactionDraftableAddFaction() {
+    FactionDraftableAddFaction() {
         super(Constants.DRAFT_FACTION_ADD, "Add a faction to the draft", true, true);
         addOption(OptionType.STRING, Constants.FACTION, "The faction to add", true, true);
     }

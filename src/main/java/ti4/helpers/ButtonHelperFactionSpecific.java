@@ -1,6 +1,8 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -79,7 +81,7 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
 
-public class ButtonHelperFactionSpecific {
+public final class ButtonHelperFactionSpecific {
 
     public static List<Button> getc4RedTechButtons(Player player) {
         // ACTION: Exhaust this card to place 1 PDS on a planet you control.
@@ -628,7 +630,6 @@ public class ButtonHelperFactionSpecific {
 
             UnitKey unitKey = unitEntry.getKey();
             String unitName = unitKey.unitName();
-            // System.out.println(unitKey.asyncID());
             int totalUnits = unitEntry.getValue();
             int damagedUnits = 0;
             if ("fighter".equalsIgnoreCase(unitName) || "spacedock".equalsIgnoreCase(unitName)) {
@@ -2743,7 +2744,6 @@ public class ButtonHelperFactionSpecific {
         buttons.add(transact2);
         buttons.add(Buttons.red("deleteButtons", "Decline"));
         String message = "Please choose how to use _AI Survey_.";
-        // System.out.println(player.getFaction() + " is playing PN KOLLEC");
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 

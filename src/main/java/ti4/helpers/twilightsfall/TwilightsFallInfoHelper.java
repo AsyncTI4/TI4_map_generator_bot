@@ -12,7 +12,7 @@ import ti4.model.TileModel;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TileEmojis;
 
-public class TwilightsFallInfoHelper {
+public final class TwilightsFallInfoHelper {
 
     /**
      * Get the string representation of the setup info a faction's reference card

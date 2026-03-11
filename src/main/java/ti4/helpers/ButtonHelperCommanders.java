@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -998,9 +998,9 @@ public class ButtonHelperCommanders {
             Game game, Player player, GenericInteractionCreateEvent event) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         List<Button> buttons = new ArrayList<>();
-        for (UnitHolder planetUnit : tile.getPlanetUnitHolders()) {
+        for (Planet planetUnit : tile.getPlanetUnitHolders()) {
 
-            Planet planetReal = (Planet) planetUnit;
+            Planet planetReal = planetUnit;
             String planetId = planetReal.getName();
             String planetName = Helper.getPlanetName(planetId);
 
@@ -1011,8 +1011,8 @@ public class ButtonHelperCommanders {
                         && tile2 != tile) {
                     continue;
                 }
-                for (UnitHolder planetUnit2 : tile2.getPlanetUnitHolders()) {
-                    Planet planetReal2 = (Planet) planetUnit2;
+                for (Planet planetUnit2 : tile2.getPlanetUnitHolders()) {
+                    Planet planetReal2 = planetUnit2;
                     int numMechs = 0;
                     int numInf = 0;
                     String colorID = Mapper.getColorID(player.getColor());

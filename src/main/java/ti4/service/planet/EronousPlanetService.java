@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class EronousPlanetService {
     public static final String CANTRIS_ID = "cantris";
-    public static final String CANTRIS_PO = "The Starlight Throne";
+    private static final String CANTRIS_PO = "The Starlight Throne";
 
     public static void resolveCantrisPO(Game game, String planet, Player player) {
         if (!CANTRIS_ID.equalsIgnoreCase(planet)) return;

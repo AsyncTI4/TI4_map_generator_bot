@@ -481,10 +481,9 @@ public class ExploreService {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveExploreAuto(
+    private static void resolveExploreAuto(
             GenericInteractionCreateEvent event, Player player, String cardID, String planetName, Game game) {
         Tile tile = game.getTileFromPlanet(planetName);
-        String tileName = tile == null ? "no tile" : tile.getPosition();
         String messageText = player.getRepresentationNoPing() + " \"chose\" to resolve _"
                 + Mapper.getExplore(cardID).getName() + "_.";
         resolveExplore(event, cardID, tile, planetName, messageText, player, game);
@@ -924,11 +923,11 @@ public class ExploreService {
                         player.getCorrectChannel(), message.toString(), discardButtons);
                 List<Button> explorePlanets = new ArrayList<>();
                 for (String planet : player.getPlanetsAllianceMode()) {
-                    UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+                    Planet unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                     if (unitHolder == null) {
                         continue;
                     }
-                    Planet planetReal = (Planet) unitHolder;
+                    Planet planetReal = unitHolder;
                     List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
                     if (buttons != null && !buttons.isEmpty()) {
                         explorePlanets.addAll(buttons);
@@ -996,7 +995,7 @@ public class ExploreService {
                 }
                 CommanderUnlockCheckService.checkPlayer(player, "hacan");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                if (message.length() > 0) {
+                if (!message.isEmpty()) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
                 }
                 message = new StringBuilder(player.getRepresentationUnfogged() + ", your current command tokens are "

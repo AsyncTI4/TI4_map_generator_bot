@@ -252,7 +252,7 @@ public class SliceDraftableSettings extends SettingsMenu {
     protected String resetSettings() {
         presetSlices = null;
         parsedSlices = null;
-        subMenus.stream().forEach(SettingsMenu::resetSettings);
+        subMenus.forEach(SettingsMenu::resetSettings);
         return super.resetSettings();
     }
 

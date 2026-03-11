@@ -12,7 +12,7 @@ import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.TileModel;
 import ti4.service.combat.CombatRollType;
 
-public class CombatTempModHelper {
+public final class CombatTempModHelper {
 
     public static void InitializeNewTempMods(Player player, TileModel tile, UnitHolder holder) {
         List<TemporaryCombatModifierModel> unusedMods = player.getNewTempCombatModifiers();

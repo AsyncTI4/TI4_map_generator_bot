@@ -12,16 +12,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "player_aggregates")
-/**
- * Persistent cache row for dashboard aggregates for a single player.
- *
- * <p>The row is keyed by {@code user_id}. Aggregate payloads are stored in {@code aggregates_json}
- * so the schema can evolve without adding a new table for each aggregate type.
- *
- * <p>{@code completed_games_hash} and {@code completed_game_count} are used for cache-busting:
- * when either no longer matches the currently observed completed games for a player, aggregates
- * are recomputed asynchronously and this row is overwritten.
- */
+/*
+ Persistent cache row for dashboard aggregates for a single player.
+
+ <p>The row is keyed by {@code user_id}. Aggregate payloads are stored in {@code aggregates_json}
+ so the schema can evolve without adding a new table for each aggregate type.
+
+ <p>{@code completed_games_hash} and {@code completed_game_count} are used for cache-busting:
+ when either no longer matches the currently observed completed games for a player, aggregates
+ are recomputed asynchronously and this row is overwritten.
+*/
 class PlayerAggregatesCache {
 
     @Id

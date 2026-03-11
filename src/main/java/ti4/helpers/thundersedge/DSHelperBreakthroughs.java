@@ -35,7 +35,7 @@ import ti4.model.UnitModel;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
-public class DSHelperBreakthroughs {
+public final class DSHelperBreakthroughs {
     // @ButtonHandler("componentActionRes_")
 
     public static void dihmohnBTExhaust(Game game, Player p1) {

@@ -61,7 +61,7 @@ import ti4.spring.jda.JdaService;
  * - Exploring a planet has chance of Stellar Converting it (with a custom token)
  *
  */
-public class RiftSetModeService {
+public final class RiftSetModeService {
     private static final String CRUCIBLE_PN = "crucible";
     private static final String CRUCIBLE_AGENDA = "riftset_crucible";
     private static final String RIFTSET_INVASION_EXPLORE = "riftset_invasion";

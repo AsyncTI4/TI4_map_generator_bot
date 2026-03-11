@@ -1,6 +1,7 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -327,20 +328,20 @@ public class CombatRollService {
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         if (!game.isFowMode() && !"none".equals(game.getStoredValue("surprisingDiceRoll"))) {
-            String disaster;
+            StringBuilder disaster;
             if ("hits".equals(game.getStoredValue("surprisingDiceRoll"))) {
-                disaster = player.getRepresentation() + " has rolled grievously against " + opponent.getRepresentation()
-                        + " in " + game.getName() + ".";
+                disaster = new StringBuilder(player.getRepresentation() + " has rolled grievously against "
+                        + opponent.getRepresentation() + " in " + game.getName() + ".");
             } else {
-                disaster = player.getRepresentation() + " has rolled dismally against " + opponent.getRepresentation()
-                        + " in " + game.getName() + ".";
+                disaster = new StringBuilder(player.getRepresentation() + " has rolled dismally against "
+                        + opponent.getRepresentation() + " in " + game.getName() + ".");
             }
             for (String line : message.split("\n")) {
                 if (line.startsWith("> `") || line.startsWith("**Total hits")) {
-                    disaster += "\n" + line;
+                    disaster.append("\n").append(line);
                 }
             }
-            DisasterWatchHelper.sendMessageInDisasterWatch(game, disaster);
+            DisasterWatchHelper.sendMessageInDisasterWatch(game, disaster.toString());
         }
         if (game.isFowMode() && isFoWPrivateChannelRoll(player, event)) {
             if (rollType == CombatRollType.SpaceCannonOffence) {

@@ -40,9 +40,4 @@ public class PoweredFrankenDraft extends FrankenDraft {
     public String getSaveString() {
         return "powered_franken";
     }
-
-    @Override
-    public int getBagSize() {
-        return 33;
-    }
 }

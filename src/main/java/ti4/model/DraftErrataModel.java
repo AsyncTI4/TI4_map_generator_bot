@@ -64,11 +64,11 @@ public class DraftErrataModel implements ModelInterface {
     }
 
     public boolean isAlwaysAddToPool() {
-        return getAlwaysAddToPool() != null && getAlwaysAddToPool();
+        return alwaysAddToPool != null && alwaysAddToPool;
     }
 
-    public boolean isUndraftable() {
-        return getUndraftable() != null && getUndraftable();
+    private boolean isUndraftable() {
+        return undraftable != null && undraftable;
     }
 
     public static void filterUndraftablesAndShuffle(List<DraftItem> items, DraftCategory listCategory) {

@@ -25,7 +25,7 @@ import ti4.service.emoji.DiceEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 
-public class CombatMessageHelper {
+public final class CombatMessageHelper {
     public static void displayDuplicateUnits(GenericInteractionCreateEvent event, List<String> dupes) {
         if (dupes.isEmpty()) return;
         // Gracefully fail when units don't exist

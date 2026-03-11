@@ -1,7 +1,25 @@
 package ti4.map.persistence;
 
-import static org.apache.commons.lang3.StringUtils.*;
-import static ti4.map.persistence.GamePersistenceKeys.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static ti4.map.persistence.GamePersistenceKeys.ENDGAMEINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDMAPINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYER;
+import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYERINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDTILE;
+import static ti4.map.persistence.GamePersistenceKeys.ENDTOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.ENDUNITHOLDER;
+import static ti4.map.persistence.GamePersistenceKeys.ENDUNITS;
+import static ti4.map.persistence.GamePersistenceKeys.GAMEINFO;
+import static ti4.map.persistence.GamePersistenceKeys.MAPINFO;
+import static ti4.map.persistence.GamePersistenceKeys.PLANET_ENDTOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.PLANET_TOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.PLAYER;
+import static ti4.map.persistence.GamePersistenceKeys.PLAYERINFO;
+import static ti4.map.persistence.GamePersistenceKeys.TILE;
+import static ti4.map.persistence.GamePersistenceKeys.TOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.UNITHOLDER;
+import static ti4.map.persistence.GamePersistenceKeys.UNITS;
 
 import java.io.File;
 import java.io.IOException;
@@ -392,12 +410,8 @@ class GameLoadService {
                         game.setAutoPingSpacer(pingHours);
                     }
                 }
-                case Constants.CURRENT_AGENDA_INFO -> {
-                    game.setCurrentAgendaInfo(info);
-                }
-                case Constants.CURRENT_ACDRAWSTATUS_INFO -> {
-                    game.setCurrentACDrawStatusInfo(info);
-                }
+                case Constants.CURRENT_AGENDA_INFO -> game.setCurrentAgendaInfo(info);
+                case Constants.CURRENT_ACDRAWSTATUS_INFO -> game.setCurrentACDrawStatusInfo(info);
 
                 case Constants.LAST_ACTIVE_PLAYER_CHANGE -> {
                     if (isNotBlank(info)) {
@@ -623,9 +637,7 @@ class GameLoadService {
                 case Constants.SHOW_OWNED_PNS_IN_PLAYER_AREA ->
                     game.setShowOwnedPNsInPlayerArea(parseBooleanOrDefault(info, false));
                 case Constants.STRAT_PINGS -> game.setStratPings(parseBooleanOrDefault(info, false));
-                case Constants.TEXT_SIZE -> {
-                    game.setTextSize(info);
-                }
+                case Constants.TEXT_SIZE -> game.setTextSize(info);
                 case Constants.ABSOL_MODE -> game.setAbsolMode(parseBooleanOrDefault(info, false));
                 case Constants.PROMISES_PROMISES -> game.setPromisesPromisesMode(parseBooleanOrDefault(info, false));
                 case Constants.FLAGSHIPPING -> game.setFlagshippingMode(parseBooleanOrDefault(info, false));
@@ -717,9 +729,7 @@ class GameLoadService {
                         game.addMigration(migration);
                     }
                 }
-                case Constants.BAG_DRAFT -> {
-                    game.setBagDraft(BagDraft.generateDraft(info, game));
-                }
+                case Constants.BAG_DRAFT -> game.setBagDraft(BagDraft.generateDraft(info, game));
                 case Constants.MILTY_DRAFT_MANAGER -> game.setMiltyDraftString(info); // We will parse this later
                 case Constants.MILTY_DRAFT_SETTINGS -> game.setMiltyJson(info); // We will parse this later
                 case Constants.DRAFT_MANAGER -> game.setDraftString(info); // We will parse this later
@@ -919,9 +929,8 @@ class GameLoadService {
                     }
                     player.setDebtTokens(debtTokens);
                 }
-                case Constants.PLAYER_STORED_VALUES -> {
+                case Constants.PLAYER_STORED_VALUES ->
                     player.setStoredValueMap(getParsedStrStrMap(tokenizer.nextToken()));
-                }
                 case Constants.BREAKTHROUGHS -> player.setBreakthroughIDs(getParsedStrList(tokenizer.nextToken()));
                 case Constants.BREAKTHROUGH_EXH_MAP ->
                     player.setBreakthroughExhausted(getParsedStrBoolMap(tokenizer.nextToken()));

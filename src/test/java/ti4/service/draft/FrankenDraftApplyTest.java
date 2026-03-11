@@ -16,7 +16,7 @@ public class FrankenDraftApplyTest extends BaseTi4Test {
     private static Player p1, p2, p3;
 
     @BeforeAll
-    private static void setupGame() {
+    public static void setupGame() {
         if (game != null) return;
         game = new Game();
         game.newGameSetup();

@@ -1394,7 +1394,7 @@ public class PlayerAreaGenerator {
 
         for (Entry<String, Map<String, Integer>> pool :
                 player.getAllDebtTokens().entrySet()) {
-            if (!pool.getValue().values().stream().anyMatch(i -> i > 0)) {
+            if (pool.getValue().values().stream().noneMatch(i -> i > 0)) {
                 continue;
             }
 
@@ -1541,7 +1541,7 @@ public class PlayerAreaGenerator {
 
             AbilityModel abilityModel = Mapper.getAbility(abilityID);
             if (abilityModel == null) {
-                System.out.println("Ability null: " + abilityID);
+                BotLogger.error("Ability null: " + abilityID);
             } else {
                 if (abilityFileName != null) {
                     String status = isExhaustedLocked ? "_exh" : "_rdy";
@@ -1729,7 +1729,7 @@ public class PlayerAreaGenerator {
                 unitCap -= ("ws".equals(unitID) && player.ownsUnit("tf-dragonfreed")) ? 1 : 0;
 
                 // Load voltron data
-                UnitModel model = player == null ? null : player.getUnitFromUnitKey(unitKey);
+                UnitModel model = player.getUnitFromUnitKey(unitKey);
                 boolean voltron = model != null && "naaz_voltron".equals(model.getAlias());
                 BufferedImage voltronDecal =
                         ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
@@ -3118,7 +3118,7 @@ public class PlayerAreaGenerator {
         List<UnitModel> playerUnitModels = new ArrayList<>(player.getUnitModels());
         for (UnitModel unit : playerUnitModels) {
             boolean drawUpgradeWithoutTech =
-                    unit.getIsUpgrade() && !unit.getRequiredTechId().isPresent();
+                    unit.getIsUpgrade() && unit.getRequiredTechId().isEmpty();
             drawUpgradeWithoutTech |= "fs".equals(unit.getAsyncId())
                     && player.hasUnlockedBreakthrough("nekrobt")
                     && !game.getStoredValue("valefarZ").isEmpty();
@@ -3355,7 +3355,7 @@ public class PlayerAreaGenerator {
                         if (j + radInner < 0) continue;
                         if (i + radInner >= width + 2 * radInner) continue;
                         if (j + radInner >= height + 2 * radInner) continue;
-                        maskInner.setRGB(i + radInner, j + radInner, (pxInner << 24) | 0x00000000);
+                        maskInner.setRGB(i + radInner, j + radInner, (pxInner << 24));
                     }
                 }
 

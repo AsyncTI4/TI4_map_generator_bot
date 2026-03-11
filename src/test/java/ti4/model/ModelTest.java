@@ -10,11 +10,11 @@ import ti4.testUtils.BaseTi4Test;
 public abstract class ModelTest<T extends ModelInterface> extends BaseTi4Test {
 
     public String type = "???";
-    public Map<String, T> models = null;
+    public Map<String, T> models;
 
     public abstract void loadData();
 
-    public ModelTest() {
+    protected ModelTest() {
         loadData();
 
         int amt = count();

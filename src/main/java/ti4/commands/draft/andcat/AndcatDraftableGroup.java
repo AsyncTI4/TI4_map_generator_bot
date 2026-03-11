@@ -36,12 +36,6 @@ public class AndcatDraftableGroup extends SubcommandGroup {
 
     public static AndcatReferenceCardsDraftable getDraftable(SlashCommandInteractionEvent event, Game game) {
         DraftManager draftManager = game.getDraftManager();
-        if (draftManager == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "Andcat Reference Packages aren't draftable; you may need `/draft manage add_draftable`.");
-            return null;
-        }
         return (AndcatReferenceCardsDraftable) draftManager.getDraftable(AndcatReferenceCardsDraftable.TYPE);
     }
 

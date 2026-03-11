@@ -13,7 +13,7 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.game.GameNameService;
 
-public class SelectionMenuProcessor {
+public final class SelectionMenuProcessor {
 
     private static final Map<String, Consumer<SelectionMenuContext>> knownMenus =
             AnnotationHandler.findKnownHandlers(SelectionMenuContext.class, SelectionHandler.class);

@@ -28,7 +28,7 @@ public class BooleanSetting extends SettingInterface {
         whenTrue = "Disable";
     }
 
-    public BooleanSetting(String id, String name, boolean val, String whenFalse, String whenTrue) {
+    BooleanSetting(String id, String name, boolean val, String whenFalse, String whenTrue) {
         super(id, name);
 
         defaultValue = val;

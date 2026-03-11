@@ -10,7 +10,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class AlRaithService {
+public final class AlRaithService {
 
     // Cabal Breakthrough
     public static void serveBeginCabalBreakthroughButtons(ButtonInteractionEvent event, Game game, Player player) {

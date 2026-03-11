@@ -3,7 +3,7 @@ package ti4.helpers.omega_phase;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class OmegaPhaseModStatusHelper {
+public final class OmegaPhaseModStatusHelper {
     public static void PrintGreeting(Game game) {
         String greeting = "### " + game.getPing() + " **Omega Phase v1**\n\n"
                 + "Omega Phase has been enabled! This overhaul will apply several changes to the game, including:\n"

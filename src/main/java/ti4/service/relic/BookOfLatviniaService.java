@@ -13,7 +13,7 @@ import ti4.model.RelicModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.emoji.MiscEmojis;
 
-public class BookOfLatviniaService {
+public final class BookOfLatviniaService {
 
     private static final String id = "bookoflatvinia";
 

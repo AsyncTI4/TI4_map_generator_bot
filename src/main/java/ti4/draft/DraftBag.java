@@ -23,7 +23,7 @@ public class DraftBag {
     public List<DraftItem> getCategory(DraftCategory cat) {
         return Contents.stream()
                 .filter(i -> i.getItemCategory() == cat)
-                .collect(Collectors.toCollection(() -> new ArrayList<>()));
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public int getCategoryCount(DraftCategory cat) {

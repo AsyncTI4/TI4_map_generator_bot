@@ -11,7 +11,7 @@ import ti4.service.draft.draftables.AndcatReferenceCardsDraftable;
 
 class AndcatDraftableModifyPackage extends GameStateSubcommand {
 
-    protected AndcatDraftableModifyPackage() {
+    AndcatDraftableModifyPackage() {
         super(Constants.DRAFT_ANDCAT_MODIFY_PACKAGE, "Modify a package in the draft", true, false);
         addOption(
                 OptionType.INTEGER,

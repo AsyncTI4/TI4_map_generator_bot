@@ -24,7 +24,7 @@ import ti4.message.logging.BotLogger;
 import ti4.model.ActionCardModel;
 import ti4.service.emoji.CardEmojis;
 
-public class NewStuffHelper {
+public final class NewStuffHelper {
 
     public static List<Button> buttonPagination(List<Button> allButtons, String prefixID, int pageNum) {
         return buttonPagination(allButtons, null, prefixID, 25, pageNum, false);
