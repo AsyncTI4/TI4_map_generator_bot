@@ -3969,66 +3969,50 @@ public final class AgendaHelper {
         if (agendaName != null && !"Covert Legislation".equalsIgnoreCase(agendaName)) {
             game.setCurrentAgendaInfo(agendaType + "_" + agendaTarget + "_" + uniqueID + "_" + agendaID);
         } else {
-            boolean notEmergency = false;
-            while (!notEmergency) {
-                if ("Emergency Session".equalsIgnoreCase(agendaName)) {
-                    game.revealAgenda(revealFromBottom);
-                    MessageHelper.sendMessageToChannel(
-                            channel,
-                            game.getPing()
-                                    + " _Emergency Session_ revealed underneath _Covert Legislation_, discarding it.");
-                }
-                notEmergency = !"Emergency Session".equalsIgnoreCase(agendaName);
-                String id2 = game.getNextAgenda(revealFromBottom);
-                AgendaModel agendaDetails2 = Mapper.getAgenda(id2);
-                agendaTarget = agendaDetails2.getTarget();
-                agendaType = agendaDetails2.getType();
-                agendaName = agendaModel.getName();
-                game.setCurrentAgendaInfo(agendaType + "_" + agendaTarget + "_CL_covert");
-                if ((agendaTarget.toLowerCase().contains("elect law") || "constitution".equalsIgnoreCase(id2))
-                        && game.getLaws().isEmpty()) {
-                    notEmergency = false;
-                    game.revealAgenda(revealFromBottom);
-                    MessageHelper.sendMessageToChannel(
-                            channel,
-                            game.getPing() + ", an \"elect law\" agenda (" + agendaName
-                                    + ") was hidden under _Covert Legislation_ with no laws in play."
-                                    + " As such, both that agenda and _Covert Legislation_ have been discarded, and the next agenda is being flipped.");
-                    aCount -= 1;
-                    game.setStoredValue("agendaCount", aCount + "");
-                    revealAgenda(event, revealFromBottom, game, channel);
-                    return;
-                }
-                if ((agendaTarget.toLowerCase().contains("secret objective")) && game.getScoredSecrets() < 1) {
-                    MessageHelper.sendMessageToChannel(
-                            channel,
-                            game.getPing() + ", an \"elect scored secret objective\" agenda (" + agendaName
-                                    + ") was hidden under _Covert Legislation_ when no secret objectives have been scored."
-                                    + " As such, both that agenda and _Covert Legislation_ have been discarded, and the next agenda is being flipped.");
-                    notEmergency = false;
-                    game.revealAgenda(revealFromBottom);
-                    aCount -= 1;
-                    game.setStoredValue("agendaCount", aCount + "");
-                    revealAgenda(event, revealFromBottom, game, channel);
-                    return;
-                }
+            String id2 = game.getNextAgenda(revealFromBottom);
+            AgendaModel agendaDetails2 = Mapper.getAgenda(id2);
+            agendaTarget = agendaDetails2.getTarget();
+            agendaType = agendaDetails2.getType();
+            agendaName = agendaModel.getName();
+            game.setCurrentAgendaInfo(agendaType + "_" + agendaTarget + "_CL_covert");
+            if ((agendaTarget.toLowerCase().contains("elect law") || "constitution".equalsIgnoreCase(id2))
+                    && game.getLaws().isEmpty()) {
+                game.revealAgenda(revealFromBottom);
+                MessageHelper.sendMessageToChannel(
+                        channel,
+                        game.getPing() + ", an \"elect law\" agenda (" + agendaName
+                                + ") was hidden under _Covert Legislation_ with no laws in play."
+                                + " As such, both that agenda and _Covert Legislation_ have been discarded, and the next agenda is being flipped.");
+                aCount -= 1;
+                game.setStoredValue("agendaCount", aCount + "");
+                revealAgenda(event, revealFromBottom, game, channel);
+                return;
+            }
+            if ((agendaTarget.toLowerCase().contains("secret objective")) && game.getScoredSecrets() < 1) {
+                MessageHelper.sendMessageToChannel(
+                        channel,
+                        game.getPing() + ", an \"elect scored secret objective\" agenda (" + agendaName
+                                + ") was hidden under _Covert Legislation_ when no secret objectives have been scored."
+                                + " As such, both that agenda and _Covert Legislation_ have been discarded, and the next agenda is being flipped.");
+                game.revealAgenda(revealFromBottom);
+                aCount -= 1;
+                game.setStoredValue("agendaCount", aCount + "");
+                revealAgenda(event, revealFromBottom, game, channel);
+                return;
+            }
 
-                if (notEmergency) {
-                    cov = true;
+            cov = true;
 
-                    Player speaker = null;
-                    if (game.getPlayer(game.getSpeakerUserID()) != null) {
-                        speaker = game.getPlayers().get(game.getSpeakerUserID());
-                    }
-                    if (speaker != null) {
-                        String sb = speaker.getRepresentationUnfogged()
-                                + " this is the hidden agenda for _Covert Legislation_:";
-                        List<MessageEmbed> embeds =
-                                List.of(Mapper.getAgenda(id2).getRepresentationEmbed());
-                        MessageHelper.sendMessageEmbedsToCardsInfoThread(speaker, sb, embeds);
-                        game.drawAgenda();
-                    }
-                }
+            Player speaker = null;
+            if (game.getPlayer(game.getSpeakerUserID()) != null) {
+                speaker = game.getPlayers().get(game.getSpeakerUserID());
+            }
+            if (speaker != null) {
+                String sb =
+                        speaker.getRepresentationUnfogged() + " this is the hidden agenda for _Covert Legislation_:";
+                List<MessageEmbed> embeds = List.of(Mapper.getAgenda(id2).getRepresentationEmbed());
+                MessageHelper.sendMessageEmbedsToCardsInfoThread(speaker, sb, embeds);
+                game.drawAgenda();
             }
         }
         game.setStoredValue("Pass On Shenanigans", "");
