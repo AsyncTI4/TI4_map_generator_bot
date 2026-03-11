@@ -21,7 +21,7 @@ import ti4.map.persistence.ManagedPlayer;
 @Service
 class CommunityStatsService {
 
-    static final Duration STATS_TTL = Duration.ofHours(4);
+    private static final Duration STATS_TTL = Duration.ofHours(4);
     private static final String CACHE_NAME = "communityStatsCache";
     private static final String CACHE_KEY = "global";
     private static final List<String> UNAVAILABLE_METRICS = List.of();

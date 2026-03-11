@@ -236,7 +236,7 @@ public class CreateGameButtonHandler {
             var userSettings = UserSettingsManager.get(member.getId());
             String activeHoursSummary = userSettings.summarizeActiveHoursEmoji(userSettings.getActiveHours());
             if (activeHoursSummary != null) {
-                if (activityList.length() == 0) {
+                if (activityList.isEmpty()) {
                     activityList
                             .append("\n### Players Active Hours (starting from ")
                             .append("<t:" + 1767225600L)
@@ -244,7 +244,7 @@ public class CreateGameButtonHandler {
                             .append("):\n");
                 }
 
-                activityList.append("\n" + playerNumber).append(". ").append(activeHoursSummary);
+                activityList.append("\n").append(playerNumber).append(". ").append(activeHoursSummary);
             }
             // } else {
             //     memberList.append("\n  - Insufficient data for active hours.");

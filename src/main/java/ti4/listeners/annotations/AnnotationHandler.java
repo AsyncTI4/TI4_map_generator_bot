@@ -34,7 +34,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.logging.BotLogger;
 
-public class AnnotationHandler {
+public final class AnnotationHandler {
 
     private static final List<Class<?>> classes = new ArrayList<>();
 

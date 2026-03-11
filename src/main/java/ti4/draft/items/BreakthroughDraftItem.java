@@ -42,7 +42,7 @@ public class BreakthroughDraftItem extends DraftItem {
     @Override
     public String getLongDescriptionImpl() {
         BreakthroughModel breakthroughModel = getBreakthroughModel();
-      return breakthroughModel.getText() + "\n";
+        return breakthroughModel.getText() + "\n";
     }
 
     @JsonIgnore

@@ -11,7 +11,7 @@ public class PersistToSqlCron {
 
     public static void register() {
         CronManager.schedulePeriodicallyAtTime(
-                PersistToSqlCron.class, PersistToSqlCron::persist, 00, 00, ZoneId.of("America/New_York"));
+                PersistToSqlCron.class, PersistToSqlCron::persist, 0, 0, ZoneId.of("America/New_York"));
     }
 
     private static void persist() {

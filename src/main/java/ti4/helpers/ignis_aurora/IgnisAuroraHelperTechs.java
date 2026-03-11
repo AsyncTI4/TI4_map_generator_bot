@@ -20,7 +20,7 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 
-public class IgnisAuroraHelperTechs {
+public final class IgnisAuroraHelperTechs {
     public static void handleExhaustIgnisAuroraTech(
             GenericInteractionCreateEvent event, Game game, Player player, String tech) {
         boolean deleteMsg = true, deleteButton = true;

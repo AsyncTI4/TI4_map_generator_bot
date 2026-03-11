@@ -497,7 +497,7 @@ public class StartCombatService {
                     if (game.getActivePlayer() != null && playersWithGF.contains(game.getActivePlayer())) {
                         p1 = game.getActivePlayer();
                         if (p2 == p1) {
-                            p2 = playersWithGF.get(0);
+                            p2 = playersWithGF.getFirst();
                         }
                     }
                     for (Player player : playersWithGF) {
@@ -909,7 +909,7 @@ public class StartCombatService {
                         buttons.add(bountyButton);
                     }
                 }
-                if (buttons.size() > 0) {
+                if (!buttons.isEmpty()) {
                     buttons.add(Buttons.red("deleteButtons", "Delete These"));
                     MessageHelper.sendMessageToChannel(
                             player.getCardsInfoThread(),

@@ -56,7 +56,7 @@ import ti4.service.unit.MoveUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
-public class ButtonHelperModifyUnits {
+public final class ButtonHelperModifyUnits {
 
     private static int getNumberOfSustainableUnits(
             Player player, Game game, UnitHolder unitHolder, boolean space, boolean spacecannonoffence) {
@@ -1452,7 +1452,7 @@ public class ButtonHelperModifyUnits {
                 getOpposingUnitsToHitOnGround(player, game, game.getTileFromPlanet(planet), planet, "ruthless"));
     }
 
-    public static List<Button> getOpposingUnitsToHitOnGround(
+    private static List<Button> getOpposingUnitsToHitOnGround(
             Player player, Game game, Tile tile, String planet, String source) {
         List<Button> buttons = new ArrayList<>();
         UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);

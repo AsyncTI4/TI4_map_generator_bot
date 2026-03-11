@@ -12,7 +12,7 @@ import ti4.message.logging.BotLogger;
 import tools.jackson.databind.JavaType;
 import tools.jackson.databind.ObjectWriter;
 
-public class GlobalSettings {
+public final class GlobalSettings {
 
     // Adding an enum here will make it show up as an AutoComplete option in the /admin setting setting_name parameter,
     // and will allow you to get the setting easier

@@ -96,7 +96,7 @@ import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
 
-public class Helper {
+public final class Helper {
 
     public static int getCurrentHour() {
         long currentTime = System.currentTimeMillis();
@@ -955,12 +955,12 @@ public class Helper {
         List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         player.resetProducedUnits();
         for (String planet : planets) {
-            UnitHolder uh = game.getUnitHolderFromPlanet(planet);
+            Planet uh = game.getUnitHolderFromPlanet(planet);
             if (uh == null) continue; // custodia, ghoti, etc.
 
             boolean containsDMZ = uh.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
 
-            if (containsDMZ || ((Planet) uh).isSpaceStation()) {
+            if (containsDMZ || uh.isSpaceStation()) {
                 continue;
             }
             if ("spacedock".equalsIgnoreCase(unit)) {
@@ -1655,9 +1655,7 @@ public class Helper {
             } else {
                 msg.append("Producing a total of ")
                         .append(unitCount)
-                        .append(" unit")
-                        .append(unitCount == 1 ? "" : "s")
-                        .append(" for a total cost of ")
+                        .append(" units for a total cost of ")
                         .append(cost)
                         .append(" resource")
                         .append(cost == 1 ? "" : "s")

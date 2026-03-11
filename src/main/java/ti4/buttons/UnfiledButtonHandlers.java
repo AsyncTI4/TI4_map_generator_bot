@@ -986,11 +986,10 @@ public class UnfiledButtonHandlers {
 
     public static List<String> getBombardablePlanets(Player player, Game game, Tile tile) {
         List<String> planets = new ArrayList<>();
-        for (UnitHolder planetUH : tile.getPlanetUnitHolders()) {
+        for (Planet planetUH : tile.getPlanetUnitHolders()) {
             if (!player.getPlanetsAllianceMode().contains(planetUH.getName())
                     || FoWHelper.otherPlayersHaveUnitsOnPlanet(player, planetUH)) {
-                if (!((Planet) planetUH).getPlanetTypes().contains("cultural")
-                        || !ButtonHelper.isLawInPlay(game, "conventions")) {
+                if (!planetUH.getPlanetTypes().contains("cultural") || !ButtonHelper.isLawInPlay(game, "conventions")) {
                     planets.add(planetUH.getName());
                 }
             }
@@ -2646,7 +2645,7 @@ public class UnfiledButtonHandlers {
                 } else {
                     Button flipAgenda = Buttons.blue("startStrategyPhase", "Start Strategy Phase");
                     List<Button> buttons = List.of(flipAgenda);
-                    String condition = "the conditions for an Agenda Phase has not yet been met";
+                    String condition;
                     if (game.isOrdinianC1Mode()) {
                         condition = "the _Coatl_ is still damaged";
                     } else if (game.isTwilightsFallMode()) {

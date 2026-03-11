@@ -38,7 +38,7 @@ import ti4.service.game.GameNameService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.CheckUnitContainmentService;
 
-public class FoWHelper {
+public final class FoWHelper {
 
     public static boolean isPrivateGame(GenericInteractionCreateEvent event) {
         if (event == null) {

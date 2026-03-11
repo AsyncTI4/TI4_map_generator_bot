@@ -25,10 +25,10 @@ import ti4.service.draft.PlayerDraftState;
 import ti4.service.draft.PlayerSetupService.PlayerSetupState;
 import ti4.service.emoji.MiltyDraftEmojis;
 
+@Setter
+@Getter
 public class SpeakerOrderDraftable extends SinglePickDraftable {
 
-    @Getter
-    @Setter
     private int numPicks;
 
     public void initialize(int numPlayers) {

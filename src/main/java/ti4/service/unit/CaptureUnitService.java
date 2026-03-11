@@ -18,7 +18,7 @@ import ti4.map.UnitHolder;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
-public class CaptureUnitService {
+public final class CaptureUnitService {
 
     public static List<Player> listCapturingMechPlayers(
             Game game, List<RemovedUnit> allUnits, RemovedUnit removedUnitType) {

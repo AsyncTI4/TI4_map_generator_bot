@@ -38,7 +38,7 @@ import ti4.service.regex.RegexService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
-public class TeHelperAgents {
+public final class TeHelperAgents {
 
     public static boolean handleTeAgentExhaust(Game game, Player player, String leaderID, String targetPlayer) {
         Player target = game.getPlayerFromColorOrFaction(targetPlayer);

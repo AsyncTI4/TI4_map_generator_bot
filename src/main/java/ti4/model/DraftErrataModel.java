@@ -67,7 +67,7 @@ public class DraftErrataModel implements ModelInterface {
         return alwaysAddToPool != null && alwaysAddToPool;
     }
 
-    public boolean isUndraftable() {
+    private boolean isUndraftable() {
         return undraftable != null && undraftable;
     }
 

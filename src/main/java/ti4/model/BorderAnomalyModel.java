@@ -10,6 +10,7 @@ import ti4.ResourceHelper;
 
 public class BorderAnomalyModel {
 
+    @Getter
     public enum BorderAnomalyType {
         // homebrew
         ASTEROID("Asteroid Field", "asteroid_border.png"), //
@@ -26,10 +27,8 @@ public class BorderAnomalyModel {
         YELLOW("Yellow", "yellow.png"), //
         REDORANGE("RedOrange", "redorange.png");
 
-        @Getter
         private final String name;
 
-        @Getter
         private final String imageFilePath;
 
         BorderAnomalyType(String name, String fileName) {

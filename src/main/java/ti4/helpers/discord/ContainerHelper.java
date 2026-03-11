@@ -12,7 +12,7 @@ public class ContainerHelper {
 
     public Container appendComponents(Container c, ContainerChildComponent... childComponents) {
         List<ContainerChildComponent> components = new ArrayList<>(c.getComponents());
-      Collections.addAll(components, childComponents);
+        Collections.addAll(components, childComponents);
         return c.withComponents(components);
     }
 }

@@ -6,7 +6,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.leader.UnlockLeaderService;
 
-public class BreakthroughHelper {
+public final class BreakthroughHelper {
 
     public static void resolveYinBreakthroughAbility(Game game, Player player) {
         String leaderID = UnusedCommanderHelper.getUnusedCommander(game);

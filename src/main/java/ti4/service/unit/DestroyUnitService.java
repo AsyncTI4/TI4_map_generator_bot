@@ -33,7 +33,7 @@ import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
-public class DestroyUnitService {
+public final class DestroyUnitService {
 
     public static void destroyAllUnitsInSystem(
             GenericInteractionCreateEvent event, Tile tile, Game game, boolean combat) {

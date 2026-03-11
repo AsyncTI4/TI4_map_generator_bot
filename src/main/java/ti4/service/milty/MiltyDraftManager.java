@@ -583,11 +583,11 @@ public class MiltyDraftManager {
             index++;
         }
 
-        if (!ignoreMessageIDs) {
-            // DEPRECATED
-            // StringTokenizer messageIds =
-            new StringTokenizer(bigTokenizer.nextToken(), ",");
-        }
+        // if (!ignoreMessageIDs) {
+        // DEPRECATED
+        // StringTokenizer messageIds =
+        // new StringTokenizer(bigTokenizer.nextToken(), ",");
+        // }
 
         // Map Template
         String savedTemplate = bigTokenizer.nextToken();

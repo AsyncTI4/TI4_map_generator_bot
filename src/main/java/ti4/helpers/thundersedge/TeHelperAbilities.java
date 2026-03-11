@@ -35,7 +35,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.AddUnitService;
 
-public class TeHelperAbilities {
+public final class TeHelperAbilities {
 
     /* ---------------------------------------------------------------------------|--------------------------------------------------------------------------- */
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- Last Bastion - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import ti4.model.ColorModel;
 
-class ColourHelper {
+final class ColourHelper {
 
     public static List<ColorModel> sortColours(String factionId, List<ColorModel> colours) {
         List<ColorModel> newcolours = new ArrayList<>(colours);

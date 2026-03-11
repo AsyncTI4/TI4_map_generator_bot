@@ -41,7 +41,7 @@ import ti4.service.planet.EronousPlanetService;
 import ti4.service.turn.StartTurnService;
 import ti4.settings.users.UserSettingsManager;
 
-public class StatusHelper {
+public final class StatusHelper {
 
     public static void AnnounceStatusPhase(Game game) {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have passed.");

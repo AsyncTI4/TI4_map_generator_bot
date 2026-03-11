@@ -24,11 +24,11 @@ public class TeHelperBreakthroughs {
         switch (breakthroughID) {
             case "arborecbt" -> PsychosporeService.postInitialButtons(event, game, player);
             case "zooidbt" -> {
-                List<Button> buttons = new ArrayList<Button>();
                 ThreadChannel channel = player.getCardsInfoThread();
                 String output = player.getRepresentation()
                         + ", please choose a secret objective to discard - the bot will automatically draw a replacement:";
-                buttons.addAll(SecretObjectiveHelper.getSODiscardButtonsWithSuffix(player, "redraw"));
+                List<Button> buttons =
+                        new ArrayList<Button>(SecretObjectiveHelper.getSODiscardButtonsWithSuffix(player, "redraw"));
                 MessageHelper.sendMessageToChannelWithButtons(channel, output, buttons);
             }
             case "crimsonbt" -> ResonanceGeneratorService.postInitialButtons(event, game, player);

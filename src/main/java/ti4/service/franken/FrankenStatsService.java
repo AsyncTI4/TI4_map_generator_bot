@@ -29,7 +29,7 @@ public class FrankenStatsService {
         }
     }
 
-    public void addStartingComms(GenericInteractionCreateEvent event, Player player, int comms) {
+    private void addStartingComms(GenericInteractionCreateEvent event, Player player, int comms) {
         int totalComms = player.getCommoditiesTotal() + comms;
 
         String message = "> Set base commodity to " + totalComms + " " + MiscEmojis.comm + ".";
@@ -37,7 +37,7 @@ public class FrankenStatsService {
         MessageHelper.sendEphemeralMessageToEventChannel(event, message);
     }
 
-    public void removeStartingComms(GenericInteractionCreateEvent event, Player player, int comms) {
+    private void removeStartingComms(GenericInteractionCreateEvent event, Player player, int comms) {
         int totalComms = player.getCommoditiesTotal() - comms;
 
         String message = "> Set base commodity to " + totalComms + " " + MiscEmojis.comm + ".";

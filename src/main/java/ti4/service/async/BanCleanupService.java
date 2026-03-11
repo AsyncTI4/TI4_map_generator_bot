@@ -127,7 +127,7 @@ public class BanCleanupService {
         }
     }
 
-    public int cleanupBotQuestionChannel(Guild guild, User user) {
+    private int cleanupBotQuestionChannel(Guild guild, User user) {
         if (user == null) return 0;
         int errors = 0;
         try {

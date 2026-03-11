@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.helpers.Constants;
 import ti4.website.UltimateStatisticsWebsiteHelper;
 
-public class TiglUsernameChangeService {
+public final class TiglUsernameChangeService {
 
     public static void changeUsername(SlashCommandInteractionEvent event) {
         var request = new TiglUsernameChangeRequest();

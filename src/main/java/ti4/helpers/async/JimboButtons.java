@@ -23,7 +23,7 @@ import ti4.message.logging.LogOrigin;
 import ti4.model.TileModel;
 
 // Jazz's Interactive Map Builder
-class JimboButtons {
+final class JimboButtons {
     // Main Page
     public static final Button MAIN_PAGE = Buttons.gray(JimboConst.mainPage, "Go back to main menu");
     private static final Button EXIT = Buttons.red(JimboConst.exit, "Exit");

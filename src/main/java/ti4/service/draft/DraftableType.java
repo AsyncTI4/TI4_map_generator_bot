@@ -2,7 +2,7 @@ package ti4.service.draft;
 
 import java.util.Objects;
 
-public class DraftableType {
+public final class DraftableType {
     private final String name;
 
     private DraftableType(String name) {

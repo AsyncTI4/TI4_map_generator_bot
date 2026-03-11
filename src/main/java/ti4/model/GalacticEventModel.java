@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.Data;
+import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
@@ -16,8 +17,12 @@ import ti4.service.emoji.CardEmojis;
 
 @Data
 public class GalacticEventModel implements ModelInterface, EmbeddableModel {
+    @Getter
     private String alias;
+
+    @Getter
     private String name;
+
     private String text;
     private String notes;
     private String mapText;
@@ -29,14 +34,6 @@ public class GalacticEventModel implements ModelInterface, EmbeddableModel {
 
     public boolean isValid() {
         return alias != null && name != null && text != null && complexity != null && source != null;
-    }
-
-    public String getAlias() {
-        return alias;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getText() {

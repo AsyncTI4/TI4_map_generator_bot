@@ -24,7 +24,7 @@ import ti4.message.logging.BotLogger;
 import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
 import ti4.spring.jda.JdaService;
 
-public class ApplicationEmojiService {
+public final class ApplicationEmojiService {
 
     public static final String fallbackEmoji = "<a:EvensOddsRage:1080111937930678282>";
     private static final Map<String, CachedEmoji> emojis = new HashMap<>();

@@ -138,7 +138,6 @@ public class MessageV2Editor {
 
     /**
      * For full container replacement, replace the container components if the predicate returns true
-     * @param contentPattern A string to test against each text component.
      * @param newContent A replacement TextDisplay.
      */
     public MessageV2Editor replace(Predicate<Component> predicate, Container newContent) {

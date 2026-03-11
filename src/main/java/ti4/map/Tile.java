@@ -15,6 +15,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -42,8 +44,13 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.map.CustomHyperlaneService;
 
 public class Tile {
+    @Getter
     private final String tileID;
+
+    @Setter
     private String position;
+
+    @Getter
     private final Map<String, UnitHolder> unitHolders = new LinkedHashMap<>();
 
     @JsonIgnore
@@ -292,16 +299,8 @@ public class Tile {
         return fullHyperlaneData.get(sourceDirection);
     }
 
-    public String getTileID() {
-        return tileID;
-    }
-
     public String getPosition() {
         return position != null ? position.toLowerCase() : null;
-    }
-
-    public void setPosition(String position) {
-        this.position = position;
     }
 
     @JsonIgnore
@@ -396,10 +395,6 @@ public class Tile {
             BotLogger.warning(new LogOrigin(player), "Could not find tile: " + fowTileID);
         }
         return tilePath;
-    }
-
-    public Map<String, UnitHolder> getUnitHolders() {
-        return unitHolders;
     }
 
     public List<Planet> getSpaceStations() {
@@ -846,8 +841,8 @@ public class Tile {
             sb.append(" with ");
             var planetDisplayNames = unitHolders.keySet().stream()
                     .filter(key -> !"space".equals(key))
-                    .map(planetId -> Helper.getPlanetName(planetId))
-                    .filter(name -> name != null)
+                    .map(Helper::getPlanetName)
+                    .filter(Objects::nonNull)
                     .toList();
             sb.append(String.join(", ", planetDisplayNames));
         }

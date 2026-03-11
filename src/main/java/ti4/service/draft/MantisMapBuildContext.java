@@ -214,11 +214,11 @@ public record MantisMapBuildContext(
         public static PlayerTiles create(String playerUserId, List<DraftItem> allTiles, Integer mulligansUsed) {
             List<String> blueTileIds = allTiles.stream()
                     .filter(item -> item.getItemCategory() == DraftCategory.BLUETILE)
-                    .map(item -> item.getItemId())
+                    .map(DraftItem::getItemId)
                     .collect(Collectors.toList());
             List<String> redTileIds = allTiles.stream()
                     .filter(item -> item.getItemCategory() == DraftCategory.REDTILE)
-                    .map(item -> item.getItemId())
+                    .map(DraftItem::getItemId)
                     .collect(Collectors.toList());
             return new PlayerTiles(playerUserId, blueTileIds, redTileIds, mulligansUsed);
         }

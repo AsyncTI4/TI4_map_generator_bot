@@ -40,7 +40,7 @@ public class PlotDraftItem extends DraftItem {
     @Override
     public String getLongDescriptionImpl() {
         GenericCardModel plotModel = getPlotModel();
-      return plotModel.getText() + "\n";
+        return plotModel.getText() + "\n";
     }
 
     @JsonIgnore

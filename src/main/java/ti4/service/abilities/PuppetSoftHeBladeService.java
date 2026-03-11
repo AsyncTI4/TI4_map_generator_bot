@@ -136,19 +136,19 @@ public class PuppetSoftHeBladeService {
 
     private static void resolveFirmamentMechFlip(Game game, Player player) {
         int count = 0;
-        String output = "### " + player.getRepresentation(false, true)
-                + ", the following planets have been taken control of by Vipers Hollow:";
+        StringBuilder output = new StringBuilder("### " + player.getRepresentation(false, true)
+                + ", the following planets have been taken control of by Vipers Hollow:");
         for (String planet : game.getPlanetsPlayerIsCoexistingOn(player)) {
             UnitHolder uH = game.getUnitHolderFromPlanet(planet);
             if (uH != null && uH.getUnitCount(UnitType.Mech, player) > 0) {
                 count++;
-                output += "\n> " + Helper.getPlanetRepresentation(planet, game);
+                output.append("\n> ").append(Helper.getPlanetRepresentation(planet, game));
                 AddPlanetService.addPlanet(player, planet, game);
             }
         }
 
         if (count > 0) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), output);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), output.toString());
         }
     }
 

@@ -123,7 +123,7 @@ public class FactionDraftable extends SinglePickDraftable {
         return getFactionByChoice(choice.getChoiceKey());
     }
 
-    public static FactionModel getFactionByChoice(String choiceKey) {
+    private static FactionModel getFactionByChoice(String choiceKey) {
         return Mapper.getFaction(choiceKey);
     }
 

@@ -139,7 +139,7 @@ public abstract class BagDraft {
         return player.getCurrentDraftBag().Contents.stream().anyMatch(draftItem -> draftItem.isDraftable(player));
     }
 
-    public List<DraftItem> draftableItemsInBag(Player player) {
+    private List<DraftItem> draftableItemsInBag(Player player) {
         ArrayList<DraftItem> draftableItems = new ArrayList<>(player.getCurrentDraftBag().Contents.stream()
                 .filter(draftItem -> draftItem.isDraftable(player))
                 .toList());
@@ -224,7 +224,7 @@ public abstract class BagDraft {
         return threadChannel;
     }
 
-    public String getBagChannelThreadName(Player player) {
+    private String getBagChannelThreadName(Player player) {
         String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-"
                 + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("");
         if (owner.isFowMode()) {

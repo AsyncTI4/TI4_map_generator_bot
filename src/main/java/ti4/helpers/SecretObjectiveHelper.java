@@ -25,7 +25,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.HeroUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
 
-public class SecretObjectiveHelper {
+public final class SecretObjectiveHelper {
 
     public static boolean scoreSO(
             GenericInteractionCreateEvent event, Game game, Player player, int soID, MessageChannel channel) {

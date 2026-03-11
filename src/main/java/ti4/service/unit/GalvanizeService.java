@@ -23,7 +23,7 @@ import ti4.message.logging.BotLogger;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.regex.RegexService;
 
-public class GalvanizeService {
+public final class GalvanizeService {
 
     @ButtonHandler("getToggleGalvanizeTiles")
     public static void postToggleGalvanizeTiles(Game game, Player player) {

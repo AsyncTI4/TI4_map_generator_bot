@@ -34,16 +34,23 @@ import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.service.emoji.TI4Emoji;
 
+@Getter
 public abstract class DraftItem {
 
-    private @Getter final DraftCategory ItemCategory;
-    private @Getter final String ItemId;
-    private @Getter final DraftErrataModel Errata;
+    private final DraftCategory ItemCategory;
+    private final String ItemId;
+    private final DraftErrataModel Errata;
 
     @Override
-    public boolean equals(Object i2) {
-        if (i2 instanceof DraftItem item) return item.getAlias().equals(getAlias());
+    public boolean equals(Object other) {
+        if (other instanceof DraftItem otherDraftItem)
+            return otherDraftItem.getAlias().equals(getAlias());
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return getAlias().hashCode();
     }
 
     protected DraftItem(DraftCategory category, String itemId) {
@@ -277,11 +284,11 @@ public abstract class DraftItem {
         return null;
     }
 
-    public static boolean isFinishedWithBag(Player player) {
+    private static boolean isFinishedWithBag(Player player) {
         return player.getGame().getActiveBagDraft().playerQueueIsFull(player);
     }
 
-    public static boolean isAtHandLimit(Player player, DraftCategory cat) {
+    private static boolean isAtHandLimit(Player player, DraftCategory cat) {
         BagDraft draftRules = player.getGame().getActiveBagDraft();
         DraftBag draftHand = player.getDraftHand();
         boolean isAtHandLimit =
@@ -295,11 +302,11 @@ public abstract class DraftItem {
         return isAtHandLimit;
     }
 
-    public static boolean alreadyDraftedThisCategory(Player player, DraftCategory category) {
+    private static boolean alreadyDraftedThisCategory(Player player, DraftCategory category) {
         return player.getDraftQueue().getCategoryCount(category) > 0;
     }
 
-    public static boolean otherCategoriesAvailable(Player player, DraftCategory category) {
+    private static boolean otherCategoriesAvailable(Player player, DraftCategory category) {
         BagDraft draftRules = player.getGame().getActiveBagDraft();
         DraftBag draftHand = player.getDraftHand();
 

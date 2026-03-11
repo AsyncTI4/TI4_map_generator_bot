@@ -21,7 +21,7 @@ import ti4.model.ColorModel;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
 
-public class AliasHandler {
+public final class AliasHandler {
 
     private static final Map<String, String> actionCardAliasList = new HashMap<>();
     private static final Map<String, String> agendaAliasList = new HashMap<>();

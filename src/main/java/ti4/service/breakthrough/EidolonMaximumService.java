@@ -33,11 +33,11 @@ public class EidolonMaximumService {
         return Mapper.getBreakthrough("naazbt").getRepresentation(includeCardText);
     }
 
-    public boolean playerHasIdleMax(Player player) {
+    private boolean playerHasIdleMax(Player player) {
         return player.hasUnlockedBreakthrough("naazbt") && !player.hasActiveBreakthrough("naazbt");
     }
 
-    public boolean playerHasActiveMax(Player player) {
+    private boolean playerHasActiveMax(Player player) {
         return player.hasActiveBreakthrough("naazbt");
     }
 
@@ -64,7 +64,7 @@ public class EidolonMaximumService {
         }
     }
 
-    public void sendFlipButtonsToCardsInfo(Player player, Tile tile, List<UnitHolder> unitHolders) {
+    private void sendFlipButtonsToCardsInfo(Player player, Tile tile, List<UnitHolder> unitHolders) {
         String tileRep = tile.getRepresentationForButtons(player.getGame(), player);
         String msg = player.getRepresentation(true, false) + " you have 4 mechs in " + tileRep
                 + ". You can remove 3 of them to activate " + eidolonRep(true) + ".";

@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.Data;
+import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import software.amazon.awssdk.utils.StringUtils;
@@ -15,8 +16,12 @@ import ti4.model.Source.ComponentSource;
 
 @Data
 public class EventModel implements ModelInterface, EmbeddableModel {
+    @Getter
     private String alias;
+
+    @Getter
     private String name;
+
     private String category;
     private String categoryDescription;
     private String type;
@@ -49,14 +54,6 @@ public class EventModel implements ModelInterface, EmbeddableModel {
     public boolean staysInPlay() {
         return "permanent".equalsIgnoreCase(getCategoryDescription())
                 || "temporary".equalsIgnoreCase(getCategoryDescription());
-    }
-
-    public String getAlias() {
-        return alias;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getNameRepresentation() {

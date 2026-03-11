@@ -60,7 +60,7 @@ class ResetObjectives extends GameStateSubcommand {
         game.setPublicObjectives1(allOmegaPhaseObjs);
 
         // Remove Imperium Rex if it's already staged
-        game.getPublicObjectives1Peekable().removeIf(s -> Constants.IMPERIUM_REX_ID.equals(s));
+        game.getPublicObjectives1Peekable().removeIf(Constants.IMPERIUM_REX_ID::equals);
 
         // Set up the right number of peakable objectives
         int revealedObjectiveCount = game.getRevealedPublicObjectives().size();

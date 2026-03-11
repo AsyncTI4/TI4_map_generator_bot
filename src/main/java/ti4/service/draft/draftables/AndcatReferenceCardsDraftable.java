@@ -48,6 +48,7 @@ import ti4.service.milty.MiltyService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.unit.AddUnitService;
 
+@Getter
 public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
 
     public record ReferenceCardPackage(
@@ -58,7 +59,6 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             String speakerOrderFaction,
             Boolean choicesFinal) {}
 
-    @Getter
     private final Map<Integer, ReferenceCardPackage> referenceCardPackages = new HashMap<>();
 
     public static final DraftableType TYPE = DraftableType.of("AndcatRefPackage");

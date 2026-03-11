@@ -17,7 +17,7 @@ import ti4.model.RuleModel;
  * will go a long way toward players not getting too lost with all the new stuff. It will help prevent constant questions in rules channels,
  * and should waylay hard feelings that could come from misunderstanding the new stuff.
  */
-public class ThundersEdgeRulesService {
+public final class ThundersEdgeRulesService {
 
     private static List<MessageEmbed> getRuleEmbeds(String... rules) {
         return Arrays.stream(rules)

@@ -39,7 +39,7 @@ import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.unit.CheckUnitContainmentService;
 
-public class CryypterHelper {
+public final class CryypterHelper {
     // Revised Politics SC
     public static List<Button> getCryypterSC3Buttons(int sc) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");

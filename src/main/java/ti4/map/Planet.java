@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
+import lombok.Getter;
+import lombok.Setter;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -34,12 +36,28 @@ public class Planet extends UnitHolder {
     private int influenceModifier;
     private String originalPlanetType;
     private String originalTechSpeciality;
+
+    @Getter
     private final List<String> planetType = new ArrayList<>();
+
+    @Getter
     private final List<String> techSpeciality = new ArrayList<>();
+
+    @Getter
     private boolean hasAbility;
+
+    @Setter
+    @Getter
     private int spaceCannonHitsOn;
+
+    @Setter
+    @Getter
     private int spaceCannonDieCount;
+
+    @Getter
     private String contrastColor;
+
+    @Getter
     private float radius;
 
     @JsonCreator
@@ -310,10 +328,6 @@ public class Planet extends UnitHolder {
         return originalTechSpeciality;
     }
 
-    public List<String> getPlanetType() {
-        return planetType;
-    }
-
     @JsonIgnore
     public PlanetModel getPlanetModel() {
         return Mapper.getPlanet(getName());
@@ -340,10 +354,6 @@ public class Planet extends UnitHolder {
         return types;
     }
 
-    public List<String> getTechSpeciality() {
-        return techSpeciality;
-    }
-
     @JsonIgnore
     public boolean hasTechSpecialty(TechnologyType type) {
         return techSpeciality.contains(type.toString().toLowerCase())
@@ -360,10 +370,6 @@ public class Planet extends UnitHolder {
             specialties.add(originalTechSpeciality);
         }
         return specialties;
-    }
-
-    public boolean isHasAbility() {
-        return hasAbility;
     }
 
     @JsonIgnore
@@ -392,29 +398,5 @@ public class Planet extends UnitHolder {
         Tile t = game.getTileFromPlanet(getName());
         if (t != null) return t.isHomeSystem(game);
         return false;
-    }
-
-    public int getSpaceCannonDieCount() {
-        return spaceCannonDieCount;
-    }
-
-    public int getSpaceCannonHitsOn() {
-        return spaceCannonHitsOn;
-    }
-
-    public void setSpaceCannonDieCount(int dieCount) {
-        spaceCannonDieCount = dieCount;
-    }
-
-    public void setSpaceCannonHitsOn(int hitsOn) {
-        spaceCannonHitsOn = hitsOn;
-    }
-
-    public String getContrastColor() {
-        return contrastColor;
-    }
-
-    public float getRadius() {
-        return radius;
     }
 }

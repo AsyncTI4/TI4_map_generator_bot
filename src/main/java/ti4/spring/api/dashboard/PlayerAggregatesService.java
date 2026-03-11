@@ -31,17 +31,17 @@ import tools.jackson.databind.json.JsonMapper;
 
 @RequiredArgsConstructor
 @Service
-/**
- * Builds and caches per-player dashboard aggregates.
- *
- * <p>Cache-busting is based on a deterministic hash of completed game IDs: completed game names are
- * deduplicated, sorted ascending, concatenated with a stable delimiter, and hashed with SHA-256. If
- * hash, count, or aggregate version differs from the stored row, a background recompute is queued.
- *
- * <p>The dashboard call is non-blocking: this service returns fresh cached data when available. If the
- * cache is stale, it schedules refresh work asynchronously and returns an empty aggregate shell until
- * recompute completes.
- */
+/*
+ Builds and caches per-player dashboard aggregates.
+
+ <p>Cache-busting is based on a deterministic hash of completed game IDs: completed game names are
+ deduplicated, sorted ascending, concatenated with a stable delimiter, and hashed with SHA-256. If
+ hash, count, or aggregate version differs from the stored row, a background recompute is queued.
+
+ <p>The dashboard call is non-blocking: this service returns fresh cached data when available. If the
+ cache is stale, it schedules refresh work asynchronously and returns an empty aggregate shell until
+ recompute completes.
+*/
 class PlayerAggregatesService {
 
     private static final int CURRENT_AGGREGATES_VERSION = 3;
@@ -857,10 +857,10 @@ class PlayerAggregatesService {
             return false;
         }
 
-      return allDecksOfficial(game)
-          && allTilesOfficial(game)
-          && allFactionsOfficial(game)
-          && allLeadersOfficial(game);
+        return allDecksOfficial(game)
+                && allTilesOfficial(game)
+                && allFactionsOfficial(game)
+                && allLeadersOfficial(game);
     }
 
     private static boolean allDecksOfficial(Game game) {

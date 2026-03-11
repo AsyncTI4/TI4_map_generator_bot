@@ -77,13 +77,14 @@ public class FrankenButtonHandler {
                 }
             }
             if (item.hasOptionalSwaps()) { // Offer Optional Swaps
-                String msg = "Added the following optional swaps to their respective categories:";
+                StringBuilder msg =
+                        new StringBuilder("Added the following optional swaps to their respective categories:");
                 for (DraftErrataModel i : item.getErrata().getOptionalSwaps()) {
                     DraftItem addl = DraftItem.generate(i.getItemCategory(), i.getItemId());
                     player.getDraftHand().Contents.add(addl);
-                    msg += "\n> " + addl.getTitle(player.getGame());
+                    msg.append("\n> ").append(addl.getTitle(player.getGame()));
                 }
-                MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
+                MessageHelper.sendEphemeralMessageToEventChannel(event, msg.toString());
             }
         }
     }
@@ -107,19 +108,20 @@ public class FrankenButtonHandler {
                 }
             }
             if (item.hasOptionalSwaps()) { // Remove Optional Swaps
-                String msg = "## ⚠️ REMOVED the following optional swaps from their respective categories:";
+                StringBuilder msg = new StringBuilder(
+                        "## ⚠️ REMOVED the following optional swaps from their respective categories:");
                 for (DraftErrataModel i : item.getErrata().getOptionalSwaps()) {
                     DraftItem addl = DraftItem.generate(i.getItemCategory(), i.getItemId());
-                    msg += "\n> " + addl.getTitle(player.getGame());
+                    msg.append("\n> ").append(addl.getTitle(player.getGame()));
 
                     player.getDraftHand().Contents.remove(addl);
                     if (!player.getDraftHand().Contents.contains(addl)) {
                         // doesn't have the item available from multiple sources
                         removeFrankenItemFromPlayer(event, player, addl);
-                        msg += " ---> AND removed it from your faction.";
+                        msg.append(" ---> AND removed it from your faction.");
                     }
                 }
-                MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
+                MessageHelper.sendEphemeralMessageToEventChannel(event, msg.toString());
             }
         }
     }
@@ -216,9 +218,8 @@ public class FrankenButtonHandler {
         ContainerChildComponent child2 = c2.getComponents().getFirst();
 
         if (child1 instanceof TextDisplay d1 && child2 instanceof TextDisplay d2) {
-          return d1.getContent().equals(d2.getContent());
-        } else
-          return child1 instanceof Section && child2 instanceof Section;
+            return d1.getContent().equals(d2.getContent());
+        } else return child1 instanceof Section && child2 instanceof Section;
     }
 
     private static Stream<Button> getButtons(ContainerChildComponent child) {

@@ -15,7 +15,7 @@ import ti4.model.AbilityModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 
-public class DeepgloomService {
+public final class DeepgloomService {
 
     public static void spendOneDebt(Game game, Player player, String ability) {
         String debtPool = "scheming".equals(ability) ? "scheming" : "stall tactics";

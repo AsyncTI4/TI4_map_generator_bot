@@ -1357,7 +1357,7 @@ public class ButtonHelper {
         }
         int slumberBonus = getSlumberstateBonusACs(game, player);
         if (slumberBonus > 0) {
-            String howmany = "(+" + slumberBonus + " action card" + (slumberBonus > 0 ? "s)" : ")");
+            String howmany = "(+" + slumberBonus + " action card" + (slumberBonus > 1 ? "s)" : ")");
             modifiers.add(FactionEmojis.Titans + " _Slumberstate Computing_ " + howmany);
             amount += slumberBonus;
         }
@@ -1440,7 +1440,6 @@ public class ButtonHelper {
             for (String col : colorsCoexisting) {
                 Player p2 = game.getPlayerFromColorOrFaction(col);
                 if (player == p2 || player.getAllianceMembers().contains(p2.getFaction())) {
-                    continue;
                 } else if (player == titans && !seenColors.contains(col)) {
                     slumberBonus++;
                     seenColors.add(col);
@@ -3252,7 +3251,7 @@ public class ButtonHelper {
         deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
-    public static void appendFactionIcon(Game game, StringBuilder sb, String key, Boolean privateGame) {
+    private static void appendFactionIcon(Game game, StringBuilder sb, String key, Boolean privateGame) {
         // parse IDs like "control_blk.png" and "command_red.png"
         String colorTokenRegex = "[a-z]+_" + RegexHelper.colorRegex(game) + "\\.png";
         Matcher tokenMatch = Pattern.compile(colorTokenRegex).matcher(key);
@@ -3780,15 +3779,15 @@ public class ButtonHelper {
     }
 
     public static boolean isPlanetLegendaryOrTechSkip(String planetName, Game game) {
-        UnitHolder unitHolder = getUnitHolderFromPlanetName(planetName, game);
-        Planet planetHolder = (Planet) unitHolder;
+        Planet unitHolder = getUnitHolderFromPlanetName(planetName, game);
+        Planet planetHolder = unitHolder;
         if (planetHolder == null) return false;
         return planetHolder.isLegendary() || checkForTechSkips(game, planetName);
     }
 
     public static boolean isPlanetTechSkip(String planetName, Game game) {
-        UnitHolder unitHolder = getUnitHolderFromPlanetName(planetName, game);
-        Planet planetHolder = (Planet) unitHolder;
+        Planet unitHolder = getUnitHolderFromPlanetName(planetName, game);
+        Planet planetHolder = unitHolder;
         if (planetHolder == null) return false;
         return checkForTechSkips(game, planetName);
     }
@@ -3805,8 +3804,8 @@ public class ButtonHelper {
         if (planetModel != null && planetModel.isSpaceStation()) {
             return false;
         }
-        UnitHolder unitHolder = getUnitHolderFromPlanetName(planetName, game);
-        Planet planetHolder = (Planet) unitHolder;
+        Planet unitHolder = getUnitHolderFromPlanetName(planetName, game);
+        Planet planetHolder = unitHolder;
         Tile tile = game.getTileFromPlanet(planetName);
         if (planetHolder == null || tile == null) return false;
 
@@ -4196,8 +4195,8 @@ public class ButtonHelper {
         List<String> planets = new ArrayList<>();
         for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)) {
             Tile tile2 = game.getTileByPosition(pos2);
-            for (UnitHolder planetUnit2 : tile2.getPlanetUnitHolders()) {
-                Planet planetReal2 = (Planet) planetUnit2;
+            for (Planet planetUnit2 : tile2.getPlanetUnitHolders()) {
+                Planet planetReal2 = planetUnit2;
                 String planet2 = planetReal2.getName();
                 if (!player.getPlanetsAllianceMode().contains(planet2)) {
                     planets.add(planet2);
@@ -5203,7 +5202,7 @@ public class ButtonHelper {
             }
         }
         if (player.hasAbility("reclamation")) {
-            for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+            for (Planet uH : tile.getPlanetUnitHolders()) {
                 if (game.mecatols().contains(uH.getName())
                         && game.getStoredValue("planetsTakenThisRound").contains(uH.getName())) {
                     AddUnitService.addUnits(event, tile, game, player.getColor(), "sd mr, pds mr");
@@ -5223,7 +5222,7 @@ public class ButtonHelper {
                     }
                 } else {
                     if (game.isTwilightsFallMode()
-                            && ((Planet) uH).isLegendary()
+                            && uH.isLegendary()
                             && game.getStoredValue("planetsTakenThisRound").contains(uH.getName())) {
                         AddUnitService.addUnits(
                                 event, tile, game, player.getColor(), "sd " + uH.getName() + ", pds " + uH.getName());
@@ -5271,8 +5270,8 @@ public class ButtonHelper {
             String msg = player.getRepresentation()
                     + ", you may use your **Secret Maps** ability to explore a planet with a PRODUCTION unit that you did not explore this turn.";
             List<Button> buttons = new ArrayList<>();
-            for (UnitHolder planetUnit : tile.getPlanetUnitHolders()) {
-                Planet planetReal = (Planet) planetUnit;
+            for (Planet planetUnit : tile.getPlanetUnitHolders()) {
+                Planet planetReal = planetUnit;
                 String planet = planetReal.getName();
                 if (isNotBlank(planetReal.getOriginalPlanetType())
                         && player.getPlanetsAllianceMode().contains(planet)
@@ -5618,8 +5617,8 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         if (tile == null) return buttons;
 
-        for (UnitHolder planetUnit : tile.getPlanetUnitHolders()) {
-            Planet planetReal = (Planet) planetUnit;
+        for (Planet planetUnit : tile.getPlanetUnitHolders()) {
+            Planet planetReal = planetUnit;
             String planet = planetReal.getName();
             if (player.getPlanetsAllianceMode().contains(planet)
                     && planetUnit.getUnitCount(UnitType.Spacedock, player.getColor()) < 1) {
@@ -5651,8 +5650,8 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         if (tile == null) return buttons;
 
-        for (UnitHolder planetUnit : tile.getPlanetUnitHolders()) {
-            Planet planetReal = (Planet) planetUnit;
+        for (Planet planetUnit : tile.getPlanetUnitHolders()) {
+            Planet planetReal = planetUnit;
             String planet = planetReal.getName();
             if (FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
                 List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player, false, true);
@@ -8208,7 +8207,7 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
-    public static String getStratName(String ogName, Game game) {
+    private static String getStratName(String ogName, Game game) {
         if (!game.isTwilightsFallMode()) {
             return ogName;
         }

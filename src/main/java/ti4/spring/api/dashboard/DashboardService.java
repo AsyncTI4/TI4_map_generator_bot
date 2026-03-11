@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import ti4.helpers.TIGLHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -22,13 +23,13 @@ import ti4.model.EventModel;
 
 @RequiredArgsConstructor
 @Service
-/**
- * Assembles the API payload for the authenticated player's dashboard.
- *
- * <p>This service composes gameplay summaries and requests aggregate data from
- * {@link PlayerAggregatesService}. Aggregate computation is cache-backed and async; when a cache
- * refresh is in flight, responses include an empty aggregate shell rather than stale aggregate data.
- */
+/*
+ Assembles the API payload for the authenticated player's dashboard.
+
+ <p>This service composes gameplay summaries and requests aggregate data from
+ {@link PlayerAggregatesService}. Aggregate computation is cache-backed and async; when a cache
+ refresh is in flight, responses include an empty aggregate shell rather than stale aggregate data.
+*/
 class DashboardService {
 
     private final PlayerAggregatesService playerAggregatesService;
@@ -154,7 +155,7 @@ class DashboardService {
                 .filter(Objects::nonNull)
                 .map(Player::getPlayerTIGLRankAtGameStart)
                 .filter(Objects::nonNull)
-                .map(rank -> rank.getName())
+                .map(TIGLHelper.TIGLRank::getName)
                 .findFirst();
     }
 
