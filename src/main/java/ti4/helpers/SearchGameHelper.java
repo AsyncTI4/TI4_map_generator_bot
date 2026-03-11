@@ -207,7 +207,13 @@ public class SearchGameHelper {
             int days = Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString());
             String dayLabel = (days == 1) ? "DAY" : "DAYS";
             String endedStatus = game.hasWinner() ? "COMPLETED" : "ABORTED";
-            sb.append(" [").append(days).append(" ").append(dayLabel).append(", ").append(endedStatus).append("]");
+            sb.append(" [")
+                    .append(days)
+                    .append(" ")
+                    .append(dayLabel)
+                    .append(", ")
+                    .append(endedStatus)
+                    .append("]");
         }
         return sb.toString();
     }
