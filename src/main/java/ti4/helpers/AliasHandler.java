@@ -240,7 +240,7 @@ public final class AliasHandler {
 
         String aliasID = allPlanetAliases.get(name.toLowerCase());
         if (aliasID != null) return aliasID;
-        
+
         return name;
     }
 
