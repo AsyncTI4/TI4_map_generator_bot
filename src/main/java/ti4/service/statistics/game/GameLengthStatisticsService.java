@@ -63,7 +63,8 @@ class GameLengthStatisticsService {
 
             long creationDateTime = game.getCreationDateTime();
             long endedDateTime = game.getEndedDate();
-            int daysPlayed = (int) Duration.ofMillis(endedDateTime - creationDateTime).toDays();
+            int daysPlayed =
+                    (int) Duration.ofMillis(endedDateTime - creationDateTime).toDays();
             endedGames.put(
                     game.getName() + " (" + game.getRealAndEliminatedPlayers().size() + "p, " + game.getVp() + "pt)",
                     daysPlayed);
