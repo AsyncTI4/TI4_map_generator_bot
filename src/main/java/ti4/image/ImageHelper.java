@@ -141,8 +141,16 @@ public class ImageHelper {
     private static BufferedImage readImageURL(String imageURL) {
         if (isBlank(imageURL)) return null;
 
+        URI uri;
+        try {
+            uri = URI.create(imageURL);
+        } catch (Exception e) {
+            BotLogger.error("Invalid image URL: " + imageURL, e);
+            return null;
+        }
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(imageURL))
+                .uri(uri)
                 .timeout(Duration.ofSeconds(5))
                 .header("User-Agent", "ti4bot")
                 .GET()
@@ -152,12 +160,12 @@ public class ImageHelper {
             HttpResponse<InputStream> response =
                     EgressClientManager.getHttpClient().send(request, HttpResponse.BodyHandlers.ofInputStream());
 
-            if (response.statusCode() != 200) {
-                BotLogger.error("Failed to read image. URL: " + imageURL + " Status: " + response.statusCode());
-                return null;
-            }
-
             try (InputStream inputStream = response.body()) {
+                if (response.statusCode() != 200) {
+                    BotLogger.error("Failed to read image. URL: " + imageURL + " Status: " + response.statusCode());
+                    return null;
+                }
+
                 BufferedImage image = ImageIO.read(inputStream);
                 if (image == null) {
                     BotLogger.error("ImageIO could not decode stream from: " + imageURL);
@@ -166,14 +174,12 @@ public class ImageHelper {
             }
         } catch (HttpTimeoutException e) {
             BotLogger.error("Timeout fetching image: " + imageURL);
-            return null;
         } catch (IOException e) {
             BotLogger.error("Network error fetching image: " + imageURL, e);
-            return null;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            return null;
         }
+        return null;
     }
 
     @SneakyThrows
