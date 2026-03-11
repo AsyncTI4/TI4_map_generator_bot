@@ -7,6 +7,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,7 @@ public class RestDiscordClient {
     public DiscordUserInfo getUserInfo(String bearerToken) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(DISCORD_USER_INFO_URL))
+                .timeout(Duration.ofSeconds(5))
                 .header("Authorization", "Bearer " + bearerToken)
                 .header("Accept", "application/json")
                 .GET()
@@ -80,6 +82,7 @@ public class RestDiscordClient {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(DISCORD_TOKEN_URL))
+                .timeout(Duration.ofSeconds(5))
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .POST(HttpRequest.BodyPublishers.ofString(formBody))
                 .build();

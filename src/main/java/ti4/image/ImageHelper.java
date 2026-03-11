@@ -151,8 +151,7 @@ public class ImageHelper {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
-                .timeout(Duration.ofSeconds(5))
-                .header("User-Agent", "ti4bot")
+                .timeout(Duration.ofSeconds(2))
                 .GET()
                 .build();
 
