@@ -1,5 +1,6 @@
 package ti4.service.statistics.game;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -59,11 +60,14 @@ class GameLengthStatisticsService {
                                 game.getEndedDateString(), Helper.getDateRepresentation(System.currentTimeMillis()))
                         < pastDays) {
             num.getAndIncrement();
-            int dif = Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString());
+
+            long creationDateTime = game.getCreationDateTime();
+            long endedDateTime = game.getEndedDate();
+            int daysPlayed = (int) Duration.ofMillis(endedDateTime - creationDateTime).toDays();
             endedGames.put(
                     game.getName() + " (" + game.getRealAndEliminatedPlayers().size() + "p, " + game.getVp() + "pt)",
-                    dif);
-            total.addAndGet(dif);
+                    daysPlayed);
+            total.addAndGet(daysPlayed);
         }
     }
 }
