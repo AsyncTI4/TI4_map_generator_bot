@@ -294,7 +294,6 @@ public class CreateFoWGameService {
 
         // GET ALL FOW ROLES FROM ALL GUILDS
         for (Guild guild : guilds) {
-            System.out.println(guild.getName());
             List<Role> fowRoles = guild.getRoles().stream()
                     .filter(r -> r.getName().startsWith("fow"))
                     .toList();

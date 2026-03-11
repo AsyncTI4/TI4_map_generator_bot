@@ -49,7 +49,7 @@ public class BotLogger {
     }
 
     private static boolean logToConsole() {
-        return JdaService.testingMode;
+        return JdaService.testingMode || JdaService.guildPrimary == null;
     }
 
     /**

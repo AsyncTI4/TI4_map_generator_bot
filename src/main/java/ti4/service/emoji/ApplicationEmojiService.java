@@ -210,7 +210,8 @@ public class ApplicationEmojiService {
                 Thread.sleep(50);
                 if (emoji == null) {
                     success = false;
-                    if (++fails > 10) break;
+                    ++fails;
+                    if (fails > 10) break;
                     continue;
                 }
                 CachedEmoji cached = new CachedEmoji(emoji);
@@ -258,11 +259,7 @@ public class ApplicationEmojiService {
     }
 
     public static CachedEmoji getApplicationEmoji(String name) {
-        CachedEmoji fin = emojis.get(name);
-        if (fin == null) {
-            System.out.println("AJAHHAHHAHSFKLNFLKE - " + name);
-        }
-        return emojis.getOrDefault(name, null);
+        return emojis.get(name);
     }
 
     public static Stream<File> enumerateEmojiFilesRecursive() {

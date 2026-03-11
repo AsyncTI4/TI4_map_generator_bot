@@ -2282,7 +2282,7 @@ public class ButtonHelperModifyUnits {
                     UnitModel producedUnit =
                             player.getUnitsByAsyncID(unitKey2.asyncID()).getFirst();
 
-                    if (UnitType.Flagship == producedUnit.getUnitType() && player.ownsUnit("creuss_flagship")) {
+                    if (producedUnit.getUnitType() == UnitType.Flagship && player.ownsUnit("creuss_flagship")) {
                         adjust = 1;
                     }
                 }

@@ -65,7 +65,7 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
     };
 
     public String getNameRepresentation() {
-        return CardEmojis.SecretObjective + " _" + getName() + "_ " + source.emoji();
+        return CardEmojis.SecretObjective + " _" + name + "_ " + source.emoji();
     }
 
     public String getRepresentation() {

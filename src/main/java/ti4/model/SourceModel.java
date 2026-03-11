@@ -29,7 +29,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        return "_" + getName() + "_ " + source.emoji();
+        return "_" + name + "_ " + source.emoji();
     }
 
     @Override

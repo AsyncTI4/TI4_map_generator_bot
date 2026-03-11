@@ -52,7 +52,7 @@ public class GalacticEventModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        return CardEmojis.Event + " _" + getName() + "_ " + complexityString();
+        return CardEmojis.Event + " _" + name + "_ " + complexityString();
     }
 
     public String getRepresentation() {

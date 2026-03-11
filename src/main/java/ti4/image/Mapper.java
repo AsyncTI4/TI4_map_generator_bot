@@ -1180,7 +1180,6 @@ public class Mapper {
             String val = token.getValue().getImagePath();
             if (tokenID.equalsIgnoreCase(val) || tokenID.equalsIgnoreCase(key)) return key;
         }
-        System.out.println("Could not resolve token: " + tokenID);
         return tokenID;
     }
 

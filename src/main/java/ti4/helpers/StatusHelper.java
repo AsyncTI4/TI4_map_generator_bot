@@ -668,7 +668,7 @@ public class StatusHelper {
                                 + Helper.getPlanetRepresentation(planet.getName(), game)
                                 + " has reached a multiple of 3 commodities, so the owner has earned a VP!";
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg2);
-                        String customPOName = "Monument on " + Helper.getPlanetName(planet.getName()) + "";
+                        String customPOName = "Monument on " + Helper.getPlanetName(planet.getName());
                         int vp = 1;
                         if (game.getCustomPublicVP().containsKey(customPOName)) {
                             vp = game.getCustomPublicVP().get(customPOName) + 1;

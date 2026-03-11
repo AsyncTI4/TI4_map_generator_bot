@@ -207,7 +207,6 @@ public class FrankenDraft extends BagDraft {
                     if (!draftableCollection.getValue().isEmpty()) {
                         bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
-                        System.out.println("bag number " + i + " - item number " + j);
                         missingItems.compute(category, (c, x) -> x == null ? 1 : x + 1);
                     }
                 }

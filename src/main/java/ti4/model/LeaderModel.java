@@ -108,7 +108,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getTFTitleIfAble() {
-        return getTFTitle().orElse(getTitle());
+        return getTFTitle().orElse(title);
     }
 
     public Optional<String> getAbilityName() {

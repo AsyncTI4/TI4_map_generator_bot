@@ -108,7 +108,6 @@ public class AnnotationHandler {
             // As such, in an effort to be notified if something goes horribly wrong, still add the handler
             // so that when it gets called it will generate an error for bot-log and ping Jazz.
             System.out.println(er);
-            // BotLogger.log(er);
         }
         return true;
     }

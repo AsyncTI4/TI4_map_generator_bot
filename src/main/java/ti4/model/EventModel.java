@@ -60,7 +60,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        return "_" + getName() + "_ " + source.emoji();
+        return "_" + name + "_ " + source.emoji();
     }
 
     private String getCategory() {

@@ -251,7 +251,7 @@ public class CreateGameButtonHandler {
             // }
             playerNumber++;
         }
-        return memberList.toString() + activityList.toString();
+        return memberList.toString() + activityList;
     }
 
     @ButtonHandler("joinGameList")

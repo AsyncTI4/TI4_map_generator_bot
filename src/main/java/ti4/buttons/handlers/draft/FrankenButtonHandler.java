@@ -216,13 +216,9 @@ public class FrankenButtonHandler {
         ContainerChildComponent child2 = c2.getComponents().getFirst();
 
         if (child1 instanceof TextDisplay d1 && child2 instanceof TextDisplay d2) {
-            if (d1.getContent().equals(d2.getContent())) {
-                return true;
-            }
-        } else if (child1 instanceof Section && child2 instanceof Section) {
-            return true;
-        }
-        return false;
+          return d1.getContent().equals(d2.getContent());
+        } else
+          return child1 instanceof Section && child2 instanceof Section;
     }
 
     private static Stream<Button> getButtons(ContainerChildComponent child) {

@@ -53,37 +53,37 @@ public class MessageV2Editor {
 
         public ReplaceMessagePart(Predicate<Component> pred, Container part) {
             this.part = part;
-            this.type = MessagePartType.CONTAINER;
-            this.replaceKey = null;
+            type = MessagePartType.CONTAINER;
+            replaceKey = null;
             this.pred = pred;
         }
 
         public ReplaceMessagePart(String oldCustomId, Button part) {
             this.part = part;
-            this.type = MessagePartType.BUTTON;
-            this.replaceKey = oldCustomId;
-            this.pred = null;
+            type = MessagePartType.BUTTON;
+            replaceKey = oldCustomId;
+            pred = null;
         }
 
         public ReplaceMessagePart(String oldCustomId, StringSelectMenu part) {
             this.part = part;
-            this.type = MessagePartType.STRING_SELECT;
-            this.replaceKey = oldCustomId;
-            this.pred = null;
+            type = MessagePartType.STRING_SELECT;
+            replaceKey = oldCustomId;
+            pred = null;
         }
 
         public ReplaceMessagePart(String oldCustomId, EntitySelectMenu part) {
             this.part = part;
-            this.type = MessagePartType.ENTITY_SELECT;
-            this.replaceKey = oldCustomId;
-            this.pred = null;
+            type = MessagePartType.ENTITY_SELECT;
+            replaceKey = oldCustomId;
+            pred = null;
         }
 
         public ReplaceMessagePart(String oldLineStartsWith, TextDisplay part) {
             this.part = part;
-            this.type = MessagePartType.TEXT_DISPLAY;
-            this.replaceKey = oldLineStartsWith;
-            this.pred = null;
+            type = MessagePartType.TEXT_DISPLAY;
+            replaceKey = oldLineStartsWith;
+            pred = null;
         }
 
         public ReplaceMessagePart(String oldItemUrlPart, MediaGallery part) {

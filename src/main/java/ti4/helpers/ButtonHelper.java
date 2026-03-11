@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -3916,7 +3919,6 @@ public class ButtonHelper {
                         capacity += entry.getValue();
                     }
                 }
-                // System.out.println(unit.getBaseType());
                 if ("spacedock".equalsIgnoreCase(unit.getBaseType())
                         && !"space".equalsIgnoreCase(capChecker.getName())) {
                     numDocks += entry.getValue();
@@ -3964,7 +3966,6 @@ public class ButtonHelper {
                         if ("space".equalsIgnoreCase(capChecker.getName())) {
                             capacity += unit.getCapacityValue() * entry.getValue();
                         }
-                        // System.out.println(unit.getBaseType());
                         if ("spacedock".equalsIgnoreCase(unit.getBaseType())
                                 && !"space".equalsIgnoreCase(capChecker.getName())) {
                             if (p2.ownsUnit("cabal_spacedock")) {
@@ -4279,7 +4280,7 @@ public class ButtonHelper {
     @ButtonHandler("takeMonument_")
     public static void resolveTakeMonument(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        String customPOName = "Monument on " + Helper.getPlanetName(planet) + "";
+        String customPOName = "Monument on " + Helper.getPlanetName(planet);
         if (game.getCustomPublicVP().containsKey(customPOName)) {
             int poIndex = game.getCustomPublicVP().get(customPOName);
             for (Player p : game.getRealPlayers()) {
@@ -4298,7 +4299,7 @@ public class ButtonHelper {
     @ButtonHandler("destroyMonument_")
     public static void resolveDestroyMonument(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        String customPOName = "Monument on " + Helper.getPlanetName(planet) + "";
+        String customPOName = "Monument on " + Helper.getPlanetName(planet);
         if (game.getCustomPublicVP().containsKey(customPOName)) {
             int poIndex = game.getCustomPublicVP().get(customPOName);
             for (Player p : game.getRealPlayers()) {

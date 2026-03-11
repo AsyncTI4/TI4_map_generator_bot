@@ -44,14 +44,14 @@ public class MessageV2Builder {
     public MessageV2Builder(MessageChannel channel) {
         Objects.requireNonNull(channel, "Channel cannot be null");
         this.channel = channel;
-        this.maxSplits = null;
-        this.pin = false;
+        maxSplits = null;
+        pin = false;
     }
 
     public MessageV2Builder(MessageChannel channel, boolean pin) {
         Objects.requireNonNull(channel, "Channel cannot be null");
         this.channel = channel;
-        this.maxSplits = null;
+        maxSplits = null;
         this.pin = pin;
     }
 
@@ -67,7 +67,7 @@ public class MessageV2Builder {
         Objects.requireNonNull(channel, "Channel cannot be null");
         this.channel = channel;
         this.maxSplits = maxSplits;
-        this.pin = false;
+        pin = false;
     }
 
     public enum MessagePartType {
@@ -191,7 +191,7 @@ public class MessageV2Builder {
         }
 
         Consumer<Message> onSuccess = null;
-        if (this.pin) onSuccess = MessageHelper.pin();
+        if (pin) onSuccess = MessageHelper.pin();
         MessageHelper.sendMessagesWithRetry(channel, combinedComponents, onSuccess, "Failed to send v2 message", 1);
     }
 

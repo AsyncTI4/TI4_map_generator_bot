@@ -951,13 +951,12 @@ public class AutoCompleteProvider {
                 try {
                     Player player = CommandHelper.getPlayerFromGame(
                             game, event.getMember(), event.getUser().getId());
-                    if (player != null && subcommandName != null && Constants.ABILITY_REMOVE.equals(subcommandName)) {
+                    if (player != null && Constants.ABILITY_REMOVE.equals(subcommandName)) {
                         for (String abilityID : player.getAbilities()) {
                             abilities.put(abilityID, Mapper.getAbilities().get(abilityID));
                         }
                     } else if (player != null
-                            && subcommandName != null
-                            && Constants.ABILITY_ADD.equals(subcommandName)) {
+                        && Constants.ABILITY_ADD.equals(subcommandName)) {
                         abilities = Mapper.getAbilities();
                         for (String abilityID : player.getAbilities()) {
                             abilities.remove(abilityID);

@@ -115,7 +115,7 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        return type.deckEmoji() + " _" + getName() + "_ " + source.emoji();
+        return type.deckEmoji() + " _" + name + "_ " + source.emoji();
     }
 
     @Override

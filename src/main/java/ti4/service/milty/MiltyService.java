@@ -781,8 +781,7 @@ public class MiltyService {
                 .map(game::getTileByPosition)
                 .filter(Objects::nonNull)
                 .map(t -> new TileAndAnchor(t, getAnchorPositionForTile(game, t)))
-                .collect(Collectors.toCollection(() -> new ArrayList<>()));
-        System.out.println(" - Found " + tilesWithAnchors.size() + " other corner tiles to rearrange.");
+                .collect(Collectors.toCollection(ArrayList::new));
         tilesWithAnchors.add(new TileAndAnchor(new Tile(tileID, "tl"), anchorPos));
         if (tilesWithAnchors.size() > 4) {
             String err = "# " + game.getPing() + " UNABLE TO ADD ANOTHER CORNER TILE. PLEASE RESOLVE.";

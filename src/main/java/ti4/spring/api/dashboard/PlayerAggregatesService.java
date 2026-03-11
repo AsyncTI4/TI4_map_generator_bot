@@ -857,14 +857,10 @@ class PlayerAggregatesService {
             return false;
         }
 
-        if (!allDecksOfficial(game)
-                || !allTilesOfficial(game)
-                || !allFactionsOfficial(game)
-                || !allLeadersOfficial(game)) {
-            return false;
-        }
-
-        return true;
+      return allDecksOfficial(game)
+          && allTilesOfficial(game)
+          && allFactionsOfficial(game)
+          && allLeadersOfficial(game);
     }
 
     private static boolean allDecksOfficial(Game game) {

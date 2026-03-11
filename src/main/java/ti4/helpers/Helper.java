@@ -543,7 +543,7 @@ public class Helper {
             initial = new Point(Constants.MIRAGE_TRIPLE_POSITION);
         }
 
-        if (imageX != null && imageY != null && planetX != null && planetY != null) {
+        if (imageX != null && planetX != null) {
             return new Point(initial.x - imageX + planetX, initial.y - imageY + planetY);
         }
 

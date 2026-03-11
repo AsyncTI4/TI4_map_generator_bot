@@ -62,7 +62,7 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        return "_" + getAlias() + "_ " + source.emoji();
+        return "_" + id + "_ " + source.emoji();
     }
 
     @Override
