@@ -241,9 +241,6 @@ public final class AliasHandler {
         String aliasID = allPlanetAliases.get(name.toLowerCase());
         if (aliasID != null) return aliasID;
 
-        if (!"space".equals(name)) {
-            BotLogger.error("Could not find an alias for Planet: " + name);
-        }
         return name;
     }
 
