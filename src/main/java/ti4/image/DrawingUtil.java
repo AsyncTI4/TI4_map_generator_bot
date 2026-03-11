@@ -339,6 +339,7 @@ public class DrawingUtil {
         return factionFile;
     }
 
+    @Nullable
     public static Image getUserDiscordAvatar(String userID) {
         try {
             User user = JdaService.jda.getUserById(userID);
