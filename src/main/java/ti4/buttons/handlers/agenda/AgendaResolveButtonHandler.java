@@ -310,7 +310,8 @@ class AgendaResolveButtonHandler {
         for (Player rid : riders) {
             String rep = rid.getRepresentationUnfogged();
             String message;
-            if (rid.hasAbility("future_sight")) {
+            if (rid.hasAbility("future_sight")
+                    && game.getStoredValue("executiveOrder").isEmpty()) {
                 message = rep
                         + " you have a Rider to resolve or you voted for the correct outcome. Either way a trade good has been added to your total due to your **Future Sight** ability "
                         + rid.gainTG(1, true) + ".";

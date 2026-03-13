@@ -362,9 +362,12 @@ public class AgendaHelper {
         for (String ability : abilities) {
             if (player.hasAbility(ability)) {
                 if ("galactic_threat".equalsIgnoreCase(ability)
-                        && !player.getGame()
-                                .getStoredValue("galacticThreatUsed")
-                                .isEmpty()) {
+                        && (!player.getGame()
+                                        .getStoredValue("galacticThreatUsed")
+                                        .isEmpty()
+                                || !player.getGame()
+                                        .getStoredValue("executiveOrder")
+                                        .isEmpty())) {
                     continue;
                 }
                 names.add(Mapper.getAbility(ability).getName());
@@ -964,7 +967,8 @@ public class AgendaHelper {
                 + " Feel free not to, this is simply an optional way to resolve agendas faster. Any pre-votes will be automatically erased if someone plays an \"after\".";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("preVote", "Pre-Vote"));
-        if (player.hasAbility("future_sight")) {
+        if (player.hasAbility("future_sight")
+                && game.getStoredValue("executiveOrder").isEmpty()) {
             msg += " Reminder that you have **Future Sight** and may wish to not abstain.";
         }
 
@@ -1436,7 +1440,8 @@ public class AgendaHelper {
                 String finChecker = "FFCC_" + nextInLine.getFaction() + "_";
                 Button Vote = Buttons.blue(finChecker + "vote", pFaction + " Choose To Vote");
                 Button Abstain;
-                if (nextInLine.hasAbility("future_sight")) {
+                if (nextInLine.hasAbility("future_sight")
+                        && game.getStoredValue("executiveOrder").isEmpty()) {
                     Abstain = Buttons.red(
                             finChecker + "resolveAgendaVote_0",
                             pFaction + " Choose To Abstain (You have Future Sight)");
@@ -1956,7 +1961,8 @@ public class AgendaHelper {
             String finChecker = "FFCC_" + nextInLine.getFaction() + "_";
             Button Vote = Buttons.blue(finChecker + "vote", pFaction + " Choose To Vote");
             Button Abstain;
-            if (nextInLine.hasAbility("future_sight")) {
+            if (nextInLine.hasAbility("future_sight")
+                    && game.getStoredValue("executiveOrder").isEmpty()) {
                 Abstain = Buttons.red(
                         finChecker + "resolveAgendaVote_0", pFaction + " Choose To Abstain (You Have Future Sight)");
             } else {
@@ -2100,7 +2106,9 @@ public class AgendaHelper {
                     }
                     if (winningR != null
                             && (specificVote.contains("Rider")
-                                    || winningR.hasAbility("future_sight")
+                                    || (winningR.hasAbility("future_sight")
+                                            && game.getStoredValue("executiveOrder")
+                                                    .isEmpty())
                                     || winningR.hasTech("dsatokcr")
                                     || winningR.hasUnit("kaltrim_mech")
                                     || specificVote.contains("Radiance")
@@ -3196,7 +3204,10 @@ public class AgendaHelper {
                         if (NumberUtils.isDigits(vote) && !game.isFowMode() && p2.hasTech("dskyrog")) {
                             outcomeSummaryBuilder.append(" (_Indoctrination Teams_)");
                         }
-                        if (!game.isFowMode() && p2 != null && p2.hasAbility("future_sight")) {
+                        if (!game.isFowMode()
+                                && p2 != null
+                                && p2.hasAbility("future_sight")
+                                && game.getStoredValue("executiveOrder").isEmpty()) {
                             outcomeSummaryBuilder.append(" (**Future Sight**)");
                         }
                         if (!game.isFowMode()
@@ -3978,12 +3989,12 @@ public class AgendaHelper {
                             game.getPing()
                                     + " _Emergency Session_ revealed underneath _Covert Legislation_, discarding it.");
                 }
-                notEmergency = !"Emergency Session".equalsIgnoreCase(agendaName);
                 String id2 = game.getNextAgenda(revealFromBottom);
                 AgendaModel agendaDetails2 = Mapper.getAgenda(id2);
                 agendaTarget = agendaDetails2.getTarget();
                 agendaType = agendaDetails2.getType();
-                agendaName = agendaModel.getName();
+                agendaName = agendaDetails2.getName();
+                notEmergency = !"Emergency Session".equalsIgnoreCase(agendaName);
                 game.setCurrentAgendaInfo(agendaType + "_" + agendaTarget + "_CL_covert");
                 if ((agendaTarget.toLowerCase().contains("elect law") || "constitution".equalsIgnoreCase(id2))
                         && game.getLaws().isEmpty()) {

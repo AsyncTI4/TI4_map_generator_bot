@@ -1493,7 +1493,7 @@ public class ButtonHelper {
     public static boolean isTileSmothered(Game game, Tile tile, Player player) {
         for (Player p2 : game.getRealPlayersExcludingThis(player)) {
             if (p2.hasTech("tf-smotheringpresence")) {
-                for (String tilePos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+                for (String tilePos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p2, false, true)) {
                     Tile t2 = game.getTileByPosition(tilePos);
                     for (UnitHolder uH : t2.getUnitHolders().values()) {
                         if (uH.getUnitCount(UnitType.Pds, p2.getColor()) > 0
@@ -1563,7 +1563,7 @@ public class ButtonHelper {
                 for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                     if (p2.hasTech("tf-smotheringpresence")) {
                         for (String tilePos :
-                                FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
+                                FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), p2, false, true)) {
                             Tile t2 = game.getTileByPosition(tilePos);
                             for (UnitHolder uH : t2.getUnitHolders().values()) {
                                 if (uH.getUnitCount(UnitType.Pds, p2.getColor()) > 0

@@ -27,17 +27,23 @@ public class AbsolConstitutionAgendaResolver implements ForAgainstAgendaResolver
         var discardedAgendas = new ArrayList<String>();
         while (counter > 0 && !lawFound) {
             counter--;
-            String id2 = game.revealAgenda(false);
+            String id2 = game.revealAgenda(true);
             AgendaModel agendaDetails = Mapper.getAgenda(id2);
             if ("law".equalsIgnoreCase(agendaDetails.getType())) {
                 lawFound = true;
                 game.putAgendaBackIntoDeckOnTop(id2);
                 AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Shuffled the found agendas back in.");
+                // MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Shuffled the found agendas back in.");
                 for (String id3 : discardedAgendas) {
                     game.putAgendaBackIntoDeckOnTop(id3);
                 }
-                game.shuffleAgendas();
+                if (discardedAgendas.size() > 0) {
+                    MessageHelper.sendMessageToChannel(
+                            game.getMainGameChannel(),
+                            "Shuffled the following non-law agendas back in: " + String.join(", ", discardedAgendas));
+                    game.shuffleAgendas();
+                }
+
             } else {
                 discardedAgendas.add(id2);
                 MessageHelper.sendMessageToChannel(

@@ -137,7 +137,8 @@ public class DeorbitBarrageService {
                         "Assign Hit" + (hits == 1 ? "" : "s")));
                 MessageHelper.sendMessageToChannelWithButtons(
                         game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
-                        p2.getRepresentation() + ", please assign the hits" + (hits == 1 ? "" : "s") + ".",
+                        p2.getRepresentation() + ", please assign the hits" + (hits == 1 ? "" : "s")
+                                + ". Reminder that the player who did the barrage officially assigns the hits, but that you can sustain if they assign a hit to mechs. Ask them how they would like you to assign hits.",
                         buttons);
             }
             buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
