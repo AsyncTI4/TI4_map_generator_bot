@@ -1045,26 +1045,63 @@ public class CombatRollService {
                 }
                 if ((game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")
                                 || player.hasTech("tf-tacticalbrilliance"))
-                        && rollType != CombatRollType.combatround
-                        && numMisses > 0) {
-                    RoundStatsTracker.recordDiceRolled(game, player, numMisses);
-                    resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numMisses);
-                    player.setExpectedHitsTimes10(
-                            player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));
-                    chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numMisses);
-                    chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, numMisses);
-                    maximumHits += numRolls * mult;
-                    int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
-                    totalHits += hitRolls2;
-                    String unitRoll2 = CombatMessageHelper.displayUnitRoll(
-                            unitModel, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
-                    resultBuilder
-                            .append("Rerolling ")
-                            .append(numMisses)
-                            .append(" miss")
-                            .append(numMisses == 1 ? "" : "es")
-                            .append(" due to Ta Zern, the Jol-Nar Commander:\n")
-                            .append(unitRoll2);
+                        && rollType != CombatRollType.combatround) {
+
+                    if (opponent == player && rollType == CombatRollType.bombardment && player.hasTech("proxima")) {
+                        if (hitRolls > 0) {
+                            RoundStatsTracker.recordDiceRolled(game, player, hitRolls);
+                            resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, hitRolls);
+                            player.setExpectedHitsTimes10(
+                                    player.getExpectedHitsTimes10() + (hitRolls * (11 - toHit + modifierToHit)));
+                            int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
+                            totalHits += hitRolls2;
+                            totalHits -= hitRolls;
+                            String unitRoll2 = CombatMessageHelper.displayUnitRoll(
+                                    unitModel,
+                                    toHit,
+                                    modifierToHit,
+                                    numOfUnit,
+                                    numRollsPerUnit,
+                                    extraRollsForUnit,
+                                    resultRolls2,
+                                    hitRolls2);
+                            resultBuilder
+                                    .append("Rerolling ")
+                                    .append(hitRolls)
+                                    .append(" hit")
+                                    .append(hitRolls == 1 ? "" : "s")
+                                    .append(" due to Ta Zern, the Jol-Nar Commander:\n")
+                                    .append(unitRoll2);
+                        }
+                    } else {
+                        if (numMisses > 0) {
+                            RoundStatsTracker.recordDiceRolled(game, player, numMisses);
+                            resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numMisses);
+                            player.setExpectedHitsTimes10(
+                                    player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));
+                            chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numMisses);
+                            chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, numMisses);
+                            maximumHits += numRolls * mult;
+                            int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
+                            totalHits += hitRolls2;
+                            String unitRoll2 = CombatMessageHelper.displayUnitRoll(
+                                    unitModel,
+                                    toHit,
+                                    modifierToHit,
+                                    numOfUnit,
+                                    numRollsPerUnit,
+                                    0,
+                                    resultRolls2,
+                                    hitRolls2);
+                            resultBuilder
+                                    .append("Rerolling ")
+                                    .append(numMisses)
+                                    .append(" miss")
+                                    .append(numMisses == 1 ? "" : "es")
+                                    .append(" due to Ta Zern, the Jol-Nar Commander:\n")
+                                    .append(unitRoll2);
+                        }
+                    }
                 }
                 if (rollType == CombatRollType.SpaceCannonOffence || rollType == CombatRollType.SpaceCannonDefence) {
                     if (player.ownsUnit("gledge_pds2") && totalHits > 0) {

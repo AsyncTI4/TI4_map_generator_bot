@@ -19,6 +19,7 @@ public class TwilightFallCommand implements ParentCommand {
                     new FixColors(),
                     new StartNewSplice(),
                     new DoEdictPhase(),
+                    new SetupStartingFleet(),
                     new DiscardVeiledCard())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

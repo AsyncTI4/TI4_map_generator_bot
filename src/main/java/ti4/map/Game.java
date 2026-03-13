@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -1770,7 +1770,7 @@ public class Game extends GameProperties {
             return ButtonHelper.isCoatlHealed(this);
         }
         if (isTwilightsFallMode()) {
-            return getTyrant() != null;
+            return getTyrant() != null && !getTyrant().isEliminated();
         }
         if (isLiberationC4Mode()) {
             return true;
