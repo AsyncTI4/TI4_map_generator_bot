@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 
-public interface ParentCommand extends Command {
+public interface ParentCommand extends Command<SlashCommandInteractionEvent> {
 
     @Override
     default boolean accept(SlashCommandInteractionEvent event) {
@@ -27,26 +27,26 @@ public interface ParentCommand extends Command {
     }
 
     default void preExecute(SlashCommandInteractionEvent event) {
-        Command subcommand = getSubcommand(event);
+        Command<SlashCommandInteractionEvent> subcommand = getSubcommand(event);
         if (subcommand != null) subcommand.preExecute(event);
     }
 
     default void execute(SlashCommandInteractionEvent event) {
-        Command subcommand = getSubcommand(event);
+        Command<SlashCommandInteractionEvent> subcommand = getSubcommand(event);
         if (subcommand != null) subcommand.execute(event);
     }
 
     default void postExecute(SlashCommandInteractionEvent event) {
-        Command subcommand = getSubcommand(event);
+        Command<SlashCommandInteractionEvent> subcommand = getSubcommand(event);
         if (subcommand != null) subcommand.postExecute(event);
     }
 
     default void onException(SlashCommandInteractionEvent event, Throwable throwable) {
-        Command subcommand = getSubcommand(event);
+        Command<SlashCommandInteractionEvent> subcommand = getSubcommand(event);
         if (subcommand != null) subcommand.onException(event, throwable);
     }
 
-    private Command getSubcommand(SlashCommandInteractionEvent event) {
+    private Command<SlashCommandInteractionEvent> getSubcommand(SlashCommandInteractionEvent event) {
         String subcommandGroupName = event.getInteraction().getSubcommandGroup();
         if (subcommandGroupName != null) {
             return getSubcommandGroups().get(subcommandGroupName);
@@ -57,7 +57,7 @@ public interface ParentCommand extends Command {
 
     @Override
     default boolean isSuspicious(SlashCommandInteractionEvent event) {
-        Command subcommand = getSubcommand(event);
+        Command<SlashCommandInteractionEvent> subcommand = getSubcommand(event);
         return subcommand != null && subcommand.isSuspicious(event);
     }
 

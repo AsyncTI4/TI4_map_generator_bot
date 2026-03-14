@@ -26,7 +26,8 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.apache.commons.lang3.function.Consumers;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Service;
-import ti4.commands.CommandManager;
+import ti4.commands.SlashCommandManager;
+import ti4.commands.context.ContextCommandManager;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CategoryCleanupCron;
 import ti4.cron.CloseLaunchThreadsCron;
@@ -387,7 +388,8 @@ public class JdaService {
         }
         try {
             CommandListUpdateAction commands = guild.updateCommands();
-            CommandManager.getCommands().forEach(command -> command.register(commands));
+            SlashCommandManager.getCommands().forEach(command -> command.register(commands));
+            ContextCommandManager.getCommands().forEach(cmd -> cmd.register(commands));
             commands.queue(Consumers.nop(), BotLogger::catchRestError);
             BotLogger.info("BOT STARTED UP: " + guild.getName());
             guilds.add(guild);
@@ -406,11 +408,12 @@ public class JdaService {
         if (Constants.ASYNCTI4_HUB_SERVER_ID.equals(guild.getId())) return false;
 
         // Disable this for now
-        if (true) return false;
+        boolean x = true;
+        if (x) return false;
 
         try {
             CommandListUpdateAction commands = guild.updateCommands();
-            CommandManager.getCommands().forEach(command -> command.registerSearchCommands(commands));
+            SlashCommandManager.getCommands().forEach(command -> command.registerSearchCommands(commands));
             commands.queue(Consumers.nop(), BotLogger::catchRestError);
             BotLogger.info("SEARCH-ONLY BOT STARTED UP: " + guild.getName());
             guilds.add(guild);

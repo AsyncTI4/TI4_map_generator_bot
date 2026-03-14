@@ -1,9 +1,11 @@
 package ti4.listeners;
 
-import java.util.Optional;
 import javax.annotation.Nonnull;
+
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.executors.ExecutorServiceManager;
@@ -31,10 +33,31 @@ public class DeletionListener extends ListenerAdapter {
         return JdaService.isValidGuild(eventGuild);
     }
 
-    private void handleMessageDelete(MessageDeleteEvent event) {
+    public static void handleContextMenuDelete(MessageContextInteractionEvent event) {
+        // MessageChannel channel = event.getMessageChannel();
+        // String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
+        // String msg = event.getTarget().getContentDisplay();
+        
+        // handleMessageDelete(channel, gameName, msg);
+    }
+
+    private static void handleMessageDelete(MessageDeleteEvent event) {
+        MessageChannel channel = event.getChannel();
+        String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
         try {
-            String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
-            if (!GameManager.isValid(gameName)) return;
+            long messageId = event.getMessageIdLong();
+            String cachedMessage = SavedBotMessagesService.getBean().getContent(messageId);
+            if (cachedMessage == null) return;
+
+            handleMessageDelete(channel, gameName, cachedMessage);
+        } catch (Exception e) {
+            BotLogger.error("Error in handleMessageDelete", e);
+        }
+    }
+
+    private static void handleMessageDelete(MessageChannel eventChannel, String gameName, String messageText) {
+        try {
+            if (!GameManager.isValid(gameName) || eventChannel == null || messageText == null) return;
 
             TextChannel deletionLogChannel =
                     JdaService.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
@@ -42,33 +65,24 @@ public class DeletionListener extends ListenerAdapter {
                             .orElse(null);
             if (deletionLogChannel == null) return;
 
-            long messageId = event.getMessageIdLong();
-            String cachedMessage = SavedBotMessagesService.getBean().getContent(messageId);
-            if (cachedMessage == null) return;
-
             Game game = GameManager.getManagedGame(gameName).getGame();
-            sendDeletionLog(event, deletionLogChannel, game, cachedMessage);
+            sendDeletionLog((GuildMessageChannel) eventChannel, deletionLogChannel, game, messageText);
         } catch (Exception e) {
             BotLogger.error("Error in handleMessageDelete", e);
         }
     }
 
-    private void sendDeletionLog(
-            MessageDeleteEvent event, MessageChannel deletionLogChannel, Game game, String cachedMessage) {
-        String channelLink = event.getJumpUrl();
-        String tableTalkLink = Optional.ofNullable(game.getTableTalkChannel())
-                .map(TextChannel::getJumpUrl)
-                .orElse("Unavailable");
-        String mainChannelLink = Optional.ofNullable(game.getMainGameChannel())
-                .map(TextChannel::getJumpUrl)
-                .orElse("Unavailable");
+    private static void sendDeletionLog(GuildMessageChannel eventChannel, MessageChannel deletionLogChannel, Game game, String cachedMessage) {
+        String channelLink = eventChannel.getJumpUrl();
+        String tableTalkLink = game.getTabletalkJumpLinkFormatted();
+        String mainChannelLink = game.getActionsJumpLinkFormatted();
         // prevent @'ing anyone.
         String sanitizedCachedMessage = cachedMessage.replace("@", "@\u200B");
 
         String logMessage =
                 String.format("""
                 **%s**
-                From: %s Talk Channel: %s Actions Channel: %s
+                From: %s %s %s
                 %s
                 """, game.getName(), channelLink, tableTalkLink, mainChannelLink, sanitizedCachedMessage);
 

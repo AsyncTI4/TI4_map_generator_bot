@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class SubcommandGroup extends SubcommandGroupData implements Command {
+public abstract class SubcommandGroup extends SubcommandGroupData implements Command<SlashCommandInteractionEvent> {
 
     protected SubcommandGroup(@NotNull String name, @NotNull String description) {
         super(name, description);

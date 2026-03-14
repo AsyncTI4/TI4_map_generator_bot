@@ -33,9 +33,9 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
@@ -142,27 +142,11 @@ public class MessageHelper {
     }
 
     public static void sendEphemeralMessageToEventChannel(GenericInteractionCreateEvent event, String msg) {
-        if (event instanceof ButtonInteractionEvent b) {
-            sendEphemeralMessageToEventChannel(b, msg);
-        } else if (event instanceof SlashCommandInteractionEvent s) {
-            sendEphemeralMessageToEventChannel(s, msg);
-        } else if (event instanceof ModalInteractionEvent m) {
-            sendEphemeralMessageToEventChannel(m, msg);
+        if (event instanceof GenericComponentInteractionCreateEvent e) {
+            e.getHook().setEphemeral(true).sendMessage(msg).queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             sendMessageToEventChannel(event, msg);
         }
-    }
-
-    public static void sendEphemeralMessageToEventChannel(ButtonInteractionEvent event, String message) {
-        event.getHook().setEphemeral(true).sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
-    }
-
-    public static void sendEphemeralMessageToEventChannel(ModalInteractionEvent event, String message) {
-        event.getHook().setEphemeral(true).sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
-    }
-
-    public static void sendEphemeralMessageToEventChannel(SlashCommandInteractionEvent event, String message) {
-        event.getHook().setEphemeral(true).sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void sendMessageToChannelWithButtons(

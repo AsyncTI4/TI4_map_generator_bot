@@ -68,7 +68,7 @@ import ti4.commands.units.RemoveUnits;
 import ti4.commands.user.UserCommand;
 
 @UtilityClass
-public class CommandManager {
+public class SlashCommandManager {
 
     private static final Map<String, ParentCommand> commands = Stream.of(
                     new AddUnits(),

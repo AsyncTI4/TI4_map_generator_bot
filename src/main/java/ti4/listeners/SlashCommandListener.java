@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.Command;
-import ti4.commands.CommandManager;
+import ti4.commands.SlashCommandManager;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
@@ -62,7 +62,7 @@ public class SlashCommandListener extends ListenerAdapter {
     private static void process(SlashCommandInteractionEvent event) {
         long startTime = System.currentTimeMillis();
 
-        Command command = CommandManager.getCommand(event.getName());
+        Command<SlashCommandInteractionEvent> command = SlashCommandManager.getCommand(event.getName());
         try {
             if (command.accept(event)) {
                 command.preExecute(event);
@@ -107,7 +107,7 @@ public class SlashCommandListener extends ListenerAdapter {
         Member member = event.getMember();
         if (member == null) return;
 
-        var command = CommandManager.getCommand(event.getInteraction().getName());
+        var command = SlashCommandManager.getCommand(event.getInteraction().getName());
         String susPrefix = command.isSuspicious(event) ? "sus" : "notSus";
         String commandText =
                 "```" + susPrefix + "\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
