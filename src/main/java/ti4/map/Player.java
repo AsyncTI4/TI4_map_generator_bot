@@ -66,6 +66,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
+import ti4.map.helper.StoredValueHelper;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
@@ -106,7 +107,7 @@ import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.jda.JdaService;
 
-public class Player extends PlayerProperties {
+public class Player extends PlayerProperties implements StoredValueHelper {
 
     private static final int EMBED_FIELD_VALUE_LIMIT = 1024;
 
@@ -583,13 +584,7 @@ public class Player extends PlayerProperties {
         return "dummyPlayerSpoof" + getFaction() + "_";
     }
 
-    public boolean hasPDS2Tech() {
-        return getTechs().contains("ht2")
-                || getTechs().contains("pds2")
-                || getTechs().contains("dsgledpds")
-                || getTechs().contains("dsmirvpds");
-    }
-
+    /** AKA: Has Infantry Revival Ability */
     public boolean hasInf2Tech() { // "dszeliinf"
         return getTechs().contains("cl2")
                 || getTechs().contains("so2")
@@ -608,33 +603,11 @@ public class Player extends PlayerProperties {
 
     public boolean hasWarsunTech() {
         return getUnitByBaseType("warsun") != null;
-        // return getTechs().contains("pws2")
-        //         || getTechs().contains("dsrohdws")
-        //         || getTechs().contains("ws")
-        //         || hasUnit("tf_warsun")
-        //         || hasUnit("tf-universitywarsun")
-        //         || hasUnit("tf-pws")
-        //         || getTechs().contains("absol_ws")
-        //         || getTechs().contains("baxanws")
-        //         || getTechs().contains("absol_pws2")
-        //         || hasUnit("muaat_warsun")
-        //         || hasUnit("rohdhna_warsun");
     }
 
     public boolean hasFF2Tech() {
-        return getTechs().contains("ff2")
-                || getTechs().contains("hcf2")
-                || getTechs().contains("dsflorff")
-                || getTechs().contains("dslizhff")
-                || getTechs().contains("dsbelkff")
-                || getTechs().contains("absol_ff2")
-                || getTechs().contains("absol_hcf2")
-                || ownsUnit("tf-hcf")
-                || ownsUnit("tf-triune")
-                || ownsUnit("tf-morphwing")
-                || ownsUnit("florzen_fighter")
-                || ownsUnit("eidolon_fighter")
-                || ownsUnit("eidolon_fighter2");
+        UnitModel ff = getUnitByType(UnitType.Fighter);
+        return ff.getIsUpgrade() || ownsUnit("florzen_fighter") || ownsUnit("eidolon_fighter");
     }
 
     public boolean hasUpgradedUnit(String baseUpgradeID) {
@@ -1677,9 +1650,10 @@ public class Player extends PlayerProperties {
 
         StringBuilder sb = new StringBuilder(userById.getAsMention());
         switch (getUserID()) {
-            case Constants.bortId -> sb.append(MiscEmojis.BortWindow); // mysonisalsonamedbort
-            case Constants.tspId -> sb.append(MiscEmojis.SpoonAbides); // tispoon
-            case Constants.jazzId -> sb.append(MiscEmojis.Scout); // Jazzx
+            case Constants.bortId -> sb.append(" ").append(MiscEmojis.BortWindow);
+            case Constants.tspId -> sb.append(" ").append(MiscEmojis.SpoonAbides);
+            case Constants.jazzId -> sb.append(" ").append(MiscEmojis.Scout);
+            case Constants.andcatId -> sb.append(" ").append(MiscEmojis.BongoMahact);
         }
         return sb.toString();
     }
@@ -3286,7 +3260,7 @@ public class Player extends PlayerProperties {
     }
 
     @JsonIgnore
-    public void addStoredValue(String key, String val) {
+    public void setStoredValue(String key, String val) {
         String safeKey = StringHelper.escape(key);
         getStoredValueMap().put(safeKey, StringHelper.escape(val));
     }

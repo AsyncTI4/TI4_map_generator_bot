@@ -474,7 +474,7 @@ public class TkHelperActionCards {
     @ButtonHandler("resolveRaze_")
     private static void resolveRaze(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         game.setStoredValue("BlitzFaction", player.getFaction());
-        player.addStoredValue("RazeFaction", "y");
+        player.setStoredValue("RazeFaction", "y");
         if (buttonID.contains("_")) {
             ButtonHelper.resolveCombatRoll(
                     player, game, event, "combatRoll_" + buttonID.split("_")[1] + "_space_bombardment");

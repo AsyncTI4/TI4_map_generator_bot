@@ -194,6 +194,9 @@ public class GameProperties {
     private Map<String, Integer> discardActionCards = new LinkedHashMap<>();
     private Map<String, ACStatus> discardACStatus = new HashMap<>();
 
+    // Stored Values
+    private final Map<String, String> storedValueMap = new HashMap<>();
+
     // Priority Track
     private PriorityTrackMode priorityTrackMode = PriorityTrackMode.NONE;
 

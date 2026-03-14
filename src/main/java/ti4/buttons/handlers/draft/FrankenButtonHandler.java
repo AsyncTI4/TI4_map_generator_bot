@@ -142,7 +142,7 @@ public class FrankenButtonHandler {
     @ButtonHandler("finishedBuilding")
     private static void finishedBuildingFaction(Game game, Player player) {
         String key = "frankenBuilt";
-        player.addStoredValue(key, "y");
+        player.setStoredValue(key, "y");
 
         Container c = player.getRepresentationContainer();
         MessageV2Builder tabletalk = new MessageV2Builder(game.getTableTalkChannel(), true);

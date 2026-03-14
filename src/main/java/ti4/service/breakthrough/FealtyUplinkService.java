@@ -2,7 +2,6 @@ package ti4.service.breakthrough;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -26,14 +25,12 @@ import ti4.service.regex.RegexService;
 public class FealtyUplinkService {
 
     private String rep(Game game) {
-        if (game.isTwilightKart())
-                return Mapper.getUnit("tk-fealtycore").getNameRepresentation();
+        if (game.isTwilightKart()) return Mapper.getUnit("tk-fealtycore").getNameRepresentation();
         return Mapper.getBreakthrough("l1z1xbt").getNameRepresentation();
     }
 
     private String name(Game game) {
-        if (game.isTwilightKart())
-                return "_"+Mapper.getUnit("tk-fealtycore").getName()+"_";
+        if (game.isTwilightKart()) return "_" + Mapper.getUnit("tk-fealtycore").getName() + "_";
         return "_" + Mapper.getBreakthrough("l1z1xbt").getName() + "_";
     }
 
@@ -51,7 +48,7 @@ public class FealtyUplinkService {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
                 player.finChecker() + "fealtyUplink_" + planetName,
-                "Use "+name(game)+" on " + prettyPlanet,
+                "Use " + name(game) + " on " + prettyPlanet,
                 FactionEmojis.L1Z1X));
         String message = "When you gain control of a planet, you may use " + rep(game);
         message +=

@@ -5,11 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-
 import javax.annotation.Nullable;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -20,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
@@ -947,9 +944,10 @@ public class StartCombatService {
                         + ", a reminder that if you win this combat, you may use the button to add a trade good to _The Reaping_.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, reap);
             }
-            
+
             boolean salvage = player.hasTech("so");
-            salvage |= player.hasUnit("tk-salvagebarge") & tile.getSpaceUnitHolder().getUnitCount(UnitType.Dreadnought, player) > 0;
+            salvage |= player.hasUnit("tk-salvagebarge")
+                    & tile.getSpaceUnitHolder().getUnitCount(UnitType.Dreadnought, player) > 0;
             if ("space".equalsIgnoreCase(type) && salvage) {
                 buttons = new ArrayList<>();
                 String label = game.isTwilightKart() ? "Salvage Barge" : "Salvage Operations";

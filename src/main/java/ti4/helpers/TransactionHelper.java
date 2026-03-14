@@ -653,7 +653,7 @@ public final class TransactionHelper {
     @ButtonHandler(value = "transaction", save = false)
     private static void transaction(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         if (buttonID.endsWith("_BMD")) {
-            player.addStoredValue("bmd", "y");
+            player.setStoredValue("bmd", "y");
             ButtonHelper.deleteMessage(event);
         }
 
@@ -2070,7 +2070,7 @@ public final class TransactionHelper {
                 msg += "or is being counter offered. Therefore, the next transaction offer you make will be ";
                 msg += "allowed to use _Black Market Dealing_ again.";
                 MessageHelper.sendMessageToChannel(bmdPlayer.getCardsInfoThread(), msg);
-                bmdPlayer.addStoredValue("bmd", "y");
+                bmdPlayer.setStoredValue("bmd", "y");
             }
         }
     }

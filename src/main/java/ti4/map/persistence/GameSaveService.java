@@ -262,7 +262,7 @@ class GameSaveService {
         writer.write(Constants.AGENDA_VOTE_INFO + " " + sb2);
         writer.write(System.lineSeparator());
 
-        Map<String, String> currentCheckingForAllReacts = game.getMessagesThatICheckedForAllReacts();
+        Map<String, String> currentCheckingForAllReacts = game.getStoredValueMap();
         sb2 = new StringBuilder();
         for (Map.Entry<String, String> entry : currentCheckingForAllReacts.entrySet()) {
             sb2.append(entry.getKey())

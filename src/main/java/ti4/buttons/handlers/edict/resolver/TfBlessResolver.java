@@ -73,7 +73,7 @@ public class TfBlessResolver implements EdictResolver {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "You have already resolved this edict.");
             return;
         }
-        player.addStoredValue(buttonID, "y");
+        player.setStoredValue(buttonID, "y");
 
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " gained 3 trade goods.");
         player.setTg(player.getTg() + 3);
@@ -89,7 +89,7 @@ public class TfBlessResolver implements EdictResolver {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "You have already resolved this edict.");
             return;
         }
-        player.addStoredValue(buttonID, "y");
+        player.setStoredValue(buttonID, "y");
         ActionCardHelper.drawActionCards(player, 3);
         afterResolve(event, game, player);
     }
@@ -100,7 +100,7 @@ public class TfBlessResolver implements EdictResolver {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "You have already resolved this edict.");
             return;
         }
-        player.addStoredValue(buttonID, "y");
+        player.setStoredValue(buttonID, "y");
         UnfiledButtonHandlers.gainCC(event, player, game);
         afterResolve(event, game, player);
     }

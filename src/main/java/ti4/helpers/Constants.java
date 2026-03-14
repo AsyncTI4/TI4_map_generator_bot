@@ -19,6 +19,7 @@ public final class Constants {
     public static final List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
     public static final String jabberwockyId = "455013002953883651";
     public static final String solaxId = "380689512621277185";
+    public static final String andcatId = "238933125072158720";
 
     // Server IDs
     public static final String ASYNCTI4_HUB_SERVER_ID = "943410040369479690";

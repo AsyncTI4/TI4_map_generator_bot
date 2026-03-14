@@ -93,9 +93,7 @@ public interface TwilightFallDeckFuncs {
     private void removeVeiledCards(List<String> cards) {
         for (String card : List.copyOf(cards)) {
             for (Player p : getRealPlayers()) {
-                if (getStoredValue("veiledCards" + p.getFaction()).contains(card))
-                    ;
-                cards.remove(card);
+                if (getStoredValue("veiledCards" + p.getFaction()).contains(card)) cards.remove(card);
             }
         }
     }

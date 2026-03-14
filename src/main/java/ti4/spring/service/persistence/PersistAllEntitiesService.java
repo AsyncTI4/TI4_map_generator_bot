@@ -138,7 +138,7 @@ public class PersistAllEntitiesService {
 
     private List<TitleEntity> toTitleEntities(Game game, GameEntity gameEntity, Map<String, UserEntity> userCache) {
         List<TitleEntity> titles = new ArrayList<>();
-        for (String storedValue : game.getMessagesThatICheckedForAllReacts().keySet()) {
+        for (String storedValue : game.getStoredValueMap().keySet()) {
             if (!storedValue.startsWith("TitlesFor")) {
                 continue;
             }

@@ -108,7 +108,7 @@ public class FrankenDraftBagService {
 
         List<Color> accents = getAccents();
         for (Player player : game.getPlayers().values()) {
-            player.addStoredValue("frankenBuilt", "n");
+            player.setStoredValue("frankenBuilt", "n");
             for (DraftCategory category : componentCategories) {
                 MessageV2Builder builder = new MessageV2Builder(player.getCardsInfoThread());
                 Container c = postDraftCategoryContainer(player, category);

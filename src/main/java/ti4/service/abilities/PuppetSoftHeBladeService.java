@@ -318,7 +318,7 @@ public class PuppetSoftHeBladeService {
     }
 
     private static String replaceStoredValues(Game game, FactionModel oldFaction, FactionModel newFaction) {
-        Map<String, String> storedValues = new HashMap<>(game.getMessagesThatICheckedForAllReacts());
+        Map<String, String> storedValues = new HashMap<>(game.getStoredValueMap());
 
         List<String> legitKeyFormats = new ArrayList<>();
         legitKeyFormats.add("$<f>^"); // standalone faction name
@@ -377,8 +377,8 @@ public class PuppetSoftHeBladeService {
             if (newKey != null || newValue != null) {
                 newKey = newKey == null ? entry.getKey() : newKey;
                 newValue = newValue == null ? entry.getValue() : newValue;
-                game.getMessagesThatICheckedForAllReacts().remove(entry.getKey());
-                game.getMessagesThatICheckedForAllReacts().put(newKey, newValue);
+                game.getStoredValueMap().remove(entry.getKey());
+                game.getStoredValueMap().put(newKey, newValue);
             }
         }
 
