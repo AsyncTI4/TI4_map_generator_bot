@@ -1,17 +1,18 @@
 {
-    "id": "br5",
+    "id": "br5b",
     "name": "Reil/Strang - Belkosea",
     "aliases": [
-        "br5",
-        "strang",
-        "reil"
+        "br5b",
+        "iterum",
+        "conviction",
+        "belkosea"
     ],
-    "imagePath": "BR5_Belkosea.png",
+    "imagePath": "BR5b_Belkosea.png",
     "shipPositionsType": "TYPE02",
     "wormholes": [],
     "planets": [
-        "strang",
-        "reil"
+        "iterum",
+        "conviction"
     ],
     "source": "ds",
     "tileBack": "green"

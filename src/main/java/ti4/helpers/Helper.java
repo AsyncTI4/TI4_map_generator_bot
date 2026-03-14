@@ -2180,22 +2180,28 @@ public class Helper {
                 ButtonHelper.isLawInPlay(game, "conscription") || ButtonHelper.isLawInPlay(game, "absol_conscription");
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
         String tp = tile.getPosition();
+        String remaining = "";
         if (!"solbtbuild".equalsIgnoreCase(warfareNOtherstuff)) {
             if (!"muaatagent".equalsIgnoreCase(warfareNOtherstuff)) {
                 if (player.hasWarsunTech() && resourcelimit > 9) {
+                    remaining = " ("
+                            + ButtonHelperFactionSpecific.remainingUnitsOfType(
+                                    game, Mapper.getUnitKey(AliasHandler.resolveUnit("warsun"), player.getColorID()))
+                            + ")";
                     Button wsButton = Buttons.green(
                             "FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp,
-                            "Produce War Sun",
+                            "Produce War Sun" + remaining,
                             UnitEmojis.warsun);
                     if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
                             game, Mapper.getUnitKey(AliasHandler.resolveUnit("warsun"), player.getColorID()))) {
                         wsButton = Buttons.gray(
                                 "FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp,
-                                "Produce War Sun",
+                                "Produce War Sun" + remaining,
                                 UnitEmojis.warsun);
                     }
                     unitButtons.add(wsButton);
                 }
+                remaining = "";
                 if (player.ownsUnit("ghemina_flagship_lady") && resourcelimit > 7) {
                     Button wsButton = Buttons.green(
                             "FFCC_" + player.getFaction() + "_" + placePrefix + "_lady_" + tp,
@@ -2225,23 +2231,31 @@ public class Helper {
                     unitButtons.add(fsButton);
                 }
             }
+            remaining = " ("
+                    + ButtonHelperFactionSpecific.remainingUnitsOfType(
+                            game, Mapper.getUnitKey(AliasHandler.resolveUnit("dreadnought"), player.getColorID()))
+                    + ")";
             Button dnButton = Buttons.green(
                     "FFCC_" + player.getFaction() + "_" + placePrefix + "_dreadnought_" + tp,
-                    "Produce Dreadnought",
+                    "Produce Dreadnought" + remaining,
                     UnitEmojis.dreadnought);
             if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
                     game, Mapper.getUnitKey(AliasHandler.resolveUnit("dreadnought"), player.getColorID()))) {
                 dnButton = Buttons.gray(
                         "FFCC_" + player.getFaction() + "_" + placePrefix + "_dreadnought_" + tp,
-                        "Produce Dreadnought",
+                        "Produce Dreadnought" + remaining,
                         UnitEmojis.dreadnought);
             }
             if (resourcelimit > 3) {
                 unitButtons.add(dnButton);
             }
+            remaining = " ("
+                    + ButtonHelperFactionSpecific.remainingUnitsOfType(
+                            game, Mapper.getUnitKey(AliasHandler.resolveUnit("carrier"), player.getColorID()))
+                    + ")";
             Button cvButton = Buttons.green(
                     "FFCC_" + player.getFaction() + "_" + placePrefix + "_carrier_" + tp,
-                    "Produce Carrier",
+                    "Produce Carrier" + remaining,
                     UnitEmojis.carrier);
             if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
                     game, Mapper.getUnitKey(AliasHandler.resolveUnit("carrier"), player.getColorID()))) {
@@ -2250,29 +2264,37 @@ public class Helper {
             if (resourcelimit > 2) {
                 unitButtons.add(cvButton);
             }
+            remaining = " ("
+                    + ButtonHelperFactionSpecific.remainingUnitsOfType(
+                            game, Mapper.getUnitKey(AliasHandler.resolveUnit("cruiser"), player.getColorID()))
+                    + ")";
             Button caButton = Buttons.green(
                     "FFCC_" + player.getFaction() + "_" + placePrefix + "_cruiser_" + tp,
-                    "Produce Cruiser",
+                    "Produce Cruiser" + remaining,
                     UnitEmojis.cruiser);
             if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
                     game, Mapper.getUnitKey(AliasHandler.resolveUnit("cruiser"), player.getColorID()))) {
                 caButton = Buttons.gray(
                         "FFCC_" + player.getFaction() + "_" + placePrefix + "_cruiser_" + tp,
-                        "Produce Cruiser",
+                        "Produce Cruiser" + remaining,
                         UnitEmojis.cruiser);
             }
             if (resourcelimit > 1) {
                 unitButtons.add(caButton);
             }
+            remaining = " ("
+                    + ButtonHelperFactionSpecific.remainingUnitsOfType(
+                            game, Mapper.getUnitKey(AliasHandler.resolveUnit("destroyer"), player.getColorID()))
+                    + ")";
             Button ddButton = Buttons.green(
                     "FFCC_" + player.getFaction() + "_" + placePrefix + "_destroyer_" + tp,
-                    "Produce Destroyer",
+                    "Produce Destroyer" + remaining,
                     UnitEmojis.destroyer);
             if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
                     game, Mapper.getUnitKey(AliasHandler.resolveUnit("destroyer"), player.getColorID()))) {
                 ddButton = Buttons.gray(
                         "FFCC_" + player.getFaction() + "_" + placePrefix + "_destroyer_" + tp,
-                        "Produce Destroyer",
+                        "Produce Destroyer" + remaining,
                         UnitEmojis.destroyer);
             }
             unitButtons.add(ddButton);

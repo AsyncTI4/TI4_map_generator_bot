@@ -85,6 +85,13 @@ public class CardsInfoService {
             buttons.add(Buttons.gray(
                     "startTradeStationConvert", "Convert Commodities With Space Station", MiscEmojis.comm));
         }
+        if (player.getPlanets().contains("conviction")
+                && !player.getExhaustedPlanetsAbilities().contains("conviction")) {
+            buttons.add(Buttons.gray(
+                    "planetAbilityExhaust_conviction",
+                    "Exhaust Conviction Ability To Replenish Comms",
+                    FactionEmojis.belkosea));
+        }
         if (player.hasUnexhaustedLeader("researchagent")) {
             buttons.add(Buttons.gray("exhaustAgent_researchagent", "Use Research Genome", FactionEmojis.Deepwrought));
         }

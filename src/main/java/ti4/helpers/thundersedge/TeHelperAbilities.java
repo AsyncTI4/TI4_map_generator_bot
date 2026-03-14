@@ -85,6 +85,19 @@ public class TeHelperAbilities {
         });
     }
 
+    @ButtonHandler("removeBreach_")
+    private static void removeBreachInactive(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String regex = "removeBreach_" + RegexHelper.posRegex(game);
+        RegexService.runMatcher(regex, buttonID, matcher -> {
+            Tile tile = game.getTileByPosition(matcher.group("pos"));
+            tile.getSpaceUnitHolder().removeToken(Constants.TOKEN_BREACH_INACTIVE);
+            String msg = player.getRepresentation(false, false) + " removed an inactive Breach from "
+                    + tile.getRepresentationForButtons(game, player) + ".";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            ButtonHelper.deleteMessage(event);
+        });
+    }
+
     /* ---------------------------------------------------------------------------|--------------------------------------------------------------------------- */
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- RalNel Consortium -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
     /* ---------------------------------------------------------------------------|--------------------------------------------------------------------------- */

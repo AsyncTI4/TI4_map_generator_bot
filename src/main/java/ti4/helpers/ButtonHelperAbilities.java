@@ -1374,6 +1374,12 @@ public class ButtonHelperAbilities {
         Tile tile = getLocationOfSuperweapon(game, name);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         List<Button> buttons = new ArrayList<>();
+        if (player.getExhaustedPlanetsAbilities().contains("conviction")) {
+            player.refreshPlanetAbility("conviction");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getFactionEmoji() + " has readied the Conviction legendary ability.");
+        }
         switch (name) {
             case "grom" -> {
                 for (String adj : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, true)) {
