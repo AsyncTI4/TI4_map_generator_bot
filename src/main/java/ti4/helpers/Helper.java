@@ -2201,7 +2201,10 @@ public class Helper {
                     }
                     unitButtons.add(wsButton);
                 }
-                remaining = "";
+                remaining = " ("
+                        + ButtonHelperFactionSpecific.remainingUnitsOfType(
+                                game, Mapper.getUnitKey(AliasHandler.resolveUnit("flagship"), player.getColorID()))
+                        + ")";
                 if (player.ownsUnit("ghemina_flagship_lady") && resourcelimit > 7) {
                     Button wsButton = Buttons.green(
                             "FFCC_" + player.getFaction() + "_" + placePrefix + "_lady_" + tp,
@@ -2218,13 +2221,13 @@ public class Helper {
                 }
                 Button fsButton = Buttons.green(
                         "FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp,
-                        "Produce Flagship",
+                        "Produce Flagship" + remaining,
                         UnitEmojis.flagship);
                 if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
                         game, Mapper.getUnitKey(AliasHandler.resolveUnit("flagship"), player.getColorID()))) {
                     fsButton = Buttons.gray(
                             "FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp,
-                            "Produce Flagship",
+                            "Produce Flagship" + remaining,
                             UnitEmojis.flagship);
                 }
                 if (resourcelimit > 7) {
@@ -2448,6 +2451,7 @@ public class Helper {
                             UnitEmojis.infantry);
                     unitButtons.add(inf2Button);
                 }
+                
                 Button mfButton = Buttons.green(
                         "FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp,
                         "Produce Mech on " + getPlanetRepresentation(pp, game),
