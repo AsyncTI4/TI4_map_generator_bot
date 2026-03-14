@@ -107,6 +107,14 @@ public class ScorePublicObjectiveService {
     private static void informAboutScoring(
             GenericInteractionCreateEvent event, MessageChannel channel, Game game, Player player, int poID) {
         String both = getNameNEMoji(game, poID);
+        String id = "";
+        Map<String, Integer> revealedPublicObjectives = game.getRevealedPublicObjectives();
+        for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+            if (po.getValue().equals(poID)) {
+                id = po.getKey();
+                break;
+            }
+        }
         String poName = both.split("_")[0];
         String emojiName = both.split("_")[1];
 
@@ -138,7 +146,9 @@ public class ScorePublicObjectiveService {
         }
         if (!poName.toLowerCase().contains("custodian")
                 && (player.hasAbility("yin_breakthrough") || player.hasUnlockedBreakthrough("yinbt"))) {
-            BreakthroughHelper.resolveYinBreakthroughAbility(game, player);
+            if (Mapper.getPublicObjective(id) != null || Mapper.getSecretObjective(id) != null) {
+                BreakthroughHelper.resolveYinBreakthroughAbility(game, player);
+            }
         }
         String idC = "";
         for (Entry<String, Integer> po : game.getRevealedPublicObjectives().entrySet()) {

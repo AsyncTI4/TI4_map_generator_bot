@@ -880,7 +880,7 @@ public class CombatRollService {
                         maximumHits += 2;
                     }
                 }
-                if (rollType == CombatRollType.bombardment && "tf-thedragonfreed".equalsIgnoreCase(unitModel.getId())) {
+                if (rollType == CombatRollType.bombardment && "tf-dragonfreed".equalsIgnoreCase(unitModel.getId())) {
                     if (!game.isFowMode() && hitRolls > 0) {
                         List<Button> buttons = new ArrayList<>();
                         String bombardPlanet2 = game.getStoredValue("bombardmentTarget" + player.getFaction());

@@ -1,6 +1,6 @@
 package ti4.message;
 
-import static ti4.helpers.discord.DiscordHelper.isDiscordServerError;
+import static ti4.helpers.discord.DiscordHelper.*;
 
 import java.io.File;
 import java.net.SocketTimeoutException;
@@ -171,6 +171,7 @@ public class MessageHelper {
         String gameName = GameNameService.getGameNameFromChannel(channel);
         if (GameManager.isValid(gameName)
                 && buttons instanceof ArrayList
+                && buttons.size() > 0
                 && !(channel instanceof ThreadChannel)
                 && channel.getName().contains("actions")) {
             buttons = addUndoButtonToList(buttons, gameName);

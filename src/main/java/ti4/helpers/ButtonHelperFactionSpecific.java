@@ -3053,6 +3053,24 @@ public final class ButtonHelperFactionSpecific {
                 && unitKey.getUnitType() != UnitType.Pds);
     }
 
+    public static int remainingUnitsOfType(Game game, UnitKey unitKey) {
+        int baseUnitCap =
+                switch (unitKey.getUnitType()) {
+                    case Infantry, Fighter -> 10_000;
+                    case Destroyer, Cruiser -> 8;
+                    case Dreadnought -> 5;
+                    case Mech, Carrier -> 4;
+                    case Warsun -> 2;
+                    case Flagship -> 1;
+                    default -> 0; // everything else that can't be captured
+                };
+        int unitCap = game.getPlayerByColorID(unitKey.getColorID())
+                .filter(p -> p.getUnitCap(unitKey.asyncID()) != 0)
+                .map(p -> p.getUnitCap(unitKey.asyncID()))
+                .orElse(baseUnitCap);
+        return unitCap - ButtonHelper.getNumberOfUnitsOnTheBoard(game, unitKey);
+    }
+
     private static Button buildVortexButton(Game game, UnitKey unitKey) {
         String faction = game.getPlayerByColorID(unitKey.getColorID())
                 .map(Player::getFaction)

@@ -4037,6 +4037,10 @@ public final class AgendaHelper {
                         List<MessageEmbed> embeds =
                                 List.of(Mapper.getAgenda(id2).getRepresentationEmbed());
                         MessageHelper.sendMessageEmbedsToCardsInfoThread(speaker, sb, embeds);
+                        if (revealFromBottom) {
+                            id2 = game.revealAgenda(true);
+                            game.putAgendaBackIntoDeckOnTop(id2);
+                        }
                         game.drawAgenda();
                     }
                 }

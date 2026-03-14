@@ -106,6 +106,9 @@ public class DeorbitBarrageService {
         String planet = buttonID.split("_")[1];
         int amount = Integer.parseInt(buttonID.split("_")[2]);
         Player p2 = game.getPlanetOwner(planet);
+        if (p2 == null) {
+            p2 = game.getPlayerFromColorOrFaction("neutral");
+        }
         String planetRep = Helper.getPlanetRepresentation(planet, game);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),

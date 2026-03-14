@@ -24,6 +24,18 @@
         "source": "balacasi"
     },
     {
+        "alias": "arachianbt",
+        "name": "The Weave Unraveled",
+        "shortName": "The Weave\nUnraveled",
+        "faction": "arachian",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "Place The Weave system tile in your play area. Gain its legendary anomaly ability. You may treat this system as being adjacent to any system that contains both one of your command tokens and your units. Other players cannot move or place units or tokens into this system. Legendary anomaly ability: Fabric of the Weave At the end of your turn, exhaust this card to produce up to 3 units in The Weave. Reduce the combined cost of this production by 1.",
+        "source": "other"
+    },
+    {
         "alias": "zooidbt",
         "name": "Foresight Module",
         "shortName": "Foresight\nModule",
