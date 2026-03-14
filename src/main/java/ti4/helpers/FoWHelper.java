@@ -475,6 +475,34 @@ public final class FoWHelper {
         return tiles;
     }
 
+    public static boolean isTileInExileRange(Game game, Tile tile, Player player) {
+        if (player.hasUnit("crimson_destroyer")) {
+            List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Destroyer);
+            for (Tile tile2 : destroyers) {
+                if (getAdjacentTiles(game, tile.getPosition(), player, false, true)
+                        .contains(tile2.getPosition())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean isTileInUpgradedExileRange(Game game, Tile tile, Player player) {
+        if (player.hasUnit("crimson_destroyer2")) {
+            List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Destroyer);
+            for (String adjPos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+                for (Tile tile2 : destroyers) {
+                    if (FoWHelper.getAdjacentTiles(game, adjPos, player, false, true)
+                            .contains(tile2.getPosition())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public static boolean isTileAdjacentToAnAnomaly(Game game, String position, Player player) {
         for (String adjPos : getAdjacentTilesAndNotThisTile(game, position, player, false)) {
             if (game.getTileByPosition(adjPos).isAnomaly(game)) {

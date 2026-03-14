@@ -51,6 +51,7 @@ import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -2974,6 +2975,7 @@ public class UnfiledButtonHandlers {
         buttons.add(Buttons.red("checkAnomView", "Find Anomalies"));
         buttons.add(Buttons.green("checkLegendView", "Find Legendaries"));
         buttons.add(Buttons.gray("checkEmptyView", "Find Empties"));
+        buttons.add(Buttons.red("checkExileView", "Determine Exile Breachable Systems"));
         buttons.add(Buttons.blue("checkAetherView", "Determine Aetherstreamable Systems"));
         buttons.add(Buttons.red("checkCannonView", "Calculate Space Cannon Offense Shots"));
         buttons.add(Buttons.green("checkTraitView", "Find Traits"));
@@ -2982,6 +2984,11 @@ public class UnfiledButtonHandlers {
         buttons.add(Buttons.gray("checkShiplessView", "Show Map Without Ships"));
         buttons.add(Buttons.gray("checkUnlocked", "Show Only Unlocked Units"));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", buttons);
+    }
+
+    @ButtonHandler("checkExileView")
+    public static void calculateExileView(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.exile);
     }
 
     @ButtonHandler("resetSpend_")
