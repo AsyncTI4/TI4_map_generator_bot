@@ -2451,7 +2451,7 @@ public class Helper {
                             UnitEmojis.infantry);
                     unitButtons.add(inf2Button);
                 }
-                
+
                 Button mfButton = Buttons.green(
                         "FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp,
                         "Produce Mech on " + getPlanetRepresentation(pp, game),
