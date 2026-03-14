@@ -3981,8 +3981,9 @@ public class AgendaHelper {
             game.setCurrentAgendaInfo(agendaType + "_" + agendaTarget + "_" + uniqueID + "_" + agendaID);
         } else {
             boolean notEmergency = false;
+            String agendaName2 = agendaName;
             while (!notEmergency) {
-                if ("Emergency Session".equalsIgnoreCase(agendaName)) {
+                if ("Emergency Session".equalsIgnoreCase(agendaName2)) {
                     game.revealAgenda(revealFromBottom);
                     MessageHelper.sendMessageToChannel(
                             channel,
@@ -3993,8 +3994,8 @@ public class AgendaHelper {
                 AgendaModel agendaDetails2 = Mapper.getAgenda(id2);
                 agendaTarget = agendaDetails2.getTarget();
                 agendaType = agendaDetails2.getType();
-                agendaName = agendaDetails2.getName();
-                notEmergency = !"Emergency Session".equalsIgnoreCase(agendaName);
+                agendaName2 = agendaDetails2.getName();
+                notEmergency = !"Emergency Session".equalsIgnoreCase(agendaName2);
                 game.setCurrentAgendaInfo(agendaType + "_" + agendaTarget + "_CL_covert");
                 if ((agendaTarget.toLowerCase().contains("elect law") || "constitution".equalsIgnoreCase(id2))
                         && game.getLaws().isEmpty()) {
@@ -4002,7 +4003,7 @@ public class AgendaHelper {
                     game.revealAgenda(revealFromBottom);
                     MessageHelper.sendMessageToChannel(
                             channel,
-                            game.getPing() + ", an \"elect law\" agenda (" + agendaName
+                            game.getPing() + ", an \"elect law\" agenda (" + agendaName2
                                     + ") was hidden under _Covert Legislation_ with no laws in play."
                                     + " As such, both that agenda and _Covert Legislation_ have been discarded, and the next agenda is being flipped.");
                     aCount -= 1;
@@ -4013,7 +4014,7 @@ public class AgendaHelper {
                 if ((agendaTarget.toLowerCase().contains("secret objective")) && game.getScoredSecrets() < 1) {
                     MessageHelper.sendMessageToChannel(
                             channel,
-                            game.getPing() + ", an \"elect scored secret objective\" agenda (" + agendaName
+                            game.getPing() + ", an \"elect scored secret objective\" agenda (" + agendaName2
                                     + ") was hidden under _Covert Legislation_ when no secret objectives have been scored."
                                     + " As such, both that agenda and _Covert Legislation_ have been discarded, and the next agenda is being flipped.");
                     notEmergency = false;
