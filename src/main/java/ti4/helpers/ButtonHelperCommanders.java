@@ -9,13 +9,11 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.function.Consumers;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.listeners.context.ButtonContext;
@@ -472,10 +470,10 @@ public class ButtonHelperCommanders {
 
         String method = game.isTwilightKart() ? "IFF Support Wing" : "Sai Seravus, the Creuss commander";
         String msg = factionEmoji + " placed 1 fighter in " + tile.getRepresentation()
-                        + " using " + method + ".\n-# " + factionEmoji
-                        + " has placed a total of " + player.getGhostCommanderCounter()
-                        + " fighters over the course of this game.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),msg);
+                + " using " + method + ".\n-# " + factionEmoji
+                + " has placed a total of " + player.getGhostCommanderCounter()
+                + " fighters over the course of this game.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
 
     @ButtonHandler("placeKhraskCommanderInf_")

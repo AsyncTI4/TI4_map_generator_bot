@@ -10,10 +10,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -728,7 +726,8 @@ public class CombatModHelper {
                 case "damaged_units_max_2" -> {
                     UnitKey key = Units.getUnitKey(origUnit.getUnitType(), player.getColor());
                     UnitHolder space = activeSystem.getUnitHolders().get("space");
-                    if (origUnit.getIsGroundForce() && !activeSystem.getPlanetUnitHolders().isEmpty()) {
+                    if (origUnit.getIsGroundForce()
+                            && !activeSystem.getPlanetUnitHolders().isEmpty()) {
                         for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
                             if (planet.getUnitCount(key) > 0) {
                                 space = planet;
@@ -741,7 +740,8 @@ public class CombatModHelper {
                 case "damaged_units" -> {
                     UnitKey key = Units.getUnitKey(origUnit.getUnitType(), player.getColor());
                     UnitHolder space = activeSystem.getUnitHolders().get("space");
-                    if (origUnit.getIsGroundForce() && !activeSystem.getPlanetUnitHolders().isEmpty()) {
+                    if (origUnit.getIsGroundForce()
+                            && !activeSystem.getPlanetUnitHolders().isEmpty()) {
                         for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
                             if (planet.getUnitCount(key) > 0) {
                                 space = planet;

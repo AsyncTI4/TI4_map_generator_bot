@@ -63,7 +63,7 @@ public final class DeepgloomService {
     private static void yssarilbtToggleDebt(ButtonInteractionEvent event, Game game, Player player) {
         String type = " allowed ";
         if (!player.hasStoredValue("enableDeepgloomDebt")) {
-            player.addStoredValue("enableDeepgloomDebt", "y");
+            player.setStoredValue("enableDeepgloomDebt", "y");
             game.setDebtPoolIcon("Scheming", CardEmojis.ActionCard.emojiString());
             game.setDebtPoolIcon("Stall Tactics", CardEmojis.ActionCard.emojiString());
         } else {

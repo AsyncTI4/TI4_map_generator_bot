@@ -74,6 +74,7 @@ import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
+import ti4.game.helper.StoredValueHelper;
 import ti4.game.helper.TwilightFallDeckFuncs;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -93,7 +94,7 @@ import ti4.service.statistics.round.RoundStatsTracker;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
-public class Game extends GameProperties implements TwilightFallDeckFuncs {
+public class Game extends GameProperties implements StoredValueHelper, TwilightFallDeckFuncs {
 
     private static final JsonMapper mapper = JsonMapperManager.basic();
 
@@ -113,7 +114,6 @@ public class Game extends GameProperties implements TwilightFallDeckFuncs {
     @Getter
     private final Map<Integer, Boolean> scPlayed = new HashMap<>();
 
-    private final Map<String, String> checkingForAllReacts = new HashMap<>();
     private List<String> listOfTilePinged = new ArrayList<>();
 
     // TODO (Jazz): These should be easily added to GameProperties
@@ -1129,23 +1129,12 @@ public class Game extends GameProperties implements TwilightFallDeckFuncs {
     }
 
     public void setCurrentReacts(String messageID, String factionsWhoReacted) {
-        checkingForAllReacts.put(messageID, factionsWhoReacted);
-    }
-
-    public Map<String, String> getMessagesThatICheckedForAllReacts() {
-        return checkingForAllReacts;
-    }
-
-    private String getFactionsThatReactedToThis(String messageID) {
-        if (checkingForAllReacts.get(messageID) != null) {
-            return checkingForAllReacts.get(messageID);
-        }
-        return "";
+        getStoredValueMap().put(messageID, factionsWhoReacted);
     }
 
     public void clearAllEmptyStoredValues() {
         // Remove the entry if the value is empty
-        checkingForAllReacts
+        getStoredValueMap()
                 .entrySet()
                 .removeIf(entry -> entry.getValue() == null || entry.getValue().isEmpty());
     }
@@ -1157,7 +1146,7 @@ public class Game extends GameProperties implements TwilightFallDeckFuncs {
             return;
         }
         value = StringHelper.escape(value);
-        checkingForAllReacts.put(key, value);
+        getStoredValueMap().put(key, value);
     }
 
     public int changeCommsOnPlanet(int change, String planet) {
@@ -1176,12 +1165,12 @@ public class Game extends GameProperties implements TwilightFallDeckFuncs {
     }
 
     public String getStoredValue(String key) {
-        String value = getFactionsThatReactedToThis(key);
+        String value = getStoredValueMap().getOrDefault(key, "");
         return StringHelper.unescape(value);
     }
 
     public String removeStoredValue(String key) {
-        return checkingForAllReacts.remove(key);
+        return getStoredValueMap().remove(key);
     }
 
     public void resetCurrentAgendaVotes() {
