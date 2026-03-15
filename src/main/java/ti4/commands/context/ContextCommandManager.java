@@ -8,14 +8,14 @@ import java.util.stream.Stream;
 
 public class ContextCommandManager {
 
-    private static final Map<String, ContextCommand<?>> commands = Stream.of(new BanUser(), new DeleteMessage())
+    private static final Map<String, ContextCommand> commands = Stream.of(new BanUser(), new DeleteMessage())
             .collect(Collectors.toMap(ContextCommand::getName, Function.identity()));
 
-    public static ContextCommand<?> getCommand(String name) {
+    public static ContextCommand getCommand(String name) {
         return commands.get(name);
     }
 
-    public static Collection<ContextCommand<?>> getCommands() {
+    public static Collection<ContextCommand> getCommands() {
         return commands.values();
     }
 }

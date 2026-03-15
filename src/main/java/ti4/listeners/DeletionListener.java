@@ -1,7 +1,6 @@
 package ti4.listeners;
 
 import javax.annotation.Nonnull;
-
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -37,7 +36,7 @@ public class DeletionListener extends ListenerAdapter {
         // MessageChannel channel = event.getMessageChannel();
         // String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
         // String msg = event.getTarget().getContentDisplay();
-        
+
         // handleMessageDelete(channel, gameName, msg);
     }
 
@@ -72,7 +71,8 @@ public class DeletionListener extends ListenerAdapter {
         }
     }
 
-    private static void sendDeletionLog(GuildMessageChannel eventChannel, MessageChannel deletionLogChannel, Game game, String cachedMessage) {
+    private static void sendDeletionLog(
+            GuildMessageChannel eventChannel, MessageChannel deletionLogChannel, Game game, String cachedMessage) {
         String channelLink = eventChannel.getJumpUrl();
         String tableTalkLink = game.getTabletalkJumpLinkFormatted();
         String mainChannelLink = game.getActionsJumpLinkFormatted();

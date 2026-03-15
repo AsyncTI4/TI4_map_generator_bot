@@ -2,10 +2,11 @@ package ti4.commands.context;
 
 import java.util.List;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.events.interaction.command.GenericContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command.Type;
 
-public abstract class MessageCommand implements ContextCommand<MessageContextInteractionEvent> {
+public abstract class MessageCommand implements ContextCommand {
 
     private final String name;
     private final List<Permission> perms;
@@ -26,4 +27,10 @@ public abstract class MessageCommand implements ContextCommand<MessageContextInt
     public List<Permission> getPermissions() {
         return perms;
     }
+
+    public void execute(GenericContextInteractionEvent<?> event) {
+        if (event instanceof MessageContextInteractionEvent userEvent) execute(userEvent);
+    }
+
+    public abstract void execute(MessageContextInteractionEvent event);
 }

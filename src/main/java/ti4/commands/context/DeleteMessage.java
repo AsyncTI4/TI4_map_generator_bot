@@ -12,8 +12,18 @@ public class DeleteMessage extends MessageCommand {
         super("Delete Message", Permission.PIN_MESSAGES);
     }
 
+    private boolean suspicious = false;
+
     public void execute(MessageContextInteractionEvent event) {
         event.getTarget().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         DeletionListener.handleContextMenuDelete(event);
+    }
+
+    public void postExecute(MessageContextInteractionEvent event) {
+        if (suspicious) {
+            event.reply("Deleting this is a bit suspicious... don't ya think?").queue();
+        } else {
+            event.getHook().deleteOriginal().queue();
+        }
     }
 }

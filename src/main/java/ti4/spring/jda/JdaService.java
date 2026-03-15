@@ -60,6 +60,7 @@ import ti4.listeners.BanListener;
 import ti4.listeners.BotRuntimeStatsListener;
 import ti4.listeners.ButtonListener;
 import ti4.listeners.ChannelCreationListener;
+import ti4.listeners.ContextMenuListener;
 import ti4.listeners.DeletionListener;
 import ti4.listeners.MessageListener;
 import ti4.listeners.ModalListener;
@@ -146,6 +147,7 @@ public class JdaService {
                 new BotRuntimeStatsListener(),
                 new MessageListener(),
                 new SlashCommandListener(),
+                new ContextMenuListener(),
                 ButtonListener.getInstance(),
                 new UserJoinServerListener(),
                 new AutoCompleteListener(),

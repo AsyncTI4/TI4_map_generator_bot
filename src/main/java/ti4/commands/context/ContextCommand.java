@@ -9,14 +9,14 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 
-public interface ContextCommand<T extends GenericContextInteractionEvent<?>> extends Command<T> {
+public interface ContextCommand extends Command<GenericContextInteractionEvent<?>> {
 
     Type getType();
 
     List<Permission> getPermissions();
 
     @Override
-    default boolean accept(T event) {
+    default boolean accept(GenericContextInteractionEvent<?> event) {
         return Command.super.accept(event);
     }
 
