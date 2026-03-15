@@ -181,7 +181,7 @@
         "combatDieCount": 1,
         "isUpgrade": true,
         "isShip": true,
-        "ability": "DEPLOY: Once per action, when a player activates a system that contains 1 of your PDS units and no other players' ships, you may place this unit from your reinforcements in that system.",
+        "ability": "DEPLOY: When a player activates a system that contains 1 of your PDS units and no other players' ships, you may place this unit from your reinforcements in that system.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-saturnremnant.png?raw=true",
         "source": "twilight_kart"
     },
@@ -217,7 +217,7 @@
         "afbDieCount": 3,
         "isUpgrade": true,
         "isShip": true,
-        "ability": "After this unit is placed, place up to 2 fighters from your reinforcements in any system that contains your ships.",
+        "ability": "After this unit is placed, you may place 1 fighter from your reinforcements in any system that contains your ships.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-moyinschosen.png?raw=true",
         "source": "twilight_kart"
     },
@@ -368,7 +368,7 @@
         "combatDieCount": 1,
         "isUpgrade": true,
         "isShip": true,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool. DEPLOY: After your ships move through 1 or more wormholes, you may place 1 fighter from your reinforcements with each of those ships.",
+        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool. DEPLOY: After your non-fighter ships move through 1 or more wormholes, you may place 1 fighter with each of those ships.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-iffsupportwing.png?raw=true",
         "source": "twilight_kart"
     },
@@ -417,7 +417,7 @@
         "combatDieCount": 1,
         "isUpgrade": true,
         "isGroundForce": true,
-        "ability": "At the start of a ground combat on a planet that contains 1 or more of your infantry you may place 1 infantry from your reinforcements on that planet.",
+        "ability": "DEPLOY: At the start of a ground combat on a planet that contains 1 or more of your infantry, you may place 1 infantry on that planet.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-genesiscorps.png?raw=true",
         "source": "twilight_kart"
     },
@@ -477,7 +477,7 @@
         "productionValue": 4,
         "isUpgrade": true,
         "isStructure": true,
-        "ability": "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity.\nAfter another player activates this system, they may spend 3 trade goods to draw 1 ability. If they do, draw 1 ability.",
+        "ability": "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity.\nAfter a player activates this system, they may spend 3 trade goods to draw 1 ability. When another player uses this ability, draw 1 ability.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-visionariaarchive.png?raw=true",
         "source": "twilight_kart"
     },

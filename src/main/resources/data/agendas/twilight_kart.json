@@ -5,7 +5,7 @@
         "category": "edict",
         "type": "Directive",
         "target": "Edict",
-        "text1": "Draw 1 card from any splice deck. Then, roll 1 die: 1 or 10: Put the Fracture into play; if the Fracture is already in play, destroy each unit in the Styx system and place neutral units in that system as indicated on the back of its system tile. If Styx was owned by a player, they return its planet card to the planet card deck.",
+        "text1": "Draw 1 card from any splice deck. Then, roll 1 die: 1 or 10: Put the Fracture into play; if the Fracture is already in play, destroy each unit in Styx's system and place neutral units as indicated on the back of its tile. If Styx was owned by a player, they return its planet card to the planet card deck.",
         "source": "twilight_kart"
     },
     {
@@ -23,7 +23,7 @@
         "category": "edict",
         "type": "Directive",
         "target": "Edict",
-        "text1": "Place 1 structure on a planet you control, or destroy 1 structure. Then, each player may place 1 PDS on a planet they control.",
+        "text1": "Place 1 structure on a planet you control, or destroy 1 structure in a non-home system. Then, all players may place 1 PDS on a planet they control.",
         "source": "twilight_kart"
     },
     {
@@ -41,7 +41,7 @@
         "category": "edict",
         "type": "Directive",
         "target": "Edict",
-        "text1": "Gain 3 trade goods. Then, each other player returns 1 of their trade goods to the supply.",
+        "text1": "Each other player removes 1 of their non-fighter ships from the game board. Gain trade goods equal to the combined cost of those ships.",
         "source": "twilight_kart"
     }
 ]
