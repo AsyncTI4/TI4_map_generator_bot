@@ -44,7 +44,7 @@
         "name": "Contract",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose a system that contains no more than 3 of your non-fighter ships. Replace each ship in that system with a neutral ship of the same type; gain trade goods equal to the combined cost of those non-fighter ships.",
+        "text": "Choose a system that contains no more than 3 of your non-fighter ships. Replace each of your ships in that system with a neutral ship of the same type; gain trade goods equal to the combined cost of those non-fighter ships.",
         "source": "twilight_kart"
     },
     {
@@ -126,7 +126,7 @@
         "name": "Oppress",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose 1 player and look at their hand of action cards.  Choose 1 of those cards and add it to your hand. ",
+        "text": "Choose 1 player and look at their hand of action cards. Choose 1 of those cards and add it to your hand.",
         "source": "twilight_kart"
     },
     {
@@ -158,7 +158,7 @@
         "name": "Preside",
         "phase": "Action",
         "window": "Action",
-        "text": "Reveal and resolve 1 edict.",
+        "text": "Draw and resolve 1 edict.",
         "source": "twilight_kart"
     },
     {
