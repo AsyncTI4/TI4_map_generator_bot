@@ -336,6 +336,8 @@ public class MapGenerator implements AutoCloseable {
             sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Anomalies));
         } else if (displayType == DisplayType.aetherstream) {
             sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Aetherstream));
+        } else if (displayType == DisplayType.exile) {
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Exile));
         } else if (displayType == DisplayType.legendaries) {
             sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Legendaries));
         } else if (displayType == DisplayType.empties) {

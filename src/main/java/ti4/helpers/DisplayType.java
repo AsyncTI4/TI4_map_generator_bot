@@ -13,6 +13,7 @@ public enum DisplayType {
     anomalies("anomalies"),
     legendaries("legendaries"),
     empties("empties"),
+    exile("exile"),
     aetherstream("aetherstream"),
     spacecannon("space_cannon_offense"),
     traits("traits"),
