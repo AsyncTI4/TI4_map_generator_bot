@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ti4.helpers.DisplayType;
+import ti4.helpers.discord.DiscordHelper;
 import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
@@ -156,8 +157,11 @@ public class GameImageController {
             String attachmentUrl = message.getAttachments().getFirst().getUrl();
             return ResponseEntity.ok(attachmentUrl);
         } catch (Exception e) {
-            BotLogger.error(
-                    "Failed to fetch message " + messageId + " from channel " + channelId + " for game " + gameName, e);
+            if (!DiscordHelper.isUnknownMessageError(e)) {
+                BotLogger.error(
+                        "Failed to fetch message " + messageId + " from channel " + channelId + " for game " + gameName,
+                        e);
+            }
             return ResponseEntity.notFound().build();
         }
     }
