@@ -88,7 +88,7 @@ class ListPlayerInfoButtonHandler {
                     for (String ability : p2.getAbilities()) {
                         messageEmbeds.add(Mapper.getAbility(ability).getRepresentationEmbed());
                     }
-                    for (Leader lead : p2.getLeaders()) {
+                    for (Leader lead : p2.getLeadersIncludingPurged()) {
                         messageEmbeds.add(lead.getLeaderModel()
                                 .get()
                                 .getRepresentationEmbed(true, true, true, true, game.isTwilightsFallMode()));
