@@ -12,6 +12,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
+import ti4.service.statistics.FirmamentObsidianStatisticsHelper;
 
 @UtilityClass
 class MostPlayedFactionsStatisticsService {
@@ -41,6 +42,21 @@ class MostPlayedFactionsStatisticsService {
                         .append((float) custodians.getOrDefault(entry.getKey().getAlias(), 0) / entry.getValue())
                         .append(")")
                         .append("\n"));
+
+        int combinedGames = FirmamentObsidianStatisticsHelper.getCombinedCount(factionCount);
+        if (combinedGames > 0) {
+            int combinedCustodians = FirmamentObsidianStatisticsHelper.getCombinedCount(custodians);
+            sb.append("`")
+                    .append(StringUtils.leftPad(Integer.toString(combinedGames), 4))
+                    .append("x` ")
+                    .append(FirmamentObsidianStatisticsHelper.COMBINED_LABEL)
+                    .append(" (Took Custodians a total of  ")
+                    .append(combinedCustodians)
+                    .append(" times, or ")
+                    .append((float) combinedCustodians / combinedGames)
+                    .append(")\n");
+        }
+
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Plays per Faction", sb.toString());
     }

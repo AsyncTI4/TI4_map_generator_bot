@@ -12,6 +12,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
+import ti4.service.statistics.FirmamentObsidianStatisticsHelper;
 
 @UtilityClass
 class MostWinningFactionsStatisticsService {
@@ -36,6 +37,16 @@ class MostWinningFactionsStatisticsService {
                         .append(" ")
                         .append(entry.getKey().getFactionNameWithSourceEmoji())
                         .append("\n"));
+
+        int combinedWins = FirmamentObsidianStatisticsHelper.getCombinedCount(factionToWinCount);
+        if (combinedWins > 0) {
+            sb.append("`")
+                    .append(StringUtils.leftPad(Integer.toString(combinedWins), 4))
+                    .append("x` ")
+                    .append(FirmamentObsidianStatisticsHelper.COMBINED_LABEL)
+                    .append("\n");
+        }
+
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Wins per Faction", sb.toString());
     }

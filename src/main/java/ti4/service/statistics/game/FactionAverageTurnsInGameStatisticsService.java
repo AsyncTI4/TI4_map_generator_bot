@@ -12,6 +12,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
+import ti4.service.statistics.FirmamentObsidianStatisticsHelper;
 
 @UtilityClass
 class FactionAverageTurnsInGameStatisticsService {
@@ -47,6 +48,19 @@ class FactionAverageTurnsInGameStatisticsService {
                         .append(" ")
                         .append(entry.getKey().getFactionNameWithSourceEmoji())
                         .append("\n"));
+
+        int combinedGames = FirmamentObsidianStatisticsHelper.getCombinedCount(factionCount);
+        if (combinedGames > 0) {
+            double combinedTurns = FirmamentObsidianStatisticsHelper.getCombinedCount(factionTurnCount);
+            sb.append("`")
+                    .append(StringUtils.leftPad(String.format("%.2f", combinedTurns / combinedGames), 4))
+                    .append(" turns from ")
+                    .append(combinedGames)
+                    .append(" games`")
+                    .append(FirmamentObsidianStatisticsHelper.COMBINED_LABEL)
+                    .append("\n");
+        }
+
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Average Turns per Faction", sb.toString());
     }

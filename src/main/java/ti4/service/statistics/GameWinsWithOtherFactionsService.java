@@ -61,6 +61,20 @@ public class GameWinsWithOtherFactionsService {
                         .append(" ")
                         .append(entry.getKey().getFactionNameWithSourceEmoji())
                         .append("\n"));
+
+        int combinedWins = FirmamentObsidianStatisticsHelper.getCombinedCount(factionWinCount);
+        int combinedGames = FirmamentObsidianStatisticsHelper.getCombinedCount(factionGameCount);
+        if (combinedGames > 0) {
+            long combinedWinPercent = Math.round(100.0 * combinedWins / combinedGames);
+            sb.append("`")
+                    .append(StringUtils.leftPad(Long.toString(combinedWinPercent), 4))
+                    .append("%` (")
+                    .append(combinedGames)
+                    .append(" games) ")
+                    .append(FirmamentObsidianStatisticsHelper.COMBINED_LABEL)
+                    .append("\n");
+        }
+
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Faction Win Percent", sb.toString());
     }

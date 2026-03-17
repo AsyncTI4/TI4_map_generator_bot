@@ -13,6 +13,7 @@ import ti4.map.Player;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.service.statistics.FirmamentObsidianStatisticsHelper;
 
 @UtilityClass
 class FactionPerformanceStatisticsService {
@@ -46,6 +47,22 @@ class FactionPerformanceStatisticsService {
                         .append(" ")
                         .append(entry.getKey().getFactionNameWithSourceEmoji())
                         .append("\n"));
+
+        int combinedGames = FirmamentObsidianStatisticsHelper.getCombinedCount(gameCount);
+        if (combinedGames > 0) {
+            double combinedWins = FirmamentObsidianStatisticsHelper.getCombinedCount(actualWins);
+            double combinedExpectedWins = FirmamentObsidianStatisticsHelper.getCombinedCount(expectedWins);
+            double combinedPerformance =
+                    combinedExpectedWins == 0 ? 0 : ((combinedWins / combinedExpectedWins) - 1) * 100;
+            sb.append("`")
+                    .append(StringUtils.leftPad(String.format("%.2f", combinedPerformance), 6))
+                    .append("%` (")
+                    .append(combinedGames)
+                    .append(" games) ")
+                    .append(FirmamentObsidianStatisticsHelper.COMBINED_LABEL)
+                    .append("\n");
+        }
+
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Faction Performance", sb.toString());
     }
