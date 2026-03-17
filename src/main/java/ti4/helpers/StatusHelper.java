@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -41,6 +42,7 @@ import ti4.service.planet.EronousPlanetService;
 import ti4.service.turn.StartTurnService;
 import ti4.settings.users.UserSettingsManager;
 
+@UtilityClass
 public final class StatusHelper {
 
     public static void AnnounceStatusPhase(Game game) {
@@ -140,8 +142,6 @@ public final class StatusHelper {
     }
 
     public static void BeginScoring(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
-        String messageText = "Please score objectives, " + game.getPing() + ".";
-
         if (game.isOmegaPhaseMode()) {
             // Show the effects of the Agendas while scoring
             ButtonHelper.updateMap(game, event, "After Agendas, Round " + game.getRound() + ".");
@@ -267,6 +267,7 @@ public final class StatusHelper {
             }
         }
 
+        String messageText;
         for (Player player : game.getActionPhaseTurnOrder()) {
             List<String> scorables = new ArrayList<>();
             List<Integer> scorableInts = new ArrayList<>();
@@ -299,6 +300,7 @@ public final class StatusHelper {
                     }
                 }
             }
+
             if (!game.getStoredValue(keyV).isEmpty()
                     && Helper.canPlayerScorePOs(game, player)
                     && scorableInts.contains(Integer.parseInt(game.getStoredValue(keyV)))) {
@@ -471,7 +473,6 @@ public final class StatusHelper {
         }
 
         for (Player player : game.getRealPlayers()) {
-
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
             for (String pn : pns) {
                 Player pnOwner = game.getPNOwner(pn);
@@ -602,7 +603,7 @@ public final class StatusHelper {
 
     private static void sendNeuralParasiteButtons(Game game) {
         List<Player> firmaments = Helper.getPlayersFromTech(game, "parasite-firm");
-        if (firmaments == null || firmaments.isEmpty()) return;
+        if (firmaments.isEmpty()) return;
 
         for (Player player : firmaments) {
             Tile home = player.getHomeSystemTile();
@@ -690,7 +691,7 @@ public final class StatusHelper {
         }
     }
 
-    public static void sendEntropicScarButtons(Game game) {
+    private static void sendEntropicScarButtons(Game game) {
         Map<Player, Integer> scars = new HashMap<>();
         for (Tile t : game.getTileMap().values()) {
             if (t.isScar()) {

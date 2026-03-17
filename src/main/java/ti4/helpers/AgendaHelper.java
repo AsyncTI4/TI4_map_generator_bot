@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import javax.annotation.Nullable;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -74,6 +75,7 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 
+@UtilityClass
 public final class AgendaHelper {
 
     private static void offerEveryonePrepassOnShenanigans(Game game) {
