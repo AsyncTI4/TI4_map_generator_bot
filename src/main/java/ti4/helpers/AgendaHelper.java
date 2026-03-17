@@ -408,6 +408,9 @@ public class AgendaHelper {
         if (player.hasLeaderUnlocked("keleresheroodlynn")) {
             names.add("Keleres Hero");
         }
+        if (player.getGame().playerHasLeaderUnlockedOrAlliance(player, "atokeracommander")) {
+            names.add("Atokera Commander Ability");
+        }
 
         if (player.hasTechReady("dsedyng")) {
             names.add("Unity Algorithm");

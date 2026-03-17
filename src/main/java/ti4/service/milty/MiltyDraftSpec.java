@@ -57,9 +57,16 @@ public class MiltyDraftSpec {
         SliceGenerationSettings sliceSettings = settings.getSliceSettings();
         specs.numFactions = sliceSettings.getNumFactions().getVal();
         specs.numSlices = sliceSettings.getNumSlices().getVal();
+        if (game.isBaseGameMode() && !game.isThundersEdge()) {
+            specs.numSlices =
+                    Math.min(6, settings.getSliceSettings().getNumSlices().getVal());
+        }
         specs.anomaliesCanTouch = false;
         specs.extraWHs = sliceSettings.getExtraWorms().isVal();
         specs.minLegend = sliceSettings.getNumLegends().getValLow();
+        if (game.isBaseGameMode() && !game.isThundersEdge()) {
+            specs.minLegend = 0;
+        }
         specs.maxLegend = sliceSettings.getNumLegends().getValHigh();
         specs.minTot = sliceSettings.getTotalValue().getValLow();
         specs.maxTot = sliceSettings.getTotalValue().getValHigh();
