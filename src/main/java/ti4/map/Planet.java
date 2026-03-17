@@ -1,7 +1,6 @@
 package ti4.map;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -134,7 +133,8 @@ public class Planet extends UnitHolder {
             if (player.getHrf() > 0) resourcesModifier++;
             if (player.getIrf() > 0) resourcesModifier++;
             if (player.getCrf() > 0) resourcesModifier++;
-            if (player.getUrf() > 0) resourcesModifier++;
+            resourcesModifier += player.getUrf();
+            resourcesModifier = Math.min(4, resourcesModifier);
             influenceModifier = resourcesModifier;
         }
     }

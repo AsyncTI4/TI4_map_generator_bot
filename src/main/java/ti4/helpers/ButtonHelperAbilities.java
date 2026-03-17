@@ -2528,7 +2528,7 @@ public final class ButtonHelperAbilities {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanetsAllianceMode()) {
             Tile tile = game.getTileFromPlanet(planet);
-            if (tile == null) {
+            if (tile == null || game.getUnitHolderFromPlanet(planet).isSpaceStation()) {
                 continue;
             }
             for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)) {
