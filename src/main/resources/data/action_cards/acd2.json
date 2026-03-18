@@ -50,8 +50,17 @@
         "name": "Betrayal",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Give 1 promissory note to another player. Then, that player and each other player with 1 of your promissory notes in their play area gives you 1 random action card.",
+        "text": "Give 1 promissory note to another player. Then, that player and each other player with 1 of your promissory notes in their play area gives you 1 random action card from their hand.",
         "flavorText": "Communications were jammed. Supply lines were harried. Staffing officers were found dead in their bunks. The grandeur of the scheme shocked Claire to her core.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "black_market_intel",
+        "name": "Black Market Intel",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Draw 2 secret objectives; give 1 of those cards to another player that has less than 3 scored secret objectives, if able.",
+        "flavorText": "Suffi kissed the data drive before placing it at the drop-off. This job would pay for a long vacation.",
         "source": "action_deck_2"
     },
     {
@@ -498,7 +507,7 @@
         "phase": "Action",
         "window": "At the start of your turn",
         "text": "Place 2 infantry from your reinforcements on any planets you control and place 2 fighters from your reinforcements in any systems that contain your ships.",
-        "flavorText": "Dart grabbed the new cadet by his Naaz. \"Any more backtalk from you and it'll be a clout in the ear!\"",
+        "flavorText": "Dart grabbed the new cadet by his Naaz. \"Any more backtalk from you and you'll get a clout in the ear!\"",
         "source": "action_deck_2"
     },
     {
@@ -862,25 +871,6 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "strategic_aid",
-        "name": "Strategic Aid",
-        "phase": "Action",
-        "window": "When you perform a strategic action",
-        "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
-        "flavorText": "Mathis was not fooled. The pageantry and endless bandying of crooked words with these witless worms was yet another scheme.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "swindle",
-        "name": "Swindle",
-        "phase": "Action",
-        "window": "When another player gains 2 or more trade goods",
-        "text": "Take 2 of those trade goods and gain 1 trade good.",
-        "notes": "Gaining trade goods includes any time your number of trade goods go up, other than converting your own commodities. This includes from transactions.",
-        "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "syndicate",
         "name": "Syndicate",
         "phase": "Action",
@@ -1091,6 +1081,16 @@
         "window": "ACTION",
         "text": "Explore 1 planet you control; when you would draw from the exploration deck, you may choose and resolve a card from its discard pile instead.",
         "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "swindle",
+        "name": "Swindle",
+        "phase": "Action",
+        "window": "When another player gains 2 or more trade goods",
+        "text": "Take 2 of those trade goods and gain 1 trade good.",
+        "notes": "Gaining trade goods includes any time your number of trade goods go up, other than converting your own commodities. This includes from transactions.",
+        "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
         "source": "action_deck_2"
     },
     {
