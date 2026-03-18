@@ -26,8 +26,12 @@ public class SavedBotMessagesService {
         botDiscordMessageEntityRepository.save(record);
     }
 
-    private boolean isImportantMessage(Message message) {
+    public static boolean isImportantMessage(Message message) {
         if (message == null || message.isEphemeral() || !message.getAuthor().isBot()) return false;
+
+        long cutoff = System.currentTimeMillis() - RETENTION_MILLIS;
+        if (message.getTimeCreated().toInstant().toEpochMilli() < cutoff) return false;
+
         String content = message.getContentRaw();
         return content.contains("privately used the command:")
                 || content.contains("A command string message was deleted.")
@@ -48,6 +52,10 @@ public class SavedBotMessagesService {
         long cutoff = System.currentTimeMillis() - RETENTION_MILLIS;
         long deletedRowCount = botDiscordMessageEntityRepository.deleteByCreatedAtEpochMillisLessThan(cutoff);
         BotLogger.info("Deleted " + deletedRowCount + " rows from the `bot_discord_message` table.");
+    }
+
+    public void remove(long messageId) {
+        botDiscordMessageEntityRepository.deleteById(messageId);
     }
 
     public static SavedBotMessagesService getBean() {

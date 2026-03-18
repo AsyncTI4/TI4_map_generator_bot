@@ -1,6 +1,7 @@
 package ti4.listeners;
 
 import javax.annotation.Nonnull;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -33,11 +34,11 @@ public class DeletionListener extends ListenerAdapter {
     }
 
     public static void handleContextMenuDelete(MessageContextInteractionEvent event) {
-        // MessageChannel channel = event.getMessageChannel();
-        // String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
-        // String msg = event.getTarget().getContentDisplay();
+        MessageChannel channel = event.getMessageChannel();
+        String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
+        String msg = event.getTarget().getContentDisplay();
 
-        // handleMessageDelete(channel, gameName, msg);
+        handleMessageDelete(channel, gameName, event.getUser(), msg);
     }
 
     private static void handleMessageDelete(MessageDeleteEvent event) {
@@ -48,13 +49,14 @@ public class DeletionListener extends ListenerAdapter {
             String cachedMessage = SavedBotMessagesService.getBean().getContent(messageId);
             if (cachedMessage == null) return;
 
-            handleMessageDelete(channel, gameName, cachedMessage);
+            handleMessageDelete(channel, gameName, null, cachedMessage);
         } catch (Exception e) {
-            BotLogger.error("Error in handleMessageDelete", e);
+            BotLogger.error("Error in handleMessageDelete[event]", e);
         }
     }
 
-    private static void handleMessageDelete(MessageChannel eventChannel, String gameName, String messageText) {
+    private static void handleMessageDelete(
+            MessageChannel eventChannel, String gameName, User deleter, String messageText) {
         try {
             if (!GameManager.isValid(gameName) || eventChannel == null || messageText == null) return;
 
@@ -65,26 +67,29 @@ public class DeletionListener extends ListenerAdapter {
             if (deletionLogChannel == null) return;
 
             Game game = GameManager.getManagedGame(gameName).getGame();
-            sendDeletionLog((GuildMessageChannel) eventChannel, deletionLogChannel, game, messageText);
+            sendDeletionLog((GuildMessageChannel) eventChannel, deletionLogChannel, game, deleter, messageText);
         } catch (Exception e) {
-            BotLogger.error("Error in handleMessageDelete", e);
+            BotLogger.error("Error in handleMessageDelete[generic]", e);
         }
     }
 
     private static void sendDeletionLog(
-            GuildMessageChannel eventChannel, MessageChannel deletionLogChannel, Game game, String cachedMessage) {
-        String channelLink = eventChannel.getJumpUrl();
-        String tableTalkLink = game.getTabletalkJumpLinkFormatted();
-        String mainChannelLink = game.getActionsJumpLinkFormatted();
-        // prevent @'ing anyone.
-        String sanitizedCachedMessage = cachedMessage.replace("@", "@\u200B");
+            GuildMessageChannel eventChannel, MessageChannel deletionLogChannel, Game game, User user, String msg) {
+        if (user != null && user.isBot()) return;
 
+        String channelLink = eventChannel.getJumpUrl();
+        String ttLink = game.getTabletalkJumpLinkFormatted();
+        String actionsLink = game.getActionsJumpLinkFormatted();
+        // prevent @'ing anyone.
+        String sanitizedMsg = msg.replace("@", "@\u200B");
+
+        String deleterName = user == null ? "unknown" : user.getEffectiveName();
         String logMessage =
                 String.format("""
-                **%s**
+                Game: **%s**, Deleted by: %s
                 From: %s %s %s
                 %s
-                """, game.getName(), channelLink, tableTalkLink, mainChannelLink, sanitizedCachedMessage);
+                """, game.getName(), deleterName, channelLink, ttLink, actionsLink, sanitizedMsg);
 
         MessageHelper.sendMessageToChannel(deletionLogChannel, logMessage);
 
@@ -92,6 +97,6 @@ public class DeletionListener extends ListenerAdapter {
                 game.getActionsChannel(),
                 "**A command string message was deleted."
                         + " If someone confesses to doing this intentionally, nothing further needs to be done."
-                        + " The admins have been alerted. :warning:Do not delete this message.:warning:**");
+                        + " The admins have been alerted.**\n__**:warning: Do not delete this message. :warning:**__");
     }
 }

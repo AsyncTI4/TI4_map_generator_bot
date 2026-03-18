@@ -28,9 +28,21 @@ public abstract class UserCommand implements ContextCommand {
         return perms;
     }
 
+    public void preExecute(UserContextInteractionEvent event) {}
+
+    public void execute(UserContextInteractionEvent event) {}
+
+    public void postExecute(UserContextInteractionEvent event) {}
+
+    public void preExecute(GenericContextInteractionEvent<?> event) {
+        if (event instanceof UserContextInteractionEvent userEvent) preExecute(userEvent);
+    }
+
     public void execute(GenericContextInteractionEvent<?> event) {
         if (event instanceof UserContextInteractionEvent userEvent) execute(userEvent);
     }
 
-    public abstract void execute(UserContextInteractionEvent event);
+    public void postExecute(GenericContextInteractionEvent<?> event) {
+        if (event instanceof UserContextInteractionEvent userEvent) postExecute(userEvent);
+    }
 }

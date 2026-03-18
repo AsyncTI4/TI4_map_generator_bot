@@ -28,9 +28,21 @@ public abstract class MessageCommand implements ContextCommand {
         return perms;
     }
 
-    public void execute(GenericContextInteractionEvent<?> event) {
-        if (event instanceof MessageContextInteractionEvent userEvent) execute(userEvent);
+    public void preExecute(MessageContextInteractionEvent event) {}
+
+    public void execute(MessageContextInteractionEvent event) {}
+
+    public void postExecute(MessageContextInteractionEvent event) {}
+
+    public void preExecute(GenericContextInteractionEvent<?> event) {
+        if (event instanceof MessageContextInteractionEvent msgEvent) preExecute(msgEvent);
     }
 
-    public abstract void execute(MessageContextInteractionEvent event);
+    public void execute(GenericContextInteractionEvent<?> event) {
+        if (event instanceof MessageContextInteractionEvent msgEvent) execute(msgEvent);
+    }
+
+    public void postExecute(GenericContextInteractionEvent<?> event) {
+        if (event instanceof MessageContextInteractionEvent msgEvent) postExecute(msgEvent);
+    }
 }

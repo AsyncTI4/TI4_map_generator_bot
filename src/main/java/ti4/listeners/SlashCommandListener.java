@@ -12,9 +12,7 @@ import ti4.commands.ParentCommand;
 import ti4.commands.SlashCommandManager;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.Constants;
-import ti4.helpers.DateTimeHelper;
 import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.service.SusSlashCommandService;
 import ti4.service.game.GameNameService;
 
@@ -50,7 +48,7 @@ public class SlashCommandListener extends ListenerAdapter implements ListenerInt
                 + event.getCommandString() + "`";
     }
 
-    private static void process(SlashCommandInteractionEvent event) {
+    private void process(SlashCommandInteractionEvent event) {
         long startTime = System.currentTimeMillis();
 
         ParentCommand command = SlashCommandManager.getCommand(event.getName());
@@ -68,27 +66,7 @@ public class SlashCommandListener extends ListenerAdapter implements ListenerInt
             command.onException(event, e);
         }
 
-        long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
-        long eventDelay = startTime - eventTime;
-
-        long endTime = System.currentTimeMillis();
-        long processingRuntime = endTime - startTime;
-
-        if (eventDelay > ListenerInterface.DELAY_THRESHOLD_MILLISECONDS
-                || processingRuntime > ListenerInterface.DELAY_THRESHOLD_MILLISECONDS) {
-            String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(eventDelay);
-            String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(processingRuntime);
-            String message = event.getChannel().getAsMention() + " "
-                    + event.getUser().getEffectiveName() + " used: `" + event.getCommandString() + "`\n> Warning: "
-                    + "This slash command took over "
-                    + ListenerInterface.DELAY_THRESHOLD_MILLISECONDS + "ms to respond or execute\n> "
-                    + DateTimeHelper.getTimestampFromMillisecondsEpoch(eventTime)
-                    + " command was issued by user\n> " + DateTimeHelper.getTimestampFromMillisecondsEpoch(startTime)
-                    + " `" + responseTime + "` to respond\n> "
-                    + DateTimeHelper.getTimestampFromMillisecondsEpoch(endTime)
-                    + " `" + executionTime + "` to execute" + (processingRuntime > eventDelay ? "😲" : "");
-            BotLogger.warning(new LogOrigin(event), message);
-        }
+        warnForLongRunningCommands(event, startTime);
     }
 
     private static boolean isModalCommand(SlashCommandInteractionEvent event) {

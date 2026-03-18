@@ -4,7 +4,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.unions.IThreadContainerUnion;
-import net.dv8tion.jda.api.events.interaction.command.GenericContextInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -27,7 +27,7 @@ public class GameNameService {
     }
 
     @Nullable
-    public static String getGameName(GenericContextInteractionEvent<?> event) {
+    public static String getGameName(GenericCommandInteractionEvent event) {
         Channel channel = event.getChannel();
         if (channel == null) return null;
         return getGameNameFromChannel(channel);

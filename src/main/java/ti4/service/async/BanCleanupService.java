@@ -85,7 +85,11 @@ public class BanCleanupService {
 
         // Go ahead and audit all other reasons for failing to propagate a ban
         String prefix = "Could not fully ban " + getIdent(target);
-        prefix += " for audit log entry `" + log.getId() + "`: ";
+        if (log != null) {
+            prefix += " for audit log entry `" + log.getId() + "`: ";
+        } else if (event != null) {
+            prefix += " for user event `" + event.getId() + "`: ";
+        }
         if (admin == null) {
             BotLogger.warning(prefix + " Initiating user not found.");
             return false;
