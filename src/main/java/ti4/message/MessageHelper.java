@@ -695,6 +695,9 @@ public class MessageHelper {
                             }
                         },
                         error -> {
+                            if (isUnknownMessageError(error)) {
+                                return;
+                            }
                             if (isDiscordServerError(error)) {
                                 CircuitBreaker.incrementThresholdCount(
                                         "Discord server error while sending message in channel " + channel.getId());
