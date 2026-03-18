@@ -12,7 +12,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
-import ti4.service.statistics.FirmamentObsidianStatisticsHelper;
+import ti4.service.statistics.FactionStatisticsHelper;
 
 @UtilityClass
 class MostPlayedFactionsStatisticsService {
@@ -43,20 +43,6 @@ class MostPlayedFactionsStatisticsService {
                         .append(")")
                         .append("\n"));
 
-        int combinedGames = FirmamentObsidianStatisticsHelper.getCombinedCount(factionCount);
-        if (combinedGames > 0) {
-            int combinedCustodians = FirmamentObsidianStatisticsHelper.getCombinedCount(custodians);
-            sb.append("`")
-                    .append(StringUtils.leftPad(Integer.toString(combinedGames), 4))
-                    .append("x` ")
-                    .append(FirmamentObsidianStatisticsHelper.COMBINED_LABEL)
-                    .append(" (Took Custodians a total of  ")
-                    .append(combinedCustodians)
-                    .append(" times, or ")
-                    .append((float) combinedCustodians / combinedGames)
-                    .append(")\n");
-        }
-
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Plays per Faction", sb.toString());
     }
@@ -64,13 +50,9 @@ class MostPlayedFactionsStatisticsService {
     private static void calculate(Game game, Map<String, Integer> factionCount, Map<String, Integer> custodians) {
         for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
             String faction = player.getFaction();
-            factionCount.put(faction, 1 + factionCount.getOrDefault(faction, 0));
+            FactionStatisticsHelper.incrementFactionsIntValue(factionCount, faction);
             if (game.getCustodiansTaker() != null && game.getCustodiansTaker().equalsIgnoreCase(faction)) {
-                if (custodians.containsKey(faction)) {
-                    custodians.put(faction, custodians.get(faction) + 1);
-                } else {
-                    custodians.put(faction, 1);
-                }
+                FactionStatisticsHelper.incrementFactionsIntValue(custodians, faction);
             }
         }
     }

@@ -12,12 +12,12 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
-import ti4.service.statistics.FirmamentObsidianStatisticsHelper;
+import ti4.service.statistics.FactionStatisticsHelper;
 
 @UtilityClass
 class MostWinningFactionsStatisticsService {
 
-    public static void getMostWinningFactions(SlashCommandInteractionEvent event) {
+    static void getMostWinningFactions(SlashCommandInteractionEvent event) {
         Map<String, Integer> factionToWinCount = new HashMap<>();
 
         GamesPage.consumeAllGames(
@@ -38,15 +38,6 @@ class MostWinningFactionsStatisticsService {
                         .append(entry.getKey().getFactionNameWithSourceEmoji())
                         .append("\n"));
 
-        int combinedWins = FirmamentObsidianStatisticsHelper.getCombinedCount(factionToWinCount);
-        if (combinedWins > 0) {
-            sb.append("`")
-                    .append(StringUtils.leftPad(Integer.toString(combinedWins), 4))
-                    .append("x` ")
-                    .append(FirmamentObsidianStatisticsHelper.COMBINED_LABEL)
-                    .append("\n");
-        }
-
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Wins per Faction", sb.toString());
     }
@@ -54,6 +45,6 @@ class MostWinningFactionsStatisticsService {
     private void countFactionWins(Game game, Map<String, Integer> factionToWinCount) {
         game.getWinner()
                 .map(Player::getFaction)
-                .ifPresent(faction -> factionToWinCount.merge(faction, 1, Integer::sum));
+                .ifPresent(faction -> FactionStatisticsHelper.incrementFactionsIntValue(factionToWinCount, faction));
     }
 }

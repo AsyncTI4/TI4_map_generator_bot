@@ -13,12 +13,12 @@ import ti4.map.Player;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
-import ti4.service.statistics.FirmamentObsidianStatisticsHelper;
+import ti4.service.statistics.FactionStatisticsHelper;
 
 @UtilityClass
 class FactionPerformanceStatisticsService {
 
-    public static void showFactionPerformance(SlashCommandInteractionEvent event) {
+    static void showFactionPerformance(SlashCommandInteractionEvent event) {
         Map<String, Double> actualWins = new HashMap<>();
         Map<String, Double> expectedWins = new HashMap<>();
         Map<String, Integer> gameCount = new HashMap<>();
@@ -48,21 +48,6 @@ class FactionPerformanceStatisticsService {
                         .append(entry.getKey().getFactionNameWithSourceEmoji())
                         .append("\n"));
 
-        int combinedGames = FirmamentObsidianStatisticsHelper.getCombinedCount(gameCount);
-        if (combinedGames > 0) {
-            double combinedWins = FirmamentObsidianStatisticsHelper.getCombinedCount(actualWins);
-            double combinedExpectedWins = FirmamentObsidianStatisticsHelper.getCombinedCount(expectedWins);
-            double combinedPerformance =
-                    combinedExpectedWins == 0 ? 0 : ((combinedWins / combinedExpectedWins) - 1) * 100;
-            sb.append("`")
-                    .append(StringUtils.leftPad(String.format("%.2f", combinedPerformance), 6))
-                    .append("%` (")
-                    .append(combinedGames)
-                    .append(" games) ")
-                    .append(FirmamentObsidianStatisticsHelper.COMBINED_LABEL)
-                    .append("\n");
-        }
-
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Faction Performance", sb.toString());
     }
@@ -78,11 +63,14 @@ class FactionPerformanceStatisticsService {
         int playerCount = game.getRealAndEliminatedPlayers().size();
         double expectedWinPerFaction = 1.0 / playerCount;
 
-        game.getWinners().forEach(winner -> actualWins.merge(winner.getFaction(), 1.0, Double::sum));
+        game.getWinners().forEach(winner -> {
+            String winningFaction = winner.getFaction();
+            FactionStatisticsHelper.incrementFactionsDoubleValue(actualWins, winningFaction);
+        });
         for (Player player : game.getRealAndEliminatedPlayers()) {
             String faction = player.getFaction();
-            gameCount.merge(faction, 1, Integer::sum);
-            expectedWins.merge(faction, expectedWinPerFaction, Double::sum);
+            FactionStatisticsHelper.incrementFactionsIntValue(gameCount, faction);
+            FactionStatisticsHelper.incrementFactionsDoubleValue(expectedWins, faction, expectedWinPerFaction);
         }
     }
 }

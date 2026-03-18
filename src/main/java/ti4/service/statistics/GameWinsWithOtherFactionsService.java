@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -62,19 +61,6 @@ public class GameWinsWithOtherFactionsService {
                         .append(entry.getKey().getFactionNameWithSourceEmoji())
                         .append("\n"));
 
-        int combinedWins = FirmamentObsidianStatisticsHelper.getCombinedCount(factionWinCount);
-        int combinedGames = FirmamentObsidianStatisticsHelper.getCombinedCount(factionGameCount);
-        if (combinedGames > 0) {
-            long combinedWinPercent = Math.round(100.0 * combinedWins / combinedGames);
-            sb.append("`")
-                    .append(StringUtils.leftPad(Long.toString(combinedWinPercent), 4))
-                    .append("%` (")
-                    .append(combinedGames)
-                    .append(" games) ")
-                    .append(FirmamentObsidianStatisticsHelper.COMBINED_LABEL)
-                    .append("\n");
-        }
-
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Faction Win Percent", sb.toString());
     }
@@ -84,8 +70,8 @@ public class GameWinsWithOtherFactionsService {
             Map<String, Integer> factionWinCount,
             Map<String, Integer> factionGameCount,
             List<String> reqFactions) {
-        Optional<Player> winner = game.getWinner();
-        if (winner.isEmpty()) {
+        List<Player> winners = game.getWinners();
+        if (winners.isEmpty()) {
             return;
         }
         boolean count = true;
@@ -102,11 +88,15 @@ public class GameWinsWithOtherFactionsService {
         if (!count) {
             return;
         }
-        String winningFaction = winner.get().getFaction();
-        factionWinCount.put(winningFaction, 1 + factionWinCount.getOrDefault(winningFaction, 0));
+
+        for (Player player : winners) {
+            String winningFaction = player.getFaction();
+            FactionStatisticsHelper.incrementFactionsIntValue(factionWinCount, winningFaction);
+        }
+
         game.getRealAndEliminatedAndDummyPlayers().forEach(player -> {
             String faction = player.getFaction();
-            factionGameCount.put(faction, 1 + factionGameCount.getOrDefault(faction, 0));
+            FactionStatisticsHelper.incrementFactionsIntValue(factionGameCount, faction);
         });
     }
 }
