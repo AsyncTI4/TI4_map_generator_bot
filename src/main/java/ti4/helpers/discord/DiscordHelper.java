@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.requests.Response;
 public class DiscordHelper {
 
     private static final int DISCORD_UNKNOWN_MESSAGE_ERROR_CODE = 10_008;
+    private static final int DISCORD_UNKNOWN_WEBHOOK_ERROR_CODE = 10_015;
 
     public static boolean isDiscordServerError(Throwable error) {
         if (error instanceof ErrorResponseException restError) {
@@ -20,5 +21,10 @@ public class DiscordHelper {
     public static boolean isUnknownMessageError(Throwable error) {
         return error instanceof ErrorResponseException restError
                 && restError.getErrorCode() == DISCORD_UNKNOWN_MESSAGE_ERROR_CODE;
+    }
+
+    public static boolean isUnknownWebhookError(Throwable error) {
+        return error instanceof ErrorResponseException restError
+                && restError.getErrorCode() == DISCORD_UNKNOWN_WEBHOOK_ERROR_CODE;
     }
 }

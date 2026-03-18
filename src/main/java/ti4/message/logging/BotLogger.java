@@ -2,6 +2,7 @@ package ti4.message.logging;
 
 import static ti4.helpers.discord.DiscordHelper.isDiscordServerError;
 import static ti4.helpers.discord.DiscordHelper.isUnknownMessageError;
+import static ti4.helpers.discord.DiscordHelper.isUnknownWebhookError;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -419,7 +420,7 @@ public class BotLogger {
 
     private static boolean ignoredError(Throwable error) {
         // Typically caused by the bot trying to delete or edit a message that has already been deleted.
-        return isUnknownMessageError(error);
+        return isUnknownMessageError(error) || isUnknownWebhookError(error);
     }
 
     /**
