@@ -30,10 +30,10 @@ class FactionWinPercentStatisticsService {
         StringBuilder sb = new StringBuilder();
         sb.append("Faction Win Percent:").append("\n");
         factionGameCount.keySet().stream()
-                .map(integer -> {
-                    double winCount = factionWinCount.getOrDefault(integer, 0);
-                    double gameCount = factionGameCount.getOrDefault(integer, 0);
-                    return Map.entry(integer, gameCount == 0 ? 0 : Math.round(100 * winCount / gameCount));
+                .map(faction -> {
+                    double winCount = factionWinCount.getOrDefault(faction, 0);
+                    double gameCount = factionGameCount.getOrDefault(faction, 0);
+                    return Map.entry(faction, gameCount == 0 ? 0 : Math.round(100 * winCount / gameCount));
                 })
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .forEach(entry -> {
