@@ -475,5 +475,11 @@
             "ABILITY:miniaturization"
         ],
         "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "xxchahero",
+        "undraftable": true,
+        "source": "thunders_edge"
     }
 ]
