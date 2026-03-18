@@ -12,6 +12,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
+import ti4.model.FactionModel;
 import ti4.service.statistics.FactionStatisticsHelper;
 
 @UtilityClass
@@ -26,21 +27,23 @@ class MostPlayedFactionsStatisticsService {
 
         StringBuilder sb = new StringBuilder();
         sb.append("Plays per Faction:").append("\n");
-        factionCount.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue())
-                .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
-                .forEach(entry -> sb.append("`")
-                        .append(StringUtils.leftPad(entry.getValue().toString(), 4))
-                        .append("x` ")
-                        .append(entry.getKey().getFactionEmoji())
-                        .append(" ")
-                        .append(entry.getKey().getFactionNameWithSourceEmoji())
-                        .append(" (Took Custodians a total of  ")
-                        .append(custodians.getOrDefault(entry.getKey().getAlias(), 0))
-                        .append(" times, or ")
-                        .append((float) custodians.getOrDefault(entry.getKey().getAlias(), 0) / entry.getValue())
-                        .append(")")
-                        .append("\n"));
+        factionCount.entrySet().stream().sorted(Map.Entry.comparingByValue()).forEach(entry -> {
+            FactionModel factionModel = Mapper.getFaction(entry.getKey());
+            String factionName = factionModel != null ? factionModel.getFactionNameWithSourceEmoji() : entry.getKey();
+            String factionEmoji = FactionStatisticsHelper.getFactionEmoji(entry.getKey());
+            sb.append("`")
+                    .append(StringUtils.leftPad(entry.getValue().toString(), 4))
+                    .append("x` ")
+                    .append(factionEmoji)
+                    .append(" ")
+                    .append(factionName)
+                    .append(" (Took Custodians a total of  ")
+                    .append(custodians.getOrDefault(entry.getKey(), 0))
+                    .append(" times, or ")
+                    .append((float) custodians.getOrDefault(entry.getKey(), 0) / entry.getValue())
+                    .append(")")
+                    .append("\n");
+        });
 
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Plays per Faction", sb.toString());

@@ -11,6 +11,7 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
+import ti4.model.FactionModel;
 import ti4.service.statistics.FactionStatisticsHelper;
 
 @UtilityClass
@@ -27,14 +28,19 @@ class MostWinningFactionsStatisticsService {
         sb.append("Wins per Faction:").append("\n");
         factionToWinCount.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
-                .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
-                .forEach(entry -> sb.append("`")
-                        .append(StringUtils.leftPad(entry.getValue().toString(), 4))
-                        .append("x` ")
-                        .append(entry.getKey().getFactionEmoji())
-                        .append(" ")
-                        .append(entry.getKey().getFactionNameWithSourceEmoji())
-                        .append("\n"));
+                .forEach(entry -> {
+                    FactionModel factionModel = Mapper.getFaction(entry.getKey());
+                    String factionName =
+                            factionModel != null ? factionModel.getFactionNameWithSourceEmoji() : entry.getKey();
+                    String factionEmoji = FactionStatisticsHelper.getFactionEmoji(entry.getKey());
+                    sb.append("`")
+                            .append(StringUtils.leftPad(entry.getValue().toString(), 4))
+                            .append("x` ")
+                            .append(factionEmoji)
+                            .append(" ")
+                            .append(factionName)
+                            .append("\n");
+                });
 
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Wins per Faction", sb.toString());
