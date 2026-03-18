@@ -27,4 +27,9 @@ public class DiscordHelper {
         return error instanceof ErrorResponseException restError
                 && restError.getErrorCode() == DISCORD_UNKNOWN_WEBHOOK_ERROR_CODE;
     }
+
+    public static boolean isIgnorableError(Throwable error) {
+        // Typically caused by the bot trying to delete or edit a message that has already been deleted.
+        return isUnknownMessageError(error) || isUnknownWebhookError(error);
+    }
 }

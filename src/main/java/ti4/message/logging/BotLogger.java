@@ -1,8 +1,7 @@
 package ti4.message.logging;
 
 import static ti4.helpers.discord.DiscordHelper.isDiscordServerError;
-import static ti4.helpers.discord.DiscordHelper.isUnknownMessageError;
-import static ti4.helpers.discord.DiscordHelper.isUnknownWebhookError;
+import static ti4.helpers.discord.DiscordHelper.isIgnorableError;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -413,14 +412,9 @@ public class BotLogger {
                 GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
         if (System.getenv("TESTING") != null || debugMode) {
             // if it's ignored, it's not actionable.
-            if (ignoredError(e)) return;
+            if (isIgnorableError(e)) return;
             error("Encountered REST error", e);
         }
-    }
-
-    private static boolean ignoredError(Throwable error) {
-        // Typically caused by the bot trying to delete or edit a message that has already been deleted.
-        return isUnknownMessageError(error) || isUnknownWebhookError(error);
     }
 
     /**

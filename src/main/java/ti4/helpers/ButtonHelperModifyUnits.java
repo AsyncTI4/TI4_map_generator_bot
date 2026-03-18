@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static ti4.helpers.discord.DiscordHelper.isUnknownWebhookError;
+import static ti4.helpers.discord.DiscordHelper.isIgnorableError;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -2009,18 +2009,16 @@ public final class ButtonHelperModifyUnits {
             } else {
                 event.getMessage()
                         .editMessage(Helper.buildProducedUnitsMessage(player, game))
-                        .queue(
-                                null,
-                                error -> {
-                                    if (isUnknownWebhookError(error)) {
-                                        return;
-                                    }
-                                    BotLogger.error(
-                                            new LogOrigin(event, player),
-                                            MessageHelper.getRestActionFailureMessage(
-                                                    event.getMessageChannel(), "Failed to edit message", null, error),
-                                            error);
-                                });
+                        .queue(null, error -> {
+                            if (isIgnorableError(error)) {
+                                return;
+                            }
+                            BotLogger.error(
+                                    new LogOrigin(event, player),
+                                    MessageHelper.getRestActionFailureMessage(
+                                            event.getMessageChannel(), "Failed to edit message", null, error),
+                                    error);
+                        });
             }
         }
         if ("sd".equalsIgnoreCase(unitID)) {
