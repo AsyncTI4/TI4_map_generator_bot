@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
+import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -49,6 +50,10 @@ class ExhaustLeader extends GameStateSubcommand {
         }
 
         Integer tgCount = event.getOption(Constants.TG, null, OptionMapping::getAsInt);
-        ExhaustLeaderService.exhaustLeader(game, player, playerLeader, tgCount);
+        if (leaderID.contains("agent")) {
+            ButtonHelperAgents.exhaustAgent(leaderID, event, game, player);
+        } else {
+            ExhaustLeaderService.exhaustLeader(game, player, playerLeader, tgCount);
+        }
     }
 }

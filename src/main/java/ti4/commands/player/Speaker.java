@@ -24,7 +24,7 @@ class Speaker extends GameStateSubcommand {
         Game game = getGame();
         Player player = getPlayer();
         game.setSpeakerUserID(player.getUserID());
-        String msg = MiscEmojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation();
+        String msg = MiscEmojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentationNoPing();
         MessageHelper.sendMessageToEventChannel(event, msg);
     }
 }

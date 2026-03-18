@@ -637,7 +637,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Choose 1 planet that is controlled by another player. Roll 1 die for each infantry on that planet. For each result of 6 or greater, destroy 1 of those units.",
-        "notes": "This may be played to target a planet with zero infantry.",
+        "notes": "This may be played to target a planet with zero infantry. This cannot target a planet owned by the neutral player, as they are not a real player.",
         "flavorText": "The letani dipped a mossy limb beneath the surface of the reservoir, feeling the flow of the particles within, shifting them, changing them into something different. Something dangerous.",
         "source": "base"
     },

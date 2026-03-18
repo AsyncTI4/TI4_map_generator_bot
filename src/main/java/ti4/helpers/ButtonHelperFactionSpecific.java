@@ -1832,15 +1832,17 @@ public final class ButtonHelperFactionSpecific {
             if (!game.getStoredValue("amalgAmount").isEmpty()) {
                 existingDiscount = Double.parseDouble(game.getStoredValue("amalgAmount"));
             }
-            double cost =
-                    player.getUnitFromAsyncID(AliasHandler.resolveUnit(unit)).getCost();
-            boolean regulated = ButtonHelper.isLawInPlay(game, "conscription")
-                    || ButtonHelper.isLawInPlay(game, "absol_conscription");
-            if (cost == 0.5 && regulated) {
-                cost = 1;
+            if (cabal.getUnitFromAsyncID(AliasHandler.resolveUnit(unit)) != null) {
+                double cost =
+                        cabal.getUnitFromAsyncID(AliasHandler.resolveUnit(unit)).getCost();
+                boolean regulated = ButtonHelper.isLawInPlay(game, "conscription")
+                        || ButtonHelper.isLawInPlay(game, "absol_conscription");
+                if (cost == 0.5 && regulated) {
+                    cost = 1;
+                }
+                existingDiscount += cost;
+                game.setStoredValue("amalgAmount", "" + existingDiscount);
             }
-            existingDiscount += cost;
-            game.setStoredValue("amalgAmount", "" + existingDiscount);
         }
     }
 
