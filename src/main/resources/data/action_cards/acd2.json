@@ -50,8 +50,17 @@
         "name": "Betrayal",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Give 1 promissory note to another player. Then, that player and each other player with 1 of your promissory notes in their play area gives you 1 random action card.",
+        "text": "Give 1 promissory note to another player. Then, that player and each other player with 1 of your promissory notes in their play area gives you 1 random action card from their hand.",
         "flavorText": "Communications were jammed. Supply lines were harried. Staffing officers were found dead in their bunks. The grandeur of the scheme shocked Claire to her core.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "black_market_intel",
+        "name": "Black Market Intel",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Draw 2 secret objectives; give 1 of those cards to another player that has less than 3 scored secret objectives, if able.",
+        "flavorText": "Suffi kissed the data drive before placing it at the drop-off. This job would pay for a long vacation.",
         "source": "action_deck_2"
     },
     {
@@ -498,7 +507,7 @@
         "phase": "Action",
         "window": "At the start of your turn",
         "text": "Place 2 infantry from your reinforcements on any planets you control and place 2 fighters from your reinforcements in any systems that contain your ships.",
-        "flavorText": "Dart grabbed the new cadet by his Naaz. \"Any more backtalk from you and it'll be a clout in the ear!\"",
+        "flavorText": "Dart grabbed the new cadet by his Naaz. \"Any more backtalk from you and you'll get a clout in the ear!\"",
         "source": "action_deck_2"
     },
     {
@@ -859,15 +868,6 @@
         "window": "ACTION",
         "text": "Place 1 cruiser from your reinforcements in a system that does not contain planets or other players' units.",
         "flavorText": "\"To be clear,\" Tai said flatly, \"you knew this ship had no weapons, no fuel, and a faulty navigation when you purchased it. And yet,\"—he gestured—\"here we are.\"",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "strategic_aid",
-        "name": "Strategic Aid",
-        "phase": "Action",
-        "window": "When you perform a strategic action",
-        "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
-        "flavorText": "Mathis was not fooled. The pageantry and endless bandying of crooked words with these witless worms was yet another scheme.",
         "source": "action_deck_2"
     },
     {

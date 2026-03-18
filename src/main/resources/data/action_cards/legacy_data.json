@@ -1645,5 +1645,14 @@
         "text": "Reduce the combined cost of the produced units by 3.",
         "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
         "source": "deprecated"
+    },
+    {
+        "alias": "strategic_aid",
+        "name": "Strategic Aid",
+        "phase": "Action",
+        "window": "When you perform a strategic action",
+        "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
+        "flavorText": "Mathis was not fooled. The pageantry and endless bandying of crooked words with these witless worms was yet another scheme.",
+        "source": "deprecated"
     }
 ]
