@@ -1474,6 +1474,23 @@ public class ButtonHelper {
                 }
             }
         }
+        if (player.hasAbility("bestow")) {
+            int commod = Math.min(player.getCommodities(), 2);
+            StringBuilder message =
+                    new StringBuilder(player.getRepresentation() + "Resolve Bestow:\n-# You currently have "
+                            + player.getCommoditiesRepresentation()
+                            + " commodit" + (commod == 1 ? "y" : "ies")
+                            + ". This can be resolved after a transaction occurs or a trade agreement resolves.");
+            commod = Math.min(commod, 2);
+            Button convert = Buttons.green(
+                    "convert_2_comms",
+                    "Convert " + commod + " Commodit" + (commod == 1 ? "y" : "ies") + " Into "
+                            + (commod == 1 ? "a " : "") + "Trade Good" + (commod == 1 ? "" : "s"),
+                    MiscEmojis.Wash);
+            Button gain = Buttons.blue("gain_2_comms", "Gain 2 Commodities", MiscEmojis.comm);
+            List<Button> buttons = List.of(convert, gain);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message.toString(), buttons);
+        }
     }
 
     public static int getNumberOfInfantryOnPlanet(String planetName, Game game, Player player) {

@@ -2567,10 +2567,10 @@ public class Game extends GameProperties {
             String id = getActionCards().getFirst();
             if (player.hasAbility("deceive")) {
                 ButtonHelperFactionSpecific.resolveDeceive(player, this);
-            } else {
-                getActionCards().remove(id);
-                player.setActionCard(id);
             }
+            getActionCards().remove(id);
+            player.setActionCard(id);
+
             return player.getActionCards();
         }
 

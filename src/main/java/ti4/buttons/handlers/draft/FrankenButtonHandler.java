@@ -154,6 +154,9 @@ public class FrankenButtonHandler {
 
         MessageChannel channel = game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel();
         MessageV2Builder builder = new MessageV2Builder(channel);
+        if (game.isTwilightsFallMode()) {
+            return;
+        }
         builder.append(game.getPing() + " Every player has chosen their components! Press this button to continue.");
         builder.append(Buttons.DEAL_2_SO);
         builder.send();

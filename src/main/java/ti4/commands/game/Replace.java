@@ -140,6 +140,9 @@ class Replace extends GameStateSubcommand {
         if (oldPlayerUserId.equals(game.getSpeakerUserID())) {
             game.setSpeakerUserID(replacementUser.getId());
         }
+        if (oldPlayerUserId.equals(game.getTyrantUserID())) {
+            game.setTyrantUserID(replacementUser.getId());
+        }
         if (oldPlayerUserId.equals(game.getActivePlayerID())) {
             game.setTemporaryPingDisable(true);
             game.setActivePlayerID(replacementUser.getId());
