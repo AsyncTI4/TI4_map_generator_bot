@@ -52,9 +52,9 @@ public class GameWinsWithOtherFactionsService {
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .forEach(entry -> {
                     FactionModel factionModel = Mapper.getFaction(entry.getKey());
-                    String factionEmoji = factionModel != null ? factionModel.getFactionEmoji() : "\uD83D\uDC7B";
                     String factionName =
                             factionModel != null ? factionModel.getFactionNameWithSourceEmoji() : entry.getKey();
+                    String factionEmoji = FactionStatisticsHelper.getFactionEmoji(entry.getKey());
                     sb.append("`")
                             .append(StringUtils.leftPad(entry.getValue().toString(), 4))
                             .append("%` (")
