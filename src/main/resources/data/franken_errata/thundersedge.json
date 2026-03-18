@@ -137,7 +137,8 @@
             "MECH:bastion_mech",
             "AGENT:bastionagent",
             "COMMANDER:bastioncommander",
-            "HERO:bastionhero"
+            "HERO:bastionhero",
+            "TECH:proxima"
         ],
         "source": "thunders_edge"
     },
@@ -146,9 +147,6 @@
         "itemId": "raisethestandard",
         "additionalComponents": [
             "ABILITY:galvanize"
-        ],
-        "optionalSwaps": [
-            "TECH:proxima"
         ],
         "source": "thunders_edge"
     },
