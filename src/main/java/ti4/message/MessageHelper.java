@@ -1,6 +1,8 @@
 package ti4.message;
 
-import static ti4.helpers.discord.DiscordHelper.*;
+import static ti4.helpers.discord.DiscordHelper.isDiscordServerError;
+import static ti4.helpers.discord.DiscordHelper.isIgnorableError;
+import static ti4.helpers.discord.DiscordHelper.isUnknownMessageError;
 
 import java.io.File;
 import java.net.SocketTimeoutException;
@@ -209,6 +211,9 @@ public class MessageHelper {
     }
 
     private static void handleFailedReaction(Game game, Player player, Message message, Throwable error) {
+        if (isUnknownMessageError(error)) {
+            return;
+        }
         if (isDiscordServerError(error)) {
             CircuitBreaker.incrementThresholdCount(
                     "Discord server error while adding reaction to message " + message.getId());
@@ -695,6 +700,9 @@ public class MessageHelper {
                             }
                         },
                         error -> {
+                            if (isIgnorableError(error)) {
+                                return;
+                            }
                             if (isDiscordServerError(error)) {
                                 CircuitBreaker.incrementThresholdCount(
                                         "Discord server error while sending message in channel " + channel.getId());
