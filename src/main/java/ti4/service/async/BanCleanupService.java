@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedPlayer;
@@ -47,17 +48,35 @@ public class BanCleanupService {
         }
     }
 
-    public void banSpamAccount(AuditLogEntry log, UserSnowflake target, UserSnowflake admin) {
-        if (shouldBanFromAllGuilds(log, target, admin)) {
-            BotLogger.info("Banning " + getIdent(target));
-            int errors = removeUserFromAllGuilds(target, log.getReason());
-            auditPostBanAction(target, log, errors);
+    public boolean banSpamAccount(UserContextInteractionEvent event, UserSnowflake target, UserSnowflake admin) {
+        if (shouldBanFromAllGuilds(null, event, target, admin)) {
+            String reason = "Banned by " + getUser(admin).getEffectiveName();
+            BotLogger.info("Banning " + getIdent(target) + " for reason: " + reason);
+            int errors = removeUserFromAllGuilds(target, reason);
+            auditPostBanAction(target, event.getGuild(), reason, errors);
+            return errors == 0;
         }
+        return false;
     }
 
-    private boolean shouldBanFromAllGuilds(AuditLogEntry log, UserSnowflake target, UserSnowflake admin) {
+    public boolean banSpamAccount(AuditLogEntry log, UserSnowflake target, UserSnowflake admin) {
+        if (shouldBanFromAllGuilds(log, null, target, admin)) {
+            String reason = log.getReason();
+            BotLogger.info("Banning " + getIdent(target) + " for reason: " + reason);
+            int errors = removeUserFromAllGuilds(target, log.getReason());
+            auditPostBanAction(target, log.getGuild(), reason, errors);
+            return errors == 0;
+        }
+        return false;
+    }
+
+    private boolean shouldBanFromAllGuilds(
+            AuditLogEntry log, UserContextInteractionEvent event, UserSnowflake target, UserSnowflake admin) {
         // Don't need to audit these
-        if (log.getType() != ActionType.BAN) { // not a ban
+        if (log != null && log.getType() != ActionType.BAN) {
+            return false;
+        }
+        if (event != null && !"Ban".equals(event.getName())) {
             return false;
         }
         if (admin != null && admin.getId().equals(JdaService.getBotId())) { // bot-propagated
@@ -66,7 +85,11 @@ public class BanCleanupService {
 
         // Go ahead and audit all other reasons for failing to propagate a ban
         String prefix = "Could not fully ban " + getIdent(target);
-        prefix += " for audit log entry `" + log.getId() + "`: ";
+        if (log != null) {
+            prefix += " for audit log entry `" + log.getId() + "`: ";
+        } else if (event != null) {
+            prefix += " for user event `" + event.getId() + "`: ";
+        }
         if (admin == null) {
             BotLogger.warning(prefix + " Initiating user not found.");
             return false;
@@ -98,10 +121,10 @@ public class BanCleanupService {
         return errors;
     }
 
-    private void auditPostBanAction(UserSnowflake target, AuditLogEntry log, int errors) {
+    private void auditPostBanAction(UserSnowflake target, Guild guild, String reason, int errors) {
         String msg = getIdent(target);
-        msg += " was banned from server " + log.getGuild().getName();
-        msg += " for the reason \"" + log.getReason() + "\".";
+        msg += " was banned from server " + guild.getName();
+        msg += " for the reason \"" + reason + "\".";
         if (errors > 0) {
             msg += "\n## Errors were encountered. Check the error log for more details.";
         }

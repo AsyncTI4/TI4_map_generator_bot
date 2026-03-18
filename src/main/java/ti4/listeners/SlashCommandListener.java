@@ -4,23 +4,19 @@ import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.commands.Command;
-import ti4.commands.CommandManager;
+import ti4.commands.ParentCommand;
+import ti4.commands.SlashCommandManager;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.Constants;
-import ti4.helpers.DateTimeHelper;
 import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.service.SusSlashCommandService;
 import ti4.service.game.GameNameService;
-import ti4.spring.jda.JdaService;
 
-public class SlashCommandListener extends ListenerAdapter {
-
-    private static final long DELAY_THRESHOLD_MILLISECONDS = 2000;
+public class SlashCommandListener extends ListenerAdapter implements ListenerInterface {
 
     private static final List<String> SLASHCOMMANDS_WITH_MODALS = Arrays.asList(
             Constants.ADD_TILE_LIST,
@@ -30,14 +26,7 @@ public class SlashCommandListener extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
-        if (!JdaService.isReadyToReceiveCommands()
-                && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
-            event.getInteraction()
-                    .reply("Please try again in a moment.\nThe bot is rebooting and is not ready to receive commands.")
-                    .setEphemeral(true)
-                    .queue(Consumers.nop(), BotLogger::catchRestError);
-            return;
-        }
+        if (!receiveCommands(event)) return;
 
         if (!isModalCommand(event)) {
             event.getInteraction().deferReply().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -46,23 +35,23 @@ public class SlashCommandListener extends ListenerAdapter {
         queue(event);
     }
 
-    private static void queue(SlashCommandInteractionEvent event) {
+    public void queue(SlashCommandInteractionEvent event) {
         String gameName = GameNameService.getGameName(event);
         ExecutorServiceManager.runAsync(
                 eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event));
     }
 
-    private static String eventToString(SlashCommandInteractionEvent event, String gameName) {
+    public String eventToString(GenericCommandInteractionEvent event, String gameName) {
         return "SlashCommandListener task for `" + event.getUser().getEffectiveName() + "`"
                 + (gameName == null ? "" : " in `" + gameName + "`")
                 + ": `"
                 + event.getCommandString() + "`";
     }
 
-    private static void process(SlashCommandInteractionEvent event) {
+    private void process(SlashCommandInteractionEvent event) {
         long startTime = System.currentTimeMillis();
 
-        Command command = CommandManager.getCommand(event.getName());
+        ParentCommand command = SlashCommandManager.getCommand(event.getName());
         try {
             if (command.accept(event)) {
                 command.preExecute(event);
@@ -77,26 +66,7 @@ public class SlashCommandListener extends ListenerAdapter {
             command.onException(event, e);
         }
 
-        long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
-        long eventDelay = startTime - eventTime;
-
-        long endTime = System.currentTimeMillis();
-        long processingRuntime = endTime - startTime;
-
-        if (eventDelay > DELAY_THRESHOLD_MILLISECONDS || processingRuntime > DELAY_THRESHOLD_MILLISECONDS) {
-            String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(eventDelay);
-            String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(processingRuntime);
-            String message = event.getChannel().getAsMention() + " "
-                    + event.getUser().getEffectiveName() + " used: `" + event.getCommandString() + "`\n> Warning: "
-                    + "This slash command took over "
-                    + DELAY_THRESHOLD_MILLISECONDS + "ms to respond or execute\n> "
-                    + DateTimeHelper.getTimestampFromMillisecondsEpoch(eventTime)
-                    + " command was issued by user\n> " + DateTimeHelper.getTimestampFromMillisecondsEpoch(startTime)
-                    + " `" + responseTime + "` to respond\n> "
-                    + DateTimeHelper.getTimestampFromMillisecondsEpoch(endTime)
-                    + " `" + executionTime + "` to execute" + (processingRuntime > eventDelay ? "😲" : "");
-            BotLogger.warning(new LogOrigin(event), message);
-        }
+        warnForLongRunningCommands(event, startTime);
     }
 
     private static boolean isModalCommand(SlashCommandInteractionEvent event) {
@@ -107,7 +77,7 @@ public class SlashCommandListener extends ListenerAdapter {
         Member member = event.getMember();
         if (member == null) return;
 
-        var command = CommandManager.getCommand(event.getInteraction().getName());
+        var command = SlashCommandManager.getCommand(event.getInteraction().getName());
         String susPrefix = command.isSuspicious(event) ? "sus" : "notSus";
         String commandText =
                 "```" + susPrefix + "\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
