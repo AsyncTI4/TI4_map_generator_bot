@@ -29,24 +29,28 @@ class FactionPerformanceStatisticsService {
 
         StringBuilder sb = new StringBuilder();
         sb.append("Faction Performance (vs expected win rate):\n");
-        Mapper.getFactionsValues().stream()
+        gameCount.keySet().stream()
                 .map(faction -> {
-                    double factionWins = actualWins.getOrDefault(faction.getAlias(), 0.0);
-                    double factionExpectedWins = expectedWins.getOrDefault(faction.getAlias(), 0.0);
+                    double factionWins = actualWins.getOrDefault(faction, 0.0);
+                    double factionExpectedWins = expectedWins.getOrDefault(faction, 0.0);
                     double performance = factionExpectedWins == 0 ? 0 : ((factionWins / factionExpectedWins) - 1) * 100;
                     return Map.entry(faction, performance);
                 })
-                .filter(entry -> gameCount.containsKey(entry.getKey().getAlias()))
-                .sorted(Map.Entry.<FactionModel, Double>comparingByValue().reversed())
-                .forEach(entry -> sb.append("`")
-                        .append(StringUtils.leftPad(String.format("%.2f", entry.getValue()), 6))
-                        .append("%` (")
-                        .append(gameCount.getOrDefault(entry.getKey().getAlias(), 0))
-                        .append(" games) ")
-                        .append(entry.getKey().getFactionEmoji())
-                        .append(" ")
-                        .append(entry.getKey().getFactionNameWithSourceEmoji())
-                        .append("\n"));
+                .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
+                .forEach(entry -> {
+                    FactionModel factionModel = Mapper.getFaction(entry.getKey());
+                    String factionEmoji = factionModel != null ? factionModel.getFactionEmoji() : "\uD83D\uDC7B";
+                    String factionName = factionModel != null ? factionModel.getFactionName() : entry.getKey();
+                    sb.append("`")
+                            .append(StringUtils.leftPad(String.format("%.2f", entry.getValue()), 6))
+                            .append("%` (")
+                            .append(gameCount.getOrDefault(entry.getKey(), 0))
+                            .append(" games) ")
+                            .append(factionEmoji)
+                            .append(" ")
+                            .append(factionName)
+                            .append("\n");
+                });
 
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Faction Performance", sb.toString());
@@ -57,7 +61,7 @@ class FactionPerformanceStatisticsService {
             Map<String, Double> actualWins,
             Map<String, Double> expectedWins,
             Map<String, Integer> gameCount) {
-        if (game.getWinner().isEmpty()) {
+        if (game.getWinners().isEmpty()) {
             return;
         }
         int playerCount = game.getRealAndEliminatedPlayers().size();

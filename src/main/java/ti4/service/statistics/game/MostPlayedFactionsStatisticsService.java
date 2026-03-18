@@ -27,7 +27,6 @@ class MostPlayedFactionsStatisticsService {
         StringBuilder sb = new StringBuilder();
         sb.append("Plays per Faction:").append("\n");
         factionCount.entrySet().stream()
-                .filter(entry -> Mapper.isValidFaction(entry.getKey()))
                 .sorted(Map.Entry.comparingByValue())
                 .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
                 .forEach(entry -> sb.append("`")

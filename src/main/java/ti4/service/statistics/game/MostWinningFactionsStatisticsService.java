@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.Player;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 import ti4.service.statistics.FactionStatisticsHelper;
@@ -43,8 +42,8 @@ class MostWinningFactionsStatisticsService {
     }
 
     private void countFactionWins(Game game, Map<String, Integer> factionToWinCount) {
-        game.getWinner()
-                .map(Player::getFaction)
-                .ifPresent(faction -> FactionStatisticsHelper.incrementFactionsIntValue(factionToWinCount, faction));
+        game.getWinners()
+                .forEach(player ->
+                        FactionStatisticsHelper.incrementFactionsIntValue(factionToWinCount, player.getFaction()));
     }
 }

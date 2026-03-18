@@ -29,23 +29,27 @@ class FactionWinPercentStatisticsService {
 
         StringBuilder sb = new StringBuilder();
         sb.append("Faction Win Percent:").append("\n");
-        Mapper.getFactionsValues().stream()
-                .map(faction -> {
-                    double winCount = factionWinCount.getOrDefault(faction.getAlias(), 0);
-                    double gameCount = factionGameCount.getOrDefault(faction.getAlias(), 0);
-                    return Map.entry(faction, gameCount == 0 ? 0 : Math.round(100 * winCount / gameCount));
+        factionGameCount.keySet().stream()
+                .map(integer -> {
+                    double winCount = factionWinCount.getOrDefault(integer, 0);
+                    double gameCount = factionGameCount.getOrDefault(integer, 0);
+                    return Map.entry(integer, gameCount == 0 ? 0 : Math.round(100 * winCount / gameCount));
                 })
-                .filter(entry -> factionGameCount.containsKey(entry.getKey().getAlias()))
-                .sorted(Map.Entry.<FactionModel, Long>comparingByValue().reversed())
-                .forEach(entry -> sb.append("`")
-                        .append(StringUtils.leftPad(entry.getValue().toString(), 4))
-                        .append("%` (")
-                        .append(factionGameCount.getOrDefault(entry.getKey().getAlias(), 0))
-                        .append(" games) ")
-                        .append(entry.getKey().getFactionEmoji())
-                        .append(" ")
-                        .append(entry.getKey().getFactionNameWithSourceEmoji())
-                        .append("\n"));
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .forEach(entry -> {
+                    FactionModel factionModel = Mapper.getFaction(entry.getKey());
+                    String factionEmoji = factionModel != null ? factionModel.getFactionEmoji() : "\uD83D\uDC7B";
+                    String factionName = factionModel != null ? factionModel.getFactionName() : entry.getKey();
+                    sb.append("`")
+                            .append(StringUtils.leftPad(entry.getValue().toString(), 4))
+                            .append("%` (")
+                            .append(factionGameCount.get(entry.getKey()))
+                            .append(" games) ")
+                            .append(factionEmoji)
+                            .append(" ")
+                            .append(factionName)
+                            .append("\n");
+                });
 
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Faction Win Percent", sb.toString());
@@ -66,7 +70,7 @@ class FactionWinPercentStatisticsService {
         }
 
         game.getRealAndEliminatedAndDummyPlayers()
-                .forEach(player -> ti4.service.statistics.FactionStatisticsHelper.incrementFactionsIntValue(
-                        factionGameCount, player.getFaction()));
+                .forEach(player ->
+                        FactionStatisticsHelper.incrementFactionsIntValue(factionGameCount, player.getFaction()));
     }
 }
