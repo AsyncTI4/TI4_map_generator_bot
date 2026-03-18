@@ -46,6 +46,12 @@
         "source": "thunders_edge"
     },
     {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "crimson_flagship",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
         "itemCategory": "BREAKTHROUGH",
         "itemId": "crimsonbt",
         "additionalComponents": [
@@ -63,6 +69,12 @@
     {
         "itemCategory": "ABILITY",
         "itemId": "researchteam",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "deepwrought_flagship",
         "undraftable": true,
         "source": "thunders_edge"
     },
