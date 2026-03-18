@@ -143,13 +143,15 @@ public class GameImageController {
      * Fetch the attachment URL from a Discord message.
      */
     private ResponseEntity<String> fetchDiscordAttachmentUrl(Long messageId, Long channelId, String gameName) {
+        MessageChannel channel = JdaService.jda.getChannelById(MessageChannel.class, channelId);
+        if (channel == null) {
+            return ResponseEntity.notFound().build();
+        }
+
         try {
             // Fetch the message from Discord to get the attachment URL using the channel.
             // The channel could be a TextChannel or ThreadChannel.
-            Message message = JdaService.jda
-                    .getChannelById(MessageChannel.class, channelId)
-                    .retrieveMessageById(messageId)
-                    .complete();
+            Message message = channel.retrieveMessageById(messageId).complete();
             if (message == null || message.getAttachments().isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
