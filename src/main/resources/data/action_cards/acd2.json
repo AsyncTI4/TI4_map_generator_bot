@@ -507,7 +507,7 @@
         "phase": "Action",
         "window": "At the start of your turn",
         "text": "Place 2 infantry from your reinforcements on any planets you control and place 2 fighters from your reinforcements in any systems that contain your ships.",
-        "flavorText": "Tai gave a self-satisfied hmph as he looked over the recruitment reports. “If you build it, they will come, they say.” The Alliance’s new war sun was proof enough.",
+        "flavorText": "Tai gave a self-satisfied hmph as he looked over the recruitment reports. \"If you build it, they will come, they say.\" The Alliance's new war sun was proof enough.",
         "source": "action_deck_2"
     },
     {
@@ -1212,7 +1212,7 @@
         "window": "After another player gains control of a planet you control",
         "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets outside of that player's home system that contain their units.",
         "notes": "You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.",
-        "flavorText": "\"Our survival hinged on the line they drew between slaughter and genocide,\" Su'la reminded her crew. \"Spit that mercy in their face.\"",
+        "flavorText": "\"Our survival hinged on the line they drew between slaughter and genocide,\" S'ula reminded her crew. \"Spit that mercy in their face.\"",
         "source": "action_deck_2"
     },
     {
