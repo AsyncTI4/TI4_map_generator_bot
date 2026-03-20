@@ -54,7 +54,7 @@ class PlayerGameCountStatisticsService {
 
     private static void getPlayerGameCount(
             Game game, Map<String, Integer> playerGameCount, Map<String, String> playerUserIdToUsername) {
-        game.getRealPlayers().forEach(player -> {
+        game.getRealAndEliminatedPlayers().forEach(player -> {
             String userId = player.getStatsTrackedUserID();
             playerUserIdToUsername.put(userId, player.getStatsTrackedUserName());
             playerGameCount.put(userId, 1 + playerGameCount.getOrDefault(userId, 0));

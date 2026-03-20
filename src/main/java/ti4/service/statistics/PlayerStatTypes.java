@@ -1,7 +1,9 @@
 package ti4.service.statistics;
 
 public enum PlayerStatTypes {
-    PLAYER_WIN_PERCENT("Player win percent", "Shows the win percent of each player rounded to the nearest integer"), //
+    PLAYER_WIN_PERCENT("Player win percent", "Shows the win percent of each player rounded to the nearest integer"),
+    PLAYER_WIN_PERFORMANCE(
+            "Player win performance", "Shows how much each player over or under performs their expected win rate"),
     PLAYER_GAME_COUNT("Player game count", "Shows the number of games each player has played in");
 
     private final String name;

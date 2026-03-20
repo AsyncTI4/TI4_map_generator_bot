@@ -17,7 +17,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 class TrueSkillMatchmakingRatingService {
 
-    private static final double SIGMA_CALIBRATION_THRESHOLD = 2;
+    private static final double SIGMA_CALIBRATION_THRESHOLD = 1.5;
 
     static List<MatchmakingRating> calculateRatings(List<MatchmakingGame> games) {
         games.sort(Comparator.comparingLong(MatchmakingGame::endedDate).thenComparing(MatchmakingGame::name));
