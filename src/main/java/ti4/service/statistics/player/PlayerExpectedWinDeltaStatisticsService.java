@@ -25,7 +25,8 @@ class PlayerExpectedWinDeltaStatisticsService {
 
         GamesPage.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event),
-                game -> calculate(game, playerWinCount, playerExpectedWinCount, playerGameCount, playerUserIdToUsername));
+                game -> calculate(
+                        game, playerWinCount, playerExpectedWinCount, playerGameCount, playerUserIdToUsername));
 
         int maximumListedPlayers = event.getOption("max_list_size", 50, OptionMapping::getAsInt);
         int minimumGameCountFilter = event.getOption("min_game_count", 10, OptionMapping::getAsInt);
@@ -60,11 +61,11 @@ class PlayerExpectedWinDeltaStatisticsService {
                 (MessageChannelUnion) event.getMessageChannel(), "Player Win Performance", sb.toString());
     }
 
-    static double getPerformance(double actualWins, double expectedWins) {
+    private static double getPerformance(double actualWins, double expectedWins) {
         return expectedWins == 0 ? 0 : ((actualWins / expectedWins) - 1) * 100;
     }
 
-    static void calculate(
+    private static void calculate(
             Game game,
             Map<String, Double> playerWinCount,
             Map<String, Double> playerExpectedWinCount,
