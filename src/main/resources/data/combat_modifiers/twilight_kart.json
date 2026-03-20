@@ -32,5 +32,20 @@
                 "alias": "tk-erelim"
             }
         ]
+    },
+    {
+        "alias": "tekklarix_extra_hits",
+        "type": "bonus_hits",
+        "value": "+1",
+        "valueScalingType": "hits",
+        "persistenceType": "ALWAYS",
+        "scope": "gf",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "tk-tekklarix"
+            }
+        ]
     }
 ]

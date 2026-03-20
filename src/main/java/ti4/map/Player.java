@@ -942,6 +942,15 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 .collect(Collectors.toSet());
     }
 
+    public boolean hasAnyUnit(String... unitIDs) {
+        for (String unitID : unitIDs) {
+            if (hasUnit(unitID)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean hasUnit(String unitID) {
         if (unitID.contains("flagship") && hasUnlockedBreakthrough("nekrobt")) {
             return ValefarZService.hasFlagshipAbility(game, this, unitID);

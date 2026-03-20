@@ -2516,6 +2516,21 @@ public final class Helper {
                 unitButtons.add(Buttons.gray("startYinSpinner", "Yin Spin 2 Duders", FactionEmojis.Yin));
             }
         }
+        if (player.hasUnit("tk-moyinschosen")) {
+            if ("sling".equalsIgnoreCase(warfareNOtherstuff)
+                    || "freelancers".equalsIgnoreCase(warfareNOtherstuff)
+                    || "chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
+                List<Button> unitButtons2 = new ArrayList<>();
+                unitButtons2.add(Buttons.gray("startMoyinsChosen", "Use Moyin's Chosen", FactionEmojis.Yin));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged()
+                                + " if you made a destroyer, you may use this to place 1 fighter using the _Moyin's Chosen_ ability.",
+                        unitButtons2);
+            } else {
+                unitButtons.add(Buttons.gray("startMoyinsChosen", "Use Moyin's Chosen", FactionEmojis.Yin));
+            }
+        }
 
         return unitButtons;
     }

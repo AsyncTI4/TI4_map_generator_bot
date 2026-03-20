@@ -7,18 +7,26 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.tactical.LandingContext;
 import ti4.service.tactical.PlanetAbilityButton;
 
 public final class CrimsonDeployButton implements PlanetAbilityButton {
     public boolean enabled(LandingContext ctx) {
-        return ctx.mainPlayer.hasUnit("crimson_mech")
+        UnitKey mech = Units.getUnitKey(UnitType.Mech, ctx.mainPlayer.getColor());
+        boolean hasReinforcement = ButtonHelperFactionSpecific.vortexButtonAvailable(ctx.game, mech);
+
+        boolean teCondition = ctx.mainPlayer.hasUnit("crimson_mech")
                 && (ctx.tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE)
                         || FoWHelper.otherPlayersHaveShipsInSystem(ctx.mainPlayer, ctx.tile, ctx.game))
-                && ButtonHelperFactionSpecific.vortexButtonAvailable(
-                        ctx.game, Units.getUnitKey(UnitType.Mech, ctx.mainPlayer.getColor()));
+                && hasReinforcement;
+        boolean tkCondition = ctx.mainPlayer.hasUnit("tk-revenant")
+                && ctx.tile.containsPlayersUnitsWithModelCondition(ctx.mainPlayer, UnitModel::isNonFighterShip)
+                && hasReinforcement;
+        return teCondition || tkCondition;
     }
 
     public List<Button> build(LandingContext ctx) {

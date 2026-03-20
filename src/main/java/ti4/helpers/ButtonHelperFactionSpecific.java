@@ -6,6 +6,7 @@ import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -2764,19 +2765,26 @@ public final class ButtonHelperFactionSpecific {
     }
 
     @ButtonHandler("startChaosMapping")
-    public static void firstStepOfChaos(Game game, Player p1, ButtonInteractionEvent event) {
+    public static void firstStepOfChaos(ButtonInteractionEvent event, Game game, Player p1, String buttonID) {
         List<Button> buttons = new ArrayList<>();
-        Set<Tile> tiles = ButtonHelper.getTilesOfUnitsWithProduction(p1, game);
+        Collection<Tile> tiles = ButtonHelper.getTilesOfUnitsWithProduction(p1, game);
+        String msg = p1.getFactionEmoji() + " has chosen to use _Chaos Mapping_.";
+        String msg2 = "Please choose which system you wish to produce in:";
+        if (buttonID.contains("sumerian")) {
+            msg = p1.getFactionEmoji() + " is producting a unit with " + UnitEmojis.spacedock + " "
+                    + FactionEmojis.Nomad + " _Sumerian Relay_.";
+            tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Spacedock);
+        }
+
         for (Tile tile : tiles) {
             Button tileButton = Buttons.green(
                     "produceOneUnitInTile_" + tile.getPosition() + "_chaosM",
                     tile.getRepresentationForButtons(game, p1));
             buttons.add(tileButton);
         }
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), p1.getFactionEmoji() + " has chosen to use _Chaos Mapping_.");
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), "Please choose which system you wish to Chaos Map in.", buttons);
+
+        MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), msg);
+        MessageHelper.sendMessageToChannelWithButtons(p1.getCorrectChannel(), msg2, buttons);
     }
 
     @ButtonHandler("startRedTFDeploy")

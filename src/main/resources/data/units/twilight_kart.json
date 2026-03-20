@@ -312,7 +312,7 @@
         "asyncId": "mf",
         "name": "Captive Sentinel",
         "faction": "argent",
-        "capacityUsed": 1,
+        "capacityUsed": 0,
         "cost": 2,
         "combatHitsOn": 6,
         "combatDieCount": 1,

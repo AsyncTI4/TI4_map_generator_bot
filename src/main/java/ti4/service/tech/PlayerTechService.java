@@ -2,7 +2,9 @@ package ti4.service.tech;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -28,6 +30,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.PatternHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
+import ti4.helpers.Units.UnitType;
 import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
 import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.Mapper;
@@ -515,26 +518,9 @@ public class PlayerTechService {
             }
             case "sr", "absol_sar" -> { // Sling Relay or Absol Self Assembley Routines
                 deleteIfButtonEvent(event);
-                List<Button> buttons = new ArrayList<>();
-                List<Tile> tiles = new ArrayList<>(CheckUnitContainmentService.getTilesContainingPlayersUnits(
-                        game, player, Units.UnitType.Spacedock, Units.UnitType.PlenaryOrbital));
-                if (player.hasUnit("ghoti_flagship")) {
-                    tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(
-                            game, player, Units.UnitType.Flagship));
-                }
-                List<String> pos2 = new ArrayList<>();
-                for (Tile tile : tiles) {
-                    if (!pos2.contains(tile.getPosition())) {
-                        String buttonID = "produceOneUnitInTile_" + tile.getPosition() + "_sling";
-                        Button tileButton = Buttons.green(buttonID, tile.getRepresentationForButtons(game, player));
-                        buttons.add(tileButton);
-                        pos2.add(tile.getPosition());
-                    }
-                }
-                MessageHelper.sendMessageToChannelWithButtons(
-                        event.getMessageChannel(),
-                        "Please choose which system you wish to produce a ship in.",
-                        buttons);
+                String msg = "Please choose the system in which you wish to produce a ship.";
+                List<Button> buttons = getSlingRelayButtons(game, player);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "dsdihmy" -> { // Impressment Programs
@@ -547,6 +533,27 @@ public class PlayerTechService {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(), "> This technology is not automated. Please resolve manually.");
         }
+    }
+
+    public static List<Button> getSlingRelayButtons(Game game, Player player) {
+        Set<Tile> tiles = new HashSet<>();
+        tiles.addAll(
+                ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock, UnitType.PlenaryOrbital));
+        if (player.hasUnit("ghoti_flagship")) {
+            tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Flagship));
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        List<String> pos2 = new ArrayList<>();
+        for (Tile tile : tiles) {
+            if (!pos2.contains(tile.getPosition())) {
+                String buttonID = "produceOneUnitInTile_" + tile.getPosition() + "_sling";
+                Button tileButton = Buttons.green(buttonID, tile.getRepresentationForButtons(game, player));
+                buttons.add(tileButton);
+                pos2.add(tile.getPosition());
+            }
+        }
+        return buttons;
     }
 
     public static List<Button> getMageonImplantsButtons(Game game, Player player) {

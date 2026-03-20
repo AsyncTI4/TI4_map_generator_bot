@@ -221,7 +221,7 @@
     {
         "alias": "jolnar_bonus_hits_9_10",
         "type": "bonus_hits",
-        "value": "+1",
+        "value": "+2",
         "valueScalingType": "raw_rolls_gt_8",
         "persistenceType": "ALWAYS",
         "scope": "fs",

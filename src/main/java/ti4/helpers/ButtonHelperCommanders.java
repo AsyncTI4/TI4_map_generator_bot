@@ -45,6 +45,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.tactical.TacticalActionService;
+import ti4.service.tech.PlayerTechService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -745,6 +746,12 @@ public class ButtonHelperCommanders {
                         buttons2);
             }
         }
+        if (player.hasUnit("tk-sumerianrelay")) {
+            String msg = "Please choose the system in which you wish to produce a ship using ";
+            msg += Mapper.getUnit("tk-sumerianrelay").getNameRepresentation() + ".";
+            List<Button> buttons = PlayerTechService.getSlingRelayButtons(game, player);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+        }
     }
 
     @ButtonHandler("freeSystemsBT_")
@@ -884,10 +891,14 @@ public class ButtonHelperCommanders {
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         Tile tile = game.getTileFromPlanet(planet);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planet);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getFactionEmoji() + " placed 1 infantry on " + Helper.getPlanetRepresentation(planet, game)
-                        + " using Claire Gibson, the Sol Commander.");
+
+        String msg = player.getFactionEmoji() + " placed 1 infantry on " + Helper.getPlanetRepresentation(planet, game);
+        if (player.hasUnit("tk-genesiscorps")) {
+            msg += " using " + UnitEmojis.infantry + " " + FactionEmojis.Sol + " _Genesis Corps_.";
+        } else {
+            msg += " using Claire Gibson, the Sol Commander.";
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 
     @ButtonHandler("utilizeMykoBT_")

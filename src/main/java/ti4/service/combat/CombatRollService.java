@@ -880,6 +880,15 @@ public class CombatRollService {
                         maximumHits += 2;
                     }
                 }
+                if (unitModel.getUnitType() == UnitType.Infantry && player.hasUnit("tk-tekklarix")) {
+                    chanceOfAllHits *= Math.pow(2.0 / (11 - toHit + modifierToHit), numRolls * mult);
+                    for (DiceHelper.Die die : resultRolls) {
+                        if (die.isSuccess()) {
+                            hitRolls += 1;
+                        }
+                        maximumHits += 1;
+                    }
+                }
                 if (rollType == CombatRollType.bombardment && "tf-dragonfreed".equalsIgnoreCase(unitModel.getId())) {
                     if (!game.isFowMode() && hitRolls > 0) {
                         List<Button> buttons = new ArrayList<>();

@@ -32,6 +32,7 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperUnits;
+import ti4.image.Mapper;
 import ti4.image.TileGenerator;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -519,14 +520,20 @@ public class StartCombatService {
                         thalnos = true;
                     }
 
+                    String magenFmt = "%s, a reminder to use _%s_. The button should be above, ";
+                    magenFmt += "but it (and SPACE CANNON) are not part of automated ground combat.";
+                    if (player.hasUnit("tk-blacktrenchbulwark")) {
+                        if (uH.getUnitCount(UnitType.Pds, player) > 0) {
+                            String msg = String.format(magenFmt, player.getRepresentation(), "Black Trench Bulwark");
+                            MessageHelper.sendMessageToChannel(threadChannel, msg);
+                        }
+                    }
                     if ((player.hasTech("md") || player.hasTech("md_c1"))
                             && player.getPlanetsAllianceMode().contains(unitHolderName)) {
                         if (uH.getUnitCount(UnitType.Pds, player) > 0
                                 || uH.getUnitCount(UnitType.Spacedock, player) > 0) {
-                            MessageHelper.sendMessageToChannel(
-                                    threadChannel,
-                                    player.getRepresentation()
-                                            + ", a reminder to use _Magen Defense Grid_. The button should be above, but it (and SPACE CANNON) are not part of automated ground combat.");
+                            String msg = String.format(magenFmt, player.getRepresentation(), "Magen Defense Grid");
+                            MessageHelper.sendMessageToChannel(threadChannel, msg);
                         }
                     }
                 }
@@ -909,6 +916,13 @@ public class StartCombatService {
                         FactionEmojis.Nekro);
                 String message = msg
                         + ", a reminder that when you first kill an opponent's unit this combat, you may use the button to copy a technology.";
+                MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, steal);
+            }
+            if (player.hasUnit("tk-maleagant")) {
+                String message = player.getRepresentation() + ", a reminder that when you first kill an opponent's";
+                message += " unit this combat, you may use the button to resolve your ";
+                message += Mapper.getUnit("tk-maleagant").getNameRepresentation() + " ability.";
+                Button steal = Buttons.gray("maleagantBegin", "Discard then Draw Ability", UnitEmojis.fighter);
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, steal);
             }
             if ((player.hasTech("tf-singularityz")
@@ -2102,6 +2116,13 @@ public class StartCombatService {
                         String label = "Use Sol Commander on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, FactionEmojis.Sol));
                     }
+                    if (p.hasUnit("tk-genesiscorps")
+                            && isGroundCombat
+                            && unitH.getUnitCount(UnitType.Infantry, p) > 0) {
+                        String id = p.finChecker() + "utilizeSolCommander_" + unitH.getName();
+                        String label = "Use Genesis Corps on " + nameOfHolder;
+                        buttons.add(Buttons.gray(id, label, FactionEmojis.Sol));
+                    }
                     if (p != game.getActivePlayer()
                             && p.hasUnlockedBreakthrough("mykomentoribt")
                             && p.getNombox().getUnitCount(UnitType.Infantry, p) > 0
@@ -2153,6 +2174,12 @@ public class StartCombatService {
                         String id = p.finChecker() + "magenHit_" + unitH.getName();
                         String label = "Use Magen Defense Grid on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, TechEmojis.WarfareTech));
+                    }
+                    if (p.hasUnit("tk-blacktrenchbulwark")
+                            && unitH.getUnitCount(Units.UnitType.Pds, p.getColor()) > 0) {
+                        String id = p.finChecker() + "magenHit_" + unitH.getName();
+                        String label = "Use Black Trench Bulwark on " + nameOfHolder;
+                        buttons.add(Buttons.gray(id, label, UnitEmojis.pds));
                     }
                     if (p.hasAbility("ruthless")
                             && isGroundCombat

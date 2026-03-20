@@ -308,7 +308,7 @@ public class ButtonHelper {
             player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
             return;
         } else {
-            if (player.hasUnit("mahact_infantry")) {
+            if (player.hasUnit("mahact_infantry") || player.hasUnit("tk-twilightlegionnaire")) {
                 ButtonHelperFactionSpecific.offerMahactInfButtons(player, player.getGame());
                 return;
             }
@@ -1676,6 +1676,21 @@ public class ButtonHelper {
                             + " use buttons to resolve a build for the Duha Menaimon (the Arborec flagship).",
                     buttons);
         }
+        if (doesPlayerHaveUnitHere("tk-warden", player, activeSystem)) {
+            UnitHolder space = activeSystem.getSpaceUnitHolder();
+            boolean noPlanets = activeSystem.getPlanetUnitHolders().isEmpty();
+            boolean hasFrontier = space.getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER));
+            if (noPlanets && !hasFrontier) {
+                AddTokenCommand.addToken(event, activeSystem, Constants.FRONTIER, game);
+
+                String msg = player.getRepresentationNoPing();
+                msg += " automatically added a frontier token to "
+                        + activeSystem.getRepresentationForButtons(game, player);
+                msg += " using their " + UnitEmojis.destroyer + FactionEmojis.Empyrean + " _Warden_.";
+                msg += "\n-# Note this is optional, and you may remove the frontier manually if you so wish.";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            }
+        }
 
         if (player.hasAbility("void_tap")
                 && (activeSystem.getPlanetUnitHolders().isEmpty()
@@ -1720,22 +1735,25 @@ public class ButtonHelper {
                     ButtonHelperAbilities.pillageCheck(nonActivePlayer, game);
                 }
             }
-            // keleres_fs
-            if ((nonActivePlayer.hasUnit("keleres_flagship")
-                            || nonActivePlayer.hasUnit("sigma_keleresa_flagship_1")
-                            || nonActivePlayer.hasUnit("sigma_keleresa_flagship_2"))
-                    && activeSystem
-                                    .getUnitHolders()
-                                    .get("space")
-                                    .getUnitCount(UnitType.Flagship, nonActivePlayer.getColor())
-                            > 0) {
+            // keleres_fs ~ish
+            if (doesPlayerHaveFSHere("keleres_flagship", nonActivePlayer, activeSystem)
+                    || doesPlayerHaveFSHere("sigma_keleresa_flagship_1", nonActivePlayer, activeSystem)
+                    || doesPlayerHaveFSHere("sigma_keleresa_flagship_2", nonActivePlayer, activeSystem)
+                    || doesPlayerHaveUnitHere("tk-publicani", nonActivePlayer, activeSystem)) {
+
                 String infToPay = nonActivePlayer.hasUnit("sigma_keleresa_flagship_2") ? "4" : "2";
+                String unitName = "the Artemiris (the Keleres flagship)";
+                if (doesPlayerHaveUnitHere("tk-publicani", nonActivePlayer, activeSystem)) {
+                    infToPay = "" + activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Carrier, nonActivePlayer);
+                    unitName = UnitEmojis.carrier.toString() + FactionEmojis.Keleres + " _Publicani_";
+                }
+
                 if (justChecking) {
                     if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(
                                 channel,
                                 "Warning: you would have to pay " + infToPay
-                                        + " influence to activate this system due to the Artemiris (the Keleres flagship).");
+                                        + " influence to activate this system due to " + unitName + ".");
                     }
                     numberOfAbilities++;
                 } else {
@@ -1744,8 +1762,7 @@ public class ButtonHelper {
                     buttons.add(doneExhausting);
                     MessageHelper.sendMessageToChannel(
                             channel,
-                            activePlayerident + " you must pay " + infToPay
-                                    + " influence due to the Artemiris (the Keleres flagship).");
+                            activePlayerident + " you must pay " + infToPay + " influence due to " + unitName + ".");
                     MessageHelper.sendMessageToChannelWithButtons(
                             channel, "Please choose the planets you wish to exhaust.", buttons);
                 }
@@ -1822,8 +1839,7 @@ public class ButtonHelper {
                             .getSpaceUnitHolder()
                             .countPlayersUnitsWithModelCondition(
                                     nonActivePlayer,
-                                    model -> model.getIsShip()
-                                            && !model.getUnitType().equals(UnitType.Fighter))
+                                    UnitModel::isNonFighterShip)
                     > 0;
             if (nonActivePlayer.getPlayableActionCards().contains("tk-incubate") && hasNonFF) {
                 List<Button> buttons = new ArrayList<>();
@@ -3573,7 +3589,9 @@ public class ButtonHelper {
             int total = 0;
             UnitKey infKey = Units.getUnitKey(UnitType.Infantry, player.getColorID());
 
-            StringBuilder msg = new StringBuilder(player.getFactionEmoji() + " resolved _Magen Defense Grid_ on "
+            boolean bulwark = player.hasUnit("tk-blacktrenchbulwark");
+            String ability = bulwark ? "_Black Trench Bulwark_" : "_Magen Defense Grid_";
+            StringBuilder msg = new StringBuilder(player.getFactionEmoji() + " resolved " + ability + " on "
                     + tile.getPosition() + ", placing %s infantry (%s total so far):");
             for (UnitHolder uh : tile.getUnitHolders().values()) {
                 int count = uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure);
@@ -3583,6 +3601,9 @@ public class ButtonHelper {
                     if (player.getPlanets().contains(uh.getName()) && token.contains("superweapon")) {
                         count++;
                     }
+                }
+                if (bulwark) {
+                    count = uh.getUnitCount(UnitType.Pds, player);
                 }
 
                 if (count > 0) {
@@ -4068,7 +4089,9 @@ public class ButtonHelper {
                         }
                         numInfNFightersNMechs += numCountedFighters;
                     } else {
-                        numInfNFightersNMechs += unit.getCapacityUsed() * entry.getValue();
+                        int capUsed = unit.getCapacityUsed();
+                        if (player.hasUnit("tk-captivesentinel") && unit.getUnitType() == UnitType.Mech) capUsed = 0;
+                        numInfNFightersNMechs += capUsed * entry.getValue();
                     }
                     if (entry.getValue() > 0) {
                         unitTypesCounted.add(unit.getBaseType());
@@ -4153,8 +4176,7 @@ public class ButtonHelper {
             }
         }
         if (spaceHolder.getUnitCount(UnitType.Pds, player) > 0) {
-            if (!(player.ownsUnit("mirveda_pds")
-                    || player.ownsUnit("mirveda_pds2")
+            if (!(player.hasAnyUnit("mirveda_pds", "mirveda_pds2", "tk-keshnu")
                     || player.hasAbility("miniaturization"))) {
                 structuresViolated = true;
             }
@@ -5349,7 +5371,7 @@ public class ButtonHelper {
                             + ", a reminder you have _Malevolency_ promissory note; now is the window to cackle evilly and pass it on if you so wish.",
                     buttons);
         }
-        if (player.hasUnit("winnu_mech") && !isLawInPlay(game, "articles_war")) {
+        if ((player.hasUnit("winnu_mech") || player.hasUnit("tk-antiquarian")) && !isLawInPlay(game, "articles_war")) {
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                 int mechCount = uH.getUnitCount(UnitType.Mech, player.getColor());
                 if (mechCount > 0

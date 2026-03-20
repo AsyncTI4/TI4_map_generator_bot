@@ -237,6 +237,10 @@ public class TacticalActionOutputService {
             } else {
                 output += ", __does not have _Gravity Drive___)";
             }
+            if (player.hasUnit("tk-shadebringer")) {
+                maxBonus++;
+                output += " (has _Shadebringer_ for +1 movement for one other ship moving from the same system)";
+            }
             if (player.hasUnlockedBreakthrough("winnubt")
                     && game.getTileByPosition(game.getActiveSystem()).hasLegendary()) {
                 maxBonus++;

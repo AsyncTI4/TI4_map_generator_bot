@@ -1017,7 +1017,7 @@ public final class ButtonHelperModifyUnits {
             }
         }
         if (pdsAmount > 0) {
-            if (player.hasUnit("mirveda_pds") || player.hasUnit("mirveda_pds2")) {
+            if (player.hasAnyUnit("mirveda_pds", "mirveda_pds2")) {
                 AddUnitService.addUnits(
                         event, game.getTileFromPlanet(uH.getName()), game, player.getColor(), pdsAmount + " pds");
             } else {
@@ -1739,7 +1739,7 @@ public final class ButtonHelperModifyUnits {
                         replace);
             }
         } else if ("pds".equalsIgnoreCase(unitLong)) {
-            if (player.ownsUnit("mirveda_pds") || player.ownsUnit("mirveda_pds2")) {
+            if (player.hasAnyUnit("mirveda_pds", "mirveda_pds2")) {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitID);
                 successMessage = "Placed 1 space dock in the space area of the "
                         + Helper.getPlanetRepresentation(planetName, game) + " system.";

@@ -39,6 +39,7 @@ import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.StrategyCardModel;
+import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
 import ti4.service.VeiledHeartService;
@@ -1364,6 +1365,32 @@ public final class ButtonHelperTwilightsFall {
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", please remove a mech.",
                     ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "mech", true));
+        }
+    }
+
+    public static void drawAbilityFromDeck(Game game, Player player) {
+        List<String> deck = game.getAbilitySpliceDeck(true);
+        if (deck.isEmpty()) {
+            String messageText = "There are no more cards in the ability deck.";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), messageText);
+            return;
+        }
+
+        String drawnCard = deck.getFirst();
+        player.addTech(drawnCard);
+        if (!game.isVeiledHeartMode()) {
+            TechnologyModel model = Mapper.getTech(drawnCard);
+            String msg = player.getRepresentation() + " has acquired the ability: " + model.getName();
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(), msg, model.getRepresentationEmbed());
+        } else {
+            game.setStoredValue(
+                    "veiledCards" + player.getFaction(),
+                    game.getStoredValue("veiledCards" + player.getFaction()) + drawnCard + "_");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing()
+                            + " has taken a secret card. They may put it into play with a button in their `#cards-info` thread.");
         }
     }
 
