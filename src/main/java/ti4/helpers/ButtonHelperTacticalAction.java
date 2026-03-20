@@ -85,9 +85,13 @@ public final class ButtonHelperTacticalAction {
                                 + " agent to place 1 space dock for 2 trade goods or 2 commodities",
                         buttons);
             }
-            if (player.hasAbility("miniaturization")) {
+            if (player.hasAbility("miniaturization") || player.hasUnit("tk-keshnu")) {
                 String msg = player.getRepresentation()
-                        + ", you may use **Miniaturization** to land any of your structures in the space area onto planets you control in this system.";
+                        + ", you may use _Miniaturization_ to land any of your structures in the space area onto planets you control in this system.";
+                if (player.hasUnit("tk-keshnu")) {
+                    msg = player.getRepresentation() + ", you may land any of your " + UnitEmojis.pds + " "
+                            + FactionEmojis.Ralnel + " _Kesh Nu_ units onto planets you control in this system.";
+                }
                 List<Button> buttons = TeHelperAbilities.miniLandingButtons(game, player);
                 if (!buttons.isEmpty()) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
@@ -654,6 +658,34 @@ public final class ButtonHelperTacticalAction {
                 String magenMsg = magenPlayer.getRepresentation()
                         + " you can, and must, use _Magen Defense Grid_ to place an infantry with each of your structures in the active system.";
                 MessageHelper.sendMessageToChannelWithButton(magenPlayer.getCorrectChannel(), magenMsg, useMagen);
+            }
+
+            for (Player btb : game.getRealPlayers()) {
+                if (!btb.ownsUnit("tk-blacktrenchbulwark")) continue;
+                if (activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Pds, btb) == 0) continue;
+
+                String id = btb.finChecker() + "useMagenDefense_" + activeSystem.getPosition();
+                Button use = Buttons.red(id, "Use Black Trench Bulwark", UnitEmojis.pds);
+                String msg = btb.getRepresentation()
+                        + " you can, and must, use _Black Trench Bulwark_ to place an infantry with each of your pds in the active system.";
+                MessageHelper.sendMessageToChannelWithButton(btb.getCorrectChannel(), msg, use);
+            }
+
+            for (Player archive : game.getRealPlayers()) {
+                if (!archive.ownsUnit("tk-visionariaarchive")) continue;
+                if (activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Spacedock, archive) == 0) continue;
+
+                String id = player.finChecker() + "useVisionariaArchive_" + archive.getColor();
+                Button use = Buttons.red(id, "Use Visionaria Archive", MiscEmojis.tf_ability);
+                String msg = player.getRepresentation()
+                        + " you can use _Visionaria Archive_ and spend 3 trade goods to draw 1 ability.";
+                if (player != archive) {
+                    msg += " If you do, " + archive.getRepresentationNoPing() + " will also draw 1 ability.";
+                }
+                msg += "-# You currently have " + player.getTg() + " trade goods.";
+
+                List<Button> buttons = List.of(use, Buttons.DONE_DELETE_BUTTONS.withLabel("Decline"));
+                MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(archive.getCorrectChannel(), msg, buttons);
             }
 
             for (Player remnant : game.getRealPlayers()) {
