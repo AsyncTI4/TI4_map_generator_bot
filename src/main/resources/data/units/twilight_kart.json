@@ -135,10 +135,10 @@
         "source": "twilight_kart"
     },
     {
-        "id": "tk-shadebringer",
+        "id": "tk-voidcarver",
         "baseType": "cruiser",
         "asyncId": "ca",
-        "name": "Shadebringer",
+        "name": "Voidcarver",
         "faction": "letnev",
         "moveValue": 3,
         "capacityValue": 1,
@@ -148,7 +148,7 @@
         "isUpgrade": true,
         "isShip": true,
         "ability": "When this unit moves, you may apply +1 to the move value of 1 of your other ships that started movement in this system.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-shadebringer.png?raw=true",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-voidcarver.png?raw=true",
         "source": "twilight_kart"
     },
     {
@@ -186,10 +186,10 @@
         "source": "twilight_kart"
     },
     {
-        "id": "tk-assaultescort",
+        "id": "tk-cendos",
         "baseType": "destroyer",
         "asyncId": "dd",
-        "name": "Assault Escort",
+        "name": "Cendos",
         "faction": "muaat",
         "moveValue": 2,
         "cost": 1,
@@ -200,7 +200,7 @@
         "isUpgrade": true,
         "isShip": true,
         "ability": "Once per combat, at the start of a space combat in a system that contains this unit and 2 or more of your other non-fighter ships, your opponent must destroy 1 of their non-fighter ships.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-assaultescort.png?raw=true",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-cendos.png?raw=true",
         "source": "twilight_kart"
     },
     {
@@ -257,10 +257,10 @@
         "source": "twilight_kart"
     },
     {
-        "id": "tk-handofcqaark",
+        "id": "tk-orchestrator",
         "baseType": "carrier",
         "asyncId": "cv",
-        "name": "Hand of Cqaark",
+        "name": "Orchestrator",
         "faction": "yssaril",
         "moveValue": 2,
         "capacityValue": 6,
@@ -270,7 +270,7 @@
         "isUpgrade": true,
         "isShip": true,
         "ability": "This unit can move through systems that contain other player's ships.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-handofcqaark.png?raw=true",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-orchestrator.png?raw=true",
         "source": "twilight_kart"
     },
     {
@@ -307,19 +307,19 @@
         "source": "twilight_kart"
     },
     {
-        "id": "tk-captivesentinel",
+        "id": "tk-boundsentinel",
         "baseType": "mech",
         "asyncId": "mf",
-        "name": "Captive Sentinel",
+        "name": "Bound Sentinel",
         "faction": "argent",
-        "capacityUsed": 0,
+        "capacityUsed": 1,
         "cost": 2,
         "combatHitsOn": 6,
         "combatDieCount": 1,
         "isUpgrade": true,
         "isGroundForce": true,
         "ability": "Keep this card in your play area, your mechs gain the following ability:\nThis unit does not count against capacity if it is being transported or if it is in a space area with 1 or more of your ships that have capacity values.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-captivesentinel.png?raw=true",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-boundsentinel.png?raw=true",
         "source": "twilight_kart"
     },
     {
@@ -339,20 +339,24 @@
         "source": "twilight_kart"
     },
     {
-        "id": "tk-raghscalled",
+        "id": "tk-modularpicket",
         "baseType": "fighter",
         "asyncId": "ff",
-        "name": "Ragh's Called",
+        "name": "Modular Picket",
         "faction": "saar",
         "moveValue": 2,
         "capacityUsed": 1,
         "cost": 0.5,
         "combatHitsOn": 7,
         "combatDieCount": 1,
+        "afbHitsOn": 9,
+        "afbDieCount": 1,
+        "bombardHitsOn": 9,
+        "bombardDieCount": 1,
         "isUpgrade": true,
         "isShip": true,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool. When you make a BOMBARDMENT roll in this system or an adjacent system you may remove this unit to roll 1 additional die.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-raghscalled.png?raw=true",
+        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-modularpicket.png?raw=true",
         "source": "twilight_kart"
     },
     {
@@ -390,10 +394,10 @@
         "source": "twilight_kart"
     },
     {
-        "id": "tk-tekklarix",
+        "id": "tk-tekklarelite",
         "baseType": "infantry",
         "asyncId": "gf",
-        "name": "Tekklar IX",
+        "name": "Tekklar Elite",
         "faction": "sardakk",
         "capacityUsed": 1,
         "cost": 0.5,
@@ -402,7 +406,7 @@
         "isUpgrade": true,
         "isGroundForce": true,
         "ability": "Double the hits produced by this unit.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-tekklarix.png?raw=true",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-tekklarelite.png?raw=true",
         "source": "twilight_kart"
     },
     {
