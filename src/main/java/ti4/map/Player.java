@@ -3269,6 +3269,11 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     @JsonIgnore
+    public boolean isElected(String law) {
+        return IsPlayerElectedService.isPlayerElected(game, this, law);
+    }
+
+    @JsonIgnore
     public void setStoredValue(String key, String val) {
         String safeKey = StringHelper.escape(key);
         getStoredValueMap().put(safeKey, StringHelper.escape(val));

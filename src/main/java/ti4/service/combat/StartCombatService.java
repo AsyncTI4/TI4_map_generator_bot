@@ -1169,18 +1169,19 @@ public class StartCombatService {
         return spaceCannonButtons;
     }
 
-    private static boolean hasAssaultEscort(Player player, Tile tile) {
-        int nonDestroyerShips = 0;
+    private static boolean hasCendos(Player player, Tile tile) {
+        int nonFighterShips = 0;
         boolean hasDestroyer = false;
         for (UnitKey unit : tile.getSpaceUnitHolder().getUnitKeysForPlayer(player)) {
             UnitModel model = player.getUnitFromUnitKey(unit);
             if (unit.getUnitType().equals(UnitType.Destroyer)) {
                 hasDestroyer = true;
-            } else if (model.isNonFighterShip()) {
-                nonDestroyerShips += tile.getSpaceUnitHolder().getUnitCount(unit);
+            }
+            if (model.isNonFighterShip()) {
+                nonFighterShips += tile.getSpaceUnitHolder().getUnitCount(unit);
             }
         }
-        return player.hasUnit("tk-assaultescort") && hasDestroyer && nonDestroyerShips >= 2;
+        return player.hasUnit("tk-cendos") && hasDestroyer && nonFighterShips >= 3;
     }
 
     private static List<Button> getStartOfSpaceCombatButtons(Game game, Player p1, Player p2, Tile tile) {
@@ -1201,9 +1202,9 @@ public class StartCombatService {
         }
 
         // Assault Escort
-        if (hasAssaultEscort(p1, tile) || hasAssaultEscort(p2, tile)) {
-            buttons.add(Buttons.blue(
-                    "assCannonNDihmohn_assEsc_" + tile.getPosition(), "Use Assault Escort", UnitEmojis.destroyer));
+        if (hasCendos(p1, tile) || hasCendos(p2, tile)) {
+            buttons.add(
+                    Buttons.blue("assCannonNDihmohn_assEsc_" + tile.getPosition(), "Use Cendos", UnitEmojis.destroyer));
         }
 
         // Dimensional Splicer

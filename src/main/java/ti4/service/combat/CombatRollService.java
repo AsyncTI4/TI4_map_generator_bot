@@ -880,7 +880,7 @@ public class CombatRollService {
                         maximumHits += 2;
                     }
                 }
-                if (unitModel.getUnitType() == UnitType.Infantry && player.hasUnit("tk-tekklarix")) {
+                if (unitModel.getUnitType() == UnitType.Infantry && player.hasUnit("tk-tekklarelite")) {
                     chanceOfAllHits *= Math.pow(2.0 / (11 - toHit + modifierToHit), numRolls * mult);
                     for (DiceHelper.Die die : resultRolls) {
                         if (die.isSuccess()) {

@@ -1837,9 +1837,7 @@ public class ButtonHelper {
             }
             boolean hasNonFF = activeSystem
                             .getSpaceUnitHolder()
-                            .countPlayersUnitsWithModelCondition(
-                                    nonActivePlayer,
-                                    UnitModel::isNonFighterShip)
+                            .countPlayersUnitsWithModelCondition(nonActivePlayer, UnitModel::isNonFighterShip)
                     > 0;
             if (nonActivePlayer.getPlayableActionCards().contains("tk-incubate") && hasNonFF) {
                 List<Button> buttons = new ArrayList<>();
@@ -4090,7 +4088,7 @@ public class ButtonHelper {
                         numInfNFightersNMechs += numCountedFighters;
                     } else {
                         int capUsed = unit.getCapacityUsed();
-                        if (player.hasUnit("tk-captivesentinel") && unit.getUnitType() == UnitType.Mech) capUsed = 0;
+                        if (player.hasUnit("tk-boundsentinel") && unit.getUnitType() == UnitType.Mech) capUsed = 0;
                         numInfNFightersNMechs += capUsed * entry.getValue();
                     }
                     if (entry.getValue() > 0) {

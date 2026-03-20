@@ -2,7 +2,6 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +21,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
-import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.UnitEmojis;
@@ -595,37 +592,11 @@ public final class ButtonHelperTwilightsFallActionCards {
     @ButtonHandler("irradiateStep2")
     public static void irradiateStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         List<MessageEmbed> embeds = new ArrayList<>();
-        List<String> allCards = new ArrayList<>();
+        List<String> unitSpliceDeck = game.getUnitSpliceDeck(false);
         String unitT = buttonID.split("_")[1];
 
-        Map<String, UnitModel> allUnits = Mapper.getUnits();
-        for (Map.Entry<String, UnitModel> entry : allUnits.entrySet()) {
-            UnitModel mod = entry.getValue();
-            if (mod.getFaction().isPresent() && mod.getSource() == ComponentSource.twilights_fall) {
-                FactionModel faction = Mapper.getFaction(mod.getFaction().get());
-                if (faction != null && faction.getSource() != ComponentSource.twilights_fall) {
-                    allCards.add(entry.getKey());
-                }
-            }
-        }
-        for (Player p : game.getRealPlayers()) {
-            for (String unit : p.getUnitsOwned()) {
-                allCards.remove(unit);
-            }
-        }
-        if (game.isVeiledHeartMode()) {
-            List<String> someCardList = new ArrayList<>(allCards);
-            for (String card : someCardList) {
-                for (Player p2 : game.getRealPlayers()) {
-                    if (game.getStoredValue("veiledCards" + p2.getFaction()).contains(card)) {
-                        allCards.remove(card);
-                    }
-                }
-            }
-        }
         String found = "nothing applicable";
-        Collections.shuffle(allCards);
-        for (String card : allCards) {
+        for (String card : unitSpliceDeck) {
             embeds.add(Mapper.getUnit(card).getRepresentationEmbed());
             if (Mapper.getUnit(card).getBaseType().equalsIgnoreCase(unitT)) {
                 UnitModel unitModel = Mapper.getUnit(card);

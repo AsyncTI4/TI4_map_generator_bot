@@ -1515,11 +1515,12 @@ public final class ButtonHelperSCs {
         if (!used
                 && !player.getFollowedSCs().contains(scNum)
                 && game.getPlayedSCs().contains(scNum)) {
-            if (player.getStrategicCC() > 0) {
+
+            String message = deductCC(game, player, scNum);
+            if (message.contains("1 command token has been spent from strategy pool")) {
                 ButtonHelperCommanders.resolveMuaatCommanderCheck(
                         player, game, event, "followed **" + Helper.getSCName(scNum, game) + "**");
             }
-            String message = deductCC(game, player, scNum);
 
             if (setStatus) {
                 if (!player.getFollowedSCs().contains(scNum)) {
@@ -1533,6 +1534,14 @@ public final class ButtonHelperSCs {
 
     @NotNull
     public static String deductCC(Game game, Player player, int scNum) {
+        String scName = "a strategy card";
+        if (scNum != -1) scName = "**" + Helper.getSCName(scNum, game) + "**";
+        String msgStart = " following to perform the secondary ability of " + scName + ".";
+
+        if (player.isElected("tk-endorse")) {
+            return msgStart + " You are elected for _Endorse_, so you do not spend a token.";
+        }
+
         int strategicCC = player.getStrategicCC();
         if (strategicCC == 0) {
             String msg = " have 0 command tokens in strategy pool, **can't follow.**";
@@ -1542,13 +1551,7 @@ public final class ButtonHelperSCs {
 
         strategicCC--;
         player.setStrategicCC(strategicCC);
-        if (scNum == -1) {
-            return " performing the secondary ability of a strategy card."
-                    + " 1 command token has been spent from strategy pool.";
-        }
-        String stratCardName = Helper.getSCName(scNum, game);
-        return " following to perform the secondary ability of **" + stratCardName + "**."
-                + " 1 command token has been spent from strategy pool.";
+        return msgStart + " 1 command token has been spent from strategy pool.";
     }
 
     @ButtonHandler("sc_ac_draw")
