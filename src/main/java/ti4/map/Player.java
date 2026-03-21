@@ -1791,6 +1791,14 @@ public class Player extends PlayerProperties {
         return new ArrayList<>(factionSetupInfo.getLeaders());
     }
 
+    public List<Leader> getLeadersIncludingPurged() {
+        ArrayList<Leader> originalLeaders = new ArrayList<>();
+        for (String leaderID : getFactionStartingLeaders()) {
+            originalLeaders.add(new Leader(leaderID));
+        }
+        return originalLeaders;
+    }
+
     public void initLeaders() {
         leaders.clear();
         if (game != null && game.isBaseGameMode()) return;
