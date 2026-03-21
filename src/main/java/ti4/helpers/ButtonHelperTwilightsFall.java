@@ -1007,34 +1007,38 @@ public final class ButtonHelperTwilightsFall {
     public static List<Button> getSpliceButtons(
             Game game, String type, List<String> cards, Player player, String prefix) {
         List<Button> buttons = new ArrayList<>();
-        if ("ability".equalsIgnoreCase(type)) {
-            for (String card : cards) {
-                String name = Mapper.getTech(card).getName();
-                buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + prefix + card,
-                        name,
-                        Mapper.getTech(card).getSingleTechEmoji()));
-            }
-        }
-        if ("genome".equalsIgnoreCase(type)) {
-            for (String card : cards) {
-                String name = Mapper.getLeader(card).getTFNameIfAble();
-                String faction = Mapper.getLeader(card).getFaction();
-                if (faction.contains("keleres")) {
-                    faction = "keleresm";
+        if (cards.size() > 0) {
+            if ("ability".equalsIgnoreCase(type)) {
+                for (String card : cards) {
+                    String name = Mapper.getTech(card).getName();
+                    buttons.add(Buttons.green(
+                            player.getFinsFactionCheckerPrefix() + prefix + card,
+                            name,
+                            Mapper.getTech(card).getSingleTechEmoji()));
                 }
-                FactionModel factionModel = Mapper.getFaction(faction);
-                buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + prefix + card, name, factionModel.getFactionEmoji()));
             }
-        }
-        if ("units".equalsIgnoreCase(type)) {
-            for (String card : cards) {
-                String name = Mapper.getUnit(card).getName();
-                buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + prefix + card,
-                        name,
-                        Mapper.getUnit(card).getUnitEmoji()));
+            if ("genome".equalsIgnoreCase(type)) {
+                for (String card : cards) {
+                    String name = Mapper.getLeader(card).getTFNameIfAble();
+                    String faction = Mapper.getLeader(card).getFaction();
+                    if (faction.contains("keleres")) {
+                        faction = "keleresm";
+                    }
+                    FactionModel factionModel = Mapper.getFaction(faction);
+                    buttons.add(Buttons.green(
+                            player.getFinsFactionCheckerPrefix() + prefix + card,
+                            name,
+                            factionModel.getFactionEmoji()));
+                }
+            }
+            if ("units".equalsIgnoreCase(type)) {
+                for (String card : cards) {
+                    String name = Mapper.getUnit(card).getName();
+                    buttons.add(Buttons.green(
+                            player.getFinsFactionCheckerPrefix() + prefix + card,
+                            name,
+                            Mapper.getUnit(card).getUnitEmoji()));
+                }
             }
         }
         if (!game.getStoredValue("engineerACSplice").startsWith("remove")) {

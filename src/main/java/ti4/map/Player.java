@@ -1354,10 +1354,12 @@ public class Player extends PlayerProperties {
 
     public int getNumberOfBluePrints() {
         int count = 0;
-        if (isHasFoundCulFrag()) count++;
-        if (isHasFoundHazFrag()) count++;
-        if (isHasFoundIndFrag()) count++;
-        if (isHasFoundUnkFrag()) count++;
+        if (hasAbility("blueprints")) {
+            if (isHasFoundCulFrag()) count++;
+            if (isHasFoundHazFrag()) count++;
+            if (isHasFoundIndFrag()) count++;
+            if (isHasFoundUnkFrag()) count++;
+        }
         return count;
     }
 
@@ -2336,7 +2338,8 @@ public class Player extends PlayerProperties {
 
         // Current coexisting framework is really very dumb
         Set<Planet> coexistingPlanets = game.getPlanetsInfo().values().stream()
-                .filter(planet -> planet.hasGroundForces(this) || planet.hasStructures(this))
+                .filter(planet -> (planet.hasGroundForces(this) || planet.hasStructures(this))
+                        && !getPlanetsAllianceMode().contains(planet.getName()))
                 .collect(Collectors.toSet());
         playerPlanets.addAll(coexistingPlanets);
 

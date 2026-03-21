@@ -50,7 +50,7 @@ class ExhaustLeader extends GameStateSubcommand {
         }
 
         Integer tgCount = event.getOption(Constants.TG, null, OptionMapping::getAsInt);
-        if (leaderID.contains("agent")) {
+        if (leaderID.contains("agent") && !leaderID.contains("artuno")) {
             ButtonHelperAgents.exhaustAgent(leaderID, event, game, player);
         } else {
             ExhaustLeaderService.exhaustLeader(game, player, playerLeader, tgCount);

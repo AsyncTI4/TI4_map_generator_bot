@@ -2299,6 +2299,7 @@ public final class ButtonHelperModifyUnits {
             if (orbitalDrop) {
                 List<Button> orbFollowUp = new ArrayList<>();
                 if (player.hasUnit("sol_mech")
+                        && !tile.isScar()
                         && !ButtonHelper.isLawInPlay(game, "articles_war")
                         && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
                     orbFollowUp.add(Buttons.green("orbitalMechDrop_" + planetName, "Pay 3r for Mech?"));
