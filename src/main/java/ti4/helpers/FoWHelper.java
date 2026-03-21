@@ -733,6 +733,10 @@ public class FoWHelper {
                 wormholeIDs.add(Constants.ALPHA);
             }
         }
+        if (!hasQuantumEntanglement && !wh_recon && !absol_recon && ButtonHelper.isLawInPlay(game, "travel_ban")) {
+            wormholeIDs.remove(Constants.ALPHA);
+            wormholeIDs.remove(Constants.BETA);
+        }
 
         if (wormholeIDs.isEmpty()) {
             return adjacentPositions;

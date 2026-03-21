@@ -1488,7 +1488,10 @@ public class AgendaHelper {
                         StringTokenizer winnerInfo = new StringTokenizer(winner, "*");
                         while (winnerInfo.hasMoreTokens()) {
                             String tiedWinner = winnerInfo.nextToken();
-                            Button button = Buttons.blue("resolveAgendaVote_outcomeTie* " + tiedWinner, tiedWinner);
+                            Button button = Buttons.blue(
+                                    speaker.getFinsFactionCheckerPrefix() + "resolveAgendaVote_outcomeTie* "
+                                            + tiedWinner,
+                                    tiedWinner);
                             tiedWinners.add(button);
                         }
                     } else {
@@ -1847,6 +1850,13 @@ public class AgendaHelper {
 
     public static void ministerOfIndustryCheck(
             Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
+
+        if (tile.isScar(game)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged()
+                            + " you just placed a space dock in an entropic scar -- it will not be able to use its PRODUCTION ability while it's in there, due to scars turning off unit abilities.");
+        }
         if (IsPlayerElectedService.isPlayerElected(game, player, "minister_industry") && !tile.isScar(game)) {
             String msg = player.getRepresentationUnfogged()
                     + "since you have _Minister of Industry_, you may build in tile "

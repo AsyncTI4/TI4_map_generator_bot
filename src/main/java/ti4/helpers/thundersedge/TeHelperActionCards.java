@@ -450,7 +450,7 @@ public class TeHelperActionCards {
 
         Predicate<Tile> emptyTile = Tile.tileHasNoPlayerShips(game)
                 .and(tile -> !tile.getTileModel().isHyperlane())
-                .and(tile -> !tile.isHomeSystem(game));
+                .and(tile -> !tile.isHomeSystem(game) || prefix.contains("NokarBt"));
         List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(player, game, prefix, emptyTile, false);
         BlindSelectionService.filterForBlindPositionSelection(game, player, buttons, player.finChecker() + prefix);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);

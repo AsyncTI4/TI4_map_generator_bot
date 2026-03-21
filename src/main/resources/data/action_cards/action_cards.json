@@ -865,7 +865,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Choose 1 player. That player gives you 1 random action card from their hand.",
-        "flavorText": "I'm no spy, Connor said, casually stuffing the data drives into his pack. \"Now, how can I get out of here without being seen?\"",
+        "flavorText": "\"I'm no spy\", Connor said, casually stuffing the data drives into his pack. \"Now, how can I get out of here without being seen?\"",
         "source": "base"
     },
     {

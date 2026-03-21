@@ -2366,27 +2366,28 @@ public class ButtonHelperAbilities {
                 game.setupNeutralPlayer(color);
                 neutral = game.getPlayerFromColorOrFaction("neutral");
             }
-
-            for (Tile tile : game.getTileMap().values()) {
-                for (UnitHolder uH : tile.getPlanetUnitHolders()) {
-                    if (ButtonHelper.getTypeOfPlanet(game, uH.getName()).contains("hazardous")) {
-                        boolean owned = false;
-                        for (Player p2 : game.getRealPlayers()) {
-                            if (p2.getPlanets().contains(uH.getName())) {
-                                owned = true;
-                                break;
+            if (neutral != null) {
+                for (Tile tile : game.getTileMap().values()) {
+                    for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                        if (ButtonHelper.getTypeOfPlanet(game, uH.getName()).contains("hazardous")) {
+                            boolean owned = false;
+                            for (Player p2 : game.getRealPlayers()) {
+                                if (p2.getPlanets().contains(uH.getName())) {
+                                    owned = true;
+                                    break;
+                                }
                             }
-                        }
-                        if (!owned) {
-                            int resource = Helper.getPlanetResources(uH.getName(), game);
-                            int neutralUnitsToAdd = resource - uH.getUnitCount(UnitType.Infantry, neutral);
-                            if (neutralUnitsToAdd > 0) {
-                                AddUnitService.addUnits(
-                                        event,
-                                        tile,
-                                        game,
-                                        neutral.getColor(),
-                                        neutralUnitsToAdd + " infantry " + uH.getName());
+                            if (!owned) {
+                                int resource = Helper.getPlanetResources(uH.getName(), game);
+                                int neutralUnitsToAdd = resource - uH.getUnitCount(UnitType.Infantry, neutral);
+                                if (neutralUnitsToAdd > 0) {
+                                    AddUnitService.addUnits(
+                                            event,
+                                            tile,
+                                            game,
+                                            neutral.getColor(),
+                                            neutralUnitsToAdd + " infantry " + uH.getName());
+                                }
                             }
                         }
                     }
@@ -2668,7 +2669,10 @@ public class ButtonHelperAbilities {
         List<Button> options = new ArrayList<>();
         options.add(Buttons.green("indoctrinate_" + planet + "_infantry", "Indoctrinate 1 Infantry into 1 Infantry")
                 .withEmoji(UnitEmojis.infantry.asEmoji()));
-        if (player.hasUnit("yin_mech")) {
+        if (player.hasUnit("yin_mech")
+                && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4
+                && !ButtonHelper.isLawInPlay(game, "articles_war")
+                && !game.getTileFromPlanet(planet).isScar()) {
             options.add(Buttons.green("indoctrinate_" + planet + "_mech", "Indoctrinate 1 Infantry into 1 Mech")
                     .withEmoji(UnitEmojis.mech.asEmoji()));
         }

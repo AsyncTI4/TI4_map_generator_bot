@@ -1086,7 +1086,7 @@ public class StartPhaseService {
         //     nextPlayer.setInRoundTurnCount(1);
         // }
         if (isFowPrivateGame) {
-            for (Player p2 : game.getRealPlayers()) {
+            for (Player p2 : Helper.getSpeakerOrFullPriorityOrder(game)) {
                 if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("startQDN", "Use Quantum Datahub Node", TechEmojis.CyberneticTech));

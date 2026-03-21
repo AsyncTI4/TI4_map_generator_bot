@@ -101,6 +101,13 @@ public class AddUnitService {
             UnitType unitType = entry.getKey();
             Integer totalAmt = entry.getValue();
             String asyncId = unitType.getValue().toLowerCase();
+            if (player.getUnitsByAsyncID(asyncId).isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        game.getActionsChannel(),
+                        "Player " + player.getFactionEmojiOrColor() + " does not have any units of type "
+                                + unitType.humanReadableName() + ". Skipping.");
+                continue;
+            }
             UnitModel mod = player.getUnitsByAsyncID(asyncId).getFirst();
             // Ships go to space
             if (mod.getIsShip()

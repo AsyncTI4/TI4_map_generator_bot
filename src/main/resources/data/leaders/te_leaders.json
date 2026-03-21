@@ -135,6 +135,7 @@
         "abilityWindow": "When you produce ships",
         "abilityText": "You may place any of those ships onto this card. At the start of a space combat, you may purge this card to place all ships from this card into the active system.",
         "unlockCondition": "Have 3 scored objectives.",
+        "notes": "Per Dane, you cannot play this hero during combats that you are not participating in. When producing ships onto the hero, you do not need to worry about fleet supply or capacity in the producing system.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/crimsonhero.png?raw=true",
         "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/crimsonhero.png?raw=true",
         "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/rebellion_paradigm.png?raw=true",
