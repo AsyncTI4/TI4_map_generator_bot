@@ -68,6 +68,7 @@ class CombatButtonHandler {
         }
         MessageHelper.sendMessageToChannel(
                 game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(), msg);
+        ButtonHelper.decrementPendingPdsDecisions(game);
     }
 
     @ButtonHandler("applytempcombatmod__" + Constants.AC + "__")

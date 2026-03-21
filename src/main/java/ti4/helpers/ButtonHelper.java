@@ -5984,6 +5984,13 @@ public class ButtonHelper {
             case "spacecannondefence" -> rollType = CombatRollType.SpaceCannonDefence;
             default -> {}
         }
+        if ((rollType == CombatRollType.combatround || rollType == CombatRollType.AFB)
+                && warnIfPendingPdsDecisions(player, game, event)) {
+            return;
+        }
+        if (rollType == CombatRollType.SpaceCannonOffence) {
+            decrementPendingPdsDecisions(game);
+        }
         if (buttonID.contains("deleteTheseButtons") && event instanceof ButtonInteractionEvent bevent) {
             deleteAllButtons(bevent);
         } else {
@@ -6041,6 +6048,44 @@ public class ButtonHelper {
         successMessage = successMessageBuilder.toString();
 
         return successMessage;
+    }
+
+    public static boolean warnIfPendingPdsDecisions(Player player, Game game, GenericInteractionCreateEvent event) {
+        int pendingPdsDecisions = getPendingPdsDecisions(game);
+        if (pendingPdsDecisions < 1) {
+            return false;
+        }
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentation() + " some players have not finished deciding to fire PDS."
+                        + " If you still want to continue, press the button again.");
+        game.removeStoredValue("warnAboutPdsBeforeContinuing");
+        return true;
+    }
+
+    public static void setPendingPdsDecisions(Game game, int count) {
+        if (count > 0) {
+            game.setStoredValue("warnAboutPdsBeforeContinuing", Integer.toString(count));
+        } else {
+            game.removeStoredValue("warnAboutPdsBeforeContinuing");
+        }
+    }
+
+    public static void decrementPendingPdsDecisions(Game game) {
+        setPendingPdsDecisions(game, getPendingPdsDecisions(game) - 1);
+    }
+
+    private static int getPendingPdsDecisions(Game game) {
+        String value = game.getStoredValue("warnAboutPdsBeforeContinuing");
+        if (value.isBlank()) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            game.removeStoredValue("warnAboutPdsBeforeContinuing");
+            return 0;
+        }
     }
 
     public static void resolveTransitDiodesStep1(Game game, Player player) {

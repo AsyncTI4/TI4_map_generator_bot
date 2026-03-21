@@ -223,6 +223,9 @@ class TacticalActionButtonHandlers {
 
     @ButtonHandler("landUnits_")
     public static void landingUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        if (ButtonHelper.warnIfPendingPdsDecisions(player, game, event)) {
+            return;
+        }
         String regex = "landUnits_" + RegexHelper.posRegex(game) + "_" + RegexHelper.intRegex("num")
                 + RegexHelper.unitTypeRegex() + "(?<dmg>(damaged)?)_" + RegexHelper.unitHolderRegex(game, "uh") + "_"
                 + RegexHelper.colorRegex(game);

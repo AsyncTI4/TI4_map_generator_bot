@@ -173,6 +173,7 @@ public class TacticalActionService {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
         if (!game.isL1Hero() && !ctx.playersWithPds2.isEmpty()) {
+            ButtonHelper.setPendingPdsDecisions(game, ctx.playersWithPds2.size());
             ButtonHelperTacticalAction.tacticalActionSpaceCannonOffenceStep(
                     game, player, ctx.playersWithPds2, ctx.tile);
         }
