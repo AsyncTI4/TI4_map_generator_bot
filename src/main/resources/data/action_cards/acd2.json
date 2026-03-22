@@ -506,7 +506,7 @@
         "name": "Mobilization",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Place 2 infantry from your reinforcements on any planets you control and place 2 fighters from your reinforcements in any systems that contain your ships.",
+        "text": "Place 2 infantry from your reinforcements on a planet you control and place 2 fighters from your reinforcements in a system that contains your ships.",
         "flavorText": "Tai gave a self-satisfied hmph as he looked over the recruitment reports. \"If you build it, they will come, they say.\" The Alliance's new war sun was proof enough.",
         "source": "action_deck_2"
     },
@@ -515,7 +515,7 @@
         "name": "Mobilization",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Place 2 infantry from your reinforcements on any planets you control and place 2 fighters from your reinforcements in any systems that contain your ships.",
+        "text": "Place 2 infantry from your reinforcements on a planet you control and place 2 fighters from your reinforcements in a system that contains your ships.",
         "flavorText": "Dart grabbed the new cadet by his Naaz. \"Any more backtalk from you and you'll get a clout in the ear!\"",
         "source": "action_deck_2"
     },
@@ -524,7 +524,7 @@
         "name": "Mobilization",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Place 2 infantry from your reinforcements on any planets you control and place 2 fighters from your reinforcements in any systems that contain your ships.",
+        "text": "Place 2 infantry from your reinforcements on a planet you control and place 2 fighters from your reinforcements in a system that contains your ships.",
         "flavorText": "The new squadron leader gasped as the simulation ended. For the fifth time today, Dart had bested them like it was cub's play.",
         "source": "action_deck_2"
     },
@@ -533,7 +533,7 @@
         "name": "Mobilization",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Place 2 infantry from your reinforcements on any planets you control and place 2 fighters from your reinforcements in any systems that contain your ships.",
+        "text": "Place 2 infantry from your reinforcements on a planet you control and place 2 fighters from your reinforcements in a system that contains your ships.",
         "flavorText": "Dart stood at the edge of the hangar, watching soldiers marching into the belly of his heavy cruiser. \"The board is set.\" Tai agreed, \"The pieces are moving.\"",
         "source": "action_deck_2"
     },
