@@ -58,8 +58,8 @@
         "alias": "black_market_intel",
         "name": "Black Market Intel",
         "phase": "Action",
-        "window": "ACTION",
-        "text": "Draw 2 secret objectives; give 1 of those cards to another player that has less than 3 scored secret objectives, if able.",
+        "window": "When you draw 1 or more secret objectives",
+        "text": "Draw 1 additional secret objective. Then, give 1 of those cards to another player that has less than 3 scored secret objectives, if able.",
         "flavorText": "Suffi kissed the data drive before placing it at the drop-off. This job would pay for a long vacation.",
         "source": "action_deck_2"
     },
