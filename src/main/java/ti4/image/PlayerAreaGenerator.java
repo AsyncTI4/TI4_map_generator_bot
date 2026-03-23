@@ -490,14 +490,16 @@ public class PlayerAreaGenerator {
         // Player/Teammate Names
         for (String teammateID : teammateIDs) {
             String userName = getPlayerNameFromID(player, teammateID);
-            int xDraw = x;
+            boolean showAvatar = !game.hideUserNames();
+            int avatarWidth = showAvatar ? DrawingUtil.DISCORD_AVATAR_SIZE : 0;
+            int avatarTextPadding = showAvatar ? 8 : 0;
+            int textOffset = avatarWidth + avatarTextPadding;
+            int xDraw = x + textOffset;
             int yDraw = y + yDelta + 10;
 
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
-            int usernameWidth = graphics.getFontMetrics().stringWidth(userName);
-            int factionTextWidth = graphics.getFontMetrics().stringWidth(factionName);
-            int maxWidthForPlayerNameBeforeLeaders = 715;
+            int maxWidthForPlayerNameBeforeLeaders = 715 - textOffset;
 
             Color fore = Color.white;
             Color back = Color.black;
@@ -505,13 +507,15 @@ public class PlayerAreaGenerator {
             VerticalAlign vert = VerticalAlign.Top;
             if (player.getUserID().equals(teammateID)) {
                 // "real" player, first row
-                if (factionTextWidth + usernameWidth > maxWidthForPlayerNameBeforeLeaders) {
+                String fullText = userName + " " + factionName;
+                int fullTextWidth = graphics.getFontMetrics().stringWidth(fullText);
+                int strokeBuffer = (int) ((BasicStroke) stroke2).getLineWidth();
+                if (fullTextWidth + strokeBuffer > maxWidthForPlayerNameBeforeLeaders) {
                     // is a team, or too long, two lines
-                    DrawingUtil.superDrawString(graphics, factionName, x, yDraw, fore, horz, vert, stroke2, back);
+                    DrawingUtil.superDrawString(graphics, factionName, xDraw, yDraw, fore, horz, vert, stroke2, back);
                     yDelta += 34;
                     DrawingUtil.superDrawString(graphics, userName, xDraw, yDraw + 34, fore, horz, vert, stroke2, back);
                 } else { // can one-line it
-                    String fullText = userName + " " + factionName;
                     DrawingUtil.superDrawString(graphics, fullText, xDraw, yDraw, fore, horz, vert, stroke2, back);
                 }
             } else { // 2nd+ row, teammates - one-line it, just username
@@ -519,7 +523,7 @@ public class PlayerAreaGenerator {
             }
 
             // Avatar
-            if (!game.hideUserNames()) {
+            if (showAvatar) {
                 graphics.drawImage(DrawingUtil.getUserDiscordAvatar(teammateID), x, y + yDelta + 5, null);
             }
 
