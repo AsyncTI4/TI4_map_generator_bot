@@ -499,8 +499,6 @@ public class PlayerAreaGenerator {
 
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
-            int usernameWidth = graphics.getFontMetrics().stringWidth(userName);
-            int factionTextWidth = graphics.getFontMetrics().stringWidth(factionName);
             int maxWidthForPlayerNameBeforeLeaders = 715 - textOffset;
 
             Color fore = Color.white;
@@ -509,14 +507,15 @@ public class PlayerAreaGenerator {
             VerticalAlign vert = VerticalAlign.Top;
             if (player.getUserID().equals(teammateID)) {
                 // "real" player, first row
-                if (factionTextWidth + usernameWidth > maxWidthForPlayerNameBeforeLeaders) {
+                String fullText = userName + " " + factionName;
+                int fullTextWidth = graphics.getFontMetrics().stringWidth(fullText);
+                int strokeBuffer = (int) ((BasicStroke) stroke2).getLineWidth();
+                if (fullTextWidth + strokeBuffer > maxWidthForPlayerNameBeforeLeaders) {
                     // is a team, or too long, two lines
-                    DrawingUtil.superDrawString(
-                            graphics, factionName, xDraw, yDraw, fore, horz, vert, stroke2, back);
+                    DrawingUtil.superDrawString(graphics, factionName, xDraw, yDraw, fore, horz, vert, stroke2, back);
                     yDelta += 34;
                     DrawingUtil.superDrawString(graphics, userName, xDraw, yDraw + 34, fore, horz, vert, stroke2, back);
                 } else { // can one-line it
-                    String fullText = userName + " " + factionName;
                     DrawingUtil.superDrawString(graphics, fullText, xDraw, yDraw, fore, horz, vert, stroke2, back);
                 }
             } else { // 2nd+ row, teammates - one-line it, just username
