@@ -55,6 +55,7 @@ public class DrawingUtil {
 
     private static final int DELTA_Y = 26;
     private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -1.570_796_326_794_896_6;
+    public static final int DISCORD_AVATAR_SIZE = 32;
 
     public static void superDrawString(
             Graphics g,
@@ -344,7 +345,8 @@ public class DrawingUtil {
         try {
             User user = JdaService.jda.getUserById(userID);
             if (user == null) return null;
-            return ImageHelper.readURLScaled(user.getEffectiveAvatar().getUrl(), 32, 32);
+            return ImageHelper.readURLScaled(
+                    user.getEffectiveAvatar().getUrl(), DISCORD_AVATAR_SIZE, DISCORD_AVATAR_SIZE);
         } catch (Exception e) {
             // BotLogger.error("Could not get Avatar", e);
         }
