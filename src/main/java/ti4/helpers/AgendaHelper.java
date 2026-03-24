@@ -1243,7 +1243,8 @@ public final class AgendaHelper {
         boolean playerPrevotesIsEmpty =
                 game.getStoredValue("preVoting" + player.getFaction()).isEmpty();
         boolean playerIsNotActivePlayer = "agendaWaiting".equalsIgnoreCase(game.getPhaseOfGame());
-        boolean playerIsPrevoting = !playerPrevotesIsEmpty || playerIsNotActivePlayer;
+        boolean playerIsPrevoting =
+                !playerPrevotesIsEmpty && (playerIsNotActivePlayer || game.getActivePlayer() != player);
         if (playerIsPrevoting) {
             if ("0".equalsIgnoreCase(votes)) {
                 MessageHelper.sendMessageToChannel(
@@ -4812,6 +4813,7 @@ public final class AgendaHelper {
         }
         Helper.refreshPlanetsOnTheRevote(player, game);
         eraseVotesOfFaction(game, pfaction);
+        game.setStoredValue("preVoting" + player.getFaction(), "");
         String eraseMsg = "Erased previous votes made by " + player.getFactionEmoji()
                 + " and readied the planets they previously exhausted\n\n" + getSummaryOfVotes(game, true);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), eraseMsg);

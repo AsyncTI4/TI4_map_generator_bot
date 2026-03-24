@@ -1206,6 +1206,9 @@ public final class ButtonHelperAgents {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
                     + "Field Marshal Mercer, a Nomad" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
+            if (!rest.contains("_")) {
+                return;
+            }
             String posNPlanet = rest.replace("nomadagentmercer_", "");
             String planetName = posNPlanet.split("_")[1];
             List<Button> buttons = ButtonHelper.getButtonsForMovingGroundForcesToAPlanet(game, planetName, player);
@@ -1220,6 +1223,9 @@ public final class ButtonHelperAgents {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "I48S, the L1Z1X"
                     + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
+            if (!rest.contains("_")) {
+                return;
+            }
             String posNPlanet = rest.replace("l1z1xagent_", "");
             String pos = posNPlanet.split("_")[0];
             String planetName = posNPlanet.split("_")[1];
@@ -1319,6 +1325,9 @@ public final class ButtonHelperAgents {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
                     + "Yudri Sukhov, the Vaden" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
+            if (!rest.contains("_")) {
+                return;
+            }
             resolveVadenAgentStep2(player, game, event, rest);
         }
         if ("celdauriagent".equalsIgnoreCase(agent)) {

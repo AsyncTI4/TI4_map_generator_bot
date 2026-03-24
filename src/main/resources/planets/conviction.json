@@ -21,7 +21,7 @@
         }
     },
     "legendaryAbilityName": "General Industries Group",
-    "legendaryAbilityText": "At any time, you may exhaust this card to replenish your commodities. When you exhaust a superweapon card, ready this card.",
+    "legendaryAbilityText": "At any time, you may exhaust this card to gain 2 commodities. When you exhaust a superweapon card, ready this card.",
     "contrastColor": "orange",
     "source": "ds"
 }

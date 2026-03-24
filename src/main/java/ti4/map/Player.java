@@ -1354,7 +1354,7 @@ public class Player extends PlayerProperties {
 
     public int getNumberOfBluePrints() {
         int count = 0;
-        if (hasAbility("blueprints")) {
+        if (hasAbility("ancient_blueprints")) {
             if (isHasFoundCulFrag()) count++;
             if (isHasFoundHazFrag()) count++;
             if (isHasFoundIndFrag()) count++;
