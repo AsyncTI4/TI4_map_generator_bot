@@ -1033,11 +1033,17 @@ public class ButtonHelperTwilightsFall {
             }
             if ("units".equalsIgnoreCase(type)) {
                 for (String card : cards) {
-                    String name = Mapper.getUnit(card).getName();
-                    buttons.add(Buttons.green(
-                            player.getFinsFactionCheckerPrefix() + prefix + card,
-                            name,
-                            Mapper.getUnit(card).getUnitEmoji()));
+                    if (Mapper.getUnit(card) != null) {
+                        String name = Mapper.getUnit(card).getName();
+                        buttons.add(Buttons.green(
+                                player.getFinsFactionCheckerPrefix() + prefix + card,
+                                name,
+                                Mapper.getUnit(card).getUnitEmoji()));
+                    } else {
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                "Error: (report to fin) could not find unit for card ID: " + card);
+                    }
                 }
             }
         }

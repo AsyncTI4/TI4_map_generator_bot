@@ -154,10 +154,9 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 }
             }
             case "conviction" -> {
-                player.setCommodities(player.getCommoditiesTotal());
-                output = player.getFactionEmoji() + " exhausted Conviction to replenish commodities. They now have "
-                        + player.getCommodities() + " commodit"
-                        + (player.getCommodities() == 1 ? "y" : "ies") + ".";
+                player.setCommodities(player.getCommodities() + 2);
+                output = player.getFactionEmoji() + " exhausted Conviction to gain 2 commodities. They now have "
+                        + player.getCommodities() + " commodities.";
             }
 
             case "silence" -> {
