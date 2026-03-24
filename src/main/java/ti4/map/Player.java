@@ -1798,6 +1798,11 @@ public class Player extends PlayerProperties {
         for (String leaderID : getFactionStartingLeaders()) {
             originalLeaders.add(new Leader(leaderID));
         }
+        for (String leaderID : getLeaderIDs()) {
+            if (!originalLeaders.stream().anyMatch(l -> l.getId().equals(leaderID))) {
+                originalLeaders.add(new Leader(leaderID));
+            }
+        }
         return originalLeaders;
     }
 

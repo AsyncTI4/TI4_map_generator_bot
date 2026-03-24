@@ -1330,13 +1330,15 @@ public class ButtonHelper {
     @ButtonHandler("drawStatusACs")
     public static void drawStatusACs(Game game, Player player, ButtonInteractionEvent event) {
         if (game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
-            ReactionService.addReaction(
-                    event,
-                    game,
-                    player,
-                    true,
-                    false,
-                    "It seems you already drew your action cards for this Status Phase, so I will not deal you more. Please draw manually if this is a mistake.");
+            if (event != null) {
+                ReactionService.addReaction(
+                        event,
+                        game,
+                        player,
+                        true,
+                        false,
+                        "It seems you already drew your action cards for this Status Phase, so I will not deal you more. Please draw manually if this is a mistake.");
+            }
             return;
         }
         List<String> modifiers = new ArrayList<>();
