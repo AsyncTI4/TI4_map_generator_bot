@@ -21,7 +21,13 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import javax.annotation.Nullable;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.springframework.util.StringUtils;
+
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
@@ -50,9 +56,6 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -1327,13 +1330,15 @@ public class ButtonHelper {
     @ButtonHandler("drawStatusACs")
     public static void drawStatusACs(Game game, Player player, ButtonInteractionEvent event) {
         if (game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
-            ReactionService.addReaction(
-                    event,
-                    game,
-                    player,
-                    true,
-                    false,
-                    "It seems you already drew your action cards for this Status Phase, so I will not deal you more. Please draw manually if this is a mistake.");
+            if(event != null){
+                ReactionService.addReaction(
+                        event,
+                        game,
+                        player,
+                        true,
+                        false,
+                        "It seems you already drew your action cards for this Status Phase, so I will not deal you more. Please draw manually if this is a mistake.");
+                }
             return;
         }
         List<String> modifiers = new ArrayList<>();

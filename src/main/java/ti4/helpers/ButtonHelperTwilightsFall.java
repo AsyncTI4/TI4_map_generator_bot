@@ -1406,7 +1406,7 @@ public class ButtonHelperTwilightsFall {
         List<String> allCards = new ArrayList<>();
         if ("ability".equalsIgnoreCase(type)) {
             allCards = Mapper.getDeck("techs_tf").getNewShuffledDeck();
-            for (Player p : game.getRealPlayers()) {
+            for (Player p : game.getRealPlayersNNeutral()) {
                 for (String tech : p.getTechs()) {
                     allCards.remove(tech);
                 }
@@ -1423,7 +1423,7 @@ public class ButtonHelperTwilightsFall {
         }
         if ("genome".equalsIgnoreCase(type)) {
             allCards = Mapper.getDeck("tf_genome").getNewShuffledDeck();
-            for (Player p : game.getRealPlayers()) {
+            for (Player p : game.getRealPlayersNNeutral()) {
                 for (String tech : p.getLeaderIDs()) {
                     allCards.remove(tech);
                 }
@@ -1440,7 +1440,7 @@ public class ButtonHelperTwilightsFall {
                     }
                 }
             }
-            for (Player p : game.getRealPlayers()) {
+            for (Player p : game.getRealPlayersNNeutral()) {
                 for (String unit : p.getUnitsOwned()) {
                     allCards.remove(unit);
                 }

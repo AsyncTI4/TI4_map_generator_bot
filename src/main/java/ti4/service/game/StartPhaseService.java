@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -801,6 +802,11 @@ public class StartPhaseService {
         }
         String message2 = "Resolve status homework using the buttons. \n";
         game.setCurrentACDrawStatusInfo("");
+        if(!game.isFowMode()){
+            for(Player p : Helper.getSpeakerOrFullPriorityOrder(game)){
+                ButtonHelper.drawStatusACs(game, p, null);
+            }
+        }
         Button draw1AC = Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.getACEmoji(game));
         Button getCCs = Buttons.green("redistributeCCButtons", "Redistribute, Gain, & Confirm Command Tokens")
                 .withEmoji(Emoji.fromFormatted("🔺"));
@@ -859,7 +865,9 @@ public class StartPhaseService {
                     Please click the "Ready For Strategy Phase" button once you are done resolving these or if you decline to do so.""";
         }
         List<Button> buttons = new ArrayList<>();
-        buttons.add(draw1AC);
+        if(game.isFowMode()){
+            buttons.add(draw1AC);
+        }
         buttons.add(getCCs);
         buttons.add(passOnAbilities);
         if (yssarilPolicy != null) {

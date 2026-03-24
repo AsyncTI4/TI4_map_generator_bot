@@ -1,17 +1,18 @@
 package ti4.service.button;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.function.Consumers;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.UnfiledButtonHandlers;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Helper;
@@ -36,7 +37,40 @@ public class ReactionService {
             boolean sendPublic,
             String message,
             String additionalMessage) {
-        if (event == null) return;
+        if (event == null) {
+            if(message != null && !message.isEmpty()) {
+                String text;
+                if (game.isFowMode() && sendPublic) {
+                    text = message;
+                } else if (game.isFowMode()) {
+                    text = "(You) " + message;
+                } else if ("not following.".equalsIgnoreCase(message)) {
+                    text = player.getRepresentation(false, false) + " " + message;
+                } else {
+                    text = player.getRepresentation() + " " + message;
+                }
+
+                if (isNotBlank(additionalMessage)) {
+                    text += " " + game.getPing() + " " + additionalMessage;
+                }
+                text = text.replace("  ", " ");
+
+                if (game.isFowMode() && !sendPublic) {
+                    MessageHelper.sendPrivateMessageToPlayer(player, game, text);
+                    if (text.contains("ready for")) {
+                        String factionReady = game.getStoredValue("fowStatusDone");
+                        if (factionReady == null || !factionReady.contains(player.getFaction())) {
+                            GMService.logPlayerActivity(game, player, player.getRepresentation(true, false) + text);
+                            game.setStoredValue(
+                                    "fowStatusDone", (factionReady == null ? "" : factionReady) + player.getFaction());
+                        }
+                    }
+                    return;
+                }
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);
+            }
+            return;
+        }
         Message mainMessage = event.getInteraction().getMessage();
         Emoji emojiToUse = Helper.getPlayerReactionEmoji(game, player, mainMessage);
         String messageId = mainMessage.getId();
