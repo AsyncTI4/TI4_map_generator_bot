@@ -23,7 +23,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 
-public class TransactionGenerator {
+public final class TransactionGenerator {
 
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
     private static final BasicStroke stroke5 = new BasicStroke(5.0f);

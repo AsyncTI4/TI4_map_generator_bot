@@ -26,7 +26,7 @@ import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.service.map.CustomHyperlaneService;
 
-class HyperlaneTileGenerator {
+final class HyperlaneTileGenerator {
 
     private static final float CENTER_X = TILE_WIDTH / 2.0f;
     private static final float CENTER_Y = TILE_HEIGHT / 2.0f;

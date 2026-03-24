@@ -155,8 +155,7 @@ public class VisionariaSelectService {
     public boolean hasRespondedToVisionaria(Game game, Player player) {
         String val = game.getStoredValue("VisionariaResponded");
         if (player.hasBreakthrough("deepwroughtbt")) return true;
-        if (val.isEmpty() || val.contains("|" + player.getFaction())) return true;
-        return false;
+        return val.isEmpty() || val.contains("|" + player.getFaction());
     }
 
     private void moveOnWhenDone(ButtonInteractionEvent event, Game game) {

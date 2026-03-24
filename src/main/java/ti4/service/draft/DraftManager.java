@@ -24,6 +24,7 @@ import ti4.service.map.AddTileListService;
  * stage.
  * - Validating state consistency
  */
+@Getter
 public class DraftManager extends DraftPlayerManager {
     public DraftManager(Game game) {
         if (game == null) {
@@ -32,13 +33,10 @@ public class DraftManager extends DraftPlayerManager {
         this.game = game;
     }
 
-    @Getter
     private final Game game;
 
-    @Getter
     private DraftOrchestrator orchestrator;
     // The order of draftables is assumed to be the correct order for summarizing, applying, etc.
-    @Getter
     private final List<Draftable> draftables = new ArrayList<>();
 
     public enum CommandSource {
@@ -179,7 +177,7 @@ public class DraftManager extends DraftPlayerManager {
         orchestrator.sendDraftButtons(this);
     }
 
-    public boolean canStartDraft() {
+    private boolean canStartDraft() {
         if (draftables.isEmpty() || orchestrator == null) {
             return false;
         }
@@ -191,7 +189,7 @@ public class DraftManager extends DraftPlayerManager {
         return whatsStoppingDraftStart() == null;
     }
 
-    public String whatsStoppingDraftStart() {
+    private String whatsStoppingDraftStart() {
         if (draftables.isEmpty()) {
             return "No draftables have been added to the draft. Try `/draft manage add_draftable`.";
         }

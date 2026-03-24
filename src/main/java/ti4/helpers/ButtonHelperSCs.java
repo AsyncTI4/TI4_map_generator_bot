@@ -45,7 +45,7 @@ import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.unit.AddUnitService;
 
-public class ButtonHelperSCs {
+public final class ButtonHelperSCs {
 
     @ButtonHandler("constructionPrimary_produce")
     public static void resolveConstructionPrimaryTE(ButtonInteractionEvent event, Game game, Player player) {

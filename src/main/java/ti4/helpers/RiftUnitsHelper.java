@@ -29,7 +29,7 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
-public class RiftUnitsHelper {
+public final class RiftUnitsHelper {
 
     @ButtonHandler("riftUnit_")
     public static void riftUnitButton(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
@@ -145,7 +145,7 @@ public class RiftUnitsHelper {
         }
     }
 
-    public static void wormholeAllUnitsInASystem(
+    private static void wormholeAllUnitsInASystem(
             String pos, ButtonInteractionEvent event, Game game, Player player, String ident) {
         Tile tile = game.getTileByPosition(pos);
 
@@ -255,7 +255,7 @@ public class RiftUnitsHelper {
         return msg;
     }
 
-    public static String getWormholeUnit(String unit, boolean over5roll, Player player, Game game) {
+    private static String getWormholeUnit(String unit, boolean over5roll, Player player, Game game) {
 
         List<String> wormholeUnits = new ArrayList<>(List.of("ff", "dd", "ca", "dn", "cv", "fs", "ws"));
         if (!over5roll) {
@@ -278,7 +278,7 @@ public class RiftUnitsHelper {
         return unit;
     }
 
-    public static String wormholeUnit(
+    private static String wormholeUnit(
             String unit, Tile tile, Game game, GenericInteractionCreateEvent event, Player player) {
         boolean damaged = false;
         if (unit.contains("damaged")) {

@@ -41,7 +41,7 @@ import ti4.service.explore.ExploreService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
-public class GMService {
+public final class GMService {
 
     private static final List<Button> GMBUTTONS = Arrays.asList(
             Buttons.REFRESH_MAP,
@@ -260,7 +260,7 @@ public class GMService {
                     pns.append("__")
                             .append(player.getRepresentationUnfoggedNoPing())
                             .append("__\n");
-                    player.getPromissoryNotes().entrySet().stream().forEach(entry -> pns.append("> ")
+                    player.getPromissoryNotes().entrySet().forEach(entry -> pns.append("> ")
                             .append(Mapper.getPromissoryNote(entry.getKey()).getNameRepresentation())
                             .append(" (")
                             .append(entry.getValue())

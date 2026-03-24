@@ -24,7 +24,7 @@ import ti4.message.logging.BotLogger;
 import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
 import ti4.spring.jda.JdaService;
 
-public class ApplicationEmojiService {
+public final class ApplicationEmojiService {
 
     public static final String fallbackEmoji = "<a:EvensOddsRage:1080111937930678282>";
     private static final Map<String, CachedEmoji> emojis = new HashMap<>();
@@ -210,7 +210,8 @@ public class ApplicationEmojiService {
                 Thread.sleep(50);
                 if (emoji == null) {
                     success = false;
-                    if (++fails > 10) break;
+                    ++fails;
+                    if (fails > 10) break;
                     continue;
                 }
                 CachedEmoji cached = new CachedEmoji(emoji);
@@ -258,11 +259,7 @@ public class ApplicationEmojiService {
     }
 
     public static CachedEmoji getApplicationEmoji(String name) {
-        CachedEmoji fin = emojis.get(name);
-        if (fin == null) {
-            System.out.println("AJAHHAHHAHSFKLNFLKE - " + name);
-        }
-        return emojis.getOrDefault(name, null);
+        return emojis.get(name);
     }
 
     public static Stream<File> enumerateEmojiFilesRecursive() {

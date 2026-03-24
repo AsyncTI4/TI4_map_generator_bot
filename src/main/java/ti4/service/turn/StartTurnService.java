@@ -2,7 +2,6 @@ package ti4.service.turn;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -399,7 +398,7 @@ public class StartTurnService {
         }
 
         thingsToFollow.entrySet().stream()
-                .sorted(Comparator.comparing(Entry::getKey))
+                .sorted(Entry.comparingByKey())
                 .map(Entry::getValue)
                 .forEach(sb::append);
         sb.append("You currently have ")
@@ -572,13 +571,10 @@ public class StartTurnService {
                             .append(" has been played and now it is their turn again and you haven't reacted.")
                             .append(" If you already reacted, check if your reaction got undone.");
 
-                    GameMessage gm = GameMessageManager.getOne(game.getName(), GameMessageType.VISIONARIA)
-                            .orElse(null);
-                    if (gm != null) {
-                        sb.append(" Message link is: ")
-                                .append(gm.asJumpLink(game.getMainGameChannel()))
-                                .append(".\n");
-                    }
+                    GameMessageManager.getOne(game.getName(), GameMessageType.VISIONARIA)
+                            .ifPresent(gm -> sb.append(" Message link is: ")
+                                    .append(gm.asJumpLink(game.getMainGameChannel()))
+                                    .append(".\n"));
                     sb.append("You currently have ").append(p2.getTg()).append(" trade goods.");
                     if (!VisionariaSelectService.hasRespondedToVisionaria(game, p2)) {
                         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());

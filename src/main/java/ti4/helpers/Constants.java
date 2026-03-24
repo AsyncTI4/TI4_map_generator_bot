@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Constants {
+public final class Constants {
     // Staff Pings
     public static final String chassitId = "183213554445320192";
     public static final String eronousId = "465241936408608769";

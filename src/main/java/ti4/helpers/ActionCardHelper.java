@@ -508,7 +508,7 @@ public class ActionCardHelper {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
-    public static void sendSchemingDiscardButtons(Player player) {
+    private static void sendSchemingDiscardButtons(Player player) {
         List<Button> buttons = getDiscardActionCardButtons(player, false);
         String msg = player.getRepresentationUnfogged() + ", discard an action card due to **Scheming**.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);

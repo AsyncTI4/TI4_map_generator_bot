@@ -22,10 +22,10 @@ import ti4.service.draft.PlayerDraftState;
 import ti4.service.draft.PlayerSetupService.PlayerSetupState;
 import ti4.service.emoji.MiscEmojis;
 
+@Setter
+@Getter
 public class SeatDraftable extends SinglePickDraftable {
 
-    @Getter
-    @Setter
     private int numSeats;
 
     public void initialize(int numSeats) {

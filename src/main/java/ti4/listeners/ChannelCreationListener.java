@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.game.CreateGameButtonHandler;
 import ti4.helpers.ButtonHelper;
@@ -21,7 +22,7 @@ public class ChannelCreationListener extends ListenerAdapter {
     private static final String FOW_REPLACEMENT_TAG = "1336539499668443229";
 
     @Override
-    public void onChannelCreate(ChannelCreateEvent event) {
+    public void onChannelCreate(@NotNull ChannelCreateEvent event) {
         if (!JdaService.isReadyToReceiveCommands()) {
             return;
         }

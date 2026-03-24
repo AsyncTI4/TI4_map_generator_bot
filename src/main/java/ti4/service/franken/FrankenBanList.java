@@ -1,6 +1,11 @@
 package ti4.service.franken;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import lombok.Getter;
 import ti4.helpers.Constants;
 
 public enum FrankenBanList {
@@ -159,7 +164,11 @@ public enum FrankenBanList {
                                     "prescience"))));
 
     private final String id;
+
+    @Getter
     private final String description;
+
+    @Getter
     private final Map<String, List<String>> bansByType;
 
     FrankenBanList(String id, String description, Map<String, List<String>> bansByType) {
@@ -170,14 +179,6 @@ public enum FrankenBanList {
 
     public String getName() {
         return id;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Map<String, List<String>> getBansByType() {
-        return bansByType;
     }
 
     public List<String> getFlattenedBans() {

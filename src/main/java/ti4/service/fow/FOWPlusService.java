@@ -57,7 +57,7 @@ import ti4.service.unit.RemoveUnitService.RemovedUnit;
  * To remove a token from the board, you need to see it
  * Prevents looking at explore/relic decks
 */
-public class FOWPlusService {
+public final class FOWPlusService {
     private static final String FOWPLUS_TAG = "FoW+";
     private static final String VOID_TILEID = "-1";
 

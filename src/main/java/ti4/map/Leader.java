@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.awt.Color;
 import java.util.Comparator;
 import java.util.Optional;
+import lombok.Getter;
+import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Constants;
@@ -13,12 +15,21 @@ import ti4.image.Mapper;
 import ti4.model.LeaderModel;
 import ti4.service.emoji.MiscEmojis;
 
+@Getter
 public class Leader {
     private final String id;
     private String type;
+
+    @Setter
     private int tgCount;
+
+    @Setter
     private boolean exhausted;
+
+    @Setter
     private boolean locked = true;
+
+    @Setter
     private boolean active;
 
     @JsonCreator
@@ -49,46 +60,6 @@ public class Leader {
         } else if (id.contains(Constants.ENVOY)) {
             type = Constants.ENVOY;
         }
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public int getTgCount() {
-        return tgCount;
-    }
-
-    public void setTgCount(int tgCount) {
-        this.tgCount = tgCount;
-    }
-
-    public boolean isExhausted() {
-        return exhausted;
-    }
-
-    public void setExhausted(boolean exhausted) {
-        this.exhausted = exhausted;
-    }
-
-    public boolean isLocked() {
-        return locked;
-    }
-
-    public void setLocked(boolean locked) {
-        this.locked = locked;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
     }
 
     @JsonIgnore

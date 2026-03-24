@@ -473,7 +473,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "After your units on this planet make rolls for a unit ability, if this planet contains no more than 1 of your mechs, apply +2 to the result of each of those dice."
+        "ability": "After your units on this planet make rolls for a unit ability, apply +2 to the result of each of those dice."
     },
     {
         "id": "vyserix_pds",

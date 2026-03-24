@@ -31,7 +31,7 @@ import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
-public class TeHelperPromissories {
+public final class TeHelperPromissories {
 
     public static void offerShareKnowledgeButtons(Game game, Player player) {
         Player dws = game.getPNOwner("shareknowledge");

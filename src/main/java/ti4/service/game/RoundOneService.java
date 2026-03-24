@@ -190,7 +190,7 @@ public class RoundOneService {
         }
     }
 
-    static String getTeActionCardDeckAlias(Game game) {
+    private static String getTeActionCardDeckAlias(Game game) {
         if (!game.isAcd2()) {
             return game.isProphecyOfKings() ? "action_cards_te" : "action_cards_basete";
         }

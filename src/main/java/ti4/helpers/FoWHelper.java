@@ -38,7 +38,7 @@ import ti4.service.game.GameNameService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.CheckUnitContainmentService;
 
-public class FoWHelper {
+public final class FoWHelper {
 
     public static boolean isPrivateGame(GenericInteractionCreateEvent event) {
         if (event == null) {
@@ -473,6 +473,34 @@ public class FoWHelper {
             tiles.addAll(newTiles);
         }
         return tiles;
+    }
+
+    public static boolean isTileInExileRange(Game game, Tile tile, Player player) {
+        if (player.hasUnit("crimson_destroyer")) {
+            List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Destroyer);
+            for (Tile tile2 : destroyers) {
+                if (getAdjacentTiles(game, tile.getPosition(), player, false, true)
+                        .contains(tile2.getPosition())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean isTileInUpgradedExileRange(Game game, Tile tile, Player player) {
+        if (player.hasUnit("crimson_destroyer2")) {
+            List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Destroyer);
+            for (String adjPos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+                for (Tile tile2 : destroyers) {
+                    if (FoWHelper.getAdjacentTiles(game, adjPos, player, false, true)
+                            .contains(tile2.getPosition())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public static boolean isTileAdjacentToAnAnomaly(Game game, String position, Player player) {

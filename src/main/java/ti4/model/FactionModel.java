@@ -177,7 +177,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        return getFactionEmoji() + " _" + getFactionName() + "_ " + source.emoji();
+        return getFactionEmoji() + " _" + factionName + "_ " + source.emoji();
     }
 
     @Override

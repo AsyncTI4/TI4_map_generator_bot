@@ -15,7 +15,7 @@ import ti4.service.draft.draftables.AndcatReferenceCardsDraftable.ReferenceCardP
 
 class AndcatDraftableClearPlayerChoices extends GameStateSubcommand {
 
-    protected AndcatDraftableClearPlayerChoices() {
+    AndcatDraftableClearPlayerChoices() {
         super(Constants.DRAFT_ANDCAT_CLEAR_PLAYER_CHOICES, "Clear player choices", true, true);
         addOption(OptionType.USER, Constants.PLAYER, "Player to clear choices for", true);
     }

@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.service.option.GameOptionService;
 
-class GameOptionButtonHandler {
+final class GameOptionButtonHandler {
 
     @ButtonHandler("enableAidReacts_")
     public static void enableAidReact(ButtonInteractionEvent event, Game game, String buttonID) {

@@ -34,16 +34,23 @@ import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.service.emoji.TI4Emoji;
 
+@Getter
 public abstract class DraftItem {
 
-    private @Getter final DraftCategory ItemCategory;
-    private @Getter final String ItemId;
-    private @Getter final DraftErrataModel Errata;
+    private final DraftCategory ItemCategory;
+    private final String ItemId;
+    private final DraftErrataModel Errata;
 
     @Override
-    public boolean equals(Object i2) {
-        if (i2 instanceof DraftItem item) return item.getAlias().equals(getAlias());
+    public boolean equals(Object other) {
+        if (other instanceof DraftItem otherDraftItem)
+            return otherDraftItem.getAlias().equals(getAlias());
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return getAlias().hashCode();
     }
 
     protected DraftItem(DraftCategory category, String itemId) {
@@ -67,11 +74,11 @@ public abstract class DraftItem {
     public abstract TI4Emoji getItemEmoji();
 
     public boolean hasOptionalSwaps() {
-        return getErrata() != null && !getErrata().getOptionalSwaps().isEmpty();
+        return Errata != null && !Errata.getOptionalSwaps().isEmpty();
     }
 
     public boolean hasAdditionalComponents() {
-        return getErrata() != null && !getErrata().getAdditionalComponents().isEmpty();
+        return Errata != null && !Errata.getAdditionalComponents().isEmpty();
     }
 
     public static DraftItem generate(DraftCategory category, String itemId) {
@@ -182,7 +189,7 @@ public abstract class DraftItem {
         if (hasAdditionalComponents() && !game.isTwilightsFallMode()) {
             List<String> adds = new ArrayList<>();
             adds.add("**__Additional Added Components:__**");
-            for (DraftErrataModel i2 : getErrata().getAdditionalComponents()) {
+            for (DraftErrataModel i2 : Errata.getAdditionalComponents()) {
                 DraftItem item2 = generate(i2.getItemCategory(), i2.getItemId());
                 adds.add("> + " + item2.getTitle(game));
             }
@@ -192,7 +199,7 @@ public abstract class DraftItem {
         if (hasOptionalSwaps() && !game.isTwilightsFallMode()) {
             List<String> swaps = new ArrayList<>();
             swaps.add("**__Optional Component Swaps:__**");
-            for (DraftErrataModel i2 : getErrata().getOptionalSwaps()) {
+            for (DraftErrataModel i2 : Errata.getOptionalSwaps()) {
                 DraftItem item2 = generate(i2.getItemCategory(), i2.getItemId());
                 swaps.add("> ♻️ " + item2.getTitle(game));
             }
@@ -206,7 +213,7 @@ public abstract class DraftItem {
         StringBuilder sb = new StringBuilder(getLongDescriptionImpl());
         if (hasAdditionalComponents()) {
             sb.append("\n>  - *Also adds: ");
-            for (DraftErrataModel i : getErrata().getAdditionalComponents()) {
+            for (DraftErrataModel i : Errata.getAdditionalComponents()) {
                 DraftItem item = generate(i.getItemCategory(), i.getItemId());
                 sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
                 sb.append(", ");
@@ -215,7 +222,7 @@ public abstract class DraftItem {
         }
         if (hasOptionalSwaps()) {
             sb.append("\n>  - *Includes optional swaps: ");
-            for (DraftErrataModel i : getErrata().getOptionalSwaps()) {
+            for (DraftErrataModel i : Errata.getOptionalSwaps()) {
                 DraftItem item = generate(i.getItemCategory(), i.getItemId());
                 sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
                 sb.append(", ");
@@ -230,7 +237,7 @@ public abstract class DraftItem {
         StringBuilder sb = new StringBuilder(getLongDescriptionImpl(game));
         if (hasAdditionalComponents()) {
             sb.append("\n>  - *Also adds: ");
-            for (DraftErrataModel i : getErrata().getAdditionalComponents()) {
+            for (DraftErrataModel i : Errata.getAdditionalComponents()) {
                 DraftItem item = generate(i.getItemCategory(), i.getItemId());
                 sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
                 sb.append(", ");
@@ -239,7 +246,7 @@ public abstract class DraftItem {
         }
         if (hasOptionalSwaps()) {
             sb.append("\n>  - *Includes optional swaps: ");
-            for (DraftErrataModel i : getErrata().getOptionalSwaps()) {
+            for (DraftErrataModel i : Errata.getOptionalSwaps()) {
                 DraftItem item = generate(i.getItemCategory(), i.getItemId());
                 sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
                 sb.append(", ");
@@ -277,11 +284,11 @@ public abstract class DraftItem {
         return null;
     }
 
-    public static boolean isFinishedWithBag(Player player) {
+    private static boolean isFinishedWithBag(Player player) {
         return player.getGame().getActiveBagDraft().playerQueueIsFull(player);
     }
 
-    public static boolean isAtHandLimit(Player player, DraftCategory cat) {
+    private static boolean isAtHandLimit(Player player, DraftCategory cat) {
         BagDraft draftRules = player.getGame().getActiveBagDraft();
         DraftBag draftHand = player.getDraftHand();
         boolean isAtHandLimit =
@@ -295,11 +302,11 @@ public abstract class DraftItem {
         return isAtHandLimit;
     }
 
-    public static boolean alreadyDraftedThisCategory(Player player, DraftCategory category) {
+    private static boolean alreadyDraftedThisCategory(Player player, DraftCategory category) {
         return player.getDraftQueue().getCategoryCount(category) > 0;
     }
 
-    public static boolean otherCategoriesAvailable(Player player, DraftCategory category) {
+    private static boolean otherCategoriesAvailable(Player player, DraftCategory category) {
         BagDraft draftRules = player.getGame().getActiveBagDraft();
         DraftBag draftHand = player.getDraftHand();
 

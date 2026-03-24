@@ -1,31 +1,28 @@
 package ti4.helpers;
 
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.message.MessageHelper;
+import ti4.website.EgressClientManager;
 
-public class URLReaderHelper {
+public final class URLReaderHelper {
 
     private static final int MAX_FILE_SIZE_BYTES = 500_000; // 500 kB
 
     public static String readFromURL(String url, MessageChannel feedbackChannel) {
         try {
-            HttpClient client = HttpClient.newBuilder()
-                    .connectTimeout(Duration.ofSeconds(5))
-                    .build();
-
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .timeout(Duration.ofSeconds(5))
                     .GET()
                     .build();
 
-            HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+            HttpResponse<byte[]> response =
+                    EgressClientManager.getHttpClient().send(request, HttpResponse.BodyHandlers.ofByteArray());
 
             if (response.statusCode() != 200) {
                 MessageHelper.sendMessageToChannel(feedbackChannel, "HTTP error: " + response.statusCode());

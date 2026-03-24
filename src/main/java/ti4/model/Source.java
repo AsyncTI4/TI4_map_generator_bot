@@ -149,7 +149,7 @@ public class Source {
         }
 
         public boolean isHiddenFromSearch(ComponentSource source) {
-            if (source != null && this == source) return false;
+            if (this == source) return false;
 
             return !isOfficial();
         }

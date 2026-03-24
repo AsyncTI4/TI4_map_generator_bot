@@ -16,7 +16,7 @@ import ti4.image.PositionMapper;
 import ti4.map.Game;
 import ti4.map.Player;
 
-public class PlayerStatsHelper {
+public final class PlayerStatsHelper {
     private static final Pattern DIGIT_PATTERN = Pattern.compile("\\d");
 
     public static List<String> findThreeNearbyStatTiles(

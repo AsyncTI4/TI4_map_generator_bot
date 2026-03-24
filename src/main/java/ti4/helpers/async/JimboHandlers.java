@@ -23,7 +23,7 @@ import ti4.model.TileModel;
 import ti4.service.map.AddTileService;
 
 // Jazz's Interactive Map Builder
-public class JimboHandlers {
+public final class JimboHandlers {
     @ButtonHandler(JimboConst.exit)
     private static void exit(ButtonInteractionEvent event) {
         String msg = "🤙 cya later!";

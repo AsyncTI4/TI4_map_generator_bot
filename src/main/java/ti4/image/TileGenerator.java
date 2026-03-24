@@ -786,6 +786,45 @@ public class TileGenerator {
                     tileGraphics.drawImage(bufferedImage, x, y, null);
                 }
             }
+            case Exile -> {
+                if (game.isFowMode()) {
+                    break;
+                }
+                if (tile.getTileModel().isHyperlane()) {
+                    break;
+                }
+                boolean inRangeOfExile = false;
+                for (Player p : game.getRealPlayers()) {
+                    if (FoWHelper.isTileInExileRange(game, tile, p)
+                            || FoWHelper.isTileInUpgradedExileRange(game, tile, p)) {
+                        inRangeOfExile = true;
+                        break;
+                    }
+                }
+                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
+                if (tileImage == null) {
+                    break;
+                }
+
+                int x = TILE_PADDING;
+                int y = TILE_PADDING;
+
+                if (!inRangeOfExile) {
+                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
+                    tileGraphics.drawImage(fogging, x, y, null);
+                } else {
+                    x += (isSpiral ? 36 : 0);
+                    y += (isSpiral ? 43 : 0);
+                    String breachFile = ResourceHelper.getInstance().getTokenFile("token_breachActive.png");
+
+                    BufferedImage bufferedImage = ImageHelper.readScaled(breachFile, 2f);
+                    if (bufferedImage != null) {
+                        x += (345 - bufferedImage.getWidth()) / 2;
+                        y += (300 - bufferedImage.getHeight()) / 2;
+                        tileGraphics.drawImage(bufferedImage, x, y, null);
+                    }
+                }
+            }
             case Aetherstream -> {
                 if (game.isFowMode()) {
                     break;

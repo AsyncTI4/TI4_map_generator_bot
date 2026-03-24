@@ -60,7 +60,7 @@ import ti4.service.turn.EndTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
-public class ButtonHelperTwilightsFall {
+public final class ButtonHelperTwilightsFall {
 
     public static boolean checkForQueuedSplicePick(Player privatePlayer, Game game) {
         Player player = privatePlayer;
@@ -247,7 +247,7 @@ public class ButtonHelperTwilightsFall {
             List<MiltyDraftTile> slice = bag.Contents.stream()
                     .map(i -> i instanceof TileDraftItem tile ? tile.getMiltyTile() : null)
                     .filter(Objects::nonNull)
-                    .collect(Collectors.toCollection(() -> new ArrayList<>()));
+                    .collect(Collectors.toCollection(ArrayList::new));
 
             Collections.shuffle(slice);
             if (slice.get(1).getTile().getPlanetUnitHolders().isEmpty()
@@ -313,7 +313,7 @@ public class ButtonHelperTwilightsFall {
 
         // Set draft position
         DraftItem draftPos = bag.getCategory(DraftCategory.DRAFTORDER).getFirst();
-        Integer draftNum = Integer.parseInt(draftPos.getItemId());
+        int draftNum = Integer.parseInt(draftPos.getItemId());
         draft.setPosition(draftNum);
         draft.setFaction(bag.getCategory(DraftCategory.HOMESYSTEM).getFirst().getItemId());
         if (draftNum == 1) game.setSpeaker(player);

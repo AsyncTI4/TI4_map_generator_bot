@@ -24,7 +24,7 @@ import ti4.message.logging.BotLogger;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
 
-public class TileHelper {
+public final class TileHelper {
 
     private static final Pattern TILE_WITH_NAME_PATTERN = Pattern.compile("^\\s*\\d{3} \\(\\w+\\)\\s*$");
     private static final Map<String, TileModel> tileIdsToTileModels = new HashMap<>();

@@ -1,6 +1,8 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,6 +51,7 @@ import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -984,11 +987,10 @@ public class UnfiledButtonHandlers {
 
     public static List<String> getBombardablePlanets(Player player, Game game, Tile tile) {
         List<String> planets = new ArrayList<>();
-        for (UnitHolder planetUH : tile.getPlanetUnitHolders()) {
+        for (Planet planetUH : tile.getPlanetUnitHolders()) {
             if (!player.getPlanetsAllianceMode().contains(planetUH.getName())
                     || FoWHelper.otherPlayersHaveUnitsOnPlanet(player, planetUH)) {
-                if (!((Planet) planetUH).getPlanetTypes().contains("cultural")
-                        || !ButtonHelper.isLawInPlay(game, "conventions")) {
+                if (!planetUH.getPlanetTypes().contains("cultural") || !ButtonHelper.isLawInPlay(game, "conventions")) {
                     planets.add(planetUH.getName());
                 }
             }
@@ -2324,7 +2326,7 @@ public class UnfiledButtonHandlers {
                         UnitModel producedUnit =
                                 player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
 
-                        if (UnitType.Flagship == producedUnit.getUnitType() && player.ownsUnit("creuss_flagship")) {
+                        if (producedUnit.getUnitType() == UnitType.Flagship && player.ownsUnit("creuss_flagship")) {
                             adjust = 1;
                         }
                     }
@@ -2644,7 +2646,7 @@ public class UnfiledButtonHandlers {
                 } else {
                     Button flipAgenda = Buttons.blue("startStrategyPhase", "Start Strategy Phase");
                     List<Button> buttons = List.of(flipAgenda);
-                    String condition = "the conditions for an Agenda Phase has not yet been met";
+                    String condition;
                     if (game.isOrdinianC1Mode()) {
                         condition = "the _Coatl_ is still damaged";
                     } else if (game.isTwilightsFallMode()) {
@@ -2973,6 +2975,7 @@ public class UnfiledButtonHandlers {
         buttons.add(Buttons.red("checkAnomView", "Find Anomalies"));
         buttons.add(Buttons.green("checkLegendView", "Find Legendaries"));
         buttons.add(Buttons.gray("checkEmptyView", "Find Empties"));
+        buttons.add(Buttons.red("checkExileView", "Determine Exile Breachable Systems"));
         buttons.add(Buttons.blue("checkAetherView", "Determine Aetherstreamable Systems"));
         buttons.add(Buttons.red("checkCannonView", "Calculate Space Cannon Offense Shots"));
         buttons.add(Buttons.green("checkTraitView", "Find Traits"));
@@ -2981,6 +2984,11 @@ public class UnfiledButtonHandlers {
         buttons.add(Buttons.gray("checkShiplessView", "Show Map Without Ships"));
         buttons.add(Buttons.gray("checkUnlocked", "Show Only Unlocked Units"));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", buttons);
+    }
+
+    @ButtonHandler("checkExileView")
+    public static void calculateExileView(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.exile);
     }
 
     @ButtonHandler("resetSpend_")

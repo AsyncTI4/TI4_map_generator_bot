@@ -41,7 +41,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        return CardEmojis.getSCFrontFromInteger(initiative) + " _" + getName() + "_ " + source.emoji();
+        return CardEmojis.getSCFrontFromInteger(initiative) + " _" + name + "_ " + source.emoji();
     }
 
     @Override

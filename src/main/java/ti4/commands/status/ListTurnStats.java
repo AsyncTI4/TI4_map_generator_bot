@@ -37,8 +37,8 @@ class ListTurnStats extends GameStateSubcommand {
                 .filter(p -> p.getNumberOfTurns() > 0)
                 .toList();
         Comparator<Player> byTurnTime = Comparator.comparing(ListTurnStats::getAvgTurnTime);
-        Optional<Player> min = players.stream().sorted(byTurnTime).findFirst();
-        Optional<Player> max = players.stream().sorted(byTurnTime.reversed()).findFirst();
+        Optional<Player> min = players.stream().min(byTurnTime);
+        Optional<Player> max = players.stream().max(byTurnTime);
         Long maxTime = max.map(ListTurnStats::getAvgTurnTime).orElse(null);
 
         for (Player player : players) {

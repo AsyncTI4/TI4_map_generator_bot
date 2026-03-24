@@ -108,7 +108,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getTFTitleIfAble() {
-        return getTFTitle().orElse(getTitle());
+        return getTFTitle().orElse(title);
     }
 
     public Optional<String> getAbilityName() {
@@ -198,8 +198,8 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         if (factionModel != null) factionName = factionModel.getFactionName();
 
         // TITLE
-        String title_name_component = "";
-        String title_subtitle_component = "";
+        String title_name_component;
+        String title_subtitle_component;
         if (useTwilightsFallText) {
             if (getTFName().isPresent() && !getTFName().get().isBlank()) {
                 title_name_component = getTFName().get();

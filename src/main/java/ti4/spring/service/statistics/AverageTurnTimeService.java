@@ -32,7 +32,6 @@ public class AverageTurnTimeService {
     @Transactional(readOnly = true)
     public void getAverageTurnTimes(SlashCommandInteractionEvent event) {
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
-        boolean showMedian = event.getOption(Constants.SHOW_MEDIAN, false, OptionMapping::getAsBoolean);
         int topLimit = event.getOption(Constants.TOP_LIMIT, DEFAULT_PLAYER_LIMIT, OptionMapping::getAsInt);
         int minTurns = event.getOption(
                 Constants.MINIMUM_NUMBER_OF_TURNS, DEFAULT_MINIMUM_NUMBER_OF_TURNS, OptionMapping::getAsInt);
@@ -43,7 +42,7 @@ public class AverageTurnTimeService {
 
         List<UserAverageTurnTimeAccumulator> sortedResults = getAverageTurnTimes(players, minTurns, topLimit);
 
-        String result = toResultString(sortedResults, showMedian);
+        String result = toResultString(sortedResults);
 
         MessageHelper.sendMessageToThread(event.getChannel(), "Average Turn Time", result);
     }
@@ -65,20 +64,13 @@ public class AverageTurnTimeService {
                 .toList();
     }
 
-    private String toResultString(List<UserAverageTurnTimeAccumulator> sortedResults, boolean showMedian) {
+    private String toResultString(List<UserAverageTurnTimeAccumulator> sortedResults) {
         StringBuilder sb = new StringBuilder("## __**Average Turn Time:**__\n");
         int index = 1;
         for (var stats : sortedResults) {
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
             index++;
             sb.append(DateTimeHelper.getTimeRepresentationToSeconds(stats.getAverage()));
-
-            if (showMedian) {
-                long median = (long) Helper.median(stats.gameAverages);
-                sb.append(" (median: ")
-                        .append(DateTimeHelper.getTimeRepresentationToSeconds(median))
-                        .append(")");
-            }
 
             sb.append("` ")
                     .append(stats.username)
@@ -92,7 +84,7 @@ public class AverageTurnTimeService {
     @Transactional(readOnly = true)
     public String getAverageTurnTimesString(List<String> userIds) {
         List<UserAverageTurnTimeAccumulator> averageTurnTimes = getAverageTurnTimes(userIds);
-        return toResultString(averageTurnTimes, true);
+        return toResultString(averageTurnTimes);
     }
 
     private List<UserAverageTurnTimeAccumulator> getAverageTurnTimes(List<String> userIds) {

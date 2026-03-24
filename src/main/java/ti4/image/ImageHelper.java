@@ -1,5 +1,7 @@
 package ti4.image;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import com.luciad.imageio.webp.CompressionType;
 import com.luciad.imageio.webp.WebPWriteParam;
 import java.awt.Color;
@@ -11,6 +13,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
+import java.time.Duration;
 import javax.annotation.Nullable;
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -23,6 +29,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.jetbrains.annotations.NotNull;
 import ti4.message.logging.BotLogger;
 import ti4.service.emoji.TI4Emoji;
+import ti4.website.EgressClientManager;
 
 @UtilityClass
 public class ImageHelper {
@@ -132,13 +139,44 @@ public class ImageHelper {
 
     @Nullable
     private static BufferedImage readImageURL(String imageURL) {
-        if (imageURL == null) {
+        if (isBlank(imageURL)) return null;
+
+        URI uri;
+        try {
+            uri = URI.create(imageURL);
+        } catch (Exception e) {
+            BotLogger.error("Invalid image URL: " + imageURL, e);
             return null;
         }
-        try (InputStream inputStream = URI.create(imageURL).toURL().openStream()) {
-            return ImageIO.read(inputStream);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri)
+                .timeout(Duration.ofSeconds(2))
+                .GET()
+                .build();
+
+        try {
+            HttpResponse<InputStream> response =
+                    EgressClientManager.getHttpClient().send(request, HttpResponse.BodyHandlers.ofInputStream());
+
+            try (InputStream inputStream = response.body()) {
+                if (response.statusCode() != 200) {
+                    BotLogger.error("Failed to read image. URL: " + imageURL + " Status: " + response.statusCode());
+                    return null;
+                }
+
+                BufferedImage image = ImageIO.read(inputStream);
+                if (image == null) {
+                    BotLogger.error("ImageIO could not decode stream from: " + imageURL);
+                }
+                return image;
+            }
+        } catch (HttpTimeoutException e) {
+            BotLogger.error("Timeout fetching image: " + imageURL);
         } catch (IOException e) {
-            BotLogger.error("Failed to read image URL '" + imageURL + "': ", e);
+            BotLogger.error("Network error fetching image: " + imageURL, e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
         return null;
     }

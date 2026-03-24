@@ -9,7 +9,7 @@ import ti4.service.draft.draftables.FactionDraftable;
 
 class FactionDraftableSetKeleresFlavor extends GameStateSubcommand {
 
-    protected FactionDraftableSetKeleresFlavor() {
+    FactionDraftableSetKeleresFlavor() {
         super(Constants.DRAFT_FACTION_SET_KELERES_FLAVOR, "Set the Keleres flavor for the draft", true, false);
         addOption(
                 OptionType.STRING,

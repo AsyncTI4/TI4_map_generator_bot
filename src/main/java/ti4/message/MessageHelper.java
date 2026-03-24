@@ -1,6 +1,8 @@
 package ti4.message;
 
-import static ti4.helpers.discord.DiscordHelper.*;
+import static ti4.helpers.discord.DiscordHelper.isDiscordServerError;
+import static ti4.helpers.discord.DiscordHelper.isIgnorableError;
+import static ti4.helpers.discord.DiscordHelper.isUnknownMessageError;
 
 import java.io.File;
 import java.net.SocketTimeoutException;
@@ -33,9 +35,9 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
@@ -142,27 +144,11 @@ public class MessageHelper {
     }
 
     public static void sendEphemeralMessageToEventChannel(GenericInteractionCreateEvent event, String msg) {
-        if (event instanceof ButtonInteractionEvent b) {
-            sendEphemeralMessageToEventChannel(b, msg);
-        } else if (event instanceof SlashCommandInteractionEvent s) {
-            sendEphemeralMessageToEventChannel(s, msg);
-        } else if (event instanceof ModalInteractionEvent m) {
-            sendEphemeralMessageToEventChannel(m, msg);
+        if (event instanceof GenericComponentInteractionCreateEvent e) {
+            e.getHook().setEphemeral(true).sendMessage(msg).queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             sendMessageToEventChannel(event, msg);
         }
-    }
-
-    public static void sendEphemeralMessageToEventChannel(ButtonInteractionEvent event, String message) {
-        event.getHook().setEphemeral(true).sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
-    }
-
-    public static void sendEphemeralMessageToEventChannel(ModalInteractionEvent event, String message) {
-        event.getHook().setEphemeral(true).sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
-    }
-
-    public static void sendEphemeralMessageToEventChannel(SlashCommandInteractionEvent event, String message) {
-        event.getHook().setEphemeral(true).sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void sendMessageToChannelWithButtons(
@@ -225,6 +211,9 @@ public class MessageHelper {
     }
 
     private static void handleFailedReaction(Game game, Player player, Message message, Throwable error) {
+        if (isUnknownMessageError(error)) {
+            return;
+        }
         if (isDiscordServerError(error)) {
             CircuitBreaker.incrementThresholdCount(
                     "Discord server error while adding reaction to message " + message.getId());
@@ -711,6 +700,9 @@ public class MessageHelper {
                             }
                         },
                         error -> {
+                            if (isIgnorableError(error)) {
+                                return;
+                            }
                             if (isDiscordServerError(error)) {
                                 CircuitBreaker.incrementThresholdCount(
                                         "Discord server error while sending message in channel " + channel.getId());

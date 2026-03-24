@@ -1,6 +1,7 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ import ti4.service.unit.MoveUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
 
-public class ButtonHelperAbilities {
+public final class ButtonHelperAbilities {
 
     @ButtonHandler("dataRecovery_")
     public static void dataRecovery(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
@@ -322,12 +323,13 @@ public class ButtonHelperAbilities {
                 UnitHolder unitHolder = tile.getUnitHolders().get(Constants.SPACE);
                 Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
-                for (UnitKey unitKey : units.keySet()) {
+                for (Map.Entry<UnitKey, Integer> entry : units.entrySet()) {
+                    UnitKey unitKey = entry.getKey();
                     if (unitKey != null
                             && unitKey.getColorID().equals(colorID)
                             && p2.getUnitFromAsyncID(unitKey.asyncID()) != null
                             && p2.getUnitFromAsyncID(unitKey.asyncID()).getIsShip()) {
-                        ships += units.get(unitKey);
+                        ships += entry.getValue();
                     }
                 }
             }
@@ -823,7 +825,7 @@ public class ButtonHelperAbilities {
         }
         String msg = player.getRepresentationUnfogged()
                 + ", please choose which player's ships you wish to place a bounty on. You may have up to 3 bounties at a time.";
-        if (currentBounties.size() > 0) {
+        if (!currentBounties.isEmpty()) {
             msg += "\nYou currently have the following bounties: " + String.join(", ", currentBounties) + ".";
         } else {
             msg += " You currently have no bounties.";
@@ -917,9 +919,9 @@ public class ButtonHelperAbilities {
                         + StringUtils.capitalize(unitTypeString) + " belonging to " + p2.getRepresentationNoPing()
                         + ".");
         if (unit != null) {
-            List<Button> removeButtons = new ArrayList<>();
             String message = p2.getRepresentation() + ", please destroy one of your ships of that type.";
-            removeButtons.addAll(ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(p2, game, unitTypeString, true));
+            List<Button> removeButtons = new ArrayList<>(
+                    ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(p2, game, unitTypeString, true));
             if (!removeButtons.isEmpty()) {
                 p2.gainTG((int) unit.getCost(), true);
                 ButtonHelperAgents.resolveArtunoCheck(p2, (int) unit.getCost());
@@ -1873,8 +1875,8 @@ public class ButtonHelperAbilities {
         if (!player.isHasUsedEnvironmentPlunderAbility()
                 && player.hasAbility("policy_the_environment_plunder")
                 && ButtonHelper.getTypeOfPlanet(game, planet).contains("hazardous")) {
-            UnitHolder planetUnit = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-            Planet planetReal = (Planet) planetUnit;
+            Planet planetUnit = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+            Planet planetReal = planetUnit;
             List<Button> buttons = new ArrayList<>();
             if (planetReal != null
                     && isNotBlank(planetReal.getOriginalPlanetType())
@@ -2348,8 +2350,8 @@ public class ButtonHelperAbilities {
         if (game.isMinorFactionsMode()) {
             for (Tile tile : game.getTileMap().values()) {
                 if (!tile.isHomeSystem(game)) {
-                    for (UnitHolder unitHolder : tile.getPlanetUnitHolders()) {
-                        Planet p = (Planet) unitHolder;
+                    for (Planet unitHolder : tile.getPlanetUnitHolders()) {
+                        Planet p = unitHolder;
                         if (p.getPlanetModel().getPlanetTypes().contains(PlanetType.FACTION)) {
                             unitHolder.addToken("attachment_threetraits.png");
                         }

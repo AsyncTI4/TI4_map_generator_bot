@@ -360,7 +360,6 @@ public class MiltyDraftHelper {
 
             MiltyDraftTile draftTile = getDraftTileFromModel(tileModel);
             draftManager.addDraftTile(draftTile);
-            // System.out.println("yes");
         }
     }
 

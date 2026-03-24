@@ -5,8 +5,8 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.CommandManager;
 import ti4.commands.ParentCommand;
+import ti4.commands.SlashCommandManager;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
@@ -26,7 +26,8 @@ public class SusSlashCommandService {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame == null) return;
 
-        ParentCommand command = CommandManager.getCommand(event.getInteraction().getName());
+        ParentCommand command =
+                SlashCommandManager.getCommand(event.getInteraction().getName());
         if (command == null || !command.isSuspicious(event)) return;
 
         if (EXCLUDED_GAMES.contains(managedGame.getName())) return;

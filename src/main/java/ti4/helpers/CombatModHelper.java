@@ -757,7 +757,7 @@ public class CombatModHelper {
                 case "nonhome_system_with_planet" -> scalingCount = getSystemsWithControlledPlanets(game, player);
                 case "galvanized_unit_count" ->
                     scalingCount = getGalvanizedUnitCount(game, unitHolder, origUnit, player);
-                case "unique_ships" -> scalingCount = getUniqueNonFighterShipCount(game, activeSystem, player);
+                case "unique_ships" -> scalingCount = getUniqueNonFighterShipCount(activeSystem, player);
                 case Constants.MOD_OPPONENT_UNIT_TECH -> {
                     if (opponent != null) {
                         scalingCount = opponent.getTechs().stream()
@@ -783,7 +783,7 @@ public class CombatModHelper {
         return (int) value;
     }
 
-    public static int getUniqueNonFighterShipCount(Game game, Tile activeSystem, Player player) {
+    private static int getUniqueNonFighterShipCount(Tile activeSystem, Player player) {
         UnitHolder space = activeSystem.getSpaceUnitHolder();
         int numberUniq = 0;
         for (UnitKey key : space.getUnitsByState().keySet()) {
@@ -797,14 +797,14 @@ public class CombatModHelper {
         return numberUniq;
     }
 
-    public static int getOpponentSfttCount(Player player) {
+    private static int getOpponentSfttCount(Player player) {
         return (int) player.getPromissoryNotesInPlayArea().stream()
                 .map(Mapper::getPromissoryNote)
                 .filter(pn -> "Support for the Throne".equals(pn.getName()))
                 .count();
     }
 
-    public static int getSystemsWithControlledPlanets(Game game, Player player) {
+    private static int getSystemsWithControlledPlanets(Game game, Player player) {
 
         int count = 0;
 
@@ -836,7 +836,7 @@ public class CombatModHelper {
     //     return space.getGalvanizedUnitCount(uk);
     // }
 
-    public static int getGalvanizedUnitCount(Game game, UnitHolder uH, UnitModel origUnit, Player player) {
+    private static int getGalvanizedUnitCount(Game game, UnitHolder uH, UnitModel origUnit, Player player) {
         UnitKey uk = Units.getUnitKey(origUnit.getUnitType(), player.getColorID());
         return uH.getGalvanizedUnitCount(uk);
     }

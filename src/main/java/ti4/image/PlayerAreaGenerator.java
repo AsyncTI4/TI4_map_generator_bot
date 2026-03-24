@@ -490,14 +490,16 @@ public class PlayerAreaGenerator {
         // Player/Teammate Names
         for (String teammateID : teammateIDs) {
             String userName = getPlayerNameFromID(player, teammateID);
-            int xDraw = x;
+            boolean showAvatar = !game.hideUserNames();
+            int avatarWidth = showAvatar ? DrawingUtil.DISCORD_AVATAR_SIZE : 0;
+            int avatarTextPadding = showAvatar ? 8 : 0;
+            int textOffset = avatarWidth + avatarTextPadding;
+            int xDraw = x + textOffset;
             int yDraw = y + yDelta + 10;
 
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
-            int usernameWidth = graphics.getFontMetrics().stringWidth(userName);
-            int factionTextWidth = graphics.getFontMetrics().stringWidth(factionName);
-            int maxWidthForPlayerNameBeforeLeaders = 715;
+            int maxWidthForPlayerNameBeforeLeaders = 715 - textOffset;
 
             Color fore = Color.white;
             Color back = Color.black;
@@ -505,13 +507,15 @@ public class PlayerAreaGenerator {
             VerticalAlign vert = VerticalAlign.Top;
             if (player.getUserID().equals(teammateID)) {
                 // "real" player, first row
-                if (factionTextWidth + usernameWidth > maxWidthForPlayerNameBeforeLeaders) {
+                String fullText = userName + " " + factionName;
+                int fullTextWidth = graphics.getFontMetrics().stringWidth(fullText);
+                int strokeBuffer = (int) ((BasicStroke) stroke2).getLineWidth();
+                if (fullTextWidth + strokeBuffer > maxWidthForPlayerNameBeforeLeaders) {
                     // is a team, or too long, two lines
-                    DrawingUtil.superDrawString(graphics, factionName, x, yDraw, fore, horz, vert, stroke2, back);
+                    DrawingUtil.superDrawString(graphics, factionName, xDraw, yDraw, fore, horz, vert, stroke2, back);
                     yDelta += 34;
                     DrawingUtil.superDrawString(graphics, userName, xDraw, yDraw + 34, fore, horz, vert, stroke2, back);
                 } else { // can one-line it
-                    String fullText = userName + " " + factionName;
                     DrawingUtil.superDrawString(graphics, fullText, xDraw, yDraw, fore, horz, vert, stroke2, back);
                 }
             } else { // 2nd+ row, teammates - one-line it, just username
@@ -519,7 +523,7 @@ public class PlayerAreaGenerator {
             }
 
             // Avatar
-            if (!game.hideUserNames()) {
+            if (showAvatar) {
                 graphics.drawImage(DrawingUtil.getUserDiscordAvatar(teammateID), x, y + yDelta + 5, null);
             }
 
@@ -1394,7 +1398,7 @@ public class PlayerAreaGenerator {
 
         for (Entry<String, Map<String, Integer>> pool :
                 player.getAllDebtTokens().entrySet()) {
-            if (!pool.getValue().values().stream().anyMatch(i -> i > 0)) {
+            if (pool.getValue().values().stream().noneMatch(i -> i > 0)) {
                 continue;
             }
 
@@ -1541,7 +1545,7 @@ public class PlayerAreaGenerator {
 
             AbilityModel abilityModel = Mapper.getAbility(abilityID);
             if (abilityModel == null) {
-                System.out.println("Ability null: " + abilityID);
+                BotLogger.error("Ability null: " + abilityID);
             } else {
                 if (abilityFileName != null) {
                     String status = isExhaustedLocked ? "_exh" : "_rdy";
@@ -1729,7 +1733,7 @@ public class PlayerAreaGenerator {
                 unitCap -= ("ws".equals(unitID) && player.ownsUnit("tf-dragonfreed")) ? 1 : 0;
 
                 // Load voltron data
-                UnitModel model = player == null ? null : player.getUnitFromUnitKey(unitKey);
+                UnitModel model = player.getUnitFromUnitKey(unitKey);
                 boolean voltron = model != null && "naaz_voltron".equals(model.getAlias());
                 BufferedImage voltronDecal =
                         ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
@@ -3118,7 +3122,7 @@ public class PlayerAreaGenerator {
         List<UnitModel> playerUnitModels = new ArrayList<>(player.getUnitModels());
         for (UnitModel unit : playerUnitModels) {
             boolean drawUpgradeWithoutTech =
-                    unit.getIsUpgrade() && !unit.getRequiredTechId().isPresent();
+                    unit.getIsUpgrade() && unit.getRequiredTechId().isEmpty();
             drawUpgradeWithoutTech |= "fs".equals(unit.getAsyncId())
                     && player.hasUnlockedBreakthrough("nekrobt")
                     && !game.getStoredValue("valefarZ").isEmpty();
@@ -3355,7 +3359,7 @@ public class PlayerAreaGenerator {
                         if (j + radInner < 0) continue;
                         if (i + radInner >= width + 2 * radInner) continue;
                         if (j + radInner >= height + 2 * radInner) continue;
-                        maskInner.setRGB(i + radInner, j + radInner, (pxInner << 24) | 0x00000000);
+                        maskInner.setRGB(i + radInner, j + radInner, (pxInner << 24));
                     }
                 }
 

@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import lombok.Getter;
 import ti4.service.emoji.DiceEmojis;
 
-public class DiceHelper {
+public final class DiceHelper {
 
+    @Getter
     public static class Die {
         private final int threshold;
         private final int result;
@@ -15,14 +17,6 @@ public class DiceHelper {
         public Die(int threshold) {
             this.threshold = threshold;
             result = ThreadLocalRandom.current().nextInt(1, 11);
-        }
-
-        public int getResult() {
-            return result;
-        }
-
-        public int getThreshold() {
-            return threshold;
         }
 
         public String getGreenDieIfSuccessOrRedDieIfFailure() {

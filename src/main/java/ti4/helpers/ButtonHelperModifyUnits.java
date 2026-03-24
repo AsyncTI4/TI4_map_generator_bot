@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static ti4.helpers.discord.DiscordHelper.isIgnorableError;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -56,7 +58,7 @@ import ti4.service.unit.MoveUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
-public class ButtonHelperModifyUnits {
+public final class ButtonHelperModifyUnits {
 
     private static int getNumberOfSustainableUnits(
             Player player, Game game, UnitHolder unitHolder, boolean space, boolean spacecannonoffence) {
@@ -1452,7 +1454,7 @@ public class ButtonHelperModifyUnits {
                 getOpposingUnitsToHitOnGround(player, game, game.getTileFromPlanet(planet), planet, "ruthless"));
     }
 
-    public static List<Button> getOpposingUnitsToHitOnGround(
+    private static List<Button> getOpposingUnitsToHitOnGround(
             Player player, Game game, Tile tile, String planet, String source) {
         List<Button> buttons = new ArrayList<>();
         UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
@@ -2007,13 +2009,16 @@ public class ButtonHelperModifyUnits {
             } else {
                 event.getMessage()
                         .editMessage(Helper.buildProducedUnitsMessage(player, game))
-                        .queue(
-                                null,
-                                (error) -> BotLogger.error(
-                                        new LogOrigin(event, player),
-                                        MessageHelper.getRestActionFailureMessage(
-                                                event.getMessageChannel(), "Failed to edit message", null, error),
-                                        error));
+                        .queue(null, error -> {
+                            if (isIgnorableError(error)) {
+                                return;
+                            }
+                            BotLogger.error(
+                                    new LogOrigin(event, player),
+                                    MessageHelper.getRestActionFailureMessage(
+                                            event.getMessageChannel(), "Failed to edit message", null, error),
+                                    error);
+                        });
             }
         }
         if ("sd".equalsIgnoreCase(unitID)) {
@@ -2282,7 +2287,7 @@ public class ButtonHelperModifyUnits {
                     UnitModel producedUnit =
                             player.getUnitsByAsyncID(unitKey2.asyncID()).getFirst();
 
-                    if (UnitType.Flagship == producedUnit.getUnitType() && player.ownsUnit("creuss_flagship")) {
+                    if (producedUnit.getUnitType() == UnitType.Flagship && player.ownsUnit("creuss_flagship")) {
                         adjust = 1;
                     }
                 }

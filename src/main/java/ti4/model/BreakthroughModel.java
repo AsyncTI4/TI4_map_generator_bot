@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.collections4.CollectionUtils;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.Player;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.emoji.FactionEmojis;
@@ -149,10 +148,8 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
     public String getAutoCompleteName(Game game) {
         StringBuilder sb = new StringBuilder(name);
         if (getFaction().isPresent()) sb.append(" (").append(getFaction().get()).append(")");
-        Player p = game.getPlayersFromBreakthrough(alias).stream().findFirst().orElse(null);
-        if (p != null) {
-            sb.append(" ").append(p.isBreakthroughUnlocked(alias) ? "🔓" : "🔒");
-        }
+        game.getPlayersFromBreakthrough(alias).stream().findFirst().ifPresent(p -> sb.append(" ")
+                .append(p.isBreakthroughUnlocked(alias) ? "🔓" : "🔒"));
         return sb.toString();
     }
 

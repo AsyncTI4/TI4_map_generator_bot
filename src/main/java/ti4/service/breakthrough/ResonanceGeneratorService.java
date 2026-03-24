@@ -28,7 +28,7 @@ public class ResonanceGeneratorService {
         return Mapper.getBreakthrough("crimsonbt").getNameRepresentation();
     }
 
-    public void checkCrimsonCommanderUnlock(Game game, Player player, Tile tile) {
+    private void checkCrimsonCommanderUnlock(Game game, Player player, Tile tile) {
         if (player.hasLeader("crimsoncommander") && !player.hasLeaderUnlocked("crimsoncommander")) {
             for (Player p2 : game.getRealPlayersNNeutral()) {
                 if (p2 == player) continue;

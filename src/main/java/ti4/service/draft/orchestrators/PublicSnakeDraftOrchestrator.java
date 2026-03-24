@@ -39,29 +39,21 @@ import ti4.service.draft.PublicDraftInfoService;
  * The picks are made in order, but that order "snakes" or reverses direction
  * after each player has made a pick.
  */
+@Setter
+@Getter
 public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
     /**
      * The per-player state for PublicSnakeDraftOrchestrator.
      * Stores the player's position in the draft order.
      */
+    @Setter
+    @Getter
     public static class State extends OrchestratorState {
         private int orderIndex;
-
-        public int getOrderIndex() {
-            return orderIndex;
-        }
-
-        public void setOrderIndex(int orderIndex) {
-            this.orderIndex = orderIndex;
-        }
     }
 
-    @Getter
-    @Setter
     private int currentPlayerIndex;
 
-    @Getter
-    @Setter
     private boolean isReversing;
 
     public void initialize(DraftManager draftManager, List<String> presetPlayerOrder) {

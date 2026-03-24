@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -99,8 +100,6 @@ public class SearchGameHelper {
         if (wantNum) {
             return filteredManagedGames.size();
         }
-        int days = 0;
-
         StringBuilder sb = new StringBuilder("**__").append(user.getName()).append("'s Games__**\n");
         for (var managedGame : filteredManagedGames) {
             sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
@@ -108,9 +107,6 @@ public class SearchGameHelper {
             sb.append(
                     getPlayerMapListRepresentation(game, userID, showAverageTurnTime, showSecondaries, showGameModes));
             sb.append("\n");
-            if (game.isHasEnded()) {
-                days += Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString());
-            }
             index++;
         }
         if (event instanceof SlashCommandInteractionEvent slash) {
@@ -208,7 +204,21 @@ public class SearchGameHelper {
             }
         }
         if (showGameModes) sb.append(" | Game Modes: ").append(game.getGameModesText());
-        if (game.isHasEnded()) sb.append(" [GAME IS OVER]");
+        if (game.isHasEnded()) {
+            long creationDateTime = game.getCreationDateTime();
+            long endedDateTime = game.getEndedDate();
+            int daysPlayed =
+                    (int) Duration.ofMillis(endedDateTime - creationDateTime).toDays();
+            String dayLabel = (daysPlayed == 1) ? "DAY" : "DAYS";
+            String endedStatus = game.hasWinner() ? "COMPLETED" : "ABORTED";
+            sb.append(" [")
+                    .append(daysPlayed)
+                    .append(" ")
+                    .append(dayLabel)
+                    .append(", ")
+                    .append(endedStatus)
+                    .append("]");
+        }
         return sb.toString();
     }
 

@@ -31,7 +31,7 @@ import ti4.service.milty.MiltyDraftTile;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
-public class DiscordantStarsHelper {
+public final class DiscordantStarsHelper {
 
     public static void checkGardenWorlds(Game game) {
         Player player = Helper.getPlayerFromAbility(game, "garden_worlds");
@@ -238,8 +238,8 @@ public class DiscordantStarsHelper {
                 || !player.hasOlradinPolicies()) return;
         PlanetModel planetModel = Mapper.getPlanet(planet);
         if (planetModel == null) return;
-        UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-        Planet planetHolder = (Planet) unitHolder;
+        Planet unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        Planet planetHolder = unitHolder;
         if (planetHolder == null) return;
 
         boolean hasAbility = planetHolder.isLegendary();

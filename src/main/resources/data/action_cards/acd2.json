@@ -50,8 +50,17 @@
         "name": "Betrayal",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Give 1 promissory note to another player. Then, that player and each other player with 1 of your promissory notes in their play area gives you 1 random action card.",
+        "text": "Give 1 promissory note to another player. Then, that player and each other player with 1 of your promissory notes in their play area gives you 1 random action card from their hand.",
         "flavorText": "Communications were jammed. Supply lines were harried. Staffing officers were found dead in their bunks. The grandeur of the scheme shocked Claire to her core.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "black_market_intel",
+        "name": "Black Market Intel",
+        "phase": "Action",
+        "window": "When you draw 1 or more secret objectives",
+        "text": "Draw 1 additional secret objective. Then, give 1 of those cards to another player that has less than 3 scored secret objectives, if able.",
+        "flavorText": "Suffi kissed the data drive before placing it at the drop-off. This job would pay for a long vacation.",
         "source": "action_deck_2"
     },
     {
@@ -160,7 +169,7 @@
         "phase": "Action",
         "window": "After another player activates a system that contains your units",
         "text": "Produce up to 2 ships in that system that have a combined cost of 3 or less.",
-        "flavorText": "\"Il Na Viroset will arrive soon,\" Artuno promised. Gila hesitated, \"How do you know?\"",
+        "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
         "source": "action_deck_2"
     },
     {
@@ -176,7 +185,7 @@
         "alias": "corruption",
         "name": "Corruption",
         "phase": "Any",
-        "window": "When a public objective is revealed",
+        "window": "After a public objective is revealed",
         "text": "Look at the top 2 cards of the deck that matches that objective; you may replace that objective with 1 of those cards. Then, shuffle that deck.",
         "flavorText": "Just as the charges went public, over half of the Council's staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
         "source": "action_deck_2"
@@ -497,8 +506,8 @@
         "name": "Mobilization",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Place 2 infantry from your reinforcements on any planets you control and place 2 fighters from your reinforcements in any systems that contain your ships.",
-        "flavorText": "Dart grabbed the new cadet by his Naaz. \"Any more backtalk from you and it'll be a clout in the ear!\"",
+        "text": "Place 2 infantry from your reinforcements on a planet you control and place 2 fighters from your reinforcements in a system that contains your ships.",
+        "flavorText": "Tai gave a self-satisfied hmph as he looked over the recruitment reports. \"If you build it, they will come, they say.\" The Alliance's new war sun was proof enough.",
         "source": "action_deck_2"
     },
     {
@@ -506,8 +515,8 @@
         "name": "Mobilization",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Place 2 infantry from your reinforcements on any planets you control and place 2 fighters from your reinforcements in any systems that contain your ships.",
-        "flavorText": "The new squadron leader gasped as the simulation ended. For the fifth time today, Dart had bested them like it was cub's play.",
+        "text": "Place 2 infantry from your reinforcements on a planet you control and place 2 fighters from your reinforcements in a system that contains your ships.",
+        "flavorText": "Dart grabbed the new cadet by his Naaz. \"Any more backtalk from you and you'll get a clout in the ear!\"",
         "source": "action_deck_2"
     },
     {
@@ -515,8 +524,8 @@
         "name": "Mobilization",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Place 2 infantry from your reinforcements on any planets you control and place 2 fighters from your reinforcements in any systems that contain your ships.",
-        "flavorText": "Tai gave a self-satisfied *hmph* as he looked over the recruitment reports. “If you build it, they will come, they say.” The Alliance’s new war sun was proof enough.",
+        "text": "Place 2 infantry from your reinforcements on a planet you control and place 2 fighters from your reinforcements in a system that contains your ships.",
+        "flavorText": "The new squadron leader gasped as the simulation ended. For the fifth time today, Dart had bested them like it was cub's play.",
         "source": "action_deck_2"
     },
     {
@@ -524,8 +533,8 @@
         "name": "Mobilization",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Place 2 infantry from your reinforcements on any planets you control and place 2 fighters from your reinforcements in any systems that contain your ships.",
-        "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
+        "text": "Place 2 infantry from your reinforcements on a planet you control and place 2 fighters from your reinforcements in a system that contains your ships.",
+        "flavorText": "Dart stood at the edge of the hangar, watching soldiers marching into the belly of his heavy cruiser. \"The board is set.\" Tai agreed, \"The pieces are moving.\"",
         "source": "action_deck_2"
     },
     {
@@ -543,7 +552,7 @@
         "phase": "Action",
         "window": "When you produce 1 or more hits",
         "text": "Produce 1 additional hit.",
-        "flavorText": "C-beams glittered in the dark as the N'orr vanguard descended upon their enemies like rain, their exoskeletons reflecting death.",
+        "flavorText": "Beams glittered in the dark as the N'orr vanguard descended upon their enemies like rain, their exoskeletons reflecting death.",
         "source": "action_deck_2"
     },
     {
@@ -667,7 +676,7 @@
         "alias": "ramming_speed",
         "name": "Ramming Speed",
         "phase": "Action",
-        "window": "After 1 of your ships is destroyed",
+        "window": "After 1 of your ships is destroyed, if you are the attacker",
         "text": "Destroy 1 of your opponent's ships in the active system that has a cost equal to or lower than your destroyed unit's cost.",
         "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
         "source": "action_deck_2"
@@ -732,7 +741,7 @@
         "phase": "Any",
         "window": "When another player plays an action card other than 'Sabotage'",
         "text": "Cancel that action card.",
-        "flavorText": "Kyver waited patiently, cloaked outside the space station in transparasteel plating. They loathed eliminating children, but the prophecy of this messiah would have to be silenced.",
+        "flavorText": "Kyver waited patiently, cloaked outside the station in transparasteel plating. They loathed eliminating children, but this messiah must remain unrisen.",
         "source": "action_deck_2"
     },
     {
@@ -859,15 +868,6 @@
         "window": "ACTION",
         "text": "Place 1 cruiser from your reinforcements in a system that does not contain planets or other players' units.",
         "flavorText": "\"To be clear,\" Tai said flatly, \"you knew this ship had no weapons, no fuel, and a faulty navigation when you purchased it. And yet,\"—he gestured—\"here we are.\"",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "strategic_aid",
-        "name": "Strategic Aid",
-        "phase": "Action",
-        "window": "When you perform a strategic action",
-        "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
-        "flavorText": "Mathis was not fooled. The pageantry and endless bandying of crooked words with these witless worms was yet another scheme.",
         "source": "action_deck_2"
     },
     {
@@ -1106,8 +1106,8 @@
         "alias": "void_path",
         "name": "Void Path",
         "phase": "Action",
-        "window": "At the start of your turn",
-        "text": "Choose 1 system that does not contain planets. During this turn, you treat that system as if it contains an alpha, beta, and gamma wormhole.",
+        "window": "After you activate a system",
+        "text": "Choose 1 system that does not contain planets. You treat that system as if it contains an alpha, beta, and gamma wormhole during this tactical action.",
         "flavorText": "\"As we lack the form of your world, you will lack that of ours,\" Taivra said without tone. \"Let us hope you are better prepared for your first pilgrimage than we for ours.\"",
         "source": "action_deck_2"
     },
@@ -1212,7 +1212,7 @@
         "window": "After another player gains control of a planet you control",
         "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets outside of that player's home system that contain their units.",
         "notes": "You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.",
-        "flavorText": "\"Our survival hinged on the line they drew between slaughter and genocide,\" Su'la reminded her crew. \"Spit that mercy in their face.\"",
+        "flavorText": "\"Our survival hinged on the line they drew between slaughter and genocide,\" S'ula reminded her crew. \"Spit that mercy in their face.\"",
         "source": "action_deck_2"
     },
     {
@@ -1294,8 +1294,8 @@
         "phase": "Action",
         "window": "At the start of a ground combat on a planet you control",
         "text": "Place each of your units on that planet into coexistence; the ground combat ends in a draw.",
-        "note": "The attacking player cannot choose to engage any coexisting units in combat after the combat ends in a draw.",
-        "flavorText": "When the ink dried, Mot knew he would be remembered as a traitor. However, as irony would have it, he had bought the Nomad precisely what he needed: time.",
+        "notes": "The attacking player cannot choose to engage any coexisting units in combat after the combat ends in a draw.",
+        "flavorText": "When the ink dried, Mot knew he would be remembered as a traitor. However, as irony would have it, he had bought the Nomad precisely what he needed—time.",
         "source": "action_deck_2"
     }
 ]

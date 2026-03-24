@@ -959,7 +959,7 @@ public class Game extends GameProperties {
         return tt.getJumpUrl();
     }
 
-    private String getTabletalkJumpLinkFormatted() {
+    public String getTabletalkJumpLinkFormatted() {
         TextChannel tt = getTableTalkChannel();
         if (tt == null) return "[no tt]";
         return String.format("[__[Tabletalk](%s)__]", tt.getJumpUrl());
@@ -971,7 +971,7 @@ public class Game extends GameProperties {
         return act.getJumpUrl();
     }
 
-    private String getActionsJumpLinkFormatted() {
+    public String getActionsJumpLinkFormatted() {
         TextChannel act = getActionsChannel();
         if (act == null) return "[no actions]";
         return String.format("[__[Actions](%s)__]", act.getJumpUrl());

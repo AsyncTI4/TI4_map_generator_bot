@@ -25,7 +25,7 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.spring.jda.JdaService;
 
-public class TIGLHelper {
+public final class TIGLHelper {
 
     public enum TIGLRank {
         UNRANKED("TIGL - Unranked", 0), // <- because current formatter settings will oneline this list

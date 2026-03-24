@@ -3,6 +3,7 @@ package ti4.service.option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -68,7 +69,10 @@ public class FOWOptionService {
         RIFTSET_MODE(null, "RiftSet Mode", "For Eronous to run fow300", false);
 
         private final FOWOptionCategory category;
+
+        @Getter
         private final String title;
+
         private final String description;
         private final boolean visible;
 
@@ -85,10 +89,6 @@ public class FOWOptionService {
 
         FOWOptionCategory getCategory() {
             return category;
-        }
-
-        public String getTitle() {
-            return title;
         }
 
         String getDescription() {

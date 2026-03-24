@@ -43,7 +43,7 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.settings.users.UserSettingsManager;
 
-public class ButtonHelperTacticalAction {
+public final class ButtonHelperTacticalAction {
 
     public static void endOfTacticalActionThings(Player player, Game game, ButtonInteractionEvent event) {
         if (!game.isL1Hero() && !FOWPlusService.isVoid(game, game.getActiveSystem())) {
@@ -440,11 +440,8 @@ public class ButtonHelperTacticalAction {
                 CheckDistanceHelper.getTileDistancesRelativeToAllYourUnlockedTiles(game, player);
         List<Button> buttons = new ArrayList<>();
 
-        System.out.println("------------------ Distance check ------------------");
-        System.out.println(distances);
         List<Integer> allDistances =
                 (new HashSet<>(distances.values())).stream().sorted().toList();
-        System.out.println(allDistances);
         int distIndx =
                 allDistances.stream().filter(i -> i <= desiredDistance).toList().size() - 1;
         int prevDistIndx = distIndx - 1;

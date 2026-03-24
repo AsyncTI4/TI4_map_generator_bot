@@ -31,7 +31,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.map.FractureService;
 import ti4.service.unit.DestroyUnitService;
 
-public class ButtonHelperTwilightsFallActionCards {
+public final class ButtonHelperTwilightsFallActionCards {
 
     @ButtonHandler("resolveEngineer")
     public static void resolveEngineer(Game game, Player player, ButtonInteractionEvent event) {

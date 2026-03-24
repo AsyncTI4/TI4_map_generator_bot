@@ -67,9 +67,4 @@ class ChangeDebtIcon extends GameStateSubcommand {
                             + "\". Please use a custom emoji from one of the bot servers. No change made.");
         }
     }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return false;
-    }
 }

@@ -47,7 +47,7 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.model.PlanetModel;
 
-public class LoreService {
+public final class LoreService {
 
     private static final Map<String, Map<String, LoreEntry>> LORECACHE = new HashMap<>();
 
@@ -521,9 +521,8 @@ public class LoreService {
     }
 
     private static void saveLore(Game game) {
-        String loreString = getGameLore(game).entrySet().stream()
-                .map(entry -> entry.getValue().toString())
-                .collect(Collectors.joining("|"));
+        String loreString =
+                getGameLore(game).values().stream().map(LoreEntry::toString).collect(Collectors.joining("|"));
         game.setStoredValue(SYSTEM_LORE_KEY, loreString);
     }
 

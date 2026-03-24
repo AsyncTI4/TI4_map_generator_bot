@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import javax.annotation.Nullable;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -74,9 +75,10 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 
-public class AgendaHelper {
+@UtilityClass
+public final class AgendaHelper {
 
-    public static void offerEveryonePrepassOnShenanigans(Game game) {
+    private static void offerEveryonePrepassOnShenanigans(Game game) {
         if (game.islandMode()) return;
         for (Player player : game.getRealPlayers()) {
             if (playerDoesNotHaveShenanigans(player)) {
@@ -2445,7 +2447,7 @@ public class AgendaHelper {
         return losers;
     }
 
-    public static List<Player> getAbainingVoters(String winner, Game game) {
+    private static List<Player> getAbainingVoters(String winner, Game game) {
         List<Player> abstainers = new ArrayList<>();
         List<Player> losers = getLosingVoters(winner, game);
         List<Player> winners = getWinningVoters(winner, game);
@@ -4091,8 +4093,8 @@ public class AgendaHelper {
         String msg;
 
         if (action) {
-            msg =
-                    "It seems likely you are resolving Midir, the Edyn hero, you may use this button to skip straight to the resolution.";
+            msg = "It seems likely you are resolving Midir, the Edyn hero, you may use this button to skip straight "
+                    + "to the resolution.";
             proceedButtons.add(Buttons.red("autoresolve_manual", "Skip Straight To Resolution"));
         } else {
             listVoteCount(game, channel);

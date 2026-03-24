@@ -449,7 +449,7 @@ public class CreateGameService {
         return missingMembers;
     }
 
-    public static Integer getNextGameNumber() {
+    private static Integer getNextGameNumber() {
         List<Integer> existingNums = getAllExistingPBDNumbers();
         if (existingNums.isEmpty()) {
             return 1;
