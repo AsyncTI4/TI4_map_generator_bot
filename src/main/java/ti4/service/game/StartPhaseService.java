@@ -782,9 +782,9 @@ public class StartPhaseService {
                 playersWithSCs++;
             }
         }
+        String message2 = "Resolve status homework using the buttons. \n";
 
         if (playersWithSCs > 0) {
-            StatusCleanupService.runStatusCleanup(game);
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "### " + game.getPing() + " **Status Cleanup Run!**");
             if (!game.isFowMode()) {
@@ -794,18 +794,12 @@ public class StartPhaseService {
                         DisplayType.map,
                         fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
             }
+            StatusCleanupService.runStatusCleanup(game);
         }
-
         for (Player player : game.getRealPlayers()) {
             sendStatusReminders(event, game, player);
         }
-        String message2 = "Resolve status homework using the buttons. \n";
-        game.setCurrentACDrawStatusInfo("");
-        if (!game.isFowMode()) {
-            for (Player p : Helper.getSpeakerOrFullPriorityOrder(game)) {
-                ButtonHelper.drawStatusACs(game, p, null);
-            }
-        }
+
         Button draw1AC = Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.getACEmoji(game));
         Button getCCs = Buttons.green("redistributeCCButtons", "Redistribute, Gain, & Confirm Command Tokens")
                 .withEmoji(Emoji.fromFormatted("🔺"));

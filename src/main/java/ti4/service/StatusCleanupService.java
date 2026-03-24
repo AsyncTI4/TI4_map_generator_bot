@@ -80,6 +80,14 @@ public class StatusCleanupService {
         if (ButtonHelper.isLawInPlay(game, "tf-censure")) {
             game.removeLaw("tf-censure");
         }
+
+        game.setCurrentACDrawStatusInfo("");
+        if (!game.isFowMode()) {
+            for (Player p : game.getActionPhaseTurnOrder()) {
+                ButtonHelper.drawStatusACs(game, p, null);
+            }
+        }
+
         for (Player player : players.values()) {
 
             player.setPassed(false);
