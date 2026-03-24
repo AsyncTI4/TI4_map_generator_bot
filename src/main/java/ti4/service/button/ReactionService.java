@@ -5,14 +5,12 @@ import static org.apache.commons.lang3.StringUtils.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.function.Consumers;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.UnfiledButtonHandlers;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Helper;
@@ -38,7 +36,7 @@ public class ReactionService {
             String message,
             String additionalMessage) {
         if (event == null) {
-            if(message != null && !message.isEmpty()) {
+            if (message != null && !message.isEmpty()) {
                 String text;
                 if (game.isFowMode() && sendPublic) {
                     text = message;
