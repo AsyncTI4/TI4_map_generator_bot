@@ -8,7 +8,7 @@ import ti4.message.MessageHelper;
 
 class ShowMapSetup extends GameStateSubcommand {
 
-    public ShowMapSetup() {
+    ShowMapSetup() {
         super("show_setup_positions", "Show the system positions to aid in manually building the map.", true, false);
         addOption(OptionType.BOOLEAN, "show", "True = ON | False = OFF", true);
     }

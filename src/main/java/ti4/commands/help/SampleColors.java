@@ -1,6 +1,9 @@
 package ti4.commands.help;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,7 +30,7 @@ import ti4.service.image.FileUploadService;
 
 class SampleColors extends Subcommand {
 
-    public SampleColors() {
+    SampleColors() {
         super(Constants.SAMPLE_COLORS, "Show a sample image of dreadnoughts in various player colors.");
         addOptions(new OptionData(OptionType.STRING, Constants.HUE, "General hue of colors to show (default: all)")
                 .setAutoComplete(true));

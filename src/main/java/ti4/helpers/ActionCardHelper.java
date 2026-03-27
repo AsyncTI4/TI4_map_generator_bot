@@ -634,7 +634,7 @@ public class ActionCardHelper {
             return;
         }
         if (autonetic && player.hasAbility("autonetic_memory")) {
-            ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
+            ButtonHelperAbilities.autoneticMemoryStep1(player, count);
             return;
         }
 

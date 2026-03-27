@@ -795,7 +795,7 @@ public final class ButtonHelperTwilightsFall {
         List<MessageEmbed> embeds = new ArrayList<>();
         for (String card :
                 game.getStoredValue("veiledCards" + player.getFaction()).split("_")) {
-            if (card == null || card.isEmpty()) {
+            if (card.isEmpty()) {
                 continue;
             }
             if (Mapper.getTech(card) != null) {
@@ -1354,7 +1354,7 @@ public final class ButtonHelperTwilightsFall {
                                             + " unit upgrade. If you would like to keep it and lose the newly acquired unit upgrade, please click the green button.",
                                     buttons);
                         }
-                        if (u.getAlias().equalsIgnoreCase("tf-floatingfactory")) {
+                        if ("tf-floatingfactory".equalsIgnoreCase(u.getAlias())) {
                             for (Tile tile :
                                     ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
                                 for (UnitHolder uh : tile.getPlanetUnitHolders()) {

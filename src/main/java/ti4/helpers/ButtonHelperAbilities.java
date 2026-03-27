@@ -94,7 +94,7 @@ public final class ButtonHelperAbilities {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void autoneticMemoryStep1(Game game, Player player, int count) {
+    static void autoneticMemoryStep1(Player player, int count) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("autoneticMemoryStep2_" + count, "Use Autonetic Memory"));
         buttons.add(Buttons.red("autoneticMemoryDecline_" + count, "Decline"));
@@ -204,7 +204,7 @@ public final class ButtonHelperAbilities {
     }
 
     @ButtonHandler("startBestow")
-    public static void startBestow(Game game, Player player, ButtonInteractionEvent event) {
+    public static void startBestow(Player player, ButtonInteractionEvent event) {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("bestowPart2_" + player.getFaction(), "Gain 2 Commodities"));
