@@ -44,6 +44,7 @@ public class PlayerProperties {
     private boolean autoPassOnWhensAfters;
     private boolean eliminated;
     private boolean fogInitialized;
+    private boolean colorManuallySet;
 
     // Player area stuff
     private int tacticalCC = 3;

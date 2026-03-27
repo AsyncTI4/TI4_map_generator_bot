@@ -49,6 +49,7 @@ class Setup extends GameStateSubcommand {
 
         Player player = getPlayer();
 
+        boolean colorWasSpecified = event.getOption(Constants.COLOR) != null;
         String color = AliasHandler.resolveColor(
                 event.getOption(Constants.COLOR, player.getNextAvailableColour(), OptionMapping::getAsString)
                         .toLowerCase());
@@ -63,6 +64,7 @@ class Setup extends GameStateSubcommand {
         String positionHS = StringUtils.substringBefore(
                 event.getOption(Constants.HS_TILE_POSITION, "", OptionMapping::getAsString),
                 " "); // Substring to grab "305" from "305 Moll Primus (Mentak)" autocomplete
-        MiltyService.secondHalfOfPlayerSetup(player, game, color, faction, positionHS, event, setSpeaker);
+        MiltyService.secondHalfOfPlayerSetup(
+                player, game, color, faction, positionHS, event, setSpeaker, colorWasSpecified);
     }
 }

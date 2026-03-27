@@ -323,6 +323,7 @@ public final class Constants {
     public static final String TILE_NAME_FROM_3 = "tile_name_from_3";
     public static final String TILE_NAME_FROM_4 = "tile_name_from_4";
     public static final String COLOR = "color";
+    public static final String COLOR_MANUALLY_SET = "color_manually_set";
     public static final String HUE = "hue";
     public static final String DECAL_HUE = "decal_category";
     public static final String SEARCH_WARRANT = "search_warrant";
@@ -589,6 +590,7 @@ public final class Constants {
     public static final String PN_RESET = "reset";
     public static final String UNDO = "undo";
     public static final String SET_ORDER = "set_order";
+    public static final String SET_COLORS = "set_colors";
     public static final String PASSED = "passed";
     public static final String SC_PLAYED = "sc_played";
     public static final String SC_FOLLOW = "sc_follow";

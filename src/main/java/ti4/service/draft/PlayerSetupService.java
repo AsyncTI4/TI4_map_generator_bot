@@ -30,6 +30,7 @@ public class PlayerSetupService {
                 setupState.getFaction(),
                 setupState.getPositionHS(),
                 event,
-                setupState.isSetSpeaker());
+                setupState.isSetSpeaker(),
+                false);
     }
 }

@@ -257,7 +257,8 @@ public class MiltyService {
             String faction,
             String positionHS,
             GenericInteractionCreateEvent event,
-            boolean setSpeaker) {
+            boolean setSpeaker,
+            boolean colorWasSpecified) {
         Map<String, Player> players = game.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
@@ -296,6 +297,9 @@ public class MiltyService {
         }
 
         player.setColor(color);
+        if (colorWasSpecified) {
+            player.setColorManuallySet(true);
+        }
         player.setFaction(game, faction);
         player.setFactionEmoji(null);
         player.getPlanets().clear();

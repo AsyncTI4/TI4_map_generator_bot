@@ -6856,7 +6856,7 @@ public class ButtonHelper {
         Collections.shuffle(colors);
         for (int i = 0; i < players.size() && i < 12; i++) {
             MiltyService.secondHalfOfPlayerSetup(
-                    players.get(i), game, colors.get(i), "franken" + emojiNum.get(i), "" + (i + 201), event, false);
+                    players.get(i), game, colors.get(i), "franken" + emojiNum.get(i), "" + (i + 201), event, false, false);
         }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
@@ -7244,10 +7244,10 @@ public class ButtonHelper {
         if (game.getPlayerFromColorOrFaction(color) != null) color = player.getNextAvailableColour();
         if (buttonID.split("_").length == 6 || speaker != null) {
             if (speaker != null) {
-                MiltyService.secondHalfOfPlayerSetup(player, game, color, factionId, pos, event, false);
+                MiltyService.secondHalfOfPlayerSetup(player, game, color, factionId, pos, event, false, true);
             } else {
                 MiltyService.secondHalfOfPlayerSetup(
-                        player, game, color, factionId, pos, event, "yes".equalsIgnoreCase(buttonID.split("_")[5]));
+                        player, game, color, factionId, pos, event, "yes".equalsIgnoreCase(buttonID.split("_")[5]), true);
             }
         } else {
             MessageHelper.sendMessageToChannelWithButtons(

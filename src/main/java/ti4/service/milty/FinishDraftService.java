@@ -21,6 +21,7 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.FactionModel;
+import ti4.service.game.SetColorsService;
 import ti4.service.map.AddTileListService;
 import ti4.service.milty.MiltyDraftManager.PlayerDraft;
 
@@ -92,9 +93,10 @@ class FinishDraftService {
                 }
 
                 if (faction != null) {
-                    MiltyService.secondHalfOfPlayerSetup(player, game, color, faction, pos, event, speaker);
+                    MiltyService.secondHalfOfPlayerSetup(player, game, color, faction, pos, event, speaker, false);
                 }
             }
+            SetColorsService.setPreferredColors(game);
             game.setPhaseOfGame("playerSetup");
             AddTileListService.finishSetup(game, event);
             if (keleresExists) {

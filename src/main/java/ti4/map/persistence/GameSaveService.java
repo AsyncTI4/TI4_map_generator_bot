@@ -751,6 +751,9 @@ class GameSaveService {
             writer.write(Constants.COLOR + " " + playerColor);
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.COLOR_MANUALLY_SET + " " + player.isColorManuallySet());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.DECAL_SET + " " + player.getDecalSet());
             writer.write(System.lineSeparator());
 

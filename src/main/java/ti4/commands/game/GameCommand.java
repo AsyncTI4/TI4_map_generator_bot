@@ -16,6 +16,7 @@ public class GameCommand implements ParentCommand {
                     new AddPlayer(),
                     new EliminatePlayer(),
                     new SetOrder(),
+                    new SetColors(),
                     new Undo(),
                     new SCCount(),
                     new Setup(),

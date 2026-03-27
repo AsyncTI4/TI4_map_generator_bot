@@ -495,7 +495,7 @@ public class FrankenDraftBagService {
                 continue;
             }
             MiltyService.secondHalfOfPlayerSetup(
-                    player, game, player.getNextAvailableColour(), faction, tempHomeSystemLocation, event, false);
+                    player, game, player.getNextAvailableColour(), faction, tempHomeSystemLocation, event, false, false);
             sb.append("\n> ").append(player.getRepresentationNoPing());
             index++;
         }

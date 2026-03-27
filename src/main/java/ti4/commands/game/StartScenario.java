@@ -83,7 +83,8 @@ public class StartScenario extends GameStateSubcommand {
                             faction,
                             tile.getPosition(),
                             event,
-                            speaker);
+                            speaker,
+                            false);
                     players.remove(face);
                 }
             }
@@ -145,7 +146,7 @@ public class StartScenario extends GameStateSubcommand {
                 };
                 if (tile != null) {
                     MiltyService.secondHalfOfPlayerSetup(
-                            players.get(face), game, color, faction, tile.getPosition(), event, speaker);
+                            players.get(face), game, color, faction, tile.getPosition(), event, speaker, false);
                     players.remove(face);
                 }
             }

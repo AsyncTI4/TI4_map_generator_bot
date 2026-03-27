@@ -329,6 +329,8 @@ public class DraftManager extends DraftPlayerManager {
             }
         }
 
+        SetColorsService.setPreferredColors(game);
+
         // Transition to end of setup
         game.setPhaseOfGame("playerSetup");
         AddTileListService.finishSetup(game, event);

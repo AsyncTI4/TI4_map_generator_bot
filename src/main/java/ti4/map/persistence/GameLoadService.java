@@ -884,6 +884,7 @@ class GameLoadService {
                 case Constants.FACTION_DISPLAY_NAME ->
                     player.setDisplayName(tokenizer.nextToken().replace("_", " "));
                 case Constants.COLOR -> player.setColor(tokenizer.nextToken());
+                case Constants.COLOR_MANUALLY_SET -> player.setColorManuallySet(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.DECAL_SET -> player.setDecalSet(tokenizer.nextToken());
                 case Constants.STATS_ANCHOR_LOCATION -> player.setPlayerStatsAnchorPosition(tokenizer.nextToken());
                 case Constants.STATS_TRACKED_USER_ID -> player.setStatsTrackedUserID(tokenizer.nextToken());
