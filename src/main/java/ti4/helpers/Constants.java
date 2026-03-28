@@ -911,6 +911,7 @@ public final class Constants {
     public static final String SHOW_AC_DISCARD_LIST = "show_discard_list";
     public static final String SHOW_AC_PURGED_LIST = "show_purged_list";
     public static final String SHOW_AC_REMAINING_CARD_COUNT = "show_remaining_card_count";
+    public static final String SHOW_GARBOZIA_AC = "show_garbozia";
 
     public static final String PROMISSORY_NOTE_ID = "promissory_note_id";
     public static final String PROMISSORY_NOTES = "promissory_notes";

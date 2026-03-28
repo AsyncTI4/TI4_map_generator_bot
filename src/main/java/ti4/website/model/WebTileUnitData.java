@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.PdsCoverage;
@@ -162,6 +163,11 @@ public final class WebTileUnitData {
 
         // Set planetary shield status
         planetData.setPlanetaryShield(TileGenerator.shouldPlanetHaveShield(planet, game));
+
+        // Add action cards on this planet (Garbozia feature)
+        if(planet.getName().equals("garbozia")) {
+            planetData.setActionCards(new ArrayList<>((ActionCardHelper.getGarboziaActionCards(game).keySet())));
+        }
     }
 
     /**

@@ -127,7 +127,7 @@ public class AsyncTi4WebsiteHelper {
             }
 
             Map<String, Object> webData = new HashMap<>();
-            webData.put("versionSchema", 6);
+            webData.put("versionSchema", 7);
             webData.put("objectives", webObjectives);
             webData.put("playerData", playerDataList);
             webData.put("lawsInPlay", lawsInPlay);
@@ -160,9 +160,9 @@ public class AsyncTi4WebsiteHelper {
                 // Dev/local mode - print to console instead of uploading
 
                 // Uncomment if this is what you're into
-                // System.out.println("=== DEV MODE: Web Player Data for game " + gameId + " ===");
-                // System.out.println(json);
-                // System.out.println("=== END Web Player Data ===");
+                System.out.println("=== DEV MODE: Web Player Data for game " + gameId + " ===");
+                System.out.println(json);
+                System.out.println("=== END Web Player Data ===");
             } else {
                 // Production mode - upload to S3
                 putObjectInBucket(
