@@ -165,8 +165,9 @@ public final class WebTileUnitData {
         planetData.setPlanetaryShield(TileGenerator.shouldPlanetHaveShield(planet, game));
 
         // Add action cards on this planet (Garbozia feature)
-        if(planet.getName().equals("garbozia")) {
-            planetData.setActionCards(new ArrayList<>((ActionCardHelper.getGarboziaActionCards(game).keySet())));
+        if ("garbozia".equals(planet.getName())) {
+            planetData.setActionCards(new ArrayList<>(
+                    (ActionCardHelper.getGarboziaActionCards(game).keySet())));
         }
     }
 

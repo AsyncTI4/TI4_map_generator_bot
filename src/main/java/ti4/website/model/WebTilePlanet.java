@@ -15,7 +15,9 @@ class WebTilePlanet {
     private boolean exhausted;
     private Integer resources;
     private Integer influence;
-    private List<String> actionCards; // List of action card IDs on this planet (from cards like "Infiltration", "Sabotage", etc.) - Garbozia feature
+    private List<String>
+            actionCards; // List of action card IDs on this planet (from cards like "Infiltration", "Sabotage", etc.) -
+    // Garbozia feature
 
     public WebTilePlanet() {
         entities = new HashMap<>();
