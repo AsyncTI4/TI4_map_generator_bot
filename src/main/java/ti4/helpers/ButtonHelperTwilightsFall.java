@@ -459,7 +459,13 @@ public final class ButtonHelperTwilightsFall {
     }
 
     public static List<String> getSpliceCards(Game game) {
-        return List.of(game.getStoredValue("savedSpliceCards").split("_"));
+        List<String> cards = new ArrayList<>();
+        for (String card : game.getStoredValue("savedSpliceCards").split("_")) {
+            if (!card.isEmpty()) {
+                cards.add(card);
+            }
+        }
+        return cards;
     }
 
     public static List<Player> getParticipantsList(Game game) {

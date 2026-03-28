@@ -641,9 +641,15 @@ public final class ButtonHelperAgents {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
                     + "Garv and Gunn, the Naaz-Rokha" + ssruuSlash + " agents.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
-            List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
+            Player p2 = player;
+            if (rest.contains("_")) {
+                p2 = game.getPlayerFromColorOrFaction(rest.split("_")[1]);
+            }
+            List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(p2, game);
             MessageHelper.sendMessageToChannelWithButtons(
-                    event.getMessageChannel(), "Please choose which planet you wish to explore.", buttons);
+                    p2.getCorrectChannel(),
+                    p2.getRepresentation() + ", please choose which planet you wish to explore.",
+                    buttons);
         }
 
         if ("researchagent".equalsIgnoreCase(agent)) {

@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -4515,7 +4512,9 @@ public class ButtonHelper {
         // Agents
         if (player.hasUnexhaustedLeader("naazagent")) {
             endButtons.add(Buttons.green(
-                    player.finChecker() + "exhaustAgent_naazagent", "Use Naaz-Rokha Agents", FactionEmojis.Naaz));
+                    player.finChecker() + "exhaustAgent_naazagent_" + player.getFaction(),
+                    "Use Naaz-Rokha Agents",
+                    FactionEmojis.Naaz));
         }
         if (player.hasUnlockedBreakthrough("mirvedabt")) {
             endButtons.add(

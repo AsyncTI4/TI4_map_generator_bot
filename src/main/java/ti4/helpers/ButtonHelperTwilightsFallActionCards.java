@@ -27,6 +27,7 @@ import ti4.model.LeaderModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.map.FractureService;
 import ti4.service.unit.DestroyUnitService;
@@ -505,7 +506,10 @@ public final class ButtonHelperTwilightsFallActionCards {
                 continue;
             }
             LeaderModel lead = Mapper.getLeader(agent);
-            buttons.add(Buttons.gray("genophageStep3_" + p2.getFaction() + "_" + agent, lead.getName()));
+            buttons.add(Buttons.gray(
+                    "genophageStep3_" + p2.getFaction() + "_" + agent,
+                    lead.getTFNameIfAble(),
+                    FactionEmojis.getFactionIcon(lead.getFaction())));
         }
         String msg =
                 player.getRepresentation() + ", please choose the genome of your neighbor that you wish to remove.";

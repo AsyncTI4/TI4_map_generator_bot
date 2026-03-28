@@ -13,6 +13,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.service.map.TokenPlanetService;
 import ti4.service.unit.DestroyUnitService;
 
 @UtilityClass
@@ -35,12 +36,16 @@ public class MuaatHeroService {
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         boolean frontier = space.getTokenList().contains(frontierFilename);
         Tile novaTile = new Tile(AliasHandler.resolveTile("81"), tile.getPosition(), space);
-
+        if (muaat.getPlanets().contains("avernus")
+                && tile.getUnitHolders().keySet().contains("avernus")) {
+            TokenPlanetService.moveTokenPlanet(game, muaat, novaTile, "avernus");
+        }
         game.removeTile(tile.getPosition());
         game.setTile(novaTile);
         if (frontier) {
             novaTile.getSpaceUnitHolder().addToken(frontierFilename);
         }
+
         String message2 = tile.getRepresentation() + " has been _Nova Seed_'d by " + muaat.getRepresentation() + ".";
         DisasterWatchHelper.postTileInDisasterWatch(game, event, novaTile, 1, message2);
 
