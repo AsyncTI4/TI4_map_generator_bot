@@ -1,8 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1509,7 +1507,7 @@ public final class ButtonHelperFactionSpecific {
         }
         int oldTg = player.getTg();
         player.setTg(oldTg + 2);
-        String message = player.getFactionEmojiOrColor() + " gained 2 trade goods due to " + FactionEmojis.Hacan
+        String message = player.getRepresentation() + " gained 2 trade goods due to " + FactionEmojis.Hacan
                 + "_Production Biomes_ (" + oldTg + "->" + player.getTg() + ").";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         if (game.isFowMode()) {
@@ -3114,13 +3112,13 @@ public final class ButtonHelperFactionSpecific {
     }
 
     public static void offerAutomatonsButtons(Player player, Game game) {
-        List<String> extraAllowedPlanets = List.of("custodiavigilia", "ghoti", "thundersedge");
+        List<String> extraDisAllowedPlanets = List.of("mr", "mrte");
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
-            boolean oneOfThree = game.getPlanetsInfo().get(planet) != null
-                    && List.of("industrial", "cultural", "hazardous")
-                            .contains(game.getPlanetsInfo().get(planet).getOriginalPlanetType());
-            if (oneOfThree || extraAllowedPlanets.contains(planet.toLowerCase())) {
+
+            if (game.getTileFromPlanet(planet) != null
+                    && !game.getTileFromPlanet(planet).isHomeSystem(game)
+                    && !extraDisAllowedPlanets.contains(planet.toLowerCase())) {
                 buttons.add(Buttons.green("automatonsPlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
             }
         }

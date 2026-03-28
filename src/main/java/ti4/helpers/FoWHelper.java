@@ -267,7 +267,7 @@ public final class FoWHelper {
             }
         }
 
-        Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player);
+        Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player, false);
         adjacentPositions.addAll(wormholeAdjacencies);
 
         Set<String> otherAdjacencies = getNonWormholeAdjacencies(game, position);
@@ -336,6 +336,7 @@ public final class FoWHelper {
                 switch (token) {
                     case Constants.TOKEN_BREACH_ACTIVE -> adjToFeatures.add(Feature.breach);
                     case Constants.TOKEN_INGRESS -> adjToFeatures.add(Feature.egress);
+                    case Constants.TOKEN_EGRESS -> adjToFeatures.add(Feature.ingress);
                 }
             }
         }
@@ -359,6 +360,10 @@ public final class FoWHelper {
                         break;
                     }
                     if (adjToFeatures.contains(Feature.ingress) && Constants.TOKEN_INGRESS.equals(token)) {
+                        adjacentPositions.add(t.getPosition());
+                        break;
+                    }
+                    if (adjToFeatures.contains(Feature.egress) && Constants.TOKEN_EGRESS.equals(token)) {
                         adjacentPositions.add(t.getPosition());
                         break;
                     }
@@ -654,7 +659,7 @@ public final class FoWHelper {
      * <p>
      * Also takes into account player abilities and agendas
      */
-    private static Set<String> getWormholeAdjacencies(Game game, String position, Player player) {
+    private static Set<String> getWormholeAdjacencies(Game game, String position, Player player, boolean neighbors) {
         Set<String> adjacentPositions = new HashSet<>();
         Set<Tile> allTiles = new HashSet<>(game.getTileMap().values());
         Tile tile = game.getTileByPosition(position);
@@ -761,7 +766,11 @@ public final class FoWHelper {
                 wormholeIDs.add(Constants.ALPHA);
             }
         }
-        if (!hasQuantumEntanglement && !wh_recon && !absol_recon && ButtonHelper.isLawInPlay(game, "travel_ban")) {
+        if (!hasQuantumEntanglement
+                && !wh_recon
+                && !absol_recon
+                && ButtonHelper.isLawInPlay(game, "travel_ban")
+                && !neighbors) {
             wormholeIDs.remove(Constants.ALPHA);
             wormholeIDs.remove(Constants.BETA);
         }
@@ -827,8 +836,8 @@ public final class FoWHelper {
 
         for (Player player_ : game.getRealPlayers()) {
             Set<String> tiles = new HashSet<>(tilesToCheck);
-            if (player_.hasAbility("quantum_entanglement")) {
-                tiles.addAll(getWormholeAdjacencies(game, position, player_));
+            if (player_.hasAbility("quantum_entanglement") || ButtonHelper.isLawInPlay(game, "travel_ban")) {
+                tiles.addAll(getWormholeAdjacencies(game, position, player_, true));
             }
 
             if (includeSweep && startingTile.hasCC(Mapper.getSweepID(player_.getColor()))) {

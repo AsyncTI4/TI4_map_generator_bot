@@ -55,6 +55,16 @@
         "source": "thunders_edge"
     },
     {
+        "id": "egress",
+        "imagePath": "token_egress.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "egress",
+            "token_egress"
+        ],
+        "source": "thunders_edge"
+    },
+    {
         "id": "relictoken",
         "imagePath": "token_relictoken.png",
         "spaceOrPlanet": "planet",

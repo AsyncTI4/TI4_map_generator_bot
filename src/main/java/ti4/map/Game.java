@@ -1108,6 +1108,10 @@ public class Game extends GameProperties {
 
     public void setStoredValue(String key, String value) {
         if (value == null) return;
+        if (value.isEmpty()) {
+            removeStoredValue(key);
+            return;
+        }
         value = StringHelper.escape(value);
         checkingForAllReacts.put(key, value);
     }

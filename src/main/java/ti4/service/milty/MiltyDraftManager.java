@@ -329,8 +329,11 @@ public class MiltyDraftManager {
 
         boolean auto = buttonID.startsWith("miltyAuto_");
         boolean force = buttonID.startsWith("miltyForce_");
-        String draftPick =
-                buttonID.replace("milty_", "").replace("miltyAuto_", "").replace("miltyForce_", "");
+        boolean queue = buttonID.startsWith("miltyQueue_");
+        String draftPick = buttonID.replace("milty_", "")
+                .replace("miltyAuto_", "")
+                .replace("miltyForce_", "")
+                .replace("miltyQueue_", "");
         String category = draftPick.substring(0, draftPick.indexOf('_'));
         String item = draftPick.substring(draftPick.indexOf('_') + 1);
 
@@ -359,6 +362,7 @@ public class MiltyDraftManager {
         String middle = " drafted ";
         if (auto) middle = " only had one option available to draft, so they were given ";
         if (force) middle = " was forced to take ";
+        if (queue) middle = " queued to take ";
         try {
             String drafted = player.getPing() + middle
                     + switch (category) {
@@ -405,8 +409,20 @@ public class MiltyDraftManager {
             if (fauxPlayerPick != null) {
                 doMiltyPick(event, game, fauxPlayerPick, nextDrafter);
             } else {
-                MiltyDraftDisplayService.updateDraftInformation(event, this, game, category);
-                MiltyDraftDisplayService.pingCurrentDraftPlayer(this, game, false);
+                if (getQueuedPick(nextDrafter, game) != null) {
+                    doMiltyPick(event, game, getQueuedPick(nextDrafter, game), nextDrafter);
+                } else {
+                    MiltyDraftDisplayService.updateDraftInformation(event, this, game, category);
+                    MiltyDraftDisplayService.pingCurrentDraftPlayer(this, game, false);
+                }
+            }
+            if (getQueueButtons(player, game).size() > 0
+                    && getQueuedPick(player, game) == null
+                    && player != nextDrafter) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCardsInfoThread(),
+                        player.getRepresentation() + " You can queue your remaining choices with these buttons",
+                        getQueueButtons(player, game));
             }
         } else {
             MessageHelper.sendMessageToChannel(
@@ -415,6 +431,36 @@ public class MiltyDraftManager {
             FinishDraftService.finishDraft(event, this, game);
             game.updateActivePlayer(null);
         }
+    }
+
+    private String getQueuedPick(Player player, Game game) {
+        String queued = game.getStoredValue(player.getUserID() + "queuedMiltyPick");
+        if (queued == null || queued.isEmpty()) return null;
+        String[] queuedPicks = queued.split("_");
+        String legitPick = null;
+        for (String pick : queuedPicks) {
+            if (pick.isEmpty()) continue;
+            pick = pick.replace("fin", "_");
+            PlayerDraft current = getPlayerDraft(player);
+            String category = pick.substring(0, pick.indexOf('_'));
+            String item = pick.substring(pick.indexOf('_') + 1);
+            boolean noError =
+                    switch (category) {
+                        case "slice" -> current.getSlice() == null && !isSliceTaken(item) && getSlice(item) != null;
+                        case "faction" ->
+                            current.getFaction() == null && !isFactionTaken(item) && Mapper.getFaction(item) != null;
+                        case "order" -> current.getPosition() == null && !isOrderTaken(Integer.parseInt(item));
+                        default -> false;
+                    };
+            if (noError) {
+                legitPick = "miltyQueue_" + pick;
+                break;
+            }
+        }
+        if (legitPick == null) {
+            game.setStoredValue(player.getUserID() + "queuedMiltyPick", "");
+        }
+        return legitPick;
     }
 
     private String getAutoButtonID(List<Button> buttons) {
@@ -494,6 +540,29 @@ public class MiltyDraftManager {
                     "milty_order_" + speakerOrder, " ", MiltyDraftEmojis.getSpeakerPickEmoji(speakerOrder)));
         }
         return orderButtons;
+    }
+
+    public List<Button> getQueueButtons(Player player, Game game) {
+        PlayerDraft current = getPlayerDraft(player);
+        List<Button> queueButtons = new ArrayList<>();
+        if (current.getPosition() == null) {
+            queueButtons.addAll(getPositionButtons());
+        }
+        if (current.getSlice() == null) {
+            queueButtons.addAll(getSliceButtons());
+        }
+        if (current.getFaction() == null) {
+            queueButtons.addAll(getFactionButtons());
+        }
+        List<Button> queueButtons2 = new ArrayList<>();
+        for (Button b : queueButtons) {
+            String newID = MILTY_.matcher(b.getCustomId()).replaceFirst("queueMilyPick_");
+            b = b.withCustomId(newID);
+            if (game.getStoredValue(player.getUserID() + "queuedMiltyPick")
+                    .contains(newID.replace("queueMilyPick_", "").replace("_", "fin"))) continue;
+            queueButtons2.add(b);
+        }
+        return queueButtons2;
     }
 
     public String getOverallSummaryString(Game game) {
