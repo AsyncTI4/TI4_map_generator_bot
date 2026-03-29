@@ -27,7 +27,7 @@ public class ColorChangeHelper {
             case "lgy" ->
                 !player.getGame().getPlayerIDs().contains(Constants.chassitId)
                         || player.getUserID().equals(Constants.chassitId);
-            default -> false;
+            default -> true;
         };
     }
 
