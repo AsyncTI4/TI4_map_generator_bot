@@ -7,6 +7,7 @@ import ti4.helpers.ColorChangeHelper;
 import ti4.image.Mapper;
 import ti4.map.Player;
 import ti4.model.ColorModel;
+import ti4.model.FactionModel;
 import ti4.service.game.GameColorsService;
 
 @UtilityClass
@@ -33,7 +34,9 @@ public class PlayerColorService {
     }
 
     private static String getPreferredColor(String faction, Collection<ColorModel> unusedColors) {
-        return Mapper.getFaction(faction).getPreferredColours().stream()
+        FactionModel factionModel = Mapper.getFaction(faction);
+        if (factionModel == null) return null;
+        return factionModel.getPreferredColours().stream()
                 .filter(color -> unusedColors.contains(Mapper.getColor(color)))
                 .findFirst()
                 .orElse(null);
