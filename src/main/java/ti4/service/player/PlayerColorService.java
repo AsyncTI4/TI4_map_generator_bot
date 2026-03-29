@@ -36,7 +36,7 @@ public class PlayerColorService {
     }
 
     private static String getFactionsPreferredColor(
-            String faction, Collection<ColorModel> unusedColors, List<String> usedHues) {
+            String faction, Collection<ColorModel> unusedColors, Collection<String> usedHues) {
         FactionModel factionModel = Mapper.getFaction(faction);
         if (factionModel == null) return null;
         return factionModel.getPreferredColours().stream()
@@ -49,15 +49,15 @@ public class PlayerColorService {
 
     private static String getPreferredColor(Collection<ColorModel> unusedColors, Collection<String> usedHues) {
         return unusedColors.stream()
-            .filter(c -> !usedHues.contains(c.getHue()))
-            .findFirst()
-            .map(ColorModel::getName)
-            .map(Mapper::getColorName)
-            .orElse(unusedColors.stream()
+                .filter(c -> !usedHues.contains(c.getHue()))
                 .findFirst()
                 .map(ColorModel::getName)
                 .map(Mapper::getColorName)
-                .orElse(null));
+                .orElse(unusedColors.stream()
+                        .findFirst()
+                        .map(ColorModel::getName)
+                        .map(Mapper::getColorName)
+                        .orElse(null));
     }
 
     private static boolean canUseColor(Player player, String color) {

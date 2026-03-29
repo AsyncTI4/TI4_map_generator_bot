@@ -50,9 +50,9 @@ class Setup extends GameStateSubcommand {
 
         Player player = getPlayer();
 
-        String color = AliasHandler.resolveColor(
-                event.getOption(Constants.COLOR, PlayerColorService.getPreferredColor(player), OptionMapping::getAsString)
-                        .toLowerCase());
+        String color = AliasHandler.resolveColor(event.getOption(
+                        Constants.COLOR, PlayerColorService.getPreferredColor(player), OptionMapping::getAsString)
+                .toLowerCase());
         if (!Mapper.isValidColor(color)) {
             MessageHelper.sendMessageToEventChannel(
                     event, "Color `" + color + "` is not valid. Options are: " + Mapper.getColors());

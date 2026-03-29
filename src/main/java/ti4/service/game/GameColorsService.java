@@ -17,8 +17,8 @@ public class GameColorsService {
     public static List<ColorModel> getUnusedColorsWithBaseColorsFirst(Game game) {
         List<ColorModel> unusedColors = getUnusedColors(game);
         return unusedColors.stream()
-            .sorted(Comparator.comparing(colorModel -> BASE_COLORS.contains(colorModel.getName()) ? 0 : 1))
-            .toList();
+                .sorted(Comparator.comparing(colorModel -> BASE_COLORS.contains(colorModel.getName()) ? 0 : 1))
+                .toList();
     }
 
     public static List<ColorModel> getUnusedColors(Game game) {
