@@ -1,6 +1,7 @@
 package ti4.service.player;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.ColorChangeHelper;
@@ -39,10 +40,12 @@ public class PlayerColorService {
             String faction, Collection<ColorModel> unusedColors, Collection<String> usedHues) {
         FactionModel factionModel = Mapper.getFaction(faction);
         if (factionModel == null) return null;
+        List<String> preferredColors = factionModel.getPreferredColours();
+        Collections.shuffle(preferredColors);
         return factionModel.getPreferredColours().stream()
                 .filter(color -> unusedColors.contains(Mapper.getColor(color)))
                 .filter(color -> !usedHues.contains(Mapper.getColor(color).getHue()))
-                .findAny()
+                .findFirst()
                 .map(Mapper::getColorName)
                 .orElse(null);
     }
