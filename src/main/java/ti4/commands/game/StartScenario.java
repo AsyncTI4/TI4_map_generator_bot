@@ -79,7 +79,7 @@ public class StartScenario extends GameStateSubcommand {
                     MiltyService.secondHalfOfPlayerSetup(
                             players.get(face),
                             game,
-                            PlayerColorService.getNewColor(players.get(face)),
+                            PlayerColorService.getPreferredColor(players.get(face)),
                             faction,
                             tile.getPosition(),
                             event,
@@ -133,7 +133,7 @@ public class StartScenario extends GameStateSubcommand {
                     tile = game.getTileFromPositionOrAlias("creussgate");
                 }
                 boolean speaker = "nekro".equalsIgnoreCase(faction);
-                String color = PlayerColorService.getNewColor(players.get(face));
+                String color = PlayerColorService.getPreferredColor(players.get(face));
                 if (tile != null) {
                     MiltyService.secondHalfOfPlayerSetup(
                             players.get(face), game, color, faction, tile.getPosition(), event, speaker);

@@ -498,7 +498,7 @@ public class FrankenDraftBagService {
             MiltyService.secondHalfOfPlayerSetup(
                     player,
                     game,
-                    PlayerColorService.getNewColor(player),
+                    PlayerColorService.getPreferredColor(player),
                     faction,
                     tempHomeSystemLocation,
                     event,

@@ -44,8 +44,14 @@
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheArborec",
         "preferredColours": [
             "frs",
+            "jad",
+            "eme",
             "grn",
-            "ptr"
+            "ptr",
+            "wtm",
+            "psn",
+            "blt",
+            "cam"
         ],
         "source": "base",
         "priorityNumber": 29
@@ -100,7 +106,13 @@
         "preferredColours": [
             "eth",
             "blu",
-            "gcr"
+            "gcr",
+            "vpw",
+            "sns",
+            "nvy",
+            "tea",
+            "ptr",
+            "vdg"
         ],
         "source": "base",
         "priorityNumber": 20
@@ -156,7 +168,13 @@
         "preferredColours": [
             "gld",
             "ylw",
-            "crm"
+            "crm",
+            "wsp",
+            "beg",
+            "cpr",
+            "spr",
+            "splitgld",
+            "dw"
         ],
         "source": "base",
         "priorityNumber": 18

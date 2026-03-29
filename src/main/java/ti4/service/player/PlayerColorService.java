@@ -13,33 +13,51 @@ import ti4.service.game.GameColorsService;
 @UtilityClass
 public class PlayerColorService {
 
-    public static String getNewColor(Player player) {
-        List<ColorModel> unusedColors = GameColorsService.getUnusedColors(player.getGame()).stream()
+    public static String getPreferredColor(Player player) {
+        List<ColorModel> unusedColors = GameColorsService.getUnusedColorsWithBaseColorsFirst(player.getGame()).stream()
                 .filter(colorModel -> canUseColor(player, colorModel.getAlias()))
                 .toList();
-        String color = getPreferredColor(player, unusedColors);
-        if (color == null) {
-            color = GameColorsService.getColorsPreferringBase(unusedColors)
-                    .getFirst()
-                    .getName();
-        }
-        return Mapper.getColorName(color);
+        String color = getUsersPreferredColor(player, unusedColors);
+        if (color != null) return color;
+
+        List<String> usedHues = GameColorsService.getUsedHues(player.getGame());
+        color = getFactionsPreferredColor(player.getFaction(), unusedColors, usedHues);
+        if (color != null) return color;
+
+        return getPreferredColor(unusedColors, usedHues);
     }
 
-    private static String getPreferredColor(Player player, Collection<ColorModel> unusedColors) {
+    private static String getUsersPreferredColor(Player player, Collection<ColorModel> unusedColors) {
         return player.getUserSettings().getPreferredColors().stream()
                 .filter(c -> unusedColors.contains(Mapper.getColor(c)))
                 .findFirst()
-                .orElse(getPreferredColor(player.getFaction(), unusedColors));
+                .map(Mapper::getColorName)
+                .orElse(null);
     }
 
-    private static String getPreferredColor(String faction, Collection<ColorModel> unusedColors) {
+    private static String getFactionsPreferredColor(
+            String faction, Collection<ColorModel> unusedColors, List<String> usedHues) {
         FactionModel factionModel = Mapper.getFaction(faction);
         if (factionModel == null) return null;
         return factionModel.getPreferredColours().stream()
                 .filter(color -> unusedColors.contains(Mapper.getColor(color)))
-                .findFirst()
+                .filter(color -> !usedHues.contains(Mapper.getColor(color).getHue()))
+                .findAny()
+                .map(Mapper::getColorName)
                 .orElse(null);
+    }
+
+    private static String getPreferredColor(Collection<ColorModel> unusedColors, Collection<String> usedHues) {
+        return unusedColors.stream()
+            .filter(c -> !usedHues.contains(c.getHue()))
+            .findFirst()
+            .map(ColorModel::getName)
+            .map(Mapper::getColorName)
+            .orElse(unusedColors.stream()
+                .findFirst()
+                .map(ColorModel::getName)
+                .map(Mapper::getColorName)
+                .orElse(null));
     }
 
     private static boolean canUseColor(Player player, String color) {

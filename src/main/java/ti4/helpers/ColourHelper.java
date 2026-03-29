@@ -9,19 +9,19 @@ import ti4.model.ColorModel;
 final class ColourHelper {
 
     public static List<ColorModel> sortColours(String factionId, List<ColorModel> colours) {
-        List<ColorModel> newcolours = new ArrayList<>(colours);
+        List<ColorModel> newColours = new ArrayList<>(colours);
         // sort by name for deterministic sorting
-        newcolours.sort(Comparator.comparing(ColorModel::getAlias));
+        newColours.sort(Comparator.comparing(ColorModel::getAlias));
         // sort by colour
-        newcolours.sort((c1, c2) -> colourValue(factionId, c2) - colourValue(factionId, c1));
+        newColours.sort((c1, c2) -> colourValue(factionId, c2) - colourValue(factionId, c1));
         // for each "page" of colours, randomise
         // this process means widows and orphans will never cross page boundaries
-        for (int x = 0; x < newcolours.size(); x += 22) {
-            Collections.shuffle(newcolours.subList(x, Math.min(x + 22, newcolours.size())));
+        for (int x = 0; x < newColours.size(); x += 22) {
+            Collections.shuffle(newColours.subList(x, Math.min(x + 22, newColours.size())));
         }
         // resort by colour
-        newcolours.sort((c1, c2) -> colourValue(factionId, c2) - colourValue(factionId, c1));
-        return newcolours;
+        newColours.sort((c1, c2) -> colourValue(factionId, c2) - colourValue(factionId, c1));
+        return newColours;
     }
 
     private static int colourValue(String factionId, ColorModel colour) {

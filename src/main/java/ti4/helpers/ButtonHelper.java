@@ -6933,7 +6933,7 @@ public class ButtonHelper {
             }
         }
 
-        List<ColorModel> unusedPrefColors = GameColorsService.getUnusedColorsPreferringBase(game);
+        List<ColorModel> unusedPrefColors = GameColorsService.getUnusedColorsWithBaseColorsFirst(game);
         unusedPrefColors = ColourHelper.sortColours(factionId, unusedPrefColors);
         for (ColorModel color : unusedPrefColors) {
             if (factionPrefColors.contains(color)) {
@@ -7242,7 +7242,7 @@ public class ButtonHelper {
         if (game.getPlayer(game.getSpeakerUserID()) != null) {
             speaker = game.getPlayers().get(game.getSpeakerUserID());
         }
-        if (game.getPlayerFromColorOrFaction(color) != null) color = PlayerColorService.getNewColor(player);
+        if (game.getPlayerFromColorOrFaction(color) != null) color = PlayerColorService.getPreferredColor(player);
         if (buttonID.split("_").length == 6 || speaker != null) {
             if (speaker != null) {
                 MiltyService.secondHalfOfPlayerSetup(player, game, color, factionId, pos, event, false);
