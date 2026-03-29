@@ -34,7 +34,7 @@ public class PlayerColorService {
 
     private static String getPreferredColor(String faction, Collection<ColorModel> unusedColors) {
         return Mapper.getFaction(faction).getPreferredColours().stream()
-                .filter(color -> !unusedColors.contains(Mapper.getColor(color)))
+                .filter(color -> unusedColors.contains(Mapper.getColor(color)))
                 .findFirst()
                 .orElse(null);
     }
