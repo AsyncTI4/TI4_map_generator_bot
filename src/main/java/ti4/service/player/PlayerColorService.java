@@ -43,7 +43,7 @@ public class PlayerColorService {
         if (factionModel == null) return null;
         List<String> preferredColors = new ArrayList<>(factionModel.getPreferredColours());
         Collections.shuffle(preferredColors);
-        return factionModel.getPreferredColours().stream()
+        return preferredColors.stream()
                 .filter(color -> unusedColors.contains(Mapper.getColor(color)))
                 .filter(color -> !usedHues.contains(Mapper.getColor(color).getHue()))
                 .findFirst()
