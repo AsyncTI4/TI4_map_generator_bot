@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.commands.player.AddAllianceMember;
 import ti4.helpers.Constants;
-import ti4.helpers.RandomHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -22,6 +21,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.map.AddTileListService;
 import ti4.service.milty.MiltyService;
 import ti4.service.objectives.DrawSecretService;
+import ti4.service.player.PlayerColorService;
 import ti4.service.unit.AddUnitService;
 
 public class StartScenario extends GameStateSubcommand {
@@ -79,7 +79,7 @@ public class StartScenario extends GameStateSubcommand {
                     MiltyService.secondHalfOfPlayerSetup(
                             players.get(face),
                             game,
-                            players.get(face).getNextAvailableColour(),
+                            PlayerColorService.getNewColor(players.get(face)),
                             faction,
                             tile.getPosition(),
                             event,
@@ -133,16 +133,7 @@ public class StartScenario extends GameStateSubcommand {
                     tile = game.getTileFromPositionOrAlias("creussgate");
                 }
                 boolean speaker = "nekro".equalsIgnoreCase(faction);
-                String color = players.get(face).getNextAvailableColour();
-                color = switch (faction.toLowerCase()) {
-                    case "ghost" -> RandomHelper.isOneInX(2) ? "ruby" : "bloodred";
-                    case "xxcha" -> RandomHelper.isOneInX(2) ? "sunset" : "tropical";
-                    case "sol" -> RandomHelper.isOneInX(2) ? "dawn" : "wasp";
-                    case "naaz" -> RandomHelper.isOneInX(2) ? "lime" : "sherbet";
-                    case "nekro" -> RandomHelper.isOneInX(2) ? "black" : "poison";
-                    case "nomad" -> RandomHelper.isOneInX(2) ? "navy" : "glacier";
-                    default -> color;
-                };
+                String color = PlayerColorService.getNewColor(players.get(face));
                 if (tile != null) {
                     MiltyService.secondHalfOfPlayerSetup(
                             players.get(face), game, color, faction, tile.getPosition(), event, speaker);

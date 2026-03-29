@@ -47,6 +47,7 @@ import ti4.message.logging.BotLogger;
 import ti4.service.fow.GMService;
 import ti4.service.game.SetOrderService;
 import ti4.service.milty.MiltyService;
+import ti4.service.player.PlayerColorService;
 
 @UtilityClass
 public class FrankenDraftBagService {
@@ -495,7 +496,13 @@ public class FrankenDraftBagService {
                 continue;
             }
             MiltyService.secondHalfOfPlayerSetup(
-                    player, game, player.getNextAvailableColour(), faction, tempHomeSystemLocation, event, false);
+                    player,
+                    game,
+                    PlayerColorService.getNewColor(player),
+                    faction,
+                    tempHomeSystemLocation,
+                    event,
+                    false);
             sb.append("\n> ").append(player.getRepresentationNoPing());
             index++;
         }

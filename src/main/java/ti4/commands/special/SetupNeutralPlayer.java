@@ -12,6 +12,7 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
 import ti4.service.emoji.ColorEmojis;
+import ti4.service.game.GameColorsService;
 
 public class SetupNeutralPlayer extends GameStateSubcommand {
 
@@ -24,17 +25,10 @@ public class SetupNeutralPlayer extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
 
-        List<String> unusedColors =
-                game.getUnusedColors().stream().map(ColorModel::getName).toList();
-        if (unusedColors.isEmpty()) {
-            MessageHelper.replyToMessage(event, "Unable to find an unused color. This is probably a bug?");
-            return;
-        }
-
         String color = event.getOption(Constants.COLOR, null, OptionMapping::getAsString);
         if (color == null) {
-            color = pickNeutralColor(unusedColors);
-        } else if (!unusedColors.contains(color)) {
+            color = pickNeutralColor(game);
+        } else if (!getUnusedColors(game).contains(color)) {
             MessageHelper.replyToMessage(event, "Selected color is in use.");
             return;
         }
@@ -46,7 +40,8 @@ public class SetupNeutralPlayer extends GameStateSubcommand {
                         + ColorEmojis.getColorEmoji(color).toString().toUpperCase() + "**.");
     }
 
-    public String pickNeutralColor(List<String> unusedColors) {
+    public static String pickNeutralColor(Game game) {
+        List<String> unusedColors = getUnusedColors(game);
         if (unusedColors.contains("aberration")) {
             return "aberration";
         }
@@ -65,5 +60,11 @@ public class SetupNeutralPlayer extends GameStateSubcommand {
         int randomIndex = random.nextInt(unusedColors.size());
         colour = unusedColors.get(randomIndex);
         return colour;
+    }
+
+    private static List<String> getUnusedColors(Game game) {
+        return GameColorsService.getUnusedColors(game).stream()
+                .map(ColorModel::getName)
+                .toList();
     }
 }

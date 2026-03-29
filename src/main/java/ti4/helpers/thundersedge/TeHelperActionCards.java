@@ -30,7 +30,6 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.model.ActionCardModel;
-import ti4.model.ColorModel;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -349,11 +348,8 @@ public class TeHelperActionCards {
         String message = player.getRepresentation() + ", please choose a planet to place 2 neutral infantry on.";
         Player neutral = game.getPlayerFromColorOrFaction("neutral");
         if (neutral == null) {
-            List<String> unusedColors =
-                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
-            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+            String color = SetupNeutralPlayer.pickNeutralColor(game);
             game.setupNeutralPlayer(color);
-            neutral = game.getPlayerFromColorOrFaction("neutral");
         }
         NewStuffHelper.checkAndHandlePaginationChange(
                 event, player.getCorrectChannel(), buttons, message, prefix, buttonID);
@@ -461,11 +457,8 @@ public class TeHelperActionCards {
         String regex = "resolvePirateContract_" + RegexHelper.posRegex();
         Player neutral = game.getPlayerFromColorOrFaction("neutral");
         if (neutral == null) {
-            List<String> unusedColors =
-                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
-            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+            String color = SetupNeutralPlayer.pickNeutralColor(game);
             game.setupNeutralPlayer(color);
-            neutral = game.getPlayerFromColorOrFaction("neutral");
         }
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
@@ -483,11 +476,8 @@ public class TeHelperActionCards {
         String regex = "resolveNokarBt_" + RegexHelper.posRegex();
         Player neutral = game.getPlayerFromColorOrFaction("neutral");
         if (neutral == null) {
-            List<String> unusedColors =
-                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
-            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+            String color = SetupNeutralPlayer.pickNeutralColor(game);
             game.setupNeutralPlayer(color);
-            neutral = game.getPlayerFromColorOrFaction("neutral");
         }
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
@@ -505,11 +495,8 @@ public class TeHelperActionCards {
         String regex = "resolvePirateFleet_" + RegexHelper.posRegex();
         Player neutral = game.getPlayerFromColorOrFaction("neutral");
         if (neutral == null) {
-            List<String> unusedColors =
-                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
-            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+            String color = SetupNeutralPlayer.pickNeutralColor(game);
             game.setupNeutralPlayer(color);
-            neutral = game.getPlayerFromColorOrFaction("neutral");
         }
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
