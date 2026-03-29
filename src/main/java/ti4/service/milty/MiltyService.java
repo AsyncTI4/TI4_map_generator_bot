@@ -292,7 +292,7 @@ public class MiltyService {
             }
         }
 
-        if (ColorChangeHelper.isColorNotAllowedForPlayer(color, player)) {
+        if (!ColorChangeHelper.isColorAllowedForPlayer(color, player)) {
             color = PlayerColorService.getNewColor(player);
         }
 

@@ -40,6 +40,6 @@ public class PlayerColorService {
     }
 
     private static boolean canUseColor(Player player, String color) {
-        return ColorChangeHelper.isColorNotAllowedForPlayer(color, player);
+        return ColorChangeHelper.isColorAllowedForPlayer(color, player);
     }
 }

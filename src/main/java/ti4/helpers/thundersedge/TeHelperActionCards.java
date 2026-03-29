@@ -30,14 +30,12 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.model.ActionCardModel;
-import ti4.model.ColorModel;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.BlindSelectionService;
-import ti4.service.game.GameColorsService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.AddUnitService;
@@ -500,10 +498,6 @@ public class TeHelperActionCards {
         String regex = "resolvePirateFleet_" + RegexHelper.posRegex();
         Player neutral = game.getPlayerFromColorOrFaction("neutral");
         if (neutral == null) {
-            List<String> unusedColors = GameColorsService.getUnusedColors(game).stream()
-                    .map(ColorModel::getName)
-                    .toList();
-            new SetupNeutralPlayer();
             String color = SetupNeutralPlayer.pickNeutralColor(game);
             game.setupNeutralPlayer(color);
         }
