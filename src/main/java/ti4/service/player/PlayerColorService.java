@@ -1,5 +1,6 @@
 package ti4.service.player;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +41,7 @@ public class PlayerColorService {
             String faction, Collection<ColorModel> unusedColors, Collection<String> usedHues) {
         FactionModel factionModel = Mapper.getFaction(faction);
         if (factionModel == null) return null;
-        List<String> preferredColors = factionModel.getPreferredColours();
+        List<String> preferredColors = new ArrayList<>(factionModel.getPreferredColours());
         Collections.shuffle(preferredColors);
         return factionModel.getPreferredColours().stream()
                 .filter(color -> unusedColors.contains(Mapper.getColor(color)))
