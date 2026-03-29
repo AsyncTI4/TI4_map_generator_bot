@@ -18,7 +18,7 @@ import ti4.model.PromissoryNoteModel;
 @UtilityClass
 public class ColorChangeHelper {
 
-    public static boolean colorIsExclusive(String color, Player player) {
+    public static boolean isColorNotAllowedForPlayer(String color, Player player) {
         String colorID = Mapper.getColorID(color);
         return switch (colorID) {
             // Riftset is exclusive to eronous always

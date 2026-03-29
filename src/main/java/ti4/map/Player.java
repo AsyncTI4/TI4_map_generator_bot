@@ -19,7 +19,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.Getter;
@@ -55,7 +54,6 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperTwilightsFall;
-import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -71,7 +69,6 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.AbilityModel;
 import ti4.model.BreakthroughModel;
-import ti4.model.ColorModel;
 import ti4.model.EmbeddableModel;
 import ti4.model.FactionModel;
 import ti4.model.GenericCardModel;
@@ -3018,24 +3015,6 @@ public class Player extends PlayerProperties {
 
     public UserSettings getUserSettings() {
         return UserSettingsManager.get(getUserID());
-    }
-
-    public String getNextAvailableColour() {
-        return getNextAvailableColorIgnoreCurrent();
-    }
-
-    public String getNextAvailableColorIgnoreCurrent() {
-        Predicate<ColorModel> nonExclusive = cm -> !ColorChangeHelper.colorIsExclusive(cm.getAlias(), this);
-        String color = getUserSettings().getPreferredColors().stream()
-                .filter(c -> !ColorChangeHelper.colorIsExclusive(c, this))
-                .filter(c -> game.getUnusedColors().contains(Mapper.getColor(c)))
-                .findFirst()
-                .orElse(game.getUnusedColorsPreferringBase().stream()
-                        .filter(nonExclusive)
-                        .findFirst()
-                        .map(ColorModel::getName)
-                        .orElse(null));
-        return Mapper.getColorName(color);
     }
 
     public boolean isSpeaker() {

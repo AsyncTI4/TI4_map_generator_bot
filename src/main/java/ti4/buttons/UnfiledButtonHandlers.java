@@ -78,7 +78,6 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.BreakthroughModel;
-import ti4.model.ColorModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
@@ -295,10 +294,7 @@ public class UnfiledButtonHandlers {
             if (enable) {
                 Player neutral = game.getPlayerFromColorOrFaction("neutral");
                 if (neutral == null) {
-                    List<String> unusedColors = game.getUnusedColors().stream()
-                            .map(ColorModel::getName)
-                            .toList();
-                    String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+                    String color = SetupNeutralPlayer.pickNeutralColor(game);
                     game.setupNeutralPlayer(color);
                 }
             }

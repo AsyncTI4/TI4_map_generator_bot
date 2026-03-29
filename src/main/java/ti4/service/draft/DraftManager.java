@@ -11,6 +11,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.map.AddTileListService;
+import ti4.service.player.PlayerColorService;
 
 /**
  * Manages the state of the draft, including:
@@ -314,7 +315,7 @@ public class DraftManager extends DraftPlayerManager {
             // Default color if not set
             boolean playerHasColor = player.getColor() != null && !"null".equals(player.getColor());
             if (!playerHasColor && playerSetupState.getColor() == null) {
-                String color = player.getNextAvailableColour();
+                String color = PlayerColorService.getNewColor(player);
                 playerSetupState.setColor(color);
             } else if (playerHasColor && playerSetupState.getColor() == null) {
                 playerSetupState.setColor(player.getColor());

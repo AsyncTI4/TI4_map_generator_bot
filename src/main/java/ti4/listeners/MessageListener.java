@@ -365,17 +365,19 @@ public class MessageListener extends ListenerAdapter {
      */
     private static void handleFogOfWarCombatThreadMirroring(MessageReceivedEvent event) {
         if (!JdaService.fowServers.isEmpty()
-                && // fog servers exists
-                !JdaService.fowServers.contains(event.getGuild())
-                && // 2nd server actually exists
-                JdaService.guildCommunityPlays != null
-                && // event server IS NOT the fog server
-                !JdaService.guildCommunityPlays.getId().equals(event.getGuild().getId())
-                && // NOR the community server
-                JdaService.guildPrimaryID.equals(Constants.ASYNCTI4_HUB_SERVER_ID)) { // bot is running in production
+                // fog servers exists
+                && !JdaService.fowServers.contains(event.getGuild())
+                // 2nd server actually exists
+                && JdaService.guildCommunityPlays != null
+                // is not the community server
+                && !JdaService.guildCommunityPlays
+                        .getId()
+                        .equals(event.getGuild().getId())
+                // bot is running in production
+                && JdaService.guildPrimaryID.equals(Constants.ASYNCTI4_HUB_SERVER_ID)) {
             return;
-        } // else it's probably a dev/test server, so execute
-
+        }
+        // else it's probably a dev/test server, so execute
         FOWCombatThreadMirroring.mirrorEvent(event);
     }
 }

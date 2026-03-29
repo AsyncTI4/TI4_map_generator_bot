@@ -33,7 +33,6 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
-import ti4.model.ColorModel;
 import ti4.model.ExploreModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.UnitModel;
@@ -2362,9 +2361,7 @@ public final class ButtonHelperAbilities {
         if (game.isDangerousWildsMode()) {
             Player neutral = game.getPlayerFromColorOrFaction("neutral");
             if (neutral == null) {
-                List<String> unusedColors =
-                        game.getUnusedColors().stream().map(ColorModel::getName).toList();
-                String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+                String color = SetupNeutralPlayer.pickNeutralColor(game);
                 game.setupNeutralPlayer(color);
                 neutral = game.getPlayerFromColorOrFaction("neutral");
             }

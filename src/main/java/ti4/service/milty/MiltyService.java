@@ -54,6 +54,7 @@ import ti4.service.info.UnitInfoService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.PlanetService;
+import ti4.service.player.PlayerColorService;
 import ti4.service.rules.ThundersEdgeRulesService;
 import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
@@ -271,7 +272,7 @@ public class MiltyService {
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
                 if (color.equals(playerInfo.getColor())) {
-                    String newColor = player.getNextAvailableColour();
+                    String newColor = PlayerColorService.getNewColor(player);
                     String message = "Player:" + playerInfo.getUserName() + " already uses color:" + color
                             + " - changing color to " + newColor;
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
@@ -291,8 +292,8 @@ public class MiltyService {
             }
         }
 
-        if (ColorChangeHelper.colorIsExclusive(color, player)) {
-            color = player.getNextAvailableColorIgnoreCurrent();
+        if (ColorChangeHelper.isColorNotAllowedForPlayer(color, player)) {
+            color = PlayerColorService.getNewColor(player);
         }
 
         if (player.isRealPlayer() && player.getSo() > 0) {

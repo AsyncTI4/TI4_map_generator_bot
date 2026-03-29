@@ -14,12 +14,12 @@ import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.model.ColorModel;
 import ti4.model.FactionModel;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.TileModel;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
+import ti4.service.player.PlayerColorService;
 import ti4.testUtils.BaseTi4Test;
 
 class CombatModifierTest extends BaseTi4Test {
@@ -128,11 +128,10 @@ class CombatModifierTest extends BaseTi4Test {
 
     private static Player setupPlayer(String faction) {
         FactionModel model = Mapper.getFaction(faction);
-        ColorModel color = testGame.getUnusedColors().getFirst();
         var player = testGame.addPlayer(model.getAlias(), model.getFactionName());
         player.setFaction(testGame, faction);
         player.setFactionEmoji("<" + faction + ">");
-        player.setColor(color.getName());
+        player.setColor(PlayerColorService.getNewColor(player));
         player.setUnitsOwned(new HashSet<>(model.getUnits()));
         player.addBreakthrough(model.getBreakthrough());
         player.setBreakthroughUnlocked(model.getBreakthrough(), true);
