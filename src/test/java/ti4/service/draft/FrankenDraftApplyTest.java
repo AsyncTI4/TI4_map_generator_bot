@@ -33,7 +33,7 @@ public class FrankenDraftApplyTest extends BaseTi4Test {
         var player = game.addPlayer(model.getAlias(), model.getFactionName());
         player.setFaction(game, faction);
         player.setFactionEmoji("<" + faction + ">");
-        player.setColor(PlayerColorService.getNewColor(player));
+        player.setColor(PlayerColorService.getPreferredColor(player));
         player.setUnitsOwned(new HashSet<>(model.getUnits()));
         player.addBreakthrough(model.getBreakthrough());
         player.setBreakthroughUnlocked(model.getBreakthrough(), true);

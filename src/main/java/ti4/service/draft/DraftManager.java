@@ -315,7 +315,7 @@ public class DraftManager extends DraftPlayerManager {
             // Default color if not set
             boolean playerHasColor = player.getColor() != null && !"null".equals(player.getColor());
             if (!playerHasColor && playerSetupState.getColor() == null) {
-                String color = PlayerColorService.getNewColor(player);
+                String color = PlayerColorService.getPreferredColor(player);
                 playerSetupState.setColor(color);
             } else if (playerHasColor && playerSetupState.getColor() == null) {
                 playerSetupState.setColor(player.getColor());

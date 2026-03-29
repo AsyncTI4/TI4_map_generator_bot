@@ -48,7 +48,7 @@ class FinishDraftService {
             for (String playerId : manager.getPlayers()) {
                 Player player = game.getPlayer(playerId);
                 PlayerDraft picks = manager.getPlayerDraft(playerId);
-                String color = PlayerColorService.getNewColor(player);
+                String color = PlayerColorService.getPreferredColor(player);
                 String faction = picks.getFaction();
                 String pos = MapTemplateHelper.getPlayerHomeSystemLocation(picks, manager.getMapTemplate());
                 boolean speaker = picks.getPosition() == 1;
