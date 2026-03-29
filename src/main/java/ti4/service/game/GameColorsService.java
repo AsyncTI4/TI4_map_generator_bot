@@ -2,6 +2,7 @@ package ti4.service.game;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -32,6 +33,7 @@ public class GameColorsService {
         return game.getPlayers().values().stream()
                 .map(Player::getColor)
                 .map(Mapper::getColor)
+                .filter(Objects::nonNull)
                 .toList();
     }
 
