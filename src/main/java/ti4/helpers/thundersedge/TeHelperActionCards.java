@@ -350,7 +350,6 @@ public class TeHelperActionCards {
         if (neutral == null) {
             String color = SetupNeutralPlayer.pickNeutralColor(game);
             game.setupNeutralPlayer(color);
-            game.getPlayerFromColorOrFaction("neutral");
         }
         NewStuffHelper.checkAndHandlePaginationChange(
                 event, player.getCorrectChannel(), buttons, message, prefix, buttonID);
@@ -460,7 +459,6 @@ public class TeHelperActionCards {
         if (neutral == null) {
             String color = SetupNeutralPlayer.pickNeutralColor(game);
             game.setupNeutralPlayer(color);
-            game.getPlayerFromColorOrFaction("neutral");
         }
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
@@ -480,7 +478,6 @@ public class TeHelperActionCards {
         if (neutral == null) {
             String color = SetupNeutralPlayer.pickNeutralColor(game);
             game.setupNeutralPlayer(color);
-            game.getPlayerFromColorOrFaction("neutral");
         }
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
