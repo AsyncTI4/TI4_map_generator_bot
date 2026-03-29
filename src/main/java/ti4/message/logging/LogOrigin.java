@@ -15,7 +15,9 @@ import ti4.listeners.ModalListener;
 import ti4.listeners.context.ListenerContext;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.persistence.GameManager;
 import ti4.selections.SelectionMenuProcessor;
+import ti4.service.game.GameNameService;
 
 @Getter
 public class LogOrigin {
@@ -74,6 +76,14 @@ public class LogOrigin {
         return "\nGame info: " + game.gameJumpLinks();
     }
 
+    @Nullable
+    private static String getGameChannelJumpLink(@Nonnull GenericInteractionCreateEvent event) {
+        if (!event.isFromGuild()) return null;
+        String gameName = GameNameService.getGameNameFromChannel(event);
+        if (!GameManager.isValid(gameName)) return null;
+        return event.getMessageChannel().getJumpUrl();
+    }
+
     @NotNull
     private static String buildEventString(@Nonnull GenericInteractionCreateEvent event) {
         StringBuilder builder =
@@ -100,6 +110,11 @@ public class LogOrigin {
                 builder.append("initiated an unexpected event of type `")
                         .append(event.getType())
                         .append("`\n");
+        }
+
+        String gameChannelJumpLink = getGameChannelJumpLink(event);
+        if (gameChannelJumpLink != null) {
+            builder.append("Channel: ").append(gameChannelJumpLink).append("\n");
         }
 
         return builder.toString();
