@@ -299,7 +299,6 @@ public class DraftManager extends DraftPlayerManager {
         }
 
         for (String userId : playerStates.keySet()) {
-
             // Collect all the setup decisions in a common object
             PlayerSetupState playerSetupState = new PlayerSetupState();
             List<Consumer<Player>> postSetupActions = new ArrayList<>();
@@ -312,14 +311,8 @@ public class DraftManager extends DraftPlayerManager {
 
             Player player = game.getPlayer(userId);
 
-            // Default color if not set
-            boolean playerHasColor = player.getColor() != null && !"null".equals(player.getColor());
-            if (!playerHasColor && playerSetupState.getColor() == null) {
-                String color = PlayerColorService.getPreferredColor(player);
-                playerSetupState.setColor(color);
-            } else if (playerHasColor && playerSetupState.getColor() == null) {
-                playerSetupState.setColor(player.getColor());
-            }
+            String color = PlayerColorService.getPreferredColor(player);
+            playerSetupState.setColor(color);
 
             // Do common setup chores
             PlayerSetupService.setupPlayer(playerSetupState, player, game, event);

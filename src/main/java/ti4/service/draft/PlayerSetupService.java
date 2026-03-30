@@ -60,13 +60,7 @@ public class PlayerSetupService {
         Map<String, Player> players = game.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
-                if (color.equals(playerInfo.getColor())) {
-                    String newColor = PlayerColorService.getPreferredColor(player);
-                    String message = "Player:" + playerInfo.getUserName() + " already uses color:" + color
-                            + " - changing color to " + newColor;
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-                    break;
-                } else if (faction.equals(playerInfo.getFaction())) {
+                if (faction.equals(playerInfo.getFaction())) {
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
                             "Setup Failed - Player:" + playerInfo.getUserName() + " already uses faction:" + faction);
@@ -87,7 +81,7 @@ public class PlayerSetupService {
 
         if (player.isRealPlayer() && player.getSo() > 0) {
             String message = player.getRepresentationNoPing()
-                    + "has secret objectives that would get lost to the void if they were setup again."
+                    + " has secret objectives that would get lost to the void if they were setup again."
                     + " If they wish to change color, use `/player change_color`. If they wish to setup as another faction, they must discard their secret objective first.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
             SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);

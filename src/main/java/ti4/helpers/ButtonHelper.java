@@ -7204,15 +7204,13 @@ public class ButtonHelper {
         String factionId = buttonID.split("_")[2];
         String color = buttonID.split("_")[3];
         String pos = buttonID.split("_")[4];
-        Player speaker = null;
+        Player currentSpeaker = game.getPlayer(game.getSpeakerUserID());
         Player player = game.getPlayer(userId);
-        if (game.getPlayer(game.getSpeakerUserID()) != null) {
-            speaker = game.getPlayers().get(game.getSpeakerUserID());
-        }
         if (game.getPlayerFromColorOrFaction(color) != null) color = PlayerColorService.getPreferredColor(player);
-        if (buttonID.split("_").length == 6 || speaker != null) {
-            boolean setSpeaker = speaker != null && "yes".equalsIgnoreCase(buttonID.split("_")[5]);
-            PlayerSetupState setupState = new PlayerSetupState(color, factionId, pos, setSpeaker);
+        String[] buttonTokens = buttonID.split("_");
+        if (buttonTokens.length == 6 || currentSpeaker != null) {
+            boolean buttonSetSpeaker = buttonTokens.length == 6 && "yes".equalsIgnoreCase(buttonTokens[5]);
+            PlayerSetupState setupState = new PlayerSetupState(color, factionId, pos, buttonSetSpeaker);
             PlayerSetupService.setupPlayer(setupState, player, game, event);
         } else {
             MessageHelper.sendMessageToChannelWithButtons(
