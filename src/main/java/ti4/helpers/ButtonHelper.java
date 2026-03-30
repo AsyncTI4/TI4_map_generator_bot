@@ -7209,8 +7209,7 @@ public class ButtonHelper {
         if (game.getPlayerFromColorOrFaction(color) != null) color = PlayerColorService.getPreferredColor(player);
         String[] buttonTokens = buttonID.split("_");
         if (buttonTokens.length == 6 || currentSpeaker != null) {
-            boolean buttonSetSpeaker =
-                    currentSpeaker == null && buttonTokens.length == 6 && "yes".equalsIgnoreCase(buttonTokens[5]);
+            boolean buttonSetSpeaker = currentSpeaker == null && "yes".equalsIgnoreCase(buttonTokens[5]);
             PlayerSetupState setupState = new PlayerSetupState(color, factionId, pos, buttonSetSpeaker);
             PlayerSetupService.setupPlayer(setupState, player, game, event);
         } else {
