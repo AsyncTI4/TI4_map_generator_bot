@@ -20,6 +20,8 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.FactionModel;
+import ti4.service.draft.PlayerSetupService;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.map.AddTileListService;
 import ti4.service.milty.MiltyDraftManager.PlayerDraft;
 import ti4.service.player.PlayerColorService;
@@ -88,7 +90,8 @@ class FinishDraftService {
                 }
 
                 if (faction != null) {
-                    MiltyService.secondHalfOfPlayerSetup(player, game, color, faction, pos, event, speaker);
+                    PlayerSetupState setupState = new PlayerSetupState(color, faction, pos, speaker);
+                    PlayerSetupService.setupPlayer(setupState, player, game, event);
                 }
             }
             game.setPhaseOfGame("playerSetup");
