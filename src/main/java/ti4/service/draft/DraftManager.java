@@ -13,7 +13,6 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.service.map.AddTileListService;
-import ti4.service.player.PlayerColorService;
 
 /**
  * Manages the state of the draft, including:
@@ -312,9 +311,6 @@ public class DraftManager extends DraftPlayerManager {
             }
 
             Player player = game.getPlayer(userId);
-
-            String color = PlayerColorService.getPreferredColor(player);
-            playerSetupState.setColor(color);
 
             // Do common setup chores
             PlayerSetupService.setupPlayer(playerSetupState, player, game, event);

@@ -24,7 +24,6 @@ import ti4.service.draft.PlayerSetupService;
 import ti4.service.draft.PlayerSetupState;
 import ti4.service.map.AddTileListService;
 import ti4.service.milty.MiltyDraftManager.PlayerDraft;
-import ti4.service.player.PlayerColorService;
 
 @UtilityClass
 class FinishDraftService {
@@ -50,7 +49,6 @@ class FinishDraftService {
             for (String playerId : manager.getPlayers()) {
                 Player player = game.getPlayer(playerId);
                 PlayerDraft picks = manager.getPlayerDraft(playerId);
-                String color = PlayerColorService.getPreferredColor(player);
                 String faction = picks.getFaction();
                 String pos = MapTemplateHelper.getPlayerHomeSystemLocation(picks, manager.getMapTemplate());
                 boolean speaker = picks.getPosition() == 1;
@@ -79,7 +77,7 @@ class FinishDraftService {
                             String keleres = "keleres" + flavor.charAt(0);
                             String id = String.format(
                                     "setupStep5_%s_%s_%s_%s_%s",
-                                    player.getUserID(), keleres, color, pos, speaker ? "yes" : "no");
+                                    player.getUserID(), keleres, null, pos, speaker ? "yes" : "no");
                             String msg = "Keleres (" + flavor + ")";
                             Button butt = Buttons.green(id, msg).withEmoji(Emoji.fromFormatted(emoji));
                             buttons.add(butt);
@@ -90,7 +88,7 @@ class FinishDraftService {
                 }
 
                 if (faction != null) {
-                    PlayerSetupState setupState = new PlayerSetupState(color, faction, pos, speaker);
+                    PlayerSetupState setupState = new PlayerSetupState(faction, pos, speaker);
                     PlayerSetupService.setupPlayer(setupState, player, game, event);
                 }
             }

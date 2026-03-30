@@ -22,7 +22,6 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.map.AddTileListService;
 import ti4.service.objectives.DrawSecretService;
-import ti4.service.player.PlayerColorService;
 import ti4.service.unit.AddUnitService;
 
 public class StartScenario extends GameStateSubcommand {
@@ -78,8 +77,7 @@ public class StartScenario extends GameStateSubcommand {
                 }
                 if (tile != null) {
                     Player player = players.get(face);
-                    String color = PlayerColorService.getPreferredColor(player);
-                    PlayerSetupState setupState = new PlayerSetupState(color, faction, tile.getPosition(), speaker);
+                    PlayerSetupState setupState = new PlayerSetupState(faction, tile.getPosition(), speaker);
                     PlayerSetupService.setupPlayer(setupState, player, game, event);
                     players.remove(face);
                 }
@@ -130,9 +128,8 @@ public class StartScenario extends GameStateSubcommand {
                     tile = game.getTileFromPositionOrAlias("creussgate");
                 }
                 boolean speaker = "nekro".equalsIgnoreCase(faction);
-                String color = PlayerColorService.getPreferredColor(players.get(face));
                 if (tile != null) {
-                    PlayerSetupState setupState = new PlayerSetupState(color, faction, tile.getPosition(), speaker);
+                    PlayerSetupState setupState = new PlayerSetupState(faction, tile.getPosition(), speaker);
                     PlayerSetupService.setupPlayer(setupState, players.get(face), game, event);
                     players.remove(face);
                 }
