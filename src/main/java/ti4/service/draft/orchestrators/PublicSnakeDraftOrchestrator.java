@@ -29,7 +29,7 @@ import ti4.service.draft.DraftableType;
 import ti4.service.draft.OrchestratorState;
 import ti4.service.draft.PartialMapService;
 import ti4.service.draft.PlayerDraftState;
-import ti4.service.draft.PlayerSetupService.PlayerSetupState;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.draft.PublicDraftInfoService;
 
 /**

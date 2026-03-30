@@ -109,6 +109,8 @@ import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.decks.ShowActionCardsService;
+import ti4.service.draft.PlayerSetupService;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -127,7 +129,6 @@ import ti4.service.fow.GMService;
 import ti4.service.game.GameColorsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftTile;
-import ti4.service.milty.MiltyService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.PlanetService;
 import ti4.service.player.PlayerColorService;
@@ -6679,7 +6680,7 @@ public class ButtonHelper {
         int h = Integer.parseInt(hits);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
-        if (message != null && message.endsWith(";\n")) {
+        if (message.endsWith(";\n")) {
             message = message.substring(0, message.length() - 2);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
@@ -6830,40 +6831,6 @@ public class ButtonHelper {
             }
         }
         return buttons;
-    }
-
-    public static void setUpFrankenFactions(Game game, GenericInteractionCreateEvent event) {
-        List<Player> players = new ArrayList<>(game.getPlayers().values());
-        List<Integer> emojiNum = new ArrayList<>(
-                List.of(3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26));
-        Collections.shuffle(emojiNum);
-        List<String> colors =
-                new ArrayList<>(List.of("black", "green", "purple", "orange", "pink", "yellow", "red", "blue"));
-        if (players.size() > 8) {
-            colors = new ArrayList<>(List.of(
-                    "black",
-                    "purple",
-                    "orange",
-                    "pink",
-                    "yellow",
-                    "red",
-                    "lightgray",
-                    "emerald",
-                    "lime",
-                    "navy",
-                    "teal",
-                    "tan"));
-        }
-        Collections.shuffle(colors);
-        for (int i = 0; i < players.size() && i < 12; i++) {
-            MiltyService.secondHalfOfPlayerSetup(
-                    players.get(i), game, colors.get(i), "franken" + emojiNum.get(i), "" + (i + 201), event, false);
-        }
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                (players.size() <= 12 ? "You have all" : "Twelve of you have")
-                        + " been set up as Franken factions. These have zombie emojis as their default faction icon."
-                        + " You may wish to personalize yours with `/franken set_faction_icon`. You may use any emoji the bot may use.");
     }
 
     private static List<Button> getFactionSetupButtons(Game game, String buttonID) {
@@ -7244,12 +7211,9 @@ public class ButtonHelper {
         }
         if (game.getPlayerFromColorOrFaction(color) != null) color = PlayerColorService.getPreferredColor(player);
         if (buttonID.split("_").length == 6 || speaker != null) {
-            if (speaker != null) {
-                MiltyService.secondHalfOfPlayerSetup(player, game, color, factionId, pos, event, false);
-            } else {
-                MiltyService.secondHalfOfPlayerSetup(
-                        player, game, color, factionId, pos, event, "yes".equalsIgnoreCase(buttonID.split("_")[5]));
-            }
+            boolean setSpeaker = speaker != null && "yes".equalsIgnoreCase(buttonID.split("_")[5]);
+            PlayerSetupState setupState = new PlayerSetupState(color, factionId, pos, setSpeaker);
+            PlayerSetupService.setupPlayer(setupState, player, game, event);
         } else {
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getChannel(),

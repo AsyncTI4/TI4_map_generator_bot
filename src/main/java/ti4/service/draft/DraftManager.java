@@ -301,7 +301,7 @@ public class DraftManager extends DraftPlayerManager {
         for (String userId : playerStates.keySet()) {
 
             // Collect all the setup decisions in a common object
-            PlayerSetupService.PlayerSetupState playerSetupState = new PlayerSetupService.PlayerSetupState();
+            PlayerSetupState playerSetupState = new PlayerSetupState();
             List<Consumer<Player>> postSetupActions = new ArrayList<>();
             for (Draftable draftable : draftables) {
                 Consumer<Player> postSetupAction = draftable.setupPlayer(this, userId, playerSetupState);
