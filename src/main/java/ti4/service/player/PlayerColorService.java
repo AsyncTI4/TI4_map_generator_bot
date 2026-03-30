@@ -19,11 +19,14 @@ public class PlayerColorService {
         List<ColorModel> unusedColors = GameColorsService.getUnusedColorsWithBaseColorsFirst(player.getGame()).stream()
                 .filter(colorModel -> canUseColor(player, colorModel.getAlias()))
                 .toList();
+        String faction = player.getFaction();
+        if (faction.contains("tf")) return getFactionsPreferredColor(faction, unusedColors, Collections.emptyList());
+
         String color = getUsersPreferredColor(player, unusedColors);
         if (color != null) return color;
 
         List<String> usedHues = GameColorsService.getUsedHues(player.getGame());
-        color = getFactionsPreferredColor(player.getFaction(), unusedColors, usedHues);
+        color = getFactionsPreferredColor(faction, unusedColors, usedHues);
         if (color != null) return color;
 
         return getPreferredColor(unusedColors, usedHues);

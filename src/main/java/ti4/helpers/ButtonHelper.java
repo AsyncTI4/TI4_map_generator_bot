@@ -131,7 +131,6 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.PlanetService;
-import ti4.service.player.PlayerColorService;
 import ti4.service.regex.RegexService;
 import ti4.service.tech.ShowTechDeckService;
 import ti4.service.transaction.SendDebtService;
@@ -7203,10 +7202,10 @@ public class ButtonHelper {
         String userId = buttonID.split("_")[1];
         String factionId = buttonID.split("_")[2];
         String color = buttonID.split("_")[3];
+        if ("null".equals(color)) color = null;
         String pos = buttonID.split("_")[4];
         Player currentSpeaker = game.getPlayer(game.getSpeakerUserID());
         Player player = game.getPlayer(userId);
-        if (game.getPlayerFromColorOrFaction(color) != null) color = PlayerColorService.getPreferredColor(player);
         String[] buttonTokens = buttonID.split("_");
         if (buttonTokens.length == 6 || currentSpeaker != null) {
             boolean buttonSetSpeaker = currentSpeaker == null && "yes".equalsIgnoreCase(buttonTokens[5]);

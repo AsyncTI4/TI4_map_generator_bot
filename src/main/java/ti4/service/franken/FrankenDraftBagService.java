@@ -48,7 +48,6 @@ import ti4.service.draft.PlayerSetupService;
 import ti4.service.draft.PlayerSetupState;
 import ti4.service.fow.GMService;
 import ti4.service.game.SetOrderService;
-import ti4.service.player.PlayerColorService;
 
 @UtilityClass
 public class FrankenDraftBagService {
@@ -497,8 +496,7 @@ public class FrankenDraftBagService {
                 continue;
             }
 
-            String color = PlayerColorService.getPreferredColor(player);
-            PlayerSetupState setupState = new PlayerSetupState(color, faction, tempHomeSystemLocation, false);
+            PlayerSetupState setupState = new PlayerSetupState(faction, tempHomeSystemLocation, false);
             PlayerSetupService.setupPlayer(setupState, player, game, event);
             sb.append("\n> ").append(player.getRepresentationNoPing());
             index++;

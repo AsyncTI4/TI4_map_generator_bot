@@ -17,7 +17,6 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperHeroes;
-import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.PromissoryNoteHelper;
@@ -60,10 +59,18 @@ public class PlayerSetupService {
         Map<String, Player> players = game.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
+                if (color != null && color.equals(playerInfo.getColor())) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(),
+                            "Setup Warning - Player: " + playerInfo.getUserName() + " already uses color: " + color
+                                    + ". So, we will give you a different color...");
+                    // if color is null, we set it later
+                    color = null;
+                }
                 if (faction.equals(playerInfo.getFaction())) {
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
-                            "Setup Failed - Player:" + playerInfo.getUserName() + " already uses faction:" + faction);
+                            "Setup Failed - Player: " + playerInfo.getUserName() + " already uses faction:" + faction);
                     return;
                 }
                 if ("franken1".equalsIgnoreCase(faction) || "franken2".equalsIgnoreCase(faction)) {
@@ -75,10 +82,6 @@ public class PlayerSetupService {
             }
         }
 
-        if (!ColorChangeHelper.isColorAllowedForPlayer(color, player)) {
-            color = PlayerColorService.getPreferredColor(player);
-        }
-
         if (player.isRealPlayer() && player.getSo() > 0) {
             String message = player.getRepresentationNoPing()
                     + " has secret objectives that would get lost to the void if they were setup again."
@@ -88,8 +91,9 @@ public class PlayerSetupService {
             return;
         }
 
-        player.setColor(color);
         player.setFaction(game, faction);
+        if (color == null) color = PlayerColorService.getPreferredColor(player);
+        player.setColor(color);
         player.setFactionEmoji(null);
         player.getPlanets().clear();
         player.getTechs().clear();

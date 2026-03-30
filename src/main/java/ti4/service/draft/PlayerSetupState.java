@@ -8,6 +8,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class PlayerSetupState {
+
+    public PlayerSetupState(String faction, String homeSystemPosition, boolean speaker) {
+        this.faction = faction;
+        this.homeSystemPosition = homeSystemPosition;
+        this.speaker = speaker;
+    }
+
     private String color;
     private String faction;
     private String homeSystemPosition;

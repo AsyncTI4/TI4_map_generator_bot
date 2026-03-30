@@ -14,7 +14,6 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.draft.PlayerSetupService;
 import ti4.service.draft.PlayerSetupState;
-import ti4.service.player.PlayerColorService;
 
 class Setup extends GameStateSubcommand {
 
@@ -52,9 +51,8 @@ class Setup extends GameStateSubcommand {
         Player player = getPlayer();
 
         String eventColor = event.getOption(Constants.COLOR, OptionMapping::getAsString);
-        if (eventColor == null) eventColor = PlayerColorService.getPreferredColor(player);
-        String color = AliasHandler.resolveColor(eventColor.toLowerCase());
-        if (!Mapper.isValidColor(color)) {
+        String color = eventColor == null ? null : AliasHandler.resolveColor(eventColor.toLowerCase());
+        if (color != null && !Mapper.isValidColor(color)) {
             MessageHelper.sendMessageToEventChannel(
                     event, "Color `" + color + "` is not valid. Options are: " + Mapper.getColors());
             return;
