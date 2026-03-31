@@ -24,20 +24,22 @@ public class FactionTopColorsStatisticsService {
     private static void showTopColorsByFaction(SlashCommandInteractionEvent event) {
         Map<String, Map<String, Integer>> colorCountsByFaction = new HashMap<>();
 
-        GamesPage.consumeAllGames(GameStatisticsFilterer.getGamesFilter(event), game -> game.getRealPlayers().forEach(player -> {
-            String faction = player.getFaction();
-            String color = player.getColor();
-            if (faction == null || color == null || "null".equals(color)) {
-                return;
-            }
+        GamesPage.consumeAllGames(GameStatisticsFilterer.getGamesFilter(event), game -> game.getRealPlayers()
+                .forEach(player -> {
+                    String faction = player.getFaction();
+                    String color = player.getColor();
+                    if (faction == null || color == null || "null".equals(color)) {
+                        return;
+                    }
 
-            colorCountsByFaction
-                    .computeIfAbsent(faction, ignored -> new HashMap<>())
-                    .merge(color, 1, Integer::sum);
-        }));
+                    colorCountsByFaction
+                            .computeIfAbsent(faction, ignored -> new HashMap<>())
+                            .merge(color, 1, Integer::sum);
+                }));
 
         String message = Mapper.getFactionsValues().stream()
-                .map(factionModel -> formatFactionLine(factionModel.getAlias(), factionModel.getFactionName(), colorCountsByFaction))
+                .map(factionModel ->
+                        formatFactionLine(factionModel.getAlias(), factionModel.getFactionName(), colorCountsByFaction))
                 .filter(line -> line != null)
                 .collect(Collectors.joining("\n"));
 
@@ -48,7 +50,8 @@ public class FactionTopColorsStatisticsService {
         MessageHelper.sendMessageToThread(event.getChannel(), "Top 8 Colors by Faction", message);
     }
 
-    private static String formatFactionLine(String factionAlias, String factionName, Map<String, Map<String, Integer>> colorCountsByFaction) {
+    private static String formatFactionLine(
+            String factionAlias, String factionName, Map<String, Map<String, Integer>> colorCountsByFaction) {
         Map<String, Integer> colorCounts = colorCountsByFaction.get(factionAlias);
         if (colorCounts == null || colorCounts.isEmpty()) {
             return null;
