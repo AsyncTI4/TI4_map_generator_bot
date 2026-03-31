@@ -3,7 +3,6 @@ package ti4.service.strategycard;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
@@ -30,6 +29,7 @@ import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.model.StrategyCardModel;
@@ -342,7 +342,7 @@ public class PlayStrategyCardService {
 
         if (!scModel.usesAutomationForSCID("pok1leadership") && !winnuHero && !isOverrule) {
             Button emelpar = Buttons.red("scepterE_follow_" + scToPlay, "Exhaust " + RelicHelper.sillySpelling());
-            List<?> tilesWithPrimaryPlayersCC = ButtonHelper.getTilesWithYourCC(player, game, event);
+            List<Tile> tilesWithPrimaryPlayersCC = ButtonHelper.getTilesWithYourCC(player, game, event);
             boolean primaryPlayerHasAnyCCInPlay = !tilesWithPrimaryPlayersCC.isEmpty();
             boolean primaryPlayerHasExactlyOneCCInPlay = tilesWithPrimaryPlayersCC.size() == 1;
             for (Player player3 : playersToFollow) {
@@ -361,10 +361,8 @@ public class PlayStrategyCardService {
                                     + "** with the _" + RelicHelper.sillySpelling() + "_.",
                             empNMahButtons);
                 }
-                if (player3.hasUnexhaustedLeader("mahactagent")
-                        && primaryPlayerHasAnyCCInPlay) {
-                    if (scModel.usesAutomationForSCID("pok6warfare")
-                            && primaryPlayerHasExactlyOneCCInPlay) {
+                if (player3.hasUnexhaustedLeader("mahactagent") && primaryPlayerHasAnyCCInPlay) {
+                    if (scModel.usesAutomationForSCID("pok6warfare") && primaryPlayerHasExactlyOneCCInPlay) {
                         continue;
                     }
                     empNMahButtons.addFirst(
@@ -469,7 +467,8 @@ public class PlayStrategyCardService {
             message.addReaction(reactionEmoji).queue(Consumers.nop(), BotLogger::catchRestError);
             player.addFollowedSC(scToPlay, event);
         }
-        boolean isSpecialPbdGame = "pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName());
+        boolean isSpecialPbdGame =
+                "pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName());
         if (!game.isFowMode() && !isSpecialPbdGame && !game.isHomebrewSCMode()) {
             boolean primaryHasAcq = player.ownsPromissoryNote("acq");
             for (Player p2 : game.getRealPlayers()) {
@@ -497,12 +496,11 @@ public class PlayStrategyCardService {
                 if (scToPlay == 5) {
                     continue;
                 }
-                Set<Integer> unfollowedSCs = p2.getUnfollowedSCs();
+                List<Integer> unfollowedSCs = p2.getUnfollowedSCs();
                 if (!primaryHasAcq
                         && p2.getStrategicCC() == 0
                         && !unfollowedSCs.contains(1)
-                        && (!p2.getTechs().contains("iihq")
-                                || !unfollowedSCs.contains(8))
+                        && (!p2.getTechs().contains("iihq") || !unfollowedSCs.contains(8))
                         && !p2.hasRelicReady("absol_emelpar")
                         && !p2.hasRelicReady("emelpar")
                         && !p2.hasUnexhaustedLeader("mahactagent")
