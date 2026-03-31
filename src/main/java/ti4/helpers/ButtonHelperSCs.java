@@ -78,7 +78,7 @@ public final class ButtonHelperSCs {
         message += ButtonHelper.getListOfStuffAvailableToSpend(player, game) + "\nYou have " + productionVal
                 + " PRODUCTION value in this system.";
         if (Helper.getProductionValue(player, game, tile, false) > productionVal) {
-            message += "\nYou may only use the PRODUCITON ability of __one__ of your space docks in this system.";
+            message += "\nYou may only use the PRODUCTION ability of __one__ of your space docks in this system.";
         }
         if (productionVal > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander"))
             message +=
@@ -138,7 +138,7 @@ public final class ButtonHelperSCs {
         message += "\nYou have " + productionValue + " PRODUCTION value in this system.";
 
         if (Helper.getProductionValue(player, game, tile, singleDock) > productionValue) {
-            message += "\nYou may only use the PRODUCITON ability of __one__ of your space docks in this system. ";
+            message += "\nYou may only use the PRODUCTION ability of __one__ of your space docks in this system. ";
         }
         if (productionValue > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
             message +=
