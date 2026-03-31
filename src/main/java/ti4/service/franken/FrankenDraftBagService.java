@@ -44,9 +44,10 @@ import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
 import ti4.message.logging.BotLogger;
+import ti4.service.draft.PlayerSetupService;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.fow.GMService;
 import ti4.service.game.SetOrderService;
-import ti4.service.milty.MiltyService;
 
 @UtilityClass
 public class FrankenDraftBagService {
@@ -494,8 +495,9 @@ public class FrankenDraftBagService {
             if (!Mapper.isValidFaction(faction) || !PositionMapper.isTilePositionValid(tempHomeSystemLocation)) {
                 continue;
             }
-            MiltyService.secondHalfOfPlayerSetup(
-                    player, game, player.getNextAvailableColour(), faction, tempHomeSystemLocation, event, false);
+
+            PlayerSetupState setupState = new PlayerSetupState(faction, tempHomeSystemLocation, false);
+            PlayerSetupService.setupPlayer(setupState, player, game, event);
             sb.append("\n> ").append(player.getRepresentationNoPing());
             index++;
         }

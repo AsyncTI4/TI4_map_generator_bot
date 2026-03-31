@@ -10,7 +10,7 @@ import ti4.service.draft.DraftManager;
 
 class DraftManagerSetupPlayers extends GameStateSubcommand {
 
-    public DraftManagerSetupPlayers() {
+    DraftManagerSetupPlayers() {
         super(Constants.DRAFT_MANAGE_SETUP_PLAYERS, "Have the draft elements set up players", true, false);
         addOption(
                 OptionType.BOOLEAN,

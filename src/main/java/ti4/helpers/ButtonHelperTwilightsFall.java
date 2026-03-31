@@ -51,6 +51,7 @@ import ti4.service.emoji.TechEmojis;
 import ti4.service.franken.FrankenDraftBagService;
 import ti4.service.franken.FrankenHomeService;
 import ti4.service.franken.FrankenMapBuildContextHelper;
+import ti4.service.game.GameColorsService;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftManager.PlayerDraft;
@@ -647,8 +648,6 @@ public final class ButtonHelperTwilightsFall {
 
     @ButtonHandler("fixMahactColors")
     public static void fixMahactColors(Game game, GenericInteractionCreateEvent event) {
-
-        // ColorChangeHelper.changePlayerColor(game, player, oldColor, newColor);
         for (Player player : game.getRealPlayers()) {
             String factionColor = player.getFaction().replace("tf", "");
             if (Mapper.getColor(factionColor) != null && !player.getColor().equalsIgnoreCase(factionColor)) {
@@ -658,7 +657,7 @@ public final class ButtonHelperTwilightsFall {
                             game,
                             p2,
                             p2.getColor(),
-                            game.getUnusedColors().getFirst().getAlias());
+                            GameColorsService.getUnusedColors(game).getFirst().getAlias());
                 }
                 ColorChangeHelper.changePlayerColor(game, player, player.getColor(), factionColor);
             }
@@ -801,7 +800,7 @@ public final class ButtonHelperTwilightsFall {
         List<MessageEmbed> embeds = new ArrayList<>();
         for (String card :
                 game.getStoredValue("veiledCards" + player.getFaction()).split("_")) {
-            if (card == null || card.isEmpty()) {
+            if (card.isEmpty()) {
                 continue;
             }
             if (Mapper.getTech(card) != null) {
@@ -1360,7 +1359,7 @@ public final class ButtonHelperTwilightsFall {
                                             + " unit upgrade. If you would like to keep it and lose the newly acquired unit upgrade, please click the green button.",
                                     buttons);
                         }
-                        if (u.getAlias().equalsIgnoreCase("tf-floatingfactory")) {
+                        if ("tf-floatingfactory".equalsIgnoreCase(u.getAlias())) {
                             for (Tile tile :
                                     ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
                                 for (UnitHolder uh : tile.getPlanetUnitHolders()) {

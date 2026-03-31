@@ -5,6 +5,7 @@
         "phase": "Action",
         "window": "At the end of the status phase",
         "text": "Purge 1 public objective you have scored. Then, draw and reveal an objective from either public objective deck and place it near the other public objectives.",
+        "notes": "Players do not lose points when an objective they have scored is purged.",
         "flavorText": "Junn waddled away from the stunned hush that followed his announcements, a ghost of a smile betraying the victory he had labored years to secure.",
         "source": "action_deck_2"
     },
@@ -340,6 +341,7 @@
         "phase": "Action",
         "window": "After 1 of your non-fighter ships is destroyed",
         "text": "Choose 1 planet in that unit's system. Destroy 1 ground force and 1 PDS on that planet.",
+        "notes": "You are not required to destroy both to play this card.",
         "flavorText": "The Exotrireme became a guided missile in its death-throes, transforming the Sol base into a burning crater of steel and death.",
         "source": "action_deck_2"
     },
@@ -470,6 +472,7 @@
         "phase": "Action",
         "window": "After you activate a system",
         "text": "Choose 1 unit in that system. That unit loses its printed abilities during this tactical action.",
+        "notes": "Printed abilities include text and unit abilities, e.g. Yin flagship will not explode and does not have Sustain Damage.",
         "flavorText": "Connor radioed command. \"You're right. It was nearly impenetrable.\" Moments later, the shield pylons came crashing down, useless.",
         "source": "action_deck_2"
     },

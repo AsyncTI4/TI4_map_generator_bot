@@ -12,7 +12,8 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.service.milty.MiltyService;
+import ti4.service.draft.PlayerSetupService;
+import ti4.service.draft.PlayerSetupState;
 
 class Setup extends GameStateSubcommand {
 
@@ -49,10 +50,9 @@ class Setup extends GameStateSubcommand {
 
         Player player = getPlayer();
 
-        String color = AliasHandler.resolveColor(
-                event.getOption(Constants.COLOR, player.getNextAvailableColour(), OptionMapping::getAsString)
-                        .toLowerCase());
-        if (!Mapper.isValidColor(color)) {
+        String eventColor = event.getOption(Constants.COLOR, OptionMapping::getAsString);
+        String color = eventColor == null ? null : AliasHandler.resolveColor(eventColor.toLowerCase());
+        if (color != null && !Mapper.isValidColor(color)) {
             MessageHelper.sendMessageToEventChannel(
                     event, "Color `" + color + "` is not valid. Options are: " + Mapper.getColors());
             return;
@@ -60,9 +60,10 @@ class Setup extends GameStateSubcommand {
 
         // SPEAKER
         boolean setSpeaker = event.getOption(Constants.SPEAKER, false, OptionMapping::getAsBoolean);
+        // Substring to grab "305" from "305 Moll Primus (Mentak)" autocomplete
         String positionHS = StringUtils.substringBefore(
-                event.getOption(Constants.HS_TILE_POSITION, "", OptionMapping::getAsString),
-                " "); // Substring to grab "305" from "305 Moll Primus (Mentak)" autocomplete
-        MiltyService.secondHalfOfPlayerSetup(player, game, color, faction, positionHS, event, setSpeaker);
+                event.getOption(Constants.HS_TILE_POSITION, "", OptionMapping::getAsString), " ");
+        PlayerSetupState setupState = new PlayerSetupState(color, faction, positionHS, setSpeaker);
+        PlayerSetupService.setupPlayer(setupState, player, game, event);
     }
 }
