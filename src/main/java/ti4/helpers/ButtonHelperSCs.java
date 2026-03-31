@@ -6,15 +6,17 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
 import ti4.helpers.Units.UnitKey;
@@ -78,7 +80,7 @@ public final class ButtonHelperSCs {
         message += ButtonHelper.getListOfStuffAvailableToSpend(player, game) + "\nYou have " + productionVal
                 + " PRODUCTION value in this system.";
         if (Helper.getProductionValue(player, game, tile, false) > productionVal) {
-            message += "\nYou may only use the PRODUCITON ability of __one__ of your space docks in this system.";
+            message += "\nYou may only use the PRODUCTION ability of __one__ of your space docks in this system.";
         }
         if (productionVal > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander"))
             message +=
@@ -138,7 +140,7 @@ public final class ButtonHelperSCs {
         message += "\nYou have " + productionValue + " PRODUCTION value in this system.";
 
         if (Helper.getProductionValue(player, game, tile, singleDock) > productionValue) {
-            message += "\nYou may only use the PRODUCITON ability of __one__ of your space docks in this system. ";
+            message += "\nYou may only use the PRODUCTION ability of __one__ of your space docks in this system. ";
         }
         if (productionValue > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
             message +=

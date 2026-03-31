@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -661,6 +662,21 @@ public class StartPhaseService {
                             + ", a reminder this is the window to play The Oracle, the Naalu Hero. You may use the buttons to start the process.",
                     buttons);
         }
+        if (player.hasLeader("poisonhero")
+                && player.getLeaderByID("poisonhero").isPresent()
+                && playerLeader != null
+                && !playerLeader.isLocked()) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("poisonHeroInitiation", "Play Poison Hero", LeaderEmojis.NaaluHero));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged()
+                            + ", a reminder this is the window to play the Poison Hero. You may use the buttons to start the process.",
+                    buttons);
+        }
+        
+
         if (player.getRelics() != null && player.hasRelic("mawofworlds") && game.isCustodiansScored()) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),

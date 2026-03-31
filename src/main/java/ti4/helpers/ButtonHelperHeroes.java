@@ -2199,6 +2199,27 @@ public final class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
     }
 
+     @ButtonHandler("poisonHeroInitiation")
+    public static void resolvePoisonHeroInitiation(Player player, Game game, ButtonInteractionEvent event) {
+        Leader playerLeader = player.unsafeGetLeader("poisonhero");
+        StringBuilder message2 = new StringBuilder(player.getRepresentation())
+                .append(" played ")
+                .append(Helper.getLeaderFullRepresentation(playerLeader));
+        boolean purged = player.removeLeader(playerLeader);
+        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+        if (purged) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    message2
+                            + " - The Oracle, the Poison hero, has been purged. \n\n ");
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "The Oracle, the Poison hero, was not purged - something went wrong");
+        }
+        ButtonHelperTwilightsFallActionCards.resolvePoison(game, player);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("kyroHeroInitiation")
     public static void resolveKyroHeroInitiation(Player player, Game game, ButtonInteractionEvent event) {
         Leader playerLeader = player.unsafeGetLeader("kyrohero");
