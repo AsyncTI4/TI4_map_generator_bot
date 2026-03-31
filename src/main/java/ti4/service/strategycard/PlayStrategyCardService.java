@@ -342,9 +342,6 @@ public class PlayStrategyCardService {
 
         if (!scModel.usesAutomationForSCID("pok1leadership") && !winnuHero && !isOverrule) {
             Button emelpar = Buttons.red("scepterE_follow_" + scToPlay, "Exhaust " + RelicHelper.sillySpelling());
-            List<Tile> tilesWithPrimaryPlayersCC = ButtonHelper.getTilesWithYourCC(player, game, event);
-            boolean primaryPlayerHasAnyCCInPlay = !tilesWithPrimaryPlayersCC.isEmpty();
-            boolean primaryPlayerHasExactlyOneCCInPlay = tilesWithPrimaryPlayersCC.size() == 1;
             for (Player player3 : playersToFollow) {
                 if (player3 == player) {
                     continue;
@@ -361,8 +358,12 @@ public class PlayStrategyCardService {
                                     + "** with the _" + RelicHelper.sillySpelling() + "_.",
                             empNMahButtons);
                 }
-                if (player3.hasUnexhaustedLeader("mahactagent") && primaryPlayerHasAnyCCInPlay) {
-                    if (scModel.usesAutomationForSCID("pok6warfare") && primaryPlayerHasExactlyOneCCInPlay) {
+                if (player3.hasUnexhaustedLeader("mahactagent")) {
+                    List<Tile> tilesWithPrimaryPlayersCC = ButtonHelper.getTilesWithYourCC(player, game, event);
+                    boolean primaryPlayerHasAnyCCInPlay = !tilesWithPrimaryPlayersCC.isEmpty();
+                    boolean primaryPlayerHasExactlyOneCCInPlay = tilesWithPrimaryPlayersCC.size() == 1;
+                    if (!primaryPlayerHasAnyCCInPlay
+                            || scModel.usesAutomationForSCID("pok6warfare") && primaryPlayerHasExactlyOneCCInPlay) {
                         continue;
                     }
                     empNMahButtons.addFirst(
