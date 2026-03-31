@@ -716,7 +716,10 @@
         "preferredColours": [
             "blu",
             "spr",
-            "gry"
+            "gry",
+            "dw",
+            "nvy",
+            "cam"
         ],
         "source": "base",
         "priorityNumber": 3
