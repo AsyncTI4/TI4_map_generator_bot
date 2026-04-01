@@ -3,7 +3,6 @@ package ti4.buttons.handlers.agenda;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -106,7 +105,7 @@ public class EdictPhaseHandler {
                 ButtonHelperTwilightsFall.drawParadigm(game, player, event, false);
             }
             for (String paradigm : game.getStoredValue("artificeParadigms").split("_")) {
-                if(paradigm.isEmpty() || Mapper.getLeader(paradigm) == null) {
+                if (paradigm.isEmpty() || Mapper.getLeader(paradigm) == null) {
                     continue;
                 }
                 buttons.add(Buttons.green(

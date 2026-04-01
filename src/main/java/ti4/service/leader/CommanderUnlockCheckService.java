@@ -2,7 +2,6 @@ package ti4.service.leader;
 
 import java.util.List;
 import java.util.Map.Entry;
-
 import lombok.experimental.UtilityClass;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -132,7 +131,7 @@ public class CommanderUnlockCheckService {
                         + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false)
                         + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer", false)
                         + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
-                if(player.hasRelic("lightrailordnance")){
+                if (player.hasRelic("lightrailordnance")) {
                     num += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "spacedock", false);
                 }
                 shouldBeUnlocked = (num >= 6);

@@ -2199,7 +2199,7 @@ public final class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
     }
 
-     @ButtonHandler("poisonHeroInitiation")
+    @ButtonHandler("poisonHeroInitiation")
     public static void resolvePoisonHeroInitiation(Player player, Game game, ButtonInteractionEvent event) {
         Leader playerLeader = player.unsafeGetLeader("poisonhero");
         StringBuilder message2 = new StringBuilder(player.getRepresentation())
@@ -2209,9 +2209,7 @@ public final class ButtonHelperHeroes {
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         if (purged) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    message2
-                            + " - The Oracle, the Poison hero, has been purged. \n\n ");
+                    player.getCorrectChannel(), message2 + " - The Oracle, the Poison hero, has been purged. \n\n ");
         } else {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "The Oracle, the Poison hero, was not purged - something went wrong");

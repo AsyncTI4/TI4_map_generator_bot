@@ -24,13 +24,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nullable;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.springframework.util.StringUtils;
-
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
@@ -59,6 +53,9 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -248,17 +245,17 @@ public class ButtonHelper {
                 if (p2.ownsUnit("tf-vortexer")) {
                     for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p2, false, true)) {
                         if (game.getTileByPosition(pos).getSpaceUnitHolder().getUnitCount(UnitType.Carrier, p2) > 0) {
-                            MessageHelper.sendMessageToChannel(
-                                    player.getCorrectChannel(),
-                                    (totalAmount <= 10
-                                                    ? UnitEmojis.infantry
-                                                            .toString()
-                                                            .repeat(totalAmount)
-                                                    : UnitEmojis.infantry + "×" + totalAmount)
-                                            + " died and were captured by a "
-                                            + p2.getFactionEmoji()
-                                            + p2.getFaction()
-                                            + " Vortexer.");
+                            // MessageHelper.sendMessageToChannel(
+                            //         player.getCorrectChannel(),
+                            //         (totalAmount <= 10
+                            //                         ? UnitEmojis.infantry
+                            //                                 .toString()
+                            //                                 .repeat(totalAmount)
+                            //                         : UnitEmojis.infantry + "×" + totalAmount)
+                            //                 + " died and were captured by a "
+                            //                 + p2.getFactionEmoji()
+                            //                 + p2.getFaction()
+                            //                 + " Vortexer.");
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, game, p2, totalAmount, "infantry", null);
                             break;
                         }

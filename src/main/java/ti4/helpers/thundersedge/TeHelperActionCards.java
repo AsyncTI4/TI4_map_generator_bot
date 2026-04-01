@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
-
-import org.apache.commons.lang3.function.Consumers;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.ActionCardHelper;
@@ -311,7 +309,8 @@ public class TeHelperActionCards {
         }
 
         String message = player.getRepresentationUnfogged() + ", please resolve _Strategize_ using these buttons.";
-        String msg2= player.getRepresentation() + ", A strategy token was auto deducted (if possible) due to so many people forgetting to do so. If you end up resolving leadership, please gain it back (the bot wont make you pay for it).";
+        String msg2 = player.getRepresentation()
+                + ", A strategy token was auto deducted (if possible) due to so many people forgetting to do so. If you end up resolving leadership, please gain it back (the bot wont make you pay for it).";
         if (player.getStrategicCC() > 0) {
             player.setStrategicCC(player.getStrategicCC() - 1);
             ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);

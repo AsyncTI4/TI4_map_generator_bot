@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -242,6 +241,15 @@ public class StartPhaseService {
             Helper.setOrder(game);
         }
         game.removeStoredValue("shouldntChangeTurnOrder");
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2.hasTech("tf-telepathic")) {
+                game.setStoredValue("TFTelepathicHolder", p2.getFaction());
+            } else {
+                game.setStoredValue(
+                        "TFTelepathicHolder",
+                        game.getStoredValue("TFTelepathicHolder").replace(p2.getFaction(), ""));
+            }
+        }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round " + round);
         if (game.isShowBanners()) {
             BannerGenerator.drawPhaseBanner("strategy", round, game.getActionsChannel());
@@ -675,7 +683,6 @@ public class StartPhaseService {
                             + ", a reminder this is the window to play the Poison Hero. You may use the buttons to start the process.",
                     buttons);
         }
-        
 
         if (player.getRelics() != null && player.hasRelic("mawofworlds") && game.isCustodiansScored()) {
             MessageHelper.sendMessageToChannel(

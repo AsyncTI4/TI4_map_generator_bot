@@ -6,12 +6,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -382,6 +380,67 @@ public final class ButtonHelperTwilightsFallActionCards {
         String msg2 = p2.getRepresentationUnfogged() + ", you exchanged _" + tech2.getName() + "_ for _"
                 + tech1.getName() + "_ via a _Transpose_ with "
                 + (game.isFowMode() ? player.getColorIfCanSeeStats(p2) : player.getFactionNameOrColor()) + ".";
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        ButtonHelper.deleteMessage(event);
+
+        if (ability1.contains("tf-singularity")) {
+            List<Button> transferButtons = getTransferSingularityButtons(game, player, p2);
+            if (!transferButtons.isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", since you lost a singularity ability, you may also have to transfer whatever it was copying to "
+                                + p2.getFactionNameOrColor() + ".",
+                        transferButtons);
+            }
+        }
+
+        if (ability2.contains("tf-singularity")) {
+            List<Button> transferButtons = getTransferSingularityButtons(game, p2, player);
+            if (!transferButtons.isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        p2.getCorrectChannel(),
+                        p2.getRepresentation()
+                                + ", since you lost a singularity ability, you may also have to transfer whatever it was copying to "
+                                + player.getFactionNameOrColor() + ".",
+                        transferButtons);
+            }
+        }
+    }
+
+    public static List<Button> getTransferSingularityButtons(Game game, Player target, Player recipient) {
+        List<Button> buttons = new ArrayList<>();
+        for (String ability : target.getTechs()) {
+            TechnologyModel tech = Mapper.getTech(ability);
+            if (tech.getFaction().isEmpty()) {
+                continue;
+            }
+            if (!target.getSingularityTechs().contains(ability)) {
+                continue;
+            }
+            buttons.add(Buttons.gray(
+                    target.getFinsFactionCheckerPrefix() + "transferSingularity_" + recipient.getFaction() + "_"
+                            + ability,
+                    tech.getName(),
+                    tech.getSingleTechEmoji()));
+        }
+        buttons.add(Buttons.red("deleteButtons", "It wasn't copying anything"));
+        return buttons;
+    }
+
+    public static void transferSingularity(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String ability1 = buttonID.split("_")[2];
+        TechnologyModel tech1 = Mapper.getTech(ability1);
+        player.removeTech(ability1);
+        player.removeSingularityTech(ability1);
+        p2.addTech(ability1);
+        p2.addSingularityTech(ability1);
+        String msg = player.getRepresentationUnfogged() + " lose the copied ability _" + tech1.getName() + "_ to "
+                + p2.getFactionNameOrColor() + " when their singularity was transposed.";
+        String msg2 = p2.getRepresentationUnfogged() + ", you gained _" + tech1.getName() + "_ from "
+                + player.getFactionNameOrColor() + ".";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
