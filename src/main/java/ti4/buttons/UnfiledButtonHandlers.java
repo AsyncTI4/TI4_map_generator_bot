@@ -3444,9 +3444,13 @@ public class UnfiledButtonHandlers {
         if (!game.isFowMode() && "statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
             ReactionService.addReaction(event, game, player);
             for (Player p2 : game.getRealPlayers()) {
-                if (p2.isNpc() && !game.getCurrentACDrawStatusInfo().contains(p2.getFaction())) {
-                    ButtonHelper.drawStatusACs(game, p2, event);
+                if (p2.isNpc()
+                        && game.getStoredValue(
+                                        "statusHomeworkReactionFor" + p2.getFaction() + "Round" + game.getRound())
+                                .isEmpty()) {
                     ReactionService.addReaction(event, game, p2);
+                    game.setStoredValue(
+                            "statusHomeworkReactionFor" + p2.getFaction() + "Round" + game.getRound(), "added");
                 }
             }
         }

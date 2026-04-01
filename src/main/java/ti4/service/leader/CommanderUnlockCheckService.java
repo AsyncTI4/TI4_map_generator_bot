@@ -131,6 +131,9 @@ public class CommanderUnlockCheckService {
                         + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false)
                         + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer", false)
                         + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
+                if (player.hasRelic("lightrailordnance")) {
+                    num += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "spacedock", false);
+                }
                 shouldBeUnlocked = (num >= 6);
             }
             case "empyrean" ->

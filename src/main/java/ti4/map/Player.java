@@ -238,6 +238,31 @@ public class Player extends PlayerProperties {
         return singularities;
     }
 
+    public boolean removeSingularityTech(String tech) {
+        boolean singularity = false;
+        if (getSingularityTechs().contains(tech)) {
+            singularity = true;
+            String oldVal = getGame().getStoredValue(getFaction() + "singularityTechs");
+            if (oldVal.contains(tech + "_")) {
+                oldVal = oldVal.replace(tech + "_", "");
+            } else {
+                oldVal = oldVal.replace(tech, "");
+            }
+            getGame().setStoredValue(getFaction() + "singularityTechs", oldVal);
+        }
+        return singularity;
+    }
+
+    public void addSingularityTech(String tech) {
+        if (!getSingularityTechs().contains(tech)) {
+            String prev = getGame().getStoredValue(getFaction() + "singularityTechs");
+            if (!prev.isEmpty()) {
+                prev += "_";
+            }
+            game.setStoredValue(getFaction() + "singularityTechs", prev + tech);
+        }
+    }
+
     public boolean hasUnplayedSCs() {
         boolean hadAnyUnplayedSCs = false;
         for (Integer SC : getSCs()) {
@@ -947,6 +972,10 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasTheZeroToken() {
+
+        if (game.getStoredValue("TFTelepathicHolder").equalsIgnoreCase(getFaction())) {
+            return true;
+        }
         if (hasAbility("telepathic")) {
             if (game.isTwilightsFallMode()
                     && !game.getStoredValue("shouldntChangeTurnOrder").isEmpty()) {

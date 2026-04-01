@@ -245,17 +245,17 @@ public class ButtonHelper {
                 if (p2.ownsUnit("tf-vortexer")) {
                     for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p2, false, true)) {
                         if (game.getTileByPosition(pos).getSpaceUnitHolder().getUnitCount(UnitType.Carrier, p2) > 0) {
-                            MessageHelper.sendMessageToChannel(
-                                    player.getCorrectChannel(),
-                                    (totalAmount <= 10
-                                                    ? UnitEmojis.infantry
-                                                            .toString()
-                                                            .repeat(totalAmount)
-                                                    : UnitEmojis.infantry + "×" + totalAmount)
-                                            + " died and were captured by a "
-                                            + p2.getFactionEmoji()
-                                            + p2.getFaction()
-                                            + " Vortexer.");
+                            // MessageHelper.sendMessageToChannel(
+                            //         player.getCorrectChannel(),
+                            //         (totalAmount <= 10
+                            //                         ? UnitEmojis.infantry
+                            //                                 .toString()
+                            //                                 .repeat(totalAmount)
+                            //                         : UnitEmojis.infantry + "×" + totalAmount)
+                            //                 + " died and were captured by a "
+                            //                 + p2.getFactionEmoji()
+                            //                 + p2.getFaction()
+                            //                 + " Vortexer.");
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, game, p2, totalAmount, "infantry", null);
                             break;
                         }
@@ -4681,6 +4681,11 @@ public class ButtonHelper {
                 "78",
                 "79",
                 "80",
+                "113",
+                "114",
+                "115",
+                "116",
+                "117",
                 "d117",
                 "d118",
                 "d119",

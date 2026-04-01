@@ -210,7 +210,7 @@ public class RelicHelper {
                 }
             }
         }
-
+        CommanderUnlockCheckService.checkPlayer(player, "argent");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), helpMessage.toString());
         Helper.checkEndGame(game, player);
     }

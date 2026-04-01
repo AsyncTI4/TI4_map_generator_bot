@@ -14,6 +14,7 @@
         "permanentEffect": "Galvanized units roll 1 additional die for combat rolls and unit abilities.",
         "window": "When a game effect instructs a player to galvanize a unit",
         "windowEffect": "they place a galvanize token beneath it if it does not have one. ",
+        "notes": "There are only 7 galvanize tokens.",
         "source": "thunders_edge"
     },
     {
@@ -49,6 +50,7 @@
         "permanentEffect": "Any time you have more ocean cards than there are planets that contain your coexisting units, discard ocean cards until you do not.",
         "window": "When your units begin coexisting on a planet",
         "windowEffect": "gain an ocean card and ready it.",
+        "notes": "There are only 5 ocean cards. You cannot gain more than that.",
         "source": "thunders_edge"
     },
     {
@@ -56,6 +58,7 @@
         "name": "Sundered",
         "faction": "crimson",
         "permanentEffect": "You cannot use wormholes other than epsilon wormholes. Other players' units that move or are placed into your home system are destroyed.",
+        "notes": "Cannot use wormholes means that you cannot move through them. You can still fire space cannon and form neighborship through them. ",
         "source": "thunders_edge"
     },
     {
