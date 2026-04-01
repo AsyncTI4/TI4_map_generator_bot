@@ -70,6 +70,10 @@ public class TkHelperActionCards {
             case "tk-avenge" -> buttons.add(Buttons.green(ffcc + "courageousStarter", resolve));
             case "tk-bestow" -> buttons.addAll(getTkBestowButtons(player, resolve));
             case "tk-commission" -> buttons.add(Buttons.green(ffcc + "tkCommission_page0", resolve));
+            case "tk-compose" -> {
+                buttons.add(Buttons.green(ffcc + "resolveSummit", "Gain 2 Command Tokens"));
+                ActionCardHelper.serveManipulateInvestmentButtons(game, player);
+            }
             case "tk-conscript" -> buttons.add(Buttons.green(ffcc + "beginTkConscript", resolve));
             case "tk-contract" -> buttons.add(Buttons.green(ffcc + "beginTkContract", resolve));
             case "tk-daunt" -> nop(); // No automation required, just ignore or force the retreat
@@ -88,10 +92,6 @@ public class TkHelperActionCards {
             case "tk-incubate" -> nop(); // Button is automatically served upon being activated
             case "tk-initiate" -> buttons.addAll(getTkInitiateButtons(game, player));
             case "tk-oppress" -> buttons.addAll(PlayerTechService.getMageonImplantsButtons(game, player));
-            case "tk-orchestrate" -> {
-                buttons.add(Buttons.green(ffcc + "resolveSummit", "Gain 2 Command Tokens"));
-                ActionCardHelper.serveManipulateInvestmentButtons(game, player);
-            }
             case "tk-ordain" -> buttons.add(Buttons.green(ffcc + "startOrdain", resolve));
             case "tk-posture" -> buttons.add(Buttons.green(ffcc + "non_sc_draw_so", resolve));
             case "tk-preside" -> {

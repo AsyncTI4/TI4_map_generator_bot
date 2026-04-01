@@ -19,6 +19,16 @@ import ti4.service.emoji.UnitEmojis;
 @UtilityClass
 public class TkHelperUnits {
 
+    @ButtonHandler("heartOfDominion")
+    public static void heartOfDominion(ButtonInteractionEvent event, Player player, Game game) {
+        List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "heartOfDominion");
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                "Please choose which system you wish to remove your command token from.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("startMoyinsChosen")
     private void startMoyinsChosen(ButtonInteractionEvent event, Game game, Player player) {
         String ident = player.getRepresentationNoPing();

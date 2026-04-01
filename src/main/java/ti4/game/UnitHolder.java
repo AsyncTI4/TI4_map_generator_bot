@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Data;
 import lombok.Getter;
 import ti4.helpers.Constants;
@@ -304,6 +305,13 @@ public abstract class UnitHolder {
     @JsonIgnore
     public List<Integer> getUnitStates(UnitKey key) {
         return unitsByState.getOrDefault(key, UnitState.emptyList());
+    }
+
+    @JsonIgnore
+    public List<UnitState> getNonZeroUnitStates(UnitKey key) {
+        return Stream.of(UnitState.values())
+                .filter(st -> getUnitCountForState(key, st) > 0)
+                .toList();
     }
 
     @JsonIgnore

@@ -662,7 +662,7 @@ public final class ButtonHelperTacticalAction {
 
             for (Player btb : game.getRealPlayers()) {
                 if (!btb.ownsUnit("tk-blacktrenchbulwark")) continue;
-                if (activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Pds, btb) == 0) continue;
+                if (!activeSystem.containsPlayersUnitsWithModelCondition(btb, UnitModel::getIsStructure)) continue;
 
                 String id = btb.finChecker() + "useMagenDefense_" + activeSystem.getPosition();
                 Button use = Buttons.red(id, "Use Black Trench Bulwark", UnitEmojis.pds);

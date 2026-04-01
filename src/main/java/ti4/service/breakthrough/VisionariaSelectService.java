@@ -183,7 +183,7 @@ public class VisionariaSelectService {
         game.removeStoredValue("endTurnAfterVisionaria");
         game.removeStoredValue("fleetLogAfterVisionaria");
         game.removeStoredValue("VisionariaResponded");
-        ButtonHelper.deleteMessageDelay(event, 5);
+        // ButtonHelper.deleteMessageDelay(event, 5);
     }
 
     public void resolveTechResearch(Game game, Player player, String techID) {

@@ -415,7 +415,7 @@ public class ActionCardHelper {
                 "deflection",
                 "summit",
                 "bounty_contracts",
-                "tk-orchestrate");
+                "tk-compose");
         List<String> actionCards = new ArrayList<>(player.getActionCards().keySet());
         if (player.hasPlanet("garbozia")) {
             actionCards.addAll(getGarboziaActionCards(player.getGame()).keySet());

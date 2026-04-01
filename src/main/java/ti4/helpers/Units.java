@@ -52,6 +52,10 @@ public class Units {
             return unitType.plainName();
         }
 
+        public String unitTypeVal() {
+            return unitType.getValue();
+        }
+
         public String humanReadableName() {
             return unitType.humanReadableName();
         }

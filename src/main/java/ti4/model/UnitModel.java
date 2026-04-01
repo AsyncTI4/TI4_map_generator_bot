@@ -16,6 +16,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
+import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
@@ -172,10 +173,16 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
+        return getNameRepresentation(null);
+    }
+
+    public String getNameRepresentation(UnitState state) {
         String factionEmoji = getFaction().isEmpty() ? "" : getFactionEmoji().toString();
         TI4Emoji unitEmoji = getUnitEmoji();
         String name = this.name == null ? "" : this.name;
-        return factionEmoji + " " + unitEmoji + " _" + name + "_ " + getSourceEmoji();
+        String stateStr =
+                (state == null || state == UnitState.none) ? "" : (state.stateEmoji() + " " + state.humanDescr());
+        return stateStr + " " + factionEmoji + " " + unitEmoji + " _" + name + "_ " + getSourceEmoji();
     }
 
     private String getSourceEmoji() {

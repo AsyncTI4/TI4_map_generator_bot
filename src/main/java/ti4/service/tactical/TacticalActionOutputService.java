@@ -106,6 +106,11 @@ public class TacticalActionOutputService {
         int riftDistance = CheckDistanceHelper.getDistanceBetweenTwoTiles(
                 game, player, tile.getPosition(), game.getActiveSystem(), false);
 
+        Tile activeTile = game.getTileByPosition(game.getActiveSystem());
+        if (player.hasTech("scc") && tile.containsPlayersUnits(player) && activeTile.containsPlayersUnits(player)) {
+            distance = riftDistance = 1;
+        }
+
         var displaced = game.getTacticalActionDisplacement();
         Set<UnitKey> movingUnitsFromTile = displaced.entrySet().stream()
                 .filter(entry -> entry.getKey().startsWith(tile.getPosition() + "-"))
@@ -240,6 +245,15 @@ public class TacticalActionOutputService {
             if (player.hasUnit("tk-voidcarver")) {
                 maxBonus++;
                 output += " (has _Voidcarver_ for +1 movement for one other ship moving from the same system)";
+            }
+            if (player.hasUnit("tk-dissident") && unit.getUnitType().equals(UnitType.Dreadnought)) {
+                for (Player p2 : game.getRealPlayers()) {
+                    if (!tile.containsPlayersUnits(p2)) continue;
+                    if (player.getTotalVictoryPoints() < p2.getTotalVictoryPoints()) {
+                        maxBonus++;
+                        output += " (_Dissident_ has +1 movement to this system)";
+                    }
+                }
             }
             if (player.hasUnlockedBreakthrough("winnubt")
                     && game.getTileByPosition(game.getActiveSystem()).hasLegendary()) {

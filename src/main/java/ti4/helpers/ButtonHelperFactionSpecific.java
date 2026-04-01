@@ -3889,9 +3889,14 @@ public final class ButtonHelperFactionSpecific {
     @ButtonHandler("creussTFCruiserStep1_")
     public static void creussTFCruiserStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Cruiser)) {
-            buttons.add(Buttons.green(
-                    "creussTFCruiserStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+        Set<Tile> tiles = new HashSet<>();
+        tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Cruiser));
+        if (player.hasUnit("pinktf_flagship")) {
+            tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Flagship));
+        }
+        for (Tile tile : tiles) {
+            String id = "creussTFCruiserStep2_" + tile.getPosition();
+            buttons.add(Buttons.green(id, tile.getRepresentationForButtons(game, player)));
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

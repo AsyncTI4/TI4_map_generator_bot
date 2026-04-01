@@ -3565,6 +3565,11 @@ public class ButtonHelper {
         List<Button> buttonsToRemoveCC = new ArrayList<>();
         String finChecker = "FFCC_" + player.getFaction() + "_";
         for (Tile tile : getTilesWithYourCC(player, game, event)) {
+            if (whatIsItFor.contains("heartOfDominion")) {
+                if (tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, player) == 0) {
+                    continue;
+                }
+            }
             if (whatIsItFor.contains("kjal")) {
                 String pos = whatIsItFor.split("_")[1];
                 if (!pos.equalsIgnoreCase(tile.getPosition())
@@ -6001,14 +6006,14 @@ public class ButtonHelper {
         return getTilesWithShipsForAction(player, game, "domnaStepOne", false);
     }
 
-    /** @returns a list of buttons with id: {@code finchecker_<action>_<position>} */
+    /** @returns a list of buttons with id: {@code FFCC_<action>_<position>} */
     public static List<Button> getTilesWithUnitsForAction(
             Player player, Game game, String action, boolean includeDelete) {
         Predicate<Tile> hasPlayerUnits = tile -> tile.containsPlayersUnits(player);
         return getTilesWithPredicateForAction(player, game, action, hasPlayerUnits, includeDelete);
     }
 
-    /** @returns a list of buttons with id: {@code finchecker_<action>_<position>} */
+    /** @returns a list of buttons with id: {@code FFCC_<action>_<position>} */
     public static List<Button> getTilesWithShipsForAction(
             Player player, Game game, String action, boolean includeDelete) {
         Predicate<Tile> hasPlayerShips =
@@ -6016,13 +6021,13 @@ public class ButtonHelper {
         return getTilesWithPredicateForAction(player, game, action, hasPlayerShips, includeDelete);
     }
 
-    /** @returns a list of buttons with id: {@code finchecker_<action>_<position>} */
+    /** @returns a list of buttons with id: {@code FFCC_<action>_<position>} */
     public static List<Button> getAllTilesToModify(Player player, Game game, String action, boolean includeDelete) {
         Predicate<Tile> tRue = tile -> true;
         return getTilesWithPredicateForAction(player, game, action, tRue, includeDelete);
     }
 
-    /** @returns a list of buttons with id: {@code finchecker_<action>_<position>} */
+    /** @returns a list of buttons with id: {@code FFCC_<action>_<position>} */
     private static List<Button> getTilesWithUnitsForModifyUnitsButton(
             Player player, Game game, String action, boolean includeDelete) {
         Predicate<Tile> hasPlayerUnits = tile -> tile.containsPlayersUnits(player);
@@ -6032,7 +6037,7 @@ public class ButtonHelper {
         return buttons;
     }
 
-    /** @returns a list of buttons with id: {@code finchecker_<action>_<position>} */
+    /** @returns a list of buttons with id: {@code FFCC_<action>_<position>} */
     public static List<Button> getTilesWithPredicateForAction(
             Player player, Game game, String action, Predicate<Tile> predicate, boolean includeDelete) {
         String finChecker = player.finChecker();
@@ -6048,6 +6053,23 @@ public class ButtonHelper {
         if (includeDelete) {
             Button deleteButtons = Buttons.red(finChecker + "deleteButtons", "Delete these buttons");
             buttons.add(deleteButtons);
+        }
+        return buttons;
+    }
+
+    /** @returns a list of buttons with id: {@code FFCC_<action>_<position>_<unittype>_<unitstate>} */
+    public List<Button> getUnitsOnHolderForAction(
+            Player player, UnitHolder holder, String pos, String labelStart, String action, boolean includeDelete) {
+        String ffcc = player.finChecker();
+        List<Button> buttons = new ArrayList<>();
+        for (UnitKey key : holder.getUnitKeysForPlayer(player)) {
+            for (UnitState state : holder.getNonZeroUnitStates(key)) {
+                String id = ffcc + action + "_" + pos + "_" + key.unitTypeVal() + "_" + state.name();
+                String label = labelStart;
+                label += state == UnitState.none ? "" : (state.humanDescr() + " ");
+                label += key.humanReadableName();
+                buttons.add(Buttons.red(id, label, key.unitEmoji()));
+            }
         }
         return buttons;
     }

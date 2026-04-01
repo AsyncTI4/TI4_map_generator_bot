@@ -286,10 +286,10 @@ public class StartPhaseService {
                     && player2.getPlayableActionCards().contains("tf-tartarus")) {
                 ActionCardHelper.playAC(event, game, player2, "tf-tartarus", game.getMainGameChannel());
             }
-            if (game.getStoredValue("Orchestrate") != null
-                    && game.getStoredValue("Orchestrate").contains(player2.getFaction())
-                    && player2.getPlayableActionCards().contains("tk-orchestrate")) {
-                ActionCardHelper.playAC(event, game, player2, "tk-orchestrate", game.getMainGameChannel());
+            if (game.getStoredValue("Compose") != null
+                    && game.getStoredValue("Compose").contains(player2.getFaction())
+                    && player2.getPlayableActionCards().contains("tk-compose")) {
+                ActionCardHelper.playAC(event, game, player2, "tk-compose", game.getMainGameChannel());
             }
             if (player2.hasLeader("zealotshero")
                     && player2.getLeader("zealotshero").get().isActive()

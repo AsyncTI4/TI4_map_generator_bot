@@ -1099,7 +1099,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 && ((Constants.SPACE.equals(unitHolder.getName()) && Boolean.TRUE.equals(unit.getIsShip()))
                         || (!Constants.SPACE.equals(unitHolder.getName()) && !Boolean.TRUE.equals(unit.getIsShip()))))
             score++;
-        if (unit.getID().contains("tf-")
+        if ((unit.getID().contains("tf-") || unit.getID().contains("tk-"))
                 && (unit.getUnitType() == UnitType.Flagship || unit.getUnitType() == UnitType.Mech)) {
             score = 0;
         }
@@ -2337,6 +2337,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             if (getTechs().contains("absol_" + techID)) {
                 return true;
             }
+        }
+        if ("scc".equalsIgnoreCase(techID) && getTechs().contains("tf-ahl")) {
+            return true;
         }
         if ("ah".equalsIgnoreCase(techID) && getTechs().contains("tf-ahl")) {
             return true;

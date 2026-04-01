@@ -942,7 +942,7 @@ public class StartCombatService {
                         + ", a reminder that when you first kill an opponent's unit this combat, you may use the button to copy a technology.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, steal);
             }
-            if (player.hasUnit("tk-maleagant")) {
+            if (player.hasUnit("tk-maleagant") && "space".equalsIgnoreCase(type)) {
                 String message = player.getRepresentation() + ", a reminder that when you first kill an opponent's";
                 message += " unit this combat, you may use the button to resolve your ";
                 message += Mapper.getUnit("tk-maleagant").getNameRepresentation() + " ability.";

@@ -90,7 +90,7 @@ public class TfBlessResolver implements EdictResolver {
             return;
         }
         player.setStoredValue(buttonID, "y");
-        ActionCardHelper.drawActionCards(player, 3);
+        ActionCardHelper.drawActionCards(player, 2);
         afterResolve(event, game, player);
     }
 

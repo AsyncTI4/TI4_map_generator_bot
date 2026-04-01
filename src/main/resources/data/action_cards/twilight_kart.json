@@ -32,6 +32,14 @@
         "source": "twilight_kart"
     },
     {
+        "alias": "tk-compose",
+        "name": "Compose",
+        "phase": "Strategy",
+        "window": "At the start of the Strategy Phase",
+        "text": "Place a total of 3 trade goods from the supply on strategy cards of your choice; you must place these tokens on at least 2 different cards. Then, gain 2 command tokens.",
+        "source": "twilight_kart"
+    },
+    {
         "alias": "tk-conscript",
         "name": "Conscript",
         "phase": "Action",
@@ -127,14 +135,6 @@
         "phase": "Action",
         "window": "Action",
         "text": "Choose 1 player and look at their hand of action cards. Choose 1 of those cards and add it to your hand.",
-        "source": "twilight_kart"
-    },
-    {
-        "alias": "tk-orchestrate",
-        "name": "Orchestrate",
-        "phase": "Strategy",
-        "window": "At the start of the Strategy Phase",
-        "text": "Place a total of 3 trade goods from the supply on strategy cards of your choice; you must place these tokens on at least 2 different cards. Then, gain 2 command tokens.",
         "source": "twilight_kart"
     },
     {

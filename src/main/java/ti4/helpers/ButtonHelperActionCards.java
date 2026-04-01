@@ -2219,13 +2219,13 @@ public final class ButtonHelperActionCards {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
-        if (player.getPlayableActionCards().contains("tk-orchestrate")) {
+        if (player.getPlayableActionCards().contains("tk-compose")) {
             String msg = player.getRepresentation()
-                    + ", you have the option to pre-play _Orchestrate_."
+                    + ", you have the option to pre-play _Compose_."
                     + " Start-of-strategy-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
                     + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("resolvePreassignment_Orchestrate", "Pre-Play Orchestrate"));
+            buttons.add(Buttons.green("resolvePreassignment_Compose", "Pre-Play Compose"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
