@@ -889,7 +889,7 @@ public class ButtonHelper {
             for (Map.Entry<String, Integer> ac : acs.entrySet()) {
                 game.discardActionCard(player.getUserID(), ac.getValue());
                 String sb = "Player: " + player.getUserName() + " - " + "Discarded action card:" + "\n"
-                        + Mapper.getActionCard(ac.getKey()).getRepresentation() + "\n";
+                        + Mapper.getActionCard(ac.getKey()).getRepresentation(game) + "\n";
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb);
             }
             ActionCardHelper.serveReverseEngineerButtons(game, player, new ArrayList<>(acs.keySet()));
