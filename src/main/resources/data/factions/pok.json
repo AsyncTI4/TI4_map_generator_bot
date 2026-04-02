@@ -28,7 +28,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheArgentFlight_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheArgentFlight_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheArgentFlight",
-        "preferredColours": ["org", "pch", "spr"],
+        "preferredColours": ["org", "rst", "cnb", "pch", "gld", "cpr", "wsp", "crm"],
         "source": "pok",
         "priorityNumber": 25
     },
@@ -62,7 +62,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheVuilRaithCabal_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheVuilRaithCabal_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheVuilRaithCabal",
-        "preferredColours": ["bld", "red", "psn"],
+        "preferredColours": ["bld", "red", "psn", "blk", "nm", "rbw", "rby", "pld"],
         "source": "pok",
         "priorityNumber": 6
     },
@@ -94,7 +94,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEmpyrean_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEmpyrean_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheEmpyrean",
-        "preferredColours": ["sns", "ppl", "eth"],
+        "preferredColours": ["ppl", "eth", "sns", "vpw", "psn", "ryl", "plm", "lvn"],
         "source": "pok",
         "priorityNumber": 9
     },
@@ -127,7 +127,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheMahactGeneSorcerers_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheMahactGeneSorcerers_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheMahactGeneSorcerers",
-        "preferredColours": ["gld", "ylw", "lvn"],
+        "preferredColours": ["gld", "ylw", "ppl", "ryl", "wsp", "splitgld", "cpr", "psy"],
         "source": "pok",
         "priorityNumber": 1
     },
@@ -166,7 +166,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNomad_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNomad_FactionSheetBack.webp",
         "wikiURL": "",
-        "preferredColours": ["nvy", "blu", "gcr"],
+        "preferredColours": ["nvy", "blu", "gcr", "ppl", "azr", "sns", "ryl", "vpw"],
         "source": "pok",
         "priorityNumber": 2
     },
@@ -201,7 +201,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNaazRokhaAlliance_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNaazRokhaAlliance_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheNaazRokhaAlliance",
-        "preferredColours": ["lme", "grn", "sbt"],
+        "preferredColours": ["eme", "grn", "frs", "psn", "tqs", "plm", "cam", "ryl"],
         "source": "pok",
         "priorityNumber": 19
     },
@@ -235,7 +235,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheTitansOfUl_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheTitansOfUl_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheTitansOfUl",
-        "preferredColours": ["pnk", "rse", "vpw"],
+        "preferredColours": ["pnk", "rse", "vpw", "sbt", "psy", "blt", "plm", "sns", "pch", "nea"],
         "source": "pok",
         "priorityNumber": 13
     }

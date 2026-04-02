@@ -40,9 +40,14 @@
             "spacedock"
         ],
         "preferredColours": [
-            "sbt",
+            "org",
+            "ppl",
+            "lvn",
+            "jpt",
+            "gry",
             "nea",
-            "lgy"
+            "lgy",
+            "crm"
         ],
         "source": "codex3",
         "priorityNumber": 23
@@ -89,9 +94,14 @@
             "spacedock"
         ],
         "preferredColours": [
-            "sbt",
+            "org",
+            "ppl",
+            "lvn",
+            "jpt",
+            "gry",
             "nea",
-            "lgy"
+            "lgy",
+            "crm"
         ],
         "source": "codex3"
     },
@@ -138,9 +148,14 @@
             "spacedock"
         ],
         "preferredColours": [
-            "sbt",
+            "org",
+            "ppl",
+            "lvn",
+            "jpt",
+            "gry",
             "nea",
-            "lgy"
+            "lgy",
+            "crm"
         ],
         "source": "codex3"
     }
