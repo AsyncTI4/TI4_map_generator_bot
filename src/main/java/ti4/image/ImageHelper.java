@@ -138,14 +138,16 @@ public class ImageHelper {
     }
 
     @Nullable
-    private static BufferedImage readImageURL(String imageURL) {
-        if (isBlank(imageURL)) return null;
+    private static BufferedImage readImageURL(String imageUrl) {
+        if (isBlank(imageUrl)) return null;
+
+        imageUrl = sanitizeUrl(imageUrl);
 
         URI uri;
         try {
-            uri = URI.create(imageURL);
+            uri = URI.create(imageUrl);
         } catch (Exception e) {
-            BotLogger.error("Invalid image URL: " + imageURL, e);
+            BotLogger.error("Invalid image URL: " + imageUrl, e);
             return null;
         }
 
@@ -161,24 +163,28 @@ public class ImageHelper {
 
             try (InputStream inputStream = response.body()) {
                 if (response.statusCode() != 200) {
-                    BotLogger.error("Failed to read image. URL: " + imageURL + " Status: " + response.statusCode());
+                    BotLogger.error("Failed to read image. URL: " + imageUrl + " Status: " + response.statusCode());
                     return null;
                 }
 
                 BufferedImage image = ImageIO.read(inputStream);
                 if (image == null) {
-                    BotLogger.error("ImageIO could not decode stream from: " + imageURL);
+                    BotLogger.error("ImageIO could not decode stream from: " + imageUrl);
                 }
                 return image;
             }
         } catch (HttpTimeoutException e) {
-            BotLogger.error("Timeout fetching image: " + imageURL);
+            BotLogger.error("Timeout fetching image: " + imageUrl);
         } catch (IOException e) {
-            BotLogger.error("Network error fetching image: " + imageURL, e);
+            BotLogger.error("Network error fetching image: " + imageUrl, e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         return null;
+    }
+
+    private static String sanitizeUrl(String imageUrl) {
+        return imageUrl.replace("animated=true", "animated=false");
     }
 
     @SneakyThrows
