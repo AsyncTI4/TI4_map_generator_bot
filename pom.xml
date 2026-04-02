@@ -21,7 +21,7 @@
     <reflections.version>0.10.2</reflections.version>
     <jskills.version>1.1</jskills.version>
     <webp-imageio.version>0.10.2</webp-imageio.version>
-    <jemoji.version>1.7.5</jemoji.version>
+    <jemoji.version>1.7.6</jemoji.version>
     <spotless.version>3.2.1</spotless.version>
   </properties>
 
