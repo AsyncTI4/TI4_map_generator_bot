@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import ti4.map.Game;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.testUtils.BaseTi4Test;
@@ -18,6 +19,33 @@ class ActionCardModelTest extends BaseTi4Test {
     void testDirectHit() {
         ActionCardModel dhActionCardModel = Mapper.getActionCard("dh1");
         assertEquals("Direct Hit", dhActionCardModel.getName());
+    }
+
+    @Test
+    void testGetRepresentation() {
+        Game game = new Game();
+        ActionCardModel dhActionCardModel = Mapper.getActionCard("dh1");
+        String expectedString = "<ActionCard>_Direct Hit_ - After another player's ship uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities: Destroy that ship.\n";
+        assertEquals(expectedString, dhActionCardModel.getRepresentation(game));
+    }
+
+    @Test
+    void testGetRepresentationWildWild() {
+        Game game = new Game();
+        game.setWildWildGalaxyMode(true);
+        ActionCardModel dhActionCardModel = Mapper.getActionCard("dh1");
+        String expectedString = "<ActionCard><Event>_Direct Hit_ - After another player's ship or mech uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities: Destroy that unit.\n";
+        assertEquals(expectedString, dhActionCardModel.getRepresentation(game));
+    }
+    
+    @Test
+    void testGetRepresentationWildWildNormalAC() {
+        // confirm an AC with no wildWild text returns the base content even when WildWild mode is enabled.
+        Game game = new Game();
+        game.setWildWildGalaxyMode(true);
+        ActionCardModel dhActionCardModel = Mapper.getActionCard("reflective");
+        String expectedString = "<ActionCard>_Reflective Shielding_ - When one of your ships uses SUSTAIN DAMAGE during combat: Produce 2 hits against your opponent's ships in the active system.\n";
+        assertEquals(expectedString, dhActionCardModel.getRepresentation(game));
     }
 
     @Test

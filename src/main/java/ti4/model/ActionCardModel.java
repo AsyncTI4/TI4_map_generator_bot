@@ -27,6 +27,8 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     private ComponentSource actualSource;
     private List<String> searchTags = new ArrayList<>();
     private boolean affectedByWildWildGalaxy;
+    private String wildWildWindow;
+    private String wildWildText;
 
     public boolean isValid() {
         return alias != null && name != null && phase != null && window != null && text != null && source != null;
@@ -41,7 +43,9 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getRepresentation(Game game) {
-        return getNameRepresentation(game) + " - " + window + ": " + text + "\n";
+        String cardText = hasWildText(game) ? wildWildText : text;
+        String windowText = hasWildText(game) ? wildWildWindow : window;
+        return getNameRepresentation(game) + " - " + windowText + ": " + cardText + "\n";
     }
 
     public String getRepresentation() {
@@ -110,5 +114,9 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
 
     public boolean isWild(Game game) {
         return (game != null) && affectedByWildWildGalaxy && game.isWildWildGalaxyMode();
+    }
+    
+    public boolean hasWildText(Game game) {
+        return (game != null) && affectedByWildWildGalaxy && game.isWildWildGalaxyMode() && wildWildText != null && wildWildWindow != null;
     }
 }
