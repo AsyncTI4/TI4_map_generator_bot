@@ -43,17 +43,22 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getRepresentation(Game game) {
-        String cardText = hasWildText(game) ? wildWildText : text;
-        String windowText = hasWildText(game) ? wildWildWindow : window;
-        return getNameRepresentation(game) + " - " + windowText + ": " + cardText + "\n";
+        String cardJustText = getRepresentationJustText(game);
+        return getNameRepresentation(game) + " - " + cardJustText + "\n";
     }
 
     public String getRepresentation() {
         return getRepresentation(null);
     }
 
+    public String getRepresentationJustText(Game game) {
+        String cardText = hasWildText(game) ? wildWildText : text;
+        String cardWindow = hasWildText(game) ? wildWildWindow : window;
+        return cardWindow + ": " + cardText;
+    }
+   
     public String getRepresentationJustText() {
-        return window + ": " + text;
+        return getRepresentationJustText(null);
     }
 
     public MessageEmbed getRepresentationEmbed() {
