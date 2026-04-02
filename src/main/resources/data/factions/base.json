@@ -704,9 +704,9 @@
             "blk",
             "rbw",
             "nm",
-            "bld",
             "pld",
-            "rby"
+            "rby",
+            "sns"
         ],
         "source": "base",
         "priorityNumber": 10
