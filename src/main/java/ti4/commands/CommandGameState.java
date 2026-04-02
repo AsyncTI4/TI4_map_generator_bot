@@ -41,7 +41,7 @@ class CommandGameState {
     void postExecute(SlashCommandInteractionEvent event) {
         if (saveGame) {
             Game game = CommandGameState.game.get();
-            GameManager.save(game, EventAuditService.getReason(event, game.isFowMode()));
+            GameManager.save(game, EventAuditService.getReason(event));
         }
         clear();
     }
