@@ -43,11 +43,10 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheArborec_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheArborec",
         "preferredColours": [
-            "frs",
-            "jad",
-            "eme",
             "grn",
-            "ptr",
+            "frs",
+            "eme",
+            "jad",
             "wtm",
             "psn",
             "blt",
@@ -104,15 +103,17 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheGhostsOfCreuss_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheGhostsOfCreuss",
         "preferredColours": [
-            "eth",
             "blu",
+            "eth",
             "gcr",
             "vpw",
             "sns",
             "nvy",
             "tea",
             "ptr",
-            "vdg"
+            "vdg",
+            "azr",
+            "sbt"
         ],
         "source": "base",
         "priorityNumber": 20
@@ -170,10 +171,9 @@
             "ylw",
             "crm",
             "wsp",
-            "beg",
+            "org",
             "cpr",
             "spr",
-            "splitgld",
             "dw"
         ],
         "source": "base",
@@ -231,9 +231,13 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheUniversitiesOfJolNar_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheUniversitiesOfJolNar",
         "preferredColours": [
-            "nvy",
             "ppl",
-            "lgy"
+            "ryl",
+            "nvy",
+            "blu",
+            "vpw",
+            "sns",
+            "lvn"
         ],
         "source": "base",
         "priorityNumber": 24
@@ -286,9 +290,14 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheL1z1xMindnet_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheL1z1xMindnet",
         "preferredColours": [
-            "bld",
+            "blk",
             "red",
-            "rby"
+            "bld",
+            "nm",
+            "cqr",
+            "orca",
+            "rbw",
+            "gry"
         ],
         "source": "base",
         "priorityNumber": 5
@@ -340,9 +349,14 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheBaronyOfLetnev_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheBaronyOfLetnev",
         "preferredColours": [
-            "pld",
+            "blk",
             "red",
-            "blk"
+            "bld",
+            "pld",
+            "rst",
+            "sns",
+            "nm",
+            "rbw"
         ],
         "source": "base",
         "priorityNumber": 8
@@ -394,9 +408,14 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheMentakCoalition_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheMentakCoalition",
         "preferredColours": [
-            "dw",
+            "ylw",
             "org",
-            "gld"
+            "gld",
+            "dw",
+            "crm",
+            "wsp",
+            "blk",
+            "cpr"
         ],
         "source": "base",
         "priorityNumber": 15
@@ -447,9 +466,14 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEmbersOfMuaat_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheEmbersOfMuaat",
         "preferredColours": [
-            "cpr",
+            "mgm",
+            "red",
             "org",
-            "mgm"
+            "sns",
+            "cnb",
+            "bld",
+            "rst",
+            "cpr"
         ],
         "source": "base",
         "priorityNumber": 14
@@ -501,9 +525,14 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNaaluCollective_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheNaaluCollective",
         "preferredColours": [
-            "tqs",
             "grn",
-            "wtm"
+            "eme",
+            "tqs",
+            "wtm",
+            "psn",
+            "hqn",
+            "tpl",
+            "jad"
         ],
         "source": "base",
         "priorityNumber": 28
@@ -557,7 +586,11 @@
         "preferredColours": [
             "bld",
             "red",
-            "pld"
+            "pld",
+            "blk",
+            "nm",
+            "rbw",
+            "sns"
         ],
         "source": "base",
         "priorityNumber": 22
@@ -608,9 +641,14 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheClanOfSaar_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheClanOfSaar",
         "preferredColours": [
+            "ylw",
+            "chk",
+            "cpr",
+            "wsp",
             "rst",
-            "org",
-            "tan"
+            "cam",
+            "tan",
+            "nea"
         ],
         "source": "base",
         "priorityNumber": 17
@@ -662,8 +700,13 @@
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=SardakkNorr",
         "preferredColours": [
             "red",
-            "wtm",
-            "psn"
+            "bld",
+            "blk",
+            "rbw",
+            "nm",
+            "bld",
+            "pld",
+            "rby"
         ],
         "source": "base",
         "priorityNumber": 10
@@ -715,11 +758,13 @@
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheFederationOfSol",
         "preferredColours": [
             "blu",
-            "spr",
-            "gry",
-            "dw",
             "nvy",
-            "cam"
+            "dw",
+            "crm",
+            "jpt",
+            "cam",
+            "lgy",
+            "gry"
         ],
         "source": "base",
         "priorityNumber": 3
@@ -778,8 +823,13 @@
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheWinnu",
         "preferredColours": [
             "ppl",
+            "ryl",
             "sns",
-            "crm"
+            "plm",
+            "rbw",
+            "vpw",
+            "lvn",
+            "blk"
         ],
         "source": "base",
         "priorityNumber": 27
@@ -830,9 +880,14 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheXxchaKingdom_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheXxchaKingdom",
         "preferredColours": [
-            "lme",
             "grn",
-            "hqn"
+            "eme",
+            "lme",
+            "hqn",
+            "tqs",
+            "vdg",
+            "jad",
+            "psn"
         ],
         "source": "base",
         "priorityNumber": 26
@@ -882,9 +937,14 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheYinBrotherhood_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheYinBrotherhood",
         "preferredColours": [
-            "plm",
             "ppl",
-            "rby"
+            "plm",
+            "ryl",
+            "sns",
+            "blk",
+            "gry",
+            "lvn",
+            "vpw"
         ],
         "source": "base",
         "priorityNumber": 4
@@ -936,9 +996,14 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheYssarilTribes_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheYssarilTribes",
         "preferredColours": [
-            "tqs",
             "grn",
-            "cqr"
+            "eme",
+            "cam",
+            "tpl",
+            "tqs",
+            "jad",
+            "lme",
+            "frs"
         ],
         "source": "base",
         "priorityNumber": 11

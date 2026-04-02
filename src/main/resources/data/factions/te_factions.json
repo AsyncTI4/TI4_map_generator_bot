@@ -47,8 +47,13 @@
         ],
         "preferredColours": [
             "dw",
+            "jpt",
             "ylw",
-            "tpl"
+            "blu",
+            "crm",
+            "tpl",
+            "wsp",
+            "cpr"
         ],
         "source": "thunders_edge",
         "priorityNumber": 21
@@ -146,11 +151,15 @@
             "spacedock"
         ],
         "preferredColours": [
-            "rby",
-            "gry",
-            "psn",
+            "ppl",
+            "blu",
             "blk",
-            "ryl"
+            "ryl",
+            "sns",
+            "psn",
+            "rby",
+            "rbw",
+            "pld"
         ],
         "source": "thunders_edge",
         "priorityNumber": 30
@@ -245,9 +254,11 @@
         ],
         "preferredColours": [
             "red",
+            "bld",
             "nm",
+            "rby",
             "sns",
-            "bld"
+            "vpw"
         ],
         "source": "thunders_edge",
         "priorityNumber": 16
@@ -299,9 +310,15 @@
             "spacedock"
         ],
         "preferredColours": [
+            "grn",
+            "ylw",
+            "tpl",
             "lme",
             "wtm",
-            "grn"
+            "psn",
+            "cam",
+            "frs",
+            "jad"
         ],
         "source": "thunders_edge",
         "priorityNumber": 12
