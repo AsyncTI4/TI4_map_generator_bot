@@ -37,7 +37,7 @@ class ActionCardModelTest extends BaseTi4Test {
         String expectedString = "<ActionCard><Event>_Direct Hit_ - After another player's ship or mech uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities: Destroy that unit.\n";
         assertEquals(expectedString, dhActionCardModel.getRepresentation(game));
     }
-    
+
     @Test
     void testGetRepresentationWildWildNormalAC() {
         // confirm an AC with no wildWild text returns the base content even when WildWild mode is enabled.
