@@ -1409,7 +1409,7 @@
         "source": "pok",
         "affectedByWildWildGalaxy": true,
         "wildWildWindow": "When an agenda is revealed",
-        "wildWildText": "Choose another player. That player must give you 3 promissory note from their hand."
+        "wildWildText": "Choose another player. That player must give you 3 promissory notes from their hand."
     },
     {
         "alias": "dp2",
@@ -1423,7 +1423,7 @@
         "source": "pok",
         "affectedByWildWildGalaxy": true,
         "wildWildWindow": "When an agenda is revealed",
-        "wildWildText": "Choose another player. That player must give you 3 promissory note from their hand."
+        "wildWildText": "Choose another player. That player must give you 3 promissory notes from their hand."
     },
     {
         "alias": "dp3",
@@ -1437,7 +1437,7 @@
         "source": "pok",
         "affectedByWildWildGalaxy": true,
         "wildWildWindow": "When an agenda is revealed",
-        "wildWildText": "Choose another player. That player must give you 3 promissory note from their hand."
+        "wildWildText": "Choose another player. That player must give you 3 promissory notes from their hand."
     },
     {
         "alias": "dp4",
@@ -1451,7 +1451,7 @@
         "source": "pok",
         "affectedByWildWildGalaxy": true,
         "wildWildWindow": "When an agenda is revealed",
-        "wildWildText": "Choose another player. That player must give you 3 promissory note from their hand."
+        "wildWildText": "Choose another player. That player must give you 3 promissory notes from their hand."
     },
     {
         "alias": "divert_funding",

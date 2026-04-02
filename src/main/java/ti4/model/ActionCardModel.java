@@ -52,8 +52,9 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getRepresentationJustText(Game game) {
-        String cardText = hasWildText(game) ? wildWildText : text;
-        String cardWindow = hasWildText(game) ? wildWildWindow : window;
+        boolean useWildText = hasWildText(game);
+        String cardText = useWildText ? wildWildText : text;
+        String cardWindow = useWildText ? wildWildWindow : window;
         return cardWindow + ": " + cardText;
     }
    
@@ -82,11 +83,15 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
                 + "**__" + source.emoji();
         eb.setTitle(title);
 
+        boolean useWildText = hasWildText(game);
+        String cardText = useWildText ? wildWildText : text;
+        String cardWindow = useWildText ? wildWildWindow : window;
+
         // DESCRIPTION
         if (notes == null) {
-            eb.setDescription("\n***" + window + ":***\n" + text);
+            eb.setDescription("\n***" + cardWindow + ":***\n" + cardText);
         } else {
-            eb.setDescription("\n***" + window + ":***\n" + text + "\n-# [" + notes + "]");
+            eb.setDescription("\n***" + cardWindow + ":***\n" + cardText + "\n-# [" + notes + "]");
         }
 
         // FLAVOUR TEXT
