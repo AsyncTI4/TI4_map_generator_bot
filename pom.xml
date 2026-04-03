@@ -221,6 +221,7 @@
           <xmlOutput>true</xmlOutput>
           <htmlOutput>true</htmlOutput>
           <sarifOutput>true</sarifOutput>
+          <excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
           <plugins>
             <plugin>
               <groupId>com.h3xstream.findsecbugs</groupId>

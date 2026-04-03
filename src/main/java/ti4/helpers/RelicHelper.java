@@ -116,7 +116,7 @@ public class RelicHelper {
                     game.drawSecretObjective(player.getUserID());
                     helpMessage.append(" Drew a second secret objective due to **Plausible Deniability**.");
                 }
-                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
+                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
             }
             case "shard" -> {
                 Integer poIndex = game.addCustomPO("Shard of the Throne", 1);

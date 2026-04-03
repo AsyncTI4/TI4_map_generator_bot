@@ -183,11 +183,9 @@ public class PlayHeroService {
                         buttons);
             }
             case "titanshero" -> {
-                Tile t = player.getHomeSystemTile();
-                if (!game.isTwilightsFallMode()
-                        && game.getTileFromPlanet("elysium") != null
-                        && game.getTileFromPlanet("elysium") == t) {
-                    t.addToken("attachment_titanshero.png", "elysium");
+                Tile tile = player.getHomeSystemTile();
+                if (!game.isTwilightsFallMode() && isElysium(game, tile)) {
+                    tile.addToken("attachment_titanshero.png", "elysium");
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(), "Elysium has had Ul The Progenitor attached, and been readied.");
                     PlanetService.refreshPlanet(player, "elysium");
@@ -730,6 +728,11 @@ public class PlayHeroService {
                     event.getMessageChannel(),
                     "Combat modifier will be applied next time you push the combat roll button.");
         }
+    }
+
+    private static boolean isElysium(Game game, Tile tile) {
+        Tile elysiumTile = game.getTileFromPlanet("elysium");
+        return elysiumTile != null && elysiumTile == tile;
     }
 
     private static List<Button> getYssarilHeroActionCardButtons(Player yssaril, Player notYssaril) {

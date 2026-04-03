@@ -95,7 +95,6 @@ public class PlayerAreaGenerator {
     private static final Stroke stroke4 = new BasicStroke(4.0f);
     private static final Stroke stroke5 = new BasicStroke(5.0f);
     private static final Stroke stroke8 = new BasicStroke(8.0f);
-    private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -1.570_796_326_794_896_6;
 
     private final Graphics graphics;
     private final Game game;
@@ -3485,8 +3484,7 @@ public class PlayerAreaGenerator {
             scoredSecretObjectives.put(id, List.of(player.getUserID()));
         }
         graphics.setColor(Color.RED);
-        y = displaySecretObjectives(
-                y, scoredSecretObjectives, revealedSecretObjectives, players, secretObjectives, secret);
+        displaySecretObjectives(y, scoredSecretObjectives, revealedSecretObjectives, players, secretObjectives, secret);
         if (player.isSearchWarrant()) {
             return secretsScored.size() + player.getSecrets().size();
         }

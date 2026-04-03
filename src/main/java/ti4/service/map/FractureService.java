@@ -81,8 +81,7 @@ public class FractureService {
         Player neutral = game.getPlayerFromColorOrFaction("neutral");
         if (neutral == null) {
             String color = SetupNeutralPlayer.pickNeutralColor(game);
-            game.setupNeutralPlayer(color);
-            neutral = game.getPlayerFromColorOrFaction("neutral");
+            neutral = game.setupNeutralPlayer(color);
         }
         String neutralColorID = neutral.getColorID();
         List<String> units =

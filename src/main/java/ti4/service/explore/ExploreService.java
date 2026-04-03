@@ -766,7 +766,7 @@ public class ExploreService {
                     game.drawSecretObjective(player.getUserID());
                     message.append(" Drew a second secret objective due to **Plausible Deniability**.");
                 }
-                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
+                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
                 MessageHelper.sendMessageToEventChannel(event, message.toString());
             }
             case "dw" -> {

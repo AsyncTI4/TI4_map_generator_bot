@@ -242,20 +242,20 @@ public class Player extends PlayerProperties {
         boolean singularity = false;
         if (getSingularityTechs().contains(tech)) {
             singularity = true;
-            String oldVal = getGame().getStoredValue(getFaction() + "singularityTechs");
+            String oldVal = game.getStoredValue(getFaction() + "singularityTechs");
             if (oldVal.contains(tech + "_")) {
                 oldVal = oldVal.replace(tech + "_", "");
             } else {
                 oldVal = oldVal.replace(tech, "");
             }
-            getGame().setStoredValue(getFaction() + "singularityTechs", oldVal);
+            game.setStoredValue(getFaction() + "singularityTechs", oldVal);
         }
         return singularity;
     }
 
     public void addSingularityTech(String tech) {
         if (!getSingularityTechs().contains(tech)) {
-            String prev = getGame().getStoredValue(getFaction() + "singularityTechs");
+            String prev = game.getStoredValue(getFaction() + "singularityTechs");
             if (!prev.isEmpty()) {
                 prev += "_";
             }
@@ -1770,10 +1770,15 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasCustomFactionEmoji() {
-        return StringUtils.isNotBlank(getFactionEmoji())
-                && !"null".equals(getFactionEmoji())
-                && getFactionModel() != null
-                && !getFactionEmoji().equalsIgnoreCase(getFactionModel().getFactionEmoji());
+        String factionEmoji = getFactionEmoji();
+        return StringUtils.isNotBlank(factionEmoji)
+                && !"null".equals(factionEmoji)
+                && isFactionEmojiDifferentFromWhatIsOnModel();
+    }
+
+    private boolean isFactionEmojiDifferentFromWhatIsOnModel() {
+        FactionModel factionModel = getFactionModel();
+        return factionModel != null && !getFactionEmoji().equalsIgnoreCase(factionModel.getFactionEmoji());
     }
 
     private void initAbilities(Game game) {

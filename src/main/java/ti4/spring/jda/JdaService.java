@@ -109,7 +109,7 @@ public class JdaService {
     private static Guild guildTredenary;
     private static Guild guildQuadrodenary;
     public static Guild guildFogOfWar;
-    public static Guild guildFogOfWarSecondary;
+    private static Guild guildFogOfWarSecondary;
     public static Guild guildCommunityPlays;
     private static Guild guildMegagame;
     private static Guild guildTourney;

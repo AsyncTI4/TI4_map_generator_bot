@@ -53,12 +53,6 @@ import ti4.service.unit.CheckUnitContainmentService;
 @UtilityClass
 public class StartCombatService {
 
-    public static void combatCheckEachTile(Game game, GenericInteractionCreateEvent event) {
-        for (Tile tile : game.getTileMap().values()) {
-            combatCheck(game, event, tile);
-        }
-    }
-
     public static void combatCheck(Game game, GenericInteractionCreateEvent event, Tile tile) {
         spaceCombatCheck(game, tile, event);
         tile.getUnitHolders().values().stream()

@@ -153,7 +153,7 @@ public class PlayerStatsDashboardPayload {
                     if (objId.toLowerCase().contains("censure")) {
                         return "Political Censure";
                     }
-                    if (objId.equalsIgnoreCase(Constants.VOICE_OF_THE_COUNCIL_PO)) {
+                    if (Constants.VOICE_OF_THE_COUNCIL_PO.equalsIgnoreCase(objId)) {
                         return "Voice of the Council";
                     }
                     if (objId.toLowerCase().contains("mutiny")) {

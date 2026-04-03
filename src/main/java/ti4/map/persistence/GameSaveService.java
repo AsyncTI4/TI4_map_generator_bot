@@ -1,6 +1,23 @@
 package ti4.map.persistence;
 
-import static ti4.map.persistence.GamePersistenceKeys.*;
+import static ti4.map.persistence.GamePersistenceKeys.ENDGAMEINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDMAPINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYER;
+import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYERINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDTILE;
+import static ti4.map.persistence.GamePersistenceKeys.ENDTOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.ENDUNITHOLDER;
+import static ti4.map.persistence.GamePersistenceKeys.ENDUNITS;
+import static ti4.map.persistence.GamePersistenceKeys.GAMEINFO;
+import static ti4.map.persistence.GamePersistenceKeys.MAPINFO;
+import static ti4.map.persistence.GamePersistenceKeys.PLANET_ENDTOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.PLANET_TOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.PLAYER;
+import static ti4.map.persistence.GamePersistenceKeys.PLAYERINFO;
+import static ti4.map.persistence.GamePersistenceKeys.TILE;
+import static ti4.map.persistence.GamePersistenceKeys.TOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.UNITHOLDER;
+import static ti4.map.persistence.GamePersistenceKeys.UNITS;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -40,7 +57,6 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.map.helper.GameHelper;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
@@ -404,8 +420,6 @@ class GameSaveService {
         writer.write(Constants.CREATION_DATE + " " + game.getCreationDate());
         writer.write(System.lineSeparator());
 
-        // TODO: this can be removed when we don't see these errors anymore.
-        GameHelper.updateCreationDateTimeIfNotSameDateAsCreationDateField(game);
         writer.write(Constants.CREATION_DATE_TIME + " " + game.getCreationDateTime());
         writer.write(System.lineSeparator());
         writer.write(Constants.STARTED_DATE + " " + game.getStartedDate());

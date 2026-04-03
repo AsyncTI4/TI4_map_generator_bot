@@ -111,8 +111,8 @@ public class FactionRecordOfStrategyCardPickService {
                     continue;
                 }
                 scsPicked.merge(scName, 1, Integer::sum);
-                if (game.getCustodiansTaker() != null
-                        && game.getCustodiansTaker().equalsIgnoreCase(faction)) {
+                String custodianTaker = game.getCustodiansTaker();
+                if (faction.equalsIgnoreCase(custodianTaker)) {
                     custodians.merge(scName, 1, Integer::sum);
                 }
             }

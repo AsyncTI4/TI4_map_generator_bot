@@ -1,0 +1,14 @@
+<FindBugsFilter>
+    <!-- Checked exceptions suck. Deal with it. -->
+    <Match>
+        <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
+    </Match>
+    <!-- It would be great to fix these one day... but let's be real... -->
+    <Match>
+        <Bug pattern="CC_CYCLOMATIC_COMPLEXITY"/>
+    </Match>
+    <!-- This triggers off Discord's formatting like '>' in a message, so it's a little annoying. -->
+    <Match>
+        <Bug pattern="CBX_CUSTOM_BUILT_XML"/>
+    </Match>
+</FindBugsFilter>

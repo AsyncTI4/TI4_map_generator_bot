@@ -101,7 +101,7 @@ public class GameStatsDashboardPayload {
         game.getCustomPublicVP().keySet().forEach(customPublicVp -> {
             if (customPublicVp.toLowerCase().contains("censure")) {
                 agendas.add("Political Censure");
-            } else if (customPublicVp.equalsIgnoreCase(Constants.VOICE_OF_THE_COUNCIL_PO)) {
+            } else if (Constants.VOICE_OF_THE_COUNCIL_PO.equalsIgnoreCase(customPublicVp)) {
                 agendas.add(Constants.VOICE_OF_THE_COUNCIL_ID);
             } else if (customPublicVp.toLowerCase().contains("mutiny")) {
                 agendas.add("Mutiny");

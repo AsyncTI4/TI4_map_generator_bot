@@ -606,10 +606,12 @@ public final class Helper {
         return "SC#" + sc;
     }
 
+    @NotNull
     public static Emoji getPlayerReactionEmoji(Game game, Player player, Message message) {
         return getPlayerReactionEmoji(game, player, message.getId());
     }
 
+    @NotNull
     public static Emoji getPlayerReactionEmoji(Game game, Player player, String messageId) {
         if (player == null) {
             return Emoji.fromFormatted(ApplicationEmojiService.fallbackEmoji);

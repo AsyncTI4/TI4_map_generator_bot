@@ -85,7 +85,7 @@ public class CreateGameService {
         String threadName = "game-starts-and-ends";
         // SEARCH FOR EXISTING OPEN THREAD
         for (ThreadChannel threadChannel_ : threadChannels) {
-            if (threadChannel_.getName().equals(threadName)) {
+            if (threadName.equals(threadChannel_.getName())) {
                 String guildName = game.getGuild() == null
                         ? "Server Unknown"
                         : game.getGuild().getName();

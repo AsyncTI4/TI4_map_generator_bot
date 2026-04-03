@@ -191,7 +191,7 @@ public class CombatRollService {
 
         if (playerUnitsByQuantity.isEmpty()) {
             String fightingOnUnitHolderName = unitHolderName;
-            if (!unitHolderName.equalsIgnoreCase(Constants.SPACE)) {
+            if (!Constants.SPACE.equalsIgnoreCase(unitHolderName)) {
                 fightingOnUnitHolderName = Helper.getPlanetRepresentation(unitHolderName, game);
             }
             MessageHelper.sendMessageToChannel(
