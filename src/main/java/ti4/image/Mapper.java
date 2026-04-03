@@ -315,7 +315,7 @@ public class Mapper {
             }
             case Constants.AC -> {
                 ActionCardModel actionCard = getActionCard(relatedID);
-                displayName = actionCard.getRepresentation(game);
+                displayName = actionCard.getRepresentation();
             }
             case Constants.PROMISSORY_NOTES -> {
                 PromissoryNoteModel pn = getPromissoryNote(relatedID);
