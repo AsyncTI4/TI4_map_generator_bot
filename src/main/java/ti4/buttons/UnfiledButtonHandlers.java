@@ -1,8 +1,6 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -2357,6 +2355,7 @@ public class UnfiledButtonHandlers {
                     && game.getStoredValue("ASN" + player.getFaction()).isEmpty()
                     && (buttonID.contains("tacticalAction")
                             || buttonID.contains("warfare")
+                            || buttonID.contains("construction")
                             || buttonID.contains("anarchy7Build")
                             || buttonID.contains("lumi7Build")
                             || buttonID.contains("ministerBuild"))) {
