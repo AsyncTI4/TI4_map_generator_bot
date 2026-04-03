@@ -97,7 +97,7 @@ class ActionCardHandButtonHandler {
             }
             String sb = player.getRepresentation() + " discarded the action card _"
                     + Mapper.getActionCard(acID).getName() + "_.\n"
-                    + Mapper.getActionCard(acID).getRepresentation();
+                    + Mapper.getActionCard(acID).getRepresentation(game);
             MessageChannel channel2 = game.isFowMode() ? player.getPrivateChannel() : game.getMainGameChannel();
             MessageHelper.sendMessageToChannel(channel2, sb);
             ActionCardHelper.sendActionCardInfo(game, player);

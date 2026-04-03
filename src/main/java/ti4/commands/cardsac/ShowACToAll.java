@@ -41,7 +41,7 @@ class ShowACToAll extends GameStateSubcommand {
         Game game = getGame();
         String sb = "Game: " + game.getName() + "\n" + "Player: "
                 + player.getUserName() + "\n" + "Shown Action Card:"
-                + "\n" + Mapper.getActionCard(acID).getRepresentation()
+                + "\n" + Mapper.getActionCard(acID).getRepresentation(game)
                 + "\n";
         player.setActionCard(acID);
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
