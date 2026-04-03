@@ -68,7 +68,8 @@ class RelicPurgeFragments extends GameStateSubcommand {
         }
 
         Game game = getGame();
-        StringBuilder message = new StringBuilder().append(activePlayer.getRepresentation()).append(" purged ");
+        StringBuilder message =
+                new StringBuilder().append(activePlayer.getRepresentation()).append(" purged ");
         if (fragmentsToPurge.size() == 1) {
             String fragid = fragmentsToPurge.getFirst();
             activePlayer.removeFragment(fragid);
@@ -80,7 +81,8 @@ class RelicPurgeFragments extends GameStateSubcommand {
                     message.append("a ").append(ExploreEmojis.HFrag).append("hazardous");
                 case "irf1", "irf2", "irf3", "irf4", "irf5" ->
                     message.append("an ").append(ExploreEmojis.IFrag).append("industrial");
-                case "urf1", "urf2", "urf3" -> message.append("an ").append(ExploreEmojis.UFrag).append("unknown");
+                case "urf1", "urf2", "urf3" ->
+                    message.append("an ").append(ExploreEmojis.UFrag).append("unknown");
                 default -> message.append(" ").append(fragid);
             }
             message.append(" relic fragment.");
