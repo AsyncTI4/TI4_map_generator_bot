@@ -2308,7 +2308,7 @@ public final class AgendaHelper {
                                 game.drawSecretObjective(winningR.getUserID());
                                 message += " Drew a second secret objective due to **Plausible Deniability**.";
                             }
-                            SecretObjectiveInfoService.sendSecretObjectiveInfo(game, winningR, event);
+                            SecretObjectiveInfoService.sendSecretObjectiveInfo(game, winningR);
                             MessageHelper.sendMessageToChannel(winningR.getCorrectChannel(), message);
                         }
                         if (specificVote.contains("Kyro Rider")) {

@@ -41,8 +41,8 @@ public class DrawSecretService {
         }
         if (event != null) {
             MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + output);
-            SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
         }
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         if (useTnelis && player.hasAbility("plausible_deniability")) {
             SecretObjectiveHelper.sendSODiscardButtons(player);
         }
