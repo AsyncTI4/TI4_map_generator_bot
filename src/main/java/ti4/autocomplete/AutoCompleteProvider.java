@@ -881,7 +881,7 @@ public class AutoCompleteProvider {
                     btSet = new HashSet<>(Mapper.getBreakthroughs().values());
                     addAllOpt = false;
                 }
-                if (subcommandName.equalsIgnoreCase(Constants.BREAKTHROUGH_SET_TG)) {
+                if (Constants.BREAKTHROUGH_SET_TG.equalsIgnoreCase(subcommandName)) {
                     addAllOpt = false;
                 }
 

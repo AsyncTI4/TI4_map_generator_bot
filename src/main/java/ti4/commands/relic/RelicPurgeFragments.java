@@ -19,7 +19,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 
 class RelicPurgeFragments extends GameStateSubcommand {
 
-    public RelicPurgeFragments() {
+    RelicPurgeFragments() {
         super(
                 Constants.PURGE_FRAGMENTS,
                 "Purge a number of relic fragments (for example, to gain a relic; may use unknown fragments).",
@@ -50,7 +50,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
             ExploreModel explore = Mapper.getExplore(id);
             if (explore.getType().equalsIgnoreCase(color)) {
                 fragmentsToPurge.add(id);
-            } else if (explore.getType().equalsIgnoreCase(Constants.FRONTIER)) {
+            } else if (Constants.FRONTIER.equalsIgnoreCase(explore.getType())) {
                 unknowns.add(id);
             }
         }

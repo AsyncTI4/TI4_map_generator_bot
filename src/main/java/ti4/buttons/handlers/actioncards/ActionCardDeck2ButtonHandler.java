@@ -458,7 +458,7 @@ class ActionCardDeck2ButtonHandler {
                     .append("_ from the top of the ")
                     .append(type)
                     .append(" deck and ");
-            if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
+            if (Constants.FRAGMENT.equalsIgnoreCase(cardType)) {
                 sb.append("gained it.");
                 player.addFragment(cardId);
                 game.purgeExplore(cardId);

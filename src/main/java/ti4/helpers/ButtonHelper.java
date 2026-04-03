@@ -3886,7 +3886,7 @@ public class ButtonHelper {
         if (player.isNpc() && player.isDummy()) {
             return values;
         }
-        if ("neutral".equals(player.getFaction()) && player.getUserID().equals(Constants.dicecordId)) {
+        if ("neutral".equals(player.getFaction()) && Constants.dicecordId.equals(player.getUserID())) {
             return values;
         }
         if (player.hasAbility("armada")) {
