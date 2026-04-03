@@ -3,6 +3,7 @@ package ti4.website;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -66,6 +67,7 @@ public class UltimateStatisticsWebsiteHelper {
 
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .uri(URI.create(url))
+                    .timeout(Duration.ofSeconds(30))
                     .header("Content-Type", "application/json")
                     .header("x-api-key", TI4_ULTIMATE_STATISTICS_API_KEY)
                     .POST(HttpRequest.BodyPublishers.ofString(json))

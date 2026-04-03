@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
@@ -33,6 +34,7 @@ import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
+@UtilityClass
 public class DestroyUnitService {
 
     public static void destroyAllUnitsInSystem(
@@ -140,7 +142,7 @@ public class DestroyUnitService {
     private static void handleDestroyedUnits(
             GenericInteractionCreateEvent event, Game game, List<RemovedUnit> units, boolean combat) {
         // batch up infantry for INF2-ish effects
-        for (Player player : game.getRealPlayers()) {
+        for (Player player : game.getRealPlayersNNeutral()) {
             int numInfantry = 0;
             for (RemovedUnit u : units) {
                 if (player.unitBelongsToPlayer(u.unitKey()) && u.unitKey().getUnitType() == UnitType.Infantry) {

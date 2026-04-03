@@ -48,7 +48,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "This system counts as containing one of your Command Tokens for the purpose of your faction abilities. During movement, this ship may move after your other ships."
+        "ability": "This ship counts as one of your command tokens for the purpose of your faction abilities. During movement, this ship may move after your other ships."
     },
     {
         "id": "arachian_mech",
@@ -473,7 +473,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "After your units on this planet make rolls for a unit ability, if this planet contains no more than 1 of your mechs, apply +2 to the result of each of those dice."
+        "ability": "After your units on this planet make rolls for a unit ability, apply +2 to the result of each of those dice."
     },
     {
         "id": "vyserix_pds",

@@ -1997,9 +1997,9 @@
     {
         "alias": "belkosea",
         "factionName": "Belkosea Allied States",
-        "homeSystem": "br5",
-        "startingFleet": "1 cv,5 ff,1 inf s, 1 sd s, 1 pds r,1 inf r, 1 dn, 1 cr",
-        "commodities": 2,
+        "homeSystem": "br5b",
+        "startingFleet": "1 cv,5 ff,3 inf i, 1 sd i, 1 pds i, 1 dn, 1 cr",
+        "commodities": 1,
         "factionTech": [
             "dsbelky",
             "dsbelkff"
@@ -2012,8 +2012,8 @@
             "aida"
         ],
         "homePlanets": [
-            "strang",
-            "reil"
+            "iterum",
+            "conviction"
         ],
         "abilities": [
             "classified_developments",

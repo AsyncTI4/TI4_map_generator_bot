@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.Data;
+import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Constants;
@@ -16,8 +17,12 @@ import ti4.service.emoji.CardEmojis;
 
 @Data
 public class AgendaModel implements ModelInterface, EmbeddableModel {
+    @Getter
     private String alias;
+
+    @Getter
     private String name;
+
     private String category;
     private String categoryDescription;
     private String type;
@@ -49,14 +54,6 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
                 return true;
             }
         }
-    }
-
-    public String getAlias() {
-        return alias;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getNameRepresentation() {

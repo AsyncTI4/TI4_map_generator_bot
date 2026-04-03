@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static ti4.helpers.discord.DiscordHelper.isIgnorableError;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -56,7 +58,7 @@ import ti4.service.unit.MoveUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
-public class ButtonHelperModifyUnits {
+public final class ButtonHelperModifyUnits {
 
     private static int getNumberOfSustainableUnits(
             Player player, Game game, UnitHolder unitHolder, boolean space, boolean spacecannonoffence) {
@@ -1288,6 +1290,19 @@ public class ButtonHelperModifyUnits {
                                 + " you may use this button to return fighters to space after combat concludes. This only needs to be done once.",
                         b2s);
             }
+            if (game.isMonumentToTheAgesMode()
+                    && unitHolder.getUnitCount(UnitType.Spacedock, game.getPlayerFromColorOrFaction("neutral")) > 0
+                    && !player.getPlanets().contains(unitHolder.getName())) {
+                List<Button> b2s = new ArrayList<>();
+                b2s.add(Buttons.green("takeMonument_" + unitHolder.getName(), "Take Control Of Monument"));
+                b2s.add(Buttons.blue("destroyMonument_" + tile.getPosition(), "Destroy Monument"));
+                b2s.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Delete These Buttons"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getMessageChannel(),
+                        player.getRepresentation(true, true)
+                                + " you may use these buttons after you win any ground combat to either take control of the monument or destroy it.",
+                        b2s);
+            }
         }
         List<Button> systemButtons = TacticalActionService.getBuildButtons(event, game, player, tile);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
@@ -1439,7 +1454,7 @@ public class ButtonHelperModifyUnits {
                 getOpposingUnitsToHitOnGround(player, game, game.getTileFromPlanet(planet), planet, "ruthless"));
     }
 
-    public static List<Button> getOpposingUnitsToHitOnGround(
+    private static List<Button> getOpposingUnitsToHitOnGround(
             Player player, Game game, Tile tile, String planet, String source) {
         List<Button> buttons = new ArrayList<>();
         UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
@@ -1994,13 +2009,16 @@ public class ButtonHelperModifyUnits {
             } else {
                 event.getMessage()
                         .editMessage(Helper.buildProducedUnitsMessage(player, game))
-                        .queue(
-                                null,
-                                (error) -> BotLogger.error(
-                                        new LogOrigin(event, player),
-                                        MessageHelper.getRestActionFailureMessage(
-                                                event.getMessageChannel(), "Failed to edit message", null, error),
-                                        error));
+                        .queue(null, error -> {
+                            if (isIgnorableError(error)) {
+                                return;
+                            }
+                            BotLogger.error(
+                                    new LogOrigin(event, player),
+                                    MessageHelper.getRestActionFailureMessage(
+                                            event.getMessageChannel(), "Failed to edit message", null, error),
+                                    error);
+                        });
             }
         }
         if ("sd".equalsIgnoreCase(unitID)) {
@@ -2261,12 +2279,27 @@ public class ButtonHelperModifyUnits {
                     && !tile.getWormholes(game).isEmpty()
                     && !"pd".equalsIgnoreCase(unitID)
                     && !"sd".equalsIgnoreCase(unitID)) {
-                player.addSpentThing("ghostbt" + tile.getWormholes(game).size());
+                Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
+                int adjust = 0;
+                for (Map.Entry<String, Integer> entry : producedUnits.entrySet()) {
+                    String unit2 = entry.getKey().split("_")[0];
+                    UnitKey unitKey2 = Mapper.getUnitKey(AliasHandler.resolveUnit(unit2), player.getColor());
+                    UnitModel producedUnit =
+                            player.getUnitsByAsyncID(unitKey2.asyncID()).getFirst();
+
+                    if (producedUnit.getUnitType() == UnitType.Flagship && player.ownsUnit("creuss_flagship")) {
+                        adjust = 1;
+                    }
+                }
+                if (tile.getWormholes(game).size() - adjust > 0) {
+                    player.addSpentThing("ghostbt" + (tile.getWormholes(game).size() - adjust));
+                }
             }
         } else {
             if (orbitalDrop) {
                 List<Button> orbFollowUp = new ArrayList<>();
                 if (player.hasUnit("sol_mech")
+                        && !tile.isScar()
                         && !ButtonHelper.isLawInPlay(game, "articles_war")
                         && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
                     orbFollowUp.add(Buttons.green("orbitalMechDrop_" + planetName, "Pay 3r for Mech?"));

@@ -685,7 +685,7 @@ public class NucleusSliceGeneratorService {
                     candidateTiles = tieredAvailableTiles.entrySet().stream()
                             // Sorting an enum in java puts it in the order it was declared
                             // so this will check high -> mid -> low -> red / anomaly
-                            .sorted(Comparator.comparing(Map.Entry::getKey))
+                            .sorted(Map.Entry.comparingByKey())
                             .map(Map.Entry::getValue)
                             .map(tiles ->
                                     tiles.stream().filter(anomalyPredicate).toList())

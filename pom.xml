@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.2</version>
+    <version>4.0.3</version>
   </parent>
 
   <groupId>me.terterro</groupId>
@@ -15,20 +15,18 @@
 
   <properties>
     <java.version>21</java.version>
-    <jda.version>6.3.0</jda.version>
-    <aws.sdk.version>2.41.24</aws.sdk.version>
-    <hibernate-dialects.version>${hibernate.version}</hibernate-dialects.version>
+    <jda.version>6.4.1</jda.version>
+    <aws.sdk.version>2.42.26</aws.sdk.version>
+    <hibernate-dialects.version>7.3.0.Final</hibernate-dialects.version>
     <reflections.version>0.10.2</reflections.version>
     <jskills.version>1.1</jskills.version>
     <webp-imageio.version>0.10.2</webp-imageio.version>
-    <jemoji.version>1.7.5</jemoji.version>
-    <spotless.version>3.2.1</spotless.version>
+    <jemoji.version>1.7.6</jemoji.version>
+    <spotless.version>3.4.0</spotless.version>
     <spotbugs.version>4.9.8</spotbugs.version>
     <spotbugs-maven-plugin.version>4.9.8.2</spotbugs-maven-plugin.version>
     <findsecbugs.version>1.14.0</findsecbugs.version>
     <sb-contrib.version>7.7.4</sb-contrib.version>
-
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <dependencyManagement>
@@ -193,7 +191,17 @@
         </executions>
         <configuration>
           <java>
-            <cleanthat/>
+            <cleanthat>
+              <sourceJdk>${java.version}</sourceJdk>
+              <mutators>
+                <mutator>SafeAndConsensual</mutator>
+                <mutator>SafeButNotConsensual</mutator>
+                <mutator>SafeButControversial</mutator>
+              </mutators>
+              <excludedMutators>
+                <excludedMutator>AvoidInlineConditionals</excludedMutator>
+              </excludedMutators>
+            </cleanthat>
             <removeUnusedImports/>
             <palantirJavaFormat/>
             <toggleOffOn/>

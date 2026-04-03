@@ -248,8 +248,8 @@
         "alias": "shrapnel_turrets2",
         "name": "Shrapnel Turrets",
         "phase": "Action",
-        "window": "Before you roll dice for ANTI-FIGHTER BARRAGE",
-        "text": "Each of your non-fighter ships in the active system that do not have ANTI-FIGHTER BARRAGE gain ANTI-FIGHTER BARRAGE 9(x2) until the end of the combat.",
+        "window": "At the start of a space combat",
+        "text": "Choose any number of your ships that have a capacity value. Each of those ships gain ANTI-FIGHTER BARRAGE 8 (x2) during this combat.",
         "automationID": "shrapnel_turrets",
         "flavorText": "Mendosa grinned widely. \"Ye say we're out of munitions, yet look at all this junk lyin' around. Get it movin' fast enough, and it'll shred them up just fine.\"",
         "source": "deprecated"
@@ -1496,7 +1496,7 @@
         "alias": "corruption_acd2",
         "name": "Corruption",
         "phase": "Any",
-        "window": "When a public objective is revealed",
+        "window": "After a public objective is revealed",
         "text": "Look at the top 2 cards of the deck that matches that objective; you may replace that objective with 1 of those cards. Then, shuffle that deck.",
         "flavorText": "Just as the charges went public, over half of the Council's staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
         "source": "deprecated"
@@ -1599,6 +1599,60 @@
         "window": "ACTION",
         "text": "Place 3 neutral fighters in a non-home anomaly; space combat is resolved in that system if it contains non-neutral ships.",
         "flavorText": "\"Them void-rats cost an arm and a leg,\" Ipswitch said with disgust. \"Ah, well. Not my arm or my leg.\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "invasion",
+        "name": "Invasion",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Put The Fracture into play if it is not already. Then, move 1 ingress token into a non-home system outside of The Fracture that contains no ships and place 2 neutral cruisers in that system.",
+        "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as a fleet of unmarked ships poured forth from the void, raining destruction upon the unsuspecting convoy.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "efficiency1",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by 3.",
+        "flavorText": "I48S surveyed the new installation, noting several blocking routines. The new processes increased output by nearly 11%—and with a little work, he was sure the enhancers could achieve another 4%.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "efficiency2",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by 3.",
+        "flavorText": "I48S traced the bottleneck to a single, catastrophically obsolete employee. Their termination shocked the other linemen, but he assured them they would be properly recycled.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "efficiency3",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by 3.",
+        "flavorText": "Dart nearly fell over as they crested the lip of the ancient crater to find three massive, entangled ships jutting from the earth below. Tai gave a self-satisfied hmph.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "efficiency4",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by 3.",
+        "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "strategic_aid",
+        "name": "Strategic Aid",
+        "phase": "Action",
+        "window": "When you perform a strategic action",
+        "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
+        "flavorText": "Mathis was not fooled. The pageantry and endless bandying of crooked words with these witless worms was yet another scheme.",
         "source": "deprecated"
     }
 ]

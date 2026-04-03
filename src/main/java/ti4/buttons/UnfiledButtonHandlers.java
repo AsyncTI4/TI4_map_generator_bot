@@ -1,8 +1,6 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,6 +49,7 @@ import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -77,7 +76,6 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.BreakthroughModel;
-import ti4.model.ColorModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
@@ -216,7 +214,7 @@ public class UnfiledButtonHandlers {
             message += "Minor Factions Mode. ";
             if (enable) {
                 message +=
-                        "You will need to decide how you wish to draft the minor factions. This site has a decent setup for it, "
+                        "Note that the bot does not currently handle the draft for minor factions very well. This site has a decent setup for it, "
                                 + "and you can important the map using buttons above: https://tidraft.com/draft/prechoice. Note that you can add 3 infantry to the minor faction planets with the provided button.";
                 List<Button> mfButtons = new ArrayList<>();
                 mfButtons.add(Buttons.blue("addMinorFactionsInfantry", "Add Minor Factions Infantry"));
@@ -294,10 +292,7 @@ public class UnfiledButtonHandlers {
             if (enable) {
                 Player neutral = game.getPlayerFromColorOrFaction("neutral");
                 if (neutral == null) {
-                    List<String> unusedColors = game.getUnusedColors().stream()
-                            .map(ColorModel::getName)
-                            .toList();
-                    String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+                    String color = SetupNeutralPlayer.pickNeutralColor(game);
                     game.setupNeutralPlayer(color);
                 }
             }
@@ -986,11 +981,10 @@ public class UnfiledButtonHandlers {
 
     public static List<String> getBombardablePlanets(Player player, Game game, Tile tile) {
         List<String> planets = new ArrayList<>();
-        for (UnitHolder planetUH : tile.getPlanetUnitHolders()) {
+        for (Planet planetUH : tile.getPlanetUnitHolders()) {
             if (!player.getPlanetsAllianceMode().contains(planetUH.getName())
                     || FoWHelper.otherPlayersHaveUnitsOnPlanet(player, planetUH)) {
-                if (!((Planet) planetUH).getPlanetTypes().contains("cultural")
-                        || !ButtonHelper.isLawInPlay(game, "conventions")) {
+                if (!planetUH.getPlanetTypes().contains("cultural") || !ButtonHelper.isLawInPlay(game, "conventions")) {
                     planets.add(planetUH.getName());
                 }
             }
@@ -2318,7 +2312,22 @@ public class UnfiledButtonHandlers {
                 if (player.hasUnlockedBreakthrough("ghostbt")
                         && tile != null
                         && !tile.getWormholes(game).isEmpty()) {
-                    player.addSpentThing("ghostbt" + tile.getWormholes(game).size());
+                    Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
+                    int adjust = 0;
+                    for (Map.Entry<String, Integer> entry : producedUnits.entrySet()) {
+                        String unit2 = entry.getKey().split("_")[0];
+                        UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit2), player.getColor());
+                        UnitModel producedUnit =
+                                player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
+
+                        if (producedUnit.getUnitType() == UnitType.Flagship && player.ownsUnit("creuss_flagship")) {
+                            adjust = 1;
+                        }
+                    }
+                    if (tile.getWormholes(game).size() - adjust > 0) {
+                        player.addSpentThing(
+                                "ghostbt" + (tile.getWormholes(game).size() - adjust));
+                    }
                 }
                 // ButtonHelper.updateMap(game, event,
                 // "Result of build on turn " + player.getInRoundTurnCount() + " for " +
@@ -2346,6 +2355,7 @@ public class UnfiledButtonHandlers {
                     && game.getStoredValue("ASN" + player.getFaction()).isEmpty()
                     && (buttonID.contains("tacticalAction")
                             || buttonID.contains("warfare")
+                            || buttonID.contains("construction")
                             || buttonID.contains("anarchy7Build")
                             || buttonID.contains("lumi7Build")
                             || buttonID.contains("ministerBuild"))) {
@@ -2631,7 +2641,7 @@ public class UnfiledButtonHandlers {
                 } else {
                     Button flipAgenda = Buttons.blue("startStrategyPhase", "Start Strategy Phase");
                     List<Button> buttons = List.of(flipAgenda);
-                    String condition = "the conditions for an Agenda Phase has not yet been met";
+                    String condition;
                     if (game.isOrdinianC1Mode()) {
                         condition = "the _Coatl_ is still damaged";
                     } else if (game.isTwilightsFallMode()) {
@@ -2960,6 +2970,7 @@ public class UnfiledButtonHandlers {
         buttons.add(Buttons.red("checkAnomView", "Find Anomalies"));
         buttons.add(Buttons.green("checkLegendView", "Find Legendaries"));
         buttons.add(Buttons.gray("checkEmptyView", "Find Empties"));
+        buttons.add(Buttons.red("checkExileView", "Determine Exile Breachable Systems"));
         buttons.add(Buttons.blue("checkAetherView", "Determine Aetherstreamable Systems"));
         buttons.add(Buttons.red("checkCannonView", "Calculate Space Cannon Offense Shots"));
         buttons.add(Buttons.green("checkTraitView", "Find Traits"));
@@ -2968,6 +2979,11 @@ public class UnfiledButtonHandlers {
         buttons.add(Buttons.gray("checkShiplessView", "Show Map Without Ships"));
         buttons.add(Buttons.gray("checkUnlocked", "Show Only Unlocked Units"));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", buttons);
+    }
+
+    @ButtonHandler("checkExileView")
+    public static void calculateExileView(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.exile);
     }
 
     @ButtonHandler("resetSpend_")
@@ -3225,6 +3241,7 @@ public class UnfiledButtonHandlers {
         String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
                 + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
         event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
+        ButtonHelper.checkFleetInEveryTile(player, game);
     }
 
     @ButtonHandler("decrease_tactic_cc")
@@ -3426,9 +3443,13 @@ public class UnfiledButtonHandlers {
         if (!game.isFowMode() && "statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
             ReactionService.addReaction(event, game, player);
             for (Player p2 : game.getRealPlayers()) {
-                if (p2.isNpc() && !game.getCurrentACDrawStatusInfo().contains(p2.getFaction())) {
-                    ButtonHelper.drawStatusACs(game, p2, event);
+                if (p2.isNpc()
+                        && game.getStoredValue(
+                                        "statusHomeworkReactionFor" + p2.getFaction() + "Round" + game.getRound())
+                                .isEmpty()) {
                     ReactionService.addReaction(event, game, p2);
+                    game.setStoredValue(
+                            "statusHomeworkReactionFor" + p2.getFaction() + "Round" + game.getRound(), "added");
                 }
             }
         }

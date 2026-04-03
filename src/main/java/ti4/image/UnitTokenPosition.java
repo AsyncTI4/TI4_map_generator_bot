@@ -2,15 +2,18 @@ package ti4.image;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.awt.*;
+import java.awt.Point;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.Getter;
 
 public class UnitTokenPosition implements Serializable {
+    @Getter
     private final String unitHolderName;
+
     private LinkedHashMap<String, List<Point>> coordinateMap = new LinkedHashMap<>();
     private final boolean removeUnitCoordinate;
 
@@ -31,10 +34,6 @@ public class UnitTokenPosition implements Serializable {
     public UnitTokenPosition(String unitHolderName, boolean removeUnitCoordinate) {
         this.unitHolderName = unitHolderName;
         this.removeUnitCoordinate = removeUnitCoordinate;
-    }
-
-    public String getUnitHolderName() {
-        return unitHolderName;
     }
 
     public Map<String, List<Point>> getCoordinateMap() {

@@ -7,12 +7,16 @@ import ti4.message.MessageHelper;
 
 class CCsButton extends Subcommand {
 
-    public CCsButton() {
+    CCsButton() {
         super("cc", "Adjust Command Tokens");
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         MessageHelper.sendMessageToChannelWithButton(event.getChannel(), null, Buttons.REDISTRIBUTE_CCs);
+    }
+
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

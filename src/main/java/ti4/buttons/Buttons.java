@@ -18,7 +18,7 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.website.AsyncTi4WebsiteHelper;
 
-public class Buttons {
+public final class Buttons {
 
     public enum ButtonColor {
         green,

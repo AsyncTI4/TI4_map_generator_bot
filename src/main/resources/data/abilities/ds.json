@@ -1009,14 +1009,14 @@
         "id": "bestow",
         "name": "Bestow (2 Honor)",
         "faction": "toldar",
-        "permanentEffect": "When you pass, you may allow all of your neighbors to each gain 2 commodities, for each neighbor that does, gain 1 commodity.",
+        "permanentEffect": "After you replenish commodities, gain 2 commodities or convert up to 2 of your commodities to trade goods.",
         "source": "ds"
     },
     {
         "id": "reflect",
         "name": "Reflect (5 Honor)",
         "faction": "toldar",
-        "permanentEffect": "When you score an objective, if another player has already scored that objective, draw 2 action cards.",
+        "permanentEffect": "After you draw 1 or more action cards, draw 1 action card and give 1 action card from your hand to one of your neighbors.",
         "source": "ds"
     },
     {
@@ -1030,7 +1030,7 @@
         "id": "thwart",
         "name": "Thwart (2 Dishonor)",
         "faction": "toldar",
-        "permanentEffect": "When you would gain 1 or more commodities or trade goods, instead take them from any combination of your neighbors, if able.",
+        "permanentEffect": "After you replenish commodities, take up to 2 commodities from any combination of your neighbors.",
         "notes": "Not automated, have your neighbors subtract with `/player stats`.",
         "source": "ds"
     },
@@ -1038,7 +1038,7 @@
         "id": "deceive",
         "name": "Deceive (5 Dishonor)",
         "faction": "toldar",
-        "permanentEffect": "When you would draw 1 or more action cards, instead take 1 at random from 1 of your neighbors. ",
+        "permanentEffect": "After you draw 1 or more action cards, take 1 action card at random from one of your neighbors.",
         "source": "ds"
     },
     {

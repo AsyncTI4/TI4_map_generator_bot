@@ -102,7 +102,7 @@ public class SpaceTokenModel implements TokenModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        return "_" + getAlias() + "_ " + source.emoji();
+        return "_" + id + "_ " + source.emoji();
     }
 
     public MessageEmbed getRepresentationEmbed() {

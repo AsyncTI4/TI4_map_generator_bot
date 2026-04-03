@@ -3,6 +3,7 @@ package ti4.website;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +59,7 @@ public class AsyncTi4WebsiteHelper {
 
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create(url))
+                        .timeout(Duration.ofSeconds(20))
                         .POST(HttpRequest.BodyPublishers.ofString(json))
                         .build();
 

@@ -1,5 +1,6 @@
 package ti4.commands.game;
 
+import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -53,10 +54,16 @@ class Info extends GameStateSubcommand {
             sb.append("> Date Ended: ")
                     .append(Helper.getDateRepresentation(game.getEndedDate()))
                     .append("\n");
-        sb.append("Game Completed: `")
-                .append(game.getWinner().isPresent())
-                .append("`")
-                .append("\n");
+        List<Player> winners = game.getWinners();
+        sb.append("Game Completed: `").append(!winners.isEmpty()).append("`").append("\n");
+        if (game.hasWinner()) {
+            sb.append("Winner(s): ");
+            for (int i = 0; i < winners.size(); i++) {
+                if (i > 0) sb.append(", ");
+                sb.append(winners.get(i).getRepresentationNoPing());
+            }
+            sb.append("\n");
+        }
 
         sb.append("### Setup: ").append("\n");
         sb.append("Victory Point Count: ").append(game.getVp()).append("\n");

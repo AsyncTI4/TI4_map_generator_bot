@@ -6,8 +6,8 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
-import ti4.model.ColorModel;
 import ti4.model.FactionModel;
+import ti4.service.player.PlayerColorService;
 import ti4.testUtils.BaseTi4Test;
 
 public class FrankenDraftApplyTest extends BaseTi4Test {
@@ -16,7 +16,7 @@ public class FrankenDraftApplyTest extends BaseTi4Test {
     private static Player p1, p2, p3;
 
     @BeforeAll
-    private static void setupGame() {
+    public static void setupGame() {
         if (game != null) return;
         game = new Game();
         game.newGameSetup();
@@ -30,11 +30,10 @@ public class FrankenDraftApplyTest extends BaseTi4Test {
 
     private static Player setupFrankenPlayer(String faction) {
         FactionModel model = Mapper.getFaction(faction);
-        ColorModel color = game.getUnusedColors().getFirst();
         var player = game.addPlayer(model.getAlias(), model.getFactionName());
         player.setFaction(game, faction);
         player.setFactionEmoji("<" + faction + ">");
-        player.setColor(color.getName());
+        player.setColor(PlayerColorService.getPreferredColor(player));
         player.setUnitsOwned(new HashSet<>(model.getUnits()));
         player.addBreakthrough(model.getBreakthrough());
         player.setBreakthroughUnlocked(model.getBreakthrough(), true);

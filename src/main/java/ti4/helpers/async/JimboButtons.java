@@ -23,7 +23,7 @@ import ti4.message.logging.LogOrigin;
 import ti4.model.TileModel;
 
 // Jazz's Interactive Map Builder
-class JimboButtons {
+final class JimboButtons {
     // Main Page
     public static final Button MAIN_PAGE = Buttons.gray(JimboConst.mainPage, "Go back to main menu");
     private static final Button EXIT = Buttons.red(JimboConst.exit, "Exit");
@@ -123,7 +123,6 @@ class JimboButtons {
         try {
             int pagenum;
             String prefix;
-            System.out.println("pagination: " + all.size() + " - " + buttonID);
             Matcher page = Pattern.compile(RegexHelper.pageRegex()).matcher(buttonID);
             if (!page.find()) return false; // no pagenum, don't paginate
             pagenum = Integer.parseInt(page.group("page"));

@@ -526,7 +526,6 @@ public class WebScoreBreakdown {
                 case SHARD -> "Shard of the Throne";
                 case STYX -> "A Song Like Marrow";
                 case AGENDA -> agendaKey != null ? agendaKey : "Agenda Point";
-                default -> "";
             };
         }
 

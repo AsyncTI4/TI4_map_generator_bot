@@ -45,7 +45,7 @@ import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.unit.AddUnitService;
 
-public class ButtonHelperSCs {
+public final class ButtonHelperSCs {
 
     @ButtonHandler("constructionPrimary_produce")
     public static void resolveConstructionPrimaryTE(ButtonInteractionEvent event, Game game, Player player) {
@@ -78,7 +78,7 @@ public class ButtonHelperSCs {
         message += ButtonHelper.getListOfStuffAvailableToSpend(player, game) + "\nYou have " + productionVal
                 + " PRODUCTION value in this system.";
         if (Helper.getProductionValue(player, game, tile, false) > productionVal) {
-            message += "\nYou may only use the PRODUCITON ability of __one__ of your space docks in this system.";
+            message += "\nYou may only use the PRODUCTION ability of __one__ of your space docks in this system.";
         }
         if (productionVal > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander"))
             message +=
@@ -138,7 +138,7 @@ public class ButtonHelperSCs {
         message += "\nYou have " + productionValue + " PRODUCTION value in this system.";
 
         if (Helper.getProductionValue(player, game, tile, singleDock) > productionValue) {
-            message += "\nYou may only use the PRODUCITON ability of __one__ of your space docks in this system. ";
+            message += "\nYou may only use the PRODUCTION ability of __one__ of your space docks in this system. ";
         }
         if (productionValue > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
             message +=
@@ -986,6 +986,22 @@ public class ButtonHelperSCs {
             MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
         } else {
             if ("agesmonument".equalsIgnoreCase(unit)) {
+                if (player.getTg() < 5) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationUnfogged()
+                                    + ", you do not have enough trade goods to place the monument (5 needed).");
+                    return;
+                }
+                if (ButtonHelper.getNumberOfUnitsOnTheBoard(
+                                game, game.getPlayerFromColorOrFaction("neutral"), "sd", true)
+                        > 2) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationUnfogged()
+                                    + ", there are already 3 monuments on the board, so you cannot place another one.");
+                    return;
+                }
                 String message = player.getRepresentationUnfogged()
                         + ", please choose the planet you wish to put your monument on for **Construction**.";
                 if (!player.getSCs().contains(4) && !"te4construction".equals(scModel.getBotSCAutomationID())) {
@@ -1032,12 +1048,9 @@ public class ButtonHelperSCs {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation(true, false) + " dropped a monument on "
-                        + Helper.getPlanetRepresentation(planet, game) + " for the cost of 5 resources.");
-        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-        Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
-        buttons.add(DoneExhausting);
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(), "Use Buttons to Pay For The Monument", buttons);
+                        + Helper.getPlanetRepresentation(planet, game)
+                        + " for the cost of 5 tg. They have been automatically deducted.");
+        player.setTg(player.getTg() - 5);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 

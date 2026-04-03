@@ -50,7 +50,7 @@ public class AndcatReferenceCardsMessageHelper {
         sendPackageInfos(player.getCardsInfoThread(), packages);
     }
 
-    public static void sendPackageInfos(MessageChannel channel, List<ReferenceCardPackage> packages) {
+    private static void sendPackageInfos(MessageChannel channel, List<ReferenceCardPackage> packages) {
         if (packages == null || packages.isEmpty()) {
             return;
         }

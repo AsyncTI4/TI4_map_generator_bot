@@ -52,7 +52,7 @@ public class ModalContext extends ListenerContext {
                 || componentID.contains("offerDeckButtons");
         if (game != null && !skippableButton) {
             ButtonHelper.saveButtons(event, game, player);
-            GameManager.save(game, EventAuditService.getReason(event, game.isFowMode()));
+            GameManager.save(game, EventAuditService.getReason(event));
         }
     }
 }

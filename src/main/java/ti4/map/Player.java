@@ -19,7 +19,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.Getter;
@@ -55,7 +54,6 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperTwilightsFall;
-import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -71,7 +69,6 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.AbilityModel;
 import ti4.model.BreakthroughModel;
-import ti4.model.ColorModel;
 import ti4.model.EmbeddableModel;
 import ti4.model.FactionModel;
 import ti4.model.GenericCardModel;
@@ -113,28 +110,63 @@ public class Player extends PlayerProperties {
     @Getter
     private final Game game;
 
+    @Setter
+    @Getter
     private DraftBag draftHand = new DraftBag();
+
+    @Setter
+    @Getter
     private DraftBag currentDraftBag = new DraftBag();
+
     private final DraftBag draftItemQueue = new DraftBag();
+
+    @Getter
     private List<Leader> leaders = new ArrayList<>();
+
+    @Getter
     private final List<TemporaryCombatModifierModel> newTempCombatModifiers = new ArrayList<>();
+
+    @Getter
     private List<TemporaryCombatModifierModel> tempCombatModifiers = new ArrayList<>();
 
     // TIGL
     private @Getter @Setter TIGLRank playerTIGLRankAtGameStart;
 
+    @Getter
     private final Tile nomboxTile = new Tile("nombox", "nombox");
 
+    @Getter
     private final Map<String, Integer> actionCards = new LinkedHashMap<>();
+
+    @Getter
     private final Map<String, Integer> events = new LinkedHashMap<>();
+
+    @Getter
     private final Map<String, Integer> trapCards = new LinkedHashMap<>();
+
+    @Getter
     private final Map<String, Integer> secrets = new LinkedHashMap<>();
+    /**
+     * -- GETTER --
+     *
+     * @return Map of (SecretObjectiveModel ID, Random Number ID)
+     */
+    @Getter
     private final Map<String, Integer> secretsScored = new LinkedHashMap<>();
+
+    @Getter
     private final Map<String, Integer> unitCaps = new HashMap<>();
+
+    @Getter
     private final Map<String, String> trapCardsPlanets = new LinkedHashMap<>();
+
     private final Map<String, String> fowSeenTiles = new HashMap<>();
     private final Map<String, String> fowCustomLabels = new HashMap<>();
+
+    @Setter
+    @Getter
     private Map<String, Integer> promissoryNotes = new LinkedHashMap<>();
+
     private @Getter Map<String, Integer> currentProducedUnits = new HashMap<>();
     // <pool: <color: count>>
     private final Map<String, Map<String, Integer>> debtTokens = new LinkedHashMap<>();
@@ -206,6 +238,31 @@ public class Player extends PlayerProperties {
         return singularities;
     }
 
+    public boolean removeSingularityTech(String tech) {
+        boolean singularity = false;
+        if (getSingularityTechs().contains(tech)) {
+            singularity = true;
+            String oldVal = getGame().getStoredValue(getFaction() + "singularityTechs");
+            if (oldVal.contains(tech + "_")) {
+                oldVal = oldVal.replace(tech + "_", "");
+            } else {
+                oldVal = oldVal.replace(tech, "");
+            }
+            getGame().setStoredValue(getFaction() + "singularityTechs", oldVal);
+        }
+        return singularity;
+    }
+
+    public void addSingularityTech(String tech) {
+        if (!getSingularityTechs().contains(tech)) {
+            String prev = getGame().getStoredValue(getFaction() + "singularityTechs");
+            if (!prev.isEmpty()) {
+                prev += "_";
+            }
+            game.setStoredValue(getFaction() + "singularityTechs", prev + tech);
+        }
+    }
+
     public boolean hasUnplayedSCs() {
         boolean hadAnyUnplayedSCs = false;
         for (Integer SC : getSCs()) {
@@ -225,10 +282,6 @@ public class Player extends PlayerProperties {
         }
 
         return oceans;
-    }
-
-    public Tile getNomboxTile() {
-        return nomboxTile;
     }
 
     public UnitHolder getNombox() {
@@ -818,16 +871,8 @@ public class Player extends PlayerProperties {
         return unitCaps.get(unit);
     }
 
-    public Map<String, Integer> getUnitCaps() {
-        return unitCaps;
-    }
-
     public void setUnitCap(String unit, int cap) {
         unitCaps.put(unit, cap);
-    }
-
-    public Map<String, Integer> getActionCards() {
-        return actionCards;
     }
 
     @NotNull
@@ -850,10 +895,6 @@ public class Player extends PlayerProperties {
                 .filter(entry -> entry.getValue() == ActionCardHelper.ACStatus.garbozia)
                 .map(Entry::getKey)
                 .toList();
-    }
-
-    public Map<String, Integer> getEvents() {
-        return events;
     }
 
     public Map<String, Integer> getPlotCardsRaw() {
@@ -930,15 +971,11 @@ public class Player extends PlayerProperties {
         return puppets == null ? List.of() : puppets;
     }
 
-    public Map<String, Integer> getTrapCards() {
-        return trapCards;
-    }
-
-    public Map<String, String> getTrapCardsPlanets() {
-        return trapCardsPlanets;
-    }
-
     public boolean hasTheZeroToken() {
+
+        if (game.getStoredValue("TFTelepathicHolder").equalsIgnoreCase(getFaction())) {
+            return true;
+        }
         if (hasAbility("telepathic")) {
             if (game.isTwilightsFallMode()
                     && !game.getStoredValue("shouldntChangeTurnOrder").isEmpty()) {
@@ -1044,8 +1081,8 @@ public class Player extends PlayerProperties {
         if (StringUtils.isNotBlank(unit.getFaction().orElse(""))) score += 3;
         if (StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse(""))) score += 2;
         if (unitHolder != null
-                && ((unitHolder.getName().equals(Constants.SPACE) && Boolean.TRUE.equals(unit.getIsShip()))
-                        || (!unitHolder.getName().equals(Constants.SPACE) && !Boolean.TRUE.equals(unit.getIsShip()))))
+                && ((Constants.SPACE.equals(unitHolder.getName()) && Boolean.TRUE.equals(unit.getIsShip()))
+                        || (!Constants.SPACE.equals(unitHolder.getName()) && !Boolean.TRUE.equals(unit.getIsShip()))))
             score++;
         if (unit.getID().contains("tf-")
                 && (unit.getUnitType() == UnitType.Flagship || unit.getUnitType() == UnitType.Mech)) {
@@ -1151,14 +1188,6 @@ public class Player extends PlayerProperties {
         promissoryNotes.put(id, identifier);
     }
 
-    public Map<String, Integer> getPromissoryNotes() {
-        return promissoryNotes;
-    }
-
-    public void setPromissoryNotes(Map<String, Integer> promissoryNotes) {
-        this.promissoryNotes = promissoryNotes;
-    }
-
     public void clearPromissoryNotes() {
         promissoryNotes.clear();
     }
@@ -1246,10 +1275,6 @@ public class Player extends PlayerProperties {
         return maxSOCount + Math.max(bonus, getBonusScoredSecrets());
     }
 
-    public Map<String, Integer> getSecrets() {
-        return secrets;
-    }
-
     public void setSecret(String id) {
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");
@@ -1289,13 +1314,6 @@ public class Player extends PlayerProperties {
         idToRemove = idToRemove.replace("extra1", "");
         idToRemove = idToRemove.replace("extra2", "");
         return Mapper.getSecretObjective(idToRemove);
-    }
-
-    /**
-     * @return Map of (SecretObjectiveModel ID, Random Number ID)
-     */
-    public Map<String, Integer> getSecretsScored() {
-        return secretsScored;
     }
 
     public Map<String, Integer> getSecretsUnscored() {
@@ -1362,10 +1380,12 @@ public class Player extends PlayerProperties {
 
     public int getNumberOfBluePrints() {
         int count = 0;
-        if (isHasFoundCulFrag()) count++;
-        if (isHasFoundHazFrag()) count++;
-        if (isHasFoundIndFrag()) count++;
-        if (isHasFoundUnkFrag()) count++;
+        if (hasAbility("ancient_blueprints")) {
+            if (isHasFoundCulFrag()) count++;
+            if (isHasFoundHazFrag()) count++;
+            if (isHasFoundIndFrag()) count++;
+            if (isHasFoundUnkFrag()) count++;
+        }
         return count;
     }
 
@@ -1799,6 +1819,19 @@ public class Player extends PlayerProperties {
         return new ArrayList<>(factionSetupInfo.getLeaders());
     }
 
+    public List<Leader> getLeadersIncludingPurged() {
+        ArrayList<Leader> originalLeaders = new ArrayList<>();
+        for (String leaderID : getFactionStartingLeaders()) {
+            originalLeaders.add(new Leader(leaderID));
+        }
+        for (String leaderID : getLeaderIDs()) {
+            if (!originalLeaders.stream().anyMatch(l -> l.getId().equals(leaderID))) {
+                originalLeaders.add(new Leader(leaderID));
+            }
+        }
+        return originalLeaders;
+    }
+
     public void initLeaders() {
         leaders.clear();
         if (game != null && game.isBaseGameMode()) return;
@@ -1871,10 +1904,6 @@ public class Player extends PlayerProperties {
             }
         }
         return Optional.empty();
-    }
-
-    public List<Leader> getLeaders() {
-        return leaders;
     }
 
     public List<String> getLeaderIDs() {
@@ -2264,22 +2293,6 @@ public class Player extends PlayerProperties {
                 .toList();
     }
 
-    public DraftBag getDraftHand() {
-        return draftHand;
-    }
-
-    public void setDraftHand(DraftBag hand) {
-        draftHand = hand;
-    }
-
-    public DraftBag getCurrentDraftBag() {
-        return currentDraftBag;
-    }
-
-    public void setCurrentDraftBag(DraftBag bag) {
-        currentDraftBag = bag;
-    }
-
     public DraftBag getDraftQueue() {
         return draftItemQueue;
     }
@@ -2356,7 +2369,8 @@ public class Player extends PlayerProperties {
 
         // Current coexisting framework is really very dumb
         Set<Planet> coexistingPlanets = game.getPlanetsInfo().values().stream()
-                .filter(planet -> planet.hasGroundForces(this) || planet.hasStructures(this))
+                .filter(planet -> (planet.hasGroundForces(this) || planet.hasStructures(this))
+                        && !getPlanetsAllianceMode().contains(planet.getName()))
                 .collect(Collectors.toSet());
         playerPlanets.addAll(coexistingPlanets);
 
@@ -2567,21 +2581,6 @@ public class Player extends PlayerProperties {
         if ("dn2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("kortalibt")) {
             addOwnedUnitByID("tribune3");
             removeOwnedUnitByID("dreadnought2");
-        }
-        Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
-        if (techModel.getFaction().isEmpty()
-                && obsidian != null
-                && !obsidian.is(this)
-                && obsidian.getPuppetedFactionsForPlot("extract").contains(getFaction())
-                && !obsidian.getTechs().contains(techID)) {
-            String msg = obsidian.getRepresentation() + ", _"
-                    + Mapper.getTech(techID).getName() + "_ has just been gained by " + getRepresentationNoPing()
-                    + ". Your _Extract_ plot card allows you to gain this technology for yourself by paying 4 resources.";
-
-            List<Button> buttons2 = new ArrayList<>();
-            buttons2.add(Buttons.green("acquireATechdeleteThisMessage", "Get a Technology"));
-            buttons2.add(Buttons.red("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(obsidian.getCorrectChannel(), msg, buttons2);
         }
     }
 
@@ -2825,7 +2824,7 @@ public class Player extends PlayerProperties {
     public Map<String, Integer> getDebtTokens(String pool) {
         Map<String, Integer> tokens = debtTokens.get(pool.toLowerCase());
         if (tokens == null) {
-            return new LinkedHashMap<String, Integer>();
+            return new LinkedHashMap<>();
         }
         return tokens;
     }
@@ -2845,7 +2844,7 @@ public class Player extends PlayerProperties {
     public void addDebtTokens(String tokenColor, int count, String pool) {
         pool = pool.toLowerCase();
         if (!debtTokens.containsKey(pool)) {
-            debtTokens.put(pool, new LinkedHashMap<String, Integer>());
+            debtTokens.put(pool, new LinkedHashMap<>());
         }
 
         if (debtTokens.get(pool).containsKey(tokenColor)) {
@@ -2991,14 +2990,6 @@ public class Player extends PlayerProperties {
         return getColor().equals(AliasHandler.resolveColor(unit.getColorID()));
     }
 
-    public List<TemporaryCombatModifierModel> getNewTempCombatModifiers() {
-        return newTempCombatModifiers;
-    }
-
-    public List<TemporaryCombatModifierModel> getTempCombatModifiers() {
-        return tempCombatModifiers;
-    }
-
     public boolean removeTempMod(TemporaryCombatModifierModel tempMod) {
         return tempCombatModifiers.remove(tempMod);
     }
@@ -3053,24 +3044,6 @@ public class Player extends PlayerProperties {
 
     public UserSettings getUserSettings() {
         return UserSettingsManager.get(getUserID());
-    }
-
-    public String getNextAvailableColour() {
-        return getNextAvailableColorIgnoreCurrent();
-    }
-
-    public String getNextAvailableColorIgnoreCurrent() {
-        Predicate<ColorModel> nonExclusive = cm -> !ColorChangeHelper.colorIsExclusive(cm.getAlias(), this);
-        String color = getUserSettings().getPreferredColors().stream()
-                .filter(c -> !ColorChangeHelper.colorIsExclusive(c, this))
-                .filter(c -> game.getUnusedColors().contains(Mapper.getColor(c)))
-                .findFirst()
-                .orElse(game.getUnusedColorsPreferringBase().stream()
-                        .filter(nonExclusive)
-                        .findFirst()
-                        .map(ColorModel::getName)
-                        .orElse(null));
-        return Mapper.getColorName(color);
     }
 
     public boolean isSpeaker() {

@@ -30,7 +30,7 @@ import ti4.service.draft.DraftButtonService;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftableType;
-import ti4.service.draft.PlayerSetupService.PlayerSetupState;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -123,7 +123,7 @@ public class FactionDraftable extends SinglePickDraftable {
         return getFactionByChoice(choice.getChoiceKey());
     }
 
-    public static FactionModel getFactionByChoice(String choiceKey) {
+    private static FactionModel getFactionByChoice(String choiceKey) {
         return Mapper.getFaction(choiceKey);
     }
 
@@ -474,7 +474,7 @@ public class FactionDraftable extends SinglePickDraftable {
         List<String> leaderNames = keleres.getLeaders();
         List<LeaderModel> leaders = leaderNames.stream().map(Mapper::getLeader).toList();
         Optional<LeaderModel> heroOpt =
-                leaders.stream().filter(l -> l.getType().equals(Constants.HERO)).findFirst();
+                leaders.stream().filter(l -> Constants.HERO.equals(l.getType())).findFirst();
         if (heroOpt.isPresent()) {
             LeaderModel hero = heroOpt.get();
             summaryParts.add(hero.getLeaderEmoji() + " " + hero.getName() + " - *" + hero.getAbilityWindow() + "* "

@@ -47,7 +47,7 @@ public class VisionariaSelectService {
         message +=
                 "\n-# > Reminder: This research costs 3 trade goods, and you must give the Deepwrought player a promissory note of your choice.";
 
-        game.removeStoredValue("VisionariaResponded");
+        game.setStoredValue("VisionariaResponded", "|" + player.getFaction());
 
         String factionEmoji = game.isFowMode() ? null : player.getFactionEmoji();
         List<Button> buttons = new ArrayList<>();
@@ -155,8 +155,7 @@ public class VisionariaSelectService {
     public boolean hasRespondedToVisionaria(Game game, Player player) {
         String val = game.getStoredValue("VisionariaResponded");
         if (player.hasBreakthrough("deepwroughtbt")) return true;
-        if (val.contains("|" + player.getFaction())) return true;
-        return false;
+        return val.isEmpty() || val.contains("|" + player.getFaction());
     }
 
     private void moveOnWhenDone(ButtonInteractionEvent event, Game game) {

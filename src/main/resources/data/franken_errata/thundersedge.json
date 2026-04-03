@@ -46,6 +46,12 @@
         "source": "thunders_edge"
     },
     {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "crimson_flagship",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
         "itemCategory": "BREAKTHROUGH",
         "itemId": "crimsonbt",
         "additionalComponents": [
@@ -63,6 +69,12 @@
     {
         "itemCategory": "ABILITY",
         "itemId": "researchteam",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "deepwrought_flagship",
         "undraftable": true,
         "source": "thunders_edge"
     },
@@ -120,6 +132,12 @@
         "itemId": "galvanize",
         "undraftable": true,
         "source": "thunders_edge"
+    }, 
+    {
+        "itemCategory": "TECH",
+        "itemId": "proxima",
+        "undraftable": true,
+        "source": "thunders_edge"
     },
     {
         "itemCategory": "ABILITY",
@@ -131,7 +149,8 @@
             "MECH:bastion_mech",
             "AGENT:bastionagent",
             "COMMANDER:bastioncommander",
-            "HERO:bastionhero"
+            "HERO:bastionhero",
+            "TECH:proxima"
         ],
         "source": "thunders_edge"
     },
@@ -193,6 +212,13 @@
         "undraftable": true,
         "source": "thunders_edge"
     },
+    {
+        "itemCategory": "STARTINGFLEET",
+        "itemId": "obsidian",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    
     {
         "itemCategory": "PLOT",
         "itemId": "enervate",
@@ -448,6 +474,12 @@
         "additionalComponents": [
             "ABILITY:miniaturization"
         ],
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "xxchahero",
+        "undraftable": true,
         "source": "thunders_edge"
     }
 ]

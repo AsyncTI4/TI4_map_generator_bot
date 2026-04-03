@@ -14,4 +14,9 @@ class NaaluCommanderButtonHandler {
     public static void secondHalfOfNaaluCommander(GenericInteractionCreateEvent event, Game game, Player player) {
         NaaluCommanderService.secondHalfOfNaaluCommander(event, game, player);
     }
+
+    @ButtonHandler("naaluCPN")
+    public static void naaluCommanderPN(GenericInteractionCreateEvent event, Game game, Player player) {
+        NaaluCommanderService.naaluCommanderPN(event, game, player);
+    }
 }

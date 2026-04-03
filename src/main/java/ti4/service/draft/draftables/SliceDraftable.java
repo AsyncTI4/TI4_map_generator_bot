@@ -28,15 +28,15 @@ import ti4.service.draft.DraftableType;
 import ti4.service.draft.NucleusSliceGeneratorService.NucleusOutcome;
 import ti4.service.draft.NucleusSpecs;
 import ti4.service.draft.PartialMapService;
-import ti4.service.draft.PlayerSetupService.PlayerSetupState;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.draft.SliceGenerationPipeline;
 import ti4.service.draft.SliceImageGeneratorService;
 import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.milty.MiltyDraftSlice;
 
+@Getter
 public class SliceDraftable extends SinglePickDraftable {
 
-    @Getter
     private List<MiltyDraftSlice> slices = new ArrayList<>();
 
     public void initialize(List<MiltyDraftSlice> slices) {

@@ -665,7 +665,7 @@ public class TileGenerator {
 
                 for (UnitHolder unitHolder : unitHolders) {
                     int radius =
-                            unitHolder.getName().equals(Constants.SPACE) ? Constants.SPACE_RADIUS : Constants.RADIUS;
+                            Constants.SPACE.equals(unitHolder.getName()) ? Constants.SPACE_RADIUS : Constants.RADIUS;
                     if (unitHolder != spaceUnitHolder) {
                         addPlanetToken(tile, tileGraphics, unitHolder, rectangles);
                     }
@@ -784,6 +784,45 @@ public class TileGenerator {
                     String chevronFile = ResourceHelper.getInstance().getTileFile("tile_anomaly_chevron.png");
                     BufferedImage bufferedImage = ImageHelper.read(chevronFile);
                     tileGraphics.drawImage(bufferedImage, x, y, null);
+                }
+            }
+            case Exile -> {
+                if (game.isFowMode()) {
+                    break;
+                }
+                if (tile.getTileModel().isHyperlane()) {
+                    break;
+                }
+                boolean inRangeOfExile = false;
+                for (Player p : game.getRealPlayers()) {
+                    if (FoWHelper.isTileInExileRange(game, tile, p)
+                            || FoWHelper.isTileInUpgradedExileRange(game, tile, p)) {
+                        inRangeOfExile = true;
+                        break;
+                    }
+                }
+                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
+                if (tileImage == null) {
+                    break;
+                }
+
+                int x = TILE_PADDING;
+                int y = TILE_PADDING;
+
+                if (!inRangeOfExile) {
+                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
+                    tileGraphics.drawImage(fogging, x, y, null);
+                } else {
+                    x += (isSpiral ? 36 : 0);
+                    y += (isSpiral ? 43 : 0);
+                    String breachFile = ResourceHelper.getInstance().getTokenFile("token_breachActive.png");
+
+                    BufferedImage bufferedImage = ImageHelper.readScaled(breachFile, 2f);
+                    if (bufferedImage != null) {
+                        x += (345 - bufferedImage.getWidth()) / 2;
+                        y += (300 - bufferedImage.getHeight()) / 2;
+                        tileGraphics.drawImage(bufferedImage, x, y, null);
+                    }
                 }
             }
             case Aetherstream -> {
@@ -1554,7 +1593,7 @@ public class TileGenerator {
             arrow.setColor(Color.BLACK);
 
             if (direction >= 2 && direction <= 4) { // all the south directions
-                arrow.rotate(3.141592653589793, imageCenterX, imageCenterY);
+                arrow.rotate(3.141_592_653_589_793, imageCenterX, imageCenterY);
                 textOffsetY = 25;
             }
             arrow.drawString(secondaryTile, textOffsetX, textOffsetY);

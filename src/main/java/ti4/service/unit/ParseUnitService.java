@@ -57,6 +57,9 @@ public class ParseUnitService {
     }
 
     private ParsedUnit parseUnit(String unitListToken, String color, Tile tile, GenericInteractionCreateEvent event) {
+        if (unitListToken != null) {
+            unitListToken = unitListToken.replace("space dock", "spacedock");
+        }
         StringTokenizer unitInfoTokenizer = new StringTokenizer(unitListToken, " ");
 
         String firstToken = unitInfoTokenizer.nextToken();
@@ -99,7 +102,7 @@ public class ParseUnitService {
             ParsedUnit parsedUnit, Tile tile, String unitListToken, GenericInteractionCreateEvent event) {
         boolean isValidUnit = parsedUnit.getUnitKey() != null;
         boolean isValidUnitHolder =
-                parsedUnit.getLocation().equals(Constants.SPACE) || tile.isSpaceHolderValid(parsedUnit.getLocation());
+                Constants.SPACE.equals(parsedUnit.getLocation()) || tile.isSpaceHolderValid(parsedUnit.getLocation());
 
         if (isValidUnit && isValidUnitHolder) {
             return true;

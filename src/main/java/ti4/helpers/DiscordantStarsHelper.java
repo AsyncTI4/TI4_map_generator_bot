@@ -31,7 +31,7 @@ import ti4.service.milty.MiltyDraftTile;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
-public class DiscordantStarsHelper {
+public final class DiscordantStarsHelper {
 
     public static void checkGardenWorlds(Game game) {
         Player player = Helper.getPlayerFromAbility(game, "garden_worlds");
@@ -46,7 +46,7 @@ public class DiscordantStarsHelper {
                         if (planet.hasGroundForces(game)
                                 && planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
                             planet.removeToken(Constants.GARDEN_WORLDS_PNG);
-                        } else if (!planet.hasGroundForces(game)) {
+                        } else if (!planet.hasGroundForces(game) && !planet.isSpaceStation()) {
                             planet.addToken(Constants.GARDEN_WORLDS_PNG);
                         }
                     } else if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
@@ -238,8 +238,8 @@ public class DiscordantStarsHelper {
                 || !player.hasOlradinPolicies()) return;
         PlanetModel planetModel = Mapper.getPlanet(planet);
         if (planetModel == null) return;
-        UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-        Planet planetHolder = (Planet) unitHolder;
+        Planet unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        Planet planetHolder = unitHolder;
         if (planetHolder == null) return;
 
         boolean hasAbility = planetHolder.isLegendary();
@@ -348,6 +348,11 @@ public class DiscordantStarsHelper {
                 "78",
                 "79",
                 "80",
+                "113",
+                "114",
+                "115",
+                "116",
+                "117",
                 "d117",
                 "d118",
                 "d119",

@@ -80,6 +80,14 @@ public class StatusCleanupService {
         if (ButtonHelper.isLawInPlay(game, "tf-censure")) {
             game.removeLaw("tf-censure");
         }
+
+        game.setCurrentACDrawStatusInfo("");
+        if (!game.isFowMode()) {
+            for (Player p : game.getActionPhaseTurnOrder()) {
+                ButtonHelper.drawStatusACs(game, p, null);
+            }
+        }
+
         for (Player player : players.values()) {
 
             player.setPassed(false);
@@ -190,7 +198,7 @@ public class StatusCleanupService {
                         player.removeTech(sharedKnowledge);
                         String msg = player.getRepresentation() + ", " + tech.getRepresentation(false)
                                 + " has been removed, and _Share Knowledge_ has been returned to "
-                                + (game.isFrankenGame() ? "the owner" : "the Deeprought player") + ".";
+                                + (game.isFrankenGame() ? "the owner" : "the Deepwrought player") + ".";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     }
                 }

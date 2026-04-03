@@ -35,7 +35,7 @@ import ti4.model.UnitModel;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
-public class DSHelperBreakthroughs {
+public final class DSHelperBreakthroughs {
     // @ButtonHandler("componentActionRes_")
 
     public static void dihmohnBTExhaust(Game game, Player p1) {
@@ -420,6 +420,14 @@ public class DSHelperBreakthroughs {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
         ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler("readyLanefirBt")
+    public static void readyLanefirBt(Game game, Player player, ButtonInteractionEvent event) {
+        String msg = player.getRepresentation() + " readied their breakthrough.";
+        player.setBreakthroughExhausted("lanefirbt", false);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void doLanefirBtCheck(Game game, Player player) {

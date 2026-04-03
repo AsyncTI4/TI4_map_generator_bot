@@ -13,11 +13,12 @@ import ti4.map.Player;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.service.statistics.FactionStatisticsHelper;
 
 @UtilityClass
 class FactionPerformanceStatisticsService {
 
-    public static void showFactionPerformance(SlashCommandInteractionEvent event) {
+    static void showFactionPerformance(SlashCommandInteractionEvent event) {
         Map<String, Double> actualWins = new HashMap<>();
         Map<String, Double> expectedWins = new HashMap<>();
         Map<String, Integer> gameCount = new HashMap<>();
@@ -28,24 +29,30 @@ class FactionPerformanceStatisticsService {
 
         StringBuilder sb = new StringBuilder();
         sb.append("Faction Performance (vs expected win rate):\n");
-        Mapper.getFactionsValues().stream()
+        gameCount.keySet().stream()
                 .map(faction -> {
-                    double factionWins = actualWins.getOrDefault(faction.getAlias(), 0.0);
-                    double factionExpectedWins = expectedWins.getOrDefault(faction.getAlias(), 0.0);
+                    double factionWins = actualWins.getOrDefault(faction, 0.0);
+                    double factionExpectedWins = expectedWins.getOrDefault(faction, 0.0);
                     double performance = factionExpectedWins == 0 ? 0 : ((factionWins / factionExpectedWins) - 1) * 100;
                     return Map.entry(faction, performance);
                 })
-                .filter(entry -> gameCount.containsKey(entry.getKey().getAlias()))
-                .sorted(Map.Entry.<FactionModel, Double>comparingByValue().reversed())
-                .forEach(entry -> sb.append("`")
-                        .append(StringUtils.leftPad(String.format("%.2f", entry.getValue()), 6))
-                        .append("%` (")
-                        .append(gameCount.getOrDefault(entry.getKey().getAlias(), 0))
-                        .append(" games) ")
-                        .append(entry.getKey().getFactionEmoji())
-                        .append(" ")
-                        .append(entry.getKey().getFactionNameWithSourceEmoji())
-                        .append("\n"));
+                .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
+                .forEach(entry -> {
+                    FactionModel factionModel = Mapper.getFaction(entry.getKey());
+                    String factionName =
+                            factionModel != null ? factionModel.getFactionNameWithSourceEmoji() : entry.getKey();
+                    String factionEmoji = FactionStatisticsHelper.getFactionEmoji(entry.getKey());
+                    sb.append("`")
+                            .append(StringUtils.leftPad(String.format("%.2f", entry.getValue()), 6))
+                            .append("%` (")
+                            .append(gameCount.getOrDefault(entry.getKey(), 0))
+                            .append(" games) ")
+                            .append(factionEmoji)
+                            .append(" ")
+                            .append(factionName)
+                            .append("\n");
+                });
+
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Faction Performance", sb.toString());
     }
@@ -55,17 +62,20 @@ class FactionPerformanceStatisticsService {
             Map<String, Double> actualWins,
             Map<String, Double> expectedWins,
             Map<String, Integer> gameCount) {
-        if (game.getWinner().isEmpty()) {
+        if (game.getWinners().isEmpty()) {
             return;
         }
         int playerCount = game.getRealAndEliminatedPlayers().size();
         double expectedWinPerFaction = 1.0 / playerCount;
 
-        game.getWinners().forEach(winner -> actualWins.merge(winner.getFaction(), 1.0, Double::sum));
+        game.getWinners().forEach(winner -> {
+            String winningFaction = winner.getFaction();
+            FactionStatisticsHelper.incrementFactionsDoubleValue(actualWins, winningFaction);
+        });
         for (Player player : game.getRealAndEliminatedPlayers()) {
             String faction = player.getFaction();
-            gameCount.merge(faction, 1, Integer::sum);
-            expectedWins.merge(faction, expectedWinPerFaction, Double::sum);
+            FactionStatisticsHelper.incrementFactionsIntValue(gameCount, faction);
+            FactionStatisticsHelper.incrementFactionsDoubleValue(expectedWins, faction, expectedWinPerFaction);
         }
     }
 }

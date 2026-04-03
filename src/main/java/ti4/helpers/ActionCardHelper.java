@@ -508,7 +508,7 @@ public class ActionCardHelper {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
-    public static void sendSchemingDiscardButtons(Player player) {
+    private static void sendSchemingDiscardButtons(Player player) {
         List<Button> buttons = getDiscardActionCardButtons(player, false);
         String msg = player.getRepresentationUnfogged() + ", discard an action card due to **Scheming**.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -634,7 +634,7 @@ public class ActionCardHelper {
             return;
         }
         if (autonetic && player.hasAbility("autonetic_memory")) {
-            ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
+            ButtonHelperAbilities.autoneticMemoryStep1(player, count);
             return;
         }
 
@@ -682,7 +682,7 @@ public class ActionCardHelper {
         if ("blackmarketdealing".equals(acID)
                 && game.getPhaseOfGame().toLowerCase().contains("agenda")
                 && game.isHiddenAgendaMode()
-                && !game.getStoredValue("executiveOrder").isEmpty()) {
+                && game.getStoredValue("executiveOrder").isEmpty()) {
             return "You cannot make transactions during the agenda phase in Hidden Agenda mode. Cancelling this action card automatically";
         }
 
@@ -1213,6 +1213,16 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "planets"), codedButtons);
             }
 
+            if ("oracle".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveOracle", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("intrigue".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveIntrigue", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("ancient_trade_routes".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveAncientTradeRoutes", buttonLabel));
@@ -1267,6 +1277,18 @@ public class ActionCardHelper {
                         player.getFinsFactionCheckerPrefix() + "resolveDefenseInstallation", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
+            }
+
+            if ("cache".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveCache", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
+            }
+
+            if ("simulacrum".equals(automationID)) {
+                codedButtons.add(
+                        Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveSimulacrum", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
             if ("harness".equals(automationID)) {

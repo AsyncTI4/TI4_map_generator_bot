@@ -4,7 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Constants {
+public final class Constants {
     // Staff Pings
     public static final String chassitId = "183213554445320192";
     public static final String eronousId = "465241936408608769";
@@ -203,6 +203,7 @@ public class Constants {
     public static final String SETTING_TYPE = "setting_type";
 
     public static final String TOKEN_INGRESS = "token_ingress.png";
+    public static final String TOKEN_EGRESS = "token_egress.png";
     public static final String TOKEN_BREACH_ACTIVE = "token_breachActive.png";
     public static final String TOKEN_BREACH_INACTIVE = "token_breachInactive.png";
     public static final String TOKEN_SEVERED = "token_severed.png";
@@ -440,6 +441,7 @@ public class Constants {
     public static final String LIZHO_REVEAL_TRAP = "lizho_reveal_trap";
     public static final String LIZHO_SWAP_TRAP = "lizho_swap_trap";
     public static final String STELLAR_CONVERTER = "stellar_converter";
+    public static final String EXPEDITION_WIN_RATES = "expedition_win_rates";
     public static final String SEND_DEBT = "send_debt";
     public static final String DEBT_COUNT = "debt_count";
     public static final String REMOVE_DEBT = "remove_debt";
@@ -650,6 +652,7 @@ public class Constants {
     public static final String SEND_TG = "send_tg";
     public static final String SEND_COMMODITIES = "send_commodities";
     public static final String SETUP = "setup";
+    public static final String SETUP_STARTING_FLEET = "setup_starting_fleet";
     public static final String WEIRD_GAME_SETUP = "weird_game_setup";
     public static final String GALACTIC_EVENTS_SETUP = "galactic_events_setup";
     public static final String CUSTOMIZATION = "customization";
@@ -900,6 +903,7 @@ public class Constants {
     public static final String PICK_AC_FROM_DISCARD = "pick_from_discard";
     public static final String PICK_AC_FROM_PURGED = "pick_from_purged";
     public static final String SHUFFLE_AC_BACK_INTO_DECK = "shuffle_back_into_deck";
+    public static final String SHUFFLE_AC_FROM_HAND = "shuffle_from_hand";
     public static final String REVEAL_AND_PUT_AC_INTO_DISCARD = "reveal_and_put_into_discard";
     public static final String SEND_AC = "send";
     public static final String SEND_AC_RANDOM = "send_random";
@@ -1287,6 +1291,8 @@ public class Constants {
     public static final String PATH_TOKEN_COUNT = "path_token_count";
     public static final String HONOR_COUNT = "honor_count";
     public static final String DISHONOR_COUNT = "dishonor_count";
+    public static final String STEELBALANCE_COUNT = "steelbalance_count";
+    public static final String STARBALANCE_COUNT = "starbalance_count";
     public static final String HARVEST_COUNT = "harvest_count";
     public static final String GLEDGE_CORE_PNG = "token_ds_gledgecore.png";
     public static final String DS_COMMAND = "ds";
@@ -1329,6 +1335,7 @@ public class Constants {
     public static final String LIFETIME_RECORD = "lifetime_record";
     public static final String FACTION_RECORD_OF_TECH = "faction_record_of_tech";
     public static final String FACTION_RECORD_OF_SCPICK = "faction_record_of_scpick";
+    public static final String FACTION_TOP_COLORS = "faction_top_colors";
     public static final String SPENDS = "spends";
     public static final String TOP_LIMIT = "top_limit";
     public static final String MINIMUM_NUMBER_OF_TURNS = "minimum_number_of_turns";
@@ -1352,6 +1359,7 @@ public class Constants {
     public static final String OBSERVER = "observer";
     public static final String REMOVE_TITLE = "remove_title";
     public static final String EDIT_TRACK_RECORD = "edit_track_record";
+    public static final String SET_GAME_LIMIT = "set_game_limit";
     public static final String SET_STATS_TRACKED_USER = "set_stats_tracked_user";
     public static final String TITLE = "title";
     public static final String ADD_REMOVE = "add_remove";

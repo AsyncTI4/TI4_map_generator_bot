@@ -8,7 +8,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class VoiceOfTheCouncilHelper {
+public final class VoiceOfTheCouncilHelper {
     public static void ResetVoiceOfTheCouncil(Game game) {
         // Clean everything in case it got put somewhere weird
         game.getLaws().remove(Constants.VOICE_OF_THE_COUNCIL_ID);

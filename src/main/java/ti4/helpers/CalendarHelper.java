@@ -7,7 +7,7 @@ import java.util.Calendar;
  * <p>
  * Note: The isBetween method is a private helper method used to determine if the current date falls within a specified range.
  */
-public class CalendarHelper {
+public final class CalendarHelper {
 
     /**
      * @param startMonth 0 indexed month #

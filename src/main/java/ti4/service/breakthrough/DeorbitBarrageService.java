@@ -106,6 +106,9 @@ public class DeorbitBarrageService {
         String planet = buttonID.split("_")[1];
         int amount = Integer.parseInt(buttonID.split("_")[2]);
         Player p2 = game.getPlanetOwner(planet);
+        if (p2 == null) {
+            p2 = game.getPlayerFromColorOrFaction("neutral");
+        }
         String planetRep = Helper.getPlanetRepresentation(planet, game);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
@@ -132,14 +135,15 @@ public class DeorbitBarrageService {
                 if (p2.hasAbility("data_recovery")) {
                     ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
                 }
+                buttons.add(Buttons.red(
+                        "getDamageButtons_" + game.getTileFromPlanet(planet).getPosition() + "_bombardment",
+                        "Assign Hit" + (hits == 1 ? "" : "s")));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
+                        p2.getRepresentation() + ", please assign the hits" + (hits == 1 ? "" : "s")
+                                + ". Reminder that the player who did the barrage officially assigns the hits, but that you can sustain if they assign a hit to mechs. Ask them how they would like you to assign hits.",
+                        buttons);
             }
-            buttons.add(Buttons.red(
-                    "getDamageButtons_" + game.getTileFromPlanet(planet).getPosition() + "_bombardment",
-                    "Assign Hit" + (hits == 1 ? "" : "s")));
-            MessageHelper.sendMessageToChannelWithButtons(
-                    game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
-                    p2.getRepresentation() + ", please assign the hits" + (hits == 1 ? "" : "s") + ".",
-                    buttons);
             buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
             Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
             buttons.add(DoneExhausting);

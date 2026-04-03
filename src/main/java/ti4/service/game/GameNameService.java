@@ -4,11 +4,13 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.unions.IThreadContainerUnion;
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.helpers.Constants;
 import ti4.map.persistence.GameManager;
 
@@ -22,6 +24,13 @@ public class GameNameService {
             return gameNameOption.getAsString();
         }
         return getGameNameFromChannel(event);
+    }
+
+    @Nullable
+    public static String getGameName(GenericCommandInteractionEvent event) {
+        Channel channel = event.getChannel();
+        if (channel == null) return null;
+        return getGameNameFromChannel(channel);
     }
 
     public static String getGameNameFromChannel(Interaction event) {

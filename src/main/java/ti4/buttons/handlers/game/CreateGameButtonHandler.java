@@ -52,11 +52,13 @@ public class CreateGameButtonHandler {
         int completedAndOngoingAmount =
                 SearchGameHelper.searchGames(member.getUser(), null, false, true, false, true, false, true, true, true);
         if (completedAndOngoingAmount < 1 && !owner) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), """
-                    You need to have completed at least one game (or be currently in a game) to create new games via this button. \
-                    This is to prevent mistakes by people who don't know what they're doing. There are a couple of ways to get around this:
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), member.getUser().getAsMention() + """
+                     You need to have completed at least one game (or be currently in a game) to create new games via this button. \
+                    This is to prevent mistakes by people who don't know what they're doing. There are a few ways to get around this:
                     1) Have someone else who has completed a game press the button for you; or
-                    2) Ping a bothelper for help.""");
+                    2) Ping a bothelper for help; or
+                    3) Have the player who made the post press the button.""");
             return;
         }
 
@@ -195,6 +197,8 @@ public class CreateGameButtonHandler {
                     .append("\n\nPlayers:");
         }
 
+        StringBuilder activityList = new StringBuilder();
+
         var userIds = members.stream().map(Member::getId).toList();
         Map<String, Long> userIdsToAverageTurnTimes =
                 AverageTurnTimeService.getBean().getUserIdsToAverageTurnTimes(userIds);
@@ -213,35 +217,41 @@ public class CreateGameButtonHandler {
             int completedGames = completedAndOngoingAmount - ongoingAmount;
             if (ongoingAmount > completedGames + 2) {
                 memberList
-                        .append("\n  - ⚠️ (Above or equal game limit: ")
+                        .append("⚠️ (Above or equal game limit: ")
                         .append(ongoingAmount)
                         .append(" ongoing, ")
                         .append(completedGames + 3)
-                        .append("-game limit)");
+                        .append("-game limit) ");
             } else {
-                memberList.append("\n  - ").append(completedGames).append(" games completed. ");
+                memberList.append(" ").append(completedGames).append(" games completed. ");
             }
             if (userIdsToAverageTurnTimes.containsKey(member.getUser().getId())) {
                 long averageTurnTime =
                         userIdsToAverageTurnTimes.get(member.getUser().getId());
                 memberList
-                        .append("\n  - `")
+                        .append(" `")
                         .append(DateTimeHelper.getTimeRepresentationToSeconds(averageTurnTime))
                         .append("` average turn time.");
             }
             var userSettings = UserSettingsManager.get(member.getId());
-            String activeHoursSummary = userSettings.summarizeActiveHours(userSettings.getActiveHours());
+            String activeHoursSummary = userSettings.summarizeActiveHoursEmoji(userSettings.getActiveHours());
             if (activeHoursSummary != null) {
-                memberList
-                        .append("\n  - Active Hours: ")
-                        .append(activeHoursSummary)
-                        .append(".");
-            } else {
-                memberList.append("\n  - Insufficient data for active hours.");
+                if (activityList.isEmpty()) {
+                    activityList
+                            .append("\n### Players Active Hours (starting from ")
+                            .append("<t:" + 1767225600L)
+                            .append(":t>")
+                            .append("):\n");
+                }
+
+                activityList.append("\n").append(playerNumber).append(". ").append(activeHoursSummary);
             }
+            // } else {
+            //     memberList.append("\n  - Insufficient data for active hours.");
+            // }
             playerNumber++;
         }
-        return memberList.toString();
+        return memberList.toString() + activityList;
     }
 
     @ButtonHandler("joinGameList")
@@ -346,8 +356,6 @@ public class CreateGameButtonHandler {
             return;
         }
 
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Message for posterity:\n\n" + buttonMsg);
-
         // CHECK IF GIVEN CATEGORY IS VALID
         String categoryChannelName = CreateGameService.getCategoryNameForGame(gameName);
         Category categoryChannel = null;
@@ -399,14 +407,14 @@ public class CreateGameButtonHandler {
                 return false;
             }
             // Used for specific people we are limiting the amount of games of
-            if ("774413088072925226".equalsIgnoreCase(member.getId())) {
-                if (ongoingAmount > 4) {
-                    MessageHelper.sendMessageToChannel(
-                            event.getChannel(),
-                            member.getUser().getAsMention()
-                                    + " is currently under a 5-game limit and cannot join more games at this time");
-                    return false;
-                }
+            var userSettings = UserSettingsManager.get(member.getId());
+            if (userSettings.getGameLimit() > 0 && ongoingAmount >= userSettings.getGameLimit()) {
+
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(),
+                        member.getUser().getAsMention() + " is currently under a " + userSettings.getGameLimit()
+                                + "-game limit and cannot join more games at this time");
+                return false;
             }
         }
         return true;

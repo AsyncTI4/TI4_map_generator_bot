@@ -33,6 +33,7 @@ import ti4.commands.omega_phase.OmegaPhaseCommand;
 import ti4.commands.planet.PlanetCommand;
 import ti4.commands.player.PlayerCommand;
 import ti4.commands.relic.RelicCommand;
+import ti4.commands.rules.RulesCommand;
 import ti4.commands.search.SearchCommand;
 import ti4.commands.search.SearchCommand2;
 import ti4.commands.special.Special2Command;
@@ -67,7 +68,7 @@ import ti4.commands.units.RemoveUnits;
 import ti4.commands.user.UserCommand;
 
 @UtilityClass
-public class CommandManager {
+public class SlashCommandManager {
 
     private static final Map<String, ParentCommand> commands = Stream.of(
                     new AddUnits(),
@@ -95,6 +96,7 @@ public class CommandManager {
                     new SearchCommand(),
                     new ExploreCommand(),
                     new RelicCommand(),
+                    new RulesCommand(),
                     new AdminCommand(),
                     new DeveloperCommand(),
                     new BothelperCommand(),

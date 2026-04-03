@@ -40,7 +40,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.DestroyUnitService;
 
-public class TeHelperTechs {
+public final class TeHelperTechs {
 
     // Generic Tech
     @ButtonHandler("useMagenDefense_")
@@ -58,6 +58,13 @@ public class TeHelperTechs {
             for (UnitHolder uh : tile.getUnitHolders().values()) {
                 int count = uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure);
                 if (player.hasAbility("byssus")) count += uh.getUnitCount(UnitType.Mech, player);
+
+                for (String token : uh.getTokenList()) {
+                    if (player.getPlanets().contains(uh.getName()) && token.contains("superweapon")) {
+                        count++;
+                    }
+                }
+
                 if (count > 0) {
                     total += count;
                     uh.addUnit(infKey, count);

@@ -55,7 +55,7 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
     };
 
     public String getNameRepresentation() {
-        return getObjectiveEmoji() + " _" + getName() + "_ " + source.emoji();
+        return getObjectiveEmoji() + " _" + name + "_ " + source.emoji();
     }
 
     public MessageEmbed getRepresentationEmbed() {

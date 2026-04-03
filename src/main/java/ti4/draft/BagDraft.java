@@ -104,7 +104,7 @@ public abstract class BagDraft {
 
     public boolean allPlayersReadyToPass() {
         for (Player p : owner.getRealPlayers()) {
-            if (!playerHasDraftableItemInBag(p) && !playerHasItemInQueue(p)) {
+            if (!playerHasDraftableItemInBag(p) && !playerHasItemInQueue(p) && !p.isReadyToPassBag()) {
                 setPlayerReadyToPass(p, true);
                 MessageHelper.sendMessageToChannel(
                         findExistingBagChannel(p),
@@ -139,7 +139,7 @@ public abstract class BagDraft {
         return player.getCurrentDraftBag().Contents.stream().anyMatch(draftItem -> draftItem.isDraftable(player));
     }
 
-    public List<DraftItem> draftableItemsInBag(Player player) {
+    private List<DraftItem> draftableItemsInBag(Player player) {
         ArrayList<DraftItem> draftableItems = new ArrayList<>(player.getCurrentDraftBag().Contents.stream()
                 .filter(draftItem -> draftItem.isDraftable(player))
                 .toList());
@@ -224,7 +224,7 @@ public abstract class BagDraft {
         return threadChannel;
     }
 
-    public String getBagChannelThreadName(Player player) {
+    private String getBagChannelThreadName(Player player) {
         String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-"
                 + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("");
         if (owner.isFowMode()) {
@@ -373,7 +373,7 @@ public abstract class BagDraft {
         String key = "frankenBuilt";
         for (Player player : owner.getRealPlayers()) {
 
-            String finished = player.getStoredValue(key).equals("n") ? "❌" : "✅";
+            String finished = "n".equals(player.getStoredValue(key)) ? "❌" : "✅";
             String ident =
                     owner.getRealPlayers().size() > 10 ? player.getFactionEmoji() : player.getRepresentationNoPing();
 

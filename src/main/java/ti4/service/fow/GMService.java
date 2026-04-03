@@ -41,7 +41,7 @@ import ti4.service.explore.ExploreService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
-public class GMService {
+public final class GMService {
 
     private static final List<Button> GMBUTTONS = Arrays.asList(
             Buttons.REFRESH_MAP,
@@ -90,10 +90,6 @@ public class GMService {
     public static TextChannel getGMChannel(Game game) {
         List<TextChannel> channels = game.getGuild().getTextChannelsByName(game.getName() + "-gm-room", true);
         return channels.isEmpty() ? game.getMainGameChannel() : channels.getFirst();
-    }
-
-    public static void sendMessageToGMChannel(Game game, String msg) {
-        sendMessageToGMChannel(game, msg, false);
     }
 
     public static void sendMessageToGMChannel(Game game, String msg, boolean ping) {
@@ -264,7 +260,7 @@ public class GMService {
                     pns.append("__")
                             .append(player.getRepresentationUnfoggedNoPing())
                             .append("__\n");
-                    player.getPromissoryNotes().entrySet().stream().forEach(entry -> pns.append("> ")
+                    player.getPromissoryNotes().entrySet().forEach(entry -> pns.append("> ")
                             .append(Mapper.getPromissoryNote(entry.getKey()).getNameRepresentation())
                             .append(" (")
                             .append(entry.getValue())

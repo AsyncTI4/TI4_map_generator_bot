@@ -481,10 +481,9 @@ public class ExploreService {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveExploreAuto(
+    private static void resolveExploreAuto(
             GenericInteractionCreateEvent event, Player player, String cardID, String planetName, Game game) {
         Tile tile = game.getTileFromPlanet(planetName);
-        String tileName = tile == null ? "no tile" : tile.getPosition();
         String messageText = player.getRepresentationNoPing() + " \"chose\" to resolve _"
                 + Mapper.getExplore(cardID).getName() + "_.";
         resolveExplore(event, cardID, tile, planetName, messageText, player, game);
@@ -576,11 +575,11 @@ public class ExploreService {
                                         .orElse(new ArrayList<>())
                                         .isEmpty()
                                 || ButtonHelper.doesPlanetHaveAttachmentTechSkip(tile, planetID)) {
-                            if ((attachment.equals(Constants.WARFARE)
-                                    || attachment.equals(Constants.PROPULSION)
-                                    || attachment.equals(Constants.CYBERNETIC)
-                                    || attachment.equals(Constants.BIOTIC)
-                                    || attachment.equals(Constants.WEAPON))) {
+                            if ((Constants.WARFARE.equals(attachment)
+                                    || Constants.PROPULSION.equals(attachment)
+                                    || Constants.CYBERNETIC.equals(attachment)
+                                    || Constants.BIOTIC.equals(attachment)
+                                    || Constants.WEAPON.equals(attachment))) {
                                 attachment += "stat";
                                 String attachmentID = Mapper.getAttachmentImagePath(attachment);
                                 if (attachmentID != null) {
@@ -594,7 +593,7 @@ public class ExploreService {
                     tile.addToken(attachmentFilename, planetID);
                     message = new StringBuilder("Attachment _" + aModel.getName() + "_ added to "
                             + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + ".");
-                    if (attachment.equals(Constants.DMZ)) {
+                    if (Constants.DMZ.equals(attachment)) {
                         String dmzLargeFilename = Mapper.getTokenID(Constants.DMZ_LARGE);
                         tile.addToken(dmzLargeFilename, planetID);
                         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
@@ -924,11 +923,11 @@ public class ExploreService {
                         player.getCorrectChannel(), message.toString(), discardButtons);
                 List<Button> explorePlanets = new ArrayList<>();
                 for (String planet : player.getPlanetsAllianceMode()) {
-                    UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+                    Planet unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                     if (unitHolder == null) {
                         continue;
                     }
-                    Planet planetReal = (Planet) unitHolder;
+                    Planet planetReal = unitHolder;
                     List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
                     if (buttons != null && !buttons.isEmpty()) {
                         explorePlanets.addAll(buttons);
@@ -996,7 +995,7 @@ public class ExploreService {
                 }
                 CommanderUnlockCheckService.checkPlayer(player, "hacan");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                if (message.length() > 0) {
+                if (!message.isEmpty()) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
                 }
                 message = new StringBuilder(player.getRepresentationUnfogged() + ", your current command tokens are "

@@ -46,7 +46,7 @@ import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
-public class ButtonHelperActionCards {
+public final class ButtonHelperActionCards {
 
     private static List<Button> getTilesToScuttle(Player player, Game game, int tgAlready) {
         String finChecker = "FFCC_" + player.getFaction() + "_";

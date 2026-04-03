@@ -79,7 +79,7 @@ public class DrumrollService {
         doDrumrollMultiChannel(main, msg, sec, gameName, resolve, chans, msgs);
     }
 
-    public void doDrumrollMultiChannel(
+    private void doDrumrollMultiChannel(
             MessageChannel main,
             String msg,
             int sec,

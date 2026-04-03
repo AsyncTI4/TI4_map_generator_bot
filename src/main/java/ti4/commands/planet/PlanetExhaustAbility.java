@@ -153,6 +153,11 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                             "starforgeTileFree_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
                 }
             }
+            case "conviction" -> {
+                player.setCommodities(player.getCommodities() + 2);
+                output = player.getFactionEmoji() + " exhausted Conviction to gain 2 commodities. They now have "
+                        + player.getCommodities() + " commodities.";
+            }
 
             case "silence" -> {
                 output = "Use buttons to put 1 cruiser with your ships.";

@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 @UtilityClass
 public class EventAuditService {
 
-    public static String getReason(GenericInteractionCreateEvent event, boolean isFow) {
+    public static String getReason(GenericInteractionCreateEvent event) {
         if (event == null) {
             return null;
         }

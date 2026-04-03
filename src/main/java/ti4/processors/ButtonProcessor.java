@@ -57,8 +57,8 @@ public class ButtonProcessor {
     private static String eventToString(ButtonInteractionEvent event, String gameName) {
         return "ButtonProcessor task for `" + event.getUser().getEffectiveName() + "`"
                 + (gameName == null ? "" : " in `" + gameName + "`")
-                + ": `"
-                + ButtonHelper.getButtonRepresentation(event.getButton()) + "`";
+                + ": "
+                + ButtonHelper.getButtonRepresentation(event.getButton());
     }
 
     private static void process(ButtonInteractionEvent event) {

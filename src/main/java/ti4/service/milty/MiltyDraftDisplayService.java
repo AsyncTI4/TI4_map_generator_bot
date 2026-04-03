@@ -86,9 +86,9 @@ public class MiltyDraftDisplayService {
 
     private Consumer<MessageHistory> editDraftInfo(MiltyDraftManager manager, Game game, String category) {
         Predicate<String> isCategory = txt -> switch (category) {
-            case "slice" -> txt.equals(SLICES);
-            case "faction" -> txt.equals(FACTIONS);
-            case "order" -> txt.equals(POSITION);
+            case "slice" -> SLICES.equals(txt);
+            case "faction" -> FACTIONS.equals(txt);
+            case "order" -> POSITION.equals(txt);
             default -> false;
         };
         List<Button> categoryButtons =
@@ -169,15 +169,15 @@ public class MiltyDraftDisplayService {
                 if (removeSummary) msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 removeSummary = true;
             }
-            if (clearOldDraftInfo && msgTxt.equals(SLICES)) {
+            if (clearOldDraftInfo && SLICES.equals(msgTxt)) {
                 if (removeSliceMsgs) msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 removeSliceMsgs = true;
             }
-            if (clearOldDraftInfo && msgTxt.equals(FACTIONS)) {
+            if (clearOldDraftInfo && FACTIONS.equals(msgTxt)) {
                 if (removeFactionMsgs) msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 removeFactionMsgs = true;
             }
-            if (clearOldDraftInfo && msgTxt.equals(POSITION)) {
+            if (clearOldDraftInfo && POSITION.equals(msgTxt)) {
                 if (removePositionMsgs) msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 removePositionMsgs = true;
             }

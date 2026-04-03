@@ -84,7 +84,7 @@ public class MapGenerator implements AutoCloseable {
     private static final BasicStroke stroke4 = new BasicStroke(4.0f);
     private static final BasicStroke stroke5 = new BasicStroke(5.0f);
     private static final BasicStroke stroke6 = new BasicStroke(6.0f);
-    private static final int WEBP_MAX_DIMENSION = 16383;
+    private static final int WEBP_MAX_DIMENSION = 16_383;
     private static final ColorConvertOp GRAYSCALE_CONVERT_OP =
             new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
 
@@ -283,8 +283,8 @@ public class MapGenerator implements AutoCloseable {
         if (game.isShowMapSetup() || tilesToDisplay.isEmpty()) {
             int ringCount = game.getRingCount();
             ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
-            minX = 10000;
-            minY = 10000;
+            minX = 10_000;
+            minY = 10_000;
             maxX = -1;
             maxY = -1;
             for (String position : PositionMapper.getTilePositions()) {
@@ -336,6 +336,8 @@ public class MapGenerator implements AutoCloseable {
             sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Anomalies));
         } else if (displayType == DisplayType.aetherstream) {
             sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Aetherstream));
+        } else if (displayType == DisplayType.exile) {
+            sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Exile));
         } else if (displayType == DisplayType.legendaries) {
             sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Legendaries));
         } else if (displayType == DisplayType.empties) {
@@ -1456,7 +1458,7 @@ public class MapGenerator implements AutoCloseable {
                     String legendaryFile = ResourceHelper.getInstance().getGeneralFile("Legendary_complete.png");
                     BufferedImage bufferedImage = ImageHelper.read(legendaryFile);
                     if (offBoardHighlighting + (hasNanoForge ? 1 : 0) >= 2) {
-                        bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f
+                        bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24_000.0f
                                 / (offBoardHighlighting + (hasNanoForge ? 1 : 0))
                                 / bufferedImage.getWidth()
                                 / bufferedImage.getHeight()));
@@ -1488,7 +1490,7 @@ public class MapGenerator implements AutoCloseable {
                     String relicFile = ResourceHelper.getInstance().getGeneralFile("Relic.png");
                     BufferedImage bufferedImage = ImageHelper.read(relicFile);
                     if (offBoardHighlighting >= 1) {
-                        bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f
+                        bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24_000.0f
                                 / (offBoardHighlighting + 1)
                                 / bufferedImage.getWidth()
                                 / bufferedImage.getHeight()));
@@ -1701,7 +1703,7 @@ public class MapGenerator implements AutoCloseable {
                             BotLogger.error("Could not load trait file " + traitFiles.get(i));
                             continue;
                         }
-                        bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f
+                        bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24_000.0f
                                 / offBoardHighlighting
                                 / bufferedImage.getWidth()
                                 / bufferedImage.getHeight()));
@@ -1722,7 +1724,7 @@ public class MapGenerator implements AutoCloseable {
                     BufferedImage bufferedImage = ImageHelper.read(traitFiles.getFirst());
                     if (bufferedImage != null) {
                         bufferedImage = ImageHelper.scale(bufferedImage, (float)
-                                Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
+                                Math.sqrt(24_000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
                         graphics.drawImage(
                                 bufferedImage,
                                 miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2,
@@ -1768,7 +1770,7 @@ public class MapGenerator implements AutoCloseable {
                 if (offBoardHighlighting >= 2) {
                     for (int i = 0; i < offBoardHighlighting; i++) {
                         BufferedImage bufferedImage = ImageHelper.read(techFiles.get(i));
-                        bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f
+                        bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24_000.0f
                                 / offBoardHighlighting
                                 / bufferedImage.getWidth()
                                 / bufferedImage.getHeight()));
@@ -1788,7 +1790,7 @@ public class MapGenerator implements AutoCloseable {
                 } else if (offBoardHighlighting == 1) {
                     BufferedImage bufferedImage = ImageHelper.read(techFiles.getFirst());
                     bufferedImage = ImageHelper.scale(bufferedImage, (float)
-                            Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
+                            Math.sqrt(24_000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
                     graphics.drawImage(
                             bufferedImage,
                             miscTile.x + (345 - bufferedImage.getWidth()) / 2,
@@ -1822,7 +1824,7 @@ public class MapGenerator implements AutoCloseable {
                     for (Map.Entry<String, String> entry : attachFiles.entrySet()) {
                         String planet = entry.getKey();
                         BufferedImage bufferedImage = ImageHelper.read(entry.getValue());
-                        bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f
+                        bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24_000.0f
                                 / offBoardHighlighting
                                 / bufferedImage.getWidth()
                                 / bufferedImage.getHeight()));
@@ -1871,7 +1873,7 @@ public class MapGenerator implements AutoCloseable {
 
                     BufferedImage bufferedImage = ImageHelper.read(attachFiles.get(planet));
                     bufferedImage = ImageHelper.scale(bufferedImage, (float)
-                            Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
+                            Math.sqrt(24_000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
                     graphics.drawImage(
                             bufferedImage,
                             miscTile.x + (345 - bufferedImage.getWidth()) / 2,
@@ -2309,6 +2311,10 @@ public class MapGenerator implements AutoCloseable {
             String agendaTitle = Mapper.getAgendaTitle(lawID);
             if (agendaTitle == null) {
                 agendaTitle = Mapper.getAgendaJustNames().get(lawID);
+            }
+            if (agendaTitle == null) {
+                BotLogger.error("Unable to find law with id '" + lawID + "' during map generation. Skipping.");
+                continue;
             }
             if (optionalText != null
                     && !optionalText.isEmpty()

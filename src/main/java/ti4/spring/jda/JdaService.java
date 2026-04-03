@@ -26,7 +26,8 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.apache.commons.lang3.function.Consumers;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Service;
-import ti4.commands.CommandManager;
+import ti4.commands.SlashCommandManager;
+import ti4.commands.context.ContextCommandManager;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CategoryCleanupCron;
 import ti4.cron.CloseLaunchThreadsCron;
@@ -59,6 +60,7 @@ import ti4.listeners.BanListener;
 import ti4.listeners.BotRuntimeStatsListener;
 import ti4.listeners.ButtonListener;
 import ti4.listeners.ChannelCreationListener;
+import ti4.listeners.ContextMenuListener;
 import ti4.listeners.DeletionListener;
 import ti4.listeners.MessageListener;
 import ti4.listeners.ModalListener;
@@ -145,6 +147,7 @@ public class JdaService {
                 new BotRuntimeStatsListener(),
                 new MessageListener(),
                 new SlashCommandListener(),
+                new ContextMenuListener(),
                 ButtonListener.getInstance(),
                 new UserJoinServerListener(),
                 new AutoCompleteListener(),
@@ -387,7 +390,8 @@ public class JdaService {
         }
         try {
             CommandListUpdateAction commands = guild.updateCommands();
-            CommandManager.getCommands().forEach(command -> command.register(commands));
+            SlashCommandManager.getCommands().forEach(command -> command.register(commands));
+            ContextCommandManager.getCommands().forEach(cmd -> cmd.register(commands));
             commands.queue(Consumers.nop(), BotLogger::catchRestError);
             BotLogger.info("BOT STARTED UP: " + guild.getName());
             guilds.add(guild);
@@ -403,14 +407,15 @@ public class JdaService {
         // are still in
         if (guild == null) return false;
         if (System.getenv("TESTING") != null) return false;
-        if (guild.getId().equals(Constants.ASYNCTI4_HUB_SERVER_ID)) return false;
+        if (Constants.ASYNCTI4_HUB_SERVER_ID.equals(guild.getId())) return false;
 
         // Disable this for now
-        if (true) return false;
+        boolean x = true;
+        if (x) return false;
 
         try {
             CommandListUpdateAction commands = guild.updateCommands();
-            CommandManager.getCommands().forEach(command -> command.registerSearchCommands(commands));
+            SlashCommandManager.getCommands().forEach(command -> command.registerSearchCommands(commands));
             commands.queue(Consumers.nop(), BotLogger::catchRestError);
             BotLogger.info("SEARCH-ONLY BOT STARTED UP: " + guild.getName());
             guilds.add(guild);

@@ -54,7 +54,8 @@ public class DrawingUtil {
     }
 
     private static final int DELTA_Y = 26;
-    private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -1.5707963267948966;
+    private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -1.570_796_326_794_896_6;
+    public static final int DISCORD_AVATAR_SIZE = 32;
 
     public static void superDrawString(
             Graphics g,
@@ -339,11 +340,13 @@ public class DrawingUtil {
         return factionFile;
     }
 
+    @Nullable
     public static Image getUserDiscordAvatar(String userID) {
         try {
             User user = JdaService.jda.getUserById(userID);
             if (user == null) return null;
-            return ImageHelper.readURLScaled(user.getEffectiveAvatar().getUrl(), 32, 32);
+            return ImageHelper.readURLScaled(
+                    user.getEffectiveAvatar().getUrl(), DISCORD_AVATAR_SIZE, DISCORD_AVATAR_SIZE);
         } catch (Exception e) {
             // BotLogger.error("Could not get Avatar", e);
         }
@@ -574,35 +577,40 @@ public class DrawingUtil {
     public static List<String> layoutText(Graphics2D g2, String inputText, int maxWidth) {
         List<String> initialSplit = new ArrayList<>(Arrays.asList(PATTERN.split(inputText)));
         List<String> finalSplit = new ArrayList<>();
-        for (String line : initialSplit) {
-            line = line.trim();
-            while (width(g2, line) > maxWidth) {
-                int splitIndex = -1;
-                int nextSpace = line.indexOf(' ');
+        try {
+            for (String line : initialSplit) {
+                line = line.trim();
+                while (width(g2, line) > maxWidth) {
+                    int splitIndex = -1;
+                    int nextSpace = line.indexOf(' ');
 
-                // Prefer splitting at spaces
-                while (nextSpace != -1 && width(g2, line.substring(0, nextSpace)) < maxWidth) {
-                    splitIndex = nextSpace;
-                    nextSpace = line.indexOf(' ', splitIndex + 1);
-                }
+                    // Prefer splitting at spaces
+                    while (nextSpace != -1 && width(g2, line.substring(0, nextSpace)) < maxWidth) {
+                        splitIndex = nextSpace;
+                        nextSpace = line.indexOf(' ', splitIndex + 1);
+                    }
 
-                // If no space is found or no valid split, break at max width
-                if (splitIndex == -1) {
-                    for (int i = 1; i < line.length(); i++) {
-                        if (width(g2, line.substring(0, i)) > maxWidth) {
-                            splitIndex = i - 1;
-                            break;
+                    // If no space is found or no valid split, break at max width
+                    if (splitIndex == -1) {
+                        for (int i = 1; i < line.length(); i++) {
+                            if (width(g2, line.substring(0, i)) > maxWidth) {
+                                splitIndex = i - 1;
+                                break;
+                            }
                         }
                     }
+
+                    finalSplit.add(line.substring(0, splitIndex).trim());
+                    line = line.substring(splitIndex).trim();
                 }
 
-                finalSplit.add(line.substring(0, splitIndex).trim());
-                line = line.substring(splitIndex).trim();
+                if (!line.isEmpty()) {
+                    finalSplit.add(line);
+                }
             }
-
-            if (!line.isEmpty()) {
-                finalSplit.add(line);
-            }
+        } catch (Exception e) {
+            BotLogger.warning("Error laying out text with width `" + maxWidth + "`:\n```" + inputText + "\n```", e);
+            return initialSplit;
         }
         return finalSplit;
     }

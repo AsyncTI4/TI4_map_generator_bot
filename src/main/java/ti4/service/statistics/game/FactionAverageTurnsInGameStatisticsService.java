@@ -12,11 +12,12 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
+import ti4.service.statistics.FactionStatisticsHelper;
 
 @UtilityClass
 class FactionAverageTurnsInGameStatisticsService {
 
-    public static void averageTurnsInAGameByFaction(SlashCommandInteractionEvent event) {
+    static void averageTurnsInAGameByFaction(SlashCommandInteractionEvent event) {
         Map<String, Integer> factionCount = new HashMap<>();
         Map<String, Integer> factionTurnCount = new HashMap<>();
 
@@ -31,7 +32,6 @@ class FactionAverageTurnsInGameStatisticsService {
                         "%.2f", factionTurnCount.get("allFactions") / (double) factionCount.get("allFactions")))
                 .append("\n");
         factionCount.entrySet().stream()
-                .filter(entry -> Mapper.isValidFaction(entry.getKey()))
                 .sorted(Map.Entry.comparingByValue())
                 .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
                 .forEach(entry -> sb.append("`")
@@ -47,6 +47,7 @@ class FactionAverageTurnsInGameStatisticsService {
                         .append(" ")
                         .append(entry.getKey().getFactionNameWithSourceEmoji())
                         .append("\n"));
+
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Average Turns per Faction", sb.toString());
     }
@@ -66,7 +67,7 @@ class FactionAverageTurnsInGameStatisticsService {
 
     private static void updateStatistics(
             String faction, int turnCount, Map<String, Integer> factionCount, Map<String, Integer> factionTurnCount) {
-        factionCount.put(faction, factionCount.getOrDefault(faction, 0) + 1);
-        factionTurnCount.put(faction, factionTurnCount.getOrDefault(faction, 0) + turnCount);
+        FactionStatisticsHelper.incrementFactionsIntValue(factionCount, faction);
+        FactionStatisticsHelper.incrementFactionsIntValue(factionTurnCount, faction, turnCount);
     }
 }

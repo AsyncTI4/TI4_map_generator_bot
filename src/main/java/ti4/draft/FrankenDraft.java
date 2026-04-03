@@ -207,19 +207,23 @@ public class FrankenDraft extends BagDraft {
                     if (!draftableCollection.getValue().isEmpty()) {
                         bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
-                        System.out.println("bag number " + i + " - item number " + j);
                         missingItems.compute(category, (c, x) -> x == null ? 1 : x + 1);
                     }
                 }
             }
 
             if (!missingItems.isEmpty()) {
-                String issue = game.getPing() + " an issue was encountered while building the franken draft.";
-                issue += "\nOne or more bags are missing components.";
+                StringBuilder issue = new StringBuilder(
+                        game.getPing() + " an issue was encountered while building the franken draft.");
+                issue.append("\nOne or more bags are missing components.");
                 for (var e : missingItems.entrySet()) {
-                    issue += "\n> " + e.getKey().toString() + " is missing " + e.getValue() + " components.";
+                    issue.append("\n> ")
+                            .append(e.getKey().toString())
+                            .append(" is missing ")
+                            .append(e.getValue())
+                            .append(" components.");
                 }
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(), issue);
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), issue.toString());
                 return null;
             }
             bags.add(bag);

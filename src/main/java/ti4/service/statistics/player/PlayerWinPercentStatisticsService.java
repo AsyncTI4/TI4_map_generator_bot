@@ -74,7 +74,7 @@ class PlayerWinPercentStatisticsService {
             playerWinCount.put(winningUserId, 1 + playerWinCount.getOrDefault(winningUserId, 0));
         }
 
-        game.getRealPlayers().forEach(player -> {
+        game.getRealAndEliminatedPlayers().forEach(player -> {
             String userId = player.getStatsTrackedUserID();
             playerUserIdToUsername.put(userId, player.getStatsTrackedUserName());
             playerGameCount.put(userId, 1 + playerGameCount.getOrDefault(userId, 0));

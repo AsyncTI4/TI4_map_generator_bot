@@ -66,7 +66,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        return getTypeEmoji() + " _" + getName() + "_ " + source.emoji();
+        return getTypeEmoji() + " _" + name + "_ " + source.emoji();
     }
 
     public String textRepresentation() {

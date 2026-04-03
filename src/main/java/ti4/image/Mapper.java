@@ -26,6 +26,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
@@ -101,11 +102,17 @@ public class Mapper {
     private static final Map<String, EventModel> events = new HashMap<>();
     private static final Map<String, ExploreModel> explores = new HashMap<>();
     private static final Map<String, FactionModel> factions = new HashMap<>();
+
+    @Getter
     private static final Map<String, DraftErrataModel> frankenErrata = new HashMap<>();
+
     private static final Map<String, GenericCardModel> genericCards = new HashMap<>();
     private static final Map<String, LeaderModel> leaders = new HashMap<>();
     private static final Map<String, MapTemplateModel> mapTemplates = new HashMap<>();
+
+    @Getter
     private static final Map<String, PromissoryNoteModel> promissoryNotes = new HashMap<>();
+
     private static final Map<String, PublicObjectiveModel> publicObjectives = new HashMap<>();
     private static final Map<String, RelicModel> relics = new HashMap<>();
     private static final Map<String, SpaceTokenModel> spaceTokens = new HashMap<>();
@@ -116,7 +123,11 @@ public class Mapper {
     private static final Map<String, TechnologyModel> technologies = new HashMap<>();
     private static final Map<String, TokenModel> tokens = new HashMap<>();
     private static final Map<String, GalacticEventModel> galacticevents = new HashMap<>();
+
+    @Getter
     private static final Map<String, UnitModel> units = new HashMap<>();
+
+    @Getter
     private static final Map<String, BreakthroughModel> breakthroughs = new HashMap<>();
 
     private static final Cache<String, ColorModel> colorToColorModelCache =
@@ -437,10 +448,6 @@ public class Mapper {
     }
     // breakthroughs
 
-    public static Map<String, BreakthroughModel> getBreakthroughs() {
-        return breakthroughs;
-    }
-
     public static BreakthroughModel getBreakthrough(String id) {
         return breakthroughs.get(id);
     }
@@ -480,11 +487,10 @@ public class Mapper {
         return agendaModel.getName().toUpperCase();
     }
 
+    @Nullable
     public static String getAgendaTitleNoCap(String id) {
         AgendaModel agendaModel = agendas.get(id);
-        if (agendaModel == null) {
-            return null;
-        }
+        if (agendaModel == null) return null;
         return agendaModel.getName();
     }
 
@@ -496,25 +502,10 @@ public class Mapper {
         return agendaList;
     }
 
-    public static Map<String, String> getAgendaJustNames(Game game) {
-        Map<String, String> agendaList = new HashMap<>();
-        for (AgendaModel agenda : agendas.values()) {
-            if (game.isAbsolMode() && agenda.getAlias().contains("absol_")) {
-                agendaList.put(agenda.getAlias(), agenda.getName());
-            }
-            if (!game.isAbsolMode() && !agenda.getAlias().contains("absol_")) {
-                agendaList.put(agenda.getAlias(), agenda.getName());
-            }
-        }
-        return agendaList;
-    }
-
     @Nullable
     public static String getAgendaText(String id) {
         AgendaModel agendaModel = agendas.get(id);
-        if (agendaModel == null) {
-            return null;
-        }
+        if (agendaModel == null) return null;
         return agendaModel.getMapText();
     }
 
@@ -526,8 +517,11 @@ public class Mapper {
         return agendaModel.displayElectedFaction() ? "0" : "1";
     }
 
+    @Nullable
     public static String getAgendaForOnly(String id) {
         AgendaModel agenda = agendas.get(id);
+        if (agenda == null) return null;
+
         StringBuilder sb = new StringBuilder();
         sb.append(agenda.getName()).append(";");
         sb.append(agenda.getType()).append(";");
@@ -548,10 +542,6 @@ public class Mapper {
 
     public static Map<String, AttachmentModel> getAttachments() {
         return new HashMap<>(attachments);
-    }
-
-    public static List<AttachmentModel> getAttachmentsValues() {
-        return new ArrayList<>(attachments.values());
     }
 
     public static boolean isValidAttachment(String id) {
@@ -751,10 +741,6 @@ public class Mapper {
     // ####################
     // Franken Errata
 
-    public static Map<String, DraftErrataModel> getFrankenErrata() {
-        return frankenErrata;
-    }
-
     public static DraftErrataModel getFrankenErrata(String alias) {
         return frankenErrata.getOrDefault(alias, null);
     }
@@ -875,10 +861,6 @@ public class Mapper {
 
     // ####################
     // Promissory Notes
-
-    public static Map<String, PromissoryNoteModel> getPromissoryNotes() {
-        return promissoryNotes;
-    }
 
     public static PromissoryNoteModel getPromissoryNote(String id) {
         return promissoryNotes.get(id);
@@ -1198,7 +1180,6 @@ public class Mapper {
             String val = token.getValue().getImagePath();
             if (tokenID.equalsIgnoreCase(val) || tokenID.equalsIgnoreCase(key)) return key;
         }
-        System.out.println("Could not resolve token: " + tokenID);
         return tokenID;
     }
 
@@ -1249,10 +1230,6 @@ public class Mapper {
 
     // ####################
     // Units
-
-    public static Map<String, UnitModel> getUnits() {
-        return units;
-    }
 
     public static UnitModel getUnit(String unitID) {
         return units.get(unitID);

@@ -15,7 +15,7 @@ import ti4.model.AbilityModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 
-public class DeepgloomService {
+public final class DeepgloomService {
 
     public static void spendOneDebt(Game game, Player player, String ability) {
         String debtPool = "scheming".equals(ability) ? "scheming" : "stall tactics";
@@ -144,8 +144,15 @@ public class DeepgloomService {
     }
 
     private static List<Button> getButtonsForAllowRevoke(Game game, Player yssaril, String ability) {
-        AbilityModel model = Mapper.getAbility(ability);
-        String abilityPart = ability.equals("scheming") ? "scheming" : "stalltactics";
+        AbilityModel model =
+                switch (ability) {
+                    case "scheming" -> Mapper.getAbility("scheming");
+                    case "stall_tactics", "stalltactics" -> Mapper.getAbility("stall_tactics");
+                    default -> null;
+                };
+        if (model == null) return List.of();
+
+        String abilityPart = "scheming".equals(ability) ? "scheming" : "stalltactics";
 
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayersExcludingThis(yssaril)) {
@@ -162,7 +169,7 @@ public class DeepgloomService {
     }
 
     @ButtonHandler("yssarilbtStep2_")
-    public static void yssarilbtStep2_(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void yssarilbtStep2_(ButtonInteractionEvent event, Game game, Player yssaril, String buttonID) {
         String type = buttonID.split("_")[1];
         AbilityModel model =
                 switch (type) {
@@ -173,23 +180,24 @@ public class DeepgloomService {
         if (model == null) return;
 
         String faction = buttonID.split("_")[2];
-        String yssarilName = player.getRepresentationNoPing();
+        String yssarilName = yssaril.getRepresentationNoPing();
+        Player p2 = game.getPlayerFromColorOrFaction(faction);
         String p2Name = game.getPlayerFromColorOrFaction(faction).getFogSafeDisplayName();
 
         String key = type + "Factions";
         String factions = game.getStoredValue(key);
 
-        if (playerAllowedToUseAbilityUnlimited(player, type)) {
-            game.setStoredValue(key, factions.replace(faction, ""));
+        if (playerAllowedToUseAbilityUnlimited(p2, type)) {
+            game.setStoredValue(key, factions.replace(faction + "_", ""));
             String msg = yssarilName + " revoked **" + model.getName() + "** for " + p2Name + ".";
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            MessageHelper.sendMessageToChannel(yssaril.getCorrectChannel(), msg);
         } else {
             game.setStoredValue(key, factions + faction + "_");
             String msg = yssarilName + " allowed **" + model.getName() + "** for " + p2Name + ".";
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            MessageHelper.sendMessageToChannel(yssaril.getCorrectChannel(), msg);
         }
 
-        List<Button> buttons = getButtonsForAllowRevoke(game, player, type);
+        List<Button> buttons = getButtonsForAllowRevoke(game, yssaril, type);
         MessageHelper.editMessageButtons(event, buttons);
     }
 }

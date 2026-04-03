@@ -47,7 +47,7 @@ public class MahactTokenService {
         String prefix = player.finChecker() + "loseMahactCC_";
         String suffix = keepButtons ? "_keep" : "";
         String label = "Lose your own token";
-        String emoji = "";
+        String emoji;
 
         if (includeSelf && player.getFleetCC() > 0) {
             emoji = player.getFactionEmoji();

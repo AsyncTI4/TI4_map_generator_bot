@@ -27,7 +27,7 @@ import ti4.model.ShipPositionModel.ShipPosition;
 import ti4.model.TileModel;
 
 // Handles positions of map
-public class PositionMapper {
+public final class PositionMapper {
     private static final int RING_MAX_COUNT = 8;
     private static final int RING_MIN_COUNT = 3;
     private static final int HORIZONTAL_TILE_SPACING = 260;

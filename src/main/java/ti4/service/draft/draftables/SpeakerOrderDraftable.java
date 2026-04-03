@@ -22,13 +22,13 @@ import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftableType;
 import ti4.service.draft.NucleusImageGeneratorService;
 import ti4.service.draft.PlayerDraftState;
-import ti4.service.draft.PlayerSetupService.PlayerSetupState;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.emoji.MiltyDraftEmojis;
 
+@Setter
+@Getter
 public class SpeakerOrderDraftable extends SinglePickDraftable {
 
-    @Getter
-    @Setter
     private int numPicks;
 
     public void initialize(int numPlayers) {
@@ -150,12 +150,12 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
                     "Player " + playerUserId + " has an invalid speaker order choice key: " + speakerOrder);
         }
 
-        playerSetupState.setSetSpeaker(speakerNum == 1);
+        playerSetupState.setSpeaker(speakerNum == 1);
 
         if (shouldAlsoSetSeat(draftManager)) {
             String homeTilePosition = MapTemplateHelper.getPlayerHomeSystemLocation(
                     speakerNum, draftManager.getGame().getMapTemplateID());
-            playerSetupState.setPositionHS(homeTilePosition);
+            playerSetupState.setHomeSystemPosition(homeTilePosition);
         }
 
         return (Player p) -> {

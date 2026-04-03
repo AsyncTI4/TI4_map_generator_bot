@@ -29,6 +29,7 @@ import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -114,6 +115,7 @@ public class PlayHeroService {
             String msg = leaderName + " has been purged.";
             if (!"mykomentorihero".equals(playerLeader.getId())) {
                 purged = player.removeLeader(playerLeader);
+                DSHelperBreakthroughs.doLanefirBtCheck(game, player);
                 ButtonHelperHeroes.checkForMykoHero(game, playerLeader.getId(), player);
             } else {
                 msg = "Coprinus Comatus, the Myko-Mentori hero, was used to copy another hero.";
@@ -133,7 +135,7 @@ public class PlayHeroService {
             case "kollecchero" ->
                 RelicHelper.drawWithAdvantage(
                         player, game, game.getRealPlayers().size());
-            case "xxchahero-te" -> ButtonHelperHeroes.xxchaHeroTEStart(game, player);
+            case "xxchahero-te" -> ButtonHelperHeroes.xxchaHeroTEStart(player);
             case "ralnelhero" -> {
                 // You may choose to no longer be passed; if you do, gain 2 command tokens, draw 1 action card, and
                 // purge this card
@@ -167,7 +169,7 @@ public class PlayHeroService {
                     List<TechnologyModel> techs =
                             ListTechService.getAllTechOfAType(game, type.toString(), player, false, false, true);
                     for (TechnologyModel tech : techs) {
-                        if (tech.isUnitUpgrade() || tech.getFaction().isPresent()) {
+                        if (tech.isUnitUpgrade()) {
                             continue;
                         }
                         buttons.add(Buttons.gray(
@@ -277,7 +279,7 @@ public class PlayHeroService {
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         "Please choose the systems in which you wish to resolve Nmenmede, the Ghoti hero.",
-                        ButtonHelperHeroes.getTilesToGhotiHeroIn(player, game, event));
+                        ButtonHelperHeroes.getTilesToGhotiHeroIn(player, game));
             case "gledgehero" -> ButtonHelperHeroes.resolveGledgeHero(player, game);
             case "khraskhero" -> {
                 ButtonHelperHeroes.resolveKhraskHero(player, game);
@@ -289,8 +291,8 @@ public class PlayHeroService {
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         "Please choose the systems in which you wish to resolve Bayan, the Mortheus hero.",
-                        ButtonHelperHeroes.getTilesToGlimmersHeroIn(player, game, event));
-            case "axishero" -> ButtonHelperHeroes.resolveAxisHeroStep1(player, game);
+                        ButtonHelperHeroes.getTilesToGlimmersHeroIn(player, game));
+            case "axishero" -> ButtonHelperHeroes.resolveAxisHeroStep1(player);
             case "lanefirhero" -> ButtonHelperHeroes.resolveLanefirHeroStep1(player, game);
             case "cymiaehero" -> {
                 List<Button> buttons = new ArrayList<>();
@@ -325,7 +327,7 @@ public class PlayHeroService {
                         event.getMessageChannel(),
                         player.getRepresentationUnfogged() + " added 1 infantry to each planet.");
                 ActionCardHelper.doRise(player, event, game);
-                ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
+                ButtonHelperHeroes.offerOlradinHeroFlips(player);
             }
             case "argenthero" -> ButtonHelperHeroes.argentHeroStep1(game, player, event);
             case "l1z1xhero" -> {
@@ -457,7 +459,7 @@ public class PlayHeroService {
                         MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
                                 msg,
-                                ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game));
+                                ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2));
                     } else {
                         String msg = p2.getFactionEmojiOrColor() + " owns "
                                 + ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2)
@@ -467,14 +469,14 @@ public class PlayHeroService {
                         MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
                                 msg,
-                                ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game));
+                                ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2));
                         for (int x = 1; x < ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2); x++) {
-                            if (!ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game)
+                            if (!ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2)
                                     .isEmpty()) {
                                 MessageHelper.sendMessageToChannelWithButtons(
                                         player.getCorrectChannel(),
                                         "",
-                                        ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game));
+                                        ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2));
                             }
                         }
                     }
@@ -591,6 +593,17 @@ public class PlayHeroService {
                         event.getMessageChannel(),
                         player.getFactionEmoji()
                                 + " has been offered buttons to gain command tokens and look at Shrines.");
+                for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                    if (p2.getSoScored() < player.getSoScored()) {
+                        List<Button> shrineButtons = ButtonHelperHeroes.getShrineButtons(player, p2, game);
+                        MessageHelper.sendMessageToChannelWithButtons(
+                                player.getCorrectChannel(),
+                                player.getRepresentationUnfogged() + " you have scored more secret objectives than "
+                                        + p2.getRepresentation()
+                                        + ", and so here are buttons to look at one of their shrines. You can decline to gain 2 CC instead, using the CC buttons above.",
+                                shrineButtons);
+                    }
+                }
             }
             case "toldarhero" -> ButtonHelperHeroes.resolveToldarHero(game, player);
             case "nivynhero" -> {

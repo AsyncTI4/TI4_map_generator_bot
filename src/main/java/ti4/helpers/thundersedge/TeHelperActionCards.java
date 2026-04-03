@@ -14,6 +14,7 @@ import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Helper;
@@ -29,7 +30,6 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.model.ActionCardModel;
-import ti4.model.ColorModel;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -78,7 +78,7 @@ public class TeHelperActionCards {
         return false;
     }
 
-    public static List<Button> getOverruleButtons(Game game) {
+    private static List<Button> getOverruleButtons(Game game) {
         List<Button> scButtons = new ArrayList<>();
         for (Integer sc : game.getSCList()) {
             if (sc <= 0
@@ -308,11 +308,16 @@ public class TeHelperActionCards {
             buttons.add(Buttons.green("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
         }
 
-        String message = player.getRepresentationUnfogged() + ", please resolve _Strategize_ using these buttons."
-                + " You __must__ spend a token from your strategy pool, unless you are resolving **Leadership**.";
-        buttons.add(Buttons.blue("spendAStratCC", "Spend a Strategy Token"));
+        String message = player.getRepresentationUnfogged() + ", please resolve _Strategize_ using these buttons.";
+        String msg2 = player.getRepresentation()
+                + ", A strategy token was auto deducted (if possible) due to so many people forgetting to do so. If you end up resolving leadership, please gain it back (the bot wont make you pay for it).";
+        if (player.getStrategicCC() > 0) {
+            player.setStrategicCC(player.getStrategicCC() - 1);
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
+        }
         buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -345,11 +350,8 @@ public class TeHelperActionCards {
         String message = player.getRepresentation() + ", please choose a planet to place 2 neutral infantry on.";
         Player neutral = game.getPlayerFromColorOrFaction("neutral");
         if (neutral == null) {
-            List<String> unusedColors =
-                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
-            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+            String color = SetupNeutralPlayer.pickNeutralColor(game);
             game.setupNeutralPlayer(color);
-            neutral = game.getPlayerFromColorOrFaction("neutral");
         }
         NewStuffHelper.checkAndHandlePaginationChange(
                 event, player.getCorrectChannel(), buttons, message, prefix, buttonID);
@@ -446,7 +448,7 @@ public class TeHelperActionCards {
 
         Predicate<Tile> emptyTile = Tile.tileHasNoPlayerShips(game)
                 .and(tile -> !tile.getTileModel().isHyperlane())
-                .and(tile -> !tile.isHomeSystem(game));
+                .and(tile -> !tile.isHomeSystem(game) || prefix.contains("NokarBt"));
         List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(player, game, prefix, emptyTile, false);
         BlindSelectionService.filterForBlindPositionSelection(game, player, buttons, player.finChecker() + prefix);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
@@ -457,11 +459,8 @@ public class TeHelperActionCards {
         String regex = "resolvePirateContract_" + RegexHelper.posRegex();
         Player neutral = game.getPlayerFromColorOrFaction("neutral");
         if (neutral == null) {
-            List<String> unusedColors =
-                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
-            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+            String color = SetupNeutralPlayer.pickNeutralColor(game);
             game.setupNeutralPlayer(color);
-            neutral = game.getPlayerFromColorOrFaction("neutral");
         }
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
@@ -479,11 +478,8 @@ public class TeHelperActionCards {
         String regex = "resolveNokarBt_" + RegexHelper.posRegex();
         Player neutral = game.getPlayerFromColorOrFaction("neutral");
         if (neutral == null) {
-            List<String> unusedColors =
-                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
-            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+            String color = SetupNeutralPlayer.pickNeutralColor(game);
             game.setupNeutralPlayer(color);
-            neutral = game.getPlayerFromColorOrFaction("neutral");
         }
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
@@ -501,11 +497,8 @@ public class TeHelperActionCards {
         String regex = "resolvePirateFleet_" + RegexHelper.posRegex();
         Player neutral = game.getPlayerFromColorOrFaction("neutral");
         if (neutral == null) {
-            List<String> unusedColors =
-                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
-            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+            String color = SetupNeutralPlayer.pickNeutralColor(game);
             game.setupNeutralPlayer(color);
-            neutral = game.getPlayerFromColorOrFaction("neutral");
         }
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));

@@ -19,7 +19,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 
-public class PlayerPreferenceHelper {
+public final class PlayerPreferenceHelper {
 
     @ButtonHandler(value = "offerPlayerPref", save = false)
     public static void offerPlayerPreferences(Player player, ButtonInteractionEvent event) {

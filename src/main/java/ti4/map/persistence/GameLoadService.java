@@ -410,12 +410,8 @@ class GameLoadService {
                         game.setAutoPingSpacer(pingHours);
                     }
                 }
-                case Constants.CURRENT_AGENDA_INFO -> {
-                    game.setCurrentAgendaInfo(info);
-                }
-                case Constants.CURRENT_ACDRAWSTATUS_INFO -> {
-                    game.setCurrentACDrawStatusInfo(info);
-                }
+                case Constants.CURRENT_AGENDA_INFO -> game.setCurrentAgendaInfo(info);
+                case Constants.CURRENT_ACDRAWSTATUS_INFO -> game.setCurrentACDrawStatusInfo(info);
 
                 case Constants.LAST_ACTIVE_PLAYER_CHANGE -> {
                     if (isNotBlank(info)) {
@@ -641,9 +637,7 @@ class GameLoadService {
                 case Constants.SHOW_OWNED_PNS_IN_PLAYER_AREA ->
                     game.setShowOwnedPNsInPlayerArea(parseBooleanOrDefault(info, false));
                 case Constants.STRAT_PINGS -> game.setStratPings(parseBooleanOrDefault(info, false));
-                case Constants.TEXT_SIZE -> {
-                    game.setTextSize(info);
-                }
+                case Constants.TEXT_SIZE -> game.setTextSize(info);
                 case Constants.ABSOL_MODE -> game.setAbsolMode(parseBooleanOrDefault(info, false));
                 case Constants.PROMISES_PROMISES -> game.setPromisesPromisesMode(parseBooleanOrDefault(info, false));
                 case Constants.FLAGSHIPPING -> game.setFlagshippingMode(parseBooleanOrDefault(info, false));
@@ -735,9 +729,7 @@ class GameLoadService {
                         game.addMigration(migration);
                     }
                 }
-                case Constants.BAG_DRAFT -> {
-                    game.setBagDraft(BagDraft.generateDraft(info, game));
-                }
+                case Constants.BAG_DRAFT -> game.setBagDraft(BagDraft.generateDraft(info, game));
                 case Constants.MILTY_DRAFT_MANAGER -> game.setMiltyDraftString(info); // We will parse this later
                 case Constants.MILTY_DRAFT_SETTINGS -> game.setMiltyJson(info); // We will parse this later
                 case Constants.DRAFT_MANAGER -> game.setDraftString(info); // We will parse this later
@@ -937,9 +929,8 @@ class GameLoadService {
                     }
                     player.setDebtTokens(debtTokens);
                 }
-                case Constants.PLAYER_STORED_VALUES -> {
+                case Constants.PLAYER_STORED_VALUES ->
                     player.setStoredValueMap(getParsedStrStrMap(tokenizer.nextToken()));
-                }
                 case Constants.BREAKTHROUGHS -> player.setBreakthroughIDs(getParsedStrList(tokenizer.nextToken()));
                 case Constants.BREAKTHROUGH_EXH_MAP ->
                     player.setBreakthroughExhausted(getParsedStrBoolMap(tokenizer.nextToken()));
@@ -1183,6 +1174,10 @@ class GameLoadService {
                 case Constants.PATH_TOKEN_COUNT -> player.setPathTokenCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.HONOR_COUNT -> player.setHonorCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.DISHONOR_COUNT -> player.setDishonorCounter(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.STEELBALANCE_COUNT ->
+                    player.setSteelbalanceCounter(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.STARBALANCE_COUNT ->
+                    player.setStarbalanceCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.HARVEST_COUNT -> player.setHarvestCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.CARDS_INFO_THREAD_CHANNEL_ID -> player.setCardsInfoThreadID(tokenizer.nextToken());
                 case Constants.DRAFT_BAG_INFO_THREAD_CHANNEL_ID -> player.setBagInfoThreadID(tokenizer.nextToken());

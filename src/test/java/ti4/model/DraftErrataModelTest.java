@@ -11,7 +11,7 @@ class DraftErrataModelTest extends ModelTest<DraftErrataModel> {
 
     @Override
     public void loadData() {
-        this.type = "DraftErrataModel";
+        type = "DraftErrataModel";
         models = Mapper.getFrankenErrata();
     }
 

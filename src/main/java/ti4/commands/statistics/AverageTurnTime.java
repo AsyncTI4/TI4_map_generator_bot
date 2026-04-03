@@ -20,10 +20,6 @@ class AverageTurnTime extends Subcommand {
                 OptionType.BOOLEAN,
                 Constants.IGNORE_ENDED_GAMES,
                 "True to exclude ended games from the calculation (default = false)"));
-        addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.SHOW_MEDIAN,
-                "True to also show median next to average (default = false)"));
     }
 
     @Override

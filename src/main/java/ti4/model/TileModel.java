@@ -87,7 +87,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
             if (nebula) sb.append(MiscEmojis.Nebula);
             if (gravityRift) sb.append(MiscEmojis.GravityRift);
         }
-        sb.append(" ").append(getName());
+        sb.append(" ").append(name);
         return sb.toString();
     }
 

@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import net.dv8tion.jda.api.components.Component;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -44,14 +45,14 @@ public class MessageV2Builder {
     public MessageV2Builder(MessageChannel channel) {
         Objects.requireNonNull(channel, "Channel cannot be null");
         this.channel = channel;
-        this.maxSplits = null;
-        this.pin = false;
+        maxSplits = null;
+        pin = false;
     }
 
     public MessageV2Builder(MessageChannel channel, boolean pin) {
         Objects.requireNonNull(channel, "Channel cannot be null");
         this.channel = channel;
-        this.maxSplits = null;
+        maxSplits = null;
         this.pin = pin;
     }
 
@@ -67,7 +68,7 @@ public class MessageV2Builder {
         Objects.requireNonNull(channel, "Channel cannot be null");
         this.channel = channel;
         this.maxSplits = maxSplits;
-        this.pin = false;
+        pin = false;
     }
 
     public enum MessagePartType {
@@ -78,6 +79,8 @@ public class MessageV2Builder {
 
     public static class MessagePart {
         private final Object part;
+
+        @Getter
         private final MessagePartType type;
 
         public MessagePart(String part) {
@@ -98,10 +101,6 @@ public class MessageV2Builder {
         public MessagePart(MessageTopLevelComponent part) {
             this.part = part;
             type = MessagePartType.TOP_LEVEL_COMPONENT;
-        }
-
-        public MessagePartType getType() {
-            return type;
         }
 
         public String asString() {
@@ -191,7 +190,7 @@ public class MessageV2Builder {
         }
 
         Consumer<Message> onSuccess = null;
-        if (this.pin) onSuccess = MessageHelper.pin();
+        if (pin) onSuccess = MessageHelper.pin();
         MessageHelper.sendMessagesWithRetry(channel, combinedComponents, onSuccess, "Failed to send v2 message", 1);
     }
 
@@ -403,8 +402,10 @@ public class MessageV2Builder {
                                 .map(MessageV2Builder::ComponentTypeTree)
                                 .collect(Collectors.joining(", "))
                         + ")";
-            case Label label ->
-                "Label(" + (label.getChild() != null ? ComponentTypeTree(label.getChild()) : "no child") + ")";
+            case Label label -> {
+                label.getChild();
+                yield "Label(" + ComponentTypeTree(label.getChild()) + ")";
+            }
             case null -> "null";
             default ->
                 throw new IllegalArgumentException(

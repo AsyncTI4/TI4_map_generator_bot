@@ -24,6 +24,7 @@ public class PlayerStatisticsService {
     private void getPlayerStatistics(SlashCommandInteractionEvent event, PlayerStatTypes statType) {
         switch (statType) {
             case PLAYER_WIN_PERCENT -> PlayerWinPercentStatisticsService.showPlayerWinPercent(event);
+            case PLAYER_WIN_PERFORMANCE -> PlayerExpectedWinDeltaStatisticsService.showPlayerExpectedWinDelta(event);
             case PLAYER_GAME_COUNT -> PlayerGameCountStatisticsService.showPlayerGameCount(event);
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statType);
         }

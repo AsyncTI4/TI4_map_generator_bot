@@ -5,8 +5,8 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.CommandManager;
 import ti4.commands.ParentCommand;
+import ti4.commands.SlashCommandManager;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
@@ -26,7 +26,8 @@ public class SusSlashCommandService {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame == null) return;
 
-        ParentCommand command = CommandManager.getCommand(event.getInteraction().getName());
+        ParentCommand command =
+                SlashCommandManager.getCommand(event.getInteraction().getName());
         if (command == null || !command.isSuspicious(event)) return;
 
         if (EXCLUDED_GAMES.contains(managedGame.getName())) return;
@@ -44,7 +45,13 @@ public class SusSlashCommandService {
                 && !isSinglePlayerGame
                 && (isPrivateThread || isNotGameChannel)
                 && !isPublicThread) {
-            reportToSusSlashCommandLog(event, jumpUrl);
+            reportToSusSlashCommandLog(event, jumpUrl, gameName);
+            String sb = event.getUser().getEffectiveName() + " privately used the command: " + "`"
+                    + event.getFullCommandName() + "`";
+            MessageHelper.sendMessageToChannel(managedGame.getMainGameChannel(), sb);
+            String sb2 = event.getUser().getAsMention()
+                    + " this is a reminder that you should use most commands that alter the game state in the game channels, not in private threads. This is so that all players can track the game state accurately. Your command has been reported to the admins, but no action will be taken unless it's determined to be a violation.";
+            MessageHelper.sendMessageToChannel(event.getChannel(), sb2);
         }
 
         if (managedGame.isFowMode()) {
@@ -73,17 +80,19 @@ public class SusSlashCommandService {
                         .findFirst()
                         .orElse(null);
         if (moderationLogChannel == null) return;
-        String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + jumpUrl;
-        MessageHelper.sendMessageToChannel(moderationLogChannel, sb);
+        String message = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + jumpUrl;
+        MessageHelper.sendMessageToChannel(moderationLogChannel, message);
     }
 
-    private static void reportToSusSlashCommandLog(SlashCommandInteractionEvent event, String jumpUrl) {
+    private static void reportToSusSlashCommandLog(
+            SlashCommandInteractionEvent event, String jumpUrl, String gameName) {
         TextChannel moderationLogChannel =
                 JdaService.guildPrimary.getTextChannelsByName("sus-slash-commands-log", true).stream()
                         .findFirst()
                         .orElse(null);
         if (moderationLogChannel == null) return;
-        String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + jumpUrl;
-        MessageHelper.sendMessageToChannel(moderationLogChannel, sb);
+        String message = event.getUser().getEffectiveName() + " (" + gameName + ") `" + event.getCommandString() + "` "
+                + jumpUrl;
+        MessageHelper.sendMessageToChannel(moderationLogChannel, message);
     }
 }

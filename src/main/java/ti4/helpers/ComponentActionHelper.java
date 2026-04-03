@@ -305,14 +305,24 @@ public class ComponentActionHelper {
                             "the_incursion_gate");
                     if (exhaustRelics.contains(relic.toLowerCase())) {
                         if (!p1.getExhaustedRelics().contains(relic)) {
-                            rButton = Buttons.blue(
-                                    finChecker + prefix + "relic_" + relic, "Exhaust " + relicData.getName());
+                            if (!"circletofthevoid".equalsIgnoreCase(relic)
+                                    || !ButtonHelperActionCards.getCircletButtons(game, p1)
+                                            .isEmpty()) {
+                                rButton = Buttons.blue(
+                                        finChecker + prefix + "relic_" + relic, "Exhaust " + relicData.getName());
+                            } else {
+                                continue;
+                            }
                         } else {
                             continue;
                         }
                     } else {
                         rButton = Buttons.red(finChecker + prefix + "relic_" + relic, "Purge " + relicData.getName());
                     }
+                }
+                if ("stellar_converter".equalsIgnoreCase(relic)
+                        && ButtonHelper.getButtonsForStellar(p1, game).isEmpty()) {
+                    continue;
                 }
                 compButtons.add(rButton);
             }

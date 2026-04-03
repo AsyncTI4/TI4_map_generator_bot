@@ -1,7 +1,6 @@
 package ti4.map;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -15,6 +14,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
+import lombok.Getter;
+import lombok.Setter;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -34,12 +35,28 @@ public class Planet extends UnitHolder {
     private int influenceModifier;
     private String originalPlanetType;
     private String originalTechSpeciality;
+
+    @Getter
     private final List<String> planetType = new ArrayList<>();
+
+    @Getter
     private final List<String> techSpeciality = new ArrayList<>();
+
+    @Getter
     private boolean hasAbility;
+
+    @Setter
+    @Getter
     private int spaceCannonHitsOn;
+
+    @Setter
+    @Getter
     private int spaceCannonDieCount;
+
+    @Getter
     private String contrastColor;
+
+    @Getter
     private float radius;
 
     @JsonCreator
@@ -116,7 +133,8 @@ public class Planet extends UnitHolder {
             if (player.getHrf() > 0) resourcesModifier++;
             if (player.getIrf() > 0) resourcesModifier++;
             if (player.getCrf() > 0) resourcesModifier++;
-            if (player.getUrf() > 0) resourcesModifier++;
+            resourcesModifier += player.getUrf();
+            resourcesModifier = Math.min(4, resourcesModifier);
             influenceModifier = resourcesModifier;
         }
     }
@@ -190,7 +208,7 @@ public class Planet extends UnitHolder {
     }
 
     private void addTokenData(String tokenFileName) {
-        if (tokenFileName.equals(Constants.GLEDGE_CORE_PNG)) { // THIS TOKEN HARD SETS THE BASE RES/INF TO 2/0
+        if (Constants.GLEDGE_CORE_PNG.equals(tokenFileName)) { // THIS TOKEN HARD SETS THE BASE RES/INF TO 2/0
             resourcesOriginal = 2;
             influenceOriginal = 0;
         }
@@ -226,7 +244,7 @@ public class Planet extends UnitHolder {
     }
 
     private void removeTokenData(String tokenFileName) {
-        if (tokenFileName.equals(Constants.GLEDGE_CORE_PNG)) {
+        if (Constants.GLEDGE_CORE_PNG.equals(tokenFileName)) {
             resetOriginalPlanetResInf();
         }
 
@@ -310,10 +328,6 @@ public class Planet extends UnitHolder {
         return originalTechSpeciality;
     }
 
-    public List<String> getPlanetType() {
-        return planetType;
-    }
-
     @JsonIgnore
     public PlanetModel getPlanetModel() {
         return Mapper.getPlanet(getName());
@@ -340,10 +354,6 @@ public class Planet extends UnitHolder {
         return types;
     }
 
-    public List<String> getTechSpeciality() {
-        return techSpeciality;
-    }
-
     @JsonIgnore
     public boolean hasTechSpecialty(TechnologyType type) {
         return techSpeciality.contains(type.toString().toLowerCase())
@@ -360,10 +370,6 @@ public class Planet extends UnitHolder {
             specialties.add(originalTechSpeciality);
         }
         return specialties;
-    }
-
-    public boolean isHasAbility() {
-        return hasAbility;
     }
 
     @JsonIgnore
@@ -392,29 +398,5 @@ public class Planet extends UnitHolder {
         Tile t = game.getTileFromPlanet(getName());
         if (t != null) return t.isHomeSystem(game);
         return false;
-    }
-
-    public int getSpaceCannonDieCount() {
-        return spaceCannonDieCount;
-    }
-
-    public int getSpaceCannonHitsOn() {
-        return spaceCannonHitsOn;
-    }
-
-    public void setSpaceCannonDieCount(int dieCount) {
-        spaceCannonDieCount = dieCount;
-    }
-
-    public void setSpaceCannonHitsOn(int hitsOn) {
-        spaceCannonHitsOn = hitsOn;
-    }
-
-    public String getContrastColor() {
-        return contrastColor;
-    }
-
-    public float getRadius() {
-        return radius;
     }
 }

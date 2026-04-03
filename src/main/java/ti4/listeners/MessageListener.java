@@ -1,6 +1,5 @@
 package ti4.listeners;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -32,6 +31,7 @@ import ti4.service.fow.WhisperService;
 import ti4.service.game.CreateGameService;
 import ti4.service.game.GameNameService;
 import ti4.spring.jda.JdaService;
+import ti4.spring.service.messagecache.SavedBotMessagesService;
 
 public class MessageListener extends ListenerAdapter {
 
@@ -43,6 +43,7 @@ public class MessageListener extends ListenerAdapter {
     private static final String BOTHELPER_MENTION_REMINDER_TEXT = """
         Friendly reminder in case you forgot, please include the specific reason for the ping (e.g. something is not working, there is a bug, or you're not sure how to do something) and any other relevant information. This will speed up the process by allowing the staff to know how they can help. Thanks!
         """;
+    private static final List<String> INTERESTING_MESSAGES = List.of("gaslight", "please stop");
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
@@ -67,16 +68,20 @@ public class MessageListener extends ListenerAdapter {
                 .ifPresent(moderationLogChannel -> MessageHelper.sendMessageToChannel(moderationLogChannel, msg));
     }
 
-    private static final List<String> interestingMessages = Arrays.asList("gaslight", "please stop", "nazi");
-
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
         try {
+            String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
+            boolean isValidGameMessage = GameManager.isValid(gameName);
+            if (isValidGameMessage) {
+                SavedBotMessagesService.getBean().cache(message);
+            }
+
             if (!event.getAuthor().isBot()) {
                 if (respondToBotHelperPing(message)) return;
                 if (checkForFogOfWarInvitePrompt(message)) return;
                 if (copyLFGPingsToLFGPingsChannel(event, message)) return;
                 String messageRaw = message.getContentRaw().toLowerCase();
-                for (String phrase : interestingMessages) {
+                for (String phrase : INTERESTING_MESSAGES) {
                     if (messageRaw.contains(phrase)) {
                         String msg =
                                 "Someone used \"" + phrase + "\" at " + message.getJumpUrl() + ". Full message:\n> "
@@ -85,8 +90,7 @@ public class MessageListener extends ListenerAdapter {
                     }
                 }
 
-                String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
-                if (GameManager.isValid(gameName)) {
+                if (isValidGameMessage) {
                     if (handleWhispers(event, message, gameName)) return;
                     if (endOfRoundSummary(event, message, gameName)) return;
                     if (addFactionEmojiReactionsToMessages(event, gameName)) return;
@@ -361,17 +365,19 @@ public class MessageListener extends ListenerAdapter {
      */
     private static void handleFogOfWarCombatThreadMirroring(MessageReceivedEvent event) {
         if (!JdaService.fowServers.isEmpty()
-                && // fog servers exists
-                !JdaService.fowServers.contains(event.getGuild())
-                && // 2nd server actually exists
-                JdaService.guildCommunityPlays != null
-                && // event server IS NOT the fog server
-                !JdaService.guildCommunityPlays.getId().equals(event.getGuild().getId())
-                && // NOR the community server
-                JdaService.guildPrimaryID.equals(Constants.ASYNCTI4_HUB_SERVER_ID)) { // bot is running in production
+                // fog servers exists
+                && !JdaService.fowServers.contains(event.getGuild())
+                // 2nd server actually exists
+                && JdaService.guildCommunityPlays != null
+                // is not the community server
+                && !JdaService.guildCommunityPlays
+                        .getId()
+                        .equals(event.getGuild().getId())
+                // bot is running in production
+                && JdaService.guildPrimaryID.equals(Constants.ASYNCTI4_HUB_SERVER_ID)) {
             return;
-        } // else it's probably a dev/test server, so execute
-
+        }
+        // else it's probably a dev/test server, so execute
         FOWCombatThreadMirroring.mirrorEvent(event);
     }
 }

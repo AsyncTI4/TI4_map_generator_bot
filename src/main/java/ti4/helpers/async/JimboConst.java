@@ -20,7 +20,7 @@ import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
 
 // Jazz's Interactive Map Builder
-class JimboConst {
+final class JimboConst {
     // Main Page
     public static final String mainPage = "jimbo_mainPage";
     public static final String exit = "jimbo_exit";

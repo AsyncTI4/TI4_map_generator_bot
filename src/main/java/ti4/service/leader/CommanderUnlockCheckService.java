@@ -36,7 +36,7 @@ public class CommanderUnlockCheckService {
         }
     }
 
-    public static void checkConditionsAndUnlock(Player player, String faction) {
+    private static void checkConditionsAndUnlock(Player player, String faction) {
         Game game = player.getGame();
         boolean shouldBeUnlocked = false;
         switch (faction) {
@@ -131,6 +131,9 @@ public class CommanderUnlockCheckService {
                         + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false)
                         + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer", false)
                         + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
+                if (player.hasRelic("lightrailordnance")) {
+                    num += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "spacedock", false);
+                }
                 shouldBeUnlocked = (num >= 6);
             }
             case "empyrean" ->

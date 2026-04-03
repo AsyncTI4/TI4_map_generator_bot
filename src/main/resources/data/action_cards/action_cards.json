@@ -637,7 +637,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Choose 1 planet that is controlled by another player. Roll 1 die for each infantry on that planet. For each result of 6 or greater, destroy 1 of those units.",
-        "notes": "This may be played to target a planet with zero infantry.",
+        "notes": "This may be played to target a planet with zero infantry. This cannot target a planet owned by the neutral player, as they are not a real player.",
         "flavorText": "The letani dipped a mossy limb beneath the surface of the reservoir, feeling the flow of the particles within, shifting them, changing them into something different. Something dangerous.",
         "source": "base"
     },
@@ -684,6 +684,7 @@
         "window": "Action",
         "text": "Destroy 1 space dock in a non-home system.",
         "automationID": "meltdown",
+        "notes": "As with most action cards, you cannot target your own units for destruction with this action card.",
         "flavorText": "Flames engulfed the shipyard, a vortex of fire and shrapnel that left nothing untouched.",
         "source": "base"
     },
@@ -864,7 +865,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Choose 1 player. That player gives you 1 random action card from their hand.",
-        "flavorText": "I'm no spy, Connor said, casually stuffing the data drives into his pack. \"Now, how can I get out of here without being seen?\"",
+        "flavorText": "\"I'm no spy\", Connor said, casually stuffing the data drives into his pack. \"Now, how can I get out of here without being seen?\"",
         "source": "base"
     },
     {

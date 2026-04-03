@@ -1,6 +1,6 @@
 package ti4.settings.users;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -19,6 +19,7 @@ public class UserSettings {
     private String userId;
     private List<String> preferredColors;
     private int personalPingInterval;
+    private int gameLimit;
     private boolean prefersDistanceBasedTacticalActions;
     private String afkHours;
     private boolean hasIndicatedStatPreferences;
@@ -131,6 +132,35 @@ public class UserSettings {
                     .append(":t>-<t:")
                     .append(midnight + 60 * 60 * 24)
                     .append(":t>");
+        }
+
+        return result.isEmpty() ? null : result.toString();
+    }
+
+    public String summarizeActiveHoursEmoji(String activity) {
+        if (isBlank(activity)) {
+            activity = "0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0";
+        }
+        String[] hourStrings = activity.split(";");
+        int[] checkins = new int[24];
+        int heat = 0;
+
+        for (int i = 0; i < hourStrings.length; i++) {
+            checkins[i] = Integer.parseInt(hourStrings[i].trim());
+            heat += checkins[i];
+        }
+
+        if (heat < 150) {
+            return "Not enough data.";
+        }
+
+        StringBuilder result = new StringBuilder();
+        for (int hour = 0; hour < 24; hour++) {
+            if (checkins[hour] > (heat / 30)) {
+                result.append("🟩");
+            } else {
+                result.append("🟥");
+            }
         }
 
         return result.isEmpty() ? null : result.toString();

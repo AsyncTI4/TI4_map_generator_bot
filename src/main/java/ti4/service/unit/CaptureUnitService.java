@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -18,6 +19,7 @@ import ti4.map.UnitHolder;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
+@UtilityClass
 public class CaptureUnitService {
 
     public static List<Player> listCapturingMechPlayers(

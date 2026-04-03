@@ -38,7 +38,7 @@ import ti4.service.game.GameNameService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.CheckUnitContainmentService;
 
-public class FoWHelper {
+public final class FoWHelper {
 
     public static boolean isPrivateGame(GenericInteractionCreateEvent event) {
         if (event == null) {
@@ -267,7 +267,7 @@ public class FoWHelper {
             }
         }
 
-        Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player);
+        Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player, false);
         adjacentPositions.addAll(wormholeAdjacencies);
 
         Set<String> otherAdjacencies = getNonWormholeAdjacencies(game, position);
@@ -336,6 +336,7 @@ public class FoWHelper {
                 switch (token) {
                     case Constants.TOKEN_BREACH_ACTIVE -> adjToFeatures.add(Feature.breach);
                     case Constants.TOKEN_INGRESS -> adjToFeatures.add(Feature.egress);
+                    case Constants.TOKEN_EGRESS -> adjToFeatures.add(Feature.ingress);
                 }
             }
         }
@@ -354,11 +355,15 @@ public class FoWHelper {
             }
             for (UnitHolder unitHolder : t.getUnitHolders().values()) {
                 for (String token : unitHolder.getTokenList()) {
-                    if (adjToFeatures.contains(Feature.breach) && token.equals(Constants.TOKEN_BREACH_ACTIVE)) {
+                    if (adjToFeatures.contains(Feature.breach) && Constants.TOKEN_BREACH_ACTIVE.equals(token)) {
                         adjacentPositions.add(t.getPosition());
                         break;
                     }
-                    if (adjToFeatures.contains(Feature.ingress) && token.equals(Constants.TOKEN_INGRESS)) {
+                    if (adjToFeatures.contains(Feature.ingress) && Constants.TOKEN_INGRESS.equals(token)) {
+                        adjacentPositions.add(t.getPosition());
+                        break;
+                    }
+                    if (adjToFeatures.contains(Feature.egress) && Constants.TOKEN_EGRESS.equals(token)) {
                         adjacentPositions.add(t.getPosition());
                         break;
                     }
@@ -473,6 +478,34 @@ public class FoWHelper {
             tiles.addAll(newTiles);
         }
         return tiles;
+    }
+
+    public static boolean isTileInExileRange(Game game, Tile tile, Player player) {
+        if (player.hasUnit("crimson_destroyer")) {
+            List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Destroyer);
+            for (Tile tile2 : destroyers) {
+                if (getAdjacentTiles(game, tile.getPosition(), player, false, true)
+                        .contains(tile2.getPosition())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean isTileInUpgradedExileRange(Game game, Tile tile, Player player) {
+        if (player.hasUnit("crimson_destroyer2")) {
+            List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Destroyer);
+            for (String adjPos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+                for (Tile tile2 : destroyers) {
+                    if (FoWHelper.getAdjacentTiles(game, adjPos, player, false, true)
+                            .contains(tile2.getPosition())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public static boolean isTileAdjacentToAnAnomaly(Game game, String position, Player player) {
@@ -626,7 +659,7 @@ public class FoWHelper {
      * <p>
      * Also takes into account player abilities and agendas
      */
-    private static Set<String> getWormholeAdjacencies(Game game, String position, Player player) {
+    private static Set<String> getWormholeAdjacencies(Game game, String position, Player player, boolean neighbors) {
         Set<String> adjacentPositions = new HashSet<>();
         Set<Tile> allTiles = new HashSet<>(game.getTileMap().values());
         Tile tile = game.getTileByPosition(position);
@@ -724,7 +757,7 @@ public class FoWHelper {
                 && player.hasTech("tf-lazaxgatefolding")) {
             boolean hasUncontrolledLeg = false;
             for (Planet planet : tile.getPlanetUnitHolders()) {
-                if (planet.isLegendary() && player.getPlanets().contains(planet.getName())) {
+                if (planet.isLegendary() && !player.getPlanets().contains(planet.getName())) {
                     hasUncontrolledLeg = true;
                 }
             }
@@ -732,6 +765,14 @@ public class FoWHelper {
                 wormholeIDs.add(Constants.BETA);
                 wormholeIDs.add(Constants.ALPHA);
             }
+        }
+        if (!hasQuantumEntanglement
+                && !wh_recon
+                && !absol_recon
+                && ButtonHelper.isLawInPlay(game, "travel_ban")
+                && !neighbors) {
+            wormholeIDs.remove(Constants.ALPHA);
+            wormholeIDs.remove(Constants.BETA);
         }
 
         if (wormholeIDs.isEmpty()) {
@@ -795,8 +836,8 @@ public class FoWHelper {
 
         for (Player player_ : game.getRealPlayers()) {
             Set<String> tiles = new HashSet<>(tilesToCheck);
-            if (player_.hasAbility("quantum_entanglement")) {
-                tiles.addAll(getWormholeAdjacencies(game, position, player_));
+            if (player_.hasAbility("quantum_entanglement") || ButtonHelper.isLawInPlay(game, "travel_ban")) {
+                tiles.addAll(getWormholeAdjacencies(game, position, player_, true));
             }
 
             if (includeSweep && startingTile.hasCC(Mapper.getSweepID(player_.getColor()))) {
