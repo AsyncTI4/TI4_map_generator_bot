@@ -162,7 +162,9 @@ public class MiltyService {
                     MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
                     for (String player : draftManager.getPlayers()) {
                         Player p = game.getPlayer(player);
-                        if (p != null && p != draftManager.getCurrentDraftPlayer(game)) {
+                        if (p != null
+                                && p != draftManager.getCurrentDraftPlayer(game)
+                                && p.getCardsInfoThread() != null) {
                             MessageHelper.sendMessageToChannel(
                                     p.getCardsInfoThread(),
                                     p.getRepresentation() + " You can queue your choices with these buttons",

@@ -2871,6 +2871,9 @@ public class PlayerAreaGenerator {
             exhaustedTechs = player.getExhaustedTechs();
             for (int t = 0; t < singularities.size(); t++) {
                 String tech = singularities.get(t);
+                if (!techs.contains(tech)) {
+                    continue;
+                }
                 boolean isExhausted = exhaustedTechs.contains(tech)
                         || exhaustedTechs.contains(
                                 "tf-singularity" + initials.toLowerCase().charAt(t));
