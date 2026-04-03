@@ -57,7 +57,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
         String cardWindow = useWildText ? wildWildWindow : window;
         return cardWindow + ": " + cardText;
     }
-   
+
     public String getRepresentationJustText() {
         return getRepresentationJustText(null);
     }
@@ -125,8 +125,12 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     public boolean isWild(Game game) {
         return (game != null) && affectedByWildWildGalaxy && game.isWildWildGalaxyMode();
     }
-    
+
     public boolean hasWildText(Game game) {
-        return (game != null) && affectedByWildWildGalaxy && game.isWildWildGalaxyMode() && wildWildText != null && wildWildWindow != null;
+        return (game != null)
+                && affectedByWildWildGalaxy
+                && game.isWildWildGalaxyMode()
+                && wildWildText != null
+                && wildWildWindow != null;
     }
 }
