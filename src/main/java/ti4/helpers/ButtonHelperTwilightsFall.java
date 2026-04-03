@@ -922,6 +922,11 @@ public final class ButtonHelperTwilightsFall {
     }
 
     public static void drawParadigm(Game game, Player player, ButtonInteractionEvent event, boolean scPara) {
+        drawParadigm(game, player, event, scPara, false);
+    }
+
+    public static void drawParadigm(
+            Game game, Player player, ButtonInteractionEvent event, boolean scPara, boolean artifice) {
 
         if (scPara) {
             String messageID = event.getMessageId();
@@ -958,7 +963,7 @@ public final class ButtonHelperTwilightsFall {
         }
         String paradigm = allCards.removeFirst();
         drawSpecificParadigm(game, player, paradigm);
-        if (!scPara && "agenda".equalsIgnoreCase(game.getPhaseOfGame())) {
+        if (!scPara && artifice) {
             if (game.getStoredValue("artificeParadigms").isEmpty()) {
                 game.setStoredValue("artificeParadigms", paradigm);
             } else {
