@@ -352,7 +352,7 @@ public final class PositionMapper {
     }
 
     public static Boolean isCornerOfHexRing(String tileID) {
-        if (!Helper.isInteger(tileID)) return null;
+        if (!Helper.isInteger(tileID)) throw new IllegalArgumentException("Invalid tile ID: " + tileID);
         int ring = Integer.parseInt(tileID) / 100;
         for (int corner = 1; corner <= 6; corner++) {
             if (tileID.equals(getTileIDAtCornerPositionOfRing(ring, corner))) return true;

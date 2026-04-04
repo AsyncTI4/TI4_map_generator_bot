@@ -7,8 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -316,7 +316,7 @@ public class SpinRingsHelper {
     }
 
     private static String randomStatusMessage() {
-        if (new Random().nextBoolean()) {
+        if (ThreadLocalRandom.current().nextBoolean()) {
             return DEFAULT_MSG;
         }
         return RandomHelper.pickRandomFromList(STATUS_MSGS);

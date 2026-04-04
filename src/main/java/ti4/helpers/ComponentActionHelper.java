@@ -286,11 +286,11 @@ public class ComponentActionHelper {
             }
 
             if (relic.equalsIgnoreCase(Constants.ENIGMATIC_DEVICE)
-                    || !relic.contains("starchart")
+                    || (!relic.contains("starchart")
                             && (relicData.getText().contains("Action:")
-                                    || relicData.getText().contains("ACTION:"))) {
+                                    || relicData.getText().contains("ACTION:")))) {
                 Button rButton;
-                if (relic.equalsIgnoreCase(Constants.ENIGMATIC_DEVICE)) {
+                if (Constants.ENIGMATIC_DEVICE.equalsIgnoreCase(relic)) {
                     if (enigmaticSeen) {
                         continue;
                     }

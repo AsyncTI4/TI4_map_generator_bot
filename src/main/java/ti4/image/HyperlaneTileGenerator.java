@@ -19,9 +19,10 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import ti4.ResourceHelper;
+import ti4.helpers.RandomHelper;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.service.map.CustomHyperlaneService;
@@ -225,13 +226,12 @@ final class HyperlaneTileGenerator {
         String tilePath = tile.getTilePath();
         int transform = -1;
         if (matrix != null) {
-            Random rand = new Random(matrix.hashCode());
-            String randomTile = RANDOM_BACKGROUNDS.get(rand.nextInt(RANDOM_BACKGROUNDS.size()));
+            String randomTile = RandomHelper.pickRandomFromList(RANDOM_BACKGROUNDS);
             tilePath = ResourceHelper.getInstance().getTileFile(randomTile);
             if (tilePath == null) {
                 tilePath = tile.getTilePath();
             }
-            transform = rand.nextInt(4); // 0, 1, 2, or 3
+            transform = ThreadLocalRandom.current().nextInt(4); // 0, 1, 2, or 3
         }
 
         BufferedImage original = ImageHelper.read(tilePath);

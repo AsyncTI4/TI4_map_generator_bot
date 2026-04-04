@@ -1,7 +1,6 @@
 package ti4.commands.special;
 
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -9,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
+import ti4.helpers.RandomHelper;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
@@ -75,7 +75,7 @@ class SwapTwoSystems extends GameStateSubcommand {
             return null;
         }
 
-        return availableTiles.get(new Random().nextInt(availableTiles.size()));
+        return RandomHelper.pickRandomFromList(availableTiles);
     }
 
     @Override
