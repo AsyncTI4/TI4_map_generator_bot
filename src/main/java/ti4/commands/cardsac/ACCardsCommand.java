@@ -26,6 +26,7 @@ public class ACCardsCommand implements ParentCommand {
                     new PickACFromPurged(),
                     new ShowDiscardActionCards(),
                     new ShowPurgedActionCards(),
+                    new ShowGarboziaActionCards(),
                     new ShuffleACBackIntoDeck(),
                     new ShuffleACFromHand(),
                     new RevealAndPutACIntoDiscard(),
