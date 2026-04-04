@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.buttons.Buttons;
-import ti4.helpers.Constants;
 import ti4.helpers.MapTemplateHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -21,6 +20,8 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.FactionModel;
+import ti4.service.draft.PlayerSetupService;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.map.AddTileListService;
 import ti4.service.milty.MiltyDraftManager.PlayerDraft;
 
@@ -48,11 +49,6 @@ class FinishDraftService {
             for (String playerId : manager.getPlayers()) {
                 Player player = game.getPlayer(playerId);
                 PlayerDraft picks = manager.getPlayerDraft(playerId);
-                String color = player.getNextAvailableColour();
-                if (playerId.equals(Constants.chassitId)
-                        && game.getUnusedColorsPreferringBase().contains(Mapper.getColor("lightgray"))) {
-                    color = "lightgray";
-                }
                 String faction = picks.getFaction();
                 String pos = MapTemplateHelper.getPlayerHomeSystemLocation(picks, manager.getMapTemplate());
                 boolean speaker = picks.getPosition() == 1;
@@ -81,7 +77,7 @@ class FinishDraftService {
                             String keleres = "keleres" + flavor.charAt(0);
                             String id = String.format(
                                     "setupStep5_%s_%s_%s_%s_%s",
-                                    player.getUserID(), keleres, color, pos, speaker ? "yes" : "no");
+                                    player.getUserID(), keleres, null, pos, speaker ? "yes" : "no");
                             String msg = "Keleres (" + flavor + ")";
                             Button butt = Buttons.green(id, msg).withEmoji(Emoji.fromFormatted(emoji));
                             buttons.add(butt);
@@ -92,7 +88,8 @@ class FinishDraftService {
                 }
 
                 if (faction != null) {
-                    MiltyService.secondHalfOfPlayerSetup(player, game, color, faction, pos, event, speaker);
+                    PlayerSetupState setupState = new PlayerSetupState(faction, pos, speaker);
+                    PlayerSetupService.setupPlayer(setupState, player, game, event);
                 }
             }
             game.setPhaseOfGame("playerSetup");

@@ -102,9 +102,12 @@ public class EdictPhaseHandler {
         if (paradigms > 0) {
             List<Button> buttons = new ArrayList<>();
             for (int x = 0; x < paradigms; x++) {
-                ButtonHelperTwilightsFall.drawParadigm(game, player, event, false);
+                ButtonHelperTwilightsFall.drawParadigm(game, player, event, false, true);
             }
             for (String paradigm : game.getStoredValue("artificeParadigms").split("_")) {
+                if (paradigm.isEmpty() || Mapper.getLeader(paradigm) == null) {
+                    continue;
+                }
                 buttons.add(Buttons.green(
                         "keepArtificeParadigm_" + paradigm,
                         "Keep " + Mapper.getLeader(paradigm).getName()));
@@ -279,14 +282,14 @@ public class EdictPhaseHandler {
                 int vpDifference = Math.max(game.getHighestScore() - player.getTotalVictoryPoints(), 0);
                 if (vpDifference < 1) {
                     RelicHelper.drawRelicAndNotify(player, event, game);
-                    ButtonHelperTwilightsFall.drawParadigm(game, player, event, false);
+                    ButtonHelperTwilightsFall.drawParadigm(game, player, event, false, true);
                     game.removeStoredValue("artificeParadigms");
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             "No player has more victory points than " + player.getRepresentationNoPing()
                                     + ", so they were not able to draw any additional relics or paradigms.");
                 } else {
-                    ButtonHelperTwilightsFall.drawParadigm(game, player, event, false);
+                    ButtonHelperTwilightsFall.drawParadigm(game, player, event, false, true);
                     String relic = game.getAllRelics().getFirst();
                     RelicModel mod = Mapper.getRelic(relic);
                     MessageHelper.sendMessageToChannelWithEmbed(

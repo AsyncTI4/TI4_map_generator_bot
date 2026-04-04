@@ -41,7 +41,7 @@ import ti4.service.draft.DraftableType;
 import ti4.service.draft.MantisMapBuildContext;
 import ti4.service.draft.MantisMapBuildService;
 import ti4.service.draft.PlayerDraftState;
-import ti4.service.draft.PlayerSetupService.PlayerSetupState;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TileEmojis;
 import ti4.service.milty.MiltyDraftTile;

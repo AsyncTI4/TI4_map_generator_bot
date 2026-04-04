@@ -577,35 +577,40 @@ public class DrawingUtil {
     public static List<String> layoutText(Graphics2D g2, String inputText, int maxWidth) {
         List<String> initialSplit = new ArrayList<>(Arrays.asList(PATTERN.split(inputText)));
         List<String> finalSplit = new ArrayList<>();
-        for (String line : initialSplit) {
-            line = line.trim();
-            while (width(g2, line) > maxWidth) {
-                int splitIndex = -1;
-                int nextSpace = line.indexOf(' ');
+        try {
+            for (String line : initialSplit) {
+                line = line.trim();
+                while (width(g2, line) > maxWidth) {
+                    int splitIndex = -1;
+                    int nextSpace = line.indexOf(' ');
 
-                // Prefer splitting at spaces
-                while (nextSpace != -1 && width(g2, line.substring(0, nextSpace)) < maxWidth) {
-                    splitIndex = nextSpace;
-                    nextSpace = line.indexOf(' ', splitIndex + 1);
-                }
+                    // Prefer splitting at spaces
+                    while (nextSpace != -1 && width(g2, line.substring(0, nextSpace)) < maxWidth) {
+                        splitIndex = nextSpace;
+                        nextSpace = line.indexOf(' ', splitIndex + 1);
+                    }
 
-                // If no space is found or no valid split, break at max width
-                if (splitIndex == -1) {
-                    for (int i = 1; i < line.length(); i++) {
-                        if (width(g2, line.substring(0, i)) > maxWidth) {
-                            splitIndex = i - 1;
-                            break;
+                    // If no space is found or no valid split, break at max width
+                    if (splitIndex == -1) {
+                        for (int i = 1; i < line.length(); i++) {
+                            if (width(g2, line.substring(0, i)) > maxWidth) {
+                                splitIndex = i - 1;
+                                break;
+                            }
                         }
                     }
+
+                    finalSplit.add(line.substring(0, splitIndex).trim());
+                    line = line.substring(splitIndex).trim();
                 }
 
-                finalSplit.add(line.substring(0, splitIndex).trim());
-                line = line.substring(splitIndex).trim();
+                if (!line.isEmpty()) {
+                    finalSplit.add(line);
+                }
             }
-
-            if (!line.isEmpty()) {
-                finalSplit.add(line);
-            }
+        } catch (Exception e) {
+            BotLogger.warning("Error laying out text with width `" + maxWidth + "`:\n```" + inputText + "\n```", e);
+            return initialSplit;
         }
         return finalSplit;
     }

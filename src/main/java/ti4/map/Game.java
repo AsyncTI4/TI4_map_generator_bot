@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -78,7 +78,6 @@ import ti4.message.logging.LogOrigin;
 import ti4.model.ActionCardModel;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
-import ti4.model.ColorModel;
 import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
@@ -4589,26 +4588,6 @@ public class Game extends GameProperties {
                 .getStrategyCardModels()
                 .forEach(scModel ->
                         setScTradeGood(scModel.getInitiative(), oldTGs.getOrDefault(scModel.getInitiative(), 0)));
-    }
-
-    public List<ColorModel> getUnusedColorsPreferringBase() {
-        List<String> priorityColourIDs = List.of("red", "blue", "yellow", "purple", "green", "orange", "pink", "black");
-        List<ColorModel> priorityColours = priorityColourIDs.stream()
-                .map(Mapper::getColor)
-                .filter(color -> players.values().stream()
-                        .noneMatch(player -> player.getColor().equals(color.getName())))
-                .toList();
-        if (!priorityColours.isEmpty()) {
-            return priorityColours;
-        }
-        return getUnusedColors();
-    }
-
-    public List<ColorModel> getUnusedColors() {
-        return Mapper.getColors().stream()
-                .filter(color -> players.values().stream()
-                        .noneMatch(player -> player.getColor().equals(color.getName())))
-                .toList();
     }
 
     public boolean addTag(String tag) {

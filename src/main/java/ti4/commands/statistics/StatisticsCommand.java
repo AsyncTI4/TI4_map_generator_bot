@@ -25,6 +25,7 @@ public class StatisticsCommand implements ParentCommand {
                     new LifetimeRecord(),
                     new FactionRecordOfTech(),
                     new FactionRecordOfSCPick(),
+                    new FactionTopColors(),
                     new GameWinsWithOtherFactions(),
                     new StellarConverterStatistics(),
                     new ExpeditionWinRates(),

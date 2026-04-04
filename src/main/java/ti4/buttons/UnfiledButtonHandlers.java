@@ -1,8 +1,6 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -78,7 +76,6 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.BreakthroughModel;
-import ti4.model.ColorModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
@@ -295,10 +292,7 @@ public class UnfiledButtonHandlers {
             if (enable) {
                 Player neutral = game.getPlayerFromColorOrFaction("neutral");
                 if (neutral == null) {
-                    List<String> unusedColors = game.getUnusedColors().stream()
-                            .map(ColorModel::getName)
-                            .toList();
-                    String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+                    String color = SetupNeutralPlayer.pickNeutralColor(game);
                     game.setupNeutralPlayer(color);
                 }
             }
@@ -2361,6 +2355,7 @@ public class UnfiledButtonHandlers {
                     && game.getStoredValue("ASN" + player.getFaction()).isEmpty()
                     && (buttonID.contains("tacticalAction")
                             || buttonID.contains("warfare")
+                            || buttonID.contains("construction")
                             || buttonID.contains("anarchy7Build")
                             || buttonID.contains("lumi7Build")
                             || buttonID.contains("ministerBuild"))) {
@@ -3448,9 +3443,13 @@ public class UnfiledButtonHandlers {
         if (!game.isFowMode() && "statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
             ReactionService.addReaction(event, game, player);
             for (Player p2 : game.getRealPlayers()) {
-                if (p2.isNpc() && !game.getCurrentACDrawStatusInfo().contains(p2.getFaction())) {
-                    ButtonHelper.drawStatusACs(game, p2, event);
+                if (p2.isNpc()
+                        && game.getStoredValue(
+                                        "statusHomeworkReactionFor" + p2.getFaction() + "Round" + game.getRound())
+                                .isEmpty()) {
                     ReactionService.addReaction(event, game, p2);
+                    game.setStoredValue(
+                            "statusHomeworkReactionFor" + p2.getFaction() + "Round" + game.getRound(), "added");
                 }
             }
         }

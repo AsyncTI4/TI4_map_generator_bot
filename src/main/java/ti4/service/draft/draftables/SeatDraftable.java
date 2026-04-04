@@ -19,7 +19,7 @@ import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftableType;
 import ti4.service.draft.NucleusImageGeneratorService;
 import ti4.service.draft.PlayerDraftState;
-import ti4.service.draft.PlayerSetupService.PlayerSetupState;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.emoji.MiscEmojis;
 
 @Setter
@@ -140,7 +140,7 @@ public class SeatDraftable extends SinglePickDraftable {
 
         String homeTilePosition = MapTemplateHelper.getPlayerHomeSystemLocation(
                 seatNum, draftManager.getGame().getMapTemplateID());
-        playerSetupState.setPositionHS(homeTilePosition);
+        playerSetupState.setHomeSystemPosition(homeTilePosition);
 
         return null;
     }

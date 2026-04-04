@@ -427,7 +427,7 @@ public class PlayerAreaGenerator {
         }
         xDelta += 20;
 
-        if (!player.getAbilities().isEmpty() || !player.getSingularityTechs().isEmpty()) {
+        if (!player.getAbilities().isEmpty()) {
             xDelta = abilityInfo(player, xDelta, yPlayArea);
         }
 
@@ -1576,48 +1576,6 @@ public class PlayerAreaGenerator {
                 deltaX += 48;
                 addedAbilities = true;
             }
-        }
-
-        List<String> singularities = player.getSingularityTechs();
-        if (!singularities.isEmpty()) {
-            String initials = (player.hasTech("tf-singularityx") ? "X" : "")
-                    + (player.hasTech("tf-singularityy") ? "Y" : "")
-                    + (player.hasTech("tf-singularityz") ? "Z" : "");
-            if (singularities.size() > initials.length()) {
-                initials += "Q".repeat(singularities.size() - initials.length());
-            }
-            List<String> exhaustedTechs = player.getExhaustedTechs();
-            for (int t = 0; t < singularities.size(); t++) {
-                String tech = singularities.get(t);
-                boolean isExhausted = exhaustedTechs.contains(tech)
-                        || exhaustedTechs.contains(
-                                "tf-singularity" + initials.toLowerCase().charAt(t));
-                drawPAImage(x + deltaX, y, "pa_tech_techicons_generictf_" + (isExhausted ? "exh" : "rdy") + ".png");
-                TechnologyModel techModel = Mapper.getTech(tech);
-                Color foreground = isExhausted ? Color.GRAY : Color.WHITE;
-                graphics.setFont(Storage.getFont48());
-                int offset = 20 - graphics.getFontMetrics().stringWidth(initials.substring(t, t + 1)) / 2;
-                graphics.setColor(Color.BLACK);
-                for (int i = -2; i <= 2; i++) {
-                    for (int j = -2; j <= 2; j++) {
-                        graphics.drawString(initials.substring(t, t + 1), x + i + deltaX + offset, y + j + 148);
-                    }
-                }
-                graphics.setColor(foreground);
-                graphics.drawString(initials.substring(t, t + 1), x + deltaX + offset, y + 148);
-                if (techModel.getShrinkName()) {
-                    graphics.setFont(Storage.getFont16());
-                    DrawingUtil.drawOneOrTwoLinesOfTextVertically(
-                            graphics, techModel.getShortName(), x + deltaX + 9, y + 116, 116);
-                } else {
-                    graphics.setFont(Storage.getFont18());
-                    DrawingUtil.drawOneOrTwoLinesOfTextVertically(
-                            graphics, techModel.getShortName(), x + deltaX + 7, y + 116, 116);
-                }
-                drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, techModel);
-                deltaX += 48;
-            }
-            addedAbilities = true;
         }
 
         return x + deltaX + (addedAbilities ? 20 : 0);
@@ -2900,6 +2858,50 @@ public class PlayerAreaGenerator {
 
             drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, techModel);
             deltaX += 48;
+        }
+
+        List<String> singularities = player.getSingularityTechs();
+        if (!singularities.isEmpty()) {
+            String initials = (player.hasTech("tf-singularityx") ? "X" : "")
+                    + (player.hasTech("tf-singularityy") ? "Y" : "")
+                    + (player.hasTech("tf-singularityz") ? "Z" : "");
+            if (singularities.size() > initials.length()) {
+                initials += "Q".repeat(singularities.size() - initials.length());
+            }
+            exhaustedTechs = player.getExhaustedTechs();
+            for (int t = 0; t < singularities.size(); t++) {
+                String tech = singularities.get(t);
+                if (!techs.contains(tech)) {
+                    continue;
+                }
+                boolean isExhausted = exhaustedTechs.contains(tech)
+                        || exhaustedTechs.contains(
+                                "tf-singularity" + initials.toLowerCase().charAt(t));
+                drawPAImage(x + deltaX, y, "pa_tech_techicons_generictf_" + (isExhausted ? "exh" : "rdy") + ".png");
+                TechnologyModel techModel = Mapper.getTech(tech);
+                Color foreground = isExhausted ? Color.GRAY : Color.WHITE;
+                graphics.setFont(Storage.getFont48());
+                int offset = 20 - graphics.getFontMetrics().stringWidth(initials.substring(t, t + 1)) / 2;
+                graphics.setColor(Color.BLACK);
+                for (int i = -2; i <= 2; i++) {
+                    for (int j = -2; j <= 2; j++) {
+                        graphics.drawString(initials.substring(t, t + 1), x + i + deltaX + offset, y + j + 148);
+                    }
+                }
+                graphics.setColor(foreground);
+                graphics.drawString(initials.substring(t, t + 1), x + deltaX + offset, y + 148);
+                if (techModel.getShrinkName()) {
+                    graphics.setFont(Storage.getFont16());
+                    DrawingUtil.drawOneOrTwoLinesOfTextVertically(
+                            graphics, techModel.getShortName(), x + deltaX + 9, y + 116, 116);
+                } else {
+                    graphics.setFont(Storage.getFont18());
+                    DrawingUtil.drawOneOrTwoLinesOfTextVertically(
+                            graphics, techModel.getShortName(), x + deltaX + 7, y + 116, 116);
+                }
+                drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, techModel);
+                deltaX += 48;
+            }
         }
         return deltaX;
     }

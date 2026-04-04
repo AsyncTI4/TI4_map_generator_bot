@@ -27,6 +27,8 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     private ComponentSource actualSource;
     private List<String> searchTags = new ArrayList<>();
     private boolean affectedByWildWildGalaxy;
+    private String wildWildWindow;
+    private String wildWildText;
 
     public boolean isValid() {
         return alias != null && name != null && phase != null && window != null && text != null && source != null;
@@ -41,15 +43,23 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getRepresentation(Game game) {
-        return getNameRepresentation(game) + " - " + window + ": " + text + "\n";
+        String cardJustText = getRepresentationJustText(game);
+        return getNameRepresentation(game) + " - " + cardJustText + "\n";
     }
 
     public String getRepresentation() {
         return getRepresentation(null);
     }
 
+    public String getRepresentationJustText(Game game) {
+        boolean useWildText = hasWildText(game);
+        String cardText = useWildText ? wildWildText : text;
+        String cardWindow = useWildText ? wildWildWindow : window;
+        return cardWindow + ": " + cardText;
+    }
+
     public String getRepresentationJustText() {
-        return window + ": " + text;
+        return getRepresentationJustText(null);
     }
 
     public MessageEmbed getRepresentationEmbed() {
@@ -73,11 +83,15 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
                 + "**__" + source.emoji();
         eb.setTitle(title);
 
+        boolean useWildText = hasWildText(game);
+        String cardText = useWildText ? wildWildText : text;
+        String cardWindow = useWildText ? wildWildWindow : window;
+
         // DESCRIPTION
         if (notes == null) {
-            eb.setDescription("\n***" + window + ":***\n" + text);
+            eb.setDescription("\n***" + cardWindow + ":***\n" + cardText);
         } else {
-            eb.setDescription("\n***" + window + ":***\n" + text + "\n-# [" + notes + "]");
+            eb.setDescription("\n***" + cardWindow + ":***\n" + cardText + "\n-# [" + notes + "]");
         }
 
         // FLAVOUR TEXT
@@ -110,5 +124,13 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
 
     public boolean isWild(Game game) {
         return (game != null) && affectedByWildWildGalaxy && game.isWildWildGalaxyMode();
+    }
+
+    public boolean hasWildText(Game game) {
+        return (game != null)
+                && affectedByWildWildGalaxy
+                && game.isWildWildGalaxyMode()
+                && wildWildText != null
+                && wildWildWindow != null;
     }
 }

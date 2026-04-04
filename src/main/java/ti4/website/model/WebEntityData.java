@@ -6,11 +6,13 @@ import lombok.Data;
 @Data
 class WebEntityData {
     private String entityId;
-    private String entityType; // "unit" or "token"
+    // "unit" or "token"
+    private String entityType;
     private int count;
-    private Integer sustained; // Optional - only for units that can sustain damage
-    private List<Integer>
-            unitStates; // Optional - unit state counts: [healthy, damaged, galvanized, damaged+galvanized]
+    // Optional - only for units that can sustain damage
+    private Integer sustained;
+    // Optional - unit state counts: [healthy, damaged, galvanized, damaged+galvanized]
+    private List<Integer> unitStates;
 
     public WebEntityData(String entityId, String entityType, int count) {
         this.entityId = entityId;

@@ -42,7 +42,7 @@ import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftableType;
 import ti4.service.draft.PartialMapService;
 import ti4.service.draft.PlayerDraftState;
-import ti4.service.draft.PlayerSetupService.PlayerSetupState;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.milty.MiltyService;
 import ti4.service.planet.AddPlanetService;
@@ -516,11 +516,11 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         // Determine speaker position and set home system location
         List<String> speakerOrder = getSpeakerOrder(draftManager);
         int speakerPosition = speakerOrder.indexOf(playerUserId) + 1;
-        playerSetupState.setSetSpeaker(speakerPosition == 1);
+        playerSetupState.setSpeaker(speakerPosition == 1);
         String homeTilePosition =
                 MapTemplateHelper.getPlayerHomeSystemLocation(speakerPosition, game.getMapTemplateID());
         if (isSourceOfSeat(draftManager)) {
-            playerSetupState.setPositionHS(homeTilePosition);
+            playerSetupState.setHomeSystemPosition(homeTilePosition);
         }
 
         // If the home system faction is Keleres, we switch them here to a random unused faction.

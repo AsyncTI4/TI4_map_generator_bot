@@ -3,6 +3,7 @@ package ti4.service.draft;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -10,6 +11,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.map.AddTileListService;
 
 /**
@@ -298,10 +300,9 @@ public class DraftManager extends DraftPlayerManager {
         }
 
         for (String userId : playerStates.keySet()) {
-
             // Collect all the setup decisions in a common object
-            PlayerSetupService.PlayerSetupState playerSetupState = new PlayerSetupService.PlayerSetupState();
-            List<Consumer<Player>> postSetupActions = new ArrayList<>();
+            PlayerSetupState playerSetupState = new PlayerSetupState();
+            var postSetupActions = new ArrayList<Consumer<Player>>();
             for (Draftable draftable : draftables) {
                 Consumer<Player> postSetupAction = draftable.setupPlayer(this, userId, playerSetupState);
                 if (postSetupAction != null) {
@@ -311,15 +312,6 @@ public class DraftManager extends DraftPlayerManager {
 
             Player player = game.getPlayer(userId);
 
-            // Default color if not set
-            boolean playerHasColor = player.getColor() != null && !"null".equals(player.getColor());
-            if (!playerHasColor && playerSetupState.getColor() == null) {
-                String color = player.getNextAvailableColour();
-                playerSetupState.setColor(color);
-            } else if (playerHasColor && playerSetupState.getColor() == null) {
-                playerSetupState.setColor(player.getColor());
-            }
-
             // Do common setup chores
             PlayerSetupService.setupPlayer(playerSetupState, player, game, event);
 
@@ -328,6 +320,12 @@ public class DraftManager extends DraftPlayerManager {
                 action.accept(player);
             }
         }
+
+        // TODO remove after some debugging
+        BotLogger.info(game.getActionsJumpLink() + " setup players during draft with colors: "
+                + game.getPlayers().values().stream()
+                        .map(player -> player.getFaction() + " " + player.getColor())
+                        .collect(Collectors.joining(", ")));
 
         // Transition to end of setup
         game.setPhaseOfGame("playerSetup");
