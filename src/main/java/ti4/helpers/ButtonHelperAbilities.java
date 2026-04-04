@@ -888,7 +888,7 @@ public final class ButtonHelperAbilities {
     public static void claimBounty(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         buttonID = buttonID.replace("claimBounty_", "");
         String colorPlayer = buttonID.split("_")[0];
-        String unitTypeString = buttonID.split("_")[1];
+        String unitTypeString = buttonID.split("_")[1].toLowerCase();
         Player p2 = game.getPlayerFromColorOrFaction(colorPlayer);
         game.removeStoredValue("bounties" + p2.getFaction() + unitTypeString);
         player.gainTG(3, true);
@@ -906,7 +906,7 @@ public final class ButtonHelperAbilities {
     public static void zephAgentRes(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         buttonID = buttonID.replace("zephAgentRes_", "");
         String colorPlayer = buttonID.split("_")[0];
-        String unitTypeString = buttonID.split("_")[1];
+        String unitTypeString = buttonID.split("_")[1].toLowerCase();
         Player p2 = game.getPlayerFromColorOrFaction(colorPlayer);
         UnitModel unit = p2.getUnitByBaseType(unitTypeString);
         game.removeStoredValue("bounties" + p2.getFaction() + unitTypeString);
@@ -943,7 +943,7 @@ public final class ButtonHelperAbilities {
                 String storedValue = game.getStoredValue("bounties" + player.getFaction()
                         + unitType.humanReadableName().toLowerCase());
                 if (!storedValue.isEmpty()) {
-                    bounties.add(player.getFaction() + " " + unitType.humanReadableName());
+                    bounties.add(StringUtils.capitalize(player.getFaction()) + " " + unitType.humanReadableName());
                 }
             }
         }
