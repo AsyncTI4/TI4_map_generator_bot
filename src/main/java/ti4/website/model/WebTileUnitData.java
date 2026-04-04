@@ -291,8 +291,7 @@ public final class WebTileUnitData {
      * @param planet The planet to extract action cards from
      * @param targetEntities The map to add the extracted entities to
      */
-    private static void extractActionCards(
-            Game game, Planet planet, Map<String, List<WebEntityData>> targetEntities) {
+    private static void extractActionCards(Game game, Planet planet, Map<String, List<WebEntityData>> targetEntities) {
         if (!"garbozia".equals(planet.getName())) {
             return;
         }
