@@ -96,9 +96,10 @@ public final class WebTileUnitData {
                 if (unitHolder instanceof Planet planet) {
                     WebTilePlanet planetData = tileData.planets.computeIfAbsent(holderName, k -> new WebTilePlanet());
 
-                    // Extract units and tokens
+                    // Extract units, tokens, and action cards
                     extractUnits(game, unitHolder, planetData.getEntities());
                     extractTokens(unitHolder, planetData.getEntities(), false);
+                    extractActionCards(game, planet, planetData.getEntities());
 
                     // Determine controller
                     String controllingFaction;
@@ -163,12 +164,6 @@ public final class WebTileUnitData {
 
         // Set planetary shield status
         planetData.setPlanetaryShield(TileGenerator.shouldPlanetHaveShield(planet, game));
-
-        // Add action cards on this planet (Garbozia feature)
-        if ("garbozia".equals(planet.getName())) {
-            planetData.setActionCards(new ArrayList<>(
-                    (ActionCardHelper.getGarboziaActionCards(game).keySet())));
-        }
     }
 
     /**
@@ -286,6 +281,25 @@ public final class WebTileUnitData {
             targetEntities
                     .computeIfAbsent(factionEntry.getKey(), k -> new ArrayList<>())
                     .addAll(factionEntry.getValue());
+        }
+    }
+
+    /**
+     * Extract action cards from a planet (Garbozia feature) and add them to the target entities map.
+     *
+     * @param game The game context
+     * @param planet The planet to extract action cards from
+     * @param targetEntities The map to add the extracted entities to
+     */
+    private static void extractActionCards(
+            Game game, Planet planet, Map<String, List<WebEntityData>> targetEntities) {
+        if (!"garbozia".equals(planet.getName())) {
+            return;
+        }
+
+        for (String cardId : ActionCardHelper.getGarboziaActionCards(game).keySet()) {
+            WebEntityData cardData = new WebEntityData(cardId, "actioncard", 1);
+            targetEntities.computeIfAbsent("neutral", k -> new ArrayList<>()).add(cardData);
         }
     }
 
