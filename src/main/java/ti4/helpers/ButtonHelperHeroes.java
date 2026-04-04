@@ -2199,6 +2199,25 @@ public final class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("poisonHeroInitiation")
+    public static void resolvePoisonHeroInitiation(Player player, Game game, ButtonInteractionEvent event) {
+        Leader playerLeader = player.unsafeGetLeader("poisonhero");
+        StringBuilder message2 = new StringBuilder(player.getRepresentation())
+                .append(" played ")
+                .append(Helper.getLeaderFullRepresentation(playerLeader));
+        boolean purged = player.removeLeader(playerLeader);
+        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+        if (purged) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), message2 + " - The Oracle, the Poison hero, has been purged. \n\n ");
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "The Oracle, the Poison hero, was not purged - something went wrong");
+        }
+        ButtonHelperTwilightsFallActionCards.resolvePoison(game, player);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("kyroHeroInitiation")
     public static void resolveKyroHeroInitiation(Player player, Game game, ButtonInteractionEvent event) {
         Leader playerLeader = player.unsafeGetLeader("kyrohero");
@@ -2316,7 +2335,7 @@ public final class ButtonHelperHeroes {
         }
         for (int x = 0; x < n; x++) {
             String acID = game.drawActionCardAndDiscard();
-            String sb = Mapper.getActionCard(acID).getRepresentation() + "\n";
+            String sb = Mapper.getActionCard(acID).getRepresentation(game) + "\n";
             MessageHelper.sendMessageToChannel(channel, sb);
             buttons.add(Buttons.green(
                     "cymiaeHeroStep2_" + acID, Mapper.getActionCard(acID).getName()));
@@ -2962,7 +2981,7 @@ public final class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannelWithEmbed(
                 yssaril.getCardsInfoThread(),
                 "For your reference, the text of the action cards offered reads as:",
-                ac.getRepresentationEmbed());
+                ac.getRepresentationEmbed(false, false, game));
     }
 
     @ButtonHandler("creussHeroStep2_")

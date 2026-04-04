@@ -51,6 +51,7 @@ import ti4.service.emoji.TechEmojis;
 import ti4.service.franken.FrankenDraftBagService;
 import ti4.service.franken.FrankenHomeService;
 import ti4.service.franken.FrankenMapBuildContextHelper;
+import ti4.service.game.GameColorsService;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftManager.PlayerDraft;
@@ -647,8 +648,6 @@ public final class ButtonHelperTwilightsFall {
 
     @ButtonHandler("fixMahactColors")
     public static void fixMahactColors(Game game, GenericInteractionCreateEvent event) {
-
-        // ColorChangeHelper.changePlayerColor(game, player, oldColor, newColor);
         for (Player player : game.getRealPlayers()) {
             String factionColor = player.getFaction().replace("tf", "");
             if (Mapper.getColor(factionColor) != null && !player.getColor().equalsIgnoreCase(factionColor)) {
@@ -658,7 +657,7 @@ public final class ButtonHelperTwilightsFall {
                             game,
                             p2,
                             p2.getColor(),
-                            game.getUnusedColors().getFirst().getAlias());
+                            GameColorsService.getUnusedColors(game).getFirst().getAlias());
                 }
                 ColorChangeHelper.changePlayerColor(game, player, player.getColor(), factionColor);
             }
@@ -923,6 +922,11 @@ public final class ButtonHelperTwilightsFall {
     }
 
     public static void drawParadigm(Game game, Player player, ButtonInteractionEvent event, boolean scPara) {
+        drawParadigm(game, player, event, scPara, false);
+    }
+
+    public static void drawParadigm(
+            Game game, Player player, ButtonInteractionEvent event, boolean scPara, boolean artifice) {
 
         if (scPara) {
             String messageID = event.getMessageId();
@@ -959,7 +963,7 @@ public final class ButtonHelperTwilightsFall {
         }
         String paradigm = allCards.removeFirst();
         drawSpecificParadigm(game, player, paradigm);
-        if (!scPara && "agenda".equalsIgnoreCase(game.getPhaseOfGame())) {
+        if (!scPara && artifice) {
             if (game.getStoredValue("artificeParadigms").isEmpty()) {
                 game.setStoredValue("artificeParadigms", paradigm);
             } else {

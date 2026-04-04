@@ -422,6 +422,14 @@ public final class DSHelperBreakthroughs {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("readyLanefirBt")
+    public static void readyLanefirBt(Game game, Player player, ButtonInteractionEvent event) {
+        String msg = player.getRepresentation() + " readied their breakthrough.";
+        player.setBreakthroughExhausted("lanefirbt", false);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        ButtonHelper.deleteMessage(event);
+    }
+
     public static void doLanefirBtCheck(Game game, Player player) {
         for (Player p2 : game.getRealPlayersExcludingThis(player)) {
             if (p2.hasUnlockedBreakthrough("lanefirbt")) {

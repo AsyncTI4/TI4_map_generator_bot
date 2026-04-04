@@ -104,7 +104,7 @@ public abstract class BagDraft {
 
     public boolean allPlayersReadyToPass() {
         for (Player p : owner.getRealPlayers()) {
-            if (!playerHasDraftableItemInBag(p) && !playerHasItemInQueue(p)) {
+            if (!playerHasDraftableItemInBag(p) && !playerHasItemInQueue(p) && !p.isReadyToPassBag()) {
                 setPlayerReadyToPass(p, true);
                 MessageHelper.sendMessageToChannel(
                         findExistingBagChannel(p),

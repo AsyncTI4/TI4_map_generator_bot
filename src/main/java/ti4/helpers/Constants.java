@@ -1342,6 +1342,7 @@ public final class Constants {
     public static final String LIFETIME_RECORD = "lifetime_record";
     public static final String FACTION_RECORD_OF_TECH = "faction_record_of_tech";
     public static final String FACTION_RECORD_OF_SCPICK = "faction_record_of_scpick";
+    public static final String FACTION_TOP_COLORS = "faction_top_colors";
     public static final String SPENDS = "spends";
     public static final String TOP_LIMIT = "top_limit";
     public static final String MINIMUM_NUMBER_OF_TURNS = "minimum_number_of_turns";

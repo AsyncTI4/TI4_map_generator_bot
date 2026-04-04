@@ -15,14 +15,14 @@
 
   <properties>
     <java.version>21</java.version>
-    <jda.version>6.3.1</jda.version>
-    <aws.sdk.version>2.42.4</aws.sdk.version>
-    <hibernate-dialects.version>${hibernate.version}</hibernate-dialects.version>
+    <jda.version>6.4.1</jda.version>
+    <aws.sdk.version>2.42.26</aws.sdk.version>
+    <hibernate-dialects.version>7.3.0.Final</hibernate-dialects.version>
     <reflections.version>0.10.2</reflections.version>
     <jskills.version>1.1</jskills.version>
     <webp-imageio.version>0.10.2</webp-imageio.version>
-    <jemoji.version>1.7.5</jemoji.version>
-    <spotless.version>3.2.1</spotless.version>
+    <jemoji.version>1.7.6</jemoji.version>
+    <spotless.version>3.4.0</spotless.version>
   </properties>
 
   <dependencyManagement>

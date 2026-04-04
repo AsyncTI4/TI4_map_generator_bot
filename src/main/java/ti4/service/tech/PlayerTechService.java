@@ -109,19 +109,9 @@ public class PlayerTechService {
                     event, player.getRepresentation(false, false) + " removed technology: " + componentID + ".");
         }
 
-        boolean singularity = false;
-        if (player.getSingularityTechs().contains(componentID)) {
-            singularity = true;
-            String oldVal = player.getGame().getStoredValue(player.getFaction() + "singularityTechs");
-            if (oldVal.contains(componentID + "_")) {
-                oldVal = oldVal.replace(componentID + "_", "");
-            } else {
-                oldVal = oldVal.replace(componentID, "");
-            }
-            player.getGame().setStoredValue(player.getFaction() + "singularityTechs", oldVal);
-            if (event instanceof ButtonInteractionEvent bevent) {
-                ButtonHelper.deleteMessage(bevent);
-            }
+        boolean singularity = player.removeSingularityTech(componentID);
+        if (event instanceof ButtonInteractionEvent bevent && singularity) {
+            ButtonHelper.deleteMessage(bevent);
         }
 
         if (exhaustNewest) {
