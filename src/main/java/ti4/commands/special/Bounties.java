@@ -17,6 +17,10 @@ class Bounties extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         Player player = getPlayer();
+        if (!player.hasAbility("marked_prey")) {
+            event.reply("You do not have the Marked Prey ability and cannot manage bounties.").setEphemeral(true).queue();
+            return;
+        }
         ButtonHelperAbilities.offerBountyButtons(game, player);
     }
 }
