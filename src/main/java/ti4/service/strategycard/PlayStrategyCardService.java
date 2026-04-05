@@ -624,7 +624,8 @@ public class PlayStrategyCardService {
                         MessageHelper.sendMessageToChannel(
                                 m5,
                                 "The **Trade** player has the **Guild Ships** ability, and thus may perform transactions with all players.");
-                    } else if (player.getPromissoryNotesInPlayArea().contains("convoys")) {
+                    } else if (player.getPromissoryNotesInPlayArea().contains("convoys")
+                            || player.getPromissoryNotesInPlayArea().contains("viability_trade_convoys")) {
                         MessageHelper.sendMessageToChannel(
                                 m5,
                                 "The **Trade** player has _Trade Convoys_, and thus may perform transactions with all players.");

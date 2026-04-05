@@ -2362,6 +2362,24 @@ public class ButtonHelperFactionSpecific {
         return buttons;
     }
 
+    public static void checkViabilityTradeConvoys(Game game, Player p1, Player p2) {
+        if (p1 == null || p2 == null) return;
+        boolean p1HasConvoys = p1.getPromissoryNotesInPlayArea().contains("viability_trade_convoys");
+        boolean p2HasConvoys = p2.getPromissoryNotesInPlayArea().contains("viability_trade_convoys");
+        if (!p1HasConvoys && !p2HasConvoys) return;
+        if (p1.getNeighbouringPlayers(true).contains(p2)) return;
+
+        Player hacanPlayer = game.getPNOwner("viability_trade_convoys");
+        if (hacanPlayer == null || !hacanPlayer.isRealPlayer()) return;
+
+        String message = hacanPlayer.getRepresentation(true, true)
+                + ", a non-neighbour transaction was completed using _Trade Convoys_."
+                + " You may gain 1 commodity or convert 1 commodity to a trade good."
+                + "\n-# You have (" + hacanPlayer.getCommoditiesRepresentation() + ") commodities.";
+        List<Button> buttons = gainOrConvertCommButtons(hacanPlayer, true);
+        MessageHelper.sendMessageToChannelWithButtons(hacanPlayer.getCorrectChannel(), message, buttons);
+    }
+
     @ButtonHandler("redCreussWashPartial")
     public static void redCreussWashPartial(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         if (player.getCommodities() == 0) {

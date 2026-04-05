@@ -46,6 +46,7 @@ public class Source {
         flagshipping,
         promises_promises,
         balacasi,
+        viability_patch,
 
         // async homebrew
         draft,
@@ -59,7 +60,6 @@ public class Source {
         dane_leaks,
 
         // personal projs
-        viability_patch,
         somno,
         ignis_aurora,
         asteroid,

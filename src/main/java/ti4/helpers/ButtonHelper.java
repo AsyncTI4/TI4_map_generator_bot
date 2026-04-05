@@ -5454,9 +5454,8 @@ public class ButtonHelper {
             }
             msg += "trade good to " + tradeHolder.getRepresentation() + ".";
         } else {
-            String tradePool = "Trade R" + game.getRound();
-            SendDebtService.sendDebt(player, tradeHolder, 1, tradePool);
-            msg += "debt token to " + tradeHolder.getRepresentation() + ", for their \"" + tradePool + "\" pool.";
+            SendDebtService.sendDebt(player, tradeHolder, 1);
+            msg += "debt token to " + tradeHolder.getRepresentation() + ", for their \"Debt Account\" pool.";
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         CommanderUnlockCheckService.checkPlayer(tradeHolder, "hacan");
