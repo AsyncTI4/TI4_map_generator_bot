@@ -3593,6 +3593,12 @@ public final class AgendaHelper {
             additionalVotesAndSources.put(TechEmojis.BioticTech + " Some Silly Ghoti Tech", fleetCC);
         }
 
+        // Viability Patch Xxcha PN
+        String viabilityFavor = game.getStoredValue("viabilityFavorXxcha");
+        if (!viabilityFavor.isEmpty() && viabilityFavor.equals(player.getFaction())) {
+            additionalVotesAndSources.put(FactionEmojis.Xxcha + " _Political Favor_", 5);
+        }
+
         return additionalVotesAndSources;
     }
 
@@ -4068,6 +4074,7 @@ public final class AgendaHelper {
         game.resetCurrentAgendaVotes();
         game.setHasHackElectionBeenPlayed(false);
         game.removeStoredValue("hackElectionFaction");
+        game.removeStoredValue("viabilityFavorXxcha");
         game.setPlayersWhoHitPersistentNoAfter("");
         game.setPlayersWhoHitPersistentNoWhen("");
         game.setLatestOutcomeVotedFor("");
