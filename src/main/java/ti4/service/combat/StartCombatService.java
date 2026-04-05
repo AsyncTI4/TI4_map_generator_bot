@@ -891,7 +891,7 @@ public class StartCombatService {
             }
             if (player.hasUnlockedBreakthrough("zephyrionbt")
                     && "space".equalsIgnoreCase(type)
-                    && ButtonHelper.isTileInOrAdjacentToPlayersHome(game, tile, otherPlayer)) {
+                    && ButtonHelper.isTileInOrAdjacentToPlayersHome(game, tile, otherPlayer, player)) {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(
                         player.getFinsFactionCheckerPrefix() + "zephyrionbtRes_" + otherPlayer.getFaction(),

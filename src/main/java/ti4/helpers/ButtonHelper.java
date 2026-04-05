@@ -8376,11 +8376,11 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Successfully logged response.");
     }
 
-    public static boolean isTileInOrAdjacentToPlayersHome(Game game, Tile tile, Player homeOwner) {
+    public static boolean isTileInOrAdjacentToPlayersHome(Game game, Tile tile, Player homeOwner, Player activePlayer) {
         Tile homeSystem = homeOwner.getHomeSystemTile();
         if (homeSystem == null) return false;
         if (homeSystem.getPosition().equals(tile.getPosition())) return true;
-        return FoWHelper.getAdjacentTiles(game, homeSystem.getPosition(), homeOwner, false)
+        return FoWHelper.getAdjacentTiles(game, homeSystem.getPosition(), activePlayer, false)
                 .contains(tile.getPosition());
     }
 }
