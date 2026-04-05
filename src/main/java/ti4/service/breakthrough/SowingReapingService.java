@@ -56,7 +56,7 @@ public class SowingReapingService {
     }
 
     @ButtonHandler("theSowingAddTg_")
-    private void addTgsToTheSowing(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    private void addTgsToTheSowing(ButtonInteractionEvent event, Player player, String buttonID) {
         String regex = "theSowingAddTg_" + RegexHelper.intRegex("amt");
         RegexService.runMatcher(regex, buttonID, matcher -> {
             int amt = Integer.parseInt(matcher.group("amt"));
@@ -100,7 +100,7 @@ public class SowingReapingService {
     }
 
     @ButtonHandler("theReapingAddTg")
-    private void addTgToTheReaping(ButtonInteractionEvent event, Game game, Player player) {
+    private void addTgToTheReaping(ButtonInteractionEvent event, Player player) {
         String message = player.getRepresentation(false, false)
                 + " won combat against a puppeted player and added 1 trade good to " + reapingRep() + ".";
         player.setBreakthroughTGs("obsidianbt", player.getBreakthroughTGs("obsidianbt") + 1);

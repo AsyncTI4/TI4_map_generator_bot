@@ -45,4 +45,8 @@
     <Match>
         <Bug pattern="OCP_OVERLY_CONCRETE_COLLECTION_PARAMETER"/>
     </Match>
+    <!-- This is useful, but it takes a lot to fix -->
+    <Match>
+        <Bug pattern="OCP_OVERLY_CONCRETE_PARAMETER"/>
+    </Match>
 </FindBugsFilter>

@@ -393,8 +393,8 @@ class GameLoadService {
                     Map<Integer, Integer> strategyCardToTradeGoodCount = new LinkedHashMap<>();
                     while (scTokenizer.hasMoreTokens()) {
                         StringTokenizer cardInfo = new StringTokenizer(scTokenizer.nextToken(), ",");
-                        Integer id = Integer.parseInt(cardInfo.nextToken());
-                        Integer value = Integer.parseInt(cardInfo.nextToken());
+                        Integer id = Integer.valueOf(cardInfo.nextToken());
+                        Integer value = Integer.valueOf(cardInfo.nextToken());
                         strategyCardToTradeGoodCount.put(id, value);
                     }
                     game.setScTradeGoods(strategyCardToTradeGoodCount);
@@ -481,7 +481,7 @@ class GameLoadService {
                     StringTokenizer scPlayed = new StringTokenizer(info, ";");
                     while (scPlayed.hasMoreTokens()) {
                         StringTokenizer dataInfoTokens = new StringTokenizer(scPlayed.nextToken(), ",");
-                        Integer scID = Integer.parseInt(dataInfoTokens.nextToken());
+                        Integer scID = Integer.valueOf(dataInfoTokens.nextToken());
                         Boolean status = Boolean.parseBoolean(dataInfoTokens.nextToken());
                         game.setSCPlayed(scID, status);
                     }

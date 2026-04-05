@@ -567,7 +567,7 @@ public class JdaService {
 
     public static boolean isReadyToReceiveCommands() {
         return GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.READY_TO_RECEIVE_COMMANDS.toString(), Boolean.class, false);
+                GlobalSettings.ImplementedSettings.READY_TO_RECEIVE_COMMANDS.toString(), Boolean.class, Boolean.FALSE);
     }
 
     public static List<Category> getAvailablePBDCategories() {

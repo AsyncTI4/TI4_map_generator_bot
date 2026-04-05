@@ -1,6 +1,6 @@
 package ti4.service.tech;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -162,12 +162,12 @@ public class BastionTechService {
 
             // Temp modifiers (bunker)
 
-            CombatTempModHelper.EnsureValidTempMods(p1, tile.getTileModel(), planet);
-            CombatTempModHelper.InitializeNewTempMods(p1, tile.getTileModel(), planet);
+            CombatTempModHelper.ensureValidTempMods(p1, tile.getTileModel(), planet);
+            CombatTempModHelper.initializeNewTempMods(p1, tile.getTileModel(), planet);
             List<NamedCombatModifierModel> tempMods = new ArrayList<>();
-            tempMods.addAll(CombatTempModHelper.BuildCurrentRoundTempNamedModifiers(
+            tempMods.addAll(CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
                     p1, tile.getTileModel(), planet, false, CombatRollType.bombardment));
-            tempMods.addAll(CombatTempModHelper.BuildCurrentRoundTempNamedModifiers(
+            tempMods.addAll(CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
                     p2, tile.getTileModel(), planet, true, CombatRollType.bombardment));
 
             String message = CombatMessageHelper.displayCombatSummary(p1, tile, planet, CombatRollType.bombardment);
@@ -176,7 +176,7 @@ public class BastionTechService {
             String hits = substringAfter(message, "Total hits ");
             hits = hits.split(" ")[0].replace("*", "");
             int h = Integer.parseInt(hits);
-            if (message != null && message.endsWith(";\n")) {
+            if (message.endsWith(";\n")) {
                 message = message.substring(0, message.length() - 2);
             }
             MessageHelper.sendMessageToChannel(

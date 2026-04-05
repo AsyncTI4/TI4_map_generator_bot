@@ -295,7 +295,7 @@ public class SliceDraftable extends SinglePickDraftable {
 
     private String doMiltyGeneration(
             GenericInteractionCreateEvent event, Game game, DraftSystemSettings draftSystemSettings) {
-        DraftSpec specs = DraftSpec.SliceSpecsFromDraftSystemSettings(draftSystemSettings);
+        DraftSpec specs = DraftSpec.sliceSpecsFromDraftSystemSettings(draftSystemSettings);
         game.setMapTemplateID(specs.getTemplate().getID());
 
         // Ensure we can't start yet

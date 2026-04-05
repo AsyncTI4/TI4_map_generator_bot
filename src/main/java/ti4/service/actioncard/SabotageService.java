@@ -178,7 +178,7 @@ public class SabotageService {
 
     private static boolean isActionCardNotPlayable(Game game, Player player, String acAlias) {
         // this first condition could go away if getDiscardACStatus starts correctly tracking discarded ACs
-        if (ActionCardHelper.getGarboziaActionCards(game).keySet().contains(acAlias)) {
+        if (ActionCardHelper.getGarboziaActionCards(game).containsKey(acAlias)) {
             return false;
         }
         return game.getDiscardActionCards().containsKey(acAlias)

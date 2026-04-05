@@ -24,12 +24,13 @@ import ti4.settings.GlobalSettings;
 import ti4.spring.jda.JdaService;
 
 @UtilityClass
-public class SliceGeneratorService {
-    public static boolean generateSlices(
-            GenericInteractionCreateEvent event,
-            SliceDraftable sliceDraftable,
-            DraftTileManager tileManager,
-            DraftSpec specs) {
+class SliceGeneratorService {
+
+    static boolean generateSlices(
+        GenericInteractionCreateEvent event,
+        SliceDraftable sliceDraftable,
+        DraftTileManager tileManager,
+        DraftSpec specs) {
 
         int sliceCount = specs.numSlices;
         boolean anomaliesCanTouch = specs.anomaliesCanTouch;
@@ -140,7 +141,7 @@ public class SliceGeneratorService {
 
         long elapsed = System.nanoTime() - startTime;
         boolean debug =
-                GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
+                GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, Boolean.FALSE);
         if (!slicesCreated || elapsed >= 10000000000L || debug) {
             StringBuilder sb = new StringBuilder();
             sb.append("Milty draft took a while... jazz, take a look:\n");

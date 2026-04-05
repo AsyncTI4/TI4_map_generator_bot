@@ -179,7 +179,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             return null;
         }
         try {
-            Integer packageKey = Integer.parseInt(choiceKey.substring("package".length()));
+            Integer packageKey = Integer.valueOf(choiceKey.substring("package".length()));
             return referenceCardPackages.get(packageKey);
         } catch (NumberFormatException e) {
             return null;
@@ -358,7 +358,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             if (!packageToken.startsWith("package")) {
                 continue;
             }
-            Integer packageKey = Integer.parseInt(packageToken.substring("package".length()));
+            Integer packageKey = Integer.valueOf(packageToken.substring("package".length()));
             List<String> factions = List.of(tokens[i + 1].split("\\."));
             String homeSystemFaction = "null".equals(tokens[i + 2]) ? null : tokens[i + 2];
             String startingUnitsFaction = "null".equals(tokens[i + 3]) ? null : tokens[i + 3];

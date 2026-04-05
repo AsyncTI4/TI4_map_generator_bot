@@ -137,6 +137,6 @@ public class GameStatisticsUploadService {
 
     private static boolean uploadsEnabled() {
         return GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false);
+                GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, Boolean.FALSE);
     }
 }

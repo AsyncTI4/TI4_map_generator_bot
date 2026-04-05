@@ -30,7 +30,7 @@ public class DraftSetupService {
             TIGLHelper.sendTIGLSetupText(game);
         }
 
-        DraftSpec specs = DraftSpec.CreateFromMiltySettings(settings);
+        DraftSpec specs = DraftSpec.createFromMiltySettings(settings);
 
         if (specs.getTemplate().isNucleusTemplate()) {
             return "Use the new settings menu to start a Nucleus draft!";

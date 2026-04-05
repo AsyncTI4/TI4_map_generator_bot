@@ -38,7 +38,7 @@ public class AsyncTi4WebsiteHelper {
 
     public static boolean uploadsEnabled() {
         return GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false);
+                GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, Boolean.FALSE);
     }
 
     public static void putData(String gameName, Game game) {

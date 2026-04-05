@@ -409,7 +409,7 @@ public class BotLogger {
         }
         // This has become too annoying, so we are limiting to testing mode/debug mode
         boolean debugMode =
-                GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
+                GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, Boolean.FALSE);
         if (System.getenv("TESTING") != null || debugMode) {
             // if it's ignored, it's not actionable.
             if (isIgnorableError(e)) return;

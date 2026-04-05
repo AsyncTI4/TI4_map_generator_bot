@@ -40,7 +40,7 @@ class ProduceNucleusGenStats extends GameStateSubcommand {
         Game game = getGame();
         DraftSpec draftSpec = new DraftSpec(game);
         if (game.getMiltySettingsUnsafe() != null) {
-            draftSpec = DraftSpec.CreateFromMiltySettings(game.getMiltySettingsUnsafe());
+            draftSpec = DraftSpec.createFromMiltySettings(game.getMiltySettingsUnsafe());
         } else {
             String mapTemplateId = game.getMapTemplateID();
             MapTemplateModel mapTemplate = mapTemplateId != null ? Mapper.getMapTemplate(mapTemplateId) : null;
