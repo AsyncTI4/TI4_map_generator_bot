@@ -11,7 +11,7 @@ public class EndPhaseService {
     public static void EndActionPhase(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
         StatusHelper.AnnounceStatusPhase(game);
         if (!game.isOmegaPhaseMode()) {
-            StatusHelper.BeginScoring(event, game, gameChannel);
+            StatusHelper.beginScoring(event, game, gameChannel);
         } else {
             StartPhaseService.startStatusHomework(event, game);
         }

@@ -76,7 +76,7 @@ public class HomebrewService {
                     .append(hb.name)
                     .append("**: ")
                     .append(hb.description)
-                    .append("\n");
+                    .append('\n');
             buttons.add(Buttons.green("setupHomebrew_" + hb, hb.name));
         }
         buttons.add(Buttons.red("setupHomebrewNone", "Remove All Homebrews"));

@@ -183,13 +183,11 @@ public class TEOptionService {
         } else {
             galacticEventButtons.add(Buttons.green("enableDaneMode_Cosmic_enable", "Enable Cosmic Phenomenae"));
         }
-        // if (game.isMonumentToTheAgesMode()) {
-        //     galacticEventButtons.add(Buttons.red("enableDaneMode_Monument_disable", "Disable Monuments to the
-        // Ages"));
-        // } else {
-        //     galacticEventButtons.add(Buttons.green("enableDaneMode_Monument_enable", "Enable Monuments to the
-        // Ages"));
-        // }
+        if (game.isMonumentToTheAgesMode()) {
+            galacticEventButtons.add(Buttons.red("enableDaneMode_Monument_disable", "Disable Monuments to the Ages"));
+        } else {
+            galacticEventButtons.add(Buttons.green("enableDaneMode_Monument_enable", "Enable Monuments to the Ages"));
+        }
         if (game.isWeirdWormholesMode()) {
             galacticEventButtons.add(Buttons.red("enableDaneMode_WeirdWormholes_disable", "Disable Weird Wormholes"));
         } else {

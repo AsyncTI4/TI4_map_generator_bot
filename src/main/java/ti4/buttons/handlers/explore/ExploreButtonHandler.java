@@ -12,7 +12,6 @@ import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ExploreHelper;
@@ -276,21 +275,7 @@ class ExploreButtonHandler {
 
         String message = " is using a mech to resolve _Seedy Space Port_.";
         if ("ac".equalsIgnoreCase(agent)) {
-            if (player.hasAbility("scheming")) {
-                game.drawActionCard(player.getUserID());
-                game.drawActionCard(player.getUserID());
-                message +=
-                        " Drew 2 action cards with **Scheming**. Please discard 1 action card with the blue buttons.";
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged() + " use buttons to discard.",
-                        ActionCardHelper.getDiscardActionCardButtons(player, false));
-            } else {
-                game.drawActionCard(player.getUserID());
-                message += " Drew 1 action card.";
-                ActionCardHelper.sendActionCardInfo(game, player, event);
-            }
-            CommanderUnlockCheckService.checkPlayer(player, "yssaril");
+            ActionCardHelper.drawActionCards(player, 1);
         } else {
             Leader playerLeader = player.getLeader(agent).orElse(null);
             if (playerLeader == null) {
@@ -319,21 +304,7 @@ class ExploreButtonHandler {
 
         String message = player.getRepresentation() + " is removing an infantry to resolve _Seedy Space Port_.";
         if ("ac".equalsIgnoreCase(agent)) {
-            if (player.hasAbility("scheming")) {
-                game.drawActionCard(player.getUserID());
-                game.drawActionCard(player.getUserID());
-                message +=
-                        " Drew 2 action cards with **Scheming**. Please discard 1 action card with the blue buttons.";
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged() + " use buttons to discard.",
-                        ActionCardHelper.getDiscardActionCardButtons(player, false));
-            } else {
-                game.drawActionCard(player.getUserID());
-                message += " Drew 1 action card.";
-                ActionCardHelper.sendActionCardInfo(game, player, event);
-            }
-            CommanderUnlockCheckService.checkPlayer(player, "yssaril");
+            ActionCardHelper.drawActionCards(player, 1);
         } else {
             Leader playerLeader = player.getLeader(agent).orElse(null);
             if (playerLeader == null) {
@@ -353,54 +324,21 @@ class ExploreButtonHandler {
 
     @ButtonHandler("comm_for_AC")
     static void commForAC(ButtonInteractionEvent event, Game game, Player player) {
-        boolean hasSchemingAbility = player.hasAbility("scheming");
-        int count2 = hasSchemingAbility ? 2 : 1;
-        String commOrTg;
+        String commOrTg = player.getCommodities() > 0 ? "commodity" : "trade good";
         if (player.getCommodities() > 0) {
-            commOrTg = "commodity";
             player.setCommodities(player.getCommodities() - 1);
-
         } else if (player.getTg() > 0) {
             player.setTg(player.getTg() - 1);
-            commOrTg = "trade good";
         } else {
-            ReactionService.addReaction(
-                    event,
-                    game,
-                    player,
-                    " didn't have any commodities or trade goods to spend, so no action card was drawn.");
+            String msg = player.getFactionEmoji() + " didn't have any commodities or trade goods to spend, ";
+            msg += "so no action card was drawn.";
+            MessageHelper.sendMessageToEventChannel(event, msg);
             return;
         }
-        String message = hasSchemingAbility
-                ? " spent 1 " + commOrTg + " to draw " + count2
-                        + " action card (**Scheming** added 1 action card). Please discard 1 action card from your hand."
-                : " spent 1 " + commOrTg + " to draw " + count2 + " action card.";
-        if (player.hasAbility("autonetic_memory")) {
-            ButtonHelperAbilities.autoneticMemoryStep1(game, player, count2);
-            message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
-        } else {
-            for (int i = 0; i < count2; i++) {
-                game.drawActionCard(player.getUserID());
-            }
-            ButtonHelper.checkACLimit(game, player);
-            ActionCardHelper.sendActionCardInfo(game, player, event);
-        }
-
-        CommanderUnlockCheckService.checkPlayer(player, "yssaril");
-
-        if (hasSchemingAbility) {
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged() + " use buttons to discard.",
-                    ActionCardHelper.getDiscardActionCardButtons(player, false));
-        }
-
-        ReactionService.addReaction(event, game, player, message);
+        String msg = player.getFactionEmoji() + " spent 1 " + commOrTg + " to resolve **Functioning Base**.";
+        MessageHelper.sendMessageToEventChannel(event, msg);
+        ActionCardHelper.drawActionCards(player, 1);
         ButtonHelper.deleteMessage(event);
-        if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
-            String pF = player.getFactionEmoji();
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), pF + " " + message);
-        }
     }
 
     @ButtonHandler("resFrontier_")

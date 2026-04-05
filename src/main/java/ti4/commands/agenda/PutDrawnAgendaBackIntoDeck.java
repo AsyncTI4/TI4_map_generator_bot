@@ -21,7 +21,7 @@ class PutDrawnAgendaBackIntoDeck extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         int agendaId = event.getOption(Constants.AGENDA_ID).getAsInt();
-        boolean onBottom = event.getOption(Constants.PUT_ON_BOTTOM, false, OptionMapping::getAsBoolean);
+        boolean onBottom = event.getOption(Constants.PUT_ON_BOTTOM, Boolean.FALSE, OptionMapping::getAsBoolean);
         if (onBottom) {
             AgendaHelper.putBottom(agendaId, getGame());
         } else {

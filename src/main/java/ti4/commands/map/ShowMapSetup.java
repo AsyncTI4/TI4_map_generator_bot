@@ -8,7 +8,7 @@ import ti4.message.MessageHelper;
 
 class ShowMapSetup extends GameStateSubcommand {
 
-    public ShowMapSetup() {
+    ShowMapSetup() {
         super("show_setup_positions", "Show the system positions to aid in manually building the map.", true, false);
         addOption(OptionType.BOOLEAN, "show", "True = ON | False = OFF", true);
     }
@@ -16,7 +16,7 @@ class ShowMapSetup extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         var game = getGame();
-        game.setShowMapSetup(event.getOption("show", false, OptionMapping::getAsBoolean));
+        game.setShowMapSetup(event.getOption("show", Boolean.FALSE, OptionMapping::getAsBoolean));
         MessageHelper.sendMessageToEventChannel(event, "Setup option set to: " + game.isShowMapSetup());
     }
 }

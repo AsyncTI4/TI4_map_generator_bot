@@ -37,12 +37,13 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.LoreService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.settings.users.UserSettingsManager;
 
-public class ButtonHelperTacticalAction {
+public final class ButtonHelperTacticalAction {
 
     public static void endOfTacticalActionThings(Player player, Game game, ButtonInteractionEvent event) {
         if (!game.isL1Hero() && !FOWPlusService.isVoid(game, game.getActiveSystem())) {
@@ -93,7 +94,9 @@ public class ButtonHelperTacticalAction {
                 }
             }
 
-            if (player.hasUnlockedBreakthrough("argentbt")) {
+            if (player.hasUnlockedBreakthrough("argentbt")
+                    && !game.getStoredValue("argentBTUse").isEmpty()) {
+                game.removeStoredValue("argentBTUse");
                 String msg = player.getRepresentation()
                         + ", you may use _Wing Transfer_ to move ships (and things they transport) between the active system and any adjacent system with only your units and your command tokens.";
                 List<Button> buttons = ButtonHelperHeroes.argentBreakthroughStep1(
@@ -118,6 +121,7 @@ public class ButtonHelperTacticalAction {
                         + ", your **Warfare** action is finished, you may redistribute your command tokens again.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), warfareDone, redistro);
             }
+            RoundStatsTracker.finalizeTactical(game, player);
             resetStoredValuesForTacticalAction(game);
         }
     }
@@ -265,6 +269,8 @@ public class ButtonHelperTacticalAction {
         if (unitsWereMoved) {
             CommanderUnlockCheckService.checkPlayer(player, "nivyn", "ghoti", "zelian", "gledge", "mortheus");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
+            CommanderUnlockCheckService.checkAllPlayersInGame(game, "cabal");
+            CommanderUnlockCheckService.checkAllPlayersInGame(game, "naalu");
             for (Player nonActivePlayer : game.getRealPlayers()) {
                 if (player == nonActivePlayer) {
                     continue;
@@ -370,11 +376,14 @@ public class ButtonHelperTacticalAction {
         game.removeStoredValue("mentakHero");
         game.removeStoredValue("ghostagent_active");
 
-        game.resetCurrentMovedUnitsFrom1TacticalAction();
         game.getTacticalActionDisplacement().clear();
+        for (Player player : game.getRealPlayers()) {
+            RoundStatsTracker.clearTacticalMarkers(game, player);
+        }
     }
 
     public static void beginTacticalAction(Game game, Player player) {
+        RoundStatsTracker.markTacticalStart(game, player);
         boolean prefersDistanceBasedTacticalActions =
                 UserSettingsManager.get(player.getUserID()).isPrefersDistanceBasedTacticalActions();
         if (!game.isFowMode() && game.getRingCount() < 5 && prefersDistanceBasedTacticalActions) {
@@ -431,11 +440,8 @@ public class ButtonHelperTacticalAction {
                 CheckDistanceHelper.getTileDistancesRelativeToAllYourUnlockedTiles(game, player);
         List<Button> buttons = new ArrayList<>();
 
-        System.out.println("------------------ Distance check ------------------");
-        System.out.println(distances);
         List<Integer> allDistances =
                 (new HashSet<>(distances.values())).stream().sorted().toList();
-        System.out.println(allDistances);
         int distIndx =
                 allDistances.stream().filter(i -> i <= desiredDistance).toList().size() - 1;
         int prevDistIndx = distIndx - 1;
@@ -488,7 +494,7 @@ public class ButtonHelperTacticalAction {
                         && !player.getFaction().equalsIgnoreCase(player_.getFaction())
                         && !player_.isPlayerMemberOfAlliance(player)
                         && FoWHelper.playerHasUnitsInSystem(player_, tile)) {
-                    message.append("\n").append(player_.getRepresentation()).append(" has units in the system.");
+                    message.append('\n').append(player_.getRepresentation()).append(" has units in the system.");
                 }
             }
             for (UnitHolder planet : tile.getPlanetUnitHolders()) {
@@ -541,7 +547,7 @@ public class ButtonHelperTacticalAction {
                 mentions.add(playerWithPds.getRepresentation());
             }
             if (!mentions.isEmpty()) {
-                message.append("\n")
+                message.append('\n')
                         .append(player.getRepresentationUnfogged())
                         .append(" the activated system is in range of SPACE CANNON units owned by ")
                         .append(String.join(", ", mentions))
@@ -592,14 +598,16 @@ public class ButtonHelperTacticalAction {
 
         if (player.hasUnlockedBreakthrough("argentbt")
                 && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)
-                && FoWHelper.playerHasUnitsInSystem(player, tile)
-                && ButtonHelper.argentBreakthroughResolution(player, tile, game).size() > 1) {
+                && FoWHelper.playerHasUnitsInSystem(player, tile)) {
+            game.setStoredValue("argentBTUse", "yes");
             List<Button> button2 = ButtonHelper.argentBreakthroughResolution(player, tile, game);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + ", you can use this button to place command tokens down via _Wing Transfer_.",
-                    button2);
+            if (ButtonHelper.argentBreakthroughResolution(player, tile, game).size() > 1) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", you can use this button to place command tokens down via _Wing Transfer_.",
+                        button2);
+            }
         }
 
         List<Button> button2 = ButtonHelper.scanlinkResolution(player, tile, game);

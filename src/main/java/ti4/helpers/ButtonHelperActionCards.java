@@ -40,12 +40,13 @@ import ti4.service.fow.BlindSelectionService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
+import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
-public class ButtonHelperActionCards {
+public final class ButtonHelperActionCards {
 
     private static List<Button> getTilesToScuttle(Player player, Game game, int tgAlready) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
@@ -404,14 +405,8 @@ public class ButtonHelperActionCards {
     @ButtonHandler("resolvePreparation")
     public static void resolvePreparation(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        String message;
-        if (player.hasAbility("scheming")) {
-            message = "Use button to draw 2 action cards (**Scheming** increases this from the normal 1 action card).";
-            buttons.add(Buttons.green("draw_2_ACDelete", "Draw 2 Action Cards"));
-        } else {
-            message = "Use button to draw 1 action card.";
-            buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
-        }
+        String message = "Use button to draw 1 action card.";
+        buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
 
@@ -456,7 +451,7 @@ public class ButtonHelperActionCards {
             ExploreModel card = Mapper.getExplore(cardID);
             sb.append(card.textRepresentation()).append(System.lineSeparator());
             String cardType = card.getResolution();
-            if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
+            if (Constants.FRAGMENT.equalsIgnoreCase(cardType)) {
                 sb.append(player.getRepresentationUnfogged()).append(" gained a relic fragment.\n");
                 player.addFragment(cardID);
                 game.purgeExplore(cardID);
@@ -603,6 +598,7 @@ public class ButtonHelperActionCards {
             }
 
             int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
+            RoundStatsTracker.recordDiceRolled(game, player, numRolls);
             List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
             player.setExpectedHitsTimes10(player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
             int hitRolls = DiceHelper.countSuccesses(resultRolls);
@@ -645,12 +641,13 @@ public class ButtonHelperActionCards {
                     resultBuilder
                             .append("Rolling against ")
                             .append(numOfUnit)
-                            .append(" ")
+                            .append(' ')
                             .append(key.getUnitType().getUnitTypeEmoji())
                             .append(" owned by ")
                             .append(key.getColor())
                             .append(".\n");
                     int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
+                    RoundStatsTracker.recordDiceRolled(game, player, numRolls);
                     List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
                     player.setExpectedHitsTimes10(
                             player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
@@ -1003,7 +1000,7 @@ public class ButtonHelperActionCards {
             }
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("seizeArtifactStep2_" + p2.getFaction() + "_" + kolleccTech, p2.getColor()));
-            } else {
+            } else if (!p2.getFragments().isEmpty()) {
                 Button button = Buttons.gray(
                         "seizeArtifactStep2_" + p2.getFaction() + "_" + kolleccTech,
                         p2.getFactionModel().getShortName());
@@ -1011,6 +1008,13 @@ public class ButtonHelperActionCards {
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
             }
+        }
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", hmmmm, it looks as though none of your neighbours have any relic fragments.");
+            return;
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
@@ -1692,12 +1696,6 @@ public class ButtonHelperActionCards {
                     && game.getTileFromPlanet(planet).isHomeSystem(game)) {
                 continue;
             }
-            if ("triad".equalsIgnoreCase(planet)
-                    || "grove".equalsIgnoreCase(planet)
-                    || (game.getUnitHolderFromPlanet(planet) != null
-                            && game.getUnitHolderFromPlanet(planet).isSpaceStation())) {
-                continue;
-            }
             buttons.add(Buttons.gray(
                     "uprisingStep3_" + p2.getFaction() + "_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
@@ -1831,16 +1829,11 @@ public class ButtonHelperActionCards {
                 }
             }
         }
-        if (p2.hasUnit("absol_saar_spacedock")
-                || p2.hasUnit("saar_spacedock")
-                || p2.hasTech("ffac2")
-                || p2.hasTech("absol_ffac2")) {
-            for (Tile tile : game.getTileMap().values()) {
-                if (tile.getUnitHolders().get("space").getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
-                    buttons.add(Buttons.gray(
-                            "reactorMeltdownStep3_" + p2.getFaction() + "_" + tile.getPosition() + "_space",
-                            tile.getRepresentationForButtons(game, player)));
-                }
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.getUnitHolders().get("space").getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
+                buttons.add(Buttons.gray(
+                        "reactorMeltdownStep3_" + p2.getFaction() + "_" + tile.getPosition() + "_space",
+                        tile.getRepresentationForButtons(game, player)));
             }
         }
         ButtonHelper.deleteMessage(event);
@@ -2872,7 +2865,7 @@ public class ButtonHelperActionCards {
                 }
                 String sb = "Game: " + game.getName() + " " + "Player: "
                         + player.getUserName() + "\n" + "Card picked from discards: "
-                        + Mapper.getActionCard(acStringID).getRepresentation()
+                        + Mapper.getActionCard(acStringID).getRepresentation(game)
                         + "\n";
                 MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
@@ -2899,26 +2892,28 @@ public class ButtonHelperActionCards {
                             event.getChannel(), "No such action card ID found, please retry.");
                     return;
                 }
-                found = true;
                 ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel());
+                found = true;
+                break;
             }
         }
         if (!found) {
-            acStrings = new ArrayList<>(game.getPurgedActionCards().keySet());
+            Map<String, Integer> purgedActionCards = game.getPurgedActionCards();
+            acStrings = new ArrayList<>(purgedActionCards.keySet());
             for (String acStringID : acStrings) {
                 ActionCardModel actionCard = Mapper.getActionCard(acStringID);
                 String actionCardTitle = actionCard.getName();
                 if (acName.equalsIgnoreCase(actionCardTitle)) {
-                    boolean picked = game.pickActionCardFromPurged(
-                            player.getUserID(), game.getPurgedActionCards().get(acStringID));
+                    boolean picked =
+                            game.pickActionCardFromPurged(player.getUserID(), purgedActionCards.get(acStringID));
                     if (!picked) {
                         MessageHelper.sendMessageToChannel(
                                 event.getChannel(), "No such action card ID found, please retry.");
                         return;
                     }
-                    found = true;
                     ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel());
                     game.setPurgedActionCard(acStringID);
+                    break;
                 }
             }
         }

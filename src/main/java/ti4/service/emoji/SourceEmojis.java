@@ -8,6 +8,7 @@ public enum SourceEmojis implements TI4Emoji {
     // Source Icons
     PoK,
     Codex,
+    ThundersEdgeIcon,
 
     // Homebrew
     Absol,

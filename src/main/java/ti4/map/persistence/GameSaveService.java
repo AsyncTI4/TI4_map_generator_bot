@@ -19,7 +19,6 @@ import static ti4.map.persistence.GamePersistenceKeys.TOKENS;
 import static ti4.map.persistence.GamePersistenceKeys.UNITHOLDER;
 import static ti4.map.persistence.GamePersistenceKeys.UNITS;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -44,18 +43,20 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.PatternHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
-import ti4.json.ObjectMapperFactory;
+import ti4.json.JsonMapperManager;
+import ti4.json.UnitKeyMapKeyDeserializer;
+import ti4.json.UnitKeyMapKeySerializer;
 import ti4.map.Expeditions;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.map.helper.GameHelper;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
@@ -65,11 +66,19 @@ import ti4.service.draft.DraftSaveService;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.statistics.round.RoundStatsTracker;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 @UtilityClass
 class GameSaveService {
 
-    private static final ObjectMapper mapper = ObjectMapperFactory.build();
+    private static final JsonMapper mapper = JsonMapperManager.basic()
+            .rebuild()
+            .addModule(new SimpleModule()
+                    .addKeySerializer(Units.UnitKey.class, new UnitKeyMapKeySerializer())
+                    .addKeyDeserializer(Units.UnitKey.class, new UnitKeyMapKeyDeserializer()))
+            .build();
 
     static boolean save(Game game, String reason) {
         return GameFileLockManager.wrapWithWriteLock(game.getName(), () -> {
@@ -101,7 +110,8 @@ class GameSaveService {
             deleteTemporaryFileIfNeeded(temporarySavePath);
         }
 
-        GameUndoService.createUndoCopy(game.getName());
+        int undoIndex = GameUndoService.createUndoCopy(game.getName());
+        RoundStatsTracker.refreshOnSave(game, undoIndex);
         return true;
     }
 
@@ -145,7 +155,6 @@ class GameSaveService {
     }
 
     private static void saveGameInfo(Writer writer, Game game) throws IOException {
-        game.setStoredValue("loadedGame", "no");
         writer.write(MAPINFO);
         writer.write(System.lineSeparator());
 
@@ -411,8 +420,6 @@ class GameSaveService {
         writer.write(Constants.CREATION_DATE + " " + game.getCreationDate());
         writer.write(System.lineSeparator());
 
-        // TODO: this can be removed when we don't see these errors anymore.
-        GameHelper.updateCreationDateTimeIfNotSameDateAsCreationDateField(game);
         writer.write(Constants.CREATION_DATE_TIME + " " + game.getCreationDateTime());
         writer.write(System.lineSeparator());
         writer.write(Constants.STARTED_DATE + " " + game.getStartedDate());
@@ -846,6 +853,12 @@ class GameSaveService {
             writer.write(Constants.DISHONOR_COUNT + " " + player.getDishonorCounter());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.STEELBALANCE_COUNT + " " + player.getSteelbalanceCounter());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.STARBALANCE_COUNT + " " + player.getStarbalanceCounter());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.HARVEST_COUNT + " " + player.getHarvestCounter());
             writer.write(System.lineSeparator());
 
@@ -866,8 +879,8 @@ class GameSaveService {
             writeCards(player.getTrapCards(), writer, Constants.LIZHO_TRAP_CARDS);
             writeCardsStrings(player.getTrapCardsPlanets(), writer, Constants.LIZHO_TRAP_PLANETS);
 
-            writeCards(player.getPlotCards(), writer, Constants.PLOT_CARDS);
-            writeCardsStringList(player.getPlotCardsFactions(), writer, Constants.PLOT_FACTIONS);
+            writeCards(player.getPlotCardsRaw(), writer, Constants.PLOT_CARDS);
+            writeCardsStringList(player.getPlotCardsFactionsRaw(), writer, Constants.PLOT_FACTIONS);
 
             writer.write(Constants.FRAGMENTS + " " + String.join(",", player.getFragments()));
             writer.write(System.lineSeparator());
@@ -948,8 +961,6 @@ class GameSaveService {
                 writer.write(System.lineSeparator());
             }
 
-            // old spot
-
             writer.write(Constants.STASIS_INFANTRY + " " + player.getStasisInfantry());
             writer.write(System.lineSeparator());
             writer.write(Constants.AUTO_SABO_PASS_MEDIAN + " " + player.getAutoSaboPassMedian());
@@ -993,6 +1004,8 @@ class GameSaveService {
                                     .map(String::valueOf)
                                     .toList()));
             writer.write(System.lineSeparator());
+
+            writeStrStrMap(writer, Constants.PLAYER_STORED_VALUES, player.getStoredValueMap());
 
             player.getBreakthroughUnlocked().remove(null);
             player.getBreakthroughExhausted().remove(null);
@@ -1126,6 +1139,7 @@ class GameSaveService {
         writer.write(System.lineSeparator());
     }
 
+    /** Assumes the map is already properly escaped */
     private static void writeStrStrMap(Writer writer, String field, Map<String, String> map) throws IOException {
         List<String> entries = map.entrySet().stream()
                 .map(e -> e.getKey() + "," + e.getValue())

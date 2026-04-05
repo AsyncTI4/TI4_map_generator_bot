@@ -481,10 +481,9 @@ public class ExploreService {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveExploreAuto(
+    private static void resolveExploreAuto(
             GenericInteractionCreateEvent event, Player player, String cardID, String planetName, Game game) {
         Tile tile = game.getTileFromPlanet(planetName);
-        String tileName = tile == null ? "no tile" : tile.getPosition();
         String messageText = player.getRepresentationNoPing() + " \"chose\" to resolve _"
                 + Mapper.getExplore(cardID).getName() + "_.";
         resolveExplore(event, cardID, tile, planetName, messageText, player, game);
@@ -576,11 +575,11 @@ public class ExploreService {
                                         .orElse(new ArrayList<>())
                                         .isEmpty()
                                 || ButtonHelper.doesPlanetHaveAttachmentTechSkip(tile, planetID)) {
-                            if ((attachment.equals(Constants.WARFARE)
-                                    || attachment.equals(Constants.PROPULSION)
-                                    || attachment.equals(Constants.CYBERNETIC)
-                                    || attachment.equals(Constants.BIOTIC)
-                                    || attachment.equals(Constants.WEAPON))) {
+                            if ((Constants.WARFARE.equals(attachment)
+                                    || Constants.PROPULSION.equals(attachment)
+                                    || Constants.CYBERNETIC.equals(attachment)
+                                    || Constants.BIOTIC.equals(attachment)
+                                    || Constants.WEAPON.equals(attachment))) {
                                 attachment += "stat";
                                 String attachmentID = Mapper.getAttachmentImagePath(attachment);
                                 if (attachmentID != null) {
@@ -594,7 +593,7 @@ public class ExploreService {
                     tile.addToken(attachmentFilename, planetID);
                     message = new StringBuilder("Attachment _" + aModel.getName() + "_ added to "
                             + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + ".");
-                    if (attachment.equals(Constants.DMZ)) {
+                    if (Constants.DMZ.equals(attachment)) {
                         String dmzLargeFilename = Mapper.getTokenID(Constants.DMZ_LARGE);
                         tile.addToken(dmzLargeFilename, planetID);
                         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
@@ -618,11 +617,11 @@ public class ExploreService {
                                 }
                             }
                             if (!groundForces.isEmpty()) {
-                                message.append("\n")
+                                message.append('\n')
                                         .append(p2.getRepresentationUnfogged())
                                         .append(", your ")
                                         .append(String.join("", groundForces))
-                                        .append(" ")
+                                        .append(' ')
                                         .append(groundForces.size() == 1 ? "has" : "have")
                                         .append(" been yote into space")
                                         .append(structures.isEmpty() ? "." : "");
@@ -634,7 +633,7 @@ public class ExploreService {
                                                         : ", and ")
                                         .append("your ")
                                         .append(String.join("", structures))
-                                        .append(" ")
+                                        .append(' ')
                                         .append(structures.size() == 1 ? "has" : "have")
                                         .append(" been yote into the shadow realm.");
                                 if (!game.isFowMode()) {
@@ -746,66 +745,16 @@ public class ExploreService {
                 MessageHelper.sendMessageToEventChannel(event, message.toString());
             }
             case "lc1", "lc2" -> {
-                boolean hasSchemingAbility = player.hasAbility("scheming");
-                message = new StringBuilder(
-                        hasSchemingAbility
-                                ? "Drew 3 action cards (**Scheming**) - please discard 1 action card from your hand"
-                                : "Drew 2 action cards");
-                int count = hasSchemingAbility ? 3 : 2;
-                if (player.hasAbility("autonetic_memory")) {
-                    ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
-                    message = new StringBuilder(player.getFactionEmoji() + " triggered **Autonetic Memory** option.");
-                } else {
-                    for (int i = 0; i < count; i++) {
-                        game.drawActionCard(player.getUserID());
-                    }
-
-                    if (game.isFowMode()) {
-                        FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2 action cards.");
-                    }
-                    ActionCardHelper.sendActionCardInfo(game, player, event);
+                ActionCardHelper.drawActionCards(player, 2);
+                if (game.isFowMode()) {
+                    FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2 action cards.");
                 }
-
-                if (hasSchemingAbility) {
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCardsInfoThread(),
-                            player.getRepresentationUnfogged() + " use buttons to discard",
-                            ActionCardHelper.getDiscardActionCardButtons(player, false));
-                }
-                MessageHelper.sendMessageToEventChannel(event, message.toString());
-                ButtonHelper.checkACLimit(game, player);
-                CommanderUnlockCheckService.checkPlayer(player, "yssaril");
             }
             case "fiveac1", "fiveac2", "fiveac3" -> {
-                boolean hasSchemingAbility = player.hasAbility("scheming");
-                message = new StringBuilder(
-                        hasSchemingAbility
-                                ? "Drew 6 action cards (**Scheming**) - please discard 1 action card from your hand"
-                                : "Drew 5 action cards");
-                int count = hasSchemingAbility ? 6 : 5;
-                if (player.hasAbility("autonetic_memory")) {
-                    ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
-                    message = new StringBuilder(player.getFactionEmoji() + " triggered **Autonetic Memory** option.");
-                } else {
-                    for (int i = 0; i < count; i++) {
-                        game.drawActionCard(player.getUserID());
-                    }
-
-                    if (game.isFowMode()) {
-                        FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2 action cards.");
-                    }
-                    ActionCardHelper.sendActionCardInfo(game, player, event);
+                ActionCardHelper.drawActionCards(player, 5);
+                if (game.isFowMode()) {
+                    FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 5 action cards.");
                 }
-
-                if (hasSchemingAbility) {
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCardsInfoThread(),
-                            player.getRepresentationUnfogged() + " use buttons to discard",
-                            ActionCardHelper.getDiscardActionCardButtons(player, false));
-                }
-                MessageHelper.sendMessageToEventChannel(event, message.toString());
-                ButtonHelper.checkACLimit(game, player);
-                CommanderUnlockCheckService.checkPlayer(player, "yssaril");
             }
             case "dv1", "dv2" -> {
                 message = new StringBuilder("Drew a secret objective.");
@@ -817,7 +766,7 @@ public class ExploreService {
                     game.drawSecretObjective(player.getUserID());
                     message.append(" Drew a second secret objective due to **Plausible Deniability**.");
                 }
-                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
+                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
                 MessageHelper.sendMessageToEventChannel(event, message.toString());
             }
             case "dw" -> {
@@ -974,11 +923,11 @@ public class ExploreService {
                         player.getCorrectChannel(), message.toString(), discardButtons);
                 List<Button> explorePlanets = new ArrayList<>();
                 for (String planet : player.getPlanetsAllianceMode()) {
-                    UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+                    Planet unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                     if (unitHolder == null) {
                         continue;
                     }
-                    Planet planetReal = (Planet) unitHolder;
+                    Planet planetReal = unitHolder;
                     List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
                     if (buttons != null && !buttons.isEmpty()) {
                         explorePlanets.addAll(buttons);
@@ -1046,7 +995,7 @@ public class ExploreService {
                 }
                 CommanderUnlockCheckService.checkPlayer(player, "hacan");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                if (message.length() > 0) {
+                if (!message.isEmpty()) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
                 }
                 message = new StringBuilder(player.getRepresentationUnfogged() + ", your current command tokens are "
@@ -1360,7 +1309,7 @@ public class ExploreService {
                             true,
                             fullText,
                             ExploreEmojis.getTraitEmoji(currentType).toString()))
-                    .append("\n");
+                    .append('\n');
 
             info.append("__").append(currentType.substring(0, 1).toUpperCase()).append(currentType.substring(1));
             info.append(" exploration discards__ (").append(discardCount).append(")\n");
@@ -1442,14 +1391,14 @@ public class ExploreService {
                             && !"frontier"
                                     .equalsIgnoreCase(
                                             entry.getValue().getFirst().getType())) {
-                        sb.append(" ").append(ExploreEmojis.Chevrons);
+                        sb.append(' ').append(ExploreEmojis.Chevrons);
                     }
                 }
                 if (showPercents && ids.size() > 1) {
                     sb.append(" - ").append(formatPercent.format(deckDrawChance * ids.size()));
                 }
             }
-            sb.append("\n");
+            sb.append('\n');
         }
 
         List<String> unmapped =
@@ -1457,7 +1406,7 @@ public class ExploreService {
         for (String cardID : unmapped) {
             ExploreModel card = Mapper.getExplore(cardID);
             String name = card != null ? card.getName() : null;
-            sb.append("> (").append(cardID).append(") ").append(name).append("\n");
+            sb.append("> (").append(cardID).append(") ").append(name).append('\n');
         }
         return sb.toString();
     }

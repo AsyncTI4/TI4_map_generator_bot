@@ -1,10 +1,10 @@
 package ti4.commands.agenda;
 
-import com.amazonaws.util.StringUtils;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import software.amazon.awssdk.utils.StringUtils;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -39,7 +39,7 @@ class ReviseLaw extends GameStateSubcommand {
         Player player = CommandHelper.getOtherPlayerFromEvent(game, event);
 
         String optionText;
-        boolean playerWasElected = !StringUtils.isNullOrEmpty(
+        boolean playerWasElected = StringUtils.isNotBlank(
                 event.getOption(Constants.TARGET_FACTION_OR_COLOR, null, OptionMapping::getAsString));
         String message = "Law revised";
         if (playerWasElected && player != null) {

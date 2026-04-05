@@ -1,12 +1,12 @@
 package ti4.commands.spin;
 
-import io.micrometer.common.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.StringUtils;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.RandomHelper;
@@ -93,7 +93,7 @@ class ExecuteSpin extends GameStateSubcommand {
 
         StringBuilder sb = new StringBuilder("Executed spin" + (settingsToExecute.size() > 1 ? "s" : "") + ":\n");
         for (SpinSetting s : settingsToExecute) {
-            sb.append(s.getRepresentation(true)).append("\n");
+            sb.append(s.getRepresentation(true)).append('\n');
         }
         if (game.isFowMode()
                 && !event.getChannelId().equals(GMService.getGMChannel(game).getId())) {

@@ -10,7 +10,6 @@ import lombok.Setter;
 import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.Constants;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
-import ti4.map.pojo.ExportableField;
 
 @Getter
 @Setter
@@ -31,7 +30,10 @@ public class GameProperties {
     private @ExportableField String mapTemplateID;
     private @ExportableField String phaseOfGame = "";
     private @ExportableField int maxSOCountPerPlayer = 3;
+
+    @Deprecated
     private @ExportableField int playerCountForMap = 6;
+
     private @ExportableField int strategyCardsPerPlayer = 1;
     private @ExportableField int round = 1;
     private @ExportableField int vp = 10;

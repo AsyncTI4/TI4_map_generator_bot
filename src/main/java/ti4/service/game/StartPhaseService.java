@@ -107,7 +107,7 @@ public class StartPhaseService {
             }
             case "statusScoring" -> {
                 StatusHelper.AnnounceStatusPhase(game);
-                StatusHelper.BeginScoring(event, game, event.getMessageChannel());
+                StatusHelper.beginScoring(event, game, event.getMessageChannel());
                 StatusHelper.HandleStatusPhaseMiddle(event, game, event.getMessageChannel());
                 game.updateActivePlayer(null);
             }
@@ -122,7 +122,7 @@ public class StartPhaseService {
                             summary.append(player.getFactionEmoji())
                                     .append(": ")
                                     .append(game.getStoredValue("endofround" + x + player.getFaction()))
-                                    .append("\n");
+                                    .append('\n');
                         }
                     }
                     if (!summary.isEmpty()) {
@@ -159,7 +159,7 @@ public class StartPhaseService {
             if (alreadyQueued.contains(num)) {
                 hasQueue = true;
                 continue;
-            } else if (alreadyPicked.contains(x)) {
+            } else if (alreadyPicked.contains(x) && !game.isFowMode()) {
                 continue;
             }
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(x);
@@ -196,9 +196,9 @@ public class StartPhaseService {
                 msg.append(count)
                         .append(". ")
                         .append(Helper.getSCName(Integer.parseInt(num), game))
-                        .append(" ")
+                        .append(' ')
                         .append(scEmoji)
-                        .append("\n");
+                        .append('\n');
             }
         }
         return msg.toString();
@@ -241,6 +241,15 @@ public class StartPhaseService {
             Helper.setOrder(game);
         }
         game.removeStoredValue("shouldntChangeTurnOrder");
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2.hasTech("tf-telepathic")) {
+                game.setStoredValue("TFTelepathicHolder", p2.getFaction());
+            } else {
+                game.setStoredValue(
+                        "TFTelepathicHolder",
+                        game.getStoredValue("TFTelepathicHolder").replace(p2.getFaction(), ""));
+            }
+        }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round " + round);
         if (game.isShowBanners()) {
             BannerGenerator.drawPhaseBanner("strategy", round, game.getActionsChannel());
@@ -464,13 +473,13 @@ public class StartPhaseService {
                 PriorityTrackHelper.PrintPriorityTrack(game);
             } else {
                 Player speaker = game.getSpeaker();
-                List<Player> priorityTrack = PriorityTrackHelper.GetPriorityTrack(game);
+                List<Player> priorityTrack = PriorityTrackHelper.getPriorityTrack(game);
                 StringBuilder sb = new StringBuilder("**Priority Track (Speaker first)**\n");
                 if (speaker != null) {
                     sb.append(MiscEmojis.SpeakerToken)
-                            .append(" ")
+                            .append(' ')
                             .append(speaker.getRepresentation())
-                            .append("\n");
+                            .append('\n');
                 }
                 for (var i = 0; i < priorityTrack.size(); i++) {
                     int priority = i + 1;
@@ -661,6 +670,20 @@ public class StartPhaseService {
                             + ", a reminder this is the window to play The Oracle, the Naalu Hero. You may use the buttons to start the process.",
                     buttons);
         }
+        if (player.hasLeader("poisonhero")
+                && player.getLeaderByID("poisonhero").isPresent()
+                && playerLeader != null
+                && !playerLeader.isLocked()) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("poisonHeroInitiation", "Play Poison Hero", LeaderEmojis.NaaluHero));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged()
+                            + ", a reminder this is the window to play the Poison Hero. You may use the buttons to start the process.",
+                    buttons);
+        }
+
         if (player.getRelics() != null && player.hasRelic("mawofworlds") && game.isCustodiansScored()) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
@@ -782,9 +805,9 @@ public class StartPhaseService {
                 playersWithSCs++;
             }
         }
+        String message2 = "Resolve status homework using the buttons. \n";
 
         if (playersWithSCs > 0) {
-            StatusCleanupService.runStatusCleanup(game);
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "### " + game.getPing() + " **Status Cleanup Run!**");
             if (!game.isFowMode()) {
@@ -794,13 +817,12 @@ public class StartPhaseService {
                         DisplayType.map,
                         fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
             }
+            StatusCleanupService.runStatusCleanup(game);
         }
-
         for (Player player : game.getRealPlayers()) {
             sendStatusReminders(event, game, player);
         }
-        String message2 = "Resolve status homework using the buttons. \n";
-        game.setCurrentACDrawStatusInfo("");
+
         Button draw1AC = Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.getACEmoji(game));
         Button getCCs = Buttons.green("redistributeCCButtons", "Redistribute, Gain, & Confirm Command Tokens")
                 .withEmoji(Emoji.fromFormatted("🔺"));
@@ -859,7 +881,9 @@ public class StartPhaseService {
                     Please click the "Ready For Strategy Phase" button once you are done resolving these or if you decline to do so.""";
         }
         List<Button> buttons = new ArrayList<>();
-        buttons.add(draw1AC);
+        if (game.isFowMode()) {
+            buttons.add(draw1AC);
+        }
         buttons.add(getCCs);
         buttons.add(passOnAbilities);
         if (yssarilPolicy != null) {
@@ -893,6 +917,9 @@ public class StartPhaseService {
         GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, false);
         if (!game.isFowMode()) {
             ButtonHelper.updateMap(game, event, "Status Homework for round #" + game.getRound() + ".");
+        }
+        if (game.isCivilizedSocietyMode()) {
+            Helper.checkEndGameCivilizedSociety(game);
         }
     }
 
@@ -948,14 +975,14 @@ public class StartPhaseService {
                                 .getWhisperPref()
                                 .replace("No Preference", "No Stated Preference")
                                 .replace("No Preference", "No Stated Preference"))
-                        .append("\n");
+                        .append('\n');
                 question2
                         .append("* ")
                         .append(userSettings
                                 .getSupportPref()
                                 .replace("No Preference", "No Stated Preference")
                                 .replace("No Preference", "No Stated Preference"))
-                        .append("\n");
+                        .append('\n');
                 if (userSettings.getSupportPref().contains("Purge")) {
                     anyoneWantsToBan = true;
                 }
@@ -971,21 +998,21 @@ public class StartPhaseService {
                                 .getWinmakingPref()
                                 .replace("No Preference", "No Stated Preference")
                                 .replace("No Preference", "No Stated Preference"))
-                        .append("\n");
+                        .append('\n');
                 question3
                         .append("* ")
                         .append(userSettings
                                 .getTakebackPref()
                                 .replace("No Preference", "No Stated Preference")
                                 .replace("No Preference", "No Stated Preference"))
-                        .append("\n");
+                        .append('\n');
                 question5
                         .append("* ")
                         .append(userSettings
                                 .getMetaPref()
                                 .replace("No Preference", "No Stated Preference")
                                 .replace("No Preference", "No Stated Preference"))
-                        .append("\n");
+                        .append('\n');
             }
             MessageHelper.sendMessageToChannelAndPin(
                     game.getTableTalkChannel(),
@@ -1083,7 +1110,7 @@ public class StartPhaseService {
         //     nextPlayer.setInRoundTurnCount(1);
         // }
         if (isFowPrivateGame) {
-            for (Player p2 : game.getRealPlayers()) {
+            for (Player p2 : Helper.getSpeakerOrFullPriorityOrder(game)) {
                 if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("startQDN", "Use Quantum Datahub Node", TechEmojis.CyberneticTech));

@@ -46,7 +46,7 @@ class KollectAgentButtonHandler {
             ExploreModel card = Mapper.getExplore(cardID);
             sb.append(card.textRepresentation()).append(System.lineSeparator());
             String cardType = card.getResolution();
-            if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
+            if (Constants.FRAGMENT.equalsIgnoreCase(cardType)) {
                 sb.append(player.getRepresentationUnfogged()).append(" Gained relic fragment\n");
                 player.addFragment(cardID);
                 game.purgeExplore(cardID);

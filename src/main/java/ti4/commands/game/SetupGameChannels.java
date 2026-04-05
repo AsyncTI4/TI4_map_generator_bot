@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 
 class SetupGameChannels extends GameStateSubcommand {
 
-    public SetupGameChannels() {
+    SetupGameChannels() {
         super(Constants.GAME_CHANNEL_SETUP, "Setup channels and roles for non-standard games", true, false);
         addOptions(
                 new OptionData(OptionType.CHANNEL, Constants.MAIN_GAME_CHANNEL, "Main game channel").setRequired(true));

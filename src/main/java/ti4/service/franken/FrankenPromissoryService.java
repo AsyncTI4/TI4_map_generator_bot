@@ -28,24 +28,24 @@ public class FrankenPromissoryService {
             sb.append("> ");
             if (pnOwner != null) {
                 sb.append(pnID).append(" is already owned by ").append(pnOwner.getUserName());
-                sb.append("\n");
+                sb.append('\n');
                 continue;
             }
 
             if (player.ownsPromissoryNote(pnID)) {
                 sb.append(pnID).append(" (player already owned this promissory note)");
-                sb.append("\n");
+                sb.append('\n');
                 continue;
             }
             sb.append(pnID);
 
             PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pnID);
             embeds.add(pnModel.getRepresentationEmbed());
-            sb.append("\n");
+            sb.append('\n');
             player.addOwnedPromissoryNoteByID(pnID);
             player.setPromissoryNote(pnID);
         }
-        MessageHelper.sendMessageToChannelWithEmbeds(event.getMessageChannel(), sb.toString(), embeds);
+        MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }
 
     public static void removePromissoryNotes(GenericInteractionCreateEvent event, Player player, List<String> pnIDs) {
@@ -56,10 +56,10 @@ public class FrankenPromissoryService {
             } else {
                 sb.append("> ").append(pnID);
             }
-            sb.append("\n");
+            sb.append('\n');
             player.removeOwnedPromissoryNoteByID(pnID);
             player.removePromissoryNote(pnID);
         }
-        MessageHelper.sendMessageToEventChannel(event, sb.toString());
+        MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }
 }

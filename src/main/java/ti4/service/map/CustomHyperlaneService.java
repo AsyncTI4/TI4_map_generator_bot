@@ -130,7 +130,7 @@ public class CustomHyperlaneService {
             sb.append(entry.getKey())
                     .append(",")
                     .append(encodeMatrix(entry.getValue()))
-                    .append(" ");
+                    .append(' ');
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
@@ -268,12 +268,12 @@ public class CustomHyperlaneService {
                     if (!StringUtils.isBlank(data)) {
                         AddTileService.addTile(game, new Tile(HYPERLANE_TILEID, position));
                         game.getCustomHyperlaneData().put(position, data);
-                        success.append(position).append(" ");
+                        success.append(position).append(' ');
                     } else {
-                        failed.append(position).append(" ");
+                        failed.append(position).append(' ');
                     }
                 } else {
-                    failed.append(position).append(" ");
+                    failed.append(position).append(' ');
                 }
             }
         }
@@ -290,9 +290,9 @@ public class CustomHyperlaneService {
                 if (staticHyperlaneTileId != null) {
                     game.getCustomHyperlaneData().remove(position);
                     AddTileService.addTile(game, new Tile(staticHyperlaneTileId, position));
-                    success.append(position).append(" ");
+                    success.append(position).append(' ');
                 } else {
-                    failed.append(position).append(" ");
+                    failed.append(position).append(' ');
                 }
             }
         }

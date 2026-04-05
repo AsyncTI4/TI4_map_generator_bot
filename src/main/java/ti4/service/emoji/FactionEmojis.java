@@ -43,6 +43,7 @@ public enum FactionEmojis implements TI4Emoji {
     Deepwrought,
     Firmament,
     Obsidian,
+    Firma_Obs,
     Neutral,
 
     // Twilight's Fall
@@ -97,7 +98,9 @@ public enum FactionEmojis implements TI4Emoji {
     atokera,
     belkosea,
     toldar,
-    kaltrim, //
+    kaltrim,
+    sarcosa,
+    xin, //
 
     // balacasi
     arvaxi,
@@ -109,6 +112,15 @@ public enum FactionEmojis implements TI4Emoji {
     vyserix,
     zephyrion,
     arachian,
+    zooid,
+
+    // beans
+    iron,
+    ta,
+    netrunners,
+    crystellum,
+    dream,
+    ashen,
 
     // nomadfalcon
     erock,
@@ -285,12 +297,15 @@ public enum FactionEmojis implements TI4Emoji {
             case "onyxxa" -> onyxxa;
             case "tyris" -> tyris;
             case "arachian" -> arachian;
+            case "zooid" -> zooid;
             case "vyserix" -> vyserix;
             case "zephyrion" -> zephyrion;
             case "pharadn" -> pharadn;
             case "qhet" -> qhet;
             case "atokera" -> atokera;
             case "kaltrim" -> kaltrim;
+            case "xin" -> xin;
+            case "sarcosa" -> sarcosa;
             case "toldar" -> toldar;
             case "belkosea" -> belkosea;
             case "admins" -> AdminsFaction;
@@ -344,6 +359,13 @@ public enum FactionEmojis implements TI4Emoji {
             case "councilors" -> councilors;
             case "erock" -> erock;
             case "explanetary" -> explanetary;
+
+            case "dream" -> dream;
+            case "ashen" -> ashen;
+            case "iron" -> iron;
+            case "ta" -> ta;
+            case "netrunners" -> netrunners;
+            case "crystellum" -> crystellum;
 
             case "netharii" -> netharii;
             case "drahn" -> Drahn;

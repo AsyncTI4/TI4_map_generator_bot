@@ -17,7 +17,7 @@ import ti4.service.draft.draftables.AndcatReferenceCardsDraftable.ReferenceCardP
 
 class AndcatDraftableSetPlayerChoices extends GameStateSubcommand {
 
-    protected AndcatDraftableSetPlayerChoices() {
+    AndcatDraftableSetPlayerChoices() {
         super(Constants.DRAFT_ANDCAT_SET_PLAYER_CHOICES, "Set which faction does what", true, true);
         addOption(OptionType.USER, Constants.PLAYER, "Player to make the pick for", true);
         addOption(
@@ -82,7 +82,8 @@ class AndcatDraftableSetPlayerChoices extends GameStateSubcommand {
                 event.getOption(Constants.STARTING_FLEET_FACTION_OPTION, null, OptionMapping::getAsString);
         String priorityNumberFaction =
                 event.getOption(Constants.PRIORITY_NUMBER_FACTION_OPTION, null, OptionMapping::getAsString);
-        Boolean lockChoices = event.getOption(Constants.LOCK_CHOICES_OPTION, false, OptionMapping::getAsBoolean);
+        Boolean lockChoices =
+                event.getOption(Constants.LOCK_CHOICES_OPTION, Boolean.FALSE, OptionMapping::getAsBoolean);
 
         // Ensure factions exist
         if (Mapper.getFaction(homeSystemFaction) == null) {

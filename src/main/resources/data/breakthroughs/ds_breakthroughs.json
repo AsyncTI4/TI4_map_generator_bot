@@ -9,6 +9,7 @@
             "WARFARE"
         ],
         "text": "At the end of your turn, you may exhaust this card to move any number of your ships between two systems that contain your space docks and no other player’s ships",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/axisbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -21,6 +22,7 @@
             "BIOTIC"
         ],
         "text": "ACTION: Exhaust this card to allow each other player to explore a planet they control; gain a number of commodities equal to the number of players who do.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/bentorbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -33,6 +35,7 @@
             "WARFARE"
         ],
         "text": "When you gain this card, flip this card and place it on your faction sheet. Then, place the Celagrom token in a system that contains your ships, if able. The Celagrom token is a second flagship with the attributes, abilities, and ability text on the Celagrom flagship card.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/celdauribt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -45,6 +48,7 @@
             "WARFARE"
         ],
         "text": "At the end of your turn, you may exhaust this card to choose 1 of your non-fighter ships on the game board; replace that ship with 1 or more units from your reinforcements that have a total combined cost less than that ship's cost value.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/cheiranbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -57,6 +61,7 @@
             "WARFARE"
         ],
         "text": "At any time, you may discard 1 action card to cancel up to 2 hits produced against your ground forces.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/cymiaebt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -69,6 +74,7 @@
             "CYBERNETIC"
         ],
         "text": "Once per space combat, after 1 of your opponent's non-fighter ships is destroyed, you may exhaust this card to place 1 frontier token in the active system, or produce 1 non-fighter ship in that system to ready this card. You can produce ships in systems that contain both your ships and another player's ships.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/dihmohnbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -81,6 +87,7 @@
             "PROPULSION"
         ],
         "text": "ACTION: Exhaust this card and show another player 1 of your unscored secret objectives; that player must show you 1 of their unscored secret objectives, at random, or allow you to place 1 ground force from your reinforcements into coexistence on a planet they control.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/edynbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -93,6 +100,7 @@
             "CYBERNETIC"
         ],
         "text": "After you spend a strategy token, you may place 1 infantry from your reinforcements into coexistence on any cultural, hazardous, or industrial planet that contains the active player's ground forces. Your infantry tokens on planets you control can be accompanied by your control tokens instead of plastic pieces.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/freesystemsbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -105,6 +113,7 @@
             "WARFARE"
         ],
         "text": "During each round of combat, you may choose 1 of your participating units; roll that unit’s combat roll twice and resolve the result of your choice. When you announce a retreat, you may exhaust this card to immediately resolve that retreat.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/gheminabt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -117,6 +126,7 @@
             "PROPULSION"
         ],
         "text": "When you pass, you may exhaust this card to move 1 ingress token into an empty system. Your units may retreat to any empty system that does not contain another player's ships.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/ghotibt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -129,6 +139,7 @@
             "PROPULSION"
         ],
         "text": "Planets you control that contain core tokens are also treated as stations except for the purposes of control; units can be committed to, produced on, and placed on these planets. Stations you control have SPACE CANNON 5.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/gledgebt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -141,6 +152,7 @@
             "BIOTIC"
         ],
         "text": "When you would explore a planet, you may instead draw 1 action card.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/augersbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -153,6 +165,7 @@
             "BIOTIC"
         ],
         "text": "For each Glory token on the game board, you control 1 Bannerhall card. Once per action, when a player wins a combat in a system that contains a Glory token, ready each Bannerhall card.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/kjalengardbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -165,6 +178,7 @@
             "BIOTIC"
         ],
         "text": "When you explore a planet, you may exhaust this card to resolve a card from that exploration deck's discard pile instead; if you would discard that card, instead shuffle it into the corresponding exploration deck. ",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/kolleccbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -177,6 +191,7 @@
             "CYBERNETIC"
         ],
         "text": "ACTION: Exhaust this card to either gain 1 command token, or spend 3 influence to research a technology of the same color as 1 of your exhausted technologies.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/kolumebt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -189,6 +204,7 @@
             "BIOTIC"
         ],
         "text": "At the end of your turn, you may exhaust this card and choose 1 other player; you and that player each secretly spend 0, 1, or 2 trade goods. Then, reveal the spent trade goods; if you spent the same number of trade goods, take 1 promissory note from that player's hand, at random.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/florzenbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -201,6 +217,7 @@
             "WARFARE"
         ],
         "text": "If you have the Dreadnought II technology, flip this card and place it on top of Dreadnought II.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/kortalibt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -213,6 +230,7 @@
             "WARFARE"
         ],
         "text": "When researching a technology, you may discard an action card to ignore 1 of that technology's prerequisites. Other players must spend 1 influence as an additional cost to research or gain a technology you own.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/kyrobt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -225,6 +243,7 @@
             "WARFARE"
         ],
         "text": "After another player purges 1 or more non-action card components, gain 1 command token or ready this card. During the action phase, you may exhaust this card to explore 1 planet you control.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/lanefirbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -237,6 +256,7 @@
             "WARFARE"
         ],
         "text": "After you perform a tactical action in a non-home system, you may move 1 of your infantry on the game board into coexistence on a planet in that system. When a player ends your units' coexistence on a planet, they must discard 1 action card, if able.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/lizhobt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -249,6 +269,7 @@
             "CYBERNETIC"
         ],
         "text": "When you resolve METEOR SLINGS, you may choose for your units to coexist instead; if you do, you may reroll each of your unit's BOMBARDMENT rolls. While you are coexisting on 1 or more planets, you control the Grove card.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/khraskbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -261,6 +282,7 @@
             "CYBERNETIC"
         ],
         "text": "At the start and end of your turn, move up to 1 of your PDS units onto a planet you control in that unit's system, or that system's space area. Your PDS units on planets have PLANETARY SHIELD and do not have text abilities; you may use their SPACE CANNON against ships in adjacent systems.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/mirvedabt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -273,6 +295,7 @@
             "CYBERNETIC"
         ],
         "text": "At the start and end of a space combat in which you are the defender, you may swap 1 of your ships in the active system with 1 of your ships in another system that contains 1 of your command tokens; the swapped ships cannot transport units.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/mortheusbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -285,6 +308,7 @@
             "CYBERNETIC"
         ],
         "text": "Capture other player's infantry that are destroyed during combat on planets you control. After each round of ground combat on a planet you control, roll a die. On a result of 7 or greater, place up to 1 of your captured infantry onto that planet, as if it were your own.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/mykomentoribt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -297,6 +321,7 @@
             "WARFARE"
         ],
         "text": "The system that contains the Wound token is also an entropic scar. You may ignore the effects of entropic scars. You may treat entropic scars as ingress tokens.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/nivynbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -309,6 +334,7 @@
             "WARFARE"
         ],
         "text": "ACTION: Exhaust this card to place 1 neutral cruiser and 2 neutral destroyers into a non-fracture system that contains no non-neutral ships. After another player wins a space combat in a system that contains your ships, gain 2 commodities.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/nokarbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -321,6 +347,7 @@
             "WARFARE"
         ],
         "text": "Once per action, after you resolve a policy ability, you may spend 1 trade good to move 1 of your infantry on the game board into coexistence on a planet in an adjacent system. ACTION: Purge this card to resolve invasion on all planets that contain your coexisting infantry.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/olradinbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -333,6 +360,7 @@
             "WARFARE"
         ],
         "text": "After you gain control of a legendary or fracture planet, you may research 1 technology or remove 1 of your command tokens in that system and return it to your reinforcements.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/zealotsbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -345,6 +373,7 @@
             "PROPULSION"
         ],
         "text": "If you have the Terrafactory II technology, flip this card and place it on top of Terrafactory II. ",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/rohdhnabt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -357,6 +386,7 @@
             "PROPULSION"
         ],
         "text": "During ground combat, you may exhaust this card; all your units on that planet enter coexistence and that combat ends in a draw. When a player ends coexistence with your units, draw 1 secret objective.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/tnelisbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -369,6 +399,7 @@
             "BIOTIC"
         ],
         "text": "Other players cannot take any of your trade goods, commodities, or relic fragments unless you allow it. When another player returns 1 of your promissory notes, place 1 of their control tokens on your faction sheet.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/vadenbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -381,6 +412,7 @@
             "PROPULSION"
         ],
         "text": "After you move 1 or more ships into the active system, you may discard an action card to move 1 of those ships into an adjacent system that does not contain another player’s ships.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/vaylerianbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -393,6 +425,7 @@
             "PROPULSION"
         ],
         "text": "Your home system is also a nebula. Hits produced by the combat and ability rolls of your units in nebulae cannot be canceled. When you pass, explore the frontier deck in your home system.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/veldyrbt.webp?raw=true",
         "source": "ds"
     },
     {
@@ -405,6 +438,7 @@
             "WARFARE"
         ],
         "text": "Your planets in the active system participate in space combat if that system contains 1 or more of your ships, and ground combat on themselves if they contain 1 or more of your ground forces. Your planets cannot be assigned hits and have a combat value equal to 10 minus their resource value, minimum 1.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/zelianbt.webp?raw=true",
         "source": "ds"
     }
 ]

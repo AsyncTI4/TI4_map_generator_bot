@@ -67,5 +67,5 @@ public abstract class DraftLifecycleHooks {
      * @return An optional consumer which will be invoked on this same player after setup, to do any additional work.
      */
     public abstract Consumer<Player> setupPlayer(
-            DraftManager draftManager, String playerUserId, PlayerSetupService.PlayerSetupState playerSetupState);
+            DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState);
 }

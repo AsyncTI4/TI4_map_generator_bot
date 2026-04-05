@@ -3,12 +3,9 @@ package ti4.buttons.handlers.agenda.resolver;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
-import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAbilities;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.service.leader.CommanderUnlockCheckService;
 
 public class AbsolMeasuresAgendaResolver implements ForAgainstAgendaResolver {
     @Override
@@ -19,24 +16,7 @@ public class AbsolMeasuresAgendaResolver implements ForAgainstAgendaResolver {
     @Override
     public void handleFor(Game game, ButtonInteractionEvent event, int agendaNumericId) {
         for (Player playerWL : AgendaHelper.getWinningVoters("for", game)) {
-            if (playerWL.hasAbility("autonetic_memory")) {
-                ButtonHelperAbilities.autoneticMemoryStep1(game, playerWL, 2);
-            } else {
-                game.drawActionCard(playerWL.getUserID());
-                game.drawActionCard(playerWL.getUserID());
-                if (playerWL.hasAbility("scheming")) {
-                    game.drawActionCard(playerWL.getUserID());
-                    ActionCardHelper.sendActionCardInfo(game, playerWL, event);
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            playerWL.getCardsInfoThread(),
-                            playerWL.getRepresentationUnfogged() + ", please discard an action card.",
-                            ActionCardHelper.getDiscardActionCardButtons(playerWL, false));
-                } else {
-                    ActionCardHelper.sendActionCardInfo(game, playerWL, event);
-                }
-            }
-            CommanderUnlockCheckService.checkPlayer(playerWL, "yssaril");
-            ButtonHelper.checkACLimit(game, playerWL);
+            ActionCardHelper.drawActionCards(playerWL, 2);
         }
         for (Player p2 : AgendaHelper.getLosingVoters("for", game)) {
             p2.setStrategicCC(p2.getStrategicCC());

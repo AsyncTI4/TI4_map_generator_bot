@@ -29,8 +29,6 @@ public class BaseTi4Test {
         if (System.getenv(Storage.ENV_VAR_RESOURCE_PATH) == null) {
             Storage.setResourcePath("./src/main/resources");
         }
-        System.out.println("Storage Path: " + Storage.getStoragePath());
-        System.out.println("Resource Path: " + Storage.getResourcePath());
 
         // Init base static data
         TileHelper.init();

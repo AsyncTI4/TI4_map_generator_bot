@@ -29,6 +29,7 @@ import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -46,6 +47,7 @@ import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.explore.AddFrontierTokensService;
@@ -113,6 +115,7 @@ public class PlayHeroService {
             String msg = leaderName + " has been purged.";
             if (!"mykomentorihero".equals(playerLeader.getId())) {
                 purged = player.removeLeader(playerLeader);
+                DSHelperBreakthroughs.doLanefirBtCheck(game, player);
                 ButtonHelperHeroes.checkForMykoHero(game, playerLeader.getId(), player);
             } else {
                 msg = "Coprinus Comatus, the Myko-Mentori hero, was used to copy another hero.";
@@ -132,7 +135,7 @@ public class PlayHeroService {
             case "kollecchero" ->
                 RelicHelper.drawWithAdvantage(
                         player, game, game.getRealPlayers().size());
-            case "xxchahero-te" -> ButtonHelperHeroes.xxchaHeroTEStart(game, player);
+            case "xxchahero-te" -> ButtonHelperHeroes.xxchaHeroTEStart(player);
             case "ralnelhero" -> {
                 // You may choose to no longer be passed; if you do, gain 2 command tokens, draw 1 action card, and
                 // purge this card
@@ -166,7 +169,7 @@ public class PlayHeroService {
                     List<TechnologyModel> techs =
                             ListTechService.getAllTechOfAType(game, type.toString(), player, false, false, true);
                     for (TechnologyModel tech : techs) {
-                        if (tech.isUnitUpgrade() || tech.getFaction().isPresent()) {
+                        if (tech.isUnitUpgrade()) {
                             continue;
                         }
                         buttons.add(Buttons.gray(
@@ -180,11 +183,9 @@ public class PlayHeroService {
                         buttons);
             }
             case "titanshero" -> {
-                Tile t = player.getHomeSystemTile();
-                if (!game.isTwilightsFallMode()
-                        && game.getTileFromPlanet("elysium") != null
-                        && game.getTileFromPlanet("elysium") == t) {
-                    t.addToken("attachment_titanshero.png", "elysium");
+                Tile tile = player.getHomeSystemTile();
+                if (!game.isTwilightsFallMode() && isElysium(game, tile)) {
+                    tile.addToken("attachment_titanshero.png", "elysium");
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(), "Elysium has had Ul The Progenitor attached, and been readied.");
                     PlanetService.refreshPlanet(player, "elysium");
@@ -276,7 +277,7 @@ public class PlayHeroService {
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         "Please choose the systems in which you wish to resolve Nmenmede, the Ghoti hero.",
-                        ButtonHelperHeroes.getTilesToGhotiHeroIn(player, game, event));
+                        ButtonHelperHeroes.getTilesToGhotiHeroIn(player, game));
             case "gledgehero" -> ButtonHelperHeroes.resolveGledgeHero(player, game);
             case "khraskhero" -> {
                 ButtonHelperHeroes.resolveKhraskHero(player, game);
@@ -288,8 +289,8 @@ public class PlayHeroService {
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         "Please choose the systems in which you wish to resolve Bayan, the Mortheus hero.",
-                        ButtonHelperHeroes.getTilesToGlimmersHeroIn(player, game, event));
-            case "axishero" -> ButtonHelperHeroes.resolveAxisHeroStep1(player, game);
+                        ButtonHelperHeroes.getTilesToGlimmersHeroIn(player, game));
+            case "axishero" -> ButtonHelperHeroes.resolveAxisHeroStep1(player);
             case "lanefirhero" -> ButtonHelperHeroes.resolveLanefirHeroStep1(player, game);
             case "cymiaehero" -> {
                 List<Button> buttons = new ArrayList<>();
@@ -324,7 +325,7 @@ public class PlayHeroService {
                         event.getMessageChannel(),
                         player.getRepresentationUnfogged() + " added 1 infantry to each planet.");
                 ActionCardHelper.doRise(player, event, game);
-                ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
+                ButtonHelperHeroes.offerOlradinHeroFlips(player);
             }
             case "argenthero" -> ButtonHelperHeroes.argentHeroStep1(game, player, event);
             case "l1z1xhero" -> {
@@ -334,7 +335,6 @@ public class PlayHeroService {
                         + " Reminder that you may carry ground forces and fighters with your dreadnoughts/flagship, and that they can't move into supernovae (or asteroid fields if you don't have _Antimass Deflectors_).";
                 List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
                 game.setL1Hero(true);
-                game.resetCurrentMovedUnitsFrom1TacticalAction();
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ringButtons);
             }
             case "winnuhero" -> {
@@ -457,7 +457,7 @@ public class PlayHeroService {
                         MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
                                 msg,
-                                ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game));
+                                ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2));
                     } else {
                         String msg = p2.getFactionEmojiOrColor() + " owns "
                                 + ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2)
@@ -467,14 +467,14 @@ public class PlayHeroService {
                         MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
                                 msg,
-                                ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game));
+                                ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2));
                         for (int x = 1; x < ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2); x++) {
-                            if (!ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game)
+                            if (!ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2)
                                     .isEmpty()) {
                                 MessageHelper.sendMessageToChannelWithButtons(
                                         player.getCorrectChannel(),
                                         "",
-                                        ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game));
+                                        ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2));
                             }
                         }
                     }
@@ -506,6 +506,33 @@ public class PlayHeroService {
                         player.getRepresentation(true, showFlavourText)
                                 + ", please choose which planet you wish to get trade goods from (and kill any enemy units).",
                         buttons);
+            }
+            case "sanctionhero" -> {
+                boolean singleDock = false;
+                Tile tile = player.getHomeSystemTile();
+                List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "warfare", "place");
+                int productionValue = Helper.getProductionValue(player, game, tile, singleDock);
+
+                String message = player.getRepresentation() + ", please use these buttons to produce.\nYou have "
+                        + productionValue + " PRODUCTION value in this system.";
+                if (productionValue > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
+                    message +=
+                            "\nYou also have the That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 fighters/infantry that don't count towards PRODUCTION limit.";
+                }
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(), message + ", you do not need to pay for these units.");
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Produce Units", buttons);
+
+                if (player.hasUnit("tf-productionbiomes")
+                        && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                                .contains(tile)) {
+                    String msg = player.getRepresentation()
+                            + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
+                            + " If you do, you will also choose another player, who will gain 2 trade goods.";
+                    List<Button> buttons2 = new ArrayList<>();
+                    buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
+                }
             }
             case "voicehero" -> {
                 List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");
@@ -553,6 +580,28 @@ public class PlayHeroService {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         player.getFactionEmoji() + " has been offered buttons to explore all their planets.");
+            }
+            case "kaltrimhero" -> {
+                List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+                String propMsg = player.getRepresentation() + ", your current command tokens are "
+                        + player.getCCRepresentation() + ". Use these buttons to gain command tokens.";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), propMsg, buttons);
+                game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getFactionEmoji()
+                                + " has been offered buttons to gain command tokens and look at Shrines.");
+                for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                    if (p2.getSoScored() < player.getSoScored()) {
+                        List<Button> shrineButtons = ButtonHelperHeroes.getShrineButtons(player, p2, game);
+                        MessageHelper.sendMessageToChannelWithButtons(
+                                player.getCorrectChannel(),
+                                player.getRepresentationUnfogged() + " you have scored more secret objectives than "
+                                        + p2.getRepresentation()
+                                        + ", and so here are buttons to look at one of their shrines. You can decline to gain 2 CC instead, using the CC buttons above.",
+                                shrineButtons);
+                    }
+                }
             }
             case "toldarhero" -> ButtonHelperHeroes.resolveToldarHero(game, player);
             case "nivynhero" -> {
@@ -681,6 +730,11 @@ public class PlayHeroService {
         }
     }
 
+    private static boolean isElysium(Game game, Tile tile) {
+        Tile elysiumTile = game.getTileFromPlanet("elysium");
+        return elysiumTile != null && elysiumTile == tile;
+    }
+
     private static List<Button> getYssarilHeroActionCardButtons(Player yssaril, Player notYssaril) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> actionCards = notYssaril.getActionCards();
@@ -724,7 +778,7 @@ public class PlayHeroService {
                         .append("> `")
                         .append(String.format("%02d", index))
                         .append(".` ")
-                        .append(actionCard.getRepresentation());
+                        .append(actionCard.getRepresentation(game));
                 componentActionACCount++;
             } else {
                 acRevealMessage
@@ -732,9 +786,9 @@ public class PlayHeroService {
                         .append(String.format("%02d", index))
                         .append(".` ")
                         .append(CardEmojis.getACEmoji(game))
-                        .append(" ")
+                        .append(' ')
                         .append(acName)
-                        .append("\n");
+                        .append('\n');
                 game.discardActionCard(player.getUserID(), acID);
                 cardsToShuffleBackIntoDeck.add(acKey);
             }
@@ -743,6 +797,49 @@ public class PlayHeroService {
                 if (index > originalACDeckCount * 2) {
                     noMoreComponentActionCards = true;
                     break;
+                }
+            }
+        }
+        if (noMoreComponentActionCards) {
+            noMoreComponentActionCards = false;
+            originalACDeckCount = game.getActionCards().size();
+            while (componentActionACCount < 3) {
+                Integer acID = null;
+                String acKey = null;
+                for (Map.Entry<String, Integer> ac : Helper.getLastEntryInHashMap(
+                                game.drawActionCard(player.getUserID()))
+                        .entrySet()) {
+                    acID = ac.getValue();
+                    acKey = ac.getKey();
+                }
+                ActionCardModel actionCard = Mapper.getActionCard(acKey);
+                String acName = actionCard.getName();
+                String acWindow = actionCard.getWindow();
+                if ("Action".equalsIgnoreCase(acWindow)) {
+                    acDrawMessage
+                            .append("> `")
+                            .append(String.format("%02d", index))
+                            .append(".` ")
+                            .append(actionCard.getRepresentation(game));
+                    componentActionACCount++;
+                } else {
+                    acRevealMessage
+                            .append("> `")
+                            .append(String.format("%02d", index))
+                            .append(".` ")
+                            .append(CardEmojis.getACEmoji(game))
+                            .append(' ')
+                            .append(acName)
+                            .append('\n');
+                    game.discardActionCard(player.getUserID(), acID);
+                    cardsToShuffleBackIntoDeck.add(acKey);
+                }
+                index++;
+                if (index >= originalACDeckCount) {
+                    if (index > originalACDeckCount * 2) {
+                        noMoreComponentActionCards = true;
+                        break;
+                    }
                 }
             }
         }

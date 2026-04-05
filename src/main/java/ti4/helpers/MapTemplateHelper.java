@@ -31,7 +31,7 @@ import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftManager.PlayerDraft;
 import ti4.service.milty.MiltyDraftSlice;
 
-public class MapTemplateHelper {
+public final class MapTemplateHelper {
 
     private static final String NUCLEUS_COLOR = "rainbow";
 

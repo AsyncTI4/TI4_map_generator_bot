@@ -1,6 +1,6 @@
 package ti4.cron;
 
-import static java.util.function.Predicate.not;
+import static java.util.function.Predicate.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -230,10 +230,8 @@ public class AutoPingCron {
     private static void sendReplacementReminder(Game game, int hoursBetweenPings, int pingNumber) {
         long hoursPassed = (long) hoursBetweenPings * pingNumber;
         boolean shouldSendReminder = hoursPassed >= REPLACEMENT_REMINDER_AFTER_HOURS
-                && !"true".equals(game.getStoredValue("replacementReminderSent"));
+                && ((long) hoursBetweenPings * (pingNumber - 1)) < REPLACEMENT_REMINDER_AFTER_HOURS;
         if (!shouldSendReminder) return;
-
-        game.setStoredValue("replacementReminderSent", "true");
         MessageHelper.sendMessageToChannel(
                 game.getMainGameChannel(),
                 game.getPing() + ", has your game unexpectedly stalled? If you'd like to start the replacement process,"

@@ -1,5 +1,6 @@
 package ti4.spring.jda;
 
+import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import java.util.ArrayList;
@@ -14,7 +15,9 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -23,7 +26,8 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.apache.commons.lang3.function.Consumers;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Service;
-import ti4.commands.CommandManager;
+import ti4.commands.SlashCommandManager;
+import ti4.commands.context.ContextCommandManager;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CategoryCleanupCron;
 import ti4.cron.CloseLaunchThreadsCron;
@@ -35,6 +39,7 @@ import ti4.cron.LogButtonRuntimeStatisticsCron;
 import ti4.cron.LogCacheStatsCron;
 import ti4.cron.LongExecutionHistoryCron;
 import ti4.cron.OldUndoFileCleanupCron;
+import ti4.cron.PersistToSqlCron;
 import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
@@ -55,6 +60,7 @@ import ti4.listeners.BanListener;
 import ti4.listeners.BotRuntimeStatsListener;
 import ti4.listeners.ButtonListener;
 import ti4.listeners.ChannelCreationListener;
+import ti4.listeners.ContextMenuListener;
 import ti4.listeners.DeletionListener;
 import ti4.listeners.MessageListener;
 import ti4.listeners.ModalListener;
@@ -103,7 +109,7 @@ public class JdaService {
     private static Guild guildTredenary;
     private static Guild guildQuadrodenary;
     public static Guild guildFogOfWar;
-    public static Guild guildFogOfWarSecondary;
+    private static Guild guildFogOfWarSecondary;
     public static Guild guildCommunityPlays;
     private static Guild guildMegagame;
     private static Guild guildTourney;
@@ -141,6 +147,7 @@ public class JdaService {
                 new BotRuntimeStatsListener(),
                 new MessageListener(),
                 new SlashCommandListener(),
+                new ContextMenuListener(),
                 ButtonListener.getInstance(),
                 new UserJoinServerListener(),
                 new AutoCompleteListener(),
@@ -152,8 +159,8 @@ public class JdaService {
                 new SelectionMenuListener(),
                 new ChannelCreationListener(),
                 new UserLeaveServerListener(),
-                ModalListener.getInstance() // ModalListener has a long init time
-                );
+                // ModalListener has a long init time
+                ModalListener.getInstance());
 
         BotLogger.info("AWAITING JDA READY");
         try {
@@ -321,6 +328,7 @@ public class JdaService {
         ReuploadStaleEmojisCron.register();
         LogCacheStatsCron.register();
         WinningPathCron.register();
+        PersistToSqlCron.register();
         UploadStatsCron.register();
         UploadRecentStatsCron.register();
         OldUndoFileCleanupCron.register();
@@ -382,7 +390,8 @@ public class JdaService {
         }
         try {
             CommandListUpdateAction commands = guild.updateCommands();
-            CommandManager.getCommands().forEach(command -> command.register(commands));
+            SlashCommandManager.getCommands().forEach(command -> command.register(commands));
+            ContextCommandManager.getCommands().forEach(cmd -> cmd.register(commands));
             commands.queue(Consumers.nop(), BotLogger::catchRestError);
             BotLogger.info("BOT STARTED UP: " + guild.getName());
             guilds.add(guild);
@@ -398,14 +407,15 @@ public class JdaService {
         // are still in
         if (guild == null) return false;
         if (System.getenv("TESTING") != null) return false;
-        if (guild.getId().equals(Constants.ASYNCTI4_HUB_SERVER_ID)) return false;
+        if (Constants.ASYNCTI4_HUB_SERVER_ID.equals(guild.getId())) return false;
 
         // Disable this for now
-        if (true) return false;
+        boolean x = true;
+        if (x) return false;
 
         try {
             CommandListUpdateAction commands = guild.updateCommands();
-            CommandManager.getCommands().forEach(command -> command.registerSearchCommands(commands));
+            SlashCommandManager.getCommands().forEach(command -> command.registerSearchCommands(commands));
             commands.queue(Consumers.nop(), BotLogger::catchRestError);
             BotLogger.info("SEARCH-ONLY BOT STARTED UP: " + guild.getName());
             guilds.add(guild);
@@ -454,7 +464,7 @@ public class JdaService {
         adminRoles.add(jda.getRoleById("1067866210865250445")); // PrisonerOne's Test Server
         adminRoles.add(jda.getRoleById("1443842222922530929")); // Spice & Thyme's Server
         adminRoles.add(jda.getRoleById("1060656344581017621")); // Softnum's Server
-        adminRoles.add(jda.getRoleById("1109657180170371182")); // Jazz's Server
+        adminRoles.add(jda.getRoleById("1072366828879355935")); // Jazz's Server
         adminRoles.add(jda.getRoleById("1100120742093406319")); // Moo's Server
         adminRoles.add(jda.getRoleById("1126610851034583050")); // Fin's Server
         adminRoles.add(jda.getRoleById("824111008863092757")); // Fireseal's Server
@@ -471,6 +481,7 @@ public class JdaService {
         adminRoles.add(jda.getRoleById("1149705227625316352")); // Will's server
         adminRoles.add(jda.getRoleById("1335330636935987343")); // Jabberwocky's server
         adminRoles.add(jda.getRoleById("1465619434839347276")); // Ariel's server
+        adminRoles.add(jda.getRoleById("1487725249398308884")); // Balacasi's server
 
         adminRoles.removeIf(Objects::isNull);
 
@@ -507,6 +518,7 @@ public class JdaService {
         developerRoles.add(jda.getRoleById("1406188584163213332")); // Will's server
         developerRoles.add(jda.getRoleById("1335330959767375902")); // Jabberwocky's server
         developerRoles.add(jda.getRoleById("1465619572718567526")); // Ariel's server
+        developerRoles.add(jda.getRoleById("1487725369766449173")); // Balacasi's server
 
         developerRoles.removeIf(Objects::isNull);
 
@@ -547,6 +559,7 @@ public class JdaService {
         bothelperRoles.add(jda.getRoleById("1150031360610799676")); // Will's server
         bothelperRoles.add(jda.getRoleById("1335331011147595929")); // Jabberwocky's Server
         bothelperRoles.add(jda.getRoleById("1465619810577678442")); // Ariel's server
+        bothelperRoles.add(jda.getRoleById("1487725393673719950")); // Balacasi's server
 
         bothelperRoles.removeIf(Objects::isNull);
     }
@@ -557,7 +570,7 @@ public class JdaService {
 
     public static boolean isReadyToReceiveCommands() {
         return GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.READY_TO_RECEIVE_COMMANDS.toString(), Boolean.class, false);
+                GlobalSettings.ImplementedSettings.READY_TO_RECEIVE_COMMANDS.toString(), Boolean.class, Boolean.FALSE);
     }
 
     public static List<Category> getAvailablePBDCategories() {
@@ -569,6 +582,15 @@ public class JdaService {
 
     public static boolean isValidGuild(String guildId) {
         return guilds.stream().anyMatch(g -> g.getId().equals(guildId));
+    }
+
+    @Nullable
+    public static String getUsername(String userId) {
+        Member member = guildPrimary.getMemberById(userId);
+        if (member != null) return member.getEffectiveName();
+        User user = jda.getUserById(userId);
+        if (user != null) return user.getEffectiveName();
+        return null;
     }
 
     @PreDestroy

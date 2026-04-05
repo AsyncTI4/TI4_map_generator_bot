@@ -1,0 +1,119 @@
+[
+    {
+        "id": "dream_nexus",
+        "name": "Dream Nexus",
+        "faction": "dream",
+        "window": "At the end of your tactical actions:",
+        "windowEffect": "You may place or move 1 nexus token into the active system. Systems with your nexus tokens are adjacent for your units except when retreating. Nexus tokens cannot be placed in your home system.",
+        "source": "beans"
+    },
+    {
+        "id": "the_waking",
+        "name": "The Waking",
+        "faction": "dream",
+        "window": "At the start of the status phase:",
+        "windowEffect": "Any player with at least 1 ship in a system containing a nexus token may choose to remove it.",
+        "source": "beans"
+    },
+    {
+        "id": "incomprehensible_form",
+        "name": "Incomprehensible Form",
+        "faction": "dream",
+        "window": "When you would lose a ship during combat:",
+        "windowEffect": "You may instead remove 1 of your nexus tokens from the active system.",
+        "source": "beans"
+    },
+    {
+        "id": "refraction",
+        "name": "Refraction",
+        "faction": "crystellum",
+        "window": "After another player produces 1 or more hits against your units during space combat:",
+        "windowEffect": "You may assign 1 of those hits to 1 of your non-fighter ships in an adjacent system.",
+        "source": "beans"
+    },
+    {
+        "id": "fragmentation",
+        "name": "Fragmentation",
+        "faction": "crystellum",
+        "window": "After one of your non-fighter ships in the active system is destroyed during combat:",
+        "windowEffect": "You may place 1 fighter from your reinforcements in that system.",
+        "source": "beans"
+    },
+    {
+        "id": "phoenix_rising",
+        "name": "Phoenix Rising",
+        "faction": "ashen",
+        "window": "When you roll for your infantry's text ability:",
+        "windowEffect": "On a result of 9 or 10, you may immediately place that unit back into combat. If you do, you cannot resolve that unit's text ability.",
+        "source": "beans"
+    },
+    {
+        "id": "beauty_in_destruction",
+        "name": "Beauty in Destruction",
+        "faction": "ashen",
+        "window": "After one of your non-fighter, non-faction specific units is destroyed during combat:",
+        "windowEffect": "You may purge that unit from the game and spend 3 resources to gain its corresponding unit upgrade.",
+        "source": "beans"
+    },
+    {
+        "id": "mechanized_military",
+        "name": "Mechanized Military",
+        "faction": "iron",
+        "window": "During setup:",
+        "windowEffect": "Take the 2 additional Iron Tide mechs and place them in your reinforcements; You have 6 mechs.",
+        "source": "beans"
+    },
+    {
+        "id": "exo-atmospheric",
+        "name": "Exo-Atmospheric",
+        "faction": "iron",
+        "permanentEffect": "Your mechs count as ships and may participate in both ground and space combat.",
+        "source": "beans"
+    },
+    {
+        "id": "iron_resilience",
+        "name": "Iron Resilience",
+        "faction": "iron",
+        "permanentEffect": "Your ground forces cannot be removed by any game effects outside of combat.",
+        "source": "beans"
+    },
+    {
+        "id": "planetary_reconfiguration",
+        "name": "Planetary Reconfiguration",
+        "faction": "ta",
+        "window": "After you explore a planet:",
+        "windowEffect": "You may attach any 1 of your Designs from your reinforcements to that planet if it does not already have one. When you lose control of a planet with a design attached to it, return that card to your reinforcements. Designs do not count as attachments for the purposes of scoring objectives.",
+        "source": "beans"
+    },
+    {
+        "id": "efficient_governance",
+        "name": "Efficient Governance",
+        "faction": "ta",
+        "window": "During the agenda phase, if an outcome you voted for passes:",
+        "windowEffect": "Ready up to 2 planets you exhausted to vote.",
+        "source": "beans"
+    },
+    {
+        "id": "system_breach",
+        "name": "System Breach",
+        "faction": "netrunners",
+        "window": "When one of your neighbours places a structure using the primary or secondary ability of the 'Construction' strategy card:",
+        "windowEffect": "You may compromise that structure by placing a compromised token underneath it. Then, you may spend 3 resources to compromise an additional structure placed by any other player.",
+        "source": "beans"
+    },
+    {
+        "id": "control_network",
+        "name": "Control Network",
+        "faction": "netrunners",
+        "permanentEffect": "Compromised PDS have -1 to rolls against your ships. You may use a compromised space dock you are blockading to produce ships as if it were your own.",
+        "source": "beans"
+    },
+    {
+        "id": "ransomware",
+        "name": "Ransomware",
+        "faction": "netrunners",
+        "window": "When you resolve your Control Network ability:",
+        "windowEffect": "Each player who controls 1 or more of the chosen structures may give you 1 trade good per compromised structure they control. For each trade good a player gives you, you cannot choose 1 structure they control for this use of that ability.",
+        "source": "beans"
+    }
+]

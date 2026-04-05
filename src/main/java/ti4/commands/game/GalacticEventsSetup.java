@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 
 class GalacticEventsSetup extends GameStateSubcommand {
 
-    public GalacticEventsSetup() {
+    GalacticEventsSetup() {
         super(Constants.GALACTIC_EVENTS_SETUP, "Game Setup for Galactic Events", true, false);
         addOptions(new OptionData(
                 OptionType.BOOLEAN,

@@ -40,7 +40,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.DestroyUnitService;
 
-public class TeHelperTechs {
+public final class TeHelperTechs {
 
     // Generic Tech
     @ButtonHandler("useMagenDefense_")
@@ -58,6 +58,13 @@ public class TeHelperTechs {
             for (UnitHolder uh : tile.getUnitHolders().values()) {
                 int count = uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure);
                 if (player.hasAbility("byssus")) count += uh.getUnitCount(UnitType.Mech, player);
+
+                for (String token : uh.getTokenList()) {
+                    if (player.getPlanets().contains(uh.getName()) && token.contains("superweapon")) {
+                        count++;
+                    }
+                }
+
                 if (count > 0) {
                     total += count;
                     uh.addUnit(infKey, count);
@@ -229,11 +236,12 @@ public class TeHelperTechs {
             }
 
             TechnologyModel biorganic = Mapper.getTech("parasite-obs");
+            String bioorganicRepresentation = biorganic.getNameRepresentation();
             String message = victim.getRepresentationUnfogged() + ", one of your infantry " + location
-                    + " has been destroyed via " + biorganic.getNameRepresentation() + ".";
+                    + " has been destroyed via " + bioorganicRepresentation + ".";
             if (game.isFowMode()) {
-                String privateMsg = "Successfully used " + biorganic.getNameRepresentation() + " to destroy 1 infantry "
-                        + location + ".";
+                String privateMsg =
+                        "Successfully used " + bioorganicRepresentation + " to destroy 1 infantry " + location + ".";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), privateMsg);
             }
             MessageHelper.sendMessageToChannel(victim.getCorrectChannel(), message);
@@ -305,9 +313,12 @@ public class TeHelperTechs {
                     }
                 }
             } else {
-                ButtonHelper.getTilesWithShipsInTheSystem(player, game)
-                        .forEach(tile -> adjTilePositions.addAll(
-                                FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)));
+                for (Tile tile : game.getTileMap().values()) {
+                    if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
+                        adjTilePositions.addAll(
+                                FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true));
+                    }
+                }
             }
 
             adjTilePositions.stream()

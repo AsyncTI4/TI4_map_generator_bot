@@ -1,9 +1,12 @@
 package ti4.service.turn;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -26,6 +29,7 @@ import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.GameMessageManager;
+import ti4.message.GameMessageManager.GameMessage;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
@@ -34,6 +38,7 @@ import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.EidolonMaximumService;
+import ti4.service.breakthrough.VisionariaSelectService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -214,10 +219,14 @@ public class StartTurnService {
                         && p2.getCommodities() > 0
                         && player.getNeighbouringPlayers(true).contains(p2)) {
                     List<Button> buttonsRedCreuss = new ArrayList<>();
-                    buttonsRedCreuss.add(
-                            Buttons.green("redCreussWashFull_" + p2.getUserID(), "Full Wash", MiscEmojis.Wash));
-                    buttonsRedCreuss.add(
-                            Buttons.blue("redCreussWashPartial_" + p2.getUserID(), "Partial Wash", MiscEmojis.Wash));
+                    buttonsRedCreuss.add(Buttons.green(
+                            player.getFinsFactionCheckerPrefix() + "redCreussWashFull_" + p2.getUserID(),
+                            "Full Wash",
+                            MiscEmojis.Wash));
+                    buttonsRedCreuss.add(Buttons.blue(
+                            player.getFinsFactionCheckerPrefix() + "redCreussWashPartial_" + p2.getUserID(),
+                            "Partial Wash",
+                            MiscEmojis.Wash));
                     buttonsRedCreuss.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCorrectChannel(),
@@ -296,7 +305,7 @@ public class StartTurnService {
 
     public static void reviveInfantryII(Player player) {
         Game game = player.getGame();
-        if (player.getStasisInfantry() > 0 && !player.hasUnit("tf-yinclone")) {
+        if (player.getStasisInfantry() > 0 && !player.hasUnit("tf-yinclone") && player.hasInf2Tech()) {
             if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
                 List<Button> buttons = ButtonHelper.getPlaceStatusInfButtons(game, player);
                 String msg = "Use buttons to revive infantry. You have " + player.getStasisInfantry()
@@ -333,6 +342,8 @@ public class StartTurnService {
         StringBuilder sb = new StringBuilder();
         sb.append(player.getRepresentationUnfogged());
         sb.append(" Please resolve these before doing anything else:\n");
+
+        Map<Long, String> thingsToFollow = new LinkedHashMap<>();
         for (int sc : game.getPlayedSCsInOrder(player)) {
             if (game.getStrategyCardModelByInitiative(sc)
                     .map(strat -> "te6warfare".equals(strat.getAlias()))
@@ -353,15 +364,43 @@ public class StartTurnService {
                     }
                 }
             }
+
             if (!player.hasFollowedSC(sc)) {
-                sb.append("> ").append(game.getSCEmojiWordRepresentation(sc));
-                if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
-                    sb.append(" ").append(game.getStoredValue("scPlay" + sc));
+                String msg = "> " + game.getSCEmojiWordRepresentation(sc);
+                String jumplink = game.getStoredValue("scPlay" + sc);
+                if (!jumplink.isEmpty()) {
+                    msg += " " + jumplink + "\n";
+                    Long id = Long.parseLong(Arrays.asList(jumplink.split("/")).getLast());
+                    thingsToFollow.put(id, msg);
+                } else {
+                    sb.append(msg).append('\n');
                 }
-                sb.append("\n");
                 sendReminder = true;
             }
         }
+        for (Player dws : game.getPlayersFromBreakthrough("deepwroughtbt")) {
+            if (dws.isBreakthroughExhausted("deepwroughtbt")) {
+                if (!VisionariaSelectService.hasRespondedToVisionaria(game, player)) {
+                    GameMessage gm = GameMessageManager.getOne(game.getName(), GameMessageType.VISIONARIA)
+                            .orElse(null);
+                    String msgPart = "> " + VisionariaSelectService.visionariaRep();
+                    if (gm != null) {
+                        Long id = Long.parseLong(gm.messageId());
+                        String jumplink = gm.asJumpLink(game.getMainGameChannel());
+                        thingsToFollow.put(id, msgPart + " " + jumplink + "\n");
+                    } else {
+                        sb.append(msgPart).append('\n');
+                    }
+                    sendReminder = true;
+                }
+                break;
+            }
+        }
+
+        thingsToFollow.entrySet().stream()
+                .sorted(Entry.comparingByKey())
+                .map(Entry::getValue)
+                .forEach(sb::append);
         sb.append("You currently have ")
                 .append(player.getStrategicCC())
                 .append(" command token")
@@ -497,16 +536,48 @@ public class StartTurnService {
             }
 
             startButtons.add(ButtonHelper.getPassButton(game, player));
-            if (!game.isFowMode()) {
-                for (Player p2 : game.getRealPlayers()) {
-                    for (int sc : player.getSCs()) {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append(p2.getRepresentationUnfogged());
-                        sb.append(" You are getting this ping because **")
-                                .append(Helper.getSCName(sc, game))
-                                .append(
-                                        "** has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone.");
-                        appendScMessages(game, p2, sc, sb);
+        }
+
+        // Send notifications for exhausted SCs & other important things
+        if (!doneActionThisTurn && !game.isFowMode()) {
+            for (Player p2 : game.getRealPlayers()) {
+                for (int sc : player.getSCs()) {
+                    if (!player.getExhaustedSCs().contains(sc) || p2.hasFollowedSC(sc)) continue;
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(p2.getRepresentationUnfogged());
+                    sb.append(" You are getting this ping because **")
+                            .append(Helper.getSCName(sc, game))
+                            .append("** has been played and now it is their turn again and you haven't reacted.")
+                            .append(" If you already reacted, check if your reaction got undone.");
+
+                    if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
+                        sb.append(" Message link is: ")
+                                .append(game.getStoredValue("scPlay" + sc))
+                                .append(".\n");
+                    }
+                    sb.append("You currently have ")
+                            .append(p2.getStrategicCC())
+                            .append(" command token")
+                            .append(p2.getStrategicCC() == 1 ? "" : "s")
+                            .append(" in your strategy pool.");
+                    MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());
+                }
+                if (player.hasBreakthrough("deepwroughtbt") && player.isBreakthroughExhausted("deepwroughtbt")) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(p2.getRepresentationUnfogged());
+                    sb.append(" You are getting this ping because ")
+                            .append(VisionariaSelectService.visionariaRep())
+                            .append(" has been played and now it is their turn again and you haven't reacted.")
+                            .append(" If you already reacted, check if your reaction got undone.");
+
+                    GameMessageManager.getOne(game.getName(), GameMessageType.VISIONARIA)
+                            .ifPresent(gm -> sb.append(" Message link is: ")
+                                    .append(gm.asJumpLink(game.getMainGameChannel()))
+                                    .append(".\n"));
+                    sb.append("You currently have ").append(p2.getTg()).append(" trade goods.");
+                    if (!VisionariaSelectService.hasRespondedToVisionaria(game, p2)) {
+                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());
                     }
                 }
             }
@@ -525,6 +596,11 @@ public class StartTurnService {
             }
             if (!game.isJustPlayedComponentAC()) {
                 AutoPingMetadataManager.setupQuickPing(game.getName());
+            }
+            if (player.hasAbility("matters_of_state")) {
+                String message2 = player.getRepresentationUnfogged() + " please gain or flip 1 balance token.";
+                List<Button> buttons2 = ButtonHelper.getBalanceButtons(player);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons2);
             }
         } else {
             game.setJustPlayedComponentAC(false);
@@ -627,6 +703,12 @@ public class StartTurnService {
         if (player.hasUnlockedBreakthrough("titansbt")) {
             startButtons.add(Buttons.gray("selectPlayerToSleeper", "Add a sleeper token", MiscEmojis.Sleeper));
         }
+        if (player.hasRelicReady("superweaponavailyn")) {
+            startButtons.add(Buttons.gray(
+                    finChecker + "exhaustSuperweapon_availyn",
+                    "Produce 3 Fighters With Availyn",
+                    FactionEmojis.belkosea));
+        }
         if (player.hasUnexhaustedLeader("pharadnagent")) {
             startButtons.add(
                     Buttons.gray(finChecker + "exhaustAgent_pharadnagent", "Use Pharadn Agent", FactionEmojis.pharadn));
@@ -667,21 +749,5 @@ public class StartTurnService {
             startButtons.add(Buttons.red(finChecker + "confirmSecondAction", "Use Ability To Do Another Action"));
         }
         return startButtons;
-    }
-
-    private static void appendScMessages(Game game, Player player, int sc, StringBuilder sb) {
-        if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
-            sb.append("Message link is: ")
-                    .append(game.getStoredValue("scPlay" + sc))
-                    .append("\n");
-        }
-        sb.append("You currently have ")
-                .append(player.getStrategicCC())
-                .append(" command token")
-                .append(player.getStrategicCC() == 1 ? "" : "s")
-                .append(" in your strategy pool.");
-        if (!player.hasFollowedSC(sc)) {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
-        }
     }
 }

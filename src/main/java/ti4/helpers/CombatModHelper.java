@@ -298,8 +298,9 @@ public class CombatModHelper {
         boolean meetsCondition = false;
 
         Tile tile = null;
-        if (onTile != null) {
-            tile = game.getTile(onTile.getId());
+        String onTileId = onTile == null ? null : onTile.getId();
+        if (onTileId != null) {
+            tile = game.getTile(onTileId);
         }
         String condition = "";
         if (modifier != null && modifier.getCondition() != null) {
@@ -313,10 +314,10 @@ public class CombatModHelper {
                                         .anyMatch("sigma_tekklar_legion"::equals))) {
                     meetsCondition = opponent.getTempCombatModifiers().stream()
                                     .anyMatch(mod -> "tekklar".equals(mod.getRelatedID())
-                                            && mod.getRelatedType().equals(Constants.PROMISSORY_NOTES))
+                                            && Constants.PROMISSORY_NOTES.equals(mod.getRelatedType()))
                             || opponent.getNewTempCombatModifiers().stream()
                                     .anyMatch(mod -> "tekklar".equals(mod.getRelatedID())
-                                            && mod.getRelatedType().equals(Constants.PROMISSORY_NOTES));
+                                            && Constants.PROMISSORY_NOTES.equals(mod.getRelatedType()));
                 }
             }
             case Constants.MOD_OPPONENT_FRAG -> {
@@ -343,25 +344,22 @@ public class CombatModHelper {
                 }
             }
             case Constants.MOD_PLANET_MR_LEGEND_HOME -> {
-                if (onTile != null
-                        && player.getHomeSystemTile() != null
-                        && onTile.getId().equals(player.getHomeSystemTile().getTileID())) {
+                if (onTile == null) break;
+                Tile homeSystemTile = player.getHomeSystemTile();
+                if (homeSystemTile != null && onTileId.equals(homeSystemTile.getTileID())) {
                     meetsCondition = true;
                 }
-                if (onTile != null
-                        && onTile.getPlanets() != null
+                if (onTile.getPlanets() != null
                         && onTile.getPlanets().stream()
                                 .anyMatch(planetId -> StringUtils.isNotBlank(
                                         Mapper.getPlanet(planetId).getLegendaryAbilityName()))) {
                     meetsCondition = true;
                 }
-                if (onTile != null
-                        && onTile.getPlanets() != null
-                        && onTile.getPlanets().contains(Constants.MR)) {
+                if (onTile.getPlanets() != null && onTile.getPlanets().contains(Constants.MR)) {
                     meetsCondition = true;
                 }
-                if (onTile != null && game.getTile(onTile.getId()) != null) {
-                    if (ButtonHelper.isTileLegendary(game.getTile(onTile.getId()))) {
+                if (game.getTile(onTileId) != null) {
+                    if (ButtonHelper.isTileLegendary(game.getTile(onTileId))) {
                         meetsCondition = true;
                     }
                 }
@@ -757,7 +755,7 @@ public class CombatModHelper {
                 case "nonhome_system_with_planet" -> scalingCount = getSystemsWithControlledPlanets(game, player);
                 case "galvanized_unit_count" ->
                     scalingCount = getGalvanizedUnitCount(game, unitHolder, origUnit, player);
-                case "unique_ships" -> scalingCount = getUniqueNonFighterShipCount(game, activeSystem, player);
+                case "unique_ships" -> scalingCount = getUniqueNonFighterShipCount(activeSystem, player);
                 case Constants.MOD_OPPONENT_UNIT_TECH -> {
                     if (opponent != null) {
                         scalingCount = opponent.getTechs().stream()
@@ -783,7 +781,7 @@ public class CombatModHelper {
         return (int) value;
     }
 
-    public static int getUniqueNonFighterShipCount(Game game, Tile activeSystem, Player player) {
+    private static int getUniqueNonFighterShipCount(Tile activeSystem, Player player) {
         UnitHolder space = activeSystem.getSpaceUnitHolder();
         int numberUniq = 0;
         for (UnitKey key : space.getUnitsByState().keySet()) {
@@ -797,14 +795,14 @@ public class CombatModHelper {
         return numberUniq;
     }
 
-    public static int getOpponentSfttCount(Player player) {
+    private static int getOpponentSfttCount(Player player) {
         return (int) player.getPromissoryNotesInPlayArea().stream()
                 .map(Mapper::getPromissoryNote)
                 .filter(pn -> "Support for the Throne".equals(pn.getName()))
                 .count();
     }
 
-    public static int getSystemsWithControlledPlanets(Game game, Player player) {
+    private static int getSystemsWithControlledPlanets(Game game, Player player) {
 
         int count = 0;
 
@@ -836,7 +834,7 @@ public class CombatModHelper {
     //     return space.getGalvanizedUnitCount(uk);
     // }
 
-    public static int getGalvanizedUnitCount(Game game, UnitHolder uH, UnitModel origUnit, Player player) {
+    private static int getGalvanizedUnitCount(Game game, UnitHolder uH, UnitModel origUnit, Player player) {
         UnitKey uk = Units.getUnitKey(origUnit.getUnitType(), player.getColorID());
         return uH.getGalvanizedUnitCount(uk);
     }

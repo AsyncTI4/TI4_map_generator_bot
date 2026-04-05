@@ -5,8 +5,8 @@ import java.util.stream.Stream;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands.GameStateSubcommand;
+import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
-import ti4.draft.DraftItem.Category;
 import ti4.draft.items.BlueTileDraftItem;
 import ti4.draft.items.RedTileDraftItem;
 import ti4.helpers.Constants;
@@ -58,9 +58,9 @@ class MantisTileDraftableSetTiles extends GameStateSubcommand {
                 return;
             }
             if (tile.getTileBack() == TileBack.BLUE) {
-                draftable.getBlueTiles().add((BlueTileDraftItem) DraftItem.generate(Category.BLUETILE, tileID));
+                draftable.getBlueTiles().add((BlueTileDraftItem) DraftItem.generate(DraftCategory.BLUETILE, tileID));
             } else {
-                draftable.getRedTiles().add((RedTileDraftItem) DraftItem.generate(Category.REDTILE, tileID));
+                draftable.getRedTiles().add((RedTileDraftItem) DraftItem.generate(DraftCategory.REDTILE, tileID));
             }
         }
 

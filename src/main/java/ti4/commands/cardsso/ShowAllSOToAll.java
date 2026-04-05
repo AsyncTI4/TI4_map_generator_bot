@@ -24,7 +24,7 @@ class ShowAllSOToAll extends GameStateSubcommand {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("Player: ").append(player.getUserName()).append("\n");
+        sb.append("Player: ").append(player.getUserName()).append('\n');
 
         List<String> secretObjectives = new ArrayList<>(player.getSecrets().keySet());
         Collections.shuffle(secretObjectives);
@@ -34,25 +34,25 @@ class ShowAllSOToAll extends GameStateSubcommand {
         }
 
         sb.append(player.getRepresentation());
-        sb.append("\n");
-        sb.append("**Secret Objectives:**").append("\n");
+        sb.append('\n');
+        sb.append("**Secret Objectives:**").append('\n');
         int index = 1;
         for (String so : secretObjectives) {
             sb.append(index)
                     .append(" - ")
                     .append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(so))
-                    .append("\n");
+                    .append('\n');
             player.setSecret(so);
             index++;
         }
-        sb.append("\n").append("**Scored Secret Objectives:**").append("\n");
+        sb.append('\n').append("**Scored Secret Objectives:**").append('\n');
         for (Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
             sb.append(index)
                     .append(". (")
                     .append(so.getValue())
                     .append(") - ")
                     .append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(so.getKey()))
-                    .append("\n");
+                    .append('\n');
             index++;
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());

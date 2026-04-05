@@ -25,15 +25,15 @@ class SearchCommandsSubcommand extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        boolean includeOptions = event.getOption(Constants.INCLUDE_OPTIONS, false, OptionMapping::getAsBoolean);
+        boolean includeOptions = event.getOption(Constants.INCLUDE_OPTIONS, Boolean.FALSE, OptionMapping::getAsBoolean);
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        boolean showCounts = event.getOption("show_counts", false, OptionMapping::getAsBoolean);
+        boolean showCounts = event.getOption("show_counts", Boolean.FALSE, OptionMapping::getAsBoolean);
 
         StringBuilder sb = new StringBuilder("# __**Command List**__");
         List<Command> commands = event.getGuild().retrieveCommands().complete();
         int commandCount = commands.size();
         if (showCounts) sb.append(" (").append(commandCount).append("/100)");
-        sb.append("\n");
+        sb.append('\n');
 
         // COMMANDS
         for (Command command : commands) {
@@ -46,14 +46,14 @@ class SearchCommandsSubcommand extends Subcommand {
             String commandText = "## `/" + command.getFullCommandName() + "` : **" + command.getDescription() + "**";
             commandSB.append(commandText);
             if (showCounts) commandSB.append(" (").append(subcommandCount).append("/25)");
-            commandSB.append("\n");
+            commandSB.append('\n');
 
             // COMMAND OPTIONS
             if (includeOptions) {
                 for (Option option : options) {
                     String optionText = "> `     " + option.getName() + "` : " + option.getDescription();
                     if (searchString == null || optionText.toLowerCase().contains(searchString.toLowerCase())) {
-                        commandSB.append(optionText).append("\n");
+                        commandSB.append(optionText).append('\n');
                     }
                 }
             }
@@ -69,7 +69,7 @@ class SearchCommandsSubcommand extends Subcommand {
                     for (Option option : suboptions) {
                         String optionText = "> `     " + option.getName() + "` : " + option.getDescription();
                         if (searchString == null || optionText.toLowerCase().contains(searchString.toLowerCase())) {
-                            suboptionSB.append(optionText).append("\n");
+                            suboptionSB.append(optionText).append('\n');
                         }
                     }
                 }
@@ -78,7 +78,7 @@ class SearchCommandsSubcommand extends Subcommand {
                 if (searchString == null
                         || subcommandText.toLowerCase().contains(searchString.toLowerCase())
                         || foundMatchingOptions) {
-                    commandSB.append(subcommandText).append("\n");
+                    commandSB.append(subcommandText).append('\n');
                     commandSB.append(suboptionSB);
                 }
             }

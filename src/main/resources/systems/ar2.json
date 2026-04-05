@@ -1,0 +1,39 @@
+{
+    "id": "ar2",
+    "name": "Cyanea/Chrysaora/Tamoya - Zooid",
+    "aliases": [
+        "ar2",
+        "chrysaora",
+        "cyanea",
+        "tamoya",
+        "zooid"
+    ],
+    "imagePath": "AR2_Cyanea.png",
+    "shipPositionsType": "TYPE03",
+    "spaceTokenLocations": [
+        {
+            "x": 250.0,
+            "y": 90.0
+        },
+        {
+            "x": 80.0,
+            "y": 10.0
+        },
+        {
+            "x": 135.0,
+            "y": 105.0
+        },
+        {
+            "x": 80.0,
+            "y": 185.0
+        }
+    ],
+    "wormholes": [],
+    "planets": [
+        "chrysaora",
+        "cyanea",
+        "tamoya"
+    ],
+    "source": "other",
+    "tileBack": "green"
+}

@@ -41,7 +41,7 @@ import ti4.service.explore.ExploreService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
-public class GMService {
+public final class GMService {
 
     private static final List<Button> GMBUTTONS = Arrays.asList(
             Buttons.REFRESH_MAP,
@@ -90,10 +90,6 @@ public class GMService {
     public static TextChannel getGMChannel(Game game) {
         List<TextChannel> channels = game.getGuild().getTextChannelsByName(game.getName() + "-gm-room", true);
         return channels.isEmpty() ? game.getMainGameChannel() : channels.getFirst();
-    }
-
-    public static void sendMessageToGMChannel(Game game, String msg) {
-        sendMessageToGMChannel(game, msg, false);
     }
 
     public static void sendMessageToGMChannel(Game game, String msg, boolean ping) {
@@ -218,14 +214,14 @@ public class GMService {
                         sbWhens.append("> ")
                                 .append(player.getRepresentationUnfoggedNoPing())
                                 .append(": ");
-                        sbWhens.append(String.join(", ", whens)).append("\n");
+                        sbWhens.append(String.join(", ", whens)).append('\n');
                     }
                     List<String> afters = AgendaHelper.getPossibleAfterNames(player);
                     if (!afters.isEmpty()) {
                         sbAfters.append("> ")
                                 .append(player.getRepresentationUnfoggedNoPing())
                                 .append(": ");
-                        sbAfters.append(String.join(", ", afters)).append("\n");
+                        sbAfters.append(String.join(", ", afters)).append('\n');
                     }
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), sbWhens.toString());
@@ -240,7 +236,7 @@ public class GMService {
                             .append(player.getRepresentationUnfoggedNoPing())
                             .append(" Unscored")
                             .append(unscored)
-                            .append("\n");
+                            .append('\n');
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), sos.toString());
             }
@@ -264,7 +260,7 @@ public class GMService {
                     pns.append("__")
                             .append(player.getRepresentationUnfoggedNoPing())
                             .append("__\n");
-                    player.getPromissoryNotes().entrySet().stream().forEach(entry -> pns.append("> ")
+                    player.getPromissoryNotes().entrySet().forEach(entry -> pns.append("> ")
                             .append(Mapper.getPromissoryNote(entry.getKey()).getNameRepresentation())
                             .append(" (")
                             .append(entry.getValue())
@@ -301,7 +297,7 @@ public class GMService {
         StringBuilder sb = new StringBuilder("Following players can see system **");
         sb.append(position).append("**:\n");
         for (Player player : FoWHelper.getAdjacentPlayers(game, position, false)) {
-            sb.append("> ").append(player.getRepresentationUnfoggedNoPing()).append("\n");
+            sb.append("> ").append(player.getRepresentationUnfoggedNoPing()).append('\n');
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
@@ -314,7 +310,7 @@ public class GMService {
                 if (ac.startsWith(acId)) {
                     sb.append("> ")
                             .append(player.getRepresentationUnfoggedNoPing())
-                            .append("\n");
+                            .append('\n');
                     break;
                 }
             }

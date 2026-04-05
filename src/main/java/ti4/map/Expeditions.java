@@ -1,6 +1,5 @@
 package ti4.map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -29,9 +28,6 @@ import ti4.service.emoji.TechEmojis;
 
 @Data
 public class Expeditions {
-
-    @JsonIgnore
-    private Game game;
 
     private Map<String, String> expeditionFactions = new LinkedHashMap<>();
 
@@ -83,8 +79,7 @@ public class Expeditions {
         return expeditionFactions.put("actionCards", value);
     }
 
-    public Expeditions(Game game) {
-        this.game = game;
+    public Expeditions() {
         expeditionFactions.put("techSkip", null);
         expeditionFactions.put("tradeGoods", null);
         expeditionFactions.put("fiveRes", null);
@@ -93,7 +88,6 @@ public class Expeditions {
         expeditionFactions.put("actionCards", null);
     }
 
-    @JsonIgnore
     public int getMostCompleteByAny() {
         Map<String, Long> factionCounts =
                 expeditionFactions.values().stream().collect(Collectors.groupingBy(x -> x, Collectors.counting()));
@@ -103,7 +97,6 @@ public class Expeditions {
         return (int) most;
     }
 
-    @JsonIgnore
     public List<String> getFactionsWithMostComplete() {
         Map<String, Long> factionCounts =
                 expeditionFactions.values().stream().collect(Collectors.groupingBy(x -> x, Collectors.counting()));
@@ -116,14 +109,12 @@ public class Expeditions {
                 .toList());
     }
 
-    @JsonIgnore
     public int getRemainingExpeditionCount() {
         return (int) expeditionFactions.entrySet().stream()
                 .filter(e -> e.getValue() == null)
                 .count();
     }
 
-    @JsonIgnore
     public String getTopLevelExpeditionButtonText() {
         int count = getRemainingExpeditionCount();
         if (count > 0) {
@@ -133,7 +124,6 @@ public class Expeditions {
         }
     }
 
-    @JsonIgnore
     private String playerInfo(Game game, Player viewingPlayer, String faction) {
         Player player = game.getPlayerFromColorOrFaction(faction);
         return player != null
@@ -143,7 +133,6 @@ public class Expeditions {
                 : "-";
     }
 
-    @JsonIgnore
     private TI4Emoji getExpeditionEmoji(String expeditionID, Game game) {
         return switch (expeditionID) {
             case "techSkip" -> TechEmojis.PropulsionTech;
@@ -156,7 +145,6 @@ public class Expeditions {
         };
     }
 
-    @JsonIgnore
     private String getExpeditionMessage(String expeditionID) {
         return switch (expeditionID) {
             case "techSkip" -> "Exhaust 1 technology specialty planet";
@@ -169,17 +157,15 @@ public class Expeditions {
         };
     }
 
-    @JsonIgnore
     public String printExpeditionInfo(Game game, Player player) {
         StringBuilder sb = new StringBuilder("Thunder's Edge Expedition Status:");
         for (Entry<String, String> exp : expeditionFactions.entrySet()) {
             sb.append("\n> ").append(getExpeditionEmoji(exp.getKey(), game));
-            sb.append(" ").append(playerInfo(game, player, exp.getValue()));
+            sb.append(' ').append(playerInfo(game, player, exp.getValue()));
         }
         return sb.toString();
     }
 
-    @JsonIgnore
     public List<Button> getRemainingExpeditionButtons(Player player) {
         String prefix = player.getFinsFactionCheckerPrefix();
         List<Button> buttons = new ArrayList<>();
@@ -275,9 +261,11 @@ public class Expeditions {
                     output += "\n-# Use the buttons in your private channel to discard 2 action cards.";
                     MessageHelper.sendMessageToChannel(channel, output);
                     MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCardsInfoThread(), "Use these buttons to discard action cards.", acButtons);
+                            player.getCardsInfoThread(),
+                            player.getRepresentation() + ", please discard 2 action cards.",
+                            acButtons);
                 } else {
-                    output += "\n-# you may not have enough action cards... use `/game undo` if this was a mistake";
+                    output += "\n-# you may not have enough action cards... use `/game undo` if this was a mistake.";
                     MessageHelper.sendMessageToChannel(channel, output);
                 }
             }
@@ -304,5 +292,17 @@ public class Expeditions {
                 .editOriginal(exp.printExpeditionInfo(game, player))
                 .setComponents()
                 .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    public String getLastExpeditionFaction() {
+        if (getRemainingExpeditionCount() != 0) return null;
+
+        String lastFaction = null;
+        for (String faction : expeditionFactions.values()) {
+            if (faction != null) {
+                lastFaction = faction;
+            }
+        }
+        return lastFaction;
     }
 }

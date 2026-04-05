@@ -93,7 +93,7 @@
     {
         "alias": "superweaponavailyn",
         "name": "Superweapon Availyn",
-        "text": "This system is a nebula. During combat, you may exhaust this card to move up to 3 of your fighters from this system to the active system. PRODUCTION 3",
+        "text": "This system is a nebula. At any time, you may exhaust this card to produce up to 3 fighters in a system that contains your ships. PRODUCTION 3",
         "notes": "You must be participating in the combat to place the fighters.",
         "isFakeRelic": true,
         "source": "ds"
@@ -150,37 +150,38 @@
         "shortName": "Vote\nToken",
         "text": "When you cast votes on an agenda, you may purge this token to cast 5 votes.",
         "isFakeRelic": true,
-        "source": "ignis_aurora"       
+        "source": "ignis_aurora"
     },
-     {
+    {
         "alias": "votetoken2",
         "name": "Vote Token 2",
         "shortName": "Vote\nToken2",
         "text": "When you cast votes on an agenda, you may purge this token to cast 5 votes.",
         "isFakeRelic": true,
-        "source": "ignis_aurora"       
+        "source": "ignis_aurora"
     },
-     {
+    {
         "alias": "votetoken3",
         "name": "Vote Token 3",
         "shortName": "Vote\nToken3",
         "text": "When you cast votes on an agenda, you may purge this token to cast 5 votes.",
         "isFakeRelic": true,
-        "source": "ignis_aurora"       
+        "source": "ignis_aurora"
     },
-     {
+    {
         "alias": "votetoken4",
         "name": "Vote Token 4",
         "shortName": "Vote\nToken4",
         "text": "When you cast votes on an agenda, you may purge this token to cast 5 votes.",
         "isFakeRelic": true,
-        "source": "ignis_aurora"       
+        "source": "ignis_aurora"
     },
-{
+    {
         "alias": "votetoken5",
         "name": "Vote Token 5",
         "shortName": "Vote\nToken5",
         "text": "When you cast votes on an agenda, you may purge this token to cast 5 votes.",
         "isFakeRelic": true,
-        "source": "ignis_aurora"       
-    }]
+        "source": "ignis_aurora"
+    }
+]

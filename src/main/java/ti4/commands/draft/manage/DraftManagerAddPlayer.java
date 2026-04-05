@@ -10,7 +10,7 @@ import ti4.service.draft.DraftManager;
 
 class DraftManagerAddPlayer extends GameStateSubcommand {
     public DraftManagerAddPlayer() {
-        super(Constants.DRAFT_MANAGE_ADD_PLAYER, "Add player to the draft", true, true);
+        super(Constants.DRAFT_MANAGE_ADD_PLAYER, "Add player to the draft", true, false);
         addOption(OptionType.USER, Constants.PLAYER, "Player to add", true);
     }
 
@@ -18,11 +18,12 @@ class DraftManagerAddPlayer extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         DraftManager draftManager = game.getDraftManager();
-        String playerUserId = getPlayer().getUserID();
+        var playerToAdd = event.getOption(Constants.PLAYER).getAsUser();
+        String playerUserId = playerToAdd.getId();
         try {
             draftManager.addPlayer(playerUserId);
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Added player to draft: " + getPlayer().getPing());
+                    event.getChannel(), "Added player to draft: " + playerToAdd.getAsMention());
         } catch (IllegalArgumentException e) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not add player to draft: " + e.getMessage());
         }

@@ -10,17 +10,17 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.commands.player.AddAllianceMember;
 import ti4.helpers.Constants;
-import ti4.helpers.RandomHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
+import ti4.service.draft.PlayerSetupService;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.map.AddTileListService;
-import ti4.service.milty.MiltyService;
 import ti4.service.objectives.DrawSecretService;
 import ti4.service.unit.AddUnitService;
 
@@ -76,14 +76,9 @@ public class StartScenario extends GameStateSubcommand {
                     speaker = chance == face;
                 }
                 if (tile != null) {
-                    MiltyService.secondHalfOfPlayerSetup(
-                            players.get(face),
-                            game,
-                            players.get(face).getNextAvailableColour(),
-                            faction,
-                            tile.getPosition(),
-                            event,
-                            speaker);
+                    Player player = players.get(face);
+                    PlayerSetupState setupState = new PlayerSetupState(faction, tile.getPosition(), speaker);
+                    PlayerSetupService.setupPlayer(setupState, player, game, event);
                     players.remove(face);
                 }
             }
@@ -133,19 +128,9 @@ public class StartScenario extends GameStateSubcommand {
                     tile = game.getTileFromPositionOrAlias("creussgate");
                 }
                 boolean speaker = "nekro".equalsIgnoreCase(faction);
-                String color = players.get(face).getNextAvailableColour();
-                color = switch (faction.toLowerCase()) {
-                    case "ghost" -> RandomHelper.isOneInX(2) ? "ruby" : "bloodred";
-                    case "xxcha" -> RandomHelper.isOneInX(2) ? "sunset" : "tropical";
-                    case "sol" -> RandomHelper.isOneInX(2) ? "dawn" : "wasp";
-                    case "naaz" -> RandomHelper.isOneInX(2) ? "lime" : "sherbet";
-                    case "nekro" -> RandomHelper.isOneInX(2) ? "black" : "poison";
-                    case "nomad" -> RandomHelper.isOneInX(2) ? "navy" : "glacier";
-                    default -> color;
-                };
                 if (tile != null) {
-                    MiltyService.secondHalfOfPlayerSetup(
-                            players.get(face), game, color, faction, tile.getPosition(), event, speaker);
+                    PlayerSetupState setupState = new PlayerSetupState(faction, tile.getPosition(), speaker);
+                    PlayerSetupService.setupPlayer(setupState, players.get(face), game, event);
                     players.remove(face);
                 }
             }

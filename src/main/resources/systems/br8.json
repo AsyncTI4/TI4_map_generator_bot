@@ -1,0 +1,17 @@
+{
+    "id": "br8",
+    "name": "Yu - Xin",
+    "aliases": [
+        "br8",
+        "xin",
+        "yu"
+    ],
+    "imagePath": "BR8_Yu.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "yu"
+    ],
+    "source": "ds",
+    "tileBack": "green"
+}

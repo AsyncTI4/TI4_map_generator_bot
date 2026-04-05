@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthResponse {
+class AuthResponse {
 
     @JsonProperty("user_id")
     private String userId;

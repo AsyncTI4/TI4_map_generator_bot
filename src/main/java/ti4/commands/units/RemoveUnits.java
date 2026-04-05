@@ -56,7 +56,8 @@ public class RemoveUnits extends GameStateCommand {
         if (tile == null) return;
 
         String color = getPlayer().getColor();
-        boolean prioritizeDamaged = event.getOption(Constants.PRIORITIZE_DAMAGED, false, OptionMapping::getAsBoolean);
+        boolean prioritizeDamaged =
+                event.getOption(Constants.PRIORITIZE_DAMAGED, Boolean.FALSE, OptionMapping::getAsBoolean);
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString();
         RemoveUnitService.removeUnits(event, tile, game, color, unitList, prioritizeDamaged);
 

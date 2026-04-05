@@ -15,11 +15,12 @@ import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 
 @Data
 public class LeaderModel implements ModelInterface, EmbeddableModel {
-    private String ID;
+    private String id;
     private String type;
     private String faction;
     private String name;
@@ -48,7 +49,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public boolean isValid() {
-        return ID != null
+        return id != null
                 && type != null
                 && faction != null
                 && name != null
@@ -61,7 +62,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public String getAlias() {
-        return ID;
+        return id;
     }
 
     public String getShortName() {
@@ -76,7 +77,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         if (getHomebrewReplacesID().isPresent()) {
             return LeaderEmojis.getLeaderEmoji(getHomebrewReplacesID().get());
         }
-        return LeaderEmojis.getLeaderEmoji(ID);
+        return LeaderEmojis.getLeaderEmoji(id);
     }
 
     public Optional<String> getTFName() {
@@ -106,6 +107,10 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(tfTitle);
     }
 
+    public String getTFTitleIfAble() {
+        return getTFTitle().orElse(title);
+    }
+
     public Optional<String> getAbilityName() {
         return Optional.ofNullable(abilityName);
     }
@@ -125,11 +130,17 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean isGenome() {
-        return Mapper.getDeck(Constants.TF_GENOME).getNewDeck().contains(ID);
+        return Mapper.getDeck(Constants.TF_GENOME).getNewDeck().contains(id);
     }
 
     public boolean isParadigm() {
-        return Mapper.getDeck(Constants.TF_PARADIGM).getNewDeck().contains(ID);
+        return Mapper.getDeck(Constants.TF_PARADIGM).getNewDeck().contains(id);
+    }
+
+    public TI4Emoji getTFEmoji() {
+        if (isGenome()) return MiscEmojis.tf_genome;
+        if (isParadigm()) return MiscEmojis.tf_paradigm;
+        return null;
     }
 
     private Optional<String> getFlavourText() {
@@ -187,8 +198,8 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         if (factionModel != null) factionName = factionModel.getFactionName();
 
         // TITLE
-        String title_name_component = "";
-        String title_subtitle_component = "";
+        String title_name_component;
+        String title_subtitle_component;
         if (useTwilightsFallText) {
             if (getTFName().isPresent() && !getTFName().get().isBlank()) {
                 title_name_component = getTFName().get();
@@ -216,8 +227,8 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         // DESCRIPTION
         StringBuilder description = new StringBuilder();
         if (includeFactionType) {
-            description.append(factionEmoji).append(" ").append(factionName).append(" ");
-            description.append(" ").append(StringUtils.capitalize(type));
+            description.append(factionEmoji).append(' ').append(factionName).append(' ');
+            description.append(' ').append(StringUtils.capitalize(type));
         }
         if (showUnlockConditions && !"agent".equals(type))
             description.append("\n*Unlock: ").append(unlockCondition).append("*");
@@ -239,11 +250,17 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
         // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID) footer.append("ID: ").append(ID).append("    Source: ").append(source);
+        if (includeID) footer.append("ID: ").append(id).append("    Source: ").append(source);
         eb.setFooter(footer.toString());
 
         eb.setColor(Color.black);
         return eb.build();
+    }
+
+    public String getTFNameRepresentation() {
+        return FactionEmojis.getFactionIcon(faction) + " " + getTFEmoji()
+                + getLeaderEmoji() + " " + getTFNameIfAble() + " (" + getTFTitleIfAble() + ") "
+                + source.emoji();
     }
 
     public String getNameRepresentation() {
@@ -255,7 +272,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     public boolean search(String searchString) {
         if (searchString == null) return true;
         searchString = searchString.toLowerCase();
-        return ID.toLowerCase().contains(searchString)
+        return id.toLowerCase().contains(searchString)
                 || name.toLowerCase().contains(searchString)
                 || getTFName().orElse("").toLowerCase().contains(searchString)
                 || title.toLowerCase().contains(searchString)

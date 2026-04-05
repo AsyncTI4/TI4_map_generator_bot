@@ -25,7 +25,7 @@ class CompareAFKTimes extends Subcommand {
             Constants.PLAYER7,
             Constants.PLAYER8);
 
-    public CompareAFKTimes() {
+    CompareAFKTimes() {
         super(Constants.COMPARE_AFK_TIMES, "Compare different players set AFK Times");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player @playerName").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player @playerName"));
@@ -53,12 +53,12 @@ class CompareAFKTimes extends Subcommand {
                                 .append(player.getName())
                                 .append(" afk hours are: ")
                                 .append(afkTime.replace(";", ", "))
-                                .append("\n");
+                                .append('\n');
                     } else {
                         stringBuilder
                                 .append("AFK hours are not set for: ")
                                 .append(player.getName())
-                                .append("\n");
+                                .append('\n');
                     }
                 });
 

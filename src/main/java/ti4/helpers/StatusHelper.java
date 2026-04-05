@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -41,7 +42,8 @@ import ti4.service.planet.EronousPlanetService;
 import ti4.service.turn.StartTurnService;
 import ti4.settings.users.UserSettingsManager;
 
-public class StatusHelper {
+@UtilityClass
+public final class StatusHelper {
 
     public static void AnnounceStatusPhase(Game game) {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have passed.");
@@ -87,14 +89,16 @@ public class StatusHelper {
             }
 
             buttons = new ArrayList<>();
-            for (String soID : player.getSecretsUnscored().keySet()) {
+            Map<String, Integer> secretsUnscored = player.getSecretsUnscored();
+            for (Map.Entry<String, Integer> entry : secretsUnscored.entrySet()) {
+                String soID = entry.getKey();
                 if (ListPlayerInfoService.getObjectiveThreshold(soID, game) > 0
                         && ListPlayerInfoService.getPlayerProgressOnObjective(soID, game, player)
                                 > (ListPlayerInfoService.getObjectiveThreshold(soID, game) - 1)
                         && !"dp".equalsIgnoreCase(soID)) {
 
                     buttons.add(Buttons.green(
-                            "preScoreObbie_SO_" + player.getSecretsUnscored().get(soID),
+                            "preScoreObbie_SO_" + entry.getValue(),
                             Mapper.getSecretObjective(soID).getName()));
                 }
             }
@@ -139,9 +143,7 @@ public class StatusHelper {
         }
     }
 
-    public static void BeginScoring(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
-        String messageText = "Please score objectives, " + game.getPing() + ".";
-
+    public static void beginScoring(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
         if (game.isOmegaPhaseMode()) {
             // Show the effects of the Agendas while scoring
             ButtonHelper.updateMap(game, event, "After Agendas, Round " + game.getRound() + ".");
@@ -261,12 +263,13 @@ public class StatusHelper {
                     game.getPing()
                             + ", players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.",
                     buttons);
-            for (Player player : GetPlayersInScoringOrder(game)) {
+            for (Player player : getPlayersInScoringOrder(game)) {
                 game.setStoredValue(key3, game.getStoredValue(key3) + player.getFaction() + "*");
                 game.setStoredValue(key3b, game.getStoredValue(key3b) + player.getFaction() + "*");
             }
         }
 
+        String messageText;
         for (Player player : game.getActionPhaseTurnOrder()) {
             List<String> scorables = new ArrayList<>();
             List<Integer> scorableInts = new ArrayList<>();
@@ -299,6 +302,7 @@ public class StatusHelper {
                     }
                 }
             }
+
             if (!game.getStoredValue(keyV).isEmpty()
                     && Helper.canPlayerScorePOs(game, player)
                     && scorableInts.contains(Integer.parseInt(game.getStoredValue(keyV)))) {
@@ -340,16 +344,18 @@ public class StatusHelper {
             int count = 0;
             StringBuilder message3a = new StringBuilder();
             List<Integer> sos = new ArrayList<>();
-            for (String soID : player.getSecretsUnscored().keySet()) {
+            Map<String, Integer> secretsUnscored = player.getSecretsUnscored();
+            for (Map.Entry<String, Integer> entry : secretsUnscored.entrySet()) {
+                String soID = entry.getKey();
                 if (ListPlayerInfoService.getObjectiveThreshold(soID, game) > 0
                         && ListPlayerInfoService.getPlayerProgressOnObjective(soID, game, player)
                                 > (ListPlayerInfoService.getObjectiveThreshold(soID, game) - 1)
                         && !"dp".equalsIgnoreCase(soID)) {
                     message3a
-                            .append("\n")
+                            .append('\n')
                             .append(Mapper.getSecretObjective(soID).getRepresentation(false));
                     count++;
-                    sos.add(player.getSecretsUnscored().get(soID));
+                    sos.add(entry.getValue());
                 }
             }
             var userSettings = UserSettingsManager.get(player.getUserID());
@@ -410,12 +416,14 @@ public class StatusHelper {
         if (!game.getStoredValue("newStatusScoringMode").isEmpty() && !game.isFowMode()) {
             poButtons.add(Buttons.gray("refreshStatusSummary", "Refresh Summary"));
         }
-        if (game.getActionCards().size() > 130
-                && game.getPlayerFromColorOrFaction("hacan") != null
-                && !ButtonHelper.getButtonsToSwitchWithAllianceMembers(
-                                game.getPlayerFromColorOrFaction("hacan"), game, false)
-                        .isEmpty()) {
-            poButtons.add(Buttons.gray("getSwapButtons_", "Swap"));
+
+        if (game.getActionCards().size() > 130) {
+            Player hacan = game.getPlayerFromColorOrFaction("hacan");
+            if (hacan != null
+                    && !ButtonHelper.getButtonsToSwitchWithAllianceMembers(hacan, game, false)
+                            .isEmpty()) {
+                poButtons.add(Buttons.gray("getSwapButtons_", "Swap"));
+            }
         }
         poButtons.removeIf(Objects::isNull);
         messageText = "Please score objectives, " + game.getPing() + ".";
@@ -442,9 +450,9 @@ public class StatusHelper {
         }
     }
 
-    public static List<Player> GetPlayersInScoringOrder(Game game) {
+    public static List<Player> getPlayersInScoringOrder(Game game) {
         if (game.hasFullPriorityTrackMode()) {
-            return PriorityTrackHelper.GetPriorityTrack(game).stream()
+            return PriorityTrackHelper.getPriorityTrack(game).stream()
                     .filter(Objects::nonNull)
                     .toList();
         } else if (game.getPlanets().contains(EronousPlanetService.CANTRIS_ID)) {
@@ -471,7 +479,6 @@ public class StatusHelper {
         }
 
         for (Player player : game.getRealPlayers()) {
-
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
             for (String pn : pns) {
                 Player pnOwner = game.getPNOwner(pn);
@@ -572,6 +579,7 @@ public class StatusHelper {
 
         // Optional abilities
         sendMitosisButtons(game);
+        handleMonumentToTheAges(game);
         sendYinCloneButtons(game);
         sendHoldingCompanyButtons(game);
         sendEntropicScarButtons(game);
@@ -584,9 +592,9 @@ public class StatusHelper {
         resolveSolFlagship(game);
     }
 
-    public static void sendRemoveBreachButtons(Game game) {
+    private static void sendRemoveBreachButtons(Game game) {
         Predicate<Tile> hasBreach = t -> t.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
-        Function<Player, Predicate<Tile>> hasPlayerShips = p -> (t -> FoWHelper.playerHasShipsInSystem(p, t));
+        Function<Player, Predicate<Tile>> hasPlayerShips = p -> (t -> FoWHelper.playerHasActualShipsInSystem(p, t));
         for (Player p : game.getRealPlayers()) {
             List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(
                     p, game, "statusRemoveBreach", hasBreach.and(hasPlayerShips.apply(p)), false);
@@ -601,7 +609,7 @@ public class StatusHelper {
 
     private static void sendNeuralParasiteButtons(Game game) {
         List<Player> firmaments = Helper.getPlayersFromTech(game, "parasite-firm");
-        if (firmaments == null || firmaments.isEmpty()) return;
+        if (firmaments.isEmpty()) return;
 
         for (Player player : firmaments) {
             Tile home = player.getHomeSystemTile();
@@ -662,12 +670,34 @@ public class StatusHelper {
 
                     String msg = "A commodity was placed upon the Monument to the Ages at " + planet.getName() + ".";
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+                    if (remaining % 3 == 0) {
+                        String msg2 = "The Monument to the Ages on the planet of "
+                                + Helper.getPlanetRepresentation(planet.getName(), game)
+                                + " has reached a multiple of 3 commodities, so the owner has earned a VP!";
+                        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg2);
+                        String customPOName = "Monument on " + Helper.getPlanetName(planet.getName());
+                        int vp = 1;
+                        if (game.getCustomPublicVP().containsKey(customPOName)) {
+                            vp = game.getCustomPublicVP().get(customPOName) + 1;
+                            game.removeCustomPO(customPOName);
+                        }
+                        Player p1 = neutral;
+                        for (Player p : game.getRealPlayers()) {
+                            if (p.getPlanets().contains(planet.getName())) {
+                                p1 = p;
+                                break;
+                            }
+                        }
+                        Integer poIndex = game.addCustomPO(customPOName, vp);
+                        game.scorePublicObjective(p1.getUserID(), poIndex);
+                        Helper.checkEndGame(game, p1);
+                    }
                 }
             }
         }
     }
 
-    public static void sendEntropicScarButtons(Game game) {
+    private static void sendEntropicScarButtons(Game game) {
         Map<Player, Integer> scars = new HashMap<>();
         for (Tile t : game.getTileMap().values()) {
             if (t.isScar()) {
@@ -720,7 +750,7 @@ public class StatusHelper {
                     player.setStrategicCC(player.getStrategicCC() + 1);
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, null, "Entropic Scar");
                 }
-                return;
+                continue;
             }
             String scarMessage = player.getRepresentationUnfogged()
                     + " You have ships in an Entropic Scar anomaly. You may use these buttons to spend a token from your strategy pool to gain one of your faction technologies.";

@@ -42,11 +42,11 @@ class SetPreferredColourList extends Subcommand {
         UserSettingsManager.save(userSettings);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Preferred Colour List updated to: `").append(colors).append("`");
+        sb.append("Preferred Colour List updated to: `").append(colors).append('`');
         if (!badColours.isEmpty()) {
             sb.append("\nThe following colours were invalid and were not added: `")
                     .append(badColours)
-                    .append("`");
+                    .append('`');
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }

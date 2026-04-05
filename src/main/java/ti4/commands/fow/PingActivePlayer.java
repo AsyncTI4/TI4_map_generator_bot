@@ -11,7 +11,7 @@ import ti4.service.fow.GMService;
 
 class PingActivePlayer extends GameStateSubcommand {
 
-    private static final long PING_COOLDOWN = 28800000; // (1000 * 60 * 60 * 8); //eight hours
+    private static final long PING_COOLDOWN = 28_800_000; // (1000 * 60 * 60 * 8); //eight hours
 
     public PingActivePlayer() {
         super(Constants.PING_ACTIVE_PLAYER, "Ping the active player in this game", true, true);

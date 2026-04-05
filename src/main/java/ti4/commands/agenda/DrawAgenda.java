@@ -19,7 +19,7 @@ class DrawAgenda extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
         count = Math.max(count, 1);
-        var fromBottom = event.getOption("from_bottom", false, OptionMapping::getAsBoolean);
+        var fromBottom = event.getOption("from_bottom", Boolean.FALSE, OptionMapping::getAsBoolean);
         AgendaHelper.drawAgenda(count, fromBottom, getGame(), getPlayer());
     }
 }

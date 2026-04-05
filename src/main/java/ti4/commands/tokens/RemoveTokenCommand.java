@@ -55,7 +55,7 @@ public class RemoveTokenCommand extends AddRemoveTokenCommand {
                     MessageHelper.replyToMessage(event, "Token: " + tokenName + " is not valid");
                     return;
                 }
-                if (tokenID.equals(Constants.CUSTODIAN_TOKEN_PNG)) {
+                if (Constants.CUSTODIAN_TOKEN_PNG.equals(tokenID)) {
                     removeToken(event, tile, tokenID, false);
                 }
                 removeToken(

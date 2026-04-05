@@ -16,7 +16,7 @@ import ti4.message.logging.BotLogger;
 @UtilityClass
 class MigrationHelper {
 
-    public static boolean replaceTokens(Game game, Map<String, String> replacements) {
+    static boolean replaceTokens(Game game, Map<String, String> replacements) {
         boolean found = false;
         for (Tile t : game.getTileMap().values()) {
             for (UnitHolder uh : t.getUnitHolders().values()) {
@@ -33,7 +33,7 @@ class MigrationHelper {
         return found;
     }
 
-    public static boolean replaceStage1s(Game game, List<String> decksToCheck, Map<String, String> replacements) {
+    static boolean replaceStage1s(Game game, List<String> decksToCheck, Map<String, String> replacements) {
         if (!decksToCheck.contains(game.getStage1PublicDeckID())) {
             return false;
         }
@@ -50,7 +50,7 @@ class MigrationHelper {
         return mapNeededMigrating;
     }
 
-    public static boolean replaceActionCards(Game game, List<String> decksToCheck, Map<String, String> replacements) {
+    static boolean replaceActionCards(Game game, List<String> decksToCheck, Map<String, String> replacements) {
         if (!decksToCheck.contains(game.getAcDeckID())) {
             return false;
         }
@@ -71,7 +71,7 @@ class MigrationHelper {
         return mapNeededMigrating;
     }
 
-    public static boolean replaceAgendaCards(Game game, List<String> decksToCheck, Map<String, String> replacements) {
+    static boolean replaceAgendaCards(Game game, List<String> decksToCheck, Map<String, String> replacements) {
         if (!decksToCheck.contains(game.getAgendaDeckID())) {
             return false;
         }
@@ -84,6 +84,8 @@ class MigrationHelper {
             mapNeededMigrating |= replace(game.getAgendas(), toReplace, replacement);
             mapNeededMigrating |= replaceKey(game.getDiscardAgendas(), toReplace, replacement);
             mapNeededMigrating |= replaceKey(game.getSentAgendas(), toReplace, replacement);
+            mapNeededMigrating |= replaceKey(game.getLaws(), toReplace, replacement);
+            mapNeededMigrating |= replaceKey(game.getLawsInfo(), toReplace, replacement);
         }
         return mapNeededMigrating;
     }
@@ -99,12 +101,14 @@ class MigrationHelper {
     }
 
     private static <K> boolean replace(List<K> list, K toReplace, K replacement) {
+        boolean replaced = false;
         int index = list.indexOf(toReplace);
-        if (index > -1) {
+        while (index > -1) {
             list.set(index, replacement);
-            return true;
+            replaced = true;
+            index = list.indexOf(toReplace);
         }
-        return false;
+        return replaced;
     }
 
     public static void swapBagItem(DraftBag bag, int index, DraftItem newItem) {

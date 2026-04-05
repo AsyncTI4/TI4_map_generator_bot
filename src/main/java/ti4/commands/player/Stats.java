@@ -276,14 +276,14 @@ class Stats extends GameStateSubcommand {
             if (sc > 0) {
                 Boolean scIsPlayed = game.getScPlayed().get(sc);
                 if (scIsPlayed == null || !scIsPlayed) {
-                    game.setSCPlayed(sc, true);
+                    game.setSCPlayed(sc, Boolean.TRUE);
                     message.append("> flipped ")
                             .append(CardEmojis.getSCFrontFromInteger(sc))
                             .append(" to ")
                             .append(CardEmojis.getSCBackFromInteger(sc))
                             .append(" (played)");
                 } else {
-                    game.setSCPlayed(sc, false);
+                    game.setSCPlayed(sc, Boolean.FALSE);
                     for (Player player_ : game.getPlayers().values()) {
                         if (!player_.isRealPlayer()) {
                             continue;
@@ -315,6 +315,12 @@ class Stats extends GameStateSubcommand {
         OptionMapping optionNPC = event.getOption(Constants.NPC);
         if (optionNPC != null) {
             boolean value = optionNPC.getAsBoolean();
+            if (game.isCompetitiveTIGLGame() && value) {
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        "NPC status is not allowed in competitive TIGL games. Please see the game out or petition a bothelper for permission to seek a replacement.");
+                return;
+            }
             player.setNpc(value);
             MessageHelper.sendMessageToEventChannel(event, getGeneralMessage(optionNPC));
             if (value) {

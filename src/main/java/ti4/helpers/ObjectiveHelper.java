@@ -27,7 +27,7 @@ public class ObjectiveHelper {
                     .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             String sb = player.getRepresentationUnfogged() + ", stage 1 public objective at location "
-                    + loc1 + ":\n" + po.getRepresentation(!po.getAlias().equalsIgnoreCase(Constants.IMPERIUM_REX_ID))
+                    + loc1 + ":\n" + po.getRepresentation(!Constants.IMPERIUM_REX_ID.equalsIgnoreCase(po.getAlias()))
                     + "\n";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb);
         }

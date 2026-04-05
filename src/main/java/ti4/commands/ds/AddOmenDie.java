@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 
 class AddOmenDie extends GameStateSubcommand {
 
-    public AddOmenDie() {
+    AddOmenDie() {
         super(Constants.ADD_OMEN_DIE, "Add a Omen Die", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.RESULT, "Number on the Omen Die").setRequired(true));
     }

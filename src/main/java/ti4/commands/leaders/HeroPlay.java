@@ -45,7 +45,7 @@ class HeroPlay extends GameStateSubcommand {
             return;
         }
 
-        if (!playerLeader.getType().equals(Constants.HERO)) {
+        if (!Constants.HERO.equals(playerLeader.getType())) {
             MessageHelper.sendMessageToEventChannel(event, "Leader is not a hero");
             return;
         }

@@ -50,7 +50,7 @@ public class AndcatReferenceCardsMessageHelper {
         sendPackageInfos(player.getCardsInfoThread(), packages);
     }
 
-    public static void sendPackageInfos(MessageChannel channel, List<ReferenceCardPackage> packages) {
+    private static void sendPackageInfos(MessageChannel channel, List<ReferenceCardPackage> packages) {
         if (packages == null || packages.isEmpty()) {
             return;
         }
@@ -432,7 +432,7 @@ public class AndcatReferenceCardsMessageHelper {
                     refPackage.startingUnitsFaction(),
                     refPackage.speakerOrderFaction(),
                     true);
-            Integer packageKey = Integer.parseInt(playerChoiceKey.substring("package".length()));
+            Integer packageKey = Integer.valueOf(playerChoiceKey.substring("package".length()));
             draftable.getReferenceCardPackages().put(packageKey, refPackage);
 
             // Disable buttons
@@ -548,7 +548,7 @@ public class AndcatReferenceCardsMessageHelper {
             }
         }
 
-        Integer packageKey = Integer.parseInt(playerChoiceKey.substring("package".length()));
+        Integer packageKey = Integer.valueOf(playerChoiceKey.substring("package".length()));
         draftable.getReferenceCardPackages().put(packageKey, refPackage);
 
         // Update buttons

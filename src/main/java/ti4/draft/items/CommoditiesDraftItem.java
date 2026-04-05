@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
@@ -16,14 +17,20 @@ import ti4.service.emoji.TI4Emoji;
 public class CommoditiesDraftItem extends DraftItem {
 
     public CommoditiesDraftItem(String itemId) {
-        super(Category.COMMODITIES, itemId);
+        super(DraftCategory.COMMODITIES, itemId);
+    }
+
+    @JsonIgnore
+    @Override
+    public String getTitle(Game game) {
+        return getFaction().getFactionEmoji() + " " + getLongDescriptionImpl();
     }
 
     private FactionModel getFaction() {
-        if ("keleres".equals(ItemId)) {
+        if ("keleres".equals(getItemId())) {
             return Mapper.getFaction("keleresa");
         }
-        return Mapper.getFaction(ItemId);
+        return Mapper.getFaction(getItemId());
     }
 
     @JsonIgnore
@@ -35,7 +42,7 @@ public class CommoditiesDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getShortDescription() {
-        return getFaction().getFactionName() + " Commodities";
+        return getFaction().getShortName() + " Commodities (" + getCommodities() + ")";
     }
 
     @JsonIgnore
@@ -58,21 +65,21 @@ public class CommoditiesDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = buildAllItems(factions);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.COMMODITIES);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.COMMODITIES);
         return allItems;
     }
 
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            allItems.add(generate(Category.COMMODITIES, faction.getAlias()));
+            allItems.add(generate(DraftCategory.COMMODITIES, faction.getAlias()));
         }
         return allItems;
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.COMMODITIES);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.COMMODITIES);
         return allItems;
     }
 
@@ -83,7 +90,7 @@ public class CommoditiesDraftItem extends DraftItem {
             if (Arrays.asList(results).contains(faction.getAlias())) {
                 continue;
             }
-            allItems.add(generate(Category.COMMODITIES, faction.getAlias()));
+            allItems.add(generate(DraftCategory.COMMODITIES, faction.getAlias()));
         }
         return allItems;
     }

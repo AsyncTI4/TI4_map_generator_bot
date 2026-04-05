@@ -9,7 +9,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 
-public class ExploreHelper {
+public final class ExploreHelper {
 
     public static boolean checkForMech(String planetName, Game game, Player player) {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));

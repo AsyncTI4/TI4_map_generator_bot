@@ -35,7 +35,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.AddUnitService;
 
-public class TeHelperAbilities {
+public final class TeHelperAbilities {
 
     /* ---------------------------------------------------------------------------|--------------------------------------------------------------------------- */
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- Last Bastion - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -82,6 +82,19 @@ public class TeHelperAbilities {
                     + tile.getRepresentationForButtons(game, player) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        });
+    }
+
+    @ButtonHandler("removeBreach_")
+    private static void removeBreachInactive(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String regex = "removeBreach_" + RegexHelper.posRegex(game);
+        RegexService.runMatcher(regex, buttonID, matcher -> {
+            Tile tile = game.getTileByPosition(matcher.group("pos"));
+            tile.getSpaceUnitHolder().removeToken(Constants.TOKEN_BREACH_INACTIVE);
+            String msg = player.getRepresentation(false, false) + " removed an inactive Breach from "
+                    + tile.getRepresentationForButtons(game, player) + ".";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            ButtonHelper.deleteMessage(event);
         });
     }
 

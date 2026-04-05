@@ -23,15 +23,15 @@ class ShowPurgedActionCards extends GameStateSubcommand {
 
     private static void showPurged(Game game, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Action card purge list: ").append("\n");
+        sb.append("Action card purge list: ").append('\n');
         int index = 1;
         for (Map.Entry<String, Integer> ac : game.getPurgedActionCards().entrySet()) {
-            sb.append("`")
+            sb.append('`')
                     .append(index)
                     .append(".")
                     .append(Helper.leftpad("(" + ac.getValue(), 4))
                     .append(")` - ")
-                    .append(Mapper.getActionCard(ac.getKey()).getRepresentation());
+                    .append(Mapper.getActionCard(ac.getKey()).getRepresentation(game));
             index++;
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());

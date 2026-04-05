@@ -34,15 +34,15 @@ public class WinningPathComparisonService {
                     .append(" paths) at ")
                     .append(formatPercent(winningPathPercent))
                     .append(" of games.")
-                    .append("\n");
+                    .append('\n');
             if (winningPathCount == 1) {
                 sb.append("🥳__**An async first! May your victory live on for all to see!**__🥳")
-                        .append("\n");
+                        .append('\n');
             } else if (winningPathPercent <= 0.005) {
                 sb.append("🎉__**Few have traveled your path! We celebrate your boldness!**__🎉")
-                        .append("\n");
+                        .append('\n');
             } else if (winningPathPercent <= 0.01) {
-                sb.append("🎉__**Who needs a conventional win? Not you!**__🎉").append("\n");
+                sb.append("🎉__**Who needs a conventional win? Not you!**__🎉").append('\n');
             }
         }
         return sb.toString();

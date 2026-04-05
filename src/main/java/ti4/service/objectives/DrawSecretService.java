@@ -39,8 +39,10 @@ public class DrawSecretService {
         for (int i = 0; i < count; i++) {
             idsDrawn.add(game.drawSecretObjective(player.getUserID()));
         }
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + output);
-        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
+        if (event != null) {
+            MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + output);
+        }
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         if (useTnelis && player.hasAbility("plausible_deniability")) {
             SecretObjectiveHelper.sendSODiscardButtons(player);
         }
@@ -72,7 +74,7 @@ public class DrawSecretService {
                             player.getRepresentation()
                                     + " due to **Plausible Deniability**, you were dealt an extra secret objective. Thus, you must also discard an extra secret objective.");
                 }
-                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event, game.getRound() == 1, false);
+                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, game.getRound() == 1, false);
             }
         }
         MessageHelper.sendMessageToChannel(

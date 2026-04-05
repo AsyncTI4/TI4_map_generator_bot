@@ -5,7 +5,7 @@
         "type": "agenda",
         "description": "All agendas in a Project Pi game",
         "cardIDs": [
-            "abolishment","arbiter","arms_reduction","articles_war","pi_ixthian_artifact","censure","checks","cladenstine","classified","committee","pi_regulated_conscription","pi_new_constitution","conventions","covert","crisis","defense_act","disarmamament","economic_equality","pi_public_execution","grant_reallocation","incentive","minister_antiquities","minister_commrece","minister_exploration","minister_industry","minister_peace","pi_minister_policy","minister_sciences","minister_war","miscount","mutiny","nexus","plowshares","prophecy","rearmament","redistribution","regulations","rep_govt","revolution","sanctions","schematics","secret","seed_empire","shared_research","standardization","pi_enforced_travel_ban","unconventional","warrant","wormhole_recon","pi_wormhole_research"
+            "abolishment","arbiter","arms_reduction","articles_war","pi_ixthian_artifact","censure","checks","cladenstine","classified","committee","pi_regulated_conscription","pi_new_constitution","conventions","covert","crisis","defense_act","disarmament","economic_equality","pi_public_execution","grant_reallocation","incentive","minister_antiquities","minister_commerce","minister_exploration","minister_industry","minister_peace","pi_minister_policy","minister_sciences","minister_war","miscount","mutiny","nexus","plowshares","prophecy","rearmament","redistribution","regulations","rep_govt","revolution","sanctions","schematics","secret","seed_empire","shared_research","standardization","pi_enforced_travel_ban","unconventional","warrant","wormhole_recon","pi_wormhole_research"
         ],
         "source": "project_pi"
     },

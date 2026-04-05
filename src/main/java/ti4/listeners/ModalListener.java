@@ -17,7 +17,7 @@ import ti4.message.logging.LogOrigin;
 import ti4.service.game.GameNameService;
 import ti4.spring.jda.JdaService;
 
-public class ModalListener extends ListenerAdapter {
+public final class ModalListener extends ListenerAdapter {
 
     private static ModalListener instance;
 

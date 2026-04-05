@@ -42,7 +42,7 @@ class SCUnplay extends GameStateSubcommand {
         Integer scToUnplay =
                 event.getOption(Constants.STRATEGY_CARD, Collections.min(player.getSCs()), OptionMapping::getAsInt);
         Game game = getGame();
-        game.setSCPlayed(scToUnplay, false);
+        game.setSCPlayed(scToUnplay, Boolean.FALSE);
 
         // fix sc reminders for all players
         for (Player player_ : game.getPlayers().values()) {

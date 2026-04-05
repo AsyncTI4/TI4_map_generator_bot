@@ -3,6 +3,7 @@ package ti4.website;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import ti4.json.JsonMapperManager;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.logging.BotLogger;
@@ -36,7 +38,7 @@ public class AsyncTi4WebsiteHelper {
 
     public static boolean uploadsEnabled() {
         return GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false);
+                GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, Boolean.FALSE);
     }
 
     public static void putData(String gameName, Game game) {
@@ -49,7 +51,7 @@ public class AsyncTi4WebsiteHelper {
 
         try {
             Map<String, Object> exportableFieldMap = game.getExportableFieldMap();
-            String json = EgressClientManager.getObjectMapper().writeValueAsString(exportableFieldMap);
+            String json = JsonMapperManager.basic().writeValueAsString(exportableFieldMap);
 
             List<String> urls = getConfiguredUrls("gamestate.api.urls");
             for (String urlTemplate : urls) {
@@ -57,6 +59,7 @@ public class AsyncTi4WebsiteHelper {
 
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create(url))
+                        .timeout(Duration.ofSeconds(20))
                         .POST(HttpRequest.BodyPublishers.ofString(json))
                         .build();
 
@@ -151,7 +154,7 @@ public class AsyncTi4WebsiteHelper {
                             : null);
             webData.put("isTwilightsFallMode", game.isTwilightsFallMode());
 
-            String json = EgressClientManager.getObjectMapper().writeValueAsString(webData);
+            String json = JsonMapperManager.basic().writeValueAsString(webData);
 
             if (isDevMode) {
                 // Dev/local mode - print to console instead of uploading
@@ -175,7 +178,7 @@ public class AsyncTi4WebsiteHelper {
                     if (latestImageName != null && !latestImageName.isEmpty()) {
                         Map<String, String> imageData = new HashMap<>();
                         imageData.put("image", latestImageName);
-                        String imageJson = EgressClientManager.getObjectMapper().writeValueAsString(imageData);
+                        String imageJson = JsonMapperManager.basic().writeValueAsString(imageData);
                         putObjectInBucket(
                                 String.format("webdata/%s/latestImage.json", gameId),
                                 AsyncRequestBody.fromString(imageJson),
@@ -209,7 +212,7 @@ public class AsyncTi4WebsiteHelper {
         }
 
         try {
-            String json = EgressClientManager.getObjectMapper().writeValueAsString(overlays);
+            String json = JsonMapperManager.basic().writeValueAsString(overlays);
 
             putObjectInBucket(
                     String.format("overlays/%s/%s.json", gameId, gameId),

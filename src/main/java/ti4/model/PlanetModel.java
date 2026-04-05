@@ -146,6 +146,10 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(name).orElse("");
     }
 
+    public String getNameRepresentation() {
+        return getEmoji() + " _" + name + "_ " + getPlanetTypeEmoji();
+    }
+
     @JsonIgnore
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(false);
@@ -312,9 +316,9 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
-        sb.append(name).append(" (").append(resources).append("/").append(influence);
-        if (!getTechSpecialtyStringRepresentation().isBlank())
-            sb.append(" ").append(getTechSpecialtyStringRepresentation());
+        sb.append(name).append(" (").append(resources).append('/').append(influence);
+        String techSpecialtyStringRepresentation = getTechSpecialtyStringRepresentation();
+        if (!techSpecialtyStringRepresentation.isBlank()) sb.append(' ').append(techSpecialtyStringRepresentation);
         sb.append(")");
         return sb.toString();
     }

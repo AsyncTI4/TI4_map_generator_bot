@@ -47,7 +47,7 @@ class SetDeck extends GameStateSubcommand {
         deckTypes.forEach(deckType -> {
             String value = event.getOption(deckType, null, OptionMapping::getAsString);
             if (Optional.ofNullable(value).isPresent()) {
-                if (deckType.equals(Constants.STRATEGY_CARD_SET)) {
+                if (Constants.STRATEGY_CARD_SET.equals(deckType)) {
                     game.setStrategyCardSet(value);
                 } else {
                     DeckModel deckModel = Mapper.getDecks().get(value);
@@ -60,7 +60,7 @@ class SetDeck extends GameStateSubcommand {
                                         + "*** could not be set, please see error above or try executing the command again (without copy/pasting).");
                     }
                 }
-                if (deckType.equals(Constants.TECHNOLOGY_DECK)) {
+                if (Constants.TECHNOLOGY_DECK.equals(deckType)) {
                     game.swapOutVariantTechs();
                     game.swapInVariantTechs();
                 }

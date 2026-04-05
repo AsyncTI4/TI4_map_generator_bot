@@ -288,8 +288,7 @@ class OtherHeroButtonHandler {
     @ButtonHandler("glimmersHeroIn_")
     public static void glimmersHeroIn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.substring(buttonID.indexOf('_') + 1);
-        List<Button> buttons =
-                ButtonHelperHeroes.getUnitsToGlimmersHero(player, game, event, game.getTileByPosition(pos));
+        List<Button> buttons = ButtonHelperHeroes.getUnitsToGlimmersHero(player, game.getTileByPosition(pos));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(),
                 player.getRepresentationUnfogged() + ", please choose which unit you wish to duplicate.",

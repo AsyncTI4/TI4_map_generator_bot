@@ -1,6 +1,7 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,6 +54,7 @@ import ti4.model.UnitModel;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
+import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 
@@ -189,7 +191,7 @@ public class CombatRollService {
 
         if (playerUnitsByQuantity.isEmpty()) {
             String fightingOnUnitHolderName = unitHolderName;
-            if (!unitHolderName.equalsIgnoreCase(Constants.SPACE)) {
+            if (!Constants.SPACE.equalsIgnoreCase(unitHolderName)) {
                 fightingOnUnitHolderName = Helper.getPlanetRepresentation(unitHolderName, game);
             }
             MessageHelper.sendMessageToChannel(
@@ -257,12 +259,12 @@ public class CombatRollService {
         }
 
         // Check for temp mods
-        CombatTempModHelper.EnsureValidTempMods(player, tileModel, combatOnHolder);
-        CombatTempModHelper.InitializeNewTempMods(player, tileModel, combatOnHolder);
+        CombatTempModHelper.ensureValidTempMods(player, tileModel, combatOnHolder);
+        CombatTempModHelper.initializeNewTempMods(player, tileModel, combatOnHolder);
         List<NamedCombatModifierModel> tempMods =
-                new ArrayList<>(CombatTempModHelper.BuildCurrentRoundTempNamedModifiers(
+                new ArrayList<>(CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
                         player, tileModel, combatOnHolder, false, rollType));
-        List<NamedCombatModifierModel> tempOpponentMods = CombatTempModHelper.BuildCurrentRoundTempNamedModifiers(
+        List<NamedCombatModifierModel> tempOpponentMods = CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
                 opponent, tileModel, combatOnHolder, true, rollType);
         tempMods.addAll(tempOpponentMods);
 
@@ -305,12 +307,8 @@ public class CombatRollService {
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
-        if (rollType == CombatRollType.bombardment
-                && opponent != null
-                && opponent != player
-                && opponent.hasTech("proxima")
-                && h > 0) {
-            if (opponent.hasTech("tf-proxima") && h > 0) {
+        if (rollType == CombatRollType.bombardment && opponent != player && opponent.hasTech("proxima") && h > 0) {
+            if (opponent.hasTech("tf-proxima")) {
                 message += "\n_Proxima Targeting VI_ canceled 1 hit automatically.";
                 h--;
             } else {
@@ -319,7 +317,8 @@ public class CombatRollService {
                     if (planet != null && planet.getGalvanizedUnitCount(player.getColorID()) > 0) {
                         int oldH = h;
                         h = Math.max(0, h - planet.getGalvanizedUnitCount(player.getColorID()));
-                        message += "\n_Proxima Targeting VI_ canceled " + (oldH - h) + " hit(s) automatically.";
+                        message += "\n_Proxima Targeting VI_ canceled " + (oldH - h) + " hit"
+                                + (oldH - h == 1 ? "" : "s") + " automatically.";
                     }
                 }
             }
@@ -328,21 +327,21 @@ public class CombatRollService {
             message = message.substring(0, message.length() - 2);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        if (!game.isFowMode() && !game.getStoredValue("surprisingDiceRoll").equals("none")) {
-            String disaster;
-            if (game.getStoredValue("surprisingDiceRoll").equals("hits")) {
-                disaster = player.getRepresentation() + " has rolled grievously against " + opponent.getRepresentation()
-                        + " in " + game.getName() + ".";
+        if (!game.isFowMode() && !"none".equals(game.getStoredValue("surprisingDiceRoll"))) {
+            StringBuilder disaster;
+            if ("hits".equals(game.getStoredValue("surprisingDiceRoll"))) {
+                disaster = new StringBuilder(player.getRepresentation() + " has rolled grievously against "
+                        + opponent.getRepresentation() + " in " + game.getName() + ".");
             } else {
-                disaster = player.getRepresentation() + " has rolled dismally against " + opponent.getRepresentation()
-                        + " in " + game.getName() + ".";
+                disaster = new StringBuilder(player.getRepresentation() + " has rolled dismally against "
+                        + opponent.getRepresentation() + " in " + game.getName() + ".");
             }
             for (String line : message.split("\n")) {
                 if (line.startsWith("> `") || line.startsWith("**Total hits")) {
-                    disaster += "\n" + line;
+                    disaster.append('\n').append(line);
                 }
             }
-            DisasterWatchHelper.sendMessageInDisasterWatch(game, disaster);
+            DisasterWatchHelper.sendMessageInDisasterWatch(game, disaster.toString());
         }
         if (game.isFowMode() && isFoWPrivateChannelRoll(player, event)) {
             if (rollType == CombatRollType.SpaceCannonOffence) {
@@ -363,7 +362,7 @@ public class CombatRollService {
         if (message.contains("adding +1, at the risk of your")) {
             Button thalnosButton = Buttons.green(
                     "startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos", ExploreEmojis.Relic);
-            Button decline = Buttons.gray("deleteMessage", "Decline");
+            Button decline = Buttons.gray("deleteButtons", "Decline");
             String thalnosMessage =
                     "Use this button to roll for Thalnos.\n-# Note that if it matters, the dice were just rolled in the following format: (normal dice for unit 1)+(normal dice for unit 2)...etc...+(extra dice for unit 1)+(extra dice for unit 2)...etc.\n-# Sol and Letnev agents automatically are given as extra dice for unit 1.";
             MessageHelper.sendMessageToChannelWithButtons(
@@ -832,6 +831,7 @@ public class CombatRollService {
 
             List<String> singleUnitUse = new ArrayList<>(List.of("no"));
             if (rollType == CombatRollType.combatround
+                    && !"true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"))
                     && (player.hasTech("tf-supercharge")
                             || (player.hasUnlockedBreakthrough("letnevbt")
                                     && "space".equalsIgnoreCase(unitHolder.getName())))) {
@@ -857,6 +857,7 @@ public class CombatRollService {
                 if (numRolls == 0) {
                     continue;
                 }
+                RoundStatsTracker.recordDiceRolled(game, player, numRolls);
                 List<DiceHelper.Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
                 int mult = 1;
 
@@ -871,9 +872,62 @@ public class CombatRollService {
                 int hitRolls = DiceHelper.countSuccesses(resultRolls);
                 if (unitModel.getUnitType() == UnitType.Flagship
                         && ValefarZService.hasFlagshipAbility(game, player, "jolnar_flagship")) {
+                    chanceOfAllHits *= Math.pow(2.0 / (11 - toHit + modifierToHit), numRolls * mult);
                     for (DiceHelper.Die die : resultRolls) {
-                        if (die.getResult() > 8) {
+                        if (die.getResult() >= 9) {
                             hitRolls += 2;
+                        }
+                        maximumHits += 2;
+                    }
+                }
+                if (rollType == CombatRollType.bombardment && "tf-dragonfreed".equalsIgnoreCase(unitModel.getId())) {
+                    if (!game.isFowMode() && hitRolls > 0) {
+                        List<Button> buttons = new ArrayList<>();
+                        String bombardPlanet2 = game.getStoredValue("bombardmentTarget" + player.getFaction());
+                        Tile tile = game.getTileByPosition(game.getActiveSystem());
+                        if (!bombardPlanet2.isEmpty()) {
+                            tile = game.getTileFromPlanet(bombardPlanet2);
+                        }
+                        for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+                            Tile tile2 = game.getTileByPosition(pos);
+                            for (UnitHolder uh : tile2.getPlanetUnitHolders()) {
+                                if (uh.getName().equalsIgnoreCase(bombardPlanet2)) {
+                                    continue;
+                                }
+                                buttons.add(Buttons.red(
+                                        "getDamageButtons_" + tile2.getPosition() + "_bombardment",
+                                        "Assign Hit" + (hitRolls == 1 ? "" : "s")));
+                                for (Player p2 : game.getRealPlayersNNeutral()) {
+                                    if (FoWHelper.playerHasUnitsOnPlanet(p2, uh)) {
+                                        if (p2.isRealPlayer()) {
+                                            MessageHelper.sendMessageToChannelWithButtons(
+                                                    game.isFowMode()
+                                                            ? p2.getCorrectChannel()
+                                                            : event.getMessageChannel(),
+                                                    p2.getRepresentation()
+                                                            + ", please assign the Dragon BOMBARDMENT hit"
+                                                            + (hitRolls == 1 ? "" : "s") + " on "
+                                                            + Helper.getPlanetRepresentation(uh.getName(), game) + ".",
+                                                    buttons);
+                                        } else {
+                                            List<Button> buttons2 = new ArrayList<>();
+                                            buttons2.add(Buttons.green(
+                                                    p2.dummyPlayerSpoof() + "autoAssignGroundHits_" + uh.getName() + "_"
+                                                            + hitRolls,
+                                                    "Auto-assign Hit" + (hitRolls == 1 ? "" : "s") + " For Dummy"));
+                                            MessageHelper.sendMessageToChannelWithButtons(
+                                                    game.isFowMode()
+                                                            ? player.getCorrectChannel()
+                                                            : event.getMessageChannel(),
+                                                    player.getRepresentation()
+                                                            + ", please assign the Dragon BOMBARDMENT hit"
+                                                            + (hitRolls == 1 ? "" : "s") + " for the dummy player on "
+                                                            + Helper.getPlanetRepresentation(uh.getName(), game) + ".",
+                                                    buttons2);
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -882,6 +936,7 @@ public class CombatRollService {
                         || "sigma_jolnar_flagship_2".equalsIgnoreCase(unitModel.getId())) {
                     int additionalDice = hitRolls;
                     while (hitRolls < 100 && additionalDice > 0) {
+                        RoundStatsTracker.recordDiceRolled(game, player, additionalDice);
                         List<DiceHelper.Die> additionalResultRolls =
                                 DiceHelper.rollDice(toHit - modifierToHit, additionalDice);
                         additionalDice = DiceHelper.countSuccesses(additionalResultRolls);
@@ -894,14 +949,16 @@ public class CombatRollService {
                         && gloryHolder != null
                         && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
                     ButtonHelperAbilities.readyBannerHalls(game);
+                    chanceOfAllHits *= Math.pow(1.0 / (11 - toHit + modifierToHit), numRolls * mult);
                     for (DiceHelper.Die die : resultRolls) {
-                        if (die.getResult() > 9) {
+                        if (die.getResult() >= 10) {
                             hitRolls += 1;
                             MessageHelper.sendMessageToChannel(
                                     event.getMessageChannel(),
                                     player.getRepresentation()
                                             + " got an extra hit due to the **Valor** ability (it has been accounted for in the hit count).");
                         }
+                        maximumHits += 1;
                     }
                 }
                 if ("vaden_flagship".equalsIgnoreCase(unitModel.getId()) && rollType == CombatRollType.bombardment) {
@@ -988,25 +1045,63 @@ public class CombatRollService {
                 }
                 if ((game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")
                                 || player.hasTech("tf-tacticalbrilliance"))
-                        && rollType != CombatRollType.combatround
-                        && numMisses > 0) {
-                    resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numMisses);
-                    player.setExpectedHitsTimes10(
-                            player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));
-                    chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numMisses);
-                    chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, numMisses);
-                    maximumHits += numRolls * mult;
-                    int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
-                    totalHits += hitRolls2;
-                    String unitRoll2 = CombatMessageHelper.displayUnitRoll(
-                            unitModel, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
-                    resultBuilder
-                            .append("Rerolling ")
-                            .append(numMisses)
-                            .append(" miss")
-                            .append(numMisses == 1 ? "" : "es")
-                            .append(" due to Ta Zern, the Jol-Nar Commander:\n ")
-                            .append(unitRoll2);
+                        && rollType != CombatRollType.combatround) {
+
+                    if (opponent == player && rollType == CombatRollType.bombardment && player.hasTech("proxima")) {
+                        if (hitRolls > 0) {
+                            RoundStatsTracker.recordDiceRolled(game, player, hitRolls);
+                            resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, hitRolls);
+                            player.setExpectedHitsTimes10(
+                                    player.getExpectedHitsTimes10() + (hitRolls * (11 - toHit + modifierToHit)));
+                            int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
+                            totalHits += hitRolls2;
+                            totalHits -= hitRolls;
+                            String unitRoll2 = CombatMessageHelper.displayUnitRoll(
+                                    unitModel,
+                                    toHit,
+                                    modifierToHit,
+                                    numOfUnit,
+                                    numRollsPerUnit,
+                                    extraRollsForUnit,
+                                    resultRolls2,
+                                    hitRolls2);
+                            resultBuilder
+                                    .append("Rerolling ")
+                                    .append(hitRolls)
+                                    .append(" hit")
+                                    .append(hitRolls == 1 ? "" : "s")
+                                    .append(" due to Ta Zern, the Jol-Nar Commander:\n")
+                                    .append(unitRoll2);
+                        }
+                    } else {
+                        if (numMisses > 0) {
+                            RoundStatsTracker.recordDiceRolled(game, player, numMisses);
+                            resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numMisses);
+                            player.setExpectedHitsTimes10(
+                                    player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));
+                            chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numMisses);
+                            chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, numMisses);
+                            maximumHits += numRolls * mult;
+                            int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
+                            totalHits += hitRolls2;
+                            String unitRoll2 = CombatMessageHelper.displayUnitRoll(
+                                    unitModel,
+                                    toHit,
+                                    modifierToHit,
+                                    numOfUnit,
+                                    numRollsPerUnit,
+                                    0,
+                                    resultRolls2,
+                                    hitRolls2);
+                            resultBuilder
+                                    .append("Rerolling ")
+                                    .append(numMisses)
+                                    .append(" miss")
+                                    .append(numMisses == 1 ? "" : "es")
+                                    .append(" due to Ta Zern, the Jol-Nar Commander:\n")
+                                    .append(unitRoll2);
+                        }
+                    }
                 }
                 if (rollType == CombatRollType.SpaceCannonOffence || rollType == CombatRollType.SpaceCannonDefence) {
                     if (player.ownsUnit("gledge_pds2") && totalHits > 0) {
@@ -1064,10 +1159,43 @@ public class CombatRollService {
                         }
                     }
                 }
+                if (game.playerHasLeaderUnlockedOrAlliance(player, "kaltrimcommander")) {
+                    int num1s = 0;
+                    for (DiceHelper.Die die : resultRolls) {
+                        if (die.getResult() == 1) {
+                            num1s++;
+                        }
+                    }
+                    if (num1s > 0) {
+                        RoundStatsTracker.recordDiceRolled(game, player, num1s);
+                        resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, num1s);
+                        player.setExpectedHitsTimes10(
+                                player.getExpectedHitsTimes10() + (num1s * (11 - toHit + modifierToHit)));
+                        int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
+                        totalHits += hitRolls2;
+                        String unitRoll2 = CombatMessageHelper.displayUnitRoll(
+                                unitModel,
+                                toHit,
+                                modifierToHit,
+                                numOfUnit,
+                                numRollsPerUnit,
+                                0,
+                                resultRolls2,
+                                hitRolls2);
+                        resultBuilder
+                                .append("Rerolling ")
+                                .append(num1s)
+                                .append(" roll")
+                                .append(num1s == 1 ? "" : "s")
+                                .append(" of 1 due to the Kaltrim Commander:\n ")
+                                .append(unitRoll2);
+                    }
+                }
 
                 if (game.getStoredValue("munitionsReserves").equalsIgnoreCase(player.getFaction())
                         && rollType == CombatRollType.combatround
                         && numMisses > 0) {
+                    RoundStatsTracker.recordDiceRolled(game, player, numMisses);
                     resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numMisses);
                     player.setExpectedHitsTimes10(
                             player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));
@@ -1253,7 +1381,7 @@ public class CombatRollService {
                         player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder), entry.getValue()))
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
         HashMap<UnitModel, Integer> output;
-        if (unitHolder.getName().equals(Constants.SPACE)) {
+        if (Constants.SPACE.equals(unitHolder.getName())) {
             if (unitsByAsyncId.containsKey("fs")
                     && (player.hasUnit("nekro_flagship") || player.hasUnit("sigma_nekro_flagship_2"))) {
                 output = new HashMap<>(unitsInCombat.entrySet().stream()

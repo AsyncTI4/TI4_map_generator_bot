@@ -74,9 +74,23 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("hacanagent")) {
             buttons.add(Buttons.gray("exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
         }
+        if (player.hasRelicReady("superweaponavailyn")) {
+            String finChecker = "FFCC_" + player.getFaction() + "_";
+            buttons.add(Buttons.gray(
+                    finChecker + "exhaustSuperweapon_availyn",
+                    "Produce 3 Fighters With Availyn",
+                    FactionEmojis.belkosea));
+        }
         if (player.hasSpaceStation()) {
             buttons.add(Buttons.gray(
                     "startTradeStationConvert", "Convert Commodities With Space Station", MiscEmojis.comm));
+        }
+        if (player.getPlanets().contains("conviction")
+                && !player.getExhaustedPlanetsAbilities().contains("conviction")) {
+            buttons.add(Buttons.gray(
+                    "planetAbilityExhaust_conviction",
+                    "Exhaust Conviction Ability To Replenish Comms",
+                    FactionEmojis.belkosea));
         }
         if (player.hasUnexhaustedLeader("researchagent")) {
             buttons.add(Buttons.gray("exhaustAgent_researchagent", "Use Research Genome", FactionEmojis.Deepwrought));
@@ -155,7 +169,7 @@ public class CardsInfoService {
         if (player.hasUnlockedBreakthrough("yssarilbt")) {
             buttons.add(Buttons.green("startYssarilbt", "Use Yssaril Breakthrough", FactionEmojis.Yssaril));
         }
-        if (player.hasAbility("pillage")) {
+        if (player.hasAbility("pillage") && !game.isTwilightsFallMode()) {
             if (game.getStoredValue("willPillageOwnTransactions" + player.getFaction())
                     .isEmpty()) {
                 buttons.add(Buttons.green(
@@ -301,7 +315,7 @@ public class CardsInfoService {
                 && !ButtonHelperAbilities.getAllOmenDie(game).isEmpty()) {
             StringBuilder omenDice = new StringBuilder();
             for (int omenDie : ButtonHelperAbilities.getAllOmenDie(game)) {
-                omenDice.append(" ").append(omenDie);
+                omenDice.append(' ').append(omenDie);
             }
             omenDice = new StringBuilder(omenDice.toString().trim());
             buttons.add(Buttons.gray("getOmenDice", "Use an omen die (" + omenDice + ")", FactionEmojis.mykomentori));

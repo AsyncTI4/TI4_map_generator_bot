@@ -1,0 +1,59 @@
+<FindBugsFilter>
+    <!-- Checked exceptions suck. Deal with it. -->
+    <Match>
+        <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
+    </Match>
+    <!-- It would be great to fix these one day... but let's be real... -->
+    <Match>
+        <Bug pattern="CC_CYCLOMATIC_COMPLEXITY"/>
+    </Match>
+    <!-- This triggers off Discord's formatting like '>' in a message, so it's a little annoying. -->
+    <Match>
+        <Bug pattern="CBX_CUSTOM_BUILT_XML"/>
+    </Match>
+    <!-- It'd be nice if we handled this differently, without writing to statics from instance methods, but we can't -->
+    <!-- without a bit of work, since this class is so heavily used. -->
+    <Match>
+        <Class name="ti4.spring.jda.JdaService"/>
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+    </Match>
+    <!-- Something we have to do because we're mixing static class with Spring beans -->
+    <Match>
+        <Class name="ti4.spring.context.SpringContext"/>
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+    </Match>
+    <!-- False positive -->
+    <Match>
+        <Class name="ti4.spring.imageio.ImageIoConfiguration"/>
+        <Bug pattern="PRMC_POSSIBLY_REDUNDANT_METHOD_CALLS"/>
+    </Match>
+    <!-- False positive (3) -->
+    <Match>
+        <Class name="ti4.image.MapGenerator"/>
+        <Bug pattern="PRMC_POSSIBLY_REDUNDANT_METHOD_CALLS"/>
+    </Match>
+    <!-- False positive (2) -->
+    <Match>
+        <Class name="ti4.helpers.ComponentActionHelper"/>
+        <Bug pattern="PRMC_POSSIBLY_REDUNDANT_METHOD_CALLS"/>
+    </Match>
+    <!-- Not sure that we care about this -->
+    <Match>
+        <Bug pattern="PSC_PRESIZE_COLLECTIONS"/>
+    </Match>
+    <!-- This is useful, but it takes a lot to fix -->
+    <Match>
+        <Bug pattern="OCP_OVERLY_CONCRETE_COLLECTION_PARAMETER"/>
+    </Match>
+    <!-- This is useful, but it takes a lot to fix -->
+    <Match>
+        <Bug pattern="OCP_OVERLY_CONCRETE_PARAMETER"/>
+    </Match>
+    <!-- I'd like this to be fixed, but we'll come back to it -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+</FindBugsFilter>

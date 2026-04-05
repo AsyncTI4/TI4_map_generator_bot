@@ -30,7 +30,7 @@ public class DraftSetupService {
             TIGLHelper.sendTIGLSetupText(game);
         }
 
-        DraftSpec specs = DraftSpec.CreateFromMiltySettings(settings);
+        DraftSpec specs = DraftSpec.createFromMiltySettings(settings);
 
         if (specs.getTemplate().isNucleusTemplate()) {
             return "Use the new settings menu to start a Nucleus draft!";
@@ -39,7 +39,7 @@ public class DraftSetupService {
         }
     }
 
-    public String startMiltyFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
+    private String startMiltyFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
         Game game = specs.game;
 
         if (specs.presetSlices != null) {

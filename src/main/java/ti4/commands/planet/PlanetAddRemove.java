@@ -121,7 +121,7 @@ abstract class PlanetAddRemove extends GameStateSubcommand {
     }
 
     private String resolvePlanetMessage(String planet) {
-        if (getName().equals(Constants.PLANET_EXHAUST_ABILITY)) {
+        if (Constants.PLANET_EXHAUST_ABILITY.equals(getName())) {
             return switch (planet) {
                 case "hopesend" ->
                     PlanetEmojis.HopesEnd + "" + MiscEmojis.LegendaryPlanet
@@ -138,7 +138,7 @@ abstract class PlanetAddRemove extends GameStateSubcommand {
                 default -> planet;
             };
         }
-        if (getName().equals(Constants.PLANET_REFRESH_ABILITY)) {
+        if (Constants.PLANET_REFRESH_ABILITY.equals(getName())) {
             return switch (planet) {
                 case "hopesend" -> PlanetEmojis.HopesEnd + "" + MiscEmojis.LegendaryPlanet + " _Imperial Arms Vault_";
                 case "primor" -> PlanetEmojis.Primor + "" + MiscEmojis.LegendaryPlanet + " _The Atrament_";

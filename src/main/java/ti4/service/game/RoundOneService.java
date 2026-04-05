@@ -12,6 +12,8 @@ import ti4.buttons.Buttons;
 import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
 import ti4.image.ImageHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -20,7 +22,6 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
-import ti4.model.ColorModel;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.image.FileUploadService;
 import ti4.service.leader.UnlockLeaderService;
@@ -69,13 +70,11 @@ public class RoundOneService {
         if (game.isThundersEdge() && !game.isTwilightsFallMode()) {
             Player neutral = game.getPlayerFromColorOrFaction("neutral");
             if (neutral == null) {
-                List<String> unusedColors =
-                        game.getUnusedColors().stream().map(ColorModel::getName).toList();
-                String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+                String color = SetupNeutralPlayer.pickNeutralColor(game);
                 game.setupNeutralPlayer(color);
             }
             game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
-            game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
+            game.validateAndSetActionCardDeck(event, Mapper.getDeck(getTeActionCardDeckAlias(game)));
             game.setStrategyCardSet("te");
         }
         if (game.isTwilightsFallMode()) {
@@ -141,6 +140,57 @@ public class RoundOneService {
                     || player.hasAbility("binding_debts")) {
                 game.setDebtPoolIcon(Constants.VADEN_DEBT_POOL, MiscEmojis.SharkLoan.toString());
             }
+
+            if (player.hasAbility("questing_prince")) {
+                List<Player> others = new ArrayList<>(game.getRealPlayersExcludingThis(player));
+                Collections.shuffle(others);
+                Tile rex = game.getMecatolTile();
+                for (int i = 0; i < others.size(); i++) {
+                    Player target = others.get(i);
+                    String shrine = (i == 0 ? "special" : "normal");
+                    buttons = new ArrayList<>();
+                    if (rex != null) {
+                        for (String pos : FoWHelper.getAdjacentTiles(game, rex.getPosition(), target, false, false)) {
+                            Tile tile = game.getTileByPosition(pos);
+                            if (tile != null) {
+                                for (Planet planet : tile.getPlanetUnitHolders()) {
+                                    buttons.add(Buttons.green(
+                                            "addShrine_" + planet.getName() + "_" + shrine,
+                                            Helper.getPlanetRepresentation(planet.getName(), game) + " In Tile "
+                                                    + tile.getRepresentationForButtons()));
+                                }
+                            }
+                        }
+                    }
+                    Tile hs = target.getHomeSystemTile();
+                    if (hs != null) {
+                        for (String pos : FoWHelper.getAdjacentTiles(game, hs.getPosition(), target, false, false)) {
+                            Tile tile = game.getTileByPosition(pos);
+                            if (tile != null) {
+                                for (Planet planet : tile.getPlanetUnitHolders()) {
+                                    buttons.add(Buttons.green(
+                                            "addShrine_" + planet.getName() + "_" + shrine,
+                                            Helper.getPlanetRepresentation(planet.getName(), game) + " In Tile "
+                                                    + tile.getRepresentationForButtons()));
+                                }
+                            }
+                        }
+                    }
+                    if (!buttons.isEmpty()) {
+                        MessageHelper.sendMessageToChannelWithButtons(
+                                target.getCorrectChannel(),
+                                target.getRepresentation() + ", please choose a planet on which to place a Shrine.",
+                                buttons);
+                    }
+                }
+            }
         }
+    }
+
+    private static String getTeActionCardDeckAlias(Game game) {
+        if (!game.isAcd2()) {
+            return game.isProphecyOfKings() ? "action_cards_te" : "action_cards_basete";
+        }
+        return game.isProphecyOfKings() ? "action_deck_2_pok_te" : "action_deck_2_te";
     }
 }

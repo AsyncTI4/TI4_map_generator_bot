@@ -14,7 +14,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.model.UnitModel;
 
-public class PdsCoverageHelper {
+public final class PdsCoverageHelper {
 
     /**
      * Calculate PDS coverage for a specific tile, returning comprehensive coverage data per faction.

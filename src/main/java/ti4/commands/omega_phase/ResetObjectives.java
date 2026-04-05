@@ -29,7 +29,7 @@ class ResetObjectives extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        boolean force = event.getOption(Constants.FORCE, false, OptionMapping::getAsBoolean);
+        boolean force = event.getOption(Constants.FORCE, Boolean.FALSE, OptionMapping::getAsBoolean);
         if (!game.isOmegaPhaseMode() && !force) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(), "This command only works in Omega Phase mode...unless you use 'force'.");
@@ -60,7 +60,7 @@ class ResetObjectives extends GameStateSubcommand {
         game.setPublicObjectives1(allOmegaPhaseObjs);
 
         // Remove Imperium Rex if it's already staged
-        game.getPublicObjectives1Peekable().removeIf(s -> s.equals(Constants.IMPERIUM_REX_ID));
+        game.getPublicObjectives1Peekable().removeIf(Constants.IMPERIUM_REX_ID::equals);
 
         // Set up the right number of peakable objectives
         int revealedObjectiveCount = game.getRevealedPublicObjectives().size();

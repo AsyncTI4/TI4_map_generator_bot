@@ -18,16 +18,16 @@ import ti4.model.PromissoryNoteModel;
 @UtilityClass
 public class ColorChangeHelper {
 
-    public static boolean colorIsExclusive(String color, Player player) {
+    public static boolean isColorAllowedForPlayer(String color, Player player) {
         String colorID = Mapper.getColorID(color);
         return switch (colorID) {
             // Riftset is exclusive to eronous always
-            case "ero" -> !player.getUserID().equals(Constants.eronousId);
+            case "ero" -> Constants.eronousId.equals(player.getUserID());
             // Lightgray is exclusive to chassit if chassit is in the game
             case "lgy" ->
-                !player.getUserID().equals(Constants.chassitId)
-                        && player.getGame().getPlayerIDs().contains(Constants.chassitId);
-            default -> false;
+                !player.getGame().getPlayerIDs().contains(Constants.chassitId)
+                        || Constants.chassitId.equals(player.getUserID());
+            default -> true;
         };
     }
 
@@ -113,7 +113,7 @@ public class ColorChangeHelper {
         }
 
         PromissoryNoteModel genericPNModel = pnModel.getSourcePNModel();
-        return genericPNModel.getID().replace("<color>", newColorModel.getName());
+        return genericPNModel.getId().replace("<color>", newColorModel.getName());
     }
 
     private static void replaceIDsOnUnitHolder(UnitHolder unitHolder, String oldColorID, String newColorID) {

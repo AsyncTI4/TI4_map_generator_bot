@@ -1,6 +1,8 @@
 package ti4.message;
 
 import static ti4.helpers.discord.DiscordHelper.isDiscordServerError;
+import static ti4.helpers.discord.DiscordHelper.isIgnorableError;
+import static ti4.helpers.discord.DiscordHelper.isUnknownMessageError;
 
 import java.io.File;
 import java.net.SocketTimeoutException;
@@ -33,9 +35,9 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
@@ -57,6 +59,7 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.VisionariaSelectService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.game.GameNameService;
@@ -66,16 +69,11 @@ import ti4.spring.jda.JdaService;
 @UtilityClass
 public class MessageHelper {
 
-    private static MessageFunction pin(MessageChannel channel) {
-        return msg -> msg.pin()
-                .queue(
-                        null,
-                        error -> BotLogger.error(
-                                getRestActionFailureMessage(channel, "Failed to pin message", null, error), error));
-    }
-
-    public interface MessageFunction {
-        void run(Message msg);
+    public static Consumer<Message> pin() {
+        return msg -> msg.pin().queue(null, error -> {
+            String err = getRestActionFailureMessage(msg.getChannel(), "Failed to pin message", null, error);
+            BotLogger.error(err, error);
+        });
     }
 
     public static void sendMessageToChannel(MessageChannel channel, String messageText) {
@@ -130,7 +128,7 @@ public class MessageHelper {
 
     public static void sendMessageToChannelWithEmbedsAndPin(
             MessageChannel channel, String messageText, List<MessageEmbed> embeds) {
-        splitAndSentWithAction(messageText, channel, pin(channel), embeds, null);
+        splitAndSentWithAction(messageText, channel, pin(), embeds, null);
     }
 
     public static void sendMessageToChannelWithButton(MessageChannel channel, String messageText, Button button) {
@@ -145,12 +143,12 @@ public class MessageHelper {
         }
     }
 
-    public static void sendEphemeralMessageToEventChannel(ButtonInteractionEvent event, String message) {
-        event.getHook().setEphemeral(true).sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
-    }
-
-    public static void sendEphemeralMessageToEventChannel(ModalInteractionEvent event, String message) {
-        event.getHook().setEphemeral(true).sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
+    public static void sendEphemeralMessageToEventChannel(GenericInteractionCreateEvent event, String msg) {
+        if (event instanceof GenericComponentInteractionCreateEvent e) {
+            e.getHook().setEphemeral(true).sendMessage(msg).queue(Consumers.nop(), BotLogger::catchRestError);
+        } else {
+            sendMessageToEventChannel(event, msg);
+        }
     }
 
     public static void sendMessageToChannelWithButtons(
@@ -159,6 +157,7 @@ public class MessageHelper {
         String gameName = GameNameService.getGameNameFromChannel(channel);
         if (GameManager.isValid(gameName)
                 && buttons instanceof ArrayList
+                && buttons.size() > 0
                 && !(channel instanceof ThreadChannel)
                 && channel.getName().contains("actions")) {
             buttons = addUndoButtonToList(buttons, gameName);
@@ -212,6 +211,9 @@ public class MessageHelper {
     }
 
     private static void handleFailedReaction(Game game, Player player, Message message, Throwable error) {
+        if (isUnknownMessageError(error)) {
+            return;
+        }
         if (isDiscordServerError(error)) {
             CircuitBreaker.incrementThresholdCount(
                     "Discord server error while adding reaction to message " + message.getId());
@@ -245,7 +247,7 @@ public class MessageHelper {
             List<MessageEmbed> embeds,
             List<Button> buttons,
             boolean saboable) {
-        MessageFunction addFactionReact = (message) -> {
+        Consumer<Message> addFactionReact = (message) -> {
             if (saboable) {
                 GameMessageManager.add(
                         game.getName(), message.getId(), GameMessageType.ACTION_CARD, game.getLastModifiedDate());
@@ -267,7 +269,7 @@ public class MessageHelper {
 
     public static void sendMessageToChannelWithPersistentReacts(
             MessageChannel channel, String messageText, Game game, List<Button> buttons, GameMessageType messageType) {
-        MessageFunction addFactionReact = (message) -> {
+        Consumer<Message> addFactionReact = (message) -> {
             StringTokenizer players =
                     switch (messageType) {
                         case STATUS_SCORING -> {
@@ -339,7 +341,7 @@ public class MessageHelper {
     }
 
     public static void sendMessageToChannelAndPin(MessageChannel channel, String messageText) {
-        splitAndSentWithAction(messageText, channel, pin(channel));
+        splitAndSentWithAction(messageText, channel, pin());
     }
 
     public static void sendFileToChannel(MessageChannel channel, File file) {
@@ -558,19 +560,20 @@ public class MessageHelper {
         splitAndSentWithAction(messageText, channel, null, embeds, buttons);
     }
 
-    public static void splitAndSentWithAction(String messageText, MessageChannel channel, MessageFunction restAction) {
+    public static void splitAndSentWithAction(
+            String messageText, MessageChannel channel, Consumer<Message> restAction) {
         splitAndSentWithAction(messageText, channel, restAction, null, null);
     }
 
     public static void splitAndSentWithAction(
-            String messageText, MessageChannel channel, List<Button> buttons, MessageFunction restAction) {
+            String messageText, MessageChannel channel, List<Button> buttons, Consumer<Message> restAction) {
         splitAndSentWithAction(messageText, channel, restAction, null, buttons);
     }
 
     private static void splitAndSentWithAction(
             String messageText,
             MessageChannel channel,
-            MessageFunction restAction,
+            Consumer<Message> restAction,
             List<MessageEmbed> embeds,
             List<Button> buttons) {
         if (channel == null) {
@@ -633,23 +636,9 @@ public class MessageHelper {
                         channel,
                         messageCreateData,
                         message -> {
-                            ManagedGame managedGame = GameManager.getManagedGame(gameName);
-                            if (finalMessageText != null && managedGame != null && !managedGame.isFowMode()) {
-                                if (finalMessageText.contains("Use buttons to do your turn")
-                                        || finalMessageText.contains("Use buttons to end turn")) {
-                                    String old = GameMessageManager.replace(
-                                            gameName,
-                                            message.getId(),
-                                            GameMessageType.TURN,
-                                            managedGame.getLastModifiedDate());
-                                    if (old != null)
-                                        channel.deleteMessageById(old)
-                                                .queue(Consumers.nop(), BotLogger::catchRestError);
-                                }
-                            }
-
+                            updateManagedMessages(finalMessageText, message, gameName);
                             if (restAction != null) {
-                                restAction.run(message);
+                                restAction.accept(message);
                             }
                         },
                         finalMessageText,
@@ -658,10 +647,31 @@ public class MessageHelper {
         }
     }
 
+    private static void updateManagedMessages(String text, Message message, String gameName) {
+        ManagedGame managedGame = GameManager.getManagedGame(gameName);
+        if (text == null || message == null || managedGame == null || managedGame.isFowMode()) return;
+
+        String id = message.getId();
+        long date = managedGame.getLastModifiedDate();
+
+        if (text.contains("Use buttons to do your turn")
+                || text.contains("Use buttons to end turn")
+                || text.contains("Use the buttons to end turn")) {
+            String old = GameMessageManager.replace(gameName, id, GameMessageType.TURN, date);
+            if (old != null) {
+                message.getChannel().deleteMessageById(old).queue(Consumers.nop(), BotLogger::catchRestError);
+            }
+        }
+
+        if (text.contains(VisionariaSelectService.initialButtonHeader())) {
+            GameMessageManager.replace(gameName, id, GameMessageType.VISIONARIA, date);
+        }
+    }
+
     public static void sendMessagesWithRetry(
             MessageChannel channel,
             List<MessageCreateData> messageCreateDataList,
-            MessageFunction successAction,
+            Consumer<Message> successAction,
             String errorHeader,
             int remainingAttempts) {
         Iterator<MessageCreateData> iterator = messageCreateDataList.iterator();
@@ -679,17 +689,20 @@ public class MessageHelper {
     private static void sendMessageWithRetry(
             MessageChannel channel,
             MessageCreateData messageCreateData,
-            MessageFunction successAction,
+            Consumer<Message> successAction,
             String errorHeader,
             int remainingAttempts) {
         channel.sendMessage(messageCreateData)
                 .queue(
                         message -> {
                             if (successAction != null) {
-                                successAction.run(message);
+                                successAction.accept(message);
                             }
                         },
                         error -> {
+                            if (isIgnorableError(error)) {
+                                return;
+                            }
                             if (isDiscordServerError(error)) {
                                 CircuitBreaker.incrementThresholdCount(
                                         "Discord server error while sending message in channel " + channel.getId());
@@ -951,10 +964,21 @@ public class MessageHelper {
         // ADD REMAINING EMBEDS IF THEY EXIST
         while (embedsIterator.hasNext()) {
             List<MessageEmbed> messageEmbeds = embedsIterator.next();
+            MessageCreateBuilder messageCreateBuilder = new MessageCreateBuilder();
             if (messageEmbeds != null && !messageEmbeds.isEmpty()) {
-                messageCreateDataList.add(
-                        new MessageCreateBuilder().addEmbeds(messageEmbeds).build());
+                messageCreateBuilder.addEmbeds(messageEmbeds);
+            } else {
+                break;
             }
+
+            // Add the first set of buttons if we're done with embeds
+            if (buttonIterator.hasNext() && !embedsIterator.hasNext()) {
+                List<ActionRow> actionRows = buttonIterator.next();
+                if (actionRows != null && !actionRows.isEmpty()) {
+                    messageCreateBuilder.addComponents(actionRows);
+                }
+            }
+            messageCreateDataList.add(messageCreateBuilder.build());
         }
 
         // ADD REMAINING BUTTONS IF THEY EXIST
@@ -978,7 +1002,7 @@ public class MessageHelper {
                     .append("...\n");
             error.append("> Buttons:\n");
             for (Button b : buttons) {
-                error.append("> - id:`").append(b.getCustomId()).append("`");
+                error.append("> - id:`").append(b.getCustomId()).append('`');
             }
             BotLogger.error(error.toString(), null);
             break;

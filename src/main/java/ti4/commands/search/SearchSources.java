@@ -61,7 +61,7 @@ class SearchSources extends Subcommand {
 
         String sourceString = event.getOption(Constants.SOURCE, null, OptionMapping::getAsString);
         ComponentSource source = ComponentSource.fromString(sourceString);
-        boolean sourcesCheck = event.getOption(CHECK_SOURCES, false, OptionMapping::getAsBoolean);
+        boolean sourcesCheck = event.getOption(CHECK_SOURCES, Boolean.FALSE, OptionMapping::getAsBoolean);
         Boolean canalBool = event.getOption(CANAL, null, OptionMapping::getAsBoolean);
 
         if (sourcesCheck) {
@@ -120,10 +120,6 @@ class SearchSources extends Subcommand {
         occurrences.put("Explores", Mapper.getExploresSources(compSource).size());
         occurrences.put("Factions", Mapper.getFactionsSources(compSource).size());
         occurrences.put(
-                "Draft Errata",
-                Mapper.getDraftErratasSources(compSource)
-                        .size()); // Draft Errata is related to files in \data\franken_errata\*
-        occurrences.put(
                 "Generic Cards", Mapper.getGenericCardsSources(compSource).size());
         occurrences.put("Leaders", Mapper.getLeadersSources(compSource).size());
         // occurrences.put("Map Templates", get...(compSource).size());
@@ -172,7 +168,6 @@ class SearchSources extends Subcommand {
         List<String> eventSources = Mapper.getEventsSources(null);
         List<String> exploreSources = Mapper.getExploresSources(null);
         List<String> factionSources = Mapper.getFactionsSources(null);
-        List<String> drafterrataSources = Mapper.getDraftErratasSources(null);
         List<String> genericcardSources = Mapper.getGenericCardsSources(null);
         List<String> leaderSources = Mapper.getLeadersSources(null);
         // map_templates not sourced
@@ -197,7 +192,6 @@ class SearchSources extends Subcommand {
                         eventSources,
                         exploreSources,
                         factionSources,
-                        drafterrataSources,
                         genericcardSources,
                         leaderSources,
                         promissorynoteSources,
@@ -265,15 +259,15 @@ class SearchSources extends Subcommand {
         uniqueComponentSourcesTextList.append("Compared to sources.json\n");
         for (String string : sources) {
             if (!uniqueComponentSources.containsKey(string))
-                uniqueComponentSourcesTextList.append("- ").append(string).append("\n");
+                uniqueComponentSourcesTextList.append("- ").append(string).append('\n');
         }
         uniqueComponentSourcesTextList.append("Compared to Source.java Enum\n");
         for (String s : enumSources) {
             if (!uniqueComponentSources.containsKey(s))
-                uniqueComponentSourcesTextList.append("- ").append(s).append("\n");
+                uniqueComponentSourcesTextList.append("- ").append(s).append('\n');
         }
 
-        uniqueComponentSourcesTextList.append("\n");
+        uniqueComponentSourcesTextList.append('\n');
 
         uniqueComponentSourcesTextList.append("**Entries missing in sources.json:**\n");
         uniqueComponentSourcesTextList.append("Compared to \\resources\\ JSON content\n");
@@ -282,15 +276,15 @@ class SearchSources extends Subcommand {
                 uniqueComponentSourcesTextList
                         .append("- ")
                         .append(entry.getKey())
-                        .append("\n");
+                        .append('\n');
         }
         uniqueComponentSourcesTextList.append("Compared to Source.java Enum\n");
         for (String enumSource : enumSources) {
             if (!sources.contains(enumSource))
-                uniqueComponentSourcesTextList.append("- ").append(enumSource).append("\n");
+                uniqueComponentSourcesTextList.append("- ").append(enumSource).append('\n');
         }
 
-        uniqueComponentSourcesTextList.append("\n");
+        uniqueComponentSourcesTextList.append('\n');
 
         uniqueComponentSourcesTextList.append("**Entries missing in Source.java Enum:**\n");
         uniqueComponentSourcesTextList.append("Compared to \\resources\\ JSON content\n");
@@ -299,12 +293,12 @@ class SearchSources extends Subcommand {
                 uniqueComponentSourcesTextList
                         .append("- ")
                         .append(entry.getKey())
-                        .append("\n");
+                        .append('\n');
         }
         uniqueComponentSourcesTextList.append("Compared to sources.json\n");
         for (String source : sources) {
             if (!enumSources.contains(source))
-                uniqueComponentSourcesTextList.append("- ").append(source).append("\n");
+                uniqueComponentSourcesTextList.append("- ").append(source).append('\n');
         }
 
         // Send answer

@@ -23,17 +23,17 @@ class WinningPathsStatisticsService {
         int gamesWithWinnerCount = winningPathCount.values().stream().reduce(0, Integer::sum);
         AtomicInteger atomicInteger = new AtomicInteger();
         StringBuilder sb = new StringBuilder();
-        sb.append("__**Winning Paths Count:**__").append("\n");
+        sb.append("__**Winning Paths Count:**__").append('\n');
         winningPathCount.entrySet().stream()
                 .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .forEach(entry -> sb.append(atomicInteger.incrementAndGet())
                         .append(". `")
-                        .append(entry.getValue().toString())
+                        .append(entry.getValue())
                         .append(" (")
                         .append(Math.round(100 * entry.getValue() / (double) gamesWithWinnerCount))
                         .append("%)` ")
                         .append(entry.getKey())
-                        .append("\n"));
+                        .append('\n'));
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Winning Paths", sb.toString());
     }
@@ -56,7 +56,7 @@ class WinningPathsStatisticsService {
         AtomicInteger atomicInteger = new AtomicInteger();
         StringBuilder sb = new StringBuilder();
         sb.append("__**Winning Paths Holding _Support for the Throne_ Count:**__")
-                .append("\n");
+                .append('\n');
         supportWinCount.entrySet().stream()
                 .sorted(Map.Entry.<Integer, Integer>comparingByValue().reversed())
                 .forEach(entry -> sb.append(atomicInteger.getAndIncrement() + 1)
@@ -67,7 +67,7 @@ class WinningPathsStatisticsService {
                         .append("%)` ")
                         .append(entry.getKey())
                         .append(" _Support for the Throne_ wins")
-                        .append("\n"));
+                        .append('\n'));
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Support for the Throne wins", sb.toString());
     }

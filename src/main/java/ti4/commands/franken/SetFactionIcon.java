@@ -48,15 +48,7 @@ class SetFactionIcon extends GameStateSubcommand {
             player.setFactionEmoji(null);
             return;
         }
-        if ((factionEmoji instanceof UnicodeEmoji)) {
-            MessageHelper.sendMessageToEventChannel(
-                    event,
-                    player.getRepresentationUnfogged() + " is setting their faction icon to " + factionEmojiString
-                            + ".");
-            player.setFactionEmoji(factionEmojiString);
-            return;
-        }
-        if ((factionEmoji instanceof CustomEmoji)) {
+        if (factionEmoji instanceof UnicodeEmoji) {
             MessageHelper.sendMessageToEventChannel(
                     event,
                     player.getRepresentationUnfogged() + " is setting their faction icon to " + factionEmojiString
@@ -66,8 +58,7 @@ class SetFactionIcon extends GameStateSubcommand {
         }
         MessageHelper.sendMessageToEventChannel(
                 event,
-                "The bot cannot load " + factionEmojiString
-                        + ". Please use a custom emoji from one of the bot servers. Resetting to default.");
-        player.setFactionEmoji(null);
+                player.getRepresentationUnfogged() + " is setting their faction icon to " + factionEmojiString + ".");
+        player.setFactionEmoji(factionEmojiString);
     }
 }

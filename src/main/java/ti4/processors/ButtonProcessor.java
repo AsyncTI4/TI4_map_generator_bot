@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -56,8 +57,8 @@ public class ButtonProcessor {
     private static String eventToString(ButtonInteractionEvent event, String gameName) {
         return "ButtonProcessor task for `" + event.getUser().getEffectiveName() + "`"
                 + (gameName == null ? "" : " in `" + gameName + "`")
-                + ": `"
-                + ButtonHelper.getButtonRepresentation(event.getButton()) + "`";
+                + ": "
+                + ButtonHelper.getButtonRepresentation(event.getButton());
     }
 
     private static void process(ButtonInteractionEvent event) {
@@ -65,9 +66,10 @@ public class ButtonProcessor {
         long contextRuntime = 0;
         long resolveRuntime = 0;
         long saveRuntime = 0;
+        ButtonContext context = null;
         try {
             long beforeTime = System.currentTimeMillis();
-            ButtonContext context = new ButtonContext(event);
+            context = new ButtonContext(event);
             contextRuntime = System.currentTimeMillis() - beforeTime;
 
             if (context.isValid()) {
@@ -80,7 +82,8 @@ public class ButtonProcessor {
                 saveRuntime = System.currentTimeMillis() - beforeTime;
             }
         } catch (Exception e) {
-            BotLogger.error(new LogOrigin(event), "Something went wrong with button interaction", e);
+            LogOrigin origin = new LogOrigin(event, context);
+            BotLogger.error(origin, "Something went wrong with button interaction", e);
         }
 
         runtimeWarningService.submitNewRuntime(
@@ -151,17 +154,7 @@ public class ButtonProcessor {
                 // Don't add anymore cases - use @ButtonHandler
                 case "refreshInfoButtons" ->
                     MessageHelper.sendMessageToChannelWithButtons(
-                            event.getChannel(),
-                            null,
-                            (game != null && game.isTwilightsFallMode())
-                                    ? Buttons.REFRESH_INFO_BUTTONS_TF
-                                    : Buttons.REFRESH_INFO_BUTTONS);
-                case "factionEmbedRefresh" ->
-                    MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
-                            player.getCardsInfoThread(),
-                            null,
-                            List.of(player.getRepresentationEmbed()),
-                            List.of(Buttons.FACTION_EMBED));
+                            event.getChannel(), null, getRefreshInfoButtons(game));
                 case "gain_1_comms" -> ButtonHelperStats.gainComms(event, game, player, 1, true);
                 case "gain_2_comms" -> ButtonHelperStats.gainComms(event, game, player, 2, true);
                 case "gain_3_comms" -> ButtonHelperStats.gainComms(event, game, player, 3, true);
@@ -214,6 +207,13 @@ public class ButtonProcessor {
                                     + " pressed. This button does not do anything.");
             }
         }
+    }
+
+    private static List<Button> getRefreshInfoButtons(Game game) {
+        if (game == null) return Buttons.REFRESH_INFO_BUTTONS;
+        if (game.isTwilightsFallMode()) return Buttons.REFRESH_INFO_BUTTONS_TF;
+        if (game.isThundersEdge()) return Buttons.REFRESH_INFO_BUTTONS_TE;
+        return Buttons.REFRESH_INFO_BUTTONS;
     }
 
     public static String getButtonProcessingStatistics() {

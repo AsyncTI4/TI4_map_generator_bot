@@ -9,9 +9,7 @@
     ],
     "imagePath": "er_06_async.png",
     "shipPositionsType": "TYPE05",
-    "wormholes": [
-        null
-    ],
+    "wormholes": [],
     "planets": [
         "selen",
         "solin"

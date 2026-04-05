@@ -29,6 +29,7 @@ public class ImageIoConfiguration {
         };
     }
 
+    // This happens on occasion and I have no idea why. If you find a better solution, delete this.
     private static boolean ensureWebpWriterRegistered() {
         if (hasWebpWriter()) {
             BotLogger.info("WebP writer already registered at startup.");

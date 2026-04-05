@@ -34,7 +34,7 @@ public class PlayerStatsService {
         sb.append("      ")
                 .append(MiscEmojis.comm)
                 .append(player.getCommodities())
-                .append("/")
+                .append('/')
                 .append(player.getCommoditiesTotal());
 
         sb.append("      ").append(ExploreEmojis.CFrag).append(player.getCrf());
@@ -42,7 +42,7 @@ public class PlayerStatsService {
         sb.append("   ").append(ExploreEmojis.HFrag).append(player.getHrf());
         sb.append("   ").append(ExploreEmojis.UFrag).append(player.getUrf());
 
-        sb.append("\n");
+        sb.append('\n');
         sb.append("> Base commodities: `").append(player.getCommoditiesBase()).append("`\n");
         sb.append("> Bonus commodities: `").append(player.getCommoditiesBonus()).append("`\n");
         sb.append("> Old total commodities: `")
@@ -93,7 +93,7 @@ public class PlayerStatsService {
         sb.append("> Owned Units: `").append(player.getUnitsOwned()).append("`\n");
         sb.append("> Alliance Members: ")
                 .append(player.getAllianceMembers().replace(player.getFaction(), ""))
-                .append("\n");
+                .append('\n');
         sb.append("> Followed SCs: `")
                 .append(player.getFollowedSCs().toString())
                 .append("`\n");
@@ -103,26 +103,26 @@ public class PlayerStatsService {
         sb.append("> Actual Hits: `").append(player.getActualHits()).append("`\n");
         sb.append("> Total Unit Resource Value: ")
                 .append(MiscEmojis.resources)
-                .append("`")
+                .append('`')
                 .append(player.getTotalResourceValueOfUnits("both"))
                 .append("`\n");
         sb.append("> Total Unit Hit-point Value: ")
                 .append("🩷")
-                .append("`")
+                .append('`')
                 .append(player.getTotalHPValueOfUnits("both"))
                 .append("`\n");
         sb.append("> Total Unit Combat Expected Hits: ")
                 .append("💥")
-                .append("`")
+                .append('`')
                 .append(player.getTotalCombatValueOfUnits("both"))
                 .append("`\n");
         sb.append("> Total Unit Ability Expected Hits: ")
                 .append(TechEmojis.UnitUpgradeTech)
-                .append("`")
+                .append('`')
                 .append(player.getTotalUnitAbilityValueOfUnits())
                 .append("`\n");
         sb.append("> Decal Set: `").append(player.getDecalName()).append("`\n");
-        sb.append("\n");
+        sb.append('\n');
         return sb.toString();
     }
 

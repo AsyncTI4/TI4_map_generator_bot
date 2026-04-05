@@ -85,7 +85,7 @@ class SCPick extends GameStateSubcommand {
             maxSCsPerPlayer = 1;
         }
         if (!game.getStoredValue("exhaustedSC" + scPicked).isEmpty()) {
-            game.setSCPlayed(scPicked, true);
+            game.setSCPlayed(scPicked, Boolean.TRUE);
             for (Player p2 : game.getRealPlayers()) {
                 p2.addFollowedSC(scPicked);
             }

@@ -18,7 +18,7 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.website.AsyncTi4WebsiteHelper;
 
-public class Buttons {
+public final class Buttons {
 
     public enum ButtonColor {
         green,
@@ -33,7 +33,10 @@ public class Buttons {
     public static final Button GET_A_FREE_TECH = green("acquireAFreeTech", "Get a Technology");
     public static final Button REDISTRIBUTE_CCs = green("redistributeCCButtons", "Redistribute Command Tokens");
     public static final Button DONE_DELETE_BUTTONS = gray("deleteButtons", "Done");
+    public static final Button CANCEL = gray("deleteButtons", "Cancel");
     public static final Button FACTION_EMBED = green("factionEmbedRefresh", "Refresh Faction Display");
+    public static final Button DEAL_2_SO =
+            green("deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt);
 
     // Cards Info Buttons
     public static final Button EDIT_SUMMARIES = blue("editEndOfRoundSummaries", "Edit Summaries");
@@ -47,6 +50,8 @@ public class Buttons {
     private static final Button REFRESH_SO_INFO =
             green("refreshSOInfo", "Secret Objectives Info", CardEmojis.SecretObjective);
     private static final Button REFRESH_ABILITY_INFO = green("refreshAbilityInfo", "Ability Info");
+    private static final Button REFRESH_BREAKTHROUGH_INFO =
+            green(Constants.REFRESH_BREAKTHROUGH_INFO, "Breakthrough Info");
     public static final Button REFRESH_RELIC_INFO =
             green(Constants.REFRESH_RELIC_INFO, "Relic Info", ExploreEmojis.Relic);
     public static final Button REFRESH_LEADER_INFO =
@@ -76,6 +81,18 @@ public class Buttons {
             REFRESH_LEADER_INFO,
             REFRESH_UNIT_INFO,
             REFRESH_TECH_INFO,
+            REFRESH_PLANET_INFO,
+            FACTION_EMBED);
+    public static final List<Button> REFRESH_INFO_BUTTONS_TE = List.of(
+            REFRESH_AC_INFO,
+            REFRESH_PN_INFO,
+            REFRESH_SO_INFO,
+            REFRESH_ABILITY_INFO,
+            REFRESH_RELIC_INFO,
+            REFRESH_LEADER_INFO,
+            REFRESH_UNIT_INFO,
+            REFRESH_TECH_INFO,
+            REFRESH_BREAKTHROUGH_INFO,
             REFRESH_PLANET_INFO,
             FACTION_EMBED);
     public static final List<Button> REFRESH_INFO_BUTTONS_TF = List.of(

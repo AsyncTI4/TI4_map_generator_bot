@@ -7,7 +7,7 @@ import lombok.Data;
  * Response from Discord OAuth2 token endpoint
  */
 @Data
-public class DiscordTokenResponse {
+class DiscordTokenResponse {
 
     @JsonProperty("access_token")
     private String accessToken;

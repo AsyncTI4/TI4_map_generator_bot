@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -204,7 +204,7 @@ public class ButtonHelperCommanders {
         List<String> techsSummed = getVeldyrCommanderTechs(player, game, true);
         for (String tech : techsSummed) {
             TechnologyModel model = Mapper.getTech(tech);
-            summary.append(model.getRepresentation(false)).append("\n");
+            summary.append(model.getRepresentation(false)).append('\n');
         }
         if (!techsSummed.isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), summary.toString());
@@ -251,7 +251,7 @@ public class ButtonHelperCommanders {
         List<String> techsSummed = getVeldyrCommanderTechs(player, game, false);
         for (String tech : techsSummed) {
             TechnologyModel model = Mapper.getTech(tech);
-            summary.append(model.getRepresentation(false)).append("\n");
+            summary.append(model.getRepresentation(false)).append('\n');
         }
         if (!techsSummed.isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), summary.toString());
@@ -480,10 +480,11 @@ public class ButtonHelperCommanders {
         Tile tile = game.getTileByPosition(pos);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "fighter");
         player.setGhostCommanderCounter(player.getGhostCommanderCounter() + 1);
+        String factionEmoji = player.getFactionEmoji();
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getFactionEmoji() + " placed 1 fighter in " + tile.getRepresentation()
-                        + " using Sai Seravus, the Creuss commander.\n-# " + player.getFactionEmoji()
+                factionEmoji + " placed 1 fighter in " + tile.getRepresentation()
+                        + " using Sai Seravus, the Creuss commander.\n-# " + factionEmoji
                         + " has placed a total of " + player.getGhostCommanderCounter()
                         + " fighters over the course of this game.");
     }
@@ -616,7 +617,7 @@ public class ButtonHelperCommanders {
                 String acID = acDeck.getFirst();
                 ActionCardModel acModel = Mapper.getActionCard(acID);
                 String sb = player.getRepresentation() + "*, the top card of the action card deck is:\n"
-                        + acModel.getRepresentation();
+                        + acModel.getRepresentation(game);
                 MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
             }
         }
@@ -778,6 +779,32 @@ public class ButtonHelperCommanders {
     }
 
     public static void resolveNekroCommanderCheck(Player player, String tech, Game game) {
+        TechnologyModel techModel = Mapper.getTech(AliasHandler.resolveTech(tech));
+        String techID = tech;
+        Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
+        if (techModel.getFaction().isEmpty()
+                && obsidian != null
+                && !obsidian.is(player)
+                && obsidian.getPuppetedFactionsForPlot("extract").contains(player.getFaction())
+                && !obsidian.getTechs().contains(techID)) {
+            String msg = obsidian.getRepresentation() + ", _"
+                    + Mapper.getTech(techID).getName() + "_ has just been gained by " + player.getRepresentationNoPing()
+                    + ". Your _Extract_ plot card allows you to gain this technology for yourself by paying 4 resources.";
+
+            List<Button> buttons2 = new ArrayList<>();
+            buttons2.add(Buttons.green(
+                    "getTech_" + Mapper.getTech(techID).getAlias() + "__noPay",
+                    Mapper.getTech(techID).getName()));
+            buttons2.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(obsidian.getCardsInfoThread(), msg, buttons2);
+            List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, obsidian, "res");
+            Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+            buttons.add(doneExhausting);
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    obsidian.getCardsInfoThread(), "You can use these buttons to pay the 4 resources.", buttons);
+        }
+
         if (game.playerHasLeaderUnlockedOrAlliance(player, "nekrocommander")) {
             if (Mapper.getTech(AliasHandler.resolveTech(tech))
                             .getFaction()
@@ -785,24 +812,14 @@ public class ButtonHelperCommanders {
                             .isEmpty()
                     || !player.hasAbility("technological_singularity")) {
                 List<Button> buttons = new ArrayList<>();
-                if (player.hasAbility("scheming")) {
-                    buttons.add(Buttons.green("draw_2_ACDelete", "Draw 2 Action Cards"));
-                    buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCorrectChannel(),
-                            player.getRepresentationUnfogged()
-                                    + ", you gained a technology while having Nekro Acidos, the Nekro commander."
-                                    + " Use the buttons to draw 2 action cards (**Scheming** increases this from the normal 1 action card).",
-                            buttons);
-                } else {
-                    buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
-                    buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCorrectChannel(),
-                            player.getRepresentationUnfogged()
-                                    + ", you gained a technology while having Nekro Acidos, the Nekro commander. Use the buttons to draw 1 action card.",
-                            buttons);
-                }
+
+                buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
+                buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged()
+                                + ", you gained a technology while having Nekro Acidos, the Nekro commander. Use the buttons to draw 1 action card.",
+                        buttons);
             } else {
                 if (player.hasAbility("technological_singularity")) {
                     MessageHelper.sendMessageToChannel(
@@ -815,7 +832,7 @@ public class ButtonHelperCommanders {
                         if ("vax".equalsIgnoreCase(nekroTech) || "vay".equalsIgnoreCase(nekroTech)) {
                             continue;
                         }
-                        TechnologyModel techModel = Mapper.getTech(AliasHandler.resolveTech(nekroTech));
+                        techModel = Mapper.getTech(AliasHandler.resolveTech(nekroTech));
                         if (!techModel.getFaction().orElse("").isEmpty()) {
                             removeTechButtons.add(
                                     Buttons.blue("removeValefar_" + nekroTech, "Remove " + techModel.getName()));
@@ -964,7 +981,7 @@ public class ButtonHelperCommanders {
         String planetRepresentation = Helper.getPlanetRepresentation(planet1, game);
 
         String message = player.getFactionEmojiOrColor() + " moved 1 " + mechorInf + " from " + planetRepresentation2
-                + " to " + planetRepresentation + " using G'hom Sek'kus, the N'orr Commander.";
+                + " to " + planetRepresentation + " using G'hom Sek'kus, the Sardakk Commander.";
         RemoveUnitService.removeUnits(
                 event, game.getTileFromPlanet(planet2), game, player.getColor(), "1 " + mechorInf + " " + planet2);
 
@@ -982,9 +999,9 @@ public class ButtonHelperCommanders {
             Game game, Player player, GenericInteractionCreateEvent event) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         List<Button> buttons = new ArrayList<>();
-        for (UnitHolder planetUnit : tile.getPlanetUnitHolders()) {
+        for (Planet planetUnit : tile.getPlanetUnitHolders()) {
 
-            Planet planetReal = (Planet) planetUnit;
+            Planet planetReal = planetUnit;
             String planetId = planetReal.getName();
             String planetName = Helper.getPlanetName(planetId);
 
@@ -995,8 +1012,8 @@ public class ButtonHelperCommanders {
                         && tile2 != tile) {
                     continue;
                 }
-                for (UnitHolder planetUnit2 : tile2.getPlanetUnitHolders()) {
-                    Planet planetReal2 = (Planet) planetUnit2;
+                for (Planet planetUnit2 : tile2.getPlanetUnitHolders()) {
+                    Planet planetReal2 = planetUnit2;
                     int numMechs = 0;
                     int numInf = 0;
                     String colorID = Mapper.getColorID(player.getColor());

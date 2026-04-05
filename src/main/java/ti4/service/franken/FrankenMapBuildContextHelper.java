@@ -10,8 +10,9 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.math.NumberUtils;
+import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
-import ti4.draft.DraftItem.Category;
+import ti4.draft.items.TileDraftItem;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -68,8 +69,8 @@ public class FrankenMapBuildContextHelper {
                             continue;
                         }
                         boolean hasSpeakerOrder = player.getDraftHand().Contents.stream()
-                                .filter(item -> item.ItemCategory == Category.DRAFTORDER)
-                                .anyMatch(item -> item.ItemId.equals("" + playerNum));
+                                .filter(item -> item.getItemCategory() == DraftCategory.DRAFTORDER)
+                                .anyMatch(item -> item.getItemId().equals("" + playerNum));
                         if (hasSpeakerOrder) {
                             return Optional.of(player);
                         }
@@ -105,23 +106,24 @@ public class FrankenMapBuildContextHelper {
                 continue;
             }
             List<DraftItem> tileItems = player.getDraftHand().Contents.stream()
-                    .filter(item -> item.ItemCategory == Category.BLUETILE || item.ItemCategory == Category.REDTILE)
+                    .filter(item -> item instanceof TileDraftItem)
                     .collect(Collectors.toList());
 
             // Count how many of the mulliganned tiles are in this bag (one tile can be
             // mulliganned more than once)
             int mulligansUsed = 0;
             for (String mulligannedTileId : mulligannedTiles) {
-                boolean isInBag = tileItems.stream().anyMatch(item -> item.ItemId.equals(mulligannedTileId));
+                boolean isInBag =
+                        tileItems.stream().anyMatch(item -> item.getItemId().equals(mulligannedTileId));
                 if (isInBag) {
                     mulligansUsed++;
                 }
             }
 
             // Remove tiles that are placed on the game board
-            tileItems.removeIf(tileItem -> placedTiles.contains(tileItem.ItemId));
+            tileItems.removeIf(tileItem -> placedTiles.contains(tileItem.getItemId()));
             // Remove tiles that the player discarded
-            tileItems.removeIf(tileItem -> discardedTiles.contains(tileItem.ItemId));
+            tileItems.removeIf(tileItem -> discardedTiles.contains(tileItem.getItemId()));
 
             result.add(PlayerTiles.create(player.getUserID(), tileItems, mulligansUsed));
         }

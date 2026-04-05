@@ -30,6 +30,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.DeepgloomService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -86,7 +87,7 @@ public class ComponentActionHelper {
         }
         if (game.isMercenariesForHireMode()) {
             if (game.getStoredValue("mercCommander").isEmpty()) {
-                game.setStoredValue("mercCommander", BreakthroughHelper.getUnusedCommander(game));
+                game.setStoredValue("mercCommander", UnusedCommanderHelper.getUnusedCommander(game));
             }
             String commanderName =
                     StringUtils.capitalize(game.getStoredValue("mercCommander").replace("commander", " Commander"));
@@ -182,7 +183,15 @@ public class ComponentActionHelper {
                         if (p1.hasExternalAccessToLeader(led)) {
                             Button lButton = Buttons.gray(
                                     finChecker + prefix + "leader_" + led,
-                                    "Use " + leaderName + " as Rebellion Agent",
+                                    "Use " + leaderName + " as Crimson Agent",
+                                    factionEmoji);
+                            compButtons.add(lButton);
+                        }
+                        led = "zephyrionagent";
+                        if (p1.hasExternalAccessToLeader(led)) {
+                            Button lButton = Buttons.gray(
+                                    finChecker + prefix + "leader_" + led,
+                                    "Use " + leaderName + " as Zephyrion Agent",
                                     factionEmoji);
                             compButtons.add(lButton);
                         }
@@ -276,12 +285,12 @@ public class ComponentActionHelper {
                 continue;
             }
 
-            if (relic.equalsIgnoreCase(Constants.ENIGMATIC_DEVICE)
-                    || !relic.contains("starchart")
+            if (Constants.ENIGMATIC_DEVICE.equalsIgnoreCase(relic)
+                    || (!relic.contains("starchart")
                             && (relicData.getText().contains("Action:")
-                                    || relicData.getText().contains("ACTION:"))) {
+                                    || relicData.getText().contains("ACTION:")))) {
                 Button rButton;
-                if (relic.equalsIgnoreCase(Constants.ENIGMATIC_DEVICE)) {
+                if (Constants.ENIGMATIC_DEVICE.equalsIgnoreCase(relic)) {
                     if (enigmaticSeen) {
                         continue;
                     }
@@ -296,14 +305,24 @@ public class ComponentActionHelper {
                             "the_incursion_gate");
                     if (exhaustRelics.contains(relic.toLowerCase())) {
                         if (!p1.getExhaustedRelics().contains(relic)) {
-                            rButton = Buttons.blue(
-                                    finChecker + prefix + "relic_" + relic, "Exhaust " + relicData.getName());
+                            if (!"circletofthevoid".equalsIgnoreCase(relic)
+                                    || !ButtonHelperActionCards.getCircletButtons(game, p1)
+                                            .isEmpty()) {
+                                rButton = Buttons.blue(
+                                        finChecker + prefix + "relic_" + relic, "Exhaust " + relicData.getName());
+                            } else {
+                                continue;
+                            }
                         } else {
                             continue;
                         }
                     } else {
                         rButton = Buttons.red(finChecker + prefix + "relic_" + relic, "Purge " + relicData.getName());
                     }
+                }
+                if ("stellar_converter".equalsIgnoreCase(relic)
+                        && ButtonHelper.getButtonsForStellar(p1, game).isEmpty()) {
+                    continue;
                 }
                 compButtons.add(rButton);
             }
@@ -359,6 +378,13 @@ public class ComponentActionHelper {
         if (p1.hasAbility("orbital_drop") && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar"))) {
             Button abilityButton =
                     Buttons.green(finChecker + prefix + "ability_orbitalDrop", "Orbital Drop", FactionEmojis.Sol);
+            compButtons.add(abilityButton);
+        }
+        if (p1.hasAbility("mutineers")
+                && !ButtonHelperAbilities.getTilesToMutineers(game, p1).isEmpty()
+                && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar"))) {
+            Button abilityButton =
+                    Buttons.green(finChecker + prefix + "ability_mutineers", "Mutineers", FactionEmojis.sarcosa);
             compButtons.add(abilityButton);
         }
         if (ButtonHelperSCs.findUsedFacilities(game, p1).contains("facilitycorefactory")) {
@@ -559,6 +585,26 @@ public class ComponentActionHelper {
                     List<Button> buttons = new ArrayList<>(
                             Helper.getPlanetPlaceUnitButtons(p1, game, "2gf", "placeOneNDone_skipbuildorbital"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                } else if ("mutineers".equalsIgnoreCase(buttonID)) {
+                    String factionEmoji = p1.getFactionEmoji();
+                    String successMessage = factionEmoji + " spent 1 strategy token using "
+                            + FactionEmojis.sarcosa + "**Mutineers** (" + (p1.getStrategicCC()) + "->"
+                            + (p1.getStrategicCC() - 1) + ")";
+                    if (!p1.hasRelicReady("emelpar")) {
+
+                        p1.setStrategicCC(p1.getStrategicCC() - 1);
+                        ButtonHelperCommanders.resolveMuaatCommanderCheck(
+                                p1, game, event, FactionEmojis.Sol + " **Mutineers**");
+                    } else {
+                        p1.addExhaustedRelic("emelpar");
+                        successMessage =
+                                factionEmoji + " used the _" + RelicHelper.sillySpelling() + "_ to **Mutineers**.";
+                    }
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
+                    String message = "Please choose the system you wish to replace 1 ship with.";
+                    List<Button> buttons = new ArrayList<>(
+                            Helper.getPlanetPlaceUnitButtons(p1, game, "2gf", "placeOneNDone_skipbuildorbital"));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("muaatFS".equalsIgnoreCase(buttonID)) {
                     String successMessage =
                             p1.getFactionEmoji() + " spent 1 strategy token using " + FactionEmojis.Muaat
@@ -629,7 +675,6 @@ public class ComponentActionHelper {
                     String message = "Use buttons to end turn or do an action";
                     List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(p1, game, true, event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, systemButtons);
-
                 } else if ("fabrication".equalsIgnoreCase(buttonID)) {
                     String message = "Please choose the fragment you wish to purge. ";
                     List<Button> purgeFragButtons = new ArrayList<>();
@@ -659,6 +704,7 @@ public class ComponentActionHelper {
 
                 } else if ("stallTactics".equalsIgnoreCase(buttonID)) {
                     List<Button> acButtons = ActionCardHelper.getDiscardActionCardButtons(p1, true);
+                    DeepgloomService.spendOneDebt(game, p1, "stall_tactics");
                     if (!acButtons.isEmpty()) {
                         MessageHelper.sendMessageToChannel(
                                 p1.getCorrectChannel(),
@@ -753,15 +799,16 @@ public class ComponentActionHelper {
             case "generic" ->
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Doing unspecified component action.");
             case "absolMOW" -> {
+                String factionEmoji = p1.getFactionEmoji();
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        p1.getFactionEmoji()
+                        factionEmoji
                                 + " is exhausting the _Minister of War_ agenda and spending a command token from their strategy pool to remove 1 command token from the game board.");
                 if (p1.getStrategicCC() > 0) {
                     p1.setStrategicCC(p1.getStrategicCC() - 1);
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
-                            p1.getFactionEmoji()
+                            factionEmoji
                                     + ", you previously had " + (p1.getStrategicCC() + 1) + " command token"
                                     + (p1.getStrategicCC() + 1 == 1 ? "" : "s")
                                     + " in your strategy pool and now you have " + p1.getStrategicCC() + ".");
@@ -839,7 +886,7 @@ public class ComponentActionHelper {
                             p1.getRepresentation() + " acquired a new commander, "
                                     + Mapper.getLeader(leaderID).getName() + "!");
                     UnlockLeaderService.unlockLeader(leaderID, game, p1);
-                    game.setStoredValue("mercCommander", BreakthroughHelper.getUnusedCommander(game));
+                    game.setStoredValue("mercCommander", UnusedCommanderHelper.getUnusedCommander(game));
                     if (!game.getStoredValue("mercCommander").isEmpty()) {
                         LeaderModel led = Mapper.getLeader(game.getStoredValue("mercCommander"));
                         if (led != null) {
@@ -866,8 +913,7 @@ public class ComponentActionHelper {
                 boolean implemented = TeHelperBreakthroughs.handleBreakthroughExhaust(event, game, p1, buttonID);
 
                 if (!implemented) {
-                    String unimplemented =
-                            "IDK how to do this yet. " + Constants.jazzPing() + " please implement this breakthrough.";
+                    String unimplemented = "IDK how to do this yet. Please resolve manually.";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), unimplemented);
                 }
             }

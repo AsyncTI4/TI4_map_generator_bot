@@ -103,7 +103,7 @@ public class IxthianArtifactService {
             } else {
                 msg += "💥💥💥💥";
             }
-        } else if (heartUsed) {
+        } else {
             msg += "............\n# But the _Heart of Ixth_ has changed the outcome!";
             if (result.isSuccess()) {
                 msg += "💥💥💥💥";

@@ -132,14 +132,14 @@ public class ShowActionCardsService {
             List<String> ids = acEntryList.getValue().stream()
                     .map(i -> "`(" + i.getValue() + ")`")
                     .toList();
-            sb.append("\n").append(index).append("\\. ");
+            sb.append('\n').append(index).append("\\. ");
             index++;
             sb.append(CardEmojis.getACEmoji(game).toString().repeat(ids.size()));
             sb.append(" _").append(acEntryList.getKey()).append("_ ");
             sb.append(String.join(", ", ids)).append("\n> ");
             ActionCardModel model =
                     Mapper.getActionCard(acEntryList.getValue().getFirst().getKey());
-            sb.append(model.getRepresentationJustText());
+            sb.append(model.getRepresentationJustText(game));
             if (model.getNotes() != null) {
                 sb.append("\n> -# [").append(model.getNotes()).append("]");
             }
@@ -167,7 +167,7 @@ public class ShowActionCardsService {
             List<String> ids = acEntryList.getValue().stream()
                     .map(i -> "`(" + i.getValue() + ")`")
                     .toList();
-            sb.append("\n").append(index).append("\\. ");
+            sb.append('\n').append(index).append("\\. ");
             index++;
             sb.append(CardEmojis.getACEmoji(game).toString().repeat(ids.size()));
             sb.append(" _").append(acEntryList.getKey()).append("_");
@@ -199,14 +199,14 @@ public class ShowActionCardsService {
         StringBuilder sb = new StringBuilder("**__").append(title).append(":__**");
         int index = 1;
         for (Map.Entry<String, List<String>> entry : displayOrder) {
-            sb.append("\n").append(index).append("\\. ");
+            sb.append('\n').append(index).append("\\. ");
             index++;
             sb.append(CardEmojis.getACEmoji(game)
                     .toString()
                     .repeat(entry.getValue().size()));
             sb.append(" _").append(entry.getKey()).append("_\n> ");
             ActionCardModel model = Mapper.getActionCard(entry.getValue().getFirst());
-            sb.append(model.getRepresentationJustText());
+            sb.append(model.getRepresentationJustText(game));
             if (model.getNotes() != null) {
                 sb.append("\n> -# [").append(model.getNotes()).append("]");
             }

@@ -88,7 +88,7 @@ class ListPlayerInfoButtonHandler {
                     for (String ability : p2.getAbilities()) {
                         messageEmbeds.add(Mapper.getAbility(ability).getRepresentationEmbed());
                     }
-                    for (Leader lead : p2.getLeaders()) {
+                    for (Leader lead : p2.getLeadersIncludingPurged()) {
                         messageEmbeds.add(lead.getLeaderModel()
                                 .get()
                                 .getRepresentationEmbed(true, true, true, true, game.isTwilightsFallMode()));
@@ -106,7 +106,7 @@ class ListPlayerInfoButtonHandler {
                     }
                     for (String planet : p2.getPlanets()) {
                         sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game))
-                                .append("\n");
+                                .append('\n');
                     }
                     for (String tech : p2.getTechs()) {
                         messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
@@ -149,7 +149,7 @@ class ListPlayerInfoButtonHandler {
                 case "planet" -> {
                     for (String planet : p2.getPlanets()) {
                         sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game))
-                                .append("\n");
+                                .append('\n');
                     }
                 }
                 case "pn" -> {
@@ -160,7 +160,7 @@ class ListPlayerInfoButtonHandler {
                     }
                 }
                 case "agent", "commander", "hero" -> {
-                    for (Leader lead : p2.getLeaders()) {
+                    for (Leader lead : p2.getLeadersIncludingPurged()) {
                         if (lead.getId().contains(category)) {
                             messageEmbeds.add(lead.getLeaderModel()
                                     .get()

@@ -166,7 +166,7 @@ public class EndTurnService {
         // Next, check if puppets on a string has been pre-played
         if (game.getRealPlayers().stream().allMatch(Player::isPassed)
                 && !game.getStoredValue("Puppets On A String").isEmpty()) {
-            String value = game.getStoredValue("Puppets On A String");
+            String value = game.getStoredValue("Puppets On A String").split("_")[0];
             Player puppeteer = game.getPlayerFromColorOrFaction(value);
             if (puppeteer != null && puppeteer.getPlayableActionCards().contains("puppetsonastring")) {
                 game.removeStoredValue("Puppets On A String");

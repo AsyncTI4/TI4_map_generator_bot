@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -36,7 +37,8 @@ public class SetOrderService {
                 sb.append(MiscEmojis.SpeakerToken);
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+        MessageChannel channel = event == null ? game.getActionsChannel() : event.getMessageChannel();
+        MessageHelper.sendMessageToChannel(channel, sb.toString());
     }
 
     private static void setPlayerOrder(Map<String, Player> newPlayerOrder, Map<String, Player> players, User user) {

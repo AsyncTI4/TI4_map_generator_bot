@@ -57,7 +57,7 @@ public class DraftSpec {
         factionSources = new ArrayList<>(tileSources);
     }
 
-    public static DraftSpec CreateFromMiltySettings(MiltySettings settings) {
+    public static DraftSpec createFromMiltySettings(MiltySettings settings) {
         Game game = settings.getGame();
         DraftSpec specs = new DraftSpec(game);
 
@@ -105,7 +105,7 @@ public class DraftSpec {
         return specs;
     }
 
-    public static DraftSpec SliceSpecsFromDraftSystemSettings(DraftSystemSettings settings) {
+    public static DraftSpec sliceSpecsFromDraftSystemSettings(DraftSystemSettings settings) {
         Game game = settings.getGame();
         DraftSpec specs = new DraftSpec(game);
 
@@ -120,9 +120,16 @@ public class DraftSpec {
         // Load Slice Generation Specifications
         MiltySliceDraftableSettings sliceSettings = settings.getSliceSettings().getMiltySettings();
         specs.numSlices = settings.getSliceSettings().getNumSlices().getVal();
+        if (game.isBaseGameMode() && !game.isThundersEdge()) {
+            specs.numSlices =
+                    Math.min(6, settings.getSliceSettings().getNumSlices().getVal());
+        }
         specs.anomaliesCanTouch = false;
         specs.extraWHs = sliceSettings.getExtraWorms().isVal();
         specs.minLegend = sliceSettings.getNumLegends().getValLow();
+        if (game.isBaseGameMode() && !game.isThundersEdge()) {
+            specs.minLegend = 0;
+        }
         specs.maxLegend = sliceSettings.getNumLegends().getValHigh();
         specs.minTot = sliceSettings.getTotalValue().getValLow();
         specs.maxTot = sliceSettings.getTotalValue().getValHigh();

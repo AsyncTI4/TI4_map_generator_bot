@@ -1,6 +1,6 @@
 package ti4.listeners;
 
-import java.util.List;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -12,7 +12,7 @@ import ti4.spring.jda.JdaService;
 
 public class ButtonListener extends ListenerAdapter {
 
-    private static final List<String> BUTTONS_TO_THINK_ABOUT = List.of("showGameAgain");
+    private static final Set<String> BUTTONS_TO_THINK_ABOUT = Set.of("showGameAgain");
 
     private static ButtonListener instance;
 

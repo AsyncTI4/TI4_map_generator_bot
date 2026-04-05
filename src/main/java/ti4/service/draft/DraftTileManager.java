@@ -38,7 +38,7 @@ public class DraftTileManager {
             "corner", "lane", "mecatol", "blank", "border", "fow", "anomaly", "deltawh", "seed", "mr", "mallice",
             "ethan", "prison", "kwon", "home", "hs", "red", "blue", "green", "gray", "gate", "setup");
 
-    public void addDraftTile(MiltyDraftTile draftTile) {
+    private void addDraftTile(MiltyDraftTile draftTile) {
         TierList draftTileTier = draftTile.getTierList();
         switch (draftTileTier) {
             case high, mid, low -> blue.add(draftTile);
@@ -109,7 +109,7 @@ public class DraftTileManager {
      * set.
      * @return A map of tiers to the tiles in that tier.
      */
-    public Map<TierList, List<MiltyDraftTile>> getTilesByTier() {
+    private Map<TierList, List<MiltyDraftTile>> getTilesByTier() {
         if (!tilesByTier.isEmpty()) {
             return tilesByTier;
         }
@@ -204,7 +204,7 @@ public class DraftTileManager {
         return DISALLOWED_TERMS.stream().anyMatch(term -> id.contains(term) || path.contains(term));
     }
 
-    public static MiltyDraftTile getDraftTileFromModel(TileModel tileModel) {
+    private static MiltyDraftTile getDraftTileFromModel(TileModel tileModel) {
         String tileID = tileModel.getId();
         if (tiles.containsKey(tileID)) return tiles.get(tileID);
 

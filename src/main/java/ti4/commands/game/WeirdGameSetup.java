@@ -14,6 +14,7 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -149,7 +150,21 @@ class WeirdGameSetup extends GameStateSubcommand {
         }
 
         Boolean thunderMode = event.getOption(Constants.THUNDERS_EDGE_MODE, null, OptionMapping::getAsBoolean);
-        if (thunderMode != null) game.setThundersEdge(thunderMode);
+        if (thunderMode != null) {
+            game.setThundersEdge(thunderMode);
+            if (thunderMode && !game.getActionCards().contains("brilliance")) {
+                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(), "The Thunder's Edge action card deck has been set.");
+            }
+            if (thunderMode && !game.getAllRelics().contains("thesilverflame")) {
+                game.addRelicToGame("quantumcore");
+                game.addRelicToGame("thesilverflame");
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "_The Silver Flame_ and _The Quantumcore_ relics have been added back to the relic deck.");
+            }
+        }
 
         Boolean riftsetMode = event.getOption(FOWOption.RIFTSET_MODE.toString(), null, OptionMapping::getAsBoolean);
         if (riftsetMode != null && game.isFowMode()) {
@@ -197,7 +212,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             boolean isTIGLGame,
             boolean votcMode) {
         if (isTIGLGame
-                && !game.getTags().contains(Constants.TIGL_FRACTURED_TAG)
+                && !TIGLHelper.isFracturedTIGLGame(game)
                 && (baseGameMode
                         || absolMode
                         || discordantStarsMode
@@ -215,6 +230,10 @@ class WeirdGameSetup extends GameStateSubcommand {
         }
 
         game.setCompetitiveTIGLGame(false);
+        if (game.isThundersEdge() || game.isTwilightsFallMode()) {
+            return true;
+            // These modes are incompatible atm with the rest of the game mode settings, so skip them
+        }
 
         if (miltyModMode && !baseGameMode) {
             MessageHelper.sendMessageToChannel(
@@ -242,8 +261,8 @@ class WeirdGameSetup extends GameStateSubcommand {
 
             for (Player player : game.getPlayers().values()) {
                 player.setLeaders(new ArrayList<>());
-                if (player.getUnitByBaseType("mech") != null)
-                    player.removeOwnedUnitByID(player.getUnitByBaseType("mech").getId());
+                UnitModel mech = player.getUnitByBaseType("mech");
+                if (mech != null) player.removeOwnedUnitByID(mech.getId());
             }
 
             game.setScSetID("miltymod");
@@ -270,8 +289,8 @@ class WeirdGameSetup extends GameStateSubcommand {
 
             for (Player player : game.getPlayers().values()) {
                 player.setLeaders(new ArrayList<>());
-                if (player.getUnitByBaseType("mech") != null)
-                    player.removeOwnedUnitByID(player.getUnitByBaseType("mech").getId());
+                UnitModel mech = player.getUnitByBaseType("mech");
+                if (mech != null) player.removeOwnedUnitByID(mech.getId());
             }
 
             game.setTechnologyDeckID("techs_base");

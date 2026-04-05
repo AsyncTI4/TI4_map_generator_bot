@@ -14,10 +14,12 @@ public class TwilightFallCommand implements ParentCommand {
                     new DrawRandomUnit(),
                     new DrawRandomGenome(),
                     new DrawSpecificParadigm(),
+                    new DrawRandomParadigm(),
                     new RadicalAdvancement(),
                     new FixColors(),
                     new StartNewSplice(),
                     new DoEdictPhase(),
+                    new SetupStartingFleet(),
                     new DiscardVeiledCard())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

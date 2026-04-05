@@ -15,6 +15,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +26,7 @@ import ti4.helpers.CalendarHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
@@ -41,8 +44,13 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.map.CustomHyperlaneService;
 
 public class Tile {
+    @Getter
     private final String tileID;
+
+    @Setter
     private String position;
+
+    @Getter
     private final Map<String, UnitHolder> unitHolders = new LinkedHashMap<>();
 
     @JsonIgnore
@@ -194,13 +202,6 @@ public class Tile {
         }
     }
 
-    public void removeControl(String tokenID, String spaceHolder) {
-        UnitHolder unitHolder = unitHolders.get(spaceHolder);
-        if (unitHolder != null) {
-            unitHolder.removeControl(tokenID);
-        }
-    }
-
     public void addToken(String tokenID, String spaceHolder) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
@@ -270,15 +271,6 @@ public class Tile {
         }
     }
 
-    public void addUnitDamage(String spaceHolder, UnitKey unitID, String count) {
-        try {
-            int unitCount = Integer.parseInt(count);
-            addUnitDamage(spaceHolder, unitID, unitCount);
-        } catch (Exception e) {
-            BotLogger.error("Could not parse unit count", e);
-        }
-    }
-
     @JsonIgnore
     public List<Boolean> getHyperlaneData(Integer sourceDirection, Game game) {
         String property = Mapper.getHyperlaneData(tileID);
@@ -307,16 +299,8 @@ public class Tile {
         return fullHyperlaneData.get(sourceDirection);
     }
 
-    public String getTileID() {
-        return tileID;
-    }
-
     public String getPosition() {
         return position != null ? position.toLowerCase() : null;
-    }
-
-    public void setPosition(String position) {
-        this.position = position;
     }
 
     @JsonIgnore
@@ -326,7 +310,7 @@ public class Tile {
             tileName = "S15_Cucumber.png";
         }
         if (("43".equals(tileID) || "80".equals(tileID))) {
-            int baubleChance = CalendarHelper.isNearChristmas() ? 5 : 10000;
+            int baubleChance = CalendarHelper.isNearChristmas() ? 5 : 10_000;
             if (RandomHelper.isOneInX(baubleChance)) {
                 tileName = tileName.replace(".png", "_xmas.png");
             }
@@ -411,10 +395,6 @@ public class Tile {
             BotLogger.warning(new LogOrigin(player), "Could not find tile: " + fowTileID);
         }
         return tilePath;
-    }
-
-    public Map<String, UnitHolder> getUnitHolders() {
-        return unitHolders;
     }
 
     public List<Planet> getSpaceStations() {
@@ -842,5 +822,31 @@ public class Tile {
         } else {
             return getTileModel().getEmoji();
         }
+    }
+
+    ///
+    /**
+     * Human-readable summary of the tile: position, tile name, and any added planets (TE, mirage, etc)
+     * present (using display names when available). Used for UI strings and logs.
+     */
+    @JsonIgnore
+    public String getDetailedDescription() {
+        var model = getTileModel();
+        var sb = new StringBuilder();
+        sb.append(getPosition());
+        sb.append(" (");
+        sb.append(model.getName());
+
+        if (model.getNumPlanets() == 0 && unitHolders.size() > 1) {
+            sb.append(" with ");
+            var planetDisplayNames = unitHolders.keySet().stream()
+                    .filter(key -> !"space".equals(key))
+                    .map(Helper::getPlanetName)
+                    .filter(Objects::nonNull)
+                    .toList();
+            sb.append(String.join(", ", planetDisplayNames));
+        }
+        sb.append(")");
+        return sb.toString();
     }
 }

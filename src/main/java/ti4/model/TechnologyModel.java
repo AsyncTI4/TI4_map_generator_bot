@@ -267,7 +267,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         sb.append(techEmoji).append("_").append(techName).append("_").append(factionEmoji);
         sb.append(source.emoji());
         if (includeCardText) {
-            sb.append("\n> ").append(text.replace("\n", "\n> ")).append("\n");
+            sb.append("\n> ").append(text.replace("\n", "\n> ")).append('\n');
             if (notes != null) {
                 sb.append("> -# [").append(notes.replace("\n", "\n> -# ")).append("]\n");
             }
@@ -320,7 +320,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         String techFaction = getFaction().orElse("");
         if (!techFaction.isBlank())
             factionEmoji = FactionEmojis.getFactionIcon(techFaction).toString();
-        String techEmoji = getType().emoji();
+        String techEmoji = getCondensedReqsEmojis(false);
         title.append(factionEmoji)
                 .append(techEmoji)
                 .append(" _")

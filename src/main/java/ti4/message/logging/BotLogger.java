@@ -1,6 +1,7 @@
 package ti4.message.logging;
 
 import static ti4.helpers.discord.DiscordHelper.isDiscordServerError;
+import static ti4.helpers.discord.DiscordHelper.isIgnorableError;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDu
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.cron.CronManager;
@@ -33,7 +33,6 @@ import ti4.spring.jda.JdaService;
 @UtilityClass
 public class BotLogger {
 
-    private static final int DISCORD_UNKNOWN_ERROR_STATUS_CODE = 10008;
     private static final Object LAST_SCHEDULED_WEBHOOK_LOCK = new Object();
     private static final long DISCORD_RATE_LIMIT = 50; // Min time in millis between discord webhook messages
     private static final int MAX_DISCORD_MESSAGE_SIZE = 2000;
@@ -48,8 +47,8 @@ public class BotLogger {
         if (!logToConsole()) getBotLogWebhookURL(); // Ensure webhook is created at startup if required
     }
 
-    public static boolean logToConsole() {
-        return JdaService.testingMode;
+    private static boolean logToConsole() {
+        return JdaService.testingMode || JdaService.guildPrimary == null;
     }
 
     /**
@@ -197,7 +196,7 @@ public class BotLogger {
         errorToThread(null, message, err, threadName);
     }
 
-    public static void errorToThread(
+    private static void errorToThread(
             @Nullable LogOrigin origin, @Nonnull String message, @Nullable Throwable err, @Nonnull String threadName) {
         logToChannel(origin, message, err, LogSeverity.Error, threadName);
     }
@@ -262,7 +261,7 @@ public class BotLogger {
         int msgLength = compiledMessage.length();
         if (logToConsole()) {
             if (severity.isErrorOrHigher()) {
-                System.err.println(severity.name() + ": " + compiledMessage);
+                System.err.println(severity.name() + ": " + compiledMessage + "\n" + err);
             } else {
                 System.out.println(severity.name() + ": " + compiledMessage);
             }
@@ -409,21 +408,13 @@ public class BotLogger {
             CircuitBreaker.incrementThresholdCount("Discord server error during REST call: " + e.getMessage());
         }
         // This has become too annoying, so we are limiting to testing mode/debug mode
-        boolean debugMode =
-                GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
+        boolean debugMode = GlobalSettings.getSetting(
+                GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, Boolean.FALSE);
         if (System.getenv("TESTING") != null || debugMode) {
             // if it's ignored, it's not actionable.
-            if (ignoredError(e)) return;
+            if (isIgnorableError(e)) return;
             error("Encountered REST error", e);
         }
-    }
-
-    private static boolean ignoredError(Throwable error) {
-        if (error instanceof ErrorResponseException restError) {
-            // Typically caused by the bot trying to delete or edit a message that has already been deleted.
-            return restError.getErrorCode() == DISCORD_UNKNOWN_ERROR_STATUS_CODE;
-        }
-        return false;
     }
 
     /**

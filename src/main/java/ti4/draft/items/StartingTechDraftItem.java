@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
@@ -18,15 +19,21 @@ import ti4.service.emoji.TechEmojis;
 public class StartingTechDraftItem extends DraftItem {
 
     public StartingTechDraftItem(String itemId) {
-        super(Category.STARTINGTECH, itemId);
+        super(DraftCategory.STARTINGTECH, itemId);
+    }
+
+    @JsonIgnore
+    @Override
+    public String getTitle(Game game) {
+        return getFaction().getFactionEmoji() + " Starting Tech";
     }
 
     @JsonIgnore
     private FactionModel getFaction() {
-        if ("keleres".equals(ItemId)) {
+        if ("keleres".equals(getItemId())) {
             return Mapper.getFaction("keleresa");
         }
-        return Mapper.getFaction(ItemId);
+        return Mapper.getFaction(getItemId());
     }
 
     @JsonIgnore
@@ -38,72 +45,40 @@ public class StartingTechDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getShortDescription() {
-        return getFaction().getFactionName() + " Starting Technology";
+        return getFaction().getShortName() + " Starting Tech";
     }
 
-    private static final Map<String, String> selectableStartingTechs = Map.ofEntries(
+    private static final Map<String, String> specialStartingTech = Map.ofEntries(
             Map.entry("winnu", "Choose any 1 technology that has no prerequisites."),
-            Map.entry(
-                    "argent",
-                    "Choose 2 of the following: :Biotictech: Neural Motivator, :Cybernetictech: Sarween Tools, :Warfaretech: Plasma Scoring"),
             Map.entry("keleresa", "Choose 2 non-faction technologies owned by other players."),
-            Map.entry(
-                    "bentor",
-                    "Choose 2 of the following: :Biotictech: Psychoarchaeology, :Propulsiontech: Dark Energy Tap, and :Cybernetictech: Scanlink Drone Network."),
-            Map.entry(
-                    "celdauri",
-                    "Choose 2 of the following: :Propulsiontech: Antimass Deflectors, :Cybernetictech: Sarween Tools, :Warfaretech: Plasma Scoring"),
-            Map.entry(
-                    "cheiran",
-                    "Choose 1 of the following: :Warfaretech: Magen Defense Grid, :Warfaretech: Self-Assembly Routines"),
+            Map.entry("deepwrought", "Research 2 technologies."),
             Map.entry("edyn", "Choose any 3 technologies that have different colors and no prerequisites."),
-            Map.entry("belkosea", "Choose 1 yellow or red technology with no prerequisites."),
-            Map.entry(
-                    "ghoti",
-                    "Choose 1 of the following: :Propulsiontech: Gravity Drive, :Propulsiontech: Sling Relay."),
-            Map.entry(
-                    "gledge",
-                    "Choose 2 of the following: :Biotictech: Psychoarchaeology, :Cybernetictech: Scanlink Drone Network, :Warfaretech: AI Development Algorithm."),
-            Map.entry("kjalengard", "Choose 1 non-faction unit upgrade."),
-            Map.entry(
-                    "kolume",
-                    "Choose 1 of the following: :Cybernetictech: Graviton Laser System, :Cybernetictech: Predictive Intelligence."),
-            Map.entry("kyro", "Choose 1 of the following: :Biotictech: Dacxive Animators, :Biotictech: Bio-Stims."),
-            Map.entry(
-                    "toldar",
-                    "Choose 1 of the following: Antimass Deflectors, Dark Energy Trap, Neural Motivator, Psychoarcheology."),
-            Map.entry(
-                    "lanefir",
-                    "Choose 2 of the following: :Propulsiontech: Dark Energy Tap, :Cybernetictech: Scanlink Drone Network, :Warfaretech: AI Development Algorithm."),
-            Map.entry(
-                    "nokar",
-                    "Choose 2 of the following: :Biotictech: Psychoarchaeology, :Propulsiontech: Dark Energy Tap, :Warfaretech: AI Development Algorithm."),
-            Map.entry(
-                    "tnelis",
-                    "Choose 2 of the following: :Biotictech: Neural Motivator, :Propulsiontech: Antimass Deflectors, :Warfaretech: Plasma Scoring."),
-            Map.entry(
-                    "vaden",
-                    "Choose 2 of the following: :Biotictech: Neural Motivator, :Propulsiontech: Antimass Deflectors, :Cybernetictech: Sarween Tools."));
+            Map.entry("kjalengard", "Choose 1 non-faction unit upgrade."));
 
     @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
-        if (selectableStartingTechs.containsKey(ItemId)) {
-            return selectableStartingTechs.get(ItemId);
+        if (specialStartingTech.containsKey(getItemId())) {
+            return specialStartingTech.get(getItemId());
         }
 
         List<String> techs = startingTechs();
-        StringBuilder builder = new StringBuilder();
-        TechnologyModel tech;
-        for (int i = 0; i < techs.size(); i++) {
-            if (i > 0) builder.append(", ");
-
-            tech = Mapper.getTech(techs.get(i));
-            builder.append(tech.getCondensedReqsEmojis(false));
-            builder.append(" ");
-            builder.append(tech.getName());
+        if (techs != null) {
+            techs = startingTechs().stream()
+                    .map(Mapper::getTech)
+                    .map(TechnologyModel::getNameRepresentation)
+                    .toList();
+            return String.join(", ", techs);
+        } else if (getFaction().getStartingTechOptions() != null) {
+            int choices = getFaction().getStartingTechAmount();
+            techs = getFaction().getStartingTechOptions().stream()
+                    .map(Mapper::getTech)
+                    .map(TechnologyModel::getNameRepresentation)
+                    .toList();
+            return "Choose " + choices + " of the following: " + String.join(", ", techs);
+        } else {
+            return "Starting Tech of " + getItemId();
         }
-        return String.join(",\n", builder.toString());
     }
 
     private List<String> startingTechs() {
@@ -118,21 +93,21 @@ public class StartingTechDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = buildAllItems(factions);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, Category.STARTINGTECH);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.STARTINGTECH);
         return allItems;
     }
 
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            allItems.add(generate(Category.STARTINGTECH, faction.getAlias()));
+            allItems.add(generate(DraftCategory.STARTINGTECH, faction.getAlias()));
         }
         return allItems;
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, Category.STARTINGTECH);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.STARTINGTECH);
         return allItems;
     }
 
@@ -143,7 +118,7 @@ public class StartingTechDraftItem extends DraftItem {
             if (Arrays.asList(results).contains(faction.getAlias())) {
                 continue;
             }
-            allItems.add(generate(Category.STARTINGTECH, faction.getAlias()));
+            allItems.add(generate(DraftCategory.STARTINGTECH, faction.getAlias()));
         }
         return allItems;
     }

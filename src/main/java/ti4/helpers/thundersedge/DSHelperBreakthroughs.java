@@ -35,7 +35,7 @@ import ti4.model.UnitModel;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
-public class DSHelperBreakthroughs {
+public final class DSHelperBreakthroughs {
     // @ButtonHandler("componentActionRes_")
 
     public static void dihmohnBTExhaust(Game game, Player p1) {
@@ -225,8 +225,7 @@ public class DSHelperBreakthroughs {
         boolean implemented = TeHelperBreakthroughs.handleBreakthroughExhaust(event, game, p1, buttonID);
 
         if (!implemented) {
-            String unimplemented =
-                    "IDK how to do this yet. " + Constants.jazzPing() + " please implement this breakthrough.";
+            String unimplemented = "IDK how to do this yet. Please resolve manually.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), unimplemented);
         }
     }
@@ -413,6 +412,24 @@ public class DSHelperBreakthroughs {
                 event.getMessageChannel(), "Please choose which planet you wish to explore.", buttons);
     }
 
+    @ButtonHandler("resolveMirvedaBT")
+    public static void resolveMirvedaBT(Game game, Player player, ButtonInteractionEvent event) {
+        String msg = player.getRepresentation() + ", you may use _Stabilization Arrays_ to land 1 PDS.";
+        List<Button> buttons = TeHelperAbilities.miniLandingButtons(game, player);
+        if (!buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+        }
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler("readyLanefirBt")
+    public static void readyLanefirBt(Game game, Player player, ButtonInteractionEvent event) {
+        String msg = player.getRepresentation() + " readied their breakthrough.";
+        player.setBreakthroughExhausted("lanefirbt", false);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        ButtonHelper.deleteMessage(event);
+    }
+
     public static void doLanefirBtCheck(Game game, Player player) {
         for (Player p2 : game.getRealPlayersExcludingThis(player)) {
             if (p2.hasUnlockedBreakthrough("lanefirbt")) {
@@ -464,8 +481,9 @@ public class DSHelperBreakthroughs {
     public static void edynbtSelect(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        if (!p1.getSecretsUnscored().isEmpty()) {
-            for (String soID : p1.getSecretsUnscored().keySet()) {
+        Map<String, Integer> secretsUnscored = p1.getSecretsUnscored();
+        if (!secretsUnscored.isEmpty()) {
+            for (String soID : secretsUnscored.keySet()) {
                 buttons.add(Buttons.blue(
                         p1.getFinsFactionCheckerPrefix() + "edynbtTarget_" + p2.getFaction() + "_" + soID,
                         Mapper.getSecretObjective(soID).getName()));

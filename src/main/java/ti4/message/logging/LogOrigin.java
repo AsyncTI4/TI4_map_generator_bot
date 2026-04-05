@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
 import ti4.listeners.ModalListener;
+import ti4.listeners.context.ListenerContext;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.selections.SelectionMenuProcessor;
@@ -37,7 +38,7 @@ public class LogOrigin {
         gameInfo = null;
     }
 
-    public LogOrigin(@Nonnull Game game) {
+    public LogOrigin(@Nullable Game game) {
         gameInfo = buildGameInfo(game);
         eventString = null;
     }
@@ -53,7 +54,12 @@ public class LogOrigin {
         eventString = null;
     }
 
-    public LogOrigin(@Nonnull GenericInteractionCreateEvent event, @Nonnull Game game) {
+    public LogOrigin(@Nonnull GenericInteractionCreateEvent event, @Nullable ListenerContext context) {
+        eventString = buildEventString(event);
+        gameInfo = context != null ? buildGameInfo(context.getGame()) : null;
+    }
+
+    public LogOrigin(@Nonnull GenericInteractionCreateEvent event, @Nullable Game game) {
         eventString = buildEventString(event);
         gameInfo = buildGameInfo(game);
     }
@@ -63,15 +69,15 @@ public class LogOrigin {
         gameInfo = player != null ? buildGameInfo(player.getGame()) : null;
     }
 
-    @NotNull
-    private static String buildGameInfo(@Nonnull Game game) {
+    private static String buildGameInfo(@Nullable Game game) {
+        if (game == null) return null;
         return "\nGame info: " + game.gameJumpLinks();
     }
 
     @NotNull
     private static String buildEventString(@Nonnull GenericInteractionCreateEvent event) {
         StringBuilder builder =
-                new StringBuilder().append(event.getUser().getEffectiveName()).append(" ");
+                new StringBuilder().append(event.getUser().getEffectiveName()).append(' ');
 
         switch (event) {
             case SlashCommandInteractionEvent sEvent ->
@@ -81,15 +87,15 @@ public class LogOrigin {
             case ButtonInteractionEvent bEvent ->
                 builder.append("pressed button ")
                         .append(ButtonHelper.getButtonRepresentation(bEvent.getButton()))
-                        .append("\n");
+                        .append('\n');
             case StringSelectInteractionEvent sEvent ->
                 builder.append("selected ")
                         .append(SelectionMenuProcessor.getSelectionMenuDebugText(sEvent))
-                        .append("\n");
+                        .append('\n');
             case ModalInteractionEvent mEvent ->
                 builder.append("used modal ")
                         .append(ModalListener.getModalDebugText(mEvent))
-                        .append("\n");
+                        .append('\n');
             default ->
                 builder.append("initiated an unexpected event of type `")
                         .append(event.getType())

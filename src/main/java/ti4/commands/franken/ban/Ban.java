@@ -19,6 +19,7 @@ public class Ban extends GameStateSubcommand {
         super(Constants.BAN, "Ban Something From The Draft", true, false);
 
         addOptions(new OptionData(OptionType.STRING, Constants.ABILITY, "Ability").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.BREAKTHROUGH, "Breakthrough").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note")
                 .setAutoComplete(true));

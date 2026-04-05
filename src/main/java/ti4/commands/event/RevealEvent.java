@@ -30,7 +30,8 @@ class RevealEvent extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "This game does not have enough cards in its event deck to reveal.");
             return;
         }
-        boolean revealFromBottom = event.getOption(Constants.REVEAL_FROM_BOTTOM, false, OptionMapping::getAsBoolean);
+        boolean revealFromBottom =
+                event.getOption(Constants.REVEAL_FROM_BOTTOM, Boolean.FALSE, OptionMapping::getAsBoolean);
         for (int i = 0; i < count; i++) {
             EventHelper.revealEvent(event, event.getChannel(), game.revealEvent(revealFromBottom));
         }

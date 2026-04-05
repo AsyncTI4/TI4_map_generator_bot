@@ -43,7 +43,7 @@ class ShowHeroes extends Subcommand {
                 sb.append(member.getEffectiveName());
             }
             sb.append("  ").append(heroEmoji).append(rank.getShortName());
-            sb.append("\n");
+            sb.append('\n');
         }
 
         MessageHelper.sendMessageToThread(event.getMessageChannel(), "Async Rank - Reigning Heroes", sb.toString());

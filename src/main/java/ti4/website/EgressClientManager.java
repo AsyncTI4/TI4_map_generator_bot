@@ -1,10 +1,10 @@
 package ti4.website;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.Objects;
 import java.util.Properties;
 import lombok.Getter;
@@ -18,10 +18,8 @@ import ti4.message.logging.BotLogger;
 public class EgressClientManager {
 
     @Getter
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-
-    @Getter
-    private static final HttpClient httpClient = HttpClient.newHttpClient();
+    private static final HttpClient httpClient =
+            HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
 
     @Getter
     private static final S3AsyncClient s3AsyncClient =

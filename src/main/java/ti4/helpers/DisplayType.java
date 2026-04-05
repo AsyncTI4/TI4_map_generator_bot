@@ -1,5 +1,8 @@
 package ti4.helpers;
 
+import lombok.Getter;
+
+@Getter
 public enum DisplayType {
     all("all"),
     map("map"),
@@ -10,6 +13,7 @@ public enum DisplayType {
     anomalies("anomalies"),
     legendaries("legendaries"),
     empties("empties"),
+    exile("exile"),
     aetherstream("aetherstream"),
     spacecannon("space_cannon_offense"),
     traits("traits"),
@@ -26,9 +30,5 @@ public enum DisplayType {
 
     DisplayType(String value) {
         this.value = value;
-    }
-
-    public String getValue() {
-        return value;
     }
 }

@@ -1,7 +1,5 @@
 package ti4.commands.user;
 
-import static java.util.function.Predicate.not;
-
 import java.util.HashSet;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
@@ -30,7 +28,6 @@ class WipeTurnTime extends Subcommand {
         // We need to place the games into a new set, to avoid a concurrent modification exception
         new HashSet<>(managedPlayer.getGames())
                 .stream()
-                        .filter(not(ManagedGame::isFowMode))
                         .map(ManagedGame::getName)
                         .distinct()
                         .forEach(gameName -> ExecutionLockManager.wrapWithLockAndRelease(
@@ -48,6 +45,8 @@ class WipeTurnTime extends Subcommand {
         if (player != null) {
             player.setTotalTurnTime(0);
             player.setNumberOfTurns(0);
+            player.setExpectedHitsTimes10(0);
+            player.setActualHits(0);
             GameManager.save(game, "Wiped turn time.");
         }
     }

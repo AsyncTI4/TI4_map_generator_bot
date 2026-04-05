@@ -1,0 +1,27 @@
+{
+    "id": "conviction",
+    "tileId": "br5b",
+    "name": "Conviction",
+    "aliases": [
+        "conviction"
+    ],
+    "resources": 1,
+    "influence": 0,
+    "factionHomeworld": "belkosea",
+    "planetTypes": [
+        "FACTION",
+        "SPACESTATION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "conviction",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 225.0,
+            "y": 205.0
+        }
+    },
+    "legendaryAbilityName": "General Industries Group",
+    "legendaryAbilityText": "At any time, you may exhaust this card to gain 2 commodities. When you exhaust a superweapon card, ready this card.",
+    "contrastColor": "orange",
+    "source": "ds"
+}

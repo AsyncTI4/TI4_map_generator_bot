@@ -72,16 +72,19 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
             @NotNull HttpServletResponse response,
             @NotNull Object handler,
             Exception exception) {
-        var game = RequestContext.getGame();
-        if (game == null) return;
+        try {
+            var game = RequestContext.getGame();
+            if (game != null) {
+                if (exception == null && RequestContext.shouldSaveGame()) {
+                    var player = RequestContext.getPlayer();
+                    GameManager.save(game, player.getUserName() + " called " + request.getRequestURI());
+                }
 
-        if (exception == null && RequestContext.shouldSaveGame()) {
-            var player = RequestContext.getPlayer();
-            GameManager.save(RequestContext.getGame(), player.getUserName() + " called " + request.getRequestURI());
+                unlockGame(game.getName());
+            }
+        } finally {
+            RequestContext.clearContext();
         }
-
-        unlockGame(game.getName());
-        RequestContext.clearContext();
     }
 
     private static void unlockGame(String gameName) {

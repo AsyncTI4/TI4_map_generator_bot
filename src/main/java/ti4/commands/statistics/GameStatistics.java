@@ -9,13 +9,13 @@ import ti4.service.statistics.game.GameStatisticsService;
 
 class GameStatistics extends Subcommand {
 
-    public GameStatistics() {
+    GameStatistics() {
         super(Constants.GAMES, "Game Statistics");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_STATISTIC, "Choose a statistic to show")
                 .setRequired(true)
                 .setAutoComplete(true));
         addOptions(GameStatisticsFilterer.gameStatsFilters());
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction that you wish to get the history of")
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "This faction is in the game")
                 .setAutoComplete(true));
     }
 

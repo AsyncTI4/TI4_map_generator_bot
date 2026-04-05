@@ -2,7 +2,9 @@ package ti4.helpers;
 
 import java.util.HashMap;
 import java.util.Map;
+import lombok.Getter;
 
+@Getter
 class RespositoryDispatchClientPayload {
     private final Map<String, String> records;
 
@@ -19,10 +21,6 @@ class RespositoryDispatchClientPayload {
 
     public void addRecord(String key, String value) {
         records.put(key, value);
-    }
-
-    public Map<String, String> getRecords() {
-        return records;
     }
 
     public boolean isValid() {

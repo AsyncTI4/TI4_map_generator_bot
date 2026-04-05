@@ -1,7 +1,6 @@
 package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -33,6 +32,7 @@ import ti4.service.draft.draftables.SpeakerOrderDraftable;
 import ti4.service.draft.orchestrators.PublicSnakeDraftOrchestrator;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.milty.MiltyDraftSlice;
+import tools.jackson.databind.JsonNode;
 
 // TODO: A library of pre-made maps would be cool.
 
@@ -89,7 +89,9 @@ public class DraftSystemSettings extends SettingsMenu {
         draftOrchestrator.setShow(s -> s);
 
         // Load JSON if applicable
-        if (json != null && json.has("menuId") && json.get("menuId").asText("").equals(MENU_ID)) {
+        if (json != null
+                && json.has("menuId")
+                && MENU_ID.equals(json.get("menuId").asText(""))) {
             draftOrchestrator.initialize(json.get("draftOrchestrator"));
             draftablesList.initialize(json.get("draftablesList"));
             preset = json.get("preset") != null ? json.get("preset").asText(null) : null;

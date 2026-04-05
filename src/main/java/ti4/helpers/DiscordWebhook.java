@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.*;
+import java.awt.Color;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.net.ssl.HttpsURLConnection;
+import lombok.Setter;
 
 /**
  * Class used to execute Discord Webhooks with low effort
@@ -43,10 +44,19 @@ import javax.net.ssl.HttpsURLConnection;
 public class DiscordWebhook {
 
     private final String url;
+
+    @Setter
     private String content;
+
+    @Setter
     private String username;
+
+    @Setter
     private String avatarUrl;
+
+    @Setter
     private boolean tts;
+
     private final List<EmbedObject> embeds = new ArrayList<>();
 
     /**
@@ -56,22 +66,6 @@ public class DiscordWebhook {
      */
     public DiscordWebhook(String url) {
         this.url = url;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
-
-    public void setTts(boolean tts) {
-        this.tts = tts;
     }
 
     public void addEmbed(EmbedObject embed) {

@@ -124,9 +124,9 @@ public class TacticalActionOutputService {
                     .append(" tile")
                     .append(distance == 1 ? "" : "s")
                     .append(" away)")
-                    .append("\n");
+                    .append('\n');
         } else {
-            summary.append(" (").append(distance).append(" away)").append("\n");
+            summary.append(" (").append(distance).append(" away)").append('\n');
         }
         if (movingUnitsFromTile.isEmpty()) {
             if (condensed) return null;
@@ -186,7 +186,7 @@ public class TacticalActionOutputService {
         }
         summary.append(String.join("\n", lines));
         String extraSummary = buildShortSummary(game, Set.of(tile.getPosition()));
-        if (extraSummary != null && inclSummary) summary.append("\n").append(extraSummary);
+        if (extraSummary != null && inclSummary) summary.append('\n').append(extraSummary);
         return summary.toString();
     }
 
@@ -227,9 +227,10 @@ public class TacticalActionOutputService {
         if (moveValue == 0) return "";
 
         String output = "";
+        int maxBonus = 0;
         if (distance > moveValue && distance < 90) {
             output += " (distance exceeds move value (" + distance + " > " + moveValue + ")";
-            int maxBonus = 0;
+
             if (player.hasTech("gd")) {
                 maxBonus++;
                 output += ", used _Gravity Drive_)";
@@ -251,9 +252,12 @@ public class TacticalActionOutputService {
                 output += " (gravity rifts along a path could add +" + (distance - riftDistance) + " movement if used)";
                 game.setStoredValue("possiblyUsedRift", "yes");
             }
-            if ((distance > (moveValue + maxBonus)) && game.isFowMode()) {
-                GMService.logPlayerActivity(game, player, output);
-            }
+        }
+        if ((distance > (moveValue + maxBonus)) && game.isFowMode()) {
+            GMService.logPlayerActivity(game, player, output);
+        }
+        if (distance > 90 && player.hasAbility("sundered")) {
+            output += " (__Warning__: has **Sundered**, and so cannot use wormholes)";
         }
         if (riftDistance < distance) {
             game.setStoredValue("possiblyUsedRift", "yes");

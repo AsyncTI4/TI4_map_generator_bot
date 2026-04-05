@@ -24,7 +24,7 @@ public class SetMapTemplate extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String mapTemplate = event.getOption(Constants.MAP_TEMPLATE, null, OptionMapping::getAsString);
-        boolean transform = event.getOption("transform", false, OptionMapping::getAsBoolean);
+        boolean transform = event.getOption("transform", Boolean.FALSE, OptionMapping::getAsBoolean);
         setMapTemplate(event, mapTemplate, transform, getGame());
     }
 

@@ -27,6 +27,9 @@ class BreakthroughAdd extends GameStateSubcommand {
         if (!bts.isEmpty()) {
             btID = bts.getFirst();
         }
+        if (!btID.contains("bt")) {
+            btID += "bt";
+        }
         if (!Mapper.isValidBreakthrough(btID)) {
             MessageHelper.replyToMessage(event, "Could not find breakthrough with ID: `" + btID + "`");
         }

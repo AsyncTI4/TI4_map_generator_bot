@@ -48,7 +48,7 @@ import ti4.service.relic.SendRelicService;
 import ti4.service.transaction.SendPromissoryService;
 import ti4.settings.users.UserSettingsManager;
 
-public class TransactionHelper {
+public final class TransactionHelper {
 
     private static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
         List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
@@ -176,9 +176,11 @@ public class TransactionHelper {
         p1.clearTransactionItemsWithPlayer(p2);
         if (!debtOnly) {
             if ((p1.hasAbility("pillage")
+                            && !game.isTwilightsFallMode()
                             && !game.getStoredValue("willPillageOwnTransactions" + p1.getFaction())
                                     .isEmpty())
                     || (p2.hasAbility("pillage")
+                            && !game.isTwilightsFallMode()
                             && !game.getStoredValue("willPillageOwnTransactions" + p2.getFaction())
                                     .isEmpty())) {
 
@@ -201,7 +203,7 @@ public class TransactionHelper {
         players.add(p2);
         for (Player player : players) {
             if (!trans.isEmpty()) {
-                trans.append("\n");
+                trans.append('\n');
             }
             trans.append("> ")
                     .append(player.getRepresentation(false, false, true))
@@ -244,15 +246,17 @@ public class TransactionHelper {
                         amountToTransact = Integer.parseInt(furtherDetail);
                         trans.append("Send ")
                                 .append(amountToTransact)
-                                .append(" debt token" + (amountToTransact == 1 ? "" : "s")
-                                        + ", for their \"Debt Account\" pool");
+                                .append(" debt token")
+                                .append(amountToTransact == 1 ? "" : "s")
+                                .append(", for their \"Debt Account\" pool");
                     }
                     case "ClearDebt" -> {
                         amountToTransact = Integer.parseInt(furtherDetail);
                         trans.append("Clear ")
                                 .append(amountToTransact)
-                                .append(" debt token" + (amountToTransact == 1 ? "" : "s")
-                                        + ", from their \"Debt Account\" pool");
+                                .append(" debt token")
+                                .append(amountToTransact == 1 ? "" : "s")
+                                .append(", from their \"Debt Account\" pool");
                     }
                     case "shipOrders" ->
                         trans.append(Mapper.getRelic(furtherDetail).getName()).append(FactionEmojis.axis);
@@ -262,7 +266,7 @@ public class TransactionHelper {
                         switch (furtherDetail) {
                             case "generic" ->
                                 trans.append(amountToTransact)
-                                        .append(" ")
+                                        .append(' ')
                                         .append(CardEmojis.getACEmoji(game))
                                         .append(" to be specified by player");
                             default -> {
@@ -291,7 +295,7 @@ public class TransactionHelper {
                             case "generic" -> {
                                 if (!hidePrivateCardText) {
                                     trans.append(amountToTransact)
-                                            .append(" ")
+                                            .append(' ')
                                             .append(CardEmojis.PN)
                                             .append(" to be specified by player");
                                 } else {
@@ -315,7 +319,7 @@ public class TransactionHelper {
                                 trans.append(CardEmojis.PN);
                                 if (!hidePrivateCardText) {
                                     if (Mapper.getPromissoryNote(id) != null) {
-                                        trans.append(" ")
+                                        trans.append(' ')
                                                 .append(StringUtils.capitalize(Mapper.getPromissoryNote(id)
                                                         .getColor()
                                                         .orElse("")))
@@ -324,7 +328,7 @@ public class TransactionHelper {
                                                         .getName())
                                                 .append("_");
                                     } else {
-                                        trans.append(" ")
+                                        trans.append(' ')
                                                 .append("null pn info for ")
                                                 .append(id);
                                     }
@@ -336,7 +340,7 @@ public class TransactionHelper {
                         switch (furtherDetail) {
                             case "generic" ->
                                 trans.append(amountToTransact)
-                                        .append(" ")
+                                        .append(' ')
                                         .append(CardEmojis.SecretObjective)
                                         .append(" to be specified by player");
                             default -> {
@@ -370,9 +374,9 @@ public class TransactionHelper {
                             trans.append(furtherDetail.replace("fin777", " "));
                         }
                     }
-                    default -> trans.append(" some odd thing: `").append(item).append("`");
+                    default -> trans.append(" some odd thing: `").append(item).append('`');
                 }
-                trans.append("\n");
+                trans.append('\n');
             }
             if (sendingNothing) {
                 String nothing = game.getStoredValue(player.getFaction() + "NothingMessage");
@@ -380,7 +384,7 @@ public class TransactionHelper {
                     nothing = getNothingMessage();
                     game.setStoredValue(player.getFaction() + "NothingMessage", nothing);
                 }
-                trans.append("> - ").append(nothing).append("\n");
+                trans.append("> - ").append(nothing).append('\n');
             }
         }
 
@@ -625,10 +629,12 @@ public class TransactionHelper {
             "Second-Hand Nothing",
             "A Promissory Vibe",
             "[Nothing](<https://youtu.be/dQw4w9WgXcQ>)",
-            "||Surprise Nothing||");
+            "||Surprise Nothing||",
+            "A Witty Pop Culture Reference",
+            "Hwat's This‽ A Transaction Proposal Woefully Underpopulated By Bees‽ My Briefcase Full Of Bees Ought To Put A Stop To That!");
 
     public static String getNothingMessage() {
-        if (RandomHelper.isOneInX(1000000)) {
+        if (RandomHelper.isOneInX(1_000_000)) {
             return "The joy of sharing a one in a million empty transaction offer message";
         }
 
@@ -655,7 +661,9 @@ public class TransactionHelper {
 
         List<Button> buttons = getPlayersToTransact(game, player);
         String message = player.getRepresentation() + ", please choose which player you wish to transact with.";
-        if (game.isHiddenAgendaMode() && game.getPhaseOfGame().toLowerCase().contains("agenda")) {
+        if (game.isHiddenAgendaMode()
+                && game.getPhaseOfGame().toLowerCase().contains("agenda")
+                && game.getStoredValue("executiveOrder").isEmpty()) {
             message = player.getRepresentation()
                     + ", this game is in Hidden Agenda mode, which does not allow transactions in the Agenda Phase.";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
@@ -1193,7 +1201,8 @@ public class TransactionHelper {
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " sent a transaction offer to " + p2.getRepresentationNoPing()
                         + ".");
-        if (game.getTableTalkChannel() != null) {
+        TextChannel tableTalkChannel = game.getTableTalkChannel();
+        if (tableTalkChannel != null) {
             boolean sentMeme = false;
             String publicOfferText = buildTransactionOffer(player, p2, game, true);
             if (sendMemeInsteadOfText(event, game)) {
@@ -1201,14 +1210,14 @@ public class TransactionHelper {
                 if (tradeOfferMeme != null) {
                     FileUpload upload = FileUploadService.createFileUpload(tradeOfferMeme, "trade_offer");
                     upload.setDescription(publicOfferText);
-                    MessageHelper.sendFileUploadToChannel(game.getTableTalkChannel(), upload);
+                    MessageHelper.sendFileUploadToChannel(tableTalkChannel, upload);
                     sentMeme = true;
                 }
             }
             if (!sentMeme) {
                 String offerMessage = "Trade offer from " + player.getRepresentationNoPing() + " to "
                         + p2.getRepresentationNoPing() + ":\n" + publicOfferText;
-                MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), offerMessage);
+                MessageHelper.sendMessageToChannel(tableTalkChannel, offerMessage);
             }
         }
 
@@ -1856,7 +1865,8 @@ public class TransactionHelper {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction(), "Promissory Notes"));
         }
-        if (blackMarket && !p1.getSecretsUnscored().isEmpty()) {
+        if ((blackMarket || p1.hasUnlockedBreakthrough("zooidbt") || p2.hasUnlockedBreakthrough("zooidbt"))
+                && !p1.getSecretsUnscored().isEmpty()) {
             stuffToTransButtons.add(
                     Buttons.gray("newTransact_SOs_" + p1.getFaction() + "_" + p2.getFaction(), "Secret Objectives"));
         }

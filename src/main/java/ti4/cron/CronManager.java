@@ -5,8 +5,7 @@ import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.TimedRunnable;
@@ -14,7 +13,7 @@ import ti4.helpers.TimedRunnable;
 @UtilityClass
 public class CronManager {
 
-    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
+    private static final ScheduledThreadPoolExecutor SCHEDULER = new ScheduledThreadPoolExecutor(1);
     private static final Map<String, Runnable> CRONS = new ConcurrentHashMap<>();
     private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
 

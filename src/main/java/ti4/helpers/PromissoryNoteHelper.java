@@ -26,6 +26,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.game.StartPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.objectives.DrawSecretService;
 import ti4.service.transaction.SendDebtService;
 import ti4.service.unit.AddUnitService;
 
@@ -53,7 +54,7 @@ public class PromissoryNoteHelper {
         StringBuilder sb = new StringBuilder();
 
         // PROMISSORY NOTES
-        sb.append("### __Promissory notes in your hand__:").append("\n");
+        sb.append("### __Promissory notes in your hand__:").append('\n');
         int index = 1;
         Map<String, Integer> promissoryNotes = player.getPromissoryNotes();
         List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
@@ -85,16 +86,16 @@ public class PromissoryNoteHelper {
                     sb.append(ColorEmojis.getColorEmojiWithName(pnOwner.getColor()));
                     sb.append(" `(").append(pn.getValue()).append(")`\n");
                     if (longFormat || pnOwner != player || !genericPromissoryNotes.contains(pn.getKey())) {
-                        sb.append("> ").append(pnModel.getTextFormatted(game)).append("\n");
+                        sb.append("> ").append(pnModel.getTextFormatted(game)).append('\n');
                     }
                 }
             }
 
             if (!excludePlayArea) {
                 // PLAY AREA PROMISSORY NOTES
-                sb.append("\n")
+                sb.append('\n')
                         .append("### __Promissory notes in your play area__:")
-                        .append("\n");
+                        .append('\n');
                 if (promissoryNotesInPlayArea.isEmpty()) {
                     sb.append("> None");
                 } else {
@@ -128,7 +129,7 @@ public class PromissoryNoteHelper {
                                     .append(pn.getValue())
                                     .append(")`\n> ")
                                     .append(pnModel.getTextFormatted(game))
-                                    .append("\n");
+                                    .append('\n');
                         }
                     }
                 }
@@ -259,13 +260,13 @@ public class PromissoryNoteHelper {
             ButtonHelperFactionSpecific.resolveOlradinPN(player, game, event);
         }
         if ("terraform".equalsIgnoreCase(id)) {
-            ButtonHelperFactionSpecific.offerTerraformButtons(player, game, event);
+            ButtonHelperFactionSpecific.offerTerraformButtons(player, game);
         }
         if ("sigma_cyber".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.resolveSigmaLizixPN(player, game, event);
         }
         if ("dspnrohd".equalsIgnoreCase(id)) {
-            ButtonHelperFactionSpecific.offerAutomatonsButtons(player, game, event);
+            ButtonHelperFactionSpecific.offerAutomatonsButtons(player, game);
         }
         if ("dspnbent".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerBentorPNButtons(player, game);
@@ -371,6 +372,15 @@ public class PromissoryNoteHelper {
             owner.removeOwnedPromissoryNoteByID(id);
             player.removePromissoryNote(id);
             owner.removePromissoryNote(id);
+        }
+        if ("zooidpn".equalsIgnoreCase(id)) {
+            DrawSecretService.drawSO(event, game, player);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + " drew a secret objective due to _Stringwalk Teachings_ being played. They should tell "
+                            + (game.isFrankenGame() ? "its owner" : "the Zooid player")
+                            + " what it is with a whisper.");
         }
         if ("ms".equalsIgnoreCase(id)) {
             List<Button> buttons =
@@ -670,9 +680,9 @@ public class PromissoryNoteHelper {
 
     public void showAll(Player player, Player targetPlayer, Game game) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(game.getName()).append("\n");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Showed Promissory Notes:").append("\n");
+        sb.append("Game: ").append(game.getName()).append('\n');
+        sb.append("Player: ").append(player.getUserName()).append('\n');
+        sb.append("Showed Promissory Notes:").append('\n');
         List<String> promissoryNotes =
                 new ArrayList<>(player.getPromissoryNotes().keySet());
         Collections.shuffle(promissoryNotes);
@@ -684,7 +694,7 @@ public class PromissoryNoteHelper {
                     .append(" (original owner ")
                     .append(game.getPNOwner(id).getFactionEmojiOrColor())
                     .append(")")
-                    .append("\n");
+                    .append('\n');
             index++;
         }
 
@@ -698,12 +708,11 @@ public class PromissoryNoteHelper {
         if (promissoryNotes.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No Promissory Notes in hand");
         }
+        for (String pn : sourcePlayer.getPromissoryNotesInPlayArea()) {
+            promissoryNotes.remove(pn);
+        }
         Collections.shuffle(promissoryNotes);
         String promissoryNoteId = promissoryNotes.getFirst();
-        if (game.isFowMode()) {
-            FoWHelper.pingPlayersTransaction(
-                    game, event, sourcePlayer, targetPlayer, CardEmojis.getACEmoji(game) + " Action Card", null);
-        }
 
         sourcePlayer.removePromissoryNote(promissoryNoteCounts.get(promissoryNoteId));
         sendPromissoryNoteInfo(game, sourcePlayer, false);

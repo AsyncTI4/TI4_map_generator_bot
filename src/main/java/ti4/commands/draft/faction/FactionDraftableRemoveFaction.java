@@ -9,7 +9,7 @@ import ti4.service.draft.draftables.FactionDraftable;
 
 class FactionDraftableRemoveFaction extends GameStateSubcommand {
 
-    protected FactionDraftableRemoveFaction() {
+    FactionDraftableRemoveFaction() {
         super(Constants.DRAFT_FACTION_REMOVE, "Remove a faction from the draft", true, true);
         addOption(OptionType.STRING, Constants.DRAFT_FACTION_OPTION, "The faction to remove", true, true);
     }

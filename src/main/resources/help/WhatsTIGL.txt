@@ -5,4 +5,4 @@ TIGL is a competitive league of TI4 players run in quarterly seasons. Please see
 ## TIGL Ranks Primer
 Everyone starts with no rank, and then as they win TIGL games, can gain ranks (see link below). To gain a new rank, you generally must win a TIGL game against people who all have at least that rank at the start. 
 
-[TIGL Ranks - Thunder's Edge Edition](https://docs.google.com/document/d/1WoFPiluIz5cw80x1-WxUeckADIdYszNFZFTb6d648tk/edit?tab=t.0#heading=h.8jgz4vsiz1at)
+[TIGL Ranks - Thunder's Edge Edition](<https://docs.google.com/document/d/1WoFPiluIz5cw80x1-WxUeckADIdYszNFZFTb6d648tk/edit?tab=t.0#heading=h.8jgz4vsiz1at>)

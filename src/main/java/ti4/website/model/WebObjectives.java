@@ -165,7 +165,7 @@ public class WebObjectives {
             return null;
         }
 
-        String displayKey = revealed ? key : "UNREVEALED_" + String.format("%04d", (int) (Math.random() * 10000));
+        String displayKey = revealed ? key : "UNREVEALED_" + String.format("%04d", (int) (Math.random() * 10_000));
         String name = revealed ? po.getName() : "UNREVEALED";
         int pointValue = po.getPoints();
 

@@ -32,6 +32,11 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
         return alias != null && name != null && text != null && source != null;
     }
 
+    public String getNameRepresentation() {
+        if (isFakeRelic()) return "_" + name + "_ " + source.emoji();
+        return ExploreEmojis.Relic + " _" + name + "_ " + source.emoji();
+    }
+
     public String getSimpleRepresentation() {
         return getSimpleRepresentation(true);
     }

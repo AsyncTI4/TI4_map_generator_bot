@@ -33,8 +33,9 @@
         "faction": "onyxxa",
         "color": "",
         "playArea": true,
+        "playImmediately": false,
         "source": "balacasi",
-        "text": "When you would spend a command token from your strategy pool to resolve the secondary ability of the Onyxxa player's strategy card: Place this card face up in your play area. You may resolve the primary ability of that card instead. At the start of the status phase, return this card to the Onyxxa player."
+        "text": "When you spend a command token from your strategy pool to resolve the secondary ability of the Onyxxa player's strategy card: Place this card face up in your play area. You may resolve the primary ability of that card instead. At the start of the status phase, return this card to the Onyxxa player."
     },
     {
         "alias": "bapnluna",

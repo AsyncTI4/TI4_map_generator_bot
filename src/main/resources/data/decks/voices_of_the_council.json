@@ -6,7 +6,7 @@
         "description": "All agendas for Voices of the Council",
         "cardIDs": [
             "cryypter_revolution","cryypter_secret","cryypter_arms_reduction","cryypter_classified","cryypter_redistribution",
-            "cryypter_committee","cryypter_disarmamament","cryypter_conventions","cryypter_economic_equality","cryypter_travel_ban",
+            "cryypter_committee","cryypter_disarmament","cryypter_conventions","cryypter_economic_equality","cryypter_travel_ban",
             "cryypter_sanctions","cryypter_regulations","cryypter_defense_act","cryypter_arbiter","cryypter_incentive",
             "cryypter_artifact","cryypter_abolishment","cryypter_minister_commerce","cryypter_minister_exploration",
             "cryypter_minister_industry","cryypter_minister_peace","cryypter_minister_policy","cryypter_minister_sciences",

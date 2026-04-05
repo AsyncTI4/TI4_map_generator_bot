@@ -13,7 +13,7 @@ import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.TokenModel;
 
-public class TokenPlanetService {
+public final class TokenPlanetService {
     public enum TokenPlanets {
         mirage,
 

@@ -70,7 +70,7 @@ class ListDeadGames extends Subcommand {
                 Role r = null;
                 for (Role role : guild.getRoles()) {
                     if (game.getName().equals(role.getName().toLowerCase())) {
-                        sb2.append(role.getName()).append("\n");
+                        sb2.append(role.getName()).append('\n');
                         r = role;
                         roleCount++;
                         break;
@@ -97,7 +97,7 @@ class ListDeadGames extends Subcommand {
         if (JdaService.getAvailablePBDCategories().contains(actionsChannel.getParentCategory())
                 && actionsChannel.getParentCategory() != null
                 && !actionsChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
-            sb.append(actionsChannel.getJumpUrl()).append("\n");
+            sb.append(actionsChannel.getJumpUrl()).append('\n');
             channelCount++;
             if (delete) {
                 actionsChannel.delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -114,7 +114,7 @@ class ListDeadGames extends Subcommand {
                 && tableTalkChannel.getParentCategory() != null
                 && !tableTalkChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
             if (tableTalkChannel.getName().contains(game.getName() + "-")) {
-                sb.append(tableTalkChannel.getJumpUrl()).append("\n");
+                sb.append(tableTalkChannel.getJumpUrl()).append('\n');
                 channelCount++;
                 if (delete) {
                     tableTalkChannel.delete().queue(Consumers.nop(), BotLogger::catchRestError);

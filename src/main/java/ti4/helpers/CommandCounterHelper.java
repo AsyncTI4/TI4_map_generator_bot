@@ -11,7 +11,7 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
 
-public class CommandCounterHelper {
+public final class CommandCounterHelper {
 
     public static void addCC(GenericInteractionCreateEvent event, Game game, String color, Tile tile) {
         addCC(event, game.getPlayerFromColorOrFaction(color), tile);

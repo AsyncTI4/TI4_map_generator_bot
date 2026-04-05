@@ -46,7 +46,7 @@ class PickACFromPurged extends GameStateSubcommand {
 
         String sb = "Game: " + game.getName() + " " + "Player: "
                 + player.getUserName() + "\n" + "Picked card from Purged: "
-                + Mapper.getActionCard(acID).getRepresentation()
+                + Mapper.getActionCard(acID).getRepresentation(game)
                 + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 

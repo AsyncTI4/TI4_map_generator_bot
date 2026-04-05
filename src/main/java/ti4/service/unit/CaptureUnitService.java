@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -18,6 +19,7 @@ import ti4.map.UnitHolder;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
+@UtilityClass
 public class CaptureUnitService {
 
     public static List<Player> listCapturingMechPlayers(
@@ -33,6 +35,7 @@ public class CaptureUnitService {
             if (player.hasUnlockedBreakthrough("mykomentoribt")
                     && player != game.getActivePlayer()
                     && !allUnits.isEmpty()
+                    && allUnits.getFirst().getPlayer(game) != player
                     && !removedUnitType.uh().getPlayersUnitListOnHolder(player).isEmpty()) {
                 capturing.add(player);
                 continue;

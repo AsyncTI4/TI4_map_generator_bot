@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -70,7 +70,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         return alias != null && name != null && (faction != null || color != null) && text != null && source != null;
     }
 
-    public String getID() {
+    public String getId() {
         return alias;
     }
 
@@ -170,7 +170,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         StringBuilder footer = new StringBuilder();
         if (includeHelpfulText) {
             if (!StringUtils.isBlank(getAttachment().orElse("")))
-                footer.append("Attachment: ").append(getAttachment().orElse("")).append("\n");
+                footer.append("Attachment: ").append(getAttachment().orElse("")).append('\n');
             if (getPlayArea()) {
                 footer.append("Play area card. ");
                 if (isPlayedDirectlyToPlayArea()) {
@@ -178,7 +178,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
                 } else {
                     footer.append("Must be played from hand to enter play area.");
                 }
-                footer.append("\n");
+                footer.append('\n');
             }
         }
         if (includeID) {
@@ -186,7 +186,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
                     .append(alias)
                     .append("    Source: ")
                     .append(source)
-                    .append("\n");
+                    .append('\n');
         }
         eb.setFooter(footer.toString());
 
@@ -199,7 +199,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         if (!StringUtils.isBlank(getFaction().orElse("")))
             sb.append(FactionEmojis.getFactionIcon(getFaction().get()));
         sb.append(CardEmojis.PN);
-        sb.append(" ").append(name);
+        sb.append(' ').append(name);
         if (!StringUtils.isBlank(getColor().orElse(""))) {
             sb.append(" (");
             if ("<color>".equals(color)) {

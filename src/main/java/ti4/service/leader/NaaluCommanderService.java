@@ -1,9 +1,14 @@
 package ti4.service.leader;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -46,7 +51,27 @@ public class NaaluCommanderService {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
         }
 
-        sb.setLength(0);
+        if (!game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(),
+                    player.getRepresentation()
+                            + " is using M'aban, the Naalu Commander, to look at the top & bottom agenda, and their neighbour's promissory notes.");
+        }
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.blue("naaluCPN", "View Promissory Notes"));
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToEventChannelWithButtons(
+                event, "You can press this button if you wish to view your neighbors promissory notes", buttons);
+    }
+
+    public static void naaluCommanderPN(GenericInteractionCreateEvent event, Game game, Player player) {
+        if (!game.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) {
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Only players with access to M'aban, the Naalu Commander, unlocked may use this ability.");
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (Player player_ : player.getNeighbouringPlayers(true)) {
             if (!first) sb.append("\n\n");
@@ -55,12 +80,7 @@ public class NaaluCommanderService {
             sb.append(PromissoryNoteHelper.getPromissoryNoteCardInfo(game, player_, false, true));
         }
 
-        if (!game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(),
-                    player.getRepresentation()
-                            + " is using M'aban, the Naalu Commander, to look at the top & bottom agenda, and their neighbour's promissory notes.");
-        }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
+        ButtonHelper.deleteMessage(event);
     }
 }

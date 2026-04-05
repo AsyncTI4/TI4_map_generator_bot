@@ -34,7 +34,7 @@ class RevealSpecificEvent extends GameStateSubcommand {
         }
 
         Game game = getGame();
-        boolean force = event.getOption(Constants.FORCE, false, OptionMapping::getAsBoolean);
+        boolean force = event.getOption(Constants.FORCE, Boolean.FALSE, OptionMapping::getAsBoolean);
         if (!game.revealEvent(eventID, force)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Event not found in deck, please retry");
             return;

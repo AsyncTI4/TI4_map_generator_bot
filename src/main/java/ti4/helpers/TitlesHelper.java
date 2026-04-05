@@ -50,7 +50,7 @@ public class TitlesHelper {
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         for (String title : titles2.keySet()) {
-            sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
+            sb.append('`').append(Helper.leftpad("" + index, 2)).append(".`");
             if (gamesIncluded) {
                 sb.append("**")
                         .append(title)
@@ -62,7 +62,7 @@ public class TitlesHelper {
             } else {
                 sb.append("**").append(title).append("** x").append(titles.get(title));
             }
-            sb.append("\n");
+            sb.append('\n');
             index++;
         }
         if (titles.isEmpty()) {

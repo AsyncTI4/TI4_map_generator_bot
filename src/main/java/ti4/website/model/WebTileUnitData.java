@@ -21,7 +21,7 @@ import ti4.map.UnitHolder;
 import ti4.website.WebPdsCoverage;
 
 @Data
-public class WebTileUnitData {
+public final class WebTileUnitData {
     private Map<String, List<WebEntityData>> space;
     private Map<String, WebTilePlanet> planets;
     private List<String> ccs;

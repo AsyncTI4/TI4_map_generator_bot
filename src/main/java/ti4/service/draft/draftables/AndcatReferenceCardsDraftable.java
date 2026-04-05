@@ -42,12 +42,13 @@ import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftableType;
 import ti4.service.draft.PartialMapService;
 import ti4.service.draft.PlayerDraftState;
-import ti4.service.draft.PlayerSetupService.PlayerSetupState;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.milty.MiltyService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.unit.AddUnitService;
 
+@Getter
 public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
 
     public record ReferenceCardPackage(
@@ -58,7 +59,6 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             String speakerOrderFaction,
             Boolean choicesFinal) {}
 
-    @Getter
     private final Map<Integer, ReferenceCardPackage> referenceCardPackages = new HashMap<>();
 
     public static final DraftableType TYPE = DraftableType.of("AndcatRefPackage");
@@ -179,7 +179,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             return null;
         }
         try {
-            Integer packageKey = Integer.parseInt(choiceKey.substring("package".length()));
+            Integer packageKey = Integer.valueOf(choiceKey.substring("package".length()));
             return referenceCardPackages.get(packageKey);
         } catch (NumberFormatException e) {
             return null;
@@ -216,7 +216,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         for (int i = 0; i < 3; ++i) {
             FactionModel pFaction = factionsInPackage.get(i);
             if (includeEmojis) {
-                formattedNameBuilder.append(pFaction.getFactionEmoji()).append(" ");
+                formattedNameBuilder.append(pFaction.getFactionEmoji()).append(' ');
             }
             if (pFaction.getShortName().toLowerCase().contains("keleres")) {
                 formattedNameBuilder.append("Keleres");
@@ -358,7 +358,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             if (!packageToken.startsWith("package")) {
                 continue;
             }
-            Integer packageKey = Integer.parseInt(packageToken.substring("package".length()));
+            Integer packageKey = Integer.valueOf(packageToken.substring("package".length()));
             List<String> factions = List.of(tokens[i + 1].split("\\."));
             String homeSystemFaction = "null".equals(tokens[i + 2]) ? null : tokens[i + 2];
             String startingUnitsFaction = "null".equals(tokens[i + 3]) ? null : tokens[i + 3];
@@ -516,11 +516,11 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         // Determine speaker position and set home system location
         List<String> speakerOrder = getSpeakerOrder(draftManager);
         int speakerPosition = speakerOrder.indexOf(playerUserId) + 1;
-        playerSetupState.setSetSpeaker(speakerPosition == 1);
+        playerSetupState.setSpeaker(speakerPosition == 1);
         String homeTilePosition =
                 MapTemplateHelper.getPlayerHomeSystemLocation(speakerPosition, game.getMapTemplateID());
         if (isSourceOfSeat(draftManager)) {
-            playerSetupState.setPositionHS(homeTilePosition);
+            playerSetupState.setHomeSystemPosition(homeTilePosition);
         }
 
         // If the home system faction is Keleres, we switch them here to a random unused faction.

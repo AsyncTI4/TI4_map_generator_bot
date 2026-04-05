@@ -66,6 +66,9 @@ class SecretObjectiveButtonHandler {
                             .sendMessage("Oh no! You drew the same secret you discarded! How unlucky 😭😭😭!")
                             .queue(Consumers.nop(), BotLogger::catchRestError);
                 }
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " drew a replacement secret objective.");
             }
             if (game.getRound() == 1 && !game.isFowMode() && !game.isCommunityMode()) {
                 var userSettings = UserSettingsManager.get(player.getUserID());

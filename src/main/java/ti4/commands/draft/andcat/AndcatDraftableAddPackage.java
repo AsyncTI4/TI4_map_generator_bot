@@ -11,7 +11,7 @@ import ti4.service.draft.draftables.AndcatReferenceCardsDraftable.ReferenceCardP
 
 class AndcatDraftableAddPackage extends GameStateSubcommand {
 
-    protected AndcatDraftableAddPackage() {
+    AndcatDraftableAddPackage() {
         super(Constants.DRAFT_ANDCAT_ADD_PACKAGE, "Add a package to the draft", true, false);
         addOption(OptionType.STRING, Constants.FACTION, "The first faction in the package", true, true);
         addOption(OptionType.STRING, Constants.FACTION2, "The second faction in the package", true, true);

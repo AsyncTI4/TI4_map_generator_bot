@@ -38,7 +38,7 @@ import ti4.service.regex.RegexService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
-public class TeHelperAgents {
+public final class TeHelperAgents {
 
     public static boolean handleTeAgentExhaust(Game game, Player player, String leaderID, String targetPlayer) {
         Player target = game.getPlayerFromColorOrFaction(targetPlayer);
@@ -55,7 +55,7 @@ public class TeHelperAgents {
 
     public static void postRalNelAgentStep1(Game game, Player player) {
         Map<String, Integer> acsBefore = new HashMap<>(player.getActionCards());
-        ActionCardHelper.drawActionCards(game, player, 2, true);
+        ActionCardHelper.drawActionCards(player, 2);
         Map<String, Integer> acsAfter = new HashMap<>(player.getActionCards());
 
         List<Button> buttons = new ArrayList<>();

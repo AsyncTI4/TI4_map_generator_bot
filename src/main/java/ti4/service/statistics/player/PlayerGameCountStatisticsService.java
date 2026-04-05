@@ -33,7 +33,7 @@ class PlayerGameCountStatisticsService {
                 .toList();
 
         StringBuilder sb = new StringBuilder();
-        sb.append("__**Player Game Count:**__").append("\n");
+        sb.append("__**Player Game Count:**__").append('\n');
         if (entries.isEmpty()) {
             sb.append("No players found for the given filters!");
         }
@@ -45,7 +45,7 @@ class PlayerGameCountStatisticsService {
                     .append("` ")
                     .append(entry.getValue())
                     .append(" games")
-                    .append("\n");
+                    .append('\n');
         }
 
         MessageHelper.sendMessageToThread(
@@ -54,7 +54,7 @@ class PlayerGameCountStatisticsService {
 
     private static void getPlayerGameCount(
             Game game, Map<String, Integer> playerGameCount, Map<String, String> playerUserIdToUsername) {
-        game.getRealPlayers().forEach(player -> {
+        game.getRealAndEliminatedPlayers().forEach(player -> {
             String userId = player.getStatsTrackedUserID();
             playerUserIdToUsername.put(userId, player.getStatsTrackedUserName());
             playerGameCount.put(userId, 1 + playerGameCount.getOrDefault(userId, 0));

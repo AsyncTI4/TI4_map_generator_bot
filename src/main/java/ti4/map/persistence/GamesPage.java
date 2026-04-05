@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 import lombok.Getter;
 import ti4.map.Game;
 
-public class GamesPage {
+public final class GamesPage {
 
     private static final int PAGE_SIZE = 100;
 

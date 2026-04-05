@@ -1,8 +1,10 @@
 package ti4.map.persistence;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.annotation.Nullable;
@@ -16,7 +18,7 @@ public class GameManager {
 
     private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame =
             new ConcurrentHashMap<>(); // TODO: We can evaluate dropping the managed objects entirely
-    private static final ConcurrentMap<String, ManagedPlayer> playerNameToManagedPlayer = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, ManagedPlayer> userIdToManagedPlayer = new ConcurrentHashMap<>();
 
     public static void initialize() {
         GameLoadService.loadManagedGames()
@@ -141,14 +143,18 @@ public class GameManager {
     }
 
     public static ManagedPlayer getManagedPlayer(String playerId) {
-        return playerNameToManagedPlayer.get(playerId);
+        return userIdToManagedPlayer.get(playerId);
+    }
+
+    public static Set<ManagedPlayer> getManagedPlayers() {
+        return new HashSet<>(userIdToManagedPlayer.values());
     }
 
     static ManagedPlayer addOrMergePlayer(ManagedGame game, Player player) {
-        var managedPlayer = playerNameToManagedPlayer.get(player.getUserID());
+        var managedPlayer = userIdToManagedPlayer.get(player.getUserID());
         if (managedPlayer == null) {
             managedPlayer = new ManagedPlayer(game, player);
-            playerNameToManagedPlayer.put(player.getUserID(), managedPlayer);
+            userIdToManagedPlayer.put(player.getUserID(), managedPlayer);
             return managedPlayer;
         }
         managedPlayer.addOrReplaceGame(game, player);

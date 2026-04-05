@@ -20,7 +20,7 @@ class UnitInfo extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        boolean showAllUnits = event.getOption(Constants.SHOW_ALL_UNITS, false, OptionMapping::getAsBoolean);
+        boolean showAllUnits = event.getOption(Constants.SHOW_ALL_UNITS, Boolean.FALSE, OptionMapping::getAsBoolean);
         UnitInfoService.sendUnitInfo(getGame(), getPlayer(), event, showAllUnits);
     }
 }

@@ -68,7 +68,7 @@
         "id": "tf-dragonfreed",
         "baseType": "warsun",
         "asyncId": "ws",
-        "name": "The Dragon, Freed",
+        "name": "The Dragon, Fred",
         "source": "twilights_fall",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/tf-dragonfreed.png?raw=true",
         "faction": "obsidian",

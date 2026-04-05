@@ -13,6 +13,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -255,6 +256,7 @@ public class PickStrategyCardButtonHandler {
         if (tgCount != null && tgCount != 0) {
             int tg = player.getTg();
             if (player.hasTech("tf-futurepath")) {
+                ButtonHelperAgents.resolveArtunoCheck(player, tgCount * 2);
                 tgCount *= 3;
             }
             tg += tgCount;

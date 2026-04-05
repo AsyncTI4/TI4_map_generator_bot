@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.game.CreateGameButtonHandler;
 import ti4.helpers.ButtonHelper;
@@ -21,7 +22,7 @@ public class ChannelCreationListener extends ListenerAdapter {
     private static final String FOW_REPLACEMENT_TAG = "1336539499668443229";
 
     @Override
-    public void onChannelCreate(ChannelCreateEvent event) {
+    public void onChannelCreate(@NotNull ChannelCreateEvent event) {
         if (!JdaService.isReadyToReceiveCommands()) {
             return;
         }
@@ -35,7 +36,7 @@ public class ChannelCreationListener extends ListenerAdapter {
         }
 
         String parentName = channel.getParentChannel().getName();
-        if (parentName.equalsIgnoreCase(PBD_MAKING_GAMES_CHANNEL)
+        if (PBD_MAKING_GAMES_CHANNEL.equalsIgnoreCase(parentName)
                 || "making-private-games".equalsIgnoreCase(parentName)
                 || "making-superfast-games".equalsIgnoreCase(parentName)) {
             String message = """
@@ -53,11 +54,11 @@ public class ChannelCreationListener extends ListenerAdapter {
 
             channel.sendMessage(message + CreateGameButtonHandler.generateMemberListMessage(membersOG, ""))
                     .addComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
-                    .queueAfter(
-                            2, TimeUnit.SECONDS); // We were having issues where we'd get errors related to the channel
-            // having no messages.
+                    // We were having issues where we'd get errors related to the channel
+                    // having no messages.
+                    .queueAfter(2, TimeUnit.SECONDS);
 
-        } else if (parentName.equalsIgnoreCase(FOW_MAKING_GAMES_CHANNEL) && !hasTag(channel, FOW_REPLACEMENT_TAG)) {
+        } else if (FOW_MAKING_GAMES_CHANNEL.equalsIgnoreCase(parentName) && !hasTag(channel, FOW_REPLACEMENT_TAG)) {
             String message = """
                 To launch a new Fog of War game, please run the command `/fow create_fow_game_button`, \
                 filling in the players, GM and fun game name. This will create a button that you may press to launch the game after confirming the members \

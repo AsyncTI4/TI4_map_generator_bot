@@ -39,6 +39,10 @@ public class GenericCardModel implements ModelInterface, EmbeddableModel {
                 || cardType.toString().contains(searchString);
     }
 
+    public String getNameRepresentation() {
+        return cardTypeEmoji() + " _" + name + "_";
+    }
+
     public String getRepresentation() {
         StringBuilder sb = new StringBuilder();
         String cardEmojis = cardTypeEmoji();
@@ -54,7 +58,7 @@ public class GenericCardModel implements ModelInterface, EmbeddableModel {
     private String cardTypeEmoji() {
         return switch (cardType) {
             case trap -> FactionEmojis.lizho.toString();
-            case plot -> FactionEmojis.Obsidian.toString();
+            case plot -> FactionEmojis.Firma_Obs.toString();
         };
     }
 

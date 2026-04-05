@@ -21,7 +21,6 @@ import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.regex.RegexService;
@@ -38,7 +37,7 @@ public class DeorbitBarrageService {
         List<Tile> asteroids =
                 game.getTileMap().values().stream().filter(asteroidWithUnit).toList();
 
-        List<Planet> eligibleTargets = asteroids.stream()
+        return asteroids.stream()
                 .map(Tile::getPosition)
                 .flatMap(pos -> FoWHelper.getAdjacentTiles(game, pos, player, false).stream())
                 .flatMap(pos -> FoWHelper.getAdjacentTiles(game, pos, player, false).stream())
@@ -48,7 +47,6 @@ public class DeorbitBarrageService {
                 .flatMap(tile -> tile.getPlanetUnitHolders().stream())
                 .filter(Planet::hasUnits)
                 .toList();
-        return eligibleTargets;
     }
 
     public void postInitialButtons(Game game, Player player) {
@@ -106,6 +104,9 @@ public class DeorbitBarrageService {
         String planet = buttonID.split("_")[1];
         int amount = Integer.parseInt(buttonID.split("_")[2]);
         Player p2 = game.getPlanetOwner(planet);
+        if (p2 == null) {
+            p2 = game.getPlayerFromColorOrFaction("neutral");
+        }
         String planetRep = Helper.getPlanetRepresentation(planet, game);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
@@ -113,7 +114,6 @@ public class DeorbitBarrageService {
                         + " resource" + (amount == 1 ? "" : "s") + " to roll " + amount
                         + " dice, hitting on a 4+.");
         ButtonHelper.deleteMessage(event);
-        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         if (amount > 0) {
             int hits = 0;
             StringBuilder msg = new StringBuilder(FactionEmojis.Saar + " rolled ");
@@ -132,14 +132,15 @@ public class DeorbitBarrageService {
                 if (p2.hasAbility("data_recovery")) {
                     ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
                 }
+                buttons.add(Buttons.red(
+                        "getDamageButtons_" + game.getTileFromPlanet(planet).getPosition() + "_bombardment",
+                        "Assign Hit" + (hits == 1 ? "" : "s")));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
+                        p2.getRepresentation() + ", please assign the hits" + (hits == 1 ? "" : "s")
+                                + ". Reminder that the player who did the barrage officially assigns the hits, but that you can sustain if they assign a hit to mechs. Ask them how they would like you to assign hits.",
+                        buttons);
             }
-            buttons.add(Buttons.red(
-                    "getDamageButtons_" + game.getTileFromPlanet(planet).getPosition() + "_bombardment",
-                    "Assign Hit" + (hits == 1 ? "" : "s")));
-            MessageHelper.sendMessageToChannelWithButtons(
-                    game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
-                    p2.getRepresentation() + ", please assign the hits" + (hits == 1 ? "" : "s") + ".",
-                    buttons);
             buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
             Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
             buttons.add(DoneExhausting);

@@ -35,10 +35,10 @@ class VictoryPointsScoredStatisticsService {
         int index = 1;
         StringBuilder sb = new StringBuilder("List of times a particular secret objective has been scored.\n");
         for (Map.Entry<String, Integer> entry : topThousand.entrySet()) {
-            sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
+            sb.append('`').append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
             sb.append("` ").append(entry.getKey()).append(": ");
             sb.append(entry.getValue());
-            sb.append("\n");
+            sb.append('\n');
             index++;
         }
         MessageHelper.sendMessageToThread(event.getChannel(), "Secret Objective Score Counts", sb.toString());
@@ -50,10 +50,10 @@ class VictoryPointsScoredStatisticsService {
         index = 1;
         sb = new StringBuilder("List of times a particular public objective has been revealed \n");
         for (Map.Entry<String, Integer> entry : topThousand.entrySet()) {
-            sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
+            sb.append('`').append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
             sb.append("` ").append(entry.getKey()).append(": ");
             sb.append(entry.getValue());
-            sb.append("\n");
+            sb.append('\n');
             index++;
         }
         MessageHelper.sendMessageToThread(event.getChannel(), "Public Objectives Revealed", sb.toString());
@@ -65,10 +65,10 @@ class VictoryPointsScoredStatisticsService {
         index = 1;
         sb = new StringBuilder("List of times a particular relic has been drawn \n");
         for (Map.Entry<String, Integer> entry : topThousand.entrySet()) {
-            sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
+            sb.append('`').append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
             sb.append("` ").append(entry.getKey()).append(": ");
             sb.append(entry.getValue());
-            sb.append("\n");
+            sb.append('\n');
             index++;
         }
         MessageHelper.sendMessageToThread(event.getChannel(), "Relics Drawn Count", sb.toString());

@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.regex.RegexService;
 
-public class ButtonHelperStats {
+public final class ButtonHelperStats {
 
     private static final Pattern convertCommsRegex =
             Pattern.compile("convertComms_" + RegexHelper.intRegex("amt") + "(_stay)?");

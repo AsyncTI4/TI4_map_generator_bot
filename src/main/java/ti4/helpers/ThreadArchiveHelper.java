@@ -15,7 +15,7 @@ public class ThreadArchiveHelper {
 
     private static final int DEFAULT_MAX_THREAD_COUNT = 950;
     private static final int DEFAULT_CLOSE_COUNT = 25;
-    private static final int COOLDOWN_MS = 30000; // 30 seconds
+    private static final int COOLDOWN_MS = 30_000; // 30 seconds
     private static final Map<Long, Long> guildIdToLastCheckTimeMs = new ConcurrentHashMap<>();
 
     public static void checkThreadLimitAndArchive(Guild guild) {

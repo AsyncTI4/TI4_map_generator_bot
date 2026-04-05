@@ -22,10 +22,10 @@ abstract class AbstractEventLog {
             log.append(source.getGameInfo());
         }
         if (message != null && !message.isBlank()) {
-            log.append(getMessagePrefix()).append(message).append("\n");
+            log.append(getMessagePrefix()).append(message).append('\n');
         }
 
-        log.append("\n");
+        log.append('\n');
         return log.toString();
     }
 

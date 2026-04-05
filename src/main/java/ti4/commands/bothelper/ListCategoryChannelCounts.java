@@ -28,10 +28,10 @@ class ListCategoryChannelCounts extends Subcommand {
                     .append(category.getName())
                     .append("**: ")
                     .append(channelCount)
-                    .append("/")
+                    .append('/')
                     .append(maxChannels)
                     .append(getPercentage(channelCount, maxChannels))
-                    .append("\n");
+                    .append('\n');
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }

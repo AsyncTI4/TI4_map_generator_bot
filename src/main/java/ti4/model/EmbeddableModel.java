@@ -12,6 +12,8 @@ public interface EmbeddableModel {
 
     String getAutoCompleteName();
 
+    String getNameRepresentation();
+
     default boolean search(String searchString, ComponentSource searchSource) {
         return (searchSource == null || (getSource() != null && getSource() == searchSource))
                 && (searchString == null || search(searchString));

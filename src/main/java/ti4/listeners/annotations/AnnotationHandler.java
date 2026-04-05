@@ -1,6 +1,6 @@
 package ti4.listeners.annotations;
 
-import static org.reflections.scanners.Scanners.*;
+import static org.reflections.scanners.Scanners.SubTypes;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import org.reflections.Reflections;
@@ -33,7 +34,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.logging.BotLogger;
 
-public class AnnotationHandler {
+public final class AnnotationHandler {
 
     private static final List<Class<?>> classes = new ArrayList<>();
 
@@ -54,6 +55,8 @@ public class AnnotationHandler {
             if (param.getType().equals(ModalInteractionEvent.class) && contextClass.equals(ModalContext.class))
                 continue;
             if (param.getType().equals(StringSelectInteractionEvent.class)
+                    && contextClass.equals(SelectionMenuContext.class)) continue;
+            if (param.getType().equals(EntitySelectInteractionEvent.class)
                     && contextClass.equals(SelectionMenuContext.class)) continue;
 
             // string parameters
@@ -105,7 +108,6 @@ public class AnnotationHandler {
             // As such, in an effort to be notified if something goes horribly wrong, still add the handler
             // so that when it gets called it will generate an error for bot-log and ping Jazz.
             System.out.println(er);
-            // BotLogger.log(er);
         }
         return true;
     }
@@ -126,6 +128,8 @@ public class AnnotationHandler {
                 if (param.getType().equals(ModalInteractionEvent.class) && contextClass.equals(ModalContext.class))
                     args.add(ctx.getEvent());
                 if (param.getType().equals(StringSelectInteractionEvent.class)
+                        && contextClass.equals(SelectionMenuContext.class)) args.add(ctx.getEvent());
+                if (param.getType().equals(EntitySelectInteractionEvent.class)
                         && contextClass.equals(SelectionMenuContext.class)) args.add(ctx.getEvent());
                 if (param.getType().equals(MessageChannel.class))
                     args.add(ctx.getEvent().getMessageChannel());

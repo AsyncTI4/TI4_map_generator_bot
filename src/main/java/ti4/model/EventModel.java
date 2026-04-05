@@ -1,12 +1,13 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.Data;
+import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import software.amazon.awssdk.utils.StringUtils;
@@ -15,8 +16,12 @@ import ti4.model.Source.ComponentSource;
 
 @Data
 public class EventModel implements ModelInterface, EmbeddableModel {
+    @Getter
     private String alias;
+
+    @Getter
     private String name;
+
     private String category;
     private String categoryDescription;
     private String type;
@@ -51,12 +56,8 @@ public class EventModel implements ModelInterface, EmbeddableModel {
                 || "temporary".equalsIgnoreCase(getCategoryDescription());
     }
 
-    public String getAlias() {
-        return alias;
-    }
-
-    public String getName() {
-        return name;
+    public String getNameRepresentation() {
+        return "_" + name + "_ " + source.emoji();
     }
 
     private String getCategory() {
@@ -96,12 +97,12 @@ public class EventModel implements ModelInterface, EmbeddableModel {
         }
         sb.append(name).append("__** ");
         sb.append(source.emoji());
-        sb.append("\n");
+        sb.append('\n');
 
         sb.append("> **").append(type).append(":** *").append(target).append("*\n");
         if (!getText().isEmpty()) {
             String arg = getText().replace("For:", "**For:**");
-            sb.append("> ").append(arg).append("\n");
+            sb.append("> ").append(arg).append('\n');
         }
 
         return sb.toString();

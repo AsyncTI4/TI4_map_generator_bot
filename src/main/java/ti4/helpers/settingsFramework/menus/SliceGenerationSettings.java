@@ -2,7 +2,6 @@ package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,6 +29,7 @@ import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftSlice;
+import tools.jackson.databind.JsonNode;
 
 // This is a sub-menu
 @Getter
@@ -155,7 +155,7 @@ public class SliceGenerationSettings extends SettingsMenu {
     public String menuSummaryString(String lastSettingTouched) {
         StringBuilder sb = new StringBuilder("# **__").append(menuName).append(":__**");
         for (String line : description) sb.append("\n- *").append(line).append("*");
-        sb.append("\n");
+        sb.append('\n');
 
         int pad = enabledSettings().stream()
                 .map(x -> x.getName().length())
@@ -164,11 +164,11 @@ public class SliceGenerationSettings extends SettingsMenu {
         for (SettingInterface setting : enabledSettings()) {
             sb.append("> ");
             sb.append(setting.longSummary(pad, lastSettingTouched));
-            sb.append("\n");
+            sb.append('\n');
         }
         if (presetSlices != null)
-            sb.append("> Using preset slices: ").append(presetSlices).append("\n");
-        if (!enabledSettings().isEmpty()) sb.append("\n"); // extra line for formatting
+            sb.append("> Using preset slices: ").append(presetSlices).append('\n');
+        if (!enabledSettings().isEmpty()) sb.append('\n'); // extra line for formatting
 
         if (!categories().isEmpty()) {
             List<String> catStrings = new ArrayList<>();

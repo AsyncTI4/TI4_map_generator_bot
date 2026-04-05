@@ -34,7 +34,7 @@ class RevealSpecificAgenda extends GameStateSubcommand {
         }
 
         Game game = getGame();
-        boolean force = event.getOption(Constants.FORCE, false, OptionMapping::getAsBoolean);
+        boolean force = event.getOption(Constants.FORCE, Boolean.FALSE, OptionMapping::getAsBoolean);
         if (!game.revealAgenda(agendaID, force)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Agenda not found in deck, please retry");
             return;

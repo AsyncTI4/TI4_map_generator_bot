@@ -5,7 +5,7 @@ import ti4.commands.Subcommand;
 
 class Monuments extends Subcommand {
 
-    public Monuments() {
+    Monuments() {
         super("monuments", "Show Helpful Monuments stuff");
     }
 

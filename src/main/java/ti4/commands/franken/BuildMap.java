@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands.GameStateSubcommand;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
-import ti4.draft.DraftItem.Category;
+import ti4.draft.DraftCategory;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -66,15 +66,15 @@ class BuildMap extends GameStateSubcommand {
         }
         // Check that all players have an expected number of tiles
         // Check that all players have a speaker order
-        int expectedBlueTiles = draft.getItemLimitForCategory(Category.BLUETILE);
-        int expectedRedTiles = draft.getItemLimitForCategory(Category.REDTILE);
-        int expectedDraftOrders = draft.getItemLimitForCategory(Category.DRAFTORDER);
+        int expectedBlueTiles = draft.getItemLimitForCategory(DraftCategory.BLUETILE);
+        int expectedRedTiles = draft.getItemLimitForCategory(DraftCategory.REDTILE);
+        int expectedDraftOrders = draft.getItemLimitForCategory(DraftCategory.DRAFTORDER);
         for (Player player : game.getRealPlayers()) {
             DraftBag draftHand = player.getDraftHand();
             if (draftHand == null) {
                 continue;
             }
-            int playerBlueTiles = draftHand.getCategoryCount(Category.BLUETILE);
+            int playerBlueTiles = draftHand.getCategoryCount(DraftCategory.BLUETILE);
             if (playerBlueTiles != expectedBlueTiles) {
                 MessageHelper.sendMessageToEventChannel(
                         event,
@@ -82,7 +82,7 @@ class BuildMap extends GameStateSubcommand {
                                 + expectedBlueTiles + " are expected.");
                 return;
             }
-            int playerRedTiles = draftHand.getCategoryCount(Category.REDTILE);
+            int playerRedTiles = draftHand.getCategoryCount(DraftCategory.REDTILE);
             if (playerRedTiles != expectedRedTiles) {
                 MessageHelper.sendMessageToEventChannel(
                         event,
@@ -90,7 +90,7 @@ class BuildMap extends GameStateSubcommand {
                                 + expectedRedTiles + " are expected.");
                 return;
             }
-            int playerDraftOrders = draftHand.getCategoryCount(Category.DRAFTORDER);
+            int playerDraftOrders = draftHand.getCategoryCount(DraftCategory.DRAFTORDER);
             if (playerDraftOrders != expectedDraftOrders) {
                 MessageHelper.sendMessageToEventChannel(
                         event,

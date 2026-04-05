@@ -1,7 +1,6 @@
 package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +17,7 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
 import ti4.service.emoji.MiscEmojis;
+import tools.jackson.databind.JsonNode;
 
 // This is a sub-menu
 @Getter
@@ -37,7 +37,7 @@ public class MiltySliceDraftableSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
-    public MiltySliceDraftableSettings(Game game, JsonNode json, SettingsMenu parent) {
+    MiltySliceDraftableSettings(JsonNode json, SettingsMenu parent) {
         super(MENU_ID, "Draft settings", "Advanced settings to fine-tune how rich the galaxy will be", parent);
 
         // Initialize Settings to default values

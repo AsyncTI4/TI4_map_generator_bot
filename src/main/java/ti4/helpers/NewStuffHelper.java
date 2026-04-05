@@ -24,7 +24,7 @@ import ti4.message.logging.BotLogger;
 import ti4.model.ActionCardModel;
 import ti4.service.emoji.CardEmojis;
 
-public class NewStuffHelper {
+public final class NewStuffHelper {
 
     public static List<Button> buttonPagination(List<Button> allButtons, String prefixID, int pageNum) {
         return buttonPagination(allButtons, null, prefixID, 25, pageNum, false);
@@ -146,7 +146,7 @@ public class NewStuffHelper {
             String msg = player.getRepresentation() + " picked up " + acModel.getName()
                     + " from the discard and placed it on _Doc 'N Pic's Salvage Yard_.";
             msg +=
-                    "You can check the cards on _Doc 'N Pic's Salvage Yard_ at any time by looking at the action card discard pile in the bot map thread.";
+                    " You can check the cards on _Doc 'N Pic's Salvage Yard_ at any time by looking at the action card discard pile in the bot map thread.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             ActionCardHelper.sendActionCardInfo(game, player, event);
             ButtonHelper.deleteMessage(event);

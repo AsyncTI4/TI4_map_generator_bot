@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import ti4.helpers.Constants;
 import ti4.message.logging.BotLogger;
 
-public class RegexService {
+public final class RegexService {
 
     public interface CheckedConsumer<T> {
         void accept(T m) throws Exception;

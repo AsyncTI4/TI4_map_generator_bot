@@ -31,7 +31,7 @@ class SearchEmojis extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, "", OptionMapping::getAsString);
-        boolean includeRAW = event.getOption(Constants.INCLUDE_RAW_STRING, false, OptionMapping::getAsBoolean);
+        boolean includeRAW = event.getOption(Constants.INCLUDE_RAW_STRING, Boolean.FALSE, OptionMapping::getAsBoolean);
 
         List<Emoji> emojis = JdaService.jda.getEmojis().stream()
                 .filter(RichCustomEmoji::isAvailable)

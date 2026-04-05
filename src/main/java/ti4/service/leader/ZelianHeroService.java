@@ -29,7 +29,7 @@ public class ZelianHeroService {
         for (Player player_ : game.getPlayers().values()) {
             if (player_ != player) {
                 for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                    if (!unitHolder.getName().equals(Constants.SPACE)) {
+                    if (!Constants.SPACE.equals(unitHolder.getName())) {
                         unitHolder.removeAllUnits(player_.getColor());
                     }
                 }

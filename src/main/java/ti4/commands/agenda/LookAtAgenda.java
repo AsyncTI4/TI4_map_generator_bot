@@ -21,7 +21,7 @@ class LookAtAgenda extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
         count = Math.max(count, 1);
-        boolean lookAtBottom = event.getOption(Constants.LOOK_AT_BOTTOM, false, OptionMapping::getAsBoolean);
+        boolean lookAtBottom = event.getOption(Constants.LOOK_AT_BOTTOM, Boolean.FALSE, OptionMapping::getAsBoolean);
 
         Game game = getGame();
         Player player = getPlayer();

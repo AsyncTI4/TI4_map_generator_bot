@@ -9,17 +9,25 @@ public class TwilightsFallFrankenDraft extends FrankenDraft {
     }
 
     @Override
-    public int getItemLimitForCategory(DraftItem.Category category) {
+    public int getItemLimitForCategory(DraftCategory category) {
+        return switch (category) {
+            case TECH, BLUETILE -> 3;
+            case REDTILE, STARTINGFLEET, HOMESYSTEM, AGENT, UNIT -> 2;
+            case DRAFTORDER, MAHACTKING -> 1;
+            default -> 0;
+        };
+    }
 
-        int limit = 0;
-        switch (category) {
-            case ABILITY -> limit = 0;
-            case TECH, BLUETILE -> limit = 3;
-            case REDTILE, STARTINGFLEET, HOMESYSTEM, AGENT, UNIT -> limit = 2;
-            case COMMANDER, STARTINGTECH, PN, COMMODITIES, FLAGSHIP, MECH, HERO -> limit = 0;
-            case DRAFTORDER, MAHACTKING -> limit = 1;
-        }
-        return limit;
+    @Override
+    public int getKeptItemLimitForCategory(DraftCategory category) {
+        return switch (category) {
+            case BLUETILE -> 3;
+            case REDTILE -> 2;
+            case TECH -> 2;
+            case DRAFTORDER, MAHACTKING, STARTINGFLEET -> 1;
+            case HOMESYSTEM, AGENT, UNIT -> 1;
+            default -> 0;
+        };
     }
 
     @Override

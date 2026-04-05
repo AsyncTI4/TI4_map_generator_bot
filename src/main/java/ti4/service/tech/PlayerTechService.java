@@ -16,6 +16,7 @@ import ti4.buttons.UnfiledButtonHandlers;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
@@ -108,19 +109,9 @@ public class PlayerTechService {
                     event, player.getRepresentation(false, false) + " removed technology: " + componentID + ".");
         }
 
-        boolean singularity = false;
-        if (player.getSingularityTechs().contains(componentID)) {
-            singularity = true;
-            String oldVal = player.getGame().getStoredValue(player.getFaction() + "singularityTechs");
-            if (oldVal.contains(componentID + "_")) {
-                oldVal = oldVal.replace(componentID + "_", "");
-            } else {
-                oldVal = oldVal.replace(componentID, "");
-            }
-            player.getGame().setStoredValue(player.getFaction() + "singularityTechs", oldVal);
-            if (event instanceof ButtonInteractionEvent bevent) {
-                ButtonHelper.deleteMessage(bevent);
-            }
+        boolean singularity = player.removeSingularityTech(componentID);
+        if (event instanceof ButtonInteractionEvent bevent && singularity) {
+            ButtonHelper.deleteMessage(bevent);
         }
 
         if (exhaustNewest) {
@@ -373,6 +364,7 @@ public class PlayerTechService {
                         event.getMessageChannel(), message, List.of(Buttons.REDISTRIBUTE_CCs, deleteButton));
             }
             case "dsvadeb" -> ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, event);
+            case "bazephy" -> ButtonHelperAbilities.offerBountyButtons(game, player);
             case "mi" -> { // Mageon
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>();
@@ -677,6 +669,7 @@ public class PlayerTechService {
                 if (tile == null) {
                     MessageHelper.sendMessageToChannel(
                             player.getCardsInfoThread(), "Could not find your home system, sorry bro.");
+                    return;
                 }
                 buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "obsessivedesigns", "place");
                 int val = Helper.getProductionValue(player, game, tile, true);
@@ -790,8 +783,8 @@ public class PlayerTechService {
                 }
             }
             if (game.isTwilightsFallMode()
-                    && !techID.equalsIgnoreCase("wavelength")
-                    && !techID.equalsIgnoreCase("antimatter")
+                    && !"wavelength".equalsIgnoreCase(techID)
+                    && !"antimatter".equalsIgnoreCase(techID)
                     && (player.hasTech("tf-singularityx")
                             || player.hasTech("tf-singularityy")
                             || player.hasTech("tf-singularityz"))) {

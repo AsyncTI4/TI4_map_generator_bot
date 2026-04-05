@@ -15,7 +15,7 @@ import ti4.service.unit.DestroyUnitService;
 public class DisarmamentAgendaResolver implements AgendaResolver {
     @Override
     public String getAgendaId() {
-        return "disarmamament";
+        return "disarmament";
     }
 
     @Override
@@ -26,18 +26,30 @@ public class DisarmamentAgendaResolver implements AgendaResolver {
                 Tile tile = game.getTileFromPlanet(winner);
                 Planet uH = ButtonHelper.getUnitHolderFromPlanetName(winner, game);
                 int count = 0;
-                for (UnitKey uk : uH.getUnitsByStateForPlayer(player).keySet()) {
-                    if (player.getUnitFromUnitKey(uk).getIsGroundForce()) {
-                        int amt = uH.getUnitCount(uk);
-                        count += amt;
-                        DestroyUnitService.destroyUnit(event, tile, game, uk, amt, uH, false);
-                        units.append(uk.unitEmoji().emojiString().repeat(amt));
+                if (uH != null) { // kill coexisters first
+                    for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                        for (UnitKey uk : uH.getUnitsByStateForPlayer(p2).keySet()) {
+                            if (p2.getUnitFromUnitKey(uk).getIsGroundForce()) {
+                                int amt = uH.getUnitCount(uk);
+                                count += amt;
+                                DestroyUnitService.destroyUnit(event, tile, game, uk, amt, uH, false);
+                                units.append(uk.unitEmoji().emojiString().repeat(amt));
+                            }
+                        }
                     }
-                }
-                if (count > 0) {
-                    player.setTg(player.getTg() + count);
-                    ButtonHelperAgents.resolveArtunoCheck(player, count);
-                    ButtonHelperAbilities.pillageCheck(player, game);
+                    for (UnitKey uk : uH.getUnitsByStateForPlayer(player).keySet()) {
+                        if (player.getUnitFromUnitKey(uk).getIsGroundForce()) {
+                            int amt = uH.getUnitCount(uk);
+                            count += amt;
+                            DestroyUnitService.destroyUnit(event, tile, game, uk, amt, uH, false);
+                            units.append(uk.unitEmoji().emojiString().repeat(amt));
+                        }
+                    }
+                    if (count > 0) {
+                        player.setTg(player.getTg() + count);
+                        ButtonHelperAgents.resolveArtunoCheck(player, count);
+                        ButtonHelperAbilities.pillageCheck(player, game);
+                    }
                 }
                 if (game.isFowMode()) {
                     MessageHelper.sendMessageToChannel(

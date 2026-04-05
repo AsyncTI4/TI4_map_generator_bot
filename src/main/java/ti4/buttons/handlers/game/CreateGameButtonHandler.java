@@ -1,11 +1,8 @@
 package ti4.buttons.handlers.game;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu;
@@ -13,7 +10,6 @@ import net.dv8tion.jda.api.components.selections.EntitySelectMenu.SelectTarget;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -28,15 +24,13 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
-import ti4.map.persistence.ManagedGame;
-import ti4.map.persistence.ManagedPlayer;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.game.CreateGameService;
-import ti4.service.statistics.AverageTurnTimeService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.jda.JdaService;
+import ti4.spring.service.statistics.AverageTurnTimeService;
 
 @UtilityClass
 public class CreateGameButtonHandler {
@@ -47,19 +41,7 @@ public class CreateGameButtonHandler {
         List<Member> members = new ArrayList<>();
         members.add(event.getMember());
         Member member = event.getMember();
-        List<User> users = members.stream().map(Member::getUser).toList();
-        List<ManagedGame> userGames = users.stream()
-                .map(user -> GameManager.getManagedPlayer(user.getId()))
-                .filter(Objects::nonNull)
-                .map(ManagedPlayer::getGames)
-                .flatMap(Collection::stream)
-                .distinct()
-                .toList();
 
-        Map<String, Map.Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
-        for (ManagedGame game : userGames) {
-            AverageTurnTimeService.getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
-        }
         boolean owner = false;
         if (event.getChannel() instanceof ThreadChannel threadChannel) {
             if (threadChannel.getOwnerId().equals(member.getId())) {
@@ -70,11 +52,13 @@ public class CreateGameButtonHandler {
         int completedAndOngoingAmount =
                 SearchGameHelper.searchGames(member.getUser(), null, false, true, false, true, false, true, true, true);
         if (completedAndOngoingAmount < 1 && !owner) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), """
-                    You need to have completed at least one game (or be currently in a game) to create new games via this button. \
-                    This is to prevent mistakes by people who don't know what they're doing. There are a couple of ways to get around this:
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), member.getUser().getAsMention() + """
+                     You need to have completed at least one game (or be currently in a game) to create new games via this button. \
+                    This is to prevent mistakes by people who don't know what they're doing. There are a few ways to get around this:
                     1) Have someone else who has completed a game press the button for you; or
-                    2) Ping a bothelper for help.""");
+                    2) Ping a bothelper for help; or
+                    3) Have the player who made the post press the button.""");
             return;
         }
 
@@ -163,7 +147,7 @@ public class CreateGameButtonHandler {
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    public static List<Member> fetchMembersFromMessage(ButtonInteractionEvent event) {
+    private static List<Member> fetchMembersFromMessage(ButtonInteractionEvent event) {
         String buttonMsg = event.getMessage().getContentRaw();
         List<Member> members = new ArrayList<>();
         for (int i = 0; i < StringUtils.countMatches(buttonMsg, "<@"); i++) {
@@ -177,7 +161,7 @@ public class CreateGameButtonHandler {
         return members;
     }
 
-    public static List<Member> fetchMembersFromMessage(ModalInteractionEvent event) {
+    private static List<Member> fetchMembersFromMessage(ModalInteractionEvent event) {
         String buttonMsg = event.getMessage().getContentRaw();
         List<Member> members = new ArrayList<>();
         for (int i = 0; i < StringUtils.countMatches(buttonMsg, "<@"); i++) {
@@ -191,38 +175,19 @@ public class CreateGameButtonHandler {
         return members;
     }
 
-    public static String fetchSillyNameFromMessage(ModalInteractionEvent event) {
+    private static String fetchSillyNameFromMessage(ModalInteractionEvent event) {
         String buttonMsg = event.getMessage().getContentRaw();
-        String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
-        return gameSillyName;
+        return StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
     }
 
-    public static String fetchSillyNameFromMessage(ButtonInteractionEvent event) {
+    private static String fetchSillyNameFromMessage(ButtonInteractionEvent event) {
         String buttonMsg = event.getMessage().getContentRaw();
-        String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
-        return gameSillyName;
-    }
-
-    public static String generateMemberListMessage(List<Member> members) {
-        return generateMemberListMessage(members, "");
+        return StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
     }
 
     public static String generateMemberListMessage(List<Member> members, String gameFunName) {
         StringBuilder memberList = new StringBuilder();
-        int x = 1;
-        List<User> users = members.stream().map(Member::getUser).toList();
-        List<ManagedGame> userGames = users.stream()
-                .map(user -> GameManager.getManagedPlayer(user.getId()))
-                .filter(Objects::nonNull)
-                .map(ManagedPlayer::getGames)
-                .flatMap(Collection::stream)
-                .distinct()
-                .toList();
 
-        Map<String, Map.Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
-        for (ManagedGame game : userGames) {
-            AverageTurnTimeService.getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
-        }
         if (gameFunName == null || gameFunName.isEmpty()) {
             memberList.append("## Players Signed Up:\n");
         } else {
@@ -231,10 +196,17 @@ public class CreateGameButtonHandler {
                     .append(gameFunName.replace(":", ""))
                     .append("\n\nPlayers:");
         }
+
+        StringBuilder activityList = new StringBuilder();
+
+        var userIds = members.stream().map(Member::getId).toList();
+        Map<String, Long> userIdsToAverageTurnTimes =
+                AverageTurnTimeService.getBean().getUserIdsToAverageTurnTimes(userIds);
+        int playerNumber = 1;
         for (Member member : members) {
             memberList
-                    .append("\n")
-                    .append(x)
+                    .append('\n')
+                    .append(playerNumber)
                     .append(". ")
                     .append(member.getUser().getAsMention());
 
@@ -245,38 +217,41 @@ public class CreateGameButtonHandler {
             int completedGames = completedAndOngoingAmount - ongoingAmount;
             if (ongoingAmount > completedGames + 2) {
                 memberList
-                        .append("\n  - ⚠️ (Above or equal game limit: ")
+                        .append("⚠️ (Above or equal game limit: ")
                         .append(ongoingAmount)
                         .append(" ongoing, ")
                         .append(completedGames + 3)
-                        .append("-game limit)");
+                        .append("-game limit) ");
             } else {
-                memberList.append("\n  - ").append(completedGames).append(" games completed. ");
+                memberList.append(' ').append(completedGames).append(" games completed. ");
             }
-            if (playerTurnTimes.containsKey(member.getUser().getId())) {
-                User user = member.getUser();
-                int turnCount = playerTurnTimes.get(user.getId()).getKey();
-                long totalMillis = playerTurnTimes.get(user.getId()).getValue();
-                if (turnCount == 0 || totalMillis == 0) continue;
-                long averageTurnTime = totalMillis / turnCount;
+            if (userIdsToAverageTurnTimes.containsKey(member.getUser().getId())) {
+                long averageTurnTime =
+                        userIdsToAverageTurnTimes.get(member.getUser().getId());
                 memberList
-                        .append("\n  - `")
+                        .append(" `")
                         .append(DateTimeHelper.getTimeRepresentationToSeconds(averageTurnTime))
                         .append("` average turn time.");
             }
             var userSettings = UserSettingsManager.get(member.getId());
-            String activeHoursSummary = userSettings.summarizeActiveHours(userSettings.getActiveHours());
+            String activeHoursSummary = userSettings.summarizeActiveHoursEmoji(userSettings.getActiveHours());
             if (activeHoursSummary != null) {
-                memberList
-                        .append("\n  - Active Hours: ")
-                        .append(activeHoursSummary)
-                        .append(".");
-            } else {
-                memberList.append("\n  - Insufficient data for active hours.");
+                if (activityList.isEmpty()) {
+                    activityList
+                            .append("\n### Players Active Hours (starting from ")
+                            .append("<t:" + 1767225600L)
+                            .append(":t>")
+                            .append("):\n");
+                }
+
+                activityList.append('\n').append(playerNumber).append(". ").append(activeHoursSummary);
             }
-            x++;
+            // } else {
+            //     memberList.append("\n  - Insufficient data for active hours.");
+            // }
+            playerNumber++;
         }
-        return memberList.toString();
+        return memberList.toString() + activityList;
     }
 
     @ButtonHandler("joinGameList")
@@ -302,8 +277,9 @@ public class CreateGameButtonHandler {
     }
 
     private static void createGameChannels(ButtonInteractionEvent event) {
-        MessageHelper.sendMessageToEventChannel(
-                event, event.getUser().getEffectiveName() + " pressed the [Create Game] button");
+        String userName = event.getUser().getEffectiveName();
+        List<Member> members = fetchMembersFromMessage(event);
+        MessageHelper.sendMessageToEventChannel(event, userName + " pressed the [Create Game] button");
 
         if (!CreateGameService.isGameCreationAllowed()) {
             MessageHelper.sendMessageToChannel(
@@ -322,8 +298,6 @@ public class CreateGameButtonHandler {
         }
 
         String buttonMsg = event.getMessage().getContentRaw();
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Message for posterity:\n\n" + buttonMsg);
-
         String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
         if (gameSillyName == null || gameSillyName.isEmpty()) {
             gameSillyName = CreateGameService.autoGenerateGameName();
@@ -346,95 +320,41 @@ public class CreateGameButtonHandler {
             return;
         }
 
-        List<Member> members = new ArrayList<>();
         Member gameOwner = null;
-        for (int i = 3; i <= 10; i++) {
-            if (StringUtils.countMatches(buttonMsg, ":") < (i)) {
-                break;
+        if (!members.isEmpty()) {
+            for (Member member : members) {
+                if (!userCanJoinGame(event, member)) {
+                    return;
+                }
+                if (gameOwner == null) gameOwner = member;
             }
-            if (!fetchMembersFromMessage(event).isEmpty()) {
-                break;
-            }
-            String user = buttonMsg.split(":")[i];
-            user = StringUtils.substringBefore(user, ".");
-            Member member = event.getGuild().getMemberById(user);
-            if (member != null) {
-                members.add(member);
-                if (!member.getUser().isBot()
-                        && !CommandHelper.hasRole(event, JdaService.developerRoles)
-                        && !CommandHelper.hasRole(event, JdaService.bothelperRoles)) {
-                    int ongoingAmount = SearchGameHelper.searchGames(
-                            member.getUser(), event, false, false, false, true, false, true, true, true);
-                    int completedAndOngoingAmount = SearchGameHelper.searchGames(
-                            member.getUser(), event, false, true, false, true, false, true, true, true);
-                    int completedGames = completedAndOngoingAmount - ongoingAmount;
-                    if (ongoingAmount > completedGames + 2) {
-                        MessageHelper.sendMessageToChannel(
-                                event.getChannel(),
-                                member.getUser().getAsMention()
-                                        + " is at their game limit (# of ongoing games must be equal or less than # of completed games + 3) and so cannot join more games at the moment."
-                                        + " Their number of ongoing games is " + ongoingAmount
-                                        + " and their number of completed games is " + completedGames + ".\n\n"
-                                        + "If you're playing a private game with friends, you can ping a bothelper for a 1-game exemption from the limit.");
+        } else {
+            for (int i = 3; i < StringUtils.countMatches(buttonMsg, ":"); i++) {
+                String user = buttonMsg.split(":")[i];
+                user = StringUtils.substringBefore(user, ".");
+                Member member = event.getGuild().getMemberById(user);
+                if (member != null) {
+                    members.add(member);
+                    if (!userCanJoinGame(event, member)) {
                         return;
                     }
-                    // Used for specific people we are limiting the amount of games of
-                    if ("163392891148959744".equalsIgnoreCase(member.getId())
-                            || "774413088072925226".equalsIgnoreCase(member.getId())) {
-                        if (ongoingAmount > 4) {
-                            MessageHelper.sendMessageToChannel(
-                                    event.getChannel(),
-                                    member.getUser().getAsMention()
-                                            + " is currently under a 5-game limit and cannot join more games at this time");
-                            return;
-                        }
-                    }
                 }
+                if (gameOwner == null) gameOwner = member;
             }
-            if (gameOwner == null) gameOwner = member;
-        }
-        if (members.isEmpty()) {
-            members = fetchMembersFromMessage(event);
-            for (Member member : members) {
-                if (member != null) {
-                    if (!member.getUser().isBot()
-                            && !CommandHelper.hasRole(event, JdaService.developerRoles)
-                            && !CommandHelper.hasRole(event, JdaService.bothelperRoles)) {
-                        int ongoingAmount = SearchGameHelper.searchGames(
-                                member.getUser(), event, false, false, false, true, false, true, true, true);
-                        int completedAndOngoingAmount = SearchGameHelper.searchGames(
-                                member.getUser(), event, false, true, false, true, false, true, true, true);
-                        int completedGames = completedAndOngoingAmount - ongoingAmount;
-                        if (ongoingAmount > completedGames + 2) {
-                            MessageHelper.sendMessageToChannel(
-                                    event.getChannel(),
-                                    member.getUser().getAsMention()
-                                            + " is at their game limit (# of ongoing games must be equal or less than # of completed games + 3) and so cannot join more games at the moment."
-                                            + " Their number of ongoing games is " + ongoingAmount
-                                            + " and their number of completed games is " + completedGames + ".\n\n"
-                                            + "If you're playing a private game with friends, you can ping a bothelper for a 1-game exemption from the limit.");
-                            return;
-                        }
-                        // Used for specific people we are limiting the amount of games of
-                        if ("163392891148959744".equalsIgnoreCase(member.getId())
-                                || "774413088072925226".equalsIgnoreCase(member.getId())) {
-                            if (ongoingAmount > 4) {
-                                MessageHelper.sendMessageToChannel(
-                                        event.getChannel(),
-                                        member.getUser().getAsMention()
-                                                + " is currently under a 5-game limit and cannot join more games at this time");
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-            if (gameOwner == null) gameOwner = members.getFirst();
         }
 
         if (isLikelyDoublePressedButton(gameName, members, lastGameName, event)
                 && !CommandHelper.hasRole(event, JdaService.bothelperRoles)
                 && !CommandHelper.hasRole(event, JdaService.developerRoles)) return;
+
+        if (event != null
+                && !members.contains(event.getMember())
+                && !CommandHelper.hasRole(event, JdaService.bothelperRoles)
+                && !CommandHelper.hasRole(event, JdaService.developerRoles)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "You must be a bothelper or a member of the game to launch the game.");
+            return;
+        }
 
         // CHECK IF GIVEN CATEGORY IS VALID
         String categoryChannelName = CreateGameService.getCategoryNameForGame(gameName);
@@ -458,9 +378,46 @@ public class CreateGameButtonHandler {
         Game game = CreateGameService.createGameChannels(
                 members, event, gameSillyName, gameName, gameOwner, categoryChannel);
         if (game != null) {
-            GameManager.save(
-                    game, "Created game channels"); // TODO: We should be locking since we're saving? Maybe not here
+            MessageHelper.sendMessageToEventChannel(event, "Message for posterity:\n\n" + buttonMsg);
+            // TODO: We should be locking since we're saving? Maybe not here
+            GameManager.save(game, "Created game channels");
+        } else {
+            MessageHelper.sendMessageToEventChannel(event, "Something went wrong...");
         }
+    }
+
+    private static boolean userCanJoinGame(ButtonInteractionEvent event, Member member) {
+        if (member == null) return false;
+        if (!member.getUser().isBot()
+                && !CommandHelper.hasRole(event, JdaService.developerRoles)
+                && !CommandHelper.hasRole(event, JdaService.bothelperRoles)) {
+            int ongoingAmount = SearchGameHelper.searchGames(
+                    member.getUser(), event, false, false, false, true, false, true, true, true);
+            int completedAndOngoingAmount = SearchGameHelper.searchGames(
+                    member.getUser(), event, false, true, false, true, false, true, true, true);
+            int completedGames = completedAndOngoingAmount - ongoingAmount;
+            if (ongoingAmount > completedGames + 2) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(),
+                        member.getUser().getAsMention()
+                                + " is at their game limit (# of ongoing games must be equal or less than # of completed games + 3) and so cannot join more games at the moment."
+                                + " Their number of ongoing games is " + ongoingAmount
+                                + " and their number of completed games is " + completedGames + ".\n\n"
+                                + "If you're playing a private game with friends, you can ping a bothelper for a 1-game exemption from the limit.");
+                return false;
+            }
+            // Used for specific people we are limiting the amount of games of
+            var userSettings = UserSettingsManager.get(member.getId());
+            if (userSettings.getGameLimit() > 0 && ongoingAmount >= userSettings.getGameLimit()) {
+
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(),
+                        member.getUser().getAsMention() + " is currently under a " + userSettings.getGameLimit()
+                                + "-game limit and cannot join more games at this time");
+                return false;
+            }
+        }
+        return true;
     }
 
     private static boolean isLikelyDoublePressedButton(

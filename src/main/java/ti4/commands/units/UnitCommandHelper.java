@@ -19,7 +19,7 @@ import ti4.service.ShowGameService;
 class UnitCommandHelper {
 
     public void handleGenerateMapOption(SlashCommandInteractionEvent event, Game game) {
-        boolean generateMap = !event.getOption(Constants.NO_MAPGEN, false, OptionMapping::getAsBoolean);
+        boolean generateMap = !event.getOption(Constants.NO_MAPGEN, Boolean.FALSE, OptionMapping::getAsBoolean);
         if (generateMap) {
             ShowGameService.simpleShowGame(game, event);
         } else {

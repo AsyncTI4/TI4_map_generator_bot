@@ -32,7 +32,7 @@ class SearchWinningPath extends Subcommand {
         var foundGames = new HashSet<String>();
         StringBuilder sb = new StringBuilder("__**Games with Winning Path:**__ ")
                 .append(searchedPath)
-                .append("\n");
+                .append('\n');
 
         GamesPage.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event).and(game -> game.getWinner()
@@ -40,7 +40,7 @@ class SearchWinningPath extends Subcommand {
                         .orElse(false)),
                 game -> {
                     foundGames.add(game.getName());
-                    sb.append(formatGame(game)).append("\n");
+                    sb.append(formatGame(game)).append('\n');
                 });
 
         if (foundGames.isEmpty()) {
@@ -60,8 +60,8 @@ class SearchWinningPath extends Subcommand {
     private static String formatGame(Game game) {
         StringBuilder sb = new StringBuilder();
         sb.append("- **").append(game.getName()).append("** ");
-        sb.append("`").append(game.getCreationDate()).append("`-`");
-        if (game.isHasEnded() && game.getEndedDate() > 100) {
+        sb.append('`').append(game.getCreationDate()).append("`-`");
+        if (game.isHasEnded()) {
             sb.append(Helper.getDateRepresentation(game.getEndedDate()));
         } else {
             sb.append(Helper.getDateRepresentation(game.getLastModifiedDate()));

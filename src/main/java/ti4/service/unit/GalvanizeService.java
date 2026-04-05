@@ -2,6 +2,7 @@ package ti4.service.unit;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -23,6 +24,7 @@ import ti4.message.logging.BotLogger;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.regex.RegexService;
 
+@UtilityClass
 public class GalvanizeService {
 
     @ButtonHandler("getToggleGalvanizeTiles")

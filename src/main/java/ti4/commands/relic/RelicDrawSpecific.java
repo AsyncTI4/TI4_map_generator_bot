@@ -30,7 +30,7 @@ class RelicDrawSpecific extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         String relicID = event.getOption(Constants.RELIC).getAsString();
-        boolean forced = event.getOption(Constants.FORCE, false, OptionMapping::getAsBoolean);
+        boolean forced = event.getOption(Constants.FORCE, Boolean.FALSE, OptionMapping::getAsBoolean);
         List<String> allRelics = game.getAllRelics();
         if (!allRelics.contains(relicID) && !forced) {
             MessageHelper.sendMessageToChannel(

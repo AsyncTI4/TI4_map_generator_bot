@@ -39,7 +39,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.map.FractureService;
 
-public class BreakthroughCommandHelper {
+public final class BreakthroughCommandHelper {
 
     public static List<String> getBreakthroughsFromEvent(SlashCommandInteractionEvent event, Player player) {
         return getBreakthroughsFromEvent(event, player, false);
@@ -240,7 +240,7 @@ public class BreakthroughCommandHelper {
             }
 
             if (!FractureService.isFractureInPlay(game) && !game.isNoFractureMode())
-                serveRollFractureButtons(game, player, btID);
+                serveRollFractureButtons(player, btID);
             if ("muaatbt".equals(bt.getAlias())) StellarGenesisService.serveAvernusButtons(game, player);
             if ("keleresbt".equals(bt.getAlias())) player.gainCustodiaVigilia();
         });
@@ -250,7 +250,7 @@ public class BreakthroughCommandHelper {
         unlockBreakthroughs(game, player, Arrays.asList(btIDs));
     }
 
-    public static void serveRollFractureButtons(Game game, Player player, String btID) {
+    private static void serveRollFractureButtons(Player player, String btID) {
         String id = player.finChecker() + "rollFracture_" + btID;
         Button rollFracture = Buttons.green(id, "Roll For The Fracture", MiscEmojis.RollDice);
         String message = "It looks like The Fracture isn't in play yet. Use the button to roll for The Fracture!"
@@ -349,7 +349,7 @@ public class BreakthroughCommandHelper {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully added a token");
     }
 
-    public static List<Button> getNekroBtFixButtons(Game game, Player player) {
+    private static List<Button> getNekroBtFixButtons(Game game, Player player) {
         List<String> factionsWithToken =
                 Arrays.asList(game.getStoredValue("valefarZ").split("\\|"));
         List<Button> buttons = new ArrayList<>();
@@ -374,7 +374,7 @@ public class BreakthroughCommandHelper {
         activateBreakthroughs(event, player, Arrays.asList(btIDs));
     }
 
-    public static void deactivateBreakthroughs(Player player, List<String> btIDs) {
+    private static void deactivateBreakthroughs(Player player, List<String> btIDs) {
         withEachBreakthrough(player, btIDs, bt -> {
             String btID = bt.getID();
             if (player.isBreakthroughActive(btID)) {
@@ -395,7 +395,7 @@ public class BreakthroughCommandHelper {
         deactivateBreakthroughs(player, Arrays.asList(btIDs));
     }
 
-    public static void setBreakthroughTGs(Player player, int newTgs, String btID) {
+    private static void setBreakthroughTGs(Player player, int newTgs, String btID) {
         if (newTgs < 0) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), "You cannot have negative trade goods on your breakthrough.");

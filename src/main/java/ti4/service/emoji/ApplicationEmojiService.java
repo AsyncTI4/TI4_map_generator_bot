@@ -24,7 +24,7 @@ import ti4.message.logging.BotLogger;
 import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
 import ti4.spring.jda.JdaService;
 
-public class ApplicationEmojiService {
+public final class ApplicationEmojiService {
 
     public static final String fallbackEmoji = "<a:EvensOddsRage:1080111937930678282>";
     private static final Map<String, CachedEmoji> emojis = new HashMap<>();
@@ -195,7 +195,7 @@ public class ApplicationEmojiService {
                     .flatMap(v -> JdaService.jda.createApplicationEmoji(name, emojiIcon))
                     .complete();
         } catch (Exception e) {
-            BotLogger.error(Constants.jazzPing() + " Failed to upload emoji file: " + name, e);
+            BotLogger.error("Failed to upload emoji file: " + name, e);
             return null;
         }
     }
@@ -204,11 +204,14 @@ public class ApplicationEmojiService {
         if (toReupload.isEmpty()) return true;
         try {
             boolean success = true;
+            int fails = 0;
             for (EmojiFileData f : toReupload) {
                 ApplicationEmoji emoji = reuploadAppEmoji(f);
                 Thread.sleep(50);
                 if (emoji == null) {
                     success = false;
+                    ++fails;
+                    if (fails > 10) break;
                     continue;
                 }
                 CachedEmoji cached = new CachedEmoji(emoji);
@@ -216,7 +219,7 @@ public class ApplicationEmojiService {
             }
             return success;
         } catch (Exception e) {
-            BotLogger.error(Constants.jazzPing() + " Failed to upload emoji files: ", e);
+            BotLogger.error("Failed to upload emoji files", e);
             return false;
         }
     }
@@ -256,11 +259,7 @@ public class ApplicationEmojiService {
     }
 
     public static CachedEmoji getApplicationEmoji(String name) {
-        CachedEmoji fin = emojis.get(name);
-        if (fin == null) {
-            System.out.println("AJAHHAHHAHSFKLNFLKE - " + name);
-        }
-        return emojis.getOrDefault(name, null);
+        return emojis.get(name);
     }
 
     public static Stream<File> enumerateEmojiFilesRecursive() {
@@ -303,7 +302,7 @@ public class ApplicationEmojiService {
     private static void pushEmojiListToCache(boolean isHealthy) {
         if (spoofing) return;
         if (!isHealthy) {
-            BotLogger.warning(Constants.jazzPing() + " - Uploading failed, reinitializing cache from Discord.");
+            BotLogger.warning(Constants.jazzPing() + " - Uploading is failing, reinitializing cache from Discord.");
             resetCacheFromDiscord();
         } else {
             pushEmojiListToCache();

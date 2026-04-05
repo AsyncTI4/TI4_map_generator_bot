@@ -93,8 +93,9 @@ public class MoveUnits extends GameStateCommand {
         }
 
         String color = getPlayer().getColor();
-        boolean prioritizeDamaged = event.getOption(Constants.PRIORITIZE_DAMAGED, false, OptionMapping::getAsBoolean);
-        boolean coexist = event.getOption(Constants.COEXIST, false, OptionMapping::getAsBoolean);
+        boolean prioritizeDamaged =
+                event.getOption(Constants.PRIORITIZE_DAMAGED, Boolean.FALSE, OptionMapping::getAsBoolean);
+        boolean coexist = event.getOption(Constants.COEXIST, Boolean.FALSE, OptionMapping::getAsBoolean);
         String fromUnitList = event.getOption(Constants.UNIT_NAMES).getAsString();
         List<RemovedUnit> removed =
                 RemoveUnitService.removeUnits(event, tileFrom, game, color, fromUnitList, prioritizeDamaged);

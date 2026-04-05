@@ -18,6 +18,7 @@
     {
         "alias": "metalivoidarmaments",
         "name": "Metali Void Armaments",
+        "shortName": "Metali Void\nArmam'nts",
         "text": "During the \"Anti-Fighter Barrage\" step of space combat, you may resolve ANTI-FIGHTER BARRAGE 6 (x3) against your opponent's units.",
         "flavourText": "The Metali, Empyrean artificers of legend, were said to have created weapons that harnessed the power of space itself.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/te/metalivoidarmaments.png?raw=true",
@@ -34,6 +35,7 @@
     {
         "alias": "quantumcore",
         "name": "The Quantumcore",
+        "shortName": "The Quan\n-tumcore",
         "text": "When you gain this card, gain your breakthrough. You have SYNERGY for all technology types.",
         "flavourText": "The core burned with the heat of a thousand stars, connections forming and reforming a thousand times per second.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/te/quantumcore.png?raw=true",

@@ -72,7 +72,7 @@ class ButtonHelperExplore {
                 case "irf1", "irf2", "irf3", "irf4", "irf5" ->
                     message.append(" an " + ExploreEmojis.IFrag + "industrial");
                 case "urf1", "urf2", "urf3" -> message.append(" an " + ExploreEmojis.UFrag + "unknown");
-                default -> message.append(" ").append(fragId);
+                default -> message.append(' ').append(fragId);
             }
             message.append(" relic fragment.");
         } else {
@@ -85,7 +85,7 @@ class ButtonHelperExplore {
                     case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> message.append(ExploreEmojis.HFrag);
                     case "irf1", "irf2", "irf3", "irf4", "irf5" -> message.append(ExploreEmojis.IFrag);
                     case "urf1", "urf2", "urf3" -> message.append(ExploreEmojis.UFrag);
-                    default -> message.append(" ").append(fragId);
+                    default -> message.append(' ').append(fragId);
                 }
             }
             message.append(" relic fragments.");

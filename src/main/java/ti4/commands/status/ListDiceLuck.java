@@ -42,7 +42,7 @@ class ListDiceLuck extends GameStateSubcommand {
         }
         lines.sort((s1, s2) -> record.get(s2).compareTo(record.get(s1)));
         for (String s : lines) {
-            message.append("\n").append(s);
+            message.append('\n').append(s);
         }
 
         MessageHelper.replyToMessage(event, message.toString());

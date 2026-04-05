@@ -24,8 +24,9 @@ import ti4.settings.GlobalSettings;
 import ti4.spring.jda.JdaService;
 
 @UtilityClass
-public class SliceGeneratorService {
-    public static boolean generateSlices(
+class SliceGeneratorService {
+
+    static boolean generateSlices(
             GenericInteractionCreateEvent event,
             SliceDraftable sliceDraftable,
             DraftTileManager tileManager,
@@ -139,24 +140,24 @@ public class SliceGeneratorService {
         }
 
         long elapsed = System.nanoTime() - startTime;
-        boolean debug =
-                GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
+        boolean debug = GlobalSettings.getSetting(
+                GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, Boolean.FALSE);
         if (!slicesCreated || elapsed >= 10000000000L || debug) {
             StringBuilder sb = new StringBuilder();
             sb.append("Milty draft took a while... jazz, take a look:\n");
             sb.append("`        Elapsed time:` ")
                     .append(DateTimeHelper.getTimeRepresentationNanoSeconds(elapsed))
-                    .append("\n");
+                    .append('\n');
             sb.append("`           Quit time:` ")
                     .append(DateTimeHelper.getTimeRepresentationNanoSeconds(quitDiff))
-                    .append("\n");
-            sb.append("`    Number of cycles:` ").append(i).append("\n");
+                    .append('\n');
+            sb.append("`    Number of cycles:` ").append(i).append('\n');
             for (Map.Entry<String, Integer> reason : reasons.entrySet()) {
-                sb.append("`")
+                sb.append('`')
                         .append(Helper.leftpad(reason.getKey(), 15))
                         .append(" fail:` ")
                         .append(reason.getValue())
-                        .append("\n");
+                        .append('\n');
             }
             BotLogger.warning(new LogOrigin(event), sb.toString());
         }

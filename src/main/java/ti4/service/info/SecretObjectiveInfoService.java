@@ -7,7 +7,6 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
@@ -50,21 +49,6 @@ public class SecretObjectiveInfoService {
             boolean autoDiscardButtons,
             boolean autoScoreButtons) {
         String headerText = player.getRepresentationUnfogged() + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
-        sendSecretObjectiveInfo(game, player, autoDiscardButtons, autoScoreButtons);
-    }
-
-    public static void sendSecretObjectiveInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        sendSecretObjectiveInfo(game, player, event, false, false);
-    }
-
-    public static void sendSecretObjectiveInfo(
-            Game game,
-            Player player,
-            GenericInteractionCreateEvent event,
-            boolean autoDiscardButtons,
-            boolean autoScoreButtons) {
-        String headerText = player.getRepresentationUnfogged() + " used something";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendSecretObjectiveInfo(game, player, autoDiscardButtons, autoScoreButtons);
     }
@@ -116,10 +100,10 @@ public class SecretObjectiveInfoService {
         // SCORED SECRET OBJECTIVES
         sb.append("__Scored Secret Objectives__ (")
                 .append(player.getSoScored())
-                .append("/")
+                .append('/')
                 .append(player.getMaxSOCount())
                 .append("):")
-                .append("\n");
+                .append('\n');
         if (scoredSecretObjective.isEmpty()) {
             sb.append("> None");
         } else {
@@ -136,10 +120,10 @@ public class SecretObjectiveInfoService {
                 index++;
             }
         }
-        sb.append("\n");
+        sb.append('\n');
 
         // UNSCORED SECRET OBJECTIVES
-        sb.append("__Unscored Secret Objectives:__").append("\n");
+        sb.append("__Unscored Secret Objectives:__").append('\n');
         if (secretObjective != null) {
             if (secretObjective.isEmpty()) {
                 sb.append("> None");
@@ -163,14 +147,14 @@ public class SecretObjectiveInfoService {
                     if (threshold > 0) {
                         sb.append(" (")
                                 .append(ListPlayerInfoService.getPlayerProgressOnObjective(so.getKey(), game, player))
-                                .append("/")
+                                .append('/')
                                 .append(threshold)
                                 .append(")");
                     }
                     if (soModel.getNotes() != null) {
                         sb.append("\n> -# [").append(soModel.getNotes()).append("]");
                     }
-                    sb.append("\n");
+                    sb.append('\n');
                 }
             }
         }
@@ -185,7 +169,7 @@ public class SecretObjectiveInfoService {
                 .append("_")
                 .append(soName)
                 .append("_")
-                .append("\n");
+                .append('\n');
         return sb.toString();
     }
 
@@ -215,7 +199,7 @@ public class SecretObjectiveInfoService {
             sb.append("\n> -# [").append(so.getNotes()).append("]");
         }
         if (newLine) {
-            sb.append("\n");
+            sb.append('\n');
         }
         return sb.toString();
     }

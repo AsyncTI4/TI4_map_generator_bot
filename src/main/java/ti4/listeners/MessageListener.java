@@ -31,6 +31,7 @@ import ti4.service.fow.WhisperService;
 import ti4.service.game.CreateGameService;
 import ti4.service.game.GameNameService;
 import ti4.spring.jda.JdaService;
+import ti4.spring.service.messagecache.SavedBotMessagesService;
 
 public class MessageListener extends ListenerAdapter {
 
@@ -42,6 +43,7 @@ public class MessageListener extends ListenerAdapter {
     private static final String BOTHELPER_MENTION_REMINDER_TEXT = """
         Friendly reminder in case you forgot, please include the specific reason for the ping (e.g. something is not working, there is a bug, or you're not sure how to do something) and any other relevant information. This will speed up the process by allowing the staff to know how they can help. Thanks!
         """;
+    private static final List<String> INTERESTING_MESSAGES = List.of("gaslight", "please stop");
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
@@ -68,23 +70,27 @@ public class MessageListener extends ListenerAdapter {
 
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
         try {
+            String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
+            boolean isValidGameMessage = GameManager.isValid(gameName);
+            if (isValidGameMessage) {
+                SavedBotMessagesService.getBean().cache(message);
+            }
+
             if (!event.getAuthor().isBot()) {
                 if (respondToBotHelperPing(message)) return;
                 if (checkForFogOfWarInvitePrompt(message)) return;
                 if (copyLFGPingsToLFGPingsChannel(event, message)) return;
-                if (message.getContentRaw().toLowerCase().contains("gaslight")) {
-                    String msg = "Someone used gaslight here: " + message.getJumpUrl() + "\nFull msg: "
-                            + message.getContentRaw();
-                    sendMessageToModLog(msg);
-                }
-                if (message.getContentRaw().toLowerCase().contains("please stop")) {
-                    String msg = "Someone used please stop here: " + message.getJumpUrl() + "\nFull msg: "
-                            + message.getContentRaw();
-                    sendMessageToModLog(msg);
+                String messageRaw = message.getContentRaw().toLowerCase();
+                for (String phrase : INTERESTING_MESSAGES) {
+                    if (messageRaw.contains(phrase)) {
+                        String msg =
+                                "Someone used \"" + phrase + "\" at " + message.getJumpUrl() + ". Full message:\n> "
+                                        + message.getContentRaw().replace("\n", "\n> ");
+                        sendMessageToModLog(msg);
+                    }
                 }
 
-                String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
-                if (GameManager.isValid(gameName)) {
+                if (isValidGameMessage) {
                     if (handleWhispers(event, message, gameName)) return;
                     if (endOfRoundSummary(event, message, gameName)) return;
                     if (addFactionEmojiReactionsToMessages(event, gameName)) return;
@@ -287,6 +293,7 @@ public class MessageListener extends ListenerAdapter {
     private static boolean addFactionEmojiReactionsToMessages(MessageReceivedEvent event, String gameName) {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame.getGame().isHiddenAgendaMode()
+                && !managedGame.getGame().getStoredValue("executiveOrder").isEmpty()
                 && managedGame.getGame().getPhaseOfGame().toLowerCase().contains("agenda")) {
             Player player = getPlayer(event, managedGame.getGame());
             if (player == null
@@ -357,18 +364,35 @@ public class MessageListener extends ListenerAdapter {
      * replicate messages in combat threads so that observers can see
      */
     private static void handleFogOfWarCombatThreadMirroring(MessageReceivedEvent event) {
-        if (!JdaService.fowServers.isEmpty()
-                && // fog servers exists
-                !JdaService.fowServers.contains(event.getGuild())
-                && // 2nd server actually exists
-                JdaService.guildCommunityPlays != null
-                && // event server IS NOT the fog server
-                !JdaService.guildCommunityPlays.getId().equals(event.getGuild().getId())
-                && // NOR the community server
-                JdaService.guildPrimaryID.equals(Constants.ASYNCTI4_HUB_SERVER_ID)) { // bot is running in production
+        if (shouldSkipEvent(event)) {
             return;
-        } // else it's probably a dev/test server, so execute
-
+        }
         FOWCombatThreadMirroring.mirrorEvent(event);
+    }
+
+    private static boolean shouldSkipEvent(MessageReceivedEvent event) {
+        return hasFowServers()
+                && isNotInFowServers(event)
+                && isDifferentCommunityPlayGuild(event)
+                && isPrimaryHubServer();
+    }
+
+    private static boolean hasFowServers() {
+        return !JdaService.fowServers.isEmpty();
+    }
+
+    private static boolean isNotInFowServers(MessageReceivedEvent event) {
+        return !JdaService.fowServers.contains(event.getGuild());
+    }
+
+    private static boolean isDifferentCommunityPlayGuild(MessageReceivedEvent event) {
+        return JdaService.guildCommunityPlays != null
+                && !JdaService.guildCommunityPlays
+                        .getId()
+                        .equals(event.getGuild().getId());
+    }
+
+    private static boolean isPrimaryHubServer() {
+        return Constants.ASYNCTI4_HUB_SERVER_ID.equals(JdaService.guildPrimaryID);
     }
 }

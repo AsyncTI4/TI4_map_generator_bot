@@ -29,7 +29,7 @@ import ti4.service.draft.DraftableType;
 import ti4.service.draft.OrchestratorState;
 import ti4.service.draft.PartialMapService;
 import ti4.service.draft.PlayerDraftState;
-import ti4.service.draft.PlayerSetupService.PlayerSetupState;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.draft.PublicDraftInfoService;
 
 /**
@@ -39,29 +39,21 @@ import ti4.service.draft.PublicDraftInfoService;
  * The picks are made in order, but that order "snakes" or reverses direction
  * after each player has made a pick.
  */
+@Setter
+@Getter
 public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
     /**
      * The per-player state for PublicSnakeDraftOrchestrator.
      * Stores the player's position in the draft order.
      */
+    @Setter
+    @Getter
     public static class State extends OrchestratorState {
         private int orderIndex;
-
-        public int getOrderIndex() {
-            return orderIndex;
-        }
-
-        public void setOrderIndex(int orderIndex) {
-            this.orderIndex = orderIndex;
-        }
     }
 
-    @Getter
-    @Setter
     private int currentPlayerIndex;
 
-    @Getter
-    @Setter
     private boolean isReversing;
 
     public void initialize(DraftManager draftManager, List<String> presetPlayerOrder) {
@@ -187,7 +179,10 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             sb.append("(automatically) ");
         } else if (source == CommandSource.SLASH_COMMAND) {
             sb.append("(forcefully) ");
+        } else if (source == CommandSource.QUEUED_PICK) {
+            sb.append("(from queue) ");
         }
+
         sb.append(choice.getFormattedName()).append("!");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
 

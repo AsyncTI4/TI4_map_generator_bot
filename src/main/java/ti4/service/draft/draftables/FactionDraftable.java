@@ -30,7 +30,7 @@ import ti4.service.draft.DraftButtonService;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftableType;
-import ti4.service.draft.PlayerSetupService.PlayerSetupState;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -54,7 +54,6 @@ public class FactionDraftable extends SinglePickDraftable {
                 .filter(f -> !effBannedFactions.contains(f.getAlias()))
                 .filter(f -> sources.contains(f.getSource()))
                 .filter(f -> !f.getAlias().contains("obsidian"))
-                .filter(f -> !f.getAlias().contains("kaltrim"))
                 .filter(f -> !f.getAlias().contains("neutral"))
                 .filter(f -> !f.getAlias().contains("keleres")
                         || "keleresm".equals(f.getAlias())) // Limit the pool to only 1 keleres flavor
@@ -124,7 +123,7 @@ public class FactionDraftable extends SinglePickDraftable {
         return getFactionByChoice(choice.getChoiceKey());
     }
 
-    public static FactionModel getFactionByChoice(String choiceKey) {
+    private static FactionModel getFactionByChoice(String choiceKey) {
         return Mapper.getFaction(choiceKey);
     }
 
@@ -148,9 +147,6 @@ public class FactionDraftable extends SinglePickDraftable {
             }
             String choiceKey = factionAlias;
             String buttonText = factionName;
-            if (factionName.toLowerCase().contains("naalu")) {
-                buttonText += " (Uses New Agent and Mech)";
-            }
             String buttonEmoji = faction.getFactionEmoji();
             String unformattedName = factionName;
             String formattedName = faction.getFactionEmoji() + " **" + factionName + "**";
@@ -478,7 +474,7 @@ public class FactionDraftable extends SinglePickDraftable {
         List<String> leaderNames = keleres.getLeaders();
         List<LeaderModel> leaders = leaderNames.stream().map(Mapper::getLeader).toList();
         Optional<LeaderModel> heroOpt =
-                leaders.stream().filter(l -> l.getType().equals(Constants.HERO)).findFirst();
+                leaders.stream().filter(l -> Constants.HERO.equals(l.getType())).findFirst();
         if (heroOpt.isPresent()) {
             LeaderModel hero = heroOpt.get();
             summaryParts.add(hero.getLeaderEmoji() + " " + hero.getName() + " - *" + hero.getAbilityWindow() + "* "

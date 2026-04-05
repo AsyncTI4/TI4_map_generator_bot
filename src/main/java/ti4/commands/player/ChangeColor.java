@@ -49,8 +49,9 @@ class ChangeColor extends GameStateSubcommand {
             }
         }
 
-        if (ColorChangeHelper.colorIsExclusive(newColor, player)) {
-            MessageHelper.sendMessageToEventChannel(event, "You cannot use this color.");
+        if (!ColorChangeHelper.isColorAllowedForPlayer(newColor, player)) {
+            MessageHelper.sendMessageToEventChannel(
+                    event, "You cannot use this color. It has been made solely for its creator's usage. Sorry!");
             return;
         }
 

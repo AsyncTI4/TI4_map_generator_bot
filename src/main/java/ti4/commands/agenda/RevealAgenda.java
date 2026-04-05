@@ -19,7 +19,8 @@ class RevealAgenda extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        boolean revealFromBottom = event.getOption(Constants.REVEAL_FROM_BOTTOM, false, OptionMapping::getAsBoolean);
+        boolean revealFromBottom =
+                event.getOption(Constants.REVEAL_FROM_BOTTOM, Boolean.FALSE, OptionMapping::getAsBoolean);
         AgendaHelper.revealAgenda(event, revealFromBottom, getGame(), event.getChannel());
     }
 }

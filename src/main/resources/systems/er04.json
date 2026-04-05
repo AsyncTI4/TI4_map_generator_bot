@@ -8,9 +8,7 @@
     ],
     "imagePath": "er_04_async.png",
     "shipPositionsType": "TYPE04",
-    "wormholes": [
-        null
-    ],
+    "wormholes": [],
     "planets": [
         "suprima"
     ],

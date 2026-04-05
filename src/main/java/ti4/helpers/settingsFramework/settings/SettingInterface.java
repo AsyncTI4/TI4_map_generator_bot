@@ -1,6 +1,5 @@
 package ti4.helpers.settingsFramework.settings;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -11,6 +10,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.Helper;
 import ti4.service.emoji.TI4Emoji;
+import tools.jackson.databind.JsonNode;
 
 @Getter
 @Setter

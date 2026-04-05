@@ -34,6 +34,12 @@ public abstract class GameStateCommand implements ParentCommand {
         commandGameState.postExecute(event);
     }
 
+    @Override
+    public void onException(SlashCommandInteractionEvent event, Throwable throwable) {
+        commandGameState.clear();
+        ParentCommand.super.onException(event, throwable);
+    }
+
     @NotNull
     protected Game getGame() {
         return commandGameState.getGame();

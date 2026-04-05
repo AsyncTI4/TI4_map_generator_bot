@@ -98,7 +98,7 @@ class AgendaResolveButtonHandler {
         AGENDA_HANDLERS.put("constitution", new ConstitutionAgendaResolver());
         AGENDA_HANDLERS.put("crisis", new CrisisAgendaResolver());
         AGENDA_HANDLERS.put("defense_act", new DefenseActAgendaResolver());
-        AGENDA_HANDLERS.put("disarmamament", new DisarmamentAgendaResolver());
+        AGENDA_HANDLERS.put("disarmament", new DisarmamentAgendaResolver());
         AGENDA_HANDLERS.put("economic_equality", new EconomicEqualityAgendaResolver());
         AGENDA_HANDLERS.put("execution", new ExecutionDirectiveAgendaResolver());
         AGENDA_HANDLERS.put("grant_reallocation", new GrantReallocationAgendaResolver());
@@ -172,7 +172,8 @@ class AgendaResolveButtonHandler {
     }
 
     private static boolean guardDoublePress(Game game, String winner, String agendaId) {
-        String key = "agendaRes" + game.getRound() + game.getDiscardAgendas().size();
+        String key = "agendaRes" + game.getRound() + game.getDiscardAgendas().size()
+                + game.getLaws().size();
         if (game.getStoredValue(key).equalsIgnoreCase(winner + agendaId)) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "Double press suspected, stopping resolution here.");
@@ -309,7 +310,8 @@ class AgendaResolveButtonHandler {
         for (Player rid : riders) {
             String rep = rid.getRepresentationUnfogged();
             String message;
-            if (rid.hasAbility("future_sight")) {
+            if (rid.hasAbility("future_sight")
+                    && game.getStoredValue("executiveOrder").isEmpty()) {
                 message = rep
                         + " you have a Rider to resolve or you voted for the correct outcome. Either way a trade good has been added to your total due to your **Future Sight** ability "
                         + rid.gainTG(1, true) + ".";
@@ -331,6 +333,18 @@ class AgendaResolveButtonHandler {
                 MessageHelper.sendMessageToChannelWithButtons(
                         rid.getCorrectChannel(),
                         "Use buttons to DEPLOY 1 cruiser to a system that contains your ships.",
+                        buttons);
+            }
+            if (rid.hasUnit("kaltrim_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, rid, "mech", true) < 4) {
+                MessageHelper.sendMessageToChannel(
+                        rid.getCorrectChannel(),
+                        rid.getFactionEmoji() + " may DEPLOY 1 mech to a planet that contains their units.");
+                List<Button> buttons =
+                        new ArrayList<>(Helper.getPlanetPlaceUnitButtons(rid, game, "mech", "placeOneNDone_skipbuild"));
+                buttons.add(Buttons.red("deleteButtons", "Decline to Drop Mech"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        rid.getCorrectChannel(),
+                        "Use buttons to DEPLOY 1 mech to a planet that contains their units.",
                         buttons);
             }
             if (game.isFowMode()) {

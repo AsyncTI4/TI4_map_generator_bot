@@ -7,11 +7,29 @@ import net.dv8tion.jda.api.requests.Response;
 @UtilityClass
 public class DiscordHelper {
 
+    private static final int DISCORD_UNKNOWN_MESSAGE_ERROR_CODE = 10_008;
+    private static final int DISCORD_UNKNOWN_WEBHOOK_ERROR_CODE = 10_015;
+
     public static boolean isDiscordServerError(Throwable error) {
         if (error instanceof ErrorResponseException restError) {
             Response response = restError.getResponse();
             return response.code >= 500 && response.code < 600;
         }
         return false;
+    }
+
+    public static boolean isUnknownMessageError(Throwable error) {
+        return error instanceof ErrorResponseException restError
+                && restError.getErrorCode() == DISCORD_UNKNOWN_MESSAGE_ERROR_CODE;
+    }
+
+    public static boolean isUnknownWebhookError(Throwable error) {
+        return error instanceof ErrorResponseException restError
+                && restError.getErrorCode() == DISCORD_UNKNOWN_WEBHOOK_ERROR_CODE;
+    }
+
+    public static boolean isIgnorableError(Throwable error) {
+        // Typically caused by the bot trying to delete or edit a message that has already been deleted.
+        return isUnknownMessageError(error) || isUnknownWebhookError(error);
     }
 }

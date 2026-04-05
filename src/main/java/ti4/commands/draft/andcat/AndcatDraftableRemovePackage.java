@@ -11,7 +11,7 @@ import ti4.service.draft.draftables.AndcatReferenceCardsDraftable;
 
 class AndcatDraftableRemovePackage extends GameStateSubcommand {
 
-    protected AndcatDraftableRemovePackage() {
+    AndcatDraftableRemovePackage() {
         super(Constants.DRAFT_ANDCAT_REMOVE_PACKAGE, "Remove a package from the draft", true, false);
         addOption(
                 OptionType.INTEGER,

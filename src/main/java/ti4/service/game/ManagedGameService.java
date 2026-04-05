@@ -31,10 +31,10 @@ public class ManagedGameService {
         if (role != null) {
             return role.getAsMention();
         }
-        StringBuilder sb = new StringBuilder(game.getName()).append(" ");
+        StringBuilder sb = new StringBuilder(game.getName()).append(' ');
         for (var player : game.getPlayers()) {
             User user = JdaService.jda.getUserById(player.getId());
-            if (user != null) sb.append(user.getAsMention()).append(" ");
+            if (user != null) sb.append(user.getAsMention()).append(' ');
         }
         return sb.toString();
     }

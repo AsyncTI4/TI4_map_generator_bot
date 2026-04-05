@@ -85,7 +85,7 @@ public class CreateGameService {
         String threadName = "game-starts-and-ends";
         // SEARCH FOR EXISTING OPEN THREAD
         for (ThreadChannel threadChannel_ : threadChannels) {
-            if (threadChannel_.getName().equals(threadName)) {
+            if (threadName.equals(threadChannel_.getName())) {
                 String guildName = game.getGuild() == null
                         ? "Server Unknown"
                         : game.getGuild().getName();
@@ -158,7 +158,7 @@ public class CreateGameService {
         String newActionsChannelName = gameName + Constants.ACTIONS_CHANNEL_SUFFIX;
         String newBotThreadName = gameName + Constants.BOT_CHANNEL_SUFFIX;
         long gameRoleID = role.getIdLong();
-        long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+        long permission = Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
         // CREATE TABLETALK CHANNEL
         TextChannel chatChannel = guild.createTextChannel(newChatChannelName, categoryChannel)
@@ -208,6 +208,9 @@ public class CreateGameService {
 
         // Create Cards Info Threads
         for (Player player : newGame.getPlayers().values()) {
+            if (player.isNpc() || player.isDummy()) {
+                continue;
+            }
             player.getCardsInfoThread();
         }
 
@@ -430,10 +433,10 @@ public class CreateGameService {
                     "### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join our **");
             sb.append(guild.getName()).append("** server.\n");
             sb.append(Helper.getGuildInviteURL(guild, missingMembers.size() + 15))
-                    .append("\n");
+                    .append('\n');
             sb.append("The following players need to join the server:\n");
             for (Member member : missingMembers) {
-                sb.append("> ").append(member.getAsMention()).append("\n");
+                sb.append("> ").append(member.getAsMention()).append('\n');
             }
             sb.append("You will be automatically added to the game channels when you join the server.");
             MessageHelper.sendMessageToChannel(channel, sb.toString());
@@ -446,7 +449,7 @@ public class CreateGameService {
         return missingMembers;
     }
 
-    public static Integer getNextGameNumber() {
+    private static Integer getNextGameNumber() {
         List<Integer> existingNums = getAllExistingPBDNumbers();
         if (existingNums.isEmpty()) {
             return 1;
@@ -728,48 +731,50 @@ public class CreateGameService {
 
     public static boolean isGameCreationAllowed() {
         return GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.ALLOW_GAME_CREATION.toString(), Boolean.class, true);
+                GlobalSettings.ImplementedSettings.ALLOW_GAME_CREATION.toString(), Boolean.class, Boolean.TRUE);
     }
 
     public String autoGenerateGameName() {
         // spotless:off
-            // if these words are changed, please replace them in place, to avoid disrupting the generation algorithm
-            // i.e. avoid deleting a word and putting a new word at the end, instead put the new word where the old word was
-            List<String> words = new ArrayList<>(Arrays.asList(
-                "Relativity", "Photon", "Crystalline", "Particle", "Lunar", "Ecosystem", "Hardlight", "Halogen",
-                "Fluorescence", "Helium", "Tachyon", "Jetpack", "Pluto", "Interstellar", "Cryptography", "Blueprint",
-                "Fission", "Disruptor", "Network", "Domino", "Doppelganger", "Freefall", "Zeta", "Hypocube",
-                "Levitation", "Chemical", "Biohazard", "Frequency", "Equinox", "Extrapolate", "Nanocarbon", "Cygnus",
-                "Labyrinth", "Zenith", "Acidic", "Oxygen", "Primordial", "Havoc", "Neutrino", "Vorpal",
-                "Solstice", "Qubit", "Cephalopod", "Vertebrate", "Lattice", "Obelisk", "Yggdrasil", "Jargon",
-                "Compass", "Machination", "Incorporeal", "Electron", "Maglev", "Radiant", "Cosmology", "Tensor",
-                "Cryosleep", "Incandescent", "Vector", "Atomizer", "Retina", "Dragonfly", "Nanotube",  "Gloom",
-                "Saturn", "Convex", "Nulldrive", "Distortion", "Equilibrium", "Abyss", "Hydra", "Friction",
-                "Equatorial", "Incursion", "Solenoid", "Illusion", "Inhibitor", "Sundial", "Microchip", "Krypton",
-                "Gravitational", "Entropy", "Taurus", "Hyperion", "Deuterium", "Voltage", "Viscosity", "Logarithm",
-                "Centrifuge", "Mercury", "Ioniser", "Parabola", "Starlight", "Hydrocarbon", "Precursor", "Scorpius",
-                "Covalent", "Paradox", "Chromosome", "Incognita", "Polarity", "Sigma", "Imprint", "Overclock",
-                "Thermodynamics", "Zephyr", "Quadrant", "Cortex", "Luminance", "Irradiated", "Polymer", "Fluctuation",
-                "Cryogenics", "Pegasus", "Ferrocore", "Quaternary", "Ultrasonic", "Pulsar", "Kinetic", "Chimera",
-                "Turbine", "Transduction", "Isotope", "Quicksilver", "Jovian", "Lateral", "Lithium", "Neurotoxin",
-                "Osmosis", "Thunderchild", "Electrical", "Ablation", "Gigawatt", "Leviathan", "Moonstone", "Emerald",
-                "Toxicology", "Immaterial", "Disintegration", "Harmonics", "Android", "Constellation", "Parallax", "Cyborg",
-                "Tesseract", "Jupiter", "Volatile", "Moebius", "Uranium", "Phoenix", "Hardwired", "Uninhabitable",
-                "Phosphorus", "Horizon", "Oscillation", "Waveform", "Banshee", "Dissonance", "Omicron", "Terraform",
-                "Conduit", "Spacetime", "Eclipse", "Ultimatum", "Junkyard", "Inertia", "Hovercraft", "Symbiotic",
-                "Cellular", "Celestial", "Instability", "Decontamination", "Valence", "Diffusion", "Fractal", "Radioactive",
-                "Caduceus", "Quotient", "Atmosphere", "Apparatus", "Infosphere", "Juggernaut", "Pendulum", "Spectral",
-                "Harbinger", "Venus", "Lambda", "Alkaline", "Voyage", "Ozone", "Iota", "Atomic",
-                "Galactic", "Redshift", "Cerebral", "Fungi", "Wetware", "Dendrite", "Ziggurat", "Vermilion",
-                "Neptune", "Pathology", "Orthogonal", "Yesteryear", "Dinosaur", "Andromeda", "Catalyst", "Fabricator",
-                "Portal", "Molecular", "Encryption", "Hydrogen", "Theta", "Angstrom", "Epoch", "Digital",
-                "Parasite", "Synchronisation", "Singularity", "Comet", "Resonance", "Topography", "Gargoyle", "Forcefield",
-                "Citadel", "Hologram", "Circuitry", "Gemini", "Cyberspace", "Graphite", "Synthetic", "Trajectory",
-                "Nitrogen", "Odyssey", "Bioluminescence", "Orbital", "Lightspeed", "Helix", "Photosynthesis", "Interface",
-                "Nanite", "Glacier", "Astrolabe", "Ultraviolet", "Enthalpy", "Observatory", "Solar", "Vacuum",
-                "Infrared", "Kaleidoscope", "Magnetosphere", "Gyroscope", "Diamond", "Optic", "Enzyme", "Energy"));
-            // extra words: "Aurora", "Datastream", "Monolith", "Coriolis", "Lagrange", "Causality", "Wintermute"
-            // spotless:on
+        // if these words are changed, please replace them in place, to avoid disrupting the generation algorithm
+        // i.e. avoid deleting a word and putting a new word at the end, instead put the new word where the old word was
+        List<String> words = new ArrayList<>(Arrays.asList(
+            "Relativity", "Photon", "Crystalline", "Exoplanet", "Lunar", "Ecosystem", "Metastable", "Halogen",
+            "Fluorescence", "Helium", "Tachyon", "Jetpack", "Pluto", "Interstellar", "Cryptography", "Blueprint",
+            "Fission", "Disruptor", "Monolith", "Domino", "Doppelganger", "Freefall", "Zeta", "Hypocube",
+            "Levitation", "Chemical", "Biohazard", "Frequency", "Equinox", "Extrapolate", "Nanocarbon", "Cygnus",
+            "Labyrinth", "Zenith", "Acidic", "Oxygen", "Primordial", "Havoc", "Neutrino", "Vorpal",
+            "Solstice", "Qubit", "Cephalopod", "Vertebrate", "Magnetron", "Obelisk", "Yggdrasil", "Jargon",
+            "Compass", "Machination", "Incorporeal", "Electron", "Maglev", "Radiant", "Cosmology", "Tensor",
+            "Cryosleep", "Incandescent", "Eigenvector", "Atomizer", "Retina", "Dragonfly", "Nanotube",  "Mnemonic",
+            "Muon", "Convex", "Nulldrive", "Failsafe", "Equilibrium", "Abyss", "Hydra", "Friction",
+            "Equatorial", "Incursion", "Solenoid", "Illusion", "Inhibitor", "Sundial", "Microchip", "Krypton",
+            "Gravitational", "Entropy", "Taurus", "Hyperion", "Deuterium", "Voltage", "Viscosity", "Logarithm",
+            "Centrifuge", "Mercury", "Ioniser", "Parabola", "Starlight", "Hydrocarbon", "Precursor", "Scorpius",
+            "Covalent", "Paradox", "Chromosome", "Incognita", "Polarity", "Wintermute", "Imprint", "Overclock",
+            "Thermodynamics", "Zephyr", "Quadrant", "Cortex", "Luminance", "Irradiated", "Polymer", "Fluctuation",
+            "Cryogenics", "Pegasus", "Ferrocore", "Quaternary", "Ultrasonic", "Quasar", "Kinetic", "Chimera",
+            "Turbine", "Transduction", "Isotope", "Quicksilver", "Jovian", "Lateral", "Lithium", "Neurotoxin",
+            "Osmosis", "Thunderchild", "Piezoelectric", "Ablation", "Gigawatt", "Leviathan", "Moonstone", "Emerald",
+            "Toxicology", "Immaterial", "Disintegration", "Harmonics", "Android", "Constellation", "Parallax", "Cyborg",
+            "Tesseract", "Jupiter", "Volatile", "Moebius", "Uranium", "Phoenix", "Hardwired", "Uninhabitable",
+            "Phosphorus", "Horizon", "Oscillation", "Waveform", "Banshee", "Dissonance", "Omicron", "Xenobiology",
+            "Continuum", "Spacetime", "Eclipse", "Ultimatum", "Junkyard", "Inertia", "Hovercraft", "Symbiotic",
+            "Cellular", "Celestial", "Instability", "Decontamination", "Valence", "Diffusion", "Fractal", "Radioactive",
+            "Caduceus", "Quotient", "Atmosphere", "Apparatus", "Infosphere", "Juggernaut", "Pendulum", "Spectral",
+            "Harbinger", "Venus", "Lambda", "Alkaline", "Voyage", "Ozone", "Iota", "Synapse",
+            "Datastream", "Redshift", "Cerebral", "Fungi", "Wetware", "Dendrite", "Ziggurat", "Vermilion",
+            "Neptune", "Pathology", "Orthogonal", "Yesteryear", "Dinosaur", "Andromeda", "Catalyst", "Fabricator",
+            "Portal", "Molecular", "Encryption", "Hydrogen", "Theta", "Angstrom", "Epoch", "Digital",
+            "Sentinel", "Synchronisation", "Coriolis", "Comet", "Resonance", "Topography", "Gargoyle", "Forcefield",
+            "Citadel", "Hologram", "Circuitry", "Gemini", "Cyberspace", "Graphite", "Synthetic", "Trajectory",
+            "Nitrogen", "Odyssey", "Bioluminescence", "Lagrange", "Lightspeed", "Helix", "Photosynthesis", "Interface",
+            "Nanite", "Glacier", "Astrolabe", "Ultraviolet", "Enthalpy", "Observatory", "Solar", "Vacuum",
+            "Infrared", "Kaleidoscope", "Magnetosphere", "Gyroscope", "Diamond", "Optic", "Enzyme", "Causality"));
+        // extra words: "Waypoint", "Faraday", "Perihelion", "Penumbra", "Barycentric", "Helical", "Stoichiometry", "Mechatronic", "Cognitive", "Newtonian"
+        // avoid words that are similar to names of TI4 components (or parts thereof) e.g. "Quantum"
+        // also avoid words that are similar to existing words or the list e.g. "Cyberspace" -> Nullspace", "Subspace", "Hyperspace"
+        // spotless:on
         int gameNumber = getNextGameNumber();
         int first = gameNumber & 0xFF;
         int second = (gameNumber >> 8) & 0xFF;

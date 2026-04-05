@@ -17,9 +17,7 @@ class PathToken extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         int count = Math.max(event.getOption("count").getAsInt(), 0);
-        if (count > 0) {
-            getPlayer().setPathTokenCounter(count);
-        }
+        getPlayer().setPathTokenCounter(count);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Set path token count to " + count + ".");
     }
 }

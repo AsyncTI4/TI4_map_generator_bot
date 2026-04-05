@@ -46,7 +46,7 @@ class PurgeAC extends GameStateSubcommand {
         }
 
         String sb = "Player: " + player.getUserName() + " - " + "Purged Action Card:"
-                + "\n" + Mapper.getActionCard(acID).getRepresentation()
+                + "\n" + Mapper.getActionCard(acID).getRepresentation(game)
                 + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
         ActionCardHelper.sendActionCardInfo(game, player);

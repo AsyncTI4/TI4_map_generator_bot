@@ -55,7 +55,7 @@ public class AbsolSeedsAgendaResolver implements ForAgainstAgendaResolver {
             MessageHelper.sendMessageToChannel(
                     playerWL.getCorrectChannel(), playerWL.getRepresentation() + " scored _Seed of an Empire_.");
             Helper.checkEndGame(game, playerWL);
-            ActionCardHelper.drawActionCards(game, playerWL, agendaNumericId, true);
+            ActionCardHelper.drawActionCards(playerWL, 3);
             playerWL.setFleetCC(playerWL.getFleetCC() + 1);
             playerWL.setTacticalCC(playerWL.getTacticalCC() + 1);
             playerWL.setStrategicCC(playerWL.getStrategicCC() + 1);

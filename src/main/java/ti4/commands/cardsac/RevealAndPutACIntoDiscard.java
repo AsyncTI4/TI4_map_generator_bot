@@ -23,7 +23,7 @@ class RevealAndPutACIntoDiscard extends GameStateSubcommand {
         String acID = game.drawActionCardAndDiscard();
         String sb = "Game: " + game.getName() + " " + "Player: "
                 + getPlayer().getUserName() + "\n" + "Revealed and discarded Action card: "
-                + Mapper.getActionCard(acID).getRepresentation()
+                + Mapper.getActionCard(acID).getRepresentation(game)
                 + "\n";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
     }

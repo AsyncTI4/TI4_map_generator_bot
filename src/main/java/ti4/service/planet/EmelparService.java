@@ -89,7 +89,7 @@ public class EmelparService {
     }
 
     @ButtonHandler("getOtherFactionsEmelpar")
-    private static void getOtherFactionsEmelpar(ButtonInteractionEvent event, Game game, Player player) {
+    private static void getOtherFactionsEmelpar(ButtonInteractionEvent event, Game game) {
         List<Button> buttons = new ArrayList<>();
         for (Player player2 : game.getRealPlayers()) {
             buttons.add(Buttons.gray(

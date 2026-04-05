@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ti4.helpers.DisplayType;
+import ti4.helpers.discord.DiscordHelper;
 import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
@@ -142,13 +143,15 @@ public class GameImageController {
      * Fetch the attachment URL from a Discord message.
      */
     private ResponseEntity<String> fetchDiscordAttachmentUrl(Long messageId, Long channelId, String gameName) {
+        MessageChannel channel = JdaService.jda.getChannelById(MessageChannel.class, channelId);
+        if (channel == null) {
+            return ResponseEntity.notFound().build();
+        }
+
         try {
             // Fetch the message from Discord to get the attachment URL using the channel.
             // The channel could be a TextChannel or ThreadChannel.
-            Message message = JdaService.jda
-                    .getChannelById(MessageChannel.class, channelId)
-                    .retrieveMessageById(messageId)
-                    .complete();
+            Message message = channel.retrieveMessageById(messageId).complete();
             if (message == null || message.getAttachments().isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
@@ -156,8 +159,11 @@ public class GameImageController {
             String attachmentUrl = message.getAttachments().getFirst().getUrl();
             return ResponseEntity.ok(attachmentUrl);
         } catch (Exception e) {
-            BotLogger.error(
-                    "Failed to fetch message " + messageId + " from channel " + channelId + " for game " + gameName, e);
+            if (!DiscordHelper.isUnknownMessageError(e)) {
+                BotLogger.error(
+                        "Failed to fetch message " + messageId + " from channel " + channelId + " for game " + gameName,
+                        e);
+            }
             return ResponseEntity.notFound().build();
         }
     }

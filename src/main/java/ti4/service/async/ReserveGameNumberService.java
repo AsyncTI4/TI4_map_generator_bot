@@ -1,14 +1,16 @@
 package ti4.service.async;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import lombok.experimental.UtilityClass;
 import ti4.json.PersistenceManager;
 import ti4.map.persistence.GameManager;
 import ti4.message.logging.BotLogger;
+import tools.jackson.core.type.TypeReference;
 
+@UtilityClass
 public class ReserveGameNumberService {
 
     private static final String fileName = "reservedGameNumbers.json";

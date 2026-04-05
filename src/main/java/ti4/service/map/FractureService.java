@@ -21,7 +21,6 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
-import ti4.model.ColorModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.breakthrough.AlRaithService;
 import ti4.service.emoji.DiceEmojis;
@@ -33,7 +32,6 @@ import ti4.service.unit.AddUnitService;
 public class FractureService {
 
     public static boolean isFractureInPlay(Game game) {
-
         return game.getTileFromPlanet("styx") != null
                 || Stream.of("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7")
                         .allMatch(pos -> game.getTileByPosition(pos) != null);
@@ -63,8 +61,8 @@ public class FractureService {
             } else if (result == 6) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        "> Thunder rolled...\n> It rolled a " + DiceEmojis.getGrayDieEmoji(6)
-                                + ".\\- Terry Pratchett, _Guards! Guards!_");
+                        "> \"Thunder rolled...\n> It rolled a " + DiceEmojis.getGrayDieEmoji(6)
+                                + ".\"\n> \\- Terry Pratchett, _Guards! Guards!_");
             } else { // fail
                 String msg = player.getRepresentation(true, false) + " rolled a " + DiceEmojis.getGrayDieEmoji(result)
                         + ", better luck next time.";
@@ -82,11 +80,8 @@ public class FractureService {
 
         Player neutral = game.getPlayerFromColorOrFaction("neutral");
         if (neutral == null) {
-            List<String> unusedColors =
-                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
-            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
-            game.setupNeutralPlayer(color);
-            neutral = game.getPlayerFromColorOrFaction("neutral");
+            String color = SetupNeutralPlayer.pickNeutralColor(game);
+            neutral = game.setupNeutralPlayer(color);
         }
         String neutralColorID = neutral.getColorID();
         List<String> units =

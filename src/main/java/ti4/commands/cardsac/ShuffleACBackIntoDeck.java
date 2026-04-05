@@ -44,7 +44,7 @@ class ShuffleACBackIntoDeck extends GameStateSubcommand {
         }
         String sb = "Game: " + game.getName() + " " + "Player: "
                 + event.getUser().getName() + "\n" + "Card shuffled back into deck from discards: "
-                + Mapper.getActionCard(acID).getRepresentation()
+                + Mapper.getActionCard(acID).getRepresentation(game)
                 + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
     }

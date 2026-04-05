@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
@@ -17,12 +18,19 @@ import ti4.service.emoji.TI4Emoji;
 public class HeroDraftItem extends DraftItem {
 
     public HeroDraftItem(String itemId) {
-        super(Category.HERO, itemId);
+        super(DraftCategory.HERO, itemId);
     }
 
     @JsonIgnore
     private LeaderModel getLeader() {
-        return Mapper.getLeader(ItemId);
+        return Mapper.getLeader(getItemId());
+    }
+
+    @JsonIgnore
+    @Override
+    public String getTitle(Game game) {
+        LeaderModel leader = getLeader();
+        return leader.getNameRepresentation();
     }
 
     @JsonIgnore
@@ -32,7 +40,7 @@ public class HeroDraftItem extends DraftItem {
         if (leader == null) {
             return getAlias();
         }
-        return "Hero - " + leader.getName().replace("\n", "");
+        return leader.getName().replace("\n", "");
     }
 
     @JsonIgnore
@@ -74,7 +82,7 @@ public class HeroDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = buildAllItems(factions);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, Category.HERO);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.HERO);
         return allItems;
     }
 
@@ -86,7 +94,7 @@ public class HeroDraftItem extends DraftItem {
             leaders.removeIf(
                     (String leader) -> !"hero".equals(allLeaders.get(leader).getType()));
             for (String leader : leaders) {
-                allItems.add(generate(Category.HERO, leader));
+                allItems.add(generate(DraftCategory.HERO, leader));
             }
         }
         return allItems;
@@ -94,7 +102,7 @@ public class HeroDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, Category.HERO);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.HERO);
         return allItems;
     }
 
@@ -110,7 +118,7 @@ public class HeroDraftItem extends DraftItem {
                 if (Arrays.asList(results).contains(leader)) {
                     continue;
                 }
-                allItems.add(generate(Category.HERO, leader));
+                allItems.add(generate(DraftCategory.HERO, leader));
             }
         }
         return allItems;

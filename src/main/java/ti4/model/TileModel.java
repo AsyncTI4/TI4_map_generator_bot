@@ -75,6 +75,22 @@ public class TileModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(name).orElse("");
     }
 
+    public String getNameRepresentation() {
+        StringBuilder sb = new StringBuilder();
+        TileEmojis emoji = TileEmojis.getTileEmojiFromTileID(id);
+        sb.append(emoji);
+
+        if (emoji.isGeneric()) {
+            if (isEmpty()) sb.append(ExploreEmojis.Frontier);
+            if (asteroidField) sb.append(MiscEmojis.Asteroids);
+            if (supernova) sb.append(MiscEmojis.Supernova);
+            if (nebula) sb.append(MiscEmojis.Nebula);
+            if (gravityRift) sb.append(MiscEmojis.GravityRift);
+        }
+        sb.append(' ').append(name);
+        return sb.toString();
+    }
+
     public MessageEmbed getRepresentationEmbed(boolean includeAliases) {
         EmbedBuilder eb = new EmbedBuilder();
 
@@ -109,7 +125,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     public String getEmbedTitle() {
         StringBuilder sb = new StringBuilder();
         sb.append("(").append(id).append(") ");
-        if (getEmoji() != null) sb.append(getEmoji().emojiString()).append(" ");
+        if (getEmoji() != null) sb.append(getEmoji().emojiString()).append(' ');
         if (!getNameNullSafe().isEmpty())
             sb.append("__").append(getNameNullSafe()).append("__");
         return sb.toString();
@@ -174,7 +190,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
-        sb.append(id).append(" ");
+        sb.append(id).append(' ');
         if (name != null) sb.append(name);
         return sb.toString();
     }

@@ -5,11 +5,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.service.statistics.LifeTimeRecordService;
+import ti4.spring.service.statistics.LifeTimeRecordService;
 
 class LifetimeRecord extends Subcommand {
 
-    public LifetimeRecord() {
+    LifetimeRecord() {
         super(Constants.LIFETIME_RECORD, "Dice luck and average turn time for all games of specific players");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2"));
@@ -23,6 +23,6 @@ class LifetimeRecord extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        LifeTimeRecordService.queueReply(event);
+        LifeTimeRecordService.getBean().getLifeTimeRecords(event);
     }
 }

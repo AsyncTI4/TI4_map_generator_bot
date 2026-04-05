@@ -27,9 +27,9 @@ class LookAtTopEvent extends GameStateSubcommand {
 
         StringBuilder sb = new StringBuilder();
         sb.append("-----------\n");
-        sb.append("Game: ").append(game.getName()).append("\n");
-        sb.append(event.getUser().getAsMention()).append("\n");
-        sb.append("`").append(event.getCommandString()).append("`").append("\n");
+        sb.append("Game: ").append(game.getName()).append('\n');
+        sb.append(event.getUser().getAsMention()).append('\n');
+        sb.append('`').append(event.getCommandString()).append('`').append('\n');
         if (count > 1) {
             sb.append("__**Top ").append(count).append(" events:**__\n");
         } else {
@@ -40,7 +40,7 @@ class LookAtTopEvent extends GameStateSubcommand {
             sb.append(i + 1).append(": ");
             EventModel eventModel = Mapper.getEvent(eventID);
             sb.append(eventModel.getRepresentation());
-            sb.append("\n");
+            sb.append('\n');
         }
         sb.append("-----------\n");
 

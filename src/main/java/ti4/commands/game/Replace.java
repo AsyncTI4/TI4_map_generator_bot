@@ -114,6 +114,19 @@ class Replace extends GameStateSubcommand {
             if (removed) {
                 value.add(replacementUser.getId());
             }
+            // for custodians
+            removed = value.remove(replacedPlayer.getUserID());
+            if (removed) {
+                value.add(replacementUser.getId());
+            }
+            removed = value.remove(replacedPlayer.getUserID());
+            if (removed) {
+                value.add(replacementUser.getId());
+            }
+            removed = value.remove(replacedPlayer.getUserID());
+            if (removed) {
+                value.add(replacementUser.getId());
+            }
         }
 
         String oldPlayerUserId = replacedPlayer.getUserID();
@@ -126,6 +139,9 @@ class Replace extends GameStateSubcommand {
         replacedPlayer.removeTeamMateID(oldPlayerUserId);
         if (oldPlayerUserId.equals(game.getSpeakerUserID())) {
             game.setSpeakerUserID(replacementUser.getId());
+        }
+        if (oldPlayerUserId.equals(game.getTyrantUserID())) {
+            game.setTyrantUserID(replacementUser.getId());
         }
         if (oldPlayerUserId.equals(game.getActivePlayerID())) {
             game.setTemporaryPingDisable(true);
@@ -145,7 +161,7 @@ class Replace extends GameStateSubcommand {
 
         // UPDATE FOW PERMISSIONS
         if (game.isFowMode()) {
-            long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+            long permission = Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
             TextChannel privateChannel = (TextChannel) replacedPlayer.getPrivateChannel();
             if (privateChannel != null) {
                 privateChannel.getMemberPermissionOverrides().stream()

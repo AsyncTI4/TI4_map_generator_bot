@@ -190,7 +190,7 @@ public abstract class ListenerContext {
 
     public void save() {
         if (game != null) {
-            GameManager.save(game, EventAuditService.getReason(getEvent(), game.isFowMode()));
+            GameManager.save(game, EventAuditService.getReason(getEvent()));
         }
     }
 }

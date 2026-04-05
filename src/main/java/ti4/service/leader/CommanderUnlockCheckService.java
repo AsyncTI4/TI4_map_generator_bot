@@ -36,7 +36,7 @@ public class CommanderUnlockCheckService {
         }
     }
 
-    public static void checkConditionsAndUnlock(Player player, String faction) {
+    private static void checkConditionsAndUnlock(Player player, String faction) {
         Game game = player.getGame();
         boolean shouldBeUnlocked = false;
         switch (faction) {
@@ -51,9 +51,11 @@ public class CommanderUnlockCheckService {
             case "sol" -> {
                 int resources = 0;
                 for (String planet : player.getPlanets()) {
-                    if (game.getUnitHolderFromPlanet(planet) != null
-                            && (game.getUnitHolderFromPlanet(planet).isSpaceStation()
-                                    || game.getUnitHolderFromPlanet(planet).isFake())) {
+                    if ("triad".equalsIgnoreCase(planet)
+                            || (game.getUnitHolderFromPlanet(planet) != null
+                                    && (game.getUnitHolderFromPlanet(planet).isSpaceStation()
+                                            || game.getUnitHolderFromPlanet(planet)
+                                                    .isFake()))) {
                         continue;
                     }
                     resources += Helper.getPlanetResources(planet, game);
@@ -106,9 +108,11 @@ public class CommanderUnlockCheckService {
             case "xxcha" -> {
                 int influence = 0;
                 for (String planet : player.getPlanets()) {
-                    if (game.getUnitHolderFromPlanet(planet) != null
-                            && (game.getUnitHolderFromPlanet(planet).isSpaceStation()
-                                    || game.getUnitHolderFromPlanet(planet).isFake())) {
+                    if ("triad".equalsIgnoreCase(planet)
+                            || (game.getUnitHolderFromPlanet(planet) != null
+                                    && (game.getUnitHolderFromPlanet(planet).isSpaceStation()
+                                            || game.getUnitHolderFromPlanet(planet)
+                                                    .isFake()))) {
                         continue;
                     }
                     influence += Helper.getPlanetInfluence(planet, game);
@@ -127,6 +131,9 @@ public class CommanderUnlockCheckService {
                         + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false)
                         + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer", false)
                         + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
+                if (player.hasRelic("lightrailordnance")) {
+                    num += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "spacedock", false);
+                }
                 shouldBeUnlocked = (num >= 6);
             }
             case "empyrean" ->

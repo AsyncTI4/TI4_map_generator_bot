@@ -48,7 +48,7 @@ class ShowAC extends GameStateSubcommand {
         String sb = "---------\n" + "Game: "
                 + game.getName() + "\n" + "Player: "
                 + player.getUserName() + "\n" + "Shown Action Cards:"
-                + "\n" + Mapper.getActionCard(acID).getRepresentation()
+                + "\n" + Mapper.getActionCard(acID).getRepresentation(game)
                 + "\n" + "---------\n";
         player.setActionCard(acID);
 

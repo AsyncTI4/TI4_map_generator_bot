@@ -20,12 +20,12 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 
-public class IgnisAuroraHelperTechs {
+public final class IgnisAuroraHelperTechs {
     public static void handleExhaustIgnisAuroraTech(
             GenericInteractionCreateEvent event, Game game, Player player, String tech) {
         boolean deleteMsg = true, deleteButton = true;
         switch (tech) {
-            case "baldrick_nm" -> ActionCardHelper.drawActionCards(game, player, 1, true);
+            case "baldrick_nm" -> ActionCardHelper.drawActionCards(player, 1);
             case "baldrick_hm" -> ButtonHelperStats.sendGainCCButtons(game, player, false);
             case "baldrick_lwd" -> deleteMsg = false;
             case "baldrick_gd" -> {

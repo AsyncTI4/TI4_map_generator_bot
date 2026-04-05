@@ -218,7 +218,7 @@ public enum TileEmojis implements TI4Emoji {
     }
 
     @Nullable
-    public static TI4Emoji getTileEmojiFromTileID(String tileID) {
+    public static TileEmojis getTileEmojiFromTileID(String tileID) {
         return switch (tileID) {
             case "01" -> Jord_01;
             case "02" -> MollPrimus_02;
@@ -423,7 +423,7 @@ public enum TileEmojis implements TI4Emoji {
     }
 
     @Nullable
-    private static TI4Emoji getTileBackEmojiFromTileID(String tileID) {
+    private static TileEmojis getTileBackEmojiFromTileID(String tileID) {
         if (!TileHelper.isValidTile(tileID)) return null;
         TileModel tileModel = TileHelper.getTileById(tileID);
 
@@ -432,6 +432,13 @@ public enum TileEmojis implements TI4Emoji {
             case BLUE -> TileBlueBack;
             case RED -> TileRedBack;
             default -> TileBlackBack;
+        };
+    }
+
+    public boolean isGeneric() {
+        return switch (this) {
+            case TileGreenBack, TileBlueBack, TileRedBack, TileBlackBack -> true;
+            default -> false;
         };
     }
 }

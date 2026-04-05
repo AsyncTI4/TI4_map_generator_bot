@@ -21,6 +21,13 @@ public class BanService implements IBanService {
             return "Successfully banned ability: " + Mapper.getAbility(id).getName() + ".\n";
         });
 
+        BAN_APPLIERS.put(Constants.BREAKTHROUGH, (game, id) -> {
+            if (isBlank(id) || Mapper.getBreakthrough(id) == null) return "";
+            appendStoredValue(game, "bannedBreakthroughs", id);
+            return "Successfully banned breakthrough: "
+                    + Mapper.getBreakthrough(id).getName() + ".\n";
+        });
+
         BAN_APPLIERS.put(Constants.LEADER, (game, id) -> {
             if (isBlank(id) || Mapper.getLeader(id) == null) return "";
             appendStoredValue(game, "bannedLeaders", id);
@@ -86,9 +93,9 @@ public class BanService implements IBanService {
             if (isBlank(unitId) || Mapper.getUnit(unitId) == null) return "";
             String[] parts = unitId.split("_");
             if (parts.length < 2) return "";
-            if (parts[1].equalsIgnoreCase(Constants.MECH_ID))
+            if (Constants.MECH_ID.equalsIgnoreCase(parts[1]))
                 return BAN_APPLIERS.get(Constants.MECH_ID).apply(game, parts[0]);
-            if (parts[1].equalsIgnoreCase(Constants.FLAGSHIP_ID))
+            if (Constants.FLAGSHIP_ID.equalsIgnoreCase(parts[1]))
                 return BAN_APPLIERS.get(Constants.FLAGSHIP_ID).apply(game, parts[0]);
             return "";
         });

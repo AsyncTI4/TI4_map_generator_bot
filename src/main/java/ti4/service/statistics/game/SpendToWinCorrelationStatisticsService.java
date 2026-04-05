@@ -60,7 +60,7 @@ class SpendToWinCorrelationStatisticsService {
                     .append(" at ")
                     .append(highestP.getTotalExpenses())
                     .append(")");
-            names.append("\n");
+            names.append('\n');
             if (highestP == winner) {
                 gamesWhereHighestWon.incrementAndGet();
             }

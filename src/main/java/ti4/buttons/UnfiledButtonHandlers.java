@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -51,6 +52,7 @@ import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -77,7 +79,6 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.BreakthroughModel;
-import ti4.model.ColorModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
@@ -179,6 +180,29 @@ public class UnfiledButtonHandlers {
         ButtonHelperHeroes.argentHeroStep3(game, player, buttonID);
     }
 
+    @ButtonHandler("ralnelCStep3_")
+    public static void ralnelCStep3(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        ButtonHelper.deleteMessage(event);
+        String pos2 = buttonID.split("_")[1];
+        Tile targetTile = game.getTileByPosition(pos2);
+        CommandCounterHelper.addCC(event, player, targetTile);
+        ButtonHelperHeroes.argentHeroStep3(game, player, buttonID);
+    }
+
+    @ButtonHandler("ralnelCommander_")
+    public static void ralnelCommander(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        ButtonHelper.deleteTheOneButton(event);
+        List<Button> buttons = ButtonHelperModifyUnits.getRalnelCommanderButtons(player, game, buttonID.split("_")[1]);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged()
+                        + ", is using Watchful Ojz, the Ral Nel commander, to immediately retreat 2 ships (and maybe transport).\nReminder: Dane has ruled that you need a valid retreat location before you can even announce retreats and use this commander.");
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged() + ", please choose which system you wish to move units to.",
+                buttons);
+    }
+
     @ButtonHandler("enableDaneMode_")
     public static void enableGalacticEvent(ButtonInteractionEvent event, String buttonID, Game game) {
         String mode = buttonID.split("_")[1];
@@ -193,7 +217,7 @@ public class UnfiledButtonHandlers {
             message += "Minor Factions Mode. ";
             if (enable) {
                 message +=
-                        "You will need to decide how you wish to draft the minor factions. This site has a decent setup for it, "
+                        "Note that the bot does not currently handle the draft for minor factions very well. This site has a decent setup for it, "
                                 + "and you can important the map using buttons above: https://tidraft.com/draft/prechoice. Note that you can add 3 infantry to the minor faction planets with the provided button.";
                 List<Button> mfButtons = new ArrayList<>();
                 mfButtons.add(Buttons.blue("addMinorFactionsInfantry", "Add Minor Factions Infantry"));
@@ -271,10 +295,7 @@ public class UnfiledButtonHandlers {
             if (enable) {
                 Player neutral = game.getPlayerFromColorOrFaction("neutral");
                 if (neutral == null) {
-                    List<String> unusedColors = game.getUnusedColors().stream()
-                            .map(ColorModel::getName)
-                            .toList();
-                    String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+                    String color = SetupNeutralPlayer.pickNeutralColor(game);
                     game.setupNeutralPlayer(color);
                 }
             }
@@ -469,8 +490,10 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("winnuStructure_")
     public static void winnuStructure(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String unit = buttonID.replace("winnuStructure_", "").split("_")[0];
-        String planet = buttonID.replace("winnuStructure_", "").split("_")[1];
+        String replaced = buttonID.replace("winnuStructure_", "");
+        String[] split = replaced.split("_");
+        String unit = split[0];
+        String planet = split[1];
         Tile tile = game.getTile(AliasHandler.resolveTile(planet));
         AddUnitService.addUnits(event, tile, game, player.getColor(), unit + " " + planet);
         MessageHelper.sendMessageToChannel(
@@ -963,11 +986,10 @@ public class UnfiledButtonHandlers {
 
     public static List<String> getBombardablePlanets(Player player, Game game, Tile tile) {
         List<String> planets = new ArrayList<>();
-        for (UnitHolder planetUH : tile.getPlanetUnitHolders()) {
+        for (Planet planetUH : tile.getPlanetUnitHolders()) {
             if (!player.getPlanetsAllianceMode().contains(planetUH.getName())
                     || FoWHelper.otherPlayersHaveUnitsOnPlanet(player, planetUH)) {
-                if (!((Planet) planetUH).getPlanetTypes().contains("cultural")
-                        || !ButtonHelper.isLawInPlay(game, "conventions")) {
+                if (!planetUH.getPlanetTypes().contains("cultural") || !ButtonHelper.isLawInPlay(game, "conventions")) {
                     planets.add(planetUH.getName());
                 }
             }
@@ -999,7 +1021,7 @@ public class UnfiledButtonHandlers {
                             .append(" currently has ")
                             .append(ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(
                                     game, p2, planet))
-                            .append("\n");
+                            .append('\n');
                     break;
                 }
             }
@@ -1015,7 +1037,7 @@ public class UnfiledButtonHandlers {
                     } else {
                         String asyncID = assignedUnit.split("_")[0];
                         UnitModel mod = player.getUnitFromAsyncID(asyncID);
-                        summary.append("- ").append(mod.getUnitEmoji()).append("\n");
+                        summary.append("- ").append(mod.getUnitEmoji()).append('\n');
                     }
                 }
             }
@@ -1296,15 +1318,6 @@ public class UnfiledButtonHandlers {
         String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, whatIsItFor);
         event.getMessage().editMessage(exhaustedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-    }
-
-    @ButtonHandler("autoneticMemoryStep3")
-    public static void autoneticMemoryStep3(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        if (buttonID.contains("autoneticMemoryStep3a")) {
-            ButtonHelperAbilities.autoneticMemoryStep3a(game, player, event);
-        } else {
-            ButtonHelperAbilities.autoneticMemoryStep3b(game, player, event);
-        }
     }
 
     @ButtonHandler("cymiaeHeroAutonetic")
@@ -1603,10 +1616,11 @@ public class UnfiledButtonHandlers {
             } else {
                 var speakerPlayer = game.getSpeaker();
                 ObjectiveHelper.secondHalfOfPeakStage1(game, speakerPlayer, 1, true);
-                if (!game.isFowMode() && game.getTableTalkChannel() != null) {
+                TextChannel tableTalkChannel = game.getTableTalkChannel();
+                if (!game.isFowMode() && tableTalkChannel != null) {
                     MessageHelper.sendMessageToChannel(
-                            game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
-                    ListPlayerInfoService.displayerScoringProgression(game, true, game.getTableTalkChannel(), "both");
+                            tableTalkChannel, "## End of Round #" + game.getRound() + " Scoring Info");
+                    ListPlayerInfoService.displayerScoringProgression(game, true, tableTalkChannel, "both");
                 }
                 String message = "When ready, proceed to the Strategy Phase.";
                 Button proceedToStrategyPhase = Buttons.green(
@@ -1733,7 +1747,7 @@ public class UnfiledButtonHandlers {
         String key3 = "potentialScorePOBlockers";
         String key3b = "potentialScoreSOBlockers";
         String message;
-        for (Player player2 : StatusHelper.GetPlayersInScoringOrder(game)) {
+        for (Player player2 : StatusHelper.getPlayersInScoringOrder(game)) {
             if (player2 == player) {
                 if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
                     game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
@@ -1811,9 +1825,6 @@ public class UnfiledButtonHandlers {
             skilled = true;
             ButtonHelper.deleteMessage(event);
         }
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "ralnelcommander")) {
-            skilled = true;
-        }
         if (buttonID.contains("foresight")) {
             if (!game.isTwilightsFallMode()) {
                 MessageHelper.sendMessageToChannel(
@@ -1836,15 +1847,15 @@ public class UnfiledButtonHandlers {
             MessageHelper.sendMessageToChannelWithEmbed(
                     p1.getCorrectChannel(), message, btModel.getRepresentationEmbed());
         }
-        {
-            String message = player.getRepresentationUnfogged() + ", please choose a system to move to.";
-            List<Button> retreatButtons =
-                    ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, pos, skilled, feint);
-            if (retreatButtons.isEmpty()) {
-                message = player.getRepresentationUnfogged() + ", there are no valid systems to retreat to.";
-            }
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, retreatButtons);
+
+        String message = player.getRepresentationUnfogged() + ", please choose a system to move to.";
+        List<Button> retreatButtons =
+                ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, pos, skilled, feint);
+        if (retreatButtons.isEmpty()) {
+            message = player.getRepresentationUnfogged() + ", there are no valid systems to retreat to.";
         }
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, retreatButtons);
+
         if (game.getTileByPosition(pos).isGravityRift()
                 && !player.hasRelic("circletofthevoid")
                 && !player.hasTech("tf-crucible")) {
@@ -1987,7 +1998,7 @@ public class UnfiledButtonHandlers {
                 String key3 = "potentialScoreSOBlockers";
                 String key3b = "potentialScorePOBlockers";
                 String message;
-                for (Player player2 : StatusHelper.GetPlayersInScoringOrder(game)) {
+                for (Player player2 : StatusHelper.getPlayersInScoringOrder(game)) {
                     if (player2 == player) {
                         int soIndex = Integer.parseInt(soID);
                         SecretObjectiveHelper.scoreSO(event, game, player, soIndex, channel);
@@ -2113,7 +2124,7 @@ public class UnfiledButtonHandlers {
                                             + " command token" + (properGain == 1 ? "" : "s") + " due to " + reasons
                                             + ".");
                         } else {
-                            if (netGain == properGain && netGain > 2 && cyber) {
+                            if (netGain > 2 && cyber) {
                                 PromissoryNoteHelper.resolvePNPlay("ce", player, game, event);
                             }
                         }
@@ -2307,7 +2318,22 @@ public class UnfiledButtonHandlers {
                 if (player.hasUnlockedBreakthrough("ghostbt")
                         && tile != null
                         && !tile.getWormholes(game).isEmpty()) {
-                    player.addSpentThing("ghostbt" + tile.getWormholes(game).size());
+                    Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
+                    int adjust = 0;
+                    for (Map.Entry<String, Integer> entry : producedUnits.entrySet()) {
+                        String unit2 = entry.getKey().split("_")[0];
+                        UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit2), player.getColor());
+                        UnitModel producedUnit =
+                                player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
+
+                        if (producedUnit.getUnitType() == UnitType.Flagship && player.ownsUnit("creuss_flagship")) {
+                            adjust = 1;
+                        }
+                    }
+                    if (tile.getWormholes(game).size() - adjust > 0) {
+                        player.addSpentThing(
+                                "ghostbt" + (tile.getWormholes(game).size() - adjust));
+                    }
                 }
                 // ButtonHelper.updateMap(game, event,
                 // "Result of build on turn " + player.getInRoundTurnCount() + " for " +
@@ -2335,6 +2361,7 @@ public class UnfiledButtonHandlers {
                     && game.getStoredValue("ASN" + player.getFaction()).isEmpty()
                     && (buttonID.contains("tacticalAction")
                             || buttonID.contains("warfare")
+                            || buttonID.contains("construction")
                             || buttonID.contains("anarchy7Build")
                             || buttonID.contains("lumi7Build")
                             || buttonID.contains("ministerBuild"))) {
@@ -2506,7 +2533,9 @@ public class UnfiledButtonHandlers {
         var endGameDeck =
                 game.isOmegaPhaseMode() ? game.getPublicObjectives1Peekable() : game.getPublicObjectives2Peekable();
         var endGameRound = game.isOmegaPhaseMode() ? 9 : 7;
-        if (game.getRound() > endGameRound || endGameDeck.isEmpty()) {
+        if ((game.getRound() > endGameRound || endGameDeck.isEmpty())
+                && !game.isRedTapeMode()
+                && !game.isCivilizedSocietyMode()) {
             if (game.isFowMode()) {
                 message2 += "\n> - If there are no more objectives to reveal, use the button to continue as is.";
                 message2 += " Or end the game manually.";
@@ -2618,7 +2647,7 @@ public class UnfiledButtonHandlers {
                 } else {
                     Button flipAgenda = Buttons.blue("startStrategyPhase", "Start Strategy Phase");
                     List<Button> buttons = List.of(flipAgenda);
-                    String condition = "the conditions for an Agenda Phase has not yet been met";
+                    String condition;
                     if (game.isOrdinianC1Mode()) {
                         condition = "the _Coatl_ is still damaged";
                     } else if (game.isTwilightsFallMode()) {
@@ -2756,14 +2785,14 @@ public class UnfiledButtonHandlers {
             facilities.add(Buttons.green("addFacility_" + tPlanet + "_" + facilityID + "_dont", "Research Lab"));
         }
         facilityID = "facilitynavalbase";
+        Set<String> planetTypes = uH.getPlanetTypes();
         if (!usedFacilities.contains(facilityID)
-                && (uH.getPlanetTypes().contains("industrial") || "mr".equalsIgnoreCase(tPlanet) || uH.isLegendary())) {
+                && (planetTypes.contains("industrial") || "mr".equalsIgnoreCase(tPlanet) || uH.isLegendary())) {
             facilities.add(Buttons.green("addFacility_" + tPlanet + "_" + facilityID + "_dont", "Naval Base"));
         }
         facilityID = "facilitylogisticshub";
         if (!usedFacilities.contains(facilityID)
-                && (uH.getPlanetTypes().contains("industrial")
-                        || uH.getPlanetTypes().contains("hazardous"))) {
+                && (planetTypes.contains("industrial") || planetTypes.contains("hazardous"))) {
             facilities.add(Buttons.green("addFacility_" + tPlanet + "_" + facilityID + "_dont", "Logistics Hub"));
         }
         facilityID = "facilityembassy";
@@ -2774,7 +2803,7 @@ public class UnfiledButtonHandlers {
                 break;
             }
         }
-        if (!hasEmbassy && (uH.getPlanetTypes().contains("industrial") || "mr".equalsIgnoreCase(tPlanet))) {
+        if (!hasEmbassy && (planetTypes.contains("industrial") || "mr".equalsIgnoreCase(tPlanet))) {
             facilities.add(Buttons.green("addFacility_" + tPlanet + "_" + facilityID + "_dont", "Embassy"));
         }
         int colonies = 0;
@@ -2947,6 +2976,7 @@ public class UnfiledButtonHandlers {
         buttons.add(Buttons.red("checkAnomView", "Find Anomalies"));
         buttons.add(Buttons.green("checkLegendView", "Find Legendaries"));
         buttons.add(Buttons.gray("checkEmptyView", "Find Empties"));
+        buttons.add(Buttons.red("checkExileView", "Determine Exile Breachable Systems"));
         buttons.add(Buttons.blue("checkAetherView", "Determine Aetherstreamable Systems"));
         buttons.add(Buttons.red("checkCannonView", "Calculate Space Cannon Offense Shots"));
         buttons.add(Buttons.green("checkTraitView", "Find Traits"));
@@ -2955,6 +2985,11 @@ public class UnfiledButtonHandlers {
         buttons.add(Buttons.gray("checkShiplessView", "Show Map Without Ships"));
         buttons.add(Buttons.gray("checkUnlocked", "Show Only Unlocked Units"));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", buttons);
+    }
+
+    @ButtonHandler("checkExileView")
+    public static void calculateExileView(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.exile);
     }
 
     @ButtonHandler("resetSpend_")
@@ -3212,6 +3247,7 @@ public class UnfiledButtonHandlers {
         String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
                 + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
         event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
+        ButtonHelper.checkFleetInEveryTile(player, game);
     }
 
     @ButtonHandler("decrease_tactic_cc")
@@ -3281,29 +3317,7 @@ public class UnfiledButtonHandlers {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getFactionEmoji() + " is drawing their _Minister of Policy_ action card.");
-        String message;
-        if (player.hasAbility("scheming")) {
-            game.drawActionCard(player.getUserID());
-            game.drawActionCard(player.getUserID());
-            message =
-                    player.getFactionEmoji() + " drew 2 action cards with **Scheming**. Please discard 1 action card.";
-            ActionCardHelper.sendActionCardInfo(game, player, event);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged() + ", please use buttons to discard.",
-                    ActionCardHelper.getDiscardActionCardButtons(player, false));
-
-        } else if (player.hasAbility("autonetic_memory")) {
-            ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
-            message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
-        } else {
-            game.drawActionCard(player.getUserID());
-            ActionCardHelper.sendActionCardInfo(game, player, event);
-            message = player.getFactionEmoji() + " drew 1 action card.";
-        }
-        player.checkCommanderUnlock("yssaril");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        ButtonHelper.checkACLimit(game, player);
+        ActionCardHelper.drawActionCards(player, 1);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
@@ -3324,7 +3338,7 @@ public class UnfiledButtonHandlers {
             readiedCardsString = "All cards have been readied at the end of the Omega Phase.";
         }
         if (game.hasAnyPriorityTrackMode()) {
-            if (PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+            if (PriorityTrackHelper.getPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "Please fill the priority track before starting the Strategy Phase.");
@@ -3334,10 +3348,12 @@ public class UnfiledButtonHandlers {
         }
         Map<String, Player> players = game.getPlayers();
         if (game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
-            for (Player player_ : players.values()) {
-                RefreshCardsService.refreshPlayerCards(game, player_, false);
+            if (!game.isTwilightsFallMode()) {
+                for (Player player_ : players.values()) {
+                    RefreshCardsService.refreshPlayerCards(game, player_, false);
+                }
+                MessageHelper.sendMessageToChannel(event.getChannel(), readiedCardsString);
             }
-            MessageHelper.sendMessageToChannel(event.getChannel(), readiedCardsString);
         } else {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
@@ -3433,9 +3449,13 @@ public class UnfiledButtonHandlers {
         if (!game.isFowMode() && "statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
             ReactionService.addReaction(event, game, player);
             for (Player p2 : game.getRealPlayers()) {
-                if (p2.isNpc() && !game.getCurrentACDrawStatusInfo().contains(p2.getFaction())) {
-                    ButtonHelper.drawStatusACs(game, p2, event);
+                if (p2.isNpc()
+                        && game.getStoredValue(
+                                        "statusHomeworkReactionFor" + p2.getFaction() + "Round" + game.getRound())
+                                .isEmpty()) {
                     ReactionService.addReaction(event, game, p2);
+                    game.setStoredValue(
+                            "statusHomeworkReactionFor" + p2.getFaction() + "Round" + game.getRound(), "added");
                 }
             }
         }
@@ -3531,7 +3551,7 @@ public class UnfiledButtonHandlers {
     @ButtonHandler("startStrategyPhase")
     public static void startStrategyPhase(ButtonInteractionEvent event, Game game) {
         if (game.hasAnyPriorityTrackMode()
-                && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+                && PriorityTrackHelper.getPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "Please fill the priority track before starting the Strategy Phase.");
             PriorityTrackHelper.PrintPriorityTrack(game);
@@ -3561,13 +3581,14 @@ public class UnfiledButtonHandlers {
         List<Button> dwsCommanders = game.getPlayers().values().stream()
                 .filter(p1 -> p1 != player)
                 .filter(p1 -> game.playerHasLeaderUnlockedOrAlliance(p1, "deepwroughtcommander"))
-                .map(p1 -> Buttons.gray(
-                        "useDwsDiscount_" + p1.getFaction(),
-                        "Use Aello Discount, Generating Money For "
-                                + (!game.isFowMode() || FoWHelper.canSeeStatsOfPlayer(game, p1, player)
-                                        ? p1.getFaction()
-                                        : "Somebody"),
-                        p1.getFactionEmoji()))
+                .map(p1 -> {
+                    String id = "useDwsDiscount_" + p1.getFaction();
+                    boolean anon = game.isFowMode() && !FoWHelper.canSeeStatsOfPlayer(game, p1, player);
+                    String ident = anon ? "Somebody's" : p1.getFactionModel().getShortName() + "'s";
+                    String label = "Use " + ident + " Aello Discount";
+                    String emoji = p1.getFactionEmoji();
+                    return Buttons.gray(id, label, emoji);
+                })
                 .toList();
         buttons.addAll(dwsCommanders);
         Button doneExhausting = Buttons.red("deleteButtons_technology", "Done Exhausting Planets");
@@ -3837,9 +3858,9 @@ public class UnfiledButtonHandlers {
             return;
         }
         if (game.hasAnyPriorityTrackMode()
-                && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+                && PriorityTrackHelper.getPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
             PriorityTrackHelper.CreateDefaultPriorityTrack(game);
-            if (PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+            if (PriorityTrackHelper.getPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "Failed to fill the Priority Track with the default seating order. Use `/omegaphase assign_player_priority` to fill the track before proceeding.");
