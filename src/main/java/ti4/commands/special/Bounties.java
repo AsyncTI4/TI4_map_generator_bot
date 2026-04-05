@@ -6,6 +6,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 class Bounties extends GameStateSubcommand {
 
@@ -18,9 +19,8 @@ class Bounties extends GameStateSubcommand {
         Game game = getGame();
         Player player = getPlayer();
         if (!player.hasAbility("marked_prey")) {
-            event.reply("You do not have the Marked Prey ability and cannot manage bounties.")
-                    .setEphemeral(true)
-                    .queue();
+            MessageHelper.sendMessageToEventChannel(
+                    event, "You do not have the Marked Prey ability and cannot manage bounties.");
             return;
         }
         ButtonHelperAbilities.offerBountyButtons(game, player);

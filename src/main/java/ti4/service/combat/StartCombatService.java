@@ -889,6 +889,20 @@ public class StartCombatService {
                             buttons);
                 }
             }
+            if (player.hasUnlockedBreakthrough("zephyrionbt")
+                    && "space".equalsIgnoreCase(type)
+                    && ButtonHelper.isTileInOrAdjacentToPlayersHome(game, tile, otherPlayer)) {
+                buttons = new ArrayList<>();
+                buttons.add(Buttons.gray(
+                        player.getFinsFactionCheckerPrefix() + "zephyrionbtRes_" + otherPlayer.getFaction(),
+                        "Resolve Subdue Chancellor (Upon Win)",
+                        FactionEmojis.zephyrion));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        msg
+                                + ", a reminder that if you win this space combat, you may resolve _Subdue Chancellor_ to draw an unused agent.",
+                        buttons);
+            }
             if (player.hasAbility("technological_singularity")
                     && !otherPlayer.isDummy()
                     && (!ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(

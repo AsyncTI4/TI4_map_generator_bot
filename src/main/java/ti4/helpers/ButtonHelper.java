@@ -8375,4 +8375,12 @@ public class ButtonHelper {
         deleteMessage(event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Successfully logged response.");
     }
+
+    public static boolean isTileInOrAdjacentToPlayersHome(Game game, Tile tile, Player homeOwner) {
+        Tile homeSystem = homeOwner.getHomeSystemTile();
+        if (homeSystem == null) return false;
+        if (homeSystem.getPosition().equals(tile.getPosition())) return true;
+        return FoWHelper.getAdjacentTiles(game, homeSystem.getPosition(), homeOwner, false)
+                .contains(tile.getPosition());
+    }
 }

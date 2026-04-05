@@ -3960,6 +3960,19 @@ public class Game extends GameProperties {
         }
     }
 
+    public void addFakeAgent(String leaderID) {
+        if (leaderID.contains("agent")) {
+            String fakeString = getStoredValue("fakeAgents");
+            if (StringUtils.isBlank(fakeString)) {
+                setStoredValue("fakeAgents", leaderID);
+            } else {
+                Set<String> leaders = new HashSet<>(Arrays.asList(fakeString.split("\\|")));
+                leaders.add(leaderID);
+                setStoredValue("fakeAgents", String.join("|", leaders));
+            }
+        }
+    }
+
     public boolean playerHasLeaderUnlockedOrAlliance(Player player, String leaderID) {
         if (player.hasLeaderUnlocked(leaderID)) return true;
         if (!leaderID.contains("commander")) return false;
