@@ -48,7 +48,7 @@ import ti4.service.unit.AddUnitService;
 public final class ButtonHelperSCs {
 
     @ButtonHandler("constructionPrimary_produce")
-    public static void resolveConstructionPrimaryTE(ButtonInteractionEvent event, Game game, Player player) {
+    public static void resolveConstructionPrimaryTE(Game game, Player player) {
         List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock);
 
         String prefix = player.getFinsFactionCheckerPrefix() + "constructionBuild_";

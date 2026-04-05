@@ -143,7 +143,7 @@ public final class StatusHelper {
         }
     }
 
-    public static void BeginScoring(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
+    public static void beginScoring(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
         if (game.isOmegaPhaseMode()) {
             // Show the effects of the Agendas while scoring
             ButtonHelper.updateMap(game, event, "After Agendas, Round " + game.getRound() + ".");
@@ -263,7 +263,7 @@ public final class StatusHelper {
                     game.getPing()
                             + ", players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.",
                     buttons);
-            for (Player player : GetPlayersInScoringOrder(game)) {
+            for (Player player : getPlayersInScoringOrder(game)) {
                 game.setStoredValue(key3, game.getStoredValue(key3) + player.getFaction() + "*");
                 game.setStoredValue(key3b, game.getStoredValue(key3b) + player.getFaction() + "*");
             }
@@ -450,7 +450,7 @@ public final class StatusHelper {
         }
     }
 
-    public static List<Player> GetPlayersInScoringOrder(Game game) {
+    public static List<Player> getPlayersInScoringOrder(Game game) {
         if (game.hasFullPriorityTrackMode()) {
             return PriorityTrackHelper.getPriorityTrack(game).stream()
                     .filter(Objects::nonNull)
@@ -592,7 +592,7 @@ public final class StatusHelper {
         resolveSolFlagship(game);
     }
 
-    public static void sendRemoveBreachButtons(Game game) {
+    private static void sendRemoveBreachButtons(Game game) {
         Predicate<Tile> hasBreach = t -> t.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
         Function<Player, Predicate<Tile>> hasPlayerShips = p -> (t -> FoWHelper.playerHasActualShipsInSystem(p, t));
         for (Player p : game.getRealPlayers()) {

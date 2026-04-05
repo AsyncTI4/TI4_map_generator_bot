@@ -39,7 +39,7 @@ public class ButtonHelperRelics {
     }
 
     @ButtonHandler("prophetsTears_")
-    public static void prophetsTears(Player player, String buttonID, Game game, ButtonInteractionEvent event) {
+    public static void prophetsTears(Player player, String buttonID, ButtonInteractionEvent event) {
         player.addExhaustedRelic("prophetstears");
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(), player.getFactionEmoji() + " is exhausting _The Prophet's Tears_.");

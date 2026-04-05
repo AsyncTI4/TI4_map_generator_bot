@@ -346,7 +346,7 @@ public final class Helper {
                 || game.getHighestScore() + 1 > game.getVp()) {
             return;
         }
-        for (Player player : StatusHelper.GetPlayersInScoringOrder(game)) {
+        for (Player player : StatusHelper.getPlayersInScoringOrder(game)) {
             if (game.getHighestScore() + 1 > game.getVp()) {
                 return;
             }

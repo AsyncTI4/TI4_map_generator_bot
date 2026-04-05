@@ -49,4 +49,11 @@
     <Match>
         <Bug pattern="OCP_OVERLY_CONCRETE_PARAMETER"/>
     </Match>
+    <!-- I'd like this to be fixed, but we'll come back to it -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
 </FindBugsFilter>

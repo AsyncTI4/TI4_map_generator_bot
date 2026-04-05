@@ -2452,7 +2452,7 @@ public final class ButtonHelperModifyUnits {
     }
 
     @ButtonHandler("domnaStepOne_")
-    public static void offerDomnaStep2Buttons(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void offerDomnaStep2Buttons(ButtonInteractionEvent event, Game game, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         List<Button> buttons = new ArrayList<>();

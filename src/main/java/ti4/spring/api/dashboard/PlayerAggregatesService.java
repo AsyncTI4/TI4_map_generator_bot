@@ -145,14 +145,16 @@ class PlayerAggregatesService {
                 context.completedGameIds(),
                 techStats,
                 factionWinStats,
-                Optional.ofNullable(stored.strategyCardStats()).orElse(emptyStrategyCardStats(completedCount, 0)),
-                Optional.ofNullable(stored.combatProfile()).orElse(emptyCombatProfile(completedCount, 0)),
+                Optional.ofNullable(stored.strategyCardStats())
+                        .orElseGet(() -> emptyStrategyCardStats(completedCount, 0)),
+                Optional.ofNullable(stored.combatProfile()).orElseGet(() -> emptyCombatProfile(completedCount, 0)),
                 Optional.ofNullable(stored.economyProfile())
-                        .orElse(new PlayerDashboardResponse.EconomyProfile(0, 0, completedCount)),
+                        .orElseGet(() -> new PlayerDashboardResponse.EconomyProfile(0, 0, completedCount)),
                 Optional.ofNullable(stored.factionTechSynergy())
-                        .orElse(new PlayerDashboardResponse.FactionTechSynergy(Map.of())),
-                Optional.ofNullable(stored.speakerImpact()).orElse(emptySpeakerImpact()),
-                Optional.ofNullable(stored.aggressionProfile()).orElse(emptyAggressionProfile(completedCount, 0)));
+                        .orElseGet(() -> new PlayerDashboardResponse.FactionTechSynergy(Map.of())),
+                Optional.ofNullable(stored.speakerImpact()).orElseGet(PlayerAggregatesService::emptySpeakerImpact),
+                Optional.ofNullable(stored.aggressionProfile())
+                        .orElseGet(() -> emptyAggressionProfile(completedCount, 0)));
     }
 
     private static boolean isStoredAggregateUsable(StoredAggregates stored) {

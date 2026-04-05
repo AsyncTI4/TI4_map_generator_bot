@@ -1747,7 +1747,7 @@ public class UnfiledButtonHandlers {
         String key3 = "potentialScorePOBlockers";
         String key3b = "potentialScoreSOBlockers";
         String message;
-        for (Player player2 : StatusHelper.GetPlayersInScoringOrder(game)) {
+        for (Player player2 : StatusHelper.getPlayersInScoringOrder(game)) {
             if (player2 == player) {
                 if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
                     game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
@@ -1998,7 +1998,7 @@ public class UnfiledButtonHandlers {
                 String key3 = "potentialScoreSOBlockers";
                 String key3b = "potentialScorePOBlockers";
                 String message;
-                for (Player player2 : StatusHelper.GetPlayersInScoringOrder(game)) {
+                for (Player player2 : StatusHelper.getPlayersInScoringOrder(game)) {
                     if (player2 == player) {
                         int soIndex = Integer.parseInt(soID);
                         SecretObjectiveHelper.scoreSO(event, game, player, soIndex, channel);

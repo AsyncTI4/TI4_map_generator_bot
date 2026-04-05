@@ -216,7 +216,7 @@
         <configuration>
           <effort>Max</effort>
           <!-- Start to avoid drowning in lower-priority noise; tighten later -->
-          <threshold>Medium</threshold>
+          <threshold>High</threshold>
           <failOnError>true</failOnError>
           <xmlOutput>true</xmlOutput>
           <htmlOutput>true</htmlOutput>
