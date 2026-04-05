@@ -808,7 +808,36 @@ public final class ButtonHelperAbilities {
     }
 
     public static void offerBountyButtons(Game game, Player player) {
+        offerBountyButtons(game, player, true);
+    }
+
+    public static void offerBountyButtons(Game game, Player player, boolean showRemove) {
+        List<String> currentBounties = getBountiesForPlayer(game);
+        boolean atCap = currentBounties.size() >= 3;
+
+        String msg;
+        if (!showRemove && atCap) {
+            msg = player.getRepresentationUnfogged() + " You currently have the following bounties: "
+                    + String.join(", ", currentBounties) + ".";
+        } else {
+            msg = player.getRepresentationUnfogged()
+                    + ", please choose which player's ships you wish to place a bounty on"
+                    + (showRemove ? ", or which bounty you want to remove" : "")
+                    + ". You may have up to 3 bounties at a time.";
+            if (!currentBounties.isEmpty()) {
+                msg += "\nYou currently have the following bounties: " + String.join(", ", currentBounties) + ".";
+            } else {
+                msg += " You currently have no bounties.";
+            }
+        }
+
+        if (!showRemove && atCap) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            return;
+        }
+
         List<Button> buttons = new ArrayList<>();
+        // Add buttons; bountyStep2 enforces the 3-token maximum
         for (Player p2 : game.getRealPlayersExcludingThis(player)) {
             String id = player.getFinsFactionCheckerPrefix() + "bountyStep1_" + p2.getFaction();
             if (game.isFowMode()) {
@@ -817,19 +846,16 @@ public final class ButtonHelperAbilities {
                 buttons.add(Buttons.green(id, p2.getFactionModel().getShortName(), p2.getFactionEmoji()));
             }
         }
+        if (showRemove) {
+            for (String bounty : currentBounties) {
+                String faction = bounty.split(" ")[0].toLowerCase();
+                String ship = bounty.split(" ")[1].toLowerCase();
+                buttons.add(Buttons.red(
+                        player.getFinsFactionCheckerPrefix() + "removeBounty_" + faction + "_" + ship,
+                        "Remove: " + bounty));
+            }
+        }
         buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Delete These Buttons"));
-        List<String> currentBounties = getBountiesForPlayer(game);
-        if (currentBounties.size() >= 3) {
-            return;
-        }
-        String msg = player.getRepresentationUnfogged()
-                + ", please choose which player's ships you wish to place a bounty on. You may have up to 3 bounties at a time.";
-        if (!currentBounties.isEmpty()) {
-            msg += "\nYou currently have the following bounties: " + String.join(", ", currentBounties) + ".";
-        } else {
-            msg += " You currently have no bounties.";
-        }
-
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 
@@ -876,6 +902,12 @@ public final class ButtonHelperAbilities {
             return;
         }
 
+        if (getBountiesForPlayer(game).size() >= 3) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                    "You already have 3 bounties placed.");
+            ButtonHelper.deleteTheOneButton(event);
+            return;
+        }
         game.setStoredValue("bounties" + p2.getFaction() + unitTypeString, unitTypeString);
         String msg = player.getRepresentationUnfogged() + " placed a bounty on a "
                 + StringUtils.capitalize(unitTypeString) + " belonging to " + p2.getRepresentationNoPing() + ".";
@@ -960,6 +992,23 @@ public final class ButtonHelperAbilities {
                 }
             }
         }
+    }
+
+    @ButtonHandler("removeBounty_")
+    public static void removeBounty(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        buttonID = buttonID.replace("removeBounty_", "");
+        String faction = buttonID.split("_")[0];
+        String unitTypeString = buttonID.split("_")[1].toLowerCase();
+        Player p2 = game.getPlayerFromColorOrFaction(faction);
+        if (p2 == null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not find player, please resolve manually.");
+            return;
+        }
+        game.removeStoredValue("bounties" + p2.getFaction() + unitTypeString);
+        String msg = player.getRepresentationUnfogged() + " removed the bounty on a "
+                + StringUtils.capitalize(unitTypeString) + " belonging to " + p2.getRepresentationNoPing() + ".";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("pillage_")
@@ -2400,7 +2449,7 @@ public final class ButtonHelperAbilities {
                 rollOmenDiceAtStartOfStrat(game, player);
             }
             if (player.hasAbility("marked_prey")) {
-                offerBountyButtons(game, player);
+                offerBountyButtons(game, player, false);
             }
             if (player.hasUnit("tyris_flagship")
                     && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship", false) > 0) {

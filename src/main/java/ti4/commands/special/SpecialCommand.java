@@ -35,7 +35,8 @@ public class SpecialCommand implements ParentCommand {
                     new MoveCreussWormhole(),
                     new MoveCoatl(),
                     new CheckDistance(),
-                    new CheckAllDistance())
+                    new CheckAllDistance(),
+                    new Bounties())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
