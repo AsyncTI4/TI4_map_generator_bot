@@ -2157,7 +2157,8 @@ public class StartCombatService {
         return buttons;
     }
 
-    private static void checkAndAddDihmonBreakthroughButton(Player player, boolean isSpaceCombat, List<Button> buttons, Tile tile) {
+    private static void checkAndAddDihmonBreakthroughButton(
+            Player player, boolean isSpaceCombat, List<Button> buttons, Tile tile) {
         if (isSpaceCombat && player.hasTechReady("dihmohnbt")) {
             if (player.hasReadyBreakthrough("dihmohnbt")) {
                 buttons.add(Buttons.green(
