@@ -2892,26 +2892,28 @@ public final class ButtonHelperActionCards {
                             event.getChannel(), "No such action card ID found, please retry.");
                     return;
                 }
-                found = true;
                 ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel());
+                found = true;
+                break;
             }
         }
         if (!found) {
-            acStrings = new ArrayList<>(game.getPurgedActionCards().keySet());
+            Map<String, Integer> purgedActionCards = game.getPurgedActionCards();
+            acStrings = new ArrayList<>(purgedActionCards.keySet());
             for (String acStringID : acStrings) {
                 ActionCardModel actionCard = Mapper.getActionCard(acStringID);
                 String actionCardTitle = actionCard.getName();
                 if (acName.equalsIgnoreCase(actionCardTitle)) {
-                    boolean picked = game.pickActionCardFromPurged(
-                            player.getUserID(), game.getPurgedActionCards().get(acStringID));
+                    boolean picked =
+                            game.pickActionCardFromPurged(player.getUserID(), purgedActionCards.get(acStringID));
                     if (!picked) {
                         MessageHelper.sendMessageToChannel(
                                 event.getChannel(), "No such action card ID found, please retry.");
                         return;
                     }
-                    found = true;
                     ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel());
                     game.setPurgedActionCard(acStringID);
+                    break;
                 }
             }
         }

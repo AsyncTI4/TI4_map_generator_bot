@@ -89,14 +89,16 @@ public final class StatusHelper {
             }
 
             buttons = new ArrayList<>();
-            for (String soID : player.getSecretsUnscored().keySet()) {
+            Map<String, Integer> secretsUnscored = player.getSecretsUnscored();
+            for (Map.Entry<String, Integer> entry : secretsUnscored.entrySet()) {
+                String soID = entry.getKey();
                 if (ListPlayerInfoService.getObjectiveThreshold(soID, game) > 0
                         && ListPlayerInfoService.getPlayerProgressOnObjective(soID, game, player)
                                 > (ListPlayerInfoService.getObjectiveThreshold(soID, game) - 1)
                         && !"dp".equalsIgnoreCase(soID)) {
 
                     buttons.add(Buttons.green(
-                            "preScoreObbie_SO_" + player.getSecretsUnscored().get(soID),
+                            "preScoreObbie_SO_" + entry.getValue(),
                             Mapper.getSecretObjective(soID).getName()));
                 }
             }
@@ -342,7 +344,9 @@ public final class StatusHelper {
             int count = 0;
             StringBuilder message3a = new StringBuilder();
             List<Integer> sos = new ArrayList<>();
-            for (String soID : player.getSecretsUnscored().keySet()) {
+            Map<String, Integer> secretsUnscored = player.getSecretsUnscored();
+            for (Map.Entry<String, Integer> entry : secretsUnscored.entrySet()) {
+                String soID = entry.getKey();
                 if (ListPlayerInfoService.getObjectiveThreshold(soID, game) > 0
                         && ListPlayerInfoService.getPlayerProgressOnObjective(soID, game, player)
                                 > (ListPlayerInfoService.getObjectiveThreshold(soID, game) - 1)
@@ -351,7 +355,7 @@ public final class StatusHelper {
                             .append("\n")
                             .append(Mapper.getSecretObjective(soID).getRepresentation(false));
                     count++;
-                    sos.add(player.getSecretsUnscored().get(soID));
+                    sos.add(entry.getValue());
                 }
             }
             var userSettings = UserSettingsManager.get(player.getUserID());
@@ -412,12 +416,14 @@ public final class StatusHelper {
         if (!game.getStoredValue("newStatusScoringMode").isEmpty() && !game.isFowMode()) {
             poButtons.add(Buttons.gray("refreshStatusSummary", "Refresh Summary"));
         }
-        if (game.getActionCards().size() > 130
-                && game.getPlayerFromColorOrFaction("hacan") != null
-                && !ButtonHelper.getButtonsToSwitchWithAllianceMembers(
-                                game.getPlayerFromColorOrFaction("hacan"), game, false)
-                        .isEmpty()) {
-            poButtons.add(Buttons.gray("getSwapButtons_", "Swap"));
+
+        if (game.getActionCards().size() > 130) {
+            Player hacan = game.getPlayerFromColorOrFaction("hacan");
+            if (hacan != null
+                    && !ButtonHelper.getButtonsToSwitchWithAllianceMembers(hacan, game, false)
+                            .isEmpty()) {
+                poButtons.add(Buttons.gray("getSwapButtons_", "Swap"));
+            }
         }
         poButtons.removeIf(Objects::isNull);
         messageText = "Please score objectives, " + game.getPing() + ".";

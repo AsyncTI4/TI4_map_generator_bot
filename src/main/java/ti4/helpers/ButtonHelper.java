@@ -2519,8 +2519,7 @@ public class ButtonHelper {
         Player neutral = game.getPlayerFromColorOrFaction("neutral");
         if (neutral == null) {
             String color = SetupNeutralPlayer.pickNeutralColor(game);
-            game.setupNeutralPlayer(color);
-            neutral = game.getPlayerFromColorOrFaction("neutral");
+            neutral = game.setupNeutralPlayer(color);
         }
         for (Tile tile : game.getTileMap().values()) {
             if (tile.isHomeSystem() && !tile.isHomeSystem(game)) {
@@ -4854,8 +4853,8 @@ public class ButtonHelper {
             if (tile.getPlanetUnitHolders().isEmpty()) {
                 AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
             }
-            if (game.isDangerousWildsMode() && game.getPlayerFromColorOrFaction("neutral") != null) {
-                Player neutral = game.getPlayerFromColorOrFaction("neutral");
+            Player neutral = game.getPlayerFromColorOrFaction("neutral");
+            if (game.isDangerousWildsMode() && neutral != null) {
                 boolean added = false;
                 for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                     if (getTypeOfPlanet(game, uH.getName()).contains("hazardous")) {

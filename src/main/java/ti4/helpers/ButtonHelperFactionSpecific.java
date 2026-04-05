@@ -1,6 +1,8 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1892,10 +1894,11 @@ public final class ButtonHelperFactionSpecific {
     private static void releaseAllUnits(
             Player cabal, Game game, Player blockader, GenericInteractionCreateEvent event) {
         for (UnitHolder unitHolder : cabal.getNomboxTile().getUnitHolders().values()) {
-            List<UnitKey> unitKeys = new ArrayList<>(unitHolder.getUnits().keySet());
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
+            List<UnitKey> unitKeys = new ArrayList<>(units.keySet());
             for (UnitKey unitKey : unitKeys) {
                 if (blockader.unitBelongsToPlayer(unitKey)) {
-                    int amount = unitHolder.getUnits().get(unitKey);
+                    int amount = units.get(unitKey);
                     String unit = unitKey.unitName();
                     RemoveUnitService.removeUnits(
                             event, cabal.getNomboxTile(), game, blockader.getColor(), amount + " " + unit);
@@ -1957,9 +1960,9 @@ public final class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         boolean hasInf = false;
         for (UnitHolder unitHolder : player.getNomboxTile().getUnitHolders().values()) {
-            for (UnitKey unitKey : unitHolder.getUnits().keySet()) {
-                if (unitKey.getUnitType() == UnitType.Infantry
-                        && unitHolder.getUnits().get(unitKey) > 0) {
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
+            for (UnitKey unitKey : units.keySet()) {
+                if (unitKey.getUnitType() == UnitType.Infantry && units.get(unitKey) > 0) {
                     hasInf = true;
                 }
             }
@@ -1979,13 +1982,13 @@ public final class ButtonHelperFactionSpecific {
         boolean hasInf = false;
         boolean hasFF = false;
         for (UnitHolder unitHolder : player.getNomboxTile().getUnitHolders().values()) {
-            for (UnitKey unitKey : unitHolder.getUnits().keySet()) {
-                if (unitKey.getUnitType() == UnitType.Infantry
-                        && unitHolder.getUnits().get(unitKey) > 0) {
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
+            for (Map.Entry<UnitKey, Integer> entry : units.entrySet()) {
+                UnitKey unitKey = entry.getKey();
+                if (unitKey.getUnitType() == UnitType.Infantry && entry.getValue() > 0) {
                     hasInf = true;
                 }
-                if (unitKey.getUnitType() == UnitType.Fighter
-                        && unitHolder.getUnits().get(unitKey) > 0) {
+                if (unitKey.getUnitType() == UnitType.Fighter && entry.getValue() > 0) {
                     hasFF = true;
                 }
             }

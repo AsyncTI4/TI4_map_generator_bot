@@ -1,6 +1,8 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +21,7 @@ import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -487,8 +490,10 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("winnuStructure_")
     public static void winnuStructure(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String unit = buttonID.replace("winnuStructure_", "").split("_")[0];
-        String planet = buttonID.replace("winnuStructure_", "").split("_")[1];
+        String replaced = buttonID.replace("winnuStructure_", "");
+        String[] split = replaced.split("_");
+        String unit = split[0];
+        String planet = split[1];
         Tile tile = game.getTile(AliasHandler.resolveTile(planet));
         AddUnitService.addUnits(event, tile, game, player.getColor(), unit + " " + planet);
         MessageHelper.sendMessageToChannel(
@@ -1611,10 +1616,11 @@ public class UnfiledButtonHandlers {
             } else {
                 var speakerPlayer = game.getSpeaker();
                 ObjectiveHelper.secondHalfOfPeakStage1(game, speakerPlayer, 1, true);
-                if (!game.isFowMode() && game.getTableTalkChannel() != null) {
+                TextChannel tableTalkChannel = game.getTableTalkChannel();
+                if (!game.isFowMode() && tableTalkChannel != null) {
                     MessageHelper.sendMessageToChannel(
-                            game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
-                    ListPlayerInfoService.displayerScoringProgression(game, true, game.getTableTalkChannel(), "both");
+                            tableTalkChannel, "## End of Round #" + game.getRound() + " Scoring Info");
+                    ListPlayerInfoService.displayerScoringProgression(game, true, tableTalkChannel, "both");
                 }
                 String message = "When ready, proceed to the Strategy Phase.";
                 Button proceedToStrategyPhase = Buttons.green(
@@ -2779,14 +2785,14 @@ public class UnfiledButtonHandlers {
             facilities.add(Buttons.green("addFacility_" + tPlanet + "_" + facilityID + "_dont", "Research Lab"));
         }
         facilityID = "facilitynavalbase";
+        Set<String> planetTypes = uH.getPlanetTypes();
         if (!usedFacilities.contains(facilityID)
-                && (uH.getPlanetTypes().contains("industrial") || "mr".equalsIgnoreCase(tPlanet) || uH.isLegendary())) {
+                && (planetTypes.contains("industrial") || "mr".equalsIgnoreCase(tPlanet) || uH.isLegendary())) {
             facilities.add(Buttons.green("addFacility_" + tPlanet + "_" + facilityID + "_dont", "Naval Base"));
         }
         facilityID = "facilitylogisticshub";
         if (!usedFacilities.contains(facilityID)
-                && (uH.getPlanetTypes().contains("industrial")
-                        || uH.getPlanetTypes().contains("hazardous"))) {
+                && (planetTypes.contains("industrial") || planetTypes.contains("hazardous"))) {
             facilities.add(Buttons.green("addFacility_" + tPlanet + "_" + facilityID + "_dont", "Logistics Hub"));
         }
         facilityID = "facilityembassy";
@@ -2797,7 +2803,7 @@ public class UnfiledButtonHandlers {
                 break;
             }
         }
-        if (!hasEmbassy && (uH.getPlanetTypes().contains("industrial") || "mr".equalsIgnoreCase(tPlanet))) {
+        if (!hasEmbassy && (planetTypes.contains("industrial") || "mr".equalsIgnoreCase(tPlanet))) {
             facilities.add(Buttons.green("addFacility_" + tPlanet + "_" + facilityID + "_dont", "Embassy"));
         }
         int colonies = 0;

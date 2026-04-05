@@ -341,7 +341,8 @@ public class PlayStrategyCardService {
         }
 
         if (!scModel.usesAutomationForSCID("pok1leadership") && !winnuHero && !isOverrule) {
-            Button emelpar = Buttons.red("scepterE_follow_" + scToPlay, "Exhaust " + RelicHelper.sillySpelling());
+            String sillySpelling = RelicHelper.sillySpelling();
+            Button emelpar = Buttons.red("scepterE_follow_" + scToPlay, "Exhaust " + sillySpelling);
             for (Player player3 : playersToFollow) {
                 if (player3 == player) {
                     continue;
@@ -355,7 +356,7 @@ public class PlayStrategyCardService {
                     MessageHelper.sendMessageToChannelWithButtons(
                             player3.getCardsInfoThread(),
                             player3.getRepresentationUnfogged() + ", you may follow **" + stratCardName
-                                    + "** with the _" + RelicHelper.sillySpelling() + "_.",
+                                    + "** with the _" + sillySpelling + "_.",
                             empNMahButtons);
                 }
                 if (player3.hasUnexhaustedLeader("mahactagent")) {

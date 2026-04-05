@@ -2362,8 +2362,7 @@ public final class ButtonHelperAbilities {
             Player neutral = game.getPlayerFromColorOrFaction("neutral");
             if (neutral == null) {
                 String color = SetupNeutralPlayer.pickNeutralColor(game);
-                game.setupNeutralPlayer(color);
-                neutral = game.getPlayerFromColorOrFaction("neutral");
+                neutral = game.setupNeutralPlayer(color);
             }
             if (neutral != null) {
                 for (Tile tile : game.getTileMap().values()) {

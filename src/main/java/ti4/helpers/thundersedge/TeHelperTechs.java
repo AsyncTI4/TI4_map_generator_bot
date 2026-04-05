@@ -236,11 +236,12 @@ public final class TeHelperTechs {
             }
 
             TechnologyModel biorganic = Mapper.getTech("parasite-obs");
+            String bioorganicRepresentation = biorganic.getNameRepresentation();
             String message = victim.getRepresentationUnfogged() + ", one of your infantry " + location
-                    + " has been destroyed via " + biorganic.getNameRepresentation() + ".";
+                    + " has been destroyed via " + bioorganicRepresentation + ".";
             if (game.isFowMode()) {
-                String privateMsg = "Successfully used " + biorganic.getNameRepresentation() + " to destroy 1 infantry "
-                        + location + ".";
+                String privateMsg =
+                        "Successfully used " + bioorganicRepresentation + " to destroy 1 infantry " + location + ".";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), privateMsg);
             }
             MessageHelper.sendMessageToChannel(victim.getCorrectChannel(), message);

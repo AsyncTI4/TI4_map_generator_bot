@@ -298,8 +298,9 @@ public class CombatModHelper {
         boolean meetsCondition = false;
 
         Tile tile = null;
-        if (onTile != null) {
-            tile = game.getTile(onTile.getId());
+        String onTileId = onTile == null ? null : onTile.getId();
+        if (onTileId != null) {
+            tile = game.getTile(onTileId);
         }
         String condition = "";
         if (modifier != null && modifier.getCondition() != null) {
@@ -343,25 +344,22 @@ public class CombatModHelper {
                 }
             }
             case Constants.MOD_PLANET_MR_LEGEND_HOME -> {
-                if (onTile != null
-                        && player.getHomeSystemTile() != null
-                        && onTile.getId().equals(player.getHomeSystemTile().getTileID())) {
+                if (onTile == null) break;
+                Tile homeSystemTile = player.getHomeSystemTile();
+                if (homeSystemTile != null && onTileId.equals(homeSystemTile.getTileID())) {
                     meetsCondition = true;
                 }
-                if (onTile != null
-                        && onTile.getPlanets() != null
+                if (onTile.getPlanets() != null
                         && onTile.getPlanets().stream()
                                 .anyMatch(planetId -> StringUtils.isNotBlank(
                                         Mapper.getPlanet(planetId).getLegendaryAbilityName()))) {
                     meetsCondition = true;
                 }
-                if (onTile != null
-                        && onTile.getPlanets() != null
-                        && onTile.getPlanets().contains(Constants.MR)) {
+                if (onTile.getPlanets() != null && onTile.getPlanets().contains(Constants.MR)) {
                     meetsCondition = true;
                 }
-                if (onTile != null && game.getTile(onTile.getId()) != null) {
-                    if (ButtonHelper.isTileLegendary(game.getTile(onTile.getId()))) {
+                if (game.getTile(onTileId) != null) {
+                    if (ButtonHelper.isTileLegendary(game.getTile(onTileId))) {
                         meetsCondition = true;
                     }
                 }

@@ -11,4 +11,30 @@
     <Match>
         <Bug pattern="CBX_CUSTOM_BUILT_XML"/>
     </Match>
+    <!-- It'd be nice if we handled this differently, without writing to statics from instance methods, but we can't -->
+    <!-- without a bit of work, since this class is so heavily used. -->
+    <Match>
+        <Class name="ti4.spring.jda.JdaService"/>
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+    </Match>
+    <!-- Something we have to do because we're mixing static class with Spring beans -->
+    <Match>
+        <Class name="ti4.spring.context.SpringContext"/>
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+    </Match>
+    <!-- False positive -->
+    <Match>
+        <Class name="ti4.spring.imageio.ImageIoConfiguration"/>
+        <Bug pattern="PRMC_POSSIBLY_REDUNDANT_METHOD_CALLS"/>
+    </Match>
+    <!-- False positive (3) -->
+    <Match>
+        <Class name="ti4.image.MapGenerator"/>
+        <Bug pattern="PRMC_POSSIBLY_REDUNDANT_METHOD_CALLS"/>
+    </Match>
+    <!-- False positive (2) -->
+    <Match>
+        <Class name="ti4.helpers.ComponentActionHelper"/>
+        <Bug pattern="PRMC_POSSIBLY_REDUNDANT_METHOD_CALLS"/>
+    </Match>
 </FindBugsFilter>

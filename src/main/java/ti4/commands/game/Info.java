@@ -2,6 +2,7 @@ package ti4.commands.game;
 
 import java.util.List;
 import java.util.Map;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -241,9 +242,10 @@ class Info extends GameStateSubcommand {
                 .append(game.isShowFullComponentTextEmbeds())
                 .append("\n");
         sb.append("Output Verbosity: ").append(game.getOutputVerbosity()).append("\n");
-        if (game.getTableTalkChannel() != null)
+        TextChannel tableTalkChannel = game.getTableTalkChannel();
+        if (tableTalkChannel != null)
             sb.append("Table Talk Channel: ")
-                    .append(game.getTableTalkChannel().getAsMention())
+                    .append(tableTalkChannel.getAsMention())
                     .append("\n");
         if (game.getActionsChannel() != null)
             sb.append("Actions Channel: ")

@@ -242,7 +242,8 @@ public class ActionCardHelper {
         if (!hasManageAbility) return new ArrayList<>();
 
         List<Button> buttons = new ArrayList<>();
-        player.getPlotCards().entrySet().stream()
+        Set<Entry<String, Integer>> plotCards = player.getPlotCards().entrySet();
+        plotCards.stream()
                 .map(plot -> Map.entry(plot.getValue(), Mapper.getPlot(plot.getKey())))
                 .sorted(Comparator.comparingInt(Entry::getKey))
                 .forEachOrdered(plotEntry -> {
@@ -251,7 +252,7 @@ public class ActionCardHelper {
                     String buttonText = plot.getName();
                     buttons.add(Buttons.green(buttonID, buttonText));
                 });
-        player.getPlotCards().entrySet().stream()
+        plotCards.stream()
                 .map(plot -> Map.entry(plot.getValue(), Mapper.getPlot(plot.getKey())))
                 .sorted(Comparator.comparingInt(Entry::getKey))
                 .forEachOrdered(plotEntry -> {

@@ -30,7 +30,6 @@ public class ImageIoConfiguration {
     }
 
     // This happens on occasion and I have no idea why. If you find a better solution, delete this.
-    @SuppressWarnings("PRMC_POSSIBLY_REDUNDANT_METHOD_CALLS")
     private static boolean ensureWebpWriterRegistered() {
         if (hasWebpWriter()) {
             BotLogger.info("WebP writer already registered at startup.");

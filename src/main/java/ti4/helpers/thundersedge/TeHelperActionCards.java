@@ -122,7 +122,7 @@ public class TeHelperActionCards {
             player.setTg(0);
         }
         int soCount = player.getSecretsUnscored().size();
-        if (!player.getSecretsUnscored().isEmpty()) {
+        if (soCount != 0) {
             SecretObjectiveHelper.showAll(player, p2, game);
         }
         String message = player.getRepresentation() + " discarded their " + acCount + " action card"

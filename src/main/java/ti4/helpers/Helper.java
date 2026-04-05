@@ -3099,14 +3099,19 @@ public final class Helper {
                     && "17"
                             .equals(game.getTileByPosition(player.getPlayerStatsAnchorPosition())
                                     .getTileID());
-            if (((player.getFaction().contains("ghost") || (tile != null && "51".equalsIgnoreCase(tile.getTileID())))
-                            && game.getTile("17") != null)
+            if (((player.getFaction().contains("ghost") || (tile != null && "51".equalsIgnoreCase(tile.getTileID()))))
                     && ghostish) {
-                tile = game.getTile("17");
+                Tile tile17 = game.getTile("17");
+                if (tile17 != null) {
+                    tile = tile17;
+                }
             }
-            if (((player.getFaction().contains("crimson") || (tile != null && "118".equalsIgnoreCase(tile.getTileID())))
-                    && game.getTile("94") != null)) {
-                tile = game.getTile("94");
+            if (((player.getFaction().contains("crimson")
+                    || (tile != null && "118".equalsIgnoreCase(tile.getTileID()))))) {
+                Tile tile94 = game.getTile("94");
+                if (tile94 != null) {
+                    tile = tile94;
+                }
             }
             if (tile != null) {
                 int parsedLocation = 9999;

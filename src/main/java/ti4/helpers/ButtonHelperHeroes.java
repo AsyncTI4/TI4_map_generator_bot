@@ -976,11 +976,11 @@ public final class ButtonHelperHeroes {
             Tile tile = game.getTileByPosition(pos);
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder instanceof Planet planet) {
+                    Map<UnitKey, Integer> units = unitHolder.getUnits();
                     if (!player.getPlanetsAllianceMode().contains(planet.getName())
                             && !tile.isHomeSystem(game)
                             && !planet.getName().toLowerCase().contains("rex")
-                            && (unitHolder.getUnits() == null
-                                    || unitHolder.getUnits().isEmpty())) {
+                            && (units == null || units.isEmpty())) {
                         buttons.add(Buttons.green(
                                 finChecker + "gheminaLordHero_" + planet.getName(),
                                 Helper.getPlanetRepresentation(planet.getName(), game)));

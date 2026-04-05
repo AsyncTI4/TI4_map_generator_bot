@@ -15,10 +15,9 @@ public class BigSelectDemo implements Selection {
 
     private static final String selectionID = "demo";
 
-    private static List<String> options;
+    private static final List<String> options = new ArrayList<>();
 
-    public BigSelectDemo() {
-        options = new ArrayList<>();
+    static {
         for (int i = 0; i < 100; i++) {
             options.add(String.valueOf(i));
         }

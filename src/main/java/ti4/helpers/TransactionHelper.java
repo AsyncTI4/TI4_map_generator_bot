@@ -1200,7 +1200,8 @@ public final class TransactionHelper {
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " sent a transaction offer to " + p2.getRepresentationNoPing()
                         + ".");
-        if (game.getTableTalkChannel() != null) {
+        TextChannel tableTalkChannel = game.getTableTalkChannel();
+        if (tableTalkChannel != null) {
             boolean sentMeme = false;
             String publicOfferText = buildTransactionOffer(player, p2, game, true);
             if (sendMemeInsteadOfText(event, game)) {
@@ -1208,14 +1209,14 @@ public final class TransactionHelper {
                 if (tradeOfferMeme != null) {
                     FileUpload upload = FileUploadService.createFileUpload(tradeOfferMeme, "trade_offer");
                     upload.setDescription(publicOfferText);
-                    MessageHelper.sendFileUploadToChannel(game.getTableTalkChannel(), upload);
+                    MessageHelper.sendFileUploadToChannel(tableTalkChannel, upload);
                     sentMeme = true;
                 }
             }
             if (!sentMeme) {
                 String offerMessage = "Trade offer from " + player.getRepresentationNoPing() + " to "
                         + p2.getRepresentationNoPing() + ":\n" + publicOfferText;
-                MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), offerMessage);
+                MessageHelper.sendMessageToChannel(tableTalkChannel, offerMessage);
             }
         }
 

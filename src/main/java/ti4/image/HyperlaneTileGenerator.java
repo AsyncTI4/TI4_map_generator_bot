@@ -227,9 +227,9 @@ final class HyperlaneTileGenerator {
         int transform = -1;
         if (matrix != null) {
             String randomTile = RandomHelper.pickRandomFromList(RANDOM_BACKGROUNDS);
-            tilePath = ResourceHelper.getInstance().getTileFile(randomTile);
-            if (tilePath == null) {
-                tilePath = tile.getTilePath();
+            String randomTilePath = ResourceHelper.getInstance().getTileFile(randomTile);
+            if (randomTilePath != null) {
+                tilePath = randomTilePath;
             }
             transform = ThreadLocalRandom.current().nextInt(4); // 0, 1, 2, or 3
         }

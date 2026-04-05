@@ -1901,9 +1901,8 @@ public class Player extends PlayerProperties {
             }
         }
         if (leaderID.contains("agent")) {
-            leaderID = "yssarilagent";
             for (Leader leader : leaders) {
-                if (leader.getId().equals(leaderID)) {
+                if ("yssarilagent".equals(leader.getId())) {
                     return Optional.of(leader);
                 }
             }
@@ -3179,7 +3178,7 @@ public class Player extends PlayerProperties {
         eb.setColor(Mapper.getColor(getColor()).getPrimaryColor());
     }
 
-    public String getContainerTitle() {
+    private String getContainerTitle() {
         FactionModel model = getFactionModel();
 
         String displayName = getDisplayName();
@@ -3188,7 +3187,8 @@ public class Player extends PlayerProperties {
 
         String emoji = getFactionEmoji();
         String color = ColorEmojis.getColorEmojiWithName(getColor());
-        String commods = getCommoditiesTotal() + " Commodities " + MiscEmojis.comm(getCommoditiesTotal());
+        int commoditiesTotal = getCommoditiesTotal();
+        String commods = commoditiesTotal + " Commodities " + MiscEmojis.comm(commoditiesTotal);
 
         return String.format("%s %s\n%s\n%s", emoji, name, color, commods);
     }

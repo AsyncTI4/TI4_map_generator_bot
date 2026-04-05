@@ -317,8 +317,8 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
         sb.append(name).append(" (").append(resources).append("/").append(influence);
-        if (!getTechSpecialtyStringRepresentation().isBlank())
-            sb.append(" ").append(getTechSpecialtyStringRepresentation());
+        String techSpecialtyStringRepresentation = getTechSpecialtyStringRepresentation();
+        if (!techSpecialtyStringRepresentation.isBlank()) sb.append(" ").append(techSpecialtyStringRepresentation);
         sb.append(")");
         return sb.toString();
     }

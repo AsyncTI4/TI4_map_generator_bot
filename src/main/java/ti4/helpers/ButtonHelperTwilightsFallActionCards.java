@@ -548,10 +548,11 @@ public final class ButtonHelperTwilightsFallActionCards {
         game.setStoredValue("purgedAbilities", game.getStoredValue("purgedAbilities") + "_" + agent);
         TechnologyModel lead = Mapper.getTech(agent);
         p2.removeTech(agent);
-        String msg = player.getRepresentation() + " has chosen to purge " + lead.getNameRepresentation() + " from "
+        String leaderRepresentation = lead.getNameRepresentation();
+        String msg = player.getRepresentation() + " has chosen to purge " + leaderRepresentation + " from "
                 + p2.getFactionNameOrColor() + ".";
-        String msg2 = p2.getRepresentation() + ", you lost " + lead.getNameRepresentation()
-                + " to _The Laws Unwritten_ by " + player.getFactionNameOrColor() + "; it has been purged.";
+        String msg2 = p2.getRepresentation() + ", you lost " + leaderRepresentation + " to _The Laws Unwritten_ by "
+                + player.getFactionNameOrColor() + "; it has been purged.";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
