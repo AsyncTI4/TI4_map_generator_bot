@@ -109,7 +109,7 @@ class FinishDraftService {
                     .toList();
             int index = 1;
             for (PlayerDraft d : speakerOrdered) {
-                error.append("\n")
+                error.append('\n')
                         .append(index)
                         .append(". ")
                         .append(d.getSlice().ttsString());

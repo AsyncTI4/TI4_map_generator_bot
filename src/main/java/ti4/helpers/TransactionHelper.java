@@ -202,7 +202,7 @@ public final class TransactionHelper {
         players.add(p2);
         for (Player player : players) {
             if (!trans.isEmpty()) {
-                trans.append("\n");
+                trans.append('\n');
             }
             trans.append("> ")
                     .append(player.getRepresentation(false, false, true))
@@ -373,9 +373,9 @@ public final class TransactionHelper {
                             trans.append(furtherDetail.replace("fin777", " "));
                         }
                     }
-                    default -> trans.append(" some odd thing: `").append(item).append("`");
+                    default -> trans.append(" some odd thing: `").append(item).append('`');
                 }
-                trans.append("\n");
+                trans.append('\n');
             }
             if (sendingNothing) {
                 String nothing = game.getStoredValue(player.getFaction() + "NothingMessage");
@@ -383,7 +383,7 @@ public final class TransactionHelper {
                     nothing = getNothingMessage();
                     game.setStoredValue(player.getFaction() + "NothingMessage", nothing);
                 }
-                trans.append("> - ").append(nothing).append("\n");
+                trans.append("> - ").append(nothing).append('\n');
             }
         }
 

@@ -338,7 +338,7 @@ public class CombatRollService {
             }
             for (String line : message.split("\n")) {
                 if (line.startsWith("> `") || line.startsWith("**Total hits")) {
-                    disaster.append("\n").append(line);
+                    disaster.append('\n').append(line);
                 }
             }
             DisasterWatchHelper.sendMessageInDisasterWatch(game, disaster.toString());

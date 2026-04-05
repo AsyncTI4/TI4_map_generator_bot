@@ -45,7 +45,7 @@ class POInfo extends GameStateSubcommand {
                     .append(publicObjectiveNumber)
                     .append(". ")
                     .append(publicObjective.getRepresentation())
-                    .append("\n");
+                    .append('\n');
 
             if (includeScored && scoredPublicObjectives.containsKey(publicObjective.getAlias())) {
                 List<Player> playersWhoHaveScoredObjective =
@@ -62,7 +62,7 @@ class POInfo extends GameStateSubcommand {
                 for (Player player : playersWhoHaveScoredObjective) {
                     stringBuilder.append(player.getFactionEmoji());
                 }
-                stringBuilder.append("\n");
+                stringBuilder.append('\n');
             }
             publicObjectiveNumber++;
         }

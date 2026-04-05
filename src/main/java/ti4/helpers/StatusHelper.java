@@ -352,7 +352,7 @@ public final class StatusHelper {
                                 > (ListPlayerInfoService.getObjectiveThreshold(soID, game) - 1)
                         && !"dp".equalsIgnoreCase(soID)) {
                     message3a
-                            .append("\n")
+                            .append('\n')
                             .append(Mapper.getSecretObjective(soID).getRepresentation(false));
                     count++;
                     sos.add(entry.getValue());

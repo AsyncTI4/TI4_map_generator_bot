@@ -122,7 +122,7 @@ public class StartPhaseService {
                             summary.append(player.getFactionEmoji())
                                     .append(": ")
                                     .append(game.getStoredValue("endofround" + x + player.getFaction()))
-                                    .append("\n");
+                                    .append('\n');
                         }
                     }
                     if (!summary.isEmpty()) {
@@ -198,7 +198,7 @@ public class StartPhaseService {
                         .append(Helper.getSCName(Integer.parseInt(num), game))
                         .append(" ")
                         .append(scEmoji)
-                        .append("\n");
+                        .append('\n');
             }
         }
         return msg.toString();
@@ -479,7 +479,7 @@ public class StartPhaseService {
                     sb.append(MiscEmojis.SpeakerToken)
                             .append(" ")
                             .append(speaker.getRepresentation())
-                            .append("\n");
+                            .append('\n');
                 }
                 for (var i = 0; i < priorityTrack.size(); i++) {
                     int priority = i + 1;
@@ -975,14 +975,14 @@ public class StartPhaseService {
                                 .getWhisperPref()
                                 .replace("No Preference", "No Stated Preference")
                                 .replace("No Preference", "No Stated Preference"))
-                        .append("\n");
+                        .append('\n');
                 question2
                         .append("* ")
                         .append(userSettings
                                 .getSupportPref()
                                 .replace("No Preference", "No Stated Preference")
                                 .replace("No Preference", "No Stated Preference"))
-                        .append("\n");
+                        .append('\n');
                 if (userSettings.getSupportPref().contains("Purge")) {
                     anyoneWantsToBan = true;
                 }
@@ -998,21 +998,21 @@ public class StartPhaseService {
                                 .getWinmakingPref()
                                 .replace("No Preference", "No Stated Preference")
                                 .replace("No Preference", "No Stated Preference"))
-                        .append("\n");
+                        .append('\n');
                 question3
                         .append("* ")
                         .append(userSettings
                                 .getTakebackPref()
                                 .replace("No Preference", "No Stated Preference")
                                 .replace("No Preference", "No Stated Preference"))
-                        .append("\n");
+                        .append('\n');
                 question5
                         .append("* ")
                         .append(userSettings
                                 .getMetaPref()
                                 .replace("No Preference", "No Stated Preference")
                                 .replace("No Preference", "No Stated Preference"))
-                        .append("\n");
+                        .append('\n');
             }
             MessageHelper.sendMessageToChannelAndPin(
                     game.getTableTalkChannel(),

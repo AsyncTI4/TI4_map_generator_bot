@@ -181,7 +181,7 @@ public class FrankenDraftBagService {
             sb.append(cat.title(player.getGame()));
             for (DraftItem item : bag.Contents) {
                 if (item.getItemCategory() != cat) continue;
-                sb.append("> ").append(item.getShortDescription()).append("\n");
+                sb.append("> ").append(item.getShortDescription()).append('\n');
             }
         }
         return sb.toString();
@@ -373,11 +373,11 @@ public class FrankenDraftBagService {
         }
         sb.append("):\n");
         for (DraftItem item : bag.getCategory(cat)) {
-            sb.append("> ").append(item.getShortDescription()).append("\n");
+            sb.append("> ").append(item.getShortDescription()).append('\n');
             if (item instanceof AgentDraftItem || item instanceof HeroDraftItem) {
-                sb.append("> - ").append(item.getLongDescription(game)).append("\n");
+                sb.append("> - ").append(item.getLongDescription(game)).append('\n');
             } else {
-                sb.append("> - ").append(item.getLongDescription()).append("\n");
+                sb.append("> - ").append(item.getLongDescription()).append('\n');
             }
         }
         return sb.toString();
@@ -392,7 +392,7 @@ public class FrankenDraftBagService {
         DraftBag currentBag = player.getDraftQueue();
         for (DraftItem item : currentBag.Contents) {
             sb.append(buildItemDescription(item, player.getGame()));
-            sb.append("\n");
+            sb.append('\n');
         }
 
         return sb.toString();

@@ -259,15 +259,15 @@ class SearchSources extends Subcommand {
         uniqueComponentSourcesTextList.append("Compared to sources.json\n");
         for (String string : sources) {
             if (!uniqueComponentSources.containsKey(string))
-                uniqueComponentSourcesTextList.append("- ").append(string).append("\n");
+                uniqueComponentSourcesTextList.append("- ").append(string).append('\n');
         }
         uniqueComponentSourcesTextList.append("Compared to Source.java Enum\n");
         for (String s : enumSources) {
             if (!uniqueComponentSources.containsKey(s))
-                uniqueComponentSourcesTextList.append("- ").append(s).append("\n");
+                uniqueComponentSourcesTextList.append("- ").append(s).append('\n');
         }
 
-        uniqueComponentSourcesTextList.append("\n");
+        uniqueComponentSourcesTextList.append('\n');
 
         uniqueComponentSourcesTextList.append("**Entries missing in sources.json:**\n");
         uniqueComponentSourcesTextList.append("Compared to \\resources\\ JSON content\n");
@@ -276,15 +276,15 @@ class SearchSources extends Subcommand {
                 uniqueComponentSourcesTextList
                         .append("- ")
                         .append(entry.getKey())
-                        .append("\n");
+                        .append('\n');
         }
         uniqueComponentSourcesTextList.append("Compared to Source.java Enum\n");
         for (String enumSource : enumSources) {
             if (!sources.contains(enumSource))
-                uniqueComponentSourcesTextList.append("- ").append(enumSource).append("\n");
+                uniqueComponentSourcesTextList.append("- ").append(enumSource).append('\n');
         }
 
-        uniqueComponentSourcesTextList.append("\n");
+        uniqueComponentSourcesTextList.append('\n');
 
         uniqueComponentSourcesTextList.append("**Entries missing in Source.java Enum:**\n");
         uniqueComponentSourcesTextList.append("Compared to \\resources\\ JSON content\n");
@@ -293,12 +293,12 @@ class SearchSources extends Subcommand {
                 uniqueComponentSourcesTextList
                         .append("- ")
                         .append(entry.getKey())
-                        .append("\n");
+                        .append('\n');
         }
         uniqueComponentSourcesTextList.append("Compared to sources.json\n");
         for (String source : sources) {
             if (!enumSources.contains(source))
-                uniqueComponentSourcesTextList.append("- ").append(source).append("\n");
+                uniqueComponentSourcesTextList.append("- ").append(source).append('\n');
         }
 
         // Send answer

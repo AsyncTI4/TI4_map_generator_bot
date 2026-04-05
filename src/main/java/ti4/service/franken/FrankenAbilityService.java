@@ -30,7 +30,7 @@ public class FrankenAbilityService {
                 AbilityModel abilityModel = Mapper.getAbility(abilityID);
                 sb.append("> ").append(abilityModel.getRepresentation());
             }
-            sb.append("\n");
+            sb.append('\n');
             player.addAbility(abilityID);
             if ("cunning".equalsIgnoreCase(abilityID)) {
                 Map<String, GenericCardModel> traps = Mapper.getTraps();
@@ -123,7 +123,7 @@ public class FrankenAbilityService {
             } else {
                 sb.append("> ").append(abilityID);
             }
-            sb.append("\n");
+            sb.append('\n');
             player.removeAbility(abilityID);
         }
         MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());

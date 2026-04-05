@@ -81,7 +81,7 @@ class ServerGameStats extends Subcommand {
             sb.append("> hosting **").append(gameCount).append("** games  -  ");
             sb.append("space for **").append(guildRoomForGames).append("** more games\n");
             if (showOldestThreadInfo) {
-                sb.append("> ").append(getOldestThreadString(guild)).append("\n");
+                sb.append("> ").append(getOldestThreadString(guild)).append('\n');
             }
             hostedGames += gameCount;
             roomForGames += guildRoomForGames;

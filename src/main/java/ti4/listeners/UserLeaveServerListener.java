@@ -182,7 +182,7 @@ public class UserLeaveServerListener extends ListenerAdapter {
                     foundOne = true;
                 }
             }
-            msg.append("\n").append(generateSingleGameReport(player, g));
+            msg.append('\n').append(generateSingleGameReport(player, g));
             msg.append(separator);
         }
         msg.append("\nUser has **__")

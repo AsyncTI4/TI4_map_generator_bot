@@ -40,8 +40,8 @@ public class TiglReportService {
                 .append(" is the winner!\n");
         sb.append("```\nMatch End Date: ")
                 .append(Helper.getDateRepresentationTIGL(game.getEndedDate()))
-                .append("\n");
-        sb.append("Players:").append("\n");
+                .append('\n');
+        sb.append("Players:").append('\n');
         int index = 1;
         for (Player player : game.getRealAndEliminatedPlayers()) {
             int playerVP = player.isEliminated() ? 0 : player.getTotalVictoryPoints();
@@ -57,7 +57,7 @@ public class TiglReportService {
             index++;
         }
 
-        sb.append("\n");
+        sb.append('\n');
         sb.append("Platform: Async\n");
         sb.append("Additional Notes: Async Game '").append(game.getName());
         if (!StringUtils.isBlank(game.getCustomName())) sb.append("   ").append(game.getCustomName());

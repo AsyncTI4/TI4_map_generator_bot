@@ -229,7 +229,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
                 sb.append("\n> ").append(model.getWindow().get()).append(":");
                 sb.append("\n> - ").append(effect);
             }
-            sb.append("\n");
+            sb.append('\n');
         }
         eb.addField("__Abilities:__", sb.toString(), false);
 
@@ -238,7 +238,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         for (String id : getFactionTech()) {
             TechnologyModel model = Mapper.getTech(id);
             sb.append(model.getCondensedReqsEmojis(false)).append(" ").append(model.getName());
-            sb.append("\n> ").append(model.getText()).append("\n");
+            sb.append("\n> ").append(model.getText()).append('\n');
         }
         eb.addField("__Faction Technologies__", sb.toString(), false);
 
@@ -250,7 +250,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             sb.append(model.getUnitEmoji()).append(" ").append(model.getName());
             if (model.getAbility().isPresent())
                 sb.append("\n> ").append(model.getAbility().get());
-            sb.append("\n");
+            sb.append('\n');
         }
         eb.addField("__Units__", sb.toString(), false);
 
@@ -258,7 +258,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         sb = new StringBuilder();
         for (String id : getPromissoryNotes()) {
             PromissoryNoteModel model = Mapper.getPromissoryNote(id);
-            sb.append(model.getName()).append("\n");
+            sb.append(model.getName()).append('\n');
         }
         eb.addField("__Promissory Notes__", sb.toString(), false);
 
@@ -269,12 +269,12 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             sb.append(model.getLeaderEmoji())
                     .append(" ")
                     .append(model.getName())
-                    .append("\n");
+                    .append('\n');
         }
         eb.addField("__Leaders__", sb.toString(), false);
 
         sb = new StringBuilder();
-        sb.append(Helper.getUnitListEmojis(startingFleet)).append("\n");
+        sb.append(Helper.getUnitListEmojis(startingFleet)).append('\n');
         eb.addField("__Starting Fleet__", sb.toString(), false);
 
         sb = new StringBuilder();
@@ -282,7 +282,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             for (String id : getStartingTech()) {
                 TechnologyModel model = Mapper.getTech(id);
                 sb.append(model.getCondensedReqsEmojis(false)).append(" ").append(model.getName());
-                // sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append("\n");
+                // sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append('\n');
             }
         } else {
             if (startingTechOptions != null && startingTechAmount != 0 && !startingTechOptions.isEmpty()) {
@@ -290,7 +290,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
                 for (String id : startingTechOptions) {
                     TechnologyModel model = Mapper.getTech(id);
                     sb.append(model.getCondensedReqsEmojis(false)).append(" ").append(model.getName());
-                    // sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append("\n");
+                    // sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append('\n');
                 }
             }
         }

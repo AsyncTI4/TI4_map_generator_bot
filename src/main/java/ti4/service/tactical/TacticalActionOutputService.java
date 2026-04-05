@@ -124,9 +124,9 @@ public class TacticalActionOutputService {
                     .append(" tile")
                     .append(distance == 1 ? "" : "s")
                     .append(" away)")
-                    .append("\n");
+                    .append('\n');
         } else {
-            summary.append(" (").append(distance).append(" away)").append("\n");
+            summary.append(" (").append(distance).append(" away)").append('\n');
         }
         if (movingUnitsFromTile.isEmpty()) {
             if (condensed) return null;
@@ -186,7 +186,7 @@ public class TacticalActionOutputService {
         }
         summary.append(String.join("\n", lines));
         String extraSummary = buildShortSummary(game, Set.of(tile.getPosition()));
-        if (extraSummary != null && inclSummary) summary.append("\n").append(extraSummary);
+        if (extraSummary != null && inclSummary) summary.append('\n').append(extraSummary);
         return summary.toString();
     }
 

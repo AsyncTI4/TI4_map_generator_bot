@@ -54,7 +54,7 @@ public class EventHelper {
                 .toList());
 
         for (Tile tile : unusedBlueTiles) {
-            sb.append("\n")
+            sb.append('\n')
                     .append(TileEmojis.TileBlueBack)
                     .append(" ")
                     .append(tile.getRepresentation())
@@ -64,7 +64,7 @@ public class EventHelper {
         }
 
         for (Tile tile : unusedRedTiles) {
-            sb.append("\n")
+            sb.append('\n')
                     .append(TileEmojis.TileRedBack)
                     .append(" ")
                     .append(tile.getRepresentation())

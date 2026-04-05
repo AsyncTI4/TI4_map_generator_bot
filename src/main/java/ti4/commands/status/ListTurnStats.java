@@ -43,7 +43,7 @@ class ListTurnStats extends GameStateSubcommand {
 
         for (Player player : players) {
             String turnString = playerAverageTurnLength(player);
-            message.append("\n").append(turnString);
+            message.append('\n').append(turnString);
             if (min.map(player::is).orElse(false)) message.append(" 🐇");
             else if (max.map(player::is).orElse(false)) message.append(" 🐢");
             else if (maxTime != null && maxTime < 30 * 60_000) message.append(" 🐢"); // 30 minutes

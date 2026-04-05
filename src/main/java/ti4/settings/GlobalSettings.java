@@ -95,7 +95,7 @@ public final class GlobalSettings {
         StringBuilder sb = new StringBuilder("### Global Settings:\n```");
         for (Entry<String, Object> entries :
                 settings.entrySet().stream().sorted(Entry.comparingByKey()).toList()) {
-            sb.append(entries.getKey()).append(": ").append(entries.getValue()).append("\n");
+            sb.append(entries.getKey()).append(": ").append(entries.getValue()).append('\n');
         }
         sb.append("```");
         return sb.toString();

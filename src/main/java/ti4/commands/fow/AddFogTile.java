@@ -67,7 +67,7 @@ class AddFogTile extends GameStateSubcommand {
                     .append(planetTileName)
                     .append(") to")
                     .append(sb2)
-                    .append("\n");
+                    .append('\n');
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }

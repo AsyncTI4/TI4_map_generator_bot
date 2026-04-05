@@ -41,7 +41,7 @@ public class RelicHelper {
                     .append(relicData.getName())
                     .append("_: ")
                     .append(relicData.getText())
-                    .append("\n");
+                    .append('\n');
         }
         String msg = player.getRepresentationUnfogged()
                 + ", please choose the relic that you wish to draw. The relic text is reproduced for your convenience.";
@@ -305,7 +305,7 @@ public class RelicHelper {
             int x = 1;
             for (String relicId : allRelics) {
                 String relicName = Mapper.getRelic(relicId).getName();
-                text.append("\n")
+                text.append('\n')
                         .append(x)
                         .append(". ")
                         .append(ExploreEmojis.Relic)

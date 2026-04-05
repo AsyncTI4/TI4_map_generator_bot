@@ -120,7 +120,7 @@ class FrankenEdit extends GameStateSubcommand {
                 .append(":\n");
         for (DraftItem item : bag.Contents) {
             sb.append(item.getAlias());
-            sb.append("\n");
+            sb.append('\n');
         }
         MessageHelper.sendMessageToUser(sb.toString(), user);
     }

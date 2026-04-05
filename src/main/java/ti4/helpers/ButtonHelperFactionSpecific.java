@@ -3471,7 +3471,7 @@ public final class ButtonHelperFactionSpecific {
             if (count > 0 && !damaged) {
                 damaged = true;
                 uH.addDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), 1);
-                sb.append("\n")
+                sb.append('\n')
                         .append(player.getFactionEmoji())
                         .append(" damaged 1 mech on ")
                         .append(tile.getRepresentation())

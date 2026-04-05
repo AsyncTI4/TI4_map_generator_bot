@@ -617,7 +617,7 @@ public class ExploreService {
                                 }
                             }
                             if (!groundForces.isEmpty()) {
-                                message.append("\n")
+                                message.append('\n')
                                         .append(p2.getRepresentationUnfogged())
                                         .append(", your ")
                                         .append(String.join("", groundForces))
@@ -1309,7 +1309,7 @@ public class ExploreService {
                             true,
                             fullText,
                             ExploreEmojis.getTraitEmoji(currentType).toString()))
-                    .append("\n");
+                    .append('\n');
 
             info.append("__").append(currentType.substring(0, 1).toUpperCase()).append(currentType.substring(1));
             info.append(" exploration discards__ (").append(discardCount).append(")\n");
@@ -1398,7 +1398,7 @@ public class ExploreService {
                     sb.append(" - ").append(formatPercent.format(deckDrawChance * ids.size()));
                 }
             }
-            sb.append("\n");
+            sb.append('\n');
         }
 
         List<String> unmapped =
@@ -1406,7 +1406,7 @@ public class ExploreService {
         for (String cardID : unmapped) {
             ExploreModel card = Mapper.getExplore(cardID);
             String name = card != null ? card.getName() : null;
-            sb.append("> (").append(cardID).append(") ").append(name).append("\n");
+            sb.append("> (").append(cardID).append(") ").append(name).append('\n');
         }
         return sb.toString();
     }

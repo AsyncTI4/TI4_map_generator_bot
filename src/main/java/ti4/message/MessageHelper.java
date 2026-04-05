@@ -1002,7 +1002,7 @@ public class MessageHelper {
                     .append("...\n");
             error.append("> Buttons:\n");
             for (Button b : buttons) {
-                error.append("> - id:`").append(b.getCustomId()).append("`");
+                error.append("> - id:`").append(b.getCustomId()).append('`');
             }
             BotLogger.error(error.toString(), null);
             break;

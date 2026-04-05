@@ -169,7 +169,7 @@ public final class ButtonHelperTwilightsFall {
                         .append(name)
                         .append(" ")
                         .append(spliceEmoji)
-                        .append("\n");
+                        .append('\n');
             }
         }
         return msg.toString();

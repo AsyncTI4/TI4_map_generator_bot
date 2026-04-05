@@ -52,7 +52,7 @@ class EndingRoundPhaseStatisticsService {
                         .append(Math.round(100 * entry.getValue() / (double) totalEndedGames))
                         .append("%)` ")
                         .append(entry.getKey())
-                        .append("\n"));
+                        .append('\n'));
 
         if (totalEndedGames == 0) {
             sb.append("No ended games found for the selected filters.\n");

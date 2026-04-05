@@ -61,7 +61,7 @@ public class MedianTurnTimeService {
         StringBuilder sb = new StringBuilder("## __**Median Of Average Turn Times:**__\n");
         int index = 1;
         for (var stats : sortedResults) {
-            sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
+            sb.append('`').append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
             index++;
             sb.append(DateTimeHelper.getTimeRepresentationToSeconds(stats.getMedian()));
             sb.append("` ")

@@ -109,7 +109,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
         if (includeID) {
             StringBuilder sb = new StringBuilder();
             if (getAttachmentId().isPresent())
-                sb.append("Attachment: ").append(getAttachmentId().get()).append("\n");
+                sb.append("Attachment: ").append(getAttachmentId().get()).append('\n');
             sb.append("ID: ").append(id).append("  Source: ").append(source);
             eb.setFooter(sb.toString());
         }

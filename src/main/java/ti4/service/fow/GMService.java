@@ -214,14 +214,14 @@ public final class GMService {
                         sbWhens.append("> ")
                                 .append(player.getRepresentationUnfoggedNoPing())
                                 .append(": ");
-                        sbWhens.append(String.join(", ", whens)).append("\n");
+                        sbWhens.append(String.join(", ", whens)).append('\n');
                     }
                     List<String> afters = AgendaHelper.getPossibleAfterNames(player);
                     if (!afters.isEmpty()) {
                         sbAfters.append("> ")
                                 .append(player.getRepresentationUnfoggedNoPing())
                                 .append(": ");
-                        sbAfters.append(String.join(", ", afters)).append("\n");
+                        sbAfters.append(String.join(", ", afters)).append('\n');
                     }
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), sbWhens.toString());
@@ -236,7 +236,7 @@ public final class GMService {
                             .append(player.getRepresentationUnfoggedNoPing())
                             .append(" Unscored")
                             .append(unscored)
-                            .append("\n");
+                            .append('\n');
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), sos.toString());
             }
@@ -297,7 +297,7 @@ public final class GMService {
         StringBuilder sb = new StringBuilder("Following players can see system **");
         sb.append(position).append("**:\n");
         for (Player player : FoWHelper.getAdjacentPlayers(game, position, false)) {
-            sb.append("> ").append(player.getRepresentationUnfoggedNoPing()).append("\n");
+            sb.append("> ").append(player.getRepresentationUnfoggedNoPing()).append('\n');
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
@@ -310,7 +310,7 @@ public final class GMService {
                 if (ac.startsWith(acId)) {
                     sb.append("> ")
                             .append(player.getRepresentationUnfoggedNoPing())
-                            .append("\n");
+                            .append('\n');
                     break;
                 }
             }

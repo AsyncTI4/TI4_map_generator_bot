@@ -404,7 +404,7 @@ public class MapGenerator implements AutoCloseable {
         sb.append(debugString("    Graphics time (of Draw Time):", 38, debugImageGraphicsTime, debugDrawTime));
         sb.append(debugString("  Discord time:", 36, debugDiscordTime, debugAbsoluteStartTime));
         sb.append(debugString("  Website time:", 36, debugWebsiteTime, debugAbsoluteStartTime));
-        sb.append("\n");
+        sb.append('\n');
 
         String message = "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```";
         MessageHelper.sendMessageToEventServerBotLogChannel(event, message);

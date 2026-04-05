@@ -280,7 +280,7 @@ class SearchGames extends Subcommand {
 
     private static void appendGameRepresentation(Game game, StringBuilder sb) {
         sb.append("- **").append(game.getName()).append("**").append(" ");
-        sb.append("`").append(game.getCreationDate()).append("`-`");
+        sb.append('`').append(game.getCreationDate()).append("`-`");
         if (game.isHasEnded()) {
             sb.append(Helper.getDateRepresentation(game.getEndedDate()));
         } else {
@@ -294,6 +294,6 @@ class SearchGames extends Subcommand {
         }
         sb.append(" [").append(game.getGameModesText()).append("] ");
         if (game.isHasEnded()) sb.append(" ENDED");
-        sb.append("\n");
+        sb.append('\n');
     }
 }

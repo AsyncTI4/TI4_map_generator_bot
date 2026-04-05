@@ -42,7 +42,7 @@ class FactionPerformanceStatisticsService {
                     String factionName =
                             factionModel != null ? factionModel.getFactionNameWithSourceEmoji() : entry.getKey();
                     String factionEmoji = FactionStatisticsHelper.getFactionEmoji(entry.getKey());
-                    sb.append("`")
+                    sb.append('`')
                             .append(StringUtils.leftPad(String.format("%.2f", entry.getValue()), 6))
                             .append("%` (")
                             .append(gameCount.getOrDefault(entry.getKey(), 0))
@@ -50,7 +50,7 @@ class FactionPerformanceStatisticsService {
                             .append(factionEmoji)
                             .append(" ")
                             .append(factionName)
-                            .append("\n");
+                            .append('\n');
                 });
 
         MessageHelper.sendMessageToThread(

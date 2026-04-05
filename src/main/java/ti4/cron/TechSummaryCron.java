@@ -77,7 +77,7 @@ public class TechSummaryCron {
             } else {
                 msg.append(" Did not resolve **Technology** ability");
             }
-            msg.append("\n");
+            msg.append('\n');
         }
 
         MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), msg.toString());

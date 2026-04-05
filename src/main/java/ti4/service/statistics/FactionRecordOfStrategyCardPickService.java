@@ -68,7 +68,7 @@ public class FactionRecordOfStrategyCardPickService {
         AtomicInteger index = new AtomicInteger(1);
 
         scsPicked.entrySet().stream().sorted(comparator).forEach(techResearched -> {
-            sb.append("`")
+            sb.append('`')
                     .append(Helper.leftpad(String.valueOf(index.get()), 3))
                     .append(". ");
             sb.append("` ").append(techResearched.getKey());
@@ -78,7 +78,7 @@ public class FactionRecordOfStrategyCardPickService {
                         .append(custodians.getOrDefault(techResearched.getKey(), 0))
                         .append(" times)");
             }
-            sb.append("\n");
+            sb.append('\n');
             index.getAndIncrement();
         });
 

@@ -3116,7 +3116,7 @@ public class Player extends PlayerProperties {
         StringBuilder sb = new StringBuilder();
         for (String id : getAbilities()) {
             AbilityModel model = Mapper.getAbility(id);
-            sb.append(model.getNameRepresentation()).append("\n");
+            sb.append(model.getNameRepresentation()).append('\n');
         }
         addFieldSafely(eb, "__Abilities__", sb.toString(), true);
 
@@ -3124,7 +3124,7 @@ public class Player extends PlayerProperties {
         sb = new StringBuilder();
         for (String id : getFactionTechs()) {
             TechnologyModel model = Mapper.getTech(id);
-            sb.append(model.getNameRepresentation()).append("\n");
+            sb.append(model.getNameRepresentation()).append('\n');
         }
         addFieldSafely(eb, "__Faction Technologies__", sb.toString(), true);
 
@@ -3132,7 +3132,7 @@ public class Player extends PlayerProperties {
         sb = new StringBuilder();
         for (String id : getTechs()) {
             TechnologyModel model = Mapper.getTech(id);
-            sb.append(model.getNameRepresentation()).append("\n");
+            sb.append(model.getNameRepresentation()).append('\n');
         }
         addFieldSafely(eb, "__Technologies__", sb.toString(), true);
 
@@ -3140,7 +3140,7 @@ public class Player extends PlayerProperties {
         sb = new StringBuilder();
         for (String id : getSpecialUnitsOwned()) {
             UnitModel model = Mapper.getUnit(id);
-            sb.append(model.getNameRepresentation()).append("\n");
+            sb.append(model.getNameRepresentation()).append('\n');
         }
         addFieldSafely(eb, "__Units__", sb.toString(), true);
 
@@ -3148,7 +3148,7 @@ public class Player extends PlayerProperties {
         sb = new StringBuilder();
         for (String id : getSpecialPromissoryNotesOwned()) {
             PromissoryNoteModel model = Mapper.getPromissoryNote(id);
-            sb.append(model.getNameRepresentation()).append("\n");
+            sb.append(model.getNameRepresentation()).append('\n');
         }
         addFieldSafely(eb, "__Promissory Notes__", sb.toString(), true);
 
@@ -3156,7 +3156,7 @@ public class Player extends PlayerProperties {
         sb = new StringBuilder();
         for (String id : getLeaderIDs()) {
             LeaderModel model = Mapper.getLeader(id);
-            sb.append(model.getNameRepresentation()).append("\n");
+            sb.append(model.getNameRepresentation()).append('\n');
         }
         addFieldSafely(eb, "__Leaders__", sb.toString(), false);
 

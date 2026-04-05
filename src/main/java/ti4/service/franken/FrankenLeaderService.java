@@ -58,7 +58,7 @@ public class FrankenLeaderService {
             Leader leader = new Leader(leaderID);
             sb.append("> ").append(Helper.getLeaderFullRepresentation(leader));
         }
-        sb.append("\n");
+        sb.append('\n');
         return sb.toString();
     }
 
@@ -72,7 +72,7 @@ public class FrankenLeaderService {
                 Leader leader = new Leader(leaderID);
                 sb.append("> ").append(Helper.getLeaderFullRepresentation(leader));
             }
-            sb.append("\n");
+            sb.append('\n');
             player.removeLeader(leaderID);
             game.setStoredValue(
                     "savedParadigms",

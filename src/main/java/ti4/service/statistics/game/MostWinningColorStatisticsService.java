@@ -26,15 +26,15 @@ class MostWinningColorStatisticsService {
                 game -> getWinningColor(game, winnerColorCount));
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Wins per Colour:").append("\n");
+        sb.append("Wins per Colour:").append('\n');
         winnerColorCount.entrySet().stream()
                 .filter(e -> Mapper.isValidColor(e.getKey()))
                 .sorted(Map.Entry.comparingByValue())
-                .forEach(entry -> sb.append("`")
+                .forEach(entry -> sb.append('`')
                         .append(StringUtils.leftPad(entry.getValue().toString(), 4))
                         .append("x` ")
                         .append(ColorEmojis.getColorEmojiWithName(entry.getKey()))
-                        .append("\n"));
+                        .append('\n'));
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Wins per Colour", sb.toString());
     }

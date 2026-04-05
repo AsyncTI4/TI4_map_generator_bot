@@ -704,7 +704,7 @@ public class StartCombatService {
                 pdsMessage
                         .append("> ")
                         .append(playerWithPds.getRepresentation())
-                        .append("\n");
+                        .append('\n');
             }
         }
         List<Button> spaceCannonButtons = getSpaceCannonButtons(game, activePlayer, tile);

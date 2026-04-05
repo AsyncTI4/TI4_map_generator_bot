@@ -25,7 +25,7 @@ class MostWinningFactionsStatisticsService {
                 game -> countFactionWins(game, factionToWinCount));
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Wins per Faction:").append("\n");
+        sb.append("Wins per Faction:").append('\n');
         factionToWinCount.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
                 .forEach(entry -> {
@@ -33,13 +33,13 @@ class MostWinningFactionsStatisticsService {
                     String factionName =
                             factionModel != null ? factionModel.getFactionNameWithSourceEmoji() : entry.getKey();
                     String factionEmoji = FactionStatisticsHelper.getFactionEmoji(entry.getKey());
-                    sb.append("`")
+                    sb.append('`')
                             .append(StringUtils.leftPad(entry.getValue().toString(), 4))
                             .append("x` ")
                             .append(factionEmoji)
                             .append(" ")
                             .append(factionName)
-                            .append("\n");
+                            .append('\n');
                 });
 
         MessageHelper.sendMessageToThread(

@@ -55,7 +55,7 @@ public class PuppetSoftHeBladeService {
         StringBuilder plotInfo = new StringBuilder("## __" + factionName + " plots are now revealed:__");
         for (String plotID : player.getPlotCards().keySet()) {
             GenericCardModel plot = Mapper.getPlot(plotID);
-            plotInfo.append("\n").append(plot.getRepresentation());
+            plotInfo.append('\n').append(plot.getRepresentation());
 
             List<String> puppetedFactions = player.getPuppetedFactionsForPlot(plotID);
             if (puppetedFactions != null && !puppetedFactions.isEmpty()) {

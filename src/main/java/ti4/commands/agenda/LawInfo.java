@@ -27,19 +27,19 @@ class LawInfo extends GameStateSubcommand {
                     stringBuilder
                             .append("> **Player Elected:** ")
                             .append(elected)
-                            .append("\n");
+                            .append('\n');
                 } else if (Mapper.isValidPlanet(agendaText)) {
                     var elected = Mapper.getPlanet(agendaText).getName();
                     stringBuilder
                             .append("> **Planet Elected:** ")
                             .append(elected)
-                            .append("\n");
+                            .append('\n');
                 } else if (Mapper.isValidSecretObjective(agendaText)) {
                     var elected = Mapper.getSecretObjective(agendaText).getName();
                     stringBuilder
                             .append("> **Objective Elected:** ")
                             .append(elected)
-                            .append("\n");
+                            .append('\n');
                 }
             }
             lawNumber++;

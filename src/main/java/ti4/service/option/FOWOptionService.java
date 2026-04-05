@@ -147,7 +147,7 @@ public class FOWOptionService {
                     .append(" **")
                     .append(option.getTitle())
                     .append("**\n");
-            sb.append("-# ").append(option.getDescription()).append("\n");
+            sb.append("-# ").append(option.getDescription()).append('\n');
 
             if (FOWPlusService.isActive(game)
                     && FOWPlusService.FORCED_FOWPLUS_OPTIONS.stream().anyMatch(p -> p.getLeft() == option)) {

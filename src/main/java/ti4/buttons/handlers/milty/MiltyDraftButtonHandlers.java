@@ -85,7 +85,7 @@ class MiltyDraftButtonHandlers {
                 if (item.startsWith("keleres"))
                     name = "The Council Keleres" + " " + Mapper.getFaction(item).getFactionEmoji();
                 msg.append(name);
-                msg.append("\n");
+                msg.append('\n');
             }
         } else {
             msg.append("You currently have no queued picks.");

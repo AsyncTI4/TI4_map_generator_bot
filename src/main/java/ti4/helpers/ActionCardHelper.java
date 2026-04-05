@@ -105,7 +105,7 @@ public class ActionCardHelper {
         sb.append("### ")
                 .append(MiscEmojis.LegendaryPlanet)
                 .append(" _Dok 'N Pic's Salvage Yard_ Action Cards:")
-                .append("\n");
+                .append('\n');
 
         Map<String, Integer> actionCards = game.getDiscardActionCards();
         if (actionCards == null || actionCards.isEmpty()) {
@@ -120,7 +120,7 @@ public class ActionCardHelper {
 
             Integer value = ac.getValue();
             ActionCardModel actionCard = Mapper.getActionCard(ac.getKey());
-            sb.append("`")
+            sb.append('`')
                     .append(index)
                     .append(".")
                     .append(Helper.leftpad("(" + value, 4))
@@ -176,7 +176,7 @@ public class ActionCardHelper {
                 if (location != null) {
                     sb.append("\nLOCATION: ").append(location.getRepresentationForButtons());
                 }
-                sb.append("\n");
+                sb.append('\n');
             }
 
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
@@ -185,8 +185,8 @@ public class ActionCardHelper {
 
     private static String getTrapCardInfo(Player player) {
         StringBuilder sb = new StringBuilder();
-        sb.append("\n");
-        sb.append("Trap Cards:").append("\n");
+        sb.append('\n');
+        sb.append("Trap Cards:").append('\n');
         int index = 1;
         Map<String, Integer> trapCards = player.getTrapCards();
         Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
@@ -222,7 +222,7 @@ public class ActionCardHelper {
             }
             sb.append("\n> Planet: ").append(representation);
         }
-        sb.append("\n");
+        sb.append('\n');
         return sb.toString();
     }
 
@@ -292,21 +292,21 @@ public class ActionCardHelper {
                     GenericCardModel plot = plotEntry.getValue();
                     Integer value = plotEntry.getKey();
                     List<String> factions = player.getPuppetedFactionsForPlot(plot.getAlias());
-                    sb.append("`").append(Helper.leftpad("(" + value, 3)).append(")`");
+                    sb.append('`').append(Helper.leftpad("(" + value, 3)).append(")`");
                     sb.append(getPlotCardRepresentation(game, plot, factions));
                 });
         return sb.toString();
     }
 
     private static String getPlotCardRepresentation(Game game, GenericCardModel plot, List<String> factions) {
-        StringBuilder sb = new StringBuilder(plot.getRepresentation()).append("\n");
+        StringBuilder sb = new StringBuilder(plot.getRepresentation()).append('\n');
         if (factions != null) {
             List<String> factionEmojis = factions.stream()
                     .map(game::getPlayerFromColorOrFaction)
                     .filter(Objects::nonNull)
                     .map(Player::fogSafeEmoji)
                     .toList();
-            sb.append("> ").append(String.join(", ", factionEmojis)).append("\n");
+            sb.append("> ").append(String.join(", ", factionEmojis)).append('\n');
         }
         return sb.toString();
     }
@@ -320,7 +320,7 @@ public class ActionCardHelper {
                 .append("/")
                 .append(ButtonHelper.getACLimit(game, player))
                 .append("):")
-                .append("\n");
+                .append('\n');
         int index = 1;
 
         Map<String, Integer> actionCards = player.getActionCards();
@@ -347,7 +347,7 @@ public class ActionCardHelper {
                         .append(actionCard.getWindow())
                         .append(": ")
                         .append(actionCard.getText())
-                        .append("\n");
+                        .append('\n');
                 if (actionCard.getNotes() != null) {
                     sb.append("> -# [").append(actionCard.getNotes()).append("]\n");
                 }
@@ -2023,16 +2023,16 @@ public class ActionCardHelper {
         StringBuilder sa = new StringBuilder();
         sa.append("Your action cards were shown to: ")
                 .append(game.isFowMode() ? "Someone" : player_.getUserName())
-                .append("\n");
+                .append('\n');
         sa.append(
                 "Action cards were presented in the order below. You may reference the number listed when discussing the cards:\n");
-        sb.append("Game: ").append(game.getName()).append("\n");
+        sb.append("Game: ").append(game.getName()).append('\n');
         sb.append("Player: ")
                 .append(game.isFowMode() ? player.getColor() : player.getUserName())
-                .append("\n");
+                .append('\n');
         sb.append(
                         "Showed Action Cards, they were also presented the cards in the order you see them so you may reference the number when talking to them:")
-                .append("\n");
+                .append('\n');
         List<String> actionCards = new ArrayList<>(player.getActionCards().keySet());
         Collections.shuffle(actionCards);
         int index = 1;
@@ -2040,11 +2040,11 @@ public class ActionCardHelper {
             sa.append(index)
                     .append("\\. ")
                     .append(Mapper.getActionCard(id).getRepresentation())
-                    .append("\n");
+                    .append('\n');
             sb.append(index)
                     .append("\\. ")
                     .append(Mapper.getActionCard(id).getRepresentation())
-                    .append("\n");
+                    .append('\n');
             index++;
         }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, sa.toString());
@@ -2061,7 +2061,7 @@ public class ActionCardHelper {
         List<Map.Entry<String, List<String>>> displayOrder = new ArrayList<>(cardsByName.entrySet());
         displayOrder.sort(Map.Entry.comparingByKey());
         for (Map.Entry<String, List<String>> acEntryList : displayOrder) {
-            sb.append("\n").append(index).append("\\. ");
+            sb.append('\n').append(index).append("\\. ");
             index++;
             sb.append(CardEmojis.ActionCard.toString()
                     .repeat(acEntryList.getValue().size()));

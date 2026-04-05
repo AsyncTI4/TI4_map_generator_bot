@@ -363,7 +363,7 @@ public class ButtonHelper {
             if (revive == 0) {
                 message.append("\nNone of your infantry revived.");
             } else {
-                message.append("\n")
+                message.append('\n')
                         .append(failed == 0 ? "All " : "")
                         .append(
                                 revive <= 10
@@ -937,7 +937,7 @@ public class ButtonHelper {
                 .append(player.getUserName())
                 .append(" from game: ")
                 .append(game.getName())
-                .append("\n");
+                .append('\n');
     }
 
     @ButtonHandler("eliminatePlayer_")
@@ -3323,7 +3323,7 @@ public class ButtonHelper {
             } else {
                 sb.append(StringUtils.capitalize(representation));
             }
-            sb.append("\n");
+            sb.append('\n');
             if (!justUnits) {
                 boolean hasCC = false;
                 for (String cc : unitHolder.getCcList()) {
@@ -3334,7 +3334,7 @@ public class ButtonHelper {
                     appendFactionIcon(game, sb, cc, privateGame);
                 }
                 if (hasCC) {
-                    sb.append("\n");
+                    sb.append('\n');
                 }
                 boolean hasToken = false;
                 Map<String, String> tokensToName = Mapper.getTokensToName();
@@ -3352,7 +3352,7 @@ public class ButtonHelper {
                     }
                 }
                 if (hasToken) {
-                    sb.append("\n");
+                    sb.append('\n');
                 }
                 boolean hasControl = false;
                 for (String control : unitHolder.getControlList()) {
@@ -3363,7 +3363,7 @@ public class ButtonHelper {
                     appendFactionIcon(game, sb, control, privateGame);
                 }
                 if (hasControl) {
-                    sb.append("\n");
+                    sb.append('\n');
                 }
             }
 
@@ -3381,9 +3381,9 @@ public class ButtonHelper {
                     if (unitModel != null) {
                         sb.append(unitModel.getUnitEmoji()).append(" ");
                         sb.append(privateGame ? unitModel.getBaseType() : unitModel.getName())
-                                .append("\n");
+                                .append('\n');
                     } else {
-                        sb.append(unitKey).append("\n");
+                        sb.append(unitKey).append('\n');
                     }
                 }
             }
@@ -6036,7 +6036,7 @@ public class ButtonHelper {
                     AddUnitService.addUnits(event, tile, game, player.getColor(), numMechs + " infantry" + planetName);
 
                     successMessageBuilder
-                            .append("\n")
+                            .append('\n')
                             .append(player.getFactionEmoji())
                             .append(" placed ")
                             .append(numMechs)
@@ -6577,7 +6577,7 @@ public class ButtonHelper {
                     .append(" ")
                     .append(damaged)
                     .append(rep)
-                    .append("\n");
+                    .append('\n');
         }
         List<Button> systemButtons = buttons;
         event.getMessage()
@@ -7273,7 +7273,7 @@ public class ButtonHelper {
             if (issue.contrast < 2) {
                 sb.append("(very bad!)");
             }
-            sb.append("\n");
+            sb.append('\n');
         }
 
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), sb.toString());

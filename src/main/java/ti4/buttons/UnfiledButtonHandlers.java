@@ -1021,7 +1021,7 @@ public class UnfiledButtonHandlers {
                             .append(" currently has ")
                             .append(ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(
                                     game, p2, planet))
-                            .append("\n");
+                            .append('\n');
                     break;
                 }
             }
@@ -1037,7 +1037,7 @@ public class UnfiledButtonHandlers {
                     } else {
                         String asyncID = assignedUnit.split("_")[0];
                         UnitModel mod = player.getUnitFromAsyncID(asyncID);
-                        summary.append("- ").append(mod.getUnitEmoji()).append("\n");
+                        summary.append("- ").append(mod.getUnitEmoji()).append('\n');
                     }
                 }
             }

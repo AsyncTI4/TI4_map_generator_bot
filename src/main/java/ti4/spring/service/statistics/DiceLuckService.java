@@ -76,7 +76,7 @@ public class DiceLuckService {
         StringBuilder sb = new StringBuilder("## __**Dice Luck**__\n");
         int index = 1;
         for (var diceLuckAccumulator : diceLuckAccumulators) {
-            sb.append("`")
+            sb.append('`')
                     .append(Helper.leftpad(String.valueOf(index), 3))
                     .append(". ")
                     .append(String.format("%.2f", diceLuckAccumulator.getActualHitsOutOfExpected()))

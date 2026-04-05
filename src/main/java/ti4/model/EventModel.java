@@ -97,12 +97,12 @@ public class EventModel implements ModelInterface, EmbeddableModel {
         }
         sb.append(name).append("__** ");
         sb.append(source.emoji());
-        sb.append("\n");
+        sb.append('\n');
 
         sb.append("> **").append(type).append(":** *").append(target).append("*\n");
         if (!getText().isEmpty()) {
             String arg = getText().replace("For:", "**For:**");
-            sb.append("> ").append(arg).append("\n");
+            sb.append("> ").append(arg).append('\n');
         }
 
         return sb.toString();

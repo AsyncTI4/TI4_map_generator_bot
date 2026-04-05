@@ -45,7 +45,7 @@ public class AbilityDraftItem extends DraftItem {
         AbilityModel abilityModel = getAbilityModel();
         StringBuilder sb = new StringBuilder();
         if (abilityModel.getPermanentEffect().isPresent()) {
-            sb.append(abilityModel.getPermanentEffect().get()).append("\n");
+            sb.append(abilityModel.getPermanentEffect().get()).append('\n');
         }
         if (abilityModel.getWindow().isPresent()
                 && abilityModel.getWindowEffect().isPresent()) {

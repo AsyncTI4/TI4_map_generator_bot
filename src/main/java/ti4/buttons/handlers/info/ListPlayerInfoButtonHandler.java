@@ -106,7 +106,7 @@ class ListPlayerInfoButtonHandler {
                     }
                     for (String planet : p2.getPlanets()) {
                         sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game))
-                                .append("\n");
+                                .append('\n');
                     }
                     for (String tech : p2.getTechs()) {
                         messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
@@ -149,7 +149,7 @@ class ListPlayerInfoButtonHandler {
                 case "planet" -> {
                     for (String planet : p2.getPlanets()) {
                         sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game))
-                                .append("\n");
+                                .append('\n');
                     }
                 }
                 case "pn" -> {

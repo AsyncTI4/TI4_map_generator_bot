@@ -103,7 +103,7 @@ public class SecretObjectiveInfoService {
                 .append("/")
                 .append(player.getMaxSOCount())
                 .append("):")
-                .append("\n");
+                .append('\n');
         if (scoredSecretObjective.isEmpty()) {
             sb.append("> None");
         } else {
@@ -120,10 +120,10 @@ public class SecretObjectiveInfoService {
                 index++;
             }
         }
-        sb.append("\n");
+        sb.append('\n');
 
         // UNSCORED SECRET OBJECTIVES
-        sb.append("__Unscored Secret Objectives:__").append("\n");
+        sb.append("__Unscored Secret Objectives:__").append('\n');
         if (secretObjective != null) {
             if (secretObjective.isEmpty()) {
                 sb.append("> None");
@@ -154,7 +154,7 @@ public class SecretObjectiveInfoService {
                     if (soModel.getNotes() != null) {
                         sb.append("\n> -# [").append(soModel.getNotes()).append("]");
                     }
-                    sb.append("\n");
+                    sb.append('\n');
                 }
             }
         }
@@ -169,7 +169,7 @@ public class SecretObjectiveInfoService {
                 .append("_")
                 .append(soName)
                 .append("_")
-                .append("\n");
+                .append('\n');
         return sb.toString();
     }
 
@@ -199,7 +199,7 @@ public class SecretObjectiveInfoService {
             sb.append("\n> -# [").append(so.getNotes()).append("]");
         }
         if (newLine) {
-            sb.append("\n");
+            sb.append('\n');
         }
         return sb.toString();
     }

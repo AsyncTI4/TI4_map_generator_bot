@@ -34,8 +34,8 @@ public class ListTurnOrderService {
 
         StringBuilder msg = new StringBuilder("__Turn Order:__\n");
         for (Player p : game.getActionPhaseTurnOrder()) {
-            msg.append("`").append(p.getInitiative()).append(".`");
-            msg.append(buildPlayerScText(game, p, pingPeople)).append("\n");
+            msg.append('`').append(p.getInitiative()).append(".`");
+            msg.append(buildPlayerScText(game, p, pingPeople)).append('\n');
         }
         msg.append("_ _"); // forced extra line
 

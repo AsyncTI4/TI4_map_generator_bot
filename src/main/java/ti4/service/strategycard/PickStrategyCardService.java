@@ -33,7 +33,7 @@ public class PickStrategyCardService {
             maxSCsPerPlayer = 1;
         }
         if (!game.getStoredValue("exhaustedSC" + scPicked).isEmpty()) {
-            game.setSCPlayed(scPicked, true);
+            game.setSCPlayed(scPicked, Boolean.TRUE);
         }
 
         boolean nextCorrectPing = false;

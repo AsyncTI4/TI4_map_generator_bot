@@ -87,10 +87,10 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
                     .append(spaceCannonHitsOn)
                     .append("x")
                     .append(spaceCannonDieCount)
-                    .append("\n");
-        if (abilityText != null) sb.append("Ability: ").append(abilityText).append("\n");
+                    .append('\n');
+        if (abilityText != null) sb.append("Ability: ").append(abilityText).append('\n');
         if (getToken().isPresent())
-            sb.append("Token: ").append(getToken().get()).append("\n");
+            sb.append("Token: ").append(getToken().get()).append('\n');
         if (isFakeAttachment != null) sb.append("(fake attachment)\n");
         eb.setDescription(sb.toString());
 

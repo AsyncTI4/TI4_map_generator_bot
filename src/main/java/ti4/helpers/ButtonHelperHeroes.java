@@ -470,7 +470,7 @@ public final class ButtonHelperHeroes {
                     .append(x)
                     .append(". ")
                     .append(Mapper.getRelic(relic).getName())
-                    .append("\n");
+                    .append('\n');
         }
         int size = revealedRelics.size();
         MessageHelper.sendMessageToChannel(
@@ -1500,7 +1500,7 @@ public final class ButtonHelperHeroes {
             boolean content = false;
             message.append("### Resolving for tile ")
                     .append(tile.getRepresentationForButtons())
-                    .append("\n");
+                    .append('\n');
             for (Player p2 : game.getRealPlayersNNeutral()) {
                 if (p2 == player) {
                     continue;
@@ -1576,7 +1576,7 @@ public final class ButtonHelperHeroes {
                                     totalLosses.get(p2.getFactionEmoji()).add(unitModel.getUnitEmoji());
                                 }
                             }
-                            message.append("\n");
+                            message.append('\n');
                             content = true;
                         }
                         if (totalUnits > damagedUnits) {
@@ -1605,7 +1605,7 @@ public final class ButtonHelperHeroes {
                                     totalLosses.get(p2.getFactionEmoji()).add(unitModel.getUnitEmoji());
                                 }
                             }
-                            message.append("\n");
+                            message.append('\n');
                             content = true;
                         }
                     }

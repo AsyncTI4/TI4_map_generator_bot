@@ -26,12 +26,12 @@ class MostPlayedFactionsStatisticsService {
                 GameStatisticsFilterer.getGamesFilter(event), game -> calculate(game, factionCount, custodians));
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Plays per Faction:").append("\n");
+        sb.append("Plays per Faction:").append('\n');
         factionCount.entrySet().stream().sorted(Map.Entry.comparingByValue()).forEach(entry -> {
             FactionModel factionModel = Mapper.getFaction(entry.getKey());
             String factionName = factionModel != null ? factionModel.getFactionNameWithSourceEmoji() : entry.getKey();
             String factionEmoji = FactionStatisticsHelper.getFactionEmoji(entry.getKey());
-            sb.append("`")
+            sb.append('`')
                     .append(StringUtils.leftPad(entry.getValue().toString(), 4))
                     .append("x` ")
                     .append(factionEmoji)
@@ -42,7 +42,7 @@ class MostPlayedFactionsStatisticsService {
                     .append(" times, or ")
                     .append((float) custodians.getOrDefault(entry.getKey(), 0) / entry.getValue())
                     .append(")")
-                    .append("\n");
+                    .append('\n');
         });
 
         MessageHelper.sendMessageToThread(

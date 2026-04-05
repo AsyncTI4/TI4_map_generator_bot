@@ -49,7 +49,7 @@ class ListButtons extends Subcommand {
 
                     StringBuilder sb = new StringBuilder("Button details:\n>>> ");
                     for (Button b : msg.getComponentTree().findAll(Button.class)) {
-                        sb.append(ButtonHelper.getButtonRepresentation(b)).append("\n");
+                        sb.append(ButtonHelper.getButtonRepresentation(b)).append('\n');
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
                 });

@@ -788,7 +788,7 @@ public class PlayHeroService {
                         .append(CardEmojis.getACEmoji(game))
                         .append(" ")
                         .append(acName)
-                        .append("\n");
+                        .append('\n');
                 game.discardActionCard(player.getUserID(), acID);
                 cardsToShuffleBackIntoDeck.add(acKey);
             }
@@ -830,7 +830,7 @@ public class PlayHeroService {
                             .append(CardEmojis.getACEmoji(game))
                             .append(" ")
                             .append(acName)
-                            .append("\n");
+                            .append('\n');
                     game.discardActionCard(player.getUserID(), acID);
                     cardsToShuffleBackIntoDeck.add(acKey);
                 }

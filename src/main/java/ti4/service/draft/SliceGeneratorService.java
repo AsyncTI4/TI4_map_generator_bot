@@ -146,17 +146,17 @@ public class SliceGeneratorService {
             sb.append("Milty draft took a while... jazz, take a look:\n");
             sb.append("`        Elapsed time:` ")
                     .append(DateTimeHelper.getTimeRepresentationNanoSeconds(elapsed))
-                    .append("\n");
+                    .append('\n');
             sb.append("`           Quit time:` ")
                     .append(DateTimeHelper.getTimeRepresentationNanoSeconds(quitDiff))
-                    .append("\n");
-            sb.append("`    Number of cycles:` ").append(i).append("\n");
+                    .append('\n');
+            sb.append("`    Number of cycles:` ").append(i).append('\n');
             for (Map.Entry<String, Integer> reason : reasons.entrySet()) {
-                sb.append("`")
+                sb.append('`')
                         .append(Helper.leftpad(reason.getKey(), 15))
                         .append(" fail:` ")
                         .append(reason.getValue())
-                        .append("\n");
+                        .append('\n');
             }
             BotLogger.warning(new LogOrigin(event), sb.toString());
         }

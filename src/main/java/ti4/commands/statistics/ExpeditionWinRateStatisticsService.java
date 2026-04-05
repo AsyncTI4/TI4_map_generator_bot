@@ -56,20 +56,20 @@ class ExpeditionWinRateStatisticsService {
                 .append(e.getKey())
                 .append(": ")
                 .append(e.getValue())
-                .append("\n"));
+                .append('\n'));
 
         sb.append("\n**By number of expeditions completed**\n");
         expeditionCountStats.entrySet().stream().sorted(Entry.comparingByKey()).forEach(entry -> sb.append("- ")
                 .append(entry.getKey())
                 .append(" expeditions: ")
                 .append(entry.getValue())
-                .append("\n"));
+                .append('\n'));
 
         sb.append("\n**Who completed the last expedition**\n");
-        sb.append("- ").append(lastExpeditionStats).append("\n");
+        sb.append("- ").append(lastExpeditionStats).append('\n');
 
         sb.append("\n**Who controls Thunder's Edge**\n");
-        sb.append("- ").append(thundersEdgeControlStats).append("\n");
+        sb.append("- ").append(thundersEdgeControlStats).append('\n');
 
         sb.append("\n**Expedition win rate by faction**\n");
         combineObsidianFirmament(factionExpeditionStats);
@@ -89,7 +89,7 @@ class ExpeditionWinRateStatisticsService {
                                     .append(e2.getKey())
                                     .append(": ")
                                     .append(e2.getValue())
-                                    .append("\n"));
+                                    .append('\n'));
                 });
 
         sb.append("\n**Expedition completion rate**\n");

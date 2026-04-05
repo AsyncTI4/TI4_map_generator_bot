@@ -285,7 +285,7 @@ public class EndGameService {
                     summary.append(RoundSummaryHelper.resolvePlayerEmoji(player))
                             .append(": ")
                             .append(game.getStoredValue(summaryKey))
-                            .append("\n");
+                            .append('\n');
                 }
             }
             if (!summary.isEmpty()) {
@@ -335,14 +335,14 @@ public class EndGameService {
         if (!game.getCustomName().isEmpty()) {
             sb.append(" - ").append(game.getCustomName());
         }
-        sb.append("\n");
+        sb.append('\n');
         sb.append("**Duration:** ");
         sb.append(game.getCreationDate())
                 .append(" - ")
                 .append(Helper.getDateRepresentation(game.getLastModifiedDate()));
-        sb.append("\n");
-        sb.append("\n");
-        sb.append("**Players:**").append("\n");
+        sb.append('\n');
+        sb.append('\n');
+        sb.append("**Players:**").append('\n');
         int index = 1;
         for (Player player : game.getRealAndEliminatedPlayers()) {
             sb.append("> `").append(index).append(".` ");
@@ -361,18 +361,18 @@ public class EndGameService {
                     if (winner2 == player) sb.append(" **👑WINNER👑**");
                 }
             }
-            sb.append("\n");
+            sb.append('\n');
             index++;
         }
 
-        sb.append("\n");
+        sb.append('\n');
         if (game.isFowMode()) {
             sb.append("**GM:** ");
             for (Player gm : game.getPlayersWithGMRole()) {
                 appendUserName(sb, gm);
                 sb.append(" ");
             }
-            sb.append("\n");
+            sb.append('\n');
         }
 
         String gameModesText = game.getGameModesText();
@@ -383,12 +383,12 @@ public class EndGameService {
                 .append(", ")
                 .append(vpCount)
                 .append(" victory points")
-                .append("\n");
+                .append('\n');
 
         var winner = game.getWinner();
         if (winner.isPresent() && game.isNormalGame()) {
             String winningPath = WinningPathHelper.buildWinningPath(game, winner.get());
-            sb.append("**Winning Path:** ").append(winningPath).append("\n");
+            sb.append("**Winning Path:** ").append(winningPath).append('\n');
             String comparison = WinningPathComparisonService.compareWinningPathToAllOthers(
                     winningPath, game.getRealAndEliminatedPlayers().size(), vpCount);
             sb.append(comparison);

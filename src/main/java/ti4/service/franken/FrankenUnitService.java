@@ -49,7 +49,7 @@ public class FrankenUnitService {
                 player.addOwnedUnitByID("naaz_mech_space");
                 sb.append("> naaz_mech_space");
             }
-            sb.append("\n");
+            sb.append('\n');
         }
         MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }
@@ -62,7 +62,7 @@ public class FrankenUnitService {
             } else {
                 sb.append("> ").append(unitID);
             }
-            sb.append("\n");
+            sb.append('\n');
             player.removeOwnedUnitByID(unitID);
             UnitModel u = Mapper.getUnit(unitID);
             if (u.getUnitType() != UnitType.Flagship && u.getUnitType() != UnitType.Mech) {

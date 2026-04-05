@@ -276,14 +276,14 @@ class Stats extends GameStateSubcommand {
             if (sc > 0) {
                 Boolean scIsPlayed = game.getScPlayed().get(sc);
                 if (scIsPlayed == null || !scIsPlayed) {
-                    game.setSCPlayed(sc, true);
+                    game.setSCPlayed(sc, Boolean.TRUE);
                     message.append("> flipped ")
                             .append(CardEmojis.getSCFrontFromInteger(sc))
                             .append(" to ")
                             .append(CardEmojis.getSCBackFromInteger(sc))
                             .append(" (played)");
                 } else {
-                    game.setSCPlayed(sc, false);
+                    game.setSCPlayed(sc, Boolean.FALSE);
                     for (Player player_ : game.getPlayers().values()) {
                         if (!player_.isRealPlayer()) {
                             continue;

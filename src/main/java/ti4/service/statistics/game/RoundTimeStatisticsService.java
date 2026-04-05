@@ -24,14 +24,14 @@ class RoundTimeStatisticsService {
                 GameStatisticsFilterer.getGamesFilter(event), game -> getRoundTimes(game, timeCount, amountCount));
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Time Per Phase:").append("\n");
+        sb.append("Time Per Phase:").append('\n');
         timeCount.forEach((key, value) -> sb.append(key)
                 .append(": ")
                 .append(StringUtils.leftPad(convertMillisecondsToDays((float) value / amountCount.get(key)), 4))
                 .append(" days (based on ")
                 .append(amountCount.get(key))
                 .append(" games)")
-                .append("\n"));
+                .append('\n'));
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Time per Phase", sb.toString());
     }

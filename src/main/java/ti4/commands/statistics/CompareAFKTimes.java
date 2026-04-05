@@ -53,12 +53,12 @@ class CompareAFKTimes extends Subcommand {
                                 .append(player.getName())
                                 .append(" afk hours are: ")
                                 .append(afkTime.replace(";", ", "))
-                                .append("\n");
+                                .append('\n');
                     } else {
                         stringBuilder
                                 .append("AFK hours are not set for: ")
                                 .append(player.getName())
-                                .append("\n");
+                                .append('\n');
                     }
                 });
 

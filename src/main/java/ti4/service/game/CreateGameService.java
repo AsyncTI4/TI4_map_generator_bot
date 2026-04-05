@@ -433,10 +433,10 @@ public class CreateGameService {
                     "### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join our **");
             sb.append(guild.getName()).append("** server.\n");
             sb.append(Helper.getGuildInviteURL(guild, missingMembers.size() + 15))
-                    .append("\n");
+                    .append('\n');
             sb.append("The following players need to join the server:\n");
             for (Member member : missingMembers) {
-                sb.append("> ").append(member.getAsMention()).append("\n");
+                sb.append("> ").append(member.getAsMention()).append('\n');
             }
             sb.append("You will be automatically added to the game channels when you join the server.");
             MessageHelper.sendMessageToChannel(channel, sb.toString());

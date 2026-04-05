@@ -63,12 +63,12 @@ public class FactionRecordOfTechService {
         AtomicInteger index = new AtomicInteger(1);
 
         techsResearched.entrySet().stream().sorted(comparator).forEach(techResearched -> {
-            sb.append("`")
+            sb.append('`')
                     .append(Helper.leftpad(String.valueOf(index.get()), 3))
                     .append(". ");
             sb.append("` ").append(techResearched.getKey());
             sb.append(": ").append(techResearched.getValue());
-            sb.append("\n");
+            sb.append('\n');
             index.getAndIncrement();
         });
 

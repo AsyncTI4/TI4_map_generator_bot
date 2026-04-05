@@ -150,7 +150,7 @@ public class PlayStrategyCardService {
             }
 
             if (!winnuHero) {
-                game.setSCPlayed(scToPlay, true);
+                game.setSCPlayed(scToPlay, Boolean.TRUE);
                 // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
                 if (scModel.hasImageFile()) {
                     MessageHelper.sendMessageToChannel(mainGameChannel, scModel.getImageFileUrl());
@@ -607,7 +607,7 @@ public class PlayStrategyCardService {
                         StringBuilder playerOrder =
                                 new StringBuilder("__Order for performing the secondary ability:__\n");
                         for (int i = 0; i < playersInOrder.size(); i++) {
-                            playerOrder.append("`").append(i + 1).append(".` ");
+                            playerOrder.append('`').append(i + 1).append(".` ");
                             if (game.hasFullPriorityTrackMode() && "action".equals(game.getPhaseOfGame())) {
                                 int lowestSC = playersInOrder.get(i).getLowestSC();
                                 TI4Emoji scEmoji = CardEmojis.getSCFrontFromInteger(lowestSC);
@@ -617,7 +617,7 @@ public class PlayStrategyCardService {
                             if (playersInOrder.get(i).isSpeaker()) {
                                 playerOrder.append(MiscEmojis.SpeakerToken);
                             }
-                            playerOrder.append("\n");
+                            playerOrder.append('\n');
                         }
                         MessageHelper.sendMessageToChannel(m5, playerOrder.toString());
                     }

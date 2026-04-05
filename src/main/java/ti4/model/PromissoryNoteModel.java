@@ -170,7 +170,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         StringBuilder footer = new StringBuilder();
         if (includeHelpfulText) {
             if (!StringUtils.isBlank(getAttachment().orElse("")))
-                footer.append("Attachment: ").append(getAttachment().orElse("")).append("\n");
+                footer.append("Attachment: ").append(getAttachment().orElse("")).append('\n');
             if (getPlayArea()) {
                 footer.append("Play area card. ");
                 if (isPlayedDirectlyToPlayArea()) {
@@ -178,7 +178,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
                 } else {
                     footer.append("Must be played from hand to enter play area.");
                 }
-                footer.append("\n");
+                footer.append('\n');
             }
         }
         if (includeID) {
@@ -186,7 +186,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
                     .append(alias)
                     .append("    Source: ")
                     .append(source)
-                    .append("\n");
+                    .append('\n');
         }
         eb.setFooter(footer.toString());
 

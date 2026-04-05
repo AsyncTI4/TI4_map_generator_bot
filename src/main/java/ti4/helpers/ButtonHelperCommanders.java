@@ -204,7 +204,7 @@ public class ButtonHelperCommanders {
         List<String> techsSummed = getVeldyrCommanderTechs(player, game, true);
         for (String tech : techsSummed) {
             TechnologyModel model = Mapper.getTech(tech);
-            summary.append(model.getRepresentation(false)).append("\n");
+            summary.append(model.getRepresentation(false)).append('\n');
         }
         if (!techsSummed.isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), summary.toString());
@@ -251,7 +251,7 @@ public class ButtonHelperCommanders {
         List<String> techsSummed = getVeldyrCommanderTechs(player, game, false);
         for (String tech : techsSummed) {
             TechnologyModel model = Mapper.getTech(tech);
-            summary.append(model.getRepresentation(false)).append("\n");
+            summary.append(model.getRepresentation(false)).append('\n');
         }
         if (!techsSummed.isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), summary.toString());
