@@ -32,7 +32,7 @@ class ListSpends extends GameStateSubcommand {
         for (Player player : game.getPlayers().values()) {
             if (!player.isRealPlayer()) continue;
             String turnString = playerSpends(player);
-            message.append("\n").append(turnString);
+            message.append('\n').append(turnString);
         }
 
         MessageHelper.replyToMessage(event, message.toString());

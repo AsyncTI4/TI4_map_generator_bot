@@ -165,7 +165,7 @@ class GameUndoService {
                     .append(latestUndoIndex - i)
                     .append("` ")
                     .append(undoCommands.get(i))
-                    .append("\n");
+                    .append('\n');
         }
         ButtonHelper.findOrCreateThreadWithMessage(game, gameName + "-undo-log", sb.toString());
     }

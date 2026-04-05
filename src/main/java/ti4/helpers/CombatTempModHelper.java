@@ -3,6 +3,7 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.experimental.UtilityClass;
 import ti4.image.Mapper;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
@@ -12,9 +13,10 @@ import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.TileModel;
 import ti4.service.combat.CombatRollType;
 
-public final class CombatTempModHelper {
+@UtilityClass
+public class CombatTempModHelper {
 
-    public static void InitializeNewTempMods(Player player, TileModel tile, UnitHolder holder) {
+    public static void initializeNewTempMods(Player player, TileModel tile, UnitHolder holder) {
         List<TemporaryCombatModifierModel> unusedMods = player.getNewTempCombatModifiers();
         unusedMods = unusedMods.stream()
                 .filter(mod -> mod.getUseInTurn() == player.getNumberOfTurns())
@@ -27,7 +29,7 @@ public final class CombatTempModHelper {
         player.clearNewTempCombatModifiers();
     }
 
-    public static void EnsureValidTempMods(Player player, TileModel tile, UnitHolder holder) {
+    public static void ensureValidTempMods(Player player, TileModel tile, UnitHolder holder) {
         List<TemporaryCombatModifierModel> tempMods = new ArrayList<>(player.getTempCombatModifiers());
 
         for (TemporaryCombatModifierModel mod : tempMods) {
@@ -52,9 +54,9 @@ public final class CombatTempModHelper {
         }
     }
 
-    public static List<NamedCombatModifierModel> BuildCurrentRoundTempNamedModifiers(
-            Player player, TileModel tile, UnitHolder holder, Boolean isApplyToOpponent, CombatRollType rollType) {
-        EnsureValidTempMods(player, tile, holder);
+    public static List<NamedCombatModifierModel> buildCurrentRoundTempNamedModifiers(
+            Player player, TileModel tile, UnitHolder holder, boolean isApplyToOpponent, CombatRollType rollType) {
+        ensureValidTempMods(player, tile, holder);
         List<TemporaryCombatModifierModel> tempMods = new ArrayList<>(player.getTempCombatModifiers());
         List<NamedCombatModifierModel> currentRoundResults = new ArrayList<>();
         for (TemporaryCombatModifierModel mod : tempMods) {

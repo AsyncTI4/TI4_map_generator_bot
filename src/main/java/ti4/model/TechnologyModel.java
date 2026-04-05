@@ -267,7 +267,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         sb.append(techEmoji).append("_").append(techName).append("_").append(factionEmoji);
         sb.append(source.emoji());
         if (includeCardText) {
-            sb.append("\n> ").append(text.replace("\n", "\n> ")).append("\n");
+            sb.append("\n> ").append(text.replace("\n", "\n> ")).append('\n');
             if (notes != null) {
                 sb.append("> -# [").append(notes.replace("\n", "\n> -# ")).append("]\n");
             }

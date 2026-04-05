@@ -1,7 +1,7 @@
 package ti4.commands.special;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -48,18 +48,16 @@ public class SetupNeutralPlayer extends GameStateSubcommand {
         if (unusedColors.contains("gray")) {
             return "gray";
         }
-        Random random = new Random();
-        String colour;
-        for (int i = 0; i < 10; i++) {
-            int randomIndex = random.nextInt(unusedColors.size());
-            colour = unusedColors.get(randomIndex);
-            if (!colour.contains("split")) {
-                return colour;
+
+        Collections.shuffle(unusedColors);
+
+        for (String color : unusedColors) {
+            if (!color.contains("split")) {
+                return color;
             }
         }
-        int randomIndex = random.nextInt(unusedColors.size());
-        colour = unusedColors.get(randomIndex);
-        return colour;
+
+        return unusedColors.getFirst();
     }
 
     private static List<String> getUnusedColors(Game game) {

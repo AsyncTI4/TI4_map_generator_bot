@@ -119,16 +119,16 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         }
         sb.append(name).append("__** ");
         sb.append(source.emoji());
-        sb.append("\n");
+        sb.append('\n');
 
         sb.append("> **").append(type).append(":** *").append(target).append("*\n");
         if (!getText1().isEmpty()) {
             String arg = getText1().replace("For:", "**For:**");
-            sb.append("> ").append(arg).append("\n");
+            sb.append("> ").append(arg).append('\n');
         }
         if (!getText2().isEmpty()) {
             String arg = getText2().replace("Against:", "**Against:**");
-            sb.append("> ").append(arg).append("\n");
+            sb.append("> ").append(arg).append('\n');
         }
         if (notes != null) {
             sb.append("> -# [").append(notes).append("]\n");
@@ -156,11 +156,11 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         StringBuilder text = new StringBuilder("**" + getType() + ":** *" + getTarget() + "*\n");
         if (!getText1().isEmpty()) {
             String arg = getText1().replace("For:", "__**For:**__");
-            text.append(arg).append("\n");
+            text.append(arg).append('\n');
         }
         if (!getText2().isEmpty()) {
             String arg = getText2().replace("Against:", "__**Against:**__");
-            text.append(arg).append("\n");
+            text.append(arg).append('\n');
         }
         if (notes != null) {
             text.append("-# [").append(notes).append("]\n");

@@ -29,6 +29,6 @@ public final class StatisticsOptInOutService {
     }
 
     private static boolean getOption(SlashCommandInteractionEvent event, String optionName) {
-        return event.getOption(optionName, false, OptionMapping::getAsBoolean);
+        return event.getOption(optionName, Boolean.FALSE, OptionMapping::getAsBoolean);
     }
 }

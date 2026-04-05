@@ -87,7 +87,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     private String getPrimaryTextFormatted() {
         StringBuilder sb = new StringBuilder();
         for (String s : primaryTexts) {
-            sb.append("- ").append(s).append("\n");
+            sb.append("- ").append(s).append('\n');
         }
         return sb.toString();
     }
@@ -96,7 +96,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     private String getSecondaryTextFormatted() {
         StringBuilder sb = new StringBuilder();
         for (String s : secondaryTexts) {
-            sb.append("- ").append(s).append("\n");
+            sb.append("- ").append(s).append('\n');
         }
         return sb.toString();
     }

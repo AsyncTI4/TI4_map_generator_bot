@@ -57,7 +57,7 @@ public class MechDraftItem extends DraftItem {
         if (unit.getCombatDieCount() > 1) {
             sb.append("x").append(unit.getCombatDieCount());
         }
-        sb.append(" ");
+        sb.append(' ');
         if (unit.getSustainDamage()) {
             sb.append("SUSTAIN DAMAGE ");
         }
@@ -66,12 +66,12 @@ public class MechDraftItem extends DraftItem {
                     .append(unit.getAfbHitsOn())
                     .append("x")
                     .append(unit.getAfbDieCount())
-                    .append(" ");
+                    .append(' ');
         }
         if (unit.getProductionValue() > 0) {
             sb.append("PRODUCTION ");
             sb.append(unit.getProductionValue());
-            sb.append(" ");
+            sb.append(' ');
         }
         if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get());
         return sb.toString();

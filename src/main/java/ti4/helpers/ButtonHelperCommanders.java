@@ -204,7 +204,7 @@ public class ButtonHelperCommanders {
         List<String> techsSummed = getVeldyrCommanderTechs(player, game, true);
         for (String tech : techsSummed) {
             TechnologyModel model = Mapper.getTech(tech);
-            summary.append(model.getRepresentation(false)).append("\n");
+            summary.append(model.getRepresentation(false)).append('\n');
         }
         if (!techsSummed.isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), summary.toString());
@@ -251,7 +251,7 @@ public class ButtonHelperCommanders {
         List<String> techsSummed = getVeldyrCommanderTechs(player, game, false);
         for (String tech : techsSummed) {
             TechnologyModel model = Mapper.getTech(tech);
-            summary.append(model.getRepresentation(false)).append("\n");
+            summary.append(model.getRepresentation(false)).append('\n');
         }
         if (!techsSummed.isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), summary.toString());
@@ -480,10 +480,11 @@ public class ButtonHelperCommanders {
         Tile tile = game.getTileByPosition(pos);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "fighter");
         player.setGhostCommanderCounter(player.getGhostCommanderCounter() + 1);
+        String factionEmoji = player.getFactionEmoji();
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getFactionEmoji() + " placed 1 fighter in " + tile.getRepresentation()
-                        + " using Sai Seravus, the Creuss commander.\n-# " + player.getFactionEmoji()
+                factionEmoji + " placed 1 fighter in " + tile.getRepresentation()
+                        + " using Sai Seravus, the Creuss commander.\n-# " + factionEmoji
                         + " has placed a total of " + player.getGhostCommanderCounter()
                         + " fighters over the course of this game.");
     }

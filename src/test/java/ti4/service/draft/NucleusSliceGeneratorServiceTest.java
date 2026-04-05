@@ -154,7 +154,7 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
     }
 
     private void testSuccessfulNucleusForMiltySettings(Game game, MiltySettings settings) {
-        DraftSpec specs = DraftSpec.CreateFromMiltySettings(settings);
+        DraftSpec specs = DraftSpec.createFromMiltySettings(settings);
 
         MapTemplateModel normalTemplate =
                 Mapper.getDefaultMapTemplateForPlayerCount(game.getPlayers().size());

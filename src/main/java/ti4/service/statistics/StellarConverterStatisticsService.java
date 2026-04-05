@@ -47,7 +47,7 @@ public class StellarConverterStatisticsService {
                     .append(Helper.leftpad(String.valueOf(index), width))
                     .append(")` ");
             output.append(planetName).append(": ").append(planetStats.getValue());
-            output.append("\n");
+            output.append('\n');
             index++;
         }
 

@@ -30,8 +30,8 @@ public class DraftButtonService {
     public boolean isError(String outcome) {
         return outcome != null
                 && !outcome.isEmpty()
-                && !outcome.equals(DELETE_BUTTON)
-                && !outcome.equals(DELETE_MESSAGE);
+                && !DELETE_BUTTON.equals(outcome)
+                && !DELETE_MESSAGE.equals(outcome);
     }
 
     @ButtonHandler(DRAFT_BUTTON_SERVICE_PREFIX)
@@ -46,9 +46,9 @@ public class DraftButtonService {
         if (outcome == null) {
             return;
         }
-        if (outcome.equals(DELETE_BUTTON)) {
+        if (DELETE_BUTTON.equals(outcome)) {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-        } else if (outcome.equals(DELETE_MESSAGE)) {
+        } else if (DELETE_MESSAGE.equals(outcome)) {
             ButtonHelper.deleteMessage(event);
         } else if (outcome.startsWith(USER_MISTAKE_PREFIX)) {
             String userMessage = outcome.substring(USER_MISTAKE_PREFIX.length());

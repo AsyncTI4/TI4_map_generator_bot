@@ -52,7 +52,7 @@ class ShowSO extends GameStateSubcommand {
         }
 
         String info = SecretObjectiveInfoService.getSecretObjectiveRepresentation(soID);
-        boolean onlyPhase = event.getOption(Constants.ONLY_PHASE, false, OptionMapping::getAsBoolean);
+        boolean onlyPhase = event.getOption(Constants.ONLY_PHASE, Boolean.FALSE, OptionMapping::getAsBoolean);
         if (onlyPhase) {
             info = Mapper.getSecretObjective(soID).getPhase();
         }

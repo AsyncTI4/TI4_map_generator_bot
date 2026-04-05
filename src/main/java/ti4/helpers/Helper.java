@@ -277,12 +277,12 @@ public final class Helper {
                 int sc = player.getLowestSC();
                 rep.append(CardEmojis.getSCBackFromInteger(sc))
                         .append(player.getRepresentation(false, false))
-                        .append("\n");
+                        .append('\n');
             } else {
                 rep.append(player.getPriorityPosition())
                         .append(". ")
                         .append(player.getRepresentation(false, false))
-                        .append("\n");
+                        .append('\n');
             }
 
             String poMessage = "";
@@ -329,8 +329,8 @@ public final class Helper {
             } else {
                 soMessage += " ✅ " + so;
             }
-            rep.append("> ").append(poMessage).append("\n");
-            rep.append("> ").append(soMessage).append("\n");
+            rep.append("> ").append(poMessage).append('\n');
+            rep.append("> ").append(soMessage).append('\n');
         }
 
         return rep.toString();
@@ -346,7 +346,7 @@ public final class Helper {
                 || game.getHighestScore() + 1 > game.getVp()) {
             return;
         }
-        for (Player player : StatusHelper.GetPlayersInScoringOrder(game)) {
+        for (Player player : StatusHelper.getPlayersInScoringOrder(game)) {
             if (game.getHighestScore() + 1 > game.getVp()) {
                 return;
             }
@@ -606,10 +606,12 @@ public final class Helper {
         return "SC#" + sc;
     }
 
+    @NotNull
     public static Emoji getPlayerReactionEmoji(Game game, Player player, Message message) {
         return getPlayerReactionEmoji(game, player, message.getId());
     }
 
+    @NotNull
     public static Emoji getPlayerReactionEmoji(Game game, Player player, String messageId) {
         if (player == null) {
             return Emoji.fromFormatted(ApplicationEmojiService.fallbackEmoji);
@@ -1310,9 +1312,9 @@ public final class Helper {
                                 .append(comms)
                                 .append(" commodit")
                                 .append("1".equals(comms) ? "y" : "ies")
-                                .append("\n");
+                                .append('\n');
                     } else {
-                        msg.append(thing).append("\n");
+                        msg.append(thing).append('\n');
                     }
                 } else {
                     Tile t = game.getTileFromPlanet(planet.getName());
@@ -1329,39 +1331,39 @@ public final class Helper {
                     if ("res".equalsIgnoreCase(resOrInfOrBoth)) {
                         if (xxchaHero) {
                             msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
-                                    .append("\n");
+                                    .append('\n');
                             res += planet.getSumResourcesInfluence();
                         } else if (xxchaBt) {
                             msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
-                                    .append("\n");
+                                    .append('\n');
                             res += planet.getMaxResInf();
                         } else {
                             if (Math.min(gledgeMech, planet.getInfluence()) > 0) {
                                 msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
-                                        .append("\n");
+                                        .append('\n');
                             } else {
                                 msg.append(getPlanetRepresentationPlusEmojiPlusResources(thing, game))
-                                        .append("\n");
+                                        .append('\n');
                             }
                             res += planet.getResources();
                         }
                     } else if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
                         if (xxchaHero) {
                             msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
-                                    .append("\n");
+                                    .append('\n');
                             inf += planet.getSumResourcesInfluence();
                         } else if (xxchaBt) {
                             msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
-                                    .append("\n");
+                                    .append('\n');
                             inf += planet.getMaxResInf();
                         } else {
                             msg.append(getPlanetRepresentationPlusEmojiPlusInfluence(thing, game))
-                                    .append("\n");
+                                    .append('\n');
                             inf += planet.getInfluence();
                         }
                     } else if ("freelancers".equalsIgnoreCase(resOrInfOrBoth)) {
                         msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
-                                .append("\n");
+                                .append('\n');
                         if (xxchaHero) {
                             res += planet.getSumResourcesInfluence();
                         } else if (xxchaBt) {
@@ -1371,7 +1373,7 @@ public final class Helper {
                         }
                     } else {
                         msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
-                                .append("\n");
+                                .append('\n');
                         if (xxchaHero) {
                             inf += planet.getSumResourcesInfluence();
                             res += planet.getSumResourcesInfluence();
@@ -1401,17 +1403,17 @@ public final class Helper {
                                                                     .getRepresentationNoPing())
                                                     + ") ")
                             .append(MiscEmojis.Resources_1)
-                            .append("\n");
+                            .append('\n');
                     res += 1;
                 }
                 if (thing.contains("boon")) {
-                    msg.append("> Used Boon Relic ").append(ExploreEmojis.Relic).append("\n");
+                    msg.append("> Used Boon Relic ").append(ExploreEmojis.Relic).append('\n');
                     res += 1;
                 }
                 if (thing.contains("warmachine")) {
                     msg.append("> Used _War Machine_ ")
                             .append(CardEmojis.getACEmoji(game))
-                            .append("\n");
+                            .append('\n');
                     res += 1;
                     if (game.isWildWildGalaxyMode()) {
                         res += 4;
@@ -1420,7 +1422,7 @@ public final class Helper {
                 if (thing.contains("manifest")) {
                     msg.append("> Used _Manifest_ for 3 resources")
                             .append(CardEmojis.getACEmoji(game))
-                            .append("\n");
+                            .append('\n');
                     res += 3;
                 }
                 if (thing.contains("ghostbt")) {
@@ -1431,7 +1433,7 @@ public final class Helper {
                             .append(wormholes)
                             .append(" resource discount. ")
                             .append(FactionEmojis.Ghost)
-                            .append("\n");
+                            .append('\n');
                 }
                 if (thing.contains("aida")) {
                     msg.append("Exhausted ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ ");
@@ -1445,9 +1447,9 @@ public final class Helper {
                     msg.append(".\n");
                 }
                 if (thing.contains("commander") || thing.contains("Gledge Agent")) {
-                    msg.append("> ").append(thing).append("\n");
+                    msg.append("> ").append(thing).append('\n');
                 } else if (thing.contains("winnuagent")) {
-                    msg.append("> Used Winnu agent for 2 resources").append("\n");
+                    msg.append("> Used Winnu agent for 2 resources").append('\n');
                     res += 2;
                 } else if (thing.contains("Zealots Agent")) {
                     msg.append("> ")
@@ -1457,7 +1459,7 @@ public final class Helper {
                             .append(")\n");
                     inf += bestRes;
                 } else if (thing.contains("Agent")) {
-                    msg.append("> ").append(thing).append("\n");
+                    msg.append("> ").append(thing).append('\n');
                 }
             }
         }
@@ -1468,7 +1470,7 @@ public final class Helper {
                     .append(tg)
                     .append(" trade good")
                     .append(tg == 1 ? "" : "s")
-                    .append(" ")
+                    .append(' ')
                     .append(MiscEmojis.getTGorNomadCoinEmoji(game))
                     .append(" (")
                     .append(player.getTg() + tg)
@@ -1490,7 +1492,7 @@ public final class Helper {
                 res += discount;
                 msg.append("> Released units with a total resource value of ")
                         .append(discount)
-                        .append("\n");
+                        .append('\n');
             }
             msg.append("for a total spend of ").append(res).append(" resource").append(res == 1 ? "" : "s");
 
@@ -1570,14 +1572,14 @@ public final class Helper {
                         localPlace
                                 .append("> ")
                                 .append(removedUnit.getUnitEmoji().toString().repeat(entry.getValue()))
-                                .append("\n");
+                                .append('\n');
                     } else {
                         localPlace
                                 .append("> ")
                                 .append(entry.getValue())
                                 .append("x ")
                                 .append(removedUnit.getUnitEmoji())
-                                .append("\n");
+                                .append('\n');
                     }
                 }
             }
@@ -2598,7 +2600,7 @@ public final class Helper {
                 .append("**");
         if (includeTitle) representation.append(" - ").append(leaderTitle).append("__"); // add title
         if (includeAbility && Constants.HERO.equals(leader.getType()))
-            representation.append("\n").append("**").append(heroAbilityName).append("**"); // add hero ability name
+            representation.append('\n').append("**").append(heroAbilityName).append("**"); // add hero ability name
         if (includeAbility)
             if ("action:".equalsIgnoreCase(leaderAbilityWindow)) {
                 representation.append("\n*ACTION:*").append(leaderAbilityText); // add ability
@@ -3097,14 +3099,19 @@ public final class Helper {
                     && "17"
                             .equals(game.getTileByPosition(player.getPlayerStatsAnchorPosition())
                                     .getTileID());
-            if (((player.getFaction().contains("ghost") || (tile != null && "51".equalsIgnoreCase(tile.getTileID())))
-                            && game.getTile("17") != null)
+            if (((player.getFaction().contains("ghost") || (tile != null && "51".equalsIgnoreCase(tile.getTileID()))))
                     && ghostish) {
-                tile = game.getTile("17");
+                Tile tile17 = game.getTile("17");
+                if (tile17 != null) {
+                    tile = tile17;
+                }
             }
-            if (((player.getFaction().contains("crimson") || (tile != null && "118".equalsIgnoreCase(tile.getTileID())))
-                    && game.getTile("94") != null)) {
-                tile = game.getTile("94");
+            if (((player.getFaction().contains("crimson")
+                    || (tile != null && "118".equalsIgnoreCase(tile.getTileID()))))) {
+                Tile tile94 = game.getTile("94");
+                if (tile94 != null) {
+                    tile = tile94;
+                }
             }
             if (tile != null) {
                 int parsedLocation = 9999;
@@ -3148,7 +3155,7 @@ public final class Helper {
                     SetOrderService.setPlayerOrder(newPlayerOrder, players, player);
                     if (player.isSpeaker()) {
                         msg.append(player.getRepresentationUnfogged())
-                                .append(" ")
+                                .append(' ')
                                 .append(MiscEmojis.SpeakerToken)
                                 .append(" \n");
                     } else {

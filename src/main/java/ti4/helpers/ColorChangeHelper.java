@@ -22,11 +22,11 @@ public class ColorChangeHelper {
         String colorID = Mapper.getColorID(color);
         return switch (colorID) {
             // Riftset is exclusive to eronous always
-            case "ero" -> player.getUserID().equals(Constants.eronousId);
+            case "ero" -> Constants.eronousId.equals(player.getUserID());
             // Lightgray is exclusive to chassit if chassit is in the game
             case "lgy" ->
                 !player.getGame().getPlayerIDs().contains(Constants.chassitId)
-                        || player.getUserID().equals(Constants.chassitId);
+                        || Constants.chassitId.equals(player.getUserID());
             default -> true;
         };
     }

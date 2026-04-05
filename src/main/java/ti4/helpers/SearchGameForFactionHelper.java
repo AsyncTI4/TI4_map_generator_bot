@@ -40,11 +40,11 @@ public class SearchGameForFactionHelper {
                 .append(Mapper.getFaction(faction).getFactionName())
                 .append("'s Games__**\n");
         for (var managedGame : filteredManagedGames) {
-            sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
+            sb.append('`').append(Helper.leftpad("" + index, 2)).append(".`");
             var game = managedGame.getGame();
             sb.append(getPlayerMapListRepresentation(
                     game, game.getPlayerFromColorOrFaction(faction).getUserID(), false, false, false));
-            sb.append("\n");
+            sb.append('\n');
             index++;
         }
         if (event instanceof SlashCommandInteractionEvent slash) {

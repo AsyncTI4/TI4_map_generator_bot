@@ -45,7 +45,7 @@ class GameLengthStatisticsService {
             }
             longMsg.append("\n The average completion time of these games is: ")
                     .append(total / num)
-                    .append("\n");
+                    .append('\n');
         }
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Game Lengths", longMsg.toString());

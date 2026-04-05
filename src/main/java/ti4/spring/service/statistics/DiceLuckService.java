@@ -28,8 +28,9 @@ public class DiceLuckService {
 
     @Transactional(readOnly = true)
     public void getActualVersusExpectedHits(SlashCommandInteractionEvent event) {
-        boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
-        boolean sortOrderAscending = event.getOption("ascending", true, OptionMapping::getAsBoolean);
+        boolean ignoreEndedGames =
+                event.getOption(Constants.IGNORE_ENDED_GAMES, Boolean.FALSE, OptionMapping::getAsBoolean);
+        boolean sortOrderAscending = event.getOption("ascending", Boolean.TRUE, OptionMapping::getAsBoolean);
         int topLimit = event.getOption(Constants.TOP_LIMIT, DEFAULT_PLAYER_LIMIT, OptionMapping::getAsInt);
         int minimumExpectedHits = event.getOption(
                 Constants.MINIMUM_NUMBER_OF_EXPECTED_HITS, DEFAULT_MINIMUM_EXPECTED_HITS, OptionMapping::getAsInt);
@@ -76,7 +77,7 @@ public class DiceLuckService {
         StringBuilder sb = new StringBuilder("## __**Dice Luck**__\n");
         int index = 1;
         for (var diceLuckAccumulator : diceLuckAccumulators) {
-            sb.append("`")
+            sb.append('`')
                     .append(Helper.leftpad(String.valueOf(index), 3))
                     .append(". ")
                     .append(String.format("%.2f", diceLuckAccumulator.getActualHitsOutOfExpected()))
@@ -84,7 +85,7 @@ public class DiceLuckService {
                     .append(diceLuckAccumulator.username)
                     .append("   [")
                     .append(diceLuckAccumulator.actualHits)
-                    .append("/")
+                    .append('/')
                     .append(String.format("%.1f", diceLuckAccumulator.expectedHits))
                     .append(" actual/expected hits]\n");
             index++;

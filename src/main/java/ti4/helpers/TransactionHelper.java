@@ -202,7 +202,7 @@ public final class TransactionHelper {
         players.add(p2);
         for (Player player : players) {
             if (!trans.isEmpty()) {
-                trans.append("\n");
+                trans.append('\n');
             }
             trans.append("> ")
                     .append(player.getRepresentation(false, false, true))
@@ -265,7 +265,7 @@ public final class TransactionHelper {
                         switch (furtherDetail) {
                             case "generic" ->
                                 trans.append(amountToTransact)
-                                        .append(" ")
+                                        .append(' ')
                                         .append(CardEmojis.getACEmoji(game))
                                         .append(" to be specified by player");
                             default -> {
@@ -294,7 +294,7 @@ public final class TransactionHelper {
                             case "generic" -> {
                                 if (!hidePrivateCardText) {
                                     trans.append(amountToTransact)
-                                            .append(" ")
+                                            .append(' ')
                                             .append(CardEmojis.PN)
                                             .append(" to be specified by player");
                                 } else {
@@ -318,7 +318,7 @@ public final class TransactionHelper {
                                 trans.append(CardEmojis.PN);
                                 if (!hidePrivateCardText) {
                                     if (Mapper.getPromissoryNote(id) != null) {
-                                        trans.append(" ")
+                                        trans.append(' ')
                                                 .append(StringUtils.capitalize(Mapper.getPromissoryNote(id)
                                                         .getColor()
                                                         .orElse("")))
@@ -327,7 +327,7 @@ public final class TransactionHelper {
                                                         .getName())
                                                 .append("_");
                                     } else {
-                                        trans.append(" ")
+                                        trans.append(' ')
                                                 .append("null pn info for ")
                                                 .append(id);
                                     }
@@ -339,7 +339,7 @@ public final class TransactionHelper {
                         switch (furtherDetail) {
                             case "generic" ->
                                 trans.append(amountToTransact)
-                                        .append(" ")
+                                        .append(' ')
                                         .append(CardEmojis.SecretObjective)
                                         .append(" to be specified by player");
                             default -> {
@@ -373,9 +373,9 @@ public final class TransactionHelper {
                             trans.append(furtherDetail.replace("fin777", " "));
                         }
                     }
-                    default -> trans.append(" some odd thing: `").append(item).append("`");
+                    default -> trans.append(" some odd thing: `").append(item).append('`');
                 }
-                trans.append("\n");
+                trans.append('\n');
             }
             if (sendingNothing) {
                 String nothing = game.getStoredValue(player.getFaction() + "NothingMessage");
@@ -383,7 +383,7 @@ public final class TransactionHelper {
                     nothing = getNothingMessage();
                     game.setStoredValue(player.getFaction() + "NothingMessage", nothing);
                 }
-                trans.append("> - ").append(nothing).append("\n");
+                trans.append("> - ").append(nothing).append('\n');
             }
         }
 
@@ -1200,7 +1200,8 @@ public final class TransactionHelper {
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " sent a transaction offer to " + p2.getRepresentationNoPing()
                         + ".");
-        if (game.getTableTalkChannel() != null) {
+        TextChannel tableTalkChannel = game.getTableTalkChannel();
+        if (tableTalkChannel != null) {
             boolean sentMeme = false;
             String publicOfferText = buildTransactionOffer(player, p2, game, true);
             if (sendMemeInsteadOfText(event, game)) {
@@ -1208,14 +1209,14 @@ public final class TransactionHelper {
                 if (tradeOfferMeme != null) {
                     FileUpload upload = FileUploadService.createFileUpload(tradeOfferMeme, "trade_offer");
                     upload.setDescription(publicOfferText);
-                    MessageHelper.sendFileUploadToChannel(game.getTableTalkChannel(), upload);
+                    MessageHelper.sendFileUploadToChannel(tableTalkChannel, upload);
                     sentMeme = true;
                 }
             }
             if (!sentMeme) {
                 String offerMessage = "Trade offer from " + player.getRepresentationNoPing() + " to "
                         + p2.getRepresentationNoPing() + ":\n" + publicOfferText;
-                MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), offerMessage);
+                MessageHelper.sendMessageToChannel(tableTalkChannel, offerMessage);
             }
         }
 

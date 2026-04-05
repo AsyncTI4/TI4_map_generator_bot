@@ -89,14 +89,16 @@ public final class StatusHelper {
             }
 
             buttons = new ArrayList<>();
-            for (String soID : player.getSecretsUnscored().keySet()) {
+            Map<String, Integer> secretsUnscored = player.getSecretsUnscored();
+            for (Map.Entry<String, Integer> entry : secretsUnscored.entrySet()) {
+                String soID = entry.getKey();
                 if (ListPlayerInfoService.getObjectiveThreshold(soID, game) > 0
                         && ListPlayerInfoService.getPlayerProgressOnObjective(soID, game, player)
                                 > (ListPlayerInfoService.getObjectiveThreshold(soID, game) - 1)
                         && !"dp".equalsIgnoreCase(soID)) {
 
                     buttons.add(Buttons.green(
-                            "preScoreObbie_SO_" + player.getSecretsUnscored().get(soID),
+                            "preScoreObbie_SO_" + entry.getValue(),
                             Mapper.getSecretObjective(soID).getName()));
                 }
             }
@@ -141,7 +143,7 @@ public final class StatusHelper {
         }
     }
 
-    public static void BeginScoring(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
+    public static void beginScoring(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
         if (game.isOmegaPhaseMode()) {
             // Show the effects of the Agendas while scoring
             ButtonHelper.updateMap(game, event, "After Agendas, Round " + game.getRound() + ".");
@@ -261,7 +263,7 @@ public final class StatusHelper {
                     game.getPing()
                             + ", players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.",
                     buttons);
-            for (Player player : GetPlayersInScoringOrder(game)) {
+            for (Player player : getPlayersInScoringOrder(game)) {
                 game.setStoredValue(key3, game.getStoredValue(key3) + player.getFaction() + "*");
                 game.setStoredValue(key3b, game.getStoredValue(key3b) + player.getFaction() + "*");
             }
@@ -342,16 +344,18 @@ public final class StatusHelper {
             int count = 0;
             StringBuilder message3a = new StringBuilder();
             List<Integer> sos = new ArrayList<>();
-            for (String soID : player.getSecretsUnscored().keySet()) {
+            Map<String, Integer> secretsUnscored = player.getSecretsUnscored();
+            for (Map.Entry<String, Integer> entry : secretsUnscored.entrySet()) {
+                String soID = entry.getKey();
                 if (ListPlayerInfoService.getObjectiveThreshold(soID, game) > 0
                         && ListPlayerInfoService.getPlayerProgressOnObjective(soID, game, player)
                                 > (ListPlayerInfoService.getObjectiveThreshold(soID, game) - 1)
                         && !"dp".equalsIgnoreCase(soID)) {
                     message3a
-                            .append("\n")
+                            .append('\n')
                             .append(Mapper.getSecretObjective(soID).getRepresentation(false));
                     count++;
-                    sos.add(player.getSecretsUnscored().get(soID));
+                    sos.add(entry.getValue());
                 }
             }
             var userSettings = UserSettingsManager.get(player.getUserID());
@@ -412,12 +416,14 @@ public final class StatusHelper {
         if (!game.getStoredValue("newStatusScoringMode").isEmpty() && !game.isFowMode()) {
             poButtons.add(Buttons.gray("refreshStatusSummary", "Refresh Summary"));
         }
-        if (game.getActionCards().size() > 130
-                && game.getPlayerFromColorOrFaction("hacan") != null
-                && !ButtonHelper.getButtonsToSwitchWithAllianceMembers(
-                                game.getPlayerFromColorOrFaction("hacan"), game, false)
-                        .isEmpty()) {
-            poButtons.add(Buttons.gray("getSwapButtons_", "Swap"));
+
+        if (game.getActionCards().size() > 130) {
+            Player hacan = game.getPlayerFromColorOrFaction("hacan");
+            if (hacan != null
+                    && !ButtonHelper.getButtonsToSwitchWithAllianceMembers(hacan, game, false)
+                            .isEmpty()) {
+                poButtons.add(Buttons.gray("getSwapButtons_", "Swap"));
+            }
         }
         poButtons.removeIf(Objects::isNull);
         messageText = "Please score objectives, " + game.getPing() + ".";
@@ -444,7 +450,7 @@ public final class StatusHelper {
         }
     }
 
-    public static List<Player> GetPlayersInScoringOrder(Game game) {
+    public static List<Player> getPlayersInScoringOrder(Game game) {
         if (game.hasFullPriorityTrackMode()) {
             return PriorityTrackHelper.getPriorityTrack(game).stream()
                     .filter(Objects::nonNull)
@@ -586,7 +592,7 @@ public final class StatusHelper {
         resolveSolFlagship(game);
     }
 
-    public static void sendRemoveBreachButtons(Game game) {
+    private static void sendRemoveBreachButtons(Game game) {
         Predicate<Tile> hasBreach = t -> t.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
         Function<Player, Predicate<Tile>> hasPlayerShips = p -> (t -> FoWHelper.playerHasActualShipsInSystem(p, t));
         for (Player p : game.getRealPlayers()) {

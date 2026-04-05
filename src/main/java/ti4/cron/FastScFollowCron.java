@@ -108,7 +108,7 @@ public class FastScFollowCron {
         if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
             sb.append("Message link is: ")
                     .append(game.getStoredValue("scPlay" + sc))
-                    .append("\n");
+                    .append('\n');
         }
         sb.append("You currently have ")
                 .append(player.getStrategicCC())

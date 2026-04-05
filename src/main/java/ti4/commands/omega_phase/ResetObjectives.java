@@ -29,7 +29,7 @@ class ResetObjectives extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        boolean force = event.getOption(Constants.FORCE, false, OptionMapping::getAsBoolean);
+        boolean force = event.getOption(Constants.FORCE, Boolean.FALSE, OptionMapping::getAsBoolean);
         if (!game.isOmegaPhaseMode() && !force) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(), "This command only works in Omega Phase mode...unless you use 'force'.");

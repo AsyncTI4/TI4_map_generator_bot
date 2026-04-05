@@ -562,7 +562,7 @@ public final class CryypterHelper {
                                 message2.append(" " + ExploreEmojis.HFrag);
                             case "irf1", "irf2", "irf3", "irf4", "irf5" -> message2.append(" " + ExploreEmojis.IFrag);
                             case "urf1", "urf2", "urf3" -> message2.append(" " + ExploreEmojis.UFrag);
-                            default -> message2.append(" ").append(fragid);
+                            default -> message2.append(' ').append(fragid);
                         }
                     }
                     CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");

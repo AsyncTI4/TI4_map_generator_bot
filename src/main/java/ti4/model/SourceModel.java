@@ -44,7 +44,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
 
         StringBuilder content = new StringBuilder();
         if (description != null) content.append("*").append(description).append("*\n\n");
-        if (data != null) content.append("Links:\n").append(getDataFormatted()).append("\n");
+        if (data != null) content.append("Links:\n").append(getDataFormatted()).append('\n');
         if (occurrences != null) content.append("Implementation: ").append(compTypeOccurrences(occurrences));
         eb.setDescription(content);
 
@@ -89,7 +89,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
     private String getDataFormatted() {
         StringBuilder sb = new StringBuilder();
         for (String s : data) {
-            sb.append("- ").append(s).append("\n");
+            sb.append("- ").append(s).append('\n');
         }
         return sb.toString();
     }

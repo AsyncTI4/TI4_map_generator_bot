@@ -215,7 +215,7 @@ public abstract class DraftItem {
             sb.append("\n>  - *Also adds: ");
             for (DraftErrataModel i : Errata.getAdditionalComponents()) {
                 DraftItem item = generate(i.getItemCategory(), i.getItemId());
-                sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
+                sb.append(item.getItemEmoji()).append(' ').append(item.getShortDescription());
                 sb.append(", ");
             }
             sb.append("*");
@@ -224,7 +224,7 @@ public abstract class DraftItem {
             sb.append("\n>  - *Includes optional swaps: ");
             for (DraftErrataModel i : Errata.getOptionalSwaps()) {
                 DraftItem item = generate(i.getItemCategory(), i.getItemId());
-                sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
+                sb.append(item.getItemEmoji()).append(' ').append(item.getShortDescription());
                 sb.append(", ");
             }
             sb.append("*");
@@ -239,7 +239,7 @@ public abstract class DraftItem {
             sb.append("\n>  - *Also adds: ");
             for (DraftErrataModel i : Errata.getAdditionalComponents()) {
                 DraftItem item = generate(i.getItemCategory(), i.getItemId());
-                sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
+                sb.append(item.getItemEmoji()).append(' ').append(item.getShortDescription());
                 sb.append(", ");
             }
             sb.append("*");
@@ -248,7 +248,7 @@ public abstract class DraftItem {
             sb.append("\n>  - *Includes optional swaps: ");
             for (DraftErrataModel i : Errata.getOptionalSwaps()) {
                 DraftItem item = generate(i.getItemCategory(), i.getItemId());
-                sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
+                sb.append(item.getItemEmoji()).append(' ').append(item.getShortDescription());
                 sb.append(", ");
             }
             sb.append("*");

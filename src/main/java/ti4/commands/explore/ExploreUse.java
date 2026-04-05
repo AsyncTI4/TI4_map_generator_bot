@@ -36,7 +36,7 @@ class ExploreUse extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         String id = event.getOption(Constants.EXPLORE_CARD_ID, "", OptionMapping::getAsString);
-        boolean force = event.getOption(Constants.FORCE, false, OptionMapping::getAsBoolean);
+        boolean force = event.getOption(Constants.FORCE, Boolean.FALSE, OptionMapping::getAsBoolean);
         id = StringUtils.substringBefore(id, " ");
 
         if (!Mapper.isValidExplore(id)) {

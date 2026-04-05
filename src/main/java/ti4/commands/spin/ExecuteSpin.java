@@ -93,7 +93,7 @@ class ExecuteSpin extends GameStateSubcommand {
 
         StringBuilder sb = new StringBuilder("Executed spin" + (settingsToExecute.size() > 1 ? "s" : "") + ":\n");
         for (SpinSetting s : settingsToExecute) {
-            sb.append(s.getRepresentation(true)).append("\n");
+            sb.append(s.getRepresentation(true)).append('\n');
         }
         if (game.isFowMode()
                 && !event.getChannelId().equals(GMService.getGMChannel(game).getId())) {

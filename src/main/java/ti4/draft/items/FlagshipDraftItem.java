@@ -69,7 +69,7 @@ public class FlagshipDraftItem extends DraftItem {
         sb.append(unit.getMoveValue());
         sb.append(" Capacity: ");
         sb.append(unit.getCapacityValue());
-        sb.append(" ");
+        sb.append(' ');
         if (unit.getSustainDamage()) {
             sb.append("SUSTAIN DAMAGE ");
         }
@@ -78,7 +78,7 @@ public class FlagshipDraftItem extends DraftItem {
                     .append(unit.getAfbHitsOn())
                     .append("x")
                     .append(unit.getAfbDieCount())
-                    .append(" ");
+                    .append(' ');
         }
         if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get());
         return sb.toString();

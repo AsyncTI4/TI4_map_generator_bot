@@ -35,7 +35,7 @@ class AddTileRandom extends GameStateSubcommand {
         String positionString = event.getOption(Constants.POSITION).getAsString();
         String randomType =
                 event.getOption(Constants.RANDOM_TYPE).getAsString().trim().toUpperCase();
-        boolean drawOnly = event.getOption(Constants.DRAW_ONLY, false, OptionMapping::getAsBoolean);
+        boolean drawOnly = event.getOption(Constants.DRAW_ONLY, Boolean.FALSE, OptionMapping::getAsBoolean);
 
         Game game = getGame();
 

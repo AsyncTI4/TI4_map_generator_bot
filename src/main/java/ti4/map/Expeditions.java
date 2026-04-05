@@ -161,7 +161,7 @@ public class Expeditions {
         StringBuilder sb = new StringBuilder("Thunder's Edge Expedition Status:");
         for (Entry<String, String> exp : expeditionFactions.entrySet()) {
             sb.append("\n> ").append(getExpeditionEmoji(exp.getKey(), game));
-            sb.append(" ").append(playerInfo(game, player, exp.getValue()));
+            sb.append(' ').append(playerInfo(game, player, exp.getValue()));
         }
         return sb.toString();
     }

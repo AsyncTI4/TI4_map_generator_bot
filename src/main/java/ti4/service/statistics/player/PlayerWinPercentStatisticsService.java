@@ -39,7 +39,7 @@ class PlayerWinPercentStatisticsService {
                 .toList();
 
         StringBuilder sb = new StringBuilder();
-        sb.append("__**Player Win Percent:**__").append("\n");
+        sb.append("__**Player Win Percent:**__").append('\n');
         if (entries.isEmpty()) {
             sb.append("No players found for the given filters!");
         }
@@ -53,7 +53,7 @@ class PlayerWinPercentStatisticsService {
                     .append("% (")
                     .append(playerGameCount.get(entry.getKey()))
                     .append(" games) ")
-                    .append("\n");
+                    .append('\n');
         }
 
         MessageHelper.sendMessageToThread(

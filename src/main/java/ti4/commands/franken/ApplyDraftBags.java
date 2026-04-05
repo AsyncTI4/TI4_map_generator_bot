@@ -25,7 +25,7 @@ class ApplyDraftBags extends GameStateSubcommand {
         Game game = getGame();
         BagDraft draft = game.getActiveBagDraft();
 
-        boolean force = event.getOption(Constants.FORCE, false, OptionMapping::getAsBoolean);
+        boolean force = event.getOption(Constants.FORCE, Boolean.FALSE, OptionMapping::getAsBoolean);
         if (!draft.isDraftStageComplete() && !force) {
             String message =
                     "The draft stage of the FrankenDraft is NOT complete. Please finish the draft or rerun the command with the force option set.";

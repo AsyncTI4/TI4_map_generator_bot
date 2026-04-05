@@ -105,7 +105,7 @@ public abstract class SettingsMenu {
     String menuSummaryString(String lastSettingTouched) {
         StringBuilder sb = new StringBuilder("# **__").append(menuName).append(":__**");
         for (String line : description) sb.append("\n- *").append(line).append("*");
-        sb.append("\n");
+        sb.append('\n');
 
         int pad = enabledSettings().stream()
                 .map(x -> x.getName().length())
@@ -114,9 +114,9 @@ public abstract class SettingsMenu {
         for (SettingInterface setting : enabledSettings()) {
             sb.append("> ");
             sb.append(setting.longSummary(pad, lastSettingTouched));
-            sb.append("\n");
+            sb.append('\n');
         }
-        if (!enabledSettings().isEmpty()) sb.append("\n"); // extra line for formatting
+        if (!enabledSettings().isEmpty()) sb.append('\n'); // extra line for formatting
 
         if (!categories().isEmpty()) {
             List<String> catStrings = new ArrayList<>();

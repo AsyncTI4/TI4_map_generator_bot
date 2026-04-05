@@ -71,11 +71,11 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         ComponentSource source =
                 ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
-        boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
+        boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, Boolean.FALSE, OptionMapping::getAsBoolean);
         int minPlanets = event.getOption(MIN_NUM_PLANET, 0, OptionMapping::getAsInt);
         int maxPlanets = event.getOption(MAX_NUM_PLANET, Integer.MAX_VALUE, OptionMapping::getAsInt);
-        boolean includeDraft = event.getOption(INCLUDE_DRAFT_TILES, false, OptionMapping::getAsBoolean);
-        boolean includeHyperlanes = event.getOption(INCLUDE_HYPERLANES, false, OptionMapping::getAsBoolean);
+        boolean includeDraft = event.getOption(INCLUDE_DRAFT_TILES, Boolean.FALSE, OptionMapping::getAsBoolean);
+        boolean includeHyperlanes = event.getOption(INCLUDE_HYPERLANES, Boolean.FALSE, OptionMapping::getAsBoolean);
         Boolean withAnomalies = event.getOption(WITH_ANOMALY, null, OptionMapping::getAsBoolean);
         Boolean withAsteroids = event.getOption(WITH_ASTEROID, null, OptionMapping::getAsBoolean);
         Boolean withGrifts = event.getOption(WITH_GRAVITY_RIFT, null, OptionMapping::getAsBoolean);

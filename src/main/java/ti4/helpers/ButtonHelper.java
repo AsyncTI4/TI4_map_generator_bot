@@ -363,7 +363,7 @@ public class ButtonHelper {
             if (revive == 0) {
                 message.append("\nNone of your infantry revived.");
             } else {
-                message.append("\n")
+                message.append('\n')
                         .append(failed == 0 ? "All " : "")
                         .append(
                                 revive <= 10
@@ -937,7 +937,7 @@ public class ButtonHelper {
                 .append(player.getUserName())
                 .append(" from game: ")
                 .append(game.getName())
-                .append("\n");
+                .append('\n');
     }
 
     @ButtonHandler("eliminatePlayer_")
@@ -1361,8 +1361,8 @@ public class ButtonHelper {
         }
         int slumberBonus = getSlumberstateBonusACs(game, player);
         if (slumberBonus > 0) {
-            String howmany = "(+" + slumberBonus + " action card" + (slumberBonus > 1 ? "s)" : ")");
-            modifiers.add(FactionEmojis.Titans + " _Slumberstate Computing_ " + howmany);
+            String howMany = "(+" + slumberBonus + " action card" + (slumberBonus > 1 ? "s)" : ")");
+            modifiers.add(FactionEmojis.Titans + " _Slumberstate Computing_ " + howMany);
             amount += slumberBonus;
         }
 
@@ -2519,8 +2519,7 @@ public class ButtonHelper {
         Player neutral = game.getPlayerFromColorOrFaction("neutral");
         if (neutral == null) {
             String color = SetupNeutralPlayer.pickNeutralColor(game);
-            game.setupNeutralPlayer(color);
-            neutral = game.getPlayerFromColorOrFaction("neutral");
+            neutral = game.setupNeutralPlayer(color);
         }
         for (Tile tile : game.getTileMap().values()) {
             if (tile.isHomeSystem() && !tile.isHomeSystem(game)) {
@@ -3282,7 +3281,7 @@ public class ButtonHelper {
                 sb.append(" (").append(color).append(") ");
             } else {
                 sb.append(player.getFactionEmoji())
-                        .append(" ")
+                        .append(' ')
                         .append(" (")
                         .append(color)
                         .append(") ");
@@ -3318,13 +3317,13 @@ public class ButtonHelper {
                 if (!justUnits) {
                     sb.append(" Resources: ")
                             .append(planet.getResources())
-                            .append("/")
+                            .append('/')
                             .append(planet.getInfluence());
                 }
             } else {
                 sb.append(StringUtils.capitalize(representation));
             }
-            sb.append("\n");
+            sb.append('\n');
             if (!justUnits) {
                 boolean hasCC = false;
                 for (String cc : unitHolder.getCcList()) {
@@ -3335,7 +3334,7 @@ public class ButtonHelper {
                     appendFactionIcon(game, sb, cc, privateGame);
                 }
                 if (hasCC) {
-                    sb.append("\n");
+                    sb.append('\n');
                 }
                 boolean hasToken = false;
                 Map<String, String> tokensToName = Mapper.getTokensToName();
@@ -3348,12 +3347,12 @@ public class ButtonHelper {
                         String key = entry_.getKey();
                         String value = entry_.getValue();
                         if (token.contains(key)) {
-                            sb.append(value).append(" ");
+                            sb.append(value).append(' ');
                         }
                     }
                 }
                 if (hasToken) {
-                    sb.append("\n");
+                    sb.append('\n');
                 }
                 boolean hasControl = false;
                 for (String control : unitHolder.getControlList()) {
@@ -3364,7 +3363,7 @@ public class ButtonHelper {
                     appendFactionIcon(game, sb, control, privateGame);
                 }
                 if (hasControl) {
-                    sb.append("\n");
+                    sb.append('\n');
                 }
             }
 
@@ -3380,11 +3379,11 @@ public class ButtonHelper {
                     sb.append(player.getFactionEmojiOrColor()).append(ColorEmojis.getColorEmojiWithName(color));
                     sb.append(" `").append(unitEntry.getValue()).append("x` ");
                     if (unitModel != null) {
-                        sb.append(unitModel.getUnitEmoji()).append(" ");
+                        sb.append(unitModel.getUnitEmoji()).append(' ');
                         sb.append(privateGame ? unitModel.getBaseType() : unitModel.getName())
-                                .append("\n");
+                                .append('\n');
                     } else {
-                        sb.append(unitKey).append("\n");
+                        sb.append(unitKey).append('\n');
                     }
                 }
             }
@@ -3886,7 +3885,7 @@ public class ButtonHelper {
         if (player.isNpc() && player.isDummy()) {
             return values;
         }
-        if ("neutral".equals(player.getFaction()) && player.getUserID().equals(Constants.dicecordId)) {
+        if ("neutral".equals(player.getFaction()) && Constants.dicecordId.equals(player.getUserID())) {
             return values;
         }
         if (player.hasAbility("armada")) {
@@ -4854,8 +4853,8 @@ public class ButtonHelper {
             if (tile.getPlanetUnitHolders().isEmpty()) {
                 AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
             }
-            if (game.isDangerousWildsMode() && game.getPlayerFromColorOrFaction("neutral") != null) {
-                Player neutral = game.getPlayerFromColorOrFaction("neutral");
+            Player neutral = game.getPlayerFromColorOrFaction("neutral");
+            if (game.isDangerousWildsMode() && neutral != null) {
                 boolean added = false;
                 for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                     if (getTypeOfPlanet(game, uH.getName()).contains("hazardous")) {
@@ -6037,11 +6036,11 @@ public class ButtonHelper {
                     AddUnitService.addUnits(event, tile, game, player.getColor(), numMechs + " infantry" + planetName);
 
                     successMessageBuilder
-                            .append("\n")
+                            .append('\n')
                             .append(player.getFactionEmoji())
                             .append(" placed ")
                             .append(numMechs)
-                            .append(" ")
+                            .append(' ')
                             .append(UnitEmojis.infantry)
                             .append(" with the mechs in ")
                             .append(tile.getRepresentationForButtons(game, player));
@@ -6573,12 +6572,12 @@ public class ButtonHelper {
                 rep = rep.replace("damaged", "");
             }
             message.append(player.getFactionEmoji())
-                    .append(" ")
+                    .append(' ')
                     .append(game.getSpecificThalnosUnit(unit))
-                    .append(" ")
+                    .append(' ')
                     .append(damaged)
                     .append(rep)
-                    .append("\n");
+                    .append('\n');
         }
         List<Button> systemButtons = buttons;
         event.getMessage()
@@ -6655,13 +6654,13 @@ public class ButtonHelper {
                 Constants.COMBAT_EXTRA_ROLLS);
 
         // Check for temp mods
-        CombatTempModHelper.EnsureValidTempMods(player, tileModel, combatOnHolder);
-        CombatTempModHelper.InitializeNewTempMods(player, tileModel, combatOnHolder);
+        CombatTempModHelper.ensureValidTempMods(player, tileModel, combatOnHolder);
+        CombatTempModHelper.initializeNewTempMods(player, tileModel, combatOnHolder);
         List<NamedCombatModifierModel> tempMods =
-                new ArrayList<>(CombatTempModHelper.BuildCurrentRoundTempNamedModifiers(
+                new ArrayList<>(CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
                         player, tileModel, combatOnHolder, false, rollType));
         List<NamedCombatModifierModel> tempOpponentMods;
-        tempOpponentMods = CombatTempModHelper.BuildCurrentRoundTempNamedModifiers(
+        tempOpponentMods = CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
                 opponent, tileModel, combatOnHolder, true, rollType);
         tempMods.addAll(tempOpponentMods);
 
@@ -7274,7 +7273,7 @@ public class ButtonHelper {
             if (issue.contrast < 2) {
                 sb.append("(very bad!)");
             }
-            sb.append("\n");
+            sb.append('\n');
         }
 
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), sb.toString());

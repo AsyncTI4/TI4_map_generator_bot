@@ -181,7 +181,7 @@ public class FrankenDraftBagService {
             sb.append(cat.title(player.getGame()));
             for (DraftItem item : bag.Contents) {
                 if (item.getItemCategory() != cat) continue;
-                sb.append("> ").append(item.getShortDescription()).append("\n");
+                sb.append("> ").append(item.getShortDescription()).append('\n');
             }
         }
         return sb.toString();
@@ -367,17 +367,17 @@ public class FrankenDraftBagService {
             sb.append("### ").append("GENOME ").append(" (");
         }
         if (draft instanceof FrankenDraft) {
-            sb.append(bag.getCategoryCount(cat)).append("/").append(FrankenDraft.getItemLimitForCategory(cat, game));
+            sb.append(bag.getCategoryCount(cat)).append('/').append(FrankenDraft.getItemLimitForCategory(cat, game));
         } else {
-            sb.append(bag.getCategoryCount(cat)).append("/").append(draft.getItemLimitForCategory(cat));
+            sb.append(bag.getCategoryCount(cat)).append('/').append(draft.getItemLimitForCategory(cat));
         }
         sb.append("):\n");
         for (DraftItem item : bag.getCategory(cat)) {
-            sb.append("> ").append(item.getShortDescription()).append("\n");
+            sb.append("> ").append(item.getShortDescription()).append('\n');
             if (item instanceof AgentDraftItem || item instanceof HeroDraftItem) {
-                sb.append("> - ").append(item.getLongDescription(game)).append("\n");
+                sb.append("> - ").append(item.getLongDescription(game)).append('\n');
             } else {
-                sb.append("> - ").append(item.getLongDescription()).append("\n");
+                sb.append("> - ").append(item.getLongDescription()).append('\n');
             }
         }
         return sb.toString();
@@ -392,7 +392,7 @@ public class FrankenDraftBagService {
         DraftBag currentBag = player.getDraftQueue();
         for (DraftItem item : currentBag.Contents) {
             sb.append(buildItemDescription(item, player.getGame()));
-            sb.append("\n");
+            sb.append('\n');
         }
 
         return sb.toString();
@@ -401,7 +401,7 @@ public class FrankenDraftBagService {
     private static String buildItemDescription(DraftItem item, Game game) {
         StringBuilder sb = new StringBuilder();
         try {
-            sb.append("### ").append(item.getItemEmoji()).append(" ");
+            sb.append("### ").append(item.getItemEmoji()).append(' ');
             sb.append(item.getShortDescription()).append("\n> ");
             sb.append(item.getLongDescription(game));
         } catch (Exception e) {

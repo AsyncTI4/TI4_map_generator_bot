@@ -14,6 +14,7 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -260,8 +261,8 @@ class WeirdGameSetup extends GameStateSubcommand {
 
             for (Player player : game.getPlayers().values()) {
                 player.setLeaders(new ArrayList<>());
-                if (player.getUnitByBaseType("mech") != null)
-                    player.removeOwnedUnitByID(player.getUnitByBaseType("mech").getId());
+                UnitModel mech = player.getUnitByBaseType("mech");
+                if (mech != null) player.removeOwnedUnitByID(mech.getId());
             }
 
             game.setScSetID("miltymod");
@@ -288,8 +289,8 @@ class WeirdGameSetup extends GameStateSubcommand {
 
             for (Player player : game.getPlayers().values()) {
                 player.setLeaders(new ArrayList<>());
-                if (player.getUnitByBaseType("mech") != null)
-                    player.removeOwnedUnitByID(player.getUnitByBaseType("mech").getId());
+                UnitModel mech = player.getUnitByBaseType("mech");
+                if (mech != null) player.removeOwnedUnitByID(mech.getId());
             }
 
             game.setTechnologyDeckID("techs_base");

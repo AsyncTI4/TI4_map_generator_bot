@@ -494,7 +494,7 @@ public final class ButtonHelperTacticalAction {
                         && !player.getFaction().equalsIgnoreCase(player_.getFaction())
                         && !player_.isPlayerMemberOfAlliance(player)
                         && FoWHelper.playerHasUnitsInSystem(player_, tile)) {
-                    message.append("\n").append(player_.getRepresentation()).append(" has units in the system.");
+                    message.append('\n').append(player_.getRepresentation()).append(" has units in the system.");
                 }
             }
             for (UnitHolder planet : tile.getPlanetUnitHolders()) {
@@ -547,7 +547,7 @@ public final class ButtonHelperTacticalAction {
                 mentions.add(playerWithPds.getRepresentation());
             }
             if (!mentions.isEmpty()) {
-                message.append("\n")
+                message.append('\n')
                         .append(player.getRepresentationUnfogged())
                         .append(" the activated system is in range of SPACE CANNON units owned by ")
                         .append(String.join(", ", mentions))

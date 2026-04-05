@@ -56,18 +56,18 @@ class ShowSOToAll extends GameStateSubcommand {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(getGame().getName()).append("\n");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
+        sb.append("Game: ").append(getGame().getName()).append('\n');
+        sb.append("Player: ").append(player.getUserName()).append('\n');
         if (scored) {
-            sb.append("Showed Scored Secret Objectives:").append("\n");
+            sb.append("Showed Scored Secret Objectives:").append('\n');
         } else {
-            sb.append("Showed Secret Objectives:").append("\n");
+            sb.append("Showed Secret Objectives:").append('\n');
         }
         String info = SecretObjectiveInfoService.getSecretObjectiveRepresentation(soID);
         if (onlyPhase) {
             info = Mapper.getSecretObjective(soID).getPhase();
         }
-        sb.append(info).append("\n");
+        sb.append(info).append('\n');
         if (!scored) {
             player.setSecret(soID);
         }

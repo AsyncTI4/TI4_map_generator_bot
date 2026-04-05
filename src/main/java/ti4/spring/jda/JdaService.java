@@ -109,7 +109,7 @@ public class JdaService {
     private static Guild guildTredenary;
     private static Guild guildQuadrodenary;
     public static Guild guildFogOfWar;
-    public static Guild guildFogOfWarSecondary;
+    private static Guild guildFogOfWarSecondary;
     public static Guild guildCommunityPlays;
     private static Guild guildMegagame;
     private static Guild guildTourney;
@@ -567,7 +567,7 @@ public class JdaService {
 
     public static boolean isReadyToReceiveCommands() {
         return GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.READY_TO_RECEIVE_COMMANDS.toString(), Boolean.class, false);
+                GlobalSettings.ImplementedSettings.READY_TO_RECEIVE_COMMANDS.toString(), Boolean.class, Boolean.FALSE);
     }
 
     public static List<Category> getAvailablePBDCategories() {

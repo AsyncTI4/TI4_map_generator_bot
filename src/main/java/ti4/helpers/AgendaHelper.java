@@ -159,7 +159,7 @@ public final class AgendaHelper {
                     .append(whens.size() == 1 ? "is" : "are")
                     .append(":");
             for (String when : whens) {
-                msg.append("\n").append(when);
+                msg.append('\n').append(when);
             }
         }
         if (!afters.isEmpty()) {
@@ -169,7 +169,7 @@ public final class AgendaHelper {
                     .append(afters.size() == 1 ? "is" : "are")
                     .append(":");
             for (String after : afters) {
-                msg.append("\n").append(after);
+                msg.append('\n').append(after);
             }
         }
         List<Button> buttons = new ArrayList<>();
@@ -510,7 +510,7 @@ public final class AgendaHelper {
                         .append(whens.size() == 1 ? "is" : "are")
                         .append(":");
                 for (String when : whens) {
-                    msg.append("\n").append(when);
+                    msg.append('\n').append(when);
                 }
             }
             List<Button> buttons = new ArrayList<>();
@@ -741,7 +741,7 @@ public final class AgendaHelper {
                                             .append(afters.size() == 1 ? "is" : "are")
                                             .append(":");
                                     for (String after2 : afters) {
-                                        msg.append("\n").append(after2);
+                                        msg.append('\n').append(after2);
                                     }
                                 }
                                 List<Button> buttons = new ArrayList<>();
@@ -865,7 +865,7 @@ public final class AgendaHelper {
                     .append(afters.size() == 1 ? "is" : "are")
                     .append(":");
             for (String after : afters) {
-                msg.append("\n").append(after);
+                msg.append('\n').append(after);
             }
         }
         buttons = new ArrayList<>();
@@ -1583,7 +1583,7 @@ public final class AgendaHelper {
                 for (Player loser : losers) {
                     message.append("> ")
                             .append(loser.getRepresentationUnfogged())
-                            .append("\n");
+                            .append('\n');
                 }
                 message.append("Please play or confirm that you will not be playing _Bribery_ or _Deadly Plot_.");
             } else {
@@ -2308,7 +2308,7 @@ public final class AgendaHelper {
                                 game.drawSecretObjective(winningR.getUserID());
                                 message += " Drew a second secret objective due to **Plausible Deniability**.";
                             }
-                            SecretObjectiveInfoService.sendSecretObjectiveInfo(game, winningR, event);
+                            SecretObjectiveInfoService.sendSecretObjectiveInfo(game, winningR);
                             MessageHelper.sendMessageToChannel(winningR.getCorrectChannel(), message);
                         }
                         if (specificVote.contains("Kyro Rider")) {
@@ -3274,14 +3274,14 @@ public final class AgendaHelper {
                         summaryBuilder
                                 .append("- ")
                                 .append(emoji)
-                                .append(" ")
+                                .append(' ')
                                 .append(outcome)
                                 .append(": ")
                                 .append(totalVotes);
                         if (!redactFactionInfo) {
                             summaryBuilder.append(". (").append(outcomeSummary).append(")\n");
                         } else {
-                            summaryBuilder.append("\n");
+                            summaryBuilder.append('\n');
                         }
 
                     } else if (!game.isHomebrewSCMode()
@@ -3296,14 +3296,14 @@ public final class AgendaHelper {
                         if (!redactFactionInfo) {
                             summaryBuilder.append(". (").append(outcomeSummary).append(")\n");
                         } else {
-                            summaryBuilder.append("\n");
+                            summaryBuilder.append('\n');
                         }
                     } else {
                         summaryBuilder.append("- ").append(outcome).append(": ").append(totalVotes);
                         if (!redactFactionInfo) {
                             summaryBuilder.append(". (").append(outcomeSummary).append(")\n");
                         } else {
-                            summaryBuilder.append("\n");
+                            summaryBuilder.append('\n');
                         }
                     }
                 } else {
@@ -3313,9 +3313,9 @@ public final class AgendaHelper {
                             .append(": Total votes ")
                             .append(totalVotes);
                     if (!redactFactionInfo) {
-                        summaryBuilder.append(". ").append(outcomeSummary).append("\n");
+                        summaryBuilder.append(". ").append(outcomeSummary).append('\n');
                     } else {
-                        summaryBuilder.append("\n");
+                        summaryBuilder.append('\n');
                     }
                 }
             }
@@ -3605,7 +3605,7 @@ public final class AgendaHelper {
                 .append(":** *")
                 .append(agenda.getTarget())
                 .append("*\n");
-        desc.append("> ").append(agenda.getText1().replace("For:", "**For:**")).append("\n");
+        desc.append("> ").append(agenda.getText1().replace("For:", "**For:**")).append('\n');
         desc.append("> ").append(agenda.getText2().replace("Against:", "**Against:**"));
         eb.setDescription(desc.toString());
         eb.setFooter(agenda.footnote());
@@ -4173,7 +4173,7 @@ public final class AgendaHelper {
                                 .append(so.getName())
                                 .append("**__: ")
                                 .append(so.getText())
-                                .append("\n");
+                                .append('\n');
                     }
                 }
             }

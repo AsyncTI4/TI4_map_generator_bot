@@ -617,11 +617,11 @@ public class ExploreService {
                                 }
                             }
                             if (!groundForces.isEmpty()) {
-                                message.append("\n")
+                                message.append('\n')
                                         .append(p2.getRepresentationUnfogged())
                                         .append(", your ")
                                         .append(String.join("", groundForces))
-                                        .append(" ")
+                                        .append(' ')
                                         .append(groundForces.size() == 1 ? "has" : "have")
                                         .append(" been yote into space")
                                         .append(structures.isEmpty() ? "." : "");
@@ -633,7 +633,7 @@ public class ExploreService {
                                                         : ", and ")
                                         .append("your ")
                                         .append(String.join("", structures))
-                                        .append(" ")
+                                        .append(' ')
                                         .append(structures.size() == 1 ? "has" : "have")
                                         .append(" been yote into the shadow realm.");
                                 if (!game.isFowMode()) {
@@ -766,7 +766,7 @@ public class ExploreService {
                     game.drawSecretObjective(player.getUserID());
                     message.append(" Drew a second secret objective due to **Plausible Deniability**.");
                 }
-                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
+                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
                 MessageHelper.sendMessageToEventChannel(event, message.toString());
             }
             case "dw" -> {
@@ -1309,7 +1309,7 @@ public class ExploreService {
                             true,
                             fullText,
                             ExploreEmojis.getTraitEmoji(currentType).toString()))
-                    .append("\n");
+                    .append('\n');
 
             info.append("__").append(currentType.substring(0, 1).toUpperCase()).append(currentType.substring(1));
             info.append(" exploration discards__ (").append(discardCount).append(")\n");
@@ -1391,14 +1391,14 @@ public class ExploreService {
                             && !"frontier"
                                     .equalsIgnoreCase(
                                             entry.getValue().getFirst().getType())) {
-                        sb.append(" ").append(ExploreEmojis.Chevrons);
+                        sb.append(' ').append(ExploreEmojis.Chevrons);
                     }
                 }
                 if (showPercents && ids.size() > 1) {
                     sb.append(" - ").append(formatPercent.format(deckDrawChance * ids.size()));
                 }
             }
-            sb.append("\n");
+            sb.append('\n');
         }
 
         List<String> unmapped =
@@ -1406,7 +1406,7 @@ public class ExploreService {
         for (String cardID : unmapped) {
             ExploreModel card = Mapper.getExplore(cardID);
             String name = card != null ? card.getName() : null;
-            sb.append("> (").append(cardID).append(") ").append(name).append("\n");
+            sb.append("> (").append(cardID).append(") ").append(name).append('\n');
         }
         return sb.toString();
     }

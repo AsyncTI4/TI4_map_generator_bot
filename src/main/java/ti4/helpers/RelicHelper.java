@@ -41,7 +41,7 @@ public class RelicHelper {
                     .append(relicData.getName())
                     .append("_: ")
                     .append(relicData.getText())
-                    .append("\n");
+                    .append('\n');
         }
         String msg = player.getRepresentationUnfogged()
                 + ", please choose the relic that you wish to draw. The relic text is reproduced for your convenience.";
@@ -116,7 +116,7 @@ public class RelicHelper {
                     game.drawSecretObjective(player.getUserID());
                     helpMessage.append(" Drew a second secret objective due to **Plausible Deniability**.");
                 }
-                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
+                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
             }
             case "shard" -> {
                 Integer poIndex = game.addCustomPO("Shard of the Throne", 1);
@@ -305,7 +305,7 @@ public class RelicHelper {
             int x = 1;
             for (String relicId : allRelics) {
                 String relicName = Mapper.getRelic(relicId).getName();
-                text.append("\n")
+                text.append('\n')
                         .append(x)
                         .append(". ")
                         .append(ExploreEmojis.Relic)

@@ -364,20 +364,35 @@ public class MessageListener extends ListenerAdapter {
      * replicate messages in combat threads so that observers can see
      */
     private static void handleFogOfWarCombatThreadMirroring(MessageReceivedEvent event) {
-        if (!JdaService.fowServers.isEmpty()
-                // fog servers exists
-                && !JdaService.fowServers.contains(event.getGuild())
-                // 2nd server actually exists
-                && JdaService.guildCommunityPlays != null
-                // is not the community server
-                && !JdaService.guildCommunityPlays
-                        .getId()
-                        .equals(event.getGuild().getId())
-                // bot is running in production
-                && JdaService.guildPrimaryID.equals(Constants.ASYNCTI4_HUB_SERVER_ID)) {
+        if (shouldSkipEvent(event)) {
             return;
         }
-        // else it's probably a dev/test server, so execute
         FOWCombatThreadMirroring.mirrorEvent(event);
+    }
+
+    private static boolean shouldSkipEvent(MessageReceivedEvent event) {
+        return hasFowServers()
+                && isNotInFowServers(event)
+                && isDifferentCommunityPlayGuild(event)
+                && isPrimaryHubServer();
+    }
+
+    private static boolean hasFowServers() {
+        return !JdaService.fowServers.isEmpty();
+    }
+
+    private static boolean isNotInFowServers(MessageReceivedEvent event) {
+        return !JdaService.fowServers.contains(event.getGuild());
+    }
+
+    private static boolean isDifferentCommunityPlayGuild(MessageReceivedEvent event) {
+        return JdaService.guildCommunityPlays != null
+                && !JdaService.guildCommunityPlays
+                        .getId()
+                        .equals(event.getGuild().getId());
+    }
+
+    private static boolean isPrimaryHubServer() {
+        return Constants.ASYNCTI4_HUB_SERVER_ID.equals(JdaService.guildPrimaryID);
     }
 }

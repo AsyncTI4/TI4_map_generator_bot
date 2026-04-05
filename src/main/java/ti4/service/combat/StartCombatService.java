@@ -53,12 +53,6 @@ import ti4.service.unit.CheckUnitContainmentService;
 @UtilityClass
 public class StartCombatService {
 
-    public static void combatCheckEachTile(Game game, GenericInteractionCreateEvent event) {
-        for (Tile tile : game.getTileMap().values()) {
-            combatCheck(game, event, tile);
-        }
-    }
-
     public static void combatCheck(Game game, GenericInteractionCreateEvent event, Tile tile) {
         spaceCombatCheck(game, tile, event);
         tile.getUnitHolders().values().stream()
@@ -710,7 +704,7 @@ public class StartCombatService {
                 pdsMessage
                         .append("> ")
                         .append(playerWithPds.getRepresentation())
-                        .append("\n");
+                        .append('\n');
             }
         }
         List<Button> spaceCannonButtons = getSpaceCannonButtons(game, activePlayer, tile);
@@ -1299,73 +1293,14 @@ public class StartCombatService {
             }
         }
 
-        if ((p1.hasTech("nekroc4y") || p1.hasTech("subatomic"))
-                && isSpaceCombat
-                && tile != p1.getHomeSystemTile()
-                && p1.getHomeSystemTile() != null) {
-            if (p1.hasUnit("ghoti_flagship")
-                    || CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p1, UnitType.Spacedock)
-                            .contains(p1.getHomeSystemTile())) {
-                buttons.add(Buttons.green(
-                        p1.getFinsFactionCheckerPrefix() + "useNekroNullRef",
-                        "Use Subatomic Splicer (Upon Each Destroy)",
-                        FactionEmojis.Crimson));
-            }
-        }
-        if ((p2.hasTech("nekroc4y") || p2.hasTech("subatomic"))
-                && isSpaceCombat
-                && tile != p2.getHomeSystemTile()
-                && p2.getHomeSystemTile() != null
-                && !game.isFowMode()) {
-            if (p2.hasUnit("ghoti_flagship")
-                    || CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Spacedock)
-                            .contains(p2.getHomeSystemTile())) {
-                buttons.add(Buttons.green(
-                        p2.getFinsFactionCheckerPrefix() + "useNekroNullRef",
-                        "Use Subatomic Splicer (Upon Each Destroy)",
-                        FactionEmojis.Crimson));
-            }
-        }
+        checkAndAddSubatomicButton(game, p1, isSpaceCombat, tile, buttons);
+        checkAndAddSubatomicButton(game, p2, isSpaceCombat, tile, buttons);
 
-        if (p1.hasTechReady("dsmortr") && isSpaceCombat && FoWHelper.playerHasShipsInAdjacentSystems(p1, tile, game)) {
-            buttons.add(Buttons.green(
-                    p1.getFinsFactionCheckerPrefix() + "exhaustTech_dsmortr",
-                    "Exhaust Fractal Plating (Upon Destroy)",
-                    FactionEmojis.mortheus));
-        }
-        if (p2.hasTechReady("dsmortr") && isSpaceCombat && FoWHelper.playerHasShipsInAdjacentSystems(p2, tile, game)) {
-            buttons.add(Buttons.green(
-                    p2.getFinsFactionCheckerPrefix() + "exhaustTech_dsmortr",
-                    "Exhaust Fractal Plating (Upon Destroy)",
-                    FactionEmojis.mortheus));
-        }
+        checkAndAddFractalPlatingButton(game, p1, isSpaceCombat, tile, buttons);
+        checkAndAddFractalPlatingButton(game, p2, isSpaceCombat, tile, buttons);
 
-        if (p1.hasTechReady("dihmohnbt") && isSpaceCombat) {
-            if (p1.hasReadyBreakthrough("dihmohnbt")) {
-                buttons.add(Buttons.green(
-                        p1.getFinsFactionCheckerPrefix() + "exhaustBT_dihmohnbt_" + tile.getPosition(),
-                        "Place Frontier Token (Upon Destroy)",
-                        FactionEmojis.dihmohn));
-            } else {
-                buttons.add(Buttons.green(
-                        p1.getFinsFactionCheckerPrefix() + "readyBT_dihmohnbt_" + tile.getPosition(),
-                        "Produce 1 Non-Fighter Ship (Upon Destroy)",
-                        FactionEmojis.dihmohn));
-            }
-        }
-        if (p2.hasUnlockedBreakthrough("dihmohnbt") && isSpaceCombat && !game.isFowMode()) {
-            if (p2.hasReadyBreakthrough("dihmohnbt")) {
-                buttons.add(Buttons.green(
-                        p2.getFinsFactionCheckerPrefix() + "exhaustBT_dihmohnbt_" + tile.getPosition(),
-                        "Place Frontier Token (Upon Destroy)",
-                        FactionEmojis.dihmohn));
-            } else {
-                buttons.add(Buttons.green(
-                        p2.getFinsFactionCheckerPrefix() + "readyBT_dihmohnbt_" + tile.getPosition(),
-                        "Produce 1 Non-Fighter Ship (Upon Destroy)",
-                        FactionEmojis.dihmohn));
-            }
-        }
+        checkAndAddDihmonBreakthroughButton(p1, isSpaceCombat, buttons, tile);
+        if (!game.isFowMode()) checkAndAddDihmonBreakthroughButton(p2, isSpaceCombat, buttons, tile);
 
         for (Player agentHolder : game.getRealPlayers()) {
             String finChecker = "FFCC_" + agentHolder.getFaction() + "_";
@@ -2220,6 +2155,55 @@ public class StartCombatService {
             }
         }
         return buttons;
+    }
+
+    private static void checkAndAddDihmonBreakthroughButton(
+            Player player, boolean isSpaceCombat, List<Button> buttons, Tile tile) {
+        if (isSpaceCombat && player.hasTechReady("dihmohnbt")) {
+            if (player.hasReadyBreakthrough("dihmohnbt")) {
+                buttons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "exhaustBT_dihmohnbt_" + tile.getPosition(),
+                        "Place Frontier Token (Upon Destroy)",
+                        FactionEmojis.dihmohn));
+            } else {
+                buttons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "readyBT_dihmohnbt_" + tile.getPosition(),
+                        "Produce 1 Non-Fighter Ship (Upon Destroy)",
+                        FactionEmojis.dihmohn));
+            }
+        }
+    }
+
+    private static void checkAndAddFractalPlatingButton(
+            Game game, Player player, boolean isSpaceCombat, Tile tile, List<Button> buttons) {
+        if (!isSpaceCombat
+                || !player.hasTechReady("dsmortr")
+                || !FoWHelper.playerHasShipsInAdjacentSystems(player, tile, game)) {
+            return;
+        }
+        buttons.add(Buttons.green(
+                player.getFinsFactionCheckerPrefix() + "exhaustTech_dsmortr",
+                "Exhaust Fractal Plating (Upon Destroy)",
+                FactionEmojis.mortheus));
+    }
+
+    private static void checkAndAddSubatomicButton(
+            Game game, Player player, boolean isSpaceCombat, Tile tile, List<Button> buttons) {
+        if (!isSpaceCombat || (!player.hasTech("nekroc4y") && !player.hasTech("subatomic"))) {
+            return;
+        }
+        Tile homeSystemTile = player.getHomeSystemTile();
+        if (homeSystemTile == null || tile == homeSystemTile) {
+            return;
+        }
+        if (player.hasUnit("ghoti_flagship")
+                || CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)
+                        .contains(homeSystemTile)) {
+            buttons.add(Buttons.green(
+                    player.getFinsFactionCheckerPrefix() + "useNekroNullRef",
+                    "Use Subatomic Splicer (Upon Each Destroy)",
+                    FactionEmojis.Crimson));
+        }
     }
 
     private static String getSpaceCombatIntroMessage() {

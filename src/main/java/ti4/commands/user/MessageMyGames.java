@@ -20,7 +20,7 @@ class MessageMyGames extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        boolean pingGame = event.getOption(Constants.PING_GAME, false, OptionMapping::getAsBoolean);
+        boolean pingGame = event.getOption(Constants.PING_GAME, Boolean.FALSE, OptionMapping::getAsBoolean);
         User user = event.getOption(Constants.PLAYER, event.getUser(), OptionMapping::getAsUser);
         String msg = event.getOption(Constants.MESSAGE, "", OptionMapping::getAsString);
         SearchGameHelper.msgGames(user, false, false, true, true, pingGame, msg);

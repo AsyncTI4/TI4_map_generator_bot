@@ -66,18 +66,18 @@ public class TechSummaryCron {
             if (techSummary.getResearchAgreementTech() != null) {
                 msg.append(" (from _Research Agreement_:");
                 for (String tech : techSummary.getResearchAgreementTech()) {
-                    msg.append(" ").append(Mapper.getTech(tech).getNameRepresentation());
+                    msg.append(' ').append(Mapper.getTech(tech).getNameRepresentation());
                 }
                 msg.append(")");
             }
             if (techSummary.getTech() != null) {
                 for (String tech : techSummary.getTech()) {
-                    msg.append(" ").append(Mapper.getTech(tech).getNameRepresentation());
+                    msg.append(' ').append(Mapper.getTech(tech).getNameRepresentation());
                 }
             } else {
                 msg.append(" Did not resolve **Technology** ability");
             }
-            msg.append("\n");
+            msg.append('\n');
         }
 
         MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), msg.toString());

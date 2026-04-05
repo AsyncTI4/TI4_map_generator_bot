@@ -57,7 +57,7 @@ class PeekAtSecretDeck extends GameStateSubcommand {
             SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
         }
 
-        boolean shuffle = event.getOption("shuffle", false, OptionMapping::getAsBoolean);
+        boolean shuffle = event.getOption("shuffle", Boolean.FALSE, OptionMapping::getAsBoolean);
         if (shuffle) {
             Collections.shuffle(game.getSecretObjectives());
         }

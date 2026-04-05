@@ -48,16 +48,21 @@ class SearchGames extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        boolean includeNormalGames = event.getOption(Constants.NORMAL_GAME, false, OptionMapping::getAsBoolean);
-        boolean includeTIGLGames = event.getOption(Constants.TIGL_GAME, false, OptionMapping::getAsBoolean);
-        boolean includeCommunityGames = event.getOption(Constants.COMMUNITY_MODE, false, OptionMapping::getAsBoolean);
-        boolean includeAllianceGames = event.getOption(Constants.ALLIANCE_MODE, false, OptionMapping::getAsBoolean);
-        boolean includeFoWGames = event.getOption(Constants.FOW_MODE, false, OptionMapping::getAsBoolean);
-        boolean includeAbsolGames = event.getOption(Constants.ABSOL_MODE, false, OptionMapping::getAsBoolean);
-        boolean includeMiltyModGames = event.getOption(Constants.MILTYMOD_MODE, false, OptionMapping::getAsBoolean);
-        boolean includeDSGames = event.getOption(Constants.DISCORDANT_STARS_MODE, false, OptionMapping::getAsBoolean);
-        boolean includeFrankenGames = event.getOption(Constants.FRANKEN_MODE, false, OptionMapping::getAsBoolean);
-        boolean includeEndedGames = event.getOption(Constants.ENDED_GAMES, false, OptionMapping::getAsBoolean);
+        boolean includeNormalGames = event.getOption(Constants.NORMAL_GAME, Boolean.FALSE, OptionMapping::getAsBoolean);
+        boolean includeTIGLGames = event.getOption(Constants.TIGL_GAME, Boolean.FALSE, OptionMapping::getAsBoolean);
+        boolean includeCommunityGames =
+                event.getOption(Constants.COMMUNITY_MODE, Boolean.FALSE, OptionMapping::getAsBoolean);
+        boolean includeAllianceGames =
+                event.getOption(Constants.ALLIANCE_MODE, Boolean.FALSE, OptionMapping::getAsBoolean);
+        boolean includeFoWGames = event.getOption(Constants.FOW_MODE, Boolean.FALSE, OptionMapping::getAsBoolean);
+        boolean includeAbsolGames = event.getOption(Constants.ABSOL_MODE, Boolean.FALSE, OptionMapping::getAsBoolean);
+        boolean includeMiltyModGames =
+                event.getOption(Constants.MILTYMOD_MODE, Boolean.FALSE, OptionMapping::getAsBoolean);
+        boolean includeDSGames =
+                event.getOption(Constants.DISCORDANT_STARS_MODE, Boolean.FALSE, OptionMapping::getAsBoolean);
+        boolean includeFrankenGames =
+                event.getOption(Constants.FRANKEN_MODE, Boolean.FALSE, OptionMapping::getAsBoolean);
+        boolean includeEndedGames = event.getOption(Constants.ENDED_GAMES, Boolean.FALSE, OptionMapping::getAsBoolean);
         String searchName = event.getOption(Constants.SEARCH_NAMES, "", OptionMapping::getAsString)
                 .toLowerCase();
         String searchTags = event.getOption(Constants.SEARCH_TAGS, "", OptionMapping::getAsString)
@@ -147,70 +152,70 @@ class SearchGames extends Subcommand {
                     .append(trueFalseEmoji(includeNormalGames))
                     .append("includeNormalGames (")
                     .append(predicatesToIntegerCounts.getOrDefault(normalGamesPredicate, 0))
-                    .append("/")
+                    .append('/')
                     .append(totalGames)
                     .append(")\n");
             sb.append("-# > ")
                     .append(trueFalseEmoji(includeTIGLGames))
                     .append("includeTIGLGames (")
                     .append(predicatesToIntegerCounts.getOrDefault(tIGLGamesPredicate, 0))
-                    .append("/")
+                    .append('/')
                     .append(totalGames)
                     .append(")\n");
             sb.append("-# > ")
                     .append(trueFalseEmoji(includeCommunityGames))
                     .append("includeCommunityGames (")
                     .append(predicatesToIntegerCounts.getOrDefault(communityGamesPredicate, 0))
-                    .append("/")
+                    .append('/')
                     .append(totalGames)
                     .append(")\n");
             sb.append("-# > ")
                     .append(trueFalseEmoji(includeAllianceGames))
                     .append("includeAllianceGames (")
                     .append(predicatesToIntegerCounts.getOrDefault(allianceGamesPredicate, 0))
-                    .append("/")
+                    .append('/')
                     .append(totalGames)
                     .append(")\n");
             sb.append("-# > ")
                     .append(trueFalseEmoji(includeFoWGames))
                     .append("includeFoWGames (")
                     .append(predicatesToIntegerCounts.getOrDefault(foWGamesPredicate, 0))
-                    .append("/")
+                    .append('/')
                     .append(totalGames)
                     .append(")\n");
             sb.append("-# > ")
                     .append(trueFalseEmoji(includeAbsolGames))
                     .append("includeAbsolGames (")
                     .append(predicatesToIntegerCounts.getOrDefault(absolGamesPredicate, 0))
-                    .append("/")
+                    .append('/')
                     .append(totalGames)
                     .append(")\n");
             sb.append("-# > ")
                     .append(trueFalseEmoji(includeMiltyModGames))
                     .append("includeMiltyModGames (")
                     .append(predicatesToIntegerCounts.getOrDefault(miltyModGamesPredicate, 0))
-                    .append("/")
+                    .append('/')
                     .append(totalGames)
                     .append(")\n");
             sb.append("-# > ")
                     .append(trueFalseEmoji(includeDSGames))
                     .append("includeDSGames (")
                     .append(predicatesToIntegerCounts.getOrDefault(dSGamesPredicate, 0))
-                    .append("/")
+                    .append('/')
                     .append(totalGames)
                     .append(")\n");
             sb.append("-# > ")
                     .append(trueFalseEmoji(includeFrankenGames))
                     .append("includeFrankenGames (")
                     .append(predicatesToIntegerCounts.getOrDefault(frankenGamesPredicate, 0))
-                    .append("/")
+                    .append('/')
                     .append(totalGames)
                     .append(")\n");
             sb.append("-# > ")
                     .append(trueFalseEmoji(includeEndedGames))
                     .append("includeEndedGames (")
                     .append(predicatesToIntegerCounts.getOrDefault(endedGamesPredicate, 0))
-                    .append("/")
+                    .append('/')
                     .append(totalGames)
                     .append(")\n");
 
@@ -220,7 +225,7 @@ class SearchGames extends Subcommand {
                     .append(searchName)
                     .append("` (")
                     .append(predicatesToIntegerCounts.getOrDefault(searchNamePredicate, 0))
-                    .append("/")
+                    .append('/')
                     .append(totalGames)
                     .append(")\n");
             sb.append("-# > ")
@@ -229,7 +234,7 @@ class SearchGames extends Subcommand {
                     .append(searchTags)
                     .append("` (")
                     .append(predicatesToIntegerCounts.getOrDefault(searchTagPredicate, 0))
-                    .append("/")
+                    .append('/')
                     .append(totalGames)
                     .append(")\n");
             sb.append("-# > ")
@@ -238,7 +243,7 @@ class SearchGames extends Subcommand {
                     .append(searchFactions)
                     .append("` (")
                     .append(predicatesToIntegerCounts.getOrDefault(searchFactionPredicate, 0))
-                    .append("/")
+                    .append('/')
                     .append(totalGames)
                     .append(")\n");
             sb.append("-# > ")
@@ -247,7 +252,7 @@ class SearchGames extends Subcommand {
                     .append(searchUser != null ? searchUser.getEffectiveName() : "")
                     .append("` (")
                     .append(predicatesToIntegerCounts.getOrDefault(searchUserPredicate, 0))
-                    .append("/")
+                    .append('/')
                     .append(totalGames)
                     .append(")\n");
             sb.append(gameText);
@@ -279,8 +284,8 @@ class SearchGames extends Subcommand {
     }
 
     private static void appendGameRepresentation(Game game, StringBuilder sb) {
-        sb.append("- **").append(game.getName()).append("**").append(" ");
-        sb.append("`").append(game.getCreationDate()).append("`-`");
+        sb.append("- **").append(game.getName()).append("**").append(' ');
+        sb.append('`').append(game.getCreationDate()).append("`-`");
         if (game.isHasEnded()) {
             sb.append(Helper.getDateRepresentation(game.getEndedDate()));
         } else {
@@ -294,6 +299,6 @@ class SearchGames extends Subcommand {
         }
         sb.append(" [").append(game.getGameModesText()).append("] ");
         if (game.isHasEnded()) sb.append(" ENDED");
-        sb.append("\n");
+        sb.append('\n');
     }
 }

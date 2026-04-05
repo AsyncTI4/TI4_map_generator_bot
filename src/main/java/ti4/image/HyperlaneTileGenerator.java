@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import ti4.ResourceHelper;
 import ti4.map.Game;
@@ -225,13 +224,17 @@ final class HyperlaneTileGenerator {
         String tilePath = tile.getTilePath();
         int transform = -1;
         if (matrix != null) {
-            Random rand = new Random(matrix.hashCode());
-            String randomTile = RANDOM_BACKGROUNDS.get(rand.nextInt(RANDOM_BACKGROUNDS.size()));
-            tilePath = ResourceHelper.getInstance().getTileFile(randomTile);
-            if (tilePath == null) {
-                tilePath = tile.getTilePath();
+            // Use matrix hashCode as seed for determinism: same matrix always yields same background/transform
+            long seed = matrix.hashCode();
+            int tileIndex = (int) Math.floorMod(seed, RANDOM_BACKGROUNDS.size());
+            String randomTile = RANDOM_BACKGROUNDS.get(tileIndex);
+            String randomTilePath = ResourceHelper.getInstance().getTileFile(randomTile);
+            if (randomTilePath != null) {
+                tilePath = randomTilePath;
             }
-            transform = rand.nextInt(4); // 0, 1, 2, or 3
+            transform = (int) Math.floorMod(
+                    seed * 6364136223846793005L + 1442695040888963407L,
+                    4); // LCG step (Knuth MMIX constants) for independent transform selection; 0, 1, 2, or 3
         }
 
         BufferedImage original = ImageHelper.read(tilePath);

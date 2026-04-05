@@ -33,7 +33,7 @@ public class AverageHitsPerTurnService {
 
     @Transactional(readOnly = true)
     public void getExpectedHitsPerTurn(SlashCommandInteractionEvent event) {
-        boolean sortOrderAscending = event.getOption("ascending", true, OptionMapping::getAsBoolean);
+        boolean sortOrderAscending = event.getOption("ascending", Boolean.TRUE, OptionMapping::getAsBoolean);
         int topLimit = event.getOption(Constants.TOP_LIMIT, DEFAULT_PLAYER_LIMIT, OptionMapping::getAsInt);
         int minimumTurns =
                 event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, DEFAULT_MINIMUM_TURNS, OptionMapping::getAsInt);
@@ -109,7 +109,7 @@ public class AverageHitsPerTurnService {
         StringBuilder sb = new StringBuilder("## __**Average Expected Hits Per Turn**__\n");
         int index = 1;
         for (var accumulator : accumulators) {
-            sb.append("`")
+            sb.append('`')
                     .append(Helper.leftpad(String.valueOf(index), 3))
                     .append(". ")
                     .append(String.format("%.2f", accumulator.getAverageExpectedHitsPerTurn()))
@@ -123,7 +123,7 @@ public class AverageHitsPerTurnService {
             if (tiers != null && tiers.containsKey(accumulator)) {
                 sb.append(" [").append(tiers.get(accumulator)).append("]");
             }
-            sb.append("\n");
+            sb.append('\n');
             index++;
         }
         return sb.toString();

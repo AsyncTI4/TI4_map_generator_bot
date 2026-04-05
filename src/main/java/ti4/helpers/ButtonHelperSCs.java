@@ -48,7 +48,7 @@ import ti4.service.unit.AddUnitService;
 public final class ButtonHelperSCs {
 
     @ButtonHandler("constructionPrimary_produce")
-    public static void resolveConstructionPrimaryTE(ButtonInteractionEvent event, Game game, Player player) {
+    public static void resolveConstructionPrimaryTE(Game game, Player player) {
         List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock);
 
         String prefix = player.getFinsFactionCheckerPrefix() + "constructionBuild_";
@@ -509,8 +509,8 @@ public final class ButtonHelperSCs {
         if (used) {
             return;
         }
-        int washedCommsPower = player.getCommoditiesTotal() + player.getTg();
         int commoditiesTotal = player.getCommoditiesTotal();
+        int washedCommsPower = commoditiesTotal + player.getTg();
         int tg = player.getTg();
         player.setTg(tg + commoditiesTotal);
         ButtonHelperAbilities.pillageCheck(player, game);
@@ -579,11 +579,11 @@ public final class ButtonHelperSCs {
                     p2.setTg(ogTG);
                     p2.setCommodities(ogComms);
                 }
-                ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, p2, player.getCommoditiesTotal());
+                ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, p2, commoditiesTotal);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p2, player, p2.getCommoditiesTotal());
             } else {
                 if (p2.getSCs().contains(tradeInitiative)) {
-                    ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, p2, player.getCommoditiesTotal());
+                    ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, p2, commoditiesTotal);
                 }
             }
             if (p2.getSCs().contains(tradeInitiative)) {
@@ -594,7 +594,7 @@ public final class ButtonHelperSCs {
         ReactionService.addReaction(event, game, player, "replenishing and washing.");
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
-        ButtonHelperStats.afterGainCommsChecks(game, player, player.getCommoditiesTotal());
+        ButtonHelperStats.afterGainCommsChecks(game, player, commoditiesTotal);
     }
 
     @ButtonHandler("anarchy7Build_")

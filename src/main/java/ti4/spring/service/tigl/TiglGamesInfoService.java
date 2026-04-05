@@ -49,7 +49,7 @@ public class TiglGamesInfoService {
             if (showGameIds && !gamesForRank.isEmpty()) {
                 sb.append(" → ").append(String.join(", ", gamesForRank));
             }
-            sb.append("\n");
+            sb.append('\n');
         }
 
         return sb.toString();

@@ -155,7 +155,7 @@ public class SliceGenerationSettings extends SettingsMenu {
     public String menuSummaryString(String lastSettingTouched) {
         StringBuilder sb = new StringBuilder("# **__").append(menuName).append(":__**");
         for (String line : description) sb.append("\n- *").append(line).append("*");
-        sb.append("\n");
+        sb.append('\n');
 
         int pad = enabledSettings().stream()
                 .map(x -> x.getName().length())
@@ -164,11 +164,11 @@ public class SliceGenerationSettings extends SettingsMenu {
         for (SettingInterface setting : enabledSettings()) {
             sb.append("> ");
             sb.append(setting.longSummary(pad, lastSettingTouched));
-            sb.append("\n");
+            sb.append('\n');
         }
         if (presetSlices != null)
-            sb.append("> Using preset slices: ").append(presetSlices).append("\n");
-        if (!enabledSettings().isEmpty()) sb.append("\n"); // extra line for formatting
+            sb.append("> Using preset slices: ").append(presetSlices).append('\n');
+        if (!enabledSettings().isEmpty()) sb.append('\n'); // extra line for formatting
 
         if (!categories().isEmpty()) {
             List<String> catStrings = new ArrayList<>();

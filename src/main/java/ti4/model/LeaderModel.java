@@ -227,8 +227,8 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         // DESCRIPTION
         StringBuilder description = new StringBuilder();
         if (includeFactionType) {
-            description.append(factionEmoji).append(" ").append(factionName).append(" ");
-            description.append(" ").append(StringUtils.capitalize(type));
+            description.append(factionEmoji).append(' ').append(factionName).append(' ');
+            description.append(' ').append(StringUtils.capitalize(type));
         }
         if (showUnlockConditions && !"agent".equals(type))
             description.append("\n*Unlock: ").append(unlockCondition).append("*");

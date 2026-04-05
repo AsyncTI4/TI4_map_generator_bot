@@ -41,10 +41,11 @@ class ServerGameStats extends Subcommand {
     public void execute(SlashCommandInteractionEvent event) {
         List<Guild> guildsToShow = new ArrayList<>(JdaService.serversToCreateNewGamesOn);
 
-        boolean includeHub = event.getOption(INCLUDE_HUB, false, OptionMapping::getAsBoolean);
+        boolean includeHub = event.getOption(INCLUDE_HUB, Boolean.FALSE, OptionMapping::getAsBoolean);
         if (includeHub || JdaService.guilds.size() == 1) guildsToShow.add(JdaService.guildPrimary);
 
-        boolean showOldestThreadInfo = event.getOption(SHOW_OLDEST_THREAD_INFO, false, OptionMapping::getAsBoolean);
+        boolean showOldestThreadInfo =
+                event.getOption(SHOW_OLDEST_THREAD_INFO, Boolean.FALSE, OptionMapping::getAsBoolean);
 
         int hostedGames = 0;
         int roomForGames = 0;
@@ -81,7 +82,7 @@ class ServerGameStats extends Subcommand {
             sb.append("> hosting **").append(gameCount).append("** games  -  ");
             sb.append("space for **").append(guildRoomForGames).append("** more games\n");
             if (showOldestThreadInfo) {
-                sb.append("> ").append(getOldestThreadString(guild)).append("\n");
+                sb.append("> ").append(getOldestThreadString(guild)).append('\n');
             }
             hostedGames += gameCount;
             roomForGames += guildRoomForGames;

@@ -32,14 +32,14 @@ class FactionAverageTurnsInGameStatisticsService {
         if (allFactionGames != null && allFactionTurns != null) {
             sb.append("All Factions Combined:")
                     .append(String.format("%.2f", allFactionTurns / (double) allFactionGames))
-                    .append("\n");
+                    .append('\n');
         }
         factionCount.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
                 .filter(entry -> !"allFactions".equals(entry.getKey()))
                 .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
                 .filter(entry -> entry.getKey() != null)
-                .forEach(entry -> sb.append("`")
+                .forEach(entry -> sb.append('`')
                         .append(StringUtils.leftPad(
                                 String.format(
                                         "%.2f",
@@ -49,9 +49,9 @@ class FactionAverageTurnsInGameStatisticsService {
                         .append(entry.getValue())
                         .append(" games`")
                         .append(entry.getKey().getFactionEmoji())
-                        .append(" ")
+                        .append(' ')
                         .append(entry.getKey().getFactionNameWithSourceEmoji())
-                        .append("\n"));
+                        .append('\n'));
 
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Average Turns per Faction", sb.toString());

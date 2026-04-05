@@ -167,9 +167,9 @@ public final class ButtonHelperTwilightsFall {
                 msg.append(count)
                         .append(". ")
                         .append(name)
-                        .append(" ")
+                        .append(' ')
                         .append(spliceEmoji)
-                        .append("\n");
+                        .append('\n');
             }
         }
         return msg.toString();

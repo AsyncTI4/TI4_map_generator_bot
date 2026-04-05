@@ -288,19 +288,19 @@ public final class LoreService {
         StringBuilder sb = new StringBuilder("\n");
         if (selectedValues.length > 0) {
             RECEIVER receiver = RECEIVER.valueOf(selectedValues[0]);
-            sb.append("1. Notify... ").append(receiver.name).append("\n");
+            sb.append("1. Notify... ").append(receiver.name).append('\n');
         }
         if (selectedValues.length > 1) {
             TRIGGER trigger = TRIGGER.valueOf(selectedValues[1]);
-            sb.append("2. When... ").append(trigger.name).append("\n");
+            sb.append("2. When... ").append(trigger.name).append('\n');
         }
         if (selectedValues.length > 2) {
             PING ping = PING.valueOf(selectedValues[2]);
-            sb.append("3. Ping GM... ").append(ping.name).append("\n");
+            sb.append("3. Ping GM... ").append(ping.name).append('\n');
         }
         if (selectedValues.length > 3) {
             PERSISTANCE persistance = PERSISTANCE.valueOf(selectedValues[3]);
-            sb.append("4. Trigger... ").append(persistance.name).append("\n");
+            sb.append("4. Trigger... ").append(persistance.name).append('\n');
         }
 
         return sb.toString();

@@ -285,12 +285,12 @@ public class ComponentActionHelper {
                 continue;
             }
 
-            if (relic.equalsIgnoreCase(Constants.ENIGMATIC_DEVICE)
-                    || !relic.contains("starchart")
+            if (Constants.ENIGMATIC_DEVICE.equalsIgnoreCase(relic)
+                    || (!relic.contains("starchart")
                             && (relicData.getText().contains("Action:")
-                                    || relicData.getText().contains("ACTION:"))) {
+                                    || relicData.getText().contains("ACTION:")))) {
                 Button rButton;
-                if (relic.equalsIgnoreCase(Constants.ENIGMATIC_DEVICE)) {
+                if (Constants.ENIGMATIC_DEVICE.equalsIgnoreCase(relic)) {
                     if (enigmaticSeen) {
                         continue;
                     }
@@ -586,7 +586,8 @@ public class ComponentActionHelper {
                             Helper.getPlanetPlaceUnitButtons(p1, game, "2gf", "placeOneNDone_skipbuildorbital"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("mutineers".equalsIgnoreCase(buttonID)) {
-                    String successMessage = p1.getFactionEmoji() + " spent 1 strategy token using "
+                    String factionEmoji = p1.getFactionEmoji();
+                    String successMessage = factionEmoji + " spent 1 strategy token using "
                             + FactionEmojis.sarcosa + "**Mutineers** (" + (p1.getStrategicCC()) + "->"
                             + (p1.getStrategicCC() - 1) + ")";
                     if (!p1.hasRelicReady("emelpar")) {
@@ -596,8 +597,8 @@ public class ComponentActionHelper {
                                 p1, game, event, FactionEmojis.Sol + " **Mutineers**");
                     } else {
                         p1.addExhaustedRelic("emelpar");
-                        successMessage = p1.getFactionEmoji() + " used the _" + RelicHelper.sillySpelling()
-                                + "_ to **Mutineers**.";
+                        successMessage =
+                                factionEmoji + " used the _" + RelicHelper.sillySpelling() + "_ to **Mutineers**.";
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                     String message = "Please choose the system you wish to replace 1 ship with.";
@@ -674,7 +675,6 @@ public class ComponentActionHelper {
                     String message = "Use buttons to end turn or do an action";
                     List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(p1, game, true, event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, systemButtons);
-
                 } else if ("fabrication".equalsIgnoreCase(buttonID)) {
                     String message = "Please choose the fragment you wish to purge. ";
                     List<Button> purgeFragButtons = new ArrayList<>();
@@ -799,15 +799,16 @@ public class ComponentActionHelper {
             case "generic" ->
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Doing unspecified component action.");
             case "absolMOW" -> {
+                String factionEmoji = p1.getFactionEmoji();
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        p1.getFactionEmoji()
+                        factionEmoji
                                 + " is exhausting the _Minister of War_ agenda and spending a command token from their strategy pool to remove 1 command token from the game board.");
                 if (p1.getStrategicCC() > 0) {
                     p1.setStrategicCC(p1.getStrategicCC() - 1);
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
-                            p1.getFactionEmoji()
+                            factionEmoji
                                     + ", you previously had " + (p1.getStrategicCC() + 1) + " command token"
                                     + (p1.getStrategicCC() + 1 == 1 ? "" : "s")
                                     + " in your strategy pool and now you have " + p1.getStrategicCC() + ".");

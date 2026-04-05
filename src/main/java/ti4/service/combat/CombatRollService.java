@@ -191,7 +191,7 @@ public class CombatRollService {
 
         if (playerUnitsByQuantity.isEmpty()) {
             String fightingOnUnitHolderName = unitHolderName;
-            if (!unitHolderName.equalsIgnoreCase(Constants.SPACE)) {
+            if (!Constants.SPACE.equalsIgnoreCase(unitHolderName)) {
                 fightingOnUnitHolderName = Helper.getPlanetRepresentation(unitHolderName, game);
             }
             MessageHelper.sendMessageToChannel(
@@ -259,12 +259,12 @@ public class CombatRollService {
         }
 
         // Check for temp mods
-        CombatTempModHelper.EnsureValidTempMods(player, tileModel, combatOnHolder);
-        CombatTempModHelper.InitializeNewTempMods(player, tileModel, combatOnHolder);
+        CombatTempModHelper.ensureValidTempMods(player, tileModel, combatOnHolder);
+        CombatTempModHelper.initializeNewTempMods(player, tileModel, combatOnHolder);
         List<NamedCombatModifierModel> tempMods =
-                new ArrayList<>(CombatTempModHelper.BuildCurrentRoundTempNamedModifiers(
+                new ArrayList<>(CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
                         player, tileModel, combatOnHolder, false, rollType));
-        List<NamedCombatModifierModel> tempOpponentMods = CombatTempModHelper.BuildCurrentRoundTempNamedModifiers(
+        List<NamedCombatModifierModel> tempOpponentMods = CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
                 opponent, tileModel, combatOnHolder, true, rollType);
         tempMods.addAll(tempOpponentMods);
 
@@ -338,7 +338,7 @@ public class CombatRollService {
             }
             for (String line : message.split("\n")) {
                 if (line.startsWith("> `") || line.startsWith("**Total hits")) {
-                    disaster.append("\n").append(line);
+                    disaster.append('\n').append(line);
                 }
             }
             DisasterWatchHelper.sendMessageInDisasterWatch(game, disaster.toString());

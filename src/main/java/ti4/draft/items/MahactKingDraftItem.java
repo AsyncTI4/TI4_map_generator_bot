@@ -62,7 +62,7 @@ public class MahactKingDraftItem extends DraftItem {
             if (unit.getCombatDieCount() > 1) {
                 sb.append("x").append(unit.getCombatDieCount());
             }
-            sb.append(" ");
+            sb.append(' ');
             if (unit.getSustainDamage()) {
                 sb.append("SUSTAIN DAMAGE ");
             }
@@ -71,22 +71,22 @@ public class MahactKingDraftItem extends DraftItem {
                         .append(unit.getAfbHitsOn())
                         .append("x")
                         .append(unit.getAfbDieCount())
-                        .append(" ");
+                        .append(' ');
             }
             if (unit.getProductionValue() > 0) {
                 sb.append("PRODUCTION ");
                 sb.append(unit.getProductionValue());
-                sb.append(" ");
+                sb.append(' ');
             }
             if (unit.getCapacityValue() > 0) {
                 sb.append("Capacity ");
                 sb.append(unit.getCapacityValue());
-                sb.append(" ");
+                sb.append(' ');
             }
             if (unit.getMoveValue() > 0) {
                 sb.append("Move ");
                 sb.append(unit.getMoveValue());
-                sb.append(" ");
+                sb.append(' ');
             }
             if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get());
             unit = Mapper.getUnit(getItemId() + "_mech");
@@ -96,7 +96,7 @@ public class MahactKingDraftItem extends DraftItem {
             if (unit.getCombatDieCount() > 1) {
                 sb.append("x").append(unit.getCombatDieCount());
             }
-            sb.append(" ");
+            sb.append(' ');
             if (unit.getSustainDamage()) {
                 sb.append("SUSTAIN DAMAGE ");
             }
@@ -105,12 +105,12 @@ public class MahactKingDraftItem extends DraftItem {
                         .append(unit.getAfbHitsOn())
                         .append("x")
                         .append(unit.getAfbDieCount())
-                        .append(" ");
+                        .append(' ');
             }
             if (unit.getProductionValue() > 0) {
                 sb.append("PRODUCTION ");
                 sb.append(unit.getProductionValue());
-                sb.append(" ");
+                sb.append(' ');
             }
             if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get());
             return sb.toString();

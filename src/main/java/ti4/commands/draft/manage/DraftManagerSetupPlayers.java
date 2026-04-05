@@ -23,7 +23,7 @@ class DraftManagerSetupPlayers extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         DraftManager draftManager = game.getDraftManager();
-        boolean force = event.getOption(Constants.FORCE_OPTION, false, OptionMapping::getAsBoolean);
+        boolean force = event.getOption(Constants.FORCE_OPTION, Boolean.FALSE, OptionMapping::getAsBoolean);
         if (force) {
             draftManager.setupPlayers(event);
         } else {

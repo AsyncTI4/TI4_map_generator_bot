@@ -25,7 +25,7 @@ public class FrankenFactionTechService {
             } else {
                 sb.append("> ").append(Mapper.getTech(techID).getRepresentation(true));
             }
-            sb.append("\n");
+            sb.append('\n');
             player.addFactionTech(techID);
 
             // ADD BASE UNIT IF ADDING UNIT UPGRADE TECH
@@ -55,7 +55,7 @@ public class FrankenFactionTechService {
             } else {
                 sb.append("> ").append(techID);
             }
-            sb.append("\n");
+            sb.append('\n');
             player.removeFactionTech(techID);
 
             // ADD BASE UNIT BACK IF REMOVING UNIT UPGRADE TECH

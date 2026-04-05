@@ -161,9 +161,9 @@ public final class ButtonHelperModifyUnits {
                 if ("fighter".equalsIgnoreCase(unitName) && min > 0) {
                     msg.append("> Destroyed ")
                             .append(min)
-                            .append(" ")
+                            .append(' ')
                             .append(UnitEmojis.fighter)
-                            .append("\n");
+                            .append('\n');
                     hits -= min;
                     var unit = new ParsedUnit(unitKey, min, unitHolder.getName());
                     DestroyUnitService.destroyUnit(event, tile, game, unit, true);
@@ -197,7 +197,7 @@ public final class ButtonHelperModifyUnits {
                 if (unitModel.getSustainDamage() && min > 0 && unitModel.getIsShip()) {
                     msg.append("> Made ")
                             .append(min)
-                            .append(" ")
+                            .append(' ')
                             .append(unitModel.getUnitEmoji())
                             .append(" sustained\n");
                     hits -= min;
@@ -326,16 +326,16 @@ public final class ButtonHelperModifyUnits {
                     if (RandomHelper.isOneInX(40)) {
                         msg.append("> ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
                                 .append(" got a boo boo 🤕")
-                                .append("\n");
+                                .append('\n');
                     } else {
                         msg.append("> Sustained ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
-                                .append("\n");
+                                .append('\n');
                     }
                     hits -= min * (player.hasTech("nes") ? 2 : 1);
                     tile.addUnitDamage(planet, unitEntry.getKey(), min);
@@ -378,9 +378,9 @@ public final class ButtonHelperModifyUnits {
                     if (unitName.equalsIgnoreCase(unitType) && min > 0) {
                         msg.append("> Destroyed ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(entry.getValue())
-                                .append("\n");
+                                .append('\n');
                         hits -= min;
                         var unit = new ParsedUnit(unitKey, min, planet);
                         DestroyUnitService.destroyUnit(event, tile, game, unit, true);
@@ -404,10 +404,10 @@ public final class ButtonHelperModifyUnits {
                 if ("mech".equalsIgnoreCase(unitName) && min > 0) {
                     msg.append("> Destroyed ")
                             .append(min)
-                            .append(" ")
+                            .append(' ')
                             .append(unitName)
                             .append(min == 1 ? "" : "s")
-                            .append("\n");
+                            .append('\n');
                     hits -= min;
                     if (min + 1 > totalUnits) {
                         duraniumMsg = duraniumMsg.replace(unitName, "");
@@ -561,9 +561,9 @@ public final class ButtonHelperModifyUnits {
                     if (!justSummarizing) {
                         msg.append("> Sustained ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
-                                .append("\n");
+                                .append('\n');
                         tile.addUnitDamage("space", unitKey, min);
                         for (int x = 0; x < min; x++) {
                             ButtonHelperCommanders.resolveLetnevCommanderCheck(player, game, event);
@@ -571,9 +571,9 @@ public final class ButtonHelperModifyUnits {
                     } else {
                         msg.append("> Would sustain ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
-                                .append("\n");
+                                .append('\n');
                     }
                 }
             }
@@ -626,9 +626,9 @@ public final class ButtonHelperModifyUnits {
                     if (!justSummarizing) {
                         msg.append("> Sustained ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
-                                .append("\n");
+                                .append('\n');
                         tile.addUnitDamage("space", unitKey, min);
                         for (int x = 0; x < min; x++) {
                             ButtonHelperCommanders.resolveLetnevCommanderCheck(player, game, event);
@@ -636,9 +636,9 @@ public final class ButtonHelperModifyUnits {
                     } else {
                         msg.append("> Would sustain ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
-                                .append("\n");
+                                .append('\n');
                     }
                 }
             }
@@ -719,15 +719,15 @@ public final class ButtonHelperModifyUnits {
                         DestroyUnitService.destroyUnit(event, tile, game, unit, !spaceCannonOffence);
                         msg.append("> Destroyed ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
-                                .append("\n");
+                                .append('\n');
                     } else {
                         msg.append("> Would destroy ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
-                                .append("\n");
+                                .append('\n');
                     }
                     continue; // Skip to the next unit
                 } else if (isRemainingSustains && unitModel.getIsShip() && unitModel.getSustainDamage() && min > 0) {
@@ -750,15 +750,15 @@ public final class ButtonHelperModifyUnits {
                         handleLetnevCommanderCheck(player, game, event, min);
                         msg.append("> Sustained ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
-                                .append("\n");
+                                .append('\n');
                     } else {
                         msg.append("> Would sustain ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
-                                .append("\n");
+                                .append('\n');
                     }
 
                     continue; // Skip to the next unit
@@ -773,15 +773,15 @@ public final class ButtonHelperModifyUnits {
                         DestroyUnitService.destroyUnit(event, tile, game, unit, !spaceCannonOffence);
                         msg.append("> Destroyed ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
-                                .append("\n");
+                                .append('\n');
                     } else {
                         msg.append("> Would destroy ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
-                                .append("\n");
+                                .append('\n');
                     }
                 }
             }
@@ -812,15 +812,15 @@ public final class ButtonHelperModifyUnits {
                             ButtonHelper.resolveInfantryRemoval(player, min, tile);
                         msg.append("> Removed ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
-                                .append("\n");
+                                .append('\n');
                     } else {
                         msg.append("> Would remove ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
-                                .append("\n");
+                                .append('\n');
                     }
                 }
             }
@@ -2452,7 +2452,7 @@ public final class ButtonHelperModifyUnits {
     }
 
     @ButtonHandler("domnaStepOne_")
-    public static void offerDomnaStep2Buttons(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void offerDomnaStep2Buttons(ButtonInteractionEvent event, Game game, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         List<Button> buttons = new ArrayList<>();

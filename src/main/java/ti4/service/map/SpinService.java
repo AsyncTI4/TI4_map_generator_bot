@@ -285,7 +285,7 @@ public class SpinService {
         } else {
             List<String> overTheBoundsWarning = new ArrayList<>();
             for (SpinSetting setting : getSpinSettings(game)) {
-                sb.append(setting.getRepresentation(false)).append("\n");
+                sb.append(setting.getRepresentation(false)).append('\n');
                 if (setting.maxRing() > 9) {
                     overTheBoundsWarning.add(setting.id);
                 }

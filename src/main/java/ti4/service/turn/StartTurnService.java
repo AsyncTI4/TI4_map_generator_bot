@@ -373,7 +373,7 @@ public class StartTurnService {
                     Long id = Long.parseLong(Arrays.asList(jumplink.split("/")).getLast());
                     thingsToFollow.put(id, msg);
                 } else {
-                    sb.append(msg).append("\n");
+                    sb.append(msg).append('\n');
                 }
                 sendReminder = true;
             }
@@ -389,7 +389,7 @@ public class StartTurnService {
                         String jumplink = gm.asJumpLink(game.getMainGameChannel());
                         thingsToFollow.put(id, msgPart + " " + jumplink + "\n");
                     } else {
-                        sb.append(msgPart).append("\n");
+                        sb.append(msgPart).append('\n');
                     }
                     sendReminder = true;
                 }

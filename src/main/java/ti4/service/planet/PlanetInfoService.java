@@ -50,7 +50,7 @@ public class PlanetInfoService {
         }
         sb.append(MiscEmojis.getResourceEmoji(planet.getResources()))
                 .append(MiscEmojis.getInfluenceEmoji(planet.getInfluence()))
-                .append("\n");
+                .append('\n');
         eb.setDescription(sb.toString());
         Mapper.getTokensToName();
         if (!planet.getTokenList().isEmpty())

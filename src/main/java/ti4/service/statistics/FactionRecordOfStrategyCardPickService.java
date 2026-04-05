@@ -58,7 +58,7 @@ public class FactionRecordOfStrategyCardPickService {
                 .append(gamesThatHadThem)
                 .append(" Games)**__\n");
 
-        boolean sortOrderAscending = event.getOption("ascending", false, OptionMapping::getAsBoolean);
+        boolean sortOrderAscending = event.getOption("ascending", Boolean.FALSE, OptionMapping::getAsBoolean);
         Comparator<Map.Entry<String, Integer>> comparator = (o1, o2) -> {
             int o1total = o1.getValue();
             int o2total = o2.getValue();
@@ -68,7 +68,7 @@ public class FactionRecordOfStrategyCardPickService {
         AtomicInteger index = new AtomicInteger(1);
 
         scsPicked.entrySet().stream().sorted(comparator).forEach(techResearched -> {
-            sb.append("`")
+            sb.append('`')
                     .append(Helper.leftpad(String.valueOf(index.get()), 3))
                     .append(". ");
             sb.append("` ").append(techResearched.getKey());
@@ -78,7 +78,7 @@ public class FactionRecordOfStrategyCardPickService {
                         .append(custodians.getOrDefault(techResearched.getKey(), 0))
                         .append(" times)");
             }
-            sb.append("\n");
+            sb.append('\n');
             index.getAndIncrement();
         });
 
@@ -111,8 +111,8 @@ public class FactionRecordOfStrategyCardPickService {
                     continue;
                 }
                 scsPicked.merge(scName, 1, Integer::sum);
-                if (game.getCustodiansTaker() != null
-                        && game.getCustodiansTaker().equalsIgnoreCase(faction)) {
+                String custodianTaker = game.getCustodiansTaker();
+                if (faction.equalsIgnoreCase(custodianTaker)) {
                     custodians.merge(scName, 1, Integer::sum);
                 }
             }

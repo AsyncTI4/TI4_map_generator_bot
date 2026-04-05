@@ -800,7 +800,7 @@ public final class ButtonHelperAbilities {
                 myko.getRepresentationUnfogged() + " rolled 4 **Omen** dice and rolled the following numbers:");
         for (int x = 0; x < 4; x++) {
             Die d1 = new Die(6);
-            msg.append(" ").append(d1.getResult());
+            msg.append(' ').append(d1.getResult());
             addOmenDie(game, d1.getResult());
         }
         MessageHelper.sendMessageToChannel(
@@ -1832,7 +1832,7 @@ public final class ButtonHelperAbilities {
         ExploreModel card = Mapper.getExplore(cardID);
         sb.append(card.textRepresentation()).append(System.lineSeparator());
         String cardType = card.getResolution();
-        if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
+        if (Constants.FRAGMENT.equalsIgnoreCase(cardType)) {
             sb.append(player.getRepresentationUnfogged()).append(" Gained relic fragment\n");
             player.addFragment(cardID);
             game.purgeExplore(cardID);
@@ -2362,8 +2362,7 @@ public final class ButtonHelperAbilities {
             Player neutral = game.getPlayerFromColorOrFaction("neutral");
             if (neutral == null) {
                 String color = SetupNeutralPlayer.pickNeutralColor(game);
-                game.setupNeutralPlayer(color);
-                neutral = game.getPlayerFromColorOrFaction("neutral");
+                neutral = game.setupNeutralPlayer(color);
             }
             if (neutral != null) {
                 for (Tile tile : game.getTileMap().values()) {

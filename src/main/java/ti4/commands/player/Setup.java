@@ -59,7 +59,7 @@ class Setup extends GameStateSubcommand {
         }
 
         // SPEAKER
-        boolean setSpeaker = event.getOption(Constants.SPEAKER, false, OptionMapping::getAsBoolean);
+        boolean setSpeaker = event.getOption(Constants.SPEAKER, Boolean.FALSE, OptionMapping::getAsBoolean);
         // Substring to grab "305" from "305 Moll Primus (Mentak)" autocomplete
         String positionHS = StringUtils.substringBefore(
                 event.getOption(Constants.HS_TILE_POSITION, "", OptionMapping::getAsString), " ");

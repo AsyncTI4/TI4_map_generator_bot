@@ -40,7 +40,7 @@ class ProduceNucleusGenStats extends GameStateSubcommand {
         Game game = getGame();
         DraftSpec draftSpec = new DraftSpec(game);
         if (game.getMiltySettingsUnsafe() != null) {
-            draftSpec = DraftSpec.CreateFromMiltySettings(game.getMiltySettingsUnsafe());
+            draftSpec = DraftSpec.createFromMiltySettings(game.getMiltySettingsUnsafe());
         } else {
             String mapTemplateId = game.getMapTemplateID();
             MapTemplateModel mapTemplate = mapTemplateId != null ? Mapper.getMapTemplate(mapTemplateId) : null;
@@ -126,7 +126,7 @@ class ProduceNucleusGenStats extends GameStateSubcommand {
 
         StringBuilder result = new StringBuilder();
         result.append("Out of ").append(numIterations).append(" attempts:\n");
-        result.append("- Successes: ").append(successAfterAttempts.size()).append("\n");
+        result.append("- Successes: ").append(successAfterAttempts.size()).append('\n');
         if (!successRuntimes.isEmpty()) {
             result.append("- Average Success Runtime: ")
                     .append(successRuntimes.stream()
@@ -152,7 +152,7 @@ class ProduceNucleusGenStats extends GameStateSubcommand {
                 .append(entry.getKey())
                 .append(": ")
                 .append(entry.getValue())
-                .append("\n"));
+                .append('\n'));
 
         var tilesByOccurrence = tileManager.getAll().stream()
                 .sorted(Comparator.comparing(t -> {
@@ -194,7 +194,7 @@ class ProduceNucleusGenStats extends GameStateSubcommand {
                     .append(" (")
                     .append(String.format("%.1f", inSlicesPercent))
                     .append("%)");
-            result.append("\n");
+            result.append('\n');
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), result.toString());

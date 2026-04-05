@@ -77,7 +77,7 @@ class SendCommodities extends GameStateSubcommand {
         ButtonHelperAbilities.pillageCheck(targetPlayer, game);
         ButtonHelperAbilities.pillageCheck(player, game);
 
-        if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
+        if (event.getOption(Constants.CLEAR_DEBT, Boolean.FALSE, OptionMapping::getAsBoolean)) {
             targetPlayer.clearDebt(player, sendCommodities);
             MessageHelper.sendMessageToEventChannel(
                     event,

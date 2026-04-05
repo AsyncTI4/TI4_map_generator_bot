@@ -285,7 +285,7 @@ public class WebScoreBreakdown {
         int maxPublicObjectives = 1; // Base: 1 scoring opportunity (status phase)
 
         // Check for Imperial holder + untapped
-        if (hasImperialUntapped(player, game)) {
+        if (hasImperialUntapped(player)) {
             maxPublicObjectives++;
         }
 
@@ -378,11 +378,11 @@ public class WebScoreBreakdown {
 
         // Imperial points - can score one from Imperial SC and one from Winnu Hero (ADDITIVE)
         // QUALIFIES if has Mecatol Rex, otherwise will be added as POTENTIAL in addPotentialEntries
-        boolean hasMecatol = hasControlOfMecatol(player, game);
+        boolean hasMecatol = hasControlOfMecatol(player);
         EntryState imperialEntryState = hasMecatol ? EntryState.QUALIFIES : EntryState.POTENTIAL;
 
         // Imperial SC point - QUALIFIES if has Mecatol
-        if (hasImperialUntapped(player, game)) {
+        if (hasImperialUntapped(player)) {
             ScoreBreakdownEntry entry =
                     createEntry(EntryType.IMPERIAL, null, null, imperialEntryState, false, 1, null, null);
 
@@ -621,7 +621,7 @@ public class WebScoreBreakdown {
         return skips.size();
     }
 
-    private static boolean hasImperialUntapped(Player player, Game game) {
+    private static boolean hasImperialUntapped(Player player) {
         if (player == null) return false;
         return player.getSCs().contains(IMPERIAL_STRATEGY_CARD)
                 && !player.getExhaustedSCs().contains(IMPERIAL_STRATEGY_CARD);
@@ -637,7 +637,7 @@ public class WebScoreBreakdown {
         return hero.isActive() && !hero.isExhausted();
     }
 
-    private static boolean hasControlOfMecatol(Player player, Game game) {
+    private static boolean hasControlOfMecatol(Player player) {
         if (player == null) return false;
         return player.getPlanets().contains(MECATOL_REX_PLANET);
     }
@@ -717,16 +717,6 @@ public class WebScoreBreakdown {
         return entries.stream().anyMatch(e -> e.getType() == type);
     }
 
-    private static boolean alreadyHasEntry(List<ScoreBreakdownEntry> entries, EntryType type, EntryState state) {
-        if (entries == null) return false;
-        return entries.stream().anyMatch(e -> e.getType() == type && e.getState() == state);
-    }
-
-    private static boolean alreadyHasEntryForObjective(List<ScoreBreakdownEntry> entries, String objectiveKey) {
-        if (entries == null || objectiveKey == null) return false;
-        return entries.stream().anyMatch(e -> objectiveKey.equals(e.getObjectiveKey()));
-    }
-
     private static boolean hasShardOfTheThrone(Player player) {
         if (player == null) return false;
         return player.hasRelic(RELIC_SHARD) || player.hasRelic(RELIC_SHARD_ABSOL);
@@ -772,7 +762,7 @@ public class WebScoreBreakdown {
         List<String> opportunities = new ArrayList<>();
         opportunities.add("status phase");
 
-        if (hasImperialUntapped(player, game)) {
+        if (hasImperialUntapped(player)) {
             opportunities.add("imperial");
         }
 

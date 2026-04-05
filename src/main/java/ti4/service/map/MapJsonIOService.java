@@ -375,7 +375,7 @@ public class MapJsonIOService {
                 .append(tileIO.getPosition())
                 .append(": ")
                 .append(message)
-                .append("\n");
+                .append('\n');
     }
 
     @Data

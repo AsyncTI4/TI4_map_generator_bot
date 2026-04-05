@@ -242,20 +242,20 @@ public class Player extends PlayerProperties {
         boolean singularity = false;
         if (getSingularityTechs().contains(tech)) {
             singularity = true;
-            String oldVal = getGame().getStoredValue(getFaction() + "singularityTechs");
+            String oldVal = game.getStoredValue(getFaction() + "singularityTechs");
             if (oldVal.contains(tech + "_")) {
                 oldVal = oldVal.replace(tech + "_", "");
             } else {
                 oldVal = oldVal.replace(tech, "");
             }
-            getGame().setStoredValue(getFaction() + "singularityTechs", oldVal);
+            game.setStoredValue(getFaction() + "singularityTechs", oldVal);
         }
         return singularity;
     }
 
     public void addSingularityTech(String tech) {
         if (!getSingularityTechs().contains(tech)) {
-            String prev = getGame().getStoredValue(getFaction() + "singularityTechs");
+            String prev = game.getStoredValue(getFaction() + "singularityTechs");
             if (!prev.isEmpty()) {
                 prev += "_";
             }
@@ -1316,6 +1316,7 @@ public class Player extends PlayerProperties {
         return Mapper.getSecretObjective(idToRemove);
     }
 
+    @NotNull
     public Map<String, Integer> getSecretsUnscored() {
         Map<String, Integer> secretsUnscored = new HashMap<>();
         for (Map.Entry<String, Integer> secret : secrets.entrySet()) {
@@ -1663,11 +1664,11 @@ public class Player extends PlayerProperties {
                         continue;
                     }
                     if (ping) {
-                        sb.append(" ").append(userById.getAsMention());
+                        sb.append(' ').append(userById.getAsMention());
                     }
                 }
                 if (getColor() != null && !"null".equals(getColor()) && !noColor) {
-                    sb.append(" ").append(ColorEmojis.getColorEmojiWithName(getColor()));
+                    sb.append(' ').append(ColorEmojis.getColorEmojiWithName(getColor()));
                 }
                 return sb.toString();
             } else if (roleForCommunity != null) {
@@ -1694,7 +1695,7 @@ public class Player extends PlayerProperties {
             sb.append(getUserName());
         }
         if (getColor() != null && !"null".equals(getColor()) && !noColor) {
-            sb.append(" ").append(ColorEmojis.getColorEmojiWithName(getColor()));
+            sb.append(' ').append(ColorEmojis.getColorEmojiWithName(getColor()));
         }
         return sb.toString();
     }
@@ -1770,10 +1771,15 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasCustomFactionEmoji() {
-        return StringUtils.isNotBlank(getFactionEmoji())
-                && !"null".equals(getFactionEmoji())
-                && getFactionModel() != null
-                && !getFactionEmoji().equalsIgnoreCase(getFactionModel().getFactionEmoji());
+        String factionEmoji = getFactionEmoji();
+        return StringUtils.isNotBlank(factionEmoji)
+                && !"null".equals(factionEmoji)
+                && isFactionEmojiDifferentFromWhatIsOnModel();
+    }
+
+    private boolean isFactionEmojiDifferentFromWhatIsOnModel() {
+        FactionModel factionModel = getFactionModel();
+        return factionModel != null && !getFactionEmoji().equalsIgnoreCase(factionModel.getFactionEmoji());
     }
 
     private void initAbilities(Game game) {
@@ -1896,9 +1902,8 @@ public class Player extends PlayerProperties {
             }
         }
         if (leaderID.contains("agent")) {
-            leaderID = "yssarilagent";
             for (Leader leader : leaders) {
-                if (leader.getId().equals(leaderID)) {
+                if ("yssarilagent".equals(leader.getId())) {
                     return Optional.of(leader);
                 }
             }
@@ -3112,7 +3117,7 @@ public class Player extends PlayerProperties {
         StringBuilder sb = new StringBuilder();
         for (String id : getAbilities()) {
             AbilityModel model = Mapper.getAbility(id);
-            sb.append(model.getNameRepresentation()).append("\n");
+            sb.append(model.getNameRepresentation()).append('\n');
         }
         addFieldSafely(eb, "__Abilities__", sb.toString(), true);
 
@@ -3120,7 +3125,7 @@ public class Player extends PlayerProperties {
         sb = new StringBuilder();
         for (String id : getFactionTechs()) {
             TechnologyModel model = Mapper.getTech(id);
-            sb.append(model.getNameRepresentation()).append("\n");
+            sb.append(model.getNameRepresentation()).append('\n');
         }
         addFieldSafely(eb, "__Faction Technologies__", sb.toString(), true);
 
@@ -3128,7 +3133,7 @@ public class Player extends PlayerProperties {
         sb = new StringBuilder();
         for (String id : getTechs()) {
             TechnologyModel model = Mapper.getTech(id);
-            sb.append(model.getNameRepresentation()).append("\n");
+            sb.append(model.getNameRepresentation()).append('\n');
         }
         addFieldSafely(eb, "__Technologies__", sb.toString(), true);
 
@@ -3136,7 +3141,7 @@ public class Player extends PlayerProperties {
         sb = new StringBuilder();
         for (String id : getSpecialUnitsOwned()) {
             UnitModel model = Mapper.getUnit(id);
-            sb.append(model.getNameRepresentation()).append("\n");
+            sb.append(model.getNameRepresentation()).append('\n');
         }
         addFieldSafely(eb, "__Units__", sb.toString(), true);
 
@@ -3144,7 +3149,7 @@ public class Player extends PlayerProperties {
         sb = new StringBuilder();
         for (String id : getSpecialPromissoryNotesOwned()) {
             PromissoryNoteModel model = Mapper.getPromissoryNote(id);
-            sb.append(model.getNameRepresentation()).append("\n");
+            sb.append(model.getNameRepresentation()).append('\n');
         }
         addFieldSafely(eb, "__Promissory Notes__", sb.toString(), true);
 
@@ -3152,7 +3157,7 @@ public class Player extends PlayerProperties {
         sb = new StringBuilder();
         for (String id : getLeaderIDs()) {
             LeaderModel model = Mapper.getLeader(id);
-            sb.append(model.getNameRepresentation()).append("\n");
+            sb.append(model.getNameRepresentation()).append('\n');
         }
         addFieldSafely(eb, "__Leaders__", sb.toString(), false);
 
@@ -3174,7 +3179,7 @@ public class Player extends PlayerProperties {
         eb.setColor(Mapper.getColor(getColor()).getPrimaryColor());
     }
 
-    public String getContainerTitle() {
+    private String getContainerTitle() {
         FactionModel model = getFactionModel();
 
         String displayName = getDisplayName();
@@ -3183,7 +3188,8 @@ public class Player extends PlayerProperties {
 
         String emoji = getFactionEmoji();
         String color = ColorEmojis.getColorEmojiWithName(getColor());
-        String commods = getCommoditiesTotal() + " Commodities " + MiscEmojis.comm(getCommoditiesTotal());
+        int commoditiesTotal = getCommoditiesTotal();
+        String commods = commoditiesTotal + " Commodities " + MiscEmojis.comm(commoditiesTotal);
 
         return String.format("%s %s\n%s\n%s", emoji, name, color, commods);
     }

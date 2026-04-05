@@ -152,10 +152,11 @@ public class StatusCleanupService {
                 SpinService.executeSpinsForTrigger(game, SpinService.AutoTrigger.STATUS);
             }
         }
-        if (!game.isFowMode() && game.getTableTalkChannel() != null && !game.isOmegaPhaseMode()) {
+        TextChannel tableTalkChannel = game.getTableTalkChannel();
+        if (!game.isFowMode() && tableTalkChannel != null && !game.isOmegaPhaseMode()) {
             MessageHelper.sendMessageToChannel(
-                    game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
-            ListPlayerInfoService.displayerScoringProgression(game, true, game.getTableTalkChannel(), "both");
+                    tableTalkChannel, "## End of Round #" + game.getRound() + " Scoring Info");
+            ListPlayerInfoService.displayerScoringProgression(game, true, tableTalkChannel, "both");
         }
         game.clearAllEmptyStoredValues();
     }

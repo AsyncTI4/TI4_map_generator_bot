@@ -315,7 +315,7 @@ public class CardsInfoService {
                 && !ButtonHelperAbilities.getAllOmenDie(game).isEmpty()) {
             StringBuilder omenDice = new StringBuilder();
             for (int omenDie : ButtonHelperAbilities.getAllOmenDie(game)) {
-                omenDice.append(" ").append(omenDie);
+                omenDice.append(' ').append(omenDie);
             }
             omenDice = new StringBuilder(omenDice.toString().trim());
             buttons.add(Buttons.gray("getOmenDice", "Use an omen die (" + omenDice + ")", FactionEmojis.mykomentori));

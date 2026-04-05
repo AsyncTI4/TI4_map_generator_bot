@@ -105,7 +105,7 @@ public final class DiceHelper {
             if (results != null && !results.isEmpty()) {
                 // "` 3` dice on a ` 5`: [4, **5**, **6**] = 2 hits"
                 sb.append(String.format("%d dice vs %d: %s", results.size(), threshold, formatDiceResults(results)));
-                sb.append("\n");
+                sb.append('\n');
             }
         }
         sb.append(String.format("Total: %d hits", countSuccesses(dice)));

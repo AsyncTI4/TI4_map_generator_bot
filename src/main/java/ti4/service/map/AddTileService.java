@@ -1,10 +1,10 @@
 package ti4.service.map;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -44,7 +44,8 @@ public class AddTileService {
     }
 
     public static Set<ComponentSource> getSources(SlashCommandInteractionEvent event, Game game) {
-        return getSources(game, event.getOption(Constants.INCLUDE_ERONOUS_TILES, false, OptionMapping::getAsBoolean));
+        return getSources(
+                game, event.getOption(Constants.INCLUDE_ERONOUS_TILES, Boolean.FALSE, OptionMapping::getAsBoolean));
     }
 
     // This should be changed to support multiple sources and not just Eronous
@@ -74,13 +75,11 @@ public class AddTileService {
         List<TileModel> availableTiles = new ArrayList<>();
         switch (type) {
             case BR:
-                List<Supplier<List<TileModel>>> tileFinders = new Random().nextBoolean()
-                        ? List.of(
-                                () -> findBlueTiles(sources, existingTileModels, drawnTiles),
-                                () -> findRedTiles(sources, existingTileModels, drawnTiles))
-                        : List.of(
-                                () -> findRedTiles(sources, existingTileModels, drawnTiles),
-                                () -> findBlueTiles(sources, existingTileModels, drawnTiles));
+                List<Supplier<List<TileModel>>> tileFinders = new ArrayList<>(List.of(
+                        () -> findBlueTiles(sources, existingTileModels, drawnTiles),
+                        () -> findRedTiles(sources, existingTileModels, drawnTiles)));
+
+                Collections.shuffle(tileFinders);
 
                 for (Supplier<List<TileModel>> tileFinder : tileFinders) {
                     availableTiles = tileFinder.get();

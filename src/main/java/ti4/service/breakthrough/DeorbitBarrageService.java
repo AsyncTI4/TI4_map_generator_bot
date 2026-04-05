@@ -21,7 +21,6 @@ import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.regex.RegexService;
@@ -38,7 +37,7 @@ public class DeorbitBarrageService {
         List<Tile> asteroids =
                 game.getTileMap().values().stream().filter(asteroidWithUnit).toList();
 
-        List<Planet> eligibleTargets = asteroids.stream()
+        return asteroids.stream()
                 .map(Tile::getPosition)
                 .flatMap(pos -> FoWHelper.getAdjacentTiles(game, pos, player, false).stream())
                 .flatMap(pos -> FoWHelper.getAdjacentTiles(game, pos, player, false).stream())
@@ -48,7 +47,6 @@ public class DeorbitBarrageService {
                 .flatMap(tile -> tile.getPlanetUnitHolders().stream())
                 .filter(Planet::hasUnits)
                 .toList();
-        return eligibleTargets;
     }
 
     public void postInitialButtons(Game game, Player player) {
@@ -116,7 +114,6 @@ public class DeorbitBarrageService {
                         + " resource" + (amount == 1 ? "" : "s") + " to roll " + amount
                         + " dice, hitting on a 4+.");
         ButtonHelper.deleteMessage(event);
-        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         if (amount > 0) {
             int hits = 0;
             StringBuilder msg = new StringBuilder(FactionEmojis.Saar + " rolled ");

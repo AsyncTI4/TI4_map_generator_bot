@@ -147,9 +147,9 @@ public class AddUnitService {
             }
             unitListBuilder
                     .append(parsedUnit.getCount())
-                    .append(" ")
+                    .append(' ')
                     .append(parsedUnit.getUnitKey().asyncID())
-                    .append(" ")
+                    .append(' ')
                     .append(parsedUnit.getLocation());
             first = false;
         }

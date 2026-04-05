@@ -2,7 +2,6 @@ package ti4.helpers;
 
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public final class Constants {
@@ -16,7 +15,7 @@ public final class Constants {
     public static final String gedsDeadId = "586504147746947090";
     public static final String sigmaId = "214326507458396161";
     public static final String bambamId = "487030345812672523";
-    public static final List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
+    public static final List<String> honoraryJazz = List.of("1153503280706625606", tspId);
     public static final String jabberwockyId = "455013002953883651";
     public static final String solaxId = "380689512621277185";
 
@@ -1234,13 +1233,8 @@ public final class Constants {
     public static final String VERBOSITY_VERBOSE = "verbose";
     private static final String VERBOSITY_AVERAGE = "average";
     private static final String VERBOSITY_MINIMAL = "minimal";
-    public static final List<String> VERBOSITY_OPTIONS = new ArrayList<>();
-
-    static {
-        VERBOSITY_OPTIONS.add(VERBOSITY_VERBOSE);
-        VERBOSITY_OPTIONS.add(VERBOSITY_AVERAGE);
-        VERBOSITY_OPTIONS.add(VERBOSITY_MINIMAL);
-    }
+    public static final List<String> VERBOSITY_OPTIONS =
+            List.of(VERBOSITY_VERBOSE, VERBOSITY_AVERAGE, VERBOSITY_MINIMAL);
 
     public static final String BETA_TEST_MODE = "beta_test_mode";
     public static final String CC_LIMIT = "cc_limit";

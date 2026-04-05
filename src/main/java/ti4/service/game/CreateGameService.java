@@ -85,7 +85,7 @@ public class CreateGameService {
         String threadName = "game-starts-and-ends";
         // SEARCH FOR EXISTING OPEN THREAD
         for (ThreadChannel threadChannel_ : threadChannels) {
-            if (threadChannel_.getName().equals(threadName)) {
+            if (threadName.equals(threadChannel_.getName())) {
                 String guildName = game.getGuild() == null
                         ? "Server Unknown"
                         : game.getGuild().getName();
@@ -433,10 +433,10 @@ public class CreateGameService {
                     "### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join our **");
             sb.append(guild.getName()).append("** server.\n");
             sb.append(Helper.getGuildInviteURL(guild, missingMembers.size() + 15))
-                    .append("\n");
+                    .append('\n');
             sb.append("The following players need to join the server:\n");
             for (Member member : missingMembers) {
-                sb.append("> ").append(member.getAsMention()).append("\n");
+                sb.append("> ").append(member.getAsMention()).append('\n');
             }
             sb.append("You will be automatically added to the game channels when you join the server.");
             MessageHelper.sendMessageToChannel(channel, sb.toString());
@@ -731,7 +731,7 @@ public class CreateGameService {
 
     public static boolean isGameCreationAllowed() {
         return GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.ALLOW_GAME_CREATION.toString(), Boolean.class, true);
+                GlobalSettings.ImplementedSettings.ALLOW_GAME_CREATION.toString(), Boolean.class, Boolean.TRUE);
     }
 
     public String autoGenerateGameName() {

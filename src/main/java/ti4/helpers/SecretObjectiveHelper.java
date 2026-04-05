@@ -45,7 +45,7 @@ public final class SecretObjectiveHelper {
                 message.append(SecretObjectiveInfoService.getSecretObjectiveRepresentationNoNewLine(entry.getKey()));
                 message.append(" (")
                         .append(ListPlayerInfoService.getPlayerProgressOnObjective(entry.getKey(), game, player))
-                        .append("/")
+                        .append('/')
                         .append(ListPlayerInfoService.getObjectiveThreshold(entry.getKey(), game))
                         .append(")\n");
             } else {
@@ -137,7 +137,7 @@ public final class SecretObjectiveHelper {
                                 message2.append(" " + ExploreEmojis.HFrag);
                             case "irf1", "irf2", "irf3", "irf4", "irf5" -> message2.append(" " + ExploreEmojis.IFrag);
                             case "urf1", "urf2", "urf3" -> message2.append(" " + ExploreEmojis.UFrag);
-                            default -> message2.append(" ").append(fragId);
+                            default -> message2.append(' ').append(fragId);
                         }
                     }
                     CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
@@ -222,14 +222,14 @@ public final class SecretObjectiveHelper {
 
     public static void showAll(Player player, Player player_, Game game) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(game.getName()).append("\n");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Showed Secret Objectives:").append("\n");
+        sb.append("Game: ").append(game.getName()).append('\n');
+        sb.append("Player: ").append(player.getUserName()).append('\n');
+        sb.append("Showed Secret Objectives:").append('\n');
         List<String> secrets = new ArrayList<>(player.getSecrets().keySet());
         Collections.shuffle(secrets);
         for (String id : secrets) {
             sb.append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(id))
-                    .append("\n");
+                    .append('\n');
         }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player_, sb.toString());
         MessageHelper.sendMessageToPlayerCardsInfoThread(
@@ -310,7 +310,7 @@ public final class SecretObjectiveHelper {
         }
         currentSecrets.removeAll(game.getSoToPoList());
         StringBuilder sb = new StringBuilder();
-        sb.append("## Game: ").append(game.getName()).append("\n");
+        sb.append("## Game: ").append(game.getName()).append('\n');
         sb.append("### Unscored Action Phase Secrets:\n");
         int index = 1;
         for (String id : currentSecrets) {
@@ -325,12 +325,12 @@ public final class SecretObjectiveHelper {
                         .append(soModel.getPhase())
                         .append(" Phase\n> ")
                         .append(soModel.getText())
-                        .append("\n");
+                        .append('\n');
                 index++;
             }
         }
         index = 1;
-        sb.append("\n").append("### Unscored Status Phase Secrets:\n");
+        sb.append('\n').append("### Unscored Status Phase Secrets:\n");
         for (String id : currentSecrets) {
             if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Status Phase")) {
                 SecretObjectiveModel soModel = Mapper.getSecretObjective(id);
@@ -343,13 +343,13 @@ public final class SecretObjectiveHelper {
                         .append(soModel.getPhase())
                         .append(" Phase\n> ")
                         .append(soModel.getText())
-                        .append("\n")
+                        .append('\n')
                         .append(getSecretObjectiveProgress(game, id));
                 index++;
             }
         }
         index = 1;
-        sb.append("\n").append("### Unscored Agenda Phase Secrets: ").append("\n");
+        sb.append('\n').append("### Unscored Agenda Phase Secrets: ").append('\n');
         for (String id : currentSecrets) {
             if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Agenda Phase")) {
                 SecretObjectiveModel soModel = Mapper.getSecretObjective(id);
@@ -362,7 +362,7 @@ public final class SecretObjectiveHelper {
                         .append(soModel.getPhase())
                         .append(" Phase\n> ")
                         .append(soModel.getText())
-                        .append("\n")
+                        .append('\n')
                         .append(getSecretObjectiveProgress(game, id));
                 index++;
             }
@@ -381,13 +381,13 @@ public final class SecretObjectiveHelper {
             sb.append(player.getFactionEmoji())
                     .append(": ")
                     .append(progress)
-                    .append("/")
+                    .append('/')
                     .append(threshold)
                     .append(progress >= threshold ? "#" : "")
                     .append(UnitEmojis.Blank)
                     .append(UnitEmojis.Blank);
         }
-        sb.append("\n");
+        sb.append('\n');
         return sb.toString();
     }
 

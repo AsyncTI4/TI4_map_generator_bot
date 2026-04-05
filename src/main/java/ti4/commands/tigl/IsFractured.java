@@ -25,7 +25,7 @@ class IsFractured extends GameStateSubcommand {
             return;
         }
 
-        boolean isFractured = event.getOption(Constants.IS_FRACTURED, false, OptionMapping::getAsBoolean);
+        boolean isFractured = event.getOption(Constants.IS_FRACTURED, Boolean.FALSE, OptionMapping::getAsBoolean);
 
         boolean changed;
         String response;

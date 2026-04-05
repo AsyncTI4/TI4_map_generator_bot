@@ -183,11 +183,9 @@ public class PlayHeroService {
                         buttons);
             }
             case "titanshero" -> {
-                Tile t = player.getHomeSystemTile();
-                if (!game.isTwilightsFallMode()
-                        && game.getTileFromPlanet("elysium") != null
-                        && game.getTileFromPlanet("elysium") == t) {
-                    t.addToken("attachment_titanshero.png", "elysium");
+                Tile tile = player.getHomeSystemTile();
+                if (!game.isTwilightsFallMode() && isElysium(game, tile)) {
+                    tile.addToken("attachment_titanshero.png", "elysium");
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(), "Elysium has had Ul The Progenitor attached, and been readied.");
                     PlanetService.refreshPlanet(player, "elysium");
@@ -732,6 +730,11 @@ public class PlayHeroService {
         }
     }
 
+    private static boolean isElysium(Game game, Tile tile) {
+        Tile elysiumTile = game.getTileFromPlanet("elysium");
+        return elysiumTile != null && elysiumTile == tile;
+    }
+
     private static List<Button> getYssarilHeroActionCardButtons(Player yssaril, Player notYssaril) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> actionCards = notYssaril.getActionCards();
@@ -783,9 +786,9 @@ public class PlayHeroService {
                         .append(String.format("%02d", index))
                         .append(".` ")
                         .append(CardEmojis.getACEmoji(game))
-                        .append(" ")
+                        .append(' ')
                         .append(acName)
-                        .append("\n");
+                        .append('\n');
                 game.discardActionCard(player.getUserID(), acID);
                 cardsToShuffleBackIntoDeck.add(acKey);
             }
@@ -825,9 +828,9 @@ public class PlayHeroService {
                             .append(String.format("%02d", index))
                             .append(".` ")
                             .append(CardEmojis.getACEmoji(game))
-                            .append(" ")
+                            .append(' ')
                             .append(acName)
-                            .append("\n");
+                            .append('\n');
                     game.discardActionCard(player.getUserID(), acID);
                     cardsToShuffleBackIntoDeck.add(acKey);
                 }

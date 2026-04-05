@@ -309,17 +309,15 @@ public class WebPlayerArea {
         webPlayerArea.setLeaderIDs(player.getLeaderIDs());
         webPlayerArea.setSecretsScored(player.getSecretsScored());
 
+        Map<String, Integer> unscoredSecrets = player.getSecretsUnscored();
         // Known unscored secrets (populated if search warrant is in play)
         if (player.isSearchWarrant()) {
-            webPlayerArea.setKnownUnscoredSecrets(player.getSecretsUnscored());
+            webPlayerArea.setKnownUnscoredSecrets(unscoredSecrets);
         } else {
             webPlayerArea.setKnownUnscoredSecrets(new HashMap<>());
         }
 
-        webPlayerArea.setNumUnscoredSecrets(
-                player.getSecretsUnscored() != null
-                        ? player.getSecretsUnscored().size()
-                        : 0);
+        webPlayerArea.setNumUnscoredSecrets(unscoredSecrets.size());
 
         // Additional properties
         webPlayerArea.setFlexibleDisplayName(player.getFlexibleDisplayName());

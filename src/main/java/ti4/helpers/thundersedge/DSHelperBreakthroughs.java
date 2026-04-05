@@ -481,8 +481,9 @@ public final class DSHelperBreakthroughs {
     public static void edynbtSelect(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        if (!p1.getSecretsUnscored().isEmpty()) {
-            for (String soID : p1.getSecretsUnscored().keySet()) {
+        Map<String, Integer> secretsUnscored = p1.getSecretsUnscored();
+        if (!secretsUnscored.isEmpty()) {
+            for (String soID : secretsUnscored.keySet()) {
                 buttons.add(Buttons.blue(
                         p1.getFinsFactionCheckerPrefix() + "edynbtTarget_" + p2.getFaction() + "_" + soID,
                         Mapper.getSecretObjective(soID).getName()));

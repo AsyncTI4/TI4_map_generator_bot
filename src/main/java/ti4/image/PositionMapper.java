@@ -352,29 +352,12 @@ public final class PositionMapper {
     }
 
     public static Boolean isCornerOfHexRing(String tileID) {
-        if (!Helper.isInteger(tileID)) return null;
+        if (!Helper.isInteger(tileID)) throw new IllegalArgumentException("Invalid tile ID: " + tileID);
         int ring = Integer.parseInt(tileID) / 100;
         for (int corner = 1; corner <= 6; corner++) {
             if (tileID.equals(getTileIDAtCornerPositionOfRing(ring, corner))) return true;
         }
         return false;
-    }
-
-    public static Boolean isStartOfHexRing(String tileID) {
-        if (!Helper.isInteger(tileID)) return null;
-        return Integer.parseInt(tileID) % 100 == 1;
-    }
-
-    public static Boolean isEndOfHexRing(String tileID) {
-        if (!Helper.isInteger(tileID)) return null;
-        int ring = Integer.parseInt(tileID) / 100;
-        int tileNumber = Integer.parseInt(tileID) % 100;
-        int maxRingTileCount = getMaxTilesInRing(ring);
-        return tileNumber == maxRingTileCount;
-    }
-
-    private static int getMaxTilesInRing(int ring) {
-        return ring * 6;
     }
 
     private static Integer getPositionWithinHexSide(String tileID) {
@@ -405,16 +388,6 @@ public final class PositionMapper {
             if (tileNumber >= lowerBound && tileNumber < upperBound) return corner;
         }
         return null;
-    }
-
-    public static String getPositionOfTileOneRingLarger(String tileID) {
-        int ring = Integer.parseInt(tileID) / 100;
-        return getTileIDAtPositionInRingSide(
-                ring + 1, getRingSideNumberOfTileID(tileID), getPositionWithinHexSide(tileID));
-    }
-
-    public static String getEquivalentPositionAtRing(int ring, String tileID) {
-        return getTileIDAtPositionInRingSide(ring, getRingSideNumberOfTileID(tileID), getPositionWithinHexSide(tileID));
     }
 
     public static String getTileIDAtCornerPositionOfRing(int ring, int cornerNumber) {

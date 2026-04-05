@@ -40,14 +40,15 @@ class SearchMyGames extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        boolean onlyMyTurn = event.getOption(Constants.IS_MY_TURN, false, OptionMapping::getAsBoolean);
-        boolean includeEndedGames = event.getOption(Constants.ENDED_GAMES, false, OptionMapping::getAsBoolean);
+        boolean onlyMyTurn = event.getOption(Constants.IS_MY_TURN, Boolean.FALSE, OptionMapping::getAsBoolean);
+        boolean includeEndedGames = event.getOption(Constants.ENDED_GAMES, Boolean.FALSE, OptionMapping::getAsBoolean);
         boolean showAverageTurnTime =
-                event.getOption(Constants.SHOW_AVERAGE_TURN_TIME, false, OptionMapping::getAsBoolean);
-        boolean showSecondaries = event.getOption(Constants.SHOW_SECONDARIES, true, OptionMapping::getAsBoolean);
-        boolean showGameModes = event.getOption(Constants.SHOW_GAME_MODES, false, OptionMapping::getAsBoolean);
-        boolean ignoreSpectate = event.getOption("ignore_spectate", true, OptionMapping::getAsBoolean);
-        boolean ignoreAborted = event.getOption("ignore_aborted", true, OptionMapping::getAsBoolean);
+                event.getOption(Constants.SHOW_AVERAGE_TURN_TIME, Boolean.FALSE, OptionMapping::getAsBoolean);
+        boolean showSecondaries =
+                event.getOption(Constants.SHOW_SECONDARIES, Boolean.TRUE, OptionMapping::getAsBoolean);
+        boolean showGameModes = event.getOption(Constants.SHOW_GAME_MODES, Boolean.FALSE, OptionMapping::getAsBoolean);
+        boolean ignoreSpectate = event.getOption("ignore_spectate", Boolean.TRUE, OptionMapping::getAsBoolean);
+        boolean ignoreAborted = event.getOption("ignore_aborted", Boolean.TRUE, OptionMapping::getAsBoolean);
 
         User user = event.getOption(Constants.PLAYER, event.getUser(), OptionMapping::getAsUser);
         User user2 = event.getOption(Constants.PLAYER2, null, OptionMapping::getAsUser);

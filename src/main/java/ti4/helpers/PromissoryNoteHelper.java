@@ -54,7 +54,7 @@ public class PromissoryNoteHelper {
         StringBuilder sb = new StringBuilder();
 
         // PROMISSORY NOTES
-        sb.append("### __Promissory notes in your hand__:").append("\n");
+        sb.append("### __Promissory notes in your hand__:").append('\n');
         int index = 1;
         Map<String, Integer> promissoryNotes = player.getPromissoryNotes();
         List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
@@ -86,16 +86,16 @@ public class PromissoryNoteHelper {
                     sb.append(ColorEmojis.getColorEmojiWithName(pnOwner.getColor()));
                     sb.append(" `(").append(pn.getValue()).append(")`\n");
                     if (longFormat || pnOwner != player || !genericPromissoryNotes.contains(pn.getKey())) {
-                        sb.append("> ").append(pnModel.getTextFormatted(game)).append("\n");
+                        sb.append("> ").append(pnModel.getTextFormatted(game)).append('\n');
                     }
                 }
             }
 
             if (!excludePlayArea) {
                 // PLAY AREA PROMISSORY NOTES
-                sb.append("\n")
+                sb.append('\n')
                         .append("### __Promissory notes in your play area__:")
-                        .append("\n");
+                        .append('\n');
                 if (promissoryNotesInPlayArea.isEmpty()) {
                     sb.append("> None");
                 } else {
@@ -129,7 +129,7 @@ public class PromissoryNoteHelper {
                                     .append(pn.getValue())
                                     .append(")`\n> ")
                                     .append(pnModel.getTextFormatted(game))
-                                    .append("\n");
+                                    .append('\n');
                         }
                     }
                 }
@@ -680,9 +680,9 @@ public class PromissoryNoteHelper {
 
     public void showAll(Player player, Player targetPlayer, Game game) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(game.getName()).append("\n");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Showed Promissory Notes:").append("\n");
+        sb.append("Game: ").append(game.getName()).append('\n');
+        sb.append("Player: ").append(player.getUserName()).append('\n');
+        sb.append("Showed Promissory Notes:").append('\n');
         List<String> promissoryNotes =
                 new ArrayList<>(player.getPromissoryNotes().keySet());
         Collections.shuffle(promissoryNotes);
@@ -694,7 +694,7 @@ public class PromissoryNoteHelper {
                     .append(" (original owner ")
                     .append(game.getPNOwner(id).getFactionEmojiOrColor())
                     .append(")")
-                    .append("\n");
+                    .append('\n');
             index++;
         }
 

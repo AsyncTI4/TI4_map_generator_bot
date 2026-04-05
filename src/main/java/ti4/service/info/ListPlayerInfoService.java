@@ -284,17 +284,17 @@ public class ListPlayerInfoService {
                 }
             }
             for (String id : game.getSoToPoList()) {
-                msg.append(representScoring(game, id, x, true)).append("\n");
+                msg.append(representScoring(game, id, x, true)).append('\n');
                 x++;
             }
-            msg.append(representSecrets(game)).append("\n");
+            msg.append(representSecrets(game)).append('\n');
             if (!game.isTwilightsFallMode()) {
-                msg.append(representSupports(game)).append("\n");
+                msg.append(representSupports(game)).append('\n');
             }
             if (gameHasTransferablePoints(game)) {
-                msg.append(representTransferablePoints(game)).append("\n");
+                msg.append(representTransferablePoints(game)).append('\n');
             }
-            msg.append(representTotalVPs(game)).append("\n");
+            msg.append(representTotalVPs(game)).append('\n');
         } else {
             for (String id : Mapper.getPublicObjectives().keySet()) {
                 if (Mapper.getPublicObjective(id).getSource() == Source.ComponentSource.pok
@@ -302,7 +302,7 @@ public class ListPlayerInfoService {
                     if (stage1sOrTwos.equalsIgnoreCase(
                                     "" + Mapper.getPublicObjective(id).getPoints())
                             || "both".equalsIgnoreCase(stage1sOrTwos)) {
-                        msg.append(representScoring(game, id, x)).append("\n");
+                        msg.append(representScoring(game, id, x)).append('\n');
                         x++;
                     }
                 }
@@ -346,7 +346,7 @@ public class ListPlayerInfoService {
                         if (threshold > 0) {
                             representation
                                     .append(progress)
-                                    .append("/")
+                                    .append('/')
                                     .append(threshold)
                                     .append(progress >= threshold ? "#" : "");
                         } else {
@@ -361,7 +361,7 @@ public class ListPlayerInfoService {
                     } else {
                         representation
                                 .append(progress)
-                                .append("/")
+                                .append('/')
                                 .append(threshold)
                                 .append(progress >= threshold ? "#" : "");
                     }
@@ -388,7 +388,7 @@ public class ListPlayerInfoService {
                         .append(player.getFactionEmoji())
                         .append(": ")
                         .append(player.getSoScored())
-                        .append("/")
+                        .append('/')
                         .append(player.getMaxSOCount())
                         .append(UnitEmojis.Blank)
                         .append(UnitEmojis.Blank);
@@ -464,7 +464,7 @@ public class ListPlayerInfoService {
                         .append(player.getFactionEmoji())
                         .append(": ")
                         .append(player.getTotalVictoryPoints())
-                        .append("/")
+                        .append('/')
                         .append(game.getVp())
                         .append(UnitEmojis.Blank)
                         .append(UnitEmojis.Blank);

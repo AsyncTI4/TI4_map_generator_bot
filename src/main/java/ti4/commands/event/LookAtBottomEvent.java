@@ -25,9 +25,9 @@ class LookAtBottomEvent extends GameStateSubcommand {
 
         StringBuilder sb = new StringBuilder();
         sb.append("-----------\n");
-        sb.append("Game: ").append(game.getName()).append("\n");
-        sb.append(event.getUser().getAsMention()).append("\n");
-        sb.append("`").append(event.getCommandString()).append("`").append("\n");
+        sb.append("Game: ").append(game.getName()).append('\n');
+        sb.append(event.getUser().getAsMention()).append('\n');
+        sb.append('`').append(event.getCommandString()).append('`').append('\n');
         int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
         if (count > 1) {
             sb.append("__**Bottom ").append(count).append(" events:**__\n");
@@ -39,7 +39,7 @@ class LookAtBottomEvent extends GameStateSubcommand {
             sb.append(i + 1).append(": ");
             EventModel eventModel = Mapper.getEvent(eventID);
             sb.append(eventModel.getRepresentation());
-            sb.append("\n");
+            sb.append('\n');
         }
         sb.append("-----------\n");
 

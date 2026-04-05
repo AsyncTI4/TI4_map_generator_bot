@@ -63,20 +63,20 @@ public abstract class TileDraftItem extends DraftItem {
     }
 
     private void buildPlanetString(PlanetModel planet, StringBuilder sb) {
-        sb.append(planet.getName()).append(" ");
+        sb.append(planet.getName()).append(' ');
         if (!planet.getPlanetTypes().isEmpty()) {
             for (PlanetType type : planet.getPlanetTypes()) {
                 sb.append(planetTypeEmoji(type));
             }
         }
         sb.append(" (");
-        sb.append(planet.getResources()).append("/").append(planet.getInfluence());
+        sb.append(planet.getResources()).append('/').append(planet.getInfluence());
         if (planet.isLegendary()) {
-            sb.append("/").append(MiscEmojis.LegendaryPlanet);
+            sb.append('/').append(MiscEmojis.LegendaryPlanet);
         }
         if (planet.getTechSpecialties() != null) {
             for (var spec : planet.getTechSpecialties()) {
-                sb.append("/").append(techSpecEmoji(spec));
+                sb.append('/').append(techSpecEmoji(spec));
             }
         }
         sb.append(") ");

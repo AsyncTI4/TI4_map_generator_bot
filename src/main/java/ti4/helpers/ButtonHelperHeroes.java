@@ -470,7 +470,7 @@ public final class ButtonHelperHeroes {
                     .append(x)
                     .append(". ")
                     .append(Mapper.getRelic(relic).getName())
-                    .append("\n");
+                    .append('\n');
         }
         int size = revealedRelics.size();
         MessageHelper.sendMessageToChannel(
@@ -976,11 +976,11 @@ public final class ButtonHelperHeroes {
             Tile tile = game.getTileByPosition(pos);
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder instanceof Planet planet) {
+                    Map<UnitKey, Integer> units = unitHolder.getUnits();
                     if (!player.getPlanetsAllianceMode().contains(planet.getName())
                             && !tile.isHomeSystem(game)
                             && !planet.getName().toLowerCase().contains("rex")
-                            && (unitHolder.getUnits() == null
-                                    || unitHolder.getUnits().isEmpty())) {
+                            && (units == null || units.isEmpty())) {
                         buttons.add(Buttons.green(
                                 finChecker + "gheminaLordHero_" + planet.getName(),
                                 Helper.getPlanetRepresentation(planet.getName(), game)));
@@ -1500,7 +1500,7 @@ public final class ButtonHelperHeroes {
             boolean content = false;
             message.append("### Resolving for tile ")
                     .append(tile.getRepresentationForButtons())
-                    .append("\n");
+                    .append('\n');
             for (Player p2 : game.getRealPlayersNNeutral()) {
                 if (p2 == player) {
                     continue;
@@ -1576,16 +1576,16 @@ public final class ButtonHelperHeroes {
                                     totalLosses.get(p2.getFactionEmoji()).add(unitModel.getUnitEmoji());
                                 }
                             }
-                            message.append("\n");
+                            message.append('\n');
                             content = true;
                         }
                         if (totalUnits > damagedUnits) {
                             message.append("Rolling for ")
                                     .append(p2.getRepresentationNoPing())
-                                    .append(" ")
+                                    .append(' ')
                                     .append(unitModel.getBaseType())
                                     .append(totalUnits - damagedUnits == 1 ? "" : "s")
-                                    .append(" ")
+                                    .append(' ')
                                     .append(unitModel.getUnitEmoji())
                                     .append(": ");
                             for (int i = 0; i < totalUnits - damagedUnits; i++) {
@@ -1605,7 +1605,7 @@ public final class ButtonHelperHeroes {
                                     totalLosses.get(p2.getFactionEmoji()).add(unitModel.getUnitEmoji());
                                 }
                             }
-                            message.append("\n");
+                            message.append('\n');
                             content = true;
                         }
                     }
@@ -1725,7 +1725,7 @@ public final class ButtonHelperHeroes {
                                 message.append(p2.getRepresentationNoPing())
                                         .append(" has a mixture of ")
                                         .append(overCapacity)
-                                        .append(" ")
+                                        .append(' ')
                                         .append(unitListing)
                                         .append(" in excess of their amended (zero) capacity; removing")
                                         .append(tf ? "" : " and capturing")
@@ -1772,7 +1772,7 @@ public final class ButtonHelperHeroes {
                                 message.append(p2.getRepresentationNoPing())
                                         .append(" has a mixture of ")
                                         .append(overCapacity)
-                                        .append(" ")
+                                        .append(' ')
                                         .append(unitListing)
                                         .append(" in excess of their amended capacity. Please remove ")
                                         .append(overCapacity == 1 ? "this" : "these")

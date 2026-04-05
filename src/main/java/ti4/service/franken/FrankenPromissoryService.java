@@ -28,20 +28,20 @@ public class FrankenPromissoryService {
             sb.append("> ");
             if (pnOwner != null) {
                 sb.append(pnID).append(" is already owned by ").append(pnOwner.getUserName());
-                sb.append("\n");
+                sb.append('\n');
                 continue;
             }
 
             if (player.ownsPromissoryNote(pnID)) {
                 sb.append(pnID).append(" (player already owned this promissory note)");
-                sb.append("\n");
+                sb.append('\n');
                 continue;
             }
             sb.append(pnID);
 
             PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pnID);
             embeds.add(pnModel.getRepresentationEmbed());
-            sb.append("\n");
+            sb.append('\n');
             player.addOwnedPromissoryNoteByID(pnID);
             player.setPromissoryNote(pnID);
         }
@@ -56,7 +56,7 @@ public class FrankenPromissoryService {
             } else {
                 sb.append("> ").append(pnID);
             }
-            sb.append("\n");
+            sb.append('\n');
             player.removeOwnedPromissoryNoteByID(pnID);
             player.removePromissoryNote(pnID);
         }

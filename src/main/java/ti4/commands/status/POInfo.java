@@ -26,7 +26,7 @@ class POInfo extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        boolean includeScored = event.getOption(Constants.INCLUDE_SCORED, false, OptionMapping::getAsBoolean);
+        boolean includeScored = event.getOption(Constants.INCLUDE_SCORED, Boolean.FALSE, OptionMapping::getAsBoolean);
 
         Game game = getGame();
         Map<String, Integer> publicObjectiveIDs = game.getRevealedPublicObjectives();
@@ -45,7 +45,7 @@ class POInfo extends GameStateSubcommand {
                     .append(publicObjectiveNumber)
                     .append(". ")
                     .append(publicObjective.getRepresentation())
-                    .append("\n");
+                    .append('\n');
 
             if (includeScored && scoredPublicObjectives.containsKey(publicObjective.getAlias())) {
                 List<Player> playersWhoHaveScoredObjective =
@@ -62,7 +62,7 @@ class POInfo extends GameStateSubcommand {
                 for (Player player : playersWhoHaveScoredObjective) {
                     stringBuilder.append(player.getFactionEmoji());
                 }
-                stringBuilder.append("\n");
+                stringBuilder.append('\n');
             }
             publicObjectiveNumber++;
         }

@@ -19,7 +19,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 
 class RelicPurgeFragments extends GameStateSubcommand {
 
-    public RelicPurgeFragments() {
+    RelicPurgeFragments() {
         super(
                 Constants.PURGE_FRAGMENTS,
                 "Purge a number of relic fragments (for example, to gain a relic; may use unknown fragments).",
@@ -50,7 +50,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
             ExploreModel explore = Mapper.getExplore(id);
             if (explore.getType().equalsIgnoreCase(color)) {
                 fragmentsToPurge.add(id);
-            } else if (explore.getType().equalsIgnoreCase(Constants.FRONTIER)) {
+            } else if (Constants.FRONTIER.equalsIgnoreCase(explore.getType())) {
                 unknowns.add(id);
             }
         }
@@ -83,7 +83,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
                     message.append("an ").append(ExploreEmojis.IFrag).append("industrial");
                 case "urf1", "urf2", "urf3" ->
                     message.append("an ").append(ExploreEmojis.UFrag).append("unknown");
-                default -> message.append(" ").append(fragid);
+                default -> message.append(' ').append(fragid);
             }
             message.append(" relic fragment.");
         } else {
@@ -96,7 +96,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
                     case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> message.append(ExploreEmojis.HFrag);
                     case "irf1", "irf2", "irf3", "irf4", "irf5" -> message.append(ExploreEmojis.IFrag);
                     case "urf1", "urf2", "urf3" -> message.append(ExploreEmojis.UFrag);
-                    default -> message.append(" ").append(fragid);
+                    default -> message.append(' ').append(fragid);
                 }
             }
             message.append(" relic fragments.");
@@ -110,7 +110,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
                     event, activePlayer.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
         }
 
-        boolean drawRelic = event.getOption(Constants.ALSO_DRAW_RELIC, false, OptionMapping::getAsBoolean);
+        boolean drawRelic = event.getOption(Constants.ALSO_DRAW_RELIC, Boolean.FALSE, OptionMapping::getAsBoolean);
         if (drawRelic) {
             RelicHelper.drawRelicAndNotify(activePlayer, event, game);
         }

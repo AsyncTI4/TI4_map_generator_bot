@@ -19,7 +19,7 @@ public class SetDeckService {
         if (Optional.ofNullable(deckModel).isEmpty()) {
             return false;
         }
-        boolean resetDeck = event.getOption("reset_deck", false, OptionMapping::getAsBoolean);
+        boolean resetDeck = event.getOption("reset_deck", Boolean.FALSE, OptionMapping::getAsBoolean);
         switch (deckType) {
             case Constants.AC_DECK -> {
                 if (resetDeck) {

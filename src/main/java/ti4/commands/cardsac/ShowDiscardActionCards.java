@@ -19,7 +19,7 @@ class ShowDiscardActionCards extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        boolean showFullText = event.getOption(Constants.SHOW_FULL_TEXT, false, OptionMapping::getAsBoolean);
+        boolean showFullText = event.getOption(Constants.SHOW_FULL_TEXT, Boolean.FALSE, OptionMapping::getAsBoolean);
         ShowActionCardsService.showDiscard(game, event, showFullText);
     }
 }

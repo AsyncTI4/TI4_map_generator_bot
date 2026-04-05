@@ -69,7 +69,7 @@ public final class FOWPlusService {
     private static final String FOWPLUS_EXPLORE_SPOOR = "fowplus_spoor";
     private static final String FOWPLUS_EXPLORE_SACRIFICE = "fowplus_sacrifice";
 
-    public static final List<Pair<FOWOption, Boolean>> FORCED_FOWPLUS_OPTIONS = Arrays.asList(
+    public static final List<Pair<FOWOption, Boolean>> FORCED_FOWPLUS_OPTIONS = List.of(
             Pair.of(FOWOption.ALLOW_AGENDA_COMMS, false),
             Pair.of(FOWOption.HIDE_TOTAL_VOTES, true),
             Pair.of(FOWOption.HIDE_VOTE_ORDER, true),

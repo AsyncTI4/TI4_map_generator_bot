@@ -18,7 +18,7 @@ class HowToMoveUnits extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        boolean examplesOnly = event.getOption(Constants.EXAMPLES_ONLY, false, OptionMapping::getAsBoolean);
+        boolean examplesOnly = event.getOption(Constants.EXAMPLES_ONLY, Boolean.FALSE, OptionMapping::getAsBoolean);
 
         String message = "# So you want to add, remove, or move some units\n" + "# Use the [Modify Units] Button\n"
                 + "> - The button will give you the options to either add or remove units from a system tile. Simply press the buttons to add/remove.\n"

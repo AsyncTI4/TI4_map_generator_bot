@@ -57,7 +57,7 @@ public class DraftSpec {
         factionSources = new ArrayList<>(tileSources);
     }
 
-    public static DraftSpec CreateFromMiltySettings(MiltySettings settings) {
+    public static DraftSpec createFromMiltySettings(MiltySettings settings) {
         Game game = settings.getGame();
         DraftSpec specs = new DraftSpec(game);
 
@@ -105,7 +105,7 @@ public class DraftSpec {
         return specs;
     }
 
-    public static DraftSpec SliceSpecsFromDraftSystemSettings(DraftSystemSettings settings) {
+    public static DraftSpec sliceSpecsFromDraftSystemSettings(DraftSystemSettings settings) {
         Game game = settings.getGame();
         DraftSpec specs = new DraftSpec(game);
 

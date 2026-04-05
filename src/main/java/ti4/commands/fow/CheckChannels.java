@@ -32,11 +32,11 @@ class CheckChannels extends GameStateSubcommand {
         boolean first = true;
         for (Player player : getGame().getPlayers().values()) {
             boolean isNeutral = "neutral".equals(player.getFaction());
-            if (!first) output.append("\n");
+            if (!first) output.append('\n');
             first = false;
 
             output.append(player.getUserName());
-            output.append(" ");
+            output.append(' ');
             output.append(player.getFactionEmojiOrColor());
             output.append(" - ");
             MessageChannel channel = player.getPrivateChannel();

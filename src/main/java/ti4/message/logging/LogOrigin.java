@@ -77,7 +77,7 @@ public class LogOrigin {
     @NotNull
     private static String buildEventString(@Nonnull GenericInteractionCreateEvent event) {
         StringBuilder builder =
-                new StringBuilder().append(event.getUser().getEffectiveName()).append(" ");
+                new StringBuilder().append(event.getUser().getEffectiveName()).append(' ');
 
         switch (event) {
             case SlashCommandInteractionEvent sEvent ->
@@ -87,15 +87,15 @@ public class LogOrigin {
             case ButtonInteractionEvent bEvent ->
                 builder.append("pressed button ")
                         .append(ButtonHelper.getButtonRepresentation(bEvent.getButton()))
-                        .append("\n");
+                        .append('\n');
             case StringSelectInteractionEvent sEvent ->
                 builder.append("selected ")
                         .append(SelectionMenuProcessor.getSelectionMenuDebugText(sEvent))
-                        .append("\n");
+                        .append('\n');
             case ModalInteractionEvent mEvent ->
                 builder.append("used modal ")
                         .append(ModalListener.getModalDebugText(mEvent))
-                        .append("\n");
+                        .append('\n');
             default ->
                 builder.append("initiated an unexpected event of type `")
                         .append(event.getType())

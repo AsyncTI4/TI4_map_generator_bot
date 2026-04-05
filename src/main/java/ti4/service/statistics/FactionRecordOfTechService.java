@@ -53,7 +53,7 @@ public class FactionRecordOfTechService {
                 .append(gamesThatHadThem)
                 .append(" Games)**__\n");
 
-        boolean sortOrderAscending = event.getOption("ascending", false, OptionMapping::getAsBoolean);
+        boolean sortOrderAscending = event.getOption("ascending", Boolean.FALSE, OptionMapping::getAsBoolean);
         Comparator<Map.Entry<String, Integer>> comparator = (o1, o2) -> {
             int o1total = o1.getValue();
             int o2total = o2.getValue();
@@ -63,12 +63,12 @@ public class FactionRecordOfTechService {
         AtomicInteger index = new AtomicInteger(1);
 
         techsResearched.entrySet().stream().sorted(comparator).forEach(techResearched -> {
-            sb.append("`")
+            sb.append('`')
                     .append(Helper.leftpad(String.valueOf(index.get()), 3))
                     .append(". ");
             sb.append("` ").append(techResearched.getKey());
             sb.append(": ").append(techResearched.getValue());
-            sb.append("\n");
+            sb.append('\n');
             index.getAndIncrement();
         });
 

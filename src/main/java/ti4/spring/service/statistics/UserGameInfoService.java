@@ -67,7 +67,7 @@ public class UserGameInfoService {
                 continue;
             }
 
-            sb.append("`")
+            sb.append('`')
                     .append(Helper.leftpad(String.valueOf(index), 3))
                     .append(". ")
                     .append(stats.completedGames)
@@ -75,20 +75,20 @@ public class UserGameInfoService {
                     .append(stats.ongoingGames)
                     .append("` Ongoing -- ")
                     .append(stats.username)
-                    .append("\n");
+                    .append('\n');
 
             if (stats.completedGames > 0) {
                 stats.completedGameDays.sort(Comparator.naturalOrder());
                 sb.append("> The completed games took the following amount of time to complete (in days):");
                 for (int day : stats.completedGameDays) {
-                    sb.append(" ").append(day);
+                    sb.append(' ').append(day);
                 }
-                sb.append("\n");
+                sb.append('\n');
 
                 double winPercentage = (double) stats.wins / stats.completedGames;
                 sb.append("> Player win percentage across all games was: ")
                         .append(String.format("%.2f", winPercentage))
-                        .append("\n");
+                        .append('\n');
             }
             index++;
         }

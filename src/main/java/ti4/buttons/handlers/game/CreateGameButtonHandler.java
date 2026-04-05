@@ -205,7 +205,7 @@ public class CreateGameButtonHandler {
         int playerNumber = 1;
         for (Member member : members) {
             memberList
-                    .append("\n")
+                    .append('\n')
                     .append(playerNumber)
                     .append(". ")
                     .append(member.getUser().getAsMention());
@@ -223,7 +223,7 @@ public class CreateGameButtonHandler {
                         .append(completedGames + 3)
                         .append("-game limit) ");
             } else {
-                memberList.append(" ").append(completedGames).append(" games completed. ");
+                memberList.append(' ').append(completedGames).append(" games completed. ");
             }
             if (userIdsToAverageTurnTimes.containsKey(member.getUser().getId())) {
                 long averageTurnTime =
@@ -244,7 +244,7 @@ public class CreateGameButtonHandler {
                             .append("):\n");
                 }
 
-                activityList.append("\n").append(playerNumber).append(". ").append(activeHoursSummary);
+                activityList.append('\n').append(playerNumber).append(". ").append(activeHoursSummary);
             }
             // } else {
             //     memberList.append("\n  - Insufficient data for active hours.");

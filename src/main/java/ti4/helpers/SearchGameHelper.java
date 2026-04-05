@@ -102,11 +102,11 @@ public class SearchGameHelper {
         }
         StringBuilder sb = new StringBuilder("**__").append(user.getName()).append("'s Games__**\n");
         for (var managedGame : filteredManagedGames) {
-            sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
+            sb.append('`').append(Helper.leftpad("" + index, 2)).append(".`");
             var game = managedGame.getGame();
             sb.append(
                     getPlayerMapListRepresentation(game, userID, showAverageTurnTime, showSecondaries, showGameModes));
-            sb.append("\n");
+            sb.append('\n');
             index++;
         }
         if (event instanceof SlashCommandInteractionEvent slash) {
@@ -213,7 +213,7 @@ public class SearchGameHelper {
             String endedStatus = game.hasWinner() ? "COMPLETED" : "ABORTED";
             sb.append(" [")
                     .append(daysPlayed)
-                    .append(" ")
+                    .append(' ')
                     .append(dayLabel)
                     .append(", ")
                     .append(endedStatus)

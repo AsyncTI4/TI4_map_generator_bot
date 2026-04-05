@@ -41,7 +41,7 @@ public class GameWinsWithOtherFactionsService {
                 game -> getGameWinsWithOtherFactions(game, factionWinCount, factionGameCount, reqFactions));
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Faction Win Percent:").append("\n");
+        sb.append("Faction Win Percent:").append('\n');
 
         factionGameCount.keySet().stream()
                 .map(faction -> {
@@ -55,15 +55,15 @@ public class GameWinsWithOtherFactionsService {
                     String factionName =
                             factionModel != null ? factionModel.getFactionNameWithSourceEmoji() : entry.getKey();
                     String factionEmoji = FactionStatisticsHelper.getFactionEmoji(entry.getKey());
-                    sb.append("`")
+                    sb.append('`')
                             .append(StringUtils.leftPad(entry.getValue().toString(), 4))
                             .append("%` (")
                             .append(factionGameCount.getOrDefault(entry.getKey(), 0))
                             .append(" games) ")
                             .append(factionEmoji)
-                            .append(" ")
+                            .append(' ')
                             .append(factionName)
-                            .append("\n");
+                            .append('\n');
                 });
 
         MessageHelper.sendMessageToThread(

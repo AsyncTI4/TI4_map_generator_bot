@@ -29,7 +29,8 @@ public class ListSlashCommandsUsedService {
         AtomicInteger acsSabod = new AtomicInteger();
         AtomicInteger largestAmountOfButtonsIn1Game = new AtomicInteger();
         AtomicReference<String> largestGame = new AtomicReference<>("");
-        boolean useOnlyLastMonth = event.getOption(Constants.ONLY_LAST_MONTH, false, OptionMapping::getAsBoolean);
+        boolean useOnlyLastMonth =
+                event.getOption(Constants.ONLY_LAST_MONTH, Boolean.FALSE, OptionMapping::getAsBoolean);
         Map<String, Integer> slashCommands = new HashMap<>();
         Map<String, Integer> actionCards = new HashMap<>();
         Map<String, Integer> actionCardsPlayed = new HashMap<>();
