@@ -123,7 +123,8 @@ public class MapGenerator implements AutoCloseable {
     private StopWatch debugWebsiteTime;
 
     MapGenerator(Game game, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
-        debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, Boolean.FALSE);
+        debug = GlobalSettings.getSetting(
+                GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, Boolean.FALSE);
         if (debug) debugAbsoluteStartTime = StopWatch.createStarted();
 
         this.game = game;

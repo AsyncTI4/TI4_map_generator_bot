@@ -37,16 +37,16 @@ public class DeorbitBarrageService {
         List<Tile> asteroids =
                 game.getTileMap().values().stream().filter(asteroidWithUnit).toList();
 
-      return asteroids.stream()
-              .map(Tile::getPosition)
-              .flatMap(pos -> FoWHelper.getAdjacentTiles(game, pos, player, false).stream())
-              .flatMap(pos -> FoWHelper.getAdjacentTiles(game, pos, player, false).stream())
-              .collect(Collectors.toSet())
-              .stream()
-              .map(game::getTileByPosition)
-              .flatMap(tile -> tile.getPlanetUnitHolders().stream())
-              .filter(Planet::hasUnits)
-              .toList();
+        return asteroids.stream()
+                .map(Tile::getPosition)
+                .flatMap(pos -> FoWHelper.getAdjacentTiles(game, pos, player, false).stream())
+                .flatMap(pos -> FoWHelper.getAdjacentTiles(game, pos, player, false).stream())
+                .collect(Collectors.toSet())
+                .stream()
+                .map(game::getTileByPosition)
+                .flatMap(tile -> tile.getPlanetUnitHolders().stream())
+                .filter(Planet::hasUnits)
+                .toList();
     }
 
     public void postInitialButtons(Game game, Player player) {
