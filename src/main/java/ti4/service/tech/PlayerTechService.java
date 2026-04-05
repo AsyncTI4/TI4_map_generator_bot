@@ -364,13 +364,7 @@ public class PlayerTechService {
                         event.getMessageChannel(), message, List.of(Buttons.REDISTRIBUTE_CCs, deleteButton));
             }
             case "dsvadeb" -> ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, event);
-            case "bazephy" -> {
-                ButtonHelperAbilities.clearBountiesForPlayer(game);
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentationUnfogged() + " all of your bounties have been reset.");
-                ButtonHelperAbilities.offerBountyButtons(game, player);
-            }
+            case "bazephy" -> ButtonHelperAbilities.offerBountyButtons(game, player);
             case "mi" -> { // Mageon
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>();

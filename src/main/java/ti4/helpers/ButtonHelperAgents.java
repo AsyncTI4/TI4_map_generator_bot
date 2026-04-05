@@ -755,6 +755,9 @@ public final class ButtonHelperAgents {
                 for (String bounty : bounties) {
                     String faction = bounty.split(" ")[0];
                     String ship = bounty.split(" ")[1];
+                    if ("flagship".equalsIgnoreCase(ship) || "warsun".equalsIgnoreCase(ship)) {
+                        continue;
+                    }
                     if (otherPlayer.getFaction().equalsIgnoreCase(faction)) {
                         Button bountyButton = Buttons.gray(
                                 "zephAgentRes_" + faction + "_" + ship,

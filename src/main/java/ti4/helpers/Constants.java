@@ -464,6 +464,7 @@ public final class Constants {
     public static final String ADD_CC_TO_FS = "mahact_cc_to_fs";
     public static final String REMOVE_CC_FROM_FS = "mahact_cc_from_fs";
     public static final String SPECIAL = "special";
+    public static final String BOUNTIES = "bounties";
     public static final String FOW = "fow";
     public static final String FOW_SYSTEMS = "fow_systems";
     public static final String FOG_FILTER = "fog_filter";
