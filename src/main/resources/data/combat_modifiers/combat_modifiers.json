@@ -170,12 +170,22 @@
                 "type": "promissory_notes",
                 "alias": "sigma_tekklar_legion"
             },
+        ]
+    },
+    {
+        "alias": "plus2_1invasion_combat",
+        "type": "DIE_MOD",
+        "value": "+2",
+        "scope": "_groundforce_",
+        "forCombatAbility": "combatround",
+        "persistenceType": "ONE_COMBAT",
+        "related": [
             {
                 "type": "promissory_notes",
                 "alias": "viability_tekklar_legion"
-            }
+            },
         ]
-    },
+    }
     {
         "alias": "plus1_1combat_fighter",
         "type": "DIE_MOD",
@@ -1611,17 +1621,4 @@
         ],
         "forCombatAbility": "bombardment"
     },
-    {
-        "alias": "plus1_bonus_hit_first_round",
-        "type": "bonus_hits",
-        "value": "+1",
-        "persistenceType": "ONE_ROUND",
-        "forCombatAbility": "combatround",
-        "related": [
-            {
-                "type": "promissory_notes",
-                "alias": "viability_tekklar_legion"
-            }
-        ]
-    }
 ]

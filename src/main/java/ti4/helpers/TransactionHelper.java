@@ -167,6 +167,8 @@ public final class TransactionHelper {
             SecretObjectiveInfoService.sendSecretObjectiveInfo(game, p2, event);
         }
 
+        ButtonHelperFactionSpecific.checkViabilityTradeConvoys(game, p1, p2);
+
         // Send Summary to Player's CardsInfo threads
         MessageHelper.sendMessageToChannel(
                 p1.getCardsInfoThread(), p1.getRepresentationUnfogged() + " " + privateSummary);
@@ -191,7 +193,6 @@ public final class TransactionHelper {
             }
             CommanderUnlockCheckService.checkPlayer(p1, "hacan");
             CommanderUnlockCheckService.checkPlayer(p2, "hacan");
-            ButtonHelperFactionSpecific.checkViabilityTradeConvoys(game, p1, p2);
         }
     }
 

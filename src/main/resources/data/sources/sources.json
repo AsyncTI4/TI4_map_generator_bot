@@ -237,6 +237,10 @@
         "subcanal": "lil homebrew",
         "credits": "mjb141",
         "description": "Slightly improving underutilised components"
+        "data": [
+            "@vindico on Async TI4 Discord.",
+            "Goal: Slightly improve underperforming factions (bottom half of expected win rates) or underutilised components (never used/traded)."
+        ]
     },
     {
         "source": "eronous",
