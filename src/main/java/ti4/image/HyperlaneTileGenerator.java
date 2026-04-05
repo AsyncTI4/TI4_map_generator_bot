@@ -232,7 +232,7 @@ final class HyperlaneTileGenerator {
             if (randomTilePath != null) {
                 tilePath = randomTilePath;
             }
-            transform = (int) Math.floorMod(seed * 6364136223846793005L + 1442695040888963407L, 4); // 0, 1, 2, or 3
+            transform = (int) Math.floorMod(seed * 6364136223846793005L + 1442695040888963407L, 4); // LCG step (Knuth MMIX constants) for independent transform selection; 0, 1, 2, or 3
         }
 
         BufferedImage original = ImageHelper.read(tilePath);
