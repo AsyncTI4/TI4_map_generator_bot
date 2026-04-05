@@ -26,14 +26,19 @@ class FactionAverageTurnsInGameStatisticsService {
                 game -> averageTurnsInAGameByFaction(game, factionCount, factionTurnCount));
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Average Turns per Faction:").append('\n');
-        sb.append("All Factions Combined:")
-                .append(String.format(
-                        "%.2f", factionTurnCount.get("allFactions") / (double) factionCount.get("allFactions")))
-                .append('\n');
+        sb.append("Average Turns per Faction:").append("\n");
+        Integer allFactionGames = factionCount.get("allFactions");
+        Integer allFactionTurns = factionTurnCount.get("allFactions");
+        if (allFactionGames != null && allFactionTurns != null) {
+            sb.append("All Factions Combined:")
+                    .append(String.format("%.2f", allFactionTurns / (double) allFactionGames))
+                    .append('\n');
+        }
         factionCount.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
+                .filter(entry -> !"allFactions".equals(entry.getKey()))
                 .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
+                .filter(entry -> entry.getKey() != null)
                 .forEach(entry -> sb.append('`')
                         .append(StringUtils.leftPad(
                                 String.format(

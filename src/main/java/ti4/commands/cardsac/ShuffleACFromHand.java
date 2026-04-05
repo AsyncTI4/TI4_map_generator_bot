@@ -39,7 +39,7 @@ class ShuffleACFromHand extends GameStateSubcommand {
         }
         game.shuffleActionCardFromHandIntoDeck(player.getUserID(), acIndex);
         String message = "Card shuffled back into deck from hand: "
-                + Mapper.getActionCard(acID).getRepresentation();
+                + Mapper.getActionCard(acID).getRepresentation(game);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         ActionCardHelper.sendActionCardInfo(game, player);
     }

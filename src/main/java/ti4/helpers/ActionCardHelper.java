@@ -125,7 +125,7 @@ public class ActionCardHelper {
                     .append(".")
                     .append(Helper.leftpad("(" + value, 4))
                     .append(")`")
-                    .append(actionCard.getRepresentation());
+                    .append(actionCard.getRepresentation(game));
             index++;
         }
         return sb.toString();
@@ -581,7 +581,7 @@ public class ActionCardHelper {
         }
         String message = player.getRepresentationNoPing() + " discarded the action card _"
                 + Mapper.getActionCard(acID).getName() + "_.\n"
-                + Mapper.getActionCard(acID).getRepresentation();
+                + Mapper.getActionCard(acID).getRepresentation(game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         sendActionCardInfo(game, player);
     }
@@ -603,7 +603,7 @@ public class ActionCardHelper {
                         event.getMessageChannel(), "No such action card with id `" + acID + "` found, please retry.");
                 return;
             }
-            message.append(Mapper.getActionCard(acID).getRepresentation());
+            message.append(Mapper.getActionCard(acID).getRepresentation(game));
             count--;
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
@@ -806,7 +806,7 @@ public class ActionCardHelper {
                 }
             }
         }
-        MessageEmbed acEmbed = actionCard.getRepresentationEmbed(false, true);
+        MessageEmbed acEmbed = actionCard.getRepresentationEmbed(false, true, game);
         if (!game.isFowMode() && event instanceof ButtonInteractionEvent bEvent) {
             if (bEvent.getChannel().getName().toLowerCase().contains("-vs-")) {
                 MessageHelper.sendMessageToChannelWithEmbed(bEvent.getChannel(), message, acEmbed);
@@ -2039,11 +2039,11 @@ public class ActionCardHelper {
         for (String id : actionCards) {
             sa.append(index)
                     .append("\\. ")
-                    .append(Mapper.getActionCard(id).getRepresentation())
+                    .append(Mapper.getActionCard(id).getRepresentation(game))
                     .append('\n');
             sb.append(index)
                     .append("\\. ")
-                    .append(Mapper.getActionCard(id).getRepresentation())
+                    .append(Mapper.getActionCard(id).getRepresentation(game))
                     .append('\n');
             index++;
         }
@@ -2150,7 +2150,7 @@ public class ActionCardHelper {
         }
         String sb = "Game: " + game.getName() + " " + "Player: "
                 + player.getUserName() + "\n" + "Picked card from Discards: "
-                + Mapper.getActionCard(acId).getRepresentation()
+                + Mapper.getActionCard(acId).getRepresentation(game)
                 + "\n";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
 

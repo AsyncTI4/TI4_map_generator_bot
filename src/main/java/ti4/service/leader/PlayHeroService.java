@@ -778,7 +778,7 @@ public class PlayHeroService {
                         .append("> `")
                         .append(String.format("%02d", index))
                         .append(".` ")
-                        .append(actionCard.getRepresentation());
+                        .append(actionCard.getRepresentation(game));
                 componentActionACCount++;
             } else {
                 acRevealMessage
@@ -820,7 +820,7 @@ public class PlayHeroService {
                             .append("> `")
                             .append(String.format("%02d", index))
                             .append(".` ")
-                            .append(actionCard.getRepresentation());
+                            .append(actionCard.getRepresentation(game));
                     componentActionACCount++;
                 } else {
                     acRevealMessage

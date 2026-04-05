@@ -617,7 +617,7 @@ public class ButtonHelperCommanders {
                 String acID = acDeck.getFirst();
                 ActionCardModel acModel = Mapper.getActionCard(acID);
                 String sb = player.getRepresentation() + "*, the top card of the action card deck is:\n"
-                        + acModel.getRepresentation();
+                        + acModel.getRepresentation(game);
                 MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
             }
         }

@@ -2335,7 +2335,7 @@ public final class ButtonHelperHeroes {
         }
         for (int x = 0; x < n; x++) {
             String acID = game.drawActionCardAndDiscard();
-            String sb = Mapper.getActionCard(acID).getRepresentation() + "\n";
+            String sb = Mapper.getActionCard(acID).getRepresentation(game) + "\n";
             MessageHelper.sendMessageToChannel(channel, sb);
             buttons.add(Buttons.green(
                     "cymiaeHeroStep2_" + acID, Mapper.getActionCard(acID).getName()));
@@ -2981,7 +2981,7 @@ public final class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannelWithEmbed(
                 yssaril.getCardsInfoThread(),
                 "For your reference, the text of the action cards offered reads as:",
-                ac.getRepresentationEmbed());
+                ac.getRepresentationEmbed(false, false, game));
     }
 
     @ButtonHandler("creussHeroStep2_")

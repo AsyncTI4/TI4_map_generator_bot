@@ -68,19 +68,21 @@ class RelicPurgeFragments extends GameStateSubcommand {
         }
 
         Game game = getGame();
-        StringBuilder message = new StringBuilder(activePlayer.getRepresentation() + " purged ");
+        StringBuilder message =
+                new StringBuilder().append(activePlayer.getRepresentation()).append(" purged ");
         if (fragmentsToPurge.size() == 1) {
             String fragid = fragmentsToPurge.getFirst();
             activePlayer.removeFragment(fragid);
             game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
             switch (fragid) {
                 case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" ->
-                    message.append("a " + ExploreEmojis.CFrag + "cultural");
+                    message.append("a ").append(ExploreEmojis.CFrag).append("cultural");
                 case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" ->
-                    message.append("a " + ExploreEmojis.HFrag + "hazardous");
+                    message.append("a ").append(ExploreEmojis.HFrag).append("hazardous");
                 case "irf1", "irf2", "irf3", "irf4", "irf5" ->
-                    message.append("an " + ExploreEmojis.IFrag + "industrial");
-                case "urf1", "urf2", "urf3" -> message.append("an " + ExploreEmojis.UFrag + "unknown");
+                    message.append("an ").append(ExploreEmojis.IFrag).append("industrial");
+                case "urf1", "urf2", "urf3" ->
+                    message.append("an ").append(ExploreEmojis.UFrag).append("unknown");
                 default -> message.append(' ').append(fragid);
             }
             message.append(" relic fragment.");

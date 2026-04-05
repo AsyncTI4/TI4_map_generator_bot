@@ -2865,7 +2865,7 @@ public final class ButtonHelperActionCards {
                 }
                 String sb = "Game: " + game.getName() + " " + "Player: "
                         + player.getUserName() + "\n" + "Card picked from discards: "
-                        + Mapper.getActionCard(acStringID).getRepresentation()
+                        + Mapper.getActionCard(acStringID).getRepresentation(game)
                         + "\n";
                 MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
