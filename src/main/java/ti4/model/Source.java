@@ -59,6 +59,7 @@ public class Source {
         dane_leaks,
 
         // personal projs
+        viability_patch,
         somno,
         ignis_aurora,
         asteroid,

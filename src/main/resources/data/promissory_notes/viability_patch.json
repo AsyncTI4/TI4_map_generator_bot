@@ -1,0 +1,12 @@
+[
+    {
+        "alias": "viability_tekklar_legion",
+        "name": "Tekklar Legion",
+        "faction": "sardakk",
+        "playArea": false,
+        "attachment": false,
+        "source": "viability_patch",
+        "homebrewReplacesID": "tekklar",
+        "text": "At the start of an invasion combat: Apply +1 to the result of each of your unit's combat rolls during this combat. During the first round of combat produce 1 additional hit. Then, return this card to the N'orr player."
+    }
+]

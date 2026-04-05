@@ -231,6 +231,14 @@
         ]
     },
     {
+        "source": "viability_patch",
+        "name": "Viability Patch",
+        "canal": "community",
+        "subcanal": "lil homebrew",
+        "credits": "mjb141",
+        "description": "Slightly improving underutilised components"
+    },
+    {
         "source": "eronous",
         "name": "Ascendent Sun",
         "canal": "community",

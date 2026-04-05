@@ -169,6 +169,10 @@
             {
                 "type": "promissory_notes",
                 "alias": "sigma_tekklar_legion"
+            },
+            {
+                "type": "promissory_notes",
+                "alias": "viability_tekklar_legion"
             }
         ]
     },
@@ -1606,5 +1610,18 @@
             }
         ],
         "forCombatAbility": "bombardment"
+    },
+    {
+        "alias": "plus1_bonus_hit_first_round",
+        "type": "bonus_hits",
+        "value": "+1",
+        "persistenceType": "ONE_ROUND",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "promissory_notes",
+                "alias": "viability_tekklar_legion"
+            }
+        ]
     }
 ]
