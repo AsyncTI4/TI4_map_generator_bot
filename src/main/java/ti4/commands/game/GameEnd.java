@@ -45,9 +45,10 @@ class GameEnd extends GameStateSubcommand {
                             + ("YES".equalsIgnoreCase(option.getAsString()) ? " - this is case sensitive" : "") + ".");
             return;
         }
-        boolean publish = event.getOption(Constants.PUBLISH, true, OptionMapping::getAsBoolean);
-        boolean archiveChannels = event.getOption(Constants.ARCHIVE_CHANNELS, true, OptionMapping::getAsBoolean);
-        boolean rematch = event.getOption(Constants.REMATCH, false, OptionMapping::getAsBoolean);
+        boolean publish = event.getOption(Constants.PUBLISH, Boolean.TRUE, OptionMapping::getAsBoolean);
+        boolean archiveChannels =
+                event.getOption(Constants.ARCHIVE_CHANNELS, Boolean.TRUE, OptionMapping::getAsBoolean);
+        boolean rematch = event.getOption(Constants.REMATCH, Boolean.FALSE, OptionMapping::getAsBoolean);
         EndGameService.secondHalfOfGameEnd(event, game, publish, archiveChannels, rematch);
     }
 }

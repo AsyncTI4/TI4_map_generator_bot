@@ -1316,6 +1316,7 @@ public class Player extends PlayerProperties {
         return Mapper.getSecretObjective(idToRemove);
     }
 
+    @NotNull
     public Map<String, Integer> getSecretsUnscored() {
         Map<String, Integer> secretsUnscored = new HashMap<>();
         for (Map.Entry<String, Integer> secret : secrets.entrySet()) {
@@ -1663,11 +1664,11 @@ public class Player extends PlayerProperties {
                         continue;
                     }
                     if (ping) {
-                        sb.append(" ").append(userById.getAsMention());
+                        sb.append(' ').append(userById.getAsMention());
                     }
                 }
                 if (getColor() != null && !"null".equals(getColor()) && !noColor) {
-                    sb.append(" ").append(ColorEmojis.getColorEmojiWithName(getColor()));
+                    sb.append(' ').append(ColorEmojis.getColorEmojiWithName(getColor()));
                 }
                 return sb.toString();
             } else if (roleForCommunity != null) {
@@ -1694,7 +1695,7 @@ public class Player extends PlayerProperties {
             sb.append(getUserName());
         }
         if (getColor() != null && !"null".equals(getColor()) && !noColor) {
-            sb.append(" ").append(ColorEmojis.getColorEmojiWithName(getColor()));
+            sb.append(' ').append(ColorEmojis.getColorEmojiWithName(getColor()));
         }
         return sb.toString();
     }

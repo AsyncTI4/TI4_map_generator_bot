@@ -19,19 +19,19 @@ import ti4.service.tactical.TacticalActionOutputService;
 
 @RequiredArgsConstructor
 @Service
-public class MovementService {
+class MovementService {
 
     /**
      * Apply the provided displacement to the given target position, handle token placement, and return the updated tile.
      */
-    public Tile commitMovement(
+    Tile commitMovement(
             Game game, Player player, String targetPosition, Map<String, List<MovementUnitCount>> displacement) {
         try {
             // Transform web payload into internal displacement structure, normalizing unit-holder keys
             Map<String, Map<UnitKey, List<Integer>>> internal = new HashMap<>();
             if (displacement != null) {
                 for (Entry<String, List<MovementUnitCount>> entry : displacement.entrySet()) {
-                    String normalizedKey = normalizeUnitHolderKey(game, entry.getKey());
+                    String normalizedKey = normalizeUnitHolderKey(entry.getKey());
                     List<MovementUnitCount> units = entry.getValue();
                     if (units == null) continue;
                     Map<UnitKey, List<Integer>> byKey = new HashMap<>();
@@ -75,7 +75,7 @@ public class MovementService {
         }
     }
 
-    private String normalizeUnitHolderKey(Game game, String raw) {
+    private String normalizeUnitHolderKey(String raw) {
         if (raw == null) return null;
         int dash = raw.indexOf('-');
         if (dash <= 0) return raw;
@@ -84,7 +84,7 @@ public class MovementService {
         // Normalize planet/unit-holder name (case-insensitive, alias-aware)
         String normalizedHolder = AliasHandler.resolvePlanet(holder);
         // Fallback to lower-case if alias handler did not map it
-        if (normalizedHolder == null || normalizedHolder.isBlank()) normalizedHolder = holder;
+        if (normalizedHolder.isBlank()) normalizedHolder = holder;
         normalizedHolder = normalizedHolder.toLowerCase();
         return pos + "-" + normalizedHolder;
     }

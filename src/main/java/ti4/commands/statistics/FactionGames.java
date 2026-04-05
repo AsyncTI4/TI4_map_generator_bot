@@ -21,7 +21,7 @@ class FactionGames extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        boolean includeEndedGames = event.getOption(Constants.ENDED_GAMES, false, OptionMapping::getAsBoolean);
+        boolean includeEndedGames = event.getOption(Constants.ENDED_GAMES, Boolean.FALSE, OptionMapping::getAsBoolean);
         String faction = event.getOption(Constants.FACTION, OptionMapping::getAsString);
         SearchGameForFactionHelper.searchGames(faction, event, includeEndedGames);
     }

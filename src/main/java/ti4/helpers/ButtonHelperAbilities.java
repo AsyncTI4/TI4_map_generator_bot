@@ -800,7 +800,7 @@ public final class ButtonHelperAbilities {
                 myko.getRepresentationUnfogged() + " rolled 4 **Omen** dice and rolled the following numbers:");
         for (int x = 0; x < 4; x++) {
             Die d1 = new Die(6);
-            msg.append(" ").append(d1.getResult());
+            msg.append(' ').append(d1.getResult());
             addOmenDie(game, d1.getResult());
         }
         MessageHelper.sendMessageToChannel(

@@ -26,7 +26,7 @@ class POInfo extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        boolean includeScored = event.getOption(Constants.INCLUDE_SCORED, false, OptionMapping::getAsBoolean);
+        boolean includeScored = event.getOption(Constants.INCLUDE_SCORED, Boolean.FALSE, OptionMapping::getAsBoolean);
 
         Game game = getGame();
         Map<String, Integer> publicObjectiveIDs = game.getRevealedPublicObjectives();

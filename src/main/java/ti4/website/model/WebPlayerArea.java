@@ -317,7 +317,7 @@ public class WebPlayerArea {
             webPlayerArea.setKnownUnscoredSecrets(new HashMap<>());
         }
 
-        webPlayerArea.setNumUnscoredSecrets(unscoredSecrets != null ? unscoredSecrets.size() : 0);
+        webPlayerArea.setNumUnscoredSecrets(unscoredSecrets.size());
 
         // Additional properties
         webPlayerArea.setFlexibleDisplayName(player.getFlexibleDisplayName());

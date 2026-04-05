@@ -25,9 +25,9 @@ class SearchCommandsSubcommand extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        boolean includeOptions = event.getOption(Constants.INCLUDE_OPTIONS, false, OptionMapping::getAsBoolean);
+        boolean includeOptions = event.getOption(Constants.INCLUDE_OPTIONS, Boolean.FALSE, OptionMapping::getAsBoolean);
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        boolean showCounts = event.getOption("show_counts", false, OptionMapping::getAsBoolean);
+        boolean showCounts = event.getOption("show_counts", Boolean.FALSE, OptionMapping::getAsBoolean);
 
         StringBuilder sb = new StringBuilder("# __**Command List**__");
         List<Command> commands = event.getGuild().retrieveCommands().complete();

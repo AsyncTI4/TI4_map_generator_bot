@@ -70,8 +70,8 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     }
 
     public String textRepresentation() {
-        StringBuilder sb = new StringBuilder(getTypeEmoji()).append(" ");
-        if (source != null) sb.append(source.emoji()).append(" ");
+        StringBuilder sb = new StringBuilder(getTypeEmoji()).append(' ');
+        if (source != null) sb.append(source.emoji()).append(' ');
         sb.append("_").append(name).append("_\n> ");
         sb.append(PatternHelper.NEWLINE_OPTIONAL_GT_PATTERN.matcher(text).replaceAll("\n> "));
         if (notes != null) {

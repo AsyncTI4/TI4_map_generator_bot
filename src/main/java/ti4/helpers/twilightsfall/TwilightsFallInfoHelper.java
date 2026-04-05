@@ -33,7 +33,7 @@ public final class TwilightsFallInfoHelper {
         StringBuilder setupInfo = new StringBuilder();
 
         // Display name
-        setupInfo.append(faction.getFactionEmoji()).append(" ");
+        setupInfo.append(faction.getFactionEmoji()).append(' ');
         if (keleres) {
             setupInfo.append("The Council Keleres");
         } else {
@@ -146,13 +146,13 @@ public final class TwilightsFallInfoHelper {
         StringBuilder sb = new StringBuilder();
         sb.append(planet.getName());
         sb.append(" (");
-        sb.append(planet.getResources()).append("/").append(planet.getInfluence());
+        sb.append(planet.getResources()).append('/').append(planet.getInfluence());
         if (planet.isLegendary()) {
-            sb.append("/").append(MiscEmojis.LegendaryPlanet);
+            sb.append('/').append(MiscEmojis.LegendaryPlanet);
         }
         if (planet.getTechSpecialties() != null) {
             for (var spec : planet.getTechSpecialties()) {
-                sb.append("/").append(spec.getEmoji());
+                sb.append('/').append(spec.getEmoji());
             }
         }
         sb.append(") ");

@@ -22,8 +22,8 @@ public class MatchmakingRatingEventService {
 
     @Transactional(readOnly = true)
     public void calculateRatings(SlashCommandInteractionEvent event) {
-        boolean onlyTiglGames = event.getOption("tigl_only", false, OptionMapping::getAsBoolean);
-        boolean showRating = event.getOption("show_my_rating", false, OptionMapping::getAsBoolean);
+        boolean onlyTiglGames = event.getOption("tigl_only", Boolean.FALSE, OptionMapping::getAsBoolean);
+        boolean showRating = event.getOption("show_my_rating", Boolean.FALSE, OptionMapping::getAsBoolean);
 
         List<PlayerEntity> players =
                 playerEntityRepository.findAllWithUsersAndGamesByCompletedSixPlayerNonAllianceGame(onlyTiglGames);

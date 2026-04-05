@@ -34,7 +34,7 @@ class AllNamesStatisticsService {
         if (isNotBlank(game.getCustomName())) {
             names.append(" (").append(game.getCustomName()).append(")");
         }
-        names.append(" ").append(getSetupTimestamp(game));
+        names.append(' ').append(getSetupTimestamp(game));
         names.append('\n');
     }
 

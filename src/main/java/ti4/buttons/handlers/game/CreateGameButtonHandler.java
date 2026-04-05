@@ -223,7 +223,7 @@ public class CreateGameButtonHandler {
                         .append(completedGames + 3)
                         .append("-game limit) ");
             } else {
-                memberList.append(" ").append(completedGames).append(" games completed. ");
+                memberList.append(' ').append(completedGames).append(" games completed. ");
             }
             if (userIdsToAverageTurnTimes.containsKey(member.getUser().getId())) {
                 long averageTurnTime =

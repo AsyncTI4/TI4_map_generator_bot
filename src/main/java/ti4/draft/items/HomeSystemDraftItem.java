@@ -72,7 +72,7 @@ public class HomeSystemDraftItem extends DraftItem {
     private void buildPlanetString(PlanetModel planet, StringBuilder sb) {
         sb.append(planet.getName());
         sb.append(" (");
-        sb.append(planet.getResources()).append("/").append(planet.getInfluence());
+        sb.append(planet.getResources()).append('/').append(planet.getInfluence());
         sb.append(") ");
     }
 

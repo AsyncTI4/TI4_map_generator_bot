@@ -36,7 +36,7 @@ class CheckChannels extends GameStateSubcommand {
             first = false;
 
             output.append(player.getUserName());
-            output.append(" ");
+            output.append(' ');
             output.append(player.getFactionEmojiOrColor());
             output.append(" - ");
             MessageChannel channel = player.getPrivateChannel();

@@ -66,7 +66,7 @@ class SendTG extends GameStateSubcommand {
         String message = p1 + " sent " + tgString + " to " + p2;
         MessageHelper.sendMessageToEventChannel(event, message);
 
-        if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
+        if (event.getOption(Constants.CLEAR_DEBT, Boolean.FALSE, OptionMapping::getAsBoolean)) {
             targetPlayer.clearDebt(player, sendTG);
             MessageHelper.sendMessageToEventChannel(
                     event,

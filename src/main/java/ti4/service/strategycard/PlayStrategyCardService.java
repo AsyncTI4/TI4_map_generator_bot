@@ -657,14 +657,14 @@ public class PlayStrategyCardService {
                         for (Player p2 : game.getRealPlayers()) {
                             if (player != p2) {
                                 if (player.getNeighbouringPlayers(true).contains(p2)) {
-                                    neighborsMsg.append(" ").append(p2.getFactionEmoji());
+                                    neighborsMsg.append(' ').append(p2.getFactionEmoji());
                                     anyNeighbours = true;
                                 } else {
-                                    notNeighborsMsg.append(" ").append(p2.getFactionEmoji());
+                                    notNeighborsMsg.append(' ').append(p2.getFactionEmoji());
                                     allNeighbours = false;
                                 }
                                 if (p2.hasSpaceStation()) {
-                                    spaceStation.append(" ").append(p2.getFactionEmoji());
+                                    spaceStation.append(' ').append(p2.getFactionEmoji());
                                 }
                             }
                         }

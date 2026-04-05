@@ -113,7 +113,7 @@ class FrankenEdit extends GameStateSubcommand {
     private void dmPlayerBag(Game game, Player player, DraftBag bag, String bagName, User user) {
         StringBuilder sb = new StringBuilder();
         sb.append(game.getName())
-                .append(" ")
+                .append(' ')
                 .append(player.getUserName())
                 .append(" Current ")
                 .append(bagName)

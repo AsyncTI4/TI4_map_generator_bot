@@ -120,7 +120,7 @@ class Info extends GameStateSubcommand {
                 .append(game.getAcDeckID())
                 .append("` ")
                 .append(game.getActionCardDeckSize())
-                .append("/")
+                .append('/')
                 .append(game.getActionCardFullDeckSize())
                 .append('\n');
         sb.append("- ")
@@ -129,7 +129,7 @@ class Info extends GameStateSubcommand {
                 .append(game.getSoDeckID())
                 .append("` ")
                 .append(game.getSecretObjectiveDeckSize())
-                .append("/")
+                .append('/')
                 .append(game.getSecretObjectiveFullDeckSize())
                 .append('\n');
         sb.append("- ")
@@ -138,7 +138,7 @@ class Info extends GameStateSubcommand {
                 .append(game.getStage1PublicDeckID())
                 .append("` ")
                 .append(game.getPublicObjectives1DeckSize())
-                .append("/")
+                .append('/')
                 .append(game.getPublicObjectives1FullDeckSize());
         sb.append(" (+").append(game.getPublicObjectives1Peekable().size()).append(" are staged/peekable)\n");
         sb.append("- ")
@@ -147,7 +147,7 @@ class Info extends GameStateSubcommand {
                 .append(game.getStage2PublicDeckID())
                 .append("` ")
                 .append(game.getPublicObjectives2DeckSize())
-                .append("/")
+                .append('/')
                 .append(game.getPublicObjectives2FullDeckSize());
         sb.append(" (+").append(game.getPublicObjectives2Peekable().size()).append(" are staged/peekable)\n");
         sb.append("- ")
@@ -156,7 +156,7 @@ class Info extends GameStateSubcommand {
                 .append(game.getAgendaDeckID())
                 .append("` ")
                 .append(game.getAgendaDeckSize())
-                .append("/")
+                .append('/')
                 .append(game.getAgendaFullDeckSize())
                 .append('\n');
         if (game.getEventDeckID() != null
@@ -167,7 +167,7 @@ class Info extends GameStateSubcommand {
                     .append(game.getEventDeckID())
                     .append("` ")
                     .append(game.getEventDeckSize())
-                    .append("/")
+                    .append('/')
                     .append(game.getEventFullDeckSize())
                     .append('\n');
         }
@@ -183,7 +183,7 @@ class Info extends GameStateSubcommand {
                 .append(game.getRelicDeckID())
                 .append("` ")
                 .append(game.getRelicDeckSize())
-                .append("/")
+                .append('/')
                 .append(game.getRelicFullDeckSize())
                 .append('\n');
         sb.append("- Exploration Deck: `")
@@ -194,28 +194,28 @@ class Info extends GameStateSubcommand {
                 .append(CardEmojis.IndustrialCard)
                 .append("Industrial Deck: ")
                 .append(game.getIndustrialExploreDeckSize())
-                .append("/")
+                .append('/')
                 .append(game.getIndustrialExploreFullDeckSize())
                 .append('\n');
         sb.append(" - ")
                 .append(CardEmojis.HazardousCard)
                 .append("Hazardous Deck: ")
                 .append(game.getHazardousExploreDeckSize())
-                .append("/")
+                .append('/')
                 .append(game.getHazardousExploreFullDeckSize())
                 .append('\n');
         sb.append(" - ")
                 .append(CardEmojis.CulturalCard)
                 .append("Cultural Deck: ")
                 .append(game.getCulturalExploreDeckSize())
-                .append("/")
+                .append('/')
                 .append(game.getCulturalExploreFullDeckSize())
                 .append('\n');
         sb.append(" - ")
                 .append(CardEmojis.FrontierCard)
                 .append("Frontier Deck: ")
                 .append(game.getFrontierExploreDeckSize())
-                .append("/")
+                .append('/')
                 .append(game.getFrontierExploreFullDeckSize())
                 .append('\n');
 
@@ -264,7 +264,7 @@ class Info extends GameStateSubcommand {
         if (game.isFowMode()) {
             sb.append("FoW Options:");
             for (Map.Entry<FOWOption, Boolean> entry : game.getFowOptions().entrySet()) {
-                sb.append(" ")
+                sb.append(' ')
                         .append(entry.getKey().getTitle())
                         .append(":")
                         .append(FOWOptionService.valueRepresentation(entry.getValue()));

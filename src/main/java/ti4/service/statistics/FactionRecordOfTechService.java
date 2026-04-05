@@ -53,7 +53,7 @@ public class FactionRecordOfTechService {
                 .append(gamesThatHadThem)
                 .append(" Games)**__\n");
 
-        boolean sortOrderAscending = event.getOption("ascending", false, OptionMapping::getAsBoolean);
+        boolean sortOrderAscending = event.getOption("ascending", Boolean.FALSE, OptionMapping::getAsBoolean);
         Comparator<Map.Entry<String, Integer>> comparator = (o1, o2) -> {
             int o1total = o1.getValue();
             int o2total = o2.getValue();

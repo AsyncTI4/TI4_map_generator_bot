@@ -641,7 +641,7 @@ public final class ButtonHelperActionCards {
                     resultBuilder
                             .append("Rolling against ")
                             .append(numOfUnit)
-                            .append(" ")
+                            .append(' ')
                             .append(key.getUnitType().getUnitTypeEmoji())
                             .append(" owned by ")
                             .append(key.getColor())

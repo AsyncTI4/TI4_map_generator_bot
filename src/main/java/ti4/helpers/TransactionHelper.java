@@ -265,7 +265,7 @@ public final class TransactionHelper {
                         switch (furtherDetail) {
                             case "generic" ->
                                 trans.append(amountToTransact)
-                                        .append(" ")
+                                        .append(' ')
                                         .append(CardEmojis.getACEmoji(game))
                                         .append(" to be specified by player");
                             default -> {
@@ -294,7 +294,7 @@ public final class TransactionHelper {
                             case "generic" -> {
                                 if (!hidePrivateCardText) {
                                     trans.append(amountToTransact)
-                                            .append(" ")
+                                            .append(' ')
                                             .append(CardEmojis.PN)
                                             .append(" to be specified by player");
                                 } else {
@@ -318,7 +318,7 @@ public final class TransactionHelper {
                                 trans.append(CardEmojis.PN);
                                 if (!hidePrivateCardText) {
                                     if (Mapper.getPromissoryNote(id) != null) {
-                                        trans.append(" ")
+                                        trans.append(' ')
                                                 .append(StringUtils.capitalize(Mapper.getPromissoryNote(id)
                                                         .getColor()
                                                         .orElse("")))
@@ -327,7 +327,7 @@ public final class TransactionHelper {
                                                         .getName())
                                                 .append("_");
                                     } else {
-                                        trans.append(" ")
+                                        trans.append(' ')
                                                 .append("null pn info for ")
                                                 .append(id);
                                     }
@@ -339,7 +339,7 @@ public final class TransactionHelper {
                         switch (furtherDetail) {
                             case "generic" ->
                                 trans.append(amountToTransact)
-                                        .append(" ")
+                                        .append(' ')
                                         .append(CardEmojis.SecretObjective)
                                         .append(" to be specified by player");
                             default -> {

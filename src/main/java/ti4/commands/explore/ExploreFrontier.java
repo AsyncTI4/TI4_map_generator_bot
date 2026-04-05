@@ -33,7 +33,7 @@ class ExploreFrontier extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String tileName = event.getOption(Constants.TILE_NAME).getAsString();
-        boolean force = event.getOption(Constants.FORCE, false, OptionMapping::getAsBoolean);
+        boolean force = event.getOption(Constants.FORCE, Boolean.FALSE, OptionMapping::getAsBoolean);
         String cardID = event.getOption(Constants.EXPLORE_CARD_ID, null, OptionMapping::getAsString);
         Game game = getGame();
 

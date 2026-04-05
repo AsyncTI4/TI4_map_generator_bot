@@ -237,7 +237,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         sb = new StringBuilder();
         for (String id : getFactionTech()) {
             TechnologyModel model = Mapper.getTech(id);
-            sb.append(model.getCondensedReqsEmojis(false)).append(" ").append(model.getName());
+            sb.append(model.getCondensedReqsEmojis(false)).append(' ').append(model.getName());
             sb.append("\n> ").append(model.getText()).append('\n');
         }
         eb.addField("__Faction Technologies__", sb.toString(), false);
@@ -247,7 +247,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         for (String id : getUnits()) {
             UnitModel model = Mapper.getUnit(id);
             if (model.getFaction().isEmpty()) continue;
-            sb.append(model.getUnitEmoji()).append(" ").append(model.getName());
+            sb.append(model.getUnitEmoji()).append(' ').append(model.getName());
             if (model.getAbility().isPresent())
                 sb.append("\n> ").append(model.getAbility().get());
             sb.append('\n');
@@ -267,7 +267,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         for (String id : getLeaders()) {
             LeaderModel model = Mapper.getLeader(id);
             sb.append(model.getLeaderEmoji())
-                    .append(" ")
+                    .append(' ')
                     .append(model.getName())
                     .append('\n');
         }
@@ -281,7 +281,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         if (getStartingTech() != null && !getStartingTech().isEmpty()) {
             for (String id : getStartingTech()) {
                 TechnologyModel model = Mapper.getTech(id);
-                sb.append(model.getCondensedReqsEmojis(false)).append(" ").append(model.getName());
+                sb.append(model.getCondensedReqsEmojis(false)).append(' ').append(model.getName());
                 // sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append('\n');
             }
         } else {
@@ -289,7 +289,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
                 sb.append("\nPick ").append(startingTechAmount).append(" of the following:\n");
                 for (String id : startingTechOptions) {
                     TechnologyModel model = Mapper.getTech(id);
-                    sb.append(model.getCondensedReqsEmojis(false)).append(" ").append(model.getName());
+                    sb.append(model.getCondensedReqsEmojis(false)).append(' ').append(model.getName());
                     // sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append('\n');
                 }
             }

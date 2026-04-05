@@ -51,7 +51,7 @@ class RemoveFogTile extends GameStateSubcommand {
 
                 // remove the custom tile from the player
                 targetPlayer.removeFogTile(position);
-                sb2.append(" ").append(position);
+                sb2.append(' ').append(position);
             }
             sb.append(targetPlayer.getRepresentation())
                     .append(" removed fog tiles:")

@@ -786,7 +786,7 @@ public class PlayHeroService {
                         .append(String.format("%02d", index))
                         .append(".` ")
                         .append(CardEmojis.getACEmoji(game))
-                        .append(" ")
+                        .append(' ')
                         .append(acName)
                         .append('\n');
                 game.discardActionCard(player.getUserID(), acID);
@@ -828,7 +828,7 @@ public class PlayHeroService {
                             .append(String.format("%02d", index))
                             .append(".` ")
                             .append(CardEmojis.getACEmoji(game))
-                            .append(" ")
+                            .append(' ')
                             .append(acName)
                             .append('\n');
                     game.discardActionCard(player.getUserID(), acID);

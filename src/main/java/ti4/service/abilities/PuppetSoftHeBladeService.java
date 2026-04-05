@@ -62,7 +62,7 @@ public class PuppetSoftHeBladeService {
                 StringBuilder factions = new StringBuilder();
                 for (String faction : puppetedFactions) {
                     Player p2 = game.getPlayerFromColorOrFaction(faction);
-                    if (p2 != null) factions.append(p2.fogSafeEmoji()).append(" ");
+                    if (p2 != null) factions.append(p2.fogSafeEmoji()).append(' ');
                 }
                 plotInfo.append("\n> - Puppeted Factions for ")
                         .append(plot.getName())

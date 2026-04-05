@@ -59,7 +59,7 @@ class AddFogTile extends GameStateSubcommand {
             StringBuilder sb2 = new StringBuilder();
             for (Player target : targetPlayers) {
                 target.addFogTile(planetTileName, position, label);
-                sb2.append(" ").append(target.getRepresentation());
+                sb2.append(' ').append(target.getRepresentation());
             }
             sb.append("Added fog tile ")
                     .append(position)

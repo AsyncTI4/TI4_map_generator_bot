@@ -44,7 +44,7 @@ class FactionAverageTurnsInGameStatisticsService {
                         .append(entry.getValue())
                         .append(" games`")
                         .append(entry.getKey().getFactionEmoji())
-                        .append(" ")
+                        .append(' ')
                         .append(entry.getKey().getFactionNameWithSourceEmoji())
                         .append('\n'));
 

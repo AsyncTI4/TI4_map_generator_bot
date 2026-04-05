@@ -15,7 +15,7 @@ class SetPingOnNextTurn extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        boolean ping = event.getOption("ping", false, OptionMapping::getAsBoolean);
+        boolean ping = event.getOption("ping", Boolean.FALSE, OptionMapping::getAsBoolean);
         PingOnNextTurn.set(event, ping);
     }
 }

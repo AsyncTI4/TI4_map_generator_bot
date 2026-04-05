@@ -81,7 +81,7 @@ public class UserGameInfoService {
                 stats.completedGameDays.sort(Comparator.naturalOrder());
                 sb.append("> The completed games took the following amount of time to complete (in days):");
                 for (int day : stats.completedGameDays) {
-                    sb.append(" ").append(day);
+                    sb.append(' ').append(day);
                 }
                 sb.append('\n');
 

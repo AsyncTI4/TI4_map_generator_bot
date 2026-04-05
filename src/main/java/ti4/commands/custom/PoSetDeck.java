@@ -31,7 +31,7 @@ class PoSetDeck extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         String stage1Ids = event.getOption(Constants.SET_PO_DECK_STAGE1_LIST, null, OptionMapping::getAsString);
         String stage2Ids = event.getOption(Constants.SET_PO_DECK_STAGE2_LIST, null, OptionMapping::getAsString);
-        boolean shuffle = event.getOption(Constants.SET_PO_DECK_SHUFFLE, false, OptionMapping::getAsBoolean);
+        boolean shuffle = event.getOption(Constants.SET_PO_DECK_SHUFFLE, Boolean.FALSE, OptionMapping::getAsBoolean);
 
         List<String> stage1IdList = parseIds(stage1Ids);
         List<String> stage2IdList = parseIds(stage2Ids);

@@ -16,7 +16,7 @@ class ShowMapSetup extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         var game = getGame();
-        game.setShowMapSetup(event.getOption("show", false, OptionMapping::getAsBoolean));
+        game.setShowMapSetup(event.getOption("show", Boolean.FALSE, OptionMapping::getAsBoolean));
         MessageHelper.sendMessageToEventChannel(event, "Setup option set to: " + game.isShowMapSetup());
     }
 }

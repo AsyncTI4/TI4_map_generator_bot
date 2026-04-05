@@ -621,7 +621,7 @@ public class ExploreService {
                                         .append(p2.getRepresentationUnfogged())
                                         .append(", your ")
                                         .append(String.join("", groundForces))
-                                        .append(" ")
+                                        .append(' ')
                                         .append(groundForces.size() == 1 ? "has" : "have")
                                         .append(" been yote into space")
                                         .append(structures.isEmpty() ? "." : "");
@@ -633,7 +633,7 @@ public class ExploreService {
                                                         : ", and ")
                                         .append("your ")
                                         .append(String.join("", structures))
-                                        .append(" ")
+                                        .append(' ')
                                         .append(structures.size() == 1 ? "has" : "have")
                                         .append(" been yote into the shadow realm.");
                                 if (!game.isFowMode()) {
@@ -1391,7 +1391,7 @@ public class ExploreService {
                             && !"frontier"
                                     .equalsIgnoreCase(
                                             entry.getValue().getFirst().getType())) {
-                        sb.append(" ").append(ExploreEmojis.Chevrons);
+                        sb.append(' ').append(ExploreEmojis.Chevrons);
                     }
                 }
                 if (showPercents && ids.size() > 1) {

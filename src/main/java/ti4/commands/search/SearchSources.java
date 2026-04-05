@@ -61,7 +61,7 @@ class SearchSources extends Subcommand {
 
         String sourceString = event.getOption(Constants.SOURCE, null, OptionMapping::getAsString);
         ComponentSource source = ComponentSource.fromString(sourceString);
-        boolean sourcesCheck = event.getOption(CHECK_SOURCES, false, OptionMapping::getAsBoolean);
+        boolean sourcesCheck = event.getOption(CHECK_SOURCES, Boolean.FALSE, OptionMapping::getAsBoolean);
         Boolean canalBool = event.getOption(CANAL, null, OptionMapping::getAsBoolean);
 
         if (sourcesCheck) {

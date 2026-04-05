@@ -37,7 +37,7 @@ class MostWinningFactionsStatisticsService {
                             .append(StringUtils.leftPad(entry.getValue().toString(), 4))
                             .append("x` ")
                             .append(factionEmoji)
-                            .append(" ")
+                            .append(' ')
                             .append(factionName)
                             .append('\n');
                 });

@@ -302,7 +302,7 @@ public class EndGameService {
         StringBuilder message = new StringBuilder();
         for (String playerID : game.getRealPlayerIDs()) { // GET ALL PLAYER PINGS
             Member member = game.getGuild().getMemberById(playerID);
-            if (member != null) message.append(member.getAsMention()).append(" ");
+            if (member != null) message.append(member.getAsMention()).append(' ');
         }
         message.append(
                 "\nPlease provide a summary of the game below. You can also leave anonymous feedback on the bot [here](https://forms.gle/EvoWpRS4xEXqtNRa9)");
@@ -347,7 +347,7 @@ public class EndGameService {
         for (Player player : game.getRealAndEliminatedPlayers()) {
             sb.append("> `").append(index).append(".` ");
             sb.append(player.getFactionEmoji());
-            sb.append(ColorEmojis.getColorEmojiWithName(player.getColor())).append(" ");
+            sb.append(ColorEmojis.getColorEmojiWithName(player.getColor())).append(' ');
             appendUserName(sb, player);
             sb.append(" - *");
             if (player.isEliminated()) {
@@ -370,7 +370,7 @@ public class EndGameService {
             sb.append("**GM:** ");
             for (Player gm : game.getPlayersWithGMRole()) {
                 appendUserName(sb, gm);
-                sb.append(" ");
+                sb.append(' ');
             }
             sb.append('\n');
         }

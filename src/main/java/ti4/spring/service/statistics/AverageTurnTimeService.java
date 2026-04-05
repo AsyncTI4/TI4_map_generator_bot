@@ -31,7 +31,8 @@ public class AverageTurnTimeService {
 
     @Transactional(readOnly = true)
     public void getAverageTurnTimes(SlashCommandInteractionEvent event) {
-        boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
+        boolean ignoreEndedGames =
+                event.getOption(Constants.IGNORE_ENDED_GAMES, Boolean.FALSE, OptionMapping::getAsBoolean);
         int topLimit = event.getOption(Constants.TOP_LIMIT, DEFAULT_PLAYER_LIMIT, OptionMapping::getAsInt);
         int minTurns = event.getOption(
                 Constants.MINIMUM_NUMBER_OF_TURNS, DEFAULT_MINIMUM_NUMBER_OF_TURNS, OptionMapping::getAsInt);

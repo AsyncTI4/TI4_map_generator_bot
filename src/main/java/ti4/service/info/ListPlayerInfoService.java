@@ -346,7 +346,7 @@ public class ListPlayerInfoService {
                         if (threshold > 0) {
                             representation
                                     .append(progress)
-                                    .append("/")
+                                    .append('/')
                                     .append(threshold)
                                     .append(progress >= threshold ? "#" : "");
                         } else {
@@ -361,7 +361,7 @@ public class ListPlayerInfoService {
                     } else {
                         representation
                                 .append(progress)
-                                .append("/")
+                                .append('/')
                                 .append(threshold)
                                 .append(progress >= threshold ? "#" : "");
                     }
@@ -388,7 +388,7 @@ public class ListPlayerInfoService {
                         .append(player.getFactionEmoji())
                         .append(": ")
                         .append(player.getSoScored())
-                        .append("/")
+                        .append('/')
                         .append(player.getMaxSOCount())
                         .append(UnitEmojis.Blank)
                         .append(UnitEmojis.Blank);
@@ -464,7 +464,7 @@ public class ListPlayerInfoService {
                         .append(player.getFactionEmoji())
                         .append(": ")
                         .append(player.getTotalVictoryPoints())
-                        .append("/")
+                        .append('/')
                         .append(game.getVp())
                         .append(UnitEmojis.Blank)
                         .append(UnitEmojis.Blank);

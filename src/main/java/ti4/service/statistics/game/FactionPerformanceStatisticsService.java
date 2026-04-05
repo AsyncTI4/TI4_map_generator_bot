@@ -48,7 +48,7 @@ class FactionPerformanceStatisticsService {
                             .append(gameCount.getOrDefault(entry.getKey(), 0))
                             .append(" games) ")
                             .append(factionEmoji)
-                            .append(" ")
+                            .append(' ')
                             .append(factionName)
                             .append('\n');
                 });

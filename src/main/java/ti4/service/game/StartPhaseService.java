@@ -196,7 +196,7 @@ public class StartPhaseService {
                 msg.append(count)
                         .append(". ")
                         .append(Helper.getSCName(Integer.parseInt(num), game))
-                        .append(" ")
+                        .append(' ')
                         .append(scEmoji)
                         .append('\n');
             }
@@ -477,7 +477,7 @@ public class StartPhaseService {
                 StringBuilder sb = new StringBuilder("**Priority Track (Speaker first)**\n");
                 if (speaker != null) {
                     sb.append(MiscEmojis.SpeakerToken)
-                            .append(" ")
+                            .append(' ')
                             .append(speaker.getRepresentation())
                             .append('\n');
                 }

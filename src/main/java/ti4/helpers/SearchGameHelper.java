@@ -213,7 +213,7 @@ public class SearchGameHelper {
             String endedStatus = game.hasWinner() ? "COMPLETED" : "ABORTED";
             sb.append(" [")
                     .append(daysPlayed)
-                    .append(" ")
+                    .append(' ')
                     .append(dayLabel)
                     .append(", ")
                     .append(endedStatus)

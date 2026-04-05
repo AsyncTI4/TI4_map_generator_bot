@@ -58,7 +58,7 @@ public class UnitDraftItem extends DraftItem {
             if (unit.getCombatDieCount() > 1) {
                 sb.append("x").append(unit.getCombatDieCount());
             }
-            sb.append(" ");
+            sb.append(' ');
         }
 
         if (unit.getSustainDamage()) {
@@ -69,31 +69,31 @@ public class UnitDraftItem extends DraftItem {
                     .append(unit.getAfbHitsOn())
                     .append("x")
                     .append(unit.getAfbDieCount())
-                    .append(" ");
+                    .append(' ');
         }
         if (unit.getSpaceCannonDieCount() > 0) {
             sb.append("SPACE CANNON ")
                     .append(unit.getSpaceCannonHitsOn())
                     .append("x")
                     .append(unit.getSpaceCannonDieCount())
-                    .append(" ");
+                    .append(' ');
         }
         if (unit.getProductionValue() > 0) {
             sb.append("PRODUCTION ");
             sb.append(unit.getProductionValue());
-            sb.append(" ");
+            sb.append(' ');
         }
         if (unit.getCapacityValue() > 0) {
             sb.append("Capacity ");
             sb.append(unit.getCapacityValue());
-            sb.append(" ");
+            sb.append(' ');
         }
         if (unit.getMoveValue() > 0) {
             sb.append("Move ");
             sb.append(unit.getMoveValue());
-            sb.append(" ");
+            sb.append(' ');
         }
-        if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get()).append(" ");
+        if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get()).append(' ');
         if (unit.getFaction().isPresent()) {
             sb.append("Faction: ").append(unit.getFaction().get());
         }

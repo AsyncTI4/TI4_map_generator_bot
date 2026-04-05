@@ -3274,7 +3274,7 @@ public final class AgendaHelper {
                         summaryBuilder
                                 .append("- ")
                                 .append(emoji)
-                                .append(" ")
+                                .append(' ')
                                 .append(outcome)
                                 .append(": ")
                                 .append(totalVotes);

@@ -44,7 +44,8 @@ public class AddTileService {
     }
 
     public static Set<ComponentSource> getSources(SlashCommandInteractionEvent event, Game game) {
-        return getSources(game, event.getOption(Constants.INCLUDE_ERONOUS_TILES, false, OptionMapping::getAsBoolean));
+        return getSources(
+                game, event.getOption(Constants.INCLUDE_ERONOUS_TILES, Boolean.FALSE, OptionMapping::getAsBoolean));
     }
 
     // This should be changed to support multiple sources and not just Eronous

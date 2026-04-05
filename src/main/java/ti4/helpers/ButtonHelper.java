@@ -3281,7 +3281,7 @@ public class ButtonHelper {
                 sb.append(" (").append(color).append(") ");
             } else {
                 sb.append(player.getFactionEmoji())
-                        .append(" ")
+                        .append(' ')
                         .append(" (")
                         .append(color)
                         .append(") ");
@@ -3317,7 +3317,7 @@ public class ButtonHelper {
                 if (!justUnits) {
                     sb.append(" Resources: ")
                             .append(planet.getResources())
-                            .append("/")
+                            .append('/')
                             .append(planet.getInfluence());
                 }
             } else {
@@ -3347,7 +3347,7 @@ public class ButtonHelper {
                         String key = entry_.getKey();
                         String value = entry_.getValue();
                         if (token.contains(key)) {
-                            sb.append(value).append(" ");
+                            sb.append(value).append(' ');
                         }
                     }
                 }
@@ -3379,7 +3379,7 @@ public class ButtonHelper {
                     sb.append(player.getFactionEmojiOrColor()).append(ColorEmojis.getColorEmojiWithName(color));
                     sb.append(" `").append(unitEntry.getValue()).append("x` ");
                     if (unitModel != null) {
-                        sb.append(unitModel.getUnitEmoji()).append(" ");
+                        sb.append(unitModel.getUnitEmoji()).append(' ');
                         sb.append(privateGame ? unitModel.getBaseType() : unitModel.getName())
                                 .append('\n');
                     } else {
@@ -6040,7 +6040,7 @@ public class ButtonHelper {
                             .append(player.getFactionEmoji())
                             .append(" placed ")
                             .append(numMechs)
-                            .append(" ")
+                            .append(' ')
                             .append(UnitEmojis.infantry)
                             .append(" with the mechs in ")
                             .append(tile.getRepresentationForButtons(game, player));
@@ -6572,9 +6572,9 @@ public class ButtonHelper {
                 rep = rep.replace("damaged", "");
             }
             message.append(player.getFactionEmoji())
-                    .append(" ")
+                    .append(' ')
                     .append(game.getSpecificThalnosUnit(unit))
-                    .append(" ")
+                    .append(' ')
                     .append(damaged)
                     .append(rep)
                     .append('\n');

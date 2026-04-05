@@ -216,7 +216,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         for (int i = 0; i < 3; ++i) {
             FactionModel pFaction = factionsInPackage.get(i);
             if (includeEmojis) {
-                formattedNameBuilder.append(pFaction.getFactionEmoji()).append(" ");
+                formattedNameBuilder.append(pFaction.getFactionEmoji()).append(' ');
             }
             if (pFaction.getShortName().toLowerCase().contains("keleres")) {
                 formattedNameBuilder.append("Keleres");

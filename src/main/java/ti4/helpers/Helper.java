@@ -1470,7 +1470,7 @@ public final class Helper {
                     .append(tg)
                     .append(" trade good")
                     .append(tg == 1 ? "" : "s")
-                    .append(" ")
+                    .append(' ')
                     .append(MiscEmojis.getTGorNomadCoinEmoji(game))
                     .append(" (")
                     .append(player.getTg() + tg)
@@ -3155,7 +3155,7 @@ public final class Helper {
                     SetOrderService.setPlayerOrder(newPlayerOrder, players, player);
                     if (player.isSpeaker()) {
                         msg.append(player.getRepresentationUnfogged())
-                                .append(" ")
+                                .append(' ')
                                 .append(MiscEmojis.SpeakerToken)
                                 .append(" \n");
                     } else {

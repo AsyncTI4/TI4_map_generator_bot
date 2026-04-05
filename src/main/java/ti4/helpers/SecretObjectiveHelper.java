@@ -45,7 +45,7 @@ public final class SecretObjectiveHelper {
                 message.append(SecretObjectiveInfoService.getSecretObjectiveRepresentationNoNewLine(entry.getKey()));
                 message.append(" (")
                         .append(ListPlayerInfoService.getPlayerProgressOnObjective(entry.getKey(), game, player))
-                        .append("/")
+                        .append('/')
                         .append(ListPlayerInfoService.getObjectiveThreshold(entry.getKey(), game))
                         .append(")\n");
             } else {
@@ -137,7 +137,7 @@ public final class SecretObjectiveHelper {
                                 message2.append(" " + ExploreEmojis.HFrag);
                             case "irf1", "irf2", "irf3", "irf4", "irf5" -> message2.append(" " + ExploreEmojis.IFrag);
                             case "urf1", "urf2", "urf3" -> message2.append(" " + ExploreEmojis.UFrag);
-                            default -> message2.append(" ").append(fragId);
+                            default -> message2.append(' ').append(fragId);
                         }
                     }
                     CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
@@ -381,7 +381,7 @@ public final class SecretObjectiveHelper {
             sb.append(player.getFactionEmoji())
                     .append(": ")
                     .append(progress)
-                    .append("/")
+                    .append('/')
                     .append(threshold)
                     .append(progress >= threshold ? "#" : "")
                     .append(UnitEmojis.Blank)

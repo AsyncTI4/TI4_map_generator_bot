@@ -33,7 +33,7 @@ public class AverageHitsPerTurnService {
 
     @Transactional(readOnly = true)
     public void getExpectedHitsPerTurn(SlashCommandInteractionEvent event) {
-        boolean sortOrderAscending = event.getOption("ascending", true, OptionMapping::getAsBoolean);
+        boolean sortOrderAscending = event.getOption("ascending", Boolean.TRUE, OptionMapping::getAsBoolean);
         int topLimit = event.getOption(Constants.TOP_LIMIT, DEFAULT_PLAYER_LIMIT, OptionMapping::getAsInt);
         int minimumTurns =
                 event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, DEFAULT_MINIMUM_TURNS, OptionMapping::getAsInt);

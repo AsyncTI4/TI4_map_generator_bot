@@ -30,7 +30,7 @@ class SearchPlanetsSubcommand extends SearchComponentModelSubcommand {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         ComponentSource source =
                 ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
-        boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
+        boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, Boolean.FALSE, OptionMapping::getAsBoolean);
 
         if (Mapper.isValidPlanet(searchString)) {
             event.getChannel()

@@ -353,7 +353,7 @@ public abstract class BagDraft {
             }
             sb.append(" (")
                     .append(player.getDraftHand().Contents.size())
-                    .append("/")
+                    .append('/')
                     .append(owner.getFrankenBagSize())
                     .append(")");
             if (player.isReadyToPassBag()) {
@@ -377,7 +377,7 @@ public abstract class BagDraft {
             String ident =
                     owner.getRealPlayers().size() > 10 ? player.getFactionEmoji() : player.getRepresentationNoPing();
 
-            sb.append("> ").append(finished).append(" ").append(ident).append('\n');
+            sb.append("> ").append(finished).append(' ').append(ident).append('\n');
         }
         return sb.toString();
     }

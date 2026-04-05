@@ -574,7 +574,7 @@ public class MiltyDraftManager {
             Player player = game.getPlayer(p);
             PlayerDraft picks = getPlayerDraft(p);
             sb.append("\n> `").append(Helper.leftpad(pickNum + ".", padding)).append("` ");
-            sb.append(picks.summary(goodDogOfTheDay)).append(" ");
+            sb.append(picks.summary(goodDogOfTheDay)).append(' ');
 
             String next = getNextDraftPlayer();
             String current = getCurrentDraftPlayer();

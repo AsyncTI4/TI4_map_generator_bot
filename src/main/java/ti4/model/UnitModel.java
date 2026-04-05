@@ -488,7 +488,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
         sb.append(name).append(" (");
-        if (getFaction().isPresent()) sb.append(getFaction().get()).append(" ");
+        if (getFaction().isPresent()) sb.append(getFaction().get()).append(' ');
         sb.append(baseType).append(") [");
         sb.append(source).append("]");
         return sb.toString();

@@ -99,7 +99,7 @@ class ExpeditionWinRateStatisticsService {
         long percent = totalGames > 0 ? Math.round(completedExpeditions * 100.0 / totalGames) : 0;
         sb.append("- ")
                 .append(completedExpeditions)
-                .append("/")
+                .append('/')
                 .append(totalGames)
                 .append(" (")
                 .append(percent)
@@ -114,7 +114,7 @@ class ExpeditionWinRateStatisticsService {
                 : 0;
         sb.append("- ")
                 .append(playersWithBreakthroughWithoutExpedition)
-                .append("/")
+                .append('/')
                 .append(playersWithBreakthrough)
                 .append(" (")
                 .append(playerPercent)

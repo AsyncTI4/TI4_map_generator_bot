@@ -34,7 +34,7 @@ public class PlayerStatsService {
         sb.append("      ")
                 .append(MiscEmojis.comm)
                 .append(player.getCommodities())
-                .append("/")
+                .append('/')
                 .append(player.getCommoditiesTotal());
 
         sb.append("      ").append(ExploreEmojis.CFrag).append(player.getCrf());

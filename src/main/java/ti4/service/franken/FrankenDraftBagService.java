@@ -367,9 +367,9 @@ public class FrankenDraftBagService {
             sb.append("### ").append("GENOME ").append(" (");
         }
         if (draft instanceof FrankenDraft) {
-            sb.append(bag.getCategoryCount(cat)).append("/").append(FrankenDraft.getItemLimitForCategory(cat, game));
+            sb.append(bag.getCategoryCount(cat)).append('/').append(FrankenDraft.getItemLimitForCategory(cat, game));
         } else {
-            sb.append(bag.getCategoryCount(cat)).append("/").append(draft.getItemLimitForCategory(cat));
+            sb.append(bag.getCategoryCount(cat)).append('/').append(draft.getItemLimitForCategory(cat));
         }
         sb.append("):\n");
         for (DraftItem item : bag.getCategory(cat)) {
@@ -401,7 +401,7 @@ public class FrankenDraftBagService {
     private static String buildItemDescription(DraftItem item, Game game) {
         StringBuilder sb = new StringBuilder();
         try {
-            sb.append("### ").append(item.getItemEmoji()).append(" ");
+            sb.append("### ").append(item.getItemEmoji()).append(' ');
             sb.append(item.getShortDescription()).append("\n> ");
             sb.append(item.getLongDescription(game));
         } catch (Exception e) {

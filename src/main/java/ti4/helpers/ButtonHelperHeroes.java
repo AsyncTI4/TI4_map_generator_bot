@@ -1582,10 +1582,10 @@ public final class ButtonHelperHeroes {
                         if (totalUnits > damagedUnits) {
                             message.append("Rolling for ")
                                     .append(p2.getRepresentationNoPing())
-                                    .append(" ")
+                                    .append(' ')
                                     .append(unitModel.getBaseType())
                                     .append(totalUnits - damagedUnits == 1 ? "" : "s")
-                                    .append(" ")
+                                    .append(' ')
                                     .append(unitModel.getUnitEmoji())
                                     .append(": ");
                             for (int i = 0; i < totalUnits - damagedUnits; i++) {
@@ -1725,7 +1725,7 @@ public final class ButtonHelperHeroes {
                                 message.append(p2.getRepresentationNoPing())
                                         .append(" has a mixture of ")
                                         .append(overCapacity)
-                                        .append(" ")
+                                        .append(' ')
                                         .append(unitListing)
                                         .append(" in excess of their amended (zero) capacity; removing")
                                         .append(tf ? "" : " and capturing")
@@ -1772,7 +1772,7 @@ public final class ButtonHelperHeroes {
                                 message.append(p2.getRepresentationNoPing())
                                         .append(" has a mixture of ")
                                         .append(overCapacity)
-                                        .append(" ")
+                                        .append(' ')
                                         .append(unitListing)
                                         .append(" in excess of their amended capacity. Please remove ")
                                         .append(overCapacity == 1 ? "this" : "these")

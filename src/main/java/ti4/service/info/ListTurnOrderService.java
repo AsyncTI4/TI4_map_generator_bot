@@ -72,7 +72,7 @@ public class ListTurnOrderService {
         if (pingPeople || game.isFowMode()) {
             textBuilder.append(player.getRepresentation());
         } else {
-            textBuilder.append(player.getFactionEmoji()).append(" ").append(player.getUserName());
+            textBuilder.append(player.getFactionEmoji()).append(' ').append(player.getUserName());
         }
 
         if (passed) {

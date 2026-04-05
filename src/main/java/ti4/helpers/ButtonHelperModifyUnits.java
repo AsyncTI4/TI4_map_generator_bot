@@ -161,7 +161,7 @@ public final class ButtonHelperModifyUnits {
                 if ("fighter".equalsIgnoreCase(unitName) && min > 0) {
                     msg.append("> Destroyed ")
                             .append(min)
-                            .append(" ")
+                            .append(' ')
                             .append(UnitEmojis.fighter)
                             .append('\n');
                     hits -= min;
@@ -197,7 +197,7 @@ public final class ButtonHelperModifyUnits {
                 if (unitModel.getSustainDamage() && min > 0 && unitModel.getIsShip()) {
                     msg.append("> Made ")
                             .append(min)
-                            .append(" ")
+                            .append(' ')
                             .append(unitModel.getUnitEmoji())
                             .append(" sustained\n");
                     hits -= min;
@@ -326,14 +326,14 @@ public final class ButtonHelperModifyUnits {
                     if (RandomHelper.isOneInX(40)) {
                         msg.append("> ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
                                 .append(" got a boo boo 🤕")
                                 .append('\n');
                     } else {
                         msg.append("> Sustained ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                     }
@@ -378,7 +378,7 @@ public final class ButtonHelperModifyUnits {
                     if (unitName.equalsIgnoreCase(unitType) && min > 0) {
                         msg.append("> Destroyed ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(entry.getValue())
                                 .append('\n');
                         hits -= min;
@@ -404,7 +404,7 @@ public final class ButtonHelperModifyUnits {
                 if ("mech".equalsIgnoreCase(unitName) && min > 0) {
                     msg.append("> Destroyed ")
                             .append(min)
-                            .append(" ")
+                            .append(' ')
                             .append(unitName)
                             .append(min == 1 ? "" : "s")
                             .append('\n');
@@ -561,7 +561,7 @@ public final class ButtonHelperModifyUnits {
                     if (!justSummarizing) {
                         msg.append("> Sustained ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                         tile.addUnitDamage("space", unitKey, min);
@@ -571,7 +571,7 @@ public final class ButtonHelperModifyUnits {
                     } else {
                         msg.append("> Would sustain ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                     }
@@ -626,7 +626,7 @@ public final class ButtonHelperModifyUnits {
                     if (!justSummarizing) {
                         msg.append("> Sustained ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                         tile.addUnitDamage("space", unitKey, min);
@@ -636,7 +636,7 @@ public final class ButtonHelperModifyUnits {
                     } else {
                         msg.append("> Would sustain ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                     }
@@ -719,13 +719,13 @@ public final class ButtonHelperModifyUnits {
                         DestroyUnitService.destroyUnit(event, tile, game, unit, !spaceCannonOffence);
                         msg.append("> Destroyed ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                     } else {
                         msg.append("> Would destroy ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                     }
@@ -750,13 +750,13 @@ public final class ButtonHelperModifyUnits {
                         handleLetnevCommanderCheck(player, game, event, min);
                         msg.append("> Sustained ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                     } else {
                         msg.append("> Would sustain ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                     }
@@ -773,13 +773,13 @@ public final class ButtonHelperModifyUnits {
                         DestroyUnitService.destroyUnit(event, tile, game, unit, !spaceCannonOffence);
                         msg.append("> Destroyed ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                     } else {
                         msg.append("> Would destroy ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                     }
@@ -812,13 +812,13 @@ public final class ButtonHelperModifyUnits {
                             ButtonHelper.resolveInfantryRemoval(player, min, tile);
                         msg.append("> Removed ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                     } else {
                         msg.append("> Would remove ")
                                 .append(min)
-                                .append(" ")
+                                .append(' ')
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                     }

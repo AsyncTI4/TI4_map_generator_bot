@@ -77,7 +77,7 @@ public class LogOrigin {
     @NotNull
     private static String buildEventString(@Nonnull GenericInteractionCreateEvent event) {
         StringBuilder builder =
-                new StringBuilder().append(event.getUser().getEffectiveName()).append(" ");
+                new StringBuilder().append(event.getUser().getEffectiveName()).append(' ');
 
         switch (event) {
             case SlashCommandInteractionEvent sEvent ->

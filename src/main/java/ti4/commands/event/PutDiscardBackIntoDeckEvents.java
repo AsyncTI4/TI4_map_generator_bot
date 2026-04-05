@@ -23,7 +23,7 @@ class PutDiscardBackIntoDeckEvents extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        boolean shuffleEvents = event.getOption(Constants.SHUFFLE_EVENTS, true, OptionMapping::getAsBoolean);
+        boolean shuffleEvents = event.getOption(Constants.SHUFFLE_EVENTS, Boolean.TRUE, OptionMapping::getAsBoolean);
         Game game = getGame();
         boolean success;
         if (shuffleEvents) {

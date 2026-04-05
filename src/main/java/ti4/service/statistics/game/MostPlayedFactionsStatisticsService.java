@@ -35,7 +35,7 @@ class MostPlayedFactionsStatisticsService {
                     .append(StringUtils.leftPad(entry.getValue().toString(), 4))
                     .append("x` ")
                     .append(factionEmoji)
-                    .append(" ")
+                    .append(' ')
                     .append(factionName)
                     .append(" (Took Custodians a total of  ")
                     .append(custodians.getOrDefault(entry.getKey(), 0))

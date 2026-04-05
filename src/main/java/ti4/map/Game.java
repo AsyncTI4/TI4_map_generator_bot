@@ -3579,10 +3579,10 @@ public class Game extends GameProperties {
         if (role != null) {
             return role.getAsMention();
         }
-        StringBuilder sb = new StringBuilder(getName()).append(" ");
+        StringBuilder sb = new StringBuilder(getName()).append(' ');
         for (String playerID : getPlayerIDs()) {
             User user = JdaService.jda.getUserById(playerID);
-            if (user != null) sb.append(user.getAsMention()).append(" ");
+            if (user != null) sb.append(user.getAsMention()).append(' ');
         }
         return sb.toString();
     }
@@ -4647,7 +4647,7 @@ public class Game extends GameProperties {
             } else if (missingTile) {
                 sb.append("-1");
             }
-            sb.append(" ");
+            sb.append(' ');
         }
         setMapString(sb.toString().trim());
         return sb.toString().trim();

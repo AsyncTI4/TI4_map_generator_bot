@@ -317,7 +317,7 @@ public class ActionCardHelper {
         // ACTION CARDS
         sb.append("__Action Cards__ (")
                 .append(player.getAcCount())
-                .append("/")
+                .append('/')
                 .append(ButtonHelper.getACLimit(game, player))
                 .append("):")
                 .append('\n');

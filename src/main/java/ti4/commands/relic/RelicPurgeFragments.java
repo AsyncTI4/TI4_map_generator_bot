@@ -81,7 +81,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
                 case "irf1", "irf2", "irf3", "irf4", "irf5" ->
                     message.append("an " + ExploreEmojis.IFrag + "industrial");
                 case "urf1", "urf2", "urf3" -> message.append("an " + ExploreEmojis.UFrag + "unknown");
-                default -> message.append(" ").append(fragid);
+                default -> message.append(' ').append(fragid);
             }
             message.append(" relic fragment.");
         } else {
@@ -94,7 +94,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
                     case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> message.append(ExploreEmojis.HFrag);
                     case "irf1", "irf2", "irf3", "irf4", "irf5" -> message.append(ExploreEmojis.IFrag);
                     case "urf1", "urf2", "urf3" -> message.append(ExploreEmojis.UFrag);
-                    default -> message.append(" ").append(fragid);
+                    default -> message.append(' ').append(fragid);
                 }
             }
             message.append(" relic fragments.");
@@ -108,7 +108,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
                     event, activePlayer.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
         }
 
-        boolean drawRelic = event.getOption(Constants.ALSO_DRAW_RELIC, false, OptionMapping::getAsBoolean);
+        boolean drawRelic = event.getOption(Constants.ALSO_DRAW_RELIC, Boolean.FALSE, OptionMapping::getAsBoolean);
         if (drawRelic) {
             RelicHelper.drawRelicAndNotify(activePlayer, event, game);
         }

@@ -100,7 +100,7 @@ public class SecretObjectiveInfoService {
         // SCORED SECRET OBJECTIVES
         sb.append("__Scored Secret Objectives__ (")
                 .append(player.getSoScored())
-                .append("/")
+                .append('/')
                 .append(player.getMaxSOCount())
                 .append("):")
                 .append('\n');
@@ -147,7 +147,7 @@ public class SecretObjectiveInfoService {
                     if (threshold > 0) {
                         sb.append(" (")
                                 .append(ListPlayerInfoService.getPlayerProgressOnObjective(so.getKey(), game, player))
-                                .append("/")
+                                .append('/')
                                 .append(threshold)
                                 .append(")");
                     }

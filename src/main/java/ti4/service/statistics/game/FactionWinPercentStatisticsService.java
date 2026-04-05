@@ -47,7 +47,7 @@ class FactionWinPercentStatisticsService {
                             .append(factionGameCount.get(entry.getKey()))
                             .append(" games) ")
                             .append(factionEmoji)
-                            .append(" ")
+                            .append(' ')
                             .append(factionName)
                             .append('\n');
                 });
