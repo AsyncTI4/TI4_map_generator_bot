@@ -903,8 +903,7 @@ public final class ButtonHelperAbilities {
         }
 
         if (getBountiesForPlayer(game).size() >= 3) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    "You already have 3 bounties placed.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "You already have 3 bounties placed.");
             ButtonHelper.deleteTheOneButton(event);
             return;
         }
@@ -1001,7 +1000,8 @@ public final class ButtonHelperAbilities {
         String unitTypeString = buttonID.split("_")[1].toLowerCase();
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 == null) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not find player, please resolve manually.");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not find player, please resolve manually.");
             return;
         }
         game.removeStoredValue("bounties" + p2.getFaction() + unitTypeString);

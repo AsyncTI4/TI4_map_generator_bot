@@ -519,7 +519,7 @@ public class JdaService {
         developerRoles.add(jda.getRoleById("1335330959767375902")); // Jabberwocky's server
         developerRoles.add(jda.getRoleById("1465619572718567526")); // Ariel's server
         developerRoles.add(jda.getRoleById("1487725369766449173")); // Balacasi's server
-        
+
         developerRoles.removeIf(Objects::isNull);
 
         // BOTHELPER ROLES
