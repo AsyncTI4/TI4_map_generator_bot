@@ -26,20 +26,22 @@ public class UnusedAgentHelper {
                 .toList();
 
         for (FactionModel faction : allFactions) {
-            String agentName = faction.getAlias() + "agent";
-            if (agentName.contains("keleres")) {
-                agentName = "keleresagent";
-            }
-            if (game.getFactions().contains(faction.getAlias())
-                    || (Helper.getPlayerFromLeader(game, agentName) != null)
-                    || agents.contains(agentName)
-                    || Mapper.getLeader(agentName) == null
-                    || "unknown".equalsIgnoreCase(Mapper.getLeader(agentName).getAbilityText())
-                    || game.getStoredValue("fakeAgents").contains(agentName)
-                    || excludedAgents.contains(agentName)) {
+            if (game.getFactions().contains(faction.getAlias())) {
                 continue;
             }
-            agents.add(agentName);
+            for (String agentName : faction.getLeaders()) {
+                if (Mapper.getLeader(agentName) == null
+                        || !"agent".equalsIgnoreCase(Mapper.getLeader(agentName).getType())
+                        || Helper.getPlayerFromLeader(game, agentName) != null
+                        || agents.contains(agentName)
+                        || "unknown"
+                                .equalsIgnoreCase(Mapper.getLeader(agentName).getAbilityText())
+                        || game.getStoredValue("fakeAgents").contains(agentName)
+                        || excludedAgents.contains(agentName)) {
+                    continue;
+                }
+                agents.add(agentName);
+            }
         }
         if (!agents.isEmpty()) {
             Collections.shuffle(agents);
