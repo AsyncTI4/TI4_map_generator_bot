@@ -93,13 +93,6 @@
         "source": "balacasi"
     },
     {
-        "id": "increased_surveillance",
-        "name": "Increased Surveillance",
-        "faction": "onyxxa",
-        "permanentEffect": "When you resolve the primary ability of a strategy card, place a control token on your commander. At the start of the status phase, remove your control tokens from your commander.",
-        "source": "balacasi"
-    },
-    {
         "id": "detachment",
         "name": "Detachment",
         "faction": "onyxxa",
