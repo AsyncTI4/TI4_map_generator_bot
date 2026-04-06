@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
+import ti4.buttons.handlers.faction.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -869,7 +870,7 @@ public class StartCombatService {
                         buttons);
             }
             if (player.hasAbility("marked_prey") && "space".equalsIgnoreCase(type)) {
-                List<String> bounties = ButtonHelperAbilities.getBountiesForPlayer(game);
+                List<String> bounties = ZephyrionBountyButtonHandler.getBountiesForPlayer(game);
                 buttons = new ArrayList<>();
                 for (String bounty : bounties) {
                     String faction = bounty.split(" ")[0];

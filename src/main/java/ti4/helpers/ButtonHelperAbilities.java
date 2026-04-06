@@ -17,9 +17,9 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
-import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
+import ti4.buttons.handlers.faction.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -27,7 +27,6 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.Leader;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -35,9 +34,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.model.ExploreModel;
-import ti4.model.LeaderModel;
 import ti4.model.PlanetTypeModel.PlanetType;
-import ti4.model.Source.ComponentSource;
 import ti4.model.UnitModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.CardEmojis;
@@ -48,7 +45,6 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
-import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.statistics.round.RoundStatsTracker;
@@ -809,360 +805,6 @@ public final class ButtonHelperAbilities {
         }
         MessageHelper.sendMessageToChannel(
                 myko.getCorrectChannel(), msg.append(".").toString());
-    }
-
-    public static void offerBountyButtons(Game game, Player player) {
-        offerBountyButtons(game, player, true);
-    }
-
-    public static void offerBountyButtons(Game game, Player player, boolean showRemove) {
-        List<String> currentBounties = getBountiesForPlayer(game);
-        boolean atCap = currentBounties.size() >= 3;
-
-        String msg;
-        if (!showRemove && atCap) {
-            msg = player.getRepresentationUnfogged() + " You currently have the following bounties: "
-                    + String.join(", ", currentBounties) + ".";
-        } else {
-            msg = player.getRepresentationUnfogged()
-                    + ", please choose which player's ships you wish to place a bounty on"
-                    + (showRemove ? ", or which bounty you want to remove" : "")
-                    + ". You may have up to 3 bounties at a time.";
-            if (!currentBounties.isEmpty()) {
-                msg += "\nYou currently have the following bounties: " + String.join(", ", currentBounties) + ".";
-            } else {
-                msg += " You currently have no bounties.";
-            }
-        }
-
-        if (!showRemove && atCap) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-            return;
-        }
-
-        List<Button> buttons = new ArrayList<>();
-        // Add buttons; bountyStep2 enforces the 3-token maximum
-        for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-            String id = player.getFinsFactionCheckerPrefix() + "bountyStep1_" + p2.getFaction();
-            if (game.isFowMode()) {
-                buttons.add(Buttons.green(id, p2.getColor(), p2.getFactionEmojiOrColor()));
-            } else {
-                buttons.add(Buttons.green(id, p2.getFactionModel().getShortName(), p2.getFactionEmoji()));
-            }
-        }
-        if (showRemove) {
-            for (String bounty : currentBounties) {
-                String faction = bounty.split(" ")[0].toLowerCase();
-                String ship = bounty.split(" ")[1].toLowerCase();
-                buttons.add(Buttons.red(
-                        player.getFinsFactionCheckerPrefix() + "removeBounty_" + faction + "_" + ship,
-                        "Remove: " + bounty));
-            }
-        }
-        buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Delete These Buttons"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
-    }
-
-    @ButtonHandler("bountyStep1_")
-    public static void bountyStep1(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        buttonID = buttonID.replace("bountyStep1_", "");
-        Player p2 = game.getPlayerFromColorOrFaction(buttonID);
-        if (p2 == null) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), "Could not find player, please resolve manually.");
-            return;
-        }
-        String msg = player.getRepresentationUnfogged()
-                + ", please choose which type of ship you wish to place a bounty on for " + p2.getRepresentationNoPing()
-                + ".";
-        Set<UnitType> allowedUnits = Set.of(
-                UnitType.Destroyer,
-                UnitType.Cruiser,
-                UnitType.Carrier,
-                UnitType.Dreadnought,
-                UnitType.Flagship,
-                UnitType.Warsun);
-        List<Button> buttons = new ArrayList<>();
-        for (UnitType unitType : allowedUnits) {
-            buttons.add(Buttons.green(
-                    player.getFinsFactionCheckerPrefix() + "bountyStep2_" + p2.getFaction() + "_"
-                            + unitType.humanReadableName().toLowerCase(),
-                    unitType.humanReadableName(),
-                    unitType.getUnitTypeEmoji()));
-        }
-        buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Delete These Buttons"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
-    }
-
-    @ButtonHandler("bountyStep2_")
-    public static void bountyStep2(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        buttonID = buttonID.replace("bountyStep2_", "");
-        String colorPlayer = buttonID.split("_")[0];
-        String unitTypeString = buttonID.split("_")[1];
-        Player p2 = game.getPlayerFromColorOrFaction(colorPlayer);
-        if (p2 == null) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), "Could not find player, please resolve manually.");
-            return;
-        }
-
-        if (getBountiesForPlayer(game).size() >= 3) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "You already have 3 bounties placed.");
-            ButtonHelper.deleteTheOneButton(event);
-            return;
-        }
-        game.setStoredValue("bounties" + p2.getFaction() + unitTypeString, unitTypeString);
-        String msg = player.getRepresentationUnfogged() + " placed a bounty on a "
-                + StringUtils.capitalize(unitTypeString) + " belonging to " + p2.getRepresentationNoPing() + ".";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        ButtonHelper.deleteTheOneButton(event);
-    }
-
-    @ButtonHandler("claimBounty_")
-    public static void claimBounty(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        buttonID = buttonID.replace("claimBounty_", "");
-        String colorPlayer = buttonID.split("_")[0];
-        String unitTypeString = buttonID.split("_")[1].toLowerCase();
-        Player p2 = game.getPlayerFromColorOrFaction(colorPlayer);
-        game.removeStoredValue("bounties" + p2.getFaction() + unitTypeString);
-        player.gainTG(3, true);
-        ButtonHelperAgents.resolveArtunoCheck(player, 3);
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentation()
-                        + " claimed a bounty and so gained 3 trade goods. The bounty claimed was on a "
-                        + StringUtils.capitalize(unitTypeString) + " belonging to " + p2.getRepresentationNoPing()
-                        + ".");
-        ButtonHelper.deleteTheOneButton(event);
-    }
-
-    @ButtonHandler("zephAgentRes_")
-    public static void zephAgentRes(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        buttonID = buttonID.replace("zephAgentRes_", "");
-        String colorPlayer = buttonID.split("_")[0];
-        String unitTypeString = buttonID.split("_")[1].toLowerCase();
-        Player p2 = game.getPlayerFromColorOrFaction(colorPlayer);
-        UnitModel unit = p2.getUnitByBaseType(unitTypeString);
-        game.removeStoredValue("bounties" + p2.getFaction() + unitTypeString);
-        player.gainTG(3, true);
-        ButtonHelperAgents.resolveArtunoCheck(player, 3);
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentation()
-                        + " claimed a bounty and so gained 3 trade goods. The bounty claimed was on a "
-                        + StringUtils.capitalize(unitTypeString) + " belonging to " + p2.getRepresentationNoPing()
-                        + ".");
-        if (unit != null) {
-            String message = p2.getRepresentation() + ", please destroy one of your ships of that type.";
-            List<Button> removeButtons = new ArrayList<>(
-                    ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(p2, game, unitTypeString, true));
-            if (!removeButtons.isEmpty()) {
-                p2.gainTG((int) unit.getCost(), true);
-                ButtonHelperAgents.resolveArtunoCheck(p2, (int) unit.getCost());
-                MessageHelper.sendMessageToChannel(
-                        p2.getCorrectChannel(),
-                        p2.getRepresentation() + " received trade goods equal to the ship's cost.");
-                message += ".";
-                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, removeButtons);
-            }
-        }
-
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("zephyrionbtRes_")
-    public static void zephyrionbtRes(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        buttonID = buttonID.replace("zephyrionbtRes_", "");
-        String opponentFaction = buttonID;
-        String agentID = UnusedAgentHelper.getUnusedAgent(game, Set.of(ComponentSource.balacasi));
-
-        List<Button> buttons = new ArrayList<>();
-        if (agentID != null) {
-            LeaderModel agentModel = Mapper.getLeader(agentID);
-            String agentName = agentModel != null ? agentModel.getName() : agentID;
-            if (agentModel != null) {
-                MessageHelper.sendMessageToChannelWithEmbed(
-                        player.getCardsInfoThread(),
-                        player.getRepresentation() + " drew this agent via _Subdue Chancellor_:",
-                        agentModel.getRepresentationEmbed());
-            }
-            buttons.add(Buttons.green(
-                    player.getFinsFactionCheckerPrefix() + "zephyrionbtAttach_" + agentID + "_" + opponentFaction,
-                    "Attach " + agentName));
-            buttons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "zephyrionbtPurge_" + agentID + "_" + opponentFaction,
-                    "Purge & Exhaust Opponent's Agent"));
-        } else {
-            MessageHelper.sendMessageToChannel(
-                    player.getCardsInfoThread(),
-                    player.getRepresentation() + " has no unused agents available to draw via _Subdue Chancellor_.");
-            buttons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "zephyrionbtExhaustOp_" + opponentFaction,
-                    "Exhaust Opponent's Agent"));
-        }
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                player.getRepresentation() + ", please choose how to resolve _Subdue Chancellor_.",
-                buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("zephyrionbtAttach_")
-    public static void zephyrionbtAttach(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        buttonID = buttonID.replace("zephyrionbtAttach_", "");
-        String agentID = buttonID.split("_")[0];
-
-        player.addLeader(agentID);
-        game.addFakeAgent(agentID);
-
-        LeaderModel attachedModel = Mapper.getLeader(agentID);
-        String agentName = attachedModel != null ? attachedModel.getName() : agentID;
-        String factionLabel =
-                attachedModel != null ? ", the " + capitalize(attachedModel.getFaction()) + " agent," : "";
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentation() + " attached _" + agentName + "_" + factionLabel
-                        + " to _Subdue Chancellor_ and may now treat it as their own agent.");
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("zephyrionbtPurge_")
-    public static void zephyrionbtPurge(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        buttonID = buttonID.replace("zephyrionbtPurge_", "");
-        String agentID = buttonID.split("_")[0];
-        String opponentFaction = buttonID.split("_")[1];
-
-        game.addFakeAgent(agentID);
-        LeaderModel purgedModel = Mapper.getLeader(agentID);
-        String agentName = purgedModel != null ? purgedModel.getName() : agentID;
-        String factionLabel = purgedModel != null ? ", the " + capitalize(purgedModel.getFaction()) + " agent," : "";
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentation() + " purged _" + agentName + "_" + factionLabel
-                        + " while resolving _Subdue Chancellor_.");
-
-        resolveZephyrionbtExhaustOpponent(event, game, player, opponentFaction);
-    }
-
-    @ButtonHandler("zephyrionbtExhaustOp_")
-    public static void zephyrionbtExhaustOp(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        buttonID = buttonID.replace("zephyrionbtExhaustOp_", "");
-        resolveZephyrionbtExhaustOpponent(event, game, player, buttonID);
-    }
-
-    private static void resolveZephyrionbtExhaustOpponent(
-            ButtonInteractionEvent event, Game game, Player player, String opponentFaction) {
-        Player opponent = game.getPlayerFromColorOrFaction(opponentFaction);
-        if (opponent == null) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), "Could not find opponent, please resolve manually.");
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        List<Leader> unexhaustedAgents = opponent.getLeaders().stream()
-                .filter(l -> Constants.AGENT.equals(l.getType()) && !l.isExhausted())
-                .toList();
-
-        if (unexhaustedAgents.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " all of " + opponent.getRepresentationNoPing()
-                            + "'s agents are already exhausted. Please resolve manually if needed.");
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        if (unexhaustedAgents.size() == 1) {
-            ExhaustLeaderService.exhaustLeader(game, opponent, unexhaustedAgents.getFirst());
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " exhausted " + opponent.getRepresentationNoPing()
-                            + "'s agent via _Subdue Chancellor_.");
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        List<Button> buttons = new ArrayList<>();
-        for (Leader agent : unexhaustedAgents) {
-            String agentName = Mapper.getLeader(agent.getId()) != null
-                    ? Mapper.getLeader(agent.getId()).getName()
-                    : agent.getId();
-            buttons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "zephyrionbtExhaustAgent_" + opponentFaction + "_"
-                            + agent.getId(),
-                    "Exhaust " + agentName));
-        }
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                player.getRepresentation() + ", " + opponent.getRepresentationNoPing()
-                        + " has multiple unexhausted agents. Choose which to exhaust.",
-                buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("zephyrionbtExhaustAgent_")
-    public static void zephyrionbtExhaustAgent(
-            String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        buttonID = buttonID.replace("zephyrionbtExhaustAgent_", "");
-        String opponentFaction = buttonID.split("_")[0];
-        String agentID = buttonID.split("_")[1];
-
-        Player opponent = game.getPlayerFromColorOrFaction(opponentFaction);
-        if (opponent == null) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), "Could not find opponent, please resolve manually.");
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        Leader agent = opponent.getLeader(agentID).orElse(null);
-        if (agent == null) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), "Could not find agent, please resolve manually.");
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        ExhaustLeaderService.exhaustLeader(game, opponent, agent);
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentation() + " exhausted " + opponent.getRepresentationNoPing()
-                        + "'s agent via _Subdue Chancellor_.");
-        ButtonHelper.deleteMessage(event);
-    }
-
-    public static List<String> getBountiesForPlayer(Game game) {
-        List<String> bounties = new ArrayList<>();
-        for (Player player : game.getRealPlayers()) {
-            for (UnitType unitType : UnitType.values()) {
-                String storedValue = game.getStoredValue("bounties" + player.getFaction()
-                        + unitType.humanReadableName().toLowerCase());
-                if (!storedValue.isEmpty()) {
-                    bounties.add(StringUtils.capitalize(player.getFaction()) + " " + unitType.humanReadableName());
-                }
-            }
-        }
-        return bounties;
-    }
-
-    @ButtonHandler("removeBounty_")
-    public static void removeBounty(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        buttonID = buttonID.replace("removeBounty_", "");
-        String faction = buttonID.split("_")[0];
-        String unitTypeString = buttonID.split("_")[1].toLowerCase();
-        Player p2 = game.getPlayerFromColorOrFaction(faction);
-        if (p2 == null) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), "Could not find player, please resolve manually.");
-            return;
-        }
-        game.removeStoredValue("bounties" + p2.getFaction() + unitTypeString);
-        String msg = player.getRepresentationUnfogged() + " removed the bounty on a "
-                + StringUtils.capitalize(unitTypeString) + " belonging to " + p2.getRepresentationNoPing() + ".";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("pillage_")
@@ -2602,7 +2244,7 @@ public final class ButtonHelperAbilities {
                 rollOmenDiceAtStartOfStrat(game, player);
             }
             if (player.hasAbility("marked_prey")) {
-                offerBountyButtons(game, player, false);
+                ZephyrionBountyButtonHandler.offerBountyButtons(game, player, false);
             }
             if (player.hasUnit("tyris_flagship")
                     && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship", false) > 0) {
