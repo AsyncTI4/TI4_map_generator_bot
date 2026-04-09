@@ -16,8 +16,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.testUtils.BaseTi4Test;
 
-class GameRoundStatsServiceTest {
+class GameRoundStatsServiceTest extends BaseTi4Test {
 
     private static final String GAME_NAME = "test-game";
 
