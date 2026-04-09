@@ -42,7 +42,7 @@ public class GameStatisticsService {
                 case WINNING_PATH -> WinningPathsStatisticsService.showWinningPaths(event);
                 case SUPPORT_WIN_COUNT -> WinningPathsStatisticsService.showWinsWithSupport(event);
                 case SECRET_OBJECTIVE_WIN_CHANCE ->
-                        SecretObjectiveWinChanceStatisticsService.showSecretObjectiveWinChance(event);
+                    SecretObjectiveWinChanceStatisticsService.showSecretObjectiveWinChance(event);
                 case ENDING_ROUND_PHASE -> EndingRoundPhaseStatisticsService.showEndingRoundPhaseStatistics(event);
                 default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statType);
             }

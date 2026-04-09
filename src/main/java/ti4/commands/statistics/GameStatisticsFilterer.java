@@ -171,7 +171,6 @@ public class GameStatisticsFilterer {
             return true;
         }
         return Arrays.stream(gameTypesFilter.split(","))
-                .map(String::strip)
                 .allMatch(gameType -> hasGameType(gameType, game));
     }
 
@@ -208,7 +207,6 @@ public class GameStatisticsFilterer {
             return true;
         }
         return Arrays.stream(excludedGameTypesFilter.split(","))
-                .map(String::strip)
                 .noneMatch(gameType -> hasGameType(gameType, game));
     }
 

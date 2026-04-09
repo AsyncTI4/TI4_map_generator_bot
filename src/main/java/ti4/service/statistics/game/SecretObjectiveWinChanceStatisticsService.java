@@ -4,9 +4,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -74,14 +74,14 @@ class SecretObjectiveWinChanceStatisticsService {
         StringBuilder secretObjectiveSb = new StringBuilder("Win chance with secret scored or in hand:\n");
         Map<String, Integer> orderedSecrets = gamesWithSecret.entrySet().stream()
                 .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         for (Map.Entry<String, Integer> entry : orderedSecrets.entrySet()) {
             String secretName = entry.getKey();
             int games = entry.getValue();
             int wins = winsWithSecret.getOrDefault(secretName, 0);
             long percent = games == 0 ? 0 : Math.round(100.0 * wins / games);
-            secretObjectiveSb.append(secretName)
+            secretObjectiveSb
+                    .append(secretName)
                     .append(": ")
                     .append(percent)
                     .append("% (")
