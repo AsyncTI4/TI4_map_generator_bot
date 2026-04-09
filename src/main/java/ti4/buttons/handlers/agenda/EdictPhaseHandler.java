@@ -64,7 +64,7 @@ public class EdictPhaseHandler {
     }
 
     @ButtonHandler("blessBoonTg")
-    public static void blessBoonTg(ButtonInteractionEvent event, Game game, String buttonID, Player player) {
+    public static void blessBoonTg(ButtonInteractionEvent event, Game game, Player player) {
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " gained 3 trade goods.");
         player.setTg(player.getTg() + 3);
         ButtonHelperAbilities.pillageCheck(player, game);
