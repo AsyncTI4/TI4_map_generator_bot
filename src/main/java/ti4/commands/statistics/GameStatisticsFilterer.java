@@ -49,12 +49,12 @@ public class GameStatisticsFilterer {
         filters.add(new OptionData(
                         OptionType.STRING,
                         GAME_TYPES_FILTER,
-                        "Game type, comma seperated, e.g. pok, absol, ds, action_deck_2")
+                        "Game type, comma seperated, e.g. pok, absol, ds, tigl, action_deck_2")
                 .setAutoComplete(true));
         filters.add(new OptionData(
                         OptionType.STRING,
                         EXCLUDED_GAME_TYPES_FILTER,
-                        "Excluded game types, comma seperated, e.g. pok, absol, ds, action_deck_2")
+                        "Excluded game types, comma seperated, e.g. pok, absol, ds, tigl, action_deck_2")
                 .setAutoComplete(true));
         filters.add(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Is it a fog game?"));
         filters.add(new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Does it have homebrew?"));
@@ -181,6 +181,7 @@ public class GameStatisticsFilterer {
             case "ds" -> isDiscordantStarsGame(game);
             case "pok" -> game.isProphecyOfKings();
             case "action_deck_2" -> game.isAcd2();
+            case "tigl" -> game.isCompetitiveTIGLGame();
             case "franken" -> game.isFrankenGame();
             case "milty_mod" -> isMiltyModGame(game);
             case "red_tape" -> game.isRedTapeMode();
