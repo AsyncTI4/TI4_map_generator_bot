@@ -16,8 +16,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.testUtils.BaseTi4Test;
 
-class GameRoundStatsServiceTest {
+class GameRoundStatsServiceTest extends BaseTi4Test {
 
     private static final String GAME_NAME = "test-game";
 
@@ -49,7 +50,7 @@ class GameRoundStatsServiceTest {
     @Test
     void refreshOnSaveUsesCreatedUndoIndexForSnapshots() {
         Game game = newGameWithPlayer();
-        Player player = game.getRealPlayers().getFirst();
+        Player player = getTestPlayer(game);
         player.addSC(5);
         player.addSC(3);
 
@@ -74,7 +75,7 @@ class GameRoundStatsServiceTest {
     @Test
     void restoreAfterUndoRestoresCanonicalAndClearsMarkers() {
         Game game = newGameWithPlayer();
-        Player player = game.getRealPlayers().getFirst();
+        Player player = getTestPlayer(game);
         game.setRound(2);
         game.setStoredValue("roundstats_tactical_open_" + player.getUserID(), "2");
         game.setStoredValue("roundstats_tactical_had_combat_" + player.getUserID(), "true");
@@ -117,7 +118,7 @@ class GameRoundStatsServiceTest {
     @Test
     void finalizeTacticalIncrementsOnceWhenCombatHappened() {
         Game game = newGameWithPlayer();
-        Player player = game.getRealPlayers().getFirst();
+        Player player = getTestPlayer(game);
         game.setRound(3);
         game.setStoredValue("roundstats_tactical_open_" + player.getUserID(), "3");
         game.setStoredValue("roundstats_tactical_had_combat_" + player.getUserID(), "true");
@@ -133,7 +134,7 @@ class GameRoundStatsServiceTest {
     @Test
     void tracksTechDiceAndTurnTimesWithExpectedAggregation() {
         Game game = newGameWithPlayer();
-        Player player = game.getRealPlayers().getFirst();
+        Player player = getTestPlayer(game);
         game.setRound(4);
 
         service.recordTechGained(game, player, "neural");
@@ -154,7 +155,7 @@ class GameRoundStatsServiceTest {
     @Test
     void incrementCombatsInitiatedMarksTacticalCombatWhenOpen() {
         Game game = newGameWithPlayer();
-        Player player = game.getRealPlayers().getFirst();
+        Player player = getTestPlayer(game);
         game.setRound(5);
         game.setStoredValue("roundstats_tactical_open_" + player.getUserID(), "5");
 
@@ -169,7 +170,7 @@ class GameRoundStatsServiceTest {
     @Test
     void finalizeTacticalDoesNotIncrementWhenNoCombat() {
         Game game = newGameWithPlayer();
-        Player player = game.getRealPlayers().getFirst();
+        Player player = getTestPlayer(game);
         game.setRound(6);
         game.setStoredValue("roundstats_tactical_open_" + player.getUserID(), "6");
         game.setStoredValue("roundstats_tactical_had_combat_" + player.getUserID(), "false");
@@ -182,7 +183,7 @@ class GameRoundStatsServiceTest {
     @Test
     void refreshOnSaveMaintainsMonotonicMaxArmyCost() {
         Game game = newGameWithPlayer();
-        Player player = game.getRealPlayers().getFirst();
+        Player player = getTestPlayer(game);
         game.setRound(7);
 
         GameRoundPlayerStats existing = new GameRoundPlayerStats();
@@ -208,5 +209,9 @@ class GameRoundStatsServiceTest {
         player.setColor("red");
         player.setFaction("arborec");
         return game;
+    }
+
+    private Player getTestPlayer(Game game) {
+        return game.getPlayer("user-1");
     }
 }
