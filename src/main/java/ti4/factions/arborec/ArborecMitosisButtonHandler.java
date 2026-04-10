@@ -42,7 +42,8 @@ public class ArborecMitosisButtonHandler {
 
     @ButtonHandler("mitosisMech")
     public static void resolveMitosisMech(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        List<Button> buttons = new ArrayList<>(UnitReplacementHelper.getMechReplacementButtons(player, game));
+        List<Button> buttons =
+                new ArrayList<>(UnitReplacementHelper.getMechReplacementButtons(player, game, "**Mitosis**"));
         String message = player.getRepresentationUnfogged()
                 + ", please choose where you wish to replace an infantry with a mech.";
         MessageHelper.sendMessageToChannel(

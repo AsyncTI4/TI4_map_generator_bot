@@ -158,10 +158,6 @@ public class UnitReplacementHelper {
 
     // --- Mech replacement (infantry → mech) ---
 
-    public static List<Button> getMechReplacementButtons(Player player, Game game) {
-        return getMechReplacementButtons(player, game, "mitosis");
-    }
-
     public static List<Button> getMechReplacementButtons(Player player, Game game, String reason) {
         List<Button> planetButtons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
@@ -169,7 +165,7 @@ public class UnitReplacementHelper {
                 String colorID = Mapper.getColorID(player.getColor());
                 int numInf = unitHolder.getUnitCount(UnitType.Infantry, colorID);
                 if (numInf > 0) {
-                    String buttonID = player.getFinsFactionCheckerPrefix() + "mitoMechPlacement_" + tile.getPosition()
+                    String buttonID = player.getFinsFactionCheckerPrefix() + "mechReplacement_" + tile.getPosition()
                             + "_" + unitHolder.getName() + "_" + reason;
                     if ("space".equalsIgnoreCase(unitHolder.getName())) {
                         planetButtons.add(Buttons.green(
@@ -184,22 +180,20 @@ public class UnitReplacementHelper {
         return planetButtons;
     }
 
-    @ButtonHandler("mitoMechPlacement_")
+    @ButtonHandler("mechReplacement_")
     public static void handleMechPlacement(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        String uH = buttonID.split("_")[2];
-        String reason = buttonID.split("_")[3];
-        switch (reason) {
-            case "mitosis" -> reason = "**Mitosis**";
-            case "refit" -> reason = "_Refit Troops_";
-        }
+        String[] parts = buttonID.split("_", 4);
+        Tile tile = game.getTileByPosition(parts[1]);
+        String uH = parts[2];
+        String reason = parts[3];
+        String via = reason.isBlank() ? "." : " with " + reason + ".";
         String successMessage;
         if ("space".equalsIgnoreCase(uH)) {
             successMessage = player.getFactionEmojiOrColor() + " replaced 1 infantry with 1 mech in the space area of "
-                    + tile.getRepresentationForButtons(game, player) + " with " + reason + ".";
+                    + tile.getRepresentationForButtons(game, player) + via;
         } else {
             successMessage = player.getFactionEmojiOrColor() + " replaced 1 infantry with 1 mech on "
-                    + Helper.getPlanetRepresentation(uH, game) + " with " + reason + ".";
+                    + Helper.getPlanetRepresentation(uH, game) + via;
         }
         UnitHolder holder = tile.getUnitHolders().get(uH);
         MoveUnitService.replaceUnit(event, game, player, tile, holder, UnitType.Infantry, UnitType.Mech);
