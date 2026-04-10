@@ -1,0 +1,32 @@
+[
+    {
+        "alias": "viability_tekklar_legion",
+        "name": "Tekklar Legion",
+        "faction": "sardakk",
+        "playArea": false,
+        "attachment": false,
+        "source": "viability_patch",
+        "homebrewReplacesID": "tekklar",
+        "text": "At the start of an invasion combat: Apply +2 to the result of each of your unit's combat rolls during this combat. Then, return this card to the N'orr player."
+    },
+    {
+        "alias": "viability_trade_convoys",
+        "name": "Trade Convoys",
+        "faction": "hacan",
+        "playArea": true,
+        "attachment": false,
+        "source": "viability_patch",
+        "homebrewReplacesID": "convoys",
+        "text": "ACTION: Place this card faceup in your play area. While this card is in your play area, you may negotiate transactions with players who are not your neighbour. When a transaction with a non-neighbour is completed, the Hacan player may gain 1 commodity or convert 1 commodity to a trade good. If you activate a system that contains 1 or more of the Hacan player's units, return this card to the Hacan player."
+    },
+    {
+        "alias": "viability_political_favor",
+        "name": "Political Favor",
+        "faction": "xxcha",
+        "playArea": false,
+        "attachment": false,
+        "source": "viability_patch",
+        "homebrewReplacesID": "favor",
+        "text": "When an agenda is revealed: Discard the revealed agenda and reveal 1 agenda from the top of the deck.  Players vote on this agenda instead. The Xxcha player gains 5 additional votes for that agenda."
+    }
+]

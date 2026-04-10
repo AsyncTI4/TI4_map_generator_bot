@@ -167,6 +167,8 @@ public final class TransactionHelper {
             SecretObjectiveInfoService.sendSecretObjectiveInfo(game, p2, event);
         }
 
+        ButtonHelperFactionSpecific.checkViabilityTradeConvoys(game, p1, p2);
+
         // Send Summary to Player's CardsInfo threads
         MessageHelper.sendMessageToChannel(
                 p1.getCardsInfoThread(), p1.getRepresentationUnfogged() + " " + privateSummary);
@@ -1752,6 +1754,8 @@ public final class TransactionHelper {
                 || player2.hasAbility("guild_ships")
                 || player.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")
                 || player2.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")
+                || player.getPromissoryNotesInPlayArea().contains("viability_trade_convoys")
+                || player2.getPromissoryNotesInPlayArea().contains("viability_trade_convoys")
                 || player2.getNeighbouringPlayers(false).contains(player)
                 || player.getNeighbouringPlayers(false).contains(player2);
     }
@@ -2121,6 +2125,7 @@ public final class TransactionHelper {
         ButtonHelperAbilities.pillageCheck(player2, game);
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         CommanderUnlockCheckService.checkPlayer(player2, "hacan");
+        ButtonHelperFactionSpecific.checkViabilityTradeConvoys(game, player, player2);
         ButtonHelper.deleteMessage(event);
     }
 

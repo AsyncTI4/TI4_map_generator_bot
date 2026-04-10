@@ -520,6 +520,14 @@ public class PromissoryNoteHelper {
                                 + " As such, _Political Favor_ cannot be resolved and the current agenda remains.");
             }
         }
+        if (("viability_political_favor".equalsIgnoreCase(id))) {
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(), " _Political Favor_ has been played to discard the current agenda.");
+
+            AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());
+
+            game.setStoredValue("viabilityFavorXxcha", owner.getFaction());
+        }
         if (("scepter".equalsIgnoreCase(id))) {
             String message = player.getRepresentationUnfogged() + ", please choose which system to Mahact Diplo.";
             MessageHelper.sendMessageToChannelWithButtons(

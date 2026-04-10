@@ -173,6 +173,20 @@
         ]
     },
     {
+        "alias": "plus2_1invasion_combat",
+        "type": "DIE_MOD",
+        "value": "+2",
+        "scope": "_groundforce_",
+        "forCombatAbility": "combatround",
+        "persistenceType": "ONE_COMBAT",
+        "related": [
+            {
+                "type": "promissory_notes",
+                "alias": "viability_tekklar_legion"
+            }
+        ]
+    },
+    {
         "alias": "plus1_1combat_fighter",
         "type": "DIE_MOD",
         "value": "+1",
