@@ -44,18 +44,19 @@ class SecretObjectiveWinChanceStatisticsService {
                         gamesWithSecretScoredOrInHand,
                         winsWithSecretScoredOrInHand));
 
-        StringBuilder sb = new StringBuilder("Action phase secret count vs win chance:\n");
+        StringBuilder sb = new StringBuilder("__**Action Phase Secret Count vs Win Chance**__\n");
         sb.append("_(Includes only scored action phase secrets.)_\n\n");
 
         for (int count = 0; count <= 4; count++) {
             int games = actionPhaseGamesByCount[count];
             int wins = actionPhaseWinsByCount[count];
             long percent = games == 0 ? 0 : Math.round(100.0 * wins / games);
-            sb.append('`')
+            sb.append("`")
                     .append(count)
                     .append(" AP secrets` ")
-                    .append(StringUtils.leftPad(String.valueOf(percent), 3))
-                    .append("% (")
+                    .append('`')
+                    .append(StringUtils.leftPad(percent + "%", 4))
+                    .append("` (")
                     .append(wins)
                     .append("/")
                     .append(games)
@@ -70,18 +71,17 @@ class SecretObjectiveWinChanceStatisticsService {
                 wins += actionPhaseWinsByCount[i];
             }
             long percent = games == 0 ? 0 : Math.round(100.0 * wins / games);
-            sb.append('`')
+            sb.append("`")
                     .append(count)
-                    .append(" or more AP secrets` ")
-                    .append(StringUtils.leftPad(String.valueOf(percent), 3))
-                    .append("% (")
+                    .append("+ AP secrets` ")
+                    .append('`')
+                    .append(StringUtils.leftPad(percent + "%", 4))
+                    .append("` (")
                     .append(wins)
                     .append("/")
                     .append(games)
                     .append(")\n");
         }
-
-        MessageHelper.sendMessageToThread(event.getChannel(), "Action Phase Secrets Win Chance", sb.toString());
 
         // Sort by highest SCORED win percent
         Map<String, Long> scoredWinPercent = new HashMap<>();
@@ -125,7 +125,8 @@ class SecretObjectiveWinChanceStatisticsService {
                 .max()
                 .orElse(0);
 
-        StringBuilder secretObjectiveSb = new StringBuilder("Win chance with secret:\n");
+        StringBuilder secretObjectiveSb = new StringBuilder(sb);
+        secretObjectiveSb.append("\n__**Win Chance with Secret**__\n");
         for (String secretName : orderedNames) {
             int scoredGames = gamesWithSecretScored.getOrDefault(secretName, 0);
             int scoredWins = winsWithSecretScored.getOrDefault(secretName, 0);
@@ -146,34 +147,33 @@ class SecretObjectiveWinChanceStatisticsService {
                     (scoredWins == 0 || maxCombinedGames == 0) ? 0 : Math.round(100.0 * scoredWins / maxCombinedGames);
 
             secretObjectiveSb
+                    .append("**")
                     .append(secretName)
-                    .append(":\n")
-                    .append("  SCORED: ")
-                    .append(scoredPct)
-                    .append("% (")
+                    .append("**\n")
+                    .append(" Scored: `")
+                    .append(StringUtils.leftPad(scoredPct + "%", 4))
+                    .append("` (")
                     .append(scoredWins)
                     .append("/")
                     .append(scoredGames)
-                    .append(")")
-                    .append("  SCORED (NORMALIZED): ")
-                    .append(normalizedScoredPct)
-                    .append("%")
-                    .append("  IN HAND: ")
-                    .append(inHandPct)
-                    .append("% (")
+                    .append(") · Normalized: `")
+                    .append(StringUtils.leftPad(normalizedScoredPct + "%", 4))
+                    .append("` · In Hand: `")
+                    .append(StringUtils.leftPad(inHandPct + "%", 4))
+                    .append("` (")
                     .append(inHandWins)
                     .append("/")
                     .append(inHandGames)
-                    .append(")")
-                    .append("  SCORED OR IN HAND: ")
-                    .append(combinedPct)
-                    .append("% (")
+                    .append(") · Combined: `")
+                    .append(StringUtils.leftPad(combinedPct + "%", 4))
+                    .append("` (")
                     .append(combinedWins)
                     .append("/")
                     .append(combinedGames)
                     .append(")\n");
         }
-        MessageHelper.sendMessageToThread(event.getChannel(), "Win chance with secret", secretObjectiveSb.toString());
+        MessageHelper.sendMessageToThread(
+                event.getChannel(), "Secret Objective Win Chance", secretObjectiveSb.toString());
     }
 
     private static void collectSecretObjectiveWinChanceStats(
