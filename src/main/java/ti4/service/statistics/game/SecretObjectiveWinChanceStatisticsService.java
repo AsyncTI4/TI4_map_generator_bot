@@ -119,6 +119,12 @@ class SecretObjectiveWinChanceStatisticsService {
                 })
                 .toList();
 
+        // Compute average combinedGames across all secrets for discard normalization
+        double averageCombinedGames = gamesWithSecretScoredOrInHand.values().stream()
+                .mapToInt(Integer::intValue)
+                .average()
+                .orElse(0);
+
         StringBuilder secretObjectiveSb = new StringBuilder("Win chance with secret:\n");
         for (String secretName : orderedNames) {
             int scoredGames = gamesWithSecretScored.getOrDefault(secretName, 0);
@@ -133,6 +139,13 @@ class SecretObjectiveWinChanceStatisticsService {
             int combinedWins = winsWithSecretScoredOrInHand.getOrDefault(secretName, 0);
             long combinedPct = combinedGames == 0 ? 0 : Math.round(100.0 * combinedWins / combinedGames);
 
+            // Normalize scored win % by the secret's keep rate relative to average.
+            // Secrets discarded more often (lower combinedGames) have their scored win %
+            // reduced to account for survivor bias.
+            long normalizedScoredPct = (scoredGames == 0 || averageCombinedGames == 0)
+                    ? 0
+                    : Math.round(scoredPct * combinedGames / averageCombinedGames);
+
             secretObjectiveSb
                     .append(secretName)
                     .append(":\n")
@@ -143,6 +156,9 @@ class SecretObjectiveWinChanceStatisticsService {
                     .append("/")
                     .append(scoredGames)
                     .append(")")
+                    .append("  SCORED (NORMALIZED): ")
+                    .append(normalizedScoredPct)
+                    .append("%")
                     .append("  IN HAND: ")
                     .append(inHandPct)
                     .append("% (")
