@@ -58,6 +58,9 @@ public class PlayerEntity {
     @Column(name = "is_winner")
     private boolean winner;
 
+    @Column(name = "is_replaced")
+    private boolean replaced;
+
     @Override
     public boolean equals(Object other) {
         if (this == other) return true;
