@@ -348,6 +348,7 @@ public final class ButtonHelperActionCards {
         checkForPlayingManipulateInvestments(game, player);
         checkForPlayingSummit(game, player);
         checkForPlayingBountyContracts(game, player);
+        checkForPlayingSpliceCards(game, player);
     }
 
     @ButtonHandler("resolveCounterStroke")
