@@ -2156,7 +2156,8 @@ public final class Helper {
         return unitButtons;
     }
 
-    public static List<Button> getAbilityBuildButtons(GenericInteractionCreateEvent event, Player player, Game game, Tile tile) {
+    public static List<Button> getAbilityBuildButtons(
+            GenericInteractionCreateEvent event, Player player, Game game, Tile tile) {
         return getPlaceUnitButtons(event, player, game, tile, "abilityBuild", "place");
     }
 

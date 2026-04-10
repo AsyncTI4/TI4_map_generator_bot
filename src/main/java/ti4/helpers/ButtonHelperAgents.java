@@ -17,9 +17,9 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
+import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.factions.arborec.ArborecAgentButtonHandler;
 import ti4.factions.zephyrion.ZephyrionAgentButtonHandler;
-import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperAgents;
@@ -627,11 +627,15 @@ public final class ButtonHelperAgents {
         }
 
         if ("zephyrionagent".equalsIgnoreCase(agent)) {
-            MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " has exhausted " + ssruuClever
-                    + "Rhino the Adventurer, the Zephyrion" + ssruuSlash + " agent.");
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    player.getRepresentation() + " has exhausted " + ssruuClever + "Rhino the Adventurer, the Zephyrion"
+                            + ssruuSlash + " agent.");
             List<Button> buttons = ZephyrionAgentButtonHandler.getAgentButtons(game, player);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " you may use the buttons to select the ship you want to kill.",
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + " you may use the buttons to select the ship you want to kill.",
                     buttons);
         }
         if ("jolnaragent".equalsIgnoreCase(agent)) {
@@ -1948,9 +1952,12 @@ public final class ButtonHelperAgents {
             count++;
         }
         if (count == 1) {
-            List<Button> prodButtons = Helper.getAbilityBuildButtons(event, player, game, game.getTileByPosition(tilePos));
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation() + " Use the buttons to produce units.", prodButtons);
+            List<Button> prodButtons =
+                    Helper.getAbilityBuildButtons(event, player, game, game.getTileByPosition(tilePos));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " Use the buttons to produce units.",
+                    prodButtons);
         }
         ButtonHelper.deleteMessage(event);
     }

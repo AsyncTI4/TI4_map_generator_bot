@@ -47,7 +47,8 @@ public class UnitReplacementHelper {
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if (unitHolder instanceof Planet) continue;
 
-            for (Map.Entry<UnitKey, List<Integer>> entry : unitHolder.getUnitsByStateForPlayer(player).entrySet()) {
+            for (Map.Entry<UnitKey, List<Integer>> entry :
+                    unitHolder.getUnitsByStateForPlayer(player).entrySet()) {
                 UnitKey unitKey = entry.getKey();
                 if (!REPLACEABLE_SHIPS.contains(unitKey.getUnitType())) continue;
 
@@ -59,14 +60,16 @@ public class UnitReplacementHelper {
 
                 for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
                     buttons.add(Buttons.red(
-                            finChecker + "replaceShipPickUnit_" + tile.getPosition() + "_" + unitName + "damaged_" + costDifferential,
+                            finChecker + "replaceShipPickUnit_" + tile.getPosition() + "_" + unitName + "damaged_"
+                                    + costDifferential,
                             "Remove A Damaged " + prettyName,
                             unitKey.unitEmoji()));
                 }
                 totalUnits -= damagedUnits;
                 for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
                     buttons.add(Buttons.red(
-                            finChecker + "replaceShipPickUnit_" + tile.getPosition() + "_" + unitName + "_" + costDifferential,
+                            finChecker + "replaceShipPickUnit_" + tile.getPosition() + "_" + unitName + "_"
+                                    + costDifferential,
                             "Remove " + x + " " + prettyName,
                             unitKey.unitEmoji()));
                 }
@@ -77,12 +80,14 @@ public class UnitReplacementHelper {
     }
 
     @ButtonHandler("replaceShipPickUnit_")
-    public static void handleReplaceShipPickUnit(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+    public static void handleReplaceShipPickUnit(
+            ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String[] parts = buttonID.split("_");
         String pos = parts[1];
         String unit = parts[2];
         int costDifferential = Integer.parseInt(parts[3]);
-        List<Button> buttons = getReplacementOptions(player, game, event, game.getTileByPosition(pos), unit, costDifferential);
+        List<Button> buttons =
+                getReplacementOptions(player, game, event, game.getTileByPosition(pos), unit, costDifferential);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(),
                 player.getRepresentationUnfogged() + ", please choose which unit you wish to place down.",
@@ -91,7 +96,12 @@ public class UnitReplacementHelper {
     }
 
     public static List<Button> getReplacementOptions(
-            Player player, Game game, GenericInteractionCreateEvent event, Tile tile, String unit, int costDifferential) {
+            Player player,
+            Game game,
+            GenericInteractionCreateEvent event,
+            Tile tile,
+            String unit,
+            int costDifferential) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
 
         boolean damaged = unit.contains("damaged");
@@ -141,8 +151,8 @@ public class UnitReplacementHelper {
         String unitDisplay = unitModel != null ? unitModel.getUnitEmoji() + " " + unitModel.getName() : unit;
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                player.getFactionEmojiOrColor() + " replaced a ship with 1 " + unitDisplay
-                        + " in " + tile.getRepresentationForButtons(game, player));
+                player.getFactionEmojiOrColor() + " replaced a ship with 1 " + unitDisplay + " in "
+                        + tile.getRepresentationForButtons(game, player));
         ButtonHelper.deleteMessage(event);
     }
 

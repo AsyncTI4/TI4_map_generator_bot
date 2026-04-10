@@ -636,7 +636,9 @@ public final class StatusHelper {
 
         String mitosisMessage = arborec.getRepresentationUnfogged() + ", a reminder to do **Mitosis**.";
         MessageHelper.sendMessageToChannelWithButtons(
-                arborec.getCardsInfoThread(), mitosisMessage, ArborecMitosisButtonHandler.getMitosisOptions(arborec, game));
+                arborec.getCardsInfoThread(),
+                mitosisMessage,
+                ArborecMitosisButtonHandler.getMitosisOptions(arborec, game));
     }
 
     private static void sendYinCloneButtons(Game game) {
