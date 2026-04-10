@@ -101,16 +101,14 @@ class SecretObjectiveWinChanceStatisticsService {
         // Order by highest scored win percent descending, with deterministic tie-breakers
         List<String> orderedNames = allSecretNames.stream()
                 .sorted((a, b) -> {
-                    int compareByPercent = Long.compare(
-                            scoredWinPercent.getOrDefault(b, 0L),
-                            scoredWinPercent.getOrDefault(a, 0L));
+                    int compareByPercent =
+                            Long.compare(scoredWinPercent.getOrDefault(b, 0L), scoredWinPercent.getOrDefault(a, 0L));
                     if (compareByPercent != 0) {
                         return compareByPercent;
                     }
 
                     int compareByScoredGames = Integer.compare(
-                            gamesWithSecretScored.getOrDefault(b, 0),
-                            gamesWithSecretScored.getOrDefault(a, 0));
+                            gamesWithSecretScored.getOrDefault(b, 0), gamesWithSecretScored.getOrDefault(a, 0));
                     if (compareByScoredGames != 0) {
                         return compareByScoredGames;
                     }
@@ -144,9 +142,8 @@ class SecretObjectiveWinChanceStatisticsService {
             // Normalize scored win % by using the max combinedGames as the denominator
             // for all secrets, so secrets that are discarded more often get a lower
             // normalized win % reflecting the discarded (unseen) population.
-            long normalizedScoredPct = (scoredWins == 0 || maxCombinedGames == 0)
-                    ? 0
-                    : Math.round(100.0 * scoredWins / maxCombinedGames);
+            long normalizedScoredPct =
+                    (scoredWins == 0 || maxCombinedGames == 0) ? 0 : Math.round(100.0 * scoredWins / maxCombinedGames);
 
             secretObjectiveSb
                     .append(secretName)
