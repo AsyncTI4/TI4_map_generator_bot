@@ -169,7 +169,7 @@
             {
                 "type": "promissory_notes",
                 "alias": "sigma_tekklar_legion"
-            },
+            }
         ]
     },
     {
@@ -183,9 +183,9 @@
             {
                 "type": "promissory_notes",
                 "alias": "viability_tekklar_legion"
-            },
+            }
         ]
-    }
+    },
     {
         "alias": "plus1_1combat_fighter",
         "type": "DIE_MOD",
