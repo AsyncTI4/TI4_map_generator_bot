@@ -1,9 +1,5 @@
 package ti4.website;
 
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,43 +35,6 @@ public class AsyncTi4WebsiteHelper {
     public static boolean uploadsEnabled() {
         return GlobalSettings.getSetting(
                 GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, Boolean.FALSE);
-    }
-
-    public static void putData(String gameName, Game game) {
-        if (!uploadsEnabled()) return;
-        String bucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
-        if (bucket == null || bucket.isEmpty()) {
-            BotLogger.error("S3 bucket not configured.");
-            return;
-        }
-
-        try {
-            Map<String, Object> exportableFieldMap = game.getExportableFieldMap();
-            String json = JsonMapperManager.basic().writeValueAsString(exportableFieldMap);
-
-            List<String> urls = getConfiguredUrls("gamestate.api.urls");
-            for (String urlTemplate : urls) {
-                String url = urlTemplate.replace("{gameName}", gameName);
-
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(url))
-                        .timeout(Duration.ofSeconds(20))
-                        .POST(HttpRequest.BodyPublishers.ofString(json))
-                        .build();
-
-                EgressClientManager.getHttpClient()
-                        .sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                        .exceptionally(e -> {
-                            BotLogger.error(
-                                    new LogOrigin(game),
-                                    "An exception occurred while performing an async send of game data to: " + url,
-                                    e);
-                            return null;
-                        });
-            }
-        } catch (Exception e) {
-            BotLogger.error(new LogOrigin(game), "Could not put data to web server", e);
-        }
     }
 
     public static void putPlayerData(String gameId, Game game) {
@@ -222,23 +181,6 @@ public class AsyncTi4WebsiteHelper {
         } catch (Exception e) {
             BotLogger.error("Could not put overlay to web server", e);
         }
-    }
-
-    private static List<String> getConfiguredUrls(String propertyKey) {
-        String urlsProperty = EgressClientManager.getWebProperties().getProperty(propertyKey, "");
-        List<String> urls = new ArrayList<>();
-
-        if (!urlsProperty.isEmpty()) {
-            String[] urlArray = urlsProperty.split(",");
-            for (String url : urlArray) {
-                String trimmedUrl = url.trim();
-                if (!trimmedUrl.isEmpty()) {
-                    urls.add(trimmedUrl);
-                }
-            }
-        }
-
-        return urls;
     }
 
     private static void putObjectInBucket(String key, AsyncRequestBody body, String contentType, String cacheControl) {

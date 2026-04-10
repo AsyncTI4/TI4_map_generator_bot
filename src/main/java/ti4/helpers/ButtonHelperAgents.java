@@ -19,6 +19,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
+import ti4.buttons.handlers.faction.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -749,7 +750,7 @@ public final class ButtonHelperAgents {
 
             String msg = player.getRepresentationUnfogged()
                     + " you may use the buttons to select the ship you want to kill.";
-            List<String> bounties = ButtonHelperAbilities.getBountiesForPlayer(game);
+            List<String> bounties = ZephyrionBountyButtonHandler.getBountiesForPlayer(game);
             List<Button> buttons = new ArrayList<>();
             for (Player otherPlayer : game.getRealPlayersExcludingThis(player)) {
                 for (String bounty : bounties) {

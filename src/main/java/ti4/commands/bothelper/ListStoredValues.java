@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
+import ti4.helpers.StringHelper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
@@ -45,7 +46,7 @@ class ListStoredValues extends GameStateSubcommand {
                             "\n",
                             storedMap.entrySet().stream()
                                     .sorted(Map.Entry.comparingByKey())
-                                    .map(e -> "- `" + e.getKey() + "`: `" + e.getValue() + "`")
+                                    .map(e -> "- `" + e.getKey() + "`: `" + StringHelper.unescape(e.getValue()) + "`")
                                     .toList());
         } else {
             if (keys.size() == 1) {
@@ -61,7 +62,7 @@ class ListStoredValues extends GameStateSubcommand {
                                 if (v == null || v.isEmpty()) {
                                     return "- Found no stored value for key `" + k + "`.";
                                 }
-                                return "- `" + k + "`: `" + v + "`";
+                                return "- `" + k + "`: `" + StringHelper.unescape(v) + "`";
                             })
                             .toList());
         }

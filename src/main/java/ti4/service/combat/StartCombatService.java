@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
+import ti4.buttons.handlers.faction.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -869,7 +870,7 @@ public class StartCombatService {
                         buttons);
             }
             if (player.hasAbility("marked_prey") && "space".equalsIgnoreCase(type)) {
-                List<String> bounties = ButtonHelperAbilities.getBountiesForPlayer(game);
+                List<String> bounties = ZephyrionBountyButtonHandler.getBountiesForPlayer(game);
                 buttons = new ArrayList<>();
                 for (String bounty : bounties) {
                     String faction = bounty.split(" ")[0];
@@ -888,6 +889,20 @@ public class StartCombatService {
                                     + " reminder that you have bounties on your opponents ships and can use these buttons to claim the bounties when you destroy the ship.",
                             buttons);
                 }
+            }
+            if (player.hasUnlockedBreakthrough("zephyrionbt")
+                    && "space".equalsIgnoreCase(type)
+                    && ButtonHelper.isTileInOrAdjacentToPlayersHome(game, tile, otherPlayer, player)) {
+                buttons = new ArrayList<>();
+                buttons.add(Buttons.gray(
+                        player.getFinsFactionCheckerPrefix() + "zephyrionbtRes_" + otherPlayer.getFaction(),
+                        "Resolve Subdue Chancellor (Upon Win)",
+                        FactionEmojis.zephyrion));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        msg
+                                + ", a reminder that if you win this space combat, you may resolve _Subdue Chancellor_ to draw an unused agent.",
+                        buttons);
             }
             if (player.hasAbility("technological_singularity")
                     && !otherPlayer.isDummy()

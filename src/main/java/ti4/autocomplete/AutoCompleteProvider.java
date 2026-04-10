@@ -458,6 +458,7 @@ public class AutoCompleteProvider {
                         "pok",
                         "absol",
                         "ds",
+                        "tigl",
                         "action_deck_2",
                         "franken",
                         "milty_mod",

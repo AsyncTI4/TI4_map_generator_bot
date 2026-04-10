@@ -86,13 +86,13 @@
     {
         "alias": "zephyrionbt",
         "name": "Subdue Chancellor",
-        "shortName": "Subdue \nhancellor",
+        "shortName": "Subdue \nChancellor",
         "faction": "zephyrion",
         "synergy": [
             "BIOTIC",
             "WARFARE"
         ],
-        "text": "After you win a space combat in or adjacent to another player's home system, draw an unused agent. Attach it to this card or discard it and exhaust your opponent's agent. Treat agents attached to this card as if you owned them.",
+        "text": "After you win a space combat in or adjacent to another player's home system, draw an unused agent, if able. Attach it to this card or purge it and exhaust your opponent's agent. Treat agents attached to this card as if you owned them.",
         "source": "balacasi"
     },
     {

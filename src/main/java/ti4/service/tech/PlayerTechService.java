@@ -13,10 +13,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
+import ti4.buttons.handlers.faction.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
@@ -364,7 +364,7 @@ public class PlayerTechService {
                         event.getMessageChannel(), message, List.of(Buttons.REDISTRIBUTE_CCs, deleteButton));
             }
             case "dsvadeb" -> ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, event);
-            case "bazephy" -> ButtonHelperAbilities.offerBountyButtons(game, player);
+            case "bazephy" -> ZephyrionBountyButtonHandler.offerBountyButtons(game, player);
             case "mi" -> { // Mageon
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>();

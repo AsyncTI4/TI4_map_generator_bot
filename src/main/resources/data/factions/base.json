@@ -50,7 +50,8 @@
             "wtm",
             "psn",
             "blt",
-            "cam"
+            "cam",
+            "tqs"
         ],
         "source": "base",
         "priorityNumber": 29
@@ -112,8 +113,7 @@
             "tea",
             "ptr",
             "vdg",
-            "azr",
-            "sbt"
+            "azr"
         ],
         "source": "base",
         "priorityNumber": 20
@@ -174,7 +174,9 @@
             "org",
             "cpr",
             "spr",
-            "dw"
+            "dw",
+            "beg",
+            "tpl"
         ],
         "source": "base",
         "priorityNumber": 18
@@ -237,7 +239,9 @@
             "blu",
             "vpw",
             "sns",
-            "lvn"
+            "lvn",
+            "eth",
+            "plm"
         ],
         "source": "base",
         "priorityNumber": 24
@@ -296,8 +300,9 @@
             "nm",
             "cqr",
             "orca",
-            "rbw",
-            "gry"
+            "pld",
+            "gry",
+            "rst"
         ],
         "source": "base",
         "priorityNumber": 5
@@ -356,7 +361,7 @@
             "rst",
             "sns",
             "nm",
-            "rbw"
+            "chk"
         ],
         "source": "base",
         "priorityNumber": 8
@@ -415,7 +420,10 @@
             "crm",
             "wsp",
             "blk",
-            "cpr"
+            "cpr",
+            "cam",
+            "tan",
+            "beg"
         ],
         "source": "base",
         "priorityNumber": 15
@@ -473,7 +481,8 @@
             "cnb",
             "bld",
             "rst",
-            "cpr"
+            "cpr",
+            "rby"
         ],
         "source": "base",
         "priorityNumber": 14
@@ -532,7 +541,9 @@
             "psn",
             "hqn",
             "tpl",
-            "jad"
+            "jad",
+            "frs",
+            "cam"
         ],
         "source": "base",
         "priorityNumber": 28
@@ -590,7 +601,8 @@
             "blk",
             "nm",
             "rbw",
-            "sns"
+            "sns",
+            "rby"
         ],
         "source": "base",
         "priorityNumber": 22
@@ -648,7 +660,8 @@
             "rst",
             "cam",
             "tan",
-            "nea"
+            "nea",
+            "beg"
         ],
         "source": "base",
         "priorityNumber": 17
@@ -702,11 +715,11 @@
             "red",
             "bld",
             "blk",
-            "rbw",
             "nm",
             "pld",
             "rby",
-            "sns"
+            "sns",
+            "chk"
         ],
         "source": "base",
         "priorityNumber": 10
@@ -763,8 +776,9 @@
             "crm",
             "jpt",
             "cam",
-            "lgy",
-            "gry"
+            "gry",
+            "vpw",
+            "eth"
         ],
         "source": "base",
         "priorityNumber": 3
@@ -829,7 +843,8 @@
             "rbw",
             "vpw",
             "lvn",
-            "blk"
+            "blk",
+            "gry"
         ],
         "source": "base",
         "priorityNumber": 27
@@ -887,7 +902,9 @@
             "tqs",
             "vdg",
             "jad",
-            "psn"
+            "psn",
+            "frs",
+            "cam"
         ],
         "source": "base",
         "priorityNumber": 26
@@ -1003,7 +1020,8 @@
             "tqs",
             "jad",
             "lme",
-            "frs"
+            "frs",
+            "vdg"
         ],
         "source": "base",
         "priorityNumber": 11

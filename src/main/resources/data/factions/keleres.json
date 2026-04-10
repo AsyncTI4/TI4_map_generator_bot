@@ -46,8 +46,9 @@
             "jpt",
             "gry",
             "nea",
-            "lgy",
-            "crm"
+            "crm",
+            "plm",
+            "vpw"
         ],
         "source": "codex3",
         "priorityNumber": 23
@@ -100,8 +101,9 @@
             "jpt",
             "gry",
             "nea",
-            "lgy",
-            "crm"
+            "crm",
+            "plm",
+            "vpw"
         ],
         "source": "codex3"
     },
@@ -154,8 +156,9 @@
             "jpt",
             "gry",
             "nea",
-            "lgy",
-            "crm"
+            "crm",
+            "plm",
+            "vpw"
         ],
         "source": "codex3"
     }
