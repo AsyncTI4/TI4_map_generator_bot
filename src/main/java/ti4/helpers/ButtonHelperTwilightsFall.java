@@ -414,14 +414,25 @@ public final class ButtonHelperTwilightsFall {
             Collections.reverse(participants);
             Collections.rotate(participants, 1);
         }
-        {
-            String engineerACSplice = game.getStoredValue("engineerACSplice");
-            if ("take_remove_remove".equals(engineerACSplice)) {
-                participants.addFirst(startPlayer);
-                participants.addFirst(startPlayer);
-            } else if (!engineerACSplice.isEmpty()) {
-                // Cleans up any dirty values left over from e.g. playing Engineer without finishing the splice
-                game.removeStoredValue("engineerACSplice");
+        String engineerACSplice = game.getStoredValue("engineerACSplice");
+        if ("take_remove_remove".equals(engineerACSplice)) {
+            participants.addFirst(startPlayer);
+            participants.addFirst(startPlayer);
+        } else if (!engineerACSplice.isEmpty()) {
+            // Cleans up any dirty values left over from e.g. playing Engineer without finishing the splice
+            game.removeStoredValue("engineerACSplice");
+        }
+        for (Player player2 : game.getRealPlayers()) {
+            if (game.getStoredValue("Reverse Splice") != null
+                    && game.getStoredValue("Reverse Splice").contains(player2.getFaction())
+                    && player2.getPlayableActionCards().contains("tf-reverse")) {
+                ActionCardHelper.playAC(null, game, player2, "tf-reverse", game.getMainGameChannel());
+            }
+            if (game.getStoredValue("Manipulate Splice") != null
+                    && game.getStoredValue("Manipulate Splice").contains(player2.getFaction())
+                    && player2.getPlayableActionCards().contains("tf-manipulate")
+                    && !participants.contains(player2)) {
+                ActionCardHelper.playAC(null, game, player2, "tf-manipulate", game.getMainGameChannel());
             }
         }
         if (!game.getStoredValue("paid6ForSplice").isEmpty()) {
@@ -451,10 +462,10 @@ public final class ButtonHelperTwilightsFall {
                         "savedParticipants", game.getStoredValue("savedParticipants") + "_" + p.getFaction());
             }
         }
-        List<String> cards = getSpliceCards(game);
-        List<MessageEmbed> embeds = getSpliceEmbeds(game, spliceType, cards, null);
-
-        MessageHelper.sendMessageToChannel(startPlayer.getCorrectChannel(), "A splice has started.");
+        MessageHelper.sendMessageToChannel(
+                startPlayer.getCorrectChannel(),
+                "A splice has started with the following order of participants:\n"
+                        + getSpliceOrderString(participants));
 
         sendPlayerSpliceOptions(game, startPlayer);
         for (Player player2 : getParticipantsList(game)) {
@@ -471,6 +482,41 @@ public final class ButtonHelperTwilightsFall {
                     getQueueSpliceMessage(game, player2),
                     getQueueSplicePickButtons(game, player2));
         }
+    }
+
+    public static void reverseSpliceOrder(Game game) {
+        List<Player> participants = new ArrayList<Player>();
+        for (String faction : game.getStoredValue("savedParticipants").split("_")) {
+            if (game.getPlayerFromColorOrFaction(faction) != null)
+                participants.add(game.getPlayerFromColorOrFaction(faction));
+        }
+        Collections.reverse(participants);
+        Collections.rotate(participants, 1);
+        game.removeStoredValue("savedParticipants");
+        for (Player p : participants) {
+            if (game.getStoredValue("savedParticipants").isEmpty()) {
+                game.setStoredValue("savedParticipants", p.getFaction());
+            } else {
+                game.setStoredValue(
+                        "savedParticipants", game.getStoredValue("savedParticipants") + "_" + p.getFaction());
+            }
+        }
+        MessageHelper.sendMessageToChannel(
+                game.getMainGameChannel(),
+                "The splice order has been reversed. The new order is: "
+                        + ButtonHelperTwilightsFall.getSpliceOrderString(participants));
+
+        game.removeStoredValue("reverseSpliceOrder");
+    }
+
+    public static String getSpliceOrderString(List<Player> participants) {
+        StringBuilder sb = new StringBuilder();
+        int count = 1;
+        for (Player p : participants) {
+            sb.append(count).append(". ").append(p.getRepresentation()).append("\n");
+            count++;
+        }
+        return sb.toString();
     }
 
     public static List<String> getSpliceCards(Game game) {

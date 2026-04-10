@@ -393,7 +393,9 @@ class AgendaResolveButtonHandler {
 
     private static List<Button> buildNextButtons(Game game, int aCount) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.blue("flip_agenda", "Flip Agenda #" + aCount));
+        if (aCount < 3 || game.isAbsolMode()) {
+            buttons.add(Buttons.blue("flip_agenda", "Flip Agenda #" + aCount));
+        }
         RiftSetModeService.includeCrucibleAgendaButton(buttons, game);
 
         if (!game.isOmegaPhaseMode()) {

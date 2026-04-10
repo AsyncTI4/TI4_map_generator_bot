@@ -62,6 +62,7 @@
         "name": "Manipulate",
         "phase": "Action",
         "window": "After cards are drawn for a splice that you are not participating in",
+        "notes": "In Async, please queue this if possible.",
         "text": "Take the spliced cards. Choose which card each participating player will take.",
         "source": "twilights_fall"
     },
@@ -174,7 +175,7 @@
         "name": "Reverse",
         "phase": "Action",
         "window": "When a splice begins",
-        "notes": "In Async, please play this before you initiate the splice.",
+        "notes": "In Async, please queue this if possible.",
         "text": "Reverse the order the spliced cards are passed.",
         "source": "twilights_fall"
     },

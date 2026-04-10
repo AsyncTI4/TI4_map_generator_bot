@@ -141,6 +141,13 @@ public class CreateGameService {
 
         // CREATE GAME
         Game newGame = createNewGame(gameName, gameOwner);
+        if (event.getChannel() instanceof ThreadChannel thread) {
+            if (thread.getName().toLowerCase().contains("tigl")
+                    || newGame.getCustomName().toLowerCase().contains("tigl")
+                    || "making-tigl-games".equals(thread.getParentChannel().getName())) {
+                gameFunName = "TIGL " + gameFunName;
+            }
+        }
 
         // ADD PLAYERS
         for (Member member : members) {
@@ -229,16 +236,18 @@ public class CreateGameService {
                 && ("making-new-games".equals(thread.getParentChannel().getName())
                         || "making-private-games"
                                 .equals(thread.getParentChannel().getName())
+                        || "making-tigl-games".equals(thread.getParentChannel().getName())
                         || "making-superfast-games"
                                 .equals(thread.getParentChannel().getName()))) {
             newGame.setLaunchPostThreadID(thread.getId());
+            if (thread.getName().toLowerCase().contains("tigl")
+                    || newGame.getCustomName().toLowerCase().contains("tigl")
+                    || "making-tigl-games".equals(thread.getParentChannel().getName())) {
+                TIGLHelper.initializeTIGLGame(newGame);
+            }
             ThreadChannelManager manager = thread.getManager()
                     .setName(StringUtils.left(newGame.getName() + "-launched [FULL] - " + thread.getName(), 100))
                     .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
-            if (thread.getName().toLowerCase().contains("tigl")
-                    || newGame.getCustomName().toLowerCase().contains("tigl")) {
-                TIGLHelper.initializeTIGLGame(newGame);
-            }
             if (missingMembers.isEmpty()) {
                 manager = manager.setArchived(true);
             }

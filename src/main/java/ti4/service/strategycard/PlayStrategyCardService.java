@@ -19,6 +19,7 @@ import ti4.buttons.UnfiledButtonHandlers;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.Constants;
 import ti4.helpers.CryypterHelper;
@@ -241,6 +242,14 @@ public class PlayStrategyCardService {
             }
         }
 
+        if (scModel.usesAutomationForSCID("tf7")
+                || scModel.usesAutomationForSCID("tf2")
+                || scModel.usesAutomationForSCID("tf6")) {
+            for (Player p : game.getRealPlayers()) {
+                ButtonHelperActionCards.checkForPlayingSpliceCards(game, p);
+            }
+        }
+
         // Handle Kyro Hero
         if (scToPlay == ButtonHelper.getKyroHeroSC(game)
                 && !player.getFaction().equalsIgnoreCase(game.getStoredValue("kyroHeroPlayer"))) {
@@ -288,7 +297,7 @@ public class PlayStrategyCardService {
         if (!isOverrule && scModel.usesAutomationForSCID("pok5trade")) {
             String assignSpeakerMessage2 = player.getRepresentation()
                     + " you may force players to replenish commodities. This is normally done in order to trigger a _Trade Agreement_ or because of a pre-existing deal."
-                    + " This is not required, and not advised if you are offering them a conditional replenishment.";
+                    + " This is not required, and not advised if you are offering them a conditional replenishment. If you're offering them a conditional replenishment, it is advised to let them press replenish (or replenish and wash) themselves, since them pressing that can act as their acceptance of the deal. The bot will not auto-deduct a strategy command token.";
             List<Button> forceRefresh = ButtonHelper.getForcedRefreshButtons(game, player, playersToFollow);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), assignSpeakerMessage2, forceRefresh);
