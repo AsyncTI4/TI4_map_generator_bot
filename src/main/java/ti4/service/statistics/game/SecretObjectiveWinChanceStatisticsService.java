@@ -140,11 +140,16 @@ class SecretObjectiveWinChanceStatisticsService {
             int combinedWins = winsWithSecretScoredOrInHand.getOrDefault(secretName, 0);
             long combinedPct = combinedGames == 0 ? 0 : Math.round(100.0 * combinedWins / combinedGames);
 
-            // Normalize scored win % by using the max combinedGames as the denominator
+            // Normalize win % by using the max combinedGames as the denominator
             // for all secrets, so secrets that are discarded more often get a lower
             // normalized win % reflecting the discarded (unseen) population.
             long normalizedScoredPct =
                     (scoredWins == 0 || maxCombinedGames == 0) ? 0 : Math.round(100.0 * scoredWins / maxCombinedGames);
+            long normalizedInHandPct =
+                    (inHandWins == 0 || maxCombinedGames == 0) ? 0 : Math.round(100.0 * inHandWins / maxCombinedGames);
+            long normalizedCombinedPct = (combinedWins == 0 || maxCombinedGames == 0)
+                    ? 0
+                    : Math.round(100.0 * combinedWins / maxCombinedGames);
 
             secretObjectiveSb
                     .append("**")
@@ -156,7 +161,7 @@ class SecretObjectiveWinChanceStatisticsService {
                     .append(scoredWins)
                     .append("/")
                     .append(scoredGames)
-                    .append(") · Normalized: `")
+                    .append(") · Norm: `")
                     .append(StringUtils.leftPad(normalizedScoredPct + "%", 4))
                     .append("` · In Hand: `")
                     .append(StringUtils.leftPad(inHandPct + "%", 4))
@@ -164,13 +169,17 @@ class SecretObjectiveWinChanceStatisticsService {
                     .append(inHandWins)
                     .append("/")
                     .append(inHandGames)
-                    .append(") · Combined: `")
+                    .append(") · Norm: `")
+                    .append(StringUtils.leftPad(normalizedInHandPct + "%", 4))
+                    .append("` · Combined: `")
                     .append(StringUtils.leftPad(combinedPct + "%", 4))
                     .append("` (")
                     .append(combinedWins)
                     .append("/")
                     .append(combinedGames)
-                    .append(")\n");
+                    .append(") · Norm: `")
+                    .append(StringUtils.leftPad(normalizedCombinedPct + "%", 4))
+                    .append("`\n");
         }
         MessageHelper.sendMessageToThread(
                 event.getChannel(), "Secret Objective Win Chance", secretObjectiveSb.toString());
