@@ -98,10 +98,25 @@ class SecretObjectiveWinChanceStatisticsService {
         allSecretNames.addAll(gamesWithSecretInHand.keySet());
         allSecretNames.addAll(gamesWithSecretScoredOrInHand.keySet());
 
-        // Order by highest scored win percent descending
+        // Order by highest scored win percent descending, with deterministic tie-breakers
         List<String> orderedNames = allSecretNames.stream()
-                .sorted((a, b) ->
-                        Long.compare(scoredWinPercent.getOrDefault(b, 0L), scoredWinPercent.getOrDefault(a, 0L)))
+                .sorted((a, b) -> {
+                    int compareByPercent = Long.compare(
+                            scoredWinPercent.getOrDefault(b, 0L),
+                            scoredWinPercent.getOrDefault(a, 0L));
+                    if (compareByPercent != 0) {
+                        return compareByPercent;
+                    }
+
+                    int compareByScoredGames = Integer.compare(
+                            gamesWithSecretScored.getOrDefault(b, 0),
+                            gamesWithSecretScored.getOrDefault(a, 0));
+                    if (compareByScoredGames != 0) {
+                        return compareByScoredGames;
+                    }
+
+                    return a.compareTo(b);
+                })
                 .toList();
 
         StringBuilder secretObjectiveSb = new StringBuilder("Win chance with secret:\n");
