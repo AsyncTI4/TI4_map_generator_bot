@@ -62,7 +62,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheVuilRaithCabal_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheVuilRaithCabal_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheVuilRaithCabal",
-        "preferredColours": ["bld", "red", "psn", "blk", "nm", "rbw", "rby", "pld"],
+        "preferredColours": ["bld", "red", "psn", "blk", "nm", "rby", "pld"],
         "source": "pok",
         "priorityNumber": 6
     },
