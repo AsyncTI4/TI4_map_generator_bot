@@ -170,9 +170,7 @@ public class GameStatisticsFilterer {
         if (gameTypesFilter == null) {
             return true;
         }
-        return Arrays.stream(gameTypesFilter.split(","))
-                .map(String::strip)
-                .allMatch(gameType -> hasGameType(gameType, game));
+        return Arrays.stream(gameTypesFilter.split(",")).allMatch(gameType -> hasGameType(gameType, game));
     }
 
     private static boolean hasGameType(@NotNull String type, Game game) {
@@ -207,9 +205,7 @@ public class GameStatisticsFilterer {
         if (excludedGameTypesFilter == null) {
             return true;
         }
-        return Arrays.stream(excludedGameTypesFilter.split(","))
-                .map(String::strip)
-                .noneMatch(gameType -> hasGameType(gameType, game));
+        return Arrays.stream(excludedGameTypesFilter.split(",")).noneMatch(gameType -> hasGameType(gameType, game));
     }
 
     private static boolean filterOnHasWinner(Boolean hasWinnerFilter, Game game) {
