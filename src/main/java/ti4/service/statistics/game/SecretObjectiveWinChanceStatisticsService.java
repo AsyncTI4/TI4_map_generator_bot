@@ -151,6 +151,12 @@ class SecretObjectiveWinChanceStatisticsService {
                     ? 0
                     : Math.round(100.0 * combinedWins / maxCombinedGames);
 
+            // Estimated discard rate: how often this secret was neither scored nor
+            // held at end-of-game compared to the most-seen secret.
+            long estimatedDiscardPct = (maxCombinedGames == 0)
+                    ? 0
+                    : Math.round(100.0 * (maxCombinedGames - combinedGames) / maxCombinedGames);
+
             secretObjectiveSb
                     .append("**")
                     .append(secretName)
@@ -179,6 +185,8 @@ class SecretObjectiveWinChanceStatisticsService {
                     .append(combinedGames)
                     .append(") · Norm: `")
                     .append(StringUtils.leftPad(normalizedCombinedPct + "%", 4))
+                    .append("` · Est. Discard: `")
+                    .append(StringUtils.leftPad(estimatedDiscardPct + "%", 4))
                     .append("`\n");
         }
         MessageHelper.sendMessageToThread(
