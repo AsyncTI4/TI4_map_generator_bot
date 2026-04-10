@@ -51,7 +51,7 @@ class SecretObjectiveWinChanceStatisticsService {
             int games = actionPhaseGamesByCount[count];
             int wins = actionPhaseWinsByCount[count];
             long percent = games == 0 ? 0 : Math.round(100.0 * wins / games);
-            sb.append("`")
+            sb.append('`')
                     .append(count)
                     .append(" AP secrets` ")
                     .append('`')
@@ -71,7 +71,7 @@ class SecretObjectiveWinChanceStatisticsService {
                 wins += actionPhaseWinsByCount[i];
             }
             long percent = games == 0 ? 0 : Math.round(100.0 * wins / games);
-            sb.append("`")
+            sb.append('`')
                     .append(count)
                     .append("+ AP secrets` ")
                     .append('`')
