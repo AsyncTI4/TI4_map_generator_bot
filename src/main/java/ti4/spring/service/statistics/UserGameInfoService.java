@@ -87,17 +87,13 @@ public class UserGameInfoService {
                         .append(stats.replacedCompleted)
                         .append(stats.replacedCompleted == 1 ? " other)" : " others)");
             }
-            sb.append(". `")
-                    .append(stats.ongoingGames)
-                    .append("` Ongoing");
+            sb.append(". `").append(stats.ongoingGames).append("` Ongoing");
             if (stats.replacedOngoing > 0) {
                 sb.append(" (replaced in ")
                         .append(stats.replacedOngoing)
                         .append(stats.replacedOngoing == 1 ? " other)" : " others)");
             }
-            sb.append(" -- ")
-                    .append(stats.username)
-                    .append('\n');
+            sb.append(" -- ").append(stats.username).append('\n');
 
             if (stats.completedGames > 0) {
                 stats.completedGameDays.sort(Comparator.naturalOrder());

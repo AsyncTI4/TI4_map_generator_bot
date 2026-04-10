@@ -28,7 +28,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheArgentFlight_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheArgentFlight_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheArgentFlight",
-        "preferredColours": ["org", "rst", "cnb", "pch", "gld", "cpr", "wsp", "crm"],
+        "preferredColours": ["org", "rst", "cnb", "pch", "gld", "cpr", "wsp", "crm","tan"],
         "source": "pok",
         "priorityNumber": 25
     },
@@ -62,7 +62,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheVuilRaithCabal_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheVuilRaithCabal_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheVuilRaithCabal",
-        "preferredColours": ["bld", "red", "psn", "blk", "nm", "rby", "pld"],
+        "preferredColours": ["bld", "red", "psn", "blk", "nm", "rby", "pld","chk"],
         "source": "pok",
         "priorityNumber": 6
     },
@@ -166,7 +166,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNomad_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNomad_FactionSheetBack.webp",
         "wikiURL": "",
-        "preferredColours": ["nvy", "blu", "gcr", "ppl", "azr", "sns", "ryl", "vpw"],
+        "preferredColours": ["nvy", "blu", "gcr", "ppl", "azr", "sns", "ryl", "vpw","eth"],
         "source": "pok",
         "priorityNumber": 2
     },
@@ -201,7 +201,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNaazRokhaAlliance_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNaazRokhaAlliance_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheNaazRokhaAlliance",
-        "preferredColours": ["eme", "grn", "frs", "psn", "tqs", "plm", "cam", "ryl"],
+        "preferredColours": ["eme", "grn", "frs", "psn", "tqs", "plm", "cam", "ryl","jad"],
         "source": "pok",
         "priorityNumber": 19
     },
@@ -235,7 +235,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheTitansOfUl_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheTitansOfUl_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheTitansOfUl",
-        "preferredColours": ["pnk", "rse", "vpw", "sbt", "psy", "blt", "plm", "sns", "pch", "nea"],
+        "preferredColours": ["pnk", "rse", "vpw", "sbt", "psy", "blt", "plm", "sns", "pch", "nea","lvn"],
         "source": "pok",
         "priorityNumber": 13
     }
