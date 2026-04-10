@@ -522,9 +522,7 @@ public class PromissoryNoteHelper {
         }
         if (("viability_political_favor".equalsIgnoreCase(id))) {
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(),
-                    " _Political Favor_ has been played to discard the current agenda."
-            );
+                    game.getMainGameChannel(), " _Political Favor_ has been played to discard the current agenda.");
 
             AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());
 
