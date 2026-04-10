@@ -1117,7 +1117,7 @@ public final class ButtonHelperTwilightsFall {
                 }
             }
         }
-        if (!game.getStoredValue("engineerACSplice").startsWith("remove")) {
+        if (!game.getStoredValue("engineerACSplice").startsWith("remove") && !prefix.contains("manipulate")) {
             if (!player.hasTech("wavelength")) {
                 buttons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + prefix + "wavelength",

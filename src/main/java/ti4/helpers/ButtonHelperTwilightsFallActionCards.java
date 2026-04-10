@@ -167,7 +167,7 @@ public final class ButtonHelperTwilightsFallActionCards {
                 continue;
             }
             buttons.add(Buttons.green(
-                    "manipulateStep2_" + cardID + "_" + p2.getFaction(), p2.getDisplayName(), p2.fogSafeEmoji()));
+                    "manipulateStep2_" + cardID + "_" + p2.getFaction(), p2.getUserName(), p2.fogSafeEmoji()));
         }
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
@@ -233,7 +233,7 @@ public final class ButtonHelperTwilightsFallActionCards {
                     Mapper.getUnit(cardID).getRepresentationEmbed());
         }
         List<Player> participants = ButtonHelperTwilightsFall.getParticipantsList(game);
-        participants.remove(player);
+        participants.remove(p2);
         game.removeStoredValue("savedParticipants");
         if (!participants.isEmpty()) {
             for (Player p : participants) {
