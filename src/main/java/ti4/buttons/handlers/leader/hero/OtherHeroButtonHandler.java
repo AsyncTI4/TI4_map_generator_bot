@@ -9,6 +9,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.UnitReplacementHelper;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
@@ -302,7 +303,7 @@ class OtherHeroButtonHandler {
     @ButtonHandler("ghotiHeroIn_")
     public static void ghotiHeroIn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.substring(buttonID.indexOf('_') + 1);
-        List<Button> buttons = ButtonHelperAgents.getUnitsToArboAgent(player, game.getTileByPosition(pos));
+        List<Button> buttons = UnitReplacementHelper.getUnitsToReplace(player, game.getTileByPosition(pos), 2);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(),
                 player.getRepresentationUnfogged() + ", please choose which unit you wish to replace.",

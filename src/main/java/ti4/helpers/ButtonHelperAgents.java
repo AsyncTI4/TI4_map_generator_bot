@@ -2,12 +2,10 @@ package ti4.helpers;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Stream;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -19,7 +17,8 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
-import ti4.buttons.handlers.faction.zephyrion.ZephyrionBountyButtonHandler;
+import ti4.factions.arborec.ArborecAgentButtonHandler;
+import ti4.factions.zephyrion.ZephyrionAgentButtonHandler;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -36,7 +35,6 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.model.ExploreModel;
 import ti4.model.PlanetModel;
-import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -55,27 +53,9 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.GalvanizeService;
-import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
 public final class ButtonHelperAgents {
-
-    private static List<Button> getTilesToArboAgent(Player player, Game game) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
-        List<Button> buttons = new ArrayList<>();
-        for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
-            if (FoWHelper.playerHasShipsInSystem(player, tileEntry.getValue())) {
-                Tile tile = tileEntry.getValue();
-                Button validTile = Buttons.green(
-                        finChecker + "arboAgentIn_" + tileEntry.getKey(),
-                        tile.getRepresentationForButtons(game, player));
-                buttons.add(validTile);
-            }
-        }
-        Button validTile2 = Buttons.red(finChecker + "deleteButtons", "Decline");
-        buttons.add(validTile2);
-        return buttons;
-    }
 
     public static void cabalAgentInitiation(Game game, Player p2) {
         for (Player cabal : game.getRealPlayers()) {
@@ -232,103 +212,6 @@ public final class ButtonHelperAgents {
                     "cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2, UnitEmojis.flagship);
             buttons.add(unitButton2);
         }
-        return buttons;
-    }
-
-    public static List<Button> getUnitsToArboAgent(Player player, Tile tile) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
-        Set<UnitType> allowedUnits = Set.of(
-                UnitType.Destroyer,
-                UnitType.Cruiser,
-                UnitType.Carrier,
-                UnitType.Dreadnought,
-                UnitType.Flagship,
-                UnitType.Warsun);
-
-        List<Button> buttons = new ArrayList<>();
-        for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
-            UnitHolder unitHolder = entry.getValue();
-            Map<UnitKey, Integer> units = unitHolder.getUnits();
-            if (unitHolder instanceof Planet) continue;
-
-            Map<UnitKey, Integer> tileUnits = new HashMap<>(units);
-            for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {
-                UnitKey unitKey = unitEntry.getKey();
-                if (!player.unitBelongsToPlayer(unitKey)) continue;
-
-                if (!allowedUnits.contains(unitKey.getUnitType())) {
-                    continue;
-                }
-
-                UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                String prettyName = unitModel == null ? unitKey.getUnitType().humanReadableName() : unitModel.getName();
-                String unitName = unitKey.unitName();
-                int totalUnits = unitEntry.getValue();
-                int damagedUnits = 0;
-
-                if (unitHolder.getUnitDamage() != null) {
-                    damagedUnits = unitHolder.getUnitDamage().getOrDefault(unitKey, 0);
-                }
-
-                for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
-                    String buttonID = finChecker + "arboAgentOn_" + tile.getPosition() + "_" + unitName + "damaged";
-                    Button validTile2 = Buttons.red(buttonID, "Remove A Damaged " + prettyName, unitKey.unitEmoji());
-                    buttons.add(validTile2);
-                }
-                totalUnits -= damagedUnits;
-                for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
-                    Button validTile2 = Buttons.red(
-                            finChecker + "arboAgentOn_" + tile.getPosition() + "_" + unitName,
-                            "Remove " + x + " " + prettyName,
-                            unitKey.unitEmoji());
-                    buttons.add(validTile2);
-                }
-            }
-        }
-        Button validTile2 = Buttons.red(finChecker + "deleteButtons", "Decline");
-        buttons.add(validTile2);
-        return buttons;
-    }
-
-    public static List<Button> getArboAgentReplacementOptions(
-            Player player, Game game, GenericInteractionCreateEvent event, Tile tile, String unit) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
-        List<Button> buttons = new ArrayList<>();
-
-        boolean damaged = false;
-        if (unit.contains("damaged")) {
-            unit = unit.replace("damaged", "");
-            damaged = true;
-        }
-        UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor());
-        var parsedUnit = new ParsedUnit(unitKey);
-        RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
-        String msg = (damaged ? "A damaged " : "") + unitKey.unitEmoji() + " was removed by "
-                + player.getFactionEmoji()
-                + ". A ship costing up to 2 more than it may now be placed.";
-
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-
-        List<String> allowedUnits = Stream.of(
-                        UnitType.Destroyer,
-                        UnitType.Cruiser,
-                        UnitType.Carrier,
-                        UnitType.Dreadnought,
-                        UnitType.Flagship,
-                        UnitType.Warsun,
-                        UnitType.Fighter)
-                .map(UnitType::getValue)
-                .toList();
-        UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
-        for (String asyncID : allowedUnits) {
-            UnitModel ownedUnit = player.getUnitFromAsyncID(asyncID);
-            if (ownedUnit != null && ownedUnit.getCost() <= removedUnit.getCost() + 2) {
-                String buttonID = finChecker + "arboAgentPutShip_" + ownedUnit.getBaseType() + "_" + tile.getPosition();
-                String buttonText = "Place " + ownedUnit.getName();
-                buttons.add(Buttons.green(buttonID, buttonText, ownedUnit.getUnitEmoji()));
-            }
-        }
-
         return buttons;
     }
 
@@ -744,31 +627,12 @@ public final class ButtonHelperAgents {
         }
 
         if ("zephyrionagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
-                    + "Rhino the Adventurer, the Zephyrion" + ssruuSlash + " agent.";
-            MessageHelper.sendMessageToChannel(channel, exhaustText);
-
-            String msg = player.getRepresentationUnfogged()
-                    + " you may use the buttons to select the ship you want to kill.";
-            List<String> bounties = ZephyrionBountyButtonHandler.getBountiesForPlayer(game);
-            List<Button> buttons = new ArrayList<>();
-            for (Player otherPlayer : game.getRealPlayersExcludingThis(player)) {
-                for (String bounty : bounties) {
-                    String faction = bounty.split(" ")[0];
-                    String ship = bounty.split(" ")[1];
-                    if ("flagship".equalsIgnoreCase(ship) || "warsun".equalsIgnoreCase(ship)) {
-                        continue;
-                    }
-                    if (otherPlayer.getFaction().equalsIgnoreCase(faction)) {
-                        Button bountyButton = Buttons.gray(
-                                "zephAgentRes_" + faction + "_" + ship,
-                                StringUtils.capitalize(ship),
-                                otherPlayer.getFactionEmojiOrColor());
-                        buttons.add(bountyButton);
-                    }
-                }
-            }
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+            MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " has exhausted " + ssruuClever
+                    + "Rhino the Adventurer, the Zephyrion" + ssruuSlash + " agent.");
+            List<Button> buttons = ZephyrionAgentButtonHandler.getAgentButtons(game, player);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + " you may use the buttons to select the ship you want to kill.",
+                    buttons);
         }
         if ("jolnaragent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
@@ -1424,7 +1288,7 @@ public final class ButtonHelperAgents {
             channel = p2.getCorrectChannel();
             message = ", please choose which system to use " + ssruuClever + "Letani Ospha, the Arborec" + ssruuSlash
                     + " agent, in.";
-            List<Button> buttons = getTilesToArboAgent(p2, game);
+            List<Button> buttons = ArborecAgentButtonHandler.getTilesToArboAgent(p2, game);
             MessageHelper.sendMessageToChannelWithButtons(channel, p2.getRepresentationUnfogged() + message, buttons);
         }
         if ("kolumeagent".equalsIgnoreCase(agent)) {
@@ -2084,7 +1948,9 @@ public final class ButtonHelperAgents {
             count++;
         }
         if (count == 1) {
-            ButtonHelperHeroes.resolveArboHeroBuild(game, player, event, "arboHeroBuild_" + tilePos);
+            List<Button> prodButtons = Helper.getAbilityBuildButtons(event, player, game, game.getTileByPosition(tilePos));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                    player.getRepresentation() + " Use the buttons to produce units.", prodButtons);
         }
         ButtonHelper.deleteMessage(event);
     }
@@ -2637,45 +2503,6 @@ public final class ButtonHelperAgents {
             }
         }
         return buttons;
-    }
-
-    @ButtonHandler("arboAgentPutShip_")
-    public static void arboAgentPutShip(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        String unitNPlace = buttonID.replace("arboAgentPutShip_", "");
-        String unit = unitNPlace.split("_")[0];
-        String pos = unitNPlace.split("_")[1];
-        Tile tile = game.getTileByPosition(pos);
-        String successMessage = player.getFactionEmojiOrColor() + " Replaced a ship with 1 ";
-        switch (unit) {
-            case "destroyer" -> {
-                AddUnitService.addUnits(event, tile, game, player.getColor(), "destroyer");
-                successMessage += UnitEmojis.destroyer;
-            }
-            case "cruiser" -> {
-                AddUnitService.addUnits(event, tile, game, player.getColor(), "cruiser");
-                successMessage += UnitEmojis.cruiser;
-            }
-            case "carrier" -> {
-                AddUnitService.addUnits(event, tile, game, player.getColor(), "carrier");
-                successMessage += UnitEmojis.carrier;
-            }
-            case "dreadnought" -> {
-                AddUnitService.addUnits(event, tile, game, player.getColor(), "dreadnought");
-                successMessage += UnitEmojis.dreadnought;
-            }
-            case "fighter" -> {
-                AddUnitService.addUnits(event, tile, game, player.getColor(), "fighter");
-                successMessage += UnitEmojis.fighter;
-            }
-            case "warsun" -> {
-                AddUnitService.addUnits(event, tile, game, player.getColor(), "warsun");
-                successMessage += UnitEmojis.warsun;
-            }
-        }
-        successMessage += " in tile " + tile.getRepresentationForButtons(game, player);
-
-        MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
-        ButtonHelper.deleteMessage(event);
     }
 
     private static List<Button> getYinAgentButtons(Player player, Game game, String pos) {

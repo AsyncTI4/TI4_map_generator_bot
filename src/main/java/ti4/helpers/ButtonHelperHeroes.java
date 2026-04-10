@@ -1048,23 +1048,6 @@ public final class ButtonHelperHeroes {
         return techToGain;
     }
 
-    public static List<Button> getArboHeroButtons(Game game, Player player) {
-        List<Button> buttons = new ArrayList<>();
-        List<Tile> tiles = new ArrayList<>();
-        tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Infantry));
-        tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Mech));
-        List<String> poses = new ArrayList<>();
-        for (Tile tile : tiles) {
-            if (!poses.contains(tile.getPosition())) {
-                buttons.add(Buttons.green(
-                        "arboHeroBuild_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
-                poses.add(tile.getPosition());
-            }
-        }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
-        return buttons;
-    }
-
     public static List<Button> getSaarHeroButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         List<Tile> tilesUsed = new ArrayList<>();
@@ -1118,17 +1101,6 @@ public final class ButtonHelperHeroes {
                 player.getFactionEmoji() + " destroyed all opposing infantry and fighters in "
                         + tile.getRepresentationForButtons(game, player) + " using Gurno Aggero, the Saar hero.");
         ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("arboHeroBuild_")
-    public static void resolveArboHeroBuild(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        String pos = buttonID.split("_")[1];
-        List<Button> buttons;
-        buttons =
-                Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "arboHeroBuild", "place");
-        String message = player.getRepresentation() + " Use the buttons to produce units. ";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     public static List<Button> getNekroHeroButtons(Player player, Game game) {

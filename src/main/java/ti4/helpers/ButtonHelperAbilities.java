@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
-import ti4.buttons.handlers.faction.zephyrion.ZephyrionBountyButtonHandler;
+import ti4.factions.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -939,17 +939,6 @@ public final class ButtonHelperAbilities {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    public static List<Button> getMitosisOptions(Game game, Player player) {
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green("mitosisInf", "Place 1 infantry"));
-        if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4
-                && player.hasUnit("arborec_mech")
-                && !ButtonHelper.isLawInPlay(game, "articles_war")) {
-            buttons.add(Buttons.blue("mitosisMech", "Remove 1 Infantry to Deploy 1 Mech"));
-        }
-        return buttons;
-    }
-
     @ButtonHandler("getDiplomatsButtons")
     public static void resolveGetDiplomatButtons(
             String buttonID, ButtonInteractionEvent event, Game game, Player player) {
@@ -1057,56 +1046,6 @@ public final class ButtonHelperAbilities {
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
-    }
-
-    @ButtonHandler("mitosisInf")
-    public static void resolveMitosisInf(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        List<Button> buttons =
-                new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "infantry", "placeOneNDone_skipbuild"));
-        String message = player.getRepresentationUnfogged() + ", please choose which planet to place an infantry on.";
-
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(), player.getFactionEmojiOrColor() + " is resolving **Mitosis**.");
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-    }
-
-    @ButtonHandler("mitosisMech")
-    public static void resolveMitosisMech(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        List<Button> buttons = new ArrayList<>(getPlanetPlaceUnitButtonsForMechMitosis(player, game));
-        String message = player.getRepresentationUnfogged()
-                + ", please choose where you wish to replace an infantry with a mech.";
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(), player.getFactionEmojiOrColor() + " is resolving **Mitosis**.");
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-    }
-
-    public static List<Button> getPlanetPlaceUnitButtonsForMechMitosis(Player player, Game game) {
-        return getPlanetPlaceUnitButtonsForMechMitosis(player, game, "mitosis");
-    }
-
-    public static List<Button> getPlanetPlaceUnitButtonsForMechMitosis(Player player, Game game, String reason) {
-        List<Button> planetButtons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
-            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                String colorID = Mapper.getColorID(player.getColor());
-                int numInf = unitHolder.getUnitCount(UnitType.Infantry, colorID);
-
-                if (numInf > 0) {
-                    String buttonID = player.getFinsFactionCheckerPrefix() + "mitoMechPlacement_" + tile.getPosition()
-                            + "_" + unitHolder.getName() + "_" + reason;
-                    if ("space".equalsIgnoreCase(unitHolder.getName())) {
-                        planetButtons.add(Buttons.green(
-                                buttonID, "Space Area of " + tile.getRepresentationForButtons(game, player)));
-                    } else {
-                        planetButtons.add(
-                                Buttons.green(buttonID, Helper.getPlanetRepresentation(unitHolder.getName(), game)));
-                    }
-                }
-            }
-        }
-        return planetButtons;
     }
 
     @ButtonHandler("putSleeperOnPlanet_")
@@ -2336,31 +2275,6 @@ public final class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
         String message = "Use buttons to end turn or do another action";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
-        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-    }
-
-    @ButtonHandler("mitoMechPlacement_")
-    public static void resolveMitosisMechPlacement(
-            String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        String uH = buttonID.split("_")[2];
-        String reason = buttonID.split("_")[3];
-        switch (reason) {
-            case "mitosis" -> reason = "**Mitosis**";
-            case "refit" -> reason = "_Refit Troops_";
-        }
-        String successMessage;
-        if ("space".equalsIgnoreCase(uH)) {
-            successMessage = player.getFactionEmojiOrColor() + " replaced 1 infantry with 1 mech in the space area of "
-                    + tile.getRepresentationForButtons(game, player) + " with " + reason + ".";
-        } else {
-            successMessage = player.getFactionEmojiOrColor() + " replaced 1 infantry with 1 mech on "
-                    + Helper.getPlanetRepresentation(uH, game) + " with " + reason + ".";
-        }
-        UnitHolder holder = tile.getUnitHolders().get(uH);
-        MoveUnitService.replaceUnit(event, game, player, tile, holder, UnitType.Infantry, UnitType.Mech);
-
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), successMessage);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 

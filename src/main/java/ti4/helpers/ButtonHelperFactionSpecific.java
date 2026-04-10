@@ -2252,7 +2252,7 @@ public final class ButtonHelperFactionSpecific {
             return;
         }
         List<Button> buttons =
-                new ArrayList<>(ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game));
+                new ArrayList<>(UnitReplacementHelper.getMechReplacementButtons(player, game));
         String message = player.getRepresentationUnfogged() + ", please use buttons to replace 1 infantry with 1 mech";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);

@@ -16,6 +16,7 @@ import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.factions.arborec.ArborecHeroButtonHandler;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperRelics;
 import ti4.helpers.ButtonHelperTwilightsFallActionCards;
@@ -364,7 +365,7 @@ public class PlayHeroService {
                         buttons);
             }
             case "arborechero" -> {
-                List<Button> buttons = ButtonHelperHeroes.getArboHeroButtons(game, player);
+                List<Button> buttons = ArborecHeroButtonHandler.getHeroButtons(game, player);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation(true, showFlavourText)

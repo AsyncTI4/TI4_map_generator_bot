@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
+import ti4.factions.arborec.ArborecMitosisButtonHandler;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.async.RoundSummaryHelper;
@@ -635,7 +636,7 @@ public final class StatusHelper {
 
         String mitosisMessage = arborec.getRepresentationUnfogged() + ", a reminder to do **Mitosis**.";
         MessageHelper.sendMessageToChannelWithButtons(
-                arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(game, arborec));
+                arborec.getCardsInfoThread(), mitosisMessage, ArborecMitosisButtonHandler.getMitosisOptions(arborec, game));
     }
 
     private static void sendYinCloneButtons(Game game) {

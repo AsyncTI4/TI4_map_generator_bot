@@ -1921,11 +1921,11 @@ public final class ButtonHelperActionCards {
     @ButtonHandler("resolveRefitTroops")
     public static void resolveRefitTroops(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons =
-                new ArrayList<>(ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game, "refit"));
+                new ArrayList<>(UnitReplacementHelper.getMechReplacementButtons(player, game, "refit"));
         String message = player.getRepresentationUnfogged() + ", use buttons to replace 1 infantry with 1 mech.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         List<Button> buttons2 =
-                new ArrayList<>(ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game, "refit"));
+                new ArrayList<>(UnitReplacementHelper.getMechReplacementButtons(player, game, "refit"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons2);
         ButtonHelper.deleteMessage(event);
     }

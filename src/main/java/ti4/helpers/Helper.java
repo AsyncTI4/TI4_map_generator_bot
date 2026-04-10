@@ -2156,6 +2156,10 @@ public final class Helper {
         return unitButtons;
     }
 
+    public static List<Button> getAbilityBuildButtons(GenericInteractionCreateEvent event, Player player, Game game, Tile tile) {
+        return getPlaceUnitButtons(event, player, game, tile, "abilityBuild", "place");
+    }
+
     public static List<Button> getPlaceUnitButtons(
             GenericInteractionCreateEvent event,
             Player player,
@@ -2323,7 +2327,7 @@ public final class Helper {
         boolean greenMechd = false;
 
         if (!"arboCommander".equalsIgnoreCase(warfareNOtherstuff)
-                && !"arboHeroBuild".equalsIgnoreCase(warfareNOtherstuff)
+                && !"abilityBuild".equalsIgnoreCase(warfareNOtherstuff)
                 && !"solBtBuild".equalsIgnoreCase(warfareNOtherstuff)
                 && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
                 && !"sling".equalsIgnoreCase(warfareNOtherstuff)

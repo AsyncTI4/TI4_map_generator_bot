@@ -569,19 +569,6 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("arboAgentOn_")
-    public static void arboAgentOn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String pos = buttonID.split("_")[1];
-        String unit = buttonID.split("_")[2];
-        List<Button> buttons = ButtonHelperAgents.getArboAgentReplacementOptions(
-                player, game, event, game.getTileByPosition(pos), unit);
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getChannel(),
-                player.getRepresentationUnfogged() + ", please choose which unit you wish to place down.",
-                buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
     @ButtonHandler("sandbagPref_")
     public static void sandbagPref(ButtonInteractionEvent event, Player player, String buttonID) {
         var userSettings = UserSettingsManager.get(player.getUserID());
@@ -626,17 +613,6 @@ public class UnfiledButtonHandlers {
             }
         }
 
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("arboAgentIn_")
-    public static void arboAgentIn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String pos = buttonID.substring(buttonID.indexOf('_') + 1);
-        List<Button> buttons = ButtonHelperAgents.getUnitsToArboAgent(player, game.getTileByPosition(pos));
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getChannel(),
-                player.getRepresentationUnfogged() + ", please choose which unit you'd like to replace.",
-                buttons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -2199,20 +2175,20 @@ public class UnfiledButtonHandlers {
 
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
                 // if (player.hasTechReady("sar") && !"muaatagent".equalsIgnoreCase(buttonID)
-                //     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
+                //     && !"abilityBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
                 //     buttons.add(
                 //         Buttons.red("exhaustTech_sar", "Exhaust Self-Assembly Routines", TechEmojis.WarfareTech));
                 // } //sar is handled elsewhere
                 if (player.hasTechReady("htp")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"abilityBuild".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)) {
                     buttons.add(Buttons.red("exhaustTech_htp", "Exhaust Hegemonic Trade Policy", FactionEmojis.Winnu));
                 }
                 if ((game.playerHasLeaderUnlockedOrAlliance(player, "titanscommander")
                                 || player.hasTech("tf-abundance"))
                         && !"muaatagent".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"abilityBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("generic")) {
@@ -2220,7 +2196,7 @@ public class UnfiledButtonHandlers {
                 }
                 if (player.hasTechReady("dsbenty")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"abilityBuild".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.green("exhaustTech_dsbenty", "Use Merged Replicators", FactionEmojis.bentor));
@@ -2228,7 +2204,7 @@ public class UnfiledButtonHandlers {
                 if (ButtonHelper.getNumberOfUnitUpgrades(player) > 0
                         && player.hasTechReady("aida")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"abilityBuild".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red(
@@ -2238,14 +2214,14 @@ public class UnfiledButtonHandlers {
                 }
                 if (player.hasTech("st")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"abilityBuild".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red("useTech_st", "Use Sarween Tools", TechEmojis.CyberneticTech));
                 }
                 if (player.hasTechReady("tf-sledfactories")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"abilityBuild".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(
@@ -2260,13 +2236,13 @@ public class UnfiledButtonHandlers {
                 if (player.hasUnexhaustedLeader("winnuagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"abilityBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red("exhaustAgent_winnuagent", "Use Winnu Agent", FactionEmojis.Winnu));
                 }
                 if (player.hasUnexhaustedLeader("gledgeagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"abilityBuild".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red(
@@ -2289,7 +2265,7 @@ public class UnfiledButtonHandlers {
                 if (player.hasUnexhaustedLeader("rohdhnaagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
+                        && !"abilityBuild".equalsIgnoreCase(buttonID)) {
                     buttons.add(Buttons.red(
                             "exhaustAgent_rohdhnaagent_" + player.getFaction(),
                             "Use Roh'Dhna Agent",
@@ -2297,7 +2273,7 @@ public class UnfiledButtonHandlers {
                 }
                 if (player.hasLeaderUnlocked("hacanhero")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !"abilityBuild".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red("purgeHacanHero", "Purge Hacan Hero", FactionEmojis.Hacan));
