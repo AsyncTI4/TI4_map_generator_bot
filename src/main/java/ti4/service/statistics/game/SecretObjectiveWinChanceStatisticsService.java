@@ -1,8 +1,8 @@
 package ti4.service.statistics.game;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -24,16 +24,28 @@ class SecretObjectiveWinChanceStatisticsService {
     static void showSecretObjectiveWinChance(SlashCommandInteractionEvent event) {
         int[] actionPhaseGamesByCount = new int[5];
         int[] actionPhaseWinsByCount = new int[5];
-        Map<String, Integer> gamesWithSecret = new HashMap<>();
-        Map<String, Integer> winsWithSecret = new HashMap<>();
+        Map<String, Integer> gamesWithSecretScored = new HashMap<>();
+        Map<String, Integer> winsWithSecretScored = new HashMap<>();
+        Map<String, Integer> gamesWithSecretInHand = new HashMap<>();
+        Map<String, Integer> winsWithSecretInHand = new HashMap<>();
+        Map<String, Integer> gamesWithSecretScoredOrInHand = new HashMap<>();
+        Map<String, Integer> winsWithSecretScoredOrInHand = new HashMap<>();
 
         GamesPage.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event),
                 game -> collectSecretObjectiveWinChanceStats(
-                        game, actionPhaseGamesByCount, actionPhaseWinsByCount, gamesWithSecret, winsWithSecret));
+                        game,
+                        actionPhaseGamesByCount,
+                        actionPhaseWinsByCount,
+                        gamesWithSecretScored,
+                        winsWithSecretScored,
+                        gamesWithSecretInHand,
+                        winsWithSecretInHand,
+                        gamesWithSecretScoredOrInHand,
+                        winsWithSecretScoredOrInHand));
 
         StringBuilder sb = new StringBuilder("Action phase secret count vs win chance:\n");
-        sb.append("_(Includes scored secrets and unscored secrets still in hand.)_\n\n");
+        sb.append("_(Includes only scored action phase secrets.)_\n\n");
 
         for (int count = 0; count <= 4; count++) {
             int games = actionPhaseGamesByCount[count];
@@ -71,68 +83,153 @@ class SecretObjectiveWinChanceStatisticsService {
 
         MessageHelper.sendMessageToThread(event.getChannel(), "Action Phase Secrets Win Chance", sb.toString());
 
-        StringBuilder secretObjectiveSb = new StringBuilder("Win chance with secret scored or in hand:\n");
-        Map<String, Integer> orderedSecrets = gamesWithSecret.entrySet().stream()
-                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-        for (Map.Entry<String, Integer> entry : orderedSecrets.entrySet()) {
-            String secretName = entry.getKey();
+        // Sort by highest SCORED win percent
+        Map<String, Long> scoredWinPercent = new HashMap<>();
+        for (Map.Entry<String, Integer> entry : gamesWithSecretScored.entrySet()) {
+            String name = entry.getKey();
             int games = entry.getValue();
-            int wins = winsWithSecret.getOrDefault(secretName, 0);
-            long percent = games == 0 ? 0 : Math.round(100.0 * wins / games);
+            int wins = winsWithSecretScored.getOrDefault(name, 0);
+            scoredWinPercent.put(name, games == 0 ? 0L : Math.round(100.0 * wins / games));
+        }
+
+        // Collect all secret names from all three maps
+        Set<String> allSecretNames = new HashSet<>();
+        allSecretNames.addAll(gamesWithSecretScored.keySet());
+        allSecretNames.addAll(gamesWithSecretInHand.keySet());
+        allSecretNames.addAll(gamesWithSecretScoredOrInHand.keySet());
+
+        // Order by highest scored win percent descending, with deterministic tie-breakers
+        List<String> orderedNames = allSecretNames.stream()
+                .sorted((a, b) -> {
+                    int compareByPercent =
+                            Long.compare(scoredWinPercent.getOrDefault(b, 0L), scoredWinPercent.getOrDefault(a, 0L));
+                    if (compareByPercent != 0) {
+                        return compareByPercent;
+                    }
+
+                    int compareByScoredGames = Integer.compare(
+                            gamesWithSecretScored.getOrDefault(b, 0), gamesWithSecretScored.getOrDefault(a, 0));
+                    if (compareByScoredGames != 0) {
+                        return compareByScoredGames;
+                    }
+
+                    return a.compareTo(b);
+                })
+                .toList();
+
+        // Find the maximum combinedGames across all secrets for discard normalization.
+        // Secrets discarded more often appear in fewer end-of-game hands; normalizing
+        // each secret's scored wins against the max adjusts for this selection bias.
+        int maxCombinedGames = gamesWithSecretScoredOrInHand.values().stream()
+                .mapToInt(Integer::intValue)
+                .max()
+                .orElse(0);
+
+        StringBuilder secretObjectiveSb = new StringBuilder("Win chance with secret:\n");
+        for (String secretName : orderedNames) {
+            int scoredGames = gamesWithSecretScored.getOrDefault(secretName, 0);
+            int scoredWins = winsWithSecretScored.getOrDefault(secretName, 0);
+            long scoredPct = scoredGames == 0 ? 0 : Math.round(100.0 * scoredWins / scoredGames);
+
+            int inHandGames = gamesWithSecretInHand.getOrDefault(secretName, 0);
+            int inHandWins = winsWithSecretInHand.getOrDefault(secretName, 0);
+            long inHandPct = inHandGames == 0 ? 0 : Math.round(100.0 * inHandWins / inHandGames);
+
+            int combinedGames = gamesWithSecretScoredOrInHand.getOrDefault(secretName, 0);
+            int combinedWins = winsWithSecretScoredOrInHand.getOrDefault(secretName, 0);
+            long combinedPct = combinedGames == 0 ? 0 : Math.round(100.0 * combinedWins / combinedGames);
+
+            // Normalize scored win % by using the max combinedGames as the denominator
+            // for all secrets, so secrets that are discarded more often get a lower
+            // normalized win % reflecting the discarded (unseen) population.
+            long normalizedScoredPct =
+                    (scoredWins == 0 || maxCombinedGames == 0) ? 0 : Math.round(100.0 * scoredWins / maxCombinedGames);
+
             secretObjectiveSb
                     .append(secretName)
-                    .append(": ")
-                    .append(percent)
+                    .append(":\n")
+                    .append("  SCORED: ")
+                    .append(scoredPct)
                     .append("% (")
-                    .append(wins)
+                    .append(scoredWins)
                     .append("/")
-                    .append(games)
+                    .append(scoredGames)
+                    .append(")")
+                    .append("  SCORED (NORMALIZED): ")
+                    .append(normalizedScoredPct)
+                    .append("%")
+                    .append("  IN HAND: ")
+                    .append(inHandPct)
+                    .append("% (")
+                    .append(inHandWins)
+                    .append("/")
+                    .append(inHandGames)
+                    .append(")")
+                    .append("  SCORED OR IN HAND: ")
+                    .append(combinedPct)
+                    .append("% (")
+                    .append(combinedWins)
+                    .append("/")
+                    .append(combinedGames)
                     .append(")\n");
         }
-        MessageHelper.sendMessageToThread(
-                event.getChannel(), "Win chance with secret scored or in hand", secretObjectiveSb.toString());
+        MessageHelper.sendMessageToThread(event.getChannel(), "Win chance with secret", secretObjectiveSb.toString());
     }
 
     private static void collectSecretObjectiveWinChanceStats(
             Game game,
             int[] actionPhaseGamesByCount,
             int[] actionPhaseWinsByCount,
-            Map<String, Integer> gamesWithSecret,
-            Map<String, Integer> winsWithSecret) {
+            Map<String, Integer> gamesWithSecretScored,
+            Map<String, Integer> winsWithSecretScored,
+            Map<String, Integer> gamesWithSecretInHand,
+            Map<String, Integer> winsWithSecretInHand,
+            Map<String, Integer> gamesWithSecretScoredOrInHand,
+            Map<String, Integer> winsWithSecretScoredOrInHand) {
         Optional<Player> winner = game.getWinner();
         if (winner.isEmpty()) return;
 
         for (Player player : game.getRealAndEliminatedPlayers()) {
-            int actionPhaseSecretCount = countActionPhaseSecrets(player);
+            int actionPhaseSecretCount = countActionPhaseScoredSecrets(player);
             int bucket = Math.min(4, actionPhaseSecretCount);
             actionPhaseGamesByCount[bucket]++;
-            if (player == winner.get()) {
+            boolean isWinner = player == winner.get();
+            if (isWinner) {
                 actionPhaseWinsByCount[bucket]++;
             }
 
-            Set<String> allSecrets = player.getSecretsScored().keySet().stream()
+            Set<String> scoredSecrets = player.getSecretsScored().keySet().stream()
                     .filter(secretId -> Mapper.getSecretObjective(secretId) != null)
                     .collect(Collectors.toSet());
-            allSecrets.addAll(player.getSecretsUnscored().keySet().stream()
+            Set<String> inHandSecrets = player.getSecretsUnscored().keySet().stream()
                     .filter(secretId -> Mapper.getSecretObjective(secretId) != null)
-                    .collect(Collectors.toSet()));
-            for (String secretId : allSecrets) {
+                    .collect(Collectors.toSet());
+
+            for (String secretId : scoredSecrets) {
                 String secretName = Mapper.getSecretObjective(secretId).getName();
-                gamesWithSecret.put(secretName, gamesWithSecret.getOrDefault(secretName, 0) + 1);
-                if (player == winner.get()) {
-                    winsWithSecret.put(secretName, winsWithSecret.getOrDefault(secretName, 0) + 1);
+                gamesWithSecretScored.merge(secretName, 1, Integer::sum);
+                gamesWithSecretScoredOrInHand.merge(secretName, 1, Integer::sum);
+                if (isWinner) {
+                    winsWithSecretScored.merge(secretName, 1, Integer::sum);
+                    winsWithSecretScoredOrInHand.merge(secretName, 1, Integer::sum);
+                }
+            }
+
+            for (String secretId : inHandSecrets) {
+                String secretName = Mapper.getSecretObjective(secretId).getName();
+                gamesWithSecretInHand.merge(secretName, 1, Integer::sum);
+                gamesWithSecretScoredOrInHand.merge(secretName, 1, Integer::sum);
+                if (isWinner) {
+                    winsWithSecretInHand.merge(secretName, 1, Integer::sum);
+                    winsWithSecretScoredOrInHand.merge(secretName, 1, Integer::sum);
                 }
             }
         }
     }
 
-    private static int countActionPhaseSecrets(Player player) {
+    private static int countActionPhaseScoredSecrets(Player player) {
         int count = 0;
         for (String secretId : player.getSecretsScored().keySet()) {
-            if (isActionPhaseSecret(secretId)) count++;
-        }
-        for (String secretId : player.getSecretsUnscored().keySet()) {
             if (isActionPhaseSecret(secretId)) count++;
         }
         return count;
