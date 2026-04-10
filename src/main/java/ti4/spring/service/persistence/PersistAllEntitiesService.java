@@ -116,7 +116,7 @@ public class PersistAllEntitiesService {
         playerEntity.setActualHits(player.getActualHits());
         playerEntity.setEliminated(player.isEliminated());
         playerEntity.setWinner(player.getGame().getWinners().contains(player));
-        playerEntity.setReplaced(!player.getUserID().equals(player.getStatsTrackedUserID()));
+        playerEntity.setReplaced(!Objects.equals(player.getUserID(), player.getStatsTrackedUserID()));
 
         playerEntity.setGame(gameEntity);
 
