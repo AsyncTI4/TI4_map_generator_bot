@@ -100,7 +100,13 @@
         "preferredColours": [
             "gcr",
             "ppl",
-            "vpw"
+            "vpw",
+            "tea",
+            "plm",
+            "ryl",
+            "eth",
+            "nvy",
+            "azr"
         ],
         "source": "thunders_edge",
         "priorityNumber": 7
@@ -159,7 +165,8 @@
             "psn",
             "rby",
             "rbw",
-            "pld"
+            "pld",
+            "plm"
         ],
         "source": "thunders_edge",
         "priorityNumber": 30
@@ -258,7 +265,8 @@
             "nm",
             "rby",
             "sns",
-            "vpw"
+            "vpw",
+            "rst"
         ],
         "source": "thunders_edge",
         "priorityNumber": 16

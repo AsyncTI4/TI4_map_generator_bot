@@ -37,13 +37,23 @@ public class UserGameInfoService {
                     k -> new UserGameStatsAccumulator(player.getUser().getName()));
 
             if (player.getGame().getEndedEpochMilliseconds() == null) {
-                stats.ongoingGames++;
+                if (player.isReplaced()) {
+                    stats.replacedOngoing++;
+                } else {
+                    stats.ongoingGames++;
+                }
                 continue;
             }
 
             if (!player.getGame().isCompleted()) {
                 continue;
             }
+
+            if (player.isReplaced()) {
+                stats.replacedCompleted++;
+                continue;
+            }
+
             stats.completedGames++;
 
             if (player.isWinner()) {
@@ -71,11 +81,19 @@ public class UserGameInfoService {
                     .append(Helper.leftpad(String.valueOf(index), 3))
                     .append(". ")
                     .append(stats.completedGames)
-                    .append("` Completed. `")
-                    .append(stats.ongoingGames)
-                    .append("` Ongoing -- ")
-                    .append(stats.username)
-                    .append('\n');
+                    .append("` Completed");
+            if (stats.replacedCompleted > 0) {
+                sb.append(" (replaced in ")
+                        .append(stats.replacedCompleted)
+                        .append(stats.replacedCompleted == 1 ? " other)" : " others)");
+            }
+            sb.append(". `").append(stats.ongoingGames).append("` Ongoing");
+            if (stats.replacedOngoing > 0) {
+                sb.append(" (replaced in ")
+                        .append(stats.replacedOngoing)
+                        .append(stats.replacedOngoing == 1 ? " other)" : " others)");
+            }
+            sb.append(" -- ").append(stats.username).append('\n');
 
             if (stats.completedGames > 0) {
                 stats.completedGameDays.sort(Comparator.naturalOrder());
@@ -99,6 +117,8 @@ public class UserGameInfoService {
         private final String username;
         private int completedGames;
         private int ongoingGames;
+        private int replacedCompleted;
+        private int replacedOngoing;
         private int wins;
         private final List<Integer> completedGameDays = new ArrayList<>();
 
