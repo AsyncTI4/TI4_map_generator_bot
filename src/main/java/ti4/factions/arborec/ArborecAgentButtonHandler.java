@@ -45,8 +45,4 @@ public class ArborecAgentButtonHandler {
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
-
-    public static List<Button> getAgentDispatchButtons(Player p2, Game game, String ssruuClever, String ssruuSlash) {
-        return getTilesToArboAgent(p2, game);
-    }
 }
