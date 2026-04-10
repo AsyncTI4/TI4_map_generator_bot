@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -94,7 +93,7 @@ class SecretObjectiveWinChanceStatisticsService {
         }
 
         // Collect all secret names from all three maps
-        Set<String> allSecretNames = new TreeSet<>();
+        Set<String> allSecretNames = new HashSet<>();
         allSecretNames.addAll(gamesWithSecretScored.keySet());
         allSecretNames.addAll(gamesWithSecretInHand.keySet());
         allSecretNames.addAll(gamesWithSecretScoredOrInHand.keySet());
@@ -179,25 +178,19 @@ class SecretObjectiveWinChanceStatisticsService {
             for (String secretId : scoredSecrets) {
                 String secretName = Mapper.getSecretObjective(secretId).getName();
                 gamesWithSecretScored.merge(secretName, 1, Integer::sum);
+                gamesWithSecretScoredOrInHand.merge(secretName, 1, Integer::sum);
                 if (isWinner) {
                     winsWithSecretScored.merge(secretName, 1, Integer::sum);
+                    winsWithSecretScoredOrInHand.merge(secretName, 1, Integer::sum);
                 }
             }
 
             for (String secretId : inHandSecrets) {
                 String secretName = Mapper.getSecretObjective(secretId).getName();
                 gamesWithSecretInHand.merge(secretName, 1, Integer::sum);
-                if (isWinner) {
-                    winsWithSecretInHand.merge(secretName, 1, Integer::sum);
-                }
-            }
-
-            Set<String> allSecrets = new HashSet<>(scoredSecrets);
-            allSecrets.addAll(inHandSecrets);
-            for (String secretId : allSecrets) {
-                String secretName = Mapper.getSecretObjective(secretId).getName();
                 gamesWithSecretScoredOrInHand.merge(secretName, 1, Integer::sum);
                 if (isWinner) {
+                    winsWithSecretInHand.merge(secretName, 1, Integer::sum);
                     winsWithSecretScoredOrInHand.merge(secretName, 1, Integer::sum);
                 }
             }
