@@ -1407,23 +1407,6 @@ public class ButtonHelper {
         ButtonHelperActionCards.checkForAssigningPublicDisgrace(game, player);
         ButtonHelperActionCards.checkForPlayingManipulateInvestments(game, player);
         ButtonHelperActionCards.checkForPlayingSummit(game, player);
-        if (game.isCustodiansScored() && !game.isTwilightsFallMode()) {
-            List<String> whens = AgendaHelper.getPossibleWhenNames(player);
-            List<String> afters = AgendaHelper.getPossibleAfterNames(player);
-            if ((player.isAutoPassOnWhensAfters() && whens.isEmpty() && afters.isEmpty()) || player.isNpc()) {
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.red("undoPassOnAllWhensNAfters", "Undo Pass"));
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(),
-                        player.getRepresentation()
-                                + ", at the start of the game you indicated a willingness to auto-pass on \"when\"s and \"after\"s if you had none, and so you have been auto-passed."
-                                + " You can undo this during the agenda if necessary, or with this button.",
-                        buttons);
-                game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "Yes");
-            } else {
-                AgendaHelper.offerPlayerPassOnWhensNAfters(player);
-            }
-        }
     }
 
     private static int getSlumberstateBonusACs(Game game, Player player) {
@@ -8059,7 +8042,7 @@ public class ButtonHelper {
                 youCanSpend
                         .append(" You also have ")
                         .append(TechEmojis.CyberneticTech)
-                        .append("_Sled Factories_.");
+                        .append("Sled Factories.");
                 resourcesAvailable += 2;
             }
             if (player.hasTechReady("aida")) {

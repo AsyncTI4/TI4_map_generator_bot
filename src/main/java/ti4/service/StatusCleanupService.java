@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import ti4.buttons.Buttons;
+import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
@@ -123,6 +124,23 @@ public class StatusCleanupService {
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get("sigma_cyber");
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(), "_" + pnModel.getName() + "_ has been returned.");
+            }
+            if (game.isCustodiansScored() && !game.isTwilightsFallMode()) {
+                List<String> whens = AgendaHelper.getPossibleWhenNames(player);
+                List<String> afters = AgendaHelper.getPossibleAfterNames(player);
+                if ((player.isAutoPassOnWhensAfters() && whens.isEmpty() && afters.isEmpty()) || player.isNpc()) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.red("undoPassOnAllWhensNAfters", "Undo Pass"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCardsInfoThread(),
+                            player.getRepresentation()
+                                    + ", at the start of the game you indicated a willingness to auto-pass on \"when\"s and \"after\"s if you had none, and so you have been auto-passed."
+                                    + " You can undo this during the agenda if necessary, or with this button.",
+                            buttons);
+                    game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "Yes");
+                } else {
+                    AgendaHelper.offerPlayerPassOnWhensNAfters(player);
+                }
             }
         }
         for (int x = 0; x < 13; x++) {

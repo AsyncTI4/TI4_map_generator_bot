@@ -348,6 +348,7 @@ public final class ButtonHelperActionCards {
         checkForPlayingManipulateInvestments(game, player);
         checkForPlayingSummit(game, player);
         checkForPlayingBountyContracts(game, player);
+        checkForPlayingSpliceCards(game, player);
     }
 
     @ButtonHandler("resolveCounterStroke")
@@ -2107,6 +2108,29 @@ public final class ButtonHelperActionCards {
                     + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("resolvePreassignment_BountyContracts", "Pre-Play Bounty Contracts"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        }
+    }
+
+    public static void checkForPlayingSpliceCards(Game game, Player player) {
+        if (player.getPlayableActionCards().contains("tf-reverse")) {
+            String msg = player.getRepresentation()
+                    + ", you have the option to pre-play _Reverse_."
+                    + " Start of a splice is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                    + " Feel free to ignore this message if you don't intend to play it any time soon.";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("resolvePreassignment_Reverse Splice", "Pre-Play Reverse"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        }
+        if (player.getPlayableActionCards().contains("tf-manipulate") && player != game.getActivePlayer()) {
+            String msg = player.getRepresentation()
+                    + ", you have the option to pre-play _Manipulate_."
+                    + " Start of a splice is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                    + " Feel free to ignore this message if you don't intend to play it any time soon.";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("resolvePreassignment_Manipulate Splice", "Pre-Play Manipulate"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }

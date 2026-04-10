@@ -109,7 +109,7 @@ public final class TeHelperUnits {
         // The nekro (bt) player has the crimson flagship, and has their flagship on a breach, and the player is not
         // nekro
         Player nekro = Helper.getPlayerFromUnlockedBreakthrough(game, "nekrobt");
-        if (nekro != null && player.hasUnit("crimson_flagship")) {
+        if (nekro != null && nekro.hasUnit("crimson_flagship")) {
             for (Tile fs : ButtonHelper.getTilesOfPlayersSpecificUnits(game, nekro, UnitType.Flagship)) {
                 if (fs.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE)
                         && player != nekro

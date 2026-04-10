@@ -38,6 +38,7 @@ public class ChannelCreationListener extends ListenerAdapter {
         String parentName = channel.getParentChannel().getName();
         if (PBD_MAKING_GAMES_CHANNEL.equalsIgnoreCase(parentName)
                 || "making-private-games".equalsIgnoreCase(parentName)
+                || "making-tigl-games".equalsIgnoreCase(parentName)
                 || "making-superfast-games".equalsIgnoreCase(parentName)) {
             String message = """
                 To launch a new game, please use the buttons. Players can add themselves or you can add them manually. Once all players are added, press the launch button.

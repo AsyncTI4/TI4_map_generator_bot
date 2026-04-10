@@ -1316,6 +1316,7 @@ public final class Constants {
     public static final String RADICAL_ADVANCEMENT = "radical_advancement";
     public static final String DO_EDICT_PHASE = "edict_phase";
     public static final String SPLICE_TYPE = "splice_type";
+    public static final String REVERSE_SPLICE = "reverse_splice";
     public static final String START_NEW_SPLICE = "start_new_splice";
     public static final String GALVANIZE = "galvanize";
     public static final String FIX_COLORS = "fix_colors";

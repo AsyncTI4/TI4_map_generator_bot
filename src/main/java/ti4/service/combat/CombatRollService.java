@@ -1,7 +1,6 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -121,6 +120,7 @@ public class CombatRollService {
                     "Planet needs to be specified to fire SPACE CANNON against ships on tile " + tile.getPosition()
                             + ".");
         }
+        Player opponent = null;
 
         Map<UnitModel, Integer> playerUnitsByQuantity =
                 getUnitsInCombat(tile, combatOnHolder, player, event, rollType, game);
@@ -154,6 +154,12 @@ public class CombatRollService {
                     playerUnitsByQuantity.put(mod, count);
                 } else {
                     playerUnitsByQuantity.remove(mod);
+                }
+            }
+            for (Player p2 : game.getRealPlayersNNeutral()) {
+                if (p2.getPlanets().contains(bombardPlanet)) {
+                    opponent = p2;
+                    break;
                 }
             }
         }
@@ -213,9 +219,11 @@ public class CombatRollService {
             }
             combatHoldersForOpponent.add(tile.getUnitHolders().get(Constants.SPACE));
         }
-        Player opponent = getOpponent(player, combatHoldersForOpponent, game);
         if (opponent == null) {
-            opponent = player;
+            opponent = getOpponent(player, combatHoldersForOpponent, game);
+            if (opponent == null) {
+                opponent = player;
+            }
         }
         Map<UnitModel, Integer> opponentUnitsByQuantity =
                 getUnitsInCombat(tile, combatOnHolder, opponent, event, rollType, game);
@@ -882,7 +890,7 @@ public class CombatRollService {
                 }
                 if (rollType == CombatRollType.bombardment && "tf-dragonfreed".equalsIgnoreCase(unitModel.getId())) {
                     if (!game.isFowMode() && hitRolls > 0) {
-                        List<Button> buttons = new ArrayList<>();
+
                         String bombardPlanet2 = game.getStoredValue("bombardmentTarget" + player.getFaction());
                         Tile tile = game.getTileByPosition(game.getActiveSystem());
                         if (!bombardPlanet2.isEmpty()) {
@@ -891,6 +899,7 @@ public class CombatRollService {
                         for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
                             Tile tile2 = game.getTileByPosition(pos);
                             for (UnitHolder uh : tile2.getPlanetUnitHolders()) {
+                                List<Button> buttons = new ArrayList<>();
                                 if (uh.getName().equalsIgnoreCase(bombardPlanet2)) {
                                     continue;
                                 }

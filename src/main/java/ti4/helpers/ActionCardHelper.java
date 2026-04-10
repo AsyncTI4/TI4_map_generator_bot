@@ -398,6 +398,8 @@ public class ActionCardHelper {
                 "disgrace",
                 "special_session",
                 "investments",
+                "tf-reverse",
+                "tf-manipulate",
                 "revolution",
                 "deflection",
                 "summit",
@@ -1477,6 +1479,11 @@ public class ActionCardHelper {
                         player.getFinsFactionCheckerPrefix() + "fighterConscription", "1 Fighter With Every Ship"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
+            if ("tf-manipulate".equals(automationID)) {
+                codedButtons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "resolveManipulateTF", "Resolve Manipulate"));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
             if ("tf-mutate1".equals(automationID) || "tf-mutate2".equals(automationID)) {
                 codedButtons.add(Buttons.red("discardSpliceCard_ability", "Discard 1 Ability"));
                 codedButtons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
@@ -1498,6 +1505,10 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.blue(
                         player.getFinsFactionCheckerPrefix() + "startSplice_6_all", "Initiate Unit Upgrade Splice"));
                 codedButtons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+                for (Player p : game.getRealPlayers()) {
+                    ButtonHelperActionCards.checkForPlayingSpliceCards(game, p);
+                }
+
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
@@ -2259,7 +2270,7 @@ public class ActionCardHelper {
                 }
             }
             if (game.isTwilightsFallMode()) {
-                if (FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+                if (FoWHelper.playerHasActualShipsInSystem(player, tile) || (!blockaded && hasSD)) {
                     AddUnitService.addUnits(event, tile, game, player.getColor(), "ff");
                     tilesAffected.add(tile);
                 }
