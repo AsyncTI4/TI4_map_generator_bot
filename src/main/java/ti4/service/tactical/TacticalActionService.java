@@ -263,7 +263,8 @@ public class TacticalActionService {
         int productionVal = Helper.getProductionValue(player, game, tile, false);
         if (productionVal > 0
                 || (("18".equalsIgnoreCase(tile.getTileID()) || "112".equalsIgnoreCase(tile.getTileID()))
-                        && player.hasIIHQ())) {
+                        && player.hasIIHQ())
+                || (player.hasUnit("tf-morphwing") && player.hasUnit("tf-lataniwarrior"))) {
             buttons.add(createBuildButton(player, tile, productionVal));
         }
         if (!game.getStoredValue("possiblyUsedRift").isEmpty()) {

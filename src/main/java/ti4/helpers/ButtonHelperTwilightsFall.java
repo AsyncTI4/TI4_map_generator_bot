@@ -490,8 +490,13 @@ public final class ButtonHelperTwilightsFall {
             if (game.getPlayerFromColorOrFaction(faction) != null)
                 participants.add(game.getPlayerFromColorOrFaction(faction));
         }
+        if (participants.get(0) == participants.get(1)) {
+            Collections.rotate(participants, -2);
+        }
         Collections.reverse(participants);
-        Collections.rotate(participants, 1);
+        if (participants.getFirst() != participants.getLast()) {
+            Collections.rotate(participants, 1);
+        }
         game.removeStoredValue("savedParticipants");
         for (Player p : participants) {
             if (game.getStoredValue("savedParticipants").isEmpty()) {
