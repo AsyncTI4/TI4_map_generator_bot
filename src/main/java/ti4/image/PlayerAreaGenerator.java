@@ -246,7 +246,9 @@ public class PlayerAreaGenerator {
                         || p2.getPromissoryNotesInPlayArea().contains("convoys")
                         || p2.hasAbility("guild_ships")
                         || player.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")
-                        || p2.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")) {
+                        || p2.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")
+                        || player.getPromissoryNotesInPlayArea().contains("viability_trade_convoys")
+                        || p2.getPromissoryNotesInPlayArea().contains("viability_trade_convoys")) {
                     guildShips.add(p2);
                 }
             }

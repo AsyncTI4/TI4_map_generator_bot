@@ -46,6 +46,7 @@ public class Source {
         flagshipping,
         promises_promises,
         balacasi,
+        viability_patch,
         beans,
 
         // async homebrew
