@@ -1528,7 +1528,7 @@ public final class ButtonHelperHeroes {
                             continue;
                         }
                         UnitModel unitModel = p2.getUnitFromUnitKey(unitEntry.getKey());
-                        if (unitModel == null) {
+                        if (unitModel == null || unitModel.getUnitEmoji() == null) {
                             continue;
                         }
 
@@ -1542,7 +1542,6 @@ public final class ButtonHelperHeroes {
                         }
 
                         int totalUnits = unitEntry.getValue();
-                        String unitAsyncID = unitModel.getAsyncId();
                         int damagedUnits = 0;
                         if (unitHolder.getUnitDamage() != null
                                 && unitHolder.getUnitDamage().get(key) != null) {
