@@ -140,14 +140,10 @@ class SecretObjectiveWinChanceStatisticsService {
             int combinedWins = winsWithSecretScoredOrInHand.getOrDefault(secretName, 0);
             long combinedPct = combinedGames == 0 ? 0 : Math.round(100.0 * combinedWins / combinedGames);
 
-            // Normalize win % by using the max combinedGames as the denominator
-            // for all secrets, so secrets that are discarded more often get a lower
-            // normalized win % reflecting the discarded (unseen) population.
-            long normalizedScoredPct =
-                    (scoredWins == 0 || maxCombinedGames == 0) ? 0 : Math.round(100.0 * scoredWins / maxCombinedGames);
-            long normalizedInHandPct =
-                    (inHandWins == 0 || maxCombinedGames == 0) ? 0 : Math.round(100.0 * inHandWins / maxCombinedGames);
-            long normalizedCombinedPct = (combinedWins == 0 || maxCombinedGames == 0)
+            // Estimated win % when drawn: use max combinedGames as the denominator
+            // so secrets that are discarded more often get a lower win % reflecting
+            // the discarded (unseen) population. Uses both scored and in-hand wins.
+            long whenDrawnPct = (combinedWins == 0 || maxCombinedGames == 0)
                     ? 0
                     : Math.round(100.0 * combinedWins / maxCombinedGames);
 
@@ -167,25 +163,25 @@ class SecretObjectiveWinChanceStatisticsService {
                     .append(scoredWins)
                     .append("/")
                     .append(scoredGames)
-                    .append(") · Norm: `")
-                    .append(StringUtils.leftPad(normalizedScoredPct + "%", 4))
-                    .append("` · In Hand: `")
+                    .append(") · In Hand: `")
                     .append(StringUtils.leftPad(inHandPct + "%", 4))
                     .append("` (")
                     .append(inHandWins)
                     .append("/")
                     .append(inHandGames)
-                    .append(") · Norm: `")
-                    .append(StringUtils.leftPad(normalizedInHandPct + "%", 4))
-                    .append("` · Combined: `")
+                    .append(") · Combined: `")
                     .append(StringUtils.leftPad(combinedPct + "%", 4))
                     .append("` (")
                     .append(combinedWins)
                     .append("/")
                     .append(combinedGames)
-                    .append(") · Norm: `")
-                    .append(StringUtils.leftPad(normalizedCombinedPct + "%", 4))
-                    .append("` · Est. Discard: `")
+                    .append(") · When Drawn (Estimated): `")
+                    .append(StringUtils.leftPad(whenDrawnPct + "%", 4))
+                    .append("` (")
+                    .append(combinedWins)
+                    .append("/")
+                    .append(maxCombinedGames)
+                    .append(") · Estimated Discard Rate: `")
                     .append(StringUtils.leftPad(estimatedDiscardPct + "%", 4))
                     .append("`\n");
         }
