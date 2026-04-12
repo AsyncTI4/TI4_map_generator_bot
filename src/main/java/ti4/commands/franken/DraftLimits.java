@@ -30,6 +30,7 @@ class DraftLimits extends GameStateSubcommand {
             new LimitConfig(Constants.STARTINGFLEET_LIMIT, "Starting fleet Limit", -1),
             new LimitConfig(Constants.BLUETILE_LIMIT, "Blue Tile Limit", -1),
             new LimitConfig(Constants.REDTILE_LIMIT, "Red tile Limit", -1),
+            new LimitConfig(Constants.BREAKTHROUGH_LIMIT, "Breakthrough Limit", -1),
             new LimitConfig(Constants.FIRSTPICK_LIMIT, "First Pick Limit", 0),
             new LimitConfig(Constants.LATERPICK_LIMIT, "Later Pick Limit", 0));
 
