@@ -80,11 +80,12 @@ public class LogBufferManager {
         }
 
         try {
+            TextChannel channel = logCandidates.getFirst();
             if (target.threadName() == null) {
-                MessageHelper.sendMessageToChannel(logCandidates.getFirst(), message.toString());
+                MessageHelper.sendMessageToChannel(channel, message.toString());
             } else {
                 ThreadGetter.getThreadInChannel(
-                        logCandidates.getFirst(),
+                        channel,
                         target.threadName(),
                         false,
                         false,

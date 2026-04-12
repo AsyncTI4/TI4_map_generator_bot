@@ -8,12 +8,12 @@ final class ButtonInteractionEventLog extends AbstractEventLog {
 
     @Override
     public String getChannelName() {
-        return "bot-log";
+        return "button-log";
     }
 
     @Override
     public String getThreadName() {
-        return "button-log";
+        return null;
     }
 
     @Override
