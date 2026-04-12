@@ -18,15 +18,16 @@ jobs:
         run: |
           BASE=${{ github.event.pull_request.base.sha }}
           HEAD=${{ github.event.pull_request.head.sha }}
-          if git diff --name-only "$BASE" "$HEAD" | grep -qE '\.json$'; then
-            echo "json=true" >> $GITHUB_OUTPUT
+          CHANGED_FILES="$(git diff --name-only "$BASE" "$HEAD")"
+          if printf '%s\n' "$CHANGED_FILES" | grep -qE '\.json$'; then
+            echo "json=true" >> "$GITHUB_OUTPUT"
           else
-            echo "json=false" >> $GITHUB_OUTPUT
+            echo "json=false" >> "$GITHUB_OUTPUT"
           fi
-          if git diff --name-only "$BASE" "$HEAD" | grep -qE '^(src/|pom\.xml$)'; then
-            echo "java=true" >> $GITHUB_OUTPUT
+          if printf '%s\n' "$CHANGED_FILES" | grep -qE '^(src/|pom\.xml$)'; then
+            echo "java=true" >> "$GITHUB_OUTPUT"
           else
-            echo "java=false" >> $GITHUB_OUTPUT
+            echo "java=false" >> "$GITHUB_OUTPUT"
           fi
 
   validate-json:
