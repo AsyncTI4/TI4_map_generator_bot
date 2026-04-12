@@ -22,7 +22,8 @@ public class ArborecMitosisButtonHandler {
     public static List<Button> getMitosisOptions(Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("mitosisInf", "Place 1 infantry"));
-        if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4
+        if (player.hasUnit("arborec_mech")
+                && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4
                 && !ButtonHelper.isLawInPlay(game, "articles_war")) {
             buttons.add(Buttons.blue("mitosisMech", "Remove 1 Infantry to Deploy 1 Mech"));
         }
