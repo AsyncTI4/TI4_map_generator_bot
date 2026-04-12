@@ -3,7 +3,6 @@ package ti4.service.game;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
@@ -172,11 +171,12 @@ public class EndGameService {
         }
 
         // Archive Game Channels
-        if (tableTalkChannel != null) {
-            new RepositoryDispatchEvent("archive_game_channel", Map.of("channel", tableTalkChannel.getId()))
-                    .sendEvent();
-        }
-        new RepositoryDispatchEvent("archive_game_channel", Map.of("channel", actionsChannel.getId())).sendEvent();
+        // disabled - too many games are ending now, creating too many GitHub action runs.
+        // if (tableTalkChannel != null) {
+        //     new RepositoryDispatchEvent("archive_game_channel", Map.of("channel", tableTalkChannel.getId()))
+        //             .sendEvent();
+        // }
+        // new RepositoryDispatchEvent("archive_game_channel", Map.of("channel", actionsChannel.getId())).sendEvent();
 
         if (rematch) {
             RematchService.secondHalfOfRematch(event, game);
