@@ -1,12 +1,12 @@
-package ti4.processors;
+package ti4.buttons;
 
 import java.time.LocalDateTime;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.service.statistics.SREStats;
 
 class ButtonRuntimeWarningService {

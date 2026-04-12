@@ -17,7 +17,7 @@ import ti4.helpers.Constants;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.game.CreateGameService;
 
 class Observer extends Subcommand {

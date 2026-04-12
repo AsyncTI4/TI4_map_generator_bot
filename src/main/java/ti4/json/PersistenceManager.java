@@ -5,7 +5,7 @@ import java.io.IOException;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Storage;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.JavaType;
 import tools.jackson.databind.json.JsonMapper;

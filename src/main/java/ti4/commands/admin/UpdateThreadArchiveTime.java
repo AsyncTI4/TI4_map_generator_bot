@@ -12,7 +12,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 
 class UpdateThreadArchiveTime extends Subcommand {
 

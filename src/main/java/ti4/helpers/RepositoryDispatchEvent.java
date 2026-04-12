@@ -9,7 +9,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import ti4.json.JsonMapperManager;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import tools.jackson.databind.JsonNode;
 
 public class RepositoryDispatchEvent {

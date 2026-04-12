@@ -20,7 +20,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedPlayer;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.spring.jda.JdaService;
 
 @UtilityClass

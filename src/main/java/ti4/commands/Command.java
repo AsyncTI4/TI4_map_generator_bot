@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEven
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 
 public interface Command<T extends GenericInteractionCreateEvent> {
 

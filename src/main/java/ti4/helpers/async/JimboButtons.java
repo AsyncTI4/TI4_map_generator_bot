@@ -18,8 +18,8 @@ import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.model.TileModel;
 
 // Jazz's Interactive Map Builder

@@ -3,8 +3,8 @@ package ti4.listeners;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.DateTimeHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.service.game.GameNameService;
 import ti4.spring.jda.JdaService;
 

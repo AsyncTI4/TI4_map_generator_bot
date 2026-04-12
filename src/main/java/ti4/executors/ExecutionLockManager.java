@@ -5,7 +5,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 
 @UtilityClass
 public class ExecutionLockManager {

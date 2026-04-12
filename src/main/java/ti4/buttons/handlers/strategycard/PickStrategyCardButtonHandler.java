@@ -20,7 +20,7 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.game.StartPhaseService;

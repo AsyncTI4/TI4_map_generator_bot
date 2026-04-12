@@ -28,7 +28,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.async.DrumrollService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.DiceEmojis;

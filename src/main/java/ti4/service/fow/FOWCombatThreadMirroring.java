@@ -23,7 +23,7 @@ import ti4.map.Tile;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 
 @UtilityClass
 public class FOWCombatThreadMirroring {

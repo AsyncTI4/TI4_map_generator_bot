@@ -1,4 +1,4 @@
-package ti4.message.logging;
+package ti4.logging;
 
 import static ti4.helpers.discord.DiscordHelper.isDiscordServerError;
 import static ti4.helpers.discord.DiscordHelper.isIgnorableError;

@@ -1,4 +1,4 @@
-package ti4.message.logging;
+package ti4.logging;
 
 enum LogSeverity {
     Info("bot-log-info", "### INFO\n"),

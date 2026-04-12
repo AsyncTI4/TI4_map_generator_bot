@@ -1,4 +1,4 @@
-package ti4.processors;
+package ti4.buttons;
 
 import java.text.DecimalFormat;
 import java.time.ZoneId;
@@ -11,8 +11,6 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
-import ti4.buttons.UnfiledButtonHandlers;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
@@ -25,11 +23,11 @@ import ti4.helpers.SearchGameHelper;
 import ti4.listeners.annotations.AnnotationHandler;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.context.ButtonContext;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.service.button.ReactionService;
 import ti4.service.game.GameNameService;
 import ti4.settings.users.UserSettingsManager;

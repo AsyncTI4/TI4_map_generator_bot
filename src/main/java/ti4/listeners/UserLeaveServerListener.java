@@ -20,7 +20,7 @@ import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
 import ti4.map.persistence.ManagedPlayer;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.async.BanCleanupService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.settings.users.UserSettingsManager;

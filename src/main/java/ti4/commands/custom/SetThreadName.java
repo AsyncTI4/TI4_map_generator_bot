@@ -10,7 +10,7 @@ import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.game.GameNameService;
 
 class SetThreadName extends Subcommand {

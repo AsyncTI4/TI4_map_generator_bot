@@ -18,7 +18,7 @@ import ti4.helpers.Constants;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 import ti4.service.map.AddTileListService;

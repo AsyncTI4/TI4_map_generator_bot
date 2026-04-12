@@ -19,7 +19,7 @@ import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.model.Source.ComponentSource;
 import ti4.model.SourceModel;
 

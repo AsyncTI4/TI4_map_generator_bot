@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.async.BanCleanupService;
 
 public class BanUser extends UserCommand {

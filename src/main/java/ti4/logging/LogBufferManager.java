@@ -1,4 +1,4 @@
-package ti4.message.logging;
+package ti4.logging;
 
 import java.util.ArrayDeque;
 import java.util.Collections;

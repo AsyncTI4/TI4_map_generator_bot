@@ -3,7 +3,7 @@ package ti4.cron;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import ti4.executors.ExecutionHistoryManager;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 
 @UtilityClass
 public class LongExecutionHistoryCron {

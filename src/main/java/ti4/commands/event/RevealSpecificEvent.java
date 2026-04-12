@@ -12,7 +12,7 @@ import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.model.EventModel;
 
 class RevealSpecificEvent extends GameStateSubcommand {

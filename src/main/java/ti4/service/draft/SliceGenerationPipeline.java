@@ -10,8 +10,8 @@ import ti4.executors.CircuitBreaker;
 import ti4.executors.ExecutionHistoryManager;
 import ti4.helpers.TimedRunnable;
 import ti4.map.Game;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.service.draft.NucleusSliceGeneratorService.NucleusOutcome;
 import ti4.service.draft.draftables.SliceDraftable;
 

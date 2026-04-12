@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 
 @UtilityClass
 public class FollowStrategyCardButtonHandler {

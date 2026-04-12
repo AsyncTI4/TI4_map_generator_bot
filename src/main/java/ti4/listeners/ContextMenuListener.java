@@ -9,7 +9,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.context.ContextCommand;
 import ti4.commands.context.ContextCommandManager;
 import ti4.executors.ExecutorServiceManager;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.game.GameNameService;
 
 public class ContextMenuListener extends ListenerAdapter implements ListenerInterface {

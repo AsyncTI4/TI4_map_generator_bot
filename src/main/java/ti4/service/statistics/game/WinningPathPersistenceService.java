@@ -9,7 +9,7 @@ import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.json.PersistenceManager;
 import ti4.map.Game;
 import ti4.map.persistence.GamesPage;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import tools.jackson.core.type.TypeReference;
 
 @UtilityClass

@@ -13,7 +13,7 @@ import ti4.helpers.Helper;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.spring.jda.JdaService;
 
 class ListDeadGames extends Subcommand {

@@ -13,6 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import ti4.helpers.DateTimeHelper;
+import ti4.logging.AbstractEventLog;
+import ti4.logging.LogOrigin;
 import ti4.map.Game;
 
 class LogOriginTest {

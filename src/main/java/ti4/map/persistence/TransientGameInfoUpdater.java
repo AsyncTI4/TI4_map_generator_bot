@@ -5,8 +5,8 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.map.Game;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 
 @UtilityClass
 class TransientGameInfoUpdater {

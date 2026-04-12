@@ -51,12 +51,12 @@ import ti4.executors.CircuitBreaker;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.VisionariaSelectService;
@@ -157,7 +157,7 @@ public class MessageHelper {
         String gameName = GameNameService.getGameNameFromChannel(channel);
         if (GameManager.isValid(gameName)
                 && buttons instanceof ArrayList
-                && buttons.size() > 0
+                && !buttons.isEmpty()
                 && !(channel instanceof ThreadChannel)
                 && channel.getName().contains("actions")) {
             buttons = addUndoButtonToList(buttons, gameName);
@@ -203,10 +203,8 @@ public class MessageHelper {
 
     private static void addFactionReactToMessage(Game game, Player player, Message message) {
         Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, message);
-        if (reactionEmoji != null) {
-            message.addReaction(reactionEmoji).queue(null, error -> handleFailedReaction(game, player, message, error));
-        }
-        String messageId = message.getId();
+      message.addReaction(reactionEmoji).queue(null, error -> handleFailedReaction(game, player, message, error));
+      String messageId = message.getId();
         GameMessageManager.addReaction(game.getName(), player.getFaction(), messageId);
     }
 

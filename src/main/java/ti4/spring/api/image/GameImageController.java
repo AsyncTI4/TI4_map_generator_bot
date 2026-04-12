@@ -19,7 +19,7 @@ import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.spring.context.RequestContext;
 import ti4.spring.context.SetupRequestContext;
 import ti4.spring.jda.JdaService;

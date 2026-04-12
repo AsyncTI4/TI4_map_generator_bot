@@ -12,8 +12,8 @@ import ti4.listeners.annotations.AnnotationHandler;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.listeners.context.ModalContext;
 import ti4.map.Game;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.service.game.GameNameService;
 import ti4.spring.jda.JdaService;
 

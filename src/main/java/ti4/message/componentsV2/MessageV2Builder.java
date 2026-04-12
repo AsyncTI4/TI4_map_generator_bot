@@ -34,7 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
 import ti4.helpers.StringHelper;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 
 public class MessageV2Builder {
     private final MessageChannel channel;

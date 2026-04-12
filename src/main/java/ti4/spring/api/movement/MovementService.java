@@ -12,8 +12,8 @@ import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.service.tactical.TacticalActionDisplacementService;
 import ti4.service.tactical.TacticalActionOutputService;
 

@@ -43,7 +43,7 @@ import ti4.message.GameMessageManager.GameMessage;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.draft.PlayerSetupService;
 import ti4.service.draft.PlayerSetupState;
 import ti4.service.fow.GMService;

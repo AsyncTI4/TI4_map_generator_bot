@@ -28,7 +28,7 @@ import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;

@@ -12,7 +12,7 @@ import lombok.experimental.UtilityClass;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import ti4.ResourceHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 
 @UtilityClass
 public class EgressClientManager {

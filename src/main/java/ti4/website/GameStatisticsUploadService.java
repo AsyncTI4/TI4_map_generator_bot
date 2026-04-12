@@ -15,7 +15,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import ti4.json.JsonMapperManager;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.settings.GlobalSettings;
 import ti4.website.model.stats.GameStatsDashboardPayload;
 import tools.jackson.databind.JsonNode;

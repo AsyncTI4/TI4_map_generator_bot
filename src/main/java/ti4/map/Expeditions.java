@@ -20,7 +20,7 @@ import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;

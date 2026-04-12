@@ -28,7 +28,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.milty.MiltyDraftDisplayService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.settings.users.UserSettingsManager;

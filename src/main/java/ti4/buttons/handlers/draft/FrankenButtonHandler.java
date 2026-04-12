@@ -34,7 +34,7 @@ import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
 import ti4.message.componentsV2.MessageV2Editor;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.service.draft.DraftButtonService;

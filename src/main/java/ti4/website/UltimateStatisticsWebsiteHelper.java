@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.json.JsonMapperManager;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.statistics.StatisticOptIn;
 import ti4.service.tigl.TiglGameReport;
 import ti4.service.tigl.TiglUsernameChangeRequest;

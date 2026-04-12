@@ -27,7 +27,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.jetbrains.annotations.NotNull;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.emoji.TI4Emoji;
 import ti4.website.EgressClientManager;
 

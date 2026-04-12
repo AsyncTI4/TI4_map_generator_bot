@@ -23,7 +23,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.model.TechnologyModel;
 import ti4.spring.service.roundstats.GameRoundPlayerStats;
 import ti4.spring.service.roundstats.GameRoundPlayerStatsRepository;

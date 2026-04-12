@@ -1,4 +1,4 @@
-package ti4.message.logging;
+package ti4.logging;
 
 import net.dv8tion.jda.api.entities.Message;
 

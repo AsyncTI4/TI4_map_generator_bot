@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.Message;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.spring.context.SpringContext;
 
 @AllArgsConstructor
