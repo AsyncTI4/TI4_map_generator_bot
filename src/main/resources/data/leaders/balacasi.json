@@ -221,7 +221,7 @@
         "name": "Strategist Kreel",
         "title": "The Judicial",
         "abilityWindow": "When you resolve the primary or secondary ability of the Leadership strategy card:",
-        "abilityText": "If you gained 1 or more command tokens from spending influence, gain 1 additional command token.",
+        "abilityText": "Gain 1 additional command token.",
         "unlockCondition": "Resolve the primary ability of a strategy card in 1 of your neighbors' play areas.",
         "source": "balacasi"
     },
