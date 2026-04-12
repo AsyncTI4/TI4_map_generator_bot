@@ -16,7 +16,7 @@ import ti4.service.map.SpinService;
 class CustomizationOptions extends GameStateSubcommand {
 
     public CustomizationOptions() {
-        super(Constants.CUSTOMIZATION, "Small Customization Options", true, true);
+        super(Constants.CUSTOMIZATION, "Small Customization Options", true, false);
         List<Choice> onOff = CommandHelper.toChoices("ON", "OFF");
         List<Choice> verbChoices = CommandHelper.toChoices(Constants.VERBOSITY_OPTIONS);
         List<Choice> hexBorderChoices = CommandHelper.toChoices("off", "dash", "solid");
