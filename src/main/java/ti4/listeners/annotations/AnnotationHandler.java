@@ -25,13 +25,13 @@ import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.listeners.context.ButtonContext;
 import ti4.listeners.context.ListenerContext;
 import ti4.listeners.context.ModalContext;
 import ti4.listeners.context.SelectionMenuContext;
-import ti4.game.Game;
-import ti4.game.Player;
 import ti4.logging.BotLogger;
 
 public final class AnnotationHandler {

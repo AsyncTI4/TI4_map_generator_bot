@@ -5,8 +5,8 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.message.MessageHelper;
 import ti4.logging.BotLogger;
+import ti4.message.MessageHelper;
 
 @UtilityClass
 class SearchHelper {

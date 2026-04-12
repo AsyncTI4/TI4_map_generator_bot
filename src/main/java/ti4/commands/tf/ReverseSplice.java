@@ -2,9 +2,9 @@ package ti4.commands.tf;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.GameStateSubcommand;
+import ti4.game.Game;
 import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
-import ti4.game.Game;
 
 class ReverseSplice extends GameStateSubcommand {
 

@@ -2,9 +2,9 @@ package ti4.buttons.handlers.info;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.listeners.annotations.ButtonHandler;
-import ti4.game.Player;
 import ti4.service.info.TechInfoService;
 
 @UtilityClass

@@ -9,12 +9,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.jetbrains.annotations.NotNull;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
 import ti4.listeners.ModalListener;
 import ti4.listeners.context.ListenerContext;
-import ti4.game.Game;
-import ti4.game.Player;
 import ti4.selections.SelectionMenuProcessor;
 
 @Getter

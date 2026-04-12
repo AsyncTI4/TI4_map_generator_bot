@@ -1,10 +1,10 @@
 package ti4.game.persistence;
 
 import lombok.experimental.UtilityClass;
+import ti4.game.Game;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.thundersedge.TeHelperGeneral;
-import ti4.game.Game;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 

@@ -48,15 +48,15 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.executors.CircuitBreaker;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
-import ti4.game.Game;
-import ti4.game.Player;
-import ti4.game.persistence.GameManager;
-import ti4.game.persistence.ManagedGame;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.VisionariaSelectService;
@@ -203,8 +203,8 @@ public class MessageHelper {
 
     private static void addFactionReactToMessage(Game game, Player player, Message message) {
         Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, message);
-      message.addReaction(reactionEmoji).queue(null, error -> handleFailedReaction(game, player, message, error));
-      String messageId = message.getId();
+        message.addReaction(reactionEmoji).queue(null, error -> handleFailedReaction(game, player, message, error));
+        String messageId = message.getId();
         GameMessageManager.addReaction(game.getName(), player.getFaction(), messageId);
     }
 

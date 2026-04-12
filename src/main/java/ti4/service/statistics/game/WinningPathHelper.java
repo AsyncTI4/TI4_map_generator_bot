@@ -5,9 +5,9 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
-import ti4.image.Mapper;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.image.Mapper;
 
 @UtilityClass
 public class WinningPathHelper {

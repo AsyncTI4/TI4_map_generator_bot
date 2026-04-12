@@ -5,10 +5,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
 import ti4.commands.GameStateSubcommand;
+import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
-import ti4.game.Tile;
 
 class RemoveSweepToken extends GameStateSubcommand {
 

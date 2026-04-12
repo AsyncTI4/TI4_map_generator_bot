@@ -4,8 +4,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import ti4.message.MessageHelper;
 import ti4.logging.BotLogger;
+import ti4.message.MessageHelper;
 
 @UtilityClass
 public class ExecutionLockManager {

@@ -10,10 +10,10 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
-import ti4.message.GameMessageManager;
-import ti4.message.GameMessageType;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.button.ReactionService;
 

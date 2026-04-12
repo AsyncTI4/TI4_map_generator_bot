@@ -9,9 +9,9 @@ import java.util.function.Consumer;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.UtilityClass;
-import ti4.json.PersistenceManager;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.json.PersistenceManager;
 import ti4.logging.BotLogger;
 
 @UtilityClass

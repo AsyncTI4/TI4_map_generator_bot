@@ -5,8 +5,8 @@ import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.executors.ExecutorServiceManager;
-import ti4.message.MessageHelper;
 import ti4.logging.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.service.async.RoleService;
 import ti4.spring.jda.JdaService;
 

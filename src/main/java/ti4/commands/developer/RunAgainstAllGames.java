@@ -9,8 +9,8 @@ import ti4.commands.Subcommand;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.GamesPage;
-import ti4.message.MessageHelper;
 import ti4.logging.BotLogger;
+import ti4.message.MessageHelper;
 
 class RunAgainstAllGames extends Subcommand {
 

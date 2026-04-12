@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
-import ti4.json.PersistenceManager;
 import ti4.game.persistence.GameManager;
+import ti4.json.PersistenceManager;
 import ti4.logging.BotLogger;
 import tools.jackson.core.type.TypeReference;
 

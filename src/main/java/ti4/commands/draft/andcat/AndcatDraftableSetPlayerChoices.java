@@ -5,9 +5,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands.GameStateSubcommand;
+import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.game.Player;
 import ti4.message.MessageHelper;
 import ti4.service.draft.AndcatReferenceCardsMessageHelper;
 import ti4.service.draft.DraftChoice;

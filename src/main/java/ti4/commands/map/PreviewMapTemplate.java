@@ -6,10 +6,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.Subcommand;
+import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.MapTemplateHelper;
 import ti4.image.Mapper;
-import ti4.game.Game;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
 

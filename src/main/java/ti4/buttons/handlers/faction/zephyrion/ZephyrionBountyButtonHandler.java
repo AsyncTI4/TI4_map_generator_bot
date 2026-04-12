@@ -8,12 +8,12 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Units.UnitType;
 import ti4.listeners.annotations.ButtonHandler;
-import ti4.game.Game;
-import ti4.game.Player;
 import ti4.message.MessageHelper;
 
 @UtilityClass

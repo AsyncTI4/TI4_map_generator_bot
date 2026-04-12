@@ -3,11 +3,11 @@ package ti4.helpers;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.helpers.thundersedge.TeHelperAgents;
-import ti4.image.Mapper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.thundersedge.TeHelperAgents;
+import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
 

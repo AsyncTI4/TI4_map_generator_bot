@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import ti4.image.Mapper;
 import ti4.game.Game;
+import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 class DraftSaveServiceTest extends BaseTi4Test {

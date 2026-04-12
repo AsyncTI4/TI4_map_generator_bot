@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Objects;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
-import ti4.helpers.ButtonHelper;
-import ti4.helpers.FoWHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.service.combat.CombatRollType;
 
 @Data

@@ -5,11 +5,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.game.Game;
+import ti4.game.Tile;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.game.Game;
-import ti4.game.Tile;
 import ti4.service.RemoveCommandCounterService;
 
 public class AddCCCommand extends AddRemoveTokenCommand {

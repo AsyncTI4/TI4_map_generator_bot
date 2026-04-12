@@ -1,10 +1,10 @@
 package ti4.buttons.handlers.agenda.resolver;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.helpers.Constants;
-import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.Constants;
+import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
 
 public class VoiceOfTheCouncilLawAgendaResolver implements AgendaResolver {
     @Override

@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import ti4.commands.statistics.GameStatisticsFilterer;
-import ti4.json.PersistenceManager;
 import ti4.game.Game;
 import ti4.game.persistence.GamesPage;
+import ti4.json.PersistenceManager;
 import ti4.logging.BotLogger;
 import tools.jackson.core.type.TypeReference;
 

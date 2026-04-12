@@ -5,8 +5,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import ti4.commands.Subcommand;
 import ti4.commands.SubcommandGroup;
-import ti4.helpers.Constants;
 import ti4.game.Game;
+import ti4.helpers.Constants;
 import ti4.service.draft.DraftManager;
 import ti4.service.draft.draftables.FactionDraftable;
 

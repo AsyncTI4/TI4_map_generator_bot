@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
-import ti4.helpers.Helper;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 
 public final class PriorityTrackHelper {

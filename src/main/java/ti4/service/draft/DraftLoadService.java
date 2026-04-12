@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
-import ti4.helpers.StringHelper;
 import ti4.game.Game;
+import ti4.helpers.StringHelper;
 
 @UtilityClass
 public class DraftLoadService {

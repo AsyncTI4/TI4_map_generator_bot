@@ -22,9 +22,9 @@ import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
 import ti4.image.MapGenerator;
 import ti4.image.Mapper;
-import ti4.message.MessageHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
 import ti4.service.image.FileUploadService;
 

@@ -4,9 +4,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
-import ti4.image.Mapper;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.image.Mapper;
 import ti4.model.ColorModel;
 
 @UtilityClass

@@ -7,10 +7,10 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
-import ti4.helpers.Constants;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
+import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.service.game.ManagedGameService;
 

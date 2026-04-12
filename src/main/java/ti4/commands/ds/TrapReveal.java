@@ -5,10 +5,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
-import ti4.helpers.Constants;
-import ti4.helpers.DiscordantStarsHelper;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.Constants;
+import ti4.helpers.DiscordantStarsHelper;
 import ti4.message.MessageHelper;
 
 class TrapReveal extends GameStateSubcommand {

@@ -1,11 +1,11 @@
 package ti4.service.leader;
 
 import lombok.experimental.UtilityClass;
-import ti4.helpers.CombatTempModHelper;
-import ti4.helpers.Constants;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
+import ti4.helpers.CombatTempModHelper;
+import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.TemporaryCombatModifierModel;
