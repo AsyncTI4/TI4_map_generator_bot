@@ -18,7 +18,6 @@ import ti4.message.MessageHelper;
 
 @UtilityClass
 class NotepadButtonHandler {
-
     private static String getNotes(Player player) {
         return StringHelper.unescape(player.getNotes());
     }
@@ -43,7 +42,9 @@ class NotepadButtonHandler {
         if (!notes.isBlank()) {
             textInputBuilder.setValue(notes);
         }
-        Modal modal = Modal.create(modalID, player.getFlexibleDisplayName() + "'s Notepad")
+        String title = player.getFlexibleDisplayName() + "'s Notepad";
+        title = title.substring(0, Math.min(title.length(), 45));
+        Modal modal = Modal.create(modalID, title)
                 .addComponents(Label.of("Edit summary", textInputBuilder.build()))
                 .build();
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
