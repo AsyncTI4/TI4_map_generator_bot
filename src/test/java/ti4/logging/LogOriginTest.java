@@ -1,4 +1,4 @@
-package ti4.message.logging;
+package ti4.logging;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -14,8 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import ti4.game.Game;
 import ti4.helpers.DateTimeHelper;
-import ti4.logging.AbstractEventLog;
-import ti4.logging.LogOrigin;
 
 class LogOriginTest {
 
