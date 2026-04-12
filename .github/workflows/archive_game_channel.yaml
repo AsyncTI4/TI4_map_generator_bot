@@ -2,6 +2,7 @@ on:
   repository_dispatch:
       types: [archive_game_channel]
 name: ArchiveGameChannel
+run-name: "ArchiveGameChannel ${{ github.event.client_payload.channel }}"
 permissions: {}
 jobs:
   build:

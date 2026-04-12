@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -31,7 +30,9 @@ class GetChannelHtml extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping channelOption = event.getOption(Constants.CHANNEL);
-        String channelId = channelOption != null ? channelOption.getAsChannel().getId() : event.getChannel().getId();
+        String channelId = channelOption != null
+                ? channelOption.getAsChannel().getId()
+                : event.getChannel().getId();
 
         Instant dispatchTime = Instant.now();
         new RepositoryDispatchEvent("archive_game_channel", Map.of("channel", channelId)).sendEvent();
@@ -41,7 +42,7 @@ class GetChannelHtml extends Subcommand {
         MessageChannel responseChannel = event.getChannel();
         ExecutorServiceManager.runAsync("archive_game_channel_" + channelId, () -> {
             boolean success = RepositoryDispatchEvent.waitForWorkflowCompletion(
-                    "archive_game_channel.yaml", dispatchTime, Duration.ofMinutes(10));
+                    "archive_game_channel.yaml", dispatchTime, Duration.ofMinutes(10), channelId);
             if (!success) {
                 MessageHelper.sendMessageToChannel(
                         responseChannel,
@@ -51,13 +52,15 @@ class GetChannelHtml extends Subcommand {
 
             String storagePath = Storage.getStoragePath();
             if (storagePath == null) {
-                MessageHelper.sendMessageToChannel(responseChannel, "Storage path is not configured; cannot locate the exported HTML file.");
+                MessageHelper.sendMessageToChannel(
+                        responseChannel, "Storage path is not configured; cannot locate the exported HTML file.");
                 return;
             }
 
             File exportDir = new File(storagePath + "/exported_channels");
             if (!exportDir.isDirectory()) {
-                MessageHelper.sendMessageToChannel(responseChannel, "The workflow completed but the exported_channels directory was not found.");
+                MessageHelper.sendMessageToChannel(
+                        responseChannel, "The workflow completed but the exported_channels directory was not found.");
                 return;
             }
 
@@ -66,7 +69,9 @@ class GetChannelHtml extends Subcommand {
                     f -> f.getName().contains(channelId) && f.getName().endsWith(".html"));
 
             if (matchingFiles == null || matchingFiles.length == 0) {
-                MessageHelper.sendMessageToChannel(responseChannel, "The workflow completed but no exported HTML file was found for channel <#" + channelId + ">.");
+                MessageHelper.sendMessageToChannel(
+                        responseChannel,
+                        "The workflow completed but no exported HTML file was found for channel <#" + channelId + ">.");
                 return;
             }
 

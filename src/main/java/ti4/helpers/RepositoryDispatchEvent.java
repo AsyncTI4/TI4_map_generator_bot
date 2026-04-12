@@ -82,21 +82,26 @@ public class RepositoryDispatchEvent {
     }
 
     /**
-     * Polls the GitHub Actions API until the most recent run of {@code workflowFileName}
-     * that was created at or after {@code notBefore} completes, or until {@code timeout} elapses.
+     * Polls the GitHub Actions API until the run of {@code workflowFileName} whose name contains
+     * {@code runNameContains} and was created at or after {@code notBefore} completes, or until
+     * {@code timeout} elapses. Matching by run name allows multiple concurrent dispatches of the
+     * same workflow to each wait for their own specific run without interfering with one another.
      *
      * @param workflowFileName  the workflow file name (e.g. {@code "archive_game_channel.yaml"})
      * @param notBefore         ignore runs that started before this instant
      * @param timeout           how long to wait before giving up
-     * @return {@code true} if the run completed with conclusion {@code "success"},
+     * @param runNameContains   a string that must appear in the run's {@code name} field, or
+     *                          {@code null} to match any run
+     * @return {@code true} if the matched run completed with conclusion {@code "success"},
      *         {@code false} if it failed, timed out, or the token is unavailable
      */
-    public static boolean waitForWorkflowCompletion(String workflowFileName, Instant notBefore, Duration timeout) {
+    public static boolean waitForWorkflowCompletion(
+            String workflowFileName, Instant notBefore, Duration timeout, String runNameContains) {
         if (REPO_DISPATCH_TOKEN == null || REPO_DISPATCH_TOKEN.isEmpty()) return false;
 
         OkHttpClient client = new OkHttpClient().newBuilder().build();
-        String url = String.format(GITHUB_WORKFLOW_RUNS_URL, workflowFileName)
-                + "?event=repository_dispatch&per_page=10";
+        String url =
+                String.format(GITHUB_WORKFLOW_RUNS_URL, workflowFileName) + "?event=repository_dispatch&per_page=10";
 
         Instant deadline = Instant.now().plus(timeout);
         while (Instant.now().isBefore(deadline)) {
@@ -111,20 +116,24 @@ public class RepositoryDispatchEvent {
                 try (Response response = client.newCall(request).execute()) {
                     if (!response.isSuccessful() || response.body() == null) continue;
 
-                    JsonNode root = JsonMapperManager.basic().readTree(response.body().string());
+                    JsonNode root =
+                            JsonMapperManager.basic().readTree(response.body().string());
                     JsonNode runs = root.get("workflow_runs");
                     if (runs == null || !runs.isArray()) continue;
 
                     for (JsonNode run : runs) {
-                        Instant runCreated = Instant.parse(run.path("created_at").asText());
-                        if (!runCreated.isBefore(notBefore)) {
-                            String status = run.path("status").asText();
-                            if ("completed".equals(status)) {
-                                return "success".equals(run.path("conclusion").asText());
-                            }
-                            // Run found but still in progress; keep polling.
-                            break;
+                        Instant runCreated =
+                                Instant.parse(run.path("created_at").asText());
+                        if (runCreated.isBefore(notBefore)) continue;
+                        if (runNameContains != null
+                                && !run.path("name").asText().contains(runNameContains)) continue;
+
+                        String status = run.path("status").asText();
+                        if ("completed".equals(status)) {
+                            return "success".equals(run.path("conclusion").asText());
                         }
+                        // Matching run found but still in progress; keep polling.
+                        break;
                     }
                 }
             } catch (Exception e) {
@@ -139,5 +148,19 @@ public class RepositoryDispatchEvent {
             }
         }
         return false;
+    }
+
+    /**
+     * Polls the GitHub Actions API until the most recent run of {@code workflowFileName}
+     * that was created at or after {@code notBefore} completes, or until {@code timeout} elapses.
+     *
+     * @param workflowFileName  the workflow file name (e.g. {@code "archive_game_channel.yaml"})
+     * @param notBefore         ignore runs that started before this instant
+     * @param timeout           how long to wait before giving up
+     * @return {@code true} if the run completed with conclusion {@code "success"},
+     *         {@code false} if it failed, timed out, or the token is unavailable
+     */
+    public static boolean waitForWorkflowCompletion(String workflowFileName, Instant notBefore, Duration timeout) {
+        return waitForWorkflowCompletion(workflowFileName, notBefore, timeout, null);
     }
 }
