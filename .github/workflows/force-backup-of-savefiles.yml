@@ -11,7 +11,75 @@ jobs:
     name: Backup Game Saves
     runs-on: ubuntu-latest
     steps:
-      - name: executing remote ssh commands using password
+      - name: executing remote ssh commands using password (attempt 1)
+        id: ssh_attempt_1
+        uses: appleboy/ssh-action@master
+        continue-on-error: true
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        with:
+          host: ${{ secrets.HOSTINGER_SSH_HOST }}
+          username: ${{ secrets.HOSTINGER_SSH_USER }}
+          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+          port: ${{ secrets.HOSTINGER_SSH_PORT }}
+          envs: DISCORD_WEBHOOK_URL
+          script: |
+            set -eu
+            cd ${{ vars.HOST_TI4_SAVES_DIR }}
+            echo "FORCING BACKUP OF SAVE FILES"
+            rm -f .git/index.lock
+            git add -A
+            if git diff-index --quiet HEAD; then
+              echo "No changes to commit"
+            else
+              git commit -m "save files"
+            fi
+            git push
+            curl -X POST -H 'Content-Type: application/json' -d '{"content":"Backup Successful"}' $DISCORD_WEBHOOK_URL
+            echo "DONE!"
+
+      - name: Wait before retry (attempt 2)
+        if: steps.ssh_attempt_1.outcome == 'failure'
+        run: |
+          echo "SSH attempt 1 failed, waiting 60s before retry..."
+          sleep 60
+
+      - name: executing remote ssh commands using password (attempt 2)
+        id: ssh_attempt_2
+        if: steps.ssh_attempt_1.outcome == 'failure'
+        uses: appleboy/ssh-action@master
+        continue-on-error: true
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        with:
+          host: ${{ secrets.HOSTINGER_SSH_HOST }}
+          username: ${{ secrets.HOSTINGER_SSH_USER }}
+          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+          port: ${{ secrets.HOSTINGER_SSH_PORT }}
+          envs: DISCORD_WEBHOOK_URL
+          script: |
+            set -eu
+            cd ${{ vars.HOST_TI4_SAVES_DIR }}
+            echo "FORCING BACKUP OF SAVE FILES"
+            rm -f .git/index.lock
+            git add -A
+            if git diff-index --quiet HEAD; then
+              echo "No changes to commit"
+            else
+              git commit -m "save files"
+            fi
+            git push
+            curl -X POST -H 'Content-Type: application/json' -d '{"content":"Backup Successful"}' $DISCORD_WEBHOOK_URL
+            echo "DONE!"
+
+      - name: Wait before retry (attempt 3)
+        if: steps.ssh_attempt_2.outcome == 'failure'
+        run: |
+          echo "SSH attempt 2 failed, waiting 60s before retry..."
+          sleep 60
+
+      - name: executing remote ssh commands using password (attempt 3 - final)
+        if: steps.ssh_attempt_2.outcome == 'failure'
         uses: appleboy/ssh-action@master
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
