@@ -3,6 +3,7 @@ package ti4.service.tech;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -12,7 +13,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
-import ti4.buttons.UnfiledButtonHandlers;
 import ti4.buttons.handlers.faction.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -251,7 +251,7 @@ public class PlayerTechService {
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "dsmortr" -> {
-                UnfiledButtonHandlers.startGlimmersRedTech(player, game);
+                startGlimmersRedTech(player);
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "dsceldr" -> {
@@ -926,5 +926,27 @@ public class PlayerTechService {
                             + ", due to the _Anti-Intellectual Revolution_ law, you now have to destroy a non-fighter ship (if you __researched__ the technology you just acquired).",
                     Buttons.gray("getModifyTiles", "Modify Units"));
         }
+    }
+
+    private static void startGlimmersRedTech(Player player) {
+        Set<Units.UnitType> allowedUnits = Set.of(
+                Units.UnitType.Fighter,
+                Units.UnitType.Destroyer,
+                Units.UnitType.Cruiser,
+                Units.UnitType.Carrier,
+                Units.UnitType.Dreadnought,
+                Units.UnitType.Flagship,
+                Units.UnitType.Warsun);
+
+        List<Button> buttons = new ArrayList<>();
+        for (Units.UnitType unit : allowedUnits) {
+            buttons.add(
+                    Buttons.green("endGlimmersRedTech_" + unit.plainName(), unit.plainName(), unit.getUnitTypeEmoji()));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                        + ", please choose the unit that was destroyed, and that you will be placing via _Fractal Plating_.",
+                buttons);
     }
 }
