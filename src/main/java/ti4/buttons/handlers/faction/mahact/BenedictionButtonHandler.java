@@ -1,4 +1,4 @@
-package ti4.buttons.handlers.leader.hero;
+package ti4.buttons.handlers.faction.mahact;
 
 import java.util.ArrayList;
 import java.util.List;

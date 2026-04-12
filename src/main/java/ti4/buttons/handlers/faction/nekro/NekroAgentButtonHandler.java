@@ -1,4 +1,4 @@
-package ti4.buttons.handlers.leader.agent;
+package ti4.buttons.handlers.faction.nekro;
 
 import java.util.List;
 import lombok.experimental.UtilityClass;

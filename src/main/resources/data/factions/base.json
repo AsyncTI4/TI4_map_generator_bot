@@ -361,7 +361,8 @@
             "rst",
             "sns",
             "nm",
-            "chk"
+            "chk",
+            "rbw"
         ],
         "source": "base",
         "priorityNumber": 8

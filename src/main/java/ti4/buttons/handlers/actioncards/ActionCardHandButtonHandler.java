@@ -239,14 +239,6 @@ class ActionCardHandButtonHandler {
         ActionCardHelper.drawActionCards(player, 1);
     }
 
-    // THIS IS ACTUALLY DRAWING 1 AC WITH SCHEMING AND THEN DISCARDING
-    // THIS HAS BEEN DEPRECATED, DO NOT USE
-    @ButtonHandler("draw_2_ACDelete")
-    static void draw2ACDelete(ButtonInteractionEvent event, Player player, Game game) {
-        ActionCardHelper.drawActionCards(player, 1);
-        ButtonHelper.deleteMessage(event);
-    }
-
     @ButtonHandler("draw2 AC")
     static void draw2AC(ButtonInteractionEvent event, Player player, Game game) {
         String message = player.hasAbility("autonetic_memory")

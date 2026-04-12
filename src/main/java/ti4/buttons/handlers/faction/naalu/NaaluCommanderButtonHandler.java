@@ -1,4 +1,4 @@
-package ti4.buttons.handlers.leader.commander;
+package ti4.buttons.handlers.faction.naalu;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;

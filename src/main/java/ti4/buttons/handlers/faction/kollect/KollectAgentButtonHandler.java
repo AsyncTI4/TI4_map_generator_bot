@@ -1,4 +1,4 @@
-package ti4.buttons.handlers.leader.agent;
+package ti4.buttons.handlers.faction.kollect;
 
 import java.util.ArrayList;
 import java.util.List;
