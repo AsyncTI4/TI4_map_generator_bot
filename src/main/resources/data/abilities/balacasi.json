@@ -96,7 +96,7 @@
         "id": "detachment",
         "name": "Detachment",
         "faction": "onyxxa",
-        "permanentEffect": "During the strategy phase, you cannot choose or be given the “Politics” strategy card if there is another unchosen strategy card. When you perform a strategic action, resolve your strategy card’s secondary ability instead of its primary ability.",
+        "permanentEffect": "During the strategy phase, you cannot choose or be given the “Politics” strategy card if there is another unchosen strategy card. When you perform a strategic action, you cannot resolve your strategy card's primary ability; you may resolve its secondary ability instead.",
         "source": "balacasi"
     },
     {
