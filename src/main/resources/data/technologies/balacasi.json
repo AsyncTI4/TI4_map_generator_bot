@@ -155,7 +155,7 @@
         "requirements": "G",
         "faction": "onyxxa",
         "source": "balacasi",
-        "text": "When you perform a strategic action, you may gain 1 command token instead of resolving any ability. While this card is readied, apply +1 to your units' combat rolls. After you resolve the primary ability of a strategy card, exhaust this card."
+        "text": "When you perform a strategic action, you may treat the secondary ability's text as blank to gain 1 command token. While this card is readied, apply +1 to your units' combat rolls. After you resolve the primary ability of a strategy card, exhaust this card."
     },
     {
         "alias": "batyriy",
