@@ -2,6 +2,7 @@ on:
   repository_dispatch:
       types: [archive_game_channel]
 name: ArchiveGameChannel
+permissions: {}
 jobs:
   build:
     name: Archive Game Channel
