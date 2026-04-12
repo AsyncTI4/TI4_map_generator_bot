@@ -66,14 +66,7 @@ class GetChannelHtml extends Subcommand {
                     f -> f.getName().contains(channelId) && f.getName().endsWith(".html"));
 
             if (matchingFiles == null || matchingFiles.length == 0) {
-                // Fallback: any HTML file newer than the dispatch time
-                long dispatchMillis = dispatchTime.toEpochMilli();
-                matchingFiles = exportDir.listFiles(
-                        f -> f.getName().endsWith(".html") && f.lastModified() >= dispatchMillis);
-            }
-
-            if (matchingFiles == null || matchingFiles.length == 0) {
-                MessageHelper.sendMessageToChannel(responseChannel, "The workflow completed but no exported HTML file was found.");
+                MessageHelper.sendMessageToChannel(responseChannel, "The workflow completed but no exported HTML file was found for channel <#" + channelId + ">.");
                 return;
             }
 
