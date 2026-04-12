@@ -13,7 +13,7 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.message.MessageHelper;
 
 @UtilityClass
-class NekroTechExhaustButtonHandler {
+class NekroFollowTechButtonHandler {
 
     @ButtonHandler("nekroTechExhaust")
     public static void nekroTechExhaust(ButtonInteractionEvent event, Player player, Game game) {

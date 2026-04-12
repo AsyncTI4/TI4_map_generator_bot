@@ -17,7 +17,7 @@ import ti4.message.MessageHelper;
 import ti4.service.fow.BlindSelectionService;
 
 @UtilityClass
-class BenedictionButtonHandler {
+class MahactHeroButtonHandler {
 
     @ButtonHandler("mahactBenedictionFrom_")
     public static void mahactBenedictionFrom(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
