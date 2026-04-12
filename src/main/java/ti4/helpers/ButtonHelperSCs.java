@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
-import ti4.buttons.UnfiledButtonHandlers;
+import ti4.buttons.handlers.commandcounter.CommandCounterExtraButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -1236,7 +1236,7 @@ public final class ButtonHelperSCs {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             }
             if (!player.getSCs().contains(4) && !buttonID.contains("_dont")) {
-                UnfiledButtonHandlers.reinforcementsCCPlacement(
+                CommandCounterExtraButtonHandler.reinforcementsCCPlacement(
                         event, game, player, "reinforcements_cc_placement_" + planet);
             }
         } else {
