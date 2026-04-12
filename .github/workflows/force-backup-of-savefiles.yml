@@ -22,7 +22,7 @@ jobs:
           username: ${{ secrets.HOSTINGER_SSH_USER }}
           password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
-          timeout: 60s
+          timeout: 15s
           envs: DISCORD_WEBHOOK_URL
           script: |
             set -eu
@@ -49,7 +49,7 @@ jobs:
           username: ${{ secrets.HOSTINGER_SSH_USER }}
           password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
-          timeout: 60s
+          timeout: 15s
           envs: DISCORD_WEBHOOK_URL
           script: |
             set -eu
