@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.Set;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
-import ti4.map.Game;
-import ti4.map.persistence.GameManager;
-import ti4.map.persistence.GamesPage;
+import ti4.game.Game;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.GamesPage;
 import ti4.message.MessageHelper;
 import ti4.logging.BotLogger;
 

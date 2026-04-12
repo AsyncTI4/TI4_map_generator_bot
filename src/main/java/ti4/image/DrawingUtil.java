@@ -37,7 +37,7 @@ import ti4.ResourceHelper;
 import ti4.helpers.Storage;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.MapGenerator.VerticalAlign;
-import ti4.map.Player;
+import ti4.game.Player;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.ColorModel;

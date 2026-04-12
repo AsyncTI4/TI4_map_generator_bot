@@ -14,11 +14,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ti4.helpers.TIGLHelper;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
-import ti4.map.persistence.ManagedGame;
-import ti4.map.persistence.ManagedPlayer;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
+import ti4.game.persistence.ManagedPlayer;
 import ti4.model.EventModel;
 
 @RequiredArgsConstructor

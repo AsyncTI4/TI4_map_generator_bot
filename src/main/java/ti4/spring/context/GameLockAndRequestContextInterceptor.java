@@ -11,7 +11,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 import ti4.executors.ExecutionLockManager;
-import ti4.map.persistence.GameManager;
+import ti4.game.persistence.GameManager;
 
 @Component
 public class GameLockAndRequestContextInterceptor implements HandlerInterceptor {

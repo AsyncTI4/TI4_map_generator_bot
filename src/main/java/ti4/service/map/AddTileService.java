@@ -13,10 +13,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.helpers.Constants;
 import ti4.image.TileHelper;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;

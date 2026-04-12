@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.StatusHelper;
 import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
+import ti4.game.Game;
 
 @UtilityClass
 class ProceedToScoringButtonHandler {

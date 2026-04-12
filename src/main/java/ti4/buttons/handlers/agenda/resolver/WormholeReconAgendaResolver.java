@@ -4,9 +4,9 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.FoWHelper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 
 public class WormholeReconAgendaResolver implements AgendaResolver {
     @Override

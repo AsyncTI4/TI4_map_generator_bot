@@ -9,8 +9,8 @@ import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionE
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.executors.ExecutorServiceManager;
-import ti4.map.Game;
-import ti4.map.persistence.GameManager;
+import ti4.game.Game;
+import ti4.game.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.logging.BotLogger;
 import ti4.service.game.GameNameService;

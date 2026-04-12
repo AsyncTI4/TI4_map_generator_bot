@@ -11,7 +11,7 @@ import ti4.helpers.settingsFramework.menus.PlayerFactionSettings;
 import ti4.helpers.settingsFramework.menus.SliceGenerationSettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source;
 import ti4.service.milty.MiltyDraftSlice;

@@ -17,8 +17,8 @@ import ti4.helpers.StringHelper;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.ReadOnlyTextSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.logging.BotLogger;
 import tools.jackson.databind.JsonNode;
 

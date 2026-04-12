@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.model.MapTemplateModel;
 import ti4.service.draft.NucleusSliceGeneratorService.NucleusOutcome;
 import ti4.testUtils.BaseTi4Test;

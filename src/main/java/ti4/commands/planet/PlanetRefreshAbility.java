@@ -3,8 +3,8 @@ package ti4.commands.planet;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Player;
 
 class PlanetRefreshAbility extends PlanetAddRemove {
 

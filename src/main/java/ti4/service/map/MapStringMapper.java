@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 import ti4.helpers.AliasHandler;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 

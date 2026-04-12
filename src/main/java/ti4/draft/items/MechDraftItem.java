@@ -9,7 +9,7 @@ import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.UnitModel;

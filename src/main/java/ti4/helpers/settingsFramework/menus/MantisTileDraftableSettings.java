@@ -10,7 +10,7 @@ import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.model.MapTemplateModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiltyDraftEmojis;

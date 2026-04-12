@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
-import ti4.map.Game;
-import ti4.map.Tile;
+import ti4.game.Game;
+import ti4.game.Tile;
 
 @Data
 public class WebTilePositions {

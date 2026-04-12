@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Tile;
+import ti4.game.Game;
+import ti4.game.Tile;
 import ti4.service.franken.FrankenBanList;
 
 public class BanService implements IBanService {

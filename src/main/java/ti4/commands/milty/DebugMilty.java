@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.message.MessageHelper;
 import ti4.service.milty.MiltyDraftManager;
 

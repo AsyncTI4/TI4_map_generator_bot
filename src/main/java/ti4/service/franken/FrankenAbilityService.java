@@ -12,7 +12,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.map.Player;
+import ti4.game.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
 import ti4.model.GenericCardModel;

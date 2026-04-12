@@ -22,7 +22,7 @@ import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.message.MessageHelper;
 import ti4.logging.BotLogger;
 import ti4.model.MapTemplateModel;

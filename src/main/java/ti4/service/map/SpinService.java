@@ -10,7 +10,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.SpinRingsHelper;
 import ti4.image.PositionMapper;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.message.MessageHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;

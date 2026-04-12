@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.image.Mapper;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
 import ti4.testUtils.BaseTi4Test;

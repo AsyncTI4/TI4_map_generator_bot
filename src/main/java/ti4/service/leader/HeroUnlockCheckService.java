@@ -8,9 +8,9 @@ import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Player;
 
 @UtilityClass
 public class HeroUnlockCheckService {

@@ -7,7 +7,7 @@ import lombok.experimental.UtilityClass;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import ti4.json.JsonMapperManager;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.settings.GlobalSettings;

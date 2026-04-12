@@ -9,7 +9,7 @@ import ti4.draft.items.HomeSystemDraftItem;
 import ti4.draft.items.RedTileDraftItem;
 import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.image.Mapper;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.service.milty.MiltyDraftHelper;

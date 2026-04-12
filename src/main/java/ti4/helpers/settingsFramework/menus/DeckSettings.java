@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.model.DeckModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.service.emoji.CardEmojis;

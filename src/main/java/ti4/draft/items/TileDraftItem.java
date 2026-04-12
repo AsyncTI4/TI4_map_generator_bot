@@ -6,7 +6,7 @@ import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel;
 import ti4.model.PlanetTypeModel.PlanetType;

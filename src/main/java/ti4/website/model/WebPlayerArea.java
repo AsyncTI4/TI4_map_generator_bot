@@ -15,11 +15,11 @@ import ti4.helpers.Storage;
 import ti4.helpers.Units;
 import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 
 @Data
 public class WebPlayerArea {

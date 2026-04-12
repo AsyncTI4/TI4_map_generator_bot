@@ -13,10 +13,10 @@ import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 

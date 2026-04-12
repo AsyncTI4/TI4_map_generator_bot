@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.helpers.Constants;
-import ti4.map.persistence.GameManager;
+import ti4.game.persistence.GameManager;
 
 @UtilityClass
 public class GameNameService {

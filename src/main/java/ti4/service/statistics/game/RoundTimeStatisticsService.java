@@ -9,8 +9,8 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.commands.statistics.GameStatisticsFilterer;
-import ti4.map.Game;
-import ti4.map.persistence.GamesPage;
+import ti4.game.Game;
+import ti4.game.persistence.GamesPage;
 import ti4.message.MessageHelper;
 
 @UtilityClass

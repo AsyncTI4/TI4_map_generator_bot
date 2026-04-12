@@ -5,7 +5,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.helpers.Constants;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.message.MessageHelper;
 
 @UtilityClass

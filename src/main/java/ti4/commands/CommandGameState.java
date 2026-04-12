@@ -2,9 +2,9 @@ package ti4.commands;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GameManager;
 import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
 

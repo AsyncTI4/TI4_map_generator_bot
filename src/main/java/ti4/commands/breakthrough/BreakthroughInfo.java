@@ -6,7 +6,7 @@ import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
-import ti4.map.Player;
+import ti4.game.Player;
 
 class BreakthroughInfo extends GameStateSubcommand {
 

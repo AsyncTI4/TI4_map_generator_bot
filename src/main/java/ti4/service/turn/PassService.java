@@ -14,8 +14,8 @@ import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.message.MessageHelper;
 
 @UtilityClass

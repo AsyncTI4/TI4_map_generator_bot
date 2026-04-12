@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.model.MapTemplateModel;
 import ti4.model.TileModel;
 

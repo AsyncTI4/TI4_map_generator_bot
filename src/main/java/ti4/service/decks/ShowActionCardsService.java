@@ -13,7 +13,7 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.service.emoji.CardEmojis;

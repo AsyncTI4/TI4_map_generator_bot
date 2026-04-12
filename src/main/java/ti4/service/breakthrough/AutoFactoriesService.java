@@ -6,8 +6,8 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.model.UnitModel;
 
 @UtilityClass

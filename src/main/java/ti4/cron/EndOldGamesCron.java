@@ -9,9 +9,9 @@ import java.time.ZoneId;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.executors.ExecutionLockManager;
-import ti4.map.Game;
-import ti4.map.persistence.GameManager;
-import ti4.map.persistence.ManagedGame;
+import ti4.game.Game;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
 import ti4.message.GameMessageManager;
 import ti4.logging.BotLogger;
 

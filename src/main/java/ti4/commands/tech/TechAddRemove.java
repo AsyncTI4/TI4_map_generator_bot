@@ -11,7 +11,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.map.Player;
+import ti4.game.Player;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 import ti4.service.leader.CommanderUnlockCheckService;

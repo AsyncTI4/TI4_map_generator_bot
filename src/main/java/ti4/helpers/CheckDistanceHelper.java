@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Units.UnitType;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 
 @UtilityClass
 public class CheckDistanceHelper {

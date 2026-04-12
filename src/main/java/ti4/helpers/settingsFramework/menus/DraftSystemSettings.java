@@ -18,7 +18,7 @@ import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.ReadOnlyTextSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.message.MessageHelper;
 import ti4.service.draft.DraftComponentFactory;
 import ti4.service.draft.DraftSetupService;

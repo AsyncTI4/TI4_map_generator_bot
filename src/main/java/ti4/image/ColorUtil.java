@@ -8,8 +8,8 @@ import java.awt.Rectangle;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.model.ColorModel;
 import ti4.model.StrategyCardModel;
 

@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.executors.CircuitBreaker;
 import ti4.executors.ExecutionHistoryManager;
 import ti4.helpers.TimedRunnable;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.service.draft.NucleusSliceGeneratorService.NucleusOutcome;

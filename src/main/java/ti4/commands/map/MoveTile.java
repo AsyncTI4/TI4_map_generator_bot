@@ -7,8 +7,8 @@ import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.image.PositionMapper;
-import ti4.map.Game;
-import ti4.map.Tile;
+import ti4.game.Game;
+import ti4.game.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.map.CustomHyperlaneService;
 

@@ -7,7 +7,7 @@ import java.util.Optional;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
 

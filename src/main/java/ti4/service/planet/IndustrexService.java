@@ -10,8 +10,8 @@ import ti4.buttons.Buttons;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 

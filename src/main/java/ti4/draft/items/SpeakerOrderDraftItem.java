@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.model.DraftErrataModel;
 import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.emoji.TI4Emoji;

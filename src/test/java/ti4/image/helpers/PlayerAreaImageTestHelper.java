@@ -10,7 +10,7 @@ import lombok.experimental.UtilityClass;
 import ti4.image.ImageHelper;
 import ti4.image.PlayerAreaGenerator;
 import ti4.image.PlayerAreaImageTest;
-import ti4.map.Player;
+import ti4.game.Player;
 import ti4.website.model.WebsiteOverlay;
 
 @UtilityClass

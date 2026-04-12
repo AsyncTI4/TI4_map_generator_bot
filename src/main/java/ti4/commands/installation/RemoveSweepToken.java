@@ -8,7 +8,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
-import ti4.map.Tile;
+import ti4.game.Tile;
 
 class RemoveSweepToken extends GameStateSubcommand {
 

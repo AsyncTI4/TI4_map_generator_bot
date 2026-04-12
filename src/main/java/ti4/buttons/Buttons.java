@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.logging.BotLogger;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;

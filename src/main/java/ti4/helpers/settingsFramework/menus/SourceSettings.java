@@ -12,7 +12,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.logging.BotLogger;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.FactionEmojis;

@@ -13,7 +13,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.draft.DraftSetupService;

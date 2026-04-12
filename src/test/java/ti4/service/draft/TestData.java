@@ -9,7 +9,7 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Constants;
 import ti4.helpers.ListHelper;
-import ti4.map.Tile;
+import ti4.game.Tile;
 import ti4.model.Source.ComponentSource;
 import ti4.service.draft.draftables.AndcatReferenceCardsDraftable;
 import ti4.service.draft.draftables.FactionDraftable;

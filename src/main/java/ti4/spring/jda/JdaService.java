@@ -69,7 +69,7 @@ import ti4.listeners.SlashCommandListener;
 import ti4.listeners.ThreadCreateListener;
 import ti4.listeners.UserJoinServerListener;
 import ti4.listeners.UserLeaveServerListener;
-import ti4.map.persistence.GameManager;
+import ti4.game.persistence.GameManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogBufferManager;
 import ti4.migration.DataMigrationManager;

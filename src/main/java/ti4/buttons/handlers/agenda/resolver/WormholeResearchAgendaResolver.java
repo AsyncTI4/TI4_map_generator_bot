@@ -5,8 +5,8 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.message.MessageHelper;
 
 public class WormholeResearchAgendaResolver implements ForAgainstAgendaResolver {

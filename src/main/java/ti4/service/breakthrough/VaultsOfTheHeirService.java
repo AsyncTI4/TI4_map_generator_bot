@@ -12,8 +12,8 @@ import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 

@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.map.Player;
+import ti4.game.Player;
 import ti4.message.MessageHelper;
 
 class SetUnitCap extends GameStateSubcommand {

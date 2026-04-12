@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.StringHelper;
-import ti4.map.Game;
+import ti4.game.Game;
 
 @UtilityClass
 public class DraftLoadService {

@@ -7,10 +7,10 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.logging.BotLogger;
 
 @UtilityClass

@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.testUtils.BaseTi4Test;
 

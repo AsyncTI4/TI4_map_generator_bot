@@ -2,7 +2,7 @@ package ti4.buttons.handlers.agenda.resolver;
 
 import java.util.ArrayList;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.message.MessageHelper;
 
 public class ConstitutionAgendaResolver implements ForAgainstAgendaResolver {

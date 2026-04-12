@@ -9,12 +9,12 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.message.MessageHelper;
 
 @UtilityClass

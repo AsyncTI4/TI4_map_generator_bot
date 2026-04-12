@@ -28,8 +28,8 @@ import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
-import ti4.map.Game;
-import ti4.map.Tile;
+import ti4.game.Game;
+import ti4.game.Tile;
 import ti4.message.MessageHelper;
 import ti4.logging.BotLogger;
 

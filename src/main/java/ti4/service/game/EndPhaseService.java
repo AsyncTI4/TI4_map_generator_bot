@@ -4,7 +4,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.StatusHelper;
-import ti4.map.Game;
+import ti4.game.Game;
 
 @UtilityClass
 public class EndPhaseService {

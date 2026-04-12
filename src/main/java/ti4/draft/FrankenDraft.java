@@ -26,7 +26,7 @@ import ti4.draft.items.TechDraftItem;
 import ti4.draft.items.UnitDraftItem;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.service.milty.MiltyDraftHelper;

@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
-import ti4.map.persistence.ManagedGame;
-import ti4.map.persistence.ManagedPlayer;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
+import ti4.game.persistence.ManagedPlayer;
 
 @RequiredArgsConstructor
 @Service

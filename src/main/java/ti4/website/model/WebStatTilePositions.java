@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import lombok.Data;
 import ti4.helpers.PlayerStatsHelper;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Player;
 
 @Data
 public class WebStatTilePositions {

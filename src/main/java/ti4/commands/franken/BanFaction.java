@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.message.MessageHelper;
 
 class BanFaction extends GameStateSubcommand {

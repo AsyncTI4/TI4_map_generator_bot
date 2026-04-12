@@ -17,8 +17,8 @@ import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.PositionMapper;
 import ti4.image.TileGenerator;
 import ti4.image.TileStep;
-import ti4.map.Game;
-import ti4.map.Tile;
+import ti4.game.Game;
+import ti4.game.Tile;
 import ti4.logging.BotLogger;
 import ti4.service.image.FileUploadService;
 

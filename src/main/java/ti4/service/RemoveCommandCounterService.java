@@ -6,9 +6,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.FoWHelper;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.message.MessageHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;

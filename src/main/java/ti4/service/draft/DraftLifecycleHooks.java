@@ -1,7 +1,7 @@
 package ti4.service.draft;
 
 import java.util.function.Consumer;
-import ti4.map.Player;
+import ti4.game.Player;
 
 /**
  * The draft lifecycle goes through several stages. These hooks

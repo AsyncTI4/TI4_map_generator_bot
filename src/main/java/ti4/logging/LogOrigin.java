@@ -13,8 +13,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
 import ti4.listeners.ModalListener;
 import ti4.listeners.context.ListenerContext;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.selections.SelectionMenuProcessor;
 
 @Getter

@@ -13,7 +13,7 @@ import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import tools.jackson.databind.JsonNode;

@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.image.Mapper;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.message.MessageHelper;
 import ti4.model.RuleModel;
 
