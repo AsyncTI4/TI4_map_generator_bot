@@ -23,9 +23,9 @@ class GetChannelHtml extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        MessageChannel channel = event.getOption(Constants.CHANNEL, null, OptionMapping::getAsChannel);
+        MessageChannel selectedChannel = event.getOption(Constants.CHANNEL, null, OptionMapping::getAsChannel);
         String channelId =
-                channel != null ? channel.getId() : event.getChannel().getId();
+                selectedChannel != null ? selectedChannel.getId() : event.getChannel().getId();
         new RepositoryDispatchEvent("archive_game_channel", Map.of("channel", channelId)).sendEvent();
         MessageHelper.sendMessageToEventChannel(
                 event, "Dispatched `archive_game_channel` for channel <#" + channelId + ">.");
