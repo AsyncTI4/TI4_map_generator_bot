@@ -80,12 +80,17 @@ public class LogBufferManager {
         }
 
         try {
-            ThreadGetter.getThreadInChannel(
-                    logCandidates.getFirst(),
-                    target.threadName(),
-                    false,
-                    false,
-                    (threadChannel) -> MessageHelper.sendMessageToChannel(threadChannel, message.toString()));
+            TextChannel channel = logCandidates.getFirst();
+            if (target.threadName() == null) {
+                MessageHelper.sendMessageToChannel(channel, message.toString());
+            } else {
+                ThreadGetter.getThreadInChannel(
+                        channel,
+                        target.threadName(),
+                        false,
+                        false,
+                        (threadChannel) -> MessageHelper.sendMessageToChannel(threadChannel, message.toString()));
+            }
         } catch (Exception e) {
             BotLogger.error("Failed to send LogBufferManager message", e);
         }
