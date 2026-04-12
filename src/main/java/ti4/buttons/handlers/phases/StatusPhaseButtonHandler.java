@@ -185,14 +185,6 @@ class StatusPhaseButtonHandler {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("doneRemoving")
-    public static void doneRemoving(ButtonInteractionEvent event, Game game) {
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), event.getMessage().getContentRaw());
-        ButtonHelper.deleteMessage(event);
-        ButtonHelper.updateMap(game, event);
-    }
-
     @ButtonHandler("scoreAnObjective")
     public static void scoreAnObjective(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> poButtons = StatusHelper.getScoreObjectiveButtons(game, player.getFinsFactionCheckerPrefix());
