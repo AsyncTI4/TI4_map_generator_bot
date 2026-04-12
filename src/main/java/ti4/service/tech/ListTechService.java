@@ -192,10 +192,10 @@ public class ListTechService {
             buttons.addAll(getTechButtons(techs, player, payType));
         }
 
-        if (game.isComponentAction()) {
-            buttons.add(Buttons.gray("acquireATech", "Get Other Technology"));
-        } else if (dwsBt) {
+        if (dwsBt) {
             buttons.add(Buttons.gray("acquireATechWithDwsBt_second", "Get Other Technology"));
+        } else if (game.isComponentAction()) {
+            buttons.add(Buttons.gray("acquireATech", "Get Other Technology"));
         } else {
             buttons.add(Buttons.gray("acquireATechWithSC_second", "Get Other Technology"));
         }
