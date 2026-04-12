@@ -10,14 +10,14 @@ import ti4.message.logging.BotLogger;
 @UtilityClass
 public class FollowStrategyCardButtonHandler {
 
-  @ButtonHandler("requestAllFollow_")
-  public static void requestAllFollow(ButtonInteractionEvent event, Game game) {
-    game.setTemporaryPingDisable(true);
-    event.getMessage()
-        .reply(
-            game.getPing()
-                + ", someone has requested that everyone resolve this strategy card before play continues."
-                + " Please do so as soon as you can. The active player should not take an action until this is done.")
-        .queue(Consumers.nop(), BotLogger::catchRestError);
-  }
+    @ButtonHandler("requestAllFollow_")
+    public static void requestAllFollow(ButtonInteractionEvent event, Game game) {
+        game.setTemporaryPingDisable(true);
+        event.getMessage()
+                .reply(
+                        game.getPing()
+                                + ", someone has requested that everyone resolve this strategy card before play continues."
+                                + " Please do so as soon as you can. The active player should not take an action until this is done.")
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
 }

@@ -12,18 +12,18 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class DrawAgendaButtonHandler {
 
-  @ButtonHandler("drawAgenda_2")
-  public static void drawAgenda2(ButtonInteractionEvent event, Game game, Player player) {
-    if (!game.getStoredValue("hasntSetSpeaker").isEmpty() && !game.isHomebrewSCMode()) {
-      MessageHelper.sendMessageToChannel(
-          player.getCorrectChannel(),
-          player.getRepresentationUnfogged()
-              + ", you need to assign speaker first before drawing agendas. You can override this restriction with `/agenda draw`.");
-      return;
+    @ButtonHandler("drawAgenda_2")
+    public static void drawAgenda2(ButtonInteractionEvent event, Game game, Player player) {
+        if (!game.getStoredValue("hasntSetSpeaker").isEmpty() && !game.isHomebrewSCMode()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", you need to assign speaker first before drawing agendas. You can override this restriction with `/agenda draw`.");
+            return;
+        }
+        AgendaHelper.drawAgenda(2, game, player);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(), player.getRepresentation(true, false) + " drew 2 agendas");
+        ButtonHelper.deleteMessage(event);
     }
-    AgendaHelper.drawAgenda(2, game, player);
-    MessageHelper.sendMessageToChannel(
-        player.getCorrectChannel(), player.getRepresentation(true, false) + " drew 2 agendas");
-    ButtonHelper.deleteMessage(event);
-  }
 }

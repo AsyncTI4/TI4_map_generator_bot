@@ -16,49 +16,49 @@ import ti4.service.player.RefreshCardsService;
 @UtilityClass
 class StrategyPhaseButtonHandler {
 
-  @ButtonHandler("startStrategyPhase")
-  public static void startStrategyPhase(ButtonInteractionEvent event, Game game) {
-    if (game.hasAnyPriorityTrackMode()
-        && PriorityTrackHelper.getPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
-      MessageHelper.sendMessageToChannel(
-          event.getMessageChannel(), "Please fill the priority track before starting the Strategy Phase.");
-      PriorityTrackHelper.PrintPriorityTrack(game);
-      return;
-    }
-    StartPhaseService.startPhase(event, game, "strategy");
-    ButtonHelper.deleteMessage(event);
-  }
-
-  @ButtonHandler("proceed_to_strategy")
-  public static void proceedToStrategy(ButtonInteractionEvent event, Game game) {
-    String readiedCardsString = "All planets have been readied at the end of the Agenda Phase.";
-    if (game.isOmegaPhaseMode()) {
-      readiedCardsString = "All cards have been readied at the end of the Omega Phase.";
-    }
-    if (game.hasAnyPriorityTrackMode()) {
-      if (PriorityTrackHelper.getPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
-        MessageHelper.sendMessageToChannel(
-            event.getMessageChannel(),
-            "Please fill the priority track before starting the Strategy Phase.");
-        PriorityTrackHelper.PrintPriorityTrack(game);
-        return;
-      }
-    }
-    Map<String, Player> players = game.getPlayers();
-    if (game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
-      if (!game.isTwilightsFallMode()) {
-        for (Player player_ : players.values()) {
-          RefreshCardsService.refreshPlayerCards(game, player_, false);
+    @ButtonHandler("startStrategyPhase")
+    public static void startStrategyPhase(ButtonInteractionEvent event, Game game) {
+        if (game.hasAnyPriorityTrackMode()
+                && PriorityTrackHelper.getPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "Please fill the priority track before starting the Strategy Phase.");
+            PriorityTrackHelper.PrintPriorityTrack(game);
+            return;
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), readiedCardsString);
-      }
-    } else {
-      MessageHelper.sendMessageToChannel(
-          event.getChannel(),
-          "Did not automatically ready planets due to _Checks and Balances_ resolving \"against\"."
-              + " Players have been sent buttons to ready up to 3 planets.");
+        StartPhaseService.startPhase(event, game, "strategy");
+        ButtonHelper.deleteMessage(event);
     }
-    StartPhaseService.startStrategyPhase(event, game);
-    ButtonHelper.deleteMessage(event);
-  }
+
+    @ButtonHandler("proceed_to_strategy")
+    public static void proceedToStrategy(ButtonInteractionEvent event, Game game) {
+        String readiedCardsString = "All planets have been readied at the end of the Agenda Phase.";
+        if (game.isOmegaPhaseMode()) {
+            readiedCardsString = "All cards have been readied at the end of the Omega Phase.";
+        }
+        if (game.hasAnyPriorityTrackMode()) {
+            if (PriorityTrackHelper.getPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "Please fill the priority track before starting the Strategy Phase.");
+                PriorityTrackHelper.PrintPriorityTrack(game);
+                return;
+            }
+        }
+        Map<String, Player> players = game.getPlayers();
+        if (game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
+            if (!game.isTwilightsFallMode()) {
+                for (Player player_ : players.values()) {
+                    RefreshCardsService.refreshPlayerCards(game, player_, false);
+                }
+                MessageHelper.sendMessageToChannel(event.getChannel(), readiedCardsString);
+            }
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Did not automatically ready planets due to _Checks and Balances_ resolving \"against\"."
+                            + " Players have been sent buttons to ready up to 3 planets.");
+        }
+        StartPhaseService.startStrategyPhase(event, game);
+        ButtonHelper.deleteMessage(event);
+    }
 }

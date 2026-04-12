@@ -743,11 +743,11 @@ class ActionCardDeck2ButtonHandler {
         // TODO: move this out of here.
         if (game.isTwilightsFallMode()) {
             MessageHelper.sendMessageToChannel(
-                event.getChannel(), "Put _Tartarus_ on **" + Helper.getSCName(Integer.parseInt(sc), game) + "**.");
+                    event.getChannel(), "Put _Tartarus_ on **" + Helper.getSCName(Integer.parseInt(sc), game) + "**.");
         } else {
             MessageHelper.sendMessageToChannel(
-                event.getChannel(),
-                "Put _Deflection_ on **" + Helper.getSCName(Integer.parseInt(sc), game) + "**.");
+                    event.getChannel(),
+                    "Put _Deflection_ on **" + Helper.getSCName(Integer.parseInt(sc), game) + "**.");
         }
     }
 }

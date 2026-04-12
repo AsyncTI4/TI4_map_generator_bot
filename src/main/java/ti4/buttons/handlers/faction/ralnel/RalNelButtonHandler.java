@@ -17,26 +17,26 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class RalNelButtonHandler {
 
-  @ButtonHandler("ralnelCStep3_")
-  public static void ralnelCStep3(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-    ButtonHelper.deleteMessage(event);
-    String pos2 = buttonID.split("_")[1];
-    Tile targetTile = game.getTileByPosition(pos2);
-    CommandCounterHelper.addCC(event, player, targetTile);
-    ButtonHelperHeroes.argentHeroStep3(game, player, buttonID);
-  }
+    @ButtonHandler("ralnelCStep3_")
+    public static void ralnelCStep3(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        ButtonHelper.deleteMessage(event);
+        String pos2 = buttonID.split("_")[1];
+        Tile targetTile = game.getTileByPosition(pos2);
+        CommandCounterHelper.addCC(event, player, targetTile);
+        ButtonHelperHeroes.argentHeroStep3(game, player, buttonID);
+    }
 
-  @ButtonHandler("ralnelCommander_")
-  public static void ralnelCommander(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-    ButtonHelper.deleteTheOneButton(event);
-    List<Button> buttons = ButtonHelperModifyUnits.getRalnelCommanderButtons(player, game, buttonID.split("_")[1]);
-    MessageHelper.sendMessageToChannel(
-        event.getMessageChannel(),
-        player.getRepresentationUnfogged()
-            + ", is using Watchful Ojz, the Ral Nel commander, to immediately retreat 2 ships (and maybe transport).\nReminder: Dane has ruled that you need a valid retreat location before you can even announce retreats and use this commander.");
-    MessageHelper.sendMessageToChannelWithButtons(
-        event.getMessageChannel(),
-        player.getRepresentationUnfogged() + ", please choose which system you wish to move units to.",
-        buttons);
-  }
+    @ButtonHandler("ralnelCommander_")
+    public static void ralnelCommander(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        ButtonHelper.deleteTheOneButton(event);
+        List<Button> buttons = ButtonHelperModifyUnits.getRalnelCommanderButtons(player, game, buttonID.split("_")[1]);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged()
+                        + ", is using Watchful Ojz, the Ral Nel commander, to immediately retreat 2 ships (and maybe transport).\nReminder: Dane has ruled that you need a valid retreat location before you can even announce retreats and use this commander.");
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged() + ", please choose which system you wish to move units to.",
+                buttons);
+    }
 }
