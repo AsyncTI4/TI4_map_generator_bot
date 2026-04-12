@@ -1171,6 +1171,7 @@ public final class Constants {
     public static final String STARTINGFLEET_LIMIT = "startingfleet_limit";
     public static final String BLUETILE_LIMIT = "bluetile_limit";
     public static final String REDTILE_LIMIT = "redtile_limit";
+    public static final String BREAKTHROUGH_LIMIT = "breakthrough_limit";
     public static final String FIRSTPICK_LIMIT = "firstpick_limit";
     public static final String LATERPICK_LIMIT = "laterpick_limit";
 
