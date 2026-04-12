@@ -49,6 +49,7 @@ public class Ban extends GameStateSubcommand {
 
         List<String> optionNames = List.of(
                 Constants.ABILITY,
+                Constants.BREAKTHROUGH,
                 Constants.LEADER,
                 Constants.PROMISSORY_NOTE_ID,
                 Constants.UNIT_ID,
