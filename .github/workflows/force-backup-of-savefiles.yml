@@ -20,7 +20,7 @@ jobs:
           username: ${{ secrets.HOSTINGER_SSH_USER }}
           password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
-          connect_timeout: 60s
+          timeout: 60s
           envs: DISCORD_WEBHOOK_URL
           script: |
             set -eu
