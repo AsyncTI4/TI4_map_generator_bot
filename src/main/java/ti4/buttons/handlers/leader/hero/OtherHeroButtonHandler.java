@@ -17,7 +17,6 @@ import ti4.helpers.RandomHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -28,6 +27,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.service.leader.PlayHeroService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.RemoveUnitService;
@@ -54,10 +54,9 @@ class OtherHeroButtonHandler {
                     player.getRepresentation() + " is playing " + heroTitle + ".\n"
                             + Helper.getLeaderFullRepresentation(playerLeader));
         }
-        boolean purged = player.removeLeader(playerLeader);
+        boolean purged = PlayHeroService.removeLeader(game, player, playerLeader);
         if (purged) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), heroTitle + ", has been purged.");
-            DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         } else {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), heroTitle + ", was not purged - something went wrong.");

@@ -61,6 +61,15 @@ import ti4.service.unit.CheckUnitContainmentService;
 @UtilityClass
 public class PlayHeroService {
 
+    public static boolean removeLeader(Game game, Player player, Leader leader) {
+        LeaderRemovalReason reason = LeaderRemovalReason.fromHeroId(leader.getId());
+        boolean removed = player.removeLeader(leader);
+        if (removed && (reason == LeaderRemovalReason.PURGED || reason == LeaderRemovalReason.STATUS_CLEANUP)) {
+            DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+        }
+        return removed;
+    }
+
     public static void playHero(GenericInteractionCreateEvent event, Game game, Player player, Leader playerLeader) {
         LeaderModel leaderModel = playerLeader.getLeaderModel().orElse(null);
         boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(game.getOutputVerbosity());
@@ -81,12 +90,8 @@ public class PlayHeroService {
             BotLogger.warning(new LogOrigin(event), "Missing LeaderModel: " + playerLeader.getId());
         }
 
-        if ("letnevhero".equals(playerLeader.getId())
-                || "nomadhero".equals(playerLeader.getId())
-                || "zealotshero".equals(playerLeader.getId())
-                || "nokarhero".equals(playerLeader.getId())
-                || "kolumehero".equals(playerLeader.getId())
-                || "qhethero".equals(playerLeader.getId())) {
+        LeaderRemovalReason removalReason = LeaderRemovalReason.fromHeroId(playerLeader.getId());
+        if (removalReason == LeaderRemovalReason.STATUS_CLEANUP) {
             playerLeader.setLocked(false);
             playerLeader.setActive(true);
             sb.append("\nLeader will be purged after status cleanup.");
@@ -112,10 +117,9 @@ public class PlayHeroService {
                     ? "Hero " + playerLeader.getId()
                     : playerLeaderModel.getName() + ", the " + StringUtils.capitalize(playerLeaderModel.getFaction())
                             + " hero,";
-            String msg = leaderName + " has been purged.";
+            String msg = removalReason.getRemovalMessage(leaderName);
             if (!"mykomentorihero".equals(playerLeader.getId())) {
-                purged = player.removeLeader(playerLeader);
-                DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+                purged = removeLeader(game, player, playerLeader);
                 ButtonHelperHeroes.checkForMykoHero(game, playerLeader.getId(), player);
             } else {
                 msg = "Coprinus Comatus, the Myko-Mentori hero, was used to copy another hero.";
