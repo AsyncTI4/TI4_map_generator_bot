@@ -73,13 +73,13 @@ class RetreatButtonHandler {
         }
 
         if (buttonID.contains("gheminabt")) {
+            Player p1 = player;
             String btID = "gheminabt";
             BreakthroughModel btModel = Mapper.getBreakthrough(btID);
-            player.getBreakthroughExhausted().put(btID, true);
-            String message =
-                    player.getRepresentation() + " exhausted _" + btModel.getName() + "_ to immediately retreat.";
+            p1.getBreakthroughExhausted().put(btID, true);
+            String message = p1.getRepresentation() + " exhausted _" + btModel.getName() + "_ to immediately retreat.";
             MessageHelper.sendMessageToChannelWithEmbed(
-                    player.getCorrectChannel(), message, btModel.getRepresentationEmbed());
+                    p1.getCorrectChannel(), message, btModel.getRepresentationEmbed());
         }
 
         String message = player.getRepresentationUnfogged() + ", please choose a system to move to.";
