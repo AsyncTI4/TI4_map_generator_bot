@@ -10,7 +10,7 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.message.MessageHelper;
 
 @UtilityClass
-public class GlimmerButtonHandler {
+class GlimmerButtonHandler {
 
     @ButtonHandler("endGlimmersRedTech_")
     public static void endGlimmersRedTech(ButtonInteractionEvent event, Player player, Game game, String buttonID) {

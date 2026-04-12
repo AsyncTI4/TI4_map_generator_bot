@@ -251,7 +251,7 @@ public class PlayerTechService {
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "dsmortr" -> {
-                startGlimmersRedTech(player, game);
+                startGlimmersRedTech(player);
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "dsceldr" -> {
@@ -928,7 +928,7 @@ public class PlayerTechService {
         }
     }
 
-    public static void startGlimmersRedTech(Player player, Game game) {
+    private static void startGlimmersRedTech(Player player) {
         Set<Units.UnitType> allowedUnits = Set.of(
                 Units.UnitType.Fighter,
                 Units.UnitType.Destroyer,

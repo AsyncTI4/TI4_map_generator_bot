@@ -20,7 +20,7 @@ import ti4.service.turn.StartTurnService;
 @UtilityClass
 class CoreFactoryButtonHandler {
 
-    @ButtonHandler("corefactoryAction")
+    @ButtonHandler("corefacilityAction")
     public static void coreFactoryAction(ButtonInteractionEvent event, Player player, Game game) {
         ButtonHelper.deleteMessage(event);
         String tPlanet = "";
