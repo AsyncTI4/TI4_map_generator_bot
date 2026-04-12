@@ -13,6 +13,7 @@ import ti4.commands.SlashCommandManager;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
+import ti4.rollbar.RollbarManager;
 import ti4.service.SusSlashCommandService;
 import ti4.service.game.GameNameService;
 
@@ -50,6 +51,9 @@ public class SlashCommandListener extends ListenerAdapter implements ListenerInt
 
     private void process(SlashCommandInteractionEvent event) {
         long startTime = System.currentTimeMillis();
+        RollbarManager.putInteractionMetadata("slash_command", event);
+        RollbarManager.put("command_name", event.getCommandString());
+        RollbarManager.put("game_name", GameNameService.getGameName(event));
 
         ParentCommand command = SlashCommandManager.getCommand(event.getName());
         try {
@@ -64,6 +68,8 @@ public class SlashCommandListener extends ListenerAdapter implements ListenerInt
             }
         } catch (Exception e) {
             command.onException(event, e);
+        } finally {
+            RollbarManager.clear();
         }
 
         warnForLongRunningCommands(event, startTime);

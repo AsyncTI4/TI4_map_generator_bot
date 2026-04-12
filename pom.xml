@@ -136,6 +136,11 @@
       <artifactId>jemoji</artifactId>
       <version>${jemoji.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.rollbar</groupId>
+      <artifactId>rollbar-java</artifactId>
+      <version>2.0.0</version>
+    </dependency>
 
     <dependency>
       <groupId>com.github.spotbugs</groupId>

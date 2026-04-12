@@ -11,6 +11,7 @@ import ti4.listeners.annotations.SelectionHandler;
 import ti4.listeners.context.SelectionMenuContext;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.rollbar.RollbarManager;
 import ti4.service.game.GameNameService;
 
 public final class SelectionMenuProcessor {
@@ -29,6 +30,9 @@ public final class SelectionMenuProcessor {
 
     private static void process(StringSelectInteractionEvent event) {
         try {
+            RollbarManager.putInteractionMetadata("select_menu", event);
+            RollbarManager.put("menu_id", event.getComponentId());
+            RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
             SelectionMenuContext context = new SelectionMenuContext(event);
             if (context.isValid()) {
                 resolveSelectionMenu(context);
@@ -38,6 +42,8 @@ public final class SelectionMenuProcessor {
             String message = "Selection Menu issue in event: " + event.getComponentId() + "\n> Channel: "
                     + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
             BotLogger.error(new LogOrigin(event), message, e);
+        } finally {
+            RollbarManager.clear();
         }
     }
 
@@ -45,6 +51,7 @@ public final class SelectionMenuProcessor {
         String menuID = context.getMenuID();
         // Check for exact match first
         if (knownMenus.containsKey(menuID)) {
+            RollbarManager.put("menu_handler_id", menuID);
             knownMenus.get(menuID).accept(context);
             return true;
         }
@@ -60,6 +67,7 @@ public final class SelectionMenuProcessor {
         }
 
         if (longestPrefixMatch != null) {
+            RollbarManager.put("menu_handler_id", longestPrefixMatch);
             knownMenus.get(longestPrefixMatch).accept(context);
             return true;
         }
