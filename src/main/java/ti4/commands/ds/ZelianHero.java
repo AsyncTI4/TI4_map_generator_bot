@@ -12,7 +12,6 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -21,6 +20,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.service.leader.PlayHeroService;
 
 class ZelianHero extends GameStateSubcommand {
 
@@ -93,8 +93,7 @@ class ZelianHero extends GameStateSubcommand {
             StringBuilder message = new StringBuilder(player.getRepresentation())
                     .append(" played ")
                     .append(Helper.getLeaderFullRepresentation(playerLeader));
-            boolean purged = player.removeLeader(playerLeader);
-            DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+            boolean purged = PlayHeroService.removeLeader(game, player, playerLeader);
             if (purged) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(), message + " - Zelian R, the Zelian heRo, has been purged.");

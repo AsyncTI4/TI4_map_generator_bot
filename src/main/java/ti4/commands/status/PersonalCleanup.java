@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -18,6 +17,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.RefreshLeaderService;
 
 class PersonalCleanup extends GameStateSubcommand {
@@ -78,8 +78,7 @@ class PersonalCleanup extends GameStateSubcommand {
         for (Leader leader : leads) {
             if (!leader.isLocked()) {
                 if (leader.isActive()) {
-                    player.removeLeader(leader.getId());
-                    DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+                    PlayHeroService.removeLeader(game, player, player.unsafeGetLeader(leader.getId()));
                 } else {
                     RefreshLeaderService.refreshLeader(player, leader, game);
                 }

@@ -22,7 +22,6 @@ import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -1181,8 +1180,7 @@ public final class ButtonHelperHeroes {
         StringBuilder message = new StringBuilder(player.getRepresentation())
                 .append(" played ")
                 .append(Helper.getLeaderFullRepresentation(playerLeader));
-        boolean purged = player.removeLeader(playerLeader);
-        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+        boolean purged = PlayHeroService.removeLeader(game, player, playerLeader);
         if (purged) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), message + " - Titus Flavius, the Celdauri hero, has been purged.");
@@ -1237,8 +1235,7 @@ public final class ButtonHelperHeroes {
         StringBuilder message = new StringBuilder(player.getRepresentation())
                 .append(" played ")
                 .append(Helper.getLeaderFullRepresentation(playerLeader));
-        boolean purged = player.removeLeader(playerLeader);
-        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+        boolean purged = PlayHeroService.removeLeader(game, player, playerLeader);
         if (purged) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -2177,8 +2174,7 @@ public final class ButtonHelperHeroes {
         StringBuilder message2 = new StringBuilder(player.getRepresentation())
                 .append(" played ")
                 .append(Helper.getLeaderFullRepresentation(playerLeader));
-        boolean purged = player.removeLeader(playerLeader);
-        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+        boolean purged = PlayHeroService.removeLeader(game, player, playerLeader);
         if (purged) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -2206,8 +2202,7 @@ public final class ButtonHelperHeroes {
         StringBuilder message2 = new StringBuilder(player.getRepresentation())
                 .append(" played ")
                 .append(Helper.getLeaderFullRepresentation(playerLeader));
-        boolean purged = player.removeLeader(playerLeader);
-        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+        boolean purged = PlayHeroService.removeLeader(game, player, playerLeader);
         if (purged) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), message2 + " - The Oracle, the Poison hero, has been purged. \n\n ");
@@ -2225,8 +2220,7 @@ public final class ButtonHelperHeroes {
         StringBuilder message2 = new StringBuilder(player.getRepresentation())
                 .append(" played ")
                 .append(Helper.getLeaderFullRepresentation(playerLeader));
-        boolean purged = player.removeLeader(playerLeader);
-        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+        boolean purged = PlayHeroService.removeLeader(game, player, playerLeader);
         if (purged) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), message2 + " - Speygh, the Kyro hero, has been purged. \n\n");

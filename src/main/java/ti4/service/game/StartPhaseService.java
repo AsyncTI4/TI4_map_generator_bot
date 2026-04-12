@@ -33,7 +33,6 @@ import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
-import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
@@ -63,6 +62,7 @@ import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.GMService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.ListTurnOrderService;
+import ti4.service.leader.PlayHeroService;
 import ti4.service.map.SpinService;
 import ti4.service.planet.PlanetService;
 import ti4.service.strategycard.PickStrategyCardService;
@@ -302,8 +302,7 @@ public class StartPhaseService {
                         player2.getCorrectChannel(), msg + "the first technology.", buttons);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player2.getCorrectChannel(), msg + "the second technology.", buttons);
-                player2.removeLeader("zealotshero");
-                DSHelperBreakthroughs.doLanefirBtCheck(game, player2);
+                PlayHeroService.removeLeader(game, player2, player2.unsafeGetLeader("zealotshero"));
                 ButtonHelperHeroes.checkForMykoHero(game, "zealotshero", player2);
                 game.setStoredValue("zealotsHeroTechs", "");
                 game.setStoredValue("zealotsHeroPurged", "true");
