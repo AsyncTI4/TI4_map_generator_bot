@@ -262,3 +262,5 @@ To run Java tests in VSCode - make sure you add a test configuration your .vscod
 - You can use `/game swap` to switch seats with another player (a bot) in the game
 - You can use `/bothelper list_buttons` to find the buttonIDs in that message, which you can use to search the repo for the code that created that button
 - You can spoof a button with a specific buttonID with `/button spoof_id:{spoofedID}`
+
+# JUST TESTING THE PR TESTS
