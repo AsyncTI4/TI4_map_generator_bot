@@ -28,6 +28,7 @@ import ti4.listeners.context.ButtonContext;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.rollbar.RollbarManager;
 import ti4.service.button.ReactionService;
 import ti4.service.game.GameNameService;
 import ti4.settings.users.UserSettingsManager;
@@ -66,6 +67,9 @@ public class ButtonProcessor {
         long saveRuntime = 0;
         ButtonContext context = null;
         try {
+            RollbarManager.putInteractionMetadata("button", event);
+            RollbarManager.put("button_id", event.getButton().getCustomId());
+            RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
             long beforeTime = System.currentTimeMillis();
             context = new ButtonContext(event);
             contextRuntime = System.currentTimeMillis() - beforeTime;
@@ -82,6 +86,8 @@ public class ButtonProcessor {
         } catch (Exception e) {
             LogOrigin origin = new LogOrigin(event, context);
             BotLogger.error(origin, "Something went wrong with button interaction", e);
+        } finally {
+            RollbarManager.clear();
         }
 
         runtimeWarningService.submitNewRuntime(
@@ -92,6 +98,7 @@ public class ButtonProcessor {
         String buttonID = context.getButtonID();
         // Check for exact match first
         if (knownButtons.containsKey(buttonID)) {
+            RollbarManager.put("button_handler_id", buttonID);
             knownButtons.get(buttonID).accept(context);
             return true;
         }
@@ -107,6 +114,7 @@ public class ButtonProcessor {
         }
 
         if (longestPrefixMatch != null) {
+            RollbarManager.put("button_handler_id", longestPrefixMatch);
             knownButtons.get(longestPrefixMatch).accept(context);
             return true;
         }
@@ -130,18 +138,24 @@ public class ButtonProcessor {
         if (false) {
             // Don't add anymore if/else startWith statements - use @ButtonHandler
         } else if (buttonID.startsWith(Constants.SO_SCORE_FROM_HAND)) {
+            trackButtonHandler(Constants.SO_SCORE_FROM_HAND);
             UnfiledButtonHandlers.soScoreFromHand(
                     event, buttonID, game, player, privateChannel, mainGameChannel, mainGameChannel);
         } else if (buttonID.startsWith(Constants.PO_SCORING)) {
+            trackButtonHandler(Constants.PO_SCORING);
             UnfiledButtonHandlers.poScoring(event, player, buttonID, game, privateChannel);
         } else if (buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
+            trackButtonHandler(Constants.GENERIC_BUTTON_ID_PREFIX);
             ReactionService.addReaction(event, game, player);
         } else if (buttonID.startsWith("autoAssignGroundHits_")) {
+            trackButtonHandler("autoAssignGroundHits_");
             ButtonHelperModifyUnits.autoAssignGroundCombatHits(
                     player, game, buttonID.split("_")[1], Integer.parseInt(buttonID.split("_")[2]), event);
         } else if (buttonID.startsWith("strategicAction_")) {
+            trackButtonHandler("strategicAction_");
             UnfiledButtonHandlers.strategicAction(event, player, buttonID, game, mainGameChannel);
         } else if (buttonID.startsWith("getSwapButtons_")) {
+            trackButtonHandler("getSwapButtons_");
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
                     "Swap",
@@ -150,53 +164,146 @@ public class ButtonProcessor {
         } else {
             switch (buttonID) { // TODO Convert all switch case to use @ButtonHandler
                 // Don't add anymore cases - use @ButtonHandler
-                case "refreshInfoButtons" ->
+                case "refreshInfoButtons" -> {
+                    trackButtonHandler("refreshInfoButtons");
                     MessageHelper.sendMessageToChannelWithButtons(
                             event.getChannel(), null, getRefreshInfoButtons(game));
-                case "gain_1_comms" -> ButtonHelperStats.gainComms(event, game, player, 1, true);
-                case "gain_2_comms" -> ButtonHelperStats.gainComms(event, game, player, 2, true);
-                case "gain_3_comms" -> ButtonHelperStats.gainComms(event, game, player, 3, true);
-                case "gain_4_comms" -> ButtonHelperStats.gainComms(event, game, player, 4, true);
-                case "gain_1_comms_stay" -> ButtonHelperStats.gainComms(event, game, player, 1, false);
-                case "gain_2_comms_stay" -> ButtonHelperStats.gainComms(event, game, player, 2, false);
-                case "gain_3_comms_stay" -> ButtonHelperStats.gainComms(event, game, player, 3, false);
-                case "gain_4_comms_stay" -> ButtonHelperStats.gainComms(event, game, player, 4, false);
-                case "convert_1_comms" -> ButtonHelperStats.convertComms(event, game, player, 1);
-                case "convert_2_comms" -> ButtonHelperStats.convertComms(event, game, player, 2, true);
-                case "convert_3_comms" -> ButtonHelperStats.convertComms(event, game, player, 3);
-                case "convert_4_comms" -> ButtonHelperStats.convertComms(event, game, player, 4);
-                case "convert_2_comms_stay" -> ButtonHelperStats.convertComms(event, game, player, 2, false);
+                }
+                case "gain_1_comms" -> {
+                    trackButtonHandler("gain_1_comms");
+                    ButtonHelperStats.gainComms(event, game, player, 1, true);
+                }
+                case "gain_2_comms" -> {
+                    trackButtonHandler("gain_2_comms");
+                    ButtonHelperStats.gainComms(event, game, player, 2, true);
+                }
+                case "gain_3_comms" -> {
+                    trackButtonHandler("gain_3_comms");
+                    ButtonHelperStats.gainComms(event, game, player, 3, true);
+                }
+                case "gain_4_comms" -> {
+                    trackButtonHandler("gain_4_comms");
+                    ButtonHelperStats.gainComms(event, game, player, 4, true);
+                }
+                case "gain_1_comms_stay" -> {
+                    trackButtonHandler("gain_1_comms_stay");
+                    ButtonHelperStats.gainComms(event, game, player, 1, false);
+                }
+                case "gain_2_comms_stay" -> {
+                    trackButtonHandler("gain_2_comms_stay");
+                    ButtonHelperStats.gainComms(event, game, player, 2, false);
+                }
+                case "gain_3_comms_stay" -> {
+                    trackButtonHandler("gain_3_comms_stay");
+                    ButtonHelperStats.gainComms(event, game, player, 3, false);
+                }
+                case "gain_4_comms_stay" -> {
+                    trackButtonHandler("gain_4_comms_stay");
+                    ButtonHelperStats.gainComms(event, game, player, 4, false);
+                }
+                case "convert_1_comms" -> {
+                    trackButtonHandler("convert_1_comms");
+                    ButtonHelperStats.convertComms(event, game, player, 1);
+                }
+                case "convert_2_comms" -> {
+                    trackButtonHandler("convert_2_comms");
+                    ButtonHelperStats.convertComms(event, game, player, 2, true);
+                }
+                case "convert_3_comms" -> {
+                    trackButtonHandler("convert_3_comms");
+                    ButtonHelperStats.convertComms(event, game, player, 3);
+                }
+                case "convert_4_comms" -> {
+                    trackButtonHandler("convert_4_comms");
+                    ButtonHelperStats.convertComms(event, game, player, 4);
+                }
+                case "convert_2_comms_stay" -> {
+                    trackButtonHandler("convert_2_comms_stay");
+                    ButtonHelperStats.convertComms(event, game, player, 2, false);
+                }
                 // Don't add anymore cases - use @ButtonHandler
-                case "play_when" -> AgendaHelper.playWhen(event, game, player, mainGameChannel);
-                case "gain_1_tg" -> UnfiledButtonHandlers.gain1TG(event, player, game, mainGameChannel);
-                case "gain1tgFromLetnevCommander" ->
+                case "play_when" -> {
+                    trackButtonHandler("play_when");
+                    AgendaHelper.playWhen(event, game, player, mainGameChannel);
+                }
+                case "gain_1_tg" -> {
+                    trackButtonHandler("gain_1_tg");
+                    UnfiledButtonHandlers.gain1TG(event, player, game, mainGameChannel);
+                }
+                case "gain1tgFromLetnevCommander" -> {
+                    trackButtonHandler("gain1tgFromLetnevCommander");
                     UnfiledButtonHandlers.gain1tgFromLetnevCommander(event, player, game, mainGameChannel);
-                case "gain1tgFromMuaatCommander" ->
+                }
+                case "gain1tgFromMuaatCommander" -> {
+                    trackButtonHandler("gain1tgFromMuaatCommander");
                     UnfiledButtonHandlers.gain1tgFromMuaatCommander(event, player, game, mainGameChannel);
-                case "gain1tgFromCommander" ->
+                }
+                case "gain1tgFromCommander" -> {
+                    trackButtonHandler("gain1tgFromCommander");
                     UnfiledButtonHandlers.gain1tgFromCommander(
                             event, player, game, mainGameChannel); // should be deprecated
-                case "resolveHarness" -> ButtonHelperStats.replenishComms(event, game, player, false);
-                case "pass_on_abilities" ->
+                }
+                case "resolveHarness" -> {
+                    trackButtonHandler("resolveHarness");
+                    ButtonHelperStats.replenishComms(event, game, player, false);
+                }
+                case "pass_on_abilities" -> {
+                    trackButtonHandler("pass_on_abilities");
                     ReactionService.addReaction(
                             event,
                             game,
                             player,
                             " is " + event.getButton().getLabel().toLowerCase() + ".");
-                case "searchMyGames" ->
+                }
+                case "searchMyGames" -> {
+                    trackButtonHandler("searchMyGames");
                     SearchGameHelper.searchGames(
                             event.getUser(), event, false, false, false, true, false, true, false, false);
-                case "checkWHView" -> ButtonHelper.showFeatureType(event, game, DisplayType.wormholes);
-                case "checkAnomView" -> ButtonHelper.showFeatureType(event, game, DisplayType.anomalies);
-                case "checkLegendView" -> ButtonHelper.showFeatureType(event, game, DisplayType.legendaries);
-                case "checkEmptyView" -> ButtonHelper.showFeatureType(event, game, DisplayType.empties);
-                case "checkAetherView" -> ButtonHelper.showFeatureType(event, game, DisplayType.aetherstream);
-                case "checkCannonView" -> ButtonHelper.showFeatureType(event, game, DisplayType.spacecannon);
-                case "checkTraitView" -> ButtonHelper.showFeatureType(event, game, DisplayType.traits);
-                case "checkTechSkipView" -> ButtonHelper.showFeatureType(event, game, DisplayType.techskips);
-                case "checkAttachmView" -> ButtonHelper.showFeatureType(event, game, DisplayType.attachments);
-                case "checkShiplessView" -> ButtonHelper.showFeatureType(event, game, DisplayType.shipless);
-                case "checkUnlocked" -> ButtonHelper.showFeatureType(event, game, DisplayType.unlocked);
+                }
+                case "checkWHView" -> {
+                    trackButtonHandler("checkWHView");
+                    ButtonHelper.showFeatureType(event, game, DisplayType.wormholes);
+                }
+                case "checkAnomView" -> {
+                    trackButtonHandler("checkAnomView");
+                    ButtonHelper.showFeatureType(event, game, DisplayType.anomalies);
+                }
+                case "checkLegendView" -> {
+                    trackButtonHandler("checkLegendView");
+                    ButtonHelper.showFeatureType(event, game, DisplayType.legendaries);
+                }
+                case "checkEmptyView" -> {
+                    trackButtonHandler("checkEmptyView");
+                    ButtonHelper.showFeatureType(event, game, DisplayType.empties);
+                }
+                case "checkAetherView" -> {
+                    trackButtonHandler("checkAetherView");
+                    ButtonHelper.showFeatureType(event, game, DisplayType.aetherstream);
+                }
+                case "checkCannonView" -> {
+                    trackButtonHandler("checkCannonView");
+                    ButtonHelper.showFeatureType(event, game, DisplayType.spacecannon);
+                }
+                case "checkTraitView" -> {
+                    trackButtonHandler("checkTraitView");
+                    ButtonHelper.showFeatureType(event, game, DisplayType.traits);
+                }
+                case "checkTechSkipView" -> {
+                    trackButtonHandler("checkTechSkipView");
+                    ButtonHelper.showFeatureType(event, game, DisplayType.techskips);
+                }
+                case "checkAttachmView" -> {
+                    trackButtonHandler("checkAttachmView");
+                    ButtonHelper.showFeatureType(event, game, DisplayType.attachments);
+                }
+                case "checkShiplessView" -> {
+                    trackButtonHandler("checkShiplessView");
+                    ButtonHelper.showFeatureType(event, game, DisplayType.shipless);
+                }
+                case "checkUnlocked" -> {
+                    trackButtonHandler("checkUnlocked");
+                    ButtonHelper.showFeatureType(event, game, DisplayType.unlocked);
+                }
                 // Don't add anymore cases - use @ButtonHandler
                 default ->
                     MessageHelper.sendMessageToEventChannel(
@@ -212,6 +319,10 @@ public class ButtonProcessor {
         if (game.isTwilightsFallMode()) return Buttons.REFRESH_INFO_BUTTONS_TF;
         if (game.isThundersEdge()) return Buttons.REFRESH_INFO_BUTTONS_TE;
         return Buttons.REFRESH_INFO_BUTTONS;
+    }
+
+    private static void trackButtonHandler(String handlerId) {
+        RollbarManager.put("button_handler_id", handlerId);
     }
 
     public static String getButtonProcessingStatistics() {

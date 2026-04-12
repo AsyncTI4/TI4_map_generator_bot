@@ -25,6 +25,7 @@ import ti4.helpers.DiscordWebhook;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.message.MessageHelper;
+import ti4.rollbar.RollbarManager;
 import ti4.service.statistics.SREStats;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
@@ -225,6 +226,8 @@ public class BotLogger {
             @Nullable Throwable err,
             @Nonnull LogSeverity severity,
             @Nullable String threadName) {
+        reportToRollbar(origin, message, err, severity);
+
         // Count Error-severity logs once per entry
         if (severity.isErrorOrHigher()) {
             SREStats.incrementErrorCount();
@@ -305,6 +308,17 @@ public class BotLogger {
                 }
             }
         }
+    }
+
+    private static void reportToRollbar(
+            @Nullable LogOrigin origin,
+            @Nonnull String message,
+            @Nullable Throwable err,
+            @Nonnull LogSeverity severity) {
+        if (err == null) {
+            return;
+        }
+        RollbarManager.report(severity.rollbarLevel, err, message, origin);
     }
 
     private static void sendMessageToThread(

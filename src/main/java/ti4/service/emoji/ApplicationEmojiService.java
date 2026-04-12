@@ -133,8 +133,7 @@ public final class ApplicationEmojiService {
                     .createApplicationEmoji(emoji.getName(), emoji.getIcon())
                     .complete();
         } catch (Exception e) {
-            // Check if we failed because it already exists...
-            BotLogger.error("Failed to upload emoji file: " + emoji.getName(), e);
+            BotLogger.warning("Failed to upload emoji file: " + emoji.getName());
             return null;
         }
     }
