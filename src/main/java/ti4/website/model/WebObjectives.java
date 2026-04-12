@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.Data;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.model.PublicObjectiveModel;
 import ti4.service.info.ListPlayerInfoService;
 

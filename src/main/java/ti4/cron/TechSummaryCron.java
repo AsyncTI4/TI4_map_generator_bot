@@ -3,12 +3,12 @@ package ti4.cron;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GameManager;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.model.metadata.TechSummariesMetadataManager;
 
 @UtilityClass

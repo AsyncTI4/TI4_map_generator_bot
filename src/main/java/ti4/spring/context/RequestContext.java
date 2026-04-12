@@ -3,8 +3,8 @@ package ti4.spring.context;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.context.SecurityContextHolder;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Player;
 
 @UtilityClass
 public class RequestContext {

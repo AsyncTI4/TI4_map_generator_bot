@@ -5,12 +5,12 @@ import java.util.function.Consumer;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.executors.ExecutorServiceManager;
+import ti4.game.Game;
 import ti4.listeners.annotations.AnnotationHandler;
 import ti4.listeners.annotations.SelectionHandler;
 import ti4.listeners.context.SelectionMenuContext;
-import ti4.map.Game;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.service.game.GameNameService;
 
 public final class SelectionMenuProcessor {

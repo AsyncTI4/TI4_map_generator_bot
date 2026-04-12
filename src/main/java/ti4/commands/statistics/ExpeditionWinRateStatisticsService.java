@@ -9,10 +9,10 @@ import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.map.Expeditions;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GamesPage;
+import ti4.game.Expeditions;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GamesPage;
 import ti4.message.MessageHelper;
 import ti4.service.statistics.StatisticsPipeline;
 

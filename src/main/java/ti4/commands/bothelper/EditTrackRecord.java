@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.settings.users.UserSettingsManager;
 
 class EditTrackRecord extends Subcommand {

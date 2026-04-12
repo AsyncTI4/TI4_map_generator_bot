@@ -4,6 +4,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
@@ -11,10 +15,6 @@ import ti4.image.ImageHelper;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
 import ti4.image.TileImageTest;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 
 @UtilityClass
 public class TileImageTestHelper {

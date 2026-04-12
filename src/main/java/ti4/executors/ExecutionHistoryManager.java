@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import ti4.helpers.TimedRunnable;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 
 public final class ExecutionHistoryManager {
 

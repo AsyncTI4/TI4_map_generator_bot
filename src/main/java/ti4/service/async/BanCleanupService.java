@@ -17,10 +17,10 @@ import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.map.persistence.GameManager;
-import ti4.map.persistence.ManagedPlayer;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedPlayer;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.spring.jda.JdaService;
 
 @UtilityClass

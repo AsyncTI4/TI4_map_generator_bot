@@ -17,7 +17,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 
 public class MessageV2Editor {
     private final List<ReplaceMessagePart> replaceByCustomId = new ArrayList<>();

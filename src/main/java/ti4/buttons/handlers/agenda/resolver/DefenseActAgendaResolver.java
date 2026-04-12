@@ -1,10 +1,10 @@
 package ti4.buttons.handlers.agenda.resolver;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.Units.UnitType;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.unit.CheckUnitContainmentService;
 

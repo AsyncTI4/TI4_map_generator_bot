@@ -1,9 +1,9 @@
 package ti4.commands.developer;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.buttons.ButtonProcessor;
 import ti4.commands.Subcommand;
 import ti4.message.MessageHelper;
-import ti4.processors.ButtonProcessor;
 
 class ButtonProcessingStatistics extends Subcommand {
 

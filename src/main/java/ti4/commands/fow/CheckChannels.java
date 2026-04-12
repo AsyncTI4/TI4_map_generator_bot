@@ -9,9 +9,9 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.commands.GameStateSubcommand;
+import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 class CheckChannels extends GameStateSubcommand {

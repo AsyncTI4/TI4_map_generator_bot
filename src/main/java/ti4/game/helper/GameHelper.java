@@ -1,0 +1,18 @@
+package ti4.game.helper;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import lombok.experimental.UtilityClass;
+import ti4.game.Game;
+
+@UtilityClass
+public class GameHelper {
+
+    public static final DateTimeFormatter CREATION_DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("uuuu.MM.dd", Locale.ROOT);
+
+    public static LocalDate getCreationDateAsLocalDate(Game game) {
+        return LocalDate.parse(game.getCreationDate(), CREATION_DATE_FORMATTER);
+    }
+}

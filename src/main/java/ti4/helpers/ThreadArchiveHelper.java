@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.settings.GlobalSettings;
 
 @UtilityClass

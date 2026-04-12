@@ -15,12 +15,12 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Storage;
-import ti4.map.Game;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 
 @UtilityClass
 public class GameUndoNameService {

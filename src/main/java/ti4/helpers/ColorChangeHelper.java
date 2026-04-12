@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.UnitHolder;
 import ti4.model.ColorModel;
 import ti4.model.PromissoryNoteModel;
 

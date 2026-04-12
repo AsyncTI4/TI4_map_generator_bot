@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.spring.context.RequestContext;
 
 @RequiredArgsConstructor

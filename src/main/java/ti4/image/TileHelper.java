@@ -13,14 +13,14 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.collections4.CollectionUtils;
+import ti4.game.Game;
+import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.PatternHelper;
 import ti4.helpers.Storage;
 import ti4.json.JsonMapperManager;
-import ti4.map.Game;
-import ti4.map.Tile;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
 

@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.listeners.DeletionListener;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.spring.service.messagecache.SavedBotMessagesService;
 
 public class DeleteMessage extends MessageCommand {

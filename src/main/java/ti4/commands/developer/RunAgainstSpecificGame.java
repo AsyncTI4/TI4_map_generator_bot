@@ -4,11 +4,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
+import ti4.game.Game;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.map.persistence.GameManager;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 
 class RunAgainstSpecificGame extends Subcommand {
 

@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import ti4.game.Game;
+import ti4.game.persistence.GameTestHelper;
 import ti4.json.JsonMapperManager;
-import ti4.map.Game;
-import ti4.map.persistence.GameTestHelper;
 import ti4.testUtils.BaseTi4Test;
 
 class GameStatsDashboardPayloadTest extends BaseTi4Test {

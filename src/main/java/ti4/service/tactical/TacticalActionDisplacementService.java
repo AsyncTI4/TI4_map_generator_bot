@@ -9,17 +9,17 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Space;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Space;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.service.regex.RegexService;
 
 @UtilityClass

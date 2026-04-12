@@ -12,9 +12,9 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.image.PositionMapper;
-import ti4.map.Game;
-import ti4.map.Player;
 
 public final class PlayerStatsHelper {
     private static final Pattern DIGIT_PATTERN = Pattern.compile("\\d");

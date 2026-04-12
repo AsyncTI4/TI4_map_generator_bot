@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.events.channel.ChannelCreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.ThreadArchiveHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 
 public class ThreadCreateListener extends ListenerAdapter {
 

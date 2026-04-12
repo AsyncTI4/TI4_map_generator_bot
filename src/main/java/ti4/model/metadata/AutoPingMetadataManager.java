@@ -7,7 +7,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.json.PersistenceManager;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 
 @UtilityClass
 public class AutoPingMetadataManager {

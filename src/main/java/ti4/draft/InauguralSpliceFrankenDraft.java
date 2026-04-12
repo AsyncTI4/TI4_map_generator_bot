@@ -1,7 +1,7 @@
 package ti4.draft;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import ti4.map.Game;
+import ti4.game.Game;
 
 public class InauguralSpliceFrankenDraft extends FrankenDraft {
 

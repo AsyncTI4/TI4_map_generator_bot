@@ -6,10 +6,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateCommand;
+import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.image.MapRenderPipeline;
-import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
 

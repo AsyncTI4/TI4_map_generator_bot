@@ -1,10 +1,10 @@
 package ti4.buttons.handlers.agenda.resolver;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.CommandCounterHelper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 public class SharedResearchAgendaResolver implements AgendaResolver {

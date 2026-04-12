@@ -12,7 +12,7 @@ import ti4.commands.ParentCommand;
 import ti4.commands.SlashCommandManager;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.Constants;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.SusSlashCommandService;
 import ti4.service.game.GameNameService;
 

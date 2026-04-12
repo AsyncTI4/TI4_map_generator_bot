@@ -7,8 +7,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
+import ti4.game.Game;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
-import ti4.map.Game;
 
 @UtilityClass
 public class GameModeService {

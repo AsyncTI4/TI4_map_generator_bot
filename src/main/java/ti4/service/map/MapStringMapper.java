@@ -3,10 +3,10 @@ package ti4.service.map;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import ti4.game.Game;
 import ti4.helpers.AliasHandler;
-import ti4.map.Game;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 
 public final class MapStringMapper {
     public static Map<String, String> getMappedTilesToPosition(String tileListAsString, Game userActiveGame) {
