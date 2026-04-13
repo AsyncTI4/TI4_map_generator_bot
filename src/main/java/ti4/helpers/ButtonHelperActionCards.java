@@ -629,6 +629,8 @@ public final class ButtonHelperActionCards {
                 }
             }
         } else {
+            Map<UnitHolder, Map<UnitKey, Integer>> pendingRemovals = new HashMap<>();
+            int totalDamageDealt = 0;
             for (UnitHolder uH : tile.getUnitHolders().values()) {
                 for (UnitKey key : uH.getUnitKeys()) {
                     Player player_ = game.getPlayerFromColorOrFaction(key.getColor());
@@ -669,11 +671,36 @@ public final class ButtonHelperActionCards {
                     result += CombatMessageHelper.displayHitResults(totalHits);
                     player.setActualHits(player.getActualHits() + totalHits);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
-                    uH.removeUnit(key, hitRolls);
-                    if (hitRolls > 0 && key.getUnitType() == UnitType.Mech && player_.hasActiveBreakthrough("naazbt")) {
-                        BreakthroughCommandHelper.deactivateBreakthrough(player_, "naazbt");
+
+                    if (hitRolls > 0) {
+                        pendingRemovals
+                                .computeIfAbsent(uH, ignored -> new HashMap<>())
+                                .put(key, hitRolls);
+                        totalDamageDealt += hitRolls;
+                        if (key.getUnitType() == UnitType.Mech && player_.hasActiveBreakthrough("naazbt")) {
+                            BreakthroughCommandHelper.deactivateBreakthrough(player_, "naazbt");
+                        }
                     }
                 }
+            }
+
+            if ("bastionhero".equalsIgnoreCase(type) && totalDamageDealt >= 10) {
+                String message1 = "Moments before disaster in game " + game.getName() + ".";
+                DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 0, message1);
+            }
+
+            for (Map.Entry<UnitHolder, Map<UnitKey, Integer>> removalEntry : pendingRemovals.entrySet()) {
+                UnitHolder unitHolder = removalEntry.getKey();
+                for (Map.Entry<UnitKey, Integer> unitEntry :
+                        removalEntry.getValue().entrySet()) {
+                    unitHolder.removeUnit(unitEntry.getKey(), unitEntry.getValue());
+                }
+            }
+
+            if ("bastionhero".equalsIgnoreCase(type) && totalDamageDealt >= 10) {
+                String message2 = tile.getRepresentation() + " has been devastated by ENTITY 4X41A \"APOLLO\" ("
+                        + player.getRepresentation() + ") for " + totalDamageDealt + " damage.";
+                DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 0, message2);
             }
         }
         ButtonHelper.deleteMessage(event);
