@@ -20,7 +20,6 @@ import ti4.service.game.StartPhaseService;
 
 @UtilityClass
 public class CommandCounterButtonHandler {
-
     @ButtonHandler("decrease_fleet_cc")
     public static void decreaseFleetCC(ButtonInteractionEvent event, Player player, Game game) {
         player.setFleetCC(player.getFleetCC() - 1);
