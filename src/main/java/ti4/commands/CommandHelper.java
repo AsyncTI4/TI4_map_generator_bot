@@ -111,7 +111,14 @@ public class CommandHelper {
         if (factionColorOption != null) {
             String factionColor =
                     AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
-            return getPlayerByFactionColor(factionColor, game);
+            Player player = getPlayerByFactionColor(factionColor, game);
+            if (player != null) {
+                return player;
+            }
+        }
+        Player player = getPlayerFromChannel(game, event);
+        if (player != null) {
+            return player;
         }
         return getPlayerFromGame(game, event.getMember(), event.getUser().getId());
     }
@@ -141,6 +148,17 @@ public class CommandHelper {
             if (Objects.equals(factionColor, player_.getFaction())
                     || Objects.equals(factionColor, player_.getColor())) {
                 return player_;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    private static Player getPlayerFromChannel(Game game, GenericCommandInteractionEvent event) {
+        String channelId = event.getChannel().getId();
+        for (Player player : game.getPlayers().values()) {
+            if (channelId.equals(player.getPrivateChannelID()) || channelId.equals(player.getCardsInfoThreadID())) {
+                return player;
             }
         }
         return null;
