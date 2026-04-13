@@ -3,6 +3,9 @@ on:
     branches: [ "master" ]
   workflow_dispatch:
 name: BuildAndDeploy
+concurrency:
+  group: deploy-to-production-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   saveGamesBeforeDeploy:
     uses: ./.github/workflows/force-backup-of-savefiles.yml
