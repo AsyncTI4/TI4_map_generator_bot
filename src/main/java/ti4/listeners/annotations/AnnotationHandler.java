@@ -33,6 +33,7 @@ import ti4.listeners.context.ListenerContext;
 import ti4.listeners.context.ModalContext;
 import ti4.listeners.context.SelectionMenuContext;
 import ti4.logging.BotLogger;
+import ti4.spring.jda.JdaService;
 
 public final class AnnotationHandler {
 
@@ -184,7 +185,8 @@ public final class AnnotationHandler {
                                 .getInteraction()
                                 .getMessage()
                                 .reply(
-                                        "The button failed. An exception has been logged for the developers. Please report this to the bot questions channel. It will probably require a code change.")
+                                        "The button failed. An exception has been logged for the developers. Please report this to "
+                                                + getBotBugsChannelLink() + ". It will probably require a code change.")
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                     if (arg instanceof StringSelectInteractionEvent selectInteractionEvent) {
@@ -193,7 +195,8 @@ public final class AnnotationHandler {
                                 .getInteraction()
                                 .getMessage()
                                 .reply(
-                                        "The selection failed. An exception has been logged for the developers. Please report this to the bot questions channel. It will probably require a code change.")
+                                        "The selection failed. An exception has been logged for the developers. Please report this to "
+                                                + getBotBugsChannelLink() + ". It will probably require a code change.")
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                 }
@@ -219,6 +222,16 @@ public final class AnnotationHandler {
                 BotLogger.error(error, e);
             }
         };
+    }
+
+    private static String getBotBugsChannelLink() {
+        if (JdaService.guildPrimary != null) {
+            return JdaService.guildPrimary.getTextChannelsByName("bot-bugs-and-feature-requests", true).stream()
+                    .findFirst()
+                    .map(c -> "[#bot-bugs-and-feature-requests](" + c.getJumpUrl() + ")")
+                    .orElse("`#bot-bugs-and-feature-requests`");
+        }
+        return "`#bot-bugs-and-feature-requests`";
     }
 
     private static List<Class<?>> contexts() {
