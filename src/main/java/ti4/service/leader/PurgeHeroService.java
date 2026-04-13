@@ -35,10 +35,10 @@ public class PurgeHeroService {
         }
         boolean purged = PlayHeroService.removeLeader(game, player, playerLeader);
         if (purged) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), heroTitle + ", has been purged.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), heroTitle + " has been purged.");
         } else {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), heroTitle + ", was not purged - something went wrong.");
+                    event.getMessageChannel(), heroTitle + " was not purged - something went wrong.");
         }
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
