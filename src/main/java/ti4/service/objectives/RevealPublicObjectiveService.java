@@ -39,6 +39,11 @@ public class RevealPublicObjectiveService {
         } else {
             objective = game.revealStage2();
         }
+        if (objective == null) {
+            MessageHelper.sendMessageToChannel(
+                    game.getActionsChannel(), "No unrevealed stage 2 public objectives remain.");
+            return;
+        }
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         NeuraloopService.offerInitialNeuraloopChoice(game, objective.getKey());

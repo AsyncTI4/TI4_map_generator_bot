@@ -1,7 +1,7 @@
 package ti4.commands.special;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.buttons.handlers.faction.zephyrion.ZephyrionBountyButtonHandler;
+import ti4.buttons.handlers.faction.other.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;

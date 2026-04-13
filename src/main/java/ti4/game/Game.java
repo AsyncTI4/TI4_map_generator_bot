@@ -1236,7 +1236,8 @@ public class Game extends GameProperties {
         if (tileMap.isEmpty()) {
             return 0;
         }
-        String highestPosition = tileMap.keySet().stream()
+        List<String> tilePositions = new ArrayList<>(tileMap.keySet());
+        String highestPosition = tilePositions.stream()
                 .filter(Helper::isInteger)
                 .max(Comparator.comparingInt(Integer::parseInt))
                 .orElse(null);

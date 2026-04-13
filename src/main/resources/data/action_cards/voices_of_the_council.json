@@ -14,6 +14,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 1 structure from your reinforcements on a planet you control.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "The vote was nearly unanimous. The council would provide funding for the restoration. Ciel was furious.",
         "source": "voices_of_the_council"
     },
@@ -23,6 +24,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 1 dreadnought, 2 cruisers, or 3 destroyers from your reinforcements in a system that contains 1 or more of your ships.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "Elder Junn sighed. \"Disarmament, it seems, has fallen out of fashion in these dark days.\"",
         "source": "voices_of_the_council"
     },

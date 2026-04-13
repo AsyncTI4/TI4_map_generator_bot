@@ -128,7 +128,7 @@ public class CreateGameService {
         }
 
         // CHECK IF GUILD HAS ALL PLAYERS LISTED
-        List<Member> missingMembers = inviteUsersToServer(guild, members, event.getMessageChannel());
+        List<Member> missingMembers = inviteUsersToServer(guild, members, event.getMessageChannel(), gameName);
 
         // CREATE ROLE
         Role role = guild.createRole().setName(gameName).setMentionable(true).complete();
@@ -428,6 +428,11 @@ public class CreateGameService {
      * @return the list of missing members
      */
     public static List<Member> inviteUsersToServer(Guild guild, List<Member> members, MessageChannel channel) {
+        return inviteUsersToServer(guild, members, channel, null);
+    }
+
+    public static List<Member> inviteUsersToServer(
+            Guild guild, List<Member> members, MessageChannel channel, String gameName) {
         List<String> guildMemberIDs =
                 guild.getMembers().stream().map(ISnowflake::getId).toList();
         List<Member> missingMembers = new ArrayList<>();
@@ -451,7 +456,8 @@ public class CreateGameService {
             MessageHelper.sendMessageToChannel(channel, sb.toString());
             String msg2 =
                     "If you have joined the server and cannot find your game, please click this button. If the invite has expired, please press this other button.";
-            Button findGameButton = Buttons.green("pingGame", "Locate My Game");
+            String findGameButtonId = gameName == null ? "pingGame" : "pingGame_" + gameName;
+            Button findGameButton = Buttons.green(findGameButtonId, "Locate My Game");
             Button resendInvite = Buttons.blue("resendInvite_" + guild.getId(), "Resend Server Invite");
             MessageHelper.sendMessageToChannelWithButtons(channel, msg2, List.of(findGameButton, resendInvite));
         }

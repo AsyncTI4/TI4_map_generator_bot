@@ -75,6 +75,10 @@ public class TileModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(name).orElse("");
     }
 
+    public List<String> getAliases() {
+        return aliases == null ? List.of() : aliases;
+    }
+
     public String getNameRepresentation() {
         StringBuilder sb = new StringBuilder();
         TileEmojis emoji = TileEmojis.getTileEmojiFromTileID(id);

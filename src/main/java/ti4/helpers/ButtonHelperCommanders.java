@@ -25,7 +25,6 @@ import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.context.ButtonContext;
 import ti4.logging.BotLogger;
@@ -149,19 +148,6 @@ public class ButtonHelperCommanders {
                 player.getCorrectChannel(),
                 player.getRepresentation() + " remove the command token from " + tile.getRepresentationForButtons()
                         + " using Tvor Khage, the Qhet hero.");
-    }
-
-    @ButtonHandler("arboCommanderBuild_")
-    public static void arboCommanderBuild(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String planet = buttonID.replace("arboCommanderBuild_", "");
-        List<Button> buttons;
-        Tile tile = TileHelper.getTile(event, planet, game);
-        buttons = Helper.getPlaceUnitButtons(
-                event, player, game, tile, "arboCommander", "placeOneNDone_dontskiparboCommander");
-        String message = player.getRepresentation() + " Use the buttons to produce 1 unit. "
-                + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
-        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("olradinCommanderStep2_")

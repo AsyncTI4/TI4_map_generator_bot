@@ -14,7 +14,6 @@ import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
@@ -195,12 +194,6 @@ class OtherGameButtonHandler {
         String ta = buttonID.replace("useTA_", "") + "_ta";
         PromissoryNoteHelper.resolvePNPlay(ta, player, game, event);
         ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("dsdihmy_")
-    public static void dsDihmhonYellowTech(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        ButtonHelper.deleteMessage(event);
-        ButtonHelperFactionSpecific.resolveImpressmentPrograms(buttonID, event, game, player);
     }
 
     @ButtonHandler("swapToFaction_")

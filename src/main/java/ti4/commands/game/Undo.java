@@ -10,6 +10,7 @@ import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.message.MessageHelper;
+import ti4.service.game.GameUndoNameService;
 
 class Undo extends GameStateSubcommand {
 
@@ -51,13 +52,12 @@ class Undo extends GameStateSubcommand {
             return;
         }
 
-        if (!gameToUndoBackTo.contains(gameName)) {
+        Integer targetUndoIndex = GameUndoNameService.getUndoNumberFromSelection(gameName, gameToUndoBackTo);
+        if (targetUndoIndex == null) {
             MessageHelper.replyToMessage(event, "Undo failed - Parameter doesn't look right: " + gameToUndoBackTo);
             return;
         }
 
-        String targetUndoIndexStr = gameToUndoBackTo.replace(gameName + "_", "").replace(".txt", "");
-        int targetUndoIndex = Integer.parseInt(targetUndoIndexStr);
         GameManager.undo(game, targetUndoIndex);
     }
 }
