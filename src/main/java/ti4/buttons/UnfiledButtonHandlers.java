@@ -70,7 +70,6 @@ import ti4.logging.LogOrigin;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
-import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.StatusCleanupService;
@@ -252,19 +251,6 @@ public class UnfiledButtonHandlers {
         AddPlanetToPlayAreaService.addPlanetToPlayArea(event, game.getTileFromPlanet(planet), planet, game);
     }
 
-    @ButtonHandler("arboAgentOn_")
-    public static void arboAgentOn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String pos = buttonID.split("_")[1];
-        String unit = buttonID.split("_")[2];
-        List<Button> buttons = ButtonHelperAgents.getArboAgentReplacementOptions(
-                player, game, event, game.getTileByPosition(pos), unit);
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getChannel(),
-                player.getRepresentationUnfogged() + ", please choose which unit you wish to place down.",
-                buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
     @ButtonHandler("sandbagPref_")
     public static void sandbagPref(ButtonInteractionEvent event, Player player, String buttonID) {
         var userSettings = UserSettingsManager.get(player.getUserID());
@@ -309,17 +295,6 @@ public class UnfiledButtonHandlers {
             }
         }
 
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("arboAgentIn_")
-    public static void arboAgentIn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String pos = buttonID.substring(buttonID.indexOf('_') + 1);
-        List<Button> buttons = ButtonHelperAgents.getUnitsToArboAgent(player, game.getTileByPosition(pos));
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getChannel(),
-                player.getRepresentationUnfogged() + ", please choose which unit you'd like to replace.",
-                buttons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1528,11 +1503,7 @@ public class UnfiledButtonHandlers {
                 boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
 
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-                // if (player.hasTechReady("sar") && !"muaatagent".equalsIgnoreCase(buttonID)
-                //     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
-                //     buttons.add(
-                //         Buttons.red("exhaustTech_sar", "Exhaust Self-Assembly Routines", TechEmojis.WarfareTech));
-                // } //sar is handled elsewhere
+
                 if (player.hasTechReady("htp")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
@@ -2376,7 +2347,6 @@ public class UnfiledButtonHandlers {
             String key3b = "potentialScorePOBlockers";
             if (!game.getStoredValue(key3b).contains(player.getFaction() + "*")) {
                 Helper.resolvePOScoringQueue(game, event);
-                // Helper.resolveSOScoringQueue(game, event);
             }
         }
         if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
@@ -2385,7 +2355,6 @@ public class UnfiledButtonHandlers {
             event.getMessage().editMessage(msg).queue(Consumers.nop(), BotLogger::catchRestError);
         }
         ReactionService.addReaction(event, game, player);
-        // checkForAllReactions(event, game);
     }
 
     @ButtonHandler(value = "refreshStatusSummary", save = false)
@@ -2488,36 +2457,6 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("primaryOfWarfare")
-    public static void primaryOfWarfare(ButtonInteractionEvent event, Player player, Game game) {
-        List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "warfare");
-        MessageChannel channel = player.getCorrectChannel();
-        MessageHelper.sendMessageToChannelWithButtons(
-                channel, "Please choose which system you wish to remove your command token from.", buttons);
-    }
-
-    @ButtonHandler("primaryOfTeWarfare")
-    public static void primaryOfTeWarfare(Player player) {
-        StrategyCardModel model = Mapper.getStrategyCard("te6warfare");
-        if (model == null) return;
-
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.blue(
-                player.finChecker() + "redistributeCCButtons_deleteThisButton", "Redistribute Command Tokens"));
-        buttons.add(Buttons.red(player.finChecker() + "beginTacticalTeWarfare", "Perform Tactical Action"));
-        String message =
-                "Use the buttons to resolve the primary of **Warfare**. Redistributing your command tokens is optional.";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-    }
-
-    @ButtonHandler("beginTacticalTeWarfare")
-    public static void beginTacticalTeWarfare(ButtonInteractionEvent event, Game game, Player player) {
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-        ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
-        game.setWarfareAction(true);
-        ButtonHelperTacticalAction.beginTacticalAction(game, player);
-    }
-
     @ButtonHandler("startOfGameObjReveal")
     public static void startOfGameObjReveal(ButtonInteractionEvent event, Game game) {
         for (Player p : game.getRealPlayers()) {
@@ -2585,12 +2524,6 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteMessage(event);
         // Reduce file size by clearing draft info
         game.clearAllDraftInfo();
-    }
-
-    @ButtonHandler("dsdihmy_")
-    public static void dsDihmhonYellowTech(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        ButtonHelper.deleteMessage(event);
-        ButtonHelperFactionSpecific.resolveImpressmentPrograms(buttonID, event, game, player);
     }
 
     @ButtonHandler("swapToFaction_")

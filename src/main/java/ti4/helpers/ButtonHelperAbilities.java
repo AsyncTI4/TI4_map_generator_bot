@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
-import ti4.buttons.handlers.faction.zephyrion.ZephyrionBountyButtonHandler;
+import ti4.buttons.handlers.faction.other.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.commands.special.SetupNeutralPlayer;
 import ti4.game.Game;
 import ti4.game.Planet;

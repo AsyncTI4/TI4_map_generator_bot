@@ -597,7 +597,7 @@ public class PlayHeroService {
                                 + " has been offered buttons to gain command tokens and look at Shrines.");
                 for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                     if (p2.getSoScored() < player.getSoScored()) {
-                        List<Button> shrineButtons = ButtonHelperHeroes.getShrineButtons(player, p2, game);
+                        List<Button> shrineButtons = ButtonHelperHeroes.getShrineButtons(p2, game);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
                                 player.getRepresentationUnfogged() + " you have scored more secret objectives than "
