@@ -38,8 +38,9 @@ public final class PlayerStatsHelper {
         if (anchor == null) return null;
         if (randomizeLocation) anchor = "000"; // just stick them on 000
 
+        int maxStatTileRing = game.getRingCount() + 1;
         Set<String> validPositions = PositionMapper.getTilePositions().stream()
-                .filter(pos -> tileRing(pos) <= (game.getRingCount() + 1))
+                .filter(pos -> tileRing(pos) <= maxStatTileRing)
                 .filter(pos -> game.getTileByPosition(pos) == null)
                 .filter(pos -> taken == null || !taken.contains(pos))
                 .collect(Collectors.toSet());
