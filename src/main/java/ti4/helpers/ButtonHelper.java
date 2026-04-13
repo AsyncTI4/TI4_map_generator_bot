@@ -3377,28 +3377,44 @@ public class ButtonHelper {
     }
 
     public static int checkNetGain(Player player, String ccs) {
-        int netGain;
-        int oldTactic = Integer.parseInt(ccs.substring(0, ccs.indexOf('/')));
-        ccs = ccs.substring(ccs.indexOf('/') + 1);
-        int oldFleet = Integer.parseInt(ccs.substring(0, ccs.indexOf('/')));
-        ccs = ccs.substring(ccs.indexOf('/') + 1);
-        int oldStrat = Integer.parseInt(ccs);
+        int[] oldCCs = parseCCRepresentation(ccs);
+        if (oldCCs == null) {
+            BotLogger.warning("Unable to calculate command token net gain from malformed CC string: `" + ccs + "`");
+            return 0;
+        }
 
-        netGain = (player.getTacticalCC() - oldTactic)
-                + (player.getFleetCC() - oldFleet)
-                + (player.getStrategicCC() - oldStrat);
-        return netGain;
+        return (player.getTacticalCC() - oldCCs[0])
+                + (player.getFleetCC() - oldCCs[1])
+                + (player.getStrategicCC() - oldCCs[2]);
     }
 
     public static void resetCCs(Player player, String ccs) {
-        int oldTactic = Integer.parseInt(ccs.substring(0, ccs.indexOf('/')));
-        ccs = ccs.substring(ccs.indexOf('/') + 1);
-        int oldFleet = Integer.parseInt(ccs.substring(0, ccs.indexOf('/')));
-        ccs = ccs.substring(ccs.indexOf('/') + 1);
-        int oldStrat = Integer.parseInt(ccs);
-        player.setTacticalCC(oldTactic);
-        player.setStrategicCC(oldStrat);
-        player.setFleetCC(oldFleet);
+        int[] oldCCs = parseCCRepresentation(ccs);
+        if (oldCCs == null) {
+            BotLogger.warning("Unable to reset command tokens from malformed CC string: `" + ccs + "`");
+            return;
+        }
+        player.setTacticalCC(oldCCs[0]);
+        player.setStrategicCC(oldCCs[2]);
+        player.setFleetCC(oldCCs[1]);
+    }
+
+    private static int[] parseCCRepresentation(String ccs) {
+        // Old button messages can outlive the stored CC snapshot, so malformed input must fail closed.
+        if (ccs == null || ccs.isBlank()) {
+            return null;
+        }
+
+        String[] parts = ccs.trim().split("/");
+        if (parts.length != 3) {
+            return null;
+        }
+
+        try {
+            return new int[] {Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2])};
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     public static List<Button> getButtonsToRemoveYourCC(
