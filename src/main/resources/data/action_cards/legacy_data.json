@@ -97,6 +97,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each player who voted for or predicted the resolved outcome gains 2 trade goods.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "As he signed the last of the costly trade deals, Mot Nesretep sank back into his chair. It was a gamble with the fate of the galaxy at stake, but his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
         "source": "deprecated"
     },
@@ -405,6 +406,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, either draw 2 secret objectives or gain the speaker token.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "Today's session would be pivotal - the Keleres proclamation was to be signed into full effect. Qanoj smiled. A new chapter in his career would begin today.",
         "source": "deprecated"
     },
@@ -553,6 +555,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each other player that did not vote for that outcome must give you 1 promissory note from their hand.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "Gil was an emissary to the Civita Planetar. His career had made him well-connected, with comrades in hundreds of bureaucracies and favors owed in many more.",
         "source": "deprecated"
     },
@@ -652,6 +655,7 @@
         "name": "Concise Legal Text",
         "phase": "Agenda",
         "window": "When an agenda is revealed",
+        "playTiming": "AGENDA_WHEN",
         "text": "Ready up to 3 planets you control. Until the \"Resolve Outcome\" step, players cannot resolve abilities.",
         "flavorText": "Magmus chuckled at Elder Junn's look of concern. \"Let's see you worm your way out of this...\"",
         "source": "deprecated"
@@ -716,6 +720,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome destroys 3 of their infantry on the game board.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "The past flooded Ahk-Syl Siven's thoughts upon seeing the Mahact, and the memory of his essence being rewritten on a subatomic level surged involuntarily to the forefront of his consciousness.",
         "source": "deprecated"
     },
@@ -836,6 +841,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each other player that did not vote for that outcome must give you 1 promissory note from their hand.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "Gil's career at the Civita Planetar was prolific, with friends in hundreds of bureaucracies and favors owed in many more.",
         "source": "deprecated"
     },
@@ -919,6 +925,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome reveals 1 random action card from their hand; take 1 of those cards and discard the rest.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "As they placed the noose around her neck, Menda wailed. Suffi, who was next in line, gave her a confident smile. \"First time?\"",
         "source": "deprecated"
     },
@@ -1036,6 +1043,7 @@
         "name": "Special Considerations",
         "phase": "Agenda",
         "window": "When an agenda is revealed",
+        "playTiming": "AGENDA_WHEN",
         "text": "Game effects cannot prevent you from playing this card or voting on this agenda. Ready up to 3 planets you control.",
         "flavorText": "\"It is our right to determine the future of this artifact,\" Mathis said calmly, flashing his imperial seal in a practiced motion. \"Are we not owed such respect?\"",
         "source": "deprecated"
@@ -1324,6 +1332,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "Predict aloud an outcome of this agenda. If your prediction is correct, place up to 2 infantry from your reinforcements into coexistence on any non-home planets controlled by players that voted for that outcome.",
+        "playTiming": "AGENDA_AFTER",
         "notes": "You may commit to the same or different planets, like Yin Hero.",
         "flavorText": "\"We will win this war, Rickar, based on how we adapt to it,\" Claire said sternly. \"Humanity has honed its differences into strength. Your people must do the same.\"",
         "source": "deprecated"
@@ -1343,6 +1352,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, produce up to 2 units that each have a cost of 4 or less in a system that contains 1 of your space docks.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "\"We groveled before the Lazax for liberation,\" Magmus declared, his voice rising from a gravelly rumble to a roar. \"Now we demand it!\"",
         "source": "deprecated"
     },

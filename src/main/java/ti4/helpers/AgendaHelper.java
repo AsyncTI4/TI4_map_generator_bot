@@ -2028,6 +2028,11 @@ public final class AgendaHelper {
         return planetOutcomeButtons;
     }
 
+    public static boolean isPreResolutionAgendaPhase(Game game) {
+        String phaseOfGame = game.getPhaseOfGame();
+        return StringUtils.containsIgnoreCase(phaseOfGame, "agenda") && !"agendaEnd".equalsIgnoreCase(phaseOfGame);
+    }
+
     public static List<Button> getAgendaButtons(String ridername, Game game, String prefix) {
         String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
         List<Button> outcomeActionRow;
