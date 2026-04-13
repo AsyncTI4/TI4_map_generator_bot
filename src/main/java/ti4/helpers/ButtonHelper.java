@@ -474,9 +474,21 @@ public class ButtonHelper {
     }
 
     @ButtonHandler("pingGame")
-    public static void pingGame(Game game, ButtonInteractionEvent event, Player player, String buttonID) {
-        Helper.fixGameChannelPermissions(game.getActionsChannel().getGuild(), game);
-        MessageHelper.sendMessageToChannel(game.getBotMapUpdatesThread(), "Pinging game" + game.getPing() + ".");
+    public static void pingGame(Game inferredGame, ButtonInteractionEvent event, Player player, String buttonID) {
+        Game gameToPing = inferredGame;
+        // Prefer the game encoded in the button id here, because inferredGame only works when the button was pressed
+        // from that game's channel.
+        if (gameToPing == null && buttonID.startsWith("pingGame_")) {
+            gameToPing = GameManager.reload(buttonID.replace("pingGame_", ""));
+        }
+        if (gameToPing == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that game.");
+            return;
+        }
+
+        Helper.fixGameChannelPermissions(gameToPing.getActionsChannel().getGuild(), gameToPing);
+        MessageHelper.sendMessageToChannel(
+                gameToPing.getBotMapUpdatesThread(), "Pinging game" + gameToPing.getPing() + ".");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Attempted to ping the game.");
     }
 
