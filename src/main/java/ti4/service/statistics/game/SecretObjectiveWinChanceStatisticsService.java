@@ -235,11 +235,25 @@ class SecretObjectiveWinChanceStatisticsService {
         for (Player player : game.getRealAndEliminatedPlayers()) {
             boolean isWinner = player == winner.get();
 
-            int actionPhaseSecretCount = countScoredSecretsByPhase(player, "action");
+            int actionPhaseSecretCount = 0;
+            int agendaPhaseSecretCount = 0;
+            Set<String> scoredSecrets = new HashSet<>();
+            for (String secretId : player.getSecretsScored().keySet()) {
+                SecretObjectiveModel secretObjective = Mapper.getSecretObjective(secretId);
+                if (secretObjective == null) {
+                    continue;
+                }
+                if ("action".equalsIgnoreCase(secretObjective.getPhase())) {
+                    actionPhaseSecretCount++;
+                } else if ("agenda".equalsIgnoreCase(secretObjective.getPhase())) {
+                    agendaPhaseSecretCount++;
+                }
+                scoredSecrets.add(secretObjective.getName());
+            }
+
             int actionBucket = Math.min(4, actionPhaseSecretCount);
             playersByScoredAPSecretCount[actionBucket]++;
 
-            int agendaPhaseSecretCount = countScoredSecretsByPhase(player, "agenda");
             int agendaBucket = Math.min(4, agendaPhaseSecretCount);
             playersByScoredAgendaSecretCount[agendaBucket]++;
 
@@ -248,15 +262,13 @@ class SecretObjectiveWinChanceStatisticsService {
                 winsByScoredAgendaSecretCount[agendaBucket]++;
             }
 
-            Set<String> scoredSecrets = player.getSecretsScored().keySet().stream()
-                    .filter(secretId -> Mapper.getSecretObjective(secretId) != null)
-                    .collect(Collectors.toSet());
             Set<String> inHandSecrets = player.getSecretsUnscored().keySet().stream()
-                    .filter(secretId -> Mapper.getSecretObjective(secretId) != null)
+                    .map(Mapper::getSecretObjective)
+                    .filter(secretObjective -> secretObjective != null)
+                    .map(SecretObjectiveModel::getName)
                     .collect(Collectors.toSet());
 
-            for (String secretId : scoredSecrets) {
-                String secretName = Mapper.getSecretObjective(secretId).getName();
+            for (String secretName : scoredSecrets) {
                 gamesWithSecretScored.merge(secretName, 1, Integer::sum);
                 gamesWithSecretScoredOrInHand.merge(secretName, 1, Integer::sum);
                 if (isWinner) {
@@ -265,8 +277,7 @@ class SecretObjectiveWinChanceStatisticsService {
                 }
             }
 
-            for (String secretId : inHandSecrets) {
-                String secretName = Mapper.getSecretObjective(secretId).getName();
+            for (String secretName : inHandSecrets) {
                 gamesWithSecretInHand.merge(secretName, 1, Integer::sum);
                 gamesWithSecretScoredOrInHand.merge(secretName, 1, Integer::sum);
                 if (isWinner) {
@@ -275,18 +286,5 @@ class SecretObjectiveWinChanceStatisticsService {
                 }
             }
         }
-    }
-
-    private static int countScoredSecretsByPhase(Player player, String phase) {
-        int count = 0;
-        for (String secretId : player.getSecretsScored().keySet()) {
-            if (isSecretInPhase(secretId, phase)) count++;
-        }
-        return count;
-    }
-
-    private static boolean isSecretInPhase(String secretId, String phase) {
-        SecretObjectiveModel so = Mapper.getSecretObjective(secretId);
-        return so != null && phase.equalsIgnoreCase(so.getPhase());
     }
 }
