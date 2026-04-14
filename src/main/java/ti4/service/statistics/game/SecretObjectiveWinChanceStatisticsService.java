@@ -22,8 +22,10 @@ import ti4.model.SecretObjectiveModel;
 class SecretObjectiveWinChanceStatisticsService {
 
     static void showSecretObjectiveWinChance(SlashCommandInteractionEvent event) {
-        int[] winnersByAPSecretCount = new int[5];
-        int[] winnersByAgendaSecretCount = new int[5];
+        int[] playersByScoredAPSecretCount = new int[5];
+        int[] winsByScoredAPSecretCount = new int[5];
+        int[] playersByScoredAgendaSecretCount = new int[5];
+        int[] winsByScoredAgendaSecretCount = new int[5];
         Map<String, Integer> gamesWithSecretScored = new HashMap<>();
         Map<String, Integer> winsWithSecretScored = new HashMap<>();
         Map<String, Integer> gamesWithSecretInHand = new HashMap<>();
@@ -35,8 +37,10 @@ class SecretObjectiveWinChanceStatisticsService {
                 GameStatisticsFilterer.getGamesFilterForWonGame(event),
                 game -> collectSecretObjectiveWinChanceStats(
                         game,
-                        winnersByAPSecretCount,
-                        winnersByAgendaSecretCount,
+                        playersByScoredAPSecretCount,
+                        winsByScoredAPSecretCount,
+                        playersByScoredAgendaSecretCount,
+                        winsByScoredAgendaSecretCount,
                         gamesWithSecretScored,
                         winsWithSecretScored,
                         gamesWithSecretInHand,
@@ -44,80 +48,11 @@ class SecretObjectiveWinChanceStatisticsService {
                         gamesWithSecretScoredOrInHand,
                         winsWithSecretScoredOrInHand));
 
-        int totalWinners = 0;
-        for (int c : winnersByAPSecretCount) totalWinners += c;
-
-        StringBuilder sb = new StringBuilder("__**Winning Player Action Phase Secret Rate**__\n");
-        sb.append("_(What percent of game winners scored X action phase secrets?)_\n\n");
-
-        for (int count = 0; count <= 4; count++) {
-            int winners = winnersByAPSecretCount[count];
-            long percent = totalWinners == 0 ? 0 : Math.round(100.0 * winners / totalWinners);
-            sb.append('`')
-                    .append(count)
-                    .append(" AP secrets` ")
-                    .append('`')
-                    .append(StringUtils.leftPad(percent + "%", 4))
-                    .append("` (")
-                    .append(winners)
-                    .append("/")
-                    .append(totalWinners)
-                    .append(")\n");
-        }
-
-        for (int count = 1; count <= 3; count++) {
-            int winners = 0;
-            for (int i = count; i <= 4; i++) {
-                winners += winnersByAPSecretCount[i];
-            }
-            long percent = totalWinners == 0 ? 0 : Math.round(100.0 * winners / totalWinners);
-            sb.append('`')
-                    .append(count)
-                    .append("+ AP secrets` ")
-                    .append('`')
-                    .append(StringUtils.leftPad(percent + "%", 4))
-                    .append("` (")
-                    .append(winners)
-                    .append("/")
-                    .append(totalWinners)
-                    .append(")\n");
-        }
-
-        sb.append("\n__**Winning Player Agenda Phase Secret Rate**__\n");
-        sb.append("_(What percent of game winners scored X agenda phase secrets?)_\n\n");
-
-        for (int count = 0; count <= 4; count++) {
-            int winners = winnersByAgendaSecretCount[count];
-            long percent = totalWinners == 0 ? 0 : Math.round(100.0 * winners / totalWinners);
-            sb.append('`')
-                    .append(count)
-                    .append(" Agenda secrets` ")
-                    .append('`')
-                    .append(StringUtils.leftPad(percent + "%", 4))
-                    .append("` (")
-                    .append(winners)
-                    .append("/")
-                    .append(totalWinners)
-                    .append(")\n");
-        }
-
-        for (int count = 1; count <= 3; count++) {
-            int winners = 0;
-            for (int i = count; i <= 4; i++) {
-                winners += winnersByAgendaSecretCount[i];
-            }
-            long percent = totalWinners == 0 ? 0 : Math.round(100.0 * winners / totalWinners);
-            sb.append('`')
-                    .append(count)
-                    .append("+ Agenda secrets` ")
-                    .append('`')
-                    .append(StringUtils.leftPad(percent + "%", 4))
-                    .append("` (")
-                    .append(winners)
-                    .append("/")
-                    .append(totalWinners)
-                    .append(")\n");
-        }
+        StringBuilder sb = new StringBuilder();
+        appendScoredSecretCountWinChanceSection(sb, "Action", playersByScoredAPSecretCount, winsByScoredAPSecretCount);
+        sb.append('\n');
+        appendScoredSecretCountWinChanceSection(
+                sb, "Agenda", playersByScoredAgendaSecretCount, winsByScoredAgendaSecretCount);
 
         // Sort by highest SCORED win percent
         Map<String, Long> scoredWinPercent = new HashMap<>();
@@ -225,10 +160,62 @@ class SecretObjectiveWinChanceStatisticsService {
                 event.getChannel(), "Secret Objective Win Chance", secretObjectiveSb.toString());
     }
 
+    private static void appendScoredSecretCountWinChanceSection(
+            StringBuilder sb, String phaseName, int[] playersByScoredSecretCount, int[] winsByScoredSecretCount) {
+        sb.append("__**Scored ")
+                .append(phaseName)
+                .append(" Phase Secret Count Win Chance**__\n")
+                .append("_(Includes only scored ")
+                .append(phaseName.toLowerCase())
+                .append(" phase secrets.)_\n\n");
+
+        for (int count = 0; count <= 4; count++) {
+            int players = playersByScoredSecretCount[count];
+            int wins = winsByScoredSecretCount[count];
+            long percent = players == 0 ? 0 : Math.round(100.0 * wins / players);
+            sb.append('`')
+                    .append(count)
+                    .append(' ')
+                    .append(phaseName)
+                    .append(" secrets` ")
+                    .append('`')
+                    .append(StringUtils.leftPad(percent + "%", 4))
+                    .append("` (")
+                    .append(wins)
+                    .append("/")
+                    .append(players)
+                    .append(")\n");
+        }
+
+        for (int count = 1; count <= 3; count++) {
+            int players = 0;
+            int wins = 0;
+            for (int i = count; i <= 4; i++) {
+                players += playersByScoredSecretCount[i];
+                wins += winsByScoredSecretCount[i];
+            }
+            long percent = players == 0 ? 0 : Math.round(100.0 * wins / players);
+            sb.append('`')
+                    .append(count)
+                    .append("+ ")
+                    .append(phaseName)
+                    .append(" secrets` ")
+                    .append('`')
+                    .append(StringUtils.leftPad(percent + "%", 4))
+                    .append("` (")
+                    .append(wins)
+                    .append("/")
+                    .append(players)
+                    .append(")\n");
+        }
+    }
+
     private static void collectSecretObjectiveWinChanceStats(
             Game game,
-            int[] winnersByAPSecretCount,
-            int[] winnersByAgendaSecretCount,
+            int[] playersByScoredAPSecretCount,
+            int[] winsByScoredAPSecretCount,
+            int[] playersByScoredAgendaSecretCount,
+            int[] winsByScoredAgendaSecretCount,
             Map<String, Integer> gamesWithSecretScored,
             Map<String, Integer> winsWithSecretScored,
             Map<String, Integer> gamesWithSecretInHand,
@@ -241,12 +228,17 @@ class SecretObjectiveWinChanceStatisticsService {
         for (Player player : game.getRealAndEliminatedPlayers()) {
             boolean isWinner = player == winner.get();
 
-            if (isWinner) {
-                int actionPhaseSecretCount = countActionPhaseScoredSecrets(player);
-                winnersByAPSecretCount[Math.min(4, actionPhaseSecretCount)]++;
+            int actionPhaseSecretCount = countScoredSecretsByPhase(player, "action");
+            int actionBucket = Math.min(4, actionPhaseSecretCount);
+            playersByScoredAPSecretCount[actionBucket]++;
 
-                int agendaPhaseSecretCount = countAgendaPhaseScoredSecrets(player);
-                winnersByAgendaSecretCount[Math.min(4, agendaPhaseSecretCount)]++;
+            int agendaPhaseSecretCount = countScoredSecretsByPhase(player, "agenda");
+            int agendaBucket = Math.min(4, agendaPhaseSecretCount);
+            playersByScoredAgendaSecretCount[agendaBucket]++;
+
+            if (isWinner) {
+                winsByScoredAPSecretCount[actionBucket]++;
+                winsByScoredAgendaSecretCount[agendaBucket]++;
             }
 
             Set<String> scoredSecrets = player.getSecretsScored().keySet().stream()
@@ -276,14 +268,6 @@ class SecretObjectiveWinChanceStatisticsService {
                 }
             }
         }
-    }
-
-    private static int countActionPhaseScoredSecrets(Player player) {
-        return countScoredSecretsByPhase(player, "action");
-    }
-
-    private static int countAgendaPhaseScoredSecrets(Player player) {
-        return countScoredSecretsByPhase(player, "agenda");
     }
 
     private static int countScoredSecretsByPhase(Player player, String phase) {
