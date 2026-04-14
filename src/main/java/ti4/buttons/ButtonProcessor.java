@@ -16,12 +16,15 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.SearchGameHelper;
+import ti4.helpers.StatusHelper;
 import ti4.listeners.annotations.AnnotationHandler;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.context.ButtonContext;
@@ -31,6 +34,7 @@ import ti4.message.MessageHelper;
 import ti4.rollbar.RollbarManager;
 import ti4.service.button.ReactionService;
 import ti4.service.game.GameNameService;
+import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -139,11 +143,11 @@ public class ButtonProcessor {
             // Don't add anymore if/else startWith statements - use @ButtonHandler
         } else if (buttonID.startsWith(Constants.SO_SCORE_FROM_HAND)) {
             trackButtonHandler(Constants.SO_SCORE_FROM_HAND);
-            UnfiledButtonHandlers.soScoreFromHand(
+            StatusHelper.soScoreFromHand(
                     event, buttonID, game, player, privateChannel, mainGameChannel, mainGameChannel);
         } else if (buttonID.startsWith(Constants.PO_SCORING)) {
             trackButtonHandler(Constants.PO_SCORING);
-            UnfiledButtonHandlers.poScoring(event, player, buttonID, game, privateChannel);
+            StatusHelper.poScoring(event, player, buttonID, game, privateChannel);
         } else if (buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
             trackButtonHandler(Constants.GENERIC_BUTTON_ID_PREFIX);
             ReactionService.addReaction(event, game, player);
@@ -153,7 +157,7 @@ public class ButtonProcessor {
                     player, game, buttonID.split("_")[1], Integer.parseInt(buttonID.split("_")[2]), event);
         } else if (buttonID.startsWith("strategicAction_")) {
             trackButtonHandler("strategicAction_");
-            UnfiledButtonHandlers.strategicAction(event, player, buttonID, game, mainGameChannel);
+            strategicAction(event, player, buttonID, game, mainGameChannel);
         } else if (buttonID.startsWith("getSwapButtons_")) {
             trackButtonHandler("getSwapButtons_");
             MessageHelper.sendMessageToChannelWithButtons(
@@ -228,20 +232,19 @@ public class ButtonProcessor {
                 }
                 case "gain_1_tg" -> {
                     trackButtonHandler("gain_1_tg");
-                    UnfiledButtonHandlers.gain1TG(event, player, game, mainGameChannel);
+                    gain1TG(event, player, game, mainGameChannel);
                 }
                 case "gain1tgFromLetnevCommander" -> {
                     trackButtonHandler("gain1tgFromLetnevCommander");
-                    UnfiledButtonHandlers.gain1tgFromLetnevCommander(event, player, game, mainGameChannel);
+                    gain1tgFromLetnevCommander(event, player, game, mainGameChannel);
                 }
                 case "gain1tgFromMuaatCommander" -> {
                     trackButtonHandler("gain1tgFromMuaatCommander");
-                    UnfiledButtonHandlers.gain1tgFromMuaatCommander(event, player, game, mainGameChannel);
+                    gain1tgFromMuaatCommander(event, player, game, mainGameChannel);
                 }
                 case "gain1tgFromCommander" -> {
                     trackButtonHandler("gain1tgFromCommander");
-                    UnfiledButtonHandlers.gain1tgFromCommander(
-                            event, player, game, mainGameChannel); // should be deprecated
+                    gain1tgFromCommander(event, player, game, mainGameChannel); // should be deprecated
                 }
                 case "resolveHarness" -> {
                     trackButtonHandler("resolveHarness");
@@ -314,11 +317,72 @@ public class ButtonProcessor {
         }
     }
 
+    @Deprecated
+    private static void gain1tgFromCommander(
+            ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
+        String message =
+                player.getRepresentation() + " gained 1 trade good " + player.gainTG(1) + " from their commander.";
+        ButtonHelperAbilities.pillageCheck(player, game);
+        ButtonHelperAgents.resolveArtunoCheck(player, 1);
+        MessageHelper.sendMessageToChannel(mainGameChannel, message);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static void gain1tgFromMuaatCommander(
+            ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
+        String message = player.getRepresentation() + " gained 1 trade good " + player.gainTG(1)
+                + " from Magmus, the Muaat commander.";
+        ButtonHelperAbilities.pillageCheck(player, game);
+        ButtonHelperAgents.resolveArtunoCheck(player, 1);
+        MessageHelper.sendMessageToChannel(mainGameChannel, message);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static void gain1tgFromLetnevCommander(
+            ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
+        String message = player.getRepresentation() + " gained 1 trade good " + player.gainTG(1)
+                + " from Rear Admiral Farran, the Letnev commander.";
+        ButtonHelperAbilities.pillageCheck(player, game);
+        ButtonHelperAgents.resolveArtunoCheck(player, 1);
+        MessageHelper.sendMessageToChannel(mainGameChannel, message);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static void gain1TG(
+            ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
+        String message = "";
+        String labelP = event.getButton().getLabel();
+        boolean failed = false;
+        if (labelP.contains("inf") && labelP.contains("mech")) {
+            message += "Please resolve removing infantry manually, if applicable.";
+            failed = message.contains("Please try again.");
+        }
+        if (!failed) {
+            message += "Gained 1 trade good " + player.gainTG(1, true) + ".";
+            ButtonHelperAgents.resolveArtunoCheck(player, 1);
+        }
+        ReactionService.addReaction(event, game, player, message);
+        if (!failed) {
+            ButtonHelper.deleteMessage(event);
+            if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
+                String pF = player.getFactionEmoji();
+                MessageHelper.sendMessageToChannel(mainGameChannel, pF + " " + message);
+            }
+        }
+    }
+
     private static List<Button> getRefreshInfoButtons(Game game) {
         if (game == null) return Buttons.REFRESH_INFO_BUTTONS;
         if (game.isTwilightsFallMode()) return Buttons.REFRESH_INFO_BUTTONS_TF;
         if (game.isThundersEdge()) return Buttons.REFRESH_INFO_BUTTONS_TE;
         return Buttons.REFRESH_INFO_BUTTONS;
+    }
+
+    private static void strategicAction(
+            ButtonInteractionEvent event, Player player, String buttonID, Game game, MessageChannel mainGameChannel) {
+        int scNum = Integer.parseInt(buttonID.replace("strategicAction_", ""));
+        PlayStrategyCardService.playSC(event, scNum, game, mainGameChannel, player);
+        ButtonHelper.deleteMessage(event);
     }
 
     private static void trackButtonHandler(String handlerId) {

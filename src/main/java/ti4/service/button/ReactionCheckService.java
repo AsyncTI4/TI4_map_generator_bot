@@ -153,7 +153,7 @@ public class ReactionCheckService {
             return;
         }
         if (buttonID.startsWith(Constants.PO_SCORING)
-                || buttonID.contains("po_no_scoring")
+                || buttonID.contains(Constants.PO_NO_SCORING)
                 || buttonID.contains("so_no_scoring")
                 || buttonID.contains("so_score_hand")) {
             buttonID = Constants.PO_SCORING;
@@ -191,7 +191,7 @@ public class ReactionCheckService {
             case "no_sabotage" ->
                 ReactionService.handleAllPlayersReactingNoSabotage(
                         event.getInteraction().getMessage(), game);
-            case Constants.PO_SCORING, Constants.PO_NO_SCORING -> respondAllHaveScored(game);
+            case Constants.PO_SCORING -> respondAllHaveScored(game);
             case "pass_on_abilities" -> {
                 if (game.isCustodiansScored() || game.isOmegaPhaseMode()) {
                     if (game.isTwilightsFallMode()) {
