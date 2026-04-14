@@ -1,4 +1,4 @@
-package ti4.buttons.handlers.unitPickers;
+package ti4.buttons.handlers.unitpickers;
 
 import java.util.regex.Matcher;
 import lombok.experimental.UtilityClass;
