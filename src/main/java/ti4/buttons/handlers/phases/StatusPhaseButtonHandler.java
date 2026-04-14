@@ -40,6 +40,9 @@ class StatusPhaseButtonHandler {
                 for (Player player : game.getRealPlayers()) {
                     String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
                     if (so.isEmpty()) {
+                        if (!missingPeople.isEmpty()) {
+                            missingPeople.append(", ");
+                        }
                         missingPeople.append(player.getRepresentation(false, true));
                     }
                 }
