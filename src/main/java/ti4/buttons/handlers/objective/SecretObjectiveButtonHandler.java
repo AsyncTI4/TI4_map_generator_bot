@@ -11,6 +11,7 @@ import ti4.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -106,6 +107,17 @@ class SecretObjectiveButtonHandler {
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), publicMsg);
         ButtonHelper.deleteMessage(event);
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
+    }
+
+    @ButtonHandler(value = "get_so_discard_buttons", save = false)
+    public static void getSODiscardButtons(ButtonInteractionEvent event, Player player) {
+        String secretScoreMsg = "Click a button below to discard your secret objective.";
+        List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveDiscardButtons(player);
+        if (!soButtons.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), secretScoreMsg, soButtons);
+        } else {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Developers");
+        }
     }
 
     @ButtonHandler("deal2SOToAll")

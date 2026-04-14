@@ -33,11 +33,9 @@ import ti4.service.abilities.MahactTokenService;
 import ti4.service.breakthrough.AutoFactoriesService;
 import ti4.service.breakthrough.EidolonMaximumService;
 import ti4.service.breakthrough.TheIconService;
-import ti4.service.button.ReactionService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.LoreService;
-import ti4.service.game.SwapFactionService;
 import ti4.service.turn.StartTurnService;
 
 @UtilityClass
@@ -415,18 +413,5 @@ class DeleteButtonsButtonHandler {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), editedMessage);
         }
         ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("genericReact")
-    public static void genericReact(ButtonInteractionEvent event, Game game, Player player) {
-        String message = game.isFowMode() ? "Turned down window" : null;
-        ReactionService.addReaction(event, game, player, message);
-    }
-
-    @ButtonHandler("swapToFaction_")
-    public static void swapToFaction(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String faction = buttonID.replace("swapToFaction_", "");
-        SwapFactionService.secondHalfOfSwap(
-                game, player, game.getPlayerFromColorOrFaction(faction), event.getUser(), event);
     }
 }

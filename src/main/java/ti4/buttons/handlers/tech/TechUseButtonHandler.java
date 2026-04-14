@@ -155,12 +155,4 @@ class TechUseButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
-
-    @ButtonHandler("getPsychoButtons")
-    public static void offerPsychoButtons(Player player, Game game) {
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", use buttons to gain 1 trade good per planet exhausted.",
-                ButtonHelper.getPsychoTechPlanets(game, player));
-    }
 }

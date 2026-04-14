@@ -178,10 +178,9 @@ class GamePhaseButtonHandler {
         ReactionService.addReaction(event, game, player, message);
     }
 
-    @ButtonHandler("diploSystem")
-    public static void diploSystem(ButtonInteractionEvent event, Player player, Game game) {
-        String message = player.getRepresentationUnfogged() + ", please choose the system you wish to Diplo.";
-        List<Button> buttons = Helper.getPlanetSystemDiploButtons(player, game, false, null);
-        MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
+    @ButtonHandler("genericReact")
+    public static void genericReact(ButtonInteractionEvent event, Game game, Player player) {
+        String message = game.isFowMode() ? "Turned down window" : null;
+        ReactionService.addReaction(event, game, player, message);
     }
 }

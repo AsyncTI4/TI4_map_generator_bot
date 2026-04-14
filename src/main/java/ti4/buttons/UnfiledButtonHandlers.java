@@ -18,7 +18,6 @@ import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -36,7 +35,6 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -53,7 +51,6 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.ObjectiveHelper;
 import ti4.helpers.PlayerPreferenceHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.SecretObjectiveHelper;
@@ -86,10 +83,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.LoreService;
-import ti4.service.game.EndGameService;
 import ti4.service.game.StartPhaseService;
-import ti4.service.game.SwapFactionService;
-import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
@@ -216,12 +210,6 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("genericReact")
-    public static void genericReact(ButtonInteractionEvent event, Game game, Player player) {
-        String message = game.isFowMode() ? "Turned down window" : null;
-        ReactionService.addReaction(event, game, player, message);
-    }
-
     @ButtonHandler("produceOneUnitInTile_")
     public static void produceOneUnitInTile(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         buttonID = buttonID.replace("produceOneUnitInTile_", "");
@@ -292,24 +280,6 @@ public class UnfiledButtonHandlers {
         }
 
         ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("getReleaseButtons")
-    public static void getReleaseButtons(ButtonInteractionEvent event, Player player, Game game) {
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getChannel(),
-                player.getRepresentationUnfogged()
-                        + ", you may release units one at a time with the buttons. Reminder that captured units may only be released as part of an ability or a transaction.",
-                ButtonHelperFactionSpecific.getReleaseButtons(player, game));
-    }
-
-    @ButtonHandler("shroudOfLithStart")
-    public static void shroudOfLithStart(ButtonInteractionEvent event, Player player, Game game) {
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                "Select up to 2 ships and 2 ground forces to place in the space area.",
-                ButtonHelperFactionSpecific.getKolleccReleaseButtons(player, game));
     }
 
     @ButtonHandler("useTech_")
@@ -840,104 +810,6 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("toldarPN")
-    public static void toldarPN(ButtonInteractionEvent event, Player player) {
-        player.setCommodities(player.getCommodities() + 3);
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentation() + " used _Concordat Allegiant_ (the Toldar promissory note)"
-                        + " to gain 3 commodities after winning a combat against someone with more victory points than them. They can do this once per action. Their currently hold "
-                        + player.getCommodities() + " commodit" + (player.getCommodities() == 1 ? "y" : "ies") + ".");
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-    }
-
-    @ButtonHandler("reveal_stage_")
-    public static void revealPOStage(ButtonInteractionEvent event, String buttonID, Game game) {
-        String stage = buttonID.replace("reveal_stage_", "");
-        if ("true".equalsIgnoreCase(game.getStoredValue("forcedScoringOrder"))) {
-            if ("statusScoring".equalsIgnoreCase(game.getPhaseOfGame())) {
-                StringBuilder missingPeople = new StringBuilder();
-                for (Player player : game.getRealPlayers()) {
-                    String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
-                    if (so.isEmpty()) {
-                        missingPeople.append(player.getRepresentation(false, true));
-                    }
-                }
-                if (!missingPeople.isEmpty()) {
-                    MessageHelper.sendMessageToChannel(
-                            game.getActionsChannel(),
-                            missingPeople
-                                    + " need to indicate if they are scoring a secret objective before the next public objective can be flipped.");
-                    return;
-                }
-            }
-        }
-        if (!game.getStoredValue("revealedPOInRound" + game.getRound()).isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    game.getActionsChannel(),
-                    "The bot thinks that a public objective was already revealed this round. Try doing `/status reveal` if this was a mistake.");
-            return;
-        } else {
-            game.setStoredValue("revealedPOInRound" + game.getRound(), "Yes");
-        }
-        String revealedObjective = null;
-        if (!game.isRedTapeMode() && !game.isCivilizedSocietyMode()) {
-            if ("2".equalsIgnoreCase(stage)) {
-                RevealPublicObjectiveService.revealS2(game, event);
-            } else if ("2x2".equalsIgnoreCase(stage)) {
-                RevealPublicObjectiveService.revealTwoStage2(game, event.getChannel());
-            } else if ("none".equalsIgnoreCase(stage)) {
-                // continue without revealing anything
-            } else {
-                revealedObjective = RevealPublicObjectiveService.revealS1(game, event);
-            }
-        } else {
-            MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "No objective is revealed at this stage in this mode.");
-            int playersWithSCs = 0;
-            for (Player player2 : game.getRealPlayers()) {
-                if (player2.getSCs() != null
-                        && !player2.getSCs().isEmpty()
-                        && !player2.getSCs().contains(0)) {
-                    playersWithSCs++;
-                }
-            }
-            if (playersWithSCs > 0) {
-                StatusCleanupService.runStatusCleanup(game);
-                MessageHelper.sendMessageToChannel(
-                        game.getMainGameChannel(), "### " + game.getPing() + " **Status Cleanup Run!**");
-            }
-        }
-
-        if (!game.isOmegaPhaseMode()) {
-            StartPhaseService.startStatusHomework(event, game);
-        } else {
-            if (Constants.IMPERIUM_REX_ID.equalsIgnoreCase(revealedObjective)) {
-                EndGameService.secondHalfOfGameEnd(event, game, true, true, false);
-            } else {
-                var speakerPlayer = game.getSpeaker();
-                ObjectiveHelper.secondHalfOfPeakStage1(game, speakerPlayer, 1, true);
-                TextChannel tableTalkChannel = game.getTableTalkChannel();
-                if (!game.isFowMode() && tableTalkChannel != null) {
-                    MessageHelper.sendMessageToChannel(
-                            tableTalkChannel, "## End of Round #" + game.getRound() + " Scoring Info");
-                    ListPlayerInfoService.displayerScoringProgression(game, true, tableTalkChannel, "both");
-                }
-                String message = "When ready, proceed to the Strategy Phase.";
-                Button proceedToStrategyPhase = Buttons.green(
-                        "proceed_to_strategy",
-                        "Proceed to Strategy Phase (will refresh all cards and ping the priority player)");
-                MessageHelper.sendMessageToChannel(
-                        event.getChannel(),
-                        "The next objective has been revealed to " + MiscEmojis.SpeakerToken
-                                + speakerPlayer.getRepresentationNoPing() + ".");
-                MessageHelper.sendMessageToChannelWithButton(event.getChannel(), message, proceedToStrategyPhase);
-            }
-        }
-
-        ButtonHelper.deleteMessage(event);
-    }
-
     @ButtonHandler("assignSpeaker_")
     @ButtonHandler(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX)
     public static void sc3AssignSpeaker(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
@@ -1103,25 +975,6 @@ public class UnfiledButtonHandlers {
         }
     }
 
-    @ButtonHandler(value = "get_so_discard_buttons", save = false)
-    public static void getSODiscardButtons(ButtonInteractionEvent event, Player player) {
-        String secretScoreMsg = "Click a button below to discard your secret objective.";
-        List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveDiscardButtons(player);
-        if (!soButtons.isEmpty()) {
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), secretScoreMsg, soButtons);
-        } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Developers");
-        }
-    }
-
-    @ButtonHandler("getPsychoButtons")
-    public static void offerPsychoButtons(Player player, Game game) {
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", use buttons to gain 1 trade good per planet exhausted.",
-                ButtonHelper.getPsychoTechPlanets(game, player));
-    }
-
     @ButtonHandler("getAgentSelection_")
     public static void getAgentSelection(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
@@ -1130,49 +983,6 @@ public class UnfiledButtonHandlers {
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + ", please choose the target of your agent.",
                 buttons);
-    }
-
-    @ButtonHandler("preScoreObbie_")
-    public static void preScoreObbie(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
-        ButtonHelper.deleteMessage(event);
-        if (game.getPhaseOfGame().contains("action")) {
-            String poOrSO = buttonID.split("_")[1];
-            String num = buttonID.split("_")[2];
-            game.setStoredValue(player.getFaction() + "Round" + game.getRound() + "PreScored" + poOrSO, num);
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "Successfully queued an objective to score (it won't be scored if you later stop meeting the requirements).");
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.gray("reverse" + buttonID, "Unqueue it"));
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "You can use this to unqueue it and queue something else.", buttons);
-        } else {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "The game is not currently in the action phase, and so no scoring was queued. Go score normally.");
-        }
-    }
-
-    @ButtonHandler("reversepreScoreObbie_")
-    public static void reversepreScoreObbie(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
-        ButtonHelper.deleteMessage(event);
-        if (game.getPhaseOfGame().contains("action")) {
-            String poOrSO = buttonID.split("_")[1];
-            game.setStoredValue(player.getFaction() + "Round" + game.getRound() + "PreScored" + poOrSO, "");
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Successfully unqueued an objective.");
-            StatusHelper.offerPreScoringButtons(game, player);
-        }
-    }
-
-    @ButtonHandler(value = "get_so_score_buttons", save = false)
-    public static void getSoScoreButtons(ButtonInteractionEvent event, Player player) {
-        String secretScoreMsg = "Please choose the secret objective you wish to score.";
-        List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveButtons(player);
-        if (!soButtons.isEmpty()) {
-            MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, secretScoreMsg, soButtons);
-        } else {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "You have no secret objectives you can score.");
-        }
     }
 
     public static void soScoreFromHand(
@@ -1901,35 +1711,12 @@ public class UnfiledButtonHandlers {
         MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, systemButtons);
     }
 
-    @ButtonHandler("thronePoint")
-    public static void thronePoint(ButtonInteractionEvent event, Player player, Game game) {
-        Integer poIndex = game.addCustomPO("Throne of the False Emperor", 1);
-        game.scorePublicObjective(player.getUserID(), poIndex);
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentation()
-                        + " scored a secret objective (they'll specify which one). The bot has already given you a victory point for this.");
-        Helper.checkEndGame(game, player);
-        ButtonHelper.deleteMessage(event);
-    }
-
     @ButtonHandler("doneRemoving")
     public static void doneRemoving(ButtonInteractionEvent event, Game game) {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), event.getMessage().getContentRaw());
         ButtonHelper.deleteMessage(event);
         ButtonHelper.updateMap(game, event);
-    }
-
-    @ButtonHandler("scoreAnObjective")
-    public static void scoreAnObjective(ButtonInteractionEvent event, Player player, Game game) {
-        List<Button> poButtons = StatusHelper.getScoreObjectiveButtons(game, player.getFinsFactionCheckerPrefix());
-        poButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
-        MessageChannel channel = event.getMessageChannel();
-        if (game.isFowMode()) {
-            channel = player.getPrivateChannel();
-        }
-        MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to score an objective", poButtons);
     }
 
     @ButtonHandler("chooseMapView")
@@ -2113,15 +1900,6 @@ public class UnfiledButtonHandlers {
                 .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    @ButtonHandler("yssarilMinisterOfPolicy")
-    public static void yssarilMinisterOfPolicy(ButtonInteractionEvent event, Player player, Game game) {
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getFactionEmoji() + " is drawing their _Minister of Policy_ action card.");
-        ActionCardHelper.drawActionCards(player, 1);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-    }
-
     @ButtonHandler("non_sc_draw_so")
     public static void nonSCDrawSO(ButtonInteractionEvent event, Player player, Game game) {
         String message = "drew a secret objective.";
@@ -2134,13 +1912,6 @@ public class UnfiledButtonHandlers {
         ReactionService.addReaction(event, game, player, message);
     }
 
-    @ButtonHandler("diploSystem")
-    public static void diploSystem(ButtonInteractionEvent event, Player player, Game game) {
-        String message = player.getRepresentationUnfogged() + ", please choose the system you wish to Diplo.";
-        List<Button> buttons = Helper.getPlanetSystemDiploButtons(player, game, false, null);
-        MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
-    }
-
     @ButtonHandler("placeCCBack_")
     public static void placeCCBack(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         String position = buttonID.split("_")[1];
@@ -2150,18 +1921,6 @@ public class UnfiledButtonHandlers {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteMessage(event);
         CommandCounterHelper.addCC(event, player, game.getTileByPosition(position));
-    }
-
-    @ButtonHandler("placeWingTransferCC_")
-    public static void placeCC(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
-        String position = buttonID.split("_")[1];
-        Tile tile = game.getTileByPosition(position);
-        String message =
-                player.getRepresentationUnfogged() + " is using _Wing Transfer_ to place their command token in the "
-                        + tile.getRepresentationForButtons() + " system.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-        CommandCounterHelper.addCC(event, player, tile);
     }
 
     @ButtonHandler("passingAbilities")
@@ -2185,39 +1944,6 @@ public class UnfiledButtonHandlers {
         }
     }
 
-    @ButtonHandler("deployTyrant")
-    public static void deployTyrant(ButtonInteractionEvent event, Player player, Game game) {
-        String message = "Use buttons to place the _Tyrant's Lament_ with your ships.";
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                message,
-                Helper.getTileWithShipsPlaceUnitButtons(player, game, "tyrantslament", "placeOneNDone_skipbuild"));
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(), player.getFactionEmoji() + " is deploying the _Tyrant's Lament_.");
-        player.addOwnedUnitByID("tyrantslament");
-    }
-
-    @ButtonHandler("turnOffForcedScoring")
-    public static void turnOffForcedScoring(ButtonInteractionEvent event, Game game) {
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                game.getPing() + ", forced scoring order has been turned off. Any queues will not be resolved.");
-        game.setStoredValue("forcedScoringOrder", "");
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("forceACertainScoringOrder")
-    public static void forceACertainScoringOrder(ButtonInteractionEvent event, Game game) {
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                game.getPing()
-                        + ", players will be forced to score in order. Players will not be prevented from declaring they don't score, and are in fact encouraged to do so without delay if that is the case."
-                        + " This forced scoring order also does not yet affect secret objectives, it only restrains public objectives.");
-        game.setStoredValue("forcedScoringOrder", "true");
-        ButtonHelper.deleteMessage(event);
-    }
-
     @ButtonHandler("passForRound")
     public static void passForRound(ButtonInteractionEvent event, Player player, Game game) {
         PassService.passPlayerForRound(event, game, player, false);
@@ -2228,39 +1954,6 @@ public class UnfiledButtonHandlers {
     public static void noSabotage(ButtonInteractionEvent event, Game game, Player player) {
         String message = game.isFowMode() ? "No Sabotage" : null;
         ReactionService.addReaction(event, game, player, message);
-    }
-
-    @ButtonHandler(Constants.SO_NO_SCORING)
-    public static void soNoScoring(ButtonInteractionEvent event, Player player, Game game) {
-        String message =
-                player.getRepresentation() + " has opted not to score a secret objective at this point in time.";
-        game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", "None");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        String key2 = "queueToScoreSOs";
-        String key3 = "potentialScoreSOBlockers";
-        if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
-            game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
-        }
-        if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
-            game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
-            String key3b = "potentialScorePOBlockers";
-            if (!game.getStoredValue(key3b).contains(player.getFaction() + "*")) {
-                Helper.resolvePOScoringQueue(game, event);
-            }
-        }
-        if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
-            String msg = "Please score objectives.";
-            msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
-            event.getMessage().editMessage(msg).queue(Consumers.nop(), BotLogger::catchRestError);
-        }
-        ReactionService.addReaction(event, game, player);
-    }
-
-    @ButtonHandler(value = "refreshStatusSummary", save = false)
-    public static void refreshStatusSummary(ButtonInteractionEvent event, Game game) {
-        String msg = "Please score objectives.";
-        msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
-        event.getMessage().editMessage(msg).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("acquireAFreeTech") // Buttons.GET_A_FREE_TECH
@@ -2293,36 +1986,6 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler(Constants.PO_NO_SCORING)
-    public static void poNoScoring(ButtonInteractionEvent event, Player player, Game game) {
-        // AFTER THE LAST PLAYER PASS COMMAND, FOR SCORING
-        String message =
-                player.getRepresentation() + " has opted not to score a public objective at this point in time.";
-        if (!game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), message);
-        }
-        game.setStoredValue(player.getFaction() + "round" + game.getRound() + "PO", "None");
-        String reply = game.isFowMode() ? "No public objective scored" : null;
-        ReactionService.addReaction(event, game, player, reply);
-        String key2 = "queueToScorePOs";
-        String key3 = "potentialScorePOBlockers";
-        if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
-            game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
-        }
-        if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
-            game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
-            String key3b = "potentialScoreSOBlockers";
-            if (!game.getStoredValue(key3b).contains(player.getFaction() + "*")) {
-                Helper.resolvePOScoringQueue(game, event);
-            }
-        }
-        if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
-            String msg = "Please score objectives.";
-            msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
-            event.getMessage().editMessage(msg).queue(Consumers.nop(), BotLogger::catchRestError);
-        }
-    }
-
     @ButtonHandler("removeCCFromBoard_")
     public static void removeCCFromBoard(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         ButtonHelper.resolveRemovingYourCC(player, game, event, buttonID);
@@ -2343,16 +2006,6 @@ public class UnfiledButtonHandlers {
     public static void useTA(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String ta = buttonID.replace("useTA_", "") + "_ta";
         PromissoryNoteHelper.resolvePNPlay(ta, player, game, event);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("mahactCommander")
-    public static void mahactCommander(ButtonInteractionEvent event, Player player, Game game) {
-        List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "mahactCommander");
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                "Please choose which system you wish to remove your command token from.",
-                buttons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -2423,12 +2076,5 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteMessage(event);
         // Reduce file size by clearing draft info
         game.clearAllDraftInfo();
-    }
-
-    @ButtonHandler("swapToFaction_")
-    public static void swapToFaction(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String faction = buttonID.replace("swapToFaction_", "");
-        SwapFactionService.secondHalfOfSwap(
-                game, player, game.getPlayerFromColorOrFaction(faction), event.getUser(), event);
     }
 }

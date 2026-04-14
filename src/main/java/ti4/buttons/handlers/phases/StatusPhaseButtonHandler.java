@@ -1,4 +1,4 @@
-package ti4.buttons.handlers.objective;
+package ti4.buttons.handlers.phases;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ import ti4.service.info.ListPlayerInfoService;
 import ti4.service.objectives.RevealPublicObjectiveService;
 
 @UtilityClass
-class ScoringButtonHandler {
+class StatusPhaseButtonHandler {
 
     @ButtonHandler("reveal_stage_")
     public static void revealPOStage(ButtonInteractionEvent event, String buttonID, Game game) {
@@ -182,17 +182,6 @@ class ScoringButtonHandler {
             String msg = "Please score objectives.";
             msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue(Consumers.nop(), BotLogger::catchRestError);
-        }
-    }
-
-    @ButtonHandler(value = "get_so_discard_buttons", save = false)
-    public static void getSODiscardButtons(ButtonInteractionEvent event, Player player) {
-        String secretScoreMsg = "Click a button below to discard your secret objective.";
-        List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveDiscardButtons(player);
-        if (!soButtons.isEmpty()) {
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), secretScoreMsg, soButtons);
-        } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Developers");
         }
     }
 
