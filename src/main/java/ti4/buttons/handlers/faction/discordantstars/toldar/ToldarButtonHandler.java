@@ -16,7 +16,7 @@ class ToldarButtonHandler {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " used _Concordat Allegiant_ (the Toldar promissory note)"
-                        + " to gain 3 commodities after winning a combat against someone with more victory points than them. They can do this once per action. Their currently hold "
+                        + " to gain 3 commodities after winning a combat against someone with more victory points than them. They can do this once per action. They currently hold "
                         + player.getCommodities() + " commodit" + (player.getCommodities() == 1 ? "y" : "ies") + ".");
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }

@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -31,7 +32,7 @@ public class ReactionCheckService {
         mainMessage.clearReactions().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    public static void checkForAllReactions(@NotNull ButtonInteractionEvent event, Game game) {
+    public static void checkForAllReactions(@Nullable ButtonInteractionEvent event, Game game) {
         if (event == null) {
             return;
         }
