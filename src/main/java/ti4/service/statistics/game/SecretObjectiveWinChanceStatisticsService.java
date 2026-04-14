@@ -49,10 +49,11 @@ class SecretObjectiveWinChanceStatisticsService {
                         winsWithSecretScoredOrInHand));
 
         StringBuilder sb = new StringBuilder();
-        appendScoredSecretCountWinChanceSection(sb, "Action", playersByScoredAPSecretCount, winsByScoredAPSecretCount);
+        appendScoredSecretCountWinChanceSection(
+                sb, "Action", playersByScoredAPSecretCount, winsByScoredAPSecretCount, true);
         sb.append('\n');
         appendScoredSecretCountWinChanceSection(
-                sb, "Agenda", playersByScoredAgendaSecretCount, winsByScoredAgendaSecretCount);
+                sb, "Agenda", playersByScoredAgendaSecretCount, winsByScoredAgendaSecretCount, false);
 
         // Sort by highest SCORED win percent
         Map<String, Long> scoredWinPercent = new HashMap<>();
@@ -161,7 +162,11 @@ class SecretObjectiveWinChanceStatisticsService {
     }
 
     private static void appendScoredSecretCountWinChanceSection(
-            StringBuilder sb, String phaseName, int[] playersByScoredSecretCount, int[] winsByScoredSecretCount) {
+            StringBuilder sb,
+            String phaseName,
+            int[] playersByScoredSecretCount,
+            int[] winsByScoredSecretCount,
+            boolean includeCumulativeCounts) {
         sb.append("__**Scored ")
                 .append(phaseName)
                 .append(" Phase Secret Count Win Chance**__\n")
@@ -187,26 +192,28 @@ class SecretObjectiveWinChanceStatisticsService {
                     .append(")\n");
         }
 
-        for (int count = 1; count <= 3; count++) {
-            int players = 0;
-            int wins = 0;
-            for (int i = count; i <= 4; i++) {
-                players += playersByScoredSecretCount[i];
-                wins += winsByScoredSecretCount[i];
+        if (includeCumulativeCounts) {
+            for (int count = 1; count <= 3; count++) {
+                int players = 0;
+                int wins = 0;
+                for (int i = count; i <= 4; i++) {
+                    players += playersByScoredSecretCount[i];
+                    wins += winsByScoredSecretCount[i];
+                }
+                long percent = players == 0 ? 0 : Math.round(100.0 * wins / players);
+                sb.append('`')
+                        .append(count)
+                        .append("+ ")
+                        .append(phaseName)
+                        .append(" secrets` ")
+                        .append('`')
+                        .append(StringUtils.leftPad(percent + "%", 4))
+                        .append("` (")
+                        .append(wins)
+                        .append("/")
+                        .append(players)
+                        .append(")\n");
             }
-            long percent = players == 0 ? 0 : Math.round(100.0 * wins / players);
-            sb.append('`')
-                    .append(count)
-                    .append("+ ")
-                    .append(phaseName)
-                    .append(" secrets` ")
-                    .append('`')
-                    .append(StringUtils.leftPad(percent + "%", 4))
-                    .append("` (")
-                    .append(wins)
-                    .append("/")
-                    .append(players)
-                    .append(")\n");
         }
     }
 
