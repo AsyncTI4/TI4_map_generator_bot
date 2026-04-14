@@ -29,7 +29,6 @@ import org.apache.commons.lang3.function.Consumers;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
-import ti4.buttons.UnfiledButtonHandlers;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
@@ -57,6 +56,7 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.button.ReactionCheckService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -4778,7 +4778,7 @@ public final class AgendaHelper {
 
     public static void playWhen(
             ButtonInteractionEvent event, Game game, Player player, MessageChannel mainGameChannel) {
-        UnfiledButtonHandlers.clearAllReactions(event);
+        ReactionCheckService.clearAllReactions(event);
         ReactionService.addReaction(event, game, player, true, true, "is playing a \"when\".");
         List<Button> whenButtons = getWhenButtons(game);
         MessageHelper.sendMessageToChannelWithPersistentReacts(

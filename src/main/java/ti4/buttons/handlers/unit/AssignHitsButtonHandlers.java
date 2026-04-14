@@ -1,4 +1,4 @@
-package ti4.buttons.handlers.unitPickers;
+package ti4.buttons.handlers.unit;
 
 import java.util.List;
 import lombok.experimental.UtilityClass;

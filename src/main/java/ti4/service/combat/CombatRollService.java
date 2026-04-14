@@ -18,7 +18,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.buttons.Buttons;
-import ti4.buttons.UnfiledButtonHandlers;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -82,9 +81,9 @@ public class CombatRollService {
             CombatRollType rollType) {
         if (rollType == CombatRollType.bombardment) {
             if (game.getStoredValue("assignedBombardment" + player.getFaction()).isEmpty()) {
-                UnfiledButtonHandlers.autoAssignAllBombardmentToAPlanet(player, game);
+                BombardmentService.autoAssignAllBombardmentToAPlanet(player, game);
             }
-            for (String planet : UnfiledButtonHandlers.getBombardablePlanets(player, game, tile)) {
+            for (String planet : BombardmentService.getBombardablePlanets(player, game, tile)) {
                 if (game.getStoredValue("assignedBombardment" + player.getFaction())
                         .contains(planet)) {
                     game.setStoredValue("bombardmentTarget" + player.getFaction(), planet);

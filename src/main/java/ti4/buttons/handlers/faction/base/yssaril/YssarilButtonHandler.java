@@ -63,6 +63,15 @@ public class YssarilButtonHandler {
                 ac.getRepresentationEmbed(false, false, game));
     }
 
+    @ButtonHandler("yssarilMinisterOfPolicy")
+    public static void yssarilMinisterOfPolicy(ButtonInteractionEvent event, Player player, Game game) {
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getFactionEmoji() + " is drawing their _Minister of Policy_ action card.");
+        ActionCardHelper.drawActionCards(player, 1);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+    }
+
     @ButtonHandler("yssarilHeroRejection_")
     public static void yssarilHeroRejection(Game game, ButtonInteractionEvent event, String buttonID) {
         String playerFaction = buttonID.replace("yssarilHeroRejection_", "");

@@ -1,4 +1,4 @@
-package ti4.buttons.handlers.omega_phase;
+package ti4.buttons.handlers.omegaphase;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.game.Game;

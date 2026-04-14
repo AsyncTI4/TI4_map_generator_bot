@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
-import ti4.buttons.UnfiledButtonHandlers;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -45,6 +44,7 @@ import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.RiftSetModeService;
+import ti4.service.game.SpeakerService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -238,7 +238,7 @@ public class PlayStrategyCardService {
                         "## Friendly reminder that _Executive Sanctions_ is a law in play, and so the action card hand limit is 3 instead of 7.");
             }
             if (player.isNpc()) {
-                UnfiledButtonHandlers.sc3AssignSpeaker(null, player, player.getFaction(), game);
+                SpeakerService.assignSpeaker(null, player, player.getFaction(), game);
             }
         }
 

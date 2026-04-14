@@ -14,9 +14,16 @@ import ti4.helpers.Helper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
+import ti4.service.button.ReactionService;
 
 @UtilityClass
 public class ActionCardButtonHandler {
+
+    @ButtonHandler("no_sabotage")
+    public static void noSabotage(ButtonInteractionEvent event, Game game, Player player) {
+        String message = game.isFowMode() ? "No Sabotage" : null;
+        ReactionService.addReaction(event, game, player, message);
+    }
 
     @ButtonHandler("increaseTGonSC_")
     public static void increaseTGonSC(ButtonInteractionEvent event, String buttonID, Game game) {
