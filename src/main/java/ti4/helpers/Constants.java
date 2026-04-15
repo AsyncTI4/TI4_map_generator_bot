@@ -1019,6 +1019,7 @@ public final class Constants {
     public static final String TTPG_FILE_NAME = "ttpg_file_name";
     public static final String GAME_FUN_NAME = "game_fun_name";
     public static final String CATEGORY = "category";
+    public static final String ACTION = "action";
     public static final String SEND_JSON_TO_S3 = "send_games_to_s3";
     public static final String SERVER_LIMIT_STATS = "server_limit_stats";
     public static final String END = "end";
@@ -1051,12 +1052,14 @@ public final class Constants {
     public static final String FIX_CHANNEL_PERMISSIONS = "fix_channel_permissions";
     public static final String CATEGORY_CHANNEL_COUNT = "category_channel_count";
     public static final String BEGIN_VIDEO_GEN = "begin_video_gen";
+    public static final String RECREATE_GAME = "recreate_game";
     public static final String INCLUDE_SUBCOMMANDS = "include_subcommands";
     public static final String INCLUDE_OPTIONS = "include_options";
     public static final String CARDS_INFO = "cards_info";
     public static final String FRANKEN = "franken";
     public static final String SHOW_GAME_AS_PLAYER = "show_game_as";
     public static final String CHECK_PRIVATE_COMMUNICATIONS = "check_private_communications";
+    public static final String LOCAL_DEV = "local_dev";
 
     // DRAFTS
     public static final String BAG_DRAFT = "bag_draft";

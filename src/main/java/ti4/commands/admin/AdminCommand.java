@@ -20,7 +20,8 @@ public class AdminCommand implements ParentCommand {
                     new DeletePersistenceManagerFile(),
                     new CardsInfoForPlayer(),
                     new UpdateThreadArchiveTime(),
-                    new GetChannelHtml())
+                    new GetChannelHtml(),
+                    new RecreateGame())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

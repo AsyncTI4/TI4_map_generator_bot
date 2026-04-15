@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.nio.file.Path;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
@@ -120,6 +121,11 @@ public class GameManager {
             handleUndo(game);
         }
         return game;
+    }
+
+    @Nullable
+    public static Game loadFromPath(Path path) {
+        return GameLoadService.load(path);
     }
 
     public static List<String> getGameNames() {

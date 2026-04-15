@@ -135,6 +135,14 @@ class GameLoadService {
     }
 
     @Nullable
+    static Game load(Path path) {
+        if (path == null) {
+            return null;
+        }
+        return readGame(path.toFile());
+    }
+
+    @Nullable
     private static Game readGame(@NotNull File gameFile) {
         if (!gameFile.exists()) {
             BotLogger.critical("Could not load map, map file does not exist: " + gameFile.getAbsolutePath());

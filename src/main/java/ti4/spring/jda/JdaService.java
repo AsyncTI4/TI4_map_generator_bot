@@ -310,9 +310,6 @@ public class JdaService {
         AliasHandler.init();
         // create directories for games files
         Storage.init();
-        if (LocalDevelopmentSampleGameService.isLocalDevelopmentStartup(args)) {
-            LocalDevelopmentSampleGameService.seedSampleGameFileIfMissing();
-        }
         SelectionManager.init();
         initializeWhitelistedRoles();
         TIGLHelper.validateTIGLness();
@@ -323,7 +320,8 @@ public class JdaService {
         GameManager.initialize();
         if (LocalDevelopmentSampleGameService.isLocalDevelopmentStartup(args)) {
             String localUserId = args.length > 1 ? args[1] : null;
-            LocalDevelopmentSampleGameService.bootstrapSampleGame(guildPrimary, localUserId);
+            String sourceGameName = LocalDevelopmentSampleGameService.getStartupSourceGameName(args);
+            LocalDevelopmentSampleGameService.createAndRecreateTestGame(guildPrimary, localUserId, sourceGameName);
         }
         BotLogger.info("FINISHED LOADING GAMES");
 
