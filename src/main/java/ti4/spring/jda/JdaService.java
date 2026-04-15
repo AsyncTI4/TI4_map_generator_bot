@@ -322,7 +322,8 @@ public class JdaService {
         BotLogger.info("LOADING GAMES");
         GameManager.initialize();
         if (LocalDevelopmentSampleGameService.isLocalDevelopmentStartup(args)) {
-            LocalDevelopmentSampleGameService.bootstrapSampleGame(guildPrimary, args[1]);
+            String localUserId = args.length > 1 ? args[1] : null;
+            LocalDevelopmentSampleGameService.bootstrapSampleGame(guildPrimary, localUserId);
         }
         BotLogger.info("FINISHED LOADING GAMES");
 
