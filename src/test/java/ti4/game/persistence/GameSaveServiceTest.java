@@ -10,7 +10,7 @@ class GameSaveServiceTest extends BaseTi4Test {
 
     @Test
     void shouldSaveAndReloadGame() {
-        try (var harness = TestResourceGameHarness.forDefaultMap()) {
+        try (var harness = TestGameHarness.forDefaultMap()) {
             Game game = harness.load();
             game.setLatestOutcomeVotedFor("testOutcome");
 

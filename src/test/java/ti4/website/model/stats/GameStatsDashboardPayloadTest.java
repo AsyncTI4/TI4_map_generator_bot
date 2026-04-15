@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
-import ti4.game.persistence.TestResourceGameHarness;
+import ti4.game.persistence.TestGameHarness;
 import ti4.json.JsonMapperManager;
 import ti4.testUtils.BaseTi4Test;
 
@@ -54,7 +54,7 @@ class GameStatsDashboardPayloadTest extends BaseTi4Test {
 
     @Test
     void serializesDisplacedUnitsGameAsDashboardPayload() {
-        try (var harness = TestResourceGameHarness.fromSourceGame("game-with-displaced-units")) {
+        try (var harness = TestGameHarness.fromSourceGame("game-with-displaced-units")) {
             var game = harness.load();
 
             var payloadJson = JsonMapperManager.basic().valueToTree(new GameStatsDashboardPayload(game));

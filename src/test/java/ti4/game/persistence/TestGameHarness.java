@@ -14,23 +14,23 @@ import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 
-public final class TestResourceGameHarness implements AutoCloseable {
+public final class TestGameHarness implements AutoCloseable {
     private static final String DEFAULT_SOURCE_GAME_NAME = "pbd15036";
     private static final int GAME_NAME_LINE_INDEX = 2;
 
     private final String gameName;
     private final Set<String> managedGameNames = new LinkedHashSet<>();
 
-    private TestResourceGameHarness(String gameName) {
+    private TestGameHarness(String gameName) {
         this.gameName = gameName;
         managedGameNames.add(gameName);
     }
 
-    public static TestResourceGameHarness forDefaultMap() {
+    public static TestGameHarness forDefaultMap() {
         return fromSourceGame(DEFAULT_SOURCE_GAME_NAME);
     }
 
-    public static TestResourceGameHarness fromSourceGame(String sourceGameName) {
+    public static TestGameHarness fromSourceGame(String sourceGameName) {
         String uniqueGameName = generateUniqueGameName();
         Path sourcePath = Storage.getGamePath(sourceGameName + Constants.TXT);
         Path targetPath = Storage.getGamePath(uniqueGameName + Constants.TXT);
@@ -46,7 +46,7 @@ public final class TestResourceGameHarness implements AutoCloseable {
             throw new IllegalStateException("Unable to create test game from resource map: " + sourcePath, e);
         }
 
-        return new TestResourceGameHarness(uniqueGameName);
+        return new TestGameHarness(uniqueGameName);
     }
 
     public String getGameName() {
@@ -69,7 +69,7 @@ public final class TestResourceGameHarness implements AutoCloseable {
 
     @Override
     public void close() {
-        managedGameNames.forEach(TestResourceGameHarness::deleteGameFiles);
+        managedGameNames.forEach(TestGameHarness::deleteGameFiles);
     }
 
     private static void deleteGameFiles(String gameName) {

@@ -11,7 +11,7 @@ class GameSaveLoadTest extends BaseTi4Test {
 
     @Test
     void shouldHandleSerializationOfBorderAnomalies() {
-        try (var harness = TestResourceGameHarness.fromSourceGame("game-with-border-anomalies")) {
+        try (var harness = TestGameHarness.fromSourceGame("game-with-border-anomalies")) {
             Game game = harness.load();
             String savedGameName = harness.createDerivedGameName("saved");
             game.setName(savedGameName);
@@ -33,7 +33,7 @@ class GameSaveLoadTest extends BaseTi4Test {
 
     @Test
     void shouldHandleSerializationOfDisplacedUnits() {
-        try (var harness = TestResourceGameHarness.fromSourceGame("game-with-displaced-units")) {
+        try (var harness = TestGameHarness.fromSourceGame("game-with-displaced-units")) {
             Game game = harness.load();
             String savedGameName = harness.createDerivedGameName("saved");
             game.setName(savedGameName);
@@ -61,7 +61,7 @@ class GameSaveLoadTest extends BaseTi4Test {
 
     @Test
     void shouldHandleSaveLoadOfPlayers() {
-        try (var harness = TestResourceGameHarness.fromSourceGame("game-with-displaced-units")) {
+        try (var harness = TestGameHarness.fromSourceGame("game-with-displaced-units")) {
             Game game = harness.load();
             String savedGameName = harness.createDerivedGameName("saved");
             game.setName(savedGameName);
