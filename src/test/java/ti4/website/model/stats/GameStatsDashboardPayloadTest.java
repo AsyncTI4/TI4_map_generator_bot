@@ -54,8 +54,8 @@ class GameStatsDashboardPayloadTest extends BaseTi4Test {
 
     @Test
     void serializesDisplacedUnitsGameAsDashboardPayload() {
-        try (var harness =
-                TestResourceGameHarness.fromSourceGame("game-with-displaced-units", "dashboard-payload-displaced-units")) {
+        try (var harness = TestResourceGameHarness.fromSourceGame(
+                "game-with-displaced-units", "dashboard-payload-displaced-units")) {
             var game = harness.load();
 
             var payloadJson = JsonMapperManager.basic().valueToTree(new GameStatsDashboardPayload(game));
