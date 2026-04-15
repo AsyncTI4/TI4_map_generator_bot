@@ -135,9 +135,13 @@ public class LocalDevelopmentSampleGameService {
         if (resourcePath == null) {
             return null;
         }
-        Path testResourcePath = Path.of(resourcePath)
+        Path mainResourcesPath = Path.of(resourcePath);
+        Path testResourcePath = mainResourcesPath
                 .getParent()
-                .resolve("../test/resources/maps/" + fileName)
+                .resolveSibling("test")
+                .resolve("resources")
+                .resolve("maps")
+                .resolve(fileName)
                 .normalize();
         return Files.exists(testResourcePath) ? testResourcePath : null;
     }
