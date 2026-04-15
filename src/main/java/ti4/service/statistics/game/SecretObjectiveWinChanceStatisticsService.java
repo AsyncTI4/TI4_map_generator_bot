@@ -172,7 +172,8 @@ class SecretObjectiveWinChanceStatisticsService {
                 .append("_(What is a player's win chance if they've scored X secrets of any type?)_\n\n");
 
         for (int count = 0; count <= 4; count++) {
-            appendSecretCountWinChanceLine(sb, count + " secrets", playersByScoredSecretCount[count], winsByScoredSecretCount[count]);
+            appendSecretCountWinChanceLine(
+                    sb, count + " secrets", playersByScoredSecretCount[count], winsByScoredSecretCount[count]);
         }
 
         for (int count = 1; count <= 3; count++) {
@@ -213,12 +214,10 @@ class SecretObjectiveWinChanceStatisticsService {
 
         int combinedGames = gamesWithSecretScoredOrInHand.getOrDefault(secretName, 0);
         int combinedWins = winsWithSecretScoredOrInHand.getOrDefault(secretName, 0);
-        long whenDrawnEstimatedPercent = (combinedWins == 0 || maxCombinedGames == 0)
-                ? 0
-                : Math.round(100.0 * combinedWins / maxCombinedGames);
-        long discardRateEstimatedPercent = (maxCombinedGames == 0)
-                ? 0
-                : Math.round(100.0 * (maxCombinedGames - combinedGames) / maxCombinedGames);
+        long whenDrawnEstimatedPercent =
+                (combinedWins == 0 || maxCombinedGames == 0) ? 0 : Math.round(100.0 * combinedWins / maxCombinedGames);
+        long discardRateEstimatedPercent =
+                (maxCombinedGames == 0) ? 0 : Math.round(100.0 * (maxCombinedGames - combinedGames) / maxCombinedGames);
 
         return new SecretWinChanceEntry(
                 secretName,
