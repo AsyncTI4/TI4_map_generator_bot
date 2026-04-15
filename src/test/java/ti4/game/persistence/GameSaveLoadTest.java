@@ -24,10 +24,7 @@ class GameSaveLoadTest extends BaseTi4Test {
             assertThat(game2)
                     .usingRecursiveComparison()
                     .ignoringFields(
-                            "lastModifiedDate",
-                            "draftManager.game.lastModifiedDate",
-                            "name",
-                            "draftManager.game.name")
+                            "lastModifiedDate", "draftManager.game.lastModifiedDate", "name", "draftManager.game.name")
                     .isEqualTo(game);
 
             assertThat(game.getLastModifiedDate()).isNotEqualTo(game2.getLastModifiedDate());

@@ -92,7 +92,9 @@ final class TestResourceGameHarness implements AutoCloseable {
     }
 
     private static Path getUndoDirectory(String gameName) {
-        return Path.of(Storage.getStoragePath(), "maps", "undo", gameName).toAbsolutePath().normalize();
+        return Path.of(Storage.getStoragePath(), "maps", "undo", gameName)
+                .toAbsolutePath()
+                .normalize();
     }
 
     private static String sanitize(String value) {
