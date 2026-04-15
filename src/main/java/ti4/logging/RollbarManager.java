@@ -5,6 +5,7 @@ import com.rollbar.notifier.Rollbar;
 import com.rollbar.notifier.config.Config;
 import com.rollbar.notifier.config.ConfigBuilder;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.experimental.UtilityClass;
@@ -52,7 +53,7 @@ public class RollbarManager {
                 .environment(getSetting("ROLLBAR_ENVIRONMENT", getDefaultEnvironment()))
                 .codeVersion(getSetting("ROLLBAR_CODE_VERSION", getDefaultCodeVersion()))
                 .framework("spring-boot")
-                .appPackages(java.util.List.of("ti4"))
+                .appPackages(List.of("ti4"))
                 .handleUncaughtErrors(true)
                 .build();
 

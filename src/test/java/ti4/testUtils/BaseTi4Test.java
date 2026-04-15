@@ -1,14 +1,14 @@
 package ti4.testUtils;
 
 import org.junit.jupiter.api.BeforeAll;
+import ti4.discord.JdaService;
+import ti4.discord.interactions.selections.SelectionManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Storage;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileHelper;
-import ti4.selections.SelectionManager;
 import ti4.service.emoji.ApplicationEmojiService;
-import ti4.spring.jda.JdaService;
 
 /**
  * Base test class for all Ti4 tests. Allows for proper global config.

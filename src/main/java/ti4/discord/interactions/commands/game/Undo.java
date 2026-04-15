@@ -1,0 +1,63 @@
+package ti4.discord.interactions.commands.game;
+
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.GameStateSubcommand;
+import ti4.game.Game;
+import ti4.game.persistence.GameManager;
+import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
+import ti4.message.MessageHelper;
+import ti4.service.game.GameUndoNameService;
+
+class Undo extends GameStateSubcommand {
+
+    public Undo() {
+        super(Constants.UNDO, "Undo the last action", false, false);
+        addOptions(new OptionData(OptionType.STRING, Constants.UNDO_TO_COMMAND, "Command to undo back to")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES")
+                .setRequired(true));
+    }
+
+    @Override
+    public void execute(SlashCommandInteractionEvent event) {
+        Game game = getGame();
+        String gameName = game.getName();
+        if (!event.getChannel().getName().startsWith(gameName + "-")) {
+            MessageHelper.replyToMessage(event, "Undo must be executed in game channel only!");
+            return;
+        }
+
+        if (game.isFowMode() && !FoWHelper.isGameMaster(event.getUser().getId(), game)) {
+            MessageHelper.replyToMessage(event, "Only the GM can use undo in Fog of War.");
+            return;
+        }
+
+        OptionMapping option = event.getOption(Constants.CONFIRM);
+        if (option == null || !"YES".equals(option.getAsString())) {
+            MessageHelper.replyToMessage(
+                    event,
+                    "Must confirm with `YES`"
+                            + ("YES".equalsIgnoreCase(option.getAsString()) ? " - this is case sensitive" : "") + ".");
+            return;
+        }
+
+        String gameToUndoBackTo = event.getOption(Constants.UNDO_TO_COMMAND, null, OptionMapping::getAsString);
+        if (gameToUndoBackTo == null || gameToUndoBackTo.isEmpty()) {
+            MessageHelper.replyToMessage(event, "Must specify command to undo back to");
+            return;
+        }
+
+        Integer targetUndoIndex = GameUndoNameService.getUndoNumberFromSelection(gameName, gameToUndoBackTo);
+        if (targetUndoIndex == null) {
+            MessageHelper.replyToMessage(event, "Undo failed - Parameter doesn't look right: " + gameToUndoBackTo);
+            return;
+        }
+
+        GameManager.undo(game, targetUndoIndex);
+    }
+}
