@@ -232,21 +232,11 @@ public final class AgendaHelper {
         if (player.hasAbility("quash") && (player.getStrategicCC() > 0 || player.hasRelicReady("emelpar"))) {
             names.add("Quash");
         }
-        for (String acId : player.getActionCards().keySet()) {
+        for (String acId : player.getPlayableActionCards()) {
             ActionCardModel actionCard = Mapper.getActionCard(acId);
             String actionCardWindow = actionCard.getWindow();
             if (actionCardWindow.contains("When an agenda is revealed")) {
                 names.add(actionCard.getName());
-            }
-        }
-        if (player.hasPlanet("garbozia")) {
-            for (String acId :
-                    ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet()) {
-                ActionCardModel actionCard = Mapper.getActionCard(acId);
-                String actionCardWindow = actionCard.getWindow();
-                if (actionCardWindow.contains("When an agenda is revealed")) {
-                    names.add(actionCard.getName());
-                }
             }
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
@@ -264,12 +254,7 @@ public final class AgendaHelper {
         if (player.hasAbility("quash") && (player.getStrategicCC() > 0 || player.hasRelicReady("emelpar"))) {
             buttons.add(Buttons.red("queueWhen_ability_quash", "Quash"));
         }
-        ArrayList<String> acIDs = new ArrayList<>(player.getActionCards().keySet());
-        if (player.hasPlanet("garbozia")) {
-            acIDs.addAll(
-                    ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet());
-        }
-        for (String acId : acIDs) {
+        for (String acId : player.getPlayableActionCards()) {
             ActionCardModel actionCard = Mapper.getActionCard(acId);
             String actionCardWindow = actionCard.getWindow();
             if (actionCardWindow.contains("When an agenda is revealed")) {
@@ -375,23 +360,12 @@ public final class AgendaHelper {
                 names.add(Mapper.getAbility(ability).getName());
             }
         }
-        for (String acId : player.getActionCards().keySet()) {
+        for (String acId : player.getPlayableActionCards()) {
             ActionCardModel actionCard = Mapper.getActionCard(acId);
             String actionCardWindow = actionCard.getWindow();
             if (actionCardWindow.contains("After an agenda is revealed")
                     || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
                 names.add(actionCard.getName());
-            }
-        }
-        if (player.hasPlanet("garbozia")) {
-            for (String acId :
-                    ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet()) {
-                ActionCardModel actionCard = Mapper.getActionCard(acId);
-                String actionCardWindow = actionCard.getWindow();
-                if (actionCardWindow.contains("After an agenda is revealed")
-                        || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
-                    names.add(actionCard.getName());
-                }
             }
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
@@ -439,23 +413,12 @@ public final class AgendaHelper {
                         Mapper.getAbility(ability).getName()));
             }
         }
-        for (String acId : player.getActionCards().keySet()) {
+        for (String acId : player.getPlayableActionCards()) {
             ActionCardModel actionCard = Mapper.getActionCard(acId);
             String actionCardWindow = actionCard.getWindow();
             if (actionCardWindow.contains("After an agenda is revealed")
                     || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
                 buttons.add(Buttons.green("queueAfter_ac_" + acId, actionCard.getName()));
-            }
-        }
-        if (player.hasPlanet("garbozia")) {
-            for (String acId :
-                    ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet()) {
-                ActionCardModel actionCard = Mapper.getActionCard(acId);
-                String actionCardWindow = actionCard.getWindow();
-                if (actionCardWindow.contains("After an agenda is revealed")
-                        || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
-                    buttons.add(Buttons.green("queueAfter_ac_" + acId, actionCard.getName()));
-                }
             }
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
