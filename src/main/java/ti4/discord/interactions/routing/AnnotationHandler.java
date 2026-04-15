@@ -25,6 +25,7 @@ import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.context.ButtonContext;
 import ti4.discord.interactions.context.ListenerContext;
 import ti4.discord.interactions.context.ModalContext;
@@ -33,7 +34,6 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
-import ti4.spring.jda.JdaService;
 
 public final class AnnotationHandler {
 
