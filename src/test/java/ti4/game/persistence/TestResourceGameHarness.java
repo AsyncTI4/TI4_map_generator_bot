@@ -1,6 +1,7 @@
 package ti4.game.persistence;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -30,22 +31,22 @@ final class TestResourceGameHarness implements AutoCloseable {
     }
 
     static TestResourceGameHarness fromSourceGame(String sourceGameName, String testName) {
-        String gameName = sanitize(testName) + "-" + UUID.randomUUID();
+        String uniqueGameName = sanitize(testName) + "-" + UUID.randomUUID();
         Path sourcePath = Storage.getGamePath(sourceGameName + Constants.TXT);
-        Path targetPath = Storage.getGamePath(gameName + Constants.TXT);
+        Path targetPath = Storage.getGamePath(uniqueGameName + Constants.TXT);
 
         try {
             List<String> gameFileLines = Files.readAllLines(sourcePath);
             if (gameFileLines.size() <= GAME_NAME_LINE_INDEX) {
                 throw new IllegalStateException("Test map is missing the expected game name line: " + sourcePath);
             }
-            gameFileLines.set(GAME_NAME_LINE_INDEX, gameName);
+            gameFileLines.set(GAME_NAME_LINE_INDEX, uniqueGameName);
             Files.write(targetPath, gameFileLines);
         } catch (IOException e) {
             throw new IllegalStateException("Unable to create test game from resource map: " + sourcePath, e);
         }
 
-        return new TestResourceGameHarness(gameName);
+        return new TestResourceGameHarness(uniqueGameName);
     }
 
     String getGameName() {
@@ -74,7 +75,8 @@ final class TestResourceGameHarness implements AutoCloseable {
     private static void deleteGameFiles(String gameName) {
         try {
             Files.deleteIfExists(Storage.getGamePath(gameName + Constants.TXT));
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to delete test game file for: " + gameName, e);
         }
 
         Path undoDirectory = getUndoDirectory(gameName);
@@ -84,10 +86,14 @@ final class TestResourceGameHarness implements AutoCloseable {
             walk.sorted(Comparator.reverseOrder()).forEach(path -> {
                 try {
                     Files.deleteIfExists(path);
-                } catch (IOException ignored) {
+                } catch (IOException e) {
+                    throw new UncheckedIOException("Unable to delete path: " + path, e);
                 }
             });
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to walk undo directory for: " + gameName, e);
+        } catch (UncheckedIOException e) {
+            throw new IllegalStateException("Unable to clean undo directory for: " + gameName, e.getCause());
         }
     }
 
