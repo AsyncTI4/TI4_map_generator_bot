@@ -16,8 +16,8 @@ class GameUndoServiceTest extends BaseTi4Test {
 
             assertThat(first).isEqualTo(1);
             assertThat(second).isEqualTo(2);
-            assertThat(Files.exists(harness.getUndoPath(1))).isTrue();
-            assertThat(Files.exists(harness.getUndoPath(2))).isTrue();
+            assertThat(Files.exists(harness.buildUndoPath(1))).isTrue();
+            assertThat(Files.exists(harness.buildUndoPath(2))).isTrue();
         }
     }
 }

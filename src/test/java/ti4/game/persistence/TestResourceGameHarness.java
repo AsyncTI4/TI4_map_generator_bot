@@ -63,8 +63,8 @@ final class TestResourceGameHarness implements AutoCloseable {
         return GameLoadService.load(gameName);
     }
 
-    Path getUndoPath(int undoIndex) {
-        return getUndoDirectory(gameName).resolve(gameName + "_" + undoIndex + Constants.TXT);
+    Path buildUndoPath(int undoIndex) {
+        return Storage.getGameUndo(gameName, gameName + "_" + undoIndex + Constants.TXT);
     }
 
     @Override
@@ -98,7 +98,8 @@ final class TestResourceGameHarness implements AutoCloseable {
     }
 
     private static Path getUndoDirectory(String gameName) {
-        return Path.of(Storage.getStoragePath(), "maps", "undo", gameName)
+        return Storage.getBaseGameUndoDirectory()
+                .resolve(gameName)
                 .toAbsolutePath()
                 .normalize();
     }
