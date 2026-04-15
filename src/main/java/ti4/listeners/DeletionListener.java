@@ -13,7 +13,8 @@ class DeletionListener extends ListenerAdapter {
     public void onMessageDelete(@Nonnull MessageDeleteEvent event) {
         if (!validateEvent(event)) return;
 
-        ExecutorServiceManager.runAsync("DeletionListener task", () -> MessageDeletionService.handleMessageDelete(event));
+        ExecutorServiceManager.runAsync(
+                "DeletionListener task", () -> MessageDeletionService.handleMessageDelete(event));
     }
 
     private static boolean validateEvent(MessageDeleteEvent event) {

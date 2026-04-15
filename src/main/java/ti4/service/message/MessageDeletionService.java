@@ -40,13 +40,15 @@ public class MessageDeletionService {
         }
     }
 
-    private static void handleMessageDelete(MessageChannel eventChannel, String gameName, User deleter, String messageText) {
+    private static void handleMessageDelete(
+            MessageChannel eventChannel, String gameName, User deleter, String messageText) {
         try {
             if (!GameManager.isValid(gameName) || eventChannel == null || messageText == null) return;
 
-            TextChannel deletionLogChannel = JdaService.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
-                    .findFirst()
-                    .orElse(null);
+            TextChannel deletionLogChannel =
+                    JdaService.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
+                            .findFirst()
+                            .orElse(null);
             if (deletionLogChannel == null) return;
 
             Game game = GameManager.getManagedGame(gameName).getGame();
@@ -66,7 +68,8 @@ public class MessageDeletionService {
         String sanitizedMsg = msg.replace("@", "@\u200B");
 
         String deleterName = user == null ? "unknown" : user.getEffectiveName();
-        String logMessage = String.format("""
+        String logMessage =
+                String.format("""
                 Game: **%s**, Deleted by: %s
                 From: %s %s %s
                 %s
