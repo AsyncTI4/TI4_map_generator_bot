@@ -2417,7 +2417,7 @@ public final class ButtonHelperFactionSpecific {
             }
         }
 
-        var units = Map.of(p1.getUnitFromAsyncID("blacktf_mech"), 1);
+        var units = Map.of(p1.getUnitByType(UnitType.Mech), 1);
         String planetN = planet.getName();
 
         var rollMods = CombatModHelper.getModifiers(
