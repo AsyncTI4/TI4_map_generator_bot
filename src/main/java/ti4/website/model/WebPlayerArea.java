@@ -140,6 +140,7 @@ public class WebPlayerArea {
     private String flexibleDisplayName;
     private Set<Integer> scs;
     private Boolean isSpeaker;
+    private Boolean isTyrant;
     private List<String> neighbors;
 
     // army values
@@ -323,6 +324,7 @@ public class WebPlayerArea {
         webPlayerArea.setFlexibleDisplayName(player.getFlexibleDisplayName());
         webPlayerArea.setScs(player.getSCs());
         webPlayerArea.setIsSpeaker(player.isSpeaker());
+        webPlayerArea.setIsTyrant(player.isTyrant());
         webPlayerArea.setNeighbors(player.getNeighbouringPlayers(false).stream()
                 .map(Player::getColor)
                 .toList());
