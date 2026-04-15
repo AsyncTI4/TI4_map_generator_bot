@@ -13,7 +13,7 @@ import ti4.testUtils.BaseTi4Test;
 class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
 
     @Test
-    void copySampleGameFileIfMissingCopiesMissingFileWithoutOverwriting() throws Exception {
+    void copySampleGameFileIfMissingCreatesNewFileButDoesNotOverwrite() throws Exception {
         Path tempDirectory = Files.createTempDirectory("local-dev-sample");
         Path sourceFile = tempDirectory.resolve("source.txt");
         Path targetFile = tempDirectory.resolve("target.txt");

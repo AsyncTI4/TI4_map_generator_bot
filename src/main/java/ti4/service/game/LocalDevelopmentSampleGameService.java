@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
+import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
@@ -28,7 +29,7 @@ public class LocalDevelopmentSampleGameService {
     static final String SAMPLE_GAME_FILE_NAME = SAMPLE_GAME_NAME + Constants.TXT;
 
     public static boolean isLocalDevelopmentStartup(String[] args) {
-        return args.length == 3;
+        return args != null && args.length == 3 && StringUtils.isNoneBlank(args);
     }
 
     public static void seedSampleGameFileIfMissing() {
@@ -95,7 +96,7 @@ public class LocalDevelopmentSampleGameService {
         game.setBotMapUpdatesThreadID(botThread.getId());
 
         for (Player player : game.getRealPlayers()) {
-            player.getCardsInfoThread();
+            ensureCardsInfoThread(player);
         }
 
         GameManager.save(game, "Bootstrapped local development sample game");
@@ -242,6 +243,13 @@ public class LocalDevelopmentSampleGameService {
         return player.getPrivateChannel() instanceof TextChannel channel ? channel : null;
     }
 
+    private static void ensureCardsInfoThread(Player player) {
+        if (player.getCardsInfoThread() == null) {
+            BotLogger.warning("LocalDevelopmentSampleGameService: failed to create cards info thread for "
+                    + player.getUserName() + " in game " + player.getGame().getName());
+        }
+    }
+
     private static String getTableTalkChannelName(Game game) {
         String customName = sanitizeChannelName(game.getCustomName());
         if (customName.isBlank()) {
@@ -259,6 +267,6 @@ public class LocalDevelopmentSampleGameService {
     }
 
     private static String sanitizeChannelName(String name) {
-        return name.replace("/", "").replace(" ", "-").replace(".", "").replace(":", "");
+        return name.replaceAll("[/:. ]+", "-").replaceAll("^-|-$", "");
     }
 }
