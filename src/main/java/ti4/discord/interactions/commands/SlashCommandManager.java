@@ -139,6 +139,6 @@ public class SlashCommandManager {
     }
 
     public static Collection<ParentCommand> getCommands() {
-        return commands.values();
+        return java.util.List.copyOf(commands.values());
     }
 }
