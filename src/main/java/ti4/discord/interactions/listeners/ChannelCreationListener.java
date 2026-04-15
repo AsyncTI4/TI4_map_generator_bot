@@ -9,10 +9,10 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.game.CreateGameButtonHandler;
 import ti4.helpers.ButtonHelper;
-import ti4.discord.JdaService;
 
 public class ChannelCreationListener extends ListenerAdapter {
 

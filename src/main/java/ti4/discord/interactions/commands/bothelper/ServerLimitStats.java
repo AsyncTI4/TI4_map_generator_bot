@@ -12,11 +12,11 @@ import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.TimeUtil;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
-import ti4.discord.JdaService;
 
 class ServerLimitStats extends Subcommand {
 

@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.statistics.StatsTrackingButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
@@ -32,7 +33,6 @@ import ti4.message.MessageHelper;
 import ti4.service.milty.MiltyDraftDisplayService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.settings.users.UserSettingsManager;
-import ti4.discord.JdaService;
 
 class Replace extends GameStateSubcommand {
 

@@ -1,9 +1,9 @@
 package ti4.discord.interactions.commands.help;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.message.MessageHelper;
-import ti4.discord.JdaService;
 
 class FoWPlusHelp extends Subcommand {
 

@@ -9,11 +9,11 @@ import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.MiscEmojis;
-import ti4.discord.JdaService;
 
 @UtilityClass
 public class DrumrollService {

@@ -4,9 +4,9 @@ import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.selections.SelectionMenuProcessor;
 import ti4.logging.BotLogger;
-import ti4.discord.JdaService;
 
 public class SelectionMenuListener extends ListenerAdapter {
 

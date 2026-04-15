@@ -46,6 +46,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
@@ -101,7 +102,6 @@ import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.user.AFKService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
-import ti4.discord.JdaService;
 
 public class Player extends PlayerProperties {
 

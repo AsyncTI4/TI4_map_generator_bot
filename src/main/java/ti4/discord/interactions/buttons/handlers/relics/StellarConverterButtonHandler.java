@@ -2,8 +2,8 @@ package ti4.discord.interactions.buttons.handlers.relics;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.game.Game;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
 import ti4.service.relic.StellarConverterService;
 
 @UtilityClass

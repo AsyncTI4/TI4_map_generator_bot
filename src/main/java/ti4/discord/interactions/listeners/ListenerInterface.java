@@ -2,11 +2,11 @@ package ti4.discord.interactions.listeners;
 
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.JdaService;
 import ti4.helpers.DateTimeHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.service.game.GameNameService;
-import ti4.discord.JdaService;
 
 public interface ListenerInterface {
 

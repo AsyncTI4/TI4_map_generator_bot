@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.DisplayType;
@@ -37,7 +38,6 @@ import ti4.service.statistics.game.WinningPathPersistenceService;
 import ti4.service.tigl.TiglReportService;
 import ti4.spring.api.image.GameImageService;
 import ti4.spring.context.SpringContext;
-import ti4.discord.JdaService;
 
 @UtilityClass
 public class EndGameService {

@@ -8,8 +8,10 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -26,7 +28,6 @@ import ti4.helpers.RiftUnitsHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.UnitModel;
@@ -37,7 +38,6 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.relic.StellarConverterService;
-import ti4.discord.JdaService;
 
 /*
  * For Eronous to run fow300

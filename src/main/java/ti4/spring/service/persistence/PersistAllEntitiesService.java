@@ -7,13 +7,13 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.logging.BotLogger;
 import ti4.service.map.FractureService;
-import ti4.discord.JdaService;
 
 @Service
 @RequiredArgsConstructor

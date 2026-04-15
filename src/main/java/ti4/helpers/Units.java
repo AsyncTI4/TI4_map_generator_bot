@@ -13,11 +13,11 @@ import javax.annotation.Nullable;
 import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import ti4.discord.JdaService;
 import ti4.image.Mapper;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
-import ti4.discord.JdaService;
 
 @UtilityClass
 public class Units {

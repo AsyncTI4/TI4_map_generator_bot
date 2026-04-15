@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import ti4.discord.JdaService;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -24,7 +25,6 @@ import ti4.message.MessageHelper;
 import ti4.service.async.BanCleanupService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.settings.users.UserSettingsManager;
-import ti4.discord.JdaService;
 
 public class UserLeaveServerListener extends ListenerAdapter {
 

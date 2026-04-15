@@ -34,6 +34,7 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import ti4.ResourceHelper;
+import ti4.discord.JdaService;
 import ti4.game.Player;
 import ti4.helpers.Storage;
 import ti4.image.MapGenerator.HorizontalAlign;
@@ -42,7 +43,6 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.ColorModel;
 import ti4.service.emoji.TI4Emoji;
-import ti4.discord.JdaService;
 
 @UtilityClass
 public class DrawingUtil {

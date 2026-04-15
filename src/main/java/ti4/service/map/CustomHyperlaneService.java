@@ -21,6 +21,8 @@ import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
@@ -28,8 +30,6 @@ import ti4.helpers.Helper;
 import ti4.helpers.SortHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
-import ti4.discord.interactions.routing.ButtonHandler;
-import ti4.discord.interactions.routing.ModalHandler;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 

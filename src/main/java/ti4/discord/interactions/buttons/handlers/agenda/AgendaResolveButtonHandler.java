@@ -55,6 +55,7 @@ import ti4.discord.interactions.buttons.handlers.agenda.resolver.VoiceOfTheCounc
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.WarrantAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.WormholeReconAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.WormholeResearchAgendaResolver;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.AgendaHelper;
@@ -63,7 +64,6 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
-import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.service.fow.RiftSetModeService;

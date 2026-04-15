@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
@@ -13,7 +14,6 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.TI4Emoji;
-import ti4.discord.JdaService;
 
 class ShowHeroes extends Subcommand {
 

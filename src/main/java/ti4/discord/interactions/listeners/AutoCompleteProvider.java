@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.cron.CronManager;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.discord.interactions.commands.uncategorized.ServerPromoteCommand;
@@ -84,7 +85,6 @@ import ti4.service.milty.MiltyDraftTile;
 import ti4.service.statistics.PlayerStatTypes;
 import ti4.service.statistics.game.GameStatTypes;
 import ti4.settings.GlobalSettings;
-import ti4.discord.JdaService;
 
 @UtilityClass
 class AutoCompleteProvider {

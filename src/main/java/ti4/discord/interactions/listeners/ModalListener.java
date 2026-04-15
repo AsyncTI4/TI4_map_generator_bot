@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.context.ModalContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.ModalHandler;
@@ -16,7 +17,6 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.logging.RollbarManager;
 import ti4.service.game.GameNameService;
-import ti4.discord.JdaService;
 
 public final class ModalListener extends ListenerAdapter {
 

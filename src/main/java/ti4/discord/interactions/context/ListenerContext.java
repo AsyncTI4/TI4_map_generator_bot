@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
@@ -25,7 +26,6 @@ import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
 import ti4.settings.users.UserSettingsManager;
-import ti4.discord.JdaService;
 
 @Getter
 public abstract class ListenerContext {

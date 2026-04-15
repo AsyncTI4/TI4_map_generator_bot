@@ -11,13 +11,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
-import ti4.discord.JdaService;
 
 class CreateGameChannels extends Subcommand {
 

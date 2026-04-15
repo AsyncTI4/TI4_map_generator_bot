@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -32,7 +33,6 @@ import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.service.game.GameNameService;
-import ti4.discord.JdaService;
 
 @UtilityClass
 public class CommandHelper {

@@ -1,10 +1,10 @@
 package ti4.discord.interactions.buttons.handlers.info;
 
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.discord.interactions.routing.ButtonHandler;
 
 @UtilityClass
 class PromissoryInfoButtonHandler {

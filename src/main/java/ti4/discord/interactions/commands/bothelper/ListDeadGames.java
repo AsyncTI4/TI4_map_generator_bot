@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
@@ -14,7 +15,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.discord.JdaService;
 
 class ListDeadGames extends Subcommand {
 

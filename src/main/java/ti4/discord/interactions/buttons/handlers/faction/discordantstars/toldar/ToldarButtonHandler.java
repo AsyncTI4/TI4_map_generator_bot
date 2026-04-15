@@ -2,9 +2,9 @@ package ti4.discord.interactions.buttons.handlers.faction.discordantstars.toldar
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.message.MessageHelper;
 
 @UtilityClass

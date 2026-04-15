@@ -11,15 +11,15 @@ import ti4.discord.JdaService;
 @RequiredArgsConstructor
 class JdaLifecycleService {
 
-  private final ApplicationArguments applicationArguments;
+    private final ApplicationArguments applicationArguments;
 
-  @PostConstruct
-  private void init() {
-    JdaService.initialize(applicationArguments.getSourceArgs());
-  }
+    @PostConstruct
+    private void init() {
+        JdaService.initialize(applicationArguments.getSourceArgs());
+    }
 
-  @PreDestroy
-  private void shutdown() {
-    JdaService.shutdown();
-  }
+    @PreDestroy
+    private void shutdown() {
+        JdaService.shutdown();
+    }
 }

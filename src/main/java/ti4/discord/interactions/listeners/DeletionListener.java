@@ -8,13 +8,13 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import ti4.discord.JdaService;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.GameNameService;
-import ti4.discord.JdaService;
 import ti4.spring.service.messagecache.SavedBotMessagesService;
 
 public class DeletionListener extends ListenerAdapter {
