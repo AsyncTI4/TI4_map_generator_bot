@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -597,7 +597,7 @@ public class PlayHeroService {
                                 + " has been offered buttons to gain command tokens and look at Shrines.");
                 for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                     if (p2.getSoScored() < player.getSoScored()) {
-                        List<Button> shrineButtons = ButtonHelperHeroes.getShrineButtons(player, p2, game);
+                        List<Button> shrineButtons = ButtonHelperHeroes.getShrineButtons(p2, game);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
                                 player.getRepresentationUnfogged() + " you have scored more secret objectives than "

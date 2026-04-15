@@ -74,7 +74,12 @@ public class DrawSecretService {
                             player.getRepresentation()
                                     + " due to **Plausible Deniability**, you were dealt an extra secret objective. Thus, you must also discard an extra secret objective.");
                 }
-                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, game.getRound() == 1, false);
+                SecretObjectiveInfoService.sendSecretObjectiveInfoWithHeaderText(
+                        game,
+                        player,
+                        player.getRepresentationUnfogged() + " used something",
+                        game.getRound() == 1,
+                        false);
             }
         }
         MessageHelper.sendMessageToChannel(

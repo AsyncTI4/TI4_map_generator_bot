@@ -19,16 +19,16 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import ti4.buttons.Buttons;
-import ti4.buttons.handlers.agenda.VoteButtonHandler;
-import ti4.commands.CommandHelper;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
+import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.GenericCardModel;
@@ -707,6 +707,10 @@ public class ActionCardHelper {
                 return player.getRepresentationUnfogged() + ", the bot thinks you have committed some light war crimes,"
                         + " thus you no longer have your token on the _Stellar Atomics_ event card, and therefore cannot play action cards during the Agenda Phase.";
             }
+        }
+        // Async leniency: reveal-window agenda cards may still be played anywhere before outcome resolution.
+        if (actionCard.getPlayTiming().isDuringAgendaReveal() && !AgendaHelper.isPreResolutionAgendaPhase(game)) {
+            return "This action card can only be played during the agenda phase before outcome resolution.";
         }
 
         CryypterHelper.checkForAssigningYssarilEnvoy(event, game, player, acID);

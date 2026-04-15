@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Helper;
@@ -34,8 +34,7 @@ public class SecretObjectiveInfoService {
             boolean autoScoreButtons) {
         String headerText = player.getRepresentationUnfogged() + " pressed button: "
                 + event.getButton().getLabel();
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
-        sendSecretObjectiveInfo(game, player, autoDiscardButtons, autoScoreButtons);
+        sendSecretObjectiveInfoWithHeaderText(game, player, headerText, autoDiscardButtons, autoScoreButtons);
     }
 
     public static void sendSecretObjectiveInfo(Game game, Player player, SlashCommandInteractionEvent event) {
@@ -49,12 +48,17 @@ public class SecretObjectiveInfoService {
             boolean autoDiscardButtons,
             boolean autoScoreButtons) {
         String headerText = player.getRepresentationUnfogged() + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
-        sendSecretObjectiveInfo(game, player, autoDiscardButtons, autoScoreButtons);
+        sendSecretObjectiveInfoWithHeaderText(game, player, headerText, autoDiscardButtons, autoScoreButtons);
     }
 
     public static void sendSecretObjectiveInfo(Game game, Player player) {
         sendSecretObjectiveInfo(game, player, false, false);
+    }
+
+    public static void sendSecretObjectiveInfoWithHeaderText(
+            Game game, Player player, String headerText, boolean autoDiscardButtons, boolean autoScoreButtons) {
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
+        sendSecretObjectiveInfo(game, player, autoDiscardButtons, autoScoreButtons);
     }
 
     public static void sendSecretObjectiveInfo(

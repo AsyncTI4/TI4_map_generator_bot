@@ -28,12 +28,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
-import ti4.buttons.Buttons;
-import ti4.buttons.UnfiledButtonHandlers;
-import ti4.buttons.handlers.agenda.VoteButtonHandler;
-import ti4.commands.planet.PlanetExhaust;
-import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.cron.AutoPingCron;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
+import ti4.discord.interactions.commands.planet.PlanetExhaust;
+import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -44,7 +44,6 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.GameMessageManager;
@@ -57,6 +56,7 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.button.ReactionCheckService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -232,21 +232,11 @@ public final class AgendaHelper {
         if (player.hasAbility("quash") && (player.getStrategicCC() > 0 || player.hasRelicReady("emelpar"))) {
             names.add("Quash");
         }
-        for (String acId : player.getActionCards().keySet()) {
+        for (String acId : player.getPlayableActionCards()) {
             ActionCardModel actionCard = Mapper.getActionCard(acId);
             String actionCardWindow = actionCard.getWindow();
             if (actionCardWindow.contains("When an agenda is revealed")) {
                 names.add(actionCard.getName());
-            }
-        }
-        if (player.hasPlanet("garbozia")) {
-            for (String acId :
-                    ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet()) {
-                ActionCardModel actionCard = Mapper.getActionCard(acId);
-                String actionCardWindow = actionCard.getWindow();
-                if (actionCardWindow.contains("When an agenda is revealed")) {
-                    names.add(actionCard.getName());
-                }
             }
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
@@ -264,12 +254,7 @@ public final class AgendaHelper {
         if (player.hasAbility("quash") && (player.getStrategicCC() > 0 || player.hasRelicReady("emelpar"))) {
             buttons.add(Buttons.red("queueWhen_ability_quash", "Quash"));
         }
-        ArrayList<String> acIDs = new ArrayList<>(player.getActionCards().keySet());
-        if (player.hasPlanet("garbozia")) {
-            acIDs.addAll(
-                    ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet());
-        }
-        for (String acId : acIDs) {
+        for (String acId : player.getPlayableActionCards()) {
             ActionCardModel actionCard = Mapper.getActionCard(acId);
             String actionCardWindow = actionCard.getWindow();
             if (actionCardWindow.contains("When an agenda is revealed")) {
@@ -375,23 +360,12 @@ public final class AgendaHelper {
                 names.add(Mapper.getAbility(ability).getName());
             }
         }
-        for (String acId : player.getActionCards().keySet()) {
+        for (String acId : player.getPlayableActionCards()) {
             ActionCardModel actionCard = Mapper.getActionCard(acId);
             String actionCardWindow = actionCard.getWindow();
             if (actionCardWindow.contains("After an agenda is revealed")
                     || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
                 names.add(actionCard.getName());
-            }
-        }
-        if (player.hasPlanet("garbozia")) {
-            for (String acId :
-                    ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet()) {
-                ActionCardModel actionCard = Mapper.getActionCard(acId);
-                String actionCardWindow = actionCard.getWindow();
-                if (actionCardWindow.contains("After an agenda is revealed")
-                        || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
-                    names.add(actionCard.getName());
-                }
             }
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
@@ -439,23 +413,12 @@ public final class AgendaHelper {
                         Mapper.getAbility(ability).getName()));
             }
         }
-        for (String acId : player.getActionCards().keySet()) {
+        for (String acId : player.getPlayableActionCards()) {
             ActionCardModel actionCard = Mapper.getActionCard(acId);
             String actionCardWindow = actionCard.getWindow();
             if (actionCardWindow.contains("After an agenda is revealed")
                     || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
                 buttons.add(Buttons.green("queueAfter_ac_" + acId, actionCard.getName()));
-            }
-        }
-        if (player.hasPlanet("garbozia")) {
-            for (String acId :
-                    ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet()) {
-                ActionCardModel actionCard = Mapper.getActionCard(acId);
-                String actionCardWindow = actionCard.getWindow();
-                if (actionCardWindow.contains("After an agenda is revealed")
-                        || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
-                    buttons.add(Buttons.green("queueAfter_ac_" + acId, actionCard.getName()));
-                }
             }
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
@@ -2026,6 +1989,11 @@ public final class AgendaHelper {
             planetOutcomeButtons.add(button);
         }
         return planetOutcomeButtons;
+    }
+
+    public static boolean isPreResolutionAgendaPhase(Game game) {
+        String phaseOfGame = game.getPhaseOfGame();
+        return StringUtils.containsIgnoreCase(phaseOfGame, "agenda") && !"agendaEnd".equalsIgnoreCase(phaseOfGame);
     }
 
     public static List<Button> getAgendaButtons(String ridername, Game game, String prefix) {
@@ -4773,7 +4741,7 @@ public final class AgendaHelper {
 
     public static void playWhen(
             ButtonInteractionEvent event, Game game, Player player, MessageChannel mainGameChannel) {
-        UnfiledButtonHandlers.clearAllReactions(event);
+        ReactionCheckService.clearAllReactions(event);
         ReactionService.addReaction(event, game, player, true, true, "is playing a \"when\".");
         List<Button> whenButtons = getWhenButtons(game);
         MessageHelper.sendMessageToChannelWithPersistentReacts(

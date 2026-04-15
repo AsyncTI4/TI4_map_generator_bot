@@ -14,6 +14,16 @@ import ti4.service.emoji.CardEmojis;
 @Data
 public class ActionCardModel implements ModelInterface, EmbeddableModel {
 
+    public enum PlayTiming {
+        NONE, // Catch-all for cards without a modeled play timing restriction; this is currently most cards.
+        AGENDA_AFTER,
+        AGENDA_WHEN;
+
+        public boolean isDuringAgendaReveal() {
+            return this == AGENDA_AFTER || this == AGENDA_WHEN;
+        }
+    }
+
     private String alias;
     private String name;
     private String phase;
@@ -23,6 +33,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     private String flavorText;
     private String imageURL;
     private String automationID;
+    private PlayTiming playTiming = PlayTiming.NONE;
     private ComponentSource source;
     private ComponentSource actualSource;
     private List<String> searchTags = new ArrayList<>();
@@ -69,6 +80,10 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     public String getAutomationID() {
         if (automationID == null) return alias;
         return automationID;
+    }
+
+    public PlayTiming getPlayTiming() {
+        return playTiming == null ? PlayTiming.NONE : playTiming;
     }
 
     public MessageEmbed getRepresentationEmbed(boolean includeID, boolean includeFlavourText) {

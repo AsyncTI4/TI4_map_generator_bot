@@ -70,6 +70,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome gives you 1 promissory note from their hand.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother,\" they said in unison.",
         "source": "action_deck_2"
     },
@@ -107,6 +108,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, look at the top 3 cards of the secret objective deck; draw 1 of those cards and shuffle that deck.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "The din of the council chamber faded as the speaker called for order. Qanoj smiled. A new chapter in his career would begin today.",
         "source": "action_deck_2"
     },
@@ -179,6 +181,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome gains 2 trade goods.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "Mot sank into his chair after signing the last of the trade deals. He was gambling with the fate of the galaxy, yet his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
         "source": "action_deck_2"
     },
@@ -264,6 +267,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place up to 2 PDS from your reinforcements on any planets you control.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "Procyon's cold silence enraged Sakora. \"We are the watchers on the walls, not you. We are the shield that guards all realms!\"",
         "source": "action_deck_2"
     },
@@ -636,6 +640,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, produce up to 2 units that each have a cost of 4 or less in a system that contains 1 of your space docks.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "\"We groveled before the Lazax for liberation,\" Magmus declared, his voice rising from a gravelly rumble to a roar. \"Now we demand it!\"",
         "source": "action_deck_2"
     },
@@ -645,6 +650,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda and choose up to 2 action cards in the discard pile. If your prediction is correct, take those cards.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "Gil's career at the Civita Planetar was prolific, with friends in hundreds of governments and favors owed in many more.",
         "source": "action_deck_2"
     },
@@ -663,6 +669,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome reveals 1 random action card from their hand; take 1 of those cards and discard the rest.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "As they placed the noose around her neck, Menda wailed. Suffi, who was next in line, gave her a confident smile. \"First time?\"",
         "source": "action_deck_2"
     },
@@ -707,6 +714,7 @@
         "name": "Rehashed Debates",
         "phase": "Agenda",
         "window": "When an agenda is revealed",
+        "playTiming": "AGENDA_WHEN",
         "text": "Discard this agenda. Then, choose any other agenda from the discard pile or in play. Players vote on that agenda instead.",
         "flavorText": "Perdin was surrounded by a crowd of doomsayers, incensed by his agreements regarding the Ixthian artifact. \"Fools,\" he sighed, \"you will soon understand the providence of Winnaran wisdom.\"",
         "source": "action_deck_2"
@@ -780,6 +788,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda and choose 1 non-faction technology owned by another player. If your prediction is correct, gain that technology.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "R7-82's optic servo motors malfunctioned momentarily as the council discussed 'feeding' the Virus to satiate its hunger.",
         "source": "action_deck_2"
     },
@@ -976,6 +985,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, explore up to 3 different non-cultural planets you control.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "Harrugh gripped the straps of his pack tightly. Even in the blazing sun, he felt a chill run down his spine. Spirits roamed here. Why must the council disturb them?",
         "source": "action_deck_2"
     },
@@ -985,6 +995,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, replenish your commodities and explore a frontier token on the game board.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "Acamar held up the partial transcription of a legendary Lazax war treatise. With the return of their ancient enemy, finding the full document was imperative.",
         "source": "action_deck_2"
     },
@@ -1030,6 +1041,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, gain 1 relic.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "Qanoj watched the light reflect off of the shard and dance about his chambers. Such a pretty thing. And yet, so many had died for it.",
         "source": "action_deck_2"
     },
@@ -1124,6 +1136,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Reveal the alliance ability of a random, unused faction and predict aloud an outcome of this agenda. If your prediction is correct, gain that ability; otherwise, purge it.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "S'ula limped toward the podium. Execution or subservience? Their desperation wrung a pained laugh and a rude gesture from her.",
         "source": "action_deck_2"
     },
@@ -1269,6 +1282,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "Predict aloud an outcome of this agenda. If your prediction is correct, place up to 2 infantry from your reinforcements into coexistence on any non-home planets controlled by players that voted for that outcome.",
+        "playTiming": "AGENDA_AFTER",
         "notes": "You can commit to the same or different planets, like Yin Hero.",
         "flavorText": "Quann's great ocean was everything Carinna had hoped. Could they not see its worth?",
         "source": "action_deck_2"

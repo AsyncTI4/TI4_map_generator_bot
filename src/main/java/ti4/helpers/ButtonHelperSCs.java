@@ -15,8 +15,9 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
-import ti4.buttons.Buttons;
-import ti4.buttons.UnfiledButtonHandlers;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.commandcounter.CommandCounterButtonHandler;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -26,7 +27,6 @@ import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
@@ -1236,7 +1236,7 @@ public final class ButtonHelperSCs {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             }
             if (!player.getSCs().contains(4) && !buttonID.contains("_dont")) {
-                UnfiledButtonHandlers.reinforcementsCCPlacement(
+                CommandCounterButtonHandler.reinforcementsCCPlacement(
                         event, game, player, "reinforcements_cc_placement_" + planet);
             }
         } else {
@@ -1423,6 +1423,12 @@ public final class ButtonHelperSCs {
                     player.getRepresentationUnfogged() + " exhausted the _" + RelicHelper.sillySpelling()
                             + "_ to follow " + Helper.getSCName(scNum, game) + ".");
             player.addExhaustedRelic("emelpar");
+            if (game.isTwilightsFallMode() && (scNum == 2 || scNum == 6 || scNum == 7)) {
+                MessageHelper.sendMessageToChannel(
+                        channel,
+                        player.getRepresentation()
+                                + " Reminder that if you intend to participate in the splice, you still need to hit the participate in the splice button now.");
+            }
         }
         Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
 

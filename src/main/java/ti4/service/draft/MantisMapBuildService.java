@@ -17,7 +17,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.buttons.Buttons;
+import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.game.Game;
@@ -32,7 +33,6 @@ import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
 import ti4.service.draft.MantisMapBuildContext.PlayerTiles;
 import ti4.service.explore.AddFrontierTokensService;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class MantisMapBuildService {

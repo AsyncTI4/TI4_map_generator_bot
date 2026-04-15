@@ -18,8 +18,8 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
-import ti4.buttons.Buttons;
-import ti4.buttons.handlers.faction.zephyrion.ZephyrionBountyButtonHandler;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.other.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -2034,6 +2034,17 @@ public class StartCombatService {
                         String label = "Roll Myko Breakthrough on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, FactionEmojis.mykomentori));
                     }
+                    if (p.hasUnit("blacktf_mech")
+                            && isGroundCombat
+                            && unitH.getUnitCount(UnitType.Mech, p) > 0
+                            && p.getNombox().getUnitCount(UnitType.Infantry, p) > 0) {
+                        buttons.add(Buttons.gray(
+                                p.getFinsFactionCheckerPrefix() + "blackTFMechReroll_" + tile.getPosition() + "_"
+                                        + unitH.getName(),
+                                "Reroll 1 Mech on " + nameOfHolder,
+                                FactionEmojis.blacktf));
+                    }
+
                     // atokera
                     if (p.hasUnit("atokera_mech")
                             && isGroundCombat
