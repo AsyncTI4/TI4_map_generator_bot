@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
-import ti4.rollbar.RollbarManager;
+import ti4.logging.RollbarManager;
 import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
 

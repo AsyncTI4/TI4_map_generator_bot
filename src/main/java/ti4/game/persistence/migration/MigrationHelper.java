@@ -1,4 +1,4 @@
-package ti4.migration;
+package ti4.game.persistence.migration;
 
 import java.util.HashSet;
 import java.util.List;

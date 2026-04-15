@@ -11,7 +11,7 @@ import ti4.listeners.annotations.SelectionHandler;
 import ti4.listeners.context.SelectionMenuContext;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
-import ti4.rollbar.RollbarManager;
+import ti4.logging.RollbarManager;
 import ti4.service.game.GameNameService;
 
 public final class SelectionMenuProcessor {
