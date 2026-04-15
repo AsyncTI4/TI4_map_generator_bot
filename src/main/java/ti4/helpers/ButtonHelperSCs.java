@@ -1423,6 +1423,12 @@ public final class ButtonHelperSCs {
                     player.getRepresentationUnfogged() + " exhausted the _" + RelicHelper.sillySpelling()
                             + "_ to follow " + Helper.getSCName(scNum, game) + ".");
             player.addExhaustedRelic("emelpar");
+            if (game.isTwilightsFallMode() && (scNum == 2 || scNum == 6 || scNum == 7)) {
+                MessageHelper.sendMessageToChannel(
+                        channel,
+                        player.getRepresentation()
+                                + " Reminder that if you intend to participate in the splice, you still need to hit the participate in the splice button now.");
+            }
         }
         Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
 

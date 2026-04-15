@@ -262,6 +262,10 @@ public class EdictPhaseHandler {
                 buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
                 buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
                 buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
+                MessageHelper.sendMessageToChannel(
+                        game.getActionsChannel(),
+                        game.getPing()
+                                + " reminder to discard all the cards you intend to discard before drawing any new cards.");
             }
             case "tf-legacy_of_ixth" -> {
                 Die d1 = new Die(6);

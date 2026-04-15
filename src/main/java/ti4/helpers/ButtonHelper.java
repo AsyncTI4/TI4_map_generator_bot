@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -4490,7 +4487,9 @@ public class ButtonHelper {
 
             // Add the button
             TechnologyModel model = Mapper.getTech(tech);
-            endButtons.add(Buttons.red(player.finChecker() + "exhaustTech_" + tech, "Exhaust " + model.getName()));
+            endButtons.add(Buttons.red(
+                    player.finChecker() + ("absol_pa".equals(tech) ? "use" : "exhaust") + "Tech_" + tech,
+                    ("absol_pa".equals(tech) ? "Use" : "Exhaust") + " " + model.getName()));
         }
 
         // Agents

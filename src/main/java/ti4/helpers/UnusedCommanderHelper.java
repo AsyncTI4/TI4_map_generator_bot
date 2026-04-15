@@ -50,6 +50,6 @@ public class UnusedCommanderHelper {
             Collections.shuffle(commanders);
             return commanders.getFirst();
         }
-        return null;
+        return "";
     }
 }
