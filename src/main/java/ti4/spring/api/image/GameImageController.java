@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
@@ -22,7 +23,6 @@ import ti4.image.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.spring.context.RequestContext;
 import ti4.spring.context.SetupRequestContext;
-import ti4.spring.jda.JdaService;
 
 @RequiredArgsConstructor
 @RestController

@@ -10,6 +10,7 @@ import java.util.function.Function;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.collections4.ListUtils;
+import ti4.discord.JdaService;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
 import ti4.image.PositionMapper;
@@ -17,7 +18,6 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.MapTemplateModel;
 import ti4.settings.GlobalSettings;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
 class GenerateSlicesService {

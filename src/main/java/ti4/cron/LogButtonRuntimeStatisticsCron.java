@@ -2,7 +2,7 @@ package ti4.cron;
 
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
-import ti4.buttons.ButtonProcessor;
+import ti4.discord.interactions.buttons.ButtonProcessor;
 import ti4.logging.BotLogger;
 
 @UtilityClass
