@@ -14,7 +14,7 @@ import ti4.buttons.handlers.game.CreateGameButtonHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.spring.jda.JdaService;
 
-public class ChannelCreationListener extends ListenerAdapter {
+class ChannelCreationListener extends ListenerAdapter {
 
     private static final String PBD_MAKING_GAMES_CHANNEL = "making-new-games";
     private static final String FOW_MAKING_GAMES_CHANNEL = "making-fow-games";

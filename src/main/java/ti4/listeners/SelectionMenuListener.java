@@ -8,7 +8,7 @@ import ti4.logging.BotLogger;
 import ti4.selections.SelectionMenuProcessor;
 import ti4.spring.jda.JdaService;
 
-public class SelectionMenuListener extends ListenerAdapter {
+class SelectionMenuListener extends ListenerAdapter {
 
     @Override
     public void onStringSelectInteraction(@Nonnull StringSelectInteractionEvent event) {

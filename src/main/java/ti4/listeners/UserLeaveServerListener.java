@@ -26,7 +26,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.jda.JdaService;
 
-public class UserLeaveServerListener extends ListenerAdapter {
+class UserLeaveServerListener extends ListenerAdapter {
 
     @Override
     public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {

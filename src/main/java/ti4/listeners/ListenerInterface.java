@@ -8,7 +8,7 @@ import ti4.logging.LogOrigin;
 import ti4.service.game.GameNameService;
 import ti4.spring.jda.JdaService;
 
-public interface ListenerInterface {
+interface ListenerInterface {
 
     long DELAY_THRESHOLD_MILLISECONDS = 2000;
 

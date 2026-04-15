@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.executors.ExecutorServiceManager;
 import ti4.spring.jda.JdaService;
 
-public class AutoCompleteListener extends ListenerAdapter {
+class AutoCompleteListener extends ListenerAdapter {
 
     private static final int EXECUTION_TIME_WARNING_THRESHOLD_SECONDS = 1;
 

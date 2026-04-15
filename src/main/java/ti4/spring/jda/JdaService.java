@@ -57,20 +57,7 @@ import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileHelper;
-import ti4.listeners.AutoCompleteListener;
-import ti4.listeners.BanListener;
-import ti4.listeners.BotRuntimeStatsListener;
-import ti4.listeners.ButtonListener;
-import ti4.listeners.ChannelCreationListener;
-import ti4.listeners.ContextMenuListener;
-import ti4.listeners.DeletionListener;
-import ti4.listeners.MessageListener;
-import ti4.listeners.ModalListener;
-import ti4.listeners.SelectionMenuListener;
-import ti4.listeners.SlashCommandListener;
-import ti4.listeners.ThreadCreateListener;
-import ti4.listeners.UserJoinServerListener;
-import ti4.listeners.UserLeaveServerListener;
+import ti4.listeners.ListenerManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogBufferManager;
 import ti4.selections.SelectionManager;
@@ -142,25 +129,7 @@ public class JdaService {
                 .build();
 
         BotLogger.info("INITIALIZING LISTENERS");
-        jda.addEventListener(
-                // Priority Listeners First
-                new BotRuntimeStatsListener(),
-                new MessageListener(),
-                new SlashCommandListener(),
-                new ContextMenuListener(),
-                ButtonListener.getInstance(),
-                new UserJoinServerListener(),
-                new AutoCompleteListener(),
-                new BanListener(),
-                new ThreadCreateListener(),
-
-                // Non-Priority Listeners
-                new DeletionListener(),
-                new SelectionMenuListener(),
-                new ChannelCreationListener(),
-                new UserLeaveServerListener(),
-                // ModalListener has a long init time
-                ModalListener.getInstance());
+        ListenerManager.registerListeners(jda);
 
         BotLogger.info("AWAITING JDA READY");
         try {

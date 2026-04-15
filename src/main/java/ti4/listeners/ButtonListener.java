@@ -10,7 +10,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.logging.BotLogger;
 import ti4.spring.jda.JdaService;
 
-public class ButtonListener extends ListenerAdapter {
+class ButtonListener extends ListenerAdapter {
 
     private static final Set<String> BUTTONS_TO_THINK_ABOUT = Set.of("showGameAgain");
 

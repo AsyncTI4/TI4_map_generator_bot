@@ -18,7 +18,7 @@ import ti4.logging.RollbarManager;
 import ti4.service.game.GameNameService;
 import ti4.spring.jda.JdaService;
 
-public final class ModalListener extends ListenerAdapter {
+final class ModalListener extends ListenerAdapter {
 
     private static ModalListener instance;
 
@@ -106,15 +106,5 @@ public final class ModalListener extends ListenerAdapter {
             }
             game.initializeMiltySettings().parseInput(context);
         }
-    }
-
-    public static String getModalDebugText(ModalInteractionEvent event) {
-        // for (ModalMapping field : event.getValues()) {
-        //     output.append("\n> Field: ")
-        //             .append(field.getCustomId())
-        //             .append(" => ")
-        //             .append(field.getAsString());
-        // }
-        return "INPUT:\n```\n" + "MenuID: " + event.getModalId() + "\n```";
     }
 }

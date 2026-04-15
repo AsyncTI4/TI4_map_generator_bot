@@ -17,7 +17,7 @@ import ti4.logging.RollbarManager;
 import ti4.service.SusSlashCommandService;
 import ti4.service.game.GameNameService;
 
-public class SlashCommandListener extends ListenerAdapter implements ListenerInterface {
+class SlashCommandListener extends ListenerAdapter implements ListenerInterface {
 
     private static final List<String> SLASHCOMMANDS_WITH_MODALS = Arrays.asList(
             Constants.ADD_TILE_LIST,

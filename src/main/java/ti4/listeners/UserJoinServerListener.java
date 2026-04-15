@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 import ti4.service.async.RoleService;
 import ti4.spring.jda.JdaService;
 
-public class UserJoinServerListener extends ListenerAdapter {
+class UserJoinServerListener extends ListenerAdapter {
 
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
