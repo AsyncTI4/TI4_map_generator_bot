@@ -15,6 +15,8 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
@@ -151,9 +153,7 @@ public class LocalDevelopmentSampleGameService {
         deleteChannel(game.getTableTalkChannel(), deletedChannelIds, result);
         deleteChannel(game.getMainGameChannel(), deletedChannelIds, result);
         for (Player player : game.getPlayers().values()) {
-            if (player.getPrivateChannel() instanceof TextChannel channel) {
-                deleteChannel(channel, deletedChannelIds, result);
-            }
+            deletePrivateChannel(player.getPrivateChannel(), deletedChannelIds, result);
             Role communityRole = player.getRoleForCommunity();
             if (communityRole != null && guild.equals(communityRole.getGuild())) {
                 deleteRole(communityRole, result);
@@ -197,6 +197,22 @@ public class LocalDevelopmentSampleGameService {
             result.getDeletedChannels().add(channel.getName());
         } catch (Exception e) {
             result.getNotes().add("Failed to delete channel " + channel.getName());
+        }
+    }
+
+    private static void deletePrivateChannel(
+            @Nullable MessageChannel channel, Set<String> deletedChannelIds, LocalDevelopmentCleanResult result) {
+        if (channel instanceof TextChannel textChannel) {
+            deleteChannel(textChannel, deletedChannelIds, result);
+            return;
+        }
+        if (channel instanceof ThreadChannel threadChannel && deletedChannelIds.add(threadChannel.getId())) {
+            try {
+                threadChannel.delete().complete();
+                result.getDeletedChannels().add(threadChannel.getName());
+            } catch (Exception e) {
+                result.getNotes().add("Failed to delete channel " + threadChannel.getName());
+            }
         }
     }
 
