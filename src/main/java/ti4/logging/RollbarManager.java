@@ -1,4 +1,4 @@
-package ti4.rollbar;
+package ti4.logging;
 
 import com.rollbar.api.payload.data.Level;
 import com.rollbar.notifier.Rollbar;
@@ -10,7 +10,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.AsyncTI4DiscordBot;
-import ti4.logging.LogOrigin;
 
 /**
  * Rollbar bootstrap, reporting facade, and thread-local context store.
@@ -66,7 +65,6 @@ public class RollbarManager {
                                     rollbar.close(true);
                                 }
                             } catch (Exception ignored) {
-                                return;
                             }
                         },
                         "rollbar-shutdown"));

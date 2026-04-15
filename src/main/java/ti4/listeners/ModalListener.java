@@ -14,7 +14,7 @@ import ti4.listeners.annotations.ModalHandler;
 import ti4.listeners.context.ModalContext;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
-import ti4.rollbar.RollbarManager;
+import ti4.logging.RollbarManager;
 import ti4.service.game.GameNameService;
 import ti4.spring.jda.JdaService;
 

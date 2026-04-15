@@ -25,7 +25,6 @@ import ti4.helpers.DiscordWebhook;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.message.MessageHelper;
-import ti4.rollbar.RollbarManager;
 import ti4.service.statistics.SREStats;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;

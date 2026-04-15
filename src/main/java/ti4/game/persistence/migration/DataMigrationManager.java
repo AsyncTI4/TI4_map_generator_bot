@@ -1,4 +1,4 @@
-package ti4.migration;
+package ti4.game.persistence.migration;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

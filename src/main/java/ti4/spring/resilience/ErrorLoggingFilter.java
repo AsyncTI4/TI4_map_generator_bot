@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 import ti4.logging.BotLogger;
-import ti4.rollbar.RollbarManager;
+import ti4.logging.RollbarManager;
 import ti4.service.statistics.SREStats;
 import ti4.spring.security.UserNotInGameForbiddenException;
 
