@@ -25,6 +25,7 @@ import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.context.ButtonContext;
 import ti4.discord.interactions.context.ListenerContext;
 import ti4.discord.interactions.context.ModalContext;
@@ -184,7 +185,8 @@ public final class AnnotationHandler {
                                 .getInteraction()
                                 .getMessage()
                                 .reply(
-                                        "The button failed. An exception has been logged for the developers. Please report this to the bot questions channel. It will probably require a code change.")
+                                        "The button failed. An exception has been logged for the developers. Please report this to "
+                                                + getBotBugsChannelLink() + ". It will probably require a code change.")
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                     if (arg instanceof StringSelectInteractionEvent selectInteractionEvent) {
@@ -193,7 +195,8 @@ public final class AnnotationHandler {
                                 .getInteraction()
                                 .getMessage()
                                 .reply(
-                                        "The selection failed. An exception has been logged for the developers. Please report this to the bot questions channel. It will probably require a code change.")
+                                        "The selection failed. An exception has been logged for the developers. Please report this to "
+                                                + getBotBugsChannelLink() + ". It will probably require a code change.")
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                 }
@@ -219,6 +222,16 @@ public final class AnnotationHandler {
                 BotLogger.error(error, e);
             }
         };
+    }
+
+    private static String getBotBugsChannelLink() {
+        if (JdaService.guildPrimary != null) {
+            return JdaService.guildPrimary.getTextChannelsByName("bot-bugs-and-feature-requests", true).stream()
+                    .findFirst()
+                    .map(c -> "[#bot-bugs-and-feature-requests](" + c.getJumpUrl() + ")")
+                    .orElse("`#bot-bugs-and-feature-requests`");
+        }
+        return "`#bot-bugs-and-feature-requests`";
     }
 
     private static List<Class<?>> contexts() {
