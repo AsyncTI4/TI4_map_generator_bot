@@ -17,7 +17,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.service.franken.FrankenDraftBagService;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 public abstract class BagDraft {
     private static final Pattern FORWARD_SLASH_PATTERN = Pattern.compile("/");

@@ -17,7 +17,7 @@ import ti4.image.Mapper;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @UtilityClass
 public class Units {

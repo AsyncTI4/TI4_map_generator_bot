@@ -13,7 +13,7 @@ import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.MiscEmojis;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @UtilityClass
 public class DrumrollService {

@@ -22,7 +22,7 @@ import ti4.image.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.spring.context.RequestContext;
 import ti4.spring.context.SetupRequestContext;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @RequiredArgsConstructor
 @RestController

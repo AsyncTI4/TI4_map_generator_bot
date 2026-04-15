@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.executors.ExecutorServiceManager;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 public class AutoCompleteListener extends ListenerAdapter {
 

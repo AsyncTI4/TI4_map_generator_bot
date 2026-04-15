@@ -13,7 +13,7 @@ import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.logging.BotLogger;
 import ti4.service.map.FractureService;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @Service
 @RequiredArgsConstructor

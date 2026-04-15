@@ -37,7 +37,7 @@ import ti4.service.statistics.game.WinningPathPersistenceService;
 import ti4.service.tigl.TiglReportService;
 import ti4.spring.api.image.GameImageService;
 import ti4.spring.context.SpringContext;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @UtilityClass
 public class EndGameService {

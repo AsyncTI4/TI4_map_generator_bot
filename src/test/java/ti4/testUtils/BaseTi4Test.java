@@ -8,7 +8,7 @@ import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileHelper;
 import ti4.service.emoji.ApplicationEmojiService;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 /**
  * Base test class for all Ti4 tests. Allows for proper global config.

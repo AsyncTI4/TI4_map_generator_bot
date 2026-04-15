@@ -84,7 +84,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.fow.GMService;
 import ti4.service.user.AFKService;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 import ti4.website.model.WebsiteOverlay;
 
 public class PlayerAreaGenerator {

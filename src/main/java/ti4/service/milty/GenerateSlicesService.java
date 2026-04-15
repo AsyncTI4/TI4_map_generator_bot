@@ -17,7 +17,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.MapTemplateModel;
 import ti4.settings.GlobalSettings;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @UtilityClass
 class GenerateSlicesService {

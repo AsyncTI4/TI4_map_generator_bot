@@ -28,7 +28,7 @@ import ti4.message.MessageHelper;
 import ti4.service.statistics.SREStats;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @UtilityClass
 public class BotLogger {

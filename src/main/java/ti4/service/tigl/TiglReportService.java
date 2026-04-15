@@ -16,7 +16,7 @@ import ti4.game.Player;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.MiscEmojis;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 import ti4.website.UltimateStatisticsWebsiteHelper;
 
 @UtilityClass

@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 class AskRulesQuestion extends Subcommand {
 

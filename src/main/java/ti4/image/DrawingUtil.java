@@ -42,7 +42,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.ColorModel;
 import ti4.service.emoji.TI4Emoji;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @UtilityClass
 public class DrawingUtil {

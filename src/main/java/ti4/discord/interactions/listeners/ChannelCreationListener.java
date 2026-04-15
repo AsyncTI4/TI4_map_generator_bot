@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.game.CreateGameButtonHandler;
 import ti4.helpers.ButtonHelper;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 public class ChannelCreationListener extends ListenerAdapter {
 

@@ -29,7 +29,7 @@ import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
 import ti4.settings.users.UserSettingsManager;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 import ti4.spring.service.statistics.AverageTurnTimeService;
 
 @UtilityClass

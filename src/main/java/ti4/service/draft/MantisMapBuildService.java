@@ -32,7 +32,7 @@ import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
 import ti4.service.draft.MantisMapBuildContext.PlayerTiles;
 import ti4.service.explore.AddFrontierTokensService;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @UtilityClass
 public class MantisMapBuildService {

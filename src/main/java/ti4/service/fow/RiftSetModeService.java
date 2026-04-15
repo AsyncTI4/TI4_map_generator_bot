@@ -37,7 +37,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.relic.StellarConverterService;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 /*
  * For Eronous to run fow300

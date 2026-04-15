@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.selections.SelectionMenuProcessor;
 import ti4.logging.BotLogger;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 public class SelectionMenuListener extends ListenerAdapter {
 

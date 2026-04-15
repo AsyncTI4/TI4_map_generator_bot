@@ -8,7 +8,7 @@ import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.ParentCommand;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 public class DeveloperCommand implements ParentCommand {
 

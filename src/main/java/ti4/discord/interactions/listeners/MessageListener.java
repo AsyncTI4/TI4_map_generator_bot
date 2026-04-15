@@ -30,7 +30,7 @@ import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.WhisperService;
 import ti4.service.game.CreateGameService;
 import ti4.service.game.GameNameService;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 import ti4.spring.service.messagecache.SavedBotMessagesService;
 
 public class MessageListener extends ListenerAdapter {

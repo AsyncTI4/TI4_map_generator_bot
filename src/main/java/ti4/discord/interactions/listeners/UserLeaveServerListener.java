@@ -24,7 +24,7 @@ import ti4.message.MessageHelper;
 import ti4.service.async.BanCleanupService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.settings.users.UserSettingsManager;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 public class UserLeaveServerListener extends ListenerAdapter {
 

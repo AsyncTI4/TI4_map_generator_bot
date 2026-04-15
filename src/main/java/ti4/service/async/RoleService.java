@@ -21,7 +21,7 @@ import ti4.helpers.GameLaunchThreadHelper;
 import ti4.helpers.Helper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @UtilityClass
 public class RoleService {

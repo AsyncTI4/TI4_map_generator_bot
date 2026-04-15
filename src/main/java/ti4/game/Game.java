@@ -97,7 +97,7 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.statistics.round.RoundStatsTracker;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 

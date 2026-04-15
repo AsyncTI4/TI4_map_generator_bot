@@ -101,7 +101,7 @@ import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.user.AFKService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 public class Player extends PlayerProperties {
 

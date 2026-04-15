@@ -14,7 +14,7 @@ import ti4.game.persistence.GameManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.GameNameService;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 import ti4.spring.service.messagecache.SavedBotMessagesService;
 
 public class DeletionListener extends ListenerAdapter {

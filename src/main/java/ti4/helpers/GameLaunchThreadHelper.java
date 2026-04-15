@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import ti4.game.Game;
 import ti4.message.MessageHelper;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @UtilityClass
 public class GameLaunchThreadHelper {

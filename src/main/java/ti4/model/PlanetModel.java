@@ -23,7 +23,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @Data
 public class PlanetModel implements ModelInterface, EmbeddableModel {

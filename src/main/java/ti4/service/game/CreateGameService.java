@@ -50,7 +50,7 @@ import ti4.service.async.ReserveGameNumberService;
 import ti4.service.image.FileUploadService;
 import ti4.settings.GlobalSettings;
 import ti4.settings.users.UserSettingsManager;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @UtilityClass
 public class CreateGameService {

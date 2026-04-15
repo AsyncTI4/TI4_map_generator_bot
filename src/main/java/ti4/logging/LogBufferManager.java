@@ -11,7 +11,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import ti4.helpers.ThreadGetter;
 import ti4.message.MessageHelper;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @UtilityClass
 public class LogBufferManager {

@@ -35,7 +35,7 @@ import ti4.service.async.ReserveGameNumberService;
 import ti4.service.game.CreateGameService;
 import ti4.service.game.HomebrewService;
 import ti4.service.option.FOWOptionService.FOWOption;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @UtilityClass
 public class CreateFoWGameService {

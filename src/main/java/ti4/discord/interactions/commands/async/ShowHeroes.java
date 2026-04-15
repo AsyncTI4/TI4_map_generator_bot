@@ -13,7 +13,7 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.TI4Emoji;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 class ShowHeroes extends Subcommand {
 

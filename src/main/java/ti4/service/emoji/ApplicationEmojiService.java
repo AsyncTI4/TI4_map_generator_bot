@@ -22,7 +22,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
 import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 public final class ApplicationEmojiService {
 

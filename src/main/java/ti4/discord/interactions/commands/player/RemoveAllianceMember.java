@@ -11,7 +11,7 @@ import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 class RemoveAllianceMember extends GameStateSubcommand {
 

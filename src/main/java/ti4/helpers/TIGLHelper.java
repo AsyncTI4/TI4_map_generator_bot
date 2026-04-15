@@ -23,7 +23,7 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 public final class TIGLHelper {
 

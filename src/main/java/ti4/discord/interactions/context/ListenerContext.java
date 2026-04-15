@@ -25,7 +25,7 @@ import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
 import ti4.settings.users.UserSettingsManager;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @Getter
 public abstract class ListenerContext {

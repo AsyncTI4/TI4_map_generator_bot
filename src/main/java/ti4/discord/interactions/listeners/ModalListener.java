@@ -16,7 +16,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.logging.RollbarManager;
 import ti4.service.game.GameNameService;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 public final class ModalListener extends ListenerAdapter {
 

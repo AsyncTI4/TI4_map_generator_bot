@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.logging.BotLogger;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @UtilityClass
 public class CategoryCleanupCron {

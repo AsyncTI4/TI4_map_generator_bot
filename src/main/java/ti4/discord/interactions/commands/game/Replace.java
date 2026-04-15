@@ -32,7 +32,7 @@ import ti4.message.MessageHelper;
 import ti4.service.milty.MiltyDraftDisplayService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.settings.users.UserSettingsManager;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 class Replace extends GameStateSubcommand {
 

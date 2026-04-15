@@ -1,15 +1,13 @@
-package ti4.spring.jda;
+package ti4.discord;
 
 import jakarta.annotation.Nullable;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import lombok.RequiredArgsConstructor;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -24,8 +22,6 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.apache.commons.lang3.function.Consumers;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.stereotype.Service;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CategoryCleanupCron;
 import ti4.cron.CloseLaunchThreadsCron;
@@ -80,12 +76,11 @@ import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
 
-@RequiredArgsConstructor
-@Service
+@UtilityClass
 public class JdaService {
 
-    // TODO: Eventually we need to make these non-static and autowire in this service.
-    //       Another thought: we may not want to trust any old "Admin" role on a server
+    // TODO:
+    //       we may not want to trust any old "Admin" role on a server
     //       should actually have admin rights
     public static final Set<Role> adminRoles = new HashSet<>();
     public static final Set<Role> developerRoles = new HashSet<>();
@@ -117,12 +112,8 @@ public class JdaService {
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
     public static final List<Guild> fowServers = new ArrayList<>();
 
-    private final ApplicationArguments applicationArguments;
-
-    @PostConstruct
-    public void init() {
+    public static void initialize(String[] args) {
         BotLogger.info("STARTING JDA");
-        String[] args = applicationArguments.getSourceArgs();
         jda = JDABuilder.createDefault(args[0])
                 // This is a privileged gateway intent that is used to update user information and join/leaves
                 // (including kicks). This is required to cache all members of a guild (including chunking)
@@ -593,8 +584,7 @@ public class JdaService {
         return null;
     }
 
-    @PreDestroy
-    public void shutdown() {
+    public static void shutdown() {
         try {
             jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
             BotLogger.info("SHUTDOWN PROCESS STARTED");

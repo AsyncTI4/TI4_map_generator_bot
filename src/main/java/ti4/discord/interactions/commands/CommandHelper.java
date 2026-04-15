@@ -32,7 +32,7 @@ import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.service.game.GameNameService;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @UtilityClass
 public class CommandHelper {

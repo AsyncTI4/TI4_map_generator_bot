@@ -16,7 +16,7 @@ import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 class ServerLimitStats extends Subcommand {
 

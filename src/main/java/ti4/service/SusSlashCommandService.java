@@ -14,7 +14,7 @@ import ti4.game.persistence.ManagedGame;
 import ti4.message.MessageHelper;
 import ti4.service.fow.GMService;
 import ti4.service.game.GameNameService;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @UtilityClass
 public class SusSlashCommandService {

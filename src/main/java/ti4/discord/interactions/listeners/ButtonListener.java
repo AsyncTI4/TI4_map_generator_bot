@@ -8,7 +8,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.ButtonProcessor;
 import ti4.helpers.ButtonHelper;
 import ti4.logging.BotLogger;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 public class ButtonListener extends ListenerAdapter {
 
