@@ -5,25 +5,23 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
+import lombok.Getter;
 import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 
+@Getter
 public final class TestGameHarness implements AutoCloseable {
     private static final String DEFAULT_SOURCE_GAME_NAME = "pbd15036";
     private static final int GAME_NAME_LINE_INDEX = 2;
 
     private final String gameName;
-    private final Set<String> managedGameNames = new LinkedHashSet<>();
 
     private TestGameHarness(String gameName) {
         this.gameName = gameName;
-        managedGameNames.add(gameName);
     }
 
     public static TestGameHarness forDefaultMap() {
@@ -49,16 +47,6 @@ public final class TestGameHarness implements AutoCloseable {
         return new TestGameHarness(uniqueGameName);
     }
 
-    public String getGameName() {
-        return gameName;
-    }
-
-    public String createDerivedGameName(String suffix) {
-        String derivedGameName = gameName + "-" + sanitize(suffix);
-        managedGameNames.add(derivedGameName);
-        return derivedGameName;
-    }
-
     public Game load() {
         return GameLoadService.load(gameName);
     }
@@ -69,7 +57,7 @@ public final class TestGameHarness implements AutoCloseable {
 
     @Override
     public void close() {
-        managedGameNames.forEach(TestGameHarness::deleteGameFiles);
+        deleteGameFiles(gameName);
     }
 
     private static void deleteGameFiles(String gameName) {
@@ -110,9 +98,5 @@ public final class TestGameHarness implements AutoCloseable {
             gameName = "pbd" + ThreadLocalRandom.current().nextLong(10_000, 10_000_000);
         } while (Files.exists(Storage.getGamePath(gameName + Constants.TXT)));
         return gameName;
-    }
-
-    private static String sanitize(String value) {
-        return value.replaceAll("[^A-Za-z0-9-]+", "-");
     }
 }
