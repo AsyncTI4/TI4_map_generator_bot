@@ -64,7 +64,7 @@ public class SecretObjectiveInfoService {
             GenericInteractionCreateEvent event,
             boolean autoDiscardButtons,
             boolean autoScoreButtons) {
-        String headerText = player.getRepresentationUnfogged() + " used something";
+        String headerText = player.getRepresentationUnfogged() + " used `" + event.getType() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendSecretObjectiveInfo(game, player, autoDiscardButtons, autoScoreButtons);
     }
