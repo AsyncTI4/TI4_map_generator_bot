@@ -13,34 +13,10 @@ class GameSaveLoadTest extends BaseTi4Test {
     void shouldHandleSerializationOfBorderAnomalies() {
         try (var harness = TestGameHarness.fromSourceGame("game-with-border-anomalies")) {
             Game game = harness.load();
-            String savedGameName = harness.createDerivedGameName("saved");
-            game.setName(savedGameName);
-            GameSaveService.save(game, "test");
 
-            game = harness.load();
-            Game game2 = GameLoadService.load(savedGameName);
-
-            assertThat(game2)
-                    .usingRecursiveComparison()
-                    .ignoringFields(
-                            "lastModifiedDate", "draftManager.game.lastModifiedDate", "name", "draftManager.game.name")
-                    .isEqualTo(game);
-
-            assertThat(game.getLastModifiedDate()).isNotEqualTo(game2.getLastModifiedDate());
-            assertThat(game.getName()).isNotEqualTo(game2.getName());
-        }
-    }
-
-    @Test
-    void shouldHandleSerializationOfDisplacedUnits() {
-        try (var harness = TestGameHarness.fromSourceGame("game-with-displaced-units")) {
-            Game game = harness.load();
-            String savedGameName = harness.createDerivedGameName("saved");
-            game.setName(savedGameName);
-            GameSaveService.save(game, "test");
-
-            game = harness.load();
-            Game game2 = GameLoadService.load(savedGameName);
+            Game game2 = harness.load();
+            GameSaveService.save(game2, "testing");
+            game2 = harness.load();
 
             assertThat(game2)
                     .usingRecursiveComparison()
@@ -48,14 +24,34 @@ class GameSaveLoadTest extends BaseTi4Test {
                             "latestCommand",
                             "draftManager.game.latestCommand",
                             "lastModifiedDate",
-                            "draftManager.game.lastModifiedDate",
-                            "name",
-                            "draftManager.game.name")
+                            "draftManager.game.lastModifiedDate")
                     .isEqualTo(game);
 
             assertThat(game.getLatestCommand()).isNotEqualTo(game2.getLatestCommand());
             assertThat(game.getLastModifiedDate()).isNotEqualTo(game2.getLastModifiedDate());
-            assertThat(game.getName()).isNotEqualTo(game2.getName());
+        }
+    }
+
+    @Test
+    void shouldHandleSerializationOfDisplacedUnits() {
+        try (var harness = TestGameHarness.fromSourceGame("game-with-displaced-units")) {
+            Game game = harness.load();
+
+            Game game2 = harness.load();
+            GameSaveService.save(game2, "test");
+            game2 = harness.load();
+
+            assertThat(game2)
+                    .usingRecursiveComparison()
+                    .ignoringFields(
+                            "latestCommand",
+                            "draftManager.game.latestCommand",
+                            "lastModifiedDate",
+                            "draftManager.game.lastModifiedDate")
+                    .isEqualTo(game);
+
+            assertThat(game.getLatestCommand()).isNotEqualTo(game2.getLatestCommand());
+            assertThat(game.getLastModifiedDate()).isNotEqualTo(game2.getLastModifiedDate());
         }
     }
 
@@ -63,20 +59,18 @@ class GameSaveLoadTest extends BaseTi4Test {
     void shouldHandleSaveLoadOfPlayers() {
         try (var harness = TestGameHarness.fromSourceGame("game-with-displaced-units")) {
             Game game = harness.load();
-            String savedGameName = harness.createDerivedGameName("saved");
-            game.setName(savedGameName);
-            GameSaveService.save(game, "test");
 
-            game = harness.load();
-            Game game2 = GameLoadService.load(savedGameName);
+            Game game2 = harness.load();
+            GameSaveService.save(game2, "test");
+            game2 = harness.load();
 
-            for (Player p2 : game2.getPlayers().values()) {
+            game2.getPlayers().values().forEach(p2 -> {
                 Player p = game.getPlayer(p2.getUserID());
                 assertThat(p2).usingRecursiveComparison().ignoringFields("game").isEqualTo(p);
-            }
+            });
+
             assertThat(game.getLatestCommand()).isNotEqualTo(game2.getLatestCommand());
             assertThat(game.getLastModifiedDate()).isNotEqualTo(game2.getLastModifiedDate());
-            assertThat(game.getName()).isNotEqualTo(game2.getName());
         }
     }
 }
