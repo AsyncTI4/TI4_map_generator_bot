@@ -41,7 +41,8 @@ class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
 
     @Test
     void isLocalDevelopmentStartupRequiresSingleGuildLaunchArguments() {
-        assertTrue(LocalDevelopmentSampleGameService.isLocalDevelopmentStartup(new String[] {"token", "user", "guild"}));
+        assertTrue(
+                LocalDevelopmentSampleGameService.isLocalDevelopmentStartup(new String[] {"token", "user", "guild"}));
         assertFalse(LocalDevelopmentSampleGameService.isLocalDevelopmentStartup(new String[] {"token", "user"}));
         assertFalse(LocalDevelopmentSampleGameService.isLocalDevelopmentStartup(
                 new String[] {"token", "user", "guild", "community"}));

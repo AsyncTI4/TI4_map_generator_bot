@@ -34,7 +34,8 @@ public class LocalDevelopmentSampleGameService {
     public static void seedSampleGameFileIfMissing() {
         Path sourcePath = getSampleGameSourcePath();
         if (sourcePath == null) {
-            BotLogger.warning("LocalDevelopmentSampleGameService: RESOURCE_PATH is not configured; skipping sample game.");
+            BotLogger.warning(
+                    "LocalDevelopmentSampleGameService: RESOURCE_PATH is not configured; skipping sample game.");
             return;
         }
         if (!Files.exists(sourcePath)) {
@@ -56,7 +57,8 @@ public class LocalDevelopmentSampleGameService {
 
         Game game = GameManager.reload(SAMPLE_GAME_NAME);
         if (game == null) {
-            BotLogger.warning("LocalDevelopmentSampleGameService: sample game could not be loaded: " + SAMPLE_GAME_NAME);
+            BotLogger.warning(
+                    "LocalDevelopmentSampleGameService: sample game could not be loaded: " + SAMPLE_GAME_NAME);
             return;
         }
 
@@ -70,19 +72,23 @@ public class LocalDevelopmentSampleGameService {
                 guild, category, getTableTalkChannelName(game), game.getTableTalkChannel(), gameRole, localMember);
         game.setTableTalkChannelID(tableTalkChannel.getId());
 
-        TextChannel actionsChannel =
-                ensurePublicChannel(guild, category, getActionsChannelName(game), game.getMainGameChannel(), gameRole, localMember);
+        TextChannel actionsChannel = ensurePublicChannel(
+                guild, category, getActionsChannelName(game), game.getMainGameChannel(), gameRole, localMember);
         game.setMainChannelID(actionsChannel.getId());
 
         if (localMember != null) {
             for (Player player : game.getRealPlayers()) {
-                TextChannel privateChannel =
-                        ensurePrivateChannel(guild, category, getPrivateChannelName(game, player), player.getPrivateChannel(), localMember);
+                TextChannel privateChannel = ensurePrivateChannel(
+                        guild,
+                        category,
+                        getPrivateChannelName(game, player),
+                        getPrivateTextChannel(player),
+                        localMember);
                 player.setPrivateChannelID(privateChannel.getId());
             }
         } else {
-            BotLogger.warning("LocalDevelopmentSampleGameService: local user is not a member of guild `" + guild.getName()
-                    + "`; skipping sample private channel creation.");
+            BotLogger.warning("LocalDevelopmentSampleGameService: local user is not a member of guild `"
+                    + guild.getName() + "`; skipping sample private channel creation.");
         }
 
         ThreadChannel botThread = ensureBotMapThread(game, actionsChannel);
@@ -121,8 +127,10 @@ public class LocalDevelopmentSampleGameService {
     }
 
     private static Role ensureGameRole(Guild guild, String gameName, @Nullable Member localMember) {
-        Role role = guild.getRolesByName(gameName, true).stream().findFirst().orElseGet(() ->
-                guild.createRole().setName(gameName).setMentionable(true).complete());
+        Role role = guild.getRolesByName(gameName, true).stream().findFirst().orElseGet(() -> guild.createRole()
+                .setName(gameName)
+                .setMentionable(true)
+                .complete());
         if (localMember != null && !localMember.getRoles().contains(role)) {
             guild.addRoleToMember(localMember, role).complete();
         }
@@ -130,8 +138,9 @@ public class LocalDevelopmentSampleGameService {
     }
 
     private static Category ensureCategory(Guild guild, String categoryName) {
-        return guild.getCategoriesByName(categoryName, true).stream().findFirst().orElseGet(() ->
-                guild.createCategory(categoryName).complete());
+        return guild.getCategoriesByName(categoryName, true).stream()
+                .findFirst()
+                .orElseGet(() -> guild.createCategory(categoryName).complete());
     }
 
     private static TextChannel ensurePublicChannel(
@@ -184,7 +193,8 @@ public class LocalDevelopmentSampleGameService {
 
         TextChannel channel = guild.getTextChannelsByName(channelName, true).stream()
                 .findFirst()
-                .orElseGet(() -> configurePrivateChannel(guild.createTextChannel(channelName, category), guild, localMember)
+                .orElseGet(() -> configurePrivateChannel(
+                                guild.createTextChannel(channelName, category), guild, localMember)
                         .complete());
         if (channel.getParentCategory() == null || !category.getId().equals(channel.getParentCategoryId())) {
             channel.getManager().setParent(category).complete();
@@ -212,19 +222,24 @@ public class LocalDevelopmentSampleGameService {
         }
 
         String threadName = game.getName() + Constants.BOT_CHANNEL_SUFFIX;
-        List<ThreadChannel> matchingThreads =
-                actionsChannel.getGuild().getThreadChannelsByName(threadName, true);
+        List<ThreadChannel> matchingThreads = actionsChannel.getGuild().getThreadChannelsByName(threadName, true);
         if (!matchingThreads.isEmpty()) {
             return matchingThreads.getFirst();
         }
 
-        return actionsChannel.createThreadChannel(threadName)
+        return actionsChannel
+                .createThreadChannel(threadName)
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
                 .complete();
     }
 
     private static boolean isChannelOnGuild(@Nullable TextChannel channel, Guild guild) {
         return channel != null && guild.getId().equals(channel.getGuild().getId());
+    }
+
+    @Nullable
+    private static TextChannel getPrivateTextChannel(Player player) {
+        return player.getPrivateChannel() instanceof TextChannel channel ? channel : null;
     }
 
     private static String getTableTalkChannelName(Game game) {
