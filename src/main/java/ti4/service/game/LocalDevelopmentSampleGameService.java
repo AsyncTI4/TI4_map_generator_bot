@@ -273,7 +273,11 @@ public class LocalDevelopmentSampleGameService {
         return game.getName() + "-" + sanitizeChannelName(player.getUserName()) + "-private";
     }
 
+    @Nullable
     private static String sanitizeChannelName(String name) {
+        if (name == null) {
+            return "";
+        }
         return name.replaceAll("[/:. ]+", "-").replaceAll("^-+|-+$", "");
     }
 }
