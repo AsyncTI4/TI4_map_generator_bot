@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
-import ti4.game.persistence.GameTestHelper;
+import ti4.game.persistence.TestResourceGameHarness;
 import ti4.json.JsonMapperManager;
 import ti4.testUtils.BaseTi4Test;
 
@@ -54,14 +54,17 @@ class GameStatsDashboardPayloadTest extends BaseTi4Test {
 
     @Test
     void serializesDisplacedUnitsGameAsDashboardPayload() {
-        var game = GameTestHelper.loadGame("game-with-displaced-units");
+        try (var harness =
+                TestResourceGameHarness.fromSourceGame("game-with-displaced-units", "dashboard-payload-displaced-units")) {
+            var game = harness.load();
 
-        var payloadJson = JsonMapperManager.basic().valueToTree(new GameStatsDashboardPayload(game));
+            var payloadJson = JsonMapperManager.basic().valueToTree(new GameStatsDashboardPayload(game));
 
-        assertThat(payloadJson.path("asyncGameID").asText()).isEqualTo(game.getID());
-        assertThat(payloadJson.path("asyncFunGameName").asText()).isEqualTo(game.getCustomName());
-        assertThat(payloadJson.path("isPoK").isBoolean()).isTrue();
-        assertThat(payloadJson.path("tiglGame").asBoolean()).isTrue();
+            assertThat(payloadJson.path("asyncGameID").asText()).isEqualTo(game.getID());
+            assertThat(payloadJson.path("asyncFunGameName").asText()).isEqualTo(game.getCustomName());
+            assertThat(payloadJson.path("isPoK").isBoolean()).isTrue();
+            assertThat(payloadJson.path("tiglGame").asBoolean()).isTrue();
+        }
     }
 
     private Game createGame() {

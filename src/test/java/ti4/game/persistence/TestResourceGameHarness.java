@@ -14,7 +14,7 @@ import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 
-final class TestResourceGameHarness implements AutoCloseable {
+public final class TestResourceGameHarness implements AutoCloseable {
     private static final String DEFAULT_SOURCE_GAME_NAME = "pbd15036";
     private static final int GAME_NAME_LINE_INDEX = 2;
 
@@ -26,11 +26,11 @@ final class TestResourceGameHarness implements AutoCloseable {
         managedGameNames.add(gameName);
     }
 
-    static TestResourceGameHarness forDefaultMap(String testName) {
+    public static TestResourceGameHarness forDefaultMap(String testName) {
         return fromSourceGame(DEFAULT_SOURCE_GAME_NAME, testName);
     }
 
-    static TestResourceGameHarness fromSourceGame(String sourceGameName, String testName) {
+    public static TestResourceGameHarness fromSourceGame(String sourceGameName, String testName) {
         String uniqueGameName = generateUniqueGameName();
         Path sourcePath = Storage.getGamePath(sourceGameName + Constants.TXT);
         Path targetPath = Storage.getGamePath(uniqueGameName + Constants.TXT);
@@ -49,21 +49,21 @@ final class TestResourceGameHarness implements AutoCloseable {
         return new TestResourceGameHarness(uniqueGameName);
     }
 
-    String getGameName() {
+    public String getGameName() {
         return gameName;
     }
 
-    String createDerivedGameName(String suffix) {
+    public String createDerivedGameName(String suffix) {
         String derivedGameName = gameName + "-" + sanitize(suffix);
         managedGameNames.add(derivedGameName);
         return derivedGameName;
     }
 
-    Game load() {
+    public Game load() {
         return GameLoadService.load(gameName);
     }
 
-    Path buildUndoPath(int undoIndex) {
+    public Path buildUndoPath(int undoIndex) {
         return Storage.getGameUndo(gameName, gameName + "_" + undoIndex + Constants.TXT);
     }
 
