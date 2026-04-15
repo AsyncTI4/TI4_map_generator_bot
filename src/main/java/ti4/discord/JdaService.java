@@ -42,20 +42,7 @@ import ti4.cron.UploadStatsCron;
 import ti4.cron.WinningPathCron;
 import ti4.discord.interactions.commands.SlashCommandManager;
 import ti4.discord.interactions.commands.context.ContextCommandManager;
-import ti4.discord.interactions.listeners.AutoCompleteListener;
-import ti4.discord.interactions.listeners.BanListener;
-import ti4.discord.interactions.listeners.BotRuntimeStatsListener;
-import ti4.discord.interactions.listeners.ButtonListener;
-import ti4.discord.interactions.listeners.ChannelCreationListener;
-import ti4.discord.interactions.listeners.ContextMenuListener;
-import ti4.discord.interactions.listeners.DeletionListener;
-import ti4.discord.interactions.listeners.MessageListener;
-import ti4.discord.interactions.listeners.ModalListener;
-import ti4.discord.interactions.listeners.SelectionMenuListener;
-import ti4.discord.interactions.listeners.SlashCommandListener;
-import ti4.discord.interactions.listeners.ThreadCreateListener;
-import ti4.discord.interactions.listeners.UserJoinServerListener;
-import ti4.discord.interactions.listeners.UserLeaveServerListener;
+import ti4.discord.interactions.listeners.ListenerManager;
 import ti4.discord.interactions.selections.SelectionManager;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.persistence.GameManager;
@@ -133,25 +120,7 @@ public class JdaService {
                 .build();
 
         BotLogger.info("INITIALIZING LISTENERS");
-        jda.addEventListener(
-                // Priority Listeners First
-                new BotRuntimeStatsListener(),
-                new MessageListener(),
-                new SlashCommandListener(),
-                new ContextMenuListener(),
-                ButtonListener.getInstance(),
-                new UserJoinServerListener(),
-                new AutoCompleteListener(),
-                new BanListener(),
-                new ThreadCreateListener(),
-
-                // Non-Priority Listeners
-                new DeletionListener(),
-                new SelectionMenuListener(),
-                new ChannelCreationListener(),
-                new UserLeaveServerListener(),
-                // ModalListener has a long init time
-                ModalListener.getInstance());
+        ListenerManager.registerListeners(jda);
 
         BotLogger.info("AWAITING JDA READY");
         try {

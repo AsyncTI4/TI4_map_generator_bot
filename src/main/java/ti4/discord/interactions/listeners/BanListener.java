@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.logging.BotLogger;
 import ti4.service.async.BanCleanupService;
 
-public class BanListener extends ListenerAdapter {
+class BanListener extends ListenerAdapter {
 
     @Override
     public void onGuildAuditLogEntryCreate(@Nonnull GuildAuditLogEntryCreateEvent event) {

@@ -26,7 +26,7 @@ import ti4.service.async.BanCleanupService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.settings.users.UserSettingsManager;
 
-public class UserLeaveServerListener extends ListenerAdapter {
+class UserLeaveServerListener extends ListenerAdapter {
 
     @Override
     public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {

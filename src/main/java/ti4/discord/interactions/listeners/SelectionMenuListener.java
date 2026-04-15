@@ -8,7 +8,7 @@ import ti4.discord.JdaService;
 import ti4.discord.interactions.selections.SelectionMenuProcessor;
 import ti4.logging.BotLogger;
 
-public class SelectionMenuListener extends ListenerAdapter {
+class SelectionMenuListener extends ListenerAdapter {
 
     @Override
     public void onStringSelectInteraction(@Nonnull StringSelectInteractionEvent event) {

@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.logging.BotLogger;
 
-public class ThreadCreateListener extends ListenerAdapter {
+class ThreadCreateListener extends ListenerAdapter {
 
     @Override
     public void onChannelCreate(@NotNull ChannelCreateEvent event) {

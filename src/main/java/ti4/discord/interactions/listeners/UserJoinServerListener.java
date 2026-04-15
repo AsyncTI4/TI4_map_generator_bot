@@ -10,7 +10,7 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.async.RoleService;
 
-public class UserJoinServerListener extends ListenerAdapter {
+class UserJoinServerListener extends ListenerAdapter {
 
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {

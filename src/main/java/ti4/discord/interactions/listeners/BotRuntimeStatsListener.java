@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.service.statistics.SREStats;
 
-public class BotRuntimeStatsListener extends ListenerAdapter {
+class BotRuntimeStatsListener extends ListenerAdapter {
 
     @Override
     public void onGenericInteractionCreate(@Nonnull GenericInteractionCreateEvent event) {

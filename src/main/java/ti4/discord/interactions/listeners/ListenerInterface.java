@@ -8,7 +8,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.service.game.GameNameService;
 
-public interface ListenerInterface {
+interface ListenerInterface {
 
     long DELAY_THRESHOLD_MILLISECONDS = 2000;
 

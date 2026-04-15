@@ -18,7 +18,7 @@ import ti4.logging.LogOrigin;
 import ti4.logging.RollbarManager;
 import ti4.service.game.GameNameService;
 
-public final class ModalListener extends ListenerAdapter {
+final class ModalListener extends ListenerAdapter {
 
     private static ModalListener instance;
 

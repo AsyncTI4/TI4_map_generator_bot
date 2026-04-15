@@ -33,7 +33,7 @@ import ti4.service.game.CreateGameService;
 import ti4.service.game.GameNameService;
 import ti4.spring.service.messagecache.SavedBotMessagesService;
 
-public class MessageListener extends ListenerAdapter {
+class MessageListener extends ListenerAdapter {
 
     private static final int EXECUTION_TIME_WARNING_THRESHOLD_SECONDS = 1;
     private static final Pattern FUTURE = Pattern.compile("future");
