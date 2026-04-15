@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.context.ListenerContext;
-import ti4.discord.interactions.listeners.ModalListener;
 import ti4.discord.interactions.selections.SelectionMenuProcessor;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -93,9 +92,7 @@ public class LogOrigin {
                         .append(SelectionMenuProcessor.getSelectionMenuDebugText(sEvent))
                         .append('\n');
             case ModalInteractionEvent mEvent ->
-                builder.append("used modal ")
-                        .append(ModalListener.getModalDebugText(mEvent))
-                        .append('\n');
+                builder.append("used modal ").append(getModalDebugText(mEvent)).append('\n');
             default ->
                 builder.append("initiated an unexpected event of type `")
                         .append(event.getType())
@@ -108,5 +105,9 @@ public class LogOrigin {
     @Nonnull
     String getOriginTimeFormatted() {
         return String.format("**__%s__** ", originTime);
+    }
+
+    private static String getModalDebugText(ModalInteractionEvent event) {
+        return "INPUT:\n```\n" + "MenuID: " + event.getModalId() + "\n```";
     }
 }

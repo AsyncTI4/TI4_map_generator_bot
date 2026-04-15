@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 
 class AddCustomPO extends GameStateSubcommand {
 
-    public AddCustomPO() {
+    AddCustomPO() {
         super(
                 Constants.ADD_CUSTOM,
                 "Add a custom public objective (as a arbitrary source of victory points)",

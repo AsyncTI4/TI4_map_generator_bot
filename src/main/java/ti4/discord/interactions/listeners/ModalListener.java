@@ -107,14 +107,4 @@ public final class ModalListener extends ListenerAdapter {
             game.initializeMiltySettings().parseInput(context);
         }
     }
-
-    public static String getModalDebugText(ModalInteractionEvent event) {
-        // for (ModalMapping field : event.getValues()) {
-        //     output.append("\n> Field: ")
-        //             .append(field.getCustomId())
-        //             .append(" => ")
-        //             .append(field.getAsString());
-        // }
-        return "INPUT:\n```\n" + "MenuID: " + event.getModalId() + "\n```";
-    }
 }
