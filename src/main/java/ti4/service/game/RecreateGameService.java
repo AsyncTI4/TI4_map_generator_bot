@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -21,7 +20,6 @@ import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.fow.GMService;
 
@@ -48,7 +46,8 @@ public class RecreateGameService {
             recreateFogOfWarRoles(game, guild, extraAccessMember, result);
             moveFogOfWarChannelsOutOfLimbo(game, guild, result);
         } else {
-            Role gameRole = game.isCommunityMode() ? null : ensurePrimaryGameRole(game, guild, extraAccessMember, result);
+            Role gameRole =
+                    game.isCommunityMode() ? null : ensurePrimaryGameRole(game, guild, extraAccessMember, result);
             Category targetCategory = ensureTargetCategory(game, guild);
             TextChannel tableTalkChannel = ensurePrimaryTextChannel(
                     guild,
@@ -234,10 +233,12 @@ public class RecreateGameService {
         Role everyoneRole = guild.getPublicRole();
         ChannelAction<Category> createCategoryAction = guild.createCategory(categoryName);
         if (bothelperRole != null) {
-            createCategoryAction = createCategoryAction.addRolePermissionOverride(bothelperRole.getIdLong(), allow, null);
+            createCategoryAction =
+                    createCategoryAction.addRolePermissionOverride(bothelperRole.getIdLong(), allow, null);
         }
         if (spectatorRole != null) {
-            createCategoryAction = createCategoryAction.addRolePermissionOverride(spectatorRole.getIdLong(), allow, null);
+            createCategoryAction =
+                    createCategoryAction.addRolePermissionOverride(spectatorRole.getIdLong(), allow, null);
         }
         if (everyoneRole != null) {
             createCategoryAction = createCategoryAction.addRolePermissionOverride(everyoneRole.getIdLong(), null, deny);
@@ -257,7 +258,9 @@ public class RecreateGameService {
             RecreateGameResult result) {
         TextChannel channel = existingChannel;
         if (channel == null || !guild.equals(channel.getGuild())) {
-            channel = guild.getTextChannelsByName(channelName, true).stream().findFirst().orElse(null);
+            channel = guild.getTextChannelsByName(channelName, true).stream()
+                    .findFirst()
+                    .orElse(null);
         }
         if (channel == null && targetCategory != null) {
             channel = createPrimaryTextChannel(guild, game, targetCategory, channelName, role, extraAccessMember);
@@ -277,7 +280,8 @@ public class RecreateGameService {
             String channelName,
             @Nullable Role role,
             @Nullable Member extraAccessMember) {
-        ChannelAction<TextChannel> action = guild.createTextChannel(channelName, targetCategory).syncPermissionOverrides();
+        ChannelAction<TextChannel> action =
+                guild.createTextChannel(channelName, targetCategory).syncPermissionOverrides();
         long allow = Permission.PIN_MESSAGES.getRawValue()
                 | Permission.VIEW_CHANNEL.getRawValue()
                 | Permission.MESSAGE_SEND.getRawValue()
@@ -346,7 +350,8 @@ public class RecreateGameService {
 
     private static boolean isInLimbo(TextChannel channel) {
         return channel.getParentCategory() != null
-                && LIMBO_CATEGORY_NAME.equalsIgnoreCase(channel.getParentCategory().getName());
+                && LIMBO_CATEGORY_NAME.equalsIgnoreCase(
+                        channel.getParentCategory().getName());
     }
 
     private static void ensureExtraMemberPermission(TextChannel channel, Member extraAccessMember) {
@@ -390,8 +395,8 @@ public class RecreateGameService {
         if (channel == null) {
             return;
         }
-        StringBuilder message = new StringBuilder(game.getPing())
-                .append(" this game's Discord resources were recreated.");
+        StringBuilder message =
+                new StringBuilder(game.getPing()).append(" this game's Discord resources were recreated.");
         if (!result.getMissingPlayers().isEmpty()) {
             message.append("\nMissing from server: ").append(String.join(", ", result.getMissingPlayers()));
         }
@@ -417,9 +422,7 @@ public class RecreateGameService {
         if (name == null) {
             return "";
         }
-        return name.toLowerCase()
-                .replaceAll("[^a-z0-9]+", "-")
-                .replaceAll("^-+|-+$", "");
+        return name.toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("^-+|-+$", "");
     }
 
     @Getter

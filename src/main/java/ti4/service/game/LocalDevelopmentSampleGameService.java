@@ -52,9 +52,8 @@ public class LocalDevelopmentSampleGameService {
         if (guild == null) {
             return null;
         }
-        String effectiveSourceGame = sourceGameName == null || sourceGameName.isBlank()
-                ? DEFAULT_SOURCE_GAME_NAME
-                : sourceGameName;
+        String effectiveSourceGame =
+                sourceGameName == null || sourceGameName.isBlank() ? DEFAULT_SOURCE_GAME_NAME : sourceGameName;
         String testGameName = buildTestGameName(effectiveSourceGame, UUID.randomUUID());
         Game game = cloneSourceGame(effectiveSourceGame, testGameName);
         if (game == null) {
@@ -171,7 +170,9 @@ public class LocalDevelopmentSampleGameService {
             deleteRole(role, result);
         }
 
-        Category category = guild.getCategoriesByName(game.getName(), true).stream().findFirst().orElse(null);
+        Category category = guild.getCategoriesByName(game.getName(), true).stream()
+                .findFirst()
+                .orElse(null);
         if (category != null && category.getChannels().isEmpty()) {
             try {
                 category.delete().complete();

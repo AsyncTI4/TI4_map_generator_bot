@@ -63,10 +63,9 @@ class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
         assertEquals(
                 LocalDevelopmentSampleGameService.DEFAULT_SOURCE_GAME_NAME,
                 LocalDevelopmentSampleGameService.getStartupSourceGameName(new String[] {"token", "user", "guild"}));
-        assertEquals(
-                "pbd42",
-                LocalDevelopmentSampleGameService.getStartupSourceGameName(
-                        new String[] {"token", "user", "guild", "pbd42"}));
+        assertEquals("pbd42", LocalDevelopmentSampleGameService.getStartupSourceGameName(new String[] {
+            "token", "user", "guild", "pbd42"
+        }));
     }
 
     @Test

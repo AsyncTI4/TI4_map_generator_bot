@@ -25,8 +25,8 @@ class LocalDevelopment extends Subcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.SOURCE, "Source game name")
                 .setRequired(false)
                 .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm cleanup")
-                .setRequired(false));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm cleanup").setRequired(false));
     }
 
     @Override
@@ -56,7 +56,8 @@ class LocalDevelopment extends Subcommand {
         RecreateGameService.RecreateGameResult result = LocalDevelopmentSampleGameService.createAndRecreateTestGame(
                 guild, event.getUser().getId(), sourceGame);
         if (result == null) {
-            MessageHelper.replyToMessage(event, "Failed to create a local development test game from `" + sourceGame + "`.");
+            MessageHelper.replyToMessage(
+                    event, "Failed to create a local development test game from `" + sourceGame + "`.");
             return;
         }
         MessageHelper.replyToMessage(event, result.getSummary());
