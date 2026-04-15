@@ -40,7 +40,7 @@ class LocalDevelopment extends Subcommand {
         String action = event.getOption(Constants.ACTION, ACTION_CREATE, OptionMapping::getAsString);
         if (ACTION_CLEAN.equals(action)) {
             String confirm = event.getOption(Constants.CONFIRM, "", OptionMapping::getAsString);
-            if (!"YES".equals(confirm)) {
+            if (!"YES".equalsIgnoreCase(confirm)) {
                 MessageHelper.replyToMessage(event, "Cleanup requires `confirm: YES`.");
                 return;
             }
