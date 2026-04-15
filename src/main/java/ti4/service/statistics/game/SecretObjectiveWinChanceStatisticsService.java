@@ -51,7 +51,12 @@ class SecretObjectiveWinChanceStatisticsService {
         StringBuilder sb = new StringBuilder();
         appendWinningPlayerActionPhaseSecretRateSection(sb, winsByScoredAPSecretCount);
         sb.append('\n');
-        appendScoredSecretCountWinChanceSection(sb, playersByScoredSecretCount, winsByScoredSecretCount);
+        appendScoredSecretCountWinChanceSection(
+                sb,
+                playersByScoredSecretCount,
+                winsByScoredSecretCount,
+                playersByScoredAPSecretCount,
+                winsByScoredAPSecretCount);
 
         // Collect all secret names from all three maps
         Set<String> allSecretNames = new HashSet<>();
@@ -102,19 +107,17 @@ class SecretObjectiveWinChanceStatisticsService {
                     .append("**")
                     .append(secretEntry.name())
                     .append("**\n")
-                    .append(" Scored: `")
+                    .append(" · Scored: `")
                     .append(StringUtils.leftPad(secretEntry.scoredPercent() + "%", 4))
                     .append("` (")
                     .append(secretEntry.scoredWins())
                     .append("/")
                     .append(secretEntry.scoredGames())
-                    .append(") · When Drawn (Estimated): `")
+                    .append(")\n")
+                    .append(" · When Drawn (Estimated): `")
                     .append(StringUtils.leftPad(secretEntry.whenDrawnEstimatedPercent() + "%", 4))
-                    .append("` (")
-                    .append(secretEntry.combinedWins())
-                    .append("/")
-                    .append(maxCombinedGames)
-                    .append(") · Discard Rate (Estimated): `")
+                    .append("`\n")
+                    .append(" · Discard Rate (Estimated): `")
                     .append(StringUtils.leftPad(secretEntry.discardRateEstimatedPercent() + "%", 4))
                     .append("`\n");
         }
@@ -167,9 +170,13 @@ class SecretObjectiveWinChanceStatisticsService {
     }
 
     private static void appendScoredSecretCountWinChanceSection(
-            StringBuilder sb, int[] playersByScoredSecretCount, int[] winsByScoredSecretCount) {
+            StringBuilder sb,
+            int[] playersByScoredSecretCount,
+            int[] winsByScoredSecretCount,
+            int[] playersByScoredAPSecretCount,
+            int[] winsByScoredAPSecretCount) {
         sb.append("__**Scored Secret Count Win Chance**__\n")
-                .append("_(What is a player's win chance if they've scored X secrets of any type?)_\n\n");
+                .append("_(What is a player's win chance if they've scored X secrets?)_\n\n");
 
         for (int count = 0; count <= 4; count++) {
             appendSecretCountWinChanceLine(
@@ -184,6 +191,11 @@ class SecretObjectiveWinChanceStatisticsService {
                 wins += winsByScoredSecretCount[i];
             }
             appendSecretCountWinChanceLine(sb, count + "+ secrets", players, wins);
+        }
+
+        for (int count = 0; count <= 4; count++) {
+            appendSecretCountWinChanceLine(
+                    sb, count + " AP secrets", playersByScoredAPSecretCount[count], winsByScoredAPSecretCount[count]);
         }
     }
 
