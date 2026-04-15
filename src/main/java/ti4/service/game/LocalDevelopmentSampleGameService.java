@@ -38,6 +38,7 @@ public class LocalDevelopmentSampleGameService {
                 return false;
             }
         }
+        // A numeric fourth argument is still treated as an additional guild/server id, not as a source game name.
         return args.length == 3 || !args[3].matches("\\d+");
     }
 
@@ -138,8 +139,11 @@ public class LocalDevelopmentSampleGameService {
             return null;
         }
         Path mainResourcesPath = Path.of(resourcePath);
-        Path testResourcePath = mainResourcesPath
-                .getParent()
+        Path parentPath = mainResourcesPath.getParent();
+        if (parentPath == null) {
+            return null;
+        }
+        Path testResourcePath = parentPath
                 .resolveSibling("test")
                 .resolve("resources")
                 .resolve("maps")

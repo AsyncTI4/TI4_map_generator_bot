@@ -144,7 +144,10 @@ public class RecreateGameService {
                 .orElse(null);
         TextChannel mainChannel = guild.getTextChannelsByName(game.getName() + FOW_MAIN_CHANNEL_SUFFIX, true).stream()
                 .findFirst()
-                .orElse(game.getMainGameChannel());
+                .orElseGet(() -> {
+                    TextChannel fallbackChannel = game.getMainGameChannel();
+                    return fallbackChannel != null && guild.equals(fallbackChannel.getGuild()) ? fallbackChannel : null;
+                });
 
         moveChannelIfNeeded(gmChannel, targetCategory, result);
         moveChannelIfNeeded(mainChannel, targetCategory, result);
@@ -226,22 +229,23 @@ public class RecreateGameService {
     }
 
     private static Category createCategoryOnGuild(Guild guild, String categoryName) {
-        EnumSet<Permission> allow = EnumSet.of(Permission.VIEW_CHANNEL);
-        EnumSet<Permission> deny = EnumSet.of(Permission.VIEW_CHANNEL);
+        EnumSet<Permission> allowViewChannel = EnumSet.of(Permission.VIEW_CHANNEL);
+        EnumSet<Permission> denyViewChannel = EnumSet.of(Permission.VIEW_CHANNEL);
         Role bothelperRole = CreateGameService.getRole("Bothelper", guild);
         Role spectatorRole = CreateGameService.getRole("Spectator", guild);
         Role everyoneRole = guild.getPublicRole();
         ChannelAction<Category> createCategoryAction = guild.createCategory(categoryName);
         if (bothelperRole != null) {
             createCategoryAction =
-                    createCategoryAction.addRolePermissionOverride(bothelperRole.getIdLong(), allow, null);
+                    createCategoryAction.addRolePermissionOverride(bothelperRole.getIdLong(), allowViewChannel, null);
         }
         if (spectatorRole != null) {
             createCategoryAction =
-                    createCategoryAction.addRolePermissionOverride(spectatorRole.getIdLong(), allow, null);
+                    createCategoryAction.addRolePermissionOverride(spectatorRole.getIdLong(), allowViewChannel, null);
         }
         if (everyoneRole != null) {
-            createCategoryAction = createCategoryAction.addRolePermissionOverride(everyoneRole.getIdLong(), null, deny);
+            createCategoryAction =
+                    createCategoryAction.addRolePermissionOverride(everyoneRole.getIdLong(), null, denyViewChannel);
         }
         return createCategoryAction.complete();
     }
@@ -308,20 +312,20 @@ public class RecreateGameService {
 
     @Nullable
     private static ThreadChannel ensureBotMapThread(Game game, TextChannel actionsChannel) {
-        if (game.isFowMode()) {
+        if (game.isFowMode() || actionsChannel == null) {
             return null;
         }
         ThreadChannel botThread = game.getBotMapUpdatesThread();
         if (botThread != null && actionsChannel.getGuild().equals(botThread.getGuild())) {
             return botThread;
         }
-        List<ThreadChannel> matchingThreads =
-                actionsChannel.getGuild().getThreadChannelsByName(game.getName() + Constants.BOT_CHANNEL_SUFFIX, true);
+        String threadName = getSanitizedGameChannelPrefix(game.getName()) + Constants.BOT_CHANNEL_SUFFIX;
+        List<ThreadChannel> matchingThreads = actionsChannel.getGuild().getThreadChannelsByName(threadName, true);
         if (!matchingThreads.isEmpty()) {
             return matchingThreads.getFirst();
         }
         return actionsChannel
-                .createThreadChannel(game.getName() + Constants.BOT_CHANNEL_SUFFIX)
+                .createThreadChannel(threadName)
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
                 .complete();
     }
