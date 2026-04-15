@@ -76,6 +76,7 @@ import ti4.migration.DataMigrationManager;
 import ti4.selections.SelectionManager;
 import ti4.service.draft.SliceGenerationPipeline;
 import ti4.service.emoji.ApplicationEmojiService;
+import ti4.service.game.LocalDevelopmentSampleGameService;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
@@ -309,6 +310,9 @@ public class JdaService {
         AliasHandler.init();
         // create directories for games files
         Storage.init();
+        if (LocalDevelopmentSampleGameService.isLocalDevelopmentStartup(args)) {
+            LocalDevelopmentSampleGameService.seedSampleGameFileIfMissing();
+        }
         SelectionManager.init();
         initializeWhitelistedRoles();
         TIGLHelper.validateTIGLness();
@@ -317,6 +321,9 @@ public class JdaService {
 
         BotLogger.info("LOADING GAMES");
         GameManager.initialize();
+        if (LocalDevelopmentSampleGameService.isLocalDevelopmentStartup(args)) {
+            LocalDevelopmentSampleGameService.bootstrapSampleGame(guildPrimary, args[1]);
+        }
         BotLogger.info("FINISHED LOADING GAMES");
 
         if (DataMigrationManager.runMigrations()) {
