@@ -19,7 +19,7 @@ public interface Command<T extends GenericInteractionCreateEvent> {
             return messageEvent.getName().equals(getName());
         if (event instanceof UserContextInteractionEvent userEvent)
             return userEvent.getName().equals(getName());
-        else return false;
+        return false;
     }
 
     default void preExecute(T event) {}
