@@ -2459,7 +2459,7 @@ public final class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), message + "\nRolled against " + p2.getRepresentationNoPing() + ".");
         if (h > 0) {
-            String msg = p2.getRepresentationUnfogged() + ", you may use this to assign" + h + " hit"
+            String msg = p2.getRepresentationUnfogged() + ", you may use this to assign " + h + " hit"
                     + (h == 1 ? "" : "s") + ".";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.blue(
@@ -2472,7 +2472,9 @@ public final class ButtonHelperFactionSpecific {
         RemoveUnitService.removeUnits(event, p1.getNomboxTile(), game, p1.getColor(), "1 inf");
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                p1.getFactionEmoji() + " has released 1 of their captured infantry to reroll combat dice on "
+                p1.getFactionEmoji() + " has released 1 of their captured infantry (they have "
+                        + p1.getNombox().getUnitCount(UnitType.Infantry, p1)
+                        + " captured infantry remaining) to reroll combat dice on "
                         + Helper.getPlanetRepresentation(planetN, game)
                         + " using their **Mech Reroll** ability. Note that you may need to manually assign the correct number of hits.");
     }
