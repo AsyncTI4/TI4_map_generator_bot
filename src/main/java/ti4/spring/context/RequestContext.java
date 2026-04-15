@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.context.SecurityContextHolder;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.rollbar.RollbarManager;
+import ti4.logging.RollbarManager;
 
 @UtilityClass
 public class RequestContext {

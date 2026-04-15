@@ -11,67 +11,72 @@ class GameSaveLoadTest extends BaseTi4Test {
 
     @Test
     void shouldHandleSerializationOfBorderAnomalies() {
-        // save game as new file
-        Game game = GameLoadService.load("game-with-border-anomalies");
-        game.setName("game-with-border-anomalies-test-save");
-        GameSaveService.save(game, "test");
+        try (var harness = TestGameHarness.fromSourceGame("game-with-border-anomalies")) {
+            Game game = harness.load();
+            String savedGameName = harness.createDerivedGameName("saved");
+            game.setName(savedGameName);
+            GameSaveService.save(game, "test");
 
-        // reload game, and that new file we just created
-        game = GameLoadService.load("game-with-border-anomalies");
-        Game game2 = GameLoadService.load("game-with-border-anomalies-test-save");
+            game = harness.load();
+            Game game2 = GameLoadService.load(savedGameName);
 
-        assertThat(game2)
-                .usingRecursiveComparison()
-                .ignoringFields(
-                        "lastModifiedDate", "draftManager.game.lastModifiedDate", "name", "draftManager.game.name")
-                .isEqualTo(game);
+            assertThat(game2)
+                    .usingRecursiveComparison()
+                    .ignoringFields(
+                            "lastModifiedDate", "draftManager.game.lastModifiedDate", "name", "draftManager.game.name")
+                    .isEqualTo(game);
 
-        assertThat(game.getLastModifiedDate()).isNotEqualTo(game2.getLastModifiedDate());
-        assertThat(game.getName()).isNotEqualTo(game2.getName());
+            assertThat(game.getLastModifiedDate()).isNotEqualTo(game2.getLastModifiedDate());
+            assertThat(game.getName()).isNotEqualTo(game2.getName());
+        }
     }
 
     @Test
     void shouldHandleSerializationOfDisplacedUnits() {
-        Game game = GameLoadService.load("game-with-displaced-units");
-        game.setName("game-with-displaced-units-test-save");
-        GameSaveService.save(game, "test");
+        try (var harness = TestGameHarness.fromSourceGame("game-with-displaced-units")) {
+            Game game = harness.load();
+            String savedGameName = harness.createDerivedGameName("saved");
+            game.setName(savedGameName);
+            GameSaveService.save(game, "test");
 
-        // reload game, and that new file we just created
-        game = GameLoadService.load("game-with-displaced-units");
-        Game game2 = GameLoadService.load("game-with-displaced-units-test-save");
+            game = harness.load();
+            Game game2 = GameLoadService.load(savedGameName);
 
-        assertThat(game2)
-                .usingRecursiveComparison()
-                .ignoringFields(
-                        "latestCommand",
-                        "draftManager.game.latestCommand",
-                        "lastModifiedDate",
-                        "draftManager.game.lastModifiedDate",
-                        "name",
-                        "draftManager.game.name")
-                .isEqualTo(game);
+            assertThat(game2)
+                    .usingRecursiveComparison()
+                    .ignoringFields(
+                            "latestCommand",
+                            "draftManager.game.latestCommand",
+                            "lastModifiedDate",
+                            "draftManager.game.lastModifiedDate",
+                            "name",
+                            "draftManager.game.name")
+                    .isEqualTo(game);
 
-        assertThat(game.getLatestCommand()).isNotEqualTo(game2.getLatestCommand());
-        assertThat(game.getLastModifiedDate()).isNotEqualTo(game2.getLastModifiedDate());
-        assertThat(game.getName()).isNotEqualTo(game2.getName());
+            assertThat(game.getLatestCommand()).isNotEqualTo(game2.getLatestCommand());
+            assertThat(game.getLastModifiedDate()).isNotEqualTo(game2.getLastModifiedDate());
+            assertThat(game.getName()).isNotEqualTo(game2.getName());
+        }
     }
 
     @Test
     void shouldHandleSaveLoadOfPlayers() {
-        Game game = GameLoadService.load("game-with-displaced-units");
-        game.setName("game-with-displaced-units-test-save");
-        GameSaveService.save(game, "test");
+        try (var harness = TestGameHarness.fromSourceGame("game-with-displaced-units")) {
+            Game game = harness.load();
+            String savedGameName = harness.createDerivedGameName("saved");
+            game.setName(savedGameName);
+            GameSaveService.save(game, "test");
 
-        // reload game, and that new file we just created
-        game = GameLoadService.load("game-with-displaced-units");
-        Game game2 = GameLoadService.load("game-with-displaced-units-test-save");
+            game = harness.load();
+            Game game2 = GameLoadService.load(savedGameName);
 
-        for (Player p2 : game2.getPlayers().values()) {
-            Player p = game.getPlayer(p2.getUserID());
-            assertThat(p2).usingRecursiveComparison().ignoringFields("game").isEqualTo(p);
+            for (Player p2 : game2.getPlayers().values()) {
+                Player p = game.getPlayer(p2.getUserID());
+                assertThat(p2).usingRecursiveComparison().ignoringFields("game").isEqualTo(p);
+            }
+            assertThat(game.getLatestCommand()).isNotEqualTo(game2.getLatestCommand());
+            assertThat(game.getLastModifiedDate()).isNotEqualTo(game2.getLastModifiedDate());
+            assertThat(game.getName()).isNotEqualTo(game2.getName());
         }
-        assertThat(game.getLatestCommand()).isNotEqualTo(game2.getLatestCommand());
-        assertThat(game.getLastModifiedDate()).isNotEqualTo(game2.getLastModifiedDate());
-        assertThat(game.getName()).isNotEqualTo(game2.getName());
     }
 }

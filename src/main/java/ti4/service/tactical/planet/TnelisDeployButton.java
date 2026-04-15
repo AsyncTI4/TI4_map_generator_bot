@@ -2,7 +2,7 @@ package ti4.service.tactical.planet;
 
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;

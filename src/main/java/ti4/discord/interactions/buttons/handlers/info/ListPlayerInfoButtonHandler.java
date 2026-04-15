@@ -1,0 +1,189 @@
+package ti4.discord.interactions.buttons.handlers.info;
+
+import java.util.ArrayList;
+import java.util.List;
+import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Player;
+import ti4.helpers.Helper;
+import ti4.image.Mapper;
+import ti4.logging.BotLogger;
+import ti4.message.MessageHelper;
+import ti4.model.BreakthroughModel;
+import ti4.service.info.ListPlayerInfoService;
+import ti4.service.info.UnitInfoService;
+import ti4.service.player.PlayerStatsService;
+
+@UtilityClass
+class ListPlayerInfoButtonHandler {
+
+    @ButtonHandler(value = "gameInfoButtons", save = false)
+    public static void offerInfoButtons(ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("offerInfoButtonStep2_allFaction", "All Info On A Faction"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_objective", "Objective Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_abilities", "Ability Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_stats", "Player Stats Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_agent", "Agent Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_commander", "Commander Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_hero", "Hero Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_breakthrough", "Breakthrough Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_relic", "Relic Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_planet", "Planet Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_units", "Special Units"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_pn", "Faction Promissory Note"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_tech", "Researched Technologies"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_ftech", "Faction Technologies"));
+        buttons.add(Buttons.REFRESH_INFO);
+        String msg =
+                "Select the category you'd like more info on. You will then be able to select either a specific faction's info, or every faction's.";
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+    }
+
+    @ButtonHandler(value = "offerInfoButtonStep2_", save = false)
+    public static void resolveOfferInfoButtonStep2(ButtonInteractionEvent event, String buttonID, Game game) {
+        String category = buttonID.split("_")[1];
+        List<Button> buttons = new ArrayList<>();
+        String msg = "";
+        if ("objective".equalsIgnoreCase(category)) {
+            buttons.add(Buttons.green("showObjInfo_both", "All Objectives in Game"));
+            buttons.add(Buttons.blue("showObjInfo_1", "All Stage 1s Possible"));
+            buttons.add(Buttons.blue("showObjInfo_2", "All Stage 2s Possible"));
+        } else {
+            for (Player p2 : game.getRealPlayers()) {
+                Button button = Buttons.gray(
+                        "offerInfoButtonStep3_" + category + "_" + p2.getFaction(),
+                        p2.getFactionModel().getShortName());
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+            buttons.add(Buttons.green("offerInfoButtonStep3_" + category + "_all", "All Factions"));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+    }
+
+    @ButtonHandler(value = "offerInfoButtonStep3_", save = false)
+    public static void resolveOfferInfoButtonStep3(
+            ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+        String category = buttonID.split("_")[1];
+        String faction = buttonID.split("_")[2];
+        List<MessageEmbed> messageEmbeds = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        for (Player p2 : game.getRealPlayers()) {
+            if (!"all".equals(faction) && !faction.equalsIgnoreCase(p2.getFaction())) {
+                continue;
+            }
+            switch (category) {
+                case "allFaction" -> {
+                    sb.append(PlayerStatsService.getPlayersCurrentStatsText(p2, game));
+                    for (String ability : p2.getAbilities()) {
+                        messageEmbeds.add(Mapper.getAbility(ability).getRepresentationEmbed());
+                    }
+                    for (Leader lead : p2.getLeadersIncludingPurged()) {
+                        messageEmbeds.add(lead.getLeaderModel()
+                                .get()
+                                .getRepresentationEmbed(true, true, true, true, game.isTwilightsFallMode()));
+                    }
+                    for (String tech : p2.getFactionTechs()) {
+                        messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
+                    }
+                    for (String unit : p2.getUnitsOwned()) {
+                        if (unit.contains("_") || unit.contains("tf-")) {
+                            messageEmbeds.add(Mapper.getUnit(unit).getRepresentationEmbed());
+                        }
+                    }
+                    for (String relic : p2.getRelics()) {
+                        messageEmbeds.add(Mapper.getRelic(relic).getRepresentationEmbed());
+                    }
+                    for (String planet : p2.getPlanets()) {
+                        sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game))
+                                .append('\n');
+                    }
+                    for (String tech : p2.getTechs()) {
+                        messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
+                    }
+                    for (String pn : p2.getPromissoryNotesOwned()) {
+                        if (!pn.contains(p2.getColor() + "_")) {
+                            messageEmbeds.add(Mapper.getPromissoryNote(pn).getRepresentationEmbed());
+                        }
+                    }
+                    for (BreakthroughModel bt : p2.getBreakthroughModels()) {
+                        messageEmbeds.add(bt.getRepresentationEmbed());
+                    }
+                }
+                case "abilities" -> {
+                    for (String ability : p2.getAbilities()) {
+                        messageEmbeds.add(Mapper.getAbility(ability).getRepresentationEmbed());
+                    }
+                }
+                case "stats" -> sb.append(PlayerStatsService.getPlayersCurrentStatsText(p2, game));
+                case "relic" -> {
+                    for (String relic : p2.getRelics()) {
+                        messageEmbeds.add(Mapper.getRelic(relic).getRepresentationEmbed());
+                    }
+                }
+                case "ftech" -> {
+                    for (String tech : p2.getFactionTechs()) {
+                        messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
+                    }
+                }
+                case "breakthrough" -> {
+                    for (BreakthroughModel bt : p2.getBreakthroughModels()) {
+                        messageEmbeds.add(bt.getRepresentationEmbed());
+                    }
+                }
+                case "tech" -> {
+                    for (String tech : p2.getTechs()) {
+                        messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
+                    }
+                }
+                case "planet" -> {
+                    for (String planet : p2.getPlanets()) {
+                        sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game))
+                                .append('\n');
+                    }
+                }
+                case "pn" -> {
+                    for (String pn : p2.getPromissoryNotesOwned()) {
+                        if (!pn.contains(p2.getColor() + "_")) {
+                            messageEmbeds.add(Mapper.getPromissoryNote(pn).getRepresentationEmbed());
+                        }
+                    }
+                }
+                case "agent", "commander", "hero" -> {
+                    for (Leader lead : p2.getLeadersIncludingPurged()) {
+                        if (lead.getId().contains(category)) {
+                            messageEmbeds.add(lead.getLeaderModel()
+                                    .get()
+                                    .getRepresentationEmbed(true, true, true, true, game.isTwilightsFallMode()));
+                        }
+                    }
+                }
+                case "units" -> messageEmbeds.addAll(UnitInfoService.getUnitMessageEmbeds(p2, false));
+            }
+        }
+
+        MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), sb.toString(), messageEmbeds);
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler(value = "showObjInfo_", save = false)
+    public static void showObjInfo(ButtonInteractionEvent event, String buttonID, Game game) {
+        String extent = buttonID.split("_")[1];
+        if ("both".equalsIgnoreCase(extent)) {
+            ListPlayerInfoService.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
+        } else {
+            ListPlayerInfoService.displayerScoringProgression(game, false, event.getMessageChannel(), extent);
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+    }
+}

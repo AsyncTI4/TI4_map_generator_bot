@@ -40,7 +40,8 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import ti4.commands.planet.PlanetRemove;
+import ti4.discord.JdaService;
+import ti4.discord.interactions.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftCategory;
 import ti4.draft.FrankenDraft;
@@ -97,7 +98,6 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.statistics.round.RoundStatsTracker;
-import ti4.spring.jda.JdaService;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 

@@ -10,9 +10,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class GameManager {

@@ -12,8 +12,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ti4.discord.JdaService;
 import ti4.executors.CircuitBreaker;
-import ti4.spring.jda.JdaService;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RequiredArgsConstructor

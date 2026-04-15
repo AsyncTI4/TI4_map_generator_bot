@@ -4,8 +4,8 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.JdaService;
 import ti4.game.persistence.ManagedGame;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class ManagedGameService {

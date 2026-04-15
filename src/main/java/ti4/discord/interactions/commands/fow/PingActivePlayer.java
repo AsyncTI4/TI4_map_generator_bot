@@ -1,0 +1,76 @@
+package ti4.discord.interactions.commands.fow;
+
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.discord.interactions.commands.GameStateSubcommand;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.helpers.Constants;
+import ti4.message.MessageHelper;
+import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.fow.GMService;
+
+class PingActivePlayer extends GameStateSubcommand {
+
+    private static final long PING_COOLDOWN = 28_800_000; // (1000 * 60 * 60 * 8); //eight hours
+
+    public PingActivePlayer() {
+        super(Constants.PING_ACTIVE_PLAYER, "Ping the active player in this game", true, true);
+    }
+
+    public void execute(SlashCommandInteractionEvent event) {
+        Game game = getGame();
+
+        String playerID = game.getActivePlayerID();
+        if (playerID == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There is no active player right now.");
+            return;
+        }
+        Player activePlayer = game.getPlayer(playerID);
+        if (activePlayer == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There is no active player right now.");
+            return;
+        }
+
+        if (!game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "This is not a fog of war game, just ping the person normally ("
+                            + activePlayer.getRepresentationNoPing() + ").");
+            return;
+        }
+
+        Player playerThatRanCommand = getPlayer();
+        boolean samePlayer = playerThatRanCommand.getUserID().equalsIgnoreCase(activePlayer.getUserID());
+
+        long latestPingMilliseconds = 0;
+        AutoPingMetadataManager.AutoPing autoPing = AutoPingMetadataManager.getLatestAutoPing(game.getName());
+        if (autoPing != null) {
+            latestPingMilliseconds = autoPing.lastPingTimeEpochMilliseconds();
+        } else if (game.getLastActivePlayerChange() != null) {
+            latestPingMilliseconds = game.getLastActivePlayerChange().getTime();
+        }
+
+        String isAfk = activePlayer.isAFK() ? " They are currently AFK." : "";
+        long milliSinceLastPing = System.currentTimeMillis() - latestPingMilliseconds;
+        if (!game.getPlayersWithGMRole().contains(playerThatRanCommand)
+                && milliSinceLastPing < PING_COOLDOWN
+                && !samePlayer) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player was pinged recently." + isAfk);
+        } else {
+            String ping = activePlayer.getRepresentationUnfogged() + " this is a gentle reminder that it is your turn.";
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        (event.getChannelIdLong()
+                                                == GMService.getGMChannel(game).getIdLong()
+                                        ? activePlayer.getRepresentationUnfoggedNoPing()
+                                        : "Active player")
+                                + " has been pinged." + isAfk);
+                MessageHelper.sendPrivateMessageToPlayer(activePlayer, game, ping);
+            } else {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), ping);
+            }
+            AutoPingMetadataManager.addPing(game.getName());
+        }
+    }
+}

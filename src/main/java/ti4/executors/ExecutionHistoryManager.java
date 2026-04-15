@@ -8,7 +8,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import ti4.helpers.TimedRunnable;
 import ti4.logging.BotLogger;
-import ti4.rollbar.RollbarManager;
+import ti4.logging.RollbarManager;
 
 public final class ExecutionHistoryManager {
 
