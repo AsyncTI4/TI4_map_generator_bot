@@ -622,7 +622,7 @@ class ActionCardDeck2ButtonHandler {
     public static void resolveAllianceRiderRandomAlly(Player player, Game game, ButtonInteractionEvent event) {
         Set<String> purgedAllies = new HashSet<>(getStoredCommanderList(game, ALLIANCE_RIDER_PURGED_ALLIES));
         String allyCommander = UnusedCommanderHelper.getUnusedCommander(game, purgedAllies);
-        if (allyCommander == null) {
+        if (allyCommander == null || allyCommander.isBlank()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " cannot reveal a new ally because none are available.");

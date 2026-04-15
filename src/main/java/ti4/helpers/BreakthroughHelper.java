@@ -10,7 +10,7 @@ public final class BreakthroughHelper {
 
     public static void resolveYinBreakthroughAbility(Game game, Player player) {
         String leaderID = UnusedCommanderHelper.getUnusedCommander(game);
-        if (leaderID == null) {
+        if (leaderID == null || leaderID.isBlank()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()

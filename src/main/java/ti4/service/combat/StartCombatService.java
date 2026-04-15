@@ -2034,6 +2034,17 @@ public class StartCombatService {
                         String label = "Roll Myko Breakthrough on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, FactionEmojis.mykomentori));
                     }
+                    if (p.hasUnit("blacktf_mech")
+                            && isGroundCombat
+                            && unitH.getUnitCount(UnitType.Mech, p) > 0
+                            && p.getNombox().getUnitCount(UnitType.Infantry, p) > 0) {
+                        buttons.add(Buttons.gray(
+                                p.getFinsFactionCheckerPrefix() + "blackTFMechReroll_" + tile.getPosition() + "_"
+                                        + unitH.getName(),
+                                "Reroll 1 Mech on " + nameOfHolder,
+                                FactionEmojis.blacktf));
+                    }
+
                     // atokera
                     if (p.hasUnit("atokera_mech")
                             && isGroundCombat

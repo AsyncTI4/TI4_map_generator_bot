@@ -1,8 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -49,11 +47,13 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.ExploreModel;
+import ti4.model.NamedCombatModifierModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.model.enums.CombatMod.CombatModType;
 import ti4.service.VeiledHeartService;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.button.ReactionService;
@@ -2376,7 +2376,7 @@ public final class ButtonHelperFactionSpecific {
     }
 
     @ButtonHandler("orangeTFMechRepair")
-    public static void resolveEmergencyRepairs(
+    public static void resolveOrangeTFMechRepair(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         player.setStrategicCC(player.getStrategicCC() - 1);
         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
@@ -2399,6 +2399,84 @@ public final class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
                 player.getFactionEmoji() + " has spent a strategy command token to repair all their damaged mechs.");
+    }
+
+    @ButtonHandler("blackTFMechReroll")
+    public static void blackTFMechReroll(ButtonInteractionEvent event, Game game, Player p1, String buttonID) {
+
+        Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
+
+        Planet planet = tile.getUnitHolderFromPlanet(buttonID.split("_")[2]);
+
+        Player p2 = null;
+        for (Player p : game.getRealPlayersNNeutral()) {
+            if (p1.isPlayerMemberOfAlliance(p) || p1 == p) continue;
+            if (FoWHelper.playerHasUnitsOnPlanet(p, planet)) {
+                p2 = p;
+                break;
+            }
+        }
+
+        var units = Map.of(p1.getUnitByType(UnitType.Mech), 1);
+        String planetN = planet.getName();
+
+        var rollMods = CombatModHelper.getModifiers(
+                p1,
+                p2,
+                units,
+                units,
+                tile.getTileModel(),
+                game,
+                CombatRollType.bombardment,
+                CombatModType.extra_rolls.toString());
+        var flatMods = CombatModHelper.getModifiers(
+                p1,
+                p2,
+                units,
+                units,
+                tile.getTileModel(),
+                game,
+                CombatRollType.bombardment,
+                CombatModType.result_modifier.toString());
+
+        // Temp modifiers (bunker)
+
+        CombatTempModHelper.ensureValidTempMods(p1, tile.getTileModel(), planet);
+        CombatTempModHelper.initializeNewTempMods(p1, tile.getTileModel(), planet);
+        List<NamedCombatModifierModel> tempMods = new ArrayList<>();
+        tempMods.addAll(CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
+                p1, tile.getTileModel(), planet, false, CombatRollType.combatround));
+
+        String message = CombatMessageHelper.displayCombatSummary(p1, tile, planet, CombatRollType.combatround);
+        message += CombatRollService.rollForUnits(
+                units, rollMods, flatMods, tempMods, p1, p2, game, CombatRollType.combatround, event, tile, planet);
+        String hits = substringAfter(message, "Total hits ");
+        hits = hits.split(" ")[0].replace("*", "");
+        int h = Integer.parseInt(hits);
+        if (message.endsWith(";\n")) {
+            message = message.substring(0, message.length() - 2);
+        }
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(), message + "\nRolled against " + p2.getRepresentationNoPing() + ".");
+        if (h > 0) {
+            String msg = p2.getRepresentationUnfogged() + ", you may use this to assign " + h + " hit"
+                    + (h == 1 ? "" : "s") + ".";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.blue(
+                    "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
+                    "Manually Assign Hit" + (h == 1 ? "" : "s")));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+        }
+
+        RemoveUnitService.removeUnits(event, p1.getNomboxTile(), game, p1.getColor(), "1 inf");
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                p1.getFactionEmoji() + " has released 1 of their captured infantry (they have "
+                        + p1.getNombox().getUnitCount(UnitType.Infantry, p1)
+                        + " captured infantry remaining) to reroll combat dice on "
+                        + Helper.getPlanetRepresentation(planetN, game)
+                        + " using their **Mech Reroll** ability. Note that you may need to manually assign the correct number of hits.");
     }
 
     @ButtonHandler("redCreussWashPartial")

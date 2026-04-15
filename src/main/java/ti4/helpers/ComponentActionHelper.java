@@ -895,6 +895,9 @@ public class ComponentActionHelper {
                                     game.getPing() + ", this is the next commander on top of the mercenary pile.",
                                     led.getRepresentationEmbed());
                         }
+                    } else {
+                        MessageHelper.sendMessageToChannel(
+                                p1.getCorrectChannel(), "## There are no more commanders in the mercenary pile.");
                     }
                 } else {
                     MessageHelper.sendMessageToChannel(
