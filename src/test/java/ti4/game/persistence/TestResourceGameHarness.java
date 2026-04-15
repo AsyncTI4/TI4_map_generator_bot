@@ -26,11 +26,11 @@ public final class TestResourceGameHarness implements AutoCloseable {
         managedGameNames.add(gameName);
     }
 
-    public static TestResourceGameHarness forDefaultMap(String testName) {
-        return fromSourceGame(DEFAULT_SOURCE_GAME_NAME, testName);
+    public static TestResourceGameHarness forDefaultMap() {
+        return fromSourceGame(DEFAULT_SOURCE_GAME_NAME);
     }
 
-    public static TestResourceGameHarness fromSourceGame(String sourceGameName, String testName) {
+    public static TestResourceGameHarness fromSourceGame(String sourceGameName) {
         String uniqueGameName = generateUniqueGameName();
         Path sourcePath = Storage.getGamePath(sourceGameName + Constants.TXT);
         Path targetPath = Storage.getGamePath(uniqueGameName + Constants.TXT);

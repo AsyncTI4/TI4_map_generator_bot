@@ -10,7 +10,7 @@ class GameLoadServiceTest extends BaseTi4Test {
 
     @Test
     void shouldLoadGameFromFile() {
-        try (var harness = TestResourceGameHarness.forDefaultMap("game-load-service")) {
+        try (var harness = TestResourceGameHarness.forDefaultMap()) {
             Game game = harness.load();
 
             assertThat(game).isNotNull();

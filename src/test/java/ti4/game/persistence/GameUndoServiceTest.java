@@ -10,7 +10,7 @@ class GameUndoServiceTest extends BaseTi4Test {
 
     @Test
     void createUndoCopyReturnsCreatedIndex() {
-        try (var harness = TestResourceGameHarness.forDefaultMap("game-undo-service")) {
+        try (var harness = TestResourceGameHarness.forDefaultMap()) {
             int first = GameUndoService.createUndoCopy(harness.getGameName());
             int second = GameUndoService.createUndoCopy(harness.getGameName());
 
