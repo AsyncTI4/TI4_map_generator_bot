@@ -1,0 +1,31 @@
+package ti4.spring.api.webdata;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ti4.game.Game;
+import ti4.spring.context.RequestContext;
+
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/public/game/{gameName}")
+public class GameWebDataController {
+
+    private final GameWebDataService gameWebDataService;
+
+    @GetMapping(value = "/web-data", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> get(@PathVariable String gameName) {
+        Game game = RequestContext.getGame();
+        if (game == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (game.isFowMode()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(gameWebDataService.getOrCompute(gameName));
+    }
+}

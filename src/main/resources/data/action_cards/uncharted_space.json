@@ -84,6 +84,7 @@
         "name": "Diplomatic Pressure",
         "phase": "Agenda",
         "window": "When an agenda is revealed",
+        "playTiming": "AGENDA_WHEN",
         "text": "Choose another player; that player must give you 1 promissory note from their hand.",
         "notes": "One player cannot play multiple of these on another player in the same agenda.",
         "automationID": "diplo_pressure",

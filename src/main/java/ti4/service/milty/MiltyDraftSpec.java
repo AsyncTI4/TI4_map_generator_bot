@@ -3,12 +3,12 @@ package ti4.service.milty;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
+import ti4.game.Game;
 import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.PlayerFactionSettings;
 import ti4.helpers.settingsFramework.menus.SliceGenerationSettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
-import ti4.map.Game;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source;
 

@@ -25,17 +25,17 @@ import ti4.draft.DraftItem;
 import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.items.HomeSystemDraftItem;
 import ti4.draft.items.TileDraftItem;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
 import ti4.model.MapTemplateModel;
@@ -176,10 +176,26 @@ public final class ButtonHelperTwilightsFall {
         return msg.toString();
     }
 
+    private static List<Player> getQueueEligibleParticipants(Game game, Player player) {
+        List<Player> participants = getParticipantsList(game);
+        if (!participants.isEmpty() && participants.contains(player)) {
+            return participants;
+        }
+
+        MessageHelper.sendMessageToChannel(
+                player.getCardsInfoThread(), "That splice queue prompt is no longer active.");
+        return null;
+    }
+
     @ButtonHandler("queueSplicePick_")
     public static void queueSplicePick(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        if (getParticipantsList(game).getFirst() == player) {
+        List<Player> participants = getQueueEligibleParticipants(game, player);
+        if (participants == null) {
+            game.setStoredValue(player.getFaction() + "splicequeue", "");
+            return;
+        }
+        if (participants.getFirst() == player) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     "You are currently up to pick a splice card, and should just do that instead of queueing.");
@@ -203,7 +219,7 @@ public final class ButtonHelperTwilightsFall {
             }
         }
         alreadyQueued = game.getStoredValue(player.getFaction() + "splicequeue");
-        int number = getParticipantsList(game).indexOf(player) + 1;
+        int number = participants.indexOf(player) + 1;
         int numQueued = alreadyQueued.split("_").length;
         if (alreadyQueued.isEmpty()) {
             numQueued = 0;
@@ -226,6 +242,10 @@ public final class ButtonHelperTwilightsFall {
     public static void restartSpliceQueue(ButtonInteractionEvent event, Game game, Player player) {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         game.setStoredValue(player.getFaction() + "splicequeue", "");
+        List<Player> participants = getQueueEligibleParticipants(game, player);
+        if (participants == null) {
+            return;
+        }
         List<Button> buttons = getQueueSplicePickButtons(game, player);
         String msg = getQueueSpliceMessage(game, player);
         msg += "You can use these buttons to queue your splice pick.";

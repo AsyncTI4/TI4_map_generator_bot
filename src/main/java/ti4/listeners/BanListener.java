@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.audit.TargetType;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.events.guild.GuildAuditLogEntryCreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.async.BanCleanupService;
 
 public class BanListener extends ListenerAdapter {

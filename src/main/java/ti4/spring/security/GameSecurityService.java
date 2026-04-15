@@ -1,7 +1,7 @@
 package ti4.spring.security;
 
 import org.springframework.stereotype.Component;
-import ti4.map.persistence.GameManager;
+import ti4.game.persistence.GameManager;
 import ti4.spring.context.RequestContext;
 
 @Component("security")

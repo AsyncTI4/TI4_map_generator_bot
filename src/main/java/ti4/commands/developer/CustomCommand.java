@@ -8,10 +8,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.buttons.Buttons;
 import ti4.commands.Subcommand;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 
 class CustomCommand extends Subcommand {

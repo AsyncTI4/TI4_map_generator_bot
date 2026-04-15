@@ -13,6 +13,11 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -24,13 +29,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.UnusedCommanderHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.model.ExploreModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -726,5 +726,28 @@ class ActionCardDeck2ButtonHandler {
                 player.getCorrectChannel(),
                 player.getRepresentation() + " readied and explored "
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game) + ".");
+    }
+
+    @ButtonHandler("willRevolution")
+    public static void willRevolution(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.deleteMessage(event);
+        game.setStoredValue("willRevolution", "active");
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Reversed strategy card picking order.");
+    }
+
+    @ButtonHandler("deflectSC_")
+    public static void deflectSC(ButtonInteractionEvent event, String buttonID, Game game) {
+        String sc = buttonID.split("_")[1];
+        ButtonHelper.deleteMessage(event);
+        game.setStoredValue("deflectedSC", sc);
+        // TODO: move this out of here.
+        if (game.isTwilightsFallMode()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Put _Tartarus_ on **" + Helper.getSCName(Integer.parseInt(sc), game) + "**.");
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Put _Deflection_ on **" + Helper.getSCName(Integer.parseInt(sc), game) + "**.");
+        }
     }
 }

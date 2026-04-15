@@ -8,13 +8,14 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.objectives.DiscardSecretService;
@@ -106,6 +107,17 @@ class SecretObjectiveButtonHandler {
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), publicMsg);
         ButtonHelper.deleteMessage(event);
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
+    }
+
+    @ButtonHandler(value = "get_so_discard_buttons", save = false)
+    public static void getSODiscardButtons(ButtonInteractionEvent event, Player player) {
+        String secretScoreMsg = "Click a button below to discard your secret objective.";
+        List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveDiscardButtons(player);
+        if (!soButtons.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), secretScoreMsg, soButtons);
+        } else {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Developers");
+        }
     }
 
     @ButtonHandler("deal2SOToAll")

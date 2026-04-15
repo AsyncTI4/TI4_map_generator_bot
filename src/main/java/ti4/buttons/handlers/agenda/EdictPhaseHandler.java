@@ -9,6 +9,9 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -18,9 +21,6 @@ import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.RelicModel;
@@ -294,19 +294,29 @@ public class EdictPhaseHandler {
                                     + ", so they were not able to draw any additional relics or paradigms.");
                 } else {
                     ButtonHelperTwilightsFall.drawParadigm(game, player, event, false, true);
-                    String relic = game.getAllRelics().getFirst();
-                    RelicModel mod = Mapper.getRelic(relic);
-                    MessageHelper.sendMessageToChannelWithEmbed(
-                            player.getCorrectChannel(),
-                            player.getRepresentationNoPing() + " will draw the following relic:",
-                            mod.getRepresentationEmbed());
+                    List<String> relicDeck = game.getAllRelics();
+                    if (relicDeck.isEmpty()) {
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                "The relic deck is empty, so "
+                                        + player.getRepresentationNoPing()
+                                        + " may only draw additional paradigms.");
+                    } else {
+                        String relic = relicDeck.getFirst();
+                        RelicModel mod = Mapper.getRelic(relic);
+                        MessageHelper.sendMessageToChannelWithEmbed(
+                                player.getCorrectChannel(),
+                                player.getRepresentationNoPing() + " will draw the following relic:",
+                                mod.getRepresentationEmbed());
+                    }
                     String plural = (vpDifference == 1 ? "" : "s");
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             player.getRepresentationNoPing() + " is " + vpDifference + " point" + plural
                                     + " behind the player with the most victory points, so they may draw "
                                     + vpDifference + " additional card" + plural + " from either deck.");
-                    for (int x = 0; x < vpDifference + 1; x++) {
+                    int maxExtraRelics = relicDeck.isEmpty() ? 0 : vpDifference;
+                    for (int x = 0; x < maxExtraRelics + 1; x++) {
                         buttons.add(Buttons.green(
                                 player.getFinsFactionCheckerPrefix() + "artificeStep2_" + (x) + "_"
                                         + (vpDifference - x),

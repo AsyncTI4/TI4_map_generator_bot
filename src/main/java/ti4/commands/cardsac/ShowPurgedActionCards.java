@@ -4,10 +4,10 @@ import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.GameStateSubcommand;
+import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
-import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 class ShowPurgedActionCards extends GameStateSubcommand {

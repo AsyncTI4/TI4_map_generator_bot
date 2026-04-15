@@ -58,6 +58,15 @@ import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.special.SetupNeutralPlayer;
 import ti4.commands.tokens.AddTokenCommand;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Space;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedPlayer;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
@@ -72,18 +81,9 @@ import ti4.image.PositionMapper;
 import ti4.image.TileGenerator;
 import ti4.image.TileHelper;
 import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Space;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
-import ti4.map.persistence.GameManager;
-import ti4.map.persistence.ManagedPlayer;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.model.ColorModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
@@ -471,9 +471,21 @@ public class ButtonHelper {
     }
 
     @ButtonHandler("pingGame")
-    public static void pingGame(Game game, ButtonInteractionEvent event, Player player, String buttonID) {
-        Helper.fixGameChannelPermissions(game.getActionsChannel().getGuild(), game);
-        MessageHelper.sendMessageToChannel(game.getBotMapUpdatesThread(), "Pinging game" + game.getPing() + ".");
+    public static void pingGame(Game inferredGame, ButtonInteractionEvent event, Player player, String buttonID) {
+        Game gameToPing = inferredGame;
+        // Prefer the game encoded in the button id here, because inferredGame only works when the button was pressed
+        // from that game's channel.
+        if (gameToPing == null && buttonID.startsWith("pingGame_")) {
+            gameToPing = GameManager.reload(buttonID.replace("pingGame_", ""));
+        }
+        if (gameToPing == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that game.");
+            return;
+        }
+
+        Helper.fixGameChannelPermissions(gameToPing.getActionsChannel().getGuild(), gameToPing);
+        MessageHelper.sendMessageToChannel(
+                gameToPing.getBotMapUpdatesThread(), "Pinging game" + gameToPing.getPing() + ".");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Attempted to ping the game.");
     }
 
@@ -3374,28 +3386,44 @@ public class ButtonHelper {
     }
 
     public static int checkNetGain(Player player, String ccs) {
-        int netGain;
-        int oldTactic = Integer.parseInt(ccs.substring(0, ccs.indexOf('/')));
-        ccs = ccs.substring(ccs.indexOf('/') + 1);
-        int oldFleet = Integer.parseInt(ccs.substring(0, ccs.indexOf('/')));
-        ccs = ccs.substring(ccs.indexOf('/') + 1);
-        int oldStrat = Integer.parseInt(ccs);
+        int[] oldCCs = parseCCRepresentation(ccs);
+        if (oldCCs == null) {
+            BotLogger.warning("Unable to calculate command token net gain from malformed CC string: `" + ccs + "`");
+            return 0;
+        }
 
-        netGain = (player.getTacticalCC() - oldTactic)
-                + (player.getFleetCC() - oldFleet)
-                + (player.getStrategicCC() - oldStrat);
-        return netGain;
+        return (player.getTacticalCC() - oldCCs[0])
+                + (player.getFleetCC() - oldCCs[1])
+                + (player.getStrategicCC() - oldCCs[2]);
     }
 
     public static void resetCCs(Player player, String ccs) {
-        int oldTactic = Integer.parseInt(ccs.substring(0, ccs.indexOf('/')));
-        ccs = ccs.substring(ccs.indexOf('/') + 1);
-        int oldFleet = Integer.parseInt(ccs.substring(0, ccs.indexOf('/')));
-        ccs = ccs.substring(ccs.indexOf('/') + 1);
-        int oldStrat = Integer.parseInt(ccs);
-        player.setTacticalCC(oldTactic);
-        player.setStrategicCC(oldStrat);
-        player.setFleetCC(oldFleet);
+        int[] oldCCs = parseCCRepresentation(ccs);
+        if (oldCCs == null) {
+            BotLogger.warning("Unable to reset command tokens from malformed CC string: `" + ccs + "`");
+            return;
+        }
+        player.setTacticalCC(oldCCs[0]);
+        player.setStrategicCC(oldCCs[2]);
+        player.setFleetCC(oldCCs[1]);
+    }
+
+    private static int[] parseCCRepresentation(String ccs) {
+        // Old button messages can outlive the stored CC snapshot, so malformed input must fail closed.
+        if (ccs == null || ccs.isBlank()) {
+            return null;
+        }
+
+        String[] parts = ccs.trim().split("/");
+        if (parts.length != 3) {
+            return null;
+        }
+
+        try {
+            return new int[] {Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2])};
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     public static List<Button> getButtonsToRemoveYourCC(

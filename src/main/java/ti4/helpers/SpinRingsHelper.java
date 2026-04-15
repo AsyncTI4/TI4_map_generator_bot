@@ -10,9 +10,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.GMService;
@@ -128,6 +128,7 @@ public class SpinRingsHelper {
             int steps = spin.steps();
             String center = spin.center();
             Hex centerHex = indexToHex.get(spin.center());
+            Map<String, String> movedPositions = new HashMap<>();
 
             if (steps == 0) continue;
 
@@ -146,15 +147,16 @@ public class SpinRingsHelper {
                 String toPosition = hexToIndex.get(toHex);
 
                 tile.setPosition(toPosition);
+                movedPositions.put(fromPosition, toPosition);
                 if (game.getCustomHyperlaneData().get(fromPosition) != null) {
                     customHyperlanesToMove.add(Map.of(fromPosition, toPosition));
                 }
                 tilesToSet.add(tile);
-                updateHomeSystem(game, tile);
                 if (game.isFowMode()) {
                     updateSystemsPlayerSawMoving(fromPosition, toPosition, systemsPlayersSawMoving, systemsPlayersSee);
                 }
             }
+            updatePlayerPositions(game, movedPositions);
             sb.append("\n-# ").append(spunMessage(ring, dir, steps, center, game.isFowMode()));
             if (game.isFowMode()) {
                 GMService.logActivity(game, spunMessage(ring, dir, steps, center, false), false);
@@ -304,13 +306,16 @@ public class SpinRingsHelper {
         return sb.toString();
     }
 
-    private static void updateHomeSystem(Game game, Tile tile) {
-        if (!tile.isHomeSystem(game)) return;
-
+    private static void updatePlayerPositions(Game game, Map<String, String> movedPositions) {
         for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
-            if (tile.getPosition().equals(player.getHomeSystemPosition())) {
-                player.setHomeSystemPosition(tile.getPosition());
-                return;
+            String newHomeSystemPosition = movedPositions.get(player.getHomeSystemPosition());
+            if (newHomeSystemPosition != null) {
+                player.setHomeSystemPosition(newHomeSystemPosition);
+            }
+
+            String newStatsAnchorPosition = movedPositions.get(player.getPlayerStatsAnchorPosition());
+            if (newStatsAnchorPosition != null) {
+                player.setPlayerStatsAnchorPosition(newStatsAnchorPosition);
             }
         }
     }

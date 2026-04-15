@@ -1,6 +1,6 @@
 package ti4.service.emoji;
 
-import ti4.map.Leader;
+import ti4.game.Leader;
 
 public enum LeaderEmojis implements TI4Emoji {
     // Official Content

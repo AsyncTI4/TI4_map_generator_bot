@@ -3,9 +3,38 @@ on:
   pull_request:
     branches: ["master"]
 jobs:
+  changes:
+    name: Detect changed files
+    runs-on: ubuntu-latest
+    outputs:
+      json: ${{ steps.filter.outputs.json }}
+      java: ${{ steps.filter.outputs.java }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Detect changed file types
+        id: filter
+        run: |
+          BASE=${{ github.event.pull_request.base.sha }}
+          HEAD=${{ github.event.pull_request.head.sha }}
+          CHANGED_FILES="$(git diff --name-only "$BASE" "$HEAD")"
+          if printf '%s\n' "$CHANGED_FILES" | grep -qE '\.json$'; then
+            echo "json=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "json=false" >> "$GITHUB_OUTPUT"
+          fi
+          if printf '%s\n' "$CHANGED_FILES" | grep -qE '^(src/|pom\.xml$)'; then
+            echo "java=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "java=false" >> "$GITHUB_OUTPUT"
+          fi
+
   validate-json:
     name: check for invalid json files
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.json == 'true'
     steps:
       - uses: actions/checkout@v4
       - name: check for invalid json files
@@ -20,7 +49,8 @@ jobs:
   ci:
     name: Run Tests On Pull Request
     runs-on: ubuntu-latest
-    needs: validate-json
+    needs: [changes, validate-json]
+    if: always() && needs.changes.outputs.java == 'true' && (needs.validate-json.result == 'success' || needs.validate-json.result == 'skipped')
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 21 for x64

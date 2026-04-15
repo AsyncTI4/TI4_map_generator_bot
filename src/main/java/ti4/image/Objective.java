@@ -6,9 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import ti4.game.Game;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.model.PublicObjectiveModel;
 
 public record Objective(

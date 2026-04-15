@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
 import ti4.commands.GameStateSubcommand;
+import ti4.game.Game;
 import ti4.helpers.Constants;
-import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 class DraftLimits extends GameStateSubcommand {
@@ -30,6 +30,7 @@ class DraftLimits extends GameStateSubcommand {
             new LimitConfig(Constants.STARTINGFLEET_LIMIT, "Starting fleet Limit", -1),
             new LimitConfig(Constants.BLUETILE_LIMIT, "Blue Tile Limit", -1),
             new LimitConfig(Constants.REDTILE_LIMIT, "Red tile Limit", -1),
+            new LimitConfig(Constants.BREAKTHROUGH_LIMIT, "Breakthrough Limit", -1),
             new LimitConfig(Constants.FIRSTPICK_LIMIT, "First Pick Limit", 0),
             new LimitConfig(Constants.LATERPICK_LIMIT, "Later Pick Limit", 0));
 

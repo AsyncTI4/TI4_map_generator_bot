@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import ti4.helpers.Storage;
 import ti4.json.JsonMapperManager;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import tools.jackson.databind.JavaType;
 import tools.jackson.databind.ObjectWriter;
 

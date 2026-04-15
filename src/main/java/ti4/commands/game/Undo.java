@@ -5,11 +5,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
+import ti4.game.Game;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
-import ti4.map.Game;
-import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
+import ti4.service.game.GameUndoNameService;
 
 class Undo extends GameStateSubcommand {
 
@@ -51,13 +52,12 @@ class Undo extends GameStateSubcommand {
             return;
         }
 
-        if (!gameToUndoBackTo.contains(gameName)) {
+        Integer targetUndoIndex = GameUndoNameService.getUndoNumberFromSelection(gameName, gameToUndoBackTo);
+        if (targetUndoIndex == null) {
             MessageHelper.replyToMessage(event, "Undo failed - Parameter doesn't look right: " + gameToUndoBackTo);
             return;
         }
 
-        String targetUndoIndexStr = gameToUndoBackTo.replace(gameName + "_", "").replace(".txt", "");
-        int targetUndoIndex = Integer.parseInt(targetUndoIndexStr);
         GameManager.undo(game, targetUndoIndex);
     }
 }

@@ -8,8 +8,8 @@ import javax.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-import ti4.map.Game;
-import ti4.map.persistence.GameManager;
+import ti4.game.Game;
+import ti4.game.persistence.GameManager;
 
 @Service
 @RequiredArgsConstructor

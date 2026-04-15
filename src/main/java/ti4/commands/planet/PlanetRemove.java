@@ -1,12 +1,12 @@
 package ti4.commands.planet;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.UnitHolder;
 
 public class PlanetRemove extends PlanetAddRemove {
 

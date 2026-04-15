@@ -1,8 +1,8 @@
 package ti4.spring.api.actioncard;
 
 import org.springframework.stereotype.Service;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.message.MessageHelper;
 
 @Service

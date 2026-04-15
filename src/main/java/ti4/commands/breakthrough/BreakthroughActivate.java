@@ -4,9 +4,9 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands.GameStateSubcommand;
+import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
-import ti4.map.Player;
 
 class BreakthroughActivate extends GameStateSubcommand {
 

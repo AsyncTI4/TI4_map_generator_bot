@@ -12,9 +12,9 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.image.PositionMapper;
-import ti4.map.Game;
-import ti4.map.Player;
 
 public final class PlayerStatsHelper {
     private static final Pattern DIGIT_PATTERN = Pattern.compile("\\d");
@@ -38,8 +38,9 @@ public final class PlayerStatsHelper {
         if (anchor == null) return null;
         if (randomizeLocation) anchor = "000"; // just stick them on 000
 
+        int maxStatTileRing = game.getRingCount() + 1;
         Set<String> validPositions = PositionMapper.getTilePositions().stream()
-                .filter(pos -> tileRing(pos) <= (game.getRingCount() + 1))
+                .filter(pos -> tileRing(pos) <= maxStatTileRing)
                 .filter(pos -> game.getTileByPosition(pos) == null)
                 .filter(pos -> taken == null || !taken.contains(pos))
                 .collect(Collectors.toSet());

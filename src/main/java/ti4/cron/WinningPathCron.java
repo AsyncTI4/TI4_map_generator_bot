@@ -2,7 +2,7 @@ package ti4.cron;
 
 import java.time.ZoneId;
 import lombok.experimental.UtilityClass;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.statistics.game.WinningPathPersistenceService;
 
 @UtilityClass

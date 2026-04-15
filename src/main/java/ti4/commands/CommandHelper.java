@@ -21,16 +21,16 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.persistence.GameManager;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.game.GameNameService;
 import ti4.spring.jda.JdaService;
 
@@ -111,7 +111,14 @@ public class CommandHelper {
         if (factionColorOption != null) {
             String factionColor =
                     AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
-            return getPlayerByFactionColor(factionColor, game);
+            Player player = getPlayerByFactionColor(factionColor, game);
+            if (player != null) {
+                return player;
+            }
+        }
+        Player player = getPlayerFromChannel(game, event);
+        if (player != null) {
+            return player;
         }
         return getPlayerFromGame(game, event.getMember(), event.getUser().getId());
     }
@@ -141,6 +148,17 @@ public class CommandHelper {
             if (Objects.equals(factionColor, player_.getFaction())
                     || Objects.equals(factionColor, player_.getColor())) {
                 return player_;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    private static Player getPlayerFromChannel(Game game, GenericCommandInteractionEvent event) {
+        String channelId = event.getChannel().getId();
+        for (Player player : game.getPlayers().values()) {
+            if (channelId.equals(player.getPrivateChannelID()) || channelId.equals(player.getCardsInfoThreadID())) {
+                return player;
             }
         }
         return null;

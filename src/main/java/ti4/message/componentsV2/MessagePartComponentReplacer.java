@@ -16,9 +16,9 @@ import net.dv8tion.jda.api.components.mediagallery.MediaGalleryItem;
 import net.dv8tion.jda.api.components.replacer.IReplaceable;
 import net.dv8tion.jda.api.components.section.Section;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
+import ti4.logging.BotLogger;
 import ti4.message.componentsV2.MessageV2Editor.MessagePartType;
 import ti4.message.componentsV2.MessageV2Editor.ReplaceMessagePart;
-import ti4.message.logging.BotLogger;
 
 public class MessagePartComponentReplacer implements TrackingComponentReplacer {
     private final Map<String, ReplaceMessagePart> replaceByCustomId;

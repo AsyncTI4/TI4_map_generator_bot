@@ -3,10 +3,10 @@ package ti4.service.player;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Player;
 import ti4.helpers.ButtonHelperHeroes;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Player;
 import ti4.service.leader.RefreshLeaderService;
 
 @UtilityClass

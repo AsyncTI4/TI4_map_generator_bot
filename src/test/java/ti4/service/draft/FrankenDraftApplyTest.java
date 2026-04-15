@@ -2,10 +2,10 @@ package ti4.service.draft;
 
 import java.util.HashSet;
 import org.junit.jupiter.api.BeforeAll;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Player;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Player;
 import ti4.model.FactionModel;
 import ti4.service.player.PlayerColorService;
 import ti4.testUtils.BaseTi4Test;

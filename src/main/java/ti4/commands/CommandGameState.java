@@ -2,9 +2,10 @@ package ti4.commands;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GameManager;
+import ti4.rollbar.RollbarManager;
 import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
 
@@ -28,6 +29,7 @@ class CommandGameState {
         }
         Game game = GameManager.getManagedGame(gameName).getGame();
         CommandGameState.game.set(game);
+        RollbarManager.put("game_name", game.getName());
 
         if (!isPlayerCommand) return;
         var player = CommandHelper.getPlayerFromEvent(game, event);
@@ -36,6 +38,7 @@ class CommandGameState {
                     + event.getName() + " in channel " + event.getChannel().getName() + " for game " + gameName);
         }
         CommandGameState.player.set(player);
+        RollbarManager.put("player_id", player.getUserID());
     }
 
     void postExecute(SlashCommandInteractionEvent event) {

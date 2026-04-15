@@ -8,15 +8,15 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
+import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.map.Game;
 import ti4.service.map.SpinService;
 
 class CustomizationOptions extends GameStateSubcommand {
 
     public CustomizationOptions() {
-        super(Constants.CUSTOMIZATION, "Small Customization Options", true, true);
+        super(Constants.CUSTOMIZATION, "Small Customization Options", true, false);
         List<Choice> onOff = CommandHelper.toChoices("ON", "OFF");
         List<Choice> verbChoices = CommandHelper.toChoices(Constants.VERBOSITY_OPTIONS);
         List<Choice> hexBorderChoices = CommandHelper.toChoices("off", "dash", "solid");

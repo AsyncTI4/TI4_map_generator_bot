@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.map.AddTileListService;
 
 class AddTileList extends GameStateSubcommand {

@@ -11,7 +11,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.ApplicationEmoji;
 import org.jetbrains.annotations.NotNull;
 import ti4.json.PersistenceManager;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import tools.jackson.core.type.TypeReference;
 
 @UtilityClass

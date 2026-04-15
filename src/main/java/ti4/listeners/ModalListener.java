@@ -8,12 +8,13 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.executors.ExecutorServiceManager;
+import ti4.game.Game;
 import ti4.listeners.annotations.AnnotationHandler;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.listeners.context.ModalContext;
-import ti4.map.Game;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
+import ti4.rollbar.RollbarManager;
 import ti4.service.game.GameNameService;
 import ti4.spring.jda.JdaService;
 
@@ -53,6 +54,9 @@ public final class ModalListener extends ListenerAdapter {
 
     private void handleModal(@Nonnull ModalInteractionEvent event) {
         try {
+            RollbarManager.putInteractionMetadata("modal", event);
+            RollbarManager.put("modal_id", event.getModalId());
+            RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
             ModalContext context = new ModalContext(event);
             if (context.isValid()) {
                 resolveModalInteractionEvent(context);
@@ -62,6 +66,8 @@ public final class ModalListener extends ListenerAdapter {
             String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: "
                     + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
             BotLogger.error(new LogOrigin(event), message, e);
+        } finally {
+            RollbarManager.clear();
         }
     }
 
@@ -69,6 +75,7 @@ public final class ModalListener extends ListenerAdapter {
         String modalID = context.getModalID();
         // Check for exact match first
         if (knownModals.containsKey(modalID)) {
+            RollbarManager.put("modal_handler_id", modalID);
             knownModals.get(modalID).accept(context);
             return true;
         }
@@ -76,6 +83,7 @@ public final class ModalListener extends ListenerAdapter {
         // Then check for prefix match
         for (Map.Entry<String, Consumer<ModalContext>> entry : knownModals.entrySet()) {
             if (modalID.startsWith(entry.getKey())) {
+                RollbarManager.put("modal_handler_id", entry.getKey());
                 entry.getValue().accept(context);
                 return true;
             }

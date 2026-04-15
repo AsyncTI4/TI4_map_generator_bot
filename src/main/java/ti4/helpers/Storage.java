@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import javax.annotation.Nullable;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 
 public final class Storage {
 

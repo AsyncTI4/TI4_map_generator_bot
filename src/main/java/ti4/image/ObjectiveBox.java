@@ -3,10 +3,10 @@ package ti4.image;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 
 class ObjectiveBox {
     private static final int objectiveBoxHeight = 38;

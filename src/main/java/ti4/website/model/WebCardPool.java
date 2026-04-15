@@ -1,15 +1,16 @@
 package ti4.website.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Data;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.model.DeckModel;
 
 @Data
@@ -65,7 +66,7 @@ public class WebCardPool {
                     .filter(so -> !scoredSecrets.contains(so))
                     .collect(Collectors.toList());
         }
-        cardPool.setSecretObjectiveDeck(unscoredSecrets);
+        cardPool.setSecretObjectiveDeck(shuffledCopy(unscoredSecrets));
         cardPool.setSecretObjectiveFullDeckSize(game.getSecretObjectiveFullDeckSize());
 
         // Action Cards
@@ -75,31 +76,37 @@ public class WebCardPool {
         cardPool.setActionCardFullDeckSize(game.getActionCardFullDeckSize());
 
         // Exploration Cards
-        cardPool.setCulturalExploreDeck(new ArrayList<>(game.getExploreDeck(Constants.CULTURAL)));
+        cardPool.setCulturalExploreDeck(shuffledCopy(game.getExploreDeck(Constants.CULTURAL)));
         cardPool.setCulturalExploreDiscard(new ArrayList<>(game.getExploreDiscard(Constants.CULTURAL)));
         cardPool.setCulturalExploreFullDeckSize(game.getCulturalExploreFullDeckSize());
 
-        cardPool.setIndustrialExploreDeck(new ArrayList<>(game.getExploreDeck(Constants.INDUSTRIAL)));
+        cardPool.setIndustrialExploreDeck(shuffledCopy(game.getExploreDeck(Constants.INDUSTRIAL)));
         cardPool.setIndustrialExploreDiscard(new ArrayList<>(game.getExploreDiscard(Constants.INDUSTRIAL)));
         cardPool.setIndustrialExploreFullDeckSize(game.getIndustrialExploreFullDeckSize());
 
-        cardPool.setHazardousExploreDeck(new ArrayList<>(game.getExploreDeck(Constants.HAZARDOUS)));
+        cardPool.setHazardousExploreDeck(shuffledCopy(game.getExploreDeck(Constants.HAZARDOUS)));
         cardPool.setHazardousExploreDiscard(new ArrayList<>(game.getExploreDiscard(Constants.HAZARDOUS)));
         cardPool.setHazardousExploreFullDeckSize(game.getHazardousExploreFullDeckSize());
 
-        cardPool.setFrontierExploreDeck(new ArrayList<>(game.getExploreDeck(Constants.FRONTIER)));
+        cardPool.setFrontierExploreDeck(shuffledCopy(game.getExploreDeck(Constants.FRONTIER)));
         cardPool.setFrontierExploreDiscard(new ArrayList<>(game.getExploreDiscard(Constants.FRONTIER)));
         cardPool.setFrontierExploreFullDeckSize(game.getFrontierExploreFullDeckSize());
 
         // Relics
-        cardPool.setRelicDeck(new ArrayList<>(game.getAllRelics()));
+        cardPool.setRelicDeck(shuffledCopy(game.getAllRelics()));
         cardPool.setRelicFullDeckSize(game.getRelicFullDeckSize());
 
         // Agendas
-        cardPool.setAgendaDeck(new ArrayList<>(game.getAgendas()));
+        cardPool.setAgendaDeck(shuffledCopy(game.getAgendas()));
         cardPool.setAgendaDiscard(new ArrayList<>(game.getDiscardAgendas().keySet()));
         cardPool.setAgendaFullDeckSize(game.getAgendaFullDeckSize());
 
         return cardPool;
+    }
+
+    private static List<String> shuffledCopy(List<String> cards) {
+        List<String> shuffled = new ArrayList<>(cards);
+        Collections.shuffle(shuffled);
+        return shuffled;
     }
 }

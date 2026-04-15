@@ -1171,6 +1171,7 @@ public final class Constants {
     public static final String STARTINGFLEET_LIMIT = "startingfleet_limit";
     public static final String BLUETILE_LIMIT = "bluetile_limit";
     public static final String REDTILE_LIMIT = "redtile_limit";
+    public static final String BREAKTHROUGH_LIMIT = "breakthrough_limit";
     public static final String FIRSTPICK_LIMIT = "firstpick_limit";
     public static final String LATERPICK_LIMIT = "laterpick_limit";
 
@@ -1488,6 +1489,8 @@ public final class Constants {
     public static final String PLAYER_TEMP_MODS = "PLAYER_TEMP_MODS";
     public static final String PLAYER_NEW_TEMP_MODS = "PLAYER_NEW_TEMP_MODS";
     public static final String ARCHIVE_CHANNELS = "archive_channels";
+    public static final String GET_CHANNEL_HTML = "get_channel_html";
+    public static final String CHANNEL = "channel";
     public static final String MILTYMOD_MODE = "miltymod_mode";
     public static final String EVENT_PLAY = "play";
     public static final String INCLUDE_RAW_STRING = "include_raw_string";

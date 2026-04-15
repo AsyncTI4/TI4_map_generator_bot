@@ -10,7 +10,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 
 @Configuration
 public class ImageIoConfiguration {

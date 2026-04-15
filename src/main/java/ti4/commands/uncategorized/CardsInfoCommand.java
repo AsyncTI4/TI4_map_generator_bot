@@ -4,10 +4,11 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.GameStateCommand;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.logging.BotLogger;
 import ti4.service.info.CardsInfoService;
 
 public class CardsInfoCommand extends GameStateCommand {

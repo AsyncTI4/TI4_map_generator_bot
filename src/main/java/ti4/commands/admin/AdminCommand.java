@@ -19,7 +19,8 @@ public class AdminCommand implements ParentCommand {
                     new TourneyWinner(),
                     new DeletePersistenceManagerFile(),
                     new CardsInfoForPlayer(),
-                    new UpdateThreadArchiveTime())
+                    new UpdateThreadArchiveTime(),
+                    new GetChannelHtml())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
