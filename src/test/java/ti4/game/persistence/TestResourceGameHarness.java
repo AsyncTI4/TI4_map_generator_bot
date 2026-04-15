@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 import ti4.game.Game;
 import ti4.helpers.Constants;
@@ -31,7 +31,7 @@ final class TestResourceGameHarness implements AutoCloseable {
     }
 
     static TestResourceGameHarness fromSourceGame(String sourceGameName, String testName) {
-        String uniqueGameName = sanitize(testName) + "-" + UUID.randomUUID();
+        String uniqueGameName = generateUniqueGameName();
         Path sourcePath = Storage.getGamePath(sourceGameName + Constants.TXT);
         Path targetPath = Storage.getGamePath(uniqueGameName + Constants.TXT);
 
@@ -102,6 +102,14 @@ final class TestResourceGameHarness implements AutoCloseable {
                 .resolve(gameName)
                 .toAbsolutePath()
                 .normalize();
+    }
+
+    private static String generateUniqueGameName() {
+        String gameName;
+        do {
+            gameName = "pbd" + ThreadLocalRandom.current().nextLong(10_000, 10_000_000);
+        } while (Files.exists(Storage.getGamePath(gameName + Constants.TXT)));
+        return gameName;
     }
 
     private static String sanitize(String value) {
