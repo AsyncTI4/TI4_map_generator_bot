@@ -46,7 +46,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.helpers.ActionCardHelper;

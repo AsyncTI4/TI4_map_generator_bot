@@ -7,7 +7,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.listeners.annotations.ButtonHandler;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 

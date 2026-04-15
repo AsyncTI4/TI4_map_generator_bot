@@ -40,7 +40,7 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import ti4.commands.planet.PlanetRemove;
+import ti4.discord.interactions.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftCategory;
 import ti4.draft.FrankenDraft;

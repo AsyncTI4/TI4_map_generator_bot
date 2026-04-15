@@ -6,7 +6,7 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -16,7 +16,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.model.PlanetModel;
 import ti4.service.regex.RegexService;
 

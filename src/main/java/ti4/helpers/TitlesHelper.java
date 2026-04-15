@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
-import ti4.listeners.annotations.ButtonHandler;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.service.game.ManagedGameService;
 
 @UtilityClass
