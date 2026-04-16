@@ -30,6 +30,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.draft.DraftManager;
 import ti4.service.milty.MiltyDraftDisplayService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.settings.users.UserSettingsManager;
@@ -224,6 +225,7 @@ class Replace extends GameStateSubcommand {
         }
 
         game.getMiltyDraftManager().replacePlayer(oldPlayerUserId, replacedPlayer.getUserID());
+        updateDraftManagerPlayer(oldPlayerUserId, replacedPlayer.getUserID(), game);
 
         if (game.getMiltyDraftManager().getDraftIndex()
                 < game.getMiltyDraftManager().getDraftOrder().size()) {
@@ -253,6 +255,23 @@ class Replace extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         } else {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
+        }
+    }
+
+    private void updateDraftManagerPlayer(String oldPlayerUserId, String newPlayerUserId, Game game) {
+        if (!DraftManager.hasDraftManager(game)) {
+            return;
+        }
+
+        DraftManager draftManager = game.getDraftManager();
+        if (!draftManager.getPlayerStates().containsKey(oldPlayerUserId)
+                || draftManager.getPlayerStates().containsKey(newPlayerUserId)) {
+            return;
+        }
+
+        draftManager.replacePlayer(oldPlayerUserId, newPlayerUserId);
+        if (draftManager.getOrchestrator() != null && draftManager.whatsStoppingDraftEnd() != null) {
+            draftManager.getOrchestrator().sendDraftButtons(draftManager);
         }
     }
 
