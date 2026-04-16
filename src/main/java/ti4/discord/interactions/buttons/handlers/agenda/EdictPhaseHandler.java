@@ -175,6 +175,35 @@ public class EdictPhaseHandler {
                     tyrant.getRepresentation() + " has acquired the ability: "
                             + Mapper.getTech(cardID).getName(),
                     Mapper.getTech(cardID).getRepresentationEmbed());
+            List<Button> remainingButtons = new ArrayList<>();
+            // Reissue the unused ability buttons for the tyrant, who assigns the remaining abilities.
+            for (var component : event.getMessage().getComponents()) {
+                if (component instanceof Button button) {
+                    if (buttonID.equals(button.getCustomId())) {
+                        continue;
+                    }
+                    remainingButtons.add(Buttons.green(
+                            tyrant.getFinsFactionCheckerPrefix()
+                                    + button.getCustomId().replace(player.getFinsFactionCheckerPrefix(), ""),
+                            button.getLabel()));
+                } else if (component instanceof net.dv8tion.jda.api.components.actionrow.ActionRow actionRow) {
+                    for (Button button : actionRow.getButtons()) {
+                        if (buttonID.equals(button.getCustomId())) {
+                            continue;
+                        }
+                        remainingButtons.add(Buttons.green(
+                                tyrant.getFinsFactionCheckerPrefix()
+                                        + button.getCustomId().replace(player.getFinsFactionCheckerPrefix(), ""),
+                                button.getLabel()));
+                    }
+                }
+            }
+            if (!remainingButtons.isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        tyrant.getCorrectChannel(),
+                        tyrant.getRepresentation() + ", choose the next ability to assign to another player.",
+                        remainingButtons);
+            }
         } else {
             List<Button> buttons = new ArrayList<>();
             for (Player p2 : game.getRealPlayers()) {
@@ -182,7 +211,7 @@ public class EdictPhaseHandler {
                     continue;
                 }
                 buttons.add(Buttons.green(
-                        "conveneStep2_" + cardID + "_" + p2.getFaction(),
+                        player.getFinsFactionCheckerPrefix() + "conveneStep2_" + cardID + "_" + p2.getFaction(),
                         p2.getFactionNameOrColor(),
                         p2.fogSafeEmoji()));
             }
@@ -338,18 +367,20 @@ public class EdictPhaseHandler {
                 List<String> techs = ButtonHelperTwilightsFall.getDeckForSplicing(
                         game, "ability", game.getRealPlayers().size());
                 embeds = new ArrayList<>();
+                Player speaker = game.getSpeaker();
 
                 for (String tech : techs) {
                     buttons.add(Buttons.green(
-                            "conveneStep1_" + tech,
+                            speaker.getFinsFactionCheckerPrefix() + "conveneStep1_" + tech,
                             "Assign " + Mapper.getTech(tech).getName()));
                     embeds.add(Mapper.getTech(tech).getRepresentationEmbed());
                 }
                 MessageHelper.sendMessageToChannelWithEmbeds(
                         player.getCorrectChannel(), "_Convene_ has revealed these abilities.", embeds);
-                msg += "\n" + game.getSpeaker().getRepresentation() + " needs to assign the first ability to "
+                msg = speaker.getRepresentation() + ", use these buttons to assign the first ability to "
                         + (buttonID.contains("_orangetf") ? "Radiant Aur" : "the tyrant")
                         + ", then that player assigns the rest.";
+                player = speaker;
             }
             case "tf-foretell" -> {
                 int loc = 1;
