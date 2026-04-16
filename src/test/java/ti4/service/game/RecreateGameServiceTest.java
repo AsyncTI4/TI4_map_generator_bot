@@ -77,7 +77,7 @@ class RecreateGameServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void recreateGameWithoutExplicitGuildUsesGameGuild() {
+    void recreateGameUsesGameGuild() {
         Game game = mock(Game.class);
         Guild guild = mock(Guild.class);
         when(game.getName()).thenReturn("fow-game");
@@ -90,6 +90,23 @@ class RecreateGameServiceTest extends BaseTi4Test {
         assertEquals(
                 "Could not recreate game resources for `fow-game`.\nNotes: Fog of War games are not compatible with recreate game and must be recreated manually.",
                 result.getSummary());
+    }
+
+    @Test
+    void resolveTargetGuildFallsBackToMostCapableGuildWhenPreferredGuildIsNull() {
+        Game game = mock(Game.class);
+        Guild fallbackGuild = mockGuildWithCapacity("fallback", 100, 100);
+        Guild smallerFallbackGuild = mockGuildWithCapacity("smaller", 150, 200);
+
+        when(game.getMainGameChannel()).thenReturn(null);
+        when(game.getTableTalkChannel()).thenReturn(null);
+
+        JdaService.serversToCreateNewGamesOn.clear();
+        JdaService.serversToCreateNewGamesOn.add(smallerFallbackGuild);
+        JdaService.serversToCreateNewGamesOn.add(fallbackGuild);
+        JdaService.guildPrimary = null;
+
+        assertSame(fallbackGuild, RecreateGameService.resolveTargetGuild(game, null));
     }
 
     @Test
