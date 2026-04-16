@@ -35,28 +35,31 @@ class LocalDevelopment extends Subcommand {
         }
 
         String action = event.getOption(Constants.ACTION, ACTION_CREATE, OptionMapping::getAsString);
-        if (ACTION_CLEAN.equals(action)) {
-            String confirm = event.getOption(Constants.CONFIRM, "", OptionMapping::getAsString);
-            if (!"YES".equalsIgnoreCase(confirm)) {
-                MessageHelper.replyToMessage(event, "Cleanup requires `confirm: YES`.");
+        switch (action) {
+            case ACTION_CLEAN -> {
+                String confirm = event.getOption(Constants.CONFIRM, "", OptionMapping::getAsString);
+                if (!"YES".equalsIgnoreCase(confirm)) {
+                    MessageHelper.replyToMessage(event, "Cleanup requires `confirm: YES`.");
+                    return;
+                }
+                var result = LocalDevelopmentSampleGameService.cleanTestGames(guild);
+                MessageHelper.replyToMessage(event, result.getSummary());
                 return;
             }
-            var result = LocalDevelopmentSampleGameService.cleanTestGames(guild);
-            MessageHelper.replyToMessage(event, result.getSummary());
-            return;
+            case ACTION_CREATE -> {
+                String sourceGame = event.getOption(
+                        Constants.SOURCE,
+                        LocalDevelopmentSampleGameService.DEFAULT_SOURCE_GAME_NAME,
+                        OptionMapping::getAsString);
+                String result = LocalDevelopmentSampleGameService.createAndRecreateTestGame(
+                        guild, event.getUser().getId(), sourceGame);
+                if (result == null) {
+                    MessageHelper.replyToMessage(
+                            event, "Failed to create a local development test game from `" + sourceGame + "`.");
+                    return;
+                }
+                MessageHelper.replyToMessage(event, result);
+            }
         }
-
-        String sourceGame = event.getOption(
-                Constants.SOURCE,
-                LocalDevelopmentSampleGameService.DEFAULT_SOURCE_GAME_NAME,
-                OptionMapping::getAsString);
-        String result = LocalDevelopmentSampleGameService.createAndRecreateTestGame(
-                guild, event.getUser().getId(), sourceGame);
-        if (result == null) {
-            MessageHelper.replyToMessage(
-                    event, "Failed to create a local development test game from `" + sourceGame + "`.");
-            return;
-        }
-        MessageHelper.replyToMessage(event, result);
     }
 }
