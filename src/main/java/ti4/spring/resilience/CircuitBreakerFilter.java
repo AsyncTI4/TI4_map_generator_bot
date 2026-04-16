@@ -22,6 +22,8 @@ public class CircuitBreakerFilter extends OncePerRequestFilter {
 
     private static final String SERVICE_UNAVAILABLE_MESSAGE = "Service temporarily unavailable: ";
     private static final String READY_PATH = "/api/public/ready";
+    private static final String PING_PATH = "/api/public/ping";
+    private static final String DEPLOY_DRAIN_PATH = "/api/public/deploy/drain";
 
     @Override
     protected void doFilterInternal(
@@ -29,7 +31,9 @@ public class CircuitBreakerFilter extends OncePerRequestFilter {
             @NotNull HttpServletResponse response,
             @NotNull FilterChain filterChain)
             throws ServletException, IOException {
-        if (READY_PATH.equals(request.getRequestURI())) {
+        if (READY_PATH.equals(request.getRequestURI())
+                || PING_PATH.equals(request.getRequestURI())
+                || DEPLOY_DRAIN_PATH.equals(request.getRequestURI())) {
             filterChain.doFilter(request, response);
             return;
         }
