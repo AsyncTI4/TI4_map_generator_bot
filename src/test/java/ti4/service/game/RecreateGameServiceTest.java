@@ -8,11 +8,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -122,11 +125,13 @@ class RecreateGameServiceTest extends BaseTi4Test {
         Guild guild = mock(Guild.class);
         when(guild.getName()).thenReturn(name);
         when(guild.getRoles())
-                .thenReturn(
-                        new ArrayList<>(Collections.nCopies(roleCount, mock(net.dv8tion.jda.api.entities.Role.class))));
+                .thenReturn(IntStream.range(0, roleCount)
+                        .mapToObj(index -> mock(Role.class))
+                        .collect(Collectors.toCollection(ArrayList::new)));
         when(guild.getChannels())
-                .thenReturn(new ArrayList<>(Collections.nCopies(
-                        channelCount, mock(net.dv8tion.jda.api.entities.channel.middleman.GuildChannel.class))));
+                .thenReturn(IntStream.range(0, channelCount)
+                        .mapToObj(index -> mock(GuildChannel.class))
+                        .collect(Collectors.toCollection(ArrayList::new)));
         return guild;
     }
 }

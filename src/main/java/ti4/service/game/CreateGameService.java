@@ -545,7 +545,8 @@ public class CreateGameService {
     private static Guild getServerWithMostCapacity() {
         List<Guild> guilds = JdaService.serversToCreateNewGamesOn.stream()
                 .filter(CreateGameService::serverHasRoomForNewFullCategory)
-                .sorted(Comparator.comparing(CreateGameService::getServerCapacityForNewGames))
+                .sorted(Comparator.comparing(CreateGameService::getServerCapacityForNewGames)
+                        .reversed())
                 .toList();
 
         if (guilds.isEmpty() && serverHasRoomForNewFullCategory(JdaService.guildPrimary)) {
@@ -562,14 +563,15 @@ public class CreateGameService {
                 .map(g -> g.getName() + ": " + getServerCapacityForNewGames(g))
                 .collect(Collectors.joining("\n"));
         BotLogger.info("Server Game Capacity Check:\n" + debugText);
-        return guilds.getLast();
+        return guilds.getFirst();
     }
 
     @Nullable
     static Guild getServerWithMostCapacityForNewGame() {
         List<Guild> guilds = JdaService.serversToCreateNewGamesOn.stream()
                 .filter(guild -> getServerCapacityForNewGames(guild) > 0)
-                .sorted(Comparator.comparing(CreateGameService::getServerCapacityForNewGames))
+                .sorted(Comparator.comparing(CreateGameService::getServerCapacityForNewGames)
+                        .reversed())
                 .toList();
 
         if (guilds.isEmpty() && getServerCapacityForNewGames(JdaService.guildPrimary) > 0) {
@@ -586,7 +588,7 @@ public class CreateGameService {
                 .map(g -> g.getName() + ": " + getServerCapacityForNewGames(g))
                 .collect(Collectors.joining("\n"));
         BotLogger.info("Server Single Game Capacity Check:\n" + debugText);
-        return guilds.getLast();
+        return guilds.getFirst();
     }
 
     public static boolean serverCanHostNewGame(Guild guild) {
