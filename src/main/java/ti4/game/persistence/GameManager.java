@@ -15,6 +15,8 @@ import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.logging.BotLogger;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class GameManager {
@@ -83,6 +85,9 @@ public class GameManager {
     }
 
     public static boolean save(Game game, String reason) {
+        if (!mayMutate(game, reason)) {
+            return false;
+        }
         validGameNames.add(game.getName());
         boolean wasActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
                 .map(ManagedGame::isActive)
@@ -99,6 +104,22 @@ public class GameManager {
             JdaService.updatePresence();
         }
         return true;
+    }
+
+    private static boolean mayMutate(Game game, String reason) {
+        try {
+            ActiveLeaseService activeLeaseService = SpringContext.getBean(ActiveLeaseService.class);
+            if (activeLeaseService.mayMutate()) {
+                return true;
+            }
+            String gameName = game == null ? "unknown" : game.getName();
+            BotLogger.warning("Rejected game save because this instance does not own the active lease. Game: `"
+                    + gameName + "` Reason: " + reason);
+            return false;
+        } catch (IllegalStateException e) {
+            // Spring may not be initialized in some startup or test paths; preserve legacy behavior there.
+            return true;
+        }
     }
 
     public static boolean delete(String gameName) {

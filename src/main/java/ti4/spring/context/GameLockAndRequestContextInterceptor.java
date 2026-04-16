@@ -12,11 +12,15 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 import ti4.executors.ExecutionLockManager;
 import ti4.game.persistence.GameManager;
+import ti4.logging.BotLogger;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @Component
+@lombok.RequiredArgsConstructor
 public class GameLockAndRequestContextInterceptor implements HandlerInterceptor {
 
     private static final List<String> MUTATION_METHODS = List.of("PUT", "POST", "PATCH", "DELETE");
+    private final ActiveLeaseService activeLeaseService;
 
     @Override
     public boolean preHandle(
@@ -76,8 +80,14 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
             var game = RequestContext.getGame();
             if (game != null) {
                 if (exception == null && RequestContext.shouldSaveGame()) {
-                    var player = RequestContext.getPlayer();
-                    GameManager.save(game, player.getUserName() + " called " + request.getRequestURI());
+                    if (activeLeaseService.mayMutate()) {
+                        var player = RequestContext.getPlayer();
+                        GameManager.save(game, player.getUserName() + " called " + request.getRequestURI());
+                    } else {
+                        BotLogger.warning(
+                                "Skipped web mutation save because this instance no longer owns the active lease. "
+                                        + request.getRequestURI());
+                    }
                 }
 
                 unlockGame(game.getName());
