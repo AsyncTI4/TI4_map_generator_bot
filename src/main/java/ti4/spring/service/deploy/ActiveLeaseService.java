@@ -1,7 +1,6 @@
 package ti4.spring.service.deploy;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,8 +24,6 @@ public class ActiveLeaseService {
     private final AtomicBoolean ready = new AtomicBoolean(false);
     private final AtomicBoolean leaseParticipationEnabled = new AtomicBoolean(true);
 
-    private volatile Instant drainStartedAt;
-
     @PostConstruct
     void acquireOnStartup() {
         boolean acquired = tryAcquireLease();
@@ -36,11 +33,6 @@ public class ActiveLeaseService {
         } else {
             BotLogger.warning("Did not acquire active lease on startup for instance " + instanceId);
         }
-    }
-
-    @PreDestroy
-    void releaseOnShutdown() {
-        releaseLease();
     }
 
     @Transactional
@@ -104,8 +96,8 @@ public class ActiveLeaseService {
         leaseParticipationEnabled.set(false);
         instanceActivityService.setDraining(true);
         setReady(false);
-        drainStartedAt = Instant.now();
         BotLogger.info("Drain requested for active instance " + instanceId);
+        Thread.ofPlatform().name("bot-drain-shutdown").start(SpringContext::closeApplicationContext);
         return true;
     }
 
@@ -138,22 +130,6 @@ public class ActiveLeaseService {
             setReady(true);
             BotLogger.info("Inactive instance acquired active lease: " + instanceId);
         }
-    }
-
-    @Scheduled(fixedDelay = 1000)
-    void finishDrainIfNeeded() {
-        Instant startedAt = drainStartedAt;
-        if (!instanceActivityService.isDraining() || startedAt == null) {
-            return;
-        }
-
-        if (Instant.now().isBefore(startedAt.plusMillis(leaseProperties.getDrainMillis()))) {
-            return;
-        }
-
-        releaseLease();
-        drainStartedAt = null;
-        BotLogger.info("Finished drain and released active lease for instance " + instanceId);
     }
 
     private ActiveLeaseEntity buildLease(Instant now) {

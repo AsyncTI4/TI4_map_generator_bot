@@ -61,6 +61,7 @@ import ti4.service.draft.SliceGenerationPipeline;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
+import ti4.spring.context.SpringContext;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
@@ -585,6 +586,8 @@ public class JdaService {
             }
             CronManager.shutdown(); // will wait for up to an additional 20 seconds
             LogBufferManager.sendBufferedLogsToDiscord(); // will drain the log buffer and doesn't have a timeout
+            SpringContext.getBean(ActiveLeaseService.class).releaseLease();
+            BotLogger.info("RELEASED ACTIVE LEASE");
             BotLogger.info("SHUTDOWN PROCESS COMPLETE");
             TimeUnit.SECONDS.sleep(1); // wait for BotLogger
             jda.shutdown();

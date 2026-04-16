@@ -9,7 +9,7 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 class DisableBot extends Subcommand {
 
     DisableBot() {
-        super("disable_bot", "Drain this bot process and release the active lease after a short wait.");
+        super("disable_bot", "Drain this bot process and shut it down.");
     }
 
     @Override
@@ -19,6 +19,7 @@ class DisableBot extends Subcommand {
             MessageHelper.sendMessageToEventChannel(event, "This bot process is not active or is already draining.");
             return;
         }
-        MessageHelper.sendMessageToEventChannel(event, "Bot is draining and will release the active lease shortly.");
+        MessageHelper.sendMessageToEventChannel(
+                event, "Bot is draining now and will release the active lease when shutdown completes.");
     }
 }
