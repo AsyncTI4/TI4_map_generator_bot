@@ -37,7 +37,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -94,9 +93,6 @@ class GameLoadService {
     private static final Pattern PATTERN = Pattern.compile("—");
     private static final String GAME_FILE_EXTENSION = Constants.TXT;
 
-    /**
-     * Returns game names from filenames only, avoiding a full parse of every saved game during startup.
-     */
     static List<String> loadManagedGameNames() {
         try (Stream<Path> pathStream = Files.list(Storage.getGamesDirectory().toPath())) {
             return pathStream
@@ -111,36 +107,6 @@ class GameLoadService {
         return Collections.emptyList();
     }
 
-    static List<ManagedGame> loadManagedGames() {
-        try (Stream<Path> pathStream = Files.list(Storage.getGamesDirectory().toPath())) {
-            return pathStream
-                    .parallel()
-                    .filter(path -> path.toString().toLowerCase().endsWith(GAME_FILE_EXTENSION))
-                    .map(GameLoadService::loadManagedGame)
-                    .filter(Objects::nonNull)
-                    .toList();
-        } catch (IOException e) {
-            BotLogger.critical("Exception occurred while getting all game names.", e);
-        }
-        return Collections.emptyList();
-    }
-
-    private static ManagedGame loadManagedGame(Path path) {
-        File file = path.toFile();
-        try {
-            Game game = readGame(file);
-
-            if (game == null || game.getName() == null) {
-                BotLogger.critical("Could not load Managed Game. Game or game name is null: " + file.getName());
-                return null;
-            }
-            return new ManagedGame(game);
-        } catch (Exception e) {
-            BotLogger.critical("Could not load game: " + file.getName(), e);
-        }
-        return null;
-    }
-
     @Nullable
     public static Game load(String gameName) {
         return GameFileLockManager.wrapWithReadLock(gameName, () -> {
@@ -152,24 +118,13 @@ class GameLoadService {
         });
     }
 
-    /**
-     * Loads one game's lightweight managed metadata from disk for lazy or background warmup paths.
-     */
     @Nullable
     static ManagedGame loadManagedGame(String gameName) {
-        return loadManagedGame(gameName, ManagedGameLoadMode.WARMUP);
-    }
-
-    /**
-     * Loads one game's managed metadata using the requested retention mode for the parsed Game.
-     */
-    @Nullable
-    static ManagedGame loadManagedGame(String gameName, ManagedGameLoadMode loadMode) {
         Game game = load(gameName);
         if (game == null) {
             return null;
         }
-        return new ManagedGame(game, loadMode);
+        return new ManagedGame(game);
     }
 
     private static String stripGameFileExtension(String fileName) {
