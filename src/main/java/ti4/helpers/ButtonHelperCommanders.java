@@ -869,11 +869,23 @@ public class ButtonHelperCommanders {
         String planet = buttonID.split("_")[1];
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         Tile tile = game.getTileFromPlanet(planet);
+        List<Player> playersToNotify = game.isFowMode()
+                ? game.getRealPlayersExcludingThis(player).stream()
+                        .filter(p2 -> FoWHelper.playerHasUnitsOnPlanet(p2, tile, planet))
+                        .toList()
+                : List.of();
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planet);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getFactionEmoji() + " placed 1 infantry on " + Helper.getPlanetRepresentation(planet, game)
                         + " using Claire Gibson, the Sol Commander.");
+        for (Player p2 : playersToNotify) {
+            MessageHelper.sendPrivateMessageToPlayer(
+                    p2,
+                    game,
+                    player.getFactionEmoji() + " placed 1 infantry on " + Helper.getPlanetRepresentation(planet, game)
+                            + " using Claire Gibson, the Sol Commander.");
+        }
     }
 
     @ButtonHandler("utilizeMykoBT_")
@@ -901,6 +913,7 @@ public class ButtonHelperCommanders {
             Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
         Tile tile = game.getTileFromPlanet(planet);
+        Player destroyedPlayer = null;
         for (Player p2 : game.getPlayers().values()) {
             if (p2.getColor() == null
                     || p2 == player
@@ -910,6 +923,7 @@ public class ButtonHelperCommanders {
             if (FoWHelper.playerHasInfantryOnPlanet(p2, tile, planet)
                     && !player.getAllianceMembers().contains(p2.getFaction())) {
                 DestroyUnitService.destroyUnits(event, tile, game, p2.getColor(), "1 infantry " + planet, true);
+                destroyedPlayer = p2;
                 break;
             }
         }
@@ -917,6 +931,14 @@ public class ButtonHelperCommanders {
                 event.getMessageChannel(),
                 player.getFactionEmoji() + " destroyed 1 opposing infantry on "
                         + Helper.getPlanetRepresentation(planet, game) + " using the Avhkan, the Pharad’n commander.");
+        if (game.isFowMode() && destroyedPlayer != null) {
+            MessageHelper.sendPrivateMessageToPlayer(
+                    destroyedPlayer,
+                    game,
+                    player.getFactionEmoji() + " destroyed 1 of your infantry on "
+                            + Helper.getPlanetRepresentation(planet, game)
+                            + " using the Avhkan, the Pharad’n commander.");
+        }
     }
 
     @ButtonHandler("yssarilcommander_")
