@@ -7,12 +7,16 @@ import ti4.helpers.DateTimeHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.service.game.GameNameService;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 interface ListenerInterface {
 
     long DELAY_THRESHOLD_MILLISECONDS = 2000;
 
     default boolean canReceiveCommands(GenericCommandInteractionEvent event) {
+        if (!ActiveLeaseService.shouldHandleCurrentProcessInteraction()) {
+            return false;
+        }
         if (!JdaService.isReadyToReceiveCommands()
                 && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
             event.getInteraction()
