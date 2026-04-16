@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.logging.BotLogger;
@@ -22,6 +23,9 @@ public class ActiveLeaseService {
 
     private final String instanceId = UUID.randomUUID().toString();
     private final AtomicBoolean ready = new AtomicBoolean(false);
+    private final AtomicBoolean leaseParticipationEnabled = new AtomicBoolean(true);
+
+    private volatile Instant drainStartedAt;
 
     @PostConstruct
     void acquireOnStartup() {
@@ -52,6 +56,7 @@ public class ActiveLeaseService {
 
         activeLeaseRepository.save(buildLease(now));
         instanceActivityService.setActive(true);
+        instanceActivityService.setDraining(false);
         return true;
     }
 
@@ -91,8 +96,64 @@ public class ActiveLeaseService {
         this.ready.set(ready);
     }
 
+    public boolean requestDrain() {
+        if (!instanceActivityService.isActive() || instanceActivityService.isDraining()) {
+            return false;
+        }
+
+        leaseParticipationEnabled.set(false);
+        instanceActivityService.setDraining(true);
+        setReady(false);
+        drainStartedAt = Instant.now();
+        BotLogger.info("Drain requested for active instance " + instanceId);
+        return true;
+    }
+
     public String currentInstanceId() {
         return instanceId;
+    }
+
+    @Scheduled(fixedDelayString = "#{@leaseProperties.heartbeatIntervalMillis}")
+    void maintainLease() {
+        if (instanceActivityService.isDraining()) {
+            return;
+        }
+
+        if (instanceActivityService.isActive()) {
+            if (stillOwnsLease()) {
+                renewLease();
+            } else {
+                BotLogger.warning("Active instance lost lease ownership: " + instanceId);
+                setReady(false);
+                instanceActivityService.setActive(false);
+            }
+            return;
+        }
+
+        if (!leaseParticipationEnabled.get()) {
+            return;
+        }
+
+        if (tryAcquireLease()) {
+            setReady(true);
+            BotLogger.info("Inactive instance acquired active lease: " + instanceId);
+        }
+    }
+
+    @Scheduled(fixedDelay = 1000)
+    void finishDrainIfNeeded() {
+        Instant startedAt = drainStartedAt;
+        if (!instanceActivityService.isDraining() || startedAt == null) {
+            return;
+        }
+
+        if (Instant.now().isBefore(startedAt.plusMillis(leaseProperties.getDrainMillis()))) {
+            return;
+        }
+
+        releaseLease();
+        drainStartedAt = null;
+        BotLogger.info("Finished drain and released active lease for instance " + instanceId);
     }
 
     private ActiveLeaseEntity buildLease(Instant now) {
