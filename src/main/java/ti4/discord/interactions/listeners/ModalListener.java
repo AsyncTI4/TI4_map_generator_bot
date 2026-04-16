@@ -17,6 +17,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.logging.RollbarManager;
 import ti4.service.game.GameNameService;
+import ti4.spring.service.deploy.InstanceActivityService;
 
 final class ModalListener extends ListenerAdapter {
 
@@ -35,6 +36,9 @@ final class ModalListener extends ListenerAdapter {
 
     @Override
     public void onModalInteraction(@Nonnull ModalInteractionEvent event) {
+        if (!InstanceActivityService.shouldHandleCurrentProcessInteraction()) {
+            return;
+        }
         if (!JdaService.isReadyToReceiveCommands()) {
             event.reply("Please try again in a moment. The bot is not ready to handle button presses.")
                     .setEphemeral(true)

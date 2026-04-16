@@ -9,11 +9,13 @@ import ti4.executors.ExecutorServiceManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.async.RoleService;
+import ti4.spring.service.deploy.InstanceActivityService;
 
 class UserJoinServerListener extends ListenerAdapter {
 
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
+        if (!InstanceActivityService.shouldHandleCurrentProcessInteraction()) return;
         if (!validateEvent(event)) return;
         ExecutorServiceManager.runAsync("UserJoinServerListener task", () -> handleGuildMemberJoin(event));
     }

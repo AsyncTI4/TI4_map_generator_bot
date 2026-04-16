@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInterac
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.discord.JdaService;
 import ti4.executors.ExecutorServiceManager;
+import ti4.spring.service.deploy.InstanceActivityService;
 
 class AutoCompleteListener extends ListenerAdapter {
 
@@ -12,6 +13,9 @@ class AutoCompleteListener extends ListenerAdapter {
 
     @Override
     public void onCommandAutoCompleteInteraction(@Nonnull CommandAutoCompleteInteractionEvent event) {
+        if (!InstanceActivityService.shouldHandleCurrentProcessInteraction()) {
+            return;
+        }
         if (!JdaService.isReadyToReceiveCommands()
                 && !event.getInteraction().getFullCommandName().startsWith("developer")) {
             return;

@@ -2,6 +2,7 @@ package ti4.spring.service.deploy;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.springframework.stereotype.Service;
+import ti4.spring.context.SpringContext;
 
 @Service
 public class InstanceActivityService {
@@ -26,5 +27,21 @@ public class InstanceActivityService {
 
     public void setDraining(boolean draining) {
         this.draining.set(draining);
+    }
+
+    public boolean shouldHandleDiscordInteraction() {
+        return isActive() && !isDraining();
+    }
+
+    /**
+     * Returns whether the current process should handle a Discord interaction, defaulting to false when Spring is not
+     * initialized.
+     */
+    public static boolean shouldHandleCurrentProcessInteraction() {
+        try {
+            return SpringContext.getBean(InstanceActivityService.class).shouldHandleDiscordInteraction();
+        } catch (IllegalStateException e) {
+            return false;
+        }
     }
 }
