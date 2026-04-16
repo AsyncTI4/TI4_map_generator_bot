@@ -97,12 +97,15 @@ public class RecreateGameService {
 
     @Nullable
     static Guild resolveTargetGuild(Game game, @Nullable Guild preferredGuild) {
-        Guild limboGuild = getGuildForExistingChannels(game, true);
+        TextChannel mainChannel = game.getMainGameChannel();
+        TextChannel tableTalkChannel = game.getTableTalkChannel();
+
+        Guild limboGuild = getGuildForExistingChannels(mainChannel, tableTalkChannel, true);
         if (limboGuild != null) {
             return limboGuild;
         }
 
-        Guild existingChannelGuild = getGuildForExistingChannels(game, false);
+        Guild existingChannelGuild = getGuildForExistingChannels(mainChannel, tableTalkChannel, false);
         if (existingChannelGuild != null) {
             return existingChannelGuild;
         }
@@ -333,13 +336,11 @@ public class RecreateGameService {
     }
 
     @Nullable
-    private static Guild getGuildForExistingChannels(Game game, boolean onlyLimboChannels) {
-        TextChannel mainChannel = game.getMainGameChannel();
+    private static Guild getGuildForExistingChannels(
+            @Nullable TextChannel mainChannel, @Nullable TextChannel tableTalkChannel, boolean onlyLimboChannels) {
         if (mainChannel != null && (!onlyLimboChannels || isInLimbo(mainChannel))) {
             return mainChannel.getGuild();
         }
-
-        TextChannel tableTalkChannel = game.getTableTalkChannel();
         if (tableTalkChannel != null && (!onlyLimboChannels || isInLimbo(tableTalkChannel))) {
             return tableTalkChannel.getGuild();
         }
