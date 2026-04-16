@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
-import ti4.game.persistence.ManagedGame;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.service.game.RecreateGameService;
@@ -22,17 +21,12 @@ class RecreateGame extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String gameName = event.getOption(Constants.GAME_NAME, OptionMapping::getAsString);
-        if (gameName == null || !GameManager.isValid(gameName)) {
+        if (!GameManager.isValid(gameName)) {
             MessageHelper.replyToMessage(event, "Invalid game name.");
             return;
         }
+        Game game = GameManager.getManagedGame(gameName).getGame();
 
-        ManagedGame managedGame = GameManager.getManagedGame(gameName);
-        if (managedGame == null) {
-            MessageHelper.replyToMessage(event, "Game could not be loaded.");
-            return;
-        }
-        Game game = managedGame.getGame();
         Guild guild = game.getGuild() != null ? game.getGuild() : event.getGuild();
         if (guild == null) {
             MessageHelper.replyToMessage(event, "Could not determine which guild should host this game.");
