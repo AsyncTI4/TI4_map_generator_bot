@@ -17,7 +17,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
@@ -91,10 +90,6 @@ public class RecreateGameService {
         Helper.fixGameChannelPermissions(targetGuild, game);
         List<String> missingPlayers = collectMissingPlayers(game, targetGuild);
         result.getMissingPlayers().addAll(missingPlayers);
-
-        if (!GameManager.save(game, "Recreated game resources")) {
-            result.addNote("Game save failed after recreation.");
-        }
         pingGame(game, result);
         return result;
     }

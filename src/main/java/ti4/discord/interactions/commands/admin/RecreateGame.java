@@ -1,30 +1,22 @@
 package ti4.discord.interactions.commands.admin;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import ti4.discord.interactions.commands.Subcommand;
-import ti4.game.Game;
-import ti4.game.persistence.GameManager;
+import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.service.game.RecreateGameService;
 
-class RecreateGame extends Subcommand {
+class RecreateGame extends GameStateSubcommand {
 
     RecreateGame() {
-        super(Constants.RECREATE_GAME, "Recreate a game's channels and roles.");
+        super(Constants.RECREATE_GAME, "Recreate a game's channels and roles.", true, false);
         addOption(OptionType.STRING, Constants.GAME_NAME, "Game to recreate", true, true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String gameName = event.getOption(Constants.GAME_NAME, OptionMapping::getAsString);
-        if (!GameManager.isValid(gameName)) {
-            MessageHelper.replyToMessage(event, "Invalid game name.");
-            return;
-        }
-        Game game = GameManager.getManagedGame(gameName).getGame();
+        var game = getGame();
         RecreateGameService.RecreateGameResult result = RecreateGameService.recreateGame(game);
         MessageHelper.replyToMessage(event, result.getSummary());
     }
