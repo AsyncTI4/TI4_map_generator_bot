@@ -48,8 +48,11 @@ public class LocalDevelopmentSampleGameService {
                 System.getenv(ENV_VAR_LOCAL_DEV_STARTUP), System.getenv(ENV_VAR_LOCAL_DEV_SOURCE_GAME));
     }
 
-    static String getStartupSourceGameName(@Nullable String localDevelopmentStartupValue, @Nullable String sourceGameName) {
-        if (!isLocalDevelopmentStartup(localDevelopmentStartupValue) || sourceGameName == null || sourceGameName.isBlank()) {
+    static String getStartupSourceGameName(
+            @Nullable String localDevelopmentStartupValue, @Nullable String sourceGameName) {
+        if (!isLocalDevelopmentStartup(localDevelopmentStartupValue)
+                || sourceGameName == null
+                || sourceGameName.isBlank()) {
             return DEFAULT_SOURCE_GAME_NAME;
         }
         return sourceGameName;
