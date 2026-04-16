@@ -273,11 +273,12 @@ public class JdaService {
         initializeWhitelistedRoles();
         TIGLHelper.validateTIGLness();
 
-        jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
+        jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Indexing Game Names"));
 
-        BotLogger.info("LOADING GAMES");
+        BotLogger.info("INDEXING GAME NAMES");
         GameManager.initialize();
-        BotLogger.info("FINISHED LOADING GAMES");
+        BotLogger.info("FINISHED INDEXING GAME NAMES");
+        BotLogger.info("STARTED BACKGROUND MANAGED GAME WARMUP");
 
         if (DataMigrationManager.runMigrations()) {
             BotLogger.info("FINISHED RUNNING MIGRATIONS");
@@ -305,7 +306,11 @@ public class JdaService {
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
         BotLogger.info("BOT IS READY TO RECEIVE COMMANDS");
-        updatePresence();
+        if (GameManager.isManagedGamesWarmupComplete()) {
+            updatePresence();
+        } else {
+            jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.customStatus("Warming game index"));
+        }
     }
 
     private static Guild tryToInitGuild(String guildID, boolean addToNewGameServerList) {

@@ -7,22 +7,38 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.discord.JdaService;
+import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.logging.BotLogger;
 
 @UtilityClass
 public class GameManager {
 
+    private static final Set<String> validGameNames = ConcurrentHashMap.newKeySet();
     private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame =
             new ConcurrentHashMap<>(); // TODO: We can evaluate dropping the managed objects entirely
     private static final ConcurrentMap<String, ManagedPlayer> userIdToManagedPlayer = new ConcurrentHashMap<>();
+    private static final AtomicBoolean managedGamesWarmupComplete = new AtomicBoolean(false);
 
+    /**
+     * Loads the authoritative game-name index synchronously, then warms managed-game metadata in the background.
+     */
     public static void initialize() {
-        GameLoadService.loadManagedGames()
-                .forEach(managedGame -> gameNameToManagedGame.put(managedGame.getName(), managedGame));
+        validGameNames.clear();
+        gameNameToManagedGame.clear();
+        userIdToManagedPlayer.clear();
+        managedGamesWarmupComplete.set(false);
+
+        validGameNames.addAll(GameLoadService.loadManagedGameNames());
+        if (JdaService.testingMode) {
+            return;
+        }
+        ExecutorServiceManager.runAsync("GameManager managed game warmup", GameManager::warmupManagedGames);
     }
 
     private static Game load(String gameName) {
@@ -46,6 +62,7 @@ public class GameManager {
         if (!isValid(gameName)) {
             return null;
         }
+        ensureManagedGameLoaded(gameName);
         Game game = load(gameName);
         if (game == null) {
             handleManagedGameRemoval(gameName);
@@ -54,6 +71,7 @@ public class GameManager {
     }
 
     private static void handleManagedGameRemoval(String gameName) {
+        validGameNames.remove(gameName);
         var managedGame = gameNameToManagedGame.remove(gameName);
         if (managedGame != null) {
             managedGame.getPlayers().forEach(player -> player.getGames().remove(managedGame));
@@ -61,10 +79,11 @@ public class GameManager {
     }
 
     public static boolean isValid(String gameName) {
-        return gameName != null && gameNameToManagedGame.containsKey(gameName);
+        return gameName != null && validGameNames.contains(gameName);
     }
 
     public static boolean save(Game game, String reason) {
+        validGameNames.add(game.getName());
         boolean wasActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
                 .map(ManagedGame::isActive)
                 .orElse(false);
@@ -123,30 +142,35 @@ public class GameManager {
     }
 
     public static List<String> getGameNames() {
-        return new ArrayList<>(gameNameToManagedGame.keySet());
+        return new ArrayList<>(validGameNames);
     }
 
     public static int getGameCount() {
-        return gameNameToManagedGame.size();
+        return validGameNames.size();
     }
 
     public static long getActiveGameCount() {
-        return getManagedGames().stream().filter(ManagedGame::isActive).count();
+        return gameNameToManagedGame.values().stream()
+                .filter(ManagedGame::isActive)
+                .count();
     }
 
     public static ManagedGame getManagedGame(String gameName) {
-        return gameNameToManagedGame.get(gameName);
+        return ensureManagedGameLoaded(gameName);
     }
 
     public static List<ManagedGame> getManagedGames() {
+        ensureAllManagedGamesLoaded();
         return new ArrayList<>(gameNameToManagedGame.values());
     }
 
     public static ManagedPlayer getManagedPlayer(String playerId) {
+        ensureAllManagedGamesLoaded();
         return userIdToManagedPlayer.get(playerId);
     }
 
     public static Set<ManagedPlayer> getManagedPlayers() {
+        ensureAllManagedGamesLoaded();
         return new HashSet<>(userIdToManagedPlayer.values());
     }
 
@@ -159,5 +183,65 @@ public class GameManager {
         }
         managedPlayer.addOrReplaceGame(game, player);
         return managedPlayer;
+    }
+
+    /**
+     * Returns whether the background pass that materializes all managed games has finished.
+     */
+    public static boolean isManagedGamesWarmupComplete() {
+        return managedGamesWarmupComplete.get();
+    }
+
+    /**
+     * Ensures a single valid game has a ManagedGame entry, loading it lazily on first access.
+     */
+    private static ManagedGame ensureManagedGameLoaded(String gameName) {
+        return ensureManagedGameLoaded(gameName, ManagedGameLoadMode.LAZY_REQUEST);
+    }
+
+    /**
+     * Materializes managed metadata for one game, choosing whether the parsed Game is retained for immediate reuse.
+     */
+    private static ManagedGame ensureManagedGameLoaded(String gameName, ManagedGameLoadMode loadMode) {
+        if (!isValid(gameName)) {
+            return null;
+        }
+        return gameNameToManagedGame.computeIfAbsent(gameName, key -> loadManagedGame(key, loadMode));
+    }
+
+    @Nullable
+    private static ManagedGame loadManagedGame(String gameName, ManagedGameLoadMode loadMode) {
+        ManagedGame managedGame = GameLoadService.loadManagedGame(gameName, loadMode);
+        if (managedGame == null) {
+            handleManagedGameRemoval(gameName);
+        }
+        return managedGame;
+    }
+
+    /**
+     * Blocks until every indexed game has managed metadata, for callers that require a complete global view.
+     */
+    private static void ensureAllManagedGamesLoaded() {
+        if (managedGamesWarmupComplete.get()) {
+            return;
+        }
+        validGameNames.forEach(gameName -> ensureManagedGameLoaded(gameName, ManagedGameLoadMode.WARMUP));
+        managedGamesWarmupComplete.compareAndSet(false, true);
+    }
+
+    /**
+     * Background task that hydrates ManagedGame entries and player indexes for every known game.
+     */
+    private static void warmupManagedGames() {
+        try {
+            validGameNames.forEach(gameName -> ensureManagedGameLoaded(gameName, ManagedGameLoadMode.WARMUP));
+        } catch (Exception e) {
+            BotLogger.critical("Failed during managed game warmup.", e);
+        } finally {
+            managedGamesWarmupComplete.set(true);
+            if (JdaService.jda != null) {
+                JdaService.updatePresence();
+            }
+        }
     }
 }
