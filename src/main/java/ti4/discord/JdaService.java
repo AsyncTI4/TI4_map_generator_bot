@@ -279,7 +279,11 @@ public class JdaService {
         BotLogger.info("INDEXING GAME NAMES");
         GameManager.initialize();
         BotLogger.info("FINISHED INDEXING GAME NAMES");
-        BotLogger.info("STARTED BACKGROUND MANAGED GAME WARMUP");
+        if (GameManager.startManagedGamesWarmupIfNeeded()) {
+            BotLogger.info("STARTED BACKGROUND MANAGED GAME WARMUP");
+        } else {
+            BotLogger.info("DEFERRED BACKGROUND MANAGED GAME WARMUP UNTIL THIS PROCESS BECOMES ACTIVE");
+        }
 
         if (DataMigrationManager.runMigrations()) {
             BotLogger.info("FINISHED RUNNING MIGRATIONS");

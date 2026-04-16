@@ -25,6 +25,8 @@ public class GameManager {
     private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame =
             new ConcurrentHashMap<>(); // TODO: We can evaluate dropping the managed objects entirely
     private static final ConcurrentMap<String, ManagedPlayer> userIdToManagedPlayer = new ConcurrentHashMap<>();
+    private static final AtomicBoolean gameNamesIndexed = new AtomicBoolean(false);
+    private static final AtomicBoolean managedGamesWarmupStarted = new AtomicBoolean(false);
     private static final AtomicBoolean managedGamesWarmupComplete = new AtomicBoolean(false);
 
     /**
@@ -34,13 +36,29 @@ public class GameManager {
         validGameNames.clear();
         gameNameToManagedGame.clear();
         userIdToManagedPlayer.clear();
+        gameNamesIndexed.set(false);
+        managedGamesWarmupStarted.set(false);
         managedGamesWarmupComplete.set(false);
 
         validGameNames.addAll(GameLoadService.loadManagedGameNames());
+        gameNamesIndexed.set(true);
         if (JdaService.testingMode) {
             return;
         }
+    }
+
+    /**
+     * Starts the background managed-game warmup once game names are indexed and only if it has not already begun.
+     */
+    public static boolean startManagedGamesWarmupIfNeeded() {
+        if (JdaService.testingMode || !gameNamesIndexed.get() || managedGamesWarmupComplete.get()) {
+            return false;
+        }
+        if (!managedGamesWarmupStarted.compareAndSet(false, true)) {
+            return false;
+        }
         ExecutorServiceManager.runAsync("GameManager managed game warmup", GameManager::warmupManagedGames);
+        return true;
     }
 
     private static Game load(String gameName) {

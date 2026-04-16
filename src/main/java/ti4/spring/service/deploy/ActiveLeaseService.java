@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ti4.game.persistence.GameManager;
 import ti4.logging.BotLogger;
 import ti4.spring.context.SpringContext;
 
@@ -55,6 +56,7 @@ public class ActiveLeaseService {
         activeLeaseRepository.save(buildLease(now));
         setActive(true);
         setDraining(false);
+        GameManager.startManagedGamesWarmupIfNeeded();
         return true;
     }
 
@@ -152,6 +154,20 @@ public class ActiveLeaseService {
         return instanceId;
     }
 
+    /** Returns a log prefix for non-serving process states, or an empty string for the active serving instance. */
+    public String currentProcessLogPrefix() {
+        if (shouldServeTraffic()) {
+            return "";
+        }
+        if (isDraining()) {
+            return "[DRAINING " + shortInstanceId() + "] ";
+        }
+        if (!isActive()) {
+            return "[STANDBY " + shortInstanceId() + "] ";
+        }
+        return "[WARMING " + shortInstanceId() + "] ";
+    }
+
     @Scheduled(fixedDelayString = "#{@leaseProperties.heartbeatIntervalMillis}")
     void maintainLease() {
         if (isDraining()) {
@@ -236,5 +252,18 @@ public class ActiveLeaseService {
         } catch (IllegalStateException e) {
             return false;
         }
+    }
+
+    /** Returns a log prefix for non-serving process states, defaulting to startup when Spring is unavailable. */
+    public static String getCurrentProcessLogPrefix() {
+        try {
+            return SpringContext.getBean(ActiveLeaseService.class).currentProcessLogPrefix();
+        } catch (IllegalStateException e) {
+            return "[STARTUP] ";
+        }
+    }
+
+    private String shortInstanceId() {
+        return instanceId.substring(0, 8);
     }
 }
