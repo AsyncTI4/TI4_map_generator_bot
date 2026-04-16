@@ -52,23 +52,28 @@ class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void isLocalDevelopmentStartupAcceptsOptionalNonGuildSourceArgument() {
-        assertTrue(
-                LocalDevelopmentSampleGameService.isLocalDevelopmentStartup(new String[] {"token", "user", "guild"}));
-        assertTrue(LocalDevelopmentSampleGameService.isLocalDevelopmentStartup(
-                new String[] {"token", "user", "guild", "pbd15036"}));
-        assertFalse(LocalDevelopmentSampleGameService.isLocalDevelopmentStartup(
-                new String[] {"token", "user", "guild", "123456789"}));
+    void isLocalDevelopmentStartupRequiresExplicitOptIn() {
+        String[] args = {"token", "user", "guild"};
+
+        assertFalse(LocalDevelopmentSampleGameService.isLocalDevelopmentStartup(args, null));
+        assertFalse(LocalDevelopmentSampleGameService.isLocalDevelopmentStartup(args, "false"));
+        assertTrue(LocalDevelopmentSampleGameService.isLocalDevelopmentStartup(args, "true"));
     }
 
     @Test
-    void startupSourceGameDefaultsAndRespectsOverride() {
+    void startupSourceGameDefaultsAndRespectsEnvOverride() {
         assertEquals(
                 LocalDevelopmentSampleGameService.DEFAULT_SOURCE_GAME_NAME,
-                LocalDevelopmentSampleGameService.getStartupSourceGameName(new String[] {"token", "user", "guild"}));
-        assertEquals("pbd42", LocalDevelopmentSampleGameService.getStartupSourceGameName(new String[] {
-            "token", "user", "guild", "pbd42"
-        }));
+                LocalDevelopmentSampleGameService.getStartupSourceGameName(
+                        new String[] {"token", "user", "guild"}, "true", null));
+        assertEquals(
+                "pbd42",
+                LocalDevelopmentSampleGameService.getStartupSourceGameName(
+                        new String[] {"token", "user", "guild"}, "true", "pbd42"));
+        assertEquals(
+                LocalDevelopmentSampleGameService.DEFAULT_SOURCE_GAME_NAME,
+                LocalDevelopmentSampleGameService.getStartupSourceGameName(
+                        new String[] {"token", "user", "guild"}, "false", "pbd42"));
     }
 
     @Test

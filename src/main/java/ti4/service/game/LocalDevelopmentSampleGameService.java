@@ -29,12 +29,18 @@ import ti4.logging.BotLogger;
 public class LocalDevelopmentSampleGameService {
 
     public static final String DEFAULT_SOURCE_GAME_NAME = "pbd15036";
+    public static final String ENV_VAR_LOCAL_DEV_STARTUP = "LOCAL_DEV_STARTUP";
+    public static final String ENV_VAR_LOCAL_DEV_SOURCE_GAME = "LOCAL_DEV_SOURCE_GAME";
     // Game save files begin with owner-id, owner-name, then game-name.
     private static final int GAME_NAME_LINE_INDEX = 2;
     private static final int MIN_GAME_FILE_LINES = GAME_NAME_LINE_INDEX + 1;
 
     public static boolean isLocalDevelopmentStartup(String[] args) {
-        if (args == null || args.length < 3 || args.length > 4) {
+        return isLocalDevelopmentStartup(args, System.getenv(ENV_VAR_LOCAL_DEV_STARTUP));
+    }
+
+    static boolean isLocalDevelopmentStartup(String[] args, @Nullable String localDevelopmentStartupValue) {
+        if (args == null || args.length < 3) {
             return false;
         }
         for (int i = 0; i < 3; i++) {
@@ -42,15 +48,22 @@ public class LocalDevelopmentSampleGameService {
                 return false;
             }
         }
-        // A numeric fourth argument is still treated as an additional guild/server id, not as a source game name.
-        return args.length == 3 || !args[3].matches("\\d+");
+        return Boolean.parseBoolean(localDevelopmentStartupValue);
     }
 
     public static String getStartupSourceGameName(String[] args) {
-        if (!isLocalDevelopmentStartup(args) || args.length < 4 || args[3] == null || args[3].isBlank()) {
+        return getStartupSourceGameName(
+                args, System.getenv(ENV_VAR_LOCAL_DEV_STARTUP), System.getenv(ENV_VAR_LOCAL_DEV_SOURCE_GAME));
+    }
+
+    static String getStartupSourceGameName(
+            String[] args, @Nullable String localDevelopmentStartupValue, @Nullable String sourceGameName) {
+        if (!isLocalDevelopmentStartup(args, localDevelopmentStartupValue)
+                || sourceGameName == null
+                || sourceGameName.isBlank()) {
             return DEFAULT_SOURCE_GAME_NAME;
         }
-        return args[3];
+        return sourceGameName;
     }
 
     @Nullable
