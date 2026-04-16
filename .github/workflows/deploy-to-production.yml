@@ -52,6 +52,14 @@ jobs:
               export GUILDID_LIST="${{ vars.GUILDID_LIST }}"
               export COMPOSE_PROJECT_NAME="ti4-bot"
               compose_file="docker-compose.production.yml"
+              rollout_plugin_path="$HOME/.docker/cli-plugins/docker-rollout"
+
+              if ! docker rollout --help >/dev/null 2>&1; then
+                mkdir -p "$(dirname "$rollout_plugin_path")"
+                curl -fsSL https://raw.githubusercontent.com/wowu/docker-rollout/v0.13/docker-rollout -o "$rollout_plugin_path"
+                chmod +x "$rollout_plugin_path"
+                docker rollout --help >/dev/null
+              fi
 
               timestamp=$(date "+%F %T.%3N")
               curl -X POST -H 'Content-Type: application/json' -d "{\"content\":\"\`$timestamp\`BUILDING DOCKER IMAGE\"}" $DISCORD_WEBHOOK_URL
