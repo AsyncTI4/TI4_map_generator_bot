@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
@@ -79,8 +80,7 @@ class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void copySourceGameToStorageCopiesFileAndUpdatesStoredGameName() throws Exception {
-        Path tempDirectory = Files.createTempDirectory("local-dev-game");
+    void copySourceGameToStorageCopiesFileAndUpdatesStoredGameName(@TempDir Path tempDirectory) throws Exception {
         Path sourcePath = tempDirectory.resolve("source.txt");
         Path targetPath = tempDirectory.resolve("target.txt");
         Files.write(sourcePath, java.util.List.of("owner-id", "owner-name", "source-game", "rest"));

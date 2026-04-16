@@ -123,6 +123,9 @@ public class LocalDevelopmentSampleGameService {
             Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
             List<String> gameFileLines = Files.readAllLines(targetPath);
             if (gameFileLines.size() < 3) {
+                BotLogger.warning(
+                        "LocalDevelopmentSampleGameService: copied test game file is malformed (expected at least 3 lines): "
+                                + targetPath);
                 return false;
             }
             gameFileLines.set(2, targetGameName);

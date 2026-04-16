@@ -37,7 +37,7 @@ public class RecreateGameService {
         RecreateGameResult result = new RecreateGameResult(game.getName());
         if (game.isFowMode()) {
             result.setStatusLine("Could not recreate game resources for `" + game.getName() + "`.");
-            result.addNote("Fog of War games are not compatible with recreate game.");
+            result.addNote("Fog of War games are not compatible with recreate game and must be recreated manually.");
             return result;
         }
 

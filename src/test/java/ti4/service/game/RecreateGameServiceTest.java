@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -47,7 +49,7 @@ class RecreateGameServiceTest extends BaseTi4Test {
         RecreateGameService.RecreateGameResult result = RecreateGameService.recreateGame(game, guild);
 
         assertEquals(
-                "Could not recreate game resources for `fow-game`.\nNotes: Fog of War games are not compatible with recreate game.",
+                "Could not recreate game resources for `fow-game`.\nNotes: Fog of War games are not compatible with recreate game and must be recreated manually.",
                 result.getSummary());
     }
 
@@ -106,10 +108,11 @@ class RecreateGameServiceTest extends BaseTi4Test {
         Guild guild = mock(Guild.class);
         when(guild.getName()).thenReturn(name);
         when(guild.getRoles())
-                .thenReturn(java.util.Collections.nCopies(roleCount, mock(net.dv8tion.jda.api.entities.Role.class)));
+                .thenReturn(
+                        new ArrayList<>(Collections.nCopies(roleCount, mock(net.dv8tion.jda.api.entities.Role.class))));
         when(guild.getChannels())
-                .thenReturn(java.util.Collections.nCopies(
-                        channelCount, mock(net.dv8tion.jda.api.entities.channel.middleman.GuildChannel.class)));
+                .thenReturn(new ArrayList<>(Collections.nCopies(
+                        channelCount, mock(net.dv8tion.jda.api.entities.channel.middleman.GuildChannel.class))));
         return guild;
     }
 }
