@@ -133,7 +133,8 @@ class SendPN extends GameStateSubcommand {
         String message = player.getRepresentation() + " sent " + CardEmojis.PN + conditionalPNName + preposition
                 + targetPlayer.getRepresentation() + ".";
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(TransactionHelper.getTradeNotificationChannel(targetPlayer, game), message);
+            MessageHelper.sendMessageToChannel(
+                    TransactionHelper.getTradeNotificationChannel(targetPlayer, game), message);
             MessageHelper.sendMessageToChannel(TransactionHelper.getTradeNotificationChannel(player, game), message);
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);

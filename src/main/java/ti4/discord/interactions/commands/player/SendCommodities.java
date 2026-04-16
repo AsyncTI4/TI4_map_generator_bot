@@ -87,7 +87,8 @@ class SendCommodities extends GameStateSubcommand {
         }
 
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(TransactionHelper.getTradeNotificationChannel(targetPlayer, game), message);
+            MessageHelper.sendMessageToChannel(
+                    TransactionHelper.getTradeNotificationChannel(targetPlayer, game), message);
 
             // Add extra message for transaction visibility
             FoWHelper.pingPlayersTransaction(game, event, player, targetPlayer, commString, null);
