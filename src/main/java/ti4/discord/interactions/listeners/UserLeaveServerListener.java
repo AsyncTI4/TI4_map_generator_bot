@@ -25,13 +25,13 @@ import ti4.message.MessageHelper;
 import ti4.service.async.BanCleanupService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.settings.users.UserSettingsManager;
-import ti4.spring.service.deploy.InstanceActivityService;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 class UserLeaveServerListener extends ListenerAdapter {
 
     @Override
     public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
-        if (!InstanceActivityService.shouldHandleCurrentProcessInteraction()) return;
+        if (!ActiveLeaseService.shouldHandleCurrentProcessInteraction()) return;
         if (!validateEvent(event)) return;
         ExecutorServiceManager.runAsync("UserLeaveServerListener task", () -> handleGuildMemberRemove(event));
     }

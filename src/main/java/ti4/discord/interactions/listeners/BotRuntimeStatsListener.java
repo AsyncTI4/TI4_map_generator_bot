@@ -9,13 +9,13 @@ import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.service.statistics.SREStats;
-import ti4.spring.service.deploy.InstanceActivityService;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 class BotRuntimeStatsListener extends ListenerAdapter {
 
     @Override
     public void onGenericInteractionCreate(@Nonnull GenericInteractionCreateEvent event) {
-        if (!InstanceActivityService.shouldHandleCurrentProcessInteraction()) {
+        if (!ActiveLeaseService.shouldHandleCurrentProcessInteraction()) {
             return;
         }
         // Count any interaction request (slash, button, modal, selection, etc.)

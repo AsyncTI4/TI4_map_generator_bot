@@ -17,7 +17,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.logging.RollbarManager;
 import ti4.service.game.GameNameService;
-import ti4.spring.service.deploy.InstanceActivityService;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 final class ModalListener extends ListenerAdapter {
 
@@ -36,7 +36,7 @@ final class ModalListener extends ListenerAdapter {
 
     @Override
     public void onModalInteraction(@Nonnull ModalInteractionEvent event) {
-        if (!InstanceActivityService.shouldHandleCurrentProcessInteraction()) {
+        if (!ActiveLeaseService.shouldHandleCurrentProcessInteraction()) {
             return;
         }
         if (!JdaService.isReadyToReceiveCommands()) {

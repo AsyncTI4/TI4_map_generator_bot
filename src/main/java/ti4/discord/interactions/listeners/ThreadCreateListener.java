@@ -5,13 +5,13 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.logging.BotLogger;
-import ti4.spring.service.deploy.InstanceActivityService;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 class ThreadCreateListener extends ListenerAdapter {
 
     @Override
     public void onChannelCreate(@NotNull ChannelCreateEvent event) {
-        if (!InstanceActivityService.shouldHandleCurrentProcessInteraction()) return;
+        if (!ActiveLeaseService.shouldHandleCurrentProcessInteraction()) return;
         if (!event.getChannelType().isThread()) return;
 
         try {

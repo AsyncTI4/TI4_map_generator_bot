@@ -8,25 +8,22 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ti4.spring.service.deploy.ActiveLeaseService;
-import ti4.spring.service.deploy.InstanceActivityService;
 
 @RestController
 @RequestMapping("/api/public/ready")
 public class ReadyController {
 
-    private final InstanceActivityService instanceActivityService;
     private final ActiveLeaseService activeLeaseService;
 
-    public ReadyController(InstanceActivityService instanceActivityService, ActiveLeaseService activeLeaseService) {
-        this.instanceActivityService = instanceActivityService;
+    public ReadyController(ActiveLeaseService activeLeaseService) {
         this.activeLeaseService = activeLeaseService;
     }
 
     @GetMapping
     public ResponseEntity<Map<String, Object>> ready() {
         boolean startupComplete = activeLeaseService.isReady();
-        boolean active = instanceActivityService.isActive();
-        boolean draining = instanceActivityService.isDraining();
+        boolean active = activeLeaseService.isActive();
+        boolean draining = activeLeaseService.isDraining();
         boolean leaseOwned = activeLeaseService.stillOwnsLease();
         boolean ready = startupComplete && active && !draining && leaseOwned;
 

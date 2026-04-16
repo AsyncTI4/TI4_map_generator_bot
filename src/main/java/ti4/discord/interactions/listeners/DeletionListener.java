@@ -6,13 +6,13 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.discord.JdaService;
 import ti4.executors.ExecutorServiceManager;
 import ti4.service.message.MessageDeletionService;
-import ti4.spring.service.deploy.InstanceActivityService;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 class DeletionListener extends ListenerAdapter {
 
     @Override
     public void onMessageDelete(@Nonnull MessageDeleteEvent event) {
-        if (!InstanceActivityService.shouldHandleCurrentProcessInteraction()) return;
+        if (!ActiveLeaseService.shouldHandleCurrentProcessInteraction()) return;
         if (!validateEvent(event)) return;
 
         ExecutorServiceManager.runAsync(

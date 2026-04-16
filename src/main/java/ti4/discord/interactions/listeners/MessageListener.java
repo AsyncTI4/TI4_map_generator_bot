@@ -31,7 +31,7 @@ import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.WhisperService;
 import ti4.service.game.CreateGameService;
 import ti4.service.game.GameNameService;
-import ti4.spring.service.deploy.InstanceActivityService;
+import ti4.spring.service.deploy.ActiveLeaseService;
 import ti4.spring.service.messagecache.SavedBotMessagesService;
 
 class MessageListener extends ListenerAdapter {
@@ -52,7 +52,7 @@ class MessageListener extends ListenerAdapter {
                 || !JdaService.isValidGuild(event.getGuild().getId())) {
             return;
         }
-        if (!InstanceActivityService.shouldHandleCurrentProcessInteraction()) {
+        if (!ActiveLeaseService.shouldHandleCurrentProcessInteraction()) {
             return;
         }
 

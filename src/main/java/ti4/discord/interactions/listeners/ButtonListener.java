@@ -9,7 +9,7 @@ import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.ButtonProcessor;
 import ti4.helpers.ButtonHelper;
 import ti4.logging.BotLogger;
-import ti4.spring.service.deploy.InstanceActivityService;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 class ButtonListener extends ListenerAdapter {
 
@@ -24,7 +24,7 @@ class ButtonListener extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(@Nonnull ButtonInteractionEvent event) {
-        if (!InstanceActivityService.shouldHandleCurrentProcessInteraction()) {
+        if (!ActiveLeaseService.shouldHandleCurrentProcessInteraction()) {
             return;
         }
         if (!JdaService.isReadyToReceiveCommands()) {

@@ -7,13 +7,13 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.selections.SelectionMenuProcessor;
 import ti4.logging.BotLogger;
-import ti4.spring.service.deploy.InstanceActivityService;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 class SelectionMenuListener extends ListenerAdapter {
 
     @Override
     public void onStringSelectInteraction(@Nonnull StringSelectInteractionEvent event) {
-        if (!InstanceActivityService.shouldHandleCurrentProcessInteraction()) {
+        if (!ActiveLeaseService.shouldHandleCurrentProcessInteraction()) {
             return;
         }
         if (!JdaService.isReadyToReceiveCommands()) {
