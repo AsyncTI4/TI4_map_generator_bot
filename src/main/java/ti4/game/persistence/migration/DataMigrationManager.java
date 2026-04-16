@@ -49,10 +49,10 @@ public class DataMigrationManager {
 
     static {
         migrations = new HashMap<>();
-        migrations.put(
-                "renameGarboziaToBozgarbia_201025_withEnded",
-                DataMigrationManager::renameGarboziaToBozgarbia_201025_withEnded);
-        migrations.put("fixMisspelledAgendaIds_200226", DataMigrationManager::fixMisspelledAgendaIds_200226);
+        // migrations.put(
+        //         "renameGarboziaToBozgarbia_201025_withEnded",
+        //         DataMigrationManager::renameGarboziaToBozgarbia_201025_withEnded);
+        // migrations.put("fixMisspelledAgendaIds_200226", DataMigrationManager::fixMisspelledAgendaIds_200226);
         // migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 
