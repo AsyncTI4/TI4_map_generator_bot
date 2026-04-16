@@ -2,6 +2,7 @@ package ti4.service.game;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -96,9 +97,16 @@ public class LocalDevelopmentSampleGameService {
             BotLogger.warning("LocalDevelopmentSampleGameService: source game not found: " + sourceGameName);
             return null;
         }
-        Game game = GameManager.loadFromPath(sourcePath);
+        Path targetPath = Storage.getGamePath(targetGameName + Constants.TXT);
+        if (!copySourceGameToStorage(sourcePath, targetPath, targetGameName)) {
+            BotLogger.warning(
+                    "LocalDevelopmentSampleGameService: failed to copy source game into storage: " + sourcePath);
+            return null;
+        }
+        Game game = GameManager.reload(targetGameName);
         if (game == null) {
-            BotLogger.warning("LocalDevelopmentSampleGameService: failed to load source game: " + sourcePath);
+            BotLogger.warning(
+                    "LocalDevelopmentSampleGameService: failed to reload copied test game: " + targetGameName);
             return null;
         }
         prepareClonedGame(game, targetGameName);
@@ -107,6 +115,24 @@ public class LocalDevelopmentSampleGameService {
             return null;
         }
         return GameManager.reload(targetGameName);
+    }
+
+    static boolean copySourceGameToStorage(Path sourcePath, Path targetPath, String targetGameName) {
+        try {
+            Files.createDirectories(targetPath.getParent());
+            Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            List<String> gameFileLines = Files.readAllLines(targetPath);
+            if (gameFileLines.size() < 3) {
+                return false;
+            }
+            gameFileLines.set(2, targetGameName);
+            Files.write(targetPath, gameFileLines);
+            return true;
+        } catch (Exception e) {
+            BotLogger.warning(
+                    "LocalDevelopmentSampleGameService: failed to prepare copied test game file: " + targetGameName, e);
+            return false;
+        }
     }
 
     static void prepareClonedGame(Game game, String targetGameName) {

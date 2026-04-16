@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
@@ -74,5 +76,20 @@ class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
         assertEquals(
                 "pbd15036::test::123e4567-e89b-12d3-a456-426614174000",
                 LocalDevelopmentSampleGameService.buildTestGameName("pbd15036", uuid));
+    }
+
+    @Test
+    void copySourceGameToStorageCopiesFileAndUpdatesStoredGameName() throws Exception {
+        Path tempDirectory = Files.createTempDirectory("local-dev-game");
+        Path sourcePath = tempDirectory.resolve("source.txt");
+        Path targetPath = tempDirectory.resolve("target.txt");
+        Files.write(sourcePath, java.util.List.of("owner-id", "owner-name", "source-game", "rest"));
+
+        assertTrue(LocalDevelopmentSampleGameService.copySourceGameToStorage(
+                sourcePath, targetPath, "source-game::test::uuid"));
+
+        assertEquals(
+                java.util.List.of("owner-id", "owner-name", "source-game::test::uuid", "rest"),
+                Files.readAllLines(targetPath));
     }
 }

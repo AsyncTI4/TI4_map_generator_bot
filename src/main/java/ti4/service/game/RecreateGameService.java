@@ -28,8 +28,6 @@ public class RecreateGameService {
 
     public static final String LIMBO_CATEGORY_NAME = "The in-limbo PBD Archive";
     public static final String TEST_GAME_MARKER = "::test::";
-    private static final String FOW_GM_CHANNEL_SUFFIX = "-gm-room";
-    private static final String FOW_MAIN_CHANNEL_SUFFIX = "-anonymous-announcements-private";
 
     public static RecreateGameResult recreateGame(Game game, Guild guild) {
         return recreateGame(game, guild, null);
@@ -37,54 +35,57 @@ public class RecreateGameService {
 
     public static RecreateGameResult recreateGame(Game game, Guild guild, @Nullable Member extraAccessMember) {
         RecreateGameResult result = new RecreateGameResult(game.getName());
-        if (guild == null) {
-            result.addNote("No guild was available.");
+        if (game.isFowMode()) {
+            result.setStatusLine("Could not recreate game resources for `" + game.getName() + "`.");
+            result.addNote("Fog of War games are not compatible with recreate game.");
             return result;
         }
 
-        if (game.isFowMode()) {
-            recreateFogOfWarRoles(game, guild, extraAccessMember, result);
-            moveFogOfWarChannelsOutOfLimbo(game, guild, result);
-        } else {
-            Role gameRole =
-                    game.isCommunityMode() ? null : ensurePrimaryGameRole(game, guild, extraAccessMember, result);
-            Category targetCategory = ensureTargetCategory(game, guild);
-            TextChannel tableTalkChannel = ensurePrimaryTextChannel(
-                    guild,
-                    game,
-                    targetCategory,
-                    getTableTalkChannelName(game),
-                    game.getTableTalkChannel(),
-                    gameRole,
-                    extraAccessMember,
-                    result);
-            if (tableTalkChannel != null) {
-                game.setTableTalkChannelID(tableTalkChannel.getId());
-            }
-
-            TextChannel actionsChannel = ensurePrimaryTextChannel(
-                    guild,
-                    game,
-                    targetCategory,
-                    getActionsChannelName(game),
-                    game.getMainGameChannel(),
-                    gameRole,
-                    extraAccessMember,
-                    result);
-            if (actionsChannel != null) {
-                game.setMainChannelID(actionsChannel.getId());
-                ThreadChannel botThread = ensureBotMapThread(game, actionsChannel);
-                if (botThread != null) {
-                    game.setBotMapUpdatesThreadID(botThread.getId());
-                }
-            }
-
-            recreateCommunityRoles(game, guild, result);
-            ensureCardsInfoThreads(game, result);
+        Guild targetGuild = resolveTargetGuild(game, guild);
+        if (targetGuild == null) {
+            result.setStatusLine("Could not recreate game resources for `" + game.getName() + "`.");
+            result.addNote("No guild with capacity was available.");
+            return result;
         }
 
-        Helper.fixGameChannelPermissions(guild, game);
-        List<String> missingPlayers = collectMissingPlayers(game, guild);
+        Role gameRole =
+                game.isCommunityMode() ? null : ensurePrimaryGameRole(game, targetGuild, extraAccessMember, result);
+        Category targetCategory = ensureTargetCategory(game, targetGuild);
+        TextChannel tableTalkChannel = ensurePrimaryTextChannel(
+                targetGuild,
+                game,
+                targetCategory,
+                getTableTalkChannelName(game),
+                game.getTableTalkChannel(),
+                gameRole,
+                extraAccessMember,
+                result);
+        if (tableTalkChannel != null) {
+            game.setTableTalkChannelID(tableTalkChannel.getId());
+        }
+
+        TextChannel actionsChannel = ensurePrimaryTextChannel(
+                targetGuild,
+                game,
+                targetCategory,
+                getActionsChannelName(game),
+                game.getMainGameChannel(),
+                gameRole,
+                extraAccessMember,
+                result);
+        if (actionsChannel != null) {
+            game.setMainChannelID(actionsChannel.getId());
+            ThreadChannel botThread = ensureBotMapThread(game, actionsChannel);
+            if (botThread != null) {
+                game.setBotMapUpdatesThreadID(botThread.getId());
+            }
+        }
+
+        recreateCommunityRoles(game, targetGuild, result);
+        ensureCardsInfoThreads(game, result);
+
+        Helper.fixGameChannelPermissions(targetGuild, game);
+        List<String> missingPlayers = collectMissingPlayers(game, targetGuild);
         result.getMissingPlayers().addAll(missingPlayers);
 
         if (!GameManager.save(game, "Recreated game resources")) {
@@ -92,6 +93,25 @@ public class RecreateGameService {
         }
         pingGame(game, result);
         return result;
+    }
+
+    @Nullable
+    static Guild resolveTargetGuild(Game game, @Nullable Guild preferredGuild) {
+        Guild guildWithExistingChannels = getGuildForExistingChannels(game, true);
+        if (guildWithExistingChannels != null) {
+            return guildWithExistingChannels;
+        }
+
+        guildWithExistingChannels = getGuildForExistingChannels(game, false);
+        if (guildWithExistingChannels != null) {
+            return guildWithExistingChannels;
+        }
+
+        if (CreateGameService.getServerCapacityForNewGames(preferredGuild) > 0) {
+            return preferredGuild;
+        }
+
+        return CreateGameService.getServerWithMostCapacityForNewGame();
     }
 
     public static String getSourceGameName(String gameName) {
@@ -108,52 +128,6 @@ public class RecreateGameService {
 
     public static String getSanitizedGameChannelPrefix(String gameName) {
         return sanitizeTextChannelSegment(gameName);
-    }
-
-    private static void recreateFogOfWarRoles(
-            Game game, Guild guild, @Nullable Member extraAccessMember, RecreateGameResult result) {
-        Role gameRole = ensureNamedRole(guild, game.getName(), true, result);
-        Role gmRole = ensureNamedRole(guild, game.getName() + " GM", true, result);
-
-        for (Player player : game.getRealPlayers()) {
-            Member member = guild.getMemberById(player.getUserID());
-            if (member == null) {
-                continue;
-            }
-            guild.addRoleToMember(member, gameRole).complete();
-        }
-
-        Member owner = guild.getMemberById(game.getOwnerID());
-        if (owner != null) {
-            guild.addRoleToMember(owner, gmRole).complete();
-        }
-        if (extraAccessMember != null) {
-            guild.addRoleToMember(extraAccessMember, gameRole).complete();
-            guild.addRoleToMember(extraAccessMember, gmRole).complete();
-        }
-    }
-
-    private static void moveFogOfWarChannelsOutOfLimbo(Game game, Guild guild, RecreateGameResult result) {
-        Category targetCategory = ensureTargetCategory(game, guild);
-        if (targetCategory == null) {
-            return;
-        }
-
-        TextChannel gmChannel = guild.getTextChannelsByName(game.getName() + FOW_GM_CHANNEL_SUFFIX, true).stream()
-                .findFirst()
-                .orElse(null);
-        TextChannel mainChannel = guild.getTextChannelsByName(game.getName() + FOW_MAIN_CHANNEL_SUFFIX, true).stream()
-                .findFirst()
-                .orElseGet(() -> {
-                    TextChannel fallbackChannel = game.getMainGameChannel();
-                    return fallbackChannel != null && guild.equals(fallbackChannel.getGuild()) ? fallbackChannel : null;
-                });
-
-        moveChannelIfNeeded(gmChannel, targetCategory, result);
-        moveChannelIfNeeded(mainChannel, targetCategory, result);
-        if (mainChannel != null) {
-            game.setMainChannelID(mainChannel.getId());
-        }
     }
 
     @Nullable
@@ -358,6 +332,21 @@ public class RecreateGameService {
                         channel.getParentCategory().getName());
     }
 
+    @Nullable
+    private static Guild getGuildForExistingChannels(Game game, boolean onlyLimboChannels) {
+        TextChannel mainChannel = game.getMainGameChannel();
+        if (mainChannel != null && (!onlyLimboChannels || isInLimbo(mainChannel))) {
+            return mainChannel.getGuild();
+        }
+
+        TextChannel tableTalkChannel = game.getTableTalkChannel();
+        if (tableTalkChannel != null && (!onlyLimboChannels || isInLimbo(tableTalkChannel))) {
+            return tableTalkChannel.getGuild();
+        }
+
+        return null;
+    }
+
     private static void ensureExtraMemberPermission(TextChannel channel, Member extraAccessMember) {
         long developerAllow = Permission.PIN_MESSAGES.getRawValue()
                 | Permission.VIEW_CHANNEL.getRawValue()
@@ -437,9 +426,14 @@ public class RecreateGameService {
         private final List<String> movedChannels = new ArrayList<>();
         private final List<String> missingPlayers = new ArrayList<>();
         private final List<String> notes = new ArrayList<>();
+        private String statusLine;
 
         public RecreateGameResult(String gameName) {
             this.gameName = gameName;
+        }
+
+        public void setStatusLine(String statusLine) {
+            this.statusLine = statusLine;
         }
 
         public void addNote(String note) {
@@ -448,7 +442,7 @@ public class RecreateGameService {
 
         public String getSummary() {
             List<String> lines = new ArrayList<>();
-            lines.add("Recreated game resources for `" + gameName + "`.");
+            lines.add(statusLine == null ? "Recreated game resources for `" + gameName + "`." : statusLine);
             if (!recreatedRoles.isEmpty()) {
                 lines.add("Recreated roles: " + String.join(", ", recreatedRoles));
             }

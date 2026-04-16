@@ -565,6 +565,30 @@ public class CreateGameService {
         return guilds.getLast();
     }
 
+    @Nullable
+    static Guild getServerWithMostCapacityForNewGame() {
+        List<Guild> guilds = JdaService.serversToCreateNewGamesOn.stream()
+                .filter(guild -> getServerCapacityForNewGames(guild) > 0)
+                .sorted(Comparator.comparing(CreateGameService::getServerCapacityForNewGames))
+                .toList();
+
+        if (guilds.isEmpty() && getServerCapacityForNewGames(JdaService.guildPrimary) > 0) {
+            return JdaService.guildPrimary;
+        }
+
+        if (guilds.isEmpty()) {
+            BotLogger.warning(
+                    "`CreateGameService.getServerWithMostCapacityForNewGame` No available servers to create a new game");
+            return null;
+        }
+
+        String debugText = guilds.stream()
+                .map(g -> g.getName() + ": " + getServerCapacityForNewGames(g))
+                .collect(Collectors.joining("\n"));
+        BotLogger.info("Server Single Game Capacity Check:\n" + debugText);
+        return guilds.getLast();
+    }
+
     public static boolean serverCanHostNewGame(Guild guild) {
         return guild != null && serverHasRoomForNewRole(guild) && serverHasRoomForNewChannels(guild);
     }
@@ -579,7 +603,10 @@ public class CreateGameService {
         return true;
     }
 
-    private static int getServerCapacityForNewGames(Guild guild) {
+    static int getServerCapacityForNewGames(@Nullable Guild guild) {
+        if (guild == null) {
+            return 0;
+        }
         int roleCount = guild.getRoles().size();
         int gameCountByRole = MAX_ROLE_COUNT - roleCount;
 
