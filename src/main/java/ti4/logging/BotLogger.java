@@ -19,17 +19,17 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.cron.CronManager;
+import ti4.discord.JdaService;
 import ti4.executors.CircuitBreaker;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.message.MessageHelper;
-import ti4.rollbar.RollbarManager;
 import ti4.service.statistics.SREStats;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
-import ti4.spring.jda.JdaService;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class BotLogger {
@@ -244,10 +244,12 @@ public class BotLogger {
         if (origin != null) {
             // Add header text iff the error spans multiple lines
             if (multiline || err != null) msg.append(severity.headerText);
+            msg.append(ActiveLeaseService.getCurrentProcessLogPrefix());
             msg.append(origin.getOriginTimeFormatted());
             if (origin.getEventString() != null) msg.append(origin.getEventString());
             if (origin.getGameInfo() != null) msg.append(origin.getGameInfo());
         } else {
+            msg.append(ActiveLeaseService.getCurrentProcessLogPrefix());
             msg.append(DateTimeHelper.getCurrentTimestamp());
         }
         channel = getLogChannel(severity);

@@ -9,13 +9,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.jetbrains.annotations.NotNull;
+import ti4.discord.interactions.context.ListenerContext;
+import ti4.discord.interactions.selections.SelectionMenuProcessor;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
-import ti4.listeners.ModalListener;
-import ti4.listeners.context.ListenerContext;
-import ti4.selections.SelectionMenuProcessor;
 
 @Getter
 public class LogOrigin {
@@ -94,7 +93,7 @@ public class LogOrigin {
                         .append('\n');
             case ModalInteractionEvent mEvent ->
                 builder.append("used modal ")
-                        .append(ModalListener.getModalDebugText(mEvent))
+                        .append(buildModalDebugText(mEvent))
                         .append('\n');
             default ->
                 builder.append("initiated an unexpected event of type `")
@@ -103,6 +102,11 @@ public class LogOrigin {
         }
 
         return builder.toString();
+    }
+
+    @Nonnull
+    private static String buildModalDebugText(ModalInteractionEvent event) {
+        return "INPUT:\n```\n" + "MenuID: " + event.getModalId() + "\n```";
     }
 
     @Nonnull

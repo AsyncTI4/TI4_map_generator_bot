@@ -2,10 +2,13 @@
     {
         "itemCategory": "HOMESYSTEM",
         "itemId": "crimson",
-        "undraftable": true,
         "additionalComponents": [
             "ABILITY:sorrow",
             "ABILITY:sundered"
+        ],
+        "optionalSwaps": [
+            "COMMANDER:crimsoncommander",
+            "BREAKTHROUGH:crimsonbt"
         ],
         "source": "thunders_edge"
     },
@@ -36,7 +39,13 @@
     {
         "itemCategory": "TECH",
         "itemId": "exile2",
-        "undraftable": true,
+         "additionalComponents": [
+            "ABILITY:incursion"
+        ],
+        "optionalSwaps": [
+            "FLAGSHIP:crimson_flagship",
+            "MECH:crimson_mech"
+        ],
         "source": "thunders_edge"
     },
     {
@@ -54,16 +63,7 @@
     {
         "itemCategory": "BREAKTHROUGH",
         "itemId": "crimsonbt",
-        "additionalComponents": [
-            "ABILITY:incursion"
-        ],
-        "optionalSwaps": [
-            "HOMESYSTEM:crimson",
-            "FLAGSHIP:crimson_flagship",
-            "COMMANDER:crimsoncommander",
-            "MECH:crimson_mech",
-            "TECH:exile2"
-        ],
+        "undraftable": true,
         "source": "thunders_edge"
     },
     {

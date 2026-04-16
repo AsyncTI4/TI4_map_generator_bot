@@ -8,7 +8,7 @@ import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;

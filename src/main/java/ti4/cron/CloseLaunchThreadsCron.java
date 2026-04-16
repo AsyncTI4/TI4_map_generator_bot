@@ -6,6 +6,7 @@ import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.helpers.GameLaunchThreadHelper;
 import ti4.logging.BotLogger;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class CloseLaunchThreadsCron {
@@ -16,6 +17,7 @@ public class CloseLaunchThreadsCron {
     }
 
     private static void closeLaunchThreads() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running CloneLaunchThreadsCron.");
         for (ManagedGame game : GameManager.getManagedGames()) {
             if (game.getLaunchPostThread() == null) continue;

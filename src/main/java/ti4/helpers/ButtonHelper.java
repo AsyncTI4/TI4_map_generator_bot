@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -54,10 +57,12 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
-import ti4.buttons.Buttons;
-import ti4.buttons.handlers.agenda.VoteButtonHandler;
-import ti4.commands.special.SetupNeutralPlayer;
-import ti4.commands.tokens.AddTokenCommand;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
+import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
+import ti4.discord.interactions.commands.tokens.AddTokenCommand;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.selections.selectmenus.SelectFaction;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -80,7 +85,6 @@ import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileGenerator;
 import ti4.image.TileHelper;
-import ti4.listeners.annotations.ButtonHandler;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
@@ -97,7 +101,6 @@ import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
 import ti4.model.UnitModel;
-import ti4.selections.selectmenus.SelectFaction;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -105,6 +108,8 @@ import ti4.service.breakthrough.ValefarZService;
 import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
+import ti4.service.combat.CombatStatsService;
+import ti4.service.combat.CombatUnitSelectionHelper;
 import ti4.service.decks.ShowActionCardsService;
 import ti4.service.draft.PlayerSetupService;
 import ti4.service.draft.PlayerSetupState;
@@ -3283,6 +3288,33 @@ public class ButtonHelper {
 
     public static String getTileSummaryMessage(
             Game game, boolean justUnits, Tile tile, Player ogPlayer, GenericInteractionCreateEvent event) {
+        return getTileSummaryMessage(game, justUnits, tile, ogPlayer, event, null);
+    }
+
+    public static String getCombatTileSummaryMessage(
+            Game game,
+            Tile tile,
+            Player ogPlayer,
+            GenericInteractionCreateEvent event,
+            String combatType,
+            @Nullable String combatHolderName,
+            List<Player> combatPlayers) {
+        return getTileSummaryMessage(
+                game,
+                true,
+                tile,
+                ogPlayer,
+                event,
+                new CombatSummaryContext(combatType, combatHolderName, combatPlayers));
+    }
+
+    private static String getTileSummaryMessage(
+            Game game,
+            boolean justUnits,
+            Tile tile,
+            Player ogPlayer,
+            GenericInteractionCreateEvent event,
+            @Nullable CombatSummaryContext combatSummaryContext) {
         String tileName = tile.getTilePath();
         tileName = tileName.substring(tileName.indexOf('_') + 1);
         tileName = tileName.substring(0, tileName.indexOf(".png"));
@@ -3372,7 +3404,9 @@ public class ButtonHelper {
                     sb.append(" `").append(unitEntry.getValue()).append("x` ");
                     if (unitModel != null) {
                         sb.append(unitModel.getUnitEmoji()).append(' ');
-                        sb.append(privateGame ? unitModel.getBaseType() : unitModel.getName())
+                        sb.append(privateGame ? unitModel.getBaseType() : unitModel.getName());
+                        sb.append(getCombatProfileForTileSummary(
+                                        tile, unitHolder, unitModel, player, combatSummaryContext))
                                 .append('\n');
                     } else {
                         sb.append(unitKey).append('\n');
@@ -3383,6 +3417,59 @@ public class ButtonHelper {
             sb.append("----------\n");
         }
         return sb.toString();
+    }
+
+    private static String getCombatProfileForTileSummary(
+            Tile tile,
+            UnitHolder unitHolder,
+            UnitModel unitModel,
+            Player player,
+            @Nullable CombatSummaryContext combatSummaryContext) {
+        if (combatSummaryContext == null
+                || !combatSummaryContext.combatPlayers().contains(player)) {
+            return "";
+        }
+        boolean participates = CombatUnitSelectionHelper.collectCombatRoundUnits(
+                        tile, combatSummaryContext.getCombatUnitHolder(tile, unitHolder), player)
+                .containsKey(unitModel);
+        CombatStatsService.CombatRoundProfile combatRoundProfile = CombatStatsService.getCombatRoundProfile(
+                participates, unitModel, player, tile, combatSummaryContext.opponentFor(player));
+        if (!combatRoundProfile.participates()) {
+            return "";
+        }
+
+        if (combatRoundProfile.diceCount() == 1) {
+            return " `[Combat " + combatRoundProfile.hitsOn() + "+]`";
+        }
+        return " `[Combat " + combatRoundProfile.diceCount() + "x" + combatRoundProfile.hitsOn() + "+]`";
+    }
+
+    /**
+     * Encapsulates the combat metadata needed to annotate a generic tile summary with
+     * combat-specific unit information, without threading nullable combat arguments
+     * through the public tile-summary API.
+     */
+    private record CombatSummaryContext(
+            String combatType, @Nullable String combatHolderName, List<Player> combatPlayers) {
+
+        private boolean isGroundCombat() {
+            return "ground".equalsIgnoreCase(combatType);
+        }
+
+        private boolean isSpaceCombat() {
+            return "space".equalsIgnoreCase(combatType);
+        }
+
+        private @Nullable Player opponentFor(Player player) {
+            return combatPlayers.stream().filter(p -> p != player).findFirst().orElse(null);
+        }
+
+        private UnitHolder getCombatUnitHolder(Tile tile, UnitHolder currentUnitHolder) {
+            if (isGroundCombat()) {
+                return currentUnitHolder;
+            }
+            return tile.getUnitHolders().get(Constants.SPACE);
+        }
     }
 
     public static int checkNetGain(Player player, String ccs) {

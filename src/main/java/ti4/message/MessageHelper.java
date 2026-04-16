@@ -46,7 +46,8 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
-import ti4.buttons.Buttons;
+import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.executors.CircuitBreaker;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -64,7 +65,6 @@ import ti4.service.button.ReactionService;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.game.GameNameService;
 import ti4.service.game.GameUndoNameService;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class MessageHelper {
@@ -859,6 +859,43 @@ public class MessageHelper {
         ThreadChannel threadChannel = player.getCardsInfoThread();
 
         sendMessageToChannel(threadChannel, messageText);
+    }
+
+    public static void replacePinnedMessageInPlayerCardsInfoThread(
+            @NotNull Player player, @NotNull String storedValueKey, String messageText) {
+        if (messageText == null || messageText.isEmpty()) {
+            return;
+        }
+
+        ThreadChannel threadChannel = player.getCardsInfoThread();
+        if (threadChannel == null) {
+            return;
+        }
+
+        splitAndSentWithAction(messageText, threadChannel, msg -> {
+            String previousMessageId = player.getStoredValue(storedValueKey);
+            Runnable pinAndTrack =
+                    () -> msg.pin().queue(success -> player.addStoredValue(storedValueKey, msg.getId()), error -> {
+                        player.addStoredValue(storedValueKey, msg.getId());
+                        String err = getRestActionFailureMessage(
+                                threadChannel, "Failed to pin cards info snapshot", null, error);
+                        BotLogger.error(err, error);
+                    });
+
+            if (StringUtils.isBlank(previousMessageId) || previousMessageId.equals(msg.getId())) {
+                pinAndTrack.run();
+                return;
+            }
+
+            threadChannel.deleteMessageById(previousMessageId).queue(success -> pinAndTrack.run(), error -> {
+                if (!isUnknownMessageError(error)) {
+                    String err = getRestActionFailureMessage(
+                            threadChannel, "Failed to delete previous pinned cards info snapshot", null, error);
+                    BotLogger.error(err, error);
+                }
+                pinAndTrack.run();
+            });
+        });
     }
 
     /**

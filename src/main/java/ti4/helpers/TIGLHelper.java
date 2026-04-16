@@ -17,13 +17,13 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
-import ti4.spring.jda.JdaService;
 
 public final class TIGLHelper {
 

@@ -4,9 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import ti4.logging.BotLogger;
-import ti4.rollbar.RollbarManager;
+import ti4.logging.RollbarManager;
 import ti4.settings.GlobalSettings;
-import ti4.settings.GlobalSettings.ImplementedSettings;
 
 @EnableScheduling
 @SpringBootApplication
@@ -16,7 +15,6 @@ public class AsyncTI4DiscordBot {
 
     public static void main(String[] args) {
         GlobalSettings.loadSettings();
-        GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
         RollbarManager.init();
         BotLogger.info("\n# __BOT IS STARTING UP__");
 

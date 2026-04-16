@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
@@ -20,6 +20,7 @@ import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class AutoPingCron {
@@ -90,6 +91,7 @@ public class AutoPingCron {
     }
 
     private static void autoPingGames() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running AutoPingCron.");
 
         removeEndedGamesFromAutoPingMetadata();

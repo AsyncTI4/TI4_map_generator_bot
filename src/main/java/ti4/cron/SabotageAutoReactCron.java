@@ -16,6 +16,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.button.ReactionService;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class SabotageAutoReactCron {
@@ -33,6 +34,7 @@ public class SabotageAutoReactCron {
     }
 
     private static void autoReact() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running SabotageAutoReactCron.");
 
         GameManager.getManagedGames().stream()

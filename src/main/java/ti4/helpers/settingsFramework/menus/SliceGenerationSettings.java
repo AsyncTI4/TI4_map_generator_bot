@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;

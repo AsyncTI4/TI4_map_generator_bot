@@ -9,7 +9,8 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.Nullable;
-import ti4.buttons.Buttons;
+import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -17,7 +18,6 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.service.franken.FrankenDraftBagService;
-import ti4.spring.jda.JdaService;
 
 public abstract class BagDraft {
     private static final Pattern FORWARD_SLASH_PATTERN = Pattern.compile("/");

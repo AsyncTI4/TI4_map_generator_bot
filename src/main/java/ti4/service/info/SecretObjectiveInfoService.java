@@ -7,10 +7,9 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Helper;
@@ -22,6 +21,8 @@ import ti4.service.emoji.CardEmojis;
 
 @UtilityClass
 public class SecretObjectiveInfoService {
+
+    private static final String PINNED_SO_INFO_MESSAGE_ID = "pinned_so_info_message_id";
 
     public static void sendSecretObjectiveInfo(Game game, Player player, ButtonInteractionEvent event) {
         sendSecretObjectiveInfo(game, player, event, false, false);
@@ -35,8 +36,7 @@ public class SecretObjectiveInfoService {
             boolean autoScoreButtons) {
         String headerText = player.getRepresentationUnfogged() + " pressed button: "
                 + event.getButton().getLabel();
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
-        sendSecretObjectiveInfo(game, player, autoDiscardButtons, autoScoreButtons);
+        sendSecretObjectiveInfoWithHeaderText(game, player, headerText, autoDiscardButtons, autoScoreButtons);
     }
 
     public static void sendSecretObjectiveInfo(Game game, Player player, SlashCommandInteractionEvent event) {
@@ -50,21 +50,15 @@ public class SecretObjectiveInfoService {
             boolean autoDiscardButtons,
             boolean autoScoreButtons) {
         String headerText = player.getRepresentationUnfogged() + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
-        sendSecretObjectiveInfo(game, player, autoDiscardButtons, autoScoreButtons);
+        sendSecretObjectiveInfoWithHeaderText(game, player, headerText, autoDiscardButtons, autoScoreButtons);
     }
 
     public static void sendSecretObjectiveInfo(Game game, Player player) {
         sendSecretObjectiveInfo(game, player, false, false);
     }
 
-    public static void sendSecretObjectiveInfo(
-            Game game,
-            Player player,
-            GenericInteractionCreateEvent event,
-            boolean autoDiscardButtons,
-            boolean autoScoreButtons) {
-        String headerText = player.getRepresentationUnfogged() + " used something";
+    public static void sendSecretObjectiveInfoWithHeaderText(
+            Game game, Player player, String headerText, boolean autoDiscardButtons, boolean autoScoreButtons) {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendSecretObjectiveInfo(game, player, autoDiscardButtons, autoScoreButtons);
     }
@@ -73,6 +67,8 @@ public class SecretObjectiveInfoService {
             Game game, Player player, boolean autoDiscardButtons, boolean autoScoreButtons) {
         // SO INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, getSecretObjectiveCardInfo(game, player));
+        MessageHelper.replacePinnedMessageInPlayerCardsInfoThread(
+                player, PINNED_SO_INFO_MESSAGE_ID, getPinnedSecretObjectiveCardInfo(game, player));
 
         if (player.getSecretsUnscored().isEmpty()) return;
 
@@ -170,6 +166,63 @@ public class SecretObjectiveInfoService {
                 }
             }
         }
+        return sb.toString();
+    }
+
+    private static String getPinnedSecretObjectiveCardInfo(Game game, Player player) {
+        Map<String, Integer> secretObjective = player.getSecrets();
+        Map<String, Integer> scoredSecretObjective = new LinkedHashMap<>(player.getSecretsScored());
+        for (String id : game.getSoToPoList()) {
+            scoredSecretObjective.remove(id);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("## Latest Secret Objectives (")
+                .append(player.getSoScored())
+                .append('/')
+                .append(player.getMaxSOCount())
+                .append(")\n");
+
+        sb.append("**Scored:**\n");
+        if (scoredSecretObjective.isEmpty()) {
+            sb.append("> None\n");
+        } else {
+            int index = 1;
+            for (Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
+                SecretObjectiveModel soModel = Mapper.getSecretObjective(so.getKey());
+                sb.append(index)
+                        .append("\\. ")
+                        .append(CardEmojis.SecretObjectiveAlt)
+                        .append(" _")
+                        .append(soModel.getName())
+                        .append("_ `(")
+                        .append(so.getValue())
+                        .append(")`\n");
+                index++;
+            }
+        }
+
+        sb.append("**Unscored:**\n");
+        if (secretObjective == null || secretObjective.isEmpty()) {
+            sb.append("> None");
+        } else {
+            int index = 1;
+            for (Map.Entry<String, Integer> so : secretObjective.entrySet()) {
+                SecretObjectiveModel soModel = Mapper.getSecretObjective(so.getKey());
+                sb.append(index)
+                        .append("\\. ")
+                        .append(CardEmojis.SecretObjectiveAlt)
+                        .append(" _")
+                        .append(soModel.getName())
+                        .append("_ - ")
+                        .append(soModel.getPhase())
+                        .append(" `(")
+                        .append(Helper.leftpad("" + so.getValue(), 3))
+                        .append(")`\n");
+                index++;
+            }
+        }
+
         return sb.toString();
     }
 

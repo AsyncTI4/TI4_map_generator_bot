@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ActionCardHelper.ACStatus;
