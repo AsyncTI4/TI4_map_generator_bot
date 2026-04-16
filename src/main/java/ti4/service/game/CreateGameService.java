@@ -566,6 +566,11 @@ public class CreateGameService {
         return guilds.getFirst();
     }
 
+    /**
+     * Selects the best guild for adding a single game's channels and role.
+     * Unlike {@link #getServerWithMostCapacity()}, this only requires per-game capacity rather than room for an
+     * entirely new category.
+     */
     @Nullable
     static Guild getServerWithMostCapacityForNewGame() {
         List<Guild> guilds = JdaService.serversToCreateNewGamesOn.stream()

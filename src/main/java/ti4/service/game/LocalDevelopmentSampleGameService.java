@@ -29,6 +29,7 @@ import ti4.logging.BotLogger;
 public class LocalDevelopmentSampleGameService {
 
     public static final String DEFAULT_SOURCE_GAME_NAME = "pbd15036";
+    // Game save files begin with owner-id, owner-name, then game-name.
     private static final int GAME_NAME_LINE_INDEX = 2;
     private static final int MIN_GAME_FILE_LINES = GAME_NAME_LINE_INDEX + 1;
 

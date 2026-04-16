@@ -29,13 +29,13 @@ class RecreateGameServiceTest extends BaseTi4Test {
     private List<Guild> originalNewGameServers;
 
     @BeforeEach
-    void captureJdaServiceGuildState() {
+    void setUpGuildState() {
         originalPrimary = JdaService.guildPrimary;
         originalNewGameServers = new ArrayList<>(JdaService.serversToCreateNewGamesOn);
     }
 
     @AfterEach
-    void restoreJdaServiceGuildState() {
+    void tearDownGuildState() {
         JdaService.guildPrimary = originalPrimary;
         JdaService.serversToCreateNewGamesOn.clear();
         JdaService.serversToCreateNewGamesOn.addAll(originalNewGameServers);
