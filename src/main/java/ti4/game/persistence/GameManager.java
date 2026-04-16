@@ -194,13 +194,13 @@ public class GameManager {
     }
 
     private static void ensureManagedGamesWarmupComplete() {
-      try {
-          boolean success = WARMUP_LATCH.await(WAIT_FOR_WARMUP_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-          if (!success) {
-              throw new IllegalStateException("GameManager is still warming up!");
-          }
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
+        try {
+            boolean success = WARMUP_LATCH.await(WAIT_FOR_WARMUP_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            if (!success) {
+                throw new IllegalStateException("GameManager is still warming up!");
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
