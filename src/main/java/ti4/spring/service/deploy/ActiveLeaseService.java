@@ -80,6 +80,10 @@ public class ActiveLeaseService {
         return instanceActivityService.isActive() && stillOwnsLease();
     }
 
+    public boolean shouldServeTraffic() {
+        return isReady() && mayMutate() && !instanceActivityService.isDraining();
+    }
+
     public boolean isReady() {
         return ready.get();
     }
@@ -158,6 +162,24 @@ public class ActiveLeaseService {
             SpringContext.getBean(ActiveLeaseService.class).setReady(ready);
         } catch (IllegalStateException e) {
             // Spring not initialized yet; ignore.
+        }
+    }
+
+    public static boolean shouldCurrentProcessServeTraffic() {
+        try {
+            return SpringContext.getBean(ActiveLeaseService.class).shouldServeTraffic();
+        } catch (IllegalStateException e) {
+            return false;
+        }
+    }
+
+    public static boolean shouldCurrentProcessRunScheduledWork() {
+        try {
+            ActiveLeaseService activeLeaseService = SpringContext.getBean(ActiveLeaseService.class);
+            return activeLeaseService.mayMutate()
+                    && !SpringContext.getBean(InstanceActivityService.class).isDraining();
+        } catch (IllegalStateException e) {
+            return false;
         }
     }
 }

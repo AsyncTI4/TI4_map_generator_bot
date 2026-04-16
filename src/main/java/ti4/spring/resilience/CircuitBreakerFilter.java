@@ -12,8 +12,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import ti4.discord.JdaService;
 import ti4.executors.CircuitBreaker;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RequiredArgsConstructor
@@ -38,9 +38,9 @@ public class CircuitBreakerFilter extends OncePerRequestFilter {
                     HttpStatus.SERVICE_UNAVAILABLE.value(), SERVICE_UNAVAILABLE_MESSAGE + "circuit breaker is open");
             return;
         }
-        if (!JdaService.isReadyToReceiveCommands()) {
+        if (!ActiveLeaseService.shouldCurrentProcessServeTraffic()) {
             response.sendError(
-                    HttpStatus.SERVICE_UNAVAILABLE.value(), SERVICE_UNAVAILABLE_MESSAGE + "bot is not ready");
+                    HttpStatus.SERVICE_UNAVAILABLE.value(), SERVICE_UNAVAILABLE_MESSAGE + "bot is not active");
             return;
         }
 

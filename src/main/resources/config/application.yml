@@ -42,4 +42,3 @@ ti4:
     lease-key: discord-bot
     lease-duration-seconds: 30
     heartbeat-interval-seconds: 5
-    drain-seconds: 10

@@ -3,9 +3,11 @@ package ti4.spring.context;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -29,7 +31,13 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         if (gameName == null) return true;
         if (!GameManager.isValid(gameName)) throw new InvalidGameNameException(gameName);
 
-        boolean requestContextSetup = setupGameRequestContext(gameName, request, handler);
+        boolean shouldSaveGame = shouldSaveGame(request, handler);
+        if (shouldSaveGame && !activeLeaseService.mayMutate()) {
+            rejectInactiveMutation(response);
+            return false;
+        }
+
+        boolean requestContextSetup = setupGameRequestContext(gameName, shouldSaveGame, handler);
         if (requestContextSetup) lockGame(gameName);
 
         return true;
@@ -44,7 +52,7 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         return (gameNameObject instanceof String gameName) ? gameName : null;
     }
 
-    private boolean setupGameRequestContext(String gameName, HttpServletRequest request, Object handler) {
+    private boolean shouldSaveGame(HttpServletRequest request, Object handler) {
         boolean shouldSaveGame = MUTATION_METHODS.contains(request.getMethod());
         if (handler instanceof HandlerMethod handlerMethod) {
             SetupRequestContext annotation = handlerMethod.getMethodAnnotation(SetupRequestContext.class);
@@ -56,11 +64,29 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
                 shouldSaveGame &= annotation.save();
             }
         }
+        return shouldSaveGame;
+    }
 
+    private boolean setupGameRequestContext(String gameName, boolean shouldSaveGame, Object handler) {
+        if (handler instanceof HandlerMethod handlerMethod) {
+            SetupRequestContext annotation = handlerMethod.getMethodAnnotation(SetupRequestContext.class);
+            if (annotation != null && !annotation.value()) {
+                return false;
+            }
+        }
         var game = GameManager.getManagedGame(gameName).getGame();
         RequestContext.setGame(game);
         RequestContext.setSaveGame(shouldSaveGame);
         return true;
+    }
+
+    private static void rejectInactiveMutation(HttpServletResponse response) {
+        try {
+            response.sendError(
+                    HttpStatus.SERVICE_UNAVAILABLE.value(), "Service temporarily unavailable: bot is not active");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static void lockGame(String gameName) {

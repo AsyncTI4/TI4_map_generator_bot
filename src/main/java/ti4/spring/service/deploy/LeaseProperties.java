@@ -17,14 +17,7 @@ public class LeaseProperties {
     @Value("${ti4.deploy.heartbeat-interval-seconds:5}")
     private long heartbeatIntervalSeconds;
 
-    @Value("${ti4.deploy.drain-seconds:10}")
-    private long drainSeconds;
-
     public long getHeartbeatIntervalMillis() {
         return heartbeatIntervalSeconds * 1000;
-    }
-
-    public long getDrainMillis() {
-        return drainSeconds * 1000;
     }
 }
