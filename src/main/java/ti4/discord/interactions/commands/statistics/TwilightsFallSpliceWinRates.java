@@ -7,7 +7,9 @@ import ti4.helpers.Constants;
 class TwilightsFallSpliceWinRates extends Subcommand {
 
     TwilightsFallSpliceWinRates() {
-        super(Constants.TWILIGHTS_FALL_SPLICE_WIN_RATES, "Twilight's Fall splice ability, unit upgrade, and genome win rates");
+        super(
+                Constants.TWILIGHTS_FALL_SPLICE_WIN_RATES,
+                "Twilight's Fall splice ability, unit upgrade, and genome win rates");
         addOptions(GameStatisticsFilterer.gameStatsFilters());
     }
 

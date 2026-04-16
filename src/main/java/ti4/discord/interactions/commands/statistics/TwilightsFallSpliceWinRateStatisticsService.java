@@ -55,7 +55,8 @@ class TwilightsFallSpliceWinRateStatisticsService {
         sb.append("Games analyzed: ").append(gameCount).append('\n');
 
         appendSection(sb, "Abilities", stats.abilities, TwilightsFallSpliceWinRateStatisticsService::getAbilityName);
-        appendSection(sb, "Unit Upgrades", stats.unitUpgrades, TwilightsFallSpliceWinRateStatisticsService::getUnitName);
+        appendSection(
+                sb, "Unit Upgrades", stats.unitUpgrades, TwilightsFallSpliceWinRateStatisticsService::getUnitName);
         appendSection(sb, "Genomes", stats.genomes, TwilightsFallSpliceWinRateStatisticsService::getGenomeName);
         return sb.toString();
     }
