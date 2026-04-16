@@ -23,8 +23,7 @@ class LocalDevelopment extends Subcommand {
                 .addChoice("Create", ACTION_CREATE)
                 .addChoice("Clean", ACTION_CLEAN));
         addOptions(new OptionData(OptionType.STRING, Constants.SOURCE, "Source game name")
-                .setRequired(false)
-                .setAutoComplete(true));
+                .setRequired(false));
         addOptions(
                 new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm cleanup").setRequired(false));
     }
