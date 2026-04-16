@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
@@ -44,18 +45,11 @@ public class LocalDevelopmentSampleGameService {
     }
 
     public static String getStartupSourceGameName() {
-        return getStartupSourceGameName(
-                System.getenv(ENV_VAR_LOCAL_DEV_STARTUP), System.getenv(ENV_VAR_LOCAL_DEV_SOURCE_GAME));
+        return getStartupSourceGameName(System.getenv(ENV_VAR_LOCAL_DEV_SOURCE_GAME));
     }
 
-    static String getStartupSourceGameName(
-            @Nullable String localDevelopmentStartupValue, @Nullable String sourceGameName) {
-        if (!isLocalDevelopmentStartup(localDevelopmentStartupValue)
-                || sourceGameName == null
-                || sourceGameName.isBlank()) {
-            return DEFAULT_SOURCE_GAME_NAME;
-        }
-        return sourceGameName;
+    private static String getStartupSourceGameName(@Nullable String sourceGameName) {
+        return StringUtils.defaultIfBlank(sourceGameName, DEFAULT_SOURCE_GAME_NAME);
     }
 
     @Nullable

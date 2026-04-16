@@ -59,14 +59,10 @@ class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void startupSourceGameDefaultsAndRespectsEnvOverride() {
+    void startupSourceGameDefaults() {
         assertEquals(
                 LocalDevelopmentSampleGameService.DEFAULT_SOURCE_GAME_NAME,
-                LocalDevelopmentSampleGameService.getStartupSourceGameName("true", null));
-        assertEquals("pbd42", LocalDevelopmentSampleGameService.getStartupSourceGameName("true", "pbd42"));
-        assertEquals(
-                LocalDevelopmentSampleGameService.DEFAULT_SOURCE_GAME_NAME,
-                LocalDevelopmentSampleGameService.getStartupSourceGameName("false", "pbd42"));
+                LocalDevelopmentSampleGameService.getStartupSourceGameName());
     }
 
     @Test
