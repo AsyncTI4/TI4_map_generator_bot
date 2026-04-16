@@ -36,6 +36,11 @@ public class RecreateGameService {
         return recreateGameResult(game, guild, null).getSummary();
     }
 
+    /**
+     * Internal helper for flows that need to adjust the detailed result before presenting it, such as appending notes
+     * before converting to a summary. Command callers should use {@link #recreateGame(Game)} or
+     * {@link #recreateGame(Game, Guild)} so they receive the summary string directly.
+     */
     static RecreateGameResult recreateGameResult(Game game, Guild guild, @Nullable Member extraAccessMember) {
         RecreateGameResult result = new RecreateGameResult(game.getName());
         if (game.isFowMode()) {
