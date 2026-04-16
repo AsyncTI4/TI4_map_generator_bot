@@ -9,7 +9,6 @@ import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.service.game.LocalDevelopmentSampleGameService;
-import ti4.service.game.RecreateGameService;
 
 class LocalDevelopment extends Subcommand {
 
@@ -51,7 +50,8 @@ class LocalDevelopment extends Subcommand {
                 Constants.SOURCE,
                 LocalDevelopmentSampleGameService.DEFAULT_SOURCE_GAME_NAME,
                 OptionMapping::getAsString);
-        String result = LocalDevelopmentSampleGameService.createAndRecreateTestGame(guild, event.getUser().getId(), sourceGame);
+        String result = LocalDevelopmentSampleGameService.createAndRecreateTestGame(
+                guild, event.getUser().getId(), sourceGame);
         if (result == null) {
             MessageHelper.replyToMessage(
                     event, "Failed to create a local development test game from `" + sourceGame + "`.");
