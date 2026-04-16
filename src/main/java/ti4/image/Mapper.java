@@ -1235,6 +1235,10 @@ public class Mapper {
         return units.get(unitID);
     }
 
+    public static Map<String, UnitModel> getUnits() {
+        return new HashMap<>(units);
+    }
+
     public static boolean isValidUnit(String unitID) {
         return units.containsKey(unitID);
     }
