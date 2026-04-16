@@ -98,8 +98,17 @@ public class AddTileListService {
     public static void finishSetup(Game game, @Nullable GenericInteractionCreateEvent event) {
         try {
             Tile tile;
-            tile = new Tile(AliasHandler.resolveTile(Constants.MALLICE), "TL");
-            game.setTile(tile);
+            if (game.getTileByPosition("tl") == null) {
+                game.setTile(new Tile("82a", "tl"));
+            } else {
+                if (game.getTileByPosition("tr") == null) {
+                    game.setTile(new Tile("82a", "tr"));
+                } else {
+                    if (game.getTileByPosition("bl") == null) {
+                        game.setTile(new Tile("82a", "bl"));
+                    }
+                }
+            }
             if (game.getTileByPosition("000") == null) {
                 tile = new Tile(AliasHandler.resolveTile(Constants.MR), "000");
                 AddTileService.addCustodianToken(tile, game);

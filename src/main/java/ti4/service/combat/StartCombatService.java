@@ -1811,7 +1811,10 @@ public class StartCombatService {
             addForesightButton.accept(p1);
 
             Consumer<Player> addRalnelCommanderButton = (player) -> {
-                if (game.playerHasLeaderUnlockedOrAlliance(player, "ralnelcommander")) {
+                if (game.playerHasLeaderUnlockedOrAlliance(player, "ralnelcommander")
+                        && !ButtonHelperModifyUnits.getRetreatSystemButtons(
+                                        player, game, game.getActiveSystem(), false, false)
+                                .isEmpty()) {
                     buttons.add(Buttons.red(
                             player.getFinsFactionCheckerPrefix() + "ralnelCommander_" + pos,
                             "Retreat With Ralnel Commander",
