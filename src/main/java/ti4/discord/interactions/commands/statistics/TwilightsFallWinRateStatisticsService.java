@@ -31,8 +31,7 @@ class TwilightsFallWinRateStatisticsService {
         AtomicInteger gameCount = new AtomicInteger();
         TwilightFallsWinRateStats stats = new TwilightFallsWinRateStats();
         GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilterForWonGame(event).and(Game::isTwilightsFallMode),
-                game -> {
+                GameStatisticsFilterer.getGamesFilterForWonGame(event).and(Game::isTwilightsFallMode), game -> {
                     gameCount.incrementAndGet();
                     accumulateGame(game, stats);
                 });
@@ -64,20 +63,17 @@ class TwilightsFallWinRateStatisticsService {
     private static void appendSection(
             StringBuilder sb, String title, Map<String, WinRateCount> stats, Function<String, String> displayName) {
         sb.append("\n**").append(title).append("**\n");
-        stats.entrySet().stream()
-                .sorted(getWinRateComparator(displayName))
-                .forEach(entry -> sb.append("- ")
-                        .append(displayName.apply(entry.getKey()))
-                        .append(": ")
-                        .append(entry.getValue())
-                        .append('\n'));
+        stats.entrySet().stream().sorted(getWinRateComparator(displayName)).forEach(entry -> sb.append("- ")
+                .append(displayName.apply(entry.getKey()))
+                .append(": ")
+                .append(entry.getValue())
+                .append('\n'));
     }
 
     private static Comparator<Entry<String, WinRateCount>> getWinRateComparator(Function<String, String> displayName) {
         return Comparator.<Entry<String, WinRateCount>, Boolean>comparing(entry -> entry.getValue().total == 0)
                 .thenComparing(
-                        (Entry<String, WinRateCount> entry) -> entry.getValue().getWinRate(),
-                        Comparator.reverseOrder())
+                        (Entry<String, WinRateCount> entry) -> entry.getValue().getWinRate(), Comparator.reverseOrder())
                 .thenComparing((Entry<String, WinRateCount> entry) -> entry.getValue().total, Comparator.reverseOrder())
                 .thenComparing(entry -> displayName.apply(entry.getKey()));
     }
@@ -129,10 +125,7 @@ class TwilightsFallWinRateStatisticsService {
     private static Map<String, WinRateCount> initializeAbilities() {
         return Mapper.getTechs().values().stream()
                 .filter(tech -> tech.getSource() == ComponentSource.twilights_fall)
-                .collect(
-                        LinkedHashMap::new,
-                        (map, tech) -> map.put(tech.getAlias(), new WinRateCount()),
-                        Map::putAll);
+                .collect(LinkedHashMap::new, (map, tech) -> map.put(tech.getAlias(), new WinRateCount()), Map::putAll);
     }
 
     private static Map<String, WinRateCount> initializeUnitUpgrades() {
