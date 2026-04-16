@@ -29,7 +29,7 @@ class TwilightsFallWinRateStatisticsService {
 
     private static void showWinRates(SlashCommandInteractionEvent event) {
         AtomicInteger gameCount = new AtomicInteger();
-        TwilightFallsWinRateStats stats = new TwilightFallsWinRateStats();
+        TwilightsFallWinRateStats stats = new TwilightsFallWinRateStats();
         GamesPage.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event).and(Game::isTwilightsFallMode), game -> {
                     gameCount.incrementAndGet();
@@ -41,12 +41,12 @@ class TwilightsFallWinRateStatisticsService {
     }
 
     static String buildReport(List<Game> games) {
-        TwilightFallsWinRateStats stats = new TwilightFallsWinRateStats();
+        TwilightsFallWinRateStats stats = new TwilightsFallWinRateStats();
         games.forEach(game -> accumulateGame(game, stats));
         return buildReport(games.size(), stats);
     }
 
-    private static String buildReport(int gameCount, TwilightFallsWinRateStats stats) {
+    private static String buildReport(int gameCount, TwilightsFallWinRateStats stats) {
         if (gameCount == 0) {
             return "No Twilight's Fall games matched the selected filters.";
         }
@@ -78,7 +78,7 @@ class TwilightsFallWinRateStatisticsService {
                 .thenComparing(entry -> displayName.apply(entry.getKey()));
     }
 
-    private static void accumulateGame(Game game, TwilightFallsWinRateStats stats) {
+    private static void accumulateGame(Game game, TwilightsFallWinRateStats stats) {
         List<Player> winners = game.getWinners();
         for (Player player : game.getRealAndEliminatedPlayers()) {
             boolean isWinner = winners.contains(player);
@@ -116,7 +116,7 @@ class TwilightsFallWinRateStatisticsService {
         return leader == null ? leaderId : leader.getTFNameIfAble();
     }
 
-    private static class TwilightFallsWinRateStats {
+    private static class TwilightsFallWinRateStats {
         private final Map<String, WinRateCount> abilities = initializeAbilities();
         private final Map<String, WinRateCount> unitUpgrades = initializeUnitUpgrades();
         private final Map<String, WinRateCount> genomes = initializeGenomes();
