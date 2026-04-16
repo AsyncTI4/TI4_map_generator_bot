@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.discord.JdaService;
 import ti4.game.Game;
@@ -21,8 +22,14 @@ import ti4.testUtils.BaseTi4Test;
 
 class RecreateGameServiceTest extends BaseTi4Test {
 
-    private final Guild originalPrimary = JdaService.guildPrimary;
-    private final List<Guild> originalNewGameServers = new ArrayList<>(JdaService.serversToCreateNewGamesOn);
+    private Guild originalPrimary;
+    private List<Guild> originalNewGameServers;
+
+    @BeforeEach
+    void captureJdaServiceGuildState() {
+        originalPrimary = JdaService.guildPrimary;
+        originalNewGameServers = new ArrayList<>(JdaService.serversToCreateNewGamesOn);
+    }
 
     @AfterEach
     void restoreJdaServiceGuildState() {

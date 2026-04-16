@@ -29,6 +29,8 @@ import ti4.logging.BotLogger;
 public class LocalDevelopmentSampleGameService {
 
     public static final String DEFAULT_SOURCE_GAME_NAME = "pbd15036";
+    private static final int GAME_NAME_LINE_INDEX = 2;
+    private static final int MIN_GAME_FILE_LINES = GAME_NAME_LINE_INDEX + 1;
 
     public static boolean isLocalDevelopmentStartup(String[] args) {
         if (args == null || args.length < 3 || args.length > 4) {
@@ -122,13 +124,15 @@ public class LocalDevelopmentSampleGameService {
             Files.createDirectories(targetPath.getParent());
             Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
             List<String> gameFileLines = Files.readAllLines(targetPath);
-            if (gameFileLines.size() < 3) {
+            if (gameFileLines.size() < MIN_GAME_FILE_LINES) {
                 BotLogger.warning(
-                        "LocalDevelopmentSampleGameService: copied test game file is malformed (expected at least 3 lines: owner-id, owner-name, and game-name): "
+                        "LocalDevelopmentSampleGameService: copied test game file is malformed (expected at least "
+                                + MIN_GAME_FILE_LINES
+                                + " lines: owner-id, owner-name, and game-name): "
                                 + targetPath);
                 return false;
             }
-            gameFileLines.set(2, targetGameName);
+            gameFileLines.set(GAME_NAME_LINE_INDEX, targetGameName);
             Files.write(targetPath, gameFileLines);
             return true;
         } catch (Exception e) {
