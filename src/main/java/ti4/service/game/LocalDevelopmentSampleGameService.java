@@ -124,7 +124,7 @@ public class LocalDevelopmentSampleGameService {
             List<String> gameFileLines = Files.readAllLines(targetPath);
             if (gameFileLines.size() < 3) {
                 BotLogger.warning(
-                        "LocalDevelopmentSampleGameService: copied test game file is malformed (expected at least 3 lines): "
+                        "LocalDevelopmentSampleGameService: copied test game file is malformed (expected owner-id, owner-name, and game-name lines): "
                                 + targetPath);
                 return false;
             }

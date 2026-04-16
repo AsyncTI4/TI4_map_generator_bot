@@ -97,14 +97,14 @@ public class RecreateGameService {
 
     @Nullable
     static Guild resolveTargetGuild(Game game, @Nullable Guild preferredGuild) {
-        Guild guildWithExistingChannels = getGuildForExistingChannels(game, true);
-        if (guildWithExistingChannels != null) {
-            return guildWithExistingChannels;
+        Guild limboGuild = getGuildForExistingChannels(game, true);
+        if (limboGuild != null) {
+            return limboGuild;
         }
 
-        guildWithExistingChannels = getGuildForExistingChannels(game, false);
-        if (guildWithExistingChannels != null) {
-            return guildWithExistingChannels;
+        Guild existingChannelGuild = getGuildForExistingChannels(game, false);
+        if (existingChannelGuild != null) {
+            return existingChannelGuild;
         }
 
         if (CreateGameService.getServerCapacityForNewGames(preferredGuild) > 0) {

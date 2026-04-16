@@ -9,15 +9,27 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.testUtils.BaseTi4Test;
 
 class RecreateGameServiceTest extends BaseTi4Test {
+
+    private final Guild originalPrimary = JdaService.guildPrimary;
+    private final List<Guild> originalNewGameServers = new ArrayList<>(JdaService.serversToCreateNewGamesOn);
+
+    @AfterEach
+    void restoreJdaServiceGuildState() {
+        JdaService.guildPrimary = originalPrimary;
+        JdaService.serversToCreateNewGamesOn.clear();
+        JdaService.serversToCreateNewGamesOn.addAll(originalNewGameServers);
+    }
 
     @Test
     void sourceGameNameStripsTestSuffix() {
@@ -91,17 +103,12 @@ class RecreateGameServiceTest extends BaseTi4Test {
         when(game.getMainGameChannel()).thenReturn(null);
         when(game.getTableTalkChannel()).thenReturn(null);
 
-        Guild originalPrimary = JdaService.guildPrimary;
         JdaService.serversToCreateNewGamesOn.clear();
         JdaService.serversToCreateNewGamesOn.add(smallerFallbackGuild);
         JdaService.serversToCreateNewGamesOn.add(fallbackGuild);
         JdaService.guildPrimary = null;
-        try {
-            assertSame(fallbackGuild, RecreateGameService.resolveTargetGuild(game, fullGuild));
-        } finally {
-            JdaService.serversToCreateNewGamesOn.clear();
-            JdaService.guildPrimary = originalPrimary;
-        }
+
+        assertSame(fallbackGuild, RecreateGameService.resolveTargetGuild(game, fullGuild));
     }
 
     private static Guild mockGuildWithCapacity(String name, int roleCount, int channelCount) {
