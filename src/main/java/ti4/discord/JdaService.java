@@ -61,7 +61,7 @@ import ti4.service.draft.SliceGenerationPipeline;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
-import ti4.settings.GlobalSettings.ImplementedSettings;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class JdaService {
@@ -248,7 +248,7 @@ public class JdaService {
         }
 
         // Check for and report a missing bot-log webhook
-        if (!GlobalSettings.settingExists(ImplementedSettings.BOT_LOG_WEBHOOK_URL)) {
+        if (!GlobalSettings.settingExists(GlobalSettings.ImplementedSettings.BOT_LOG_WEBHOOK_URL)) {
             BotLogger.warning(
                     "BOT-LOG WEBHOOK NOT FOUND for Primary GuildID:" + guildPrimaryID
                             + "\nPlease set a valid bot-log Webhook URL using `/developer setting setting_name:bot_log_webhook_url setting_type:string setting_value:<url>`");
@@ -304,7 +304,7 @@ public class JdaService {
         CategoryCleanupCron.register();
 
         // BOT IS READY
-        GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
+        ActiveLeaseService.setCurrentProcessReady(true);
         BotLogger.info("BOT IS READY TO RECEIVE COMMANDS");
         if (GameManager.isManagedGamesWarmupComplete()) {
             updatePresence();
@@ -534,8 +534,7 @@ public class JdaService {
     }
 
     public static boolean isReadyToReceiveCommands() {
-        return GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.READY_TO_RECEIVE_COMMANDS.toString(), Boolean.class, Boolean.FALSE);
+        return ActiveLeaseService.isCurrentProcessReady();
     }
 
     public static List<Category> getAvailablePBDCategories() {
@@ -562,7 +561,7 @@ public class JdaService {
         try {
             jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
             BotLogger.info("SHUTDOWN PROCESS STARTED");
-            GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
+            ActiveLeaseService.setCurrentProcessReady(false);
             BotLogger.info("NO LONGER ACCEPTING COMMANDS");
             if (ExecutorServiceManager.shutdown()) { // will wait for up to an additional 20 seconds
                 BotLogger.info("FINISHED PROCESSING ASYNC THREADPOOL");

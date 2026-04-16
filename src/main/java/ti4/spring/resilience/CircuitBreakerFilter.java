@@ -21,6 +21,7 @@ import ti4.executors.CircuitBreaker;
 public class CircuitBreakerFilter extends OncePerRequestFilter {
 
     private static final String SERVICE_UNAVAILABLE_MESSAGE = "Service temporarily unavailable: ";
+    private static final String READY_PATH = "/api/public/ready";
 
     @Override
     protected void doFilterInternal(
@@ -28,6 +29,10 @@ public class CircuitBreakerFilter extends OncePerRequestFilter {
             @NotNull HttpServletResponse response,
             @NotNull FilterChain filterChain)
             throws ServletException, IOException {
+        if (READY_PATH.equals(request.getRequestURI())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         if (CircuitBreaker.isOpen()) {
             response.sendError(
                     HttpStatus.SERVICE_UNAVAILABLE.value(), SERVICE_UNAVAILABLE_MESSAGE + "circuit breaker is open");

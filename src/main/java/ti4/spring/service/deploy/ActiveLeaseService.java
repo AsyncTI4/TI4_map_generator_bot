@@ -5,10 +5,12 @@ import jakarta.annotation.PreDestroy;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.logging.BotLogger;
+import ti4.spring.context.SpringContext;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +21,7 @@ public class ActiveLeaseService {
     private final InstanceActivityService instanceActivityService;
 
     private final String instanceId = UUID.randomUUID().toString();
+    private final AtomicBoolean ready = new AtomicBoolean(false);
 
     @PostConstruct
     void acquireOnStartup() {
@@ -80,6 +83,14 @@ public class ActiveLeaseService {
         return instanceActivityService.isActive() && stillOwnsLease();
     }
 
+    public boolean isReady() {
+        return ready.get();
+    }
+
+    public void setReady(boolean ready) {
+        this.ready.set(ready);
+    }
+
     public String currentInstanceId() {
         return instanceId;
     }
@@ -95,5 +106,21 @@ public class ActiveLeaseService {
 
     private boolean isExpired(ActiveLeaseEntity lease, Instant now) {
         return lease.getLeaseExpiresAt() == null || lease.getLeaseExpiresAt().isBefore(now);
+    }
+
+    public static boolean isCurrentProcessReady() {
+        try {
+            return SpringContext.getBean(ActiveLeaseService.class).isReady();
+        } catch (IllegalStateException e) {
+            return false;
+        }
+    }
+
+    public static void setCurrentProcessReady(boolean ready) {
+        try {
+            SpringContext.getBean(ActiveLeaseService.class).setReady(ready);
+        } catch (IllegalStateException e) {
+            // Spring not initialized yet; ignore.
+        }
     }
 }
