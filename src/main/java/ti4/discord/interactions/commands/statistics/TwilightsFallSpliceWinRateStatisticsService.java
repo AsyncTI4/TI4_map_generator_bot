@@ -21,7 +21,7 @@ import ti4.model.UnitModel;
 import ti4.service.statistics.StatisticsPipeline;
 
 @UtilityClass
-class TwilightsFallWinRateStatisticsService {
+class TwilightsFallSpliceWinRateStatisticsService {
 
     void queueReply(SlashCommandInteractionEvent event) {
         StatisticsPipeline.queue(event, () -> showWinRates(event));
@@ -29,7 +29,7 @@ class TwilightsFallWinRateStatisticsService {
 
     private static void showWinRates(SlashCommandInteractionEvent event) {
         AtomicInteger gameCount = new AtomicInteger();
-        TwilightsFallWinRateStats stats = new TwilightsFallWinRateStats();
+        TwilightsFallSpliceWinRateStats stats = new TwilightsFallSpliceWinRateStats();
         GamesPage.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event).and(Game::isTwilightsFallMode), game -> {
                     gameCount.incrementAndGet();
@@ -37,26 +37,26 @@ class TwilightsFallWinRateStatisticsService {
                 });
 
         String report = buildReport(gameCount.get(), stats);
-        MessageHelper.sendMessageToThread(event.getChannel(), "Twilight's Fall win rates", report);
+        MessageHelper.sendMessageToThread(event.getChannel(), "Twilight's Fall splice win rates", report);
     }
 
     static String buildReport(List<Game> games) {
-        TwilightsFallWinRateStats stats = new TwilightsFallWinRateStats();
+        TwilightsFallSpliceWinRateStats stats = new TwilightsFallSpliceWinRateStats();
         games.forEach(game -> accumulateGame(game, stats));
         return buildReport(games.size(), stats);
     }
 
-    private static String buildReport(int gameCount, TwilightsFallWinRateStats stats) {
+    private static String buildReport(int gameCount, TwilightsFallSpliceWinRateStats stats) {
         if (gameCount == 0) {
             return "No Twilight's Fall games matched the selected filters.";
         }
 
-        StringBuilder sb = new StringBuilder("## __**Twilight's Fall Win Rates**__\n");
+        StringBuilder sb = new StringBuilder("## __**Twilight's Fall Splice Win Rates**__\n");
         sb.append("Games analyzed: ").append(gameCount).append('\n');
 
-        appendSection(sb, "Abilities", stats.abilities, TwilightsFallWinRateStatisticsService::getAbilityName);
-        appendSection(sb, "Unit Upgrades", stats.unitUpgrades, TwilightsFallWinRateStatisticsService::getUnitName);
-        appendSection(sb, "Genomes", stats.genomes, TwilightsFallWinRateStatisticsService::getGenomeName);
+        appendSection(sb, "Abilities", stats.abilities, TwilightsFallSpliceWinRateStatisticsService::getAbilityName);
+        appendSection(sb, "Unit Upgrades", stats.unitUpgrades, TwilightsFallSpliceWinRateStatisticsService::getUnitName);
+        appendSection(sb, "Genomes", stats.genomes, TwilightsFallSpliceWinRateStatisticsService::getGenomeName);
         return sb.toString();
     }
 
@@ -78,7 +78,7 @@ class TwilightsFallWinRateStatisticsService {
                 .thenComparing(entry -> displayName.apply(entry.getKey()));
     }
 
-    private static void accumulateGame(Game game, TwilightsFallWinRateStats stats) {
+    private static void accumulateGame(Game game, TwilightsFallSpliceWinRateStats stats) {
         List<Player> winners = game.getWinners();
         for (Player player : game.getRealAndEliminatedPlayers()) {
             boolean isWinner = winners.contains(player);
@@ -116,7 +116,7 @@ class TwilightsFallWinRateStatisticsService {
         return leader == null ? leaderId : leader.getTFNameIfAble();
     }
 
-    private static class TwilightsFallWinRateStats {
+    private static class TwilightsFallSpliceWinRateStats {
         private final Map<String, WinRateCount> abilities = initializeAbilities();
         private final Map<String, WinRateCount> unitUpgrades = initializeUnitUpgrades();
         private final Map<String, WinRateCount> genomes = initializeGenomes();

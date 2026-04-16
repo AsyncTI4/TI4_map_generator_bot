@@ -9,7 +9,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
 
-class TwilightsFallWinRateStatisticsServiceTest extends BaseTi4Test {
+class TwilightsFallSpliceWinRateStatisticsServiceTest extends BaseTi4Test {
 
     @Test
     void buildReportCountsAbilitiesUnitUpgradesAndGenomes() {
@@ -34,7 +34,7 @@ class TwilightsFallWinRateStatisticsServiceTest extends BaseTi4Test {
                 "experimentalagent",
                 "tf-dawncrusher");
 
-        String report = TwilightsFallWinRateStatisticsService.buildReport(List.of(firstGame, secondGame));
+        String report = TwilightsFallSpliceWinRateStatisticsService.buildReport(List.of(firstGame, secondGame));
 
         assertTrue(report.contains("Games analyzed: 2"));
         assertTrue(report.contains("- Mitosis: 2/2 (100%)"));
