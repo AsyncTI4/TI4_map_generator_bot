@@ -28,15 +28,15 @@ public class RecreateGameService {
     public static final String LIMBO_CATEGORY_NAME = "The in-limbo PBD Archive";
     public static final String TEST_GAME_MARKER = "::test::";
 
-    public static RecreateGameResult recreateGame(Game game) {
-        return recreateGame(game, game.getGuild(), null);
+    public static String recreateGame(Game game) {
+        return recreateGameResult(game, game.getGuild(), null).getSummary();
     }
 
-    public static RecreateGameResult recreateGame(Game game, Guild guild) {
-        return recreateGame(game, guild, null);
+    public static String recreateGame(Game game, Guild guild) {
+        return recreateGameResult(game, guild, null).getSummary();
     }
 
-    public static RecreateGameResult recreateGame(Game game, Guild guild, @Nullable Member extraAccessMember) {
+    static RecreateGameResult recreateGameResult(Game game, Guild guild, @Nullable Member extraAccessMember) {
         RecreateGameResult result = new RecreateGameResult(game.getName());
         if (game.isFowMode()) {
             result.setStatusLine("Could not recreate game resources for `" + game.getName() + "`.");

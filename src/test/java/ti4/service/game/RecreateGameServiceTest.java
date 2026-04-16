@@ -69,11 +69,11 @@ class RecreateGameServiceTest extends BaseTi4Test {
         when(game.getName()).thenReturn("fow-game");
         when(game.isFowMode()).thenReturn(true);
 
-        RecreateGameService.RecreateGameResult result = RecreateGameService.recreateGame(game, guild);
+        String result = RecreateGameService.recreateGame(game, guild);
 
         assertEquals(
                 "Could not recreate game resources for `fow-game`.\nNotes: Fog of War games are not compatible with recreate game and must be recreated manually.",
-                result.getSummary());
+                result);
     }
 
     @Test
@@ -84,12 +84,12 @@ class RecreateGameServiceTest extends BaseTi4Test {
         when(game.isFowMode()).thenReturn(true);
         when(game.getGuild()).thenReturn(guild);
 
-        RecreateGameService.RecreateGameResult result = RecreateGameService.recreateGame(game);
+        String result = RecreateGameService.recreateGame(game);
 
         verify(game).getGuild();
         assertEquals(
                 "Could not recreate game resources for `fow-game`.\nNotes: Fog of War games are not compatible with recreate game and must be recreated manually.",
-                result.getSummary());
+                result);
     }
 
     @Test

@@ -51,13 +51,12 @@ class LocalDevelopment extends Subcommand {
                 Constants.SOURCE,
                 LocalDevelopmentSampleGameService.DEFAULT_SOURCE_GAME_NAME,
                 OptionMapping::getAsString);
-        RecreateGameService.RecreateGameResult result = LocalDevelopmentSampleGameService.createAndRecreateTestGame(
-                guild, event.getUser().getId(), sourceGame);
+        String result = LocalDevelopmentSampleGameService.createAndRecreateTestGame(guild, event.getUser().getId(), sourceGame);
         if (result == null) {
             MessageHelper.replyToMessage(
                     event, "Failed to create a local development test game from `" + sourceGame + "`.");
             return;
         }
-        MessageHelper.replyToMessage(event, result.getSummary());
+        MessageHelper.replyToMessage(event, result);
     }
 }

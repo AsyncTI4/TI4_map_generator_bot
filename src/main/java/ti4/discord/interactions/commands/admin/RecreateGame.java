@@ -17,7 +17,6 @@ class RecreateGame extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         var game = getGame();
-        RecreateGameService.RecreateGameResult result = RecreateGameService.recreateGame(game);
-        MessageHelper.replyToMessage(event, result.getSummary());
+        MessageHelper.replyToMessage(event, RecreateGameService.recreateGame(game));
     }
 }

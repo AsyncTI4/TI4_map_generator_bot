@@ -53,7 +53,7 @@ public class LocalDevelopmentSampleGameService {
     }
 
     @Nullable
-    public static RecreateGameService.RecreateGameResult createAndRecreateTestGame(
+    public static String createAndRecreateTestGame(
             Guild guild, @Nullable String developerUserId, @Nullable String sourceGameName) {
         if (guild == null) {
             return null;
@@ -66,11 +66,11 @@ public class LocalDevelopmentSampleGameService {
             return null;
         }
         Member developer = developerUserId == null ? null : guild.getMemberById(developerUserId);
-        RecreateGameService.RecreateGameResult result = RecreateGameService.recreateGame(game, guild, developer);
+        RecreateGameService.RecreateGameResult result = RecreateGameService.recreateGameResult(game, guild, developer);
         if (!GameManager.save(game, "Recreated local development test game resources")) {
             result.addNote("Game save failed after recreation.");
         }
-        return result;
+        return result.getSummary();
     }
 
     public static LocalDevelopmentCleanResult cleanTestGames(@Nullable Guild guild) {
