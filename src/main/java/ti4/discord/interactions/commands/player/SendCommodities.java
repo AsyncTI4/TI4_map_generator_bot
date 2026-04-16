@@ -72,7 +72,7 @@ class SendCommodities extends GameStateSubcommand {
         String p2 = targetPlayer.getRepresentation();
         String commString = sendCommodities + " commodit" + (sendCommodities == 1 ? "y" : "ies");
         String message = p1 + " sent " + commString + " to " + p2 + ".";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        MessageHelper.sendMessageToChannel(TransactionHelper.getTradeNotificationChannel(player, game), message);
         ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, targetPlayer, sendCommodities);
         ButtonHelperAbilities.pillageCheck(targetPlayer, game);
         ButtonHelperAbilities.pillageCheck(player, game);
@@ -87,7 +87,8 @@ class SendCommodities extends GameStateSubcommand {
         }
 
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(targetPlayer.getPrivateChannel(), message);
+            MessageHelper.sendMessageToChannel(
+                    TransactionHelper.getTradeNotificationChannel(targetPlayer, game), message);
 
             // Add extra message for transaction visibility
             FoWHelper.pingPlayersTransaction(game, event, player, targetPlayer, commString, null);

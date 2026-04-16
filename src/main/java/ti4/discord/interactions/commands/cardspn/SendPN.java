@@ -12,6 +12,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.TransactionHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
@@ -132,8 +133,9 @@ class SendPN extends GameStateSubcommand {
         String message = player.getRepresentation() + " sent " + CardEmojis.PN + conditionalPNName + preposition
                 + targetPlayer.getRepresentation() + ".";
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(targetPlayer.getPrivateChannel(), message);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Promissory note sent.");
+            MessageHelper.sendMessageToChannel(
+                    TransactionHelper.getTradeNotificationChannel(targetPlayer, game), message);
+            MessageHelper.sendMessageToChannel(TransactionHelper.getTradeNotificationChannel(player, game), message);
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
