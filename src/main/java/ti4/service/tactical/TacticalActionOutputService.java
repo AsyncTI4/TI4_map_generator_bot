@@ -100,7 +100,7 @@ public class TacticalActionOutputService {
 
     private String buildMessageForSingleSystem(
             Game game, Player player, Tile tile, boolean condensed, boolean inclSummary) {
-        String linePrefix = "> " + player.getFactionEmoji();
+        String linePrefix = "> ";
         int distance = CheckDistanceHelper.getDistanceBetweenTwoTiles(
                 game, player, tile.getPosition(), game.getActiveSystem(), true);
         int riftDistance = CheckDistanceHelper.getDistanceBetweenTwoTiles(
@@ -171,7 +171,7 @@ public class TacticalActionOutputService {
                     int amt = states.get(state.ordinal());
                     if (amt == 0) continue;
 
-                    String stateStr = (state == UnitState.none) ? "" : " " + state.humanDescr();
+                    String stateStr = (state == UnitState.none) ? "" : " " + state.stateEmoji();
                     String unitMoveStr = linePrefix + " moved " + amt + color + stateStr + " " + key.unitEmoji();
 
                     String unitHolderStr =
