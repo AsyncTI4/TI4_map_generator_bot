@@ -1,6 +1,5 @@
 package ti4.discord.interactions.commands.admin;
 
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -26,14 +25,7 @@ class RecreateGame extends Subcommand {
             return;
         }
         Game game = GameManager.getManagedGame(gameName).getGame();
-
-        Guild guild = game.getGuild() != null ? game.getGuild() : event.getGuild();
-        if (guild == null) {
-            MessageHelper.replyToMessage(event, "Could not determine which guild should host this game.");
-            return;
-        }
-
-        RecreateGameService.RecreateGameResult result = RecreateGameService.recreateGame(game, guild);
+        RecreateGameService.RecreateGameResult result = RecreateGameService.recreateGame(game);
         MessageHelper.replyToMessage(event, result.getSummary());
     }
 }

@@ -29,6 +29,10 @@ public class RecreateGameService {
     public static final String LIMBO_CATEGORY_NAME = "The in-limbo PBD Archive";
     public static final String TEST_GAME_MARKER = "::test::";
 
+    public static RecreateGameResult recreateGame(Game game) {
+        return recreateGame(game, game.getGuild(), null);
+    }
+
     public static RecreateGameResult recreateGame(Game game, Guild guild) {
         return recreateGame(game, guild, null);
     }

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -70,6 +71,22 @@ class RecreateGameServiceTest extends BaseTi4Test {
 
         RecreateGameService.RecreateGameResult result = RecreateGameService.recreateGame(game, guild);
 
+        assertEquals(
+                "Could not recreate game resources for `fow-game`.\nNotes: Fog of War games are not compatible with recreate game and must be recreated manually.",
+                result.getSummary());
+    }
+
+    @Test
+    void recreateGameWithoutExplicitGuildUsesGameGuild() {
+        Game game = mock(Game.class);
+        Guild guild = mock(Guild.class);
+        when(game.getName()).thenReturn("fow-game");
+        when(game.isFowMode()).thenReturn(true);
+        when(game.getGuild()).thenReturn(guild);
+
+        RecreateGameService.RecreateGameResult result = RecreateGameService.recreateGame(game);
+
+        verify(game).getGuild();
         assertEquals(
                 "Could not recreate game resources for `fow-game`.\nNotes: Fog of War games are not compatible with recreate game and must be recreated manually.",
                 result.getSummary());
