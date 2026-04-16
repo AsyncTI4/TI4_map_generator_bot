@@ -35,32 +35,21 @@ public class LocalDevelopmentSampleGameService {
     private static final int GAME_NAME_LINE_INDEX = 2;
     private static final int MIN_GAME_FILE_LINES = GAME_NAME_LINE_INDEX + 1;
 
-    public static boolean isLocalDevelopmentStartup(String[] args) {
-        return isLocalDevelopmentStartup(args, System.getenv(ENV_VAR_LOCAL_DEV_STARTUP));
+    public static boolean isLocalDevelopmentStartup() {
+        return isLocalDevelopmentStartup(System.getenv(ENV_VAR_LOCAL_DEV_STARTUP));
     }
 
-    static boolean isLocalDevelopmentStartup(String[] args, @Nullable String localDevelopmentStartupValue) {
-        if (args == null || args.length < 3) {
-            return false;
-        }
-        for (int i = 0; i < 3; i++) {
-            if (args[i] == null || args[i].isBlank()) {
-                return false;
-            }
-        }
+    static boolean isLocalDevelopmentStartup(@Nullable String localDevelopmentStartupValue) {
         return Boolean.parseBoolean(localDevelopmentStartupValue);
     }
 
-    public static String getStartupSourceGameName(String[] args) {
+    public static String getStartupSourceGameName() {
         return getStartupSourceGameName(
-                args, System.getenv(ENV_VAR_LOCAL_DEV_STARTUP), System.getenv(ENV_VAR_LOCAL_DEV_SOURCE_GAME));
+                System.getenv(ENV_VAR_LOCAL_DEV_STARTUP), System.getenv(ENV_VAR_LOCAL_DEV_SOURCE_GAME));
     }
 
-    static String getStartupSourceGameName(
-            String[] args, @Nullable String localDevelopmentStartupValue, @Nullable String sourceGameName) {
-        if (!isLocalDevelopmentStartup(args, localDevelopmentStartupValue)
-                || sourceGameName == null
-                || sourceGameName.isBlank()) {
+    static String getStartupSourceGameName(@Nullable String localDevelopmentStartupValue, @Nullable String sourceGameName) {
+        if (!isLocalDevelopmentStartup(localDevelopmentStartupValue) || sourceGameName == null || sourceGameName.isBlank()) {
             return DEFAULT_SOURCE_GAME_NAME;
         }
         return sourceGameName;

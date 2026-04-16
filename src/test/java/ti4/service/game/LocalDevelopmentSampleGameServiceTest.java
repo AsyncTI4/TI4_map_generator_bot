@@ -53,27 +53,22 @@ class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
 
     @Test
     void isLocalDevelopmentStartupRequiresExplicitOptIn() {
-        String[] args = {"token", "user", "guild"};
-
-        assertFalse(LocalDevelopmentSampleGameService.isLocalDevelopmentStartup(args, null));
-        assertFalse(LocalDevelopmentSampleGameService.isLocalDevelopmentStartup(args, "false"));
-        assertTrue(LocalDevelopmentSampleGameService.isLocalDevelopmentStartup(args, "true"));
+        assertFalse(LocalDevelopmentSampleGameService.isLocalDevelopmentStartup(null));
+        assertFalse(LocalDevelopmentSampleGameService.isLocalDevelopmentStartup("false"));
+        assertTrue(LocalDevelopmentSampleGameService.isLocalDevelopmentStartup("true"));
     }
 
     @Test
     void startupSourceGameDefaultsAndRespectsEnvOverride() {
         assertEquals(
                 LocalDevelopmentSampleGameService.DEFAULT_SOURCE_GAME_NAME,
-                LocalDevelopmentSampleGameService.getStartupSourceGameName(
-                        new String[] {"token", "user", "guild"}, "true", null));
+                LocalDevelopmentSampleGameService.getStartupSourceGameName("true", null));
         assertEquals(
                 "pbd42",
-                LocalDevelopmentSampleGameService.getStartupSourceGameName(
-                        new String[] {"token", "user", "guild"}, "true", "pbd42"));
+                LocalDevelopmentSampleGameService.getStartupSourceGameName("true", "pbd42"));
         assertEquals(
                 LocalDevelopmentSampleGameService.DEFAULT_SOURCE_GAME_NAME,
-                LocalDevelopmentSampleGameService.getStartupSourceGameName(
-                        new String[] {"token", "user", "guild"}, "false", "pbd42"));
+                LocalDevelopmentSampleGameService.getStartupSourceGameName("false", "pbd42"));
     }
 
     @Test
