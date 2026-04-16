@@ -61,7 +61,10 @@ class LocalDevelopment extends Subcommand {
                 MessageHelper.replyToMessage(event, result);
                 return;
             }
-            default -> MessageHelper.replyToMessage(event, "Unknown local development action: `" + action + "`.");
+            default -> {
+                MessageHelper.replyToMessage(event, "Unknown local development action: `" + action + "`.");
+                return;
+            }
         }
     }
 }
