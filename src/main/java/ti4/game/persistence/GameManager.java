@@ -1,6 +1,5 @@
 package ti4.game.persistence;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -121,11 +120,6 @@ public class GameManager {
             handleUndo(game);
         }
         return game;
-    }
-
-    @Nullable
-    public static Game loadFromPath(Path path) {
-        return GameLoadService.load(path);
     }
 
     public static List<String> getGameNames() {
