@@ -65,12 +65,12 @@ class TwilightsFallSpliceWinRateStatisticsServiceTest extends BaseTi4Test {
                 "hyperagent",
                 "tf-swa");
 
-        report = TwilightsFallSpliceWinRateStatisticsService.buildReport(List.of(game));
+        String reportWithGame = TwilightsFallSpliceWinRateStatisticsService.buildReport(List.of(game));
 
         Mapper.getDeck(Constants.TF_GENOME).getNewDeck().stream()
                 .map(Mapper::getLeader)
                 .map(leader -> "- " + leader.getTFNameIfAble() + ": ")
-                .forEach(linePrefix -> assertTrue(report.contains(linePrefix), linePrefix));
+                .forEach(linePrefix -> assertTrue(reportWithGame.contains(linePrefix), linePrefix));
     }
 
     private static Game createTwilightsFallGame(
