@@ -14,11 +14,12 @@ services:
       - ti4-rollout
 
   tibot:
-    build: .
+    image: ${IMAGE_REPOSITORY:-ghcr.io/asyncti4/ti4-map-generator-bot}:${IMAGE_TAG:-master}
     restart: unless-stopped
     mem_limit: 7g
     volumes:
       - ${HOST_TI4_SAVES_DIR}:/opt/STORAGE
+      - ${HOST_TI4_REPO_DIR}/src/main/resources:/opt/resources:ro
     environment:
       AWS_ACCESS_KEY_ID: ${AWS_KEY}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET}
