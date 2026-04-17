@@ -7,6 +7,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 class TwilightsFallSpliceWinRateStatisticsServiceTest extends BaseTi4Test {
@@ -44,6 +46,31 @@ class TwilightsFallSpliceWinRateStatisticsServiceTest extends BaseTi4Test {
         assertTrue(report.contains("- Experimental Genome: 1/2 (50%)"));
         assertTrue(report.contains("- Hyper Genome: 1/2 (50%)"));
         assertFalse(report.contains("Carrier II"));
+    }
+
+    @Test
+    void buildReportPrintsEntireGenomeDeck() {
+        String report = TwilightsFallSpliceWinRateStatisticsService.buildReport(List.of());
+        String noGamesMessage = "No Twilight's Fall games matched the selected filters.";
+        assertTrue(noGamesMessage.equals(report));
+
+        Game game = createTwilightsFallGame(
+                "3",
+                "winner-3",
+                "loser-3",
+                "tf-mitosis",
+                "experimentalagent",
+                "tf-dawncrusher",
+                "tf-armada",
+                "hyperagent",
+                "tf-swa");
+
+        report = TwilightsFallSpliceWinRateStatisticsService.buildReport(List.of(game));
+
+        Mapper.getDeck(Constants.TF_GENOME).getNewDeck().stream()
+                .map(Mapper::getLeader)
+                .map(leader -> "- " + leader.getTFNameIfAble() + ": ")
+                .forEach(linePrefix -> assertTrue(report.contains(linePrefix), linePrefix));
     }
 
     private static Game createTwilightsFallGame(

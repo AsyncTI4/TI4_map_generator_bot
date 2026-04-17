@@ -13,6 +13,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GamesPage;
 import ti4.image.Mapper;
+import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.Source.ComponentSource;
@@ -137,10 +138,8 @@ class TwilightsFallSpliceWinRateStatisticsService {
     }
 
     private static Map<String, WinRateCount> initializeGenomes() {
-        return Mapper.getLeaders().values().stream()
-                .filter(leader -> leader.getSource() == ComponentSource.twilights_fall)
-                .filter(leader -> "agent".equalsIgnoreCase(leader.getType()))
-                .collect(LinkedHashMap::new, (map, leader) -> map.put(leader.getId(), new WinRateCount()), Map::putAll);
+        return Mapper.getDeck(Constants.TF_GENOME).getNewDeck().stream().collect(
+                LinkedHashMap::new, (map, leaderId) -> map.put(leaderId, new WinRateCount()), Map::putAll);
     }
 
     private static class WinRateCount {
