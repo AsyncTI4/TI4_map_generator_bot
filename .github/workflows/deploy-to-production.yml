@@ -7,7 +7,7 @@ permissions:
   contents: read
   packages: write
 env:
-  IMAGE_REPOSITORY: ghcr.io/asyncti/ti4-map-generator-bot
+  IMAGE_REPOSITORY: ghcr.io/asyncti4/ti4-map-generator-bot
 concurrency:
   group: deploy-to-production-master
   cancel-in-progress: true

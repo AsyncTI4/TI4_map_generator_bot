@@ -1,7 +1,7 @@
 on: workflow_dispatch
 name: RestartBot
 env:
-  IMAGE_REPOSITORY: ghcr.io/asyncti/ti4-map-generator-bot
+  IMAGE_REPOSITORY: ghcr.io/asyncti4/ti4-map-generator-bot
 concurrency:
   group: "Start Bot"
 jobs:
