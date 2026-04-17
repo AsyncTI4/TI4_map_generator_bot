@@ -4,6 +4,7 @@ import java.time.ZoneId;
 import lombok.experimental.UtilityClass;
 import ti4.logging.BotLogger;
 import ti4.spring.context.SpringContext;
+import ti4.spring.service.deploy.ActiveLeaseService;
 import ti4.spring.service.persistence.PersistAllEntitiesService;
 
 @UtilityClass
@@ -15,6 +16,7 @@ public class PersistToSqlCron {
     }
 
     private static void persist() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running PersistToSqlCron.");
         try {
             SpringContext.getBean(PersistAllEntitiesService.class).persistAll();

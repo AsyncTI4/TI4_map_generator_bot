@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.ButtonProcessor;
 import ti4.logging.BotLogger;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class LogButtonRuntimeStatisticsCron {
@@ -18,6 +19,7 @@ public class LogButtonRuntimeStatisticsCron {
     }
 
     private static void logButtonRuntimeStatistics() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         try {
             String buttonProcessingStatistics = ButtonProcessor.getButtonProcessingStatistics();
             BotLogger.info(buttonProcessingStatistics);

@@ -66,9 +66,8 @@ public class SecretObjectiveInfoService {
     public static void sendSecretObjectiveInfo(
             Game game, Player player, boolean autoDiscardButtons, boolean autoScoreButtons) {
         // SO INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, getSecretObjectiveCardInfo(game, player));
-        MessageHelper.replacePinnedMessageInPlayerCardsInfoThread(
-                player, PINNED_SO_INFO_MESSAGE_ID, getPinnedSecretObjectiveCardInfo(game, player));
+        MessageHelper.sendMessageToPlayerCardsInfoThreadAndPin(
+                game, player, PINNED_SO_INFO_MESSAGE_ID, getSecretObjectiveCardInfo(game, player));
 
         if (player.getSecretsUnscored().isEmpty()) return;
 
@@ -166,63 +165,6 @@ public class SecretObjectiveInfoService {
                 }
             }
         }
-        return sb.toString();
-    }
-
-    private static String getPinnedSecretObjectiveCardInfo(Game game, Player player) {
-        Map<String, Integer> secretObjective = player.getSecrets();
-        Map<String, Integer> scoredSecretObjective = new LinkedHashMap<>(player.getSecretsScored());
-        for (String id : game.getSoToPoList()) {
-            scoredSecretObjective.remove(id);
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("## Latest Secret Objectives (")
-                .append(player.getSoScored())
-                .append('/')
-                .append(player.getMaxSOCount())
-                .append(")\n");
-
-        sb.append("**Scored:**\n");
-        if (scoredSecretObjective.isEmpty()) {
-            sb.append("> None\n");
-        } else {
-            int index = 1;
-            for (Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
-                SecretObjectiveModel soModel = Mapper.getSecretObjective(so.getKey());
-                sb.append(index)
-                        .append("\\. ")
-                        .append(CardEmojis.SecretObjectiveAlt)
-                        .append(" _")
-                        .append(soModel.getName())
-                        .append("_ `(")
-                        .append(so.getValue())
-                        .append(")`\n");
-                index++;
-            }
-        }
-
-        sb.append("**Unscored:**\n");
-        if (secretObjective == null || secretObjective.isEmpty()) {
-            sb.append("> None");
-        } else {
-            int index = 1;
-            for (Map.Entry<String, Integer> so : secretObjective.entrySet()) {
-                SecretObjectiveModel soModel = Mapper.getSecretObjective(so.getKey());
-                sb.append(index)
-                        .append("\\. ")
-                        .append(CardEmojis.SecretObjectiveAlt)
-                        .append(" _")
-                        .append(soModel.getName())
-                        .append("_ - ")
-                        .append(soModel.getPhase())
-                        .append(" `(")
-                        .append(Helper.leftpad("" + so.getValue(), 3))
-                        .append(")`\n");
-                index++;
-            }
-        }
-
         return sb.toString();
     }
 

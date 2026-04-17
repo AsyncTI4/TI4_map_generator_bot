@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 
 class TrapToken extends GameStateSubcommand {
 
-    public TrapToken() {
+    TrapToken() {
         super(Constants.LIZHO_TRAP, "Select planets were to add/remove trap tokens", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet")
                 .setRequired(true)

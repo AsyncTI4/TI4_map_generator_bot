@@ -16,6 +16,7 @@ import ti4.helpers.SecretObjectiveHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.SecretObjectiveModel;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.objectives.DiscardSecretService;
@@ -39,6 +40,12 @@ class SecretObjectiveButtonHandler {
 
         try {
             int soIndex = Integer.parseInt(soID);
+            SecretObjectiveModel secretObjective = player.getSecret(soIndex);
+            if (secretObjective == null) {
+                MessageHelper.sendMessageToPlayerCardsInfoThread(
+                        player, "No such secret objective ID found, please retry.");
+                return;
+            }
 
             String msg = player.getRepresentation() + " discarded a secret objective";
             if (game.getRound() == 1 && !game.isFowMode() && player.getSo() > 1) {
@@ -53,11 +60,13 @@ class SecretObjectiveButtonHandler {
                             + " still to discard)";
                 }
             }
+            if (!DiscardSecretService.discardSO(player, soIndex, game)) {
+                return;
+            }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg + ".");
-            String oldSO = player.getSecret(soIndex).getAlias();
-            DiscardSecretService.discardSO(player, soIndex, game);
 
             if (drawReplacement) {
+                String oldSO = secretObjective.getAlias();
                 DrawSecretService.drawSO(event, game, player);
 
                 if (player.getSecrets().containsKey(oldSO)

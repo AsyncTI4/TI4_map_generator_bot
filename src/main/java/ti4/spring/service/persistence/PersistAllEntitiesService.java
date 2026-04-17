@@ -12,6 +12,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
+import ti4.helpers.TIGLHelper;
 import ti4.logging.BotLogger;
 import ti4.service.map.FractureService;
 
@@ -83,6 +84,8 @@ public class PersistAllEntitiesService {
         gameEntity.setFrankenMode(game.isFrankenGame());
         gameEntity.setAllianceMode(game.isAllianceMode());
         gameEntity.setTwilightImperiumGlobalLeague(game.isCompetitiveTIGLGame());
+        gameEntity.setTwilightImperiumGlobalLeagueFractured(
+                game.isCompetitiveTIGLGame() && TIGLHelper.isFracturedTIGLGame(game));
         gameEntity.setTwilightImperiumGlobalLeagueRank(
                 game.getMinimumTIGLRankAtGameStart() == null
                         ? null

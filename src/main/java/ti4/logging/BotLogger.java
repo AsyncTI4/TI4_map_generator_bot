@@ -29,6 +29,7 @@ import ti4.message.MessageHelper;
 import ti4.service.statistics.SREStats;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class BotLogger {
@@ -243,10 +244,12 @@ public class BotLogger {
         if (origin != null) {
             // Add header text iff the error spans multiple lines
             if (multiline || err != null) msg.append(severity.headerText);
+            msg.append(ActiveLeaseService.getCurrentProcessLogPrefix());
             msg.append(origin.getOriginTimeFormatted());
             if (origin.getEventString() != null) msg.append(origin.getEventString());
             if (origin.getGameInfo() != null) msg.append(origin.getGameInfo());
         } else {
+            msg.append(ActiveLeaseService.getCurrentProcessLogPrefix());
             msg.append(DateTimeHelper.getCurrentTimestamp());
         }
         channel = getLogChannel(severity);

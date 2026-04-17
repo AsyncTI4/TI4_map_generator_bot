@@ -442,7 +442,7 @@ public final class Constants {
     public static final String LIZHO_SWAP_TRAP = "lizho_swap_trap";
     public static final String STELLAR_CONVERTER = "stellar_converter";
     public static final String EXPEDITION_WIN_RATES = "expedition_win_rates";
-    public static final String TWILIGHTS_FALL_SPLICE_WIN_RATES = "twilights_fall_splice_win_rates";
+    public static final String TWILIGHTS_FALL_SPLICE_WIN_RATES = "tf_splice_win_rates";
     public static final String SEND_DEBT = "send_debt";
     public static final String DEBT_COUNT = "debt_count";
     public static final String REMOVE_DEBT = "remove_debt";
