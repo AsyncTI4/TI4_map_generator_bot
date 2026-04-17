@@ -1,5 +1,4 @@
 .git
-.worktrees
 .idea
 target
 **/*.iml
@@ -7,5 +6,3 @@ target
 node_modules
 *.log
 .DS_Store
-docs
-scripts
