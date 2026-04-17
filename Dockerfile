@@ -8,6 +8,7 @@ RUN --mount=type=cache,target=/root/.m2 \
     mvn -B -ntp -DskipTests dependency:go-offline
 
 # add sources late for better layer reuse
+COPY src/test ./src/test
 COPY src/main/resources ./src/main/resources
 COPY src/main/java ./src/main/java
 
