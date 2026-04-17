@@ -20,7 +20,8 @@ public abstract class SubcommandGroup extends SubcommandGroupData implements Com
     public boolean accept(SlashCommandInteractionEvent event) {
         if (!getName().equals(event.getInteraction().getSubcommandGroup())) return false;
 
-        return getGroupSubcommands().containsKey(event.getInteraction().getSubcommandName());
+        Subcommand subcommand = getGroupSubcommands().get(event.getInteraction().getSubcommandName());
+        return subcommand != null && subcommand.accept(event);
     }
 
     public void execute(SlashCommandInteractionEvent event) {
