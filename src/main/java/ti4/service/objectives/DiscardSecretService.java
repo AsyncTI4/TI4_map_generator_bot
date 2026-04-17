@@ -16,7 +16,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 @UtilityClass
 public class DiscardSecretService {
 
-    public static void discardSO(Player player, int SOID, Game game) {
+    public static boolean discardSO(Player player, int SOID, Game game) {
         String soIDString = "";
         for (Map.Entry<String, Integer> so : player.getSecrets().entrySet()) {
             if (so.getValue().equals(SOID)) {
@@ -27,7 +27,7 @@ public class DiscardSecretService {
         if (!removed) {
             MessageHelper.sendMessageToPlayerCardsInfoThread(
                     player, "No such secret objective ID found, please retry.");
-            return;
+            return false;
         }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, "Secret objective discarded.");
 
@@ -45,6 +45,7 @@ public class DiscardSecretService {
         }
 
         handleSecretObjectiveDrawOrder(game, player);
+        return true;
     }
 
     private static void handleSecretObjectiveDrawOrder(Game game, Player player) {
