@@ -13,7 +13,7 @@ COPY src/main/resources ./src/main/resources
 COPY src/main/java ./src/main/java
 
 RUN --mount=type=cache,target=/root/.m2 \
-    mvn -B -ntp -DskipTests clean package
+    mvn -B -ntp -Dmaven.test.skip=true clean package
 
 # ---- Runtime stage ----
 FROM amazoncorretto:21-alpine

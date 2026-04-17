@@ -14,7 +14,7 @@ services:
       - ti4-rollout
 
   tibot:
-    image: ${IMAGE_REPOSITORY:-ghcr.io/asyncti/ti4-map-generator-bot}:${IMAGE_TAG:-master}
+    image: ${IMAGE_REPOSITORY:-ghcr.io/asyncti4/ti4-map-generator-bot}:${IMAGE_TAG:-master}
     restart: unless-stopped
     mem_limit: 7g
     volumes:
