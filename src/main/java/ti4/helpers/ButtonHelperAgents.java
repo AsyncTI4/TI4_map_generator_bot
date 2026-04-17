@@ -1196,6 +1196,21 @@ public final class ButtonHelperAgents {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "T'ro An, the N'orr"
                     + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
+            if (!rest.contains("_")) {
+                Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
+                if (activeSystem == null || activeSystem.getPlanetUnitHolders().isEmpty()) {
+                    MessageHelper.sendMessageToChannel(
+                            channel,
+                            trueIdentity + ", choose the planet for " + ssruuClever + "T'ro An, the N'orr"
+                                    + ssruuSlash
+                                    + " agent from the tactical action buttons while an active system with planets is selected.");
+                    return;
+                }
+                message = trueIdentity + ", please choose the planet where you wish to place 2 infantry with "
+                        + ssruuClever + "T'ro An, the N'orr" + ssruuSlash + " agent.";
+                MessageHelper.sendMessageToChannelWithButtons(channel, message, getSardakkAgentButtons(game));
+                return;
+            }
             String posNPlanet = rest.replace("sardakkagent_", "");
             String pos = posNPlanet.split("_")[0];
             String planetName = posNPlanet.split("_")[1];
