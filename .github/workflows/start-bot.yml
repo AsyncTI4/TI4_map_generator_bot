@@ -1,7 +1,5 @@
 on: workflow_dispatch
 name: StartBot
-env:
-  IMAGE_REPOSITORY: ghcr.io/asyncti4/ti4-map-generator-bot
 concurrency:
   group: "Start Bot"
 jobs:
@@ -35,24 +33,19 @@ jobs:
           set -eu
           
           cd ${{ vars.HOST_TI4_REPO_DIR }}
-          echo "Pulling deployment config from GitHub..."
-          git pull --ff-only
           export HOST_TI4_SAVES_DIR="${{ vars.HOST_TI4_SAVES_DIR }}"
-          export HOST_TI4_REPO_DIR="${{ vars.HOST_TI4_REPO_DIR }}"
           export GUILDID_LIST="${{ vars.GUILDID_LIST }}"
           export COMPOSE_PROJECT_NAME="ti4-bot"
-          export IMAGE_REPOSITORY="${{ env.IMAGE_REPOSITORY }}"
-          export IMAGE_TAG="master"
           compose_file="docker-compose.production.yml"
           
-          echo "Pulling docker image..."
+          echo "Building docker image..."
           docker version
-          docker compose -f "$compose_file" pull tibot
+          docker compose -f "$compose_file" build tibot
           
           echo "Starting Container..."
           docker compose -f "$compose_file" up -d traefik tibot
           echo "Cleaning up docker stuff..."
           
-          docker image prune --force --filter until=48h
+          docker image prune --force
           
           echo "DONE!"
