@@ -1,5 +1,6 @@
 package ti4.discord.interactions.commands.statistics;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -52,7 +53,7 @@ class TwilightsFallSpliceWinRateStatisticsServiceTest extends BaseTi4Test {
     void buildReportPrintsEntireGenomeDeck() {
         String report = TwilightsFallSpliceWinRateStatisticsService.buildReport(List.of());
         String noGamesMessage = "No Twilight's Fall games matched the selected filters.";
-        assertTrue(noGamesMessage.equals(report));
+        assertEquals(noGamesMessage, report);
 
         Game game = createTwilightsFallGame(
                 "3",
