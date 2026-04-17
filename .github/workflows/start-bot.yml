@@ -1,5 +1,7 @@
 on: workflow_dispatch
 name: StartBot
+env:
+  IMAGE_REPOSITORY: ghcr.io/asyncti/ti4-map-generator-bot
 concurrency:
   group: "Start Bot"
 jobs:
@@ -23,29 +25,38 @@ jobs:
         ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
         ROLLBAR_ENVIRONMENT: production
         ROLLBAR_CODE_VERSION: ${{ github.sha }}
+        GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+        GHCR_READ_PACKAGES_TOKEN: ${{ secrets.GHCR_READ_PACKAGES_TOKEN }}
       with:
         host: ${{ secrets.HOSTINGER_SSH_HOST }}
         username: ${{ secrets.HOSTINGER_SSH_USER }}
         password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
         port: ${{ secrets.HOSTINGER_SSH_PORT }}
-        envs: AWS_KEY, AWS_SECRET, DISCORD_BOT_TOKEN, DISCORD_BOT_USERID, REPO_DISPATCH_TOKEN, TI4_ULTIMATE_STATISTICS_API_KEY, MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY, DISCORD_REDIRECT_URI, DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, ROLLBAR_ACCESS_TOKEN, ROLLBAR_ENVIRONMENT, ROLLBAR_CODE_VERSION
+        envs: AWS_KEY, AWS_SECRET, DISCORD_BOT_TOKEN, DISCORD_BOT_USERID, REPO_DISPATCH_TOKEN, TI4_ULTIMATE_STATISTICS_API_KEY, MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY, DISCORD_REDIRECT_URI, DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, ROLLBAR_ACCESS_TOKEN, ROLLBAR_ENVIRONMENT, ROLLBAR_CODE_VERSION, GHCR_USERNAME, GHCR_READ_PACKAGES_TOKEN
         script: |
           set -eu
           
           cd ${{ vars.HOST_TI4_REPO_DIR }}
+          echo "Pulling deployment config from GitHub..."
+          git pull --ff-only
           export HOST_TI4_SAVES_DIR="${{ vars.HOST_TI4_SAVES_DIR }}"
           export GUILDID_LIST="${{ vars.GUILDID_LIST }}"
           export COMPOSE_PROJECT_NAME="ti4-bot"
+          export IMAGE_REPOSITORY="${{ env.IMAGE_REPOSITORY }}"
+          export IMAGE_TAG="master"
           compose_file="docker-compose.production.yml"
           
-          echo "Building docker image..."
+          echo "Pulling docker image..."
           docker version
-          docker compose -f "$compose_file" build tibot
+          if [ -n "${GHCR_READ_PACKAGES_TOKEN:-}" ]; then
+            echo "$GHCR_READ_PACKAGES_TOKEN" | docker login ghcr.io -u "${GHCR_USERNAME}" --password-stdin
+          fi
+          docker compose -f "$compose_file" pull tibot
           
           echo "Starting Container..."
           docker compose -f "$compose_file" up -d traefik tibot
           echo "Cleaning up docker stuff..."
           
-          docker image prune --force
+          docker image prune --force --filter until=168h
           
           echo "DONE!"
