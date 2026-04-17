@@ -913,15 +913,15 @@ public class ButtonHelperCommanders {
             Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
         Tile tile = game.getTileFromPlanet(planet);
+        String playerFactionEmoji = player.getFactionEmoji();
+        String planetRepresentation = Helper.getPlanetRepresentation(planet, game);
         Player destroyedPlayer = null;
         for (Player p2 : game.getPlayers().values()) {
-            if (p2.getColor() == null
-                    || p2 == player
-                    || player.getAllianceMembers().contains(p2.getFaction())) {
+            boolean isAllianceMember = player.getAllianceMembers().contains(p2.getFaction());
+            if (p2.getColor() == null || p2 == player || isAllianceMember) {
                 continue; // fix indoctrinate vs neutral
             }
-            if (FoWHelper.playerHasInfantryOnPlanet(p2, tile, planet)
-                    && !player.getAllianceMembers().contains(p2.getFaction())) {
+            if (FoWHelper.playerHasInfantryOnPlanet(p2, tile, planet)) {
                 DestroyUnitService.destroyUnits(event, tile, game, p2.getColor(), "1 infantry " + planet, true);
                 destroyedPlayer = p2;
                 break;
@@ -929,14 +929,14 @@ public class ButtonHelperCommanders {
         }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getFactionEmoji() + " destroyed 1 opposing infantry on "
-                        + Helper.getPlanetRepresentation(planet, game) + " using the Avhkan, the Pharad’n commander.");
+                playerFactionEmoji + " destroyed 1 opposing infantry on " + planetRepresentation
+                        + " using the Avhkan, the Pharad’n commander.");
         if (game.isFowMode() && destroyedPlayer != null) {
             MessageHelper.sendPrivateMessageToPlayer(
                     destroyedPlayer,
                     game,
-                    player.getFactionEmoji() + " destroyed 1 of your infantry on "
-                            + Helper.getPlanetRepresentation(planet, game)
+                    playerFactionEmoji + " destroyed 1 of your infantry on "
+                            + planetRepresentation
                             + " using the Avhkan, the Pharad’n commander.");
         }
     }
