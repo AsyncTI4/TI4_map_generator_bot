@@ -211,11 +211,6 @@ class WeirdGameSetup extends GameStateSubcommand {
             boolean discordantStarsMode,
             boolean isTIGLGame,
             boolean votcMode) {
-        if (isTIGLGame && (game.isAllianceMode() || game.isCommunityMode())) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "TIGL Games cannot be mixed with Alliance or Community mode.");
-            return false;
-        }
         if (isTIGLGame
                 && !TIGLHelper.isFracturedTIGLGame(game)
                 && (baseGameMode
@@ -223,9 +218,11 @@ class WeirdGameSetup extends GameStateSubcommand {
                         || discordantStarsMode
                         || game.isHomebrewSCMode()
                         || game.isFowMode()
+                        || game.isAllianceMode()
+                        || game.isCommunityMode()
                         || votcMode)) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "TIGL Games in standard ladder cannot be mixed with other game modes.");
+                    event.getMessageChannel(), "TIGL Games cannot be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {
             TIGLHelper.initializeTIGLGame(game);
