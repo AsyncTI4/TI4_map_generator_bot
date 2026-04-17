@@ -25,14 +25,12 @@ jobs:
         ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
         ROLLBAR_ENVIRONMENT: production
         ROLLBAR_CODE_VERSION: ${{ github.sha }}
-        GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
-        GHCR_READ_PACKAGES_TOKEN: ${{ secrets.GHCR_READ_PACKAGES_TOKEN }}
       with:
         host: ${{ secrets.HOSTINGER_SSH_HOST }}
         username: ${{ secrets.HOSTINGER_SSH_USER }}
         password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
         port: ${{ secrets.HOSTINGER_SSH_PORT }}
-        envs: AWS_KEY, AWS_SECRET, DISCORD_BOT_TOKEN, DISCORD_BOT_USERID, REPO_DISPATCH_TOKEN, TI4_ULTIMATE_STATISTICS_API_KEY, MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY, DISCORD_REDIRECT_URI, DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, ROLLBAR_ACCESS_TOKEN, ROLLBAR_ENVIRONMENT, ROLLBAR_CODE_VERSION, GHCR_USERNAME, GHCR_READ_PACKAGES_TOKEN
+        envs: AWS_KEY, AWS_SECRET, DISCORD_BOT_TOKEN, DISCORD_BOT_USERID, REPO_DISPATCH_TOKEN, TI4_ULTIMATE_STATISTICS_API_KEY, MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY, DISCORD_REDIRECT_URI, DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, ROLLBAR_ACCESS_TOKEN, ROLLBAR_ENVIRONMENT, ROLLBAR_CODE_VERSION
         script: |
           set -eu
           
@@ -48,9 +46,6 @@ jobs:
           
           echo "Pulling docker image..."
           docker version
-          if [ -n "${GHCR_READ_PACKAGES_TOKEN:-}" ]; then
-            echo "$GHCR_READ_PACKAGES_TOKEN" | docker login ghcr.io -u "${GHCR_USERNAME}" --password-stdin
-          fi
           docker compose -f "$compose_file" pull tibot
           
           echo "Starting Container..."
