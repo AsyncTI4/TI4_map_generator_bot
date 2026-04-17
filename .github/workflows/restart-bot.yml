@@ -73,6 +73,6 @@ jobs:
           fi
           echo "Cleaning up docker stuff..."
           
-          docker image prune --force --filter until=168h
+          docker image prune --force --filter until=48h
           
           echo "DONE!"

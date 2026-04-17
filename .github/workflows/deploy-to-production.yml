@@ -125,8 +125,8 @@ jobs:
               curl -X POST -H 'Content-Type: application/json' -d "{\"content\":\"\`$timestamp\`CLEANING UP DOCKER\"}" $DISCORD_WEBHOOK_URL
               echo "Cleaning up docker stuff..."
               
-              docker image prune --force --filter until=168h
-              docker builder prune --force --filter until=168h
+              docker image prune --force --filter until=48h
+              docker builder prune --force --filter until=48h
               
               echo "DONE!"
   saveGamesAfterDeploy:
