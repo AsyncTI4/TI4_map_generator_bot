@@ -14,10 +14,12 @@ class TwilightsFallSpliceWinRates extends Subcommand {
     private static final String FOG_FILTER = "is_fog";
 
     TwilightsFallSpliceWinRates() {
-        super(Constants.TWILIGHTS_FALL_SPLICE_WIN_RATES, "Twilight's Fall splice ability, unit upgrade, and genome win rates");
+        super(
+                Constants.TWILIGHTS_FALL_SPLICE_WIN_RATES,
+                "Twilight's Fall splice ability, unit upgrade, and genome win rates");
         addOptions(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Filter by player count, e.g. 3-8"));
         addOptions(new OptionData(
-            OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Filter by victory point goal, e.g. 10-14"));
+                OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Filter by victory point goal, e.g. 10-14"));
         addOptions(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter by if the game is a fog game"));
         addOptions(new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Filter by if the game has any homebrew"));
     }
