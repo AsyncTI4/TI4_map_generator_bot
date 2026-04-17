@@ -14,6 +14,7 @@ import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessageManager;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class EndOldGamesCron {
@@ -27,6 +28,7 @@ public class EndOldGamesCron {
     }
 
     private static void endOldGames() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running EndOldGamesCron.");
         try {
             GameManager.getManagedGames().stream()

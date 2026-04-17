@@ -10,6 +10,7 @@ import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.TechSummariesMetadataManager;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class TechSummaryCron {
@@ -20,6 +21,7 @@ public class TechSummaryCron {
     }
 
     private static void postTechSummaries() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running TechSummaryCron.");
         TechSummariesMetadataManager.consumeAndPersist(TechSummaryCron::postTechSummaries);
         BotLogger.logCron("Finished TechSummaryCron.");

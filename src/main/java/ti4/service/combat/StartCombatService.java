@@ -353,7 +353,9 @@ public class StartCombatService {
         }
         if (amount > 2 || tile.getNumberOfUnitsInSystem() > 2) {
             MessageHelper.sendMessageToChannel(
-                    threadChannel, ButtonHelper.getTileSummaryMessage(game, true, tile, player1, event));
+                    threadChannel,
+                    ButtonHelper.getCombatTileSummaryMessage(
+                            game, tile, player1, event, spaceOrGround, unitHolderName, List.of(player1, player2)));
         }
 
         // Space Cannon Offense

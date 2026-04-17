@@ -861,6 +861,43 @@ public class MessageHelper {
         sendMessageToChannel(threadChannel, messageText);
     }
 
+    public static void replacePinnedMessageInPlayerCardsInfoThread(
+            @NotNull Player player, @NotNull String storedValueKey, String messageText) {
+        if (messageText == null || messageText.isEmpty()) {
+            return;
+        }
+
+        ThreadChannel threadChannel = player.getCardsInfoThread();
+        if (threadChannel == null) {
+            return;
+        }
+
+        splitAndSentWithAction(messageText, threadChannel, msg -> {
+            String previousMessageId = player.getStoredValue(storedValueKey);
+            Runnable pinAndTrack =
+                    () -> msg.pin().queue(success -> player.addStoredValue(storedValueKey, msg.getId()), error -> {
+                        player.addStoredValue(storedValueKey, msg.getId());
+                        String err = getRestActionFailureMessage(
+                                threadChannel, "Failed to pin cards info snapshot", null, error);
+                        BotLogger.error(err, error);
+                    });
+
+            if (StringUtils.isBlank(previousMessageId) || previousMessageId.equals(msg.getId())) {
+                pinAndTrack.run();
+                return;
+            }
+
+            threadChannel.deleteMessageById(previousMessageId).queue(success -> pinAndTrack.run(), error -> {
+                if (!isUnknownMessageError(error)) {
+                    String err = getRestActionFailureMessage(
+                            threadChannel, "Failed to delete previous pinned cards info snapshot", null, error);
+                    BotLogger.error(err, error);
+                }
+                pinAndTrack.run();
+            });
+        });
+    }
+
     /**
      * Given a text string and a maximum length, will return a List<String> split by
      * either the max length or the last newline "\n"

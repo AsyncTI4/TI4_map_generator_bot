@@ -16,6 +16,7 @@ import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 import ti4.service.button.ReactionService;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class FastScFollowCron {
@@ -28,6 +29,7 @@ public class FastScFollowCron {
     }
 
     private static void handleFastScFollow() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running FastScFollowCron");
 
         GameManager.getManagedGames().stream()

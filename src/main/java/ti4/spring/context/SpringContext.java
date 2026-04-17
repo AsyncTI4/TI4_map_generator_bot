@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,5 +26,13 @@ public final class SpringContext implements ApplicationContextAware {
             throw new IllegalStateException("ApplicationContext not initialized");
         }
         return context.getBean(type);
+    }
+
+    public static void closeApplicationContext() {
+        ApplicationContext context = applicationContext;
+        if (!(context instanceof ConfigurableApplicationContext configurableApplicationContext)) {
+            throw new IllegalStateException("ApplicationContext is not configurable");
+        }
+        configurableApplicationContext.close();
     }
 }
