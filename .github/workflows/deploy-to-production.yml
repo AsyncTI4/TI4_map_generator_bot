@@ -3,11 +3,6 @@ on:
     branches: [ "master" ]
   workflow_dispatch:
 name: BuildAndDeploy
-permissions:
-  contents: read
-  packages: write
-env:
-  IMAGE_REPOSITORY: ghcr.io/asyncti4/ti4-map-generator-bot
 concurrency:
   group: deploy-to-production-master
   cancel-in-progress: true
@@ -15,40 +10,11 @@ jobs:
   saveGamesBeforeDeploy:
     uses: ./.github/workflows/force-backup-of-savefiles.yml
     secrets: inherit
-  buildImage:
-    needs: saveGamesBeforeDeploy
-    name: Build & Publish Bot Image
-    runs-on: ubuntu-latest
-    outputs:
-      image_tag: ${{ steps.image.outputs.image_tag }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Compute image tag
-        id: image
-        run: echo "image_tag=sha-${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: |
-            ${{ env.IMAGE_REPOSITORY }}:${{ steps.image.outputs.image_tag }}
-            ${{ env.IMAGE_REPOSITORY }}:master
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
   build:
     concurrency:
       group: "Start Bot"
-    needs: [saveGamesBeforeDeploy, buildImage]
-    name: Pull & Deploy Bot
+    needs: saveGamesBeforeDeploy
+    name: Build, Test, & Deploy Bot
     runs-on: ubuntu-latest
     steps:
       - name: Execute remote ssh commands
@@ -79,15 +45,13 @@ jobs:
 
               timestamp=$(date "+%F %T.%3N")
               curl -X POST -H 'Content-Type: application/json' -d "{\"content\":\"\`$timestamp\`NEW DEPLOYMENT TRIGGERED\"}" $DISCORD_WEBHOOK_URL
-              echo "Pulling deployment config from GitHub..."
+              echo "Pulling changes from GitHub..."
               cd ${{ vars.HOST_TI4_REPO_DIR }}
               git pull --ff-only
               export HOST_TI4_SAVES_DIR="${{ vars.HOST_TI4_SAVES_DIR }}"
               export HOST_TI4_REPO_DIR="${{ vars.HOST_TI4_REPO_DIR }}"
               export GUILDID_LIST="${{ vars.GUILDID_LIST }}"
               export COMPOSE_PROJECT_NAME="ti4-bot"
-              export IMAGE_REPOSITORY="${{ env.IMAGE_REPOSITORY }}"
-              export IMAGE_TAG="${{ needs.buildImage.outputs.image_tag }}"
               compose_file="docker-compose.production.yml"
               rollout_plugin_path="$HOME/.docker/cli-plugins/docker-rollout"
 
@@ -99,10 +63,11 @@ jobs:
               fi
 
               timestamp=$(date "+%F %T.%3N")
-              curl -X POST -H 'Content-Type: application/json' -d "{\"content\":\"\`$timestamp\`PULLING DOCKER IMAGE ${IMAGE_TAG}\"}" $DISCORD_WEBHOOK_URL
+              curl -X POST -H 'Content-Type: application/json' -d "{\"content\":\"\`$timestamp\`BUILDING DOCKER IMAGE\"}" $DISCORD_WEBHOOK_URL
+              echo "Building docker image..."
               docker version
-              docker compose -f "$compose_file" pull tibot
-
+              docker compose -f "$compose_file" build tibot
+              
               timestamp=$(date "+%F %T.%3N")
               curl -X POST -H 'Content-Type: application/json' -d "{\"content\":\"\`$timestamp\`ENSURING TRAEFIK PROXY IS RUNNING\"}" $DISCORD_WEBHOOK_URL
               docker compose -f "$compose_file" up -d traefik
@@ -121,8 +86,8 @@ jobs:
               curl -X POST -H 'Content-Type: application/json' -d "{\"content\":\"\`$timestamp\`CLEANING UP DOCKER\"}" $DISCORD_WEBHOOK_URL
               echo "Cleaning up docker stuff..."
               
-              docker image prune --force --filter until=48h
-              docker builder prune --force --filter until=48h
+              docker image prune --force
+              docker builder prune --force
               
               echo "DONE!"
   saveGamesAfterDeploy:
