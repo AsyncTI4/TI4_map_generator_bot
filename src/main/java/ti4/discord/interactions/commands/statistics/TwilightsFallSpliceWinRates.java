@@ -16,7 +16,8 @@ class TwilightsFallSpliceWinRates extends Subcommand {
         addOptions(new OptionData(
                 OptionType.INTEGER, GameStatisticsFilterer.PLAYER_COUNT_FILTER, "Filter by player count, e.g. 3-8"));
         addOptions(new OptionData(
-                OptionType.INTEGER, GameStatisticsFilterer.VICTORY_POINT_GOAL_FILTER,
+                OptionType.INTEGER,
+                GameStatisticsFilterer.VICTORY_POINT_GOAL_FILTER,
                 "Filter by victory point goal, e.g. 10-14"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN, GameStatisticsFilterer.FOG_FILTER, "Filter by if the game is a fog game"));
