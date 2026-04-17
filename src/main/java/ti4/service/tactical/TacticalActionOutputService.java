@@ -17,6 +17,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Constants;
@@ -37,9 +38,19 @@ public class TacticalActionOutputService {
         List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);
         if (event == null) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, systemButtons);
+        } else if (requiresFreshMessageForChoosingTileRefresh(systemButtons)) {
+            MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(event.getMessageChannel(), message, systemButtons);
+            ButtonHelper.deleteMessage(event);
         } else {
             MessageHelper.editMessageWithButtons(event, message, systemButtons);
         }
+    }
+
+    static boolean requiresFreshMessageForChoosingTileRefresh(List<Button> buttons) {
+        if (buttons == null || buttons.isEmpty()) {
+            return false;
+        }
+        return MessageHelper.getPartitionedButtonLists(new ArrayList<>(buttons)).size() > 1;
     }
 
     public void refreshButtonsAndMessageForTile(
