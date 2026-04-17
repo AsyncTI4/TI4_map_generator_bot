@@ -38,6 +38,7 @@ jobs:
           echo "Pulling deployment config from GitHub..."
           git pull --ff-only
           export HOST_TI4_SAVES_DIR="${{ vars.HOST_TI4_SAVES_DIR }}"
+          export HOST_TI4_REPO_DIR="${{ vars.HOST_TI4_REPO_DIR }}"
           export GUILDID_LIST="${{ vars.GUILDID_LIST }}"
           export COMPOSE_PROJECT_NAME="ti4-bot"
           export IMAGE_REPOSITORY="${{ env.IMAGE_REPOSITORY }}"
