@@ -41,6 +41,7 @@ import ti4.discord.interactions.commands.special.Special2Command;
 import ti4.discord.interactions.commands.special.SpecialCommand;
 import ti4.discord.interactions.commands.spin.SpinCommand;
 import ti4.discord.interactions.commands.statistics.StatisticsCommand;
+import ti4.discord.interactions.commands.statistics.StatisticsCommand2;
 import ti4.discord.interactions.commands.status.StatusCommand;
 import ti4.discord.interactions.commands.tech.TechCommand;
 import ti4.discord.interactions.commands.tf.TwilightFallCommand;
@@ -123,6 +124,7 @@ public class SlashCommandManager {
                     new DiscordantStarsCommand(),
                     new TwilightFallCommand(),
                     new StatisticsCommand(),
+                    new StatisticsCommand2(),
                     new TechCommand(),
                     new BreakthroughCommand(),
                     new PlanetCommand(),
