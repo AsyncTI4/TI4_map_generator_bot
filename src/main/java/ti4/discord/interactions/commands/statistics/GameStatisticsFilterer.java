@@ -26,10 +26,10 @@ public class GameStatisticsFilterer {
 
     public static final String PLAYER_COUNT_FILTER = "player_count";
     private static final String MIN_PLAYER_COUNT_FILTER = "min_player_count";
-    private static final String VICTORY_POINT_GOAL_FILTER = "victory_point_goal";
+    static final String VICTORY_POINT_GOAL_FILTER = "victory_point_goal";
     public static final String GAME_TYPES_FILTER = "game_type";
-    private static final String FOG_FILTER = "is_fog";
-    private static final String HOMEBREW_FILTER = "has_homebrew";
+    static final String FOG_FILTER = "is_fog";
+    static final String HOMEBREW_FILTER = "has_homebrew";
     private static final String HAS_WINNER_FILTER = "has_winner";
     public static final String WINNING_FACTION_FILTER = "winning_faction";
     public static final String EXCLUDED_GAME_TYPES_FILTER = "exclude_game_types";
