@@ -19,7 +19,6 @@ services:
     mem_limit: 7g
     volumes:
       - ${HOST_TI4_SAVES_DIR}:/opt/STORAGE
-      - ${HOST_TI4_REPO_DIR}/src/main/resources:/opt/resources:ro
     environment:
       AWS_ACCESS_KEY_ID: ${AWS_KEY}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET}

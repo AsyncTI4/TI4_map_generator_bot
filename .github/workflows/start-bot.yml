@@ -34,7 +34,6 @@ jobs:
           
           cd ${{ vars.HOST_TI4_REPO_DIR }}
           export HOST_TI4_SAVES_DIR="${{ vars.HOST_TI4_SAVES_DIR }}"
-          export HOST_TI4_REPO_DIR="${{ vars.HOST_TI4_REPO_DIR }}"
           export GUILDID_LIST="${{ vars.GUILDID_LIST }}"
           export COMPOSE_PROJECT_NAME="ti4-bot"
           compose_file="docker-compose.production.yml"
