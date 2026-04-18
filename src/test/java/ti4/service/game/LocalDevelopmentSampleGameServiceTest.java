@@ -80,8 +80,7 @@ class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
         Files.deleteIfExists(existingPath);
         Files.write(existingPath, java.util.List.of("owner-id", "owner-name", "game-name"));
         try {
-            assertEquals(
-                    "localdevnaming-test-2", LocalDevelopmentSampleGameService.buildTestGameName(sourceGameName));
+            assertEquals("localdevnaming-test-2", LocalDevelopmentSampleGameService.buildTestGameName(sourceGameName));
         } finally {
             Files.deleteIfExists(existingPath);
         }
