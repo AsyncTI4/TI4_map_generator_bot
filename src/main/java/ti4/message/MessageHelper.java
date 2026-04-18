@@ -861,8 +861,8 @@ public class MessageHelper {
         sendMessageToChannel(threadChannel, messageText);
     }
 
-    public static void replacePinnedMessageInPlayerCardsInfoThread(
-            @NotNull Player player, @NotNull String storedValueKey, String messageText) {
+    public static void sendMessageToPlayerCardsInfoThreadAndPin(
+            @NotNull Game game, @NotNull Player player, @NotNull String storedValueKeyPrefix, String messageText) {
         if (messageText == null || messageText.isEmpty()) {
             return;
         }
@@ -872,30 +872,58 @@ public class MessageHelper {
             return;
         }
 
-        splitAndSentWithAction(messageText, threadChannel, msg -> {
-            String previousMessageId = player.getStoredValue(storedValueKey);
-            Runnable pinAndTrack =
-                    () -> msg.pin().queue(success -> player.addStoredValue(storedValueKey, msg.getId()), error -> {
-                        player.addStoredValue(storedValueKey, msg.getId());
-                        String err = getRestActionFailureMessage(
-                                threadChannel, "Failed to pin cards info snapshot", null, error);
-                        BotLogger.error(err, error);
-                    });
+        splitAndSentWithAction(
+                messageText,
+                threadChannel,
+                msg -> rotatePinnedCardsInfoMessage(game, threadChannel, storedValueKeyPrefix, msg));
+    }
 
-            if (StringUtils.isBlank(previousMessageId) || previousMessageId.equals(msg.getId())) {
-                pinAndTrack.run();
-                return;
-            }
+    public static void sendMessageToPlayerCardsInfoThreadWithButtonsAndPin(
+            @NotNull Game game,
+            @NotNull Player player,
+            @NotNull String storedValueKeyPrefix,
+            String messageText,
+            List<Button> buttons) {
+        if (messageText == null || messageText.isEmpty()) {
+            return;
+        }
 
-            threadChannel.deleteMessageById(previousMessageId).queue(success -> pinAndTrack.run(), error -> {
-                if (!isUnknownMessageError(error)) {
-                    String err = getRestActionFailureMessage(
-                            threadChannel, "Failed to delete previous pinned cards info snapshot", null, error);
-                    BotLogger.error(err, error);
-                }
-                pinAndTrack.run();
-            });
-        });
+        ThreadChannel threadChannel = player.getCardsInfoThread();
+        if (threadChannel == null) {
+            return;
+        }
+
+        splitAndSentWithAction(
+                messageText,
+                threadChannel,
+                msg -> rotatePinnedCardsInfoMessage(game, threadChannel, storedValueKeyPrefix, msg),
+                null,
+                buttons);
+    }
+
+    private static void rotatePinnedCardsInfoMessage(
+            @NotNull Game game,
+            @NotNull ThreadChannel threadChannel,
+            @NotNull String storedValueKeyPrefix,
+            @NotNull Message msg) {
+        String storedValueKey = storedValueKeyPrefix + "_" + threadChannel.getId();
+        String previousMessageId = game.getStoredValue(storedValueKey);
+
+        if (StringUtils.isNotBlank(previousMessageId) && !previousMessageId.equals(msg.getId())) {
+            threadChannel
+                    .retrieveMessageById(previousMessageId)
+                    .queue(
+                            previousMessage ->
+                                    previousMessage.unpin().queue(Consumers.nop(), BotLogger::catchRestError),
+                            BotLogger::catchRestError);
+        }
+
+        pinCardsInfoMessage(game, storedValueKey, msg);
+    }
+
+    private static void pinCardsInfoMessage(@NotNull Game game, @NotNull String storedValueKey, @NotNull Message msg) {
+        game.setStoredValue(storedValueKey, msg.getId());
+        msg.pin().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     /**

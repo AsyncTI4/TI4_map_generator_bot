@@ -766,11 +766,6 @@ public class StartPhaseService {
         }
 
         for (String pn : player.getPromissoryNotes().keySet()) {
-            if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
-                String cyberMessage =
-                        player.getRepresentationUnfogged() + ", a reminder to use _Cybernetic Enhancements_.";
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), cyberMessage);
-            }
             if (!player.ownsPromissoryNote("malevolency") && "malevolency".equalsIgnoreCase(pn)) {
                 boolean mahactMalev = !player.getMahactCC().isEmpty();
                 if (mahactMalev) {

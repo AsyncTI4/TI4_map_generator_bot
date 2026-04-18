@@ -1,5 +1,7 @@
 package ti4.logging;
 
+import ti4.spring.service.deploy.ActiveLeaseService;
+
 abstract class AbstractEventLog {
 
     private final LogOrigin source;
@@ -14,6 +16,7 @@ abstract class AbstractEventLog {
     String getLogString() {
         StringBuilder log = new StringBuilder();
 
+        log.append(ActiveLeaseService.getCurrentProcessLogPrefix());
         log.append(source.getOriginTimeFormatted());
         if (source.getEventString() != null) {
             log.append(source.getEventString());
