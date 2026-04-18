@@ -7,11 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.Constants;
+import ti4.helpers.Storage;
 import ti4.testUtils.BaseTi4Test;
 
 class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
@@ -34,9 +35,9 @@ class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
         player.setCardsInfoThreadID("cards");
         player.setBagInfoThreadID("bag");
 
-        LocalDevelopmentSampleGameService.prepareClonedGame(game, "source::test::uuid");
+        LocalDevelopmentSampleGameService.prepareClonedGame(game, "source-test-00001");
 
-        assertEquals("source::test::uuid", game.getName());
+        assertEquals("source-test-00001", game.getName());
         assertFalse(game.isHasEnded());
         assertEquals(0, game.getEndedDate());
         assertNull(game.getTableTalkChannelID());
@@ -66,11 +67,23 @@ class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void buildTestGameNameUsesMarkerAndUuid() {
-        UUID uuid = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
-        assertEquals(
-                "pbd15036::test::123e4567-e89b-12d3-a456-426614174000",
-                LocalDevelopmentSampleGameService.buildTestGameName("pbd15036", uuid));
+    void formatTestGameNameUsesMarkerAndFiveDigitSuffix() {
+        assertEquals("pbd15036-test-00042", LocalDevelopmentSampleGameService.formatTestGameName("pbd15036", 42));
+    }
+
+    @Test
+    void buildTestGameNameSkipsExistingStoredFile() throws Exception {
+        String sourceGameName = "localdevnaming";
+        Path existingPath = Storage.getGamePath(LocalDevelopmentSampleGameService.formatTestGameName(sourceGameName, 1)
+                + Constants.TXT);
+        Files.createDirectories(existingPath.getParent());
+        Files.deleteIfExists(existingPath);
+        Files.write(existingPath, java.util.List.of("owner-id", "owner-name", "game-name"));
+        try {
+            assertEquals("localdevnaming-test-00002", LocalDevelopmentSampleGameService.buildTestGameName(sourceGameName));
+        } finally {
+            Files.deleteIfExists(existingPath);
+        }
     }
 
     @Test
@@ -80,10 +93,10 @@ class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
         Files.write(sourcePath, java.util.List.of("owner-id", "owner-name", "source-game", "rest"));
 
         assertTrue(LocalDevelopmentSampleGameService.copySourceGameToStorage(
-                sourcePath, targetPath, "source-game::test::uuid"));
+                sourcePath, targetPath, "source-game-test-00001"));
 
         assertEquals(
-                java.util.List.of("owner-id", "owner-name", "source-game::test::uuid", "rest"),
+                java.util.List.of("owner-id", "owner-name", "source-game-test-00001", "rest"),
                 Files.readAllLines(targetPath));
     }
 }

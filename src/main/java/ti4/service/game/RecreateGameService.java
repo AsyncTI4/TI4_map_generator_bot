@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -26,7 +28,10 @@ import ti4.service.fow.GMService;
 public class RecreateGameService {
 
     public static final String LIMBO_CATEGORY_NAME = "The in-limbo PBD Archive";
-    public static final String TEST_GAME_MARKER = "::test::";
+    public static final String TEST_GAME_MARKER = "-test-";
+    private static final String LEGACY_TEST_GAME_MARKER = "::test::";
+    private static final Pattern TEST_GAME_NAME_PATTERN =
+            Pattern.compile("^(?<source>.+)" + Pattern.quote(TEST_GAME_MARKER) + "(?<suffix>\\d{5})$");
 
     public static String recreateGame(Game game) {
         return recreateGameResult(game, game.getGuild(), null).getSummary();
@@ -125,12 +130,17 @@ public class RecreateGameService {
         if (gameName == null) {
             return "";
         }
-        int markerIndex = gameName.indexOf(TEST_GAME_MARKER);
-        return markerIndex == -1 ? gameName : gameName.substring(0, markerIndex);
+        Matcher matcher = TEST_GAME_NAME_PATTERN.matcher(gameName);
+        if (matcher.matches()) {
+            return matcher.group("source");
+        }
+        int legacyMarkerIndex = gameName.indexOf(LEGACY_TEST_GAME_MARKER);
+        return legacyMarkerIndex == -1 ? gameName : gameName.substring(0, legacyMarkerIndex);
     }
 
     public static boolean isTestGame(String gameName) {
-        return gameName != null && gameName.contains(TEST_GAME_MARKER);
+        return gameName != null
+                && (TEST_GAME_NAME_PATTERN.matcher(gameName).matches() || gameName.contains(LEGACY_TEST_GAME_MARKER));
     }
 
     public static String getSanitizedGameChannelPrefix(String gameName) {

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -35,6 +34,7 @@ public class LocalDevelopmentSampleGameService {
     // Game save files begin with owner-id, owner-name, then game-name.
     private static final int GAME_NAME_LINE_INDEX = 2;
     private static final int MIN_GAME_FILE_LINES = GAME_NAME_LINE_INDEX + 1;
+    private static final int MAX_TEST_GAME_SUFFIX = 99_999;
 
     public static boolean isLocalDevelopmentStartup() {
         return isLocalDevelopmentStartup(System.getenv(ENV_VAR_LOCAL_DEV_STARTUP));
@@ -60,7 +60,12 @@ public class LocalDevelopmentSampleGameService {
         }
         String effectiveSourceGame =
                 sourceGameName == null || sourceGameName.isBlank() ? DEFAULT_SOURCE_GAME_NAME : sourceGameName;
-        String testGameName = buildTestGameName(effectiveSourceGame, UUID.randomUUID());
+        String testGameName = buildTestGameName(effectiveSourceGame);
+        if (testGameName == null) {
+            BotLogger.warning("LocalDevelopmentSampleGameService: no available local development test game name for "
+                    + effectiveSourceGame);
+            return null;
+        }
         Game game = cloneSourceGame(effectiveSourceGame, testGameName);
         if (game == null) {
             return null;
@@ -92,8 +97,23 @@ public class LocalDevelopmentSampleGameService {
         return result;
     }
 
-    static String buildTestGameName(String sourceGameName, UUID uuid) {
-        return sourceGameName + RecreateGameService.TEST_GAME_MARKER + uuid;
+    @Nullable
+    static String buildTestGameName(String sourceGameName) {
+        for (int suffix = 1; suffix <= MAX_TEST_GAME_SUFFIX; suffix++) {
+            String candidate = formatTestGameName(sourceGameName, suffix);
+            if (isAvailableTestGameName(candidate)) {
+                return candidate;
+            }
+        }
+        return null;
+    }
+
+    static String formatTestGameName(String sourceGameName, int suffix) {
+        return sourceGameName + RecreateGameService.TEST_GAME_MARKER + String.format("%05d", suffix);
+    }
+
+    private static boolean isAvailableTestGameName(String gameName) {
+        return !GameManager.isValid(gameName) && !Files.exists(Storage.getGamePath(gameName + Constants.TXT));
     }
 
     @Nullable
