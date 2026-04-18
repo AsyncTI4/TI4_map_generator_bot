@@ -59,6 +59,8 @@ public interface ParentCommand extends Command<SlashCommandInteractionEvent> {
     }
 
     default void register(CommandListUpdateAction commands) {
+        SlashCommandRegistrationValidator.validateCommandStructure(
+                getName(), getSubcommands().values(), getSubcommandGroups().values(), getOptions());
         var command = Commands.slash(getName(), getDescription())
                 .addSubcommands(getSubcommands().values())
                 .addSubcommandGroups(getSubcommandGroups().values())
@@ -68,6 +70,8 @@ public interface ParentCommand extends Command<SlashCommandInteractionEvent> {
 
     default void registerSearchCommands(CommandListUpdateAction commands) {
         if (getSearchSubcommands().isEmpty()) return;
+        SlashCommandRegistrationValidator.validateCommandStructure(
+                getName(), getSearchSubcommands().values(), Collections.emptyList(), getOptions());
         var command = Commands.slash(getName(), getDescription())
                 .addSubcommands(getSearchSubcommands().values())
                 .addOptions(getOptions());

@@ -72,7 +72,10 @@ import ti4.discord.interactions.commands.user.UserCommand;
 @UtilityClass
 public class SlashCommandManager {
 
-    private static final Map<String, ParentCommand> commands = Stream.of(
+    private static final Map<String, ParentCommand> commands = initCommands();
+
+    private static Map<String, ParentCommand> initCommands() {
+        Map<String, ParentCommand> commands = Stream.of(
                     new AddUnits(),
                     new RemoveUnits(),
                     new RemoveAllUnits(),
@@ -136,6 +139,9 @@ public class SlashCommandManager {
                     new DraftCommand(),
                     new SpinCommand())
             .collect(Collectors.toMap(ParentCommand::getName, command -> command));
+        SlashCommandRegistrationValidator.validateTopLevelSlashCommandCount(commands.values());
+        return commands;
+    }
 
     public static ParentCommand getCommand(String name) {
         return commands.get(name);

@@ -14,6 +14,7 @@ public abstract class SubcommandGroup extends SubcommandGroupData implements Com
         if (subcommands == null) {
             throw new IllegalStateException("Subcommand group " + name + " returned null subcommands map");
         }
+        SlashCommandRegistrationValidator.validateGroupSubcommandCount(name, subcommands.values());
         addSubcommands(subcommands.values());
     }
 
