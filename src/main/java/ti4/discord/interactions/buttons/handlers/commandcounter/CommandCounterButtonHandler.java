@@ -217,7 +217,6 @@ public class CommandCounterButtonHandler {
                                 + ButtonHelper.checkFleetInEveryTile(player, game)
                                 + ". That's how many command tokens you'll need to retain in your fleet pool to avoid removing ships.");
             }
-            StartPhaseService.sendStatusReminders(event, game, player);
         }
     }
 

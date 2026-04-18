@@ -559,7 +559,7 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " is looking at the top card of a deck.");
-        List<Button> buttons = getUydaiCommanderButtons(game, false, player);
+        List<Button> buttons = getUydaiCommanderButtons(game, true, player);
         String message =
                 player.getRepresentationUnfogged() + ", please choose which deck you wish to look at the top of.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
