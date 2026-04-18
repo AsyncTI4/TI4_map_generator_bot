@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ti4.game.persistence.GameManager;
 import ti4.logging.BotLogger;
 import ti4.spring.context.SpringContext;
 
@@ -56,7 +55,6 @@ public class ActiveLeaseService {
         activeLeaseRepository.save(buildLease(now));
         setActive(true);
         setDraining(false);
-        GameManager.startManagedGamesWarmupIfNeeded();
         return true;
     }
 
