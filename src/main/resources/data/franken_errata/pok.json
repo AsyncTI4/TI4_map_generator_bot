@@ -304,7 +304,7 @@
         "undraftable": true,
         "source": "pok"
     },
-        "ItemCategory":BREAKTHROUGH",
+        "ItemCategory": "BREAKTHROUGH",
         "ItemId": "sardakkbt",
         "additionalComponents": [
             "STARTINGTECH:sardakk"
