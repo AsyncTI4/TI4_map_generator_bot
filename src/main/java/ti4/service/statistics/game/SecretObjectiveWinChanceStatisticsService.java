@@ -231,7 +231,8 @@ class SecretObjectiveWinChanceStatisticsService {
             int[][] playersByExactScoredSecretCountAndMinimumAPCount,
             int[][] winsByExactScoredSecretCountAndMinimumAPCount) {
         StringBuilder sb = new StringBuilder("__**Action Phase Secret Win Chance by Total Scored Secrets**__\n")
-                .append("_(What is a player's win chance with X total scored secrets and at least Y action phase secrets?)_\n\n");
+                .append(
+                        "_(What is a player's win chance with X total scored secrets and at least Y action phase secrets?)_\n\n");
 
         for (int totalSecretCount = 1; totalSecretCount <= 4; totalSecretCount++) {
             sb.append("**")
@@ -240,9 +241,7 @@ class SecretObjectiveWinChanceStatisticsService {
                     .append(totalSecretCount == 1 ? "" : "s")
                     .append("**\n");
             for (int minimumAPCount = 1; minimumAPCount <= totalSecretCount; minimumAPCount++) {
-                String label = minimumAPCount == totalSecretCount
-                        ? minimumAPCount + " AP"
-                        : minimumAPCount + "+ AP";
+                String label = minimumAPCount == totalSecretCount ? minimumAPCount + " AP" : minimumAPCount + "+ AP";
                 appendSecretCountWinChanceLine(
                         sb,
                         label,
