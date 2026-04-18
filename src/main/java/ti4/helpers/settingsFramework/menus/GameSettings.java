@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.helpers.MapTemplateHelper;
+import ti4.helpers.TIGLHelper;
 import ti4.helpers.settingsFramework.menus.MiltySettings.DraftingMode;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.BooleanSettingWithCustomAction;
@@ -67,10 +68,14 @@ public class GameSettings extends SettingsMenu {
         stage2s = new IntegerSetting("Stage2s", "number of Stage 2 public objectives", 5, 1, 20, 1);
         secrets = new IntegerSetting("Secrets", "Max number of secret objectives", 3, 1, 10, 1);
         boolean defaultTigl = game.isCompetitiveTIGLGame();
+        boolean defaultTiglFractured = defaultTigl && TIGLHelper.isFracturedTIGLGame(game);
         tigl = new BooleanSettingWithCustomAction(
-                "TIGL", "TIGL Game", defaultTigl, (value) -> ensureTIGLConsistency(true, false));
+                "TIGL", "TIGL Game", defaultTigl, (value) -> ensureFracturedDisabledWhenTiglOff());
         tiglFractured = new BooleanSettingWithCustomAction(
-                "TIGL Fractured", "TIGL Fractured Game", false, (value) -> ensureTIGLConsistency(false, true));
+                "TIGL Fractured",
+                "TIGL Fractured Game",
+                defaultTiglFractured,
+                (value) -> ensureTiglEnabledWhenFracturedOn());
         alliance = new BooleanSetting("Alliance", "Alliance Mode", false);
         mapTemplate = new ChoiceSetting<>("Template", "Map Template", "6pStandard");
 
@@ -190,18 +195,15 @@ public class GameSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Specific Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private void ensureTIGLConsistency(boolean userToggleTIGL, boolean userToggleTIGLFractured) {
-        if (userToggleTIGL) {
-            boolean tiglStatus = tigl.isVal();
-            if (!tiglStatus) {
-                tiglFractured.setVal(false); // keep fractured off if TIGL is turned off
-            }
+    private void ensureFracturedDisabledWhenTiglOff() {
+        if (!tigl.isVal()) {
+            tiglFractured.setVal(false);
         }
-        if (userToggleTIGLFractured) {
-            boolean fracturedStatus = tiglFractured.isVal();
-            if (fracturedStatus) {
-                tigl.setVal(true); // keep TIGL on if fractured is on
-            }
+    }
+
+    private void ensureTiglEnabledWhenFracturedOn() {
+        if (tiglFractured.isVal()) {
+            tigl.setVal(true);
         }
     }
 
