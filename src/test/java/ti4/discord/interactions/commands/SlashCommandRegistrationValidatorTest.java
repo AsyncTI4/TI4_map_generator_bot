@@ -90,19 +90,18 @@ class SlashCommandRegistrationValidatorTest {
     void existingSlashCommandsStayWithinDiscordLimits() {
         assertDoesNotThrow(() -> {
             SlashCommandRegistrationValidator.validateTopLevelSlashCommandCount(SlashCommandManager.getCommands());
-            SlashCommandManager.getCommands()
-                    .forEach(command -> SlashCommandRegistrationValidator.validateCommandStructure(
-                            command.getName(),
-                            command.getSubcommands().values(),
-                            command.getSubcommandGroups().values(),
-                            command.getOptions()));
-            SlashCommandManager.getCommands()
-                    .forEach(command -> SlashCommandRegistrationValidator.validateCommandStructure(
-                            command.getName(),
-                            command.getSearchSubcommands().values(),
-                            List.of(),
-                            command.getOptions()));
+            SlashCommandManager.getCommands().forEach(SlashCommandRegistrationValidatorTest::validateRegisteredCommand);
         });
+    }
+
+    private static void validateRegisteredCommand(ParentCommand command) {
+        SlashCommandRegistrationValidator.validateCommandStructure(
+                command.getName(),
+                command.getSubcommands().values(),
+                command.getSubcommandGroups().values(),
+                command.getOptions());
+        SlashCommandRegistrationValidator.validateCommandStructure(
+                command.getName(), command.getSearchSubcommands().values(), List.of(), command.getOptions());
     }
 
     private static Map<String, Subcommand> buildSubcommands(int count) {

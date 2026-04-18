@@ -23,9 +23,9 @@ final class SlashCommandRegistrationValidator {
             Collection<? extends Subcommand> subcommands,
             Collection<? extends SubcommandGroup> subcommandGroups,
             List<OptionData> options) {
-        requireNonNull(commandName, subcommands, "subcommands");
-        requireNonNull(commandName, subcommandGroups, "subcommand groups");
-        requireNonNull(commandName, options, "options");
+        validateNotNull(commandName, subcommands, "subcommands");
+        validateNotNull(commandName, subcommandGroups, "subcommand groups");
+        validateNotNull(commandName, options, "options");
 
         if (subcommands.size() > MAX_SUBCOMMANDS_OR_GROUPS_PER_COMMAND) {
             throw new SlashCommandRegistrationException("Slash command `/" + commandName + "` attempted to register "
@@ -57,7 +57,7 @@ final class SlashCommandRegistrationValidator {
     }
 
     static void validateGroupSubcommandCount(String groupName, Collection<?> subcommands) {
-        requireNonNull(groupName, subcommands, "group subcommands");
+        validateNotNull(groupName, subcommands, "group subcommands");
 
         if (subcommands.size() > MAX_SUBCOMMANDS_PER_GROUP) {
             throw new SlashCommandRegistrationException("Subcommand group `" + groupName + "` attempted to register "
@@ -66,7 +66,7 @@ final class SlashCommandRegistrationValidator {
     }
 
     static void validateGroupSubcommandCount(String parentCommandName, String groupName, Collection<?> subcommands) {
-        requireNonNull(parentCommandName, subcommands, "group subcommands");
+        validateNotNull(parentCommandName, subcommands, "group subcommands");
 
         if (subcommands.size() > MAX_SUBCOMMANDS_PER_GROUP) {
             throw new SlashCommandRegistrationException("Slash command `/" + parentCommandName + "` group `"
@@ -75,7 +75,7 @@ final class SlashCommandRegistrationValidator {
         }
     }
 
-    private static void requireNonNull(String commandName, Object value, String fieldName) {
+    private static void validateNotNull(String commandName, Object value, String fieldName) {
         if (value == null) {
             throw new SlashCommandRegistrationException(
                     "Slash command `/" + commandName + "` returned null " + fieldName + ".");
