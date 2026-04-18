@@ -31,9 +31,10 @@ import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.WhisperService;
 import ti4.service.game.CreateGameService;
 import ti4.service.game.GameNameService;
+import ti4.spring.service.deploy.ActiveLeaseService;
 import ti4.spring.service.messagecache.SavedBotMessagesService;
 
-public class MessageListener extends ListenerAdapter {
+class MessageListener extends ListenerAdapter {
 
     private static final int EXECUTION_TIME_WARNING_THRESHOLD_SECONDS = 1;
     private static final Pattern FUTURE = Pattern.compile("future");
@@ -49,6 +50,9 @@ public class MessageListener extends ListenerAdapter {
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
         if (!JdaService.isReadyToReceiveCommands()
                 || !JdaService.isValidGuild(event.getGuild().getId())) {
+            return;
+        }
+        if (!ActiveLeaseService.shouldHandleCurrentProcessInteraction()) {
             return;
         }
 

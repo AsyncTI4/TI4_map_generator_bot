@@ -42,20 +42,7 @@ import ti4.cron.UploadStatsCron;
 import ti4.cron.WinningPathCron;
 import ti4.discord.interactions.commands.SlashCommandManager;
 import ti4.discord.interactions.commands.context.ContextCommandManager;
-import ti4.discord.interactions.listeners.AutoCompleteListener;
-import ti4.discord.interactions.listeners.BanListener;
-import ti4.discord.interactions.listeners.BotRuntimeStatsListener;
-import ti4.discord.interactions.listeners.ButtonListener;
-import ti4.discord.interactions.listeners.ChannelCreationListener;
-import ti4.discord.interactions.listeners.ContextMenuListener;
-import ti4.discord.interactions.listeners.DeletionListener;
-import ti4.discord.interactions.listeners.MessageListener;
-import ti4.discord.interactions.listeners.ModalListener;
-import ti4.discord.interactions.listeners.SelectionMenuListener;
-import ti4.discord.interactions.listeners.SlashCommandListener;
-import ti4.discord.interactions.listeners.ThreadCreateListener;
-import ti4.discord.interactions.listeners.UserJoinServerListener;
-import ti4.discord.interactions.listeners.UserLeaveServerListener;
+import ti4.discord.interactions.listeners.ListenerManager;
 import ti4.discord.interactions.selections.SelectionManager;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.persistence.GameManager;
@@ -75,7 +62,8 @@ import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.game.LocalDevelopmentSampleGameService;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
-import ti4.settings.GlobalSettings.ImplementedSettings;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class JdaService {
@@ -134,25 +122,7 @@ public class JdaService {
                 .build();
 
         BotLogger.info("INITIALIZING LISTENERS");
-        jda.addEventListener(
-                // Priority Listeners First
-                new BotRuntimeStatsListener(),
-                new MessageListener(),
-                new SlashCommandListener(),
-                new ContextMenuListener(),
-                ButtonListener.getInstance(),
-                new UserJoinServerListener(),
-                new AutoCompleteListener(),
-                new BanListener(),
-                new ThreadCreateListener(),
-
-                // Non-Priority Listeners
-                new DeletionListener(),
-                new SelectionMenuListener(),
-                new ChannelCreationListener(),
-                new UserLeaveServerListener(),
-                // ModalListener has a long init time
-                ModalListener.getInstance());
+        ListenerManager.registerListeners(jda);
 
         BotLogger.info("AWAITING JDA READY");
         try {
@@ -280,7 +250,7 @@ public class JdaService {
         }
 
         // Check for and report a missing bot-log webhook
-        if (!GlobalSettings.settingExists(ImplementedSettings.BOT_LOG_WEBHOOK_URL)) {
+        if (!GlobalSettings.settingExists(GlobalSettings.ImplementedSettings.BOT_LOG_WEBHOOK_URL)) {
             BotLogger.warning(
                     "BOT-LOG WEBHOOK NOT FOUND for Primary GuildID:" + guildPrimaryID
                             + "\nPlease set a valid bot-log Webhook URL using `/developer setting setting_name:bot_log_webhook_url setting_type:string setting_value:<url>`");
@@ -305,16 +275,17 @@ public class JdaService {
         initializeWhitelistedRoles();
         TIGLHelper.validateTIGLness();
 
-        jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
+        jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Indexing Game Names"));
 
-        BotLogger.info("LOADING GAMES");
+        BotLogger.info("INDEXING GAME NAMES");
         GameManager.initialize();
-        if (LocalDevelopmentSampleGameService.isLocalDevelopmentStartup()) {
-            String localUserId = args.length > 1 ? args[1] : null;
-            String sourceGameName = LocalDevelopmentSampleGameService.getStartupSourceGameName();
-            LocalDevelopmentSampleGameService.createAndRecreateTestGame(guildPrimary, localUserId, sourceGameName);
+
+        BotLogger.info("FINISHED INDEXING GAME NAMES");
+        if (GameManager.startManagedGamesWarmupIfNeeded()) {
+            BotLogger.info("STARTED BACKGROUND MANAGED GAME WARMUP");
+        } else {
+            BotLogger.info("DEFERRED BACKGROUND MANAGED GAME WARMUP UNTIL THIS PROCESS BECOMES ACTIVE");
         }
-        BotLogger.info("FINISHED LOADING GAMES");
 
         if (DataMigrationManager.runMigrations()) {
             BotLogger.info("FINISHED RUNNING MIGRATIONS");
@@ -340,9 +311,19 @@ public class JdaService {
         CategoryCleanupCron.register();
 
         // BOT IS READY
-        GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
+        ActiveLeaseService.setCurrentProcessReady(true);
         BotLogger.info("BOT IS READY TO RECEIVE COMMANDS");
-        updatePresence();
+        if (GameManager.isManagedGamesWarmupComplete()) {
+            updatePresence();
+        } else {
+            jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.customStatus("Warming game index"));
+        }
+
+        if (LocalDevelopmentSampleGameService.isLocalDevelopmentStartup()) {
+            String localUserId = args[1];
+            String sourceGameName = LocalDevelopmentSampleGameService.getStartupSourceGameName();
+            LocalDevelopmentSampleGameService.createAndRecreateTestGame(guildPrimary, localUserId, sourceGameName);
+        }
     }
 
     private static Guild tryToInitGuild(String guildID, boolean addToNewGameServerList) {
@@ -566,8 +547,7 @@ public class JdaService {
     }
 
     public static boolean isReadyToReceiveCommands() {
-        return GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.READY_TO_RECEIVE_COMMANDS.toString(), Boolean.class, Boolean.FALSE);
+        return ActiveLeaseService.isCurrentProcessReady();
     }
 
     public static List<Category> getAvailablePBDCategories() {
@@ -594,7 +574,7 @@ public class JdaService {
         try {
             jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
             BotLogger.info("SHUTDOWN PROCESS STARTED");
-            GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
+            ActiveLeaseService.setCurrentProcessReady(false);
             BotLogger.info("NO LONGER ACCEPTING COMMANDS");
             if (ExecutorServiceManager.shutdown()) { // will wait for up to an additional 20 seconds
                 BotLogger.info("FINISHED PROCESSING ASYNC THREADPOOL");
@@ -618,6 +598,8 @@ public class JdaService {
             }
             CronManager.shutdown(); // will wait for up to an additional 20 seconds
             LogBufferManager.sendBufferedLogsToDiscord(); // will drain the log buffer and doesn't have a timeout
+            SpringContext.getBean(ActiveLeaseService.class).releaseLease();
+            BotLogger.info("RELEASED ACTIVE LEASE");
             BotLogger.info("SHUTDOWN PROCESS COMPLETE");
             TimeUnit.SECONDS.sleep(1); // wait for BotLogger
             jda.shutdown();

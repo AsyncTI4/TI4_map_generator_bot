@@ -38,7 +38,9 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.collections4.CollectionUtils;
@@ -1715,11 +1717,7 @@ public class Player extends PlayerProperties {
 
     @NotNull
     public String getFactionEmoji() {
-        String emoji = null;
-        if (StringUtils.isNotBlank(super.getFactionEmoji()) && !"null".equals(super.getFactionEmoji())) {
-            cleanupFactionEmoji();
-            emoji = super.getFactionEmoji();
-        }
+        String emoji = normalizeCustomFactionEmoji();
         if (emoji == null && getFactionModel() != null) {
             emoji = getFactionModel().getFactionEmoji();
         }
@@ -1728,15 +1726,29 @@ public class Player extends PlayerProperties {
                 : FactionEmojis.getFactionIcon(getFaction()).toString();
     }
 
-    private void cleanupFactionEmoji() {
+    @Nullable
+    private String normalizeCustomFactionEmoji() {
         String emoji = super.getFactionEmoji();
-        if (StringUtils.isNotBlank(emoji) && !"null".equals(emoji)) {
-            Emoji e = Emoji.fromFormatted(emoji);
-            TI4Emoji repl = TI4Emoji.findEmojiFromJustName(e.getName());
-            if (repl != null) {
-                setFactionEmoji(repl.emojiString());
-            }
+        if (StringUtils.isBlank(emoji) || "null".equals(emoji)) {
+            return null;
         }
+
+        Emoji parsedEmoji = Emoji.fromFormatted(emoji);
+        if (parsedEmoji instanceof CustomEmoji) {
+            TI4Emoji replacement = TI4Emoji.findEmojiFromJustName(parsedEmoji.getName());
+            if (replacement != null) {
+                emoji = replacement.emojiString();
+                setFactionEmoji(emoji);
+            }
+            return emoji;
+        }
+
+        if (parsedEmoji instanceof UnicodeEmoji && emoji.codePoints().anyMatch(codepoint -> codepoint > 0x7F)) {
+            return emoji;
+        }
+
+        setFactionEmoji(null);
+        return null;
     }
 
     public String fogSafeEmoji() {

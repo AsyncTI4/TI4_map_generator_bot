@@ -1,0 +1,59 @@
+services:
+  traefik:
+    image: traefik:v3.6.13
+    restart: unless-stopped
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:8081
+    ports:
+      - "8081:8081"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - ti4-rollout
+
+  tibot:
+    image: ${IMAGE_REPOSITORY:-ghcr.io/asyncti4/ti4-map-generator-bot}:${IMAGE_TAG:-master}
+    restart: unless-stopped
+    mem_limit: 7g
+    volumes:
+      - ${HOST_TI4_SAVES_DIR}:/opt/STORAGE
+      - ${HOST_TI4_REPO_DIR}/src/main/resources:/opt/resources:ro
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET}
+      DB_PATH: /opt/STORAGE
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN}
+      DISCORD_BOT_USERID: ${DISCORD_BOT_USERID}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET}
+      DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI}
+      GUILDID_LIST: ${GUILDID_LIST}
+      MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY: ${MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY}
+      REPO_DISPATCH_TOKEN: ${REPO_DISPATCH_TOKEN}
+      RESOURCE_PATH: /opt/resources
+      ROLLBAR_ACCESS_TOKEN: ${ROLLBAR_ACCESS_TOKEN}
+      ROLLBAR_CODE_VERSION: ${ROLLBAR_CODE_VERSION}
+      ROLLBAR_ENVIRONMENT: ${ROLLBAR_ENVIRONMENT}
+      TI4_ULTIMATE_STATISTICS_API_KEY: ${TI4_ULTIMATE_STATISTICS_API_KEY}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:8081/api/public/ping >/dev/null 2>&1"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+      start_period: 10s
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: ti4-rollout
+      traefik.http.routers.tibot.entrypoints: web
+      traefik.http.routers.tibot.rule: PathPrefix(`/`)
+      traefik.http.services.tibot.loadbalancer.healthcheck.interval: 2s
+      traefik.http.services.tibot.loadbalancer.healthcheck.path: /api/public/ready
+      traefik.http.services.tibot.loadbalancer.server.port: "8081"
+    networks:
+      - ti4-rollout
+
+networks:
+  ti4-rollout:
+    name: ti4-rollout

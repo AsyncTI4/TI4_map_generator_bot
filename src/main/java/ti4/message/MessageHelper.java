@@ -861,6 +861,71 @@ public class MessageHelper {
         sendMessageToChannel(threadChannel, messageText);
     }
 
+    public static void sendMessageToPlayerCardsInfoThreadAndPin(
+            @NotNull Game game, @NotNull Player player, @NotNull String storedValueKeyPrefix, String messageText) {
+        if (messageText == null || messageText.isEmpty()) {
+            return;
+        }
+
+        ThreadChannel threadChannel = player.getCardsInfoThread();
+        if (threadChannel == null) {
+            return;
+        }
+
+        splitAndSentWithAction(
+                messageText,
+                threadChannel,
+                msg -> rotatePinnedCardsInfoMessage(game, threadChannel, storedValueKeyPrefix, msg));
+    }
+
+    public static void sendMessageToPlayerCardsInfoThreadWithButtonsAndPin(
+            @NotNull Game game,
+            @NotNull Player player,
+            @NotNull String storedValueKeyPrefix,
+            String messageText,
+            List<Button> buttons) {
+        if (messageText == null || messageText.isEmpty()) {
+            return;
+        }
+
+        ThreadChannel threadChannel = player.getCardsInfoThread();
+        if (threadChannel == null) {
+            return;
+        }
+
+        splitAndSentWithAction(
+                messageText,
+                threadChannel,
+                msg -> rotatePinnedCardsInfoMessage(game, threadChannel, storedValueKeyPrefix, msg),
+                null,
+                buttons);
+    }
+
+    private static void rotatePinnedCardsInfoMessage(
+            @NotNull Game game,
+            @NotNull ThreadChannel threadChannel,
+            @NotNull String storedValueKeyPrefix,
+            @NotNull Message msg) {
+        String storedValueKey = storedValueKeyPrefix + "_" + threadChannel.getId();
+        String previousMessageId = game.getStoredValue(storedValueKey);
+
+        if (StringUtils.isNotBlank(previousMessageId) && !previousMessageId.equals(msg.getId())) {
+            threadChannel
+                    .retrieveMessageById(previousMessageId)
+                    .queue(
+                            previousMessage ->
+                                    previousMessage.unpin().queue(Consumers.nop(), BotLogger::catchRestError),
+                            BotLogger::catchRestError);
+        }
+
+        pinCardsInfoMessage(game, storedValueKey, msg);
+    }
+
+    private static void pinCardsInfoMessage(@NotNull Game game, @NotNull String storedValueKey, @NotNull Message msg) {
+        game.setStoredValue(storedValueKey, msg.getId());
+        msg.pin().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
     /**
      * Given a text string and a maximum length, will return a List<String> split by
      * either the max length or the last newline "\n"

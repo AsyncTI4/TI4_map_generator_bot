@@ -36,3 +36,9 @@ spring:
       include-stacktrace: never
       include-binding-errors: never
       include-message: always
+
+ti4:
+  deploy:
+    lease-key: discord-bot
+    lease-duration-seconds: 30
+    heartbeat-interval-seconds: 1

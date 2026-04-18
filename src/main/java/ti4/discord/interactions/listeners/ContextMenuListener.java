@@ -13,7 +13,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.RollbarManager;
 import ti4.service.game.GameNameService;
 
-public class ContextMenuListener extends ListenerAdapter implements ListenerInterface {
+class ContextMenuListener extends ListenerAdapter implements ListenerInterface {
 
     @Override
     public void onMessageContextInteraction(MessageContextInteractionEvent event) {

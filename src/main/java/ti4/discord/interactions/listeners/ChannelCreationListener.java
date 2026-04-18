@@ -13,8 +13,9 @@ import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.game.CreateGameButtonHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
-public class ChannelCreationListener extends ListenerAdapter {
+class ChannelCreationListener extends ListenerAdapter {
 
     private static final String PBD_MAKING_GAMES_CHANNEL = "making-new-games";
     private static final String FOW_MAKING_GAMES_CHANNEL = "making-fow-games";
@@ -23,6 +24,9 @@ public class ChannelCreationListener extends ListenerAdapter {
 
     @Override
     public void onChannelCreate(@NotNull ChannelCreateEvent event) {
+        if (!ActiveLeaseService.shouldHandleCurrentProcessInteraction()) {
+            return;
+        }
         if (!JdaService.isReadyToReceiveCommands()) {
             return;
         }

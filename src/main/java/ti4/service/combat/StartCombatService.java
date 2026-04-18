@@ -353,7 +353,9 @@ public class StartCombatService {
         }
         if (amount > 2 || tile.getNumberOfUnitsInSystem() > 2) {
             MessageHelper.sendMessageToChannel(
-                    threadChannel, ButtonHelper.getTileSummaryMessage(game, true, tile, player1, event));
+                    threadChannel,
+                    ButtonHelper.getCombatTileSummaryMessage(
+                            game, tile, player1, event, spaceOrGround, unitHolderName, List.of(player1, player2)));
         }
 
         // Space Cannon Offense
@@ -1811,7 +1813,10 @@ public class StartCombatService {
             addForesightButton.accept(p1);
 
             Consumer<Player> addRalnelCommanderButton = (player) -> {
-                if (game.playerHasLeaderUnlockedOrAlliance(player, "ralnelcommander")) {
+                if (game.playerHasLeaderUnlockedOrAlliance(player, "ralnelcommander")
+                        && !ButtonHelperModifyUnits.getRetreatSystemButtons(
+                                        player, game, game.getActiveSystem(), false, false)
+                                .isEmpty()) {
                     buttons.add(Buttons.red(
                             player.getFinsFactionCheckerPrefix() + "ralnelCommander_" + pos,
                             "Retreat With Ralnel Commander",

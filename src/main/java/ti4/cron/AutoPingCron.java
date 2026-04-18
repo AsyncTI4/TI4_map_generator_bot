@@ -20,6 +20,7 @@ import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class AutoPingCron {
@@ -90,6 +91,7 @@ public class AutoPingCron {
     }
 
     private static void autoPingGames() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running AutoPingCron.");
 
         removeEndedGamesFromAutoPingMetadata();

@@ -33,9 +33,13 @@ import ti4.service.unit.AddUnitService;
 @UtilityClass
 public class PromissoryNoteHelper {
 
+    private static final String PINNED_PN_INFO_MESSAGE_ID = "pinned_pn_info_message_id";
+
     public static void sendPromissoryNoteInfo(Game game, Player player, boolean longFormat) {
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
+        MessageHelper.sendMessageToPlayerCardsInfoThreadWithButtonsAndPin(
+                game,
+                player,
+                PINNED_PN_INFO_MESSAGE_ID,
                 getPromissoryNoteCardInfo(game, player, longFormat, false),
                 getPNButtons(game, player));
     }

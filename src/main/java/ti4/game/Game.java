@@ -800,27 +800,43 @@ public class Game extends GameProperties {
 
     @Override
     public void setCompetitiveTIGLGame(boolean competitiveTIGLGame) {
-        if (isAbsolMode()
-                || isMiltyModMode()
-                || isDiscordantStarsMode()
-                || isHomebrewSCMode()
-                || isFowMode()
-                || isAllianceMode()
-                || isCommunityMode()) competitiveTIGLGame = false;
+        boolean isFracturedTIGL = TIGLHelper.isFracturedTIGLGame(this);
+        boolean hasAlwaysIncompatibleMode = isAllianceMode() || isCommunityMode();
+        boolean hasStandardOnlyIncompatibleMode =
+                isAbsolMode() || isMiltyModMode() || isDiscordantStarsMode() || isHomebrewSCMode() || isFowMode();
+        if (hasAlwaysIncompatibleMode || (!isFracturedTIGL && hasStandardOnlyIncompatibleMode)) {
+            competitiveTIGLGame = false;
+        }
         super.setCompetitiveTIGLGame(competitiveTIGLGame);
+        if (!competitiveTIGLGame) {
+            clearTIGLSetupState();
+        }
     }
 
     @Override
-    public boolean isAllianceMode() {
-        for (Player player : getRealPlayers()) {
-            if (player.getAllianceMembers() != null
-                    && !player.getAllianceMembers()
-                            .replace(player.getFaction(), "")
-                            .isEmpty()) {
-                setAllianceMode(true);
+    public void setAllianceMode(boolean allianceMode) {
+        super.setAllianceMode(allianceMode);
+        if (allianceMode) {
+            setCompetitiveTIGLGame(false);
+        }
+    }
+
+    @Override
+    public void setCommunityMode(boolean communityMode) {
+        super.setCommunityMode(communityMode);
+        if (communityMode) {
+            setCompetitiveTIGLGame(false);
+        }
+    }
+
+    private void clearTIGLSetupState() {
+        TIGLHelper.removeFracturedTag(this);
+        setMinimumTIGLRankAtGameStart(null);
+        for (Player player : players.values()) {
+            if (player != null) {
+                player.setPlayerTIGLRankAtGameStart(null);
             }
         }
-        return super.isAllianceMode();
     }
 
     @Override

@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import ti4.game.Game;
 import ti4.helpers.DateTimeHelper;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 class LogOriginTest {
 
@@ -38,8 +39,12 @@ class LogOriginTest {
 
     @Test
     void logStringContainsPreformattedEventAndGameInfo() {
-        try (MockedStatic<DateTimeHelper> mocked = mockStatic(DateTimeHelper.class)) {
-            mocked.when(DateTimeHelper::getCurrentTimestamp).thenReturn("`timestamp`");
+        try (MockedStatic<DateTimeHelper> mockedTime = mockStatic(DateTimeHelper.class);
+                MockedStatic<ActiveLeaseService> mockedActiveLeaseService = mockStatic(ActiveLeaseService.class)) {
+            mockedTime.when(DateTimeHelper::getCurrentTimestamp).thenReturn("`timestamp`");
+            mockedActiveLeaseService
+                    .when(ActiveLeaseService::getCurrentProcessLogPrefix)
+                    .thenReturn("");
 
             LogOrigin origin = new LogOrigin(event, game);
             String log = new TestEventLog(origin).getLogString();

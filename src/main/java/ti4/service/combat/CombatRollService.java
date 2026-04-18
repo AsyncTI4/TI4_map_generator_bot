@@ -96,6 +96,18 @@ public class CombatRollService {
         return secondHalfOfCombatRoll(player, game, event, tile, unitHolderName, rollType, false);
     }
 
+    public static UnitModel getMetaliAFBUnit(Player player) {
+        UnitModel metaliFakeUnit = new UnitModel();
+        metaliFakeUnit.setAfbDieCount(3);
+        metaliFakeUnit.setAfbHitsOn(6);
+        metaliFakeUnit.setName("Metali Void Armaments");
+        metaliFakeUnit.setAsyncId("MetaliAFB");
+        metaliFakeUnit.setId("MetaliAFB");
+        metaliFakeUnit.setBaseType("dd");
+        metaliFakeUnit.setFaction(player.getFaction());
+        return metaliFakeUnit;
+    }
+
     public static int secondHalfOfCombatRoll(
             Player player,
             Game game,
@@ -118,21 +130,14 @@ public class CombatRollService {
                     event.getMessageChannel(),
                     "Planet needs to be specified to fire SPACE CANNON against ships on tile " + tile.getPosition()
                             + ".");
+            return 0;
         }
         Player opponent = null;
 
         Map<UnitModel, Integer> playerUnitsByQuantity =
                 getUnitsInCombat(tile, combatOnHolder, player, event, rollType, game);
         if (rollType == CombatRollType.AFB && player.hasRelic("metalivoidarmaments")) {
-            UnitModel metaliFakeUnit = new UnitModel();
-            metaliFakeUnit.setAfbDieCount(3);
-            metaliFakeUnit.setAfbHitsOn(6);
-            metaliFakeUnit.setName("Metali Void Armaments");
-            metaliFakeUnit.setAsyncId("MetaliAFB");
-            metaliFakeUnit.setId("MetaliAFB");
-            metaliFakeUnit.setBaseType("dd");
-            metaliFakeUnit.setFaction(player.getFaction());
-            playerUnitsByQuantity.put(metaliFakeUnit, 1);
+            playerUnitsByQuantity.put(getMetaliAFBUnit(player), 1);
         }
         String bombardPlanet = "";
         if (rollType == CombatRollType.bombardment
@@ -210,12 +215,6 @@ public class CombatRollService {
 
         List<UnitHolder> combatHoldersForOpponent = new ArrayList<>(List.of(combatOnHolder));
         if (rollType == CombatRollType.SpaceCannonDefence || rollType == CombatRollType.SpaceCannonOffence) {
-            // Including space for finding opponents for pds - since people will fire before
-            // landing sometimes
-            // and fire after landing other times.
-            if (rollType == CombatRollType.SpaceCannonOffence) {
-                combatHoldersForOpponent = new ArrayList<>();
-            }
             combatHoldersForOpponent.add(tile.getUnitHolders().get(Constants.SPACE));
         }
         if (opponent == null) {
@@ -334,38 +333,6 @@ public class CombatRollService {
             message = message.substring(0, message.length() - 2);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        if (!game.isFowMode() && !"none".equals(game.getStoredValue("surprisingDiceRoll"))) {
-            StringBuilder disaster;
-            if ("hits".equals(game.getStoredValue("surprisingDiceRoll"))) {
-                disaster = new StringBuilder(player.getRepresentation() + " has rolled grievously against "
-                        + opponent.getRepresentation() + " in " + game.getName() + ".");
-            } else {
-                disaster = new StringBuilder(player.getRepresentation() + " has rolled dismally against "
-                        + opponent.getRepresentation() + " in " + game.getName() + ".");
-            }
-            for (String line : message.split("\n")) {
-                if (line.startsWith("> `") || line.startsWith("**Total hits")) {
-                    disaster.append('\n').append(line);
-                }
-            }
-            DisasterWatchHelper.sendMessageInDisasterWatch(game, disaster.toString());
-        }
-        if (game.isFowMode() && isFoWPrivateChannelRoll(player, event)) {
-            if (rollType == CombatRollType.SpaceCannonOffence) {
-                // If roll was from pds button in private channel, send the result to the target
-                MessageHelper.sendMessageToChannel(
-                        opponent.getCorrectChannel(),
-                        opponent.getRepresentationUnfogged() + " "
-                                + FOWCombatThreadMirroring.parseCombatRollMessage(message, player));
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(), "Roll result was sent to " + opponent.getRepresentationNoPing());
-            } else if (rollType == CombatRollType.bombardment) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentationUnfogged()
-                                + " This roll result is not automatically relayed. Please communicate the hits to the opponent manually.");
-            }
-        }
         if (message.contains("adding +1, at the risk of your")) {
             Button thalnosButton = Buttons.green(
                     "startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos", ExploreEmojis.Relic);
@@ -375,199 +342,214 @@ public class CombatRollService {
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(), thalnosMessage, List.of(thalnosButton, decline));
         }
-        if (!game.isFowMode()
-                && rollType == CombatRollType.combatround
-                && combatOnHolder instanceof Planet
-                && opponent != player) {
-            String msg2 = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered " + h + " hit"
-                    + (h == 1 ? "" : "s") + " in round #" + round2 + ".";
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
-            if (!automated) {
-                if (h > 0) {
-                    String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit"
-                            + (h == 1 ? "" : "s") + ".";
-                    List<Button> buttons = new ArrayList<>();
-                    if (opponent.isDummy() || opponent.isNpc()) {
-                        if (round2 > round) {
-                            buttons.add(Buttons.blue(
-                                    opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_"
-                                            + combatOnHolder.getName(),
-                                    "Roll Dice For Dummy for Combat Round #" + (round + 1)));
-                        }
-                        buttons.add(Buttons.green(
-                                opponent.dummyPlayerSpoof() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_"
-                                        + h,
-                                "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
-                    } else {
-                        if (round2 > round) {
-                            buttons.add(Buttons.blue(
-                                    "combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(),
-                                    "Roll Dice For Combat Round #" + (round + 1)));
-                        }
-                        buttons.add(Buttons.green(
-                                opponent.getFinsFactionCheckerPrefix() + "autoAssignGroundHits_"
-                                        + combatOnHolder.getName() + "_" + h,
-                                "Auto-assign Hit" + (h == 1 ? "" : "s")));
-                        buttons.add(Buttons.red(
-                                "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
-                                "Manually Assign Hit" + (h == 1 ? "" : "s")));
 
-                        buttons.add(Buttons.gray(
-                                opponent.getFinsFactionCheckerPrefix() + "cancelGroundHits_" + tile.getPosition() + "_"
-                                        + h,
-                                "Cancel a Hit"));
-                    }
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
-                    if (opponent.hasTech("vpw")) {
-                        msg = player.getRepresentationUnfogged()
-                                + " you got hit by _Valkyrie Particle Weave_. You may autoassign 1 hit.";
-                        buttons = new ArrayList<>();
-                        buttons.add(Buttons.green(
-                                player.getFinsFactionCheckerPrefix() + "autoAssignGroundHits_"
-                                        + combatOnHolder.getName() + "_1",
-                                "Auto-assign Hit" + (h == 1 ? "" : "s")));
-                        buttons.add(Buttons.red(
-                                "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
-                                "Manually Assign Hit" + (h == 1 ? "" : "s")));
-                        buttons.add(Buttons.gray(
-                                player.getFinsFactionCheckerPrefix() + "cancelGroundHits_" + tile.getPosition() + "_1",
-                                "Cancel a Hit"));
-                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
-                    }
+        if (!game.isFowMode()) {
+            if (!"none".equals(game.getStoredValue("surprisingDiceRoll"))) {
+                StringBuilder disaster;
+                if ("hits".equals(game.getStoredValue("surprisingDiceRoll"))) {
+                    disaster = new StringBuilder(player.getRepresentation() + " has rolled grievously against "
+                            + opponent.getRepresentation() + " in " + game.getName() + ".");
                 } else {
-                    String msg = opponent.getRepresentationUnfogged() + " you may roll dice for Combat Round #"
-                            + (round + 1) + ".";
-                    List<Button> buttons = new ArrayList<>();
-                    if (opponent.isDummy() || opponent.isNpc()) {
-                        if (round2 > round) {
-                            buttons.add(Buttons.blue(
-                                    opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_"
-                                            + combatOnHolder.getName(),
-                                    "Roll Dice For Dummy for Combat Round #" + (round + 1)));
-                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
-                        }
-
-                    } else {
-                        if (round2 > round) {
-                            buttons.add(Buttons.blue(
-                                    "combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(),
-                                    "Roll Dice For Combat Round #" + (round + 1)));
-                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
-                        }
+                    disaster = new StringBuilder(player.getRepresentation() + " has rolled dismally against "
+                            + opponent.getRepresentation() + " in " + game.getName() + ".");
+                }
+                for (String line : message.split("\n")) {
+                    if (line.startsWith("> `") || line.startsWith("**Total hits")) {
+                        disaster.append('\n').append(line);
                     }
                 }
-            } else {
-                if (opponent.hasTech("vpw") && h > 0) {
-                    MessageHelper.sendMessageToChannel(
-                            event.getMessageChannel(),
-                            player.getRepresentation() + " suffered 1 hit due to _Valkyrie Particle Weave_.");
+                DisasterWatchHelper.sendMessageInDisasterWatch(game, disaster.toString());
+            }
+            if (rollType == CombatRollType.combatround && opponent != player) {
+                List<Button> buttons = new ArrayList<>();
+                if (combatOnHolder instanceof Planet) {
+                    String msg2 = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered " + h
+                            + " hit" + (h == 1 ? "" : "s") + " in round #" + round2 + ".";
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
+                    if (!automated) {
+                        if (h > 0) {
+                            String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit"
+                                    + (h == 1 ? "" : "s") + ".";
+                            if (opponent.isDummy() || opponent.isNpc()) {
+                                if (round2 > round) {
+                                    buttons.add(Buttons.blue(
+                                            opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_"
+                                                    + combatOnHolder.getName(),
+                                            "Roll Dice For Dummy for Combat Round #" + (round + 1)));
+                                }
+                                buttons.add(Buttons.green(
+                                        opponent.dummyPlayerSpoof() + "autoAssignGroundHits_" + combatOnHolder.getName()
+                                                + "_" + h,
+                                        "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
+                            } else {
+                                if (round2 > round) {
+                                    buttons.add(Buttons.blue(
+                                            "combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(),
+                                            "Roll Dice For Combat Round #" + (round + 1)));
+                                }
+                                buttons.add(Buttons.green(
+                                        opponent.getFinsFactionCheckerPrefix() + "autoAssignGroundHits_"
+                                                + combatOnHolder.getName() + "_" + h,
+                                        "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                                buttons.add(Buttons.red(
+                                        "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
+                                        "Manually Assign Hit" + (h == 1 ? "" : "s")));
+
+                                buttons.add(Buttons.gray(
+                                        opponent.getFinsFactionCheckerPrefix() + "cancelGroundHits_"
+                                                + tile.getPosition() + "_" + h,
+                                        "Cancel a Hit"));
+                            }
+                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+                            if (opponent.hasTech("vpw")) {
+                                msg = player.getRepresentationUnfogged()
+                                        + " you got hit by _Valkyrie Particle Weave_. You may autoassign 1 hit.";
+                                buttons = new ArrayList<>();
+                                buttons.add(Buttons.green(
+                                        player.getFinsFactionCheckerPrefix() + "autoAssignGroundHits_"
+                                                + combatOnHolder.getName() + "_1",
+                                        "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                                buttons.add(Buttons.red(
+                                        "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
+                                        "Manually Assign Hit" + (h == 1 ? "" : "s")));
+                                buttons.add(Buttons.gray(
+                                        player.getFinsFactionCheckerPrefix() + "cancelGroundHits_" + tile.getPosition()
+                                                + "_1",
+                                        "Cancel a Hit"));
+                                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+                            }
+                        } else {
+                            String msg = opponent.getRepresentationUnfogged() + " you may roll dice for Combat Round #"
+                                    + (round + 1) + ".";
+                            if (opponent.isDummy() || opponent.isNpc()) {
+                                if (round2 > round) {
+                                    buttons.add(Buttons.blue(
+                                            opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_"
+                                                    + combatOnHolder.getName(),
+                                            "Roll Dice For Dummy for Combat Round #" + (round + 1)));
+                                    MessageHelper.sendMessageToChannelWithButtons(
+                                            event.getMessageChannel(), msg, buttons);
+                                }
+
+                            } else {
+                                if (round2 > round) {
+                                    buttons.add(Buttons.blue(
+                                            "combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(),
+                                            "Roll Dice For Combat Round #" + (round + 1)));
+                                    MessageHelper.sendMessageToChannelWithButtons(
+                                            event.getMessageChannel(), msg, buttons);
+                                }
+                            }
+                        }
+                    } else if (opponent.hasTech("vpw") && h > 0) {
+                        MessageHelper.sendMessageToChannel(
+                                event.getMessageChannel(),
+                                player.getRepresentation() + " suffered 1 hit due to _Valkyrie Particle Weave_.");
+                    }
+                } else {
+                    if (round2 > round) {
+                        if (opponent.isDummy() || opponent.isNpc()) {
+                            buttons.add(Buttons.blue(
+                                    opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_"
+                                            + combatOnHolder.getName(),
+                                    "Roll Dice For Dummy For Combat Round #" + (round + 1)));
+                        } else {
+                            buttons.add(Buttons.blue(
+                                    "combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(),
+                                    "Roll Dice For Combat Round #" + (round + 1)));
+                        }
+                    }
+                    String msg = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered " + h
+                            + " hit" + (h == 1 ? "" : "s") + " in round #" + round2 + ".";
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+                    if (h > 0) {
+                        String finChecker = "FFCC_" + opponent.getFaction() + "_";
+                        if (opponent.isDummy() || opponent.isNpc()) {
+                            buttons.add(Buttons.green(
+                                    opponent.dummyPlayerSpoof() + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
+                                    "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
+
+                        } else {
+                            buttons.add(Buttons.green(
+                                    finChecker + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
+                                    "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                            buttons.add(Buttons.red(
+                                    "getDamageButtons_" + tile.getPosition() + "deleteThis_spacecombat",
+                                    "Manually Assign Hit" + (h == 1 ? "" : "s")));
+                            buttons.add(Buttons.gray(
+                                    finChecker + "cancelSpaceHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
+                        }
+
+                        String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign "
+                                + (h == 1 ? "the hit" : "hits") + ". "
+                                + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(
+                                        opponent, game, tile, h, event, true);
+                        if (opponent.hasRelic("metalivoidshielding")) {
+                            RelicModel relicModel = Mapper.getRelic("metalivoidshielding");
+                            msg2 += "\nReminder: You have the _" + relicModel.getName()
+                                    + "_ relic, you may SUSTAIN DAMAGE on one of your none-fighter ships instead of taking a hit.";
+                        }
+                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
+                    } else {
+                        String msg2 = opponent.getRepresentationUnfogged() + " you may roll dice for Combat Round #"
+                                + (round + 1) + ".";
+                        if (round2 > round) {
+                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
+                        }
+                    }
                 }
             }
         } else {
-            List<Button> buttons = new ArrayList<>();
-            if (!game.isFowMode() && rollType == CombatRollType.combatround && opponent != player) {
-                if (round2 > round) {
-                    if (opponent.isDummy() || opponent.isNpc()) {
+            if (isFoWPrivateChannelRoll(player, event)) {
+                if (rollType == CombatRollType.SpaceCannonOffence) {
+                    // If roll was from pds button in private channel, send the result to the target
+                    MessageHelper.sendMessageToChannel(
+                            opponent.getCorrectChannel(),
+                            opponent.getRepresentationUnfogged() + " "
+                                    + FOWCombatThreadMirroring.parseCombatRollMessage(message, player));
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            "Roll result was sent to " + opponent.getRepresentationNoPing());
+                } else if (rollType == CombatRollType.bombardment) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationUnfogged()
+                                    + " This roll result is not automatically relayed. Please communicate the hits to the opponent manually.");
+                }
+            }
+            if ((opponent.isDummy() || opponent.isNpc()) && h > 0) {
+                List<Button> buttons = new ArrayList<>();
+                if (combatOnHolder instanceof Planet) {
+                    if (round2 > round) {
                         buttons.add(Buttons.blue(
                                 opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_"
                                         + combatOnHolder.getName(),
-                                "Roll Dice For Dummy For Combat Round #" + (round + 1)));
-                    } else {
-                        buttons.add(Buttons.blue(
-                                "combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(),
-                                "Roll Dice For Combat Round #" + (round + 1)));
+                                "Roll Dice For Dummy for Combat Round #" + (round + 1)));
                     }
-                }
-                String msg = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered " + h + " hit"
-                        + (h == 1 ? "" : "s") + " in round #" + round2 + ".";
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-                if (h > 0) {
-                    String finChecker = "FFCC_" + opponent.getFaction() + "_";
-                    if (opponent.isDummy() || opponent.isNpc()) {
-                        buttons.add(Buttons.green(
-                                opponent.dummyPlayerSpoof() + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
-                                "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
-
-                    } else {
-                        buttons.add(Buttons.green(
-                                finChecker + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
-                                "Auto-assign Hit" + (h == 1 ? "" : "s")));
-                        buttons.add(Buttons.red(
-                                "getDamageButtons_" + tile.getPosition() + "deleteThis_spacecombat",
-                                "Manually Assign Hit" + (h == 1 ? "" : "s")));
-                        buttons.add(Buttons.gray(
-                                finChecker + "cancelSpaceHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
-                    }
-
-                    String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign "
-                            + (h == 1 ? "the hit" : "hits") + ". "
-                            + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true);
-                    if (opponent.hasRelic("metalivoidshielding")) {
-                        RelicModel relicModel = Mapper.getRelic("metalivoidshielding");
-                        msg2 += "\nReminder: You have the _" + relicModel.getName()
-                                + "_ relic, you may SUSTAIN DAMAGE on one of your none-fighter ships instead of taking a hit.";
-                    }
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
+                    buttons.add(Buttons.green(
+                            opponent.dummyPlayerSpoof() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_" + h,
+                            "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
+                    String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit"
+                            + (h == 1 ? "" : "s") + ".";
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
                 } else {
-                    String msg2 = opponent.getRepresentationUnfogged() + " you may roll dice for Combat Round #"
-                            + (round + 1) + ".";
-                    if (round2 > round) {
-                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
-                    }
-                }
-
-            } else {
-                if (game.isFowMode() && (opponent.isDummy() || opponent.isNpc()) && h > 0) {
-                    if (combatOnHolder instanceof Planet) {
-                        if (round2 > round) {
-                            buttons.add(Buttons.blue(
-                                    opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_"
-                                            + combatOnHolder.getName(),
-                                    "Roll Dice For Dummy for Combat Round #" + (round + 1)));
-                        }
+                    String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign "
+                            + (h == 1 ? "the hit" : "hits") + ".";
+                    if (rollType == CombatRollType.AFB) {
                         buttons.add(Buttons.green(
-                                opponent.dummyPlayerSpoof() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_"
-                                        + h,
-                                "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
-                        String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit"
-                                + (h == 1 ? "" : "s") + ".";
-                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+                                opponent.dummyPlayerSpoof() + "autoAssignAFBHits_" + tile.getPosition() + "_" + h,
+                                "Auto-assign Hit" + (h == 1 ? "" : "s For Dummy")));
                     } else {
                         buttons.add(Buttons.green(
                                 opponent.dummyPlayerSpoof() + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
                                 "Auto-assign Hits For Dummy"));
-                        String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign "
-                                + (h == 1 ? "the hit" : "hits") + "."
-                                + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(
-                                        opponent, game, tile, h, event, true);
-                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
+                        msg2 += ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true);
                     }
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
                 }
             }
         }
-        if (!game.isFowMode() && rollType == CombatRollType.AFB && opponent != player) {
-            String msg2 = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered " + h + " hit"
-                    + (h == 1 ? "" : "s") + " from ANTI-FIGHTER BARRAGE.";
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
-            if (h > 0) {
-                String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit"
-                        + (h == 1 ? "" : "s") + ".";
-                List<Button> buttons = new ArrayList<>();
-                String finChecker = "FFCC_" + opponent.getFaction() + "_";
-                if (opponent.isDummy() || opponent.isNpc()) {
-                    buttons.add(Buttons.green(
-                            opponent.dummyPlayerSpoof() + "autoAssignAFBHits_" + tile.getPosition() + "_" + h,
-                            "Auto-assign Hit" + (h == 1 ? "" : "s For Dummy")));
-                } else {
-                    buttons.add(Buttons.green(
-                            finChecker + "autoAssignAFBHits_" + tile.getPosition() + "_" + h,
-                            "Auto-assign Hit" + (h == 1 ? "" : "s")));
-                }
-                buttons.add(Buttons.gray("cancelAFBHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
-            }
-        }
+
         if ((!game.isFowMode() || isFoWPrivateChannelRoll(player, event))
                 && rollType == CombatRollType.SpaceCannonOffence
                 && h > 0
@@ -599,69 +581,74 @@ public class CombatRollService {
                     + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true, true);
             MessageHelper.sendMessageToChannelWithButtons(channel, msg2, buttons);
         }
-        if (!game.isFowMode() && rollType == CombatRollType.bombardment && h > 0) {
-            List<Button> buttons = new ArrayList<>();
 
-            buttons.add(Buttons.red(
-                    "getDamageButtons_" + tile.getPosition() + "_bombardment", "Assign Hit" + (h == 1 ? "" : "s")));
-            for (Player p2 : game.getRealPlayersNNeutral()) {
-                if (p2 == player) {
-                    continue;
+        if (rollType == CombatRollType.bombardment) {
+            if (h > 0) {
+                if (!game.isFowMode()) {
+                    List<Button> buttons = new ArrayList<>();
+
+                    buttons.add(Buttons.red(
+                            "getDamageButtons_" + tile.getPosition() + "_bombardment",
+                            "Assign Hit" + (h == 1 ? "" : "s")));
+                    for (Player p2 : game.getRealPlayersNNeutral()) {
+                        if (p2 == player) {
+                            continue;
+                        }
+                        if (!bombardPlanet.isEmpty()
+                                && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(bombardPlanet))) {
+                            if (p2.isRealPlayer()) {
+                                MessageHelper.sendMessageToChannelWithButtons(
+                                        game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
+                                        p2.getRepresentation() + ", please assign the BOMBARDMENT hit"
+                                                + (h == 1 ? "" : "s") + ".",
+                                        buttons);
+                            } else {
+                                List<Button> buttons2 = new ArrayList<>();
+                                buttons2.add(Buttons.green(
+                                        p2.dummyPlayerSpoof() + "autoAssignGroundHits_"
+                                                + game.getUnitHolderFromPlanet(bombardPlanet)
+                                                        .getName() + "_" + h,
+                                        "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
+                                MessageHelper.sendMessageToChannelWithButtons(
+                                        game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
+                                        player.getRepresentation() + ", please assign the BOMBARDMENT hit"
+                                                + (h == 1 ? "" : "s") + " for the dummy player.",
+                                        buttons2);
+                            }
+                        }
+                    }
                 }
-                if (!bombardPlanet.isEmpty()
-                        && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(bombardPlanet))) {
-                    if (p2.isRealPlayer()) {
-                        MessageHelper.sendMessageToChannelWithButtons(
-                                game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
-                                p2.getRepresentation() + ", please assign the BOMBARDMENT hit" + (h == 1 ? "" : "s")
-                                        + ".",
-                                buttons);
-                    } else {
-                        List<Button> buttons2 = new ArrayList<>();
-                        buttons2.add(Buttons.green(
-                                p2.dummyPlayerSpoof() + "autoAssignGroundHits_"
-                                        + game.getUnitHolderFromPlanet(bombardPlanet)
-                                                .getName() + "_" + h,
-                                "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
-                        MessageHelper.sendMessageToChannelWithButtons(
-                                game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
-                                player.getRepresentation() + ", please assign the BOMBARDMENT hit" + (h == 1 ? "" : "s")
-                                        + " for the dummy player.",
-                                buttons2);
+                if (player.hasAbility("meteor_slings")
+                        || player.getPromissoryNotes().containsKey("dspnkhra")) {
+                    List<Button> buttons = new ArrayList<>();
+                    String planet = game.getStoredValue("bombardmentTarget" + player.getFaction());
+                    buttons.add(Buttons.green(
+                            player.getFinsFactionCheckerPrefix() + "meteorSlings_" + planet,
+                            "Infantry on " + Helper.getPlanetRepresentation(planet, game)));
+
+                    buttons.add(Buttons.red("deleteButtons", "Done"));
+                    String msg2 = player.getRepresentation() + " you could potentially cancel "
+                            + (h == 1 ? "the BOMBARDMENT hit" : "some BOMBARDMENT hits")
+                            + " to place infantry instead. Use these buttons to do so, and press done when done. The bot did not track how many hits you got. ";
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
+                }
+            }
+            if (player.hasTech("x89c4")) {
+                for (Player p2 : game.getRealPlayers()) {
+                    if (p2.hasPlanetReady(bombardPlanet)) {
+                        PlanetExhaust.doAction(p2, bombardPlanet, game);
+                        MessageHelper.sendMessageToChannel(
+                                p2.getCorrectChannel(),
+                                p2.getRepresentation() + ", your planet "
+                                        + Helper.getPlanetRepresentation(bombardPlanet, game) + " was exhausted when "
+                                        + (game.isFowMode() ? "another player" : player.getRepresentationNoPing())
+                                        + " bombarded it with _X-89 Bacterial Weapon ΩΩ_.");
+                        break;
                     }
                 }
             }
         }
-        if (rollType == CombatRollType.bombardment
-                && h > 0
-                && (player.hasAbility("meteor_slings")
-                        || player.getPromissoryNotes().containsKey("dspnkhra"))) {
-            List<Button> buttons = new ArrayList<>();
-            String planet = game.getStoredValue("bombardmentTarget" + player.getFaction());
-            buttons.add(Buttons.green(
-                    player.getFinsFactionCheckerPrefix() + "meteorSlings_" + planet,
-                    "Infantry on " + Helper.getPlanetRepresentation(planet, game)));
 
-            buttons.add(Buttons.red("deleteButtons", "Done"));
-            String msg2 = player.getRepresentation() + " you could potentially cancel "
-                    + (h == 1 ? "the BOMBARDMENT hit" : "some BOMBARDMENT hits")
-                    + " to place infantry instead. Use these buttons to do so, and press done when done. The bot did not track how many hits you got. ";
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
-        }
-        if (player.hasTech("x89c4") && rollType == CombatRollType.bombardment) {
-            for (Player p2 : game.getRealPlayers()) {
-                if (p2.hasPlanetReady(bombardPlanet)) {
-                    PlanetExhaust.doAction(p2, bombardPlanet, game);
-                    MessageHelper.sendMessageToChannel(
-                            p2.getCorrectChannel(),
-                            p2.getRepresentation() + ", your planet "
-                                    + Helper.getPlanetRepresentation(bombardPlanet, game) + " was exhausted when "
-                                    + (game.isFowMode() ? "another player" : player.getRepresentationNoPing())
-                                    + " bombarded it with _X-89 Bacterial Weapon ΩΩ_.");
-                    break;
-                }
-            }
-        }
         return h;
     }
 
@@ -795,6 +782,13 @@ public class CombatRollService {
                     activeSystem,
                     unitHolder);
             int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player);
+            if (rollType == CombatRollType.combatround) {
+                CombatStatsService.CombatRoundProfile combatRoundProfile =
+                        CombatStatsService.getCombatRoundProfile(true, unitModel, player, activeSystem, opponent);
+                modifierToHit += toHit - combatRoundProfile.hitsOn();
+                toHit = combatRoundProfile.hitsOn();
+                numRollsPerUnit = combatRoundProfile.diceCount();
+            }
             boolean extraRollsCount = false;
             if ((numRollsPerUnit > 1 || extraRollsForUnit > 0)
                     && "true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"))) {
@@ -823,19 +817,6 @@ public class CombatRollService {
                     continue;
                 }
             }
-            if (rollType == CombatRollType.combatround) {
-                if (unitModel.getUnitType() == UnitType.Mech && player.ownsUnit("tf-eidolonlandwaster")) {
-                    numRollsPerUnit++;
-                }
-                if (unitModel.getUnitType() == UnitType.Mech && player.ownsUnit("tf-eidolonterminus")) {
-                    modifierToHit++;
-                }
-                if (unitModel.getUnitType() == UnitType.Flagship && player.ownsUnit("tf-echoofascension")) {
-                    modifierToHit++;
-                    numRollsPerUnit++;
-                }
-            }
-
             List<String> singleUnitUse = new ArrayList<>(List.of("no"));
             if (rollType == CombatRollType.combatround
                     && !"true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"))
@@ -1372,7 +1353,7 @@ public class CombatRollService {
             unitHolderPlanet = (Planet) unitHolder;
         }
         return switch (roleType) {
-            case combatround -> getUnitsInCombatRound(unitHolder, player, event, tile);
+            case combatround -> getCombatRoundUnits(tile, unitHolder, player, event);
             case AFB -> getUnitsInAFB(tile, player, event);
             case bombardment -> getUnitsInBombardment(tile, player, event);
             case SpaceCannonOffence -> getUnitsInSpaceCannonOffense(tile, player, event, game);
@@ -1380,102 +1361,12 @@ public class CombatRollService {
         };
     }
 
-    private static Map<UnitModel, Integer> getUnitsInCombatRound(
-            UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event, Tile tile) {
+    public static Map<UnitModel, Integer> getCombatRoundUnits(
+            Tile tile, UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
         Map<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
-        Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream()
-                .map(entry -> new ImmutablePair<>(
-                        player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder), entry.getValue()))
-                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
-        HashMap<UnitModel, Integer> output;
-        if (Constants.SPACE.equals(unitHolder.getName())) {
-            if (unitsByAsyncId.containsKey("fs")
-                    && (player.hasUnit("nekro_flagship") || player.hasUnit("sigma_nekro_flagship_2"))) {
-                output = new HashMap<>(unitsInCombat.entrySet().stream()
-                        .filter(entry -> entry.getKey() != null
-                                && (entry.getKey().getIsGroundForce()
-                                        || entry.getKey().getIsShip()))
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-                for (UnitHolder u2 : tile.getUnitHolders().values()) {
-                    if (u2 == unitHolder) {
-                        continue;
-                    }
-                    Map<String, Integer> unitsByAsyncId2 = u2.getUnitAsyncIdsOnHolder(colorID);
-                    Map<UnitModel, Integer> unitsInCombat2 = unitsByAsyncId2.entrySet().stream()
-                            .map(entry -> new ImmutablePair<>(
-                                    player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder), entry.getValue()))
-                            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
-                    Map<UnitModel, Integer> output2;
-                    output2 = new HashMap<>(unitsInCombat2.entrySet().stream()
-                            .filter(entry -> entry.getKey() != null
-                                    && (entry.getKey().getIsGroundForce()
-                                            || entry.getKey().getIsShip()))
-                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-                    for (Map.Entry<UnitModel, Integer> entry : output2.entrySet()) {
-                        UnitModel unit = entry.getKey();
-                        if (output.containsKey(unit)) {
-                            output.put(unit, output.get(unit) + entry.getValue());
-                        } else {
-                            output.put(unit, entry.getValue());
-                        }
-                    }
-                }
-            } else {
-
-                if (player.hasUnit("purpletf_mech") || player.hasUnit("naaz_voltron")) {
-                    output = new HashMap<>(unitsInCombat.entrySet().stream()
-                            .filter(entry -> entry.getKey() != null
-                                    && (entry.getKey().getUnitType() == UnitType.Mech
-                                            || entry.getKey().getIsShip()))
-                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-                    for (UnitHolder u2 : tile.getUnitHolders().values()) {
-                        if (u2 == unitHolder) {
-                            continue;
-                        }
-                        Map<String, Integer> unitsByAsyncId2 = u2.getUnitAsyncIdsOnHolder(colorID);
-                        Map<UnitModel, Integer> unitsInCombat2 = unitsByAsyncId2.entrySet().stream()
-                                .map(entry -> new ImmutablePair<>(
-                                        player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder), entry.getValue()))
-                                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
-                        Map<UnitModel, Integer> output2;
-                        output2 = new HashMap<>(unitsInCombat2.entrySet().stream()
-                                .filter(entry -> entry.getKey() != null
-                                        && (entry.getKey().getUnitType() == UnitType.Mech
-                                                || entry.getKey().getIsShip()))
-                                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-                        for (Map.Entry<UnitModel, Integer> entry : output2.entrySet()) {
-                            UnitModel unit = entry.getKey();
-                            if (output.containsKey(unit)) {
-                                output.put(unit, output.get(unit) + entry.getValue());
-                            } else {
-                                output.put(unit, entry.getValue());
-                            }
-                        }
-                    }
-                } else {
-                    output = new HashMap<>(unitsInCombat.entrySet().stream()
-                            .filter(entry ->
-                                    entry.getKey() != null && entry.getKey().getIsShip())
-                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-                }
-            }
-            if (player.getGame().isCosmicPhenomenaeMode() && tile.isAsteroidField() && !player.hasFF2Tech()) {
-                output = new HashMap<>(unitsInCombat.entrySet().stream()
-                        .filter(entry -> entry.getKey() != null
-                                && entry.getKey().getIsShip()
-                                && entry.getKey().getUnitType() != UnitType.Fighter)
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-            }
-        } else {
-            output = new HashMap<>(unitsInCombat.entrySet().stream()
-                    .filter(entry -> entry.getKey() != null
-                            && (entry.getKey().getIsGroundForce()
-                                    || entry.getKey().getIsShip()))
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-        }
+        Map<UnitModel, Integer> output = CombatUnitSelectionHelper.collectCombatRoundUnits(tile, unitHolder, player);
         checkBadUnits(player, event, unitsByAsyncId, output);
-
         return output;
     }
 

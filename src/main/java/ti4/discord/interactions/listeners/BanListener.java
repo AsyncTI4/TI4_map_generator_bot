@@ -8,11 +8,13 @@ import net.dv8tion.jda.api.events.guild.GuildAuditLogEntryCreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.logging.BotLogger;
 import ti4.service.async.BanCleanupService;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
-public class BanListener extends ListenerAdapter {
+class BanListener extends ListenerAdapter {
 
     @Override
     public void onGuildAuditLogEntryCreate(@Nonnull GuildAuditLogEntryCreateEvent event) {
+        if (!ActiveLeaseService.shouldHandleCurrentProcessInteraction()) return;
         try {
             AuditLogEntry log = event.getEntry();
             UserSnowflake target = getTargetUser(log);

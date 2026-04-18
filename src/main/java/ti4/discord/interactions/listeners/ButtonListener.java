@@ -9,8 +9,9 @@ import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.ButtonProcessor;
 import ti4.helpers.ButtonHelper;
 import ti4.logging.BotLogger;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
-public class ButtonListener extends ListenerAdapter {
+class ButtonListener extends ListenerAdapter {
 
     private static final Set<String> BUTTONS_TO_THINK_ABOUT = Set.of("showGameAgain");
 
@@ -23,6 +24,9 @@ public class ButtonListener extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(@Nonnull ButtonInteractionEvent event) {
+        if (!ActiveLeaseService.shouldHandleCurrentProcessInteraction()) {
+            return;
+        }
         if (!JdaService.isReadyToReceiveCommands()) {
             event.reply("You pressed: " + ButtonHelper.getButtonRepresentation(event.getButton(), false)
                             + "\nPlease try again in a few minutes. The bot is rebooting.")

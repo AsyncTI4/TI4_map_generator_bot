@@ -23,15 +23,9 @@ public class StatisticsCommand implements ParentCommand {
                     new HitsPerTurn(),
                     new MatchmakingRatingCommand(),
                     new LifetimeRecord(),
-                    new FactionRecordOfTech(),
-                    new FactionRecordOfSCPick(),
-                    new FactionTopColors(),
                     new GameWinsWithOtherFactions(),
-                    new StellarConverterStatistics(),
-                    new ExpeditionWinRates(),
                     new ListTitlesGiven(),
                     new ExportToCSV(),
-                    new FactionGames(),
                     new PoliticsPosition())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

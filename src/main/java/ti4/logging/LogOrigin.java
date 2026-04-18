@@ -92,7 +92,9 @@ public class LogOrigin {
                         .append(SelectionMenuProcessor.getSelectionMenuDebugText(sEvent))
                         .append('\n');
             case ModalInteractionEvent mEvent ->
-                builder.append("used modal ").append(getModalDebugText(mEvent)).append('\n');
+                builder.append("used modal ")
+                        .append(buildModalDebugText(mEvent))
+                        .append('\n');
             default ->
                 builder.append("initiated an unexpected event of type `")
                         .append(event.getType())
@@ -103,11 +105,12 @@ public class LogOrigin {
     }
 
     @Nonnull
-    String getOriginTimeFormatted() {
-        return String.format("**__%s__** ", originTime);
+    private static String buildModalDebugText(ModalInteractionEvent event) {
+        return "INPUT:\n```\n" + "MenuID: " + event.getModalId() + "\n```";
     }
 
-    private static String getModalDebugText(ModalInteractionEvent event) {
-        return "INPUT:\n```\n" + "MenuID: " + event.getModalId() + "\n```";
+    @Nonnull
+    String getOriginTimeFormatted() {
+        return String.format("**__%s__** ", originTime);
     }
 }
