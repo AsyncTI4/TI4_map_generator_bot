@@ -1,8 +1,10 @@
 package ti4.spring.service.statistics;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,15 +27,12 @@ public class SharedGamesService {
             return Map.of();
         }
 
-        List<String> relevantUserIds = new java.util.ArrayList<>();
+        Set<String> relevantUserIds = new LinkedHashSet<>();
         relevantUserIds.add(joiningUserId);
-        for (String otherUserId : otherUserIds) {
-            if (!relevantUserIds.contains(otherUserId)) {
-                relevantUserIds.add(otherUserId);
-            }
-        }
+        relevantUserIds.addAll(otherUserIds);
 
-        List<PlayerEntity> players = playerEntityRepository.findAllWithUsersAndGamesByUserIdIn(relevantUserIds);
+        List<PlayerEntity> players =
+                playerEntityRepository.findAllWithUsersAndGamesByUserIdIn(new ArrayList<>(relevantUserIds));
         Set<String> joiningUserGameNames = new HashSet<>();
         Map<String, Set<String>> participantIdsByGameName = new HashMap<>();
 

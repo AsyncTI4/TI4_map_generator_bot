@@ -18,16 +18,12 @@ class CreateGameButtonHandlerTest {
         Member alpha = member("alpha");
 
         String announcement = CreateGameButtonHandler.buildJoinAnnouncement(
-                "<@joiner> joined the game.",
-                joiningMember,
-                List.of(beta, alpha),
-                Map.of("alpha", 1, "beta", 2));
+                "<@joiner> joined the game.", joiningMember, List.of(beta, alpha), Map.of("alpha", 1, "beta", 2));
 
         assertThat(announcement)
-                .isEqualTo(
-                        "<@joiner> joined the game.\n"
-                                + "🎉 Congrats to <@joiner> and <@beta> on their 3rd game together!\n"
-                                + "🎉 Congrats to <@joiner> and <@alpha> on their 2nd game together!");
+                .isEqualTo("<@joiner> joined the game.\n"
+                        + "🎉 Congrats to <@joiner> and <@beta> on their 3rd game together!\n"
+                        + "🎉 Congrats to <@joiner> and <@alpha> on their 2nd game together!");
     }
 
     @Test

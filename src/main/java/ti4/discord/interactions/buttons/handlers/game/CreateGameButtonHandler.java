@@ -279,7 +279,8 @@ public class CreateGameButtonHandler {
         if (added) {
             MessageHelper.sendMessageToEventChannel(
                     event,
-                    buildJoinAnnouncement(event.getUser().getEffectiveName() + " joined the game.", event.getMember(), members));
+                    buildJoinAnnouncement(
+                            event.getUser().getEffectiveName() + " joined the game.", event.getMember(), members));
         }
     }
 
@@ -303,12 +304,16 @@ public class CreateGameButtonHandler {
 
         Map<String, Integer> sharedGameCounts = SharedGamesService.getBean()
                 .getSharedGameCounts(
-                        joiningMember.getId(), otherMembers.stream().map(Member::getId).toList());
+                        joiningMember.getId(),
+                        otherMembers.stream().map(Member::getId).toList());
         return buildJoinAnnouncement(joinMessage, joiningMember, otherMembers, sharedGameCounts);
     }
 
     static String buildJoinAnnouncement(
-            String joinMessage, Member joiningMember, List<Member> otherMembers, Map<String, Integer> sharedGameCounts) {
+            String joinMessage,
+            Member joiningMember,
+            List<Member> otherMembers,
+            Map<String, Integer> sharedGameCounts) {
         StringBuilder message = new StringBuilder(joinMessage);
         if (sharedGameCounts.isEmpty()) {
             return message.toString();
