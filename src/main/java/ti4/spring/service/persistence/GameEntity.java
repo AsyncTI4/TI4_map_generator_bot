@@ -68,7 +68,7 @@ public class GameEntity {
     private boolean twilightImperiumGlobalLeague;
 
     @Column(name = "is_twilight_imperium_global_league_fractured")
-    private boolean twilightImperiumGlobalLeagueFractured;
+    private Boolean twilightImperiumGlobalLeagueFractured = false;
 
     @Column(name = "twilight_imperium_global_league_rank")
     private String twilightImperiumGlobalLeagueRank;
@@ -78,6 +78,10 @@ public class GameEntity {
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<PlayerEntity> players = new ArrayList<>();
+
+    public boolean isTwilightImperiumGlobalLeagueFractured() {
+        return Boolean.TRUE.equals(twilightImperiumGlobalLeagueFractured);
+    }
 
     @Override
     public boolean equals(Object other) {
