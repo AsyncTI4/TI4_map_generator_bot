@@ -304,6 +304,13 @@
         "undraftable": true,
         "source": "pok"
     },
+        "ItemCategory":BREAKTHROUGH",
+        "ItemId": "sardakkbt",
+        "additionalComponents": [
+            "STARTINGTECH:sardakk"
+        ],
+        "source":"pok"
+    },  
     {
         "itemCategory": "BREAKTHROUGH",
         "itemId": "titansbt",
