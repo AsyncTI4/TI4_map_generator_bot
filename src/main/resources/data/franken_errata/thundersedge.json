@@ -3,19 +3,12 @@
         "itemCategory": "HOMESYSTEM",
         "itemId": "crimson",
         "additionalComponents": [
-            "ABILITY:sorrow",
-            "ABILITY:sundered"
+            "ABILITY:sorrow"
         ],
         "optionalSwaps": [
             "COMMANDER:crimsoncommander",
             "BREAKTHROUGH:crimsonbt"
         ],
-        "source": "thunders_edge"
-    },
-    {
-        "itemCategory": "ABILITY",
-        "itemId": "sundered",
-        "undraftable": true,
         "source": "thunders_edge"
     },
     {
