@@ -26,6 +26,8 @@ class SecretObjectiveWinChanceStatisticsService {
         int[] winsByScoredAPSecretCount = new int[5];
         int[] playersByScoredSecretCount = new int[5];
         int[] winsByScoredSecretCount = new int[5];
+        int[][] playersByExactScoredSecretCountAndMinimumAPCount = new int[5][5];
+        int[][] winsByExactScoredSecretCountAndMinimumAPCount = new int[5][5];
         Map<String, Integer> playersBySecretPhaseCombination = new HashMap<>();
         Map<String, Integer> winsBySecretPhaseCombination = new HashMap<>();
         Map<String, Integer> gamesWithSecretScored = new HashMap<>();
@@ -43,6 +45,8 @@ class SecretObjectiveWinChanceStatisticsService {
                         winsByScoredAPSecretCount,
                         playersByScoredSecretCount,
                         winsByScoredSecretCount,
+                        playersByExactScoredSecretCountAndMinimumAPCount,
+                        winsByExactScoredSecretCountAndMinimumAPCount,
                         playersBySecretPhaseCombination,
                         winsBySecretPhaseCombination,
                         gamesWithSecretScored,
@@ -61,6 +65,9 @@ class SecretObjectiveWinChanceStatisticsService {
                 winsByScoredSecretCount,
                 playersByScoredAPSecretCount,
                 winsByScoredAPSecretCount);
+        sb.append('\n');
+        sb.append(buildConditionedActionPhaseWinChanceSection(
+                playersByExactScoredSecretCountAndMinimumAPCount, winsByExactScoredSecretCountAndMinimumAPCount));
         sb.append('\n');
         sb.append(buildSecretPhaseCombinationWinChanceSection(
                 playersBySecretPhaseCombination, winsBySecretPhaseCombination));
@@ -220,6 +227,36 @@ class SecretObjectiveWinChanceStatisticsService {
                 .append(")\n");
     }
 
+    static String buildConditionedActionPhaseWinChanceSection(
+            int[][] playersByExactScoredSecretCountAndMinimumAPCount,
+            int[][] winsByExactScoredSecretCountAndMinimumAPCount) {
+        StringBuilder sb = new StringBuilder("__**Action Phase Secret Win Chance by Total Scored Secrets**__\n")
+                .append("_(What is a player's win chance with X total scored secrets and at least Y action phase secrets?)_\n\n");
+
+        for (int totalSecretCount = 1; totalSecretCount <= 4; totalSecretCount++) {
+            sb.append("**")
+                    .append(totalSecretCount)
+                    .append(" total scored secret")
+                    .append(totalSecretCount == 1 ? "" : "s")
+                    .append("**\n");
+            for (int minimumAPCount = 1; minimumAPCount <= totalSecretCount; minimumAPCount++) {
+                String label = minimumAPCount == totalSecretCount
+                        ? minimumAPCount + " AP"
+                        : minimumAPCount + "+ AP";
+                appendSecretCountWinChanceLine(
+                        sb,
+                        label,
+                        playersByExactScoredSecretCountAndMinimumAPCount[totalSecretCount][minimumAPCount],
+                        winsByExactScoredSecretCountAndMinimumAPCount[totalSecretCount][minimumAPCount]);
+            }
+            if (totalSecretCount < 4) {
+                sb.append('\n');
+            }
+        }
+
+        return sb.toString();
+    }
+
     static String buildSecretPhaseCombinationWinChanceSection(
             Map<String, Integer> playersBySecretPhaseCombination, Map<String, Integer> winsBySecretPhaseCombination) {
         StringBuilder sb = new StringBuilder("__**Scored + Unscored Secret Phase Combination Win Chance**__\n")
@@ -314,6 +351,8 @@ class SecretObjectiveWinChanceStatisticsService {
             int[] winsByScoredAPSecretCount,
             int[] playersByScoredSecretCount,
             int[] winsByScoredSecretCount,
+            int[][] playersByExactScoredSecretCountAndMinimumAPCount,
+            int[][] winsByExactScoredSecretCountAndMinimumAPCount,
             Map<String, Integer> playersBySecretPhaseCombination,
             Map<String, Integer> winsBySecretPhaseCombination,
             Map<String, Integer> gamesWithSecretScored,
@@ -351,9 +390,24 @@ class SecretObjectiveWinChanceStatisticsService {
             int totalScoredBucket = Math.min(4, totalScoredSecretCount);
             playersByScoredSecretCount[totalScoredBucket]++;
 
+            if (totalScoredSecretCount <= 4) {
+                for (int minimumAPCount = 1; minimumAPCount <= totalScoredSecretCount; minimumAPCount++) {
+                    if (actionPhaseSecretCount >= minimumAPCount) {
+                        playersByExactScoredSecretCountAndMinimumAPCount[totalScoredSecretCount][minimumAPCount]++;
+                    }
+                }
+            }
+
             if (isWinner) {
                 winsByScoredAPSecretCount[actionBucket]++;
                 winsByScoredSecretCount[totalScoredBucket]++;
+                if (totalScoredSecretCount <= 4) {
+                    for (int minimumAPCount = 1; minimumAPCount <= totalScoredSecretCount; minimumAPCount++) {
+                        if (actionPhaseSecretCount >= minimumAPCount) {
+                            winsByExactScoredSecretCountAndMinimumAPCount[totalScoredSecretCount][minimumAPCount]++;
+                        }
+                    }
+                }
             }
 
             Map<String, Integer> unscoredSecrets = player.getSecretsUnscored();
