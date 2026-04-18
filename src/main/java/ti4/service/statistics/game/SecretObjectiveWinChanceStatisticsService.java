@@ -26,6 +26,8 @@ class SecretObjectiveWinChanceStatisticsService {
         int[] winsByScoredAPSecretCount = new int[5];
         int[] playersByScoredSecretCount = new int[5];
         int[] winsByScoredSecretCount = new int[5];
+        Map<String, Integer> playersBySecretPhaseCombination = new HashMap<>();
+        Map<String, Integer> winsBySecretPhaseCombination = new HashMap<>();
         Map<String, Integer> gamesWithSecretScored = new HashMap<>();
         Map<String, Integer> winsWithSecretScored = new HashMap<>();
         Map<String, Integer> gamesWithSecretInHand = new HashMap<>();
@@ -41,6 +43,8 @@ class SecretObjectiveWinChanceStatisticsService {
                         winsByScoredAPSecretCount,
                         playersByScoredSecretCount,
                         winsByScoredSecretCount,
+                        playersBySecretPhaseCombination,
+                        winsBySecretPhaseCombination,
                         gamesWithSecretScored,
                         winsWithSecretScored,
                         gamesWithSecretInHand,
@@ -57,6 +61,9 @@ class SecretObjectiveWinChanceStatisticsService {
                 winsByScoredSecretCount,
                 playersByScoredAPSecretCount,
                 winsByScoredAPSecretCount);
+        sb.append('\n');
+        sb.append(buildSecretPhaseCombinationWinChanceSection(
+                playersBySecretPhaseCombination, winsBySecretPhaseCombination));
 
         // Collect all secret names from all three maps
         Set<String> allSecretNames = new HashSet<>();
@@ -213,6 +220,66 @@ class SecretObjectiveWinChanceStatisticsService {
                 .append(")\n");
     }
 
+    static String buildSecretPhaseCombinationWinChanceSection(
+            Map<String, Integer> playersBySecretPhaseCombination, Map<String, Integer> winsBySecretPhaseCombination) {
+        StringBuilder sb = new StringBuilder("__**Scored + Unscored Secret Phase Combination Win Chance**__\n")
+                .append("_(What is a player's win chance for each end-of-game action/status secret mix?)_\n\n");
+
+        playersBySecretPhaseCombination.entrySet().stream()
+                .sorted((left, right) -> {
+                    int leftActionCount = getActionSecretCount(left.getKey());
+                    int rightActionCount = getActionSecretCount(right.getKey());
+                    int compareByTotalSecretCount = Integer.compare(
+                            leftActionCount + getStatusSecretCount(left.getKey()),
+                            rightActionCount + getStatusSecretCount(right.getKey()));
+                    if (compareByTotalSecretCount != 0) {
+                        return compareByTotalSecretCount;
+                    }
+                    return Integer.compare(leftActionCount, rightActionCount);
+                })
+                .forEach(entry -> appendSecretCountWinChanceLine(
+                        sb,
+                        formatSecretPhaseCombinationLabel(
+                                getActionSecretCount(entry.getKey()), getStatusSecretCount(entry.getKey())),
+                        entry.getValue(),
+                        winsBySecretPhaseCombination.getOrDefault(entry.getKey(), 0)));
+
+        return sb.toString();
+    }
+
+    private static String getSecretPhaseCombinationKey(int actionCount, int statusCount) {
+        return actionCount + "|" + statusCount;
+    }
+
+    private static int getActionSecretCount(String combinationKey) {
+        return Integer.parseInt(StringUtils.substringBefore(combinationKey, "|"));
+    }
+
+    private static int getStatusSecretCount(String combinationKey) {
+        return Integer.parseInt(StringUtils.substringAfter(combinationKey, "|"));
+    }
+
+    static String formatSecretPhaseCombinationLabel(int actionCount, int statusCount) {
+        if (actionCount == 0 && statusCount == 0) {
+            return "0 secrets";
+        }
+        if (actionCount == 0) {
+            return statusCount + " " + formatStatusSecretLabel(statusCount);
+        }
+        if (statusCount == 0) {
+            return actionCount + " action" + (actionCount == 1 ? "" : "s");
+        }
+        return actionCount + " action" + (actionCount == 1 ? "" : "s")
+                + " and "
+                + statusCount
+                + " "
+                + formatStatusSecretLabel(statusCount);
+    }
+
+    private static String formatStatusSecretLabel(int statusCount) {
+        return statusCount == 1 ? "status" : "statuses";
+    }
+
     private static SecretWinChanceEntry buildSecretWinChanceEntry(
             String secretName,
             Map<String, Integer> gamesWithSecretScored,
@@ -241,12 +308,14 @@ class SecretObjectiveWinChanceStatisticsService {
                 discardRateEstimatedPercent);
     }
 
-    private static void collectSecretObjectiveWinChanceStats(
+    static void collectSecretObjectiveWinChanceStats(
             Game game,
             int[] playersByScoredAPSecretCount,
             int[] winsByScoredAPSecretCount,
             int[] playersByScoredSecretCount,
             int[] winsByScoredSecretCount,
+            Map<String, Integer> playersBySecretPhaseCombination,
+            Map<String, Integer> winsBySecretPhaseCombination,
             Map<String, Integer> gamesWithSecretScored,
             Map<String, Integer> winsWithSecretScored,
             Map<String, Integer> gamesWithSecretInHand,
@@ -260,6 +329,7 @@ class SecretObjectiveWinChanceStatisticsService {
             boolean isWinner = player == winner.get();
 
             int actionPhaseSecretCount = 0;
+            int statusPhaseSecretCount = 0;
             int totalScoredSecretCount = player.getSecretsScored().size();
             Set<String> scoredSecrets = new HashSet<>();
             for (String secretId : player.getSecretsScored().keySet()) {
@@ -269,6 +339,8 @@ class SecretObjectiveWinChanceStatisticsService {
                 }
                 if ("action".equalsIgnoreCase(secretObjective.getPhase())) {
                     actionPhaseSecretCount++;
+                } else {
+                    statusPhaseSecretCount++;
                 }
                 scoredSecrets.add(secretObjective.getName());
             }
@@ -284,11 +356,31 @@ class SecretObjectiveWinChanceStatisticsService {
                 winsByScoredSecretCount[totalScoredBucket]++;
             }
 
-            Set<String> inHandSecrets = player.getSecretsUnscored().keySet().stream()
+            Map<String, Integer> unscoredSecrets = player.getSecretsUnscored();
+            Set<String> inHandSecrets = unscoredSecrets.keySet().stream()
                     .map(Mapper::getSecretObjective)
                     .filter(secretObjective -> secretObjective != null)
                     .map(SecretObjectiveModel::getName)
                     .collect(Collectors.toSet());
+
+            for (String secretId : unscoredSecrets.keySet()) {
+                SecretObjectiveModel secretObjective = Mapper.getSecretObjective(secretId);
+                if (secretObjective == null) {
+                    continue;
+                }
+                if ("action".equalsIgnoreCase(secretObjective.getPhase())) {
+                    actionPhaseSecretCount++;
+                } else {
+                    statusPhaseSecretCount++;
+                }
+            }
+
+            String secretPhaseCombinationKey =
+                    getSecretPhaseCombinationKey(actionPhaseSecretCount, statusPhaseSecretCount);
+            playersBySecretPhaseCombination.merge(secretPhaseCombinationKey, 1, Integer::sum);
+            if (isWinner) {
+                winsBySecretPhaseCombination.merge(secretPhaseCombinationKey, 1, Integer::sum);
+            }
 
             for (String secretName : scoredSecrets) {
                 gamesWithSecretScored.merge(secretName, 1, Integer::sum);
