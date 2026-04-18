@@ -71,9 +71,15 @@ class SlashCommandRegistrationValidatorTest {
 
     @Test
     void subcommandGroupRejectsTooManySubcommands() {
+        Map<String, Subcommand> groupSubcommands = buildSubcommands(26);
+
         SlashCommandRegistrationException exception = assertThrows(
-                SlashCommandRegistrationException.class,
-                () -> TestSubcommandGroup.create("group", buildSubcommands(26)));
+                SlashCommandRegistrationException.class, () -> new SubcommandGroup("group", "description") {
+                    @Override
+                    public Map<String, Subcommand> getGroupSubcommands() {
+                        return groupSubcommands;
+                    }
+                });
 
         assertEquals(
                 "Subcommand group `group` attempted to register 26 subcommands, but Discord only allows 25.",
@@ -159,23 +165,5 @@ class SlashCommandRegistrationValidatorTest {
 
         @Override
         public void execute(net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent event) {}
-    }
-
-    private static final class TestSubcommandGroup extends SubcommandGroup {
-        private static Map<String, Subcommand> subcommands = Map.of();
-
-        private TestSubcommandGroup(String name) {
-            super(name, "description");
-        }
-
-        private static TestSubcommandGroup create(String name, Map<String, Subcommand> subcommands) {
-            TestSubcommandGroup.subcommands = subcommands;
-            return new TestSubcommandGroup(name);
-        }
-
-        @Override
-        public Map<String, Subcommand> getGroupSubcommands() {
-            return subcommands;
-        }
     }
 }
