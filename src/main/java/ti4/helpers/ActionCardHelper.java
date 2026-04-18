@@ -74,9 +74,8 @@ public class ActionCardHelper {
 
     public static void sendActionCardInfo(Game game, Player player) {
         // AC INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, getActionCardInfo(game, player));
-        MessageHelper.replacePinnedMessageInPlayerCardsInfoThread(
-                player, PINNED_AC_INFO_MESSAGE_ID, getPinnedActionCardInfo(game, player));
+        MessageHelper.sendMessageToPlayerCardsInfoThreadAndPin(
+                game, player, PINNED_AC_INFO_MESSAGE_ID, getActionCardInfo(game, player));
         Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(
@@ -357,42 +356,6 @@ public class ActionCardHelper {
                 }
             }
         }
-        return sb.toString();
-    }
-
-    private static String getPinnedActionCardInfo(Game game, Player player) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("## Latest Action Cards (")
-                .append(player.getAcCount())
-                .append('/')
-                .append(ButtonHelper.getACLimit(game, player))
-                .append(")\n");
-
-        Map<String, Integer> actionCards = player.getActionCards();
-        if (actionCards == null || actionCards.isEmpty()) {
-            sb.append("> None");
-            return sb.toString();
-        }
-
-        int index = 1;
-        for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
-            ActionCardModel actionCard = Mapper.getActionCard(ac.getKey());
-            sb.append(index).append("\\. ");
-            if (actionCard == null) {
-                sb.append("Unknown card `(").append(ac.getValue()).append(")`");
-            } else {
-                sb.append(CardEmojis.getACEmoji(game))
-                        .append(actionCard.isWild(game) ? CardEmojis.Event : "")
-                        .append(" _")
-                        .append(actionCard.getName())
-                        .append("_ `(")
-                        .append(Helper.leftpad("" + ac.getValue(), 3))
-                        .append(")`");
-            }
-            sb.append('\n');
-            index++;
-        }
-
         return sb.toString();
     }
 

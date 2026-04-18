@@ -3317,6 +3317,11 @@ public class PlayerAreaGenerator {
 
     private static void drawFactionIconImageOpaque(
             Graphics g, String faction, int x, int y, int width, int height, Float opacity, boolean border) {
+        BufferedImage icon = DrawingUtil.getFactionIconImageScaled(faction, width, height);
+        if (icon == null) {
+            return;
+        }
+
         if (border) {
             try {
                 // this is over-engineered, allowing for any radius for the inner and outer strokes,
@@ -3325,7 +3330,6 @@ public class PlayerAreaGenerator {
                 // NB: `int` is 32 bit two's complement, such that the range of positive numbers is
                 // 0x00000000 - 0x7FFFFFFF, and the range of negative numbers is 0x80000000 - 0xFFFFFFFF
                 // this affects Math.max, and so requires the unsigned right-shift `>>>` to compare properly
-                BufferedImage icon = DrawingUtil.getFactionIconImageScaled(faction, width, height);
                 int[] pixels = icon.getRGB(0, 0, width, height, null, 0, width);
                 for (int i = 0; i < pixels.length; i++) {
                     pixels[i] &= 0xFF000000;
@@ -3374,12 +3378,11 @@ public class PlayerAreaGenerator {
             }
         }
         try {
-            BufferedImage resourceBufferedImage = DrawingUtil.getFactionIconImageScaled(faction, width, height);
             Graphics2D g2 = (Graphics2D) g;
             float opacityToSet = opacity == null ? 1.0f : opacity;
             boolean setOpacity = opacity != null && !opacity.equals(1.0f);
             if (setOpacity) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacityToSet));
-            g2.drawImage(resourceBufferedImage, x, y, null);
+            g2.drawImage(icon, x, y, null);
             if (setOpacity) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         } catch (Exception e) {
             BotLogger.error("Could not display faction icon image: " + faction, e);

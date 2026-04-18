@@ -14,16 +14,13 @@ public interface ParentCommand extends Command<SlashCommandInteractionEvent> {
     default boolean accept(SlashCommandInteractionEvent event) {
         if (!Command.super.accept(event)) return false;
 
-        String subcommandGroupName = event.getInteraction().getSubcommandGroup();
-        if (subcommandGroupName == null) {
-            String subcommandName = event.getInteraction().getSubcommandName();
-            Subcommand subcommand = getSubcommands().get(subcommandName);
-            return subcommand == null
-                    || getSubcommands().containsKey(event.getInteraction().getSubcommandName());
+        Command<SlashCommandInteractionEvent> subcommand = getSubcommand(event);
+        if (subcommand != null) {
+            return subcommand.accept(event);
         }
 
-        SubcommandGroup subcommandGroup = getSubcommandGroups().get(subcommandGroupName);
-        return subcommandGroup == null || getSubcommandGroups().containsKey(subcommandGroupName);
+        return event.getInteraction().getSubcommandName() == null
+                && event.getInteraction().getSubcommandGroup() == null;
     }
 
     default void preExecute(SlashCommandInteractionEvent event) {
