@@ -31,7 +31,7 @@ public class RecreateGameService {
     public static final String TEST_GAME_MARKER = "-test-";
     private static final String LEGACY_TEST_GAME_MARKER = "::test::";
     private static final Pattern TEST_GAME_NAME_PATTERN =
-            Pattern.compile("^(?<source>.+)" + Pattern.quote(TEST_GAME_MARKER) + "(?<suffix>\\d{5})$");
+            Pattern.compile("^(?<source>.+?)" + Pattern.quote(TEST_GAME_MARKER) + "(?<suffix>\\d{5})$");
 
     public static String recreateGame(Game game) {
         return recreateGameResult(game, game.getGuild(), null).getSummary();
