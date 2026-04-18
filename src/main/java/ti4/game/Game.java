@@ -801,7 +801,7 @@ public class Game extends GameProperties {
     @Override
     public void setCompetitiveTIGLGame(boolean competitiveTIGLGame) {
         boolean isFracturedTIGL = TIGLHelper.isFracturedTIGLGame(this);
-        boolean hasAlwaysIncompatibleMode = super.isAllianceMode() || super.isCommunityMode();
+        boolean hasAlwaysIncompatibleMode = isAllianceMode() || isCommunityMode();
         boolean hasStandardOnlyIncompatibleMode =
                 isAbsolMode() || isMiltyModMode() || isDiscordantStarsMode() || isHomebrewSCMode() || isFowMode();
         if (hasAlwaysIncompatibleMode || (!isFracturedTIGL && hasStandardOnlyIncompatibleMode)) {
@@ -832,27 +832,11 @@ public class Game extends GameProperties {
     private void clearTIGLSetupState() {
         TIGLHelper.removeFracturedTag(this);
         setMinimumTIGLRankAtGameStart(null);
-        for (Player player : getPlayers().values()) {
+        for (Player player : players.values()) {
             if (player != null) {
                 player.setPlayerTIGLRankAtGameStart(null);
             }
         }
-    }
-
-    @Override
-    public boolean isAllianceMode() {
-        if (!super.isAllianceMode()) {
-            for (Player player : getRealPlayers()) {
-                if (player.getAllianceMembers() != null
-                        && !player.getAllianceMembers()
-                                .replace(player.getFaction(), "")
-                                .isEmpty()) {
-                    setAllianceMode(true);
-                    break;
-                }
-            }
-        }
-        return super.isAllianceMode();
     }
 
     @Override

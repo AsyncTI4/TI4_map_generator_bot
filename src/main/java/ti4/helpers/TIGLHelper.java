@@ -410,7 +410,7 @@ public final class TIGLHelper {
         return game.getTags().contains(Constants.TIGL_FRACTURED_TAG);
     }
 
-    public static void addFracturedTag(Game game) {
+    private static void addFracturedTag(Game game) {
         if (!isFracturedTIGLGame(game)) {
             game.addTag(Constants.TIGL_FRACTURED_TAG);
         }
