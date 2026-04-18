@@ -2010,7 +2010,7 @@ public class ButtonHelper {
                         }
 
                         if ("dspntold".equalsIgnoreCase(pn)) {
-                            player.setFleetCC(player.getFleetCC()-1);
+                            player.setFleetCC(player.getFleetCC() - 1);
                             ButtonHelper.checkFleetInEveryTile(player, game);
                             MessageHelper.sendMessageToChannel(
                                     channel,
