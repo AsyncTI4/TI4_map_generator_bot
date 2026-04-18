@@ -109,7 +109,7 @@ public class LocalDevelopmentSampleGameService {
     }
 
     static String formatTestGameName(String sourceGameName, int suffix) {
-        return sourceGameName + RecreateGameService.TEST_GAME_MARKER + String.format("%05d", suffix);
+        return sourceGameName + RecreateGameService.TEST_GAME_MARKER + suffix;
     }
 
     private static boolean isAvailableTestGameName(String gameName) {

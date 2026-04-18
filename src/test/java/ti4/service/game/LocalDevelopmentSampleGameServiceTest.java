@@ -35,9 +35,9 @@ class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
         player.setCardsInfoThreadID("cards");
         player.setBagInfoThreadID("bag");
 
-        LocalDevelopmentSampleGameService.prepareClonedGame(game, "source-test-00001");
+        LocalDevelopmentSampleGameService.prepareClonedGame(game, "source-test-1");
 
-        assertEquals("source-test-00001", game.getName());
+        assertEquals("source-test-1", game.getName());
         assertFalse(game.isHasEnded());
         assertEquals(0, game.getEndedDate());
         assertNull(game.getTableTalkChannelID());
@@ -67,8 +67,8 @@ class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void formatTestGameNameUsesMarkerAndFiveDigitSuffix() {
-        assertEquals("pbd15036-test-00042", LocalDevelopmentSampleGameService.formatTestGameName("pbd15036", 42));
+    void formatTestGameNameUsesMarkerAndIncrementingSuffix() {
+        assertEquals("pbd15036-test-42", LocalDevelopmentSampleGameService.formatTestGameName("pbd15036", 42));
     }
 
     @Test
@@ -81,7 +81,7 @@ class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
         Files.write(existingPath, java.util.List.of("owner-id", "owner-name", "game-name"));
         try {
             assertEquals(
-                    "localdevnaming-test-00002", LocalDevelopmentSampleGameService.buildTestGameName(sourceGameName));
+                    "localdevnaming-test-2", LocalDevelopmentSampleGameService.buildTestGameName(sourceGameName));
         } finally {
             Files.deleteIfExists(existingPath);
         }
@@ -94,10 +94,10 @@ class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
         Files.write(sourcePath, java.util.List.of("owner-id", "owner-name", "source-game", "rest"));
 
         assertTrue(LocalDevelopmentSampleGameService.copySourceGameToStorage(
-                sourcePath, targetPath, "source-game-test-00001"));
+                sourcePath, targetPath, "source-game-test-1"));
 
         assertEquals(
-                java.util.List.of("owner-id", "owner-name", "source-game-test-00001", "rest"),
+                java.util.List.of("owner-id", "owner-name", "source-game-test-1", "rest"),
                 Files.readAllLines(targetPath));
     }
 }
