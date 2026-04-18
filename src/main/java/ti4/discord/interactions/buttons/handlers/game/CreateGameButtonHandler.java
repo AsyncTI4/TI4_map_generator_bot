@@ -25,12 +25,14 @@ import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.SearchGameHelper;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.statistics.AverageTurnTimeService;
+import ti4.spring.service.statistics.SharedGamesService;
 
 @UtilityClass
 public class CreateGameButtonHandler {
@@ -69,10 +71,19 @@ public class CreateGameButtonHandler {
     public static void finishSignup(ModalInteractionEvent event) {
         List<Member> members = event.getValue("players").getAsMentions().getMembers();
         List<Member> membersOG = fetchMembersFromMessage(event);
+        List<Member> newMembers = new ArrayList<>();
         for (Member member : members) {
             if (membersOG.contains(member)) continue;
-            membersOG.add(member);
-            MessageHelper.sendMessageToEventChannel(event, member.getAsMention() + " joined the game.");
+            newMembers.add(member);
+        }
+
+        if (!newMembers.isEmpty()) {
+            membersOG.addAll(newMembers);
+        }
+
+        for (Member member : newMembers) {
+            MessageHelper.sendMessageToEventChannel(
+                    event, buildJoinAnnouncement(member.getAsMention() + " joined the game.", member, membersOG));
         }
         event.getMessage()
                 .editMessage(generateMemberListMessage(membersOG, fetchSillyNameFromMessage(event)))
@@ -257,13 +268,19 @@ public class CreateGameButtonHandler {
     @ButtonHandler("joinGameList")
     public static void joinGameList(ButtonInteractionEvent event) {
         List<Member> members = fetchMembersFromMessage(event);
+        boolean added = false;
         if (!members.contains(event.getMember())) {
             members.add(event.getMember());
+            added = true;
         }
         event.getMessage()
                 .editMessage(generateMemberListMessage(members, fetchSillyNameFromMessage(event)))
                 .queue();
-        MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " joined the game.");
+        if (added) {
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    buildJoinAnnouncement(event.getUser().getEffectiveName() + " joined the game.", event.getMember(), members));
+        }
     }
 
     @ButtonHandler("leaveGameList")
@@ -274,6 +291,43 @@ public class CreateGameButtonHandler {
                 .editMessage(generateMemberListMessage(members, fetchSillyNameFromMessage(event)))
                 .queue();
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " left the game.");
+    }
+
+    static String buildJoinAnnouncement(String joinMessage, Member joiningMember, List<Member> signedUpMembers) {
+        List<Member> otherMembers = signedUpMembers.stream()
+                .filter(member -> !member.getId().equals(joiningMember.getId()))
+                .toList();
+        if (otherMembers.isEmpty()) {
+            return joinMessage;
+        }
+
+        Map<String, Integer> sharedGameCounts = SharedGamesService.getBean()
+                .getSharedGameCounts(
+                        joiningMember.getId(), otherMembers.stream().map(Member::getId).toList());
+        return buildJoinAnnouncement(joinMessage, joiningMember, otherMembers, sharedGameCounts);
+    }
+
+    static String buildJoinAnnouncement(
+            String joinMessage, Member joiningMember, List<Member> otherMembers, Map<String, Integer> sharedGameCounts) {
+        StringBuilder message = new StringBuilder(joinMessage);
+        if (sharedGameCounts.isEmpty()) {
+            return message.toString();
+        }
+
+        for (Member otherMember : otherMembers) {
+            Integer sharedGames = sharedGameCounts.get(otherMember.getId());
+            if (sharedGames == null || sharedGames < 1) {
+                continue;
+            }
+            message.append("\n🎉 Congrats to ")
+                    .append(joiningMember.getAsMention())
+                    .append(" and ")
+                    .append(otherMember.getAsMention())
+                    .append(" on their ")
+                    .append(StringHelper.ordinal(sharedGames + 1))
+                    .append(" game together!");
+        }
+        return message.toString();
     }
 
     private static void createGameChannels(ButtonInteractionEvent event) {
