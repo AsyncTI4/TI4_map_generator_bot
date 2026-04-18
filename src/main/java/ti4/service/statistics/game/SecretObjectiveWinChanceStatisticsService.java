@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -316,6 +315,46 @@ class SecretObjectiveWinChanceStatisticsService {
         return statusCount == 1 ? "status" : "statuses";
     }
 
+    private static void incrementMinimumActionPhaseSecretCounts(
+            int[][] countsByExactScoredSecretCountAndMinimumAPCount, int totalScoredSecretCount, int actionPhaseSecretCount) {
+        if (totalScoredSecretCount > 4) {
+            return;
+        }
+        for (int minimumAPCount = 1; minimumAPCount <= totalScoredSecretCount; minimumAPCount++) {
+            if (actionPhaseSecretCount >= minimumAPCount) {
+                countsByExactScoredSecretCountAndMinimumAPCount[totalScoredSecretCount][minimumAPCount]++;
+            }
+        }
+    }
+
+    private static SecretPhaseCounts countSecretPhases(Iterable<String> secretIds) {
+        int actionPhaseSecretCount = 0;
+        int statusPhaseSecretCount = 0;
+        for (String secretId : secretIds) {
+            SecretObjectiveModel secretObjective = Mapper.getSecretObjective(secretId);
+            if (secretObjective == null) {
+                continue;
+            }
+            if ("action".equalsIgnoreCase(secretObjective.getPhase())) {
+                actionPhaseSecretCount++;
+            } else {
+                statusPhaseSecretCount++;
+            }
+        }
+        return new SecretPhaseCounts(actionPhaseSecretCount, statusPhaseSecretCount);
+    }
+
+    private static Set<String> getSecretNames(Iterable<String> secretIds) {
+        Set<String> secretNames = new HashSet<>();
+        for (String secretId : secretIds) {
+            SecretObjectiveModel secretObjective = Mapper.getSecretObjective(secretId);
+            if (secretObjective != null) {
+                secretNames.add(secretObjective.getName());
+            }
+        }
+        return secretNames;
+    }
+
     private static SecretWinChanceEntry buildSecretWinChanceEntry(
             String secretName,
             Map<String, Integer> gamesWithSecretScored,
@@ -366,67 +405,32 @@ class SecretObjectiveWinChanceStatisticsService {
         for (Player player : game.getRealAndEliminatedPlayers()) {
             boolean isWinner = player == winner.get();
 
-            int actionPhaseSecretCount = 0;
-            int statusPhaseSecretCount = 0;
+            SecretPhaseCounts scoredSecretPhaseCounts = countSecretPhases(player.getSecretsScored().keySet());
+            int actionPhaseSecretCount = scoredSecretPhaseCounts.actionCount();
+            int statusPhaseSecretCount = scoredSecretPhaseCounts.statusCount();
             int totalScoredSecretCount = player.getSecretsScored().size();
-            Set<String> scoredSecrets = new HashSet<>();
-            for (String secretId : player.getSecretsScored().keySet()) {
-                SecretObjectiveModel secretObjective = Mapper.getSecretObjective(secretId);
-                if (secretObjective == null) {
-                    continue;
-                }
-                if ("action".equalsIgnoreCase(secretObjective.getPhase())) {
-                    actionPhaseSecretCount++;
-                } else {
-                    statusPhaseSecretCount++;
-                }
-                scoredSecrets.add(secretObjective.getName());
-            }
+            Set<String> scoredSecrets = getSecretNames(player.getSecretsScored().keySet());
 
             int actionBucket = Math.min(4, actionPhaseSecretCount);
             playersByScoredAPSecretCount[actionBucket]++;
 
             int totalScoredBucket = Math.min(4, totalScoredSecretCount);
             playersByScoredSecretCount[totalScoredBucket]++;
-
-            if (totalScoredSecretCount <= 4) {
-                for (int minimumAPCount = 1; minimumAPCount <= totalScoredSecretCount; minimumAPCount++) {
-                    if (actionPhaseSecretCount >= minimumAPCount) {
-                        playersByExactScoredSecretCountAndMinimumAPCount[totalScoredSecretCount][minimumAPCount]++;
-                    }
-                }
-            }
+            incrementMinimumActionPhaseSecretCounts(
+                    playersByExactScoredSecretCountAndMinimumAPCount, totalScoredSecretCount, actionPhaseSecretCount);
 
             if (isWinner) {
                 winsByScoredAPSecretCount[actionBucket]++;
                 winsByScoredSecretCount[totalScoredBucket]++;
-                if (totalScoredSecretCount <= 4) {
-                    for (int minimumAPCount = 1; minimumAPCount <= totalScoredSecretCount; minimumAPCount++) {
-                        if (actionPhaseSecretCount >= minimumAPCount) {
-                            winsByExactScoredSecretCountAndMinimumAPCount[totalScoredSecretCount][minimumAPCount]++;
-                        }
-                    }
-                }
+                incrementMinimumActionPhaseSecretCounts(
+                        winsByExactScoredSecretCountAndMinimumAPCount, totalScoredSecretCount, actionPhaseSecretCount);
             }
 
             Map<String, Integer> unscoredSecrets = player.getSecretsUnscored();
-            Set<String> inHandSecrets = unscoredSecrets.keySet().stream()
-                    .map(Mapper::getSecretObjective)
-                    .filter(secretObjective -> secretObjective != null)
-                    .map(SecretObjectiveModel::getName)
-                    .collect(Collectors.toSet());
-
-            for (String secretId : unscoredSecrets.keySet()) {
-                SecretObjectiveModel secretObjective = Mapper.getSecretObjective(secretId);
-                if (secretObjective == null) {
-                    continue;
-                }
-                if ("action".equalsIgnoreCase(secretObjective.getPhase())) {
-                    actionPhaseSecretCount++;
-                } else {
-                    statusPhaseSecretCount++;
-                }
-            }
+            Set<String> inHandSecrets = getSecretNames(unscoredSecrets.keySet());
+            SecretPhaseCounts unscoredSecretPhaseCounts = countSecretPhases(unscoredSecrets.keySet());
+            actionPhaseSecretCount += unscoredSecretPhaseCounts.actionCount();
+            statusPhaseSecretCount += unscoredSecretPhaseCounts.statusCount();
 
             String secretPhaseCombinationKey =
                     getSecretPhaseCombinationKey(actionPhaseSecretCount, statusPhaseSecretCount);
@@ -463,4 +467,6 @@ class SecretObjectiveWinChanceStatisticsService {
             int combinedWins,
             long whenDrawnEstimatedPercent,
             long discardRateEstimatedPercent) {}
+
+    private record SecretPhaseCounts(int actionCount, int statusCount) {}
 }
