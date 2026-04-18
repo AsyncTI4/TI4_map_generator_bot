@@ -316,7 +316,9 @@ class SecretObjectiveWinChanceStatisticsService {
     }
 
     private static void incrementMinimumActionPhaseSecretCounts(
-            int[][] countsByExactScoredSecretCountAndMinimumAPCount, int totalScoredSecretCount, int actionPhaseSecretCount) {
+            int[][] countsByExactScoredSecretCountAndMinimumAPCount,
+            int totalScoredSecretCount,
+            int actionPhaseSecretCount) {
         if (totalScoredSecretCount > 4) {
             return;
         }
@@ -405,7 +407,8 @@ class SecretObjectiveWinChanceStatisticsService {
         for (Player player : game.getRealAndEliminatedPlayers()) {
             boolean isWinner = player == winner.get();
 
-            SecretPhaseCounts scoredSecretPhaseCounts = countSecretPhases(player.getSecretsScored().keySet());
+            SecretPhaseCounts scoredSecretPhaseCounts =
+                    countSecretPhases(player.getSecretsScored().keySet());
             int actionPhaseSecretCount = scoredSecretPhaseCounts.actionCount();
             int statusPhaseSecretCount = scoredSecretPhaseCounts.statusCount();
             int totalScoredSecretCount = player.getSecretsScored().size();
