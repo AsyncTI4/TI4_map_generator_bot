@@ -58,9 +58,7 @@ class RecreateGameServiceTest extends BaseTi4Test {
 
     @Test
     void sanitizedGameChannelPrefixRemovesUnsupportedCharacters() {
-        assertEquals(
-                "pbd15036-test-00001",
-                RecreateGameService.getSanitizedGameChannelPrefix("pbd15036-test-00001"));
+        assertEquals("pbd15036-test-00001", RecreateGameService.getSanitizedGameChannelPrefix("pbd15036-test-00001"));
     }
 
     @Test

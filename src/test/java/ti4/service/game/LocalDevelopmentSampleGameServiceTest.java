@@ -74,13 +74,14 @@ class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
     @Test
     void buildTestGameNameSkipsExistingStoredFile() throws Exception {
         String sourceGameName = "localdevnaming";
-        Path existingPath = Storage.getGamePath(LocalDevelopmentSampleGameService.formatTestGameName(sourceGameName, 1)
-                + Constants.TXT);
+        Path existingPath = Storage.getGamePath(
+                LocalDevelopmentSampleGameService.formatTestGameName(sourceGameName, 1) + Constants.TXT);
         Files.createDirectories(existingPath.getParent());
         Files.deleteIfExists(existingPath);
         Files.write(existingPath, java.util.List.of("owner-id", "owner-name", "game-name"));
         try {
-            assertEquals("localdevnaming-test-00002", LocalDevelopmentSampleGameService.buildTestGameName(sourceGameName));
+            assertEquals(
+                    "localdevnaming-test-00002", LocalDevelopmentSampleGameService.buildTestGameName(sourceGameName));
         } finally {
             Files.deleteIfExists(existingPath);
         }
