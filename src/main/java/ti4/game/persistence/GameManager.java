@@ -25,7 +25,7 @@ public class GameManager {
     private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, ManagedPlayer> userIdToManagedPlayer = new ConcurrentHashMap<>();
     private static final CountDownLatch WARMUP_LATCH = new CountDownLatch(1);
-    private static final long WAIT_FOR_WARMUP_TIMEOUT_SECONDS = 10;
+    private static final long WAIT_FOR_WARMUP_TIMEOUT_SECONDS = 30;
 
     public static void initialize() {
         validGameNames.addAll(GameLoadService.loadManagedGameNames());
@@ -200,6 +200,7 @@ public class GameManager {
                 throw new IllegalStateException("GameManager is still warming up!");
             }
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
     }
