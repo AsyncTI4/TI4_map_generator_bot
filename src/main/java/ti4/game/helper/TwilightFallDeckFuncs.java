@@ -1,8 +1,8 @@
 package ti4.game.helper;
 
 import java.util.List;
-import ti4.image.Mapper;
 import ti4.game.Player;
+import ti4.image.Mapper;
 
 public interface TwilightFallDeckFuncs {
 

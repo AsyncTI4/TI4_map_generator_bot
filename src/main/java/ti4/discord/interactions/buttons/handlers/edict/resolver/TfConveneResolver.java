@@ -8,12 +8,12 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.edict.EdictResolveButtonHandler;
-import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperTwilightsFall;
-import ti4.image.Mapper;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperTwilightsFall;
+import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 
 public class TfConveneResolver implements EdictResolver {

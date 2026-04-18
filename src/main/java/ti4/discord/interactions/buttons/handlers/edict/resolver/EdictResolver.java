@@ -1,9 +1,9 @@
 package ti4.discord.interactions.buttons.handlers.edict.resolver;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.image.Mapper;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.image.Mapper;
 import ti4.model.AgendaModel;
 
 public interface EdictResolver {
