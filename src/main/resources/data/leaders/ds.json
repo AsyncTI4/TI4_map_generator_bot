@@ -895,7 +895,7 @@
         "name": "Baird Feraux",
         "title": "Reserved Strategist",
         "abilityWindow": "During each round of combat:",
-        "abilityText": "One of your units may reroll 1 of its combat dice; if your opponent controls more units participating in that combat than you, that unit may roll 1 additional combat die instead",
+        "abilityText": "One of your units may reroll 1 of its combat dice; if your opponent controls more units participating in that combat than you, one of your units may roll 1 additional combat die instead.",
         "unlockCondition": "Have a Code card",
         "source": "ds"
     },
@@ -1480,7 +1480,7 @@
         "title": " Concordat Marshall",
         "abilityName": "Concord Renewed - Galactic Outreach",
         "abilityWindow": "ACTION:",
-        "abilityText": "Attach this card to a revealed objective. The players with the fewest victory points may score this objective without fulfilling its requirements; after a player scores this objective, the Toldar player draws 1 secret objective.",
+        "abilityText": "Attach this card to a revealed objective. A player with the fewest victory points may score this objective without fulfilling its requirements; after a player scores this objective, the Toldar player may draw 1 secret objective.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     }

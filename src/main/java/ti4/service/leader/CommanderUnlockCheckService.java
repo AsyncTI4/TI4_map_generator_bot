@@ -220,7 +220,7 @@ public class CommanderUnlockCheckService {
                 shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "infantry", false) >= 6
                         && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "fighter", false) >= 6);
             case "lanefir" -> shouldBeUnlocked = (game.getNumberOfPurgedFragments() >= 7);
-            case "lizho" -> shouldBeUnlocked = (player.getTrapCardsPlanets().size() >= 4);
+            case "lizho" -> shouldBeUnlocked = (player.getTrapCardsPlanets().size() >= 3);
             case "mirveda" -> shouldBeUnlocked = (ButtonHelper.getNumberOfUnitUpgrades(player) >= 2);
             case "mortheus" ->
                 shouldBeUnlocked = (ButtonHelper.getNumberOfSystemsWithShipsNotAdjacentToHS(player, game) >= 3);

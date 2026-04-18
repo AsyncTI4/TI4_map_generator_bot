@@ -2010,11 +2010,12 @@ public class ButtonHelper {
                         }
 
                         if ("dspntold".equalsIgnoreCase(pn)) {
-                            game.setStoredValue("ccLimit" + player.getColor(), "15");
+                            player.setFleetCC(player.getFleetCC() - 1);
+                            ButtonHelper.checkFleetInEveryTile(player, game);
                             MessageHelper.sendMessageToChannel(
                                     channel,
                                     player.getRepresentation()
-                                            + " purged one of their command tokens due to the effect of _Concordat Allegiant_.");
+                                            + " lost 1 fleet pool command token due to the effect of _Concordat Allegiant_.");
                         }
                     }
                 }
