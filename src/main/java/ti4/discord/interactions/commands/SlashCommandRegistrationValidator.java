@@ -56,7 +56,7 @@ final class SlashCommandRegistrationValidator {
         }
     }
 
-    static void validateGroupSubcommandCount(String groupName, Collection<? extends Subcommand> subcommands) {
+    static void validateGroupSubcommandCount(String groupName, Collection<?> subcommands) {
         requireNonNull(groupName, subcommands, "group subcommands");
 
         if (subcommands.size() > MAX_SUBCOMMANDS_PER_GROUP) {
@@ -65,8 +65,7 @@ final class SlashCommandRegistrationValidator {
         }
     }
 
-    static void validateGroupSubcommandCount(
-            String parentCommandName, String groupName, Collection<? extends Subcommand> subcommands) {
+    static void validateGroupSubcommandCount(String parentCommandName, String groupName, Collection<?> subcommands) {
         requireNonNull(parentCommandName, subcommands, "group subcommands");
 
         if (subcommands.size() > MAX_SUBCOMMANDS_PER_GROUP) {

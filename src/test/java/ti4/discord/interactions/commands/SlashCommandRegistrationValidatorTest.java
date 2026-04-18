@@ -18,7 +18,7 @@ class SlashCommandRegistrationValidatorTest {
 
     @Test
     void validateTopLevelSlashCommandCountRejectsTooManyCommands() {
-        Collection<ParentCommand> commands = IntStream.range(0, Commands.MAX_SLASH_COMMANDS + 1)
+        Collection<? extends ParentCommand> commands = IntStream.range(0, Commands.MAX_SLASH_COMMANDS + 1)
                 .mapToObj(index -> new TestParentCommand("command" + index))
                 .toList();
 
@@ -38,7 +38,9 @@ class SlashCommandRegistrationValidatorTest {
         SlashCommandRegistrationException exception = assertThrows(
                 SlashCommandRegistrationException.class,
                 () -> SlashCommandRegistrationValidator.validateCommandStructure(
-                        command.getName(), command.getSubcommands().values(), command.getSubcommandGroups().values(),
+                        command.getName(),
+                        command.getSubcommands().values(),
+                        command.getSubcommandGroups().values(),
                         command.getOptions()));
 
         assertEquals(
@@ -57,7 +59,9 @@ class SlashCommandRegistrationValidatorTest {
         SlashCommandRegistrationException exception = assertThrows(
                 SlashCommandRegistrationException.class,
                 () -> SlashCommandRegistrationValidator.validateCommandStructure(
-                        command.getName(), command.getSubcommands().values(), command.getSubcommandGroups().values(),
+                        command.getName(),
+                        command.getSubcommands().values(),
+                        command.getSubcommandGroups().values(),
                         command.getOptions()));
 
         assertEquals(
@@ -80,11 +84,18 @@ class SlashCommandRegistrationValidatorTest {
     void existingSlashCommandsStayWithinDiscordLimits() {
         assertDoesNotThrow(() -> {
             SlashCommandRegistrationValidator.validateTopLevelSlashCommandCount(SlashCommandManager.getCommands());
-            SlashCommandManager.getCommands().forEach(command -> SlashCommandRegistrationValidator.validateCommandStructure(
-                    command.getName(),
-                    command.getSubcommands().values(),
-                    command.getSubcommandGroups().values(),
-                    command.getOptions()));
+            SlashCommandManager.getCommands()
+                    .forEach(command -> SlashCommandRegistrationValidator.validateCommandStructure(
+                            command.getName(),
+                            command.getSubcommands().values(),
+                            command.getSubcommandGroups().values(),
+                            command.getOptions()));
+            SlashCommandManager.getCommands()
+                    .forEach(command -> SlashCommandRegistrationValidator.validateCommandStructure(
+                            command.getName(),
+                            command.getSearchSubcommands().values(),
+                            List.of(),
+                            command.getOptions()));
         });
     }
 
