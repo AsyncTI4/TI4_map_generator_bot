@@ -240,7 +240,7 @@ class SecretObjectiveWinChanceStatisticsService {
             int[][] winsByExactScoredSecretCountAndMinimumAPCount) {
         StringBuilder sb = new StringBuilder("__**Action Phase Secret Win Chance by Total Scored Secrets**__\n")
                 .append(
-                        "_(What is a player's win chance with X total scored secrets and at least Y action phase secrets?)_\n\n");
+                        "_(What is a player's win chance with X total scored secrets and exactly Y action phase secrets?)_\n\n");
 
         for (int totalSecretCount = 1; totalSecretCount <= 4; totalSecretCount++) {
             sb.append("**")
@@ -248,15 +248,12 @@ class SecretObjectiveWinChanceStatisticsService {
                     .append(" total scored secret")
                     .append(totalSecretCount == 1 ? "" : "s")
                     .append("**\n");
-            for (int minimumAPCount = 0; minimumAPCount <= totalSecretCount; minimumAPCount++) {
-                String label = minimumAPCount == 0
-                        ? "0 AP"
-                        : minimumAPCount == totalSecretCount ? minimumAPCount + " AP" : minimumAPCount + "+ AP";
+            for (int exactAPCount = 0; exactAPCount <= totalSecretCount; exactAPCount++) {
                 appendSecretCountWinChanceLine(
                         sb,
-                        label,
-                        playersByExactScoredSecretCountAndMinimumAPCount[totalSecretCount][minimumAPCount],
-                        winsByExactScoredSecretCountAndMinimumAPCount[totalSecretCount][minimumAPCount]);
+                        exactAPCount + " AP",
+                        playersByExactScoredSecretCountAndMinimumAPCount[totalSecretCount][exactAPCount],
+                        winsByExactScoredSecretCountAndMinimumAPCount[totalSecretCount][exactAPCount]);
             }
             if (totalSecretCount < 4) {
                 sb.append('\n');
@@ -346,18 +343,17 @@ class SecretObjectiveWinChanceStatisticsService {
         return agendaCount == 1 ? "agenda" : "agendas";
     }
 
-    private static void incrementMinimumActionPhaseSecretCounts(
+    private static void incrementExactActionPhaseSecretCount(
             int[][] countsByExactScoredSecretCountAndMinimumAPCount,
             int totalScoredSecretCount,
             int actionPhaseSecretCount) {
         if (totalScoredSecretCount > 4) {
             return;
         }
-        for (int minimumAPCount = 0; minimumAPCount <= totalScoredSecretCount; minimumAPCount++) {
-            if (actionPhaseSecretCount >= minimumAPCount) {
-                countsByExactScoredSecretCountAndMinimumAPCount[totalScoredSecretCount][minimumAPCount]++;
-            }
+        if (actionPhaseSecretCount > totalScoredSecretCount) {
+            return;
         }
+        countsByExactScoredSecretCountAndMinimumAPCount[totalScoredSecretCount][actionPhaseSecretCount]++;
     }
 
     private static SecretPhaseCounts countSecretPhases(Iterable<String> secretIds, Set<String> convertedSecretIds) {
@@ -500,13 +496,13 @@ class SecretObjectiveWinChanceStatisticsService {
 
             int totalScoredBucket = Math.min(4, totalScoredSecretCount);
             playersByScoredSecretCount[totalScoredBucket]++;
-            incrementMinimumActionPhaseSecretCounts(
+            incrementExactActionPhaseSecretCount(
                     playersByExactScoredSecretCountAndMinimumAPCount, totalScoredSecretCount, actionPhaseSecretCount);
 
             if (isWinner) {
                 winsByScoredAPSecretCount[actionBucket]++;
                 winsByScoredSecretCount[totalScoredBucket]++;
-                incrementMinimumActionPhaseSecretCounts(
+                incrementExactActionPhaseSecretCount(
                         winsByExactScoredSecretCountAndMinimumAPCount, totalScoredSecretCount, actionPhaseSecretCount);
             }
 
