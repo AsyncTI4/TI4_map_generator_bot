@@ -27,5 +27,4 @@ class MapImageData {
 
     @Column(name = "latest_discord_channel_id")
     private Long latestDiscordChannelId;
-
 }

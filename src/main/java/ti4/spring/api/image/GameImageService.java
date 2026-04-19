@@ -52,7 +52,11 @@ public class GameImageService {
 
     public void saveDiscordMessage(Game game, Message message) {
         if (game == null || message == null) return;
-        saveDiscordMessageId(game, message.getIdLong(), message.getGuild().getIdLong(), message.getChannel().getIdLong());
+        saveDiscordMessageId(
+                game,
+                message.getIdLong(),
+                message.getGuild().getIdLong(),
+                message.getChannel().getIdLong());
     }
 
     private MapImageData loadOrCreate(String gameName) {
