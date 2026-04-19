@@ -31,6 +31,7 @@ import ti4.spring.context.SetupRequestContext;
 public class GameImageController {
 
     private final GameImageService gameImageService;
+    private final GameAttachmentUrlRefreshService gameAttachmentUrlRefreshService;
 
     // TODO: once the above is /image, this doesn't need to specify anything
     @SetupRequestContext(false)
@@ -53,7 +54,7 @@ public class GameImageController {
 
         // Non-FoW game: return full map to anyone
         if (!managedGame.isFowMode()) {
-            return getFullMapUrl(gameName);
+            return getFullMapUrl(managedGame.getGame());
         }
 
         // FoW game: check for authentication
@@ -66,14 +67,14 @@ public class GameImageController {
         // FoW game: GM (owner) gets full map
         Game game = managedGame.getGame();
         if (game != null && userId.equals(game.getOwnerID())) {
-            return getFullMapUrl(gameName);
+            return getFullMapUrl(game);
         }
 
         // FoW game: Check if user is a GM via Discord role
         if (game != null) {
             boolean isGm = game.getPlayersWithGMRole().stream().anyMatch(p -> userId.equals(p.getUserID()));
             if (isGm) {
-                return getFullMapUrl(gameName);
+                return getFullMapUrl(game);
             }
         }
 
@@ -86,6 +87,28 @@ public class GameImageController {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(
                         "To see this Fog of War map, please make sure you are logged in and are participating in this game");
+    }
+
+    @SetupRequestContext(false)
+    @PostMapping("/image/attachment-url/refresh")
+    public ResponseEntity<String> refreshAttachmentUrl(@PathVariable String gameName) {
+        ManagedGame managedGame = GameManager.getManagedGame(gameName);
+        if (managedGame == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (managedGame.isFowMode()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Refresh is unavailable for Fog of War games");
+        }
+
+        Game game = managedGame.getGame();
+        if (game == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return refreshAttachmentUrl(game)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
@@ -102,21 +125,51 @@ public class GameImageController {
     /**
      * Get the full (non-FoW) map URL for a game.
      */
-    private ResponseEntity<String> getFullMapUrl(String gameName) {
-        MapImageData mapImageData =
-                gameImageService.getLatestMapImageData(gameName).orElse(null);
-        if (mapImageData == null) {
+    private ResponseEntity<String> getFullMapUrl(Game game) {
+        if (game == null) {
             return ResponseEntity.notFound().build();
+        }
+
+        String attachmentUrl = gameImageService.getLatestAttachmentUrl(game.getName()).orElse(null);
+        if (attachmentUrl != null && !attachmentUrl.isBlank()) {
+            return ResponseEntity.ok(attachmentUrl);
+        }
+
+        MapImageData mapImageData =
+                gameImageService.getLatestMapImageData(game.getName()).orElse(null);
+        if (mapImageData == null) {
+            if (game.isFowMode()) {
+                return ResponseEntity.notFound().build();
+            }
+            return refreshAttachmentUrl(game)
+                    .map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
         }
 
         Long messageId = mapImageData.getLatestDiscordMessageId();
         Long channelId = mapImageData.getLatestDiscordChannelId();
 
         if (messageId == null || messageId == 0 || channelId == null || channelId == 0) {
-            return ResponseEntity.notFound().build();
+            if (game.isFowMode()) {
+                return ResponseEntity.notFound().build();
+            }
+            return refreshAttachmentUrl(game)
+                    .map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
         }
 
-        return fetchDiscordAttachmentUrl(messageId, channelId, gameName);
+        ResponseEntity<String> response = fetchDiscordAttachmentUrl(messageId, channelId, game);
+        if (response.getStatusCode().value() != HttpStatus.NOT_FOUND.value()) {
+            return response;
+        }
+
+        if (game.isFowMode()) {
+            return response;
+        }
+
+        return refreshAttachmentUrl(game)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
@@ -136,13 +189,13 @@ public class GameImageController {
             return ResponseEntity.notFound().build();
         }
 
-        return fetchDiscordAttachmentUrl(messageId, channelId, gameName);
+        return fetchDiscordAttachmentUrl(messageId, channelId, null);
     }
 
     /**
      * Fetch the attachment URL from a Discord message.
      */
-    private ResponseEntity<String> fetchDiscordAttachmentUrl(Long messageId, Long channelId, String gameName) {
+    private ResponseEntity<String> fetchDiscordAttachmentUrl(Long messageId, Long channelId, Game game) {
         MessageChannel channel = JdaService.jda.getChannelById(MessageChannel.class, channelId);
         if (channel == null) {
             return ResponseEntity.notFound().build();
@@ -157,15 +210,23 @@ public class GameImageController {
             }
 
             String attachmentUrl = message.getAttachments().getFirst().getUrl();
+            if (game != null && !game.isFowMode()) {
+                gameImageService.saveDiscordMessage(game, message);
+            }
             return ResponseEntity.ok(attachmentUrl);
         } catch (Exception e) {
             if (!DiscordHelper.isUnknownMessageError(e)) {
                 BotLogger.error(
-                        "Failed to fetch message " + messageId + " from channel " + channelId + " for game " + gameName,
+                        "Failed to fetch message " + messageId + " from channel " + channelId + " for game "
+                                + (game == null ? "unknown" : game.getName()),
                         e);
             }
             return ResponseEntity.notFound().build();
         }
+    }
+
+    private java.util.Optional<String> refreshAttachmentUrl(Game game) {
+        return gameAttachmentUrlRefreshService.refreshAttachmentUrl(game);
     }
 
     @SetupRequestContext(save = false)

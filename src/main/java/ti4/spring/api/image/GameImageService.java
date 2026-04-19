@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import net.dv8tion.jda.api.entities.Message;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import ti4.game.Game;
@@ -33,6 +34,12 @@ public class GameImageService {
                 .orElse(null);
     }
 
+    @NotNull
+    Optional<String> getLatestAttachmentUrl(String gameName) {
+        if (!GameManager.isValid(gameName)) return Optional.empty();
+        return mapImageDataRepository.findById(gameName).map(MapImageData::getLatestDiscordAttachmentUrl);
+    }
+
     public void saveMapImageName(Game game, String mapImageName) {
         if (game == null || isBlank(mapImageName)) return;
         MapImageData mapImageData = loadOrCreate(game.getName());
@@ -41,18 +48,33 @@ public class GameImageService {
     }
 
     public void saveDiscordMessageId(Game game, long discordMessageId, long guildId, long channelId) {
+        saveDiscordMessage(game, discordMessageId, guildId, channelId, null);
+    }
+
+    public void saveDiscordMessage(Game game, Message message) {
+        if (game == null || message == null) return;
+        String attachmentUrl = message.getAttachments().isEmpty()
+                ? null
+                : message.getAttachments().getFirst().getUrl();
+        saveDiscordMessage(
+                game, message.getIdLong(), message.getGuild().getIdLong(), message.getChannel().getIdLong(), attachmentUrl);
+    }
+
+    public void saveDiscordMessage(
+            Game game, long discordMessageId, long guildId, long channelId, @Nullable String attachmentUrl) {
         if (game == null || !GameManager.isValid(game.getName())) return;
         MapImageData mapImageData = loadOrCreate(game.getName());
         mapImageData.setLatestDiscordMessageId(discordMessageId);
         mapImageData.setLatestDiscordGuildId(guildId);
         mapImageData.setLatestDiscordChannelId(channelId);
+        mapImageData.setLatestDiscordAttachmentUrl(attachmentUrl);
         mapImageDataRepository.save(mapImageData);
     }
 
     private MapImageData loadOrCreate(String gameName) {
         return mapImageDataRepository
                 .findById(gameName)
-                .orElseGet(() -> new MapImageData(gameName, null, null, null, null));
+                .orElseGet(() -> new MapImageData(gameName, null, null, null, null, null));
     }
 
     /**

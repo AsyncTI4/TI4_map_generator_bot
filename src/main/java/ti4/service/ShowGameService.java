@@ -40,11 +40,7 @@ public class ShowGameService {
         // For non-FoW games: persist the full map message ID
         Consumer<Message> persistMessageId = shouldPersistFullMapMessageId
                 ? msg -> SpringContext.getBean(GameImageService.class)
-                        .saveDiscordMessageId(
-                                game,
-                                msg.getIdLong(),
-                                msg.getGuild().getIdLong(),
-                                msg.getChannel().getIdLong())
+                        .saveDiscordMessage(game, msg)
                 : null;
 
         // For FoW games: persist the player-specific map message ID
