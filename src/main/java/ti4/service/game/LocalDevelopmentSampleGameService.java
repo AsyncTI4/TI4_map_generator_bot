@@ -245,8 +245,8 @@ public class LocalDevelopmentSampleGameService {
         if (Files.exists(storagePath)) {
             return storagePath;
         }
-        Path testResourcePath = getMapsSourcePath(fileName);
-        return testResourcePath != null && Files.exists(testResourcePath) ? testResourcePath : null;
+        Path mapsSourcePath = getMapsSourcePath(fileName);
+        return mapsSourcePath != null && Files.exists(mapsSourcePath) ? mapsSourcePath : null;
     }
 
     @Nullable

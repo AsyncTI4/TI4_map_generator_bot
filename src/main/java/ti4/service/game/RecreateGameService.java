@@ -92,8 +92,8 @@ public class RecreateGameService {
             ThreadChannel botThread = ensureBotMapThread(game, actionsChannel);
             if (botThread != null) {
                 game.setBotMapUpdatesThreadID(botThread.getId());
-                postShowGameToBotMapThread(game, botThread);
             }
+            postShowGameToBotMapThread(game, botThread);
         }
 
         recreateCommunityRoles(game, targetGuild, result);
