@@ -34,12 +34,6 @@ public class GameImageService {
                 .orElse(null);
     }
 
-    @NotNull
-    Optional<String> getLatestAttachmentUrl(String gameName) {
-        if (!GameManager.isValid(gameName)) return Optional.empty();
-        return mapImageDataRepository.findById(gameName).map(MapImageData::getLatestDiscordAttachmentUrl);
-    }
-
     public void saveMapImageName(Game game, String mapImageName) {
         if (game == null || isBlank(mapImageName)) return;
         MapImageData mapImageData = loadOrCreate(game.getName());
@@ -48,37 +42,23 @@ public class GameImageService {
     }
 
     public void saveDiscordMessageId(Game game, long discordMessageId, long guildId, long channelId) {
-        saveDiscordMessage(game, discordMessageId, guildId, channelId, null);
-    }
-
-    public void saveDiscordMessage(Game game, Message message) {
-        if (game == null || message == null) return;
-        var attachments = message.getAttachments();
-        String attachmentUrl =
-                attachments.isEmpty() ? null : attachments.getFirst().getUrl();
-        saveDiscordMessage(
-                game,
-                message.getIdLong(),
-                message.getGuild().getIdLong(),
-                message.getChannel().getIdLong(),
-                attachmentUrl);
-    }
-
-    public void saveDiscordMessage(
-            Game game, long discordMessageId, long guildId, long channelId, @Nullable String attachmentUrl) {
         if (game == null || !GameManager.isValid(game.getName())) return;
         MapImageData mapImageData = loadOrCreate(game.getName());
         mapImageData.setLatestDiscordMessageId(discordMessageId);
         mapImageData.setLatestDiscordGuildId(guildId);
         mapImageData.setLatestDiscordChannelId(channelId);
-        mapImageData.setLatestDiscordAttachmentUrl(attachmentUrl);
         mapImageDataRepository.save(mapImageData);
+    }
+
+    public void saveDiscordMessage(Game game, Message message) {
+        if (game == null || message == null) return;
+        saveDiscordMessageId(game, message.getIdLong(), message.getGuild().getIdLong(), message.getChannel().getIdLong());
     }
 
     private MapImageData loadOrCreate(String gameName) {
         return mapImageDataRepository
                 .findById(gameName)
-                .orElseGet(() -> new MapImageData(gameName, null, null, null, null, null));
+                .orElseGet(() -> new MapImageData(gameName, null, null, null, null));
     }
 
     /**

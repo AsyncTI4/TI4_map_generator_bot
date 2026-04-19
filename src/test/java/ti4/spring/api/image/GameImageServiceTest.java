@@ -4,12 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
 import java.util.Optional;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -20,7 +19,7 @@ import ti4.game.persistence.GameManager;
 class GameImageServiceTest {
 
     @Test
-    void saveDiscordMessagePersistsAttachmentUrl() {
+    void saveDiscordMessagePersistsDiscordIds() {
         MapImageDataRepository mapImageDataRepository = mock(MapImageDataRepository.class);
         PlayerMapImageDataRepository playerMapImageDataRepository = mock(PlayerMapImageDataRepository.class);
         GameImageService service = new GameImageService(mapImageDataRepository, playerMapImageDataRepository);
@@ -28,7 +27,6 @@ class GameImageServiceTest {
         game.setName("pbd11223");
 
         Message message = mock(Message.class);
-        Attachment attachment = mock(Attachment.class);
         net.dv8tion.jda.api.entities.Guild guild = mock(net.dv8tion.jda.api.entities.Guild.class);
         MessageChannelUnion channel = mock(MessageChannelUnion.class);
         when(message.getIdLong()).thenReturn(11L);
@@ -36,8 +34,6 @@ class GameImageServiceTest {
         when(message.getChannel()).thenReturn(channel);
         when(guild.getIdLong()).thenReturn(22L);
         when(channel.getIdLong()).thenReturn(33L);
-        when(message.getAttachments()).thenReturn(List.of(attachment));
-        when(attachment.getUrl()).thenReturn("https://cdn.discordapp.com/example.png");
         when(mapImageDataRepository.findById("pbd11223")).thenReturn(Optional.empty());
         when(mapImageDataRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -48,11 +44,9 @@ class GameImageServiceTest {
         }
 
         ArgumentCaptor<MapImageData> dataCaptor = ArgumentCaptor.forClass(MapImageData.class);
-        org.mockito.Mockito.verify(mapImageDataRepository).save(dataCaptor.capture());
+        verify(mapImageDataRepository).save(dataCaptor.capture());
         assertThat(dataCaptor.getValue().getLatestDiscordMessageId()).isEqualTo(11L);
         assertThat(dataCaptor.getValue().getLatestDiscordGuildId()).isEqualTo(22L);
         assertThat(dataCaptor.getValue().getLatestDiscordChannelId()).isEqualTo(33L);
-        assertThat(dataCaptor.getValue().getLatestDiscordAttachmentUrl())
-                .isEqualTo("https://cdn.discordapp.com/example.png");
     }
 }

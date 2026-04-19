@@ -127,12 +127,6 @@ public class GameImageController {
             return ResponseEntity.notFound().build();
         }
 
-        String attachmentUrl =
-                gameImageService.getLatestAttachmentUrl(game.getName()).orElse(null);
-        if (attachmentUrl != null && !attachmentUrl.isBlank()) {
-            return ResponseEntity.ok(attachmentUrl);
-        }
-
         MapImageData mapImageData =
                 gameImageService.getLatestMapImageData(game.getName()).orElse(null);
         if (mapImageData == null) {
