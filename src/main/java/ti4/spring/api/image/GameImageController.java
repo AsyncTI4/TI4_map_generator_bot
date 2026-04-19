@@ -120,7 +120,8 @@ public class GameImageController {
      * Get the full (non-FoW) map URL for a game.
      */
     private ResponseEntity<String> getFullMapUrl(String gameName, boolean fowMode) {
-        MapImageData mapImageData = gameImageService.getLatestMapImageData(gameName).orElse(null);
+        MapImageData mapImageData =
+                gameImageService.getLatestMapImageData(gameName).orElse(null);
         if (mapImageData == null) {
             if (fowMode) {
                 return notFound();
@@ -196,8 +197,7 @@ public class GameImageController {
         } catch (Exception e) {
             if (!DiscordHelper.isUnknownMessageError(e)) {
                 BotLogger.error(
-                        "Failed to fetch message " + messageId + " from channel " + channelId + " for game "
-                                + gameName,
+                        "Failed to fetch message " + messageId + " from channel " + channelId + " for game " + gameName,
                         e);
             }
             return ResponseEntity.notFound().build();

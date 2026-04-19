@@ -26,7 +26,8 @@ class GameImageControllerTest {
 
         when(managedGame.isFowMode()).thenReturn(false);
         when(gameImageService.getLatestMapImageData("pbd11223")).thenReturn(Optional.empty());
-        when(refreshService.refreshAttachmentUrl("pbd11223")).thenReturn(Optional.of("https://cdn.discordapp.com/new.png"));
+        when(refreshService.refreshAttachmentUrl("pbd11223"))
+                .thenReturn(Optional.of("https://cdn.discordapp.com/new.png"));
 
         try (MockedStatic<GameManager> gameManager = mockStatic(GameManager.class);
                 MockedStatic<RequestContext> requestContext = mockStatic(RequestContext.class)) {
@@ -55,7 +56,8 @@ class GameImageControllerTest {
 
         when(managedGame.isFowMode()).thenReturn(false);
         when(gameImageService.getLatestMapImageData("pbd11223")).thenReturn(Optional.of(mapImageData));
-        when(refreshService.refreshAttachmentUrl("pbd11223")).thenReturn(Optional.of("https://cdn.discordapp.com/new.png"));
+        when(refreshService.refreshAttachmentUrl("pbd11223"))
+                .thenReturn(Optional.of("https://cdn.discordapp.com/new.png"));
 
         try (MockedStatic<GameManager> gameManager = mockStatic(GameManager.class);
                 MockedStatic<RequestContext> requestContext = mockStatic(RequestContext.class)) {

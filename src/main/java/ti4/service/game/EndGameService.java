@@ -226,9 +226,9 @@ public class EndGameService {
                             m -> { // POST INITIAL MESSAGE
                                 m.editMessageAttachments(fileUpload)
                                         .queue(
-                                                    success -> {
-                                                        // Save message ID to SQLite, same as show game
-                                                        SpringContext.getBean(GameImageService.class)
+                                                success -> {
+                                                    // Save message ID to SQLite, same as show game
+                                                    SpringContext.getBean(GameImageService.class)
                                                             .saveDiscordMessage(game.getName(), success);
                                                 },
                                                 BotLogger::catchRestError); // ADD MAP FILE TO MESSAGE

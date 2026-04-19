@@ -1,12 +1,13 @@
 package ti4.spring.api.image;
 
+import static software.amazon.awssdk.utils.StringUtils.isBlank;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import static software.amazon.awssdk.utils.StringUtils.isBlank;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
