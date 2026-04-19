@@ -359,6 +359,16 @@ class SecretObjectiveWinChanceStatisticsService {
         return secretNames;
     }
 
+    private static int countRealSecretObjectives(Iterable<String> secretIds) {
+        int count = 0;
+        for (String secretId : secretIds) {
+            if (Mapper.getSecretObjective(secretId) != null) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     private static SecretWinChanceEntry buildSecretWinChanceEntry(
             String secretName,
             Map<String, Integer> gamesWithSecretScored,
@@ -413,7 +423,7 @@ class SecretObjectiveWinChanceStatisticsService {
                     countSecretPhases(player.getSecretsScored().keySet());
             int actionPhaseSecretCount = scoredSecretPhaseCounts.actionCount();
             int statusPhaseSecretCount = scoredSecretPhaseCounts.statusCount();
-            int totalScoredSecretCount = player.getSecretsScored().size();
+            int totalScoredSecretCount = countRealSecretObjectives(player.getSecretsScored().keySet());
             Set<String> scoredSecrets = getSecretNames(player.getSecretsScored().keySet());
 
             int actionBucket = Math.min(4, actionPhaseSecretCount);

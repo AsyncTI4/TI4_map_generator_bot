@@ -144,4 +144,51 @@ class SecretObjectiveWinChanceStatisticsServiceTest extends BaseTi4Test {
         assertTrue(report.contains("`3+ AP` ` 50%` (1/2)"));
         assertTrue(report.contains("`4 AP` `100%` (1/1)"));
     }
+
+    @Test
+    void collectSecretObjectiveWinChanceStatsIgnoresFakeScoredSecretsWhenBucketingTotals() {
+        Game game = new Game();
+        game.setName("fake-scored-secret");
+        game.setVp(1);
+        game.setHasEnded(true);
+
+        Player winner = game.addPlayer("winner", "Winner");
+        winner.setFaction("obsidian");
+        winner.setColor("red");
+        winner.setSecretScored("defy_space_and_time_pbd100");
+        winner.setSecretScored("fake_plotted_secret");
+
+        int[] playersByScoredAPSecretCount = new int[5];
+        int[] winsByScoredAPSecretCount = new int[5];
+        int[] playersByScoredSecretCount = new int[5];
+        int[] winsByScoredSecretCount = new int[5];
+        int[][] playersByExactScoredSecretCountAndMinimumAPCount = new int[5][5];
+        int[][] winsByExactScoredSecretCountAndMinimumAPCount = new int[5][5];
+
+        SecretObjectiveWinChanceStatisticsService.collectSecretObjectiveWinChanceStats(
+                game,
+                playersByScoredAPSecretCount,
+                winsByScoredAPSecretCount,
+                playersByScoredSecretCount,
+                winsByScoredSecretCount,
+                playersByExactScoredSecretCountAndMinimumAPCount,
+                winsByExactScoredSecretCountAndMinimumAPCount,
+                new HashMap<>(),
+                new HashMap<>(),
+                new HashMap<>(),
+                new HashMap<>(),
+                new HashMap<>(),
+                new HashMap<>(),
+                new HashMap<>(),
+                new HashMap<>());
+
+        assertEquals(0, playersByScoredSecretCount[2]);
+        assertEquals(0, winsByScoredSecretCount[2]);
+        assertEquals(1, playersByScoredSecretCount[1]);
+        assertEquals(1, winsByScoredSecretCount[1]);
+        assertEquals(1, playersByExactScoredSecretCountAndMinimumAPCount[1][0]);
+        assertEquals(1, winsByExactScoredSecretCountAndMinimumAPCount[1][0]);
+        assertEquals(1, playersByExactScoredSecretCountAndMinimumAPCount[1][1]);
+        assertEquals(1, winsByExactScoredSecretCountAndMinimumAPCount[1][1]);
+    }
 }
