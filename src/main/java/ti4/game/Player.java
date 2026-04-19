@@ -148,11 +148,8 @@ public class Player extends PlayerProperties {
 
     @Getter
     private final Map<String, Integer> secrets = new LinkedHashMap<>();
-    /**
-     * -- GETTER --
-     *
-     * @return Map of (SecretObjectiveModel ID, Random Number ID)
-     */
+
+    // Map of (SecretObjectiveModel ID, Random Number ID)
     @Getter
     private final Map<String, Integer> secretsScored = new LinkedHashMap<>();
 
