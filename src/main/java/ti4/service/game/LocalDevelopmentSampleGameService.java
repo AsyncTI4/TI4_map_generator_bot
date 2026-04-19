@@ -78,6 +78,19 @@ public class LocalDevelopmentSampleGameService {
         return result.getSummary();
     }
 
+    @Nullable
+    public static String createAndRecreateTestGameFromSourceFile(
+            Guild guild, @Nullable String developerUserId, Path uploadedSourceFile) {
+        if (guild == null) {
+            return null;
+        }
+        String sourceGameName = importSourceGameFile(uploadedSourceFile);
+        if (sourceGameName == null) {
+            return null;
+        }
+        return createAndRecreateTestGame(guild, developerUserId, sourceGameName);
+    }
+
     public static LocalDevelopmentCleanResult cleanTestGames(@Nullable Guild guild) {
         LocalDevelopmentCleanResult result = new LocalDevelopmentCleanResult();
         List<String> testGameNames = GameManager.getGameNames().stream()
@@ -185,12 +198,57 @@ public class LocalDevelopmentSampleGameService {
     }
 
     @Nullable
+    static String importSourceGameFile(Path uploadedSourceFile) {
+        String sourceGameName = readGameNameFromSourceFile(uploadedSourceFile);
+        if (sourceGameName == null) {
+            return null;
+        }
+        Path sourceMapsPath = getMapsSourcePath(sourceGameName + Constants.TXT);
+        if (sourceMapsPath == null) {
+            BotLogger.warning("LocalDevelopmentSampleGameService: source maps path unavailable for " + sourceGameName);
+            return null;
+        }
+        try {
+            Files.createDirectories(sourceMapsPath.getParent());
+            Files.copy(uploadedSourceFile, sourceMapsPath, StandardCopyOption.REPLACE_EXISTING);
+            return sourceGameName;
+        } catch (Exception e) {
+            BotLogger.warning(
+                    "LocalDevelopmentSampleGameService: failed to store uploaded source game file for "
+                            + sourceGameName,
+                    e);
+            return null;
+        }
+    }
+
+    @Nullable
+    static String readGameNameFromSourceFile(Path sourcePath) {
+        try {
+            List<String> gameFileLines = Files.readAllLines(sourcePath);
+            if (gameFileLines.size() < MIN_GAME_FILE_LINES) {
+                BotLogger.warning("LocalDevelopmentSampleGameService: uploaded source game file is malformed: " + sourcePath);
+                return null;
+            }
+            return StringUtils.trimToNull(gameFileLines.get(GAME_NAME_LINE_INDEX));
+        } catch (Exception e) {
+            BotLogger.warning("LocalDevelopmentSampleGameService: failed to read uploaded source game file: " + sourcePath, e);
+            return null;
+        }
+    }
+
+    @Nullable
     static Path resolveSourceGamePath(String sourceGameName) {
         String fileName = sourceGameName.endsWith(Constants.TXT) ? sourceGameName : sourceGameName + Constants.TXT;
         Path storagePath = Storage.getGamePath(fileName);
         if (Files.exists(storagePath)) {
             return storagePath;
         }
+        Path testResourcePath = getMapsSourcePath(fileName);
+        return testResourcePath != null && Files.exists(testResourcePath) ? testResourcePath : null;
+    }
+
+    @Nullable
+    static Path getMapsSourcePath(String fileName) {
         String resourcePath = Storage.getResourcePath();
         if (resourcePath == null) {
             return null;
@@ -200,13 +258,11 @@ public class LocalDevelopmentSampleGameService {
         if (parentPath == null) {
             return null;
         }
-        Path testResourcePath = parentPath
-                .resolveSibling("test")
+        return parentPath.resolveSibling("test")
                 .resolve("resources")
                 .resolve("maps")
                 .resolve(fileName)
                 .normalize();
-        return Files.exists(testResourcePath) ? testResourcePath : null;
     }
 
     private static void deleteDiscordResources(Game game, Guild guild, LocalDevelopmentCleanResult result) {

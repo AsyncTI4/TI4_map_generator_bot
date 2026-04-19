@@ -1,5 +1,8 @@
 package ti4.discord.interactions.commands.developer;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -22,6 +25,8 @@ class LocalDevelopment extends Subcommand {
                 .addChoice("Create", ACTION_CREATE)
                 .addChoice("Clean", ACTION_CLEAN));
         addOptions(new OptionData(OptionType.STRING, Constants.SOURCE, "Source game name").setRequired(false));
+        addOptions(new OptionData(OptionType.ATTACHMENT, Constants.SOURCE_FILE, "Source game save file")
+                .setRequired(false));
         addOptions(
                 new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm cleanup").setRequired(false));
     }
@@ -47,16 +52,59 @@ class LocalDevelopment extends Subcommand {
                 return;
             }
             case ACTION_CREATE -> {
-                String sourceGame = event.getOption(
-                        Constants.SOURCE,
-                        LocalDevelopmentSampleGameService.DEFAULT_SOURCE_GAME_NAME,
-                        OptionMapping::getAsString);
-                String result = LocalDevelopmentSampleGameService.createAndRecreateTestGame(
-                        guild, event.getUser().getId(), sourceGame);
-                if (result == null) {
-                    MessageHelper.replyToMessage(
-                            event, "Failed to create a local development test game from `" + sourceGame + "`.");
+                OptionMapping sourceOption = event.getOption(Constants.SOURCE);
+                OptionMapping sourceFileOption = event.getOption(Constants.SOURCE_FILE);
+                if (sourceOption != null && sourceFileOption != null) {
+                    MessageHelper.replyToMessage(event, "Use either `source` or `source_file`, not both.");
                     return;
+                }
+
+                String result;
+                if (sourceFileOption != null) {
+                    Attachment sourceFile = sourceFileOption.getAsAttachment();
+                    if (!"txt".equalsIgnoreCase(sourceFile.getFileExtension())) {
+                        MessageHelper.replyToMessage(event, "Source file must be a .txt file.");
+                        return;
+                    }
+                    String contentType = sourceFile.getContentType();
+                    if (contentType != null && !contentType.startsWith("text/plain")) {
+                        MessageHelper.replyToMessage(event, "Source file must be plain text.");
+                        return;
+                    }
+                    Path downloadedSourceFile = null;
+                    try {
+                        downloadedSourceFile = Files.createTempFile("ti4-local-dev-source-", Constants.TXT);
+                        sourceFile.getProxy().downloadToFile(downloadedSourceFile.toFile()).get();
+                        result = LocalDevelopmentSampleGameService.createAndRecreateTestGameFromSourceFile(
+                                guild, event.getUser().getId(), downloadedSourceFile);
+                    } catch (Exception e) {
+                        MessageHelper.replyToMessage(event, "Failed to download the uploaded source file.");
+                        return;
+                    } finally {
+                        if (downloadedSourceFile != null) {
+                            try {
+                                Files.deleteIfExists(downloadedSourceFile);
+                            } catch (Exception ignored) {
+                                // ignore temporary file cleanup errors
+                            }
+                        }
+                    }
+                    if (result == null) {
+                        MessageHelper.replyToMessage(event, "Failed to create a local development test game from the uploaded source file.");
+                        return;
+                    }
+                } else {
+                    String sourceGame = event.getOption(
+                            Constants.SOURCE,
+                            LocalDevelopmentSampleGameService.DEFAULT_SOURCE_GAME_NAME,
+                            OptionMapping::getAsString);
+                    result = LocalDevelopmentSampleGameService.createAndRecreateTestGame(
+                            guild, event.getUser().getId(), sourceGame);
+                    if (result == null) {
+                        MessageHelper.replyToMessage(
+                                event, "Failed to create a local development test game from `" + sourceGame + "`.");
+                        return;
+                    }
                 }
                 MessageHelper.replyToMessage(event, result);
                 return;
