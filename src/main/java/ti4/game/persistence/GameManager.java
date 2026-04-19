@@ -222,7 +222,7 @@ public class GameManager {
         return managedPlayer;
     }
 
-    public static boolean areManagedGamesLoaded() {
+    public static boolean areAllManagedGamesLoaded() {
         return WARMUP_LATCH.getCount() == 0;
     }
 
