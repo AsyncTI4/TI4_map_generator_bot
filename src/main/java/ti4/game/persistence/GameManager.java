@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.discord.JdaService;
@@ -26,15 +27,26 @@ public class GameManager {
     // TODO: We can evaluate dropping the managed objects entirely
     private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, ManagedPlayer> userIdToManagedPlayer = new ConcurrentHashMap<>();
+    private static final AtomicBoolean GAME_NAMES_INDEXED = new AtomicBoolean(false);
+    private static final AtomicBoolean WARMUP_STARTED = new AtomicBoolean(false);
     private static final CountDownLatch WARMUP_LATCH = new CountDownLatch(1);
     private static final long WAIT_FOR_WARMUP_TIMEOUT_SECONDS = 30;
 
     public static synchronized void initialize() {
-        if (WARMUP_LATCH.getCount() == 0) return;
-
-        validGameNames.addAll(GameLoadService.loadManagedGameNames());
+        indexManagedGameNamesIfNeeded();
         if (JdaService.testingMode) {
             WARMUP_LATCH.countDown();
+            return;
+        }
+
+        startManagedGamesWarmupIfNeeded();
+    }
+
+    public static synchronized void startManagedGamesWarmupIfNeeded() {
+        indexManagedGameNamesIfNeeded();
+        if (WARMUP_LATCH.getCount() == 0
+                || !currentInstanceOwnsLeaseForWarmup()
+                || !WARMUP_STARTED.compareAndSet(false, true)) {
             return;
         }
 
@@ -43,6 +55,7 @@ public class GameManager {
                 validGameNames.forEach(GameManager::getManagedGame);
                 WARMUP_LATCH.countDown();
             } catch (Exception e) {
+                WARMUP_STARTED.set(false);
                 BotLogger.critical("Failed during managed game warmup.", e);
             } finally {
                 if (JdaService.jda != null) {
@@ -50,6 +63,20 @@ public class GameManager {
                 }
             }
         });
+    }
+
+    private static void indexManagedGameNamesIfNeeded() {
+        if (GAME_NAMES_INDEXED.compareAndSet(false, true)) {
+            validGameNames.addAll(GameLoadService.loadManagedGameNames());
+        }
+    }
+
+    private static boolean currentInstanceOwnsLeaseForWarmup() {
+        try {
+            return SpringContext.getBean(ActiveLeaseService.class).mayMutate();
+        } catch (IllegalStateException e) {
+            return false;
+        }
     }
 
     private static Game load(String gameName) {
