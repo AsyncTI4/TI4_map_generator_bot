@@ -35,6 +35,31 @@ class AgendaHelperTest extends BaseTi4Test {
     }
 
     @Test
+    void getSummaryOfVotesUsesPlanetNameForElectPlanetOutcome() {
+        Game game = new Game();
+        Player player = playerWithFaction(game, "arborec");
+        game.setPlayers(Map.of(player.getUserID(), player));
+        game.setCurrentAgendaInfo("agenda_Elect Planet");
+        game.setCurrentAgendaVote("mrte", "arborec_14");
+
+        assertThat(AgendaHelper.getSummaryOfVotes(game, true))
+                .contains("Mecatol Rex: 14")
+                .doesNotContain("Mrte: 14");
+    }
+
+    @Test
+    void buildSpentThingsMessageForVotingUsesPlanetNameForElectPlanetOutcome() {
+        Game game = new Game();
+        Player player = playerWithFaction(game, "arborec");
+        game.setCurrentAgendaInfo("agenda_Elect Planet");
+        game.setStoredValue("latestOutcomeVotedFor" + player.getFaction(), "mrte");
+
+        assertThat(Helper.buildSpentThingsMessageForVoting(player, game, false))
+                .contains("outcome \"Mecatol Rex\"")
+                .doesNotContain("outcome \"Mrte\"");
+    }
+
+    @Test
     void getVoteCountMessageShowsTotalVotesNormally() {
         Game game = voteCountGame();
 
@@ -62,8 +87,12 @@ class AgendaHelperTest extends BaseTi4Test {
         Game game = new Game();
         game.setLaws(Map.of("censure", 1));
         game.setLawsInfo(Map.of("censure", "faction"));
+        return playerWithFaction(game, "faction");
+    }
+
+    private static Player playerWithFaction(Game game, String faction) {
         Player player = new Player("userId", "userName", game);
-        player.setFaction("faction");
+        player.setFaction(faction);
         return player;
     }
 
