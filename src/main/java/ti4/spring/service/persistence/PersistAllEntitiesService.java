@@ -77,6 +77,7 @@ public class PersistAllEntitiesService {
         gameEntity.setCreationEpochMilliseconds(game.getCreationDateTime());
         gameEntity.setEndedEpochMilliseconds(getEndedDate(game));
         gameEntity.setCompleted(game.getWinner().isPresent() && game.isHasEnded());
+        gameEntity.setAborted(game.isHasEnded() && game.getWinner().isEmpty());
         gameEntity.setFractureInPlay(FractureService.isFractureInPlay(game));
         gameEntity.setHomebrew(game.isHomebrew());
         gameEntity.setDiscordantStarsMode(game.isDiscordantStarsMode());

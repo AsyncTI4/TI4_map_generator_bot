@@ -40,6 +40,9 @@ public class GameEntity {
     @Column(name = "is_completed")
     private boolean completed;
 
+    @Column(name = "is_aborted")
+    private boolean aborted;
+
     @Column(name = "is_prophecy_of_kings")
     private boolean prophecyOfKings;
 
