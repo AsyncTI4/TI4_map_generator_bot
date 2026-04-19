@@ -307,7 +307,7 @@ public class JdaService {
         // BOT IS READY
         ActiveLeaseService.setCurrentProcessReady(true);
         BotLogger.info("BOT IS READY TO RECEIVE COMMANDS");
-        if (GameManager.isWarmupComplete()) {
+        if (GameManager.areManagedGamesLoaded()) {
             updatePresence();
         } else {
             jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.customStatus("Warming game index"));

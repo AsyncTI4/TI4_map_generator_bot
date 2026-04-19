@@ -29,7 +29,7 @@ public class GameManager {
     private static final CountDownLatch WARMUP_LATCH = new CountDownLatch(1);
     private static final long WAIT_FOR_WARMUP_TIMEOUT_SECONDS = 30;
 
-    public synchronized static void initialize() {
+    public static synchronized void initialize() {
         if (WARMUP_LATCH.getCount() == 0) return;
 
         validGameNames.addAll(GameLoadService.loadManagedGameNames());
@@ -197,17 +197,17 @@ public class GameManager {
     }
 
     public static List<ManagedGame> getManagedGames() {
-        ensureManagedGamesWarmupComplete();
+        waitForAllManagedGamesToLoad();
         return new ArrayList<>(gameNameToManagedGame.values());
     }
 
     public static ManagedPlayer getManagedPlayer(String playerId) {
-        ensureManagedGamesWarmupComplete();
+        waitForAllManagedGamesToLoad();
         return userIdToManagedPlayer.get(playerId);
     }
 
     public static Set<ManagedPlayer> getManagedPlayers() {
-        ensureManagedGamesWarmupComplete();
+        waitForAllManagedGamesToLoad();
         return new HashSet<>(userIdToManagedPlayer.values());
     }
 
@@ -222,11 +222,11 @@ public class GameManager {
         return managedPlayer;
     }
 
-    public static boolean isWarmupComplete() {
+    public static boolean areManagedGamesLoaded() {
         return WARMUP_LATCH.getCount() == 0;
     }
 
-    private static void ensureManagedGamesWarmupComplete() {
+    private static void waitForAllManagedGamesToLoad() {
         try {
             boolean success = WARMUP_LATCH.await(WAIT_FOR_WARMUP_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             if (!success) {
