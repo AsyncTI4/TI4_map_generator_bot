@@ -217,12 +217,11 @@ public class GameImageController {
         }
     }
 
-    private java.util.Optional<String> refreshAttachmentUrl(Game game) {
-        return gameAttachmentUrlRefreshService.refreshAttachmentUrl(game);
-    }
-
     private ResponseEntity<String> refreshAttachmentUrlResponse(Game game) {
-        return refreshAttachmentUrl(game).map(ResponseEntity::ok).orElseGet(this::notFound);
+        return gameAttachmentUrlRefreshService
+                .refreshAttachmentUrl(game)
+                .map(ResponseEntity::ok)
+                .orElseGet(this::notFound);
     }
 
     private ResponseEntity<String> notFound() {

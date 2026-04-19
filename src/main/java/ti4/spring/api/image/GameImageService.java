@@ -53,9 +53,9 @@ public class GameImageService {
 
     public void saveDiscordMessage(Game game, Message message) {
         if (game == null || message == null) return;
-        String attachmentUrl = message.getAttachments().isEmpty()
-                ? null
-                : message.getAttachments().getFirst().getUrl();
+        var attachments = message.getAttachments();
+        String attachmentUrl =
+                attachments.isEmpty() ? null : attachments.getFirst().getUrl();
         saveDiscordMessage(
                 game,
                 message.getIdLong(),

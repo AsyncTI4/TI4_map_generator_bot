@@ -3,7 +3,9 @@ package ti4.spring.api.image;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -60,7 +62,14 @@ public class GameAttachmentUrlRefreshService {
 
         try {
             return Optional.ofNullable(attachmentUrlFuture.get(REFRESH_TIMEOUT_SECONDS, TimeUnit.SECONDS));
-        } catch (Exception e) {
+        } catch (TimeoutException e) {
+            BotLogger.error("Timed out refreshing attachment URL for game " + game.getName(), e);
+            return Optional.empty();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            BotLogger.error("Interrupted while refreshing attachment URL for game " + game.getName(), e);
+            return Optional.empty();
+        } catch (ExecutionException e) {
             BotLogger.error("Failed to refresh attachment URL for game " + game.getName(), e);
             return Optional.empty();
         }
