@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.cron.CronManager;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.search.FindService;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.discord.interactions.commands.uncategorized.ServerPromoteCommand;
 import ti4.game.Game;
@@ -101,6 +102,11 @@ class AutoCompleteProvider {
         String commandName = event.getName();
         String subCommandName = event.getSubcommandName();
         String optionName = event.getFocusedOption().getName();
+
+        if (Constants.FIND.equals(commandName)) {
+            resolveFindAutoComplete(event, optionName);
+            if (event.isAcknowledged()) return;
+        }
 
         if (subCommandName != null) {
             switch (commandName) {
@@ -1434,6 +1440,17 @@ class AutoCompleteProvider {
         }
         event.replyChoices(Objects.requireNonNullElse(options, Collections.emptyList()))
                 .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    private static void resolveFindAutoComplete(
+            @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String optionName) {
+        List<Command.Choice> options =
+                switch (optionName) {
+                    case Constants.SEARCH_TYPE -> FindService.autoCompleteType(event);
+                    case Constants.SOURCE -> FindService.autoCompleteSource(event);
+                    default -> Collections.emptyList();
+                };
+        event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static void resolveFrankenAutoComplete(
