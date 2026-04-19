@@ -243,12 +243,7 @@ class FindRegistry {
     }
 
     private static String actionCardSearchText(ActionCardModel model) {
-        return String.join(
-                " ",
-                model.getWindow(),
-                model.getText(),
-                model.getNotes() == null ? "" : model.getNotes(),
-                model.getFlavorText().orElse(""));
+        return String.join(" ", model.getWindow(), model.getText(), model.getNotes() == null ? "" : model.getNotes());
     }
 
     private static String agendaSearchText(AgendaModel model) {
