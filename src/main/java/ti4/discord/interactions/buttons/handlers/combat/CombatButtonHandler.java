@@ -2,7 +2,9 @@ package ti4.discord.interactions.buttons.handlers.combat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
@@ -64,6 +66,7 @@ class CombatButtonHandler {
         Tile tile = game.getTile(buttonID.split("_")[1]);
         String msg = player.getRepresentationNoPing() + " officially declines to fire SPACE CANNON"
                 + (tile != null ? " at " + tile.getRepresentation() : "") + ".";
+        deleteSpaceCannonDeclineMessageIfDone(event);
         if (game.isFowMode()) {
             String targetFaction = buttonID.split("_")[2];
             Player target = game.getPlayerFromColorOrFaction(targetFaction);
@@ -74,6 +77,32 @@ class CombatButtonHandler {
         }
         MessageHelper.sendMessageToChannel(
                 game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(), msg);
+    }
+
+    static void deleteSpaceCannonDeclineMessageIfDone(ButtonInteractionEvent event) {
+        List<ActionRow> updatedRows = event.getMessage().getActionRows().stream()
+                .map(row -> row.getButtons().stream()
+                        .filter(button -> !Objects.equals(button.getId(), event.getButton().getId()))
+                        .toList())
+                .filter(buttons -> !buttons.isEmpty())
+                .map(ActionRow::of)
+                .toList();
+
+        boolean hasRemainingDeclineButtons = hasRemainingSpaceCannonDeclineButtons(updatedRows);
+
+        if (hasRemainingDeclineButtons) {
+            event.getMessage().editMessageComponents(updatedRows).queue(Consumers.nop(), BotLogger::catchRestError);
+        } else {
+            event.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+    }
+
+    static boolean hasRemainingSpaceCannonDeclineButtons(List<ActionRow> actionRows) {
+        return actionRows.stream()
+                .flatMap(row -> row.getButtons().stream())
+                .map(Button::getId)
+                .filter(Objects::nonNull)
+                .anyMatch(id -> id.startsWith("declinePDS_"));
     }
 
     @ButtonHandler("applytempcombatmod__" + Constants.AC + "__")

@@ -1147,7 +1147,12 @@ public class StartCombatService {
         spaceCannonButtons.add(Buttons.gray(
                 "combatRoll_" + tile.getPosition() + "_space_spacecannonoffence", "Roll SPACE CANNON Offence"));
         if (game.isFowMode()) return spaceCannonButtons;
-        spaceCannonButtons.add(Buttons.red("declinePDS_" + tile.getTileID(), "Decline SPACE CANNON"));
+        for (Player playerWithPds : ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition())) {
+            spaceCannonButtons.add(Buttons.red(
+                    "declinePDS_" + tile.getTileID() + "_" + playerWithPds.getFaction(),
+                    "Decline SPACE CANNON",
+                    playerWithPds.getFactionEmoji()));
+        }
 
         // Add Graviton Laser System button if applicable
         for (Player playerWithPds : ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition())) {
