@@ -6,7 +6,9 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import ti4.game.Game;
@@ -52,11 +54,10 @@ public class GameImageService {
 
     public void saveDiscordMessage(Game game, Message message) {
         if (game == null || message == null) return;
-        saveDiscordMessageId(
-                game,
-                message.getIdLong(),
-                message.getGuild().getIdLong(),
-                message.getChannel().getIdLong());
+        Guild guild = message.getGuild();
+        MessageChannel channel = message.getChannel();
+        if (guild == null || channel == null) return;
+        saveDiscordMessageId(game, message.getIdLong(), guild.getIdLong(), channel.getIdLong());
     }
 
     private MapImageData loadOrCreate(String gameName) {

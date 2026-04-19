@@ -46,7 +46,10 @@ class GameImageControllerTest {
         ManagedGame managedGame = mock(ManagedGame.class);
         Game game = new Game();
         game.setName("pbd11223");
-        MapImageData mapImageData = new MapImageData("pbd11223", "map.png", null, 1L, null);
+        MapImageData mapImageData = new MapImageData();
+        mapImageData.setGameName("pbd11223");
+        mapImageData.setLatestMapImageName("map.png");
+        mapImageData.setLatestDiscordGuildId(1L);
 
         when(managedGame.isFowMode()).thenReturn(false);
         when(managedGame.getGame()).thenReturn(game);
