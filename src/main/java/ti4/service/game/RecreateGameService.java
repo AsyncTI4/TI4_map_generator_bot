@@ -22,6 +22,7 @@ import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
+import ti4.service.ShowGameService;
 import ti4.service.fow.GMService;
 
 @UtilityClass
@@ -92,6 +93,7 @@ public class RecreateGameService {
             if (botThread != null) {
                 game.setBotMapUpdatesThreadID(botThread.getId());
             }
+            postShowGameToBotMapThread(game, botThread);
         }
 
         recreateCommunityRoles(game, targetGuild, result);
@@ -100,7 +102,7 @@ public class RecreateGameService {
         Helper.fixGameChannelPermissions(targetGuild, game);
         List<String> missingPlayers = collectMissingPlayers(game, targetGuild);
         result.getMissingPlayers().addAll(missingPlayers);
-        pingGame(game, result);
+        pingGame(game, result, extraAccessMember);
         return result;
     }
 
@@ -395,7 +397,7 @@ public class RecreateGameService {
         return missingPlayers;
     }
 
-    private static void pingGame(Game game, RecreateGameResult result) {
+    private static void pingGame(Game game, RecreateGameResult result, @Nullable Member extraAccessMember) {
         TextChannel channel = game.getTableTalkChannel();
         if (channel == null) {
             channel = game.getMainGameChannel();
@@ -403,15 +405,29 @@ public class RecreateGameService {
         if (channel == null) {
             return;
         }
-        StringBuilder message =
-                new StringBuilder(game.getPing()).append(" this game's Discord resources were recreated.");
-        if (!result.getMissingPlayers().isEmpty()) {
-            message.append("\nMissing from server: ").append(String.join(", ", result.getMissingPlayers()));
-        }
+        StringBuilder message = new StringBuilder(getRecreatedResourcesAnnouncement(game, result, extraAccessMember));
         MessageHelper.sendMessageToChannel(channel, message.toString());
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(GMService.getGMChannel(game), message.toString());
         }
+    }
+
+    static String getRecreatedResourcesAnnouncement(
+            Game game, RecreateGameResult result, @Nullable Member extraAccessMember) {
+        String pingTarget = extraAccessMember == null ? game.getPing() : extraAccessMember.getAsMention();
+        StringBuilder announcement =
+                new StringBuilder(pingTarget).append(" this game's Discord resources were recreated.");
+        if (!result.getMissingPlayers().isEmpty()) {
+            announcement.append("\nMissing from server: ").append(String.join(", ", result.getMissingPlayers()));
+        }
+        return announcement.toString();
+    }
+
+    static void postShowGameToBotMapThread(Game game, @Nullable ThreadChannel botThread) {
+        if (botThread == null) {
+            return;
+        }
+        ShowGameService.postShowGame(game, botThread);
     }
 
     static String getTableTalkChannelName(Game game) {

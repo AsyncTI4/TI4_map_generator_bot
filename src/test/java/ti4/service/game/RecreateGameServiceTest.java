@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -13,15 +14,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import ti4.discord.JdaService;
 import ti4.game.Game;
+import ti4.service.ShowGameService;
 import ti4.testUtils.BaseTi4Test;
 
 class RecreateGameServiceTest extends BaseTi4Test {
@@ -68,6 +73,31 @@ class RecreateGameServiceTest extends BaseTi4Test {
         game.setCustomName("gemini atmosphere omicron");
 
         assertEquals("pbd19815-test-1", RecreateGameService.getTableTalkChannelName(game));
+    }
+
+    @Test
+    void recreatedResourcesAnnouncementUsesRunnerMentionWhenPresent() {
+        Game game = mock(Game.class);
+        Member member = mock(Member.class);
+        RecreateGameService.RecreateGameResult result = new RecreateGameService.RecreateGameResult("pbd1");
+        when(game.getPing()).thenReturn("@players");
+        when(member.getAsMention()).thenReturn("<@123>");
+
+        assertEquals(
+                "<@123> this game's Discord resources were recreated.",
+                RecreateGameService.getRecreatedResourcesAnnouncement(game, result, member));
+    }
+
+    @Test
+    void postShowGameToBotMapThreadDelegatesToShowGameService() {
+        Game game = mock(Game.class);
+        ThreadChannel botThread = mock(ThreadChannel.class);
+
+        try (MockedStatic<ShowGameService> showGameService = mockStatic(ShowGameService.class)) {
+            RecreateGameService.postShowGameToBotMapThread(game, botThread);
+
+            showGameService.verify(() -> ShowGameService.postShowGame(game, botThread));
+        }
     }
 
     @Test

@@ -1503,6 +1503,7 @@ public final class Constants {
     public static final String INCLUDE_RAW_STRING = "include_raw_string";
     public static final String RESTORE_GAME = "restore_game";
     public static final String SAVE_FILE = "save_file";
+    public static final String SOURCE_FILE = "source_file";
     public static final String GAMES = "games";
     public static final String GAMES_WITH_FACTIONS = "games_with_factions";
     public static final String GAME_STATISTIC = "game_statistic";

@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import ti4.game.Game;
@@ -16,6 +18,18 @@ import ti4.helpers.Storage;
 import ti4.testUtils.BaseTi4Test;
 
 class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
+
+    private String originalResourcePath;
+
+    @BeforeEach
+    void captureResourcePath() {
+        originalResourcePath = Storage.getResourcePath();
+    }
+
+    @AfterEach
+    void restoreResourcePath() {
+        Storage.setResourcePath(originalResourcePath);
+    }
 
     @Test
     void prepareClonedGameRenamesGameAndClearsDiscordIds() {
@@ -98,5 +112,26 @@ class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
         assertEquals(
                 java.util.List.of("owner-id", "owner-name", "source-game-test-1", "rest"),
                 Files.readAllLines(targetPath));
+    }
+
+    @Test
+    void importSourceGameFileStoresUploadedFileUsingEmbeddedGameName(@TempDir Path tempDirectory) throws Exception {
+        Path mainResources = tempDirectory.resolve("main").resolve("resources");
+        Storage.setResourcePath(mainResources.toString());
+        Path uploadedSourceFile = tempDirectory.resolve("upload.txt");
+        Files.write(uploadedSourceFile, java.util.List.of("owner-id", "owner-name", "embedded-game-name", "rest"));
+
+        assertEquals("embedded-game-name", LocalDevelopmentSampleGameService.importSourceGameFile(uploadedSourceFile));
+        assertEquals(
+                java.util.List.of("owner-id", "owner-name", "embedded-game-name", "rest"),
+                Files.readAllLines(LocalDevelopmentSampleGameService.getMapsSourcePath("embedded-game-name.txt")));
+    }
+
+    @Test
+    void readGameNameFromSourceFileReturnsNullForMalformedFile(@TempDir Path tempDirectory) throws Exception {
+        Path uploadedSourceFile = tempDirectory.resolve("upload.txt");
+        Files.write(uploadedSourceFile, java.util.List.of("owner-id", "owner-name"));
+
+        assertNull(LocalDevelopmentSampleGameService.readGameNameFromSourceFile(uploadedSourceFile));
     }
 }
