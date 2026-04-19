@@ -78,12 +78,22 @@ public class KnownActionCardsService {
 
     private static String getStorageKey(Player target) {
         String targetId = target.getFaction();
-        if (targetId == null || targetId.isBlank() || "null".equalsIgnoreCase(targetId)) {
+        if (isUnset(targetId)) {
             targetId = target.getColor();
         }
-        if (targetId == null || targetId.isBlank() || "null".equalsIgnoreCase(targetId)) {
+        if (isUnset(targetId)) {
             targetId = target.getUserID();
         }
+        if (isUnset(targetId)) {
+            targetId = target.getUserName();
+        }
+        if (isUnset(targetId)) {
+            targetId = "unknownPlayer";
+        }
         return KNOWN_ACTION_CARDS_PREFIX + targetId;
+    }
+
+    private static boolean isUnset(String value) {
+        return value == null || value.isBlank() || "null".equalsIgnoreCase(value);
     }
 }

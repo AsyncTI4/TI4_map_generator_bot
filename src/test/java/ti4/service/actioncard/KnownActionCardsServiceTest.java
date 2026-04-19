@@ -66,6 +66,32 @@ class KnownActionCardsServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void forgetRemovedCardsForEveryViewerTrackingThatHand() {
+        Game game = new Game();
+
+        Player firstViewer = createPlayer(game, "viewer1", "yssaril", "blue");
+        Player secondViewer = createPlayer(game, "viewer2", "jolnar", "purple");
+        Player target = createPlayer(game, "target", "hacan", "yellow");
+
+        target.setActionCard("dh1", 11);
+        target.setActionCard("s_retreat1", 12);
+
+        LinkedHashMap<String, Player> players = new LinkedHashMap<>();
+        players.put(firstViewer.getUserID(), firstViewer);
+        players.put(secondViewer.getUserID(), secondViewer);
+        players.put(target.getUserID(), target);
+        game.setPlayers(players);
+
+        KnownActionCardsService.rememberViewedHand(firstViewer, target);
+        KnownActionCardsService.rememberViewedHand(secondViewer, target);
+
+        target.removeActionCard(11);
+
+        assertThat(firstViewer.getStoredList("knownActionCards_hacan")).containsExactly("s_retreat1");
+        assertThat(secondViewer.getStoredList("knownActionCards_hacan")).containsExactly("s_retreat1");
+    }
+
+    @Test
     void shouldShowKnownActionCardsButtonForMageonOwnersOrTrackedKnowledge() {
         Game game = new Game();
         Player viewer = createPlayer(game, "viewer", "yssaril", "blue");
