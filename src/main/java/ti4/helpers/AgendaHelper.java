@@ -4170,7 +4170,8 @@ public final class AgendaHelper {
         for (Player player : orderList) {
             votes += getTotalVoteCount(game, player);
         }
-        boolean hideTotalVotes = game.getFowOption(FOWOption.HIDE_TOTAL_VOTES) || isRepresentativeGovernmentInEffect(game);
+        boolean hideTotalVotes =
+                game.getFowOption(FOWOption.HIDE_TOTAL_VOTES) || isRepresentativeGovernmentInEffect(game);
         boolean hideVoteOrder = game.getFowOption(FOWOption.HIDE_VOTE_ORDER);
         StringBuilder sb = new StringBuilder("# Vote Count");
         if (!hideTotalVotes) sb.append("\nTotal votes: ").append(votes);
