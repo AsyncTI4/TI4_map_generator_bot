@@ -269,32 +269,44 @@ class SecretObjectiveWinChanceStatisticsService {
     static String buildSecretPhaseCombinationWinChanceSection(
             Map<String, Integer> playersBySecretPhaseCombination, Map<String, Integer> winsBySecretPhaseCombination) {
         StringBuilder sb = new StringBuilder("__**Scored + Unscored Secret Combination Win Chance**__\n")
-                .append("_(What is a player's win chance for each end-of-game action/status secret mix?)_\n\n");
+                .append("_(What is a player's win chance for each end-of-game action/status/agenda secret mix?)_\n\n");
 
         playersBySecretPhaseCombination.entrySet().stream()
                 .sorted((left, right) -> {
                     int leftActionCount = getActionSecretCount(left.getKey());
                     int rightActionCount = getActionSecretCount(right.getKey());
+                    int leftStatusCount = getStatusSecretCount(left.getKey());
+                    int rightStatusCount = getStatusSecretCount(right.getKey());
                     int compareByTotalSecretCount = Integer.compare(
-                            leftActionCount + getStatusSecretCount(left.getKey()),
-                            rightActionCount + getStatusSecretCount(right.getKey()));
+                            leftActionCount + leftStatusCount + getAgendaSecretCount(left.getKey()),
+                            rightActionCount + rightStatusCount + getAgendaSecretCount(right.getKey()));
                     if (compareByTotalSecretCount != 0) {
                         return compareByTotalSecretCount;
                     }
-                    return Integer.compare(leftActionCount, rightActionCount);
+                    int compareByActionCount = Integer.compare(leftActionCount, rightActionCount);
+                    if (compareByActionCount != 0) {
+                        return compareByActionCount;
+                    }
+                    int compareByStatusCount = Integer.compare(leftStatusCount, rightStatusCount);
+                    if (compareByStatusCount != 0) {
+                        return compareByStatusCount;
+                    }
+                    return Integer.compare(getAgendaSecretCount(left.getKey()), getAgendaSecretCount(right.getKey()));
                 })
                 .forEach(entry -> appendSecretCountWinChanceLine(
                         sb,
                         formatSecretPhaseCombinationLabel(
-                                getActionSecretCount(entry.getKey()), getStatusSecretCount(entry.getKey())),
+                                getActionSecretCount(entry.getKey()),
+                                getStatusSecretCount(entry.getKey()),
+                                getAgendaSecretCount(entry.getKey())),
                         entry.getValue(),
                         winsBySecretPhaseCombination.getOrDefault(entry.getKey(), 0)));
 
         return sb.toString();
     }
 
-    private static String getSecretPhaseCombinationKey(int actionCount, int statusCount) {
-        return actionCount + "|" + statusCount;
+    private static String getSecretPhaseCombinationKey(int actionCount, int statusCount, int agendaCount) {
+        return actionCount + "|" + statusCount + "|" + agendaCount;
     }
 
     private static int getActionSecretCount(String combinationKey) {
@@ -302,28 +314,36 @@ class SecretObjectiveWinChanceStatisticsService {
     }
 
     private static int getStatusSecretCount(String combinationKey) {
-        return Integer.parseInt(StringUtils.substringAfter(combinationKey, "|"));
+        return Integer.parseInt(StringUtils.substringBefore(StringUtils.substringAfter(combinationKey, "|"), "|"));
     }
 
-    private static String formatSecretPhaseCombinationLabel(int actionCount, int statusCount) {
-        if (actionCount == 0 && statusCount == 0) {
+    private static int getAgendaSecretCount(String combinationKey) {
+        return Integer.parseInt(StringUtils.substringAfterLast(combinationKey, "|"));
+    }
+
+    private static String formatSecretPhaseCombinationLabel(int actionCount, int statusCount, int agendaCount) {
+        if (actionCount == 0 && statusCount == 0 && agendaCount == 0) {
             return "0 secrets";
         }
-        if (actionCount == 0) {
-            return statusCount + " " + formatStatusSecretLabel(statusCount);
+        List<String> segments = new java.util.ArrayList<>();
+        if (actionCount > 0) {
+            segments.add(actionCount + " action" + (actionCount == 1 ? "" : "s"));
         }
-        if (statusCount == 0) {
-            return actionCount + " action" + (actionCount == 1 ? "" : "s");
+        if (statusCount > 0) {
+            segments.add(statusCount + " " + formatStatusSecretLabel(statusCount));
         }
-        return actionCount + " action" + (actionCount == 1 ? "" : "s")
-                + " and "
-                + statusCount
-                + " "
-                + formatStatusSecretLabel(statusCount);
+        if (agendaCount > 0) {
+            segments.add(agendaCount + " " + formatAgendaSecretLabel(agendaCount));
+        }
+        return String.join(" and ", segments);
     }
 
     private static String formatStatusSecretLabel(int statusCount) {
         return statusCount == 1 ? "status" : "statuses";
+    }
+
+    private static String formatAgendaSecretLabel(int agendaCount) {
+        return agendaCount == 1 ? "agenda" : "agendas";
     }
 
     private static void incrementMinimumActionPhaseSecretCounts(
@@ -343,6 +363,7 @@ class SecretObjectiveWinChanceStatisticsService {
     private static SecretPhaseCounts countSecretPhases(Iterable<String> secretIds, Set<String> convertedSecretIds) {
         int actionPhaseSecretCount = 0;
         int statusPhaseSecretCount = 0;
+        int agendaPhaseSecretCount = 0;
         for (String secretId : secretIds) {
             SecretObjectiveModel secretObjective = getTrackableSecretObjective(secretId, convertedSecretIds);
             if (secretObjective == null) {
@@ -353,9 +374,11 @@ class SecretObjectiveWinChanceStatisticsService {
                 actionPhaseSecretCount++;
             } else if ("status".equalsIgnoreCase(phase)) {
                 statusPhaseSecretCount++;
+            } else if ("agenda".equalsIgnoreCase(phase)) {
+                agendaPhaseSecretCount++;
             }
         }
-        return new SecretPhaseCounts(actionPhaseSecretCount, statusPhaseSecretCount);
+        return new SecretPhaseCounts(actionPhaseSecretCount, statusPhaseSecretCount, agendaPhaseSecretCount);
     }
 
     private static Set<String> getSecretNames(Iterable<String> secretIds, Set<String> convertedSecretIds) {
@@ -467,6 +490,7 @@ class SecretObjectiveWinChanceStatisticsService {
                     countSecretPhases(player.getSecretsScored().keySet(), convertedSecretIds);
             int actionPhaseSecretCount = scoredSecretPhaseCounts.actionCount();
             int statusPhaseSecretCount = scoredSecretPhaseCounts.statusCount();
+            int agendaPhaseSecretCount = scoredSecretPhaseCounts.agendaCount();
             int totalScoredSecretCount =
                     countRealSecretObjectives(player.getSecretsScored().keySet(), convertedSecretIds);
             Set<String> scoredSecrets = getSecretNames(player.getSecretsScored().keySet(), convertedSecretIds);
@@ -492,9 +516,10 @@ class SecretObjectiveWinChanceStatisticsService {
                     countSecretPhases(unscoredSecrets.keySet(), convertedSecretIds);
             actionPhaseSecretCount += unscoredSecretPhaseCounts.actionCount();
             statusPhaseSecretCount += unscoredSecretPhaseCounts.statusCount();
+            agendaPhaseSecretCount += unscoredSecretPhaseCounts.agendaCount();
 
             String secretPhaseCombinationKey =
-                    getSecretPhaseCombinationKey(actionPhaseSecretCount, statusPhaseSecretCount);
+                    getSecretPhaseCombinationKey(actionPhaseSecretCount, statusPhaseSecretCount, agendaPhaseSecretCount);
             playersBySecretPhaseCombination.merge(secretPhaseCombinationKey, 1, Integer::sum);
             if (isWinner) {
                 winsBySecretPhaseCombination.merge(secretPhaseCombinationKey, 1, Integer::sum);
@@ -529,5 +554,5 @@ class SecretObjectiveWinChanceStatisticsService {
             long whenDrawnEstimatedPercent,
             long discardRateEstimatedPercent) {}
 
-    private record SecretPhaseCounts(int actionCount, int statusCount) {}
+    private record SecretPhaseCounts(int actionCount, int statusCount, int agendaCount) {}
 }

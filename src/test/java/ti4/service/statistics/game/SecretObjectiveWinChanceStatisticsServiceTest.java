@@ -26,14 +26,14 @@ class SecretObjectiveWinChanceStatisticsServiceTest extends BaseTi4Test {
         winner.setColor("red");
         winner.setSecretScored("accept_bribes_pbd100");
         winner.setSecret("rule_a_diverse_empire_pbd100");
-        winner.setSecret("deep_space_research_pbd100");
+        winner.setSecret("win_the_people's_favor_pbd100");
 
         Player loser = game.addPlayer("loser", "Loser");
         loser.setFaction("hacan");
         loser.setColor("blue");
         loser.setSecret("gather_a_legion_pbd100");
         loser.setSecret("sponsor_data_archives_pbd100");
-        loser.setSecret("secure_a_path_pbd100");
+        loser.setSecret("win_the_people's_favor_pbd100");
 
         int[] playersByScoredAPSecretCount = new int[5];
         int[] winsByScoredAPSecretCount = new int[5];
@@ -67,10 +67,10 @@ class SecretObjectiveWinChanceStatisticsServiceTest extends BaseTi4Test {
                 gamesWithSecretScoredOrInHand,
                 winsWithSecretScoredOrInHand);
 
-        assertEquals(1, playersBySecretPhaseCombination.get("1|2"));
-        assertEquals(1, winsBySecretPhaseCombination.get("1|2"));
-        assertEquals(1, playersBySecretPhaseCombination.get("0|3"));
-        assertEquals(0, winsBySecretPhaseCombination.getOrDefault("0|3", 0));
+        assertEquals(1, playersBySecretPhaseCombination.get("1|1|1"));
+        assertEquals(1, winsBySecretPhaseCombination.get("1|1|1"));
+        assertEquals(1, playersBySecretPhaseCombination.get("0|2|1"));
+        assertEquals(0, winsBySecretPhaseCombination.getOrDefault("0|2|1", 0));
         assertEquals(1, playersByExactScoredSecretCountAndMinimumAPCount[1][0]);
         assertEquals(1, winsByExactScoredSecretCountAndMinimumAPCount[1][0]);
         assertEquals(1, playersByExactScoredSecretCountAndMinimumAPCount[1][1]);
@@ -79,18 +79,19 @@ class SecretObjectiveWinChanceStatisticsServiceTest extends BaseTi4Test {
 
     @Test
     void buildSecretPhaseCombinationWinChanceSectionFormatsAndSortsCombinations() {
-        Map<String, Integer> playersBySecretPhaseCombination = Map.of("1|2", 2, "0|3", 1, "2|0", 1);
-        Map<String, Integer> winsBySecretPhaseCombination = Map.of("1|2", 1, "2|0", 1);
+        Map<String, Integer> playersBySecretPhaseCombination = Map.of("1|1|1", 2, "0|2|1", 1, "2|0|0", 1);
+        Map<String, Integer> winsBySecretPhaseCombination = Map.of("1|1|1", 1, "2|0|0", 1);
 
         String report = SecretObjectiveWinChanceStatisticsService.buildSecretPhaseCombinationWinChanceSection(
                 playersBySecretPhaseCombination, winsBySecretPhaseCombination);
 
         assertTrue(report.contains("__**Scored + Unscored Secret Combination Win Chance**__"));
+        assertTrue(report.contains("action/status/agenda secret mix"));
         assertTrue(report.contains("`2 actions` `100%` (1/1)"));
-        assertTrue(report.contains("`3 statuses` `  0%` (0/1)"));
-        assertTrue(report.contains("`1 action and 2 statuses` ` 50%` (1/2)"));
-        assertTrue(report.indexOf("`2 actions`") < report.indexOf("`3 statuses`"));
-        assertTrue(report.indexOf("`3 statuses`") < report.indexOf("`1 action and 2 statuses`"));
+        assertTrue(report.contains("`2 statuses and 1 agenda` `  0%` (0/1)"));
+        assertTrue(report.contains("`1 action and 1 status and 1 agenda` ` 50%` (1/2)"));
+        assertTrue(report.indexOf("`2 actions`") < report.indexOf("`2 statuses and 1 agenda`"));
+        assertTrue(report.indexOf("`2 statuses and 1 agenda`") < report.indexOf("`1 action and 1 status and 1 agenda`"));
     }
 
     @Test
