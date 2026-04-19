@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import static software.amazon.awssdk.utils.StringUtils.isBlank;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -13,21 +14,33 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.springframework.stereotype.Service;
 import ti4.discord.JdaService;
 import ti4.game.Game;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
 import ti4.helpers.DisplayType;
 import ti4.image.MapRenderPipeline;
 import ti4.logging.BotLogger;
 
 @Service
 @RequiredArgsConstructor
-public class GameAttachmentUrlRefreshService {
+class GameAttachmentUrlRefreshService {
 
-    static final String CHRONICLES_CHANNEL_NAME = "the-pbd-chronicles";
-    static final String REFRESHED_MAP_IMAGES_THREAD_NAME = "refreshed-map-images";
+    private static final String CHRONICLES_CHANNEL_NAME = "the-pbd-chronicles";
+    private static final String REFRESHED_MAP_IMAGES_THREAD_NAME = "refreshed-map-images";
     private static final long REFRESH_TIMEOUT_SECONDS = 120;
 
     private final GameImageService gameImageService;
 
-    public Optional<String> refreshAttachmentUrl(Game game) {
+    public Optional<String> refreshAttachmentUrl(String gameName) {
+        if (isBlank(gameName) || !GameManager.isValid(gameName)) {
+            return Optional.empty();
+        }
+
+        ManagedGame managedGame = GameManager.getManagedGame(gameName);
+        if (managedGame == null) {
+            return Optional.empty();
+        }
+
+        Game game = managedGame.getGame();
         if (game == null || game.isFowMode()) {
             return Optional.empty();
         }
@@ -53,7 +66,7 @@ public class GameAttachmentUrlRefreshService {
                     return;
                 }
 
-                gameImageService.saveDiscordMessage(game, message);
+                gameImageService.saveDiscordMessage(gameName, message);
                 attachmentUrlFuture.complete(message.getAttachments().getFirst().getUrl());
             } catch (Exception e) {
                 attachmentUrlFuture.completeExceptionally(e);

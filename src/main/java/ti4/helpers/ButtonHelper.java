@@ -2316,7 +2316,7 @@ public class ButtonHelper {
 
             List<Button> buttonsWeb = Buttons.mapImageButtons(game);
             Consumer<Message> persistMessageId =
-                    msg -> SpringContext.getBean(GameImageService.class).saveDiscordMessage(game, msg);
+                    msg -> SpringContext.getBean(GameImageService.class).saveDiscordMessage(game.getName(), msg);
 
             for (ThreadChannel thread : threadChannels) {
                 if (threadName.equals(thread.getName())) {

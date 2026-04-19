@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
-import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 
 class GameImageServiceTest {
@@ -23,8 +22,6 @@ class GameImageServiceTest {
         MapImageDataRepository mapImageDataRepository = mock(MapImageDataRepository.class);
         PlayerMapImageDataRepository playerMapImageDataRepository = mock(PlayerMapImageDataRepository.class);
         GameImageService service = new GameImageService(mapImageDataRepository, playerMapImageDataRepository);
-        Game game = new Game();
-        game.setName("pbd11223");
 
         Message message = mock(Message.class);
         net.dv8tion.jda.api.entities.Guild guild = mock(net.dv8tion.jda.api.entities.Guild.class);
@@ -40,7 +37,7 @@ class GameImageServiceTest {
         try (MockedStatic<GameManager> gameManager = mockStatic(GameManager.class)) {
             gameManager.when(() -> GameManager.isValid("pbd11223")).thenReturn(true);
 
-            service.saveDiscordMessage(game, message);
+            service.saveDiscordMessage("pbd11223", message);
         }
 
         ArgumentCaptor<MapImageData> dataCaptor = ArgumentCaptor.forClass(MapImageData.class);
