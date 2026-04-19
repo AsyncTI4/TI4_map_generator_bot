@@ -1,5 +1,6 @@
 package ti4.service.statistics.game;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -72,7 +73,7 @@ class SecretObjectiveWinChanceStatisticsService {
                 playersBySecretPhaseCombination, winsBySecretPhaseCombination));
 
         // Collect all secret names from all three maps
-        Set<String> allSecretNames = new HashSet<>();
+        Collection<String> allSecretNames = new HashSet<>();
         allSecretNames.addAll(gamesWithSecretScored.keySet());
         allSecretNames.addAll(gamesWithSecretInHand.keySet());
         allSecretNames.addAll(gamesWithSecretScoredOrInHand.keySet());
@@ -294,7 +295,7 @@ class SecretObjectiveWinChanceStatisticsService {
         return Integer.parseInt(StringUtils.substringAfter(combinationKey, "|"));
     }
 
-    static String formatSecretPhaseCombinationLabel(int actionCount, int statusCount) {
+    private static String formatSecretPhaseCombinationLabel(int actionCount, int statusCount) {
         if (actionCount == 0 && statusCount == 0) {
             return "0 secrets";
         }
