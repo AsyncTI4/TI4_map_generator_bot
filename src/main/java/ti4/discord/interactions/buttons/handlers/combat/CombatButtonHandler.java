@@ -80,11 +80,13 @@ class CombatButtonHandler {
     }
 
     static void deleteSpaceCannonDeclineMessageIfDone(ButtonInteractionEvent event) {
-        List<ActionRow> updatedRows = event.getMessage().getActionRows().stream()
-                .map(row -> row.getButtons().stream()
-                        .filter(button -> !Objects.equals(button.getId(), event.getButton().getId()))
+        List<ActionRow> updatedRows = event.getMessage().getComponentTree().findAll(ActionRow.class).stream()
+                .map(row -> row.getComponents().stream()
+                        .filter(component -> !(component instanceof Button button
+                                && Objects.equals(
+                                        button.getCustomId(), event.getButton().getCustomId())))
                         .toList())
-                .filter(buttons -> !buttons.isEmpty())
+                .filter(components -> !components.isEmpty())
                 .map(ActionRow::of)
                 .toList();
 
@@ -99,8 +101,10 @@ class CombatButtonHandler {
 
     static boolean hasRemainingSpaceCannonDeclineButtons(List<ActionRow> actionRows) {
         return actionRows.stream()
-                .flatMap(row -> row.getButtons().stream())
-                .map(Button::getId)
+                .flatMap(row -> row.getComponents().stream())
+                .filter(Button.class::isInstance)
+                .map(Button.class::cast)
+                .map(Button::getCustomId)
                 .filter(Objects::nonNull)
                 .anyMatch(id -> id.startsWith("declinePDS_"));
     }
