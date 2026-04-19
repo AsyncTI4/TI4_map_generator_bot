@@ -117,7 +117,7 @@
         "id": "phantom_energy",
         "name": "Phantom Energy",
         "faction": "tyris",
-        "permanentEffect": "After you explore a frontier token during a tactical action, you may place a control token on a unit space on your faction sheet that matches a ship in the active system. You may move ships that have a control token on your faction sheet out of systems containing your command tokens. At the end of your turn, remove control tokens from your faction sheet for any ships matching those you have in systems that contain your command tokens.",
+        "permanentEffect": "After you explore a frontier token during a tactical action, you may place a control token on a unit space on your faction sheet that matches a ship in the active system. You may move ships that have a control token on your faction sheet out of systems containing your command tokens, and transport units that started in that ship’s system. At the end of your turn, remove control tokens from your faction sheet for any ships matching those you have in systems that contain your command tokens.",
         "source": "balacasi"
     },
     {
