@@ -3135,7 +3135,10 @@ public final class AgendaHelper {
             return Mapper.getAgendaTitleNoCap(outcome);
         }
         if (StringUtils.containsIgnoreCase(agendaDetails, "unit upgrade") && Mapper.getTech(outcome) != null) {
-            return Mapper.getTech(outcome).getName();
+            String techName = Mapper.getTech(outcome).getName();
+            if (StringUtils.isNotBlank(techName)) {
+                return techName;
+            }
         }
         if (StringUtils.containsIgnoreCase(agendaDetails, "Elect Strategy Card") && NumberUtils.isDigits(outcome)) {
             return Helper.getSCName(Integer.parseInt(outcome), game);

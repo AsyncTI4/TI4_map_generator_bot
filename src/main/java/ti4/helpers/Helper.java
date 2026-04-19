@@ -1174,7 +1174,9 @@ public final class Helper {
         }
         String outcome = game.getStoredValue("latestOutcomeVotedFor" + player.getFaction());
         String formattedOutcome = AgendaHelper.getAgendaOutcomeName(game, outcome, true);
-        if (game.getCurrentAgendaInfo().contains("Secret") && !formattedOutcome.equals(outcome)) {
+        boolean isSecretOutcome = game.getCurrentAgendaInfo().contains("Secret")
+                && Mapper.getSecretObjectivesJustNames().containsKey(outcome);
+        if (isSecretOutcome) {
             msg.append("For a total of **")
                     .append(votes)
                     .append("** vote")
