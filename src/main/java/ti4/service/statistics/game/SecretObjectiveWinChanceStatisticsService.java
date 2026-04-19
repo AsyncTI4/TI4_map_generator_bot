@@ -423,7 +423,8 @@ class SecretObjectiveWinChanceStatisticsService {
                     countSecretPhases(player.getSecretsScored().keySet());
             int actionPhaseSecretCount = scoredSecretPhaseCounts.actionCount();
             int statusPhaseSecretCount = scoredSecretPhaseCounts.statusCount();
-            int totalScoredSecretCount = countRealSecretObjectives(player.getSecretsScored().keySet());
+            int totalScoredSecretCount =
+                    countRealSecretObjectives(player.getSecretsScored().keySet());
             Set<String> scoredSecrets = getSecretNames(player.getSecretsScored().keySet());
 
             int actionBucket = Math.min(4, actionPhaseSecretCount);

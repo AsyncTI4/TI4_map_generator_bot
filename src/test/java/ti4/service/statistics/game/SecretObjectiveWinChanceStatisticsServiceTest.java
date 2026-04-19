@@ -155,7 +155,7 @@ class SecretObjectiveWinChanceStatisticsServiceTest extends BaseTi4Test {
         Player winner = game.addPlayer("winner", "Winner");
         winner.setFaction("obsidian");
         winner.setColor("red");
-        winner.setSecretScored("defy_space_and_time_pbd100");
+        winner.setSecretScored("accept_bribes_pbd100");
         winner.setSecretScored("fake_plotted_secret");
 
         int[] playersByScoredAPSecretCount = new int[5];
