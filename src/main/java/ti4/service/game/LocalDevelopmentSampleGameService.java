@@ -226,12 +226,14 @@ public class LocalDevelopmentSampleGameService {
         try {
             List<String> gameFileLines = Files.readAllLines(sourcePath);
             if (gameFileLines.size() < MIN_GAME_FILE_LINES) {
-                BotLogger.warning("LocalDevelopmentSampleGameService: uploaded source game file is malformed: " + sourcePath);
+                BotLogger.warning(
+                        "LocalDevelopmentSampleGameService: uploaded source game file is malformed: " + sourcePath);
                 return null;
             }
             return StringUtils.trimToNull(gameFileLines.get(GAME_NAME_LINE_INDEX));
         } catch (Exception e) {
-            BotLogger.warning("LocalDevelopmentSampleGameService: failed to read uploaded source game file: " + sourcePath, e);
+            BotLogger.warning(
+                    "LocalDevelopmentSampleGameService: failed to read uploaded source game file: " + sourcePath, e);
             return null;
         }
     }
@@ -258,7 +260,8 @@ public class LocalDevelopmentSampleGameService {
         if (parentPath == null) {
             return null;
         }
-        return parentPath.resolveSibling("test")
+        return parentPath
+                .resolveSibling("test")
                 .resolve("resources")
                 .resolve("maps")
                 .resolve(fileName)

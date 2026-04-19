@@ -20,9 +20,9 @@ import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.service.ShowGameService;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
+import ti4.service.ShowGameService;
 import ti4.service.fow.GMService;
 
 @UtilityClass
@@ -415,7 +415,8 @@ public class RecreateGameService {
     static String getRecreatedResourcesAnnouncement(
             Game game, RecreateGameResult result, @Nullable Member extraAccessMember) {
         String pingTarget = extraAccessMember == null ? game.getPing() : extraAccessMember.getAsMention();
-        StringBuilder announcement = new StringBuilder(pingTarget).append(" this game's Discord resources were recreated.");
+        StringBuilder announcement =
+                new StringBuilder(pingTarget).append(" this game's Discord resources were recreated.");
         if (!result.getMissingPlayers().isEmpty()) {
             announcement.append("\nMissing from server: ").append(String.join(", ", result.getMissingPlayers()));
         }

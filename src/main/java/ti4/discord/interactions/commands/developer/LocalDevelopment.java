@@ -2,8 +2,8 @@ package ti4.discord.interactions.commands.developer;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -74,7 +74,10 @@ class LocalDevelopment extends Subcommand {
                     Path downloadedSourceFile = null;
                     try {
                         downloadedSourceFile = Files.createTempFile("ti4-local-dev-source-", Constants.TXT);
-                        sourceFile.getProxy().downloadToFile(downloadedSourceFile.toFile()).get();
+                        sourceFile
+                                .getProxy()
+                                .downloadToFile(downloadedSourceFile.toFile())
+                                .get();
                         result = LocalDevelopmentSampleGameService.createAndRecreateTestGameFromSourceFile(
                                 guild, event.getUser().getId(), downloadedSourceFile);
                     } catch (Exception e) {
@@ -90,7 +93,8 @@ class LocalDevelopment extends Subcommand {
                         }
                     }
                     if (result == null) {
-                        MessageHelper.replyToMessage(event, "Failed to create a local development test game from the uploaded source file.");
+                        MessageHelper.replyToMessage(
+                                event, "Failed to create a local development test game from the uploaded source file.");
                         return;
                     }
                 } else {

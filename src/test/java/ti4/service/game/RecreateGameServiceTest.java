@@ -26,8 +26,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import ti4.discord.JdaService;
 import ti4.game.Game;
-import ti4.testUtils.BaseTi4Test;
 import ti4.service.ShowGameService;
+import ti4.testUtils.BaseTi4Test;
 
 class RecreateGameServiceTest extends BaseTi4Test {
 
