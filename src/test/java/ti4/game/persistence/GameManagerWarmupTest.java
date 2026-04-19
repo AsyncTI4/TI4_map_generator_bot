@@ -21,8 +21,11 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 
 class GameManagerWarmupTest {
 
+    private boolean originalTestingMode;
+
     @BeforeEach
     void beforeEach() throws Exception {
+        originalTestingMode = JdaService.testingMode;
         resetState();
         JdaService.testingMode = false;
     }
@@ -30,7 +33,7 @@ class GameManagerWarmupTest {
     @AfterEach
     void afterEach() throws Exception {
         resetState();
-        JdaService.testingMode = false;
+        JdaService.testingMode = originalTestingMode;
     }
 
     @Test

@@ -55,7 +55,6 @@ public class GameManager {
                 validGameNames.forEach(GameManager::getManagedGame);
                 WARMUP_LATCH.countDown();
             } catch (Exception e) {
-                WARMUP_STARTED.compareAndSet(true, false);
                 BotLogger.critical("Failed during managed game warmup.", e);
             } finally {
                 if (JdaService.jda != null) {
