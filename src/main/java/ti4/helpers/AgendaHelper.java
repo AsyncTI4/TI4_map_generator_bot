@@ -4184,12 +4184,17 @@ public final class AgendaHelper {
     }
 
     public static void listVoteCount(Game game, MessageChannel channel) {
+        MessageHelper.sendMessageToChannel(channel, getVoteCountMessage(game));
+    }
+
+    static String getVoteCountMessage(Game game) {
         List<Player> orderList = getVotingOrder(game);
         int votes = 0;
         for (Player player : orderList) {
             votes += getTotalVoteCount(game, player);
         }
-        boolean hideTotalVotes = game.getFowOption(FOWOption.HIDE_TOTAL_VOTES);
+        boolean hideTotalVotes =
+                game.getFowOption(FOWOption.HIDE_TOTAL_VOTES) || isRepresentativeGovernmentInEffect(game);
         boolean hideVoteOrder = game.getFowOption(FOWOption.HIDE_VOTE_ORDER);
         StringBuilder sb = new StringBuilder("# Vote Count");
         if (!hideTotalVotes) sb.append("\nTotal votes: ").append(votes);
@@ -4203,7 +4208,13 @@ public final class AgendaHelper {
             sb.append(getPlayerVoteText(game, player));
             itemNo++;
         }
-        MessageHelper.sendMessageToChannel(channel, sb.toString());
+        return sb.toString();
+    }
+
+    private static boolean isRepresentativeGovernmentInEffect(Game game) {
+        return game.getLaws() != null
+                && game.getLaws().containsKey("rep_govt")
+                && game.getStoredValue("executiveOrder").isEmpty();
     }
 
     public static void putTop(int agendaID, Game game) {

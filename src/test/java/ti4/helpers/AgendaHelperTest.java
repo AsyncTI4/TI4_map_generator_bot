@@ -59,6 +59,30 @@ class AgendaHelperTest extends BaseTi4Test {
                 .doesNotContain("outcome \"Mrte\"");
     }
 
+    @Test
+    void getVoteCountMessageShowsTotalVotesNormally() {
+        Game game = voteCountGame();
+
+        assertThat(AgendaHelper.getVoteCountMessage(game)).contains("Total votes:");
+    }
+
+    @Test
+    void getVoteCountMessageOmitsTotalVotesForRepresentativeGovernment() {
+        Game game = voteCountGame();
+        game.setLaws(Map.of("rep_govt", 1));
+
+        assertThat(AgendaHelper.getVoteCountMessage(game)).doesNotContain("Total votes:");
+    }
+
+    @Test
+    void getVoteCountMessageShowsTotalVotesWhenExecutiveOrderDisablesRepresentativeGovernment() {
+        Game game = voteCountGame();
+        game.setLaws(Map.of("rep_govt", 1));
+        game.setStoredValue("executiveOrder", "active");
+
+        assertThat(AgendaHelper.getVoteCountMessage(game)).contains("Total votes:");
+    }
+
     private static Player censuredPlayer() {
         Game game = new Game();
         game.setLaws(Map.of("censure", 1));
@@ -70,5 +94,19 @@ class AgendaHelperTest extends BaseTi4Test {
         Player player = new Player("userId", "userName", game);
         player.setFaction(faction);
         return player;
+    }
+
+    private static Game voteCountGame() {
+        Game game = new Game();
+        Player speaker = game.addPlayer("speaker", "speaker");
+        speaker.setFaction("arborec");
+        speaker.setColor("green");
+        game.setSpeaker(speaker);
+
+        Player player = game.addPlayer("player", "player");
+        player.setFaction("hacan");
+        player.setColor("yellow");
+
+        return game;
     }
 }
