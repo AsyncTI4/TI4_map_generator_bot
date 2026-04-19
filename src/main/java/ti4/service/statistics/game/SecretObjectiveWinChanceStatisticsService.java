@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeSet;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -37,11 +36,8 @@ class SecretObjectiveWinChanceStatisticsService {
         Map<String, Integer> winsWithSecretInHand = new HashMap<>();
         Map<String, Integer> gamesWithSecretScoredOrInHand = new HashMap<>();
         Map<String, Integer> winsWithSecretScoredOrInHand = new HashMap<>();
-        Set<String> ignoredGameNames = new TreeSet<>();
-
         GamesPage.consumeAllGames(GameStatisticsFilterer.getGamesFilterForWonGame(event), game -> {
             if (shouldIgnoreGameForSecretObjectiveStats(game)) {
-                ignoredGameNames.add(game.getName());
                 return;
             }
 
@@ -142,7 +138,6 @@ class SecretObjectiveWinChanceStatisticsService {
                     .append(StringUtils.leftPad(secretEntry.discardRateEstimatedPercent() + "%", 4))
                     .append("`\n");
         }
-        secretObjectiveSb.append(buildIgnoredGamesSection(ignoredGameNames));
         MessageHelper.sendMessageToThread(
                 event.getChannel(), "Secret Objective Win Chance", secretObjectiveSb.toString());
     }
@@ -416,18 +411,6 @@ class SecretObjectiveWinChanceStatisticsService {
             }
         }
         return false;
-    }
-
-    static String buildIgnoredGamesSection(Set<String> ignoredGameNames) {
-        if (ignoredGameNames.isEmpty()) {
-            return "";
-        }
-
-        StringBuilder sb = new StringBuilder("\n__**Ignored Games**__\n");
-        for (String gameName : new TreeSet<>(ignoredGameNames)) {
-            sb.append("- ").append(gameName).append('\n');
-        }
-        return sb.toString();
     }
 
     private static SecretWinChanceEntry buildSecretWinChanceEntry(

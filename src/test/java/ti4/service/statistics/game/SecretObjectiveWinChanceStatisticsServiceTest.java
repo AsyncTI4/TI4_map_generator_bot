@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -275,16 +274,5 @@ class SecretObjectiveWinChanceStatisticsServiceTest extends BaseTi4Test {
 
         assertFalse(SecretObjectiveWinChanceStatisticsService.shouldIgnoreGameForSecretObjectiveStats(validGame));
         assertTrue(SecretObjectiveWinChanceStatisticsService.shouldIgnoreGameForSecretObjectiveStats(ignoredGame));
-    }
-
-    @Test
-    void buildIgnoredGamesSectionListsIgnoredGamesAtEnd() {
-        String report =
-                SecretObjectiveWinChanceStatisticsService.buildIgnoredGamesSection(Set.of("omega-game", "alpha-game"));
-
-        assertTrue(report.startsWith("\n__**Ignored Games**__\n"));
-        assertTrue(report.contains("- alpha-game\n"));
-        assertTrue(report.contains("- omega-game\n"));
-        assertTrue(report.indexOf("- alpha-game\n") < report.indexOf("- omega-game\n"));
     }
 }
