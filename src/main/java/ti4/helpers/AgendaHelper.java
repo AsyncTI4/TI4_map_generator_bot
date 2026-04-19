@@ -3132,7 +3132,10 @@ public final class AgendaHelper {
             return Mapper.getSecretObjectivesJustNames().getOrDefault(outcome, outcome);
         }
         if (StringUtils.containsIgnoreCase(agendaDetails, "Elect Law")) {
-            return Mapper.getAgendaTitleNoCap(outcome);
+            String lawTitle = Mapper.getAgendaTitleNoCap(outcome);
+            if (StringUtils.isNotBlank(lawTitle)) {
+                return lawTitle;
+            }
         }
         if (StringUtils.containsIgnoreCase(agendaDetails, "unit upgrade") && Mapper.getTech(outcome) != null) {
             String techName = Mapper.getTech(outcome).getName();
