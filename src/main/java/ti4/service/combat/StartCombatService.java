@@ -54,6 +54,8 @@ import ti4.service.unit.CheckUnitContainmentService;
 @UtilityClass
 public class StartCombatService {
 
+    public static final String DECLINE_PDS_BUTTON_PREFIX = "declinePDS_";
+
     public static void combatCheck(Game game, GenericInteractionCreateEvent event, Tile tile) {
         spaceCombatCheck(game, tile, event);
         tile.getUnitHolders().values().stream()
@@ -1149,7 +1151,7 @@ public class StartCombatService {
         if (game.isFowMode()) return spaceCannonButtons;
         for (Player playerWithPds : ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition())) {
             spaceCannonButtons.add(Buttons.red(
-                    "declinePDS_" + tile.getTileID() + "_" + playerWithPds.getFaction(),
+                    DECLINE_PDS_BUTTON_PREFIX + tile.getTileID() + "_" + playerWithPds.getFaction(),
                     "Decline SPACE CANNON",
                     playerWithPds.getFactionEmoji()));
         }

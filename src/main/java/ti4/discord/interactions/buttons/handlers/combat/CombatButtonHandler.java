@@ -21,6 +21,7 @@ import ti4.helpers.Helper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.combat.StartCombatService;
 import ti4.service.fow.FOWCombatThreadMirroring;
 
 @UtilityClass
@@ -66,7 +67,7 @@ class CombatButtonHandler {
         Tile tile = game.getTile(buttonID.split("_")[1]);
         String msg = player.getRepresentationNoPing() + " officially declines to fire SPACE CANNON"
                 + (tile != null ? " at " + tile.getRepresentation() : "") + ".";
-        deleteSpaceCannonDeclineMessageIfDone(event);
+        removeDeclineButtonAndCleanupIfDone(event);
         if (game.isFowMode()) {
             String targetFaction = buttonID.split("_")[2];
             Player target = game.getPlayerFromColorOrFaction(targetFaction);
@@ -79,7 +80,7 @@ class CombatButtonHandler {
                 game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(), msg);
     }
 
-    static void deleteSpaceCannonDeclineMessageIfDone(ButtonInteractionEvent event) {
+    static void removeDeclineButtonAndCleanupIfDone(ButtonInteractionEvent event) {
         List<ActionRow> updatedRows = event.getMessage().getComponentTree().findAll(ActionRow.class).stream()
                 .map(row -> row.getComponents().stream()
                         .filter(component -> !(component instanceof Button button
@@ -106,7 +107,7 @@ class CombatButtonHandler {
                 .map(Button.class::cast)
                 .map(Button::getCustomId)
                 .filter(Objects::nonNull)
-                .anyMatch(id -> id.startsWith("declinePDS_"));
+                .anyMatch(id -> id.startsWith(StartCombatService.DECLINE_PDS_BUTTON_PREFIX));
     }
 
     @ButtonHandler("applytempcombatmod__" + Constants.AC + "__")
