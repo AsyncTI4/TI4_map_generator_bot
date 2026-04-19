@@ -35,6 +35,7 @@ import ti4.discord.interactions.commands.planet.PlanetCommand;
 import ti4.discord.interactions.commands.player.PlayerCommand;
 import ti4.discord.interactions.commands.relic.RelicCommand;
 import ti4.discord.interactions.commands.rules.RulesCommand;
+import ti4.discord.interactions.commands.search.FindCommand;
 import ti4.discord.interactions.commands.search.SearchCommand;
 import ti4.discord.interactions.commands.search.SearchCommand2;
 import ti4.discord.interactions.commands.special.Special2Command;
@@ -84,6 +85,7 @@ public class SlashCommandManager {
                     new RemoveCCCommand(),
                     new RemoveAllCC(),
                     new SearchCommand2(),
+                    new FindCommand(),
                     new AddFrontierTokensCommand(),
                     new MoveUnits(),
                     new ModifyUnitsButtons(),

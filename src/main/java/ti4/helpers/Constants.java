@@ -233,6 +233,7 @@ public final class Constants {
 
     /* From \data\ */
     public static final String SEARCH_ABILITIES = "abilities";
+    public static final String SEARCH_PLOTS = "plots";
     public static final String SEARCH_BREAKTHROUGHS = "breakthroughs";
     public static final String SEARCH_GALACTIC_EVENTS = "galactic_events";
     public static final String SEARCH_ACTION_CARDS = "action_cards";
@@ -1285,6 +1286,8 @@ public final class Constants {
     public static final String NORMAL_GAME = "normal_game";
     public static final String INCLUDE_ALIASES = "include_aliases";
     public static final String SEARCH = "search";
+    public static final String FIND = "find";
+    public static final String SEARCH_TYPE = "type";
     public static final String BENTOR_HAS_FOUND_CFRAG = "has_found_cfrag";
     public static final String BENTOR_HAS_FOUND_HFRAG = "has_found_hfrag";
     public static final String BENTOR_HAS_FOUND_IFRAG = "has_found_ifrag";
