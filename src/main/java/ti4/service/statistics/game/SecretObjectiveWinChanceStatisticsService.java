@@ -518,8 +518,8 @@ class SecretObjectiveWinChanceStatisticsService {
             statusPhaseSecretCount += unscoredSecretPhaseCounts.statusCount();
             agendaPhaseSecretCount += unscoredSecretPhaseCounts.agendaCount();
 
-            String secretPhaseCombinationKey =
-                    getSecretPhaseCombinationKey(actionPhaseSecretCount, statusPhaseSecretCount, agendaPhaseSecretCount);
+            String secretPhaseCombinationKey = getSecretPhaseCombinationKey(
+                    actionPhaseSecretCount, statusPhaseSecretCount, agendaPhaseSecretCount);
             playersBySecretPhaseCombination.merge(secretPhaseCombinationKey, 1, Integer::sum);
             if (isWinner) {
                 winsBySecretPhaseCombination.merge(secretPhaseCombinationKey, 1, Integer::sum);

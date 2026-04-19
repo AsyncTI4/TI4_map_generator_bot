@@ -91,7 +91,8 @@ class SecretObjectiveWinChanceStatisticsServiceTest extends BaseTi4Test {
         assertTrue(report.contains("`2 statuses and 1 agenda` `  0%` (0/1)"));
         assertTrue(report.contains("`1 action and 1 status and 1 agenda` ` 50%` (1/2)"));
         assertTrue(report.indexOf("`2 actions`") < report.indexOf("`2 statuses and 1 agenda`"));
-        assertTrue(report.indexOf("`2 statuses and 1 agenda`") < report.indexOf("`1 action and 1 status and 1 agenda`"));
+        assertTrue(
+                report.indexOf("`2 statuses and 1 agenda`") < report.indexOf("`1 action and 1 status and 1 agenda`"));
     }
 
     @Test
