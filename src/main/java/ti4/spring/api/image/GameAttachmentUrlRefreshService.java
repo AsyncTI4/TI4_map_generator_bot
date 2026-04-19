@@ -41,6 +41,7 @@ public class GameAttachmentUrlRefreshService {
         }
 
         CompletableFuture<String> attachmentUrlFuture = new CompletableFuture<>();
+        // This render is started from an API request instead of a Discord interaction.
         MapRenderPipeline.queue(game, null, DisplayType.all, fileUpload -> {
             try {
                 Message message = threadChannel.sendFiles(fileUpload).complete();

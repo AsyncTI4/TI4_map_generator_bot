@@ -105,8 +105,7 @@ public class GameImageController {
             return ResponseEntity.notFound().build();
         }
 
-        return refreshAttachmentUrl(game).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound()
-                .build());
+        return refreshAttachmentUrlResponse(game);
     }
 
     /**
@@ -138,10 +137,9 @@ public class GameImageController {
                 gameImageService.getLatestMapImageData(game.getName()).orElse(null);
         if (mapImageData == null) {
             if (game.isFowMode()) {
-                return ResponseEntity.notFound().build();
+                return notFound();
             }
-            return refreshAttachmentUrl(game).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound()
-                    .build());
+            return refreshAttachmentUrlResponse(game);
         }
 
         Long messageId = mapImageData.getLatestDiscordMessageId();
@@ -149,14 +147,13 @@ public class GameImageController {
 
         if (messageId == null || messageId == 0 || channelId == null || channelId == 0) {
             if (game.isFowMode()) {
-                return ResponseEntity.notFound().build();
+                return notFound();
             }
-            return refreshAttachmentUrl(game).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound()
-                    .build());
+            return refreshAttachmentUrlResponse(game);
         }
 
         ResponseEntity<String> response = fetchDiscordAttachmentUrl(messageId, channelId, game);
-        if (response.getStatusCode().value() != HttpStatus.NOT_FOUND.value()) {
+        if (!HttpStatus.NOT_FOUND.equals(response.getStatusCode())) {
             return response;
         }
 
@@ -164,8 +161,7 @@ public class GameImageController {
             return response;
         }
 
-        return refreshAttachmentUrl(game).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound()
-                .build());
+        return refreshAttachmentUrlResponse(game);
     }
 
     /**
@@ -223,6 +219,14 @@ public class GameImageController {
 
     private java.util.Optional<String> refreshAttachmentUrl(Game game) {
         return gameAttachmentUrlRefreshService.refreshAttachmentUrl(game);
+    }
+
+    private ResponseEntity<String> refreshAttachmentUrlResponse(Game game) {
+        return refreshAttachmentUrl(game).map(ResponseEntity::ok).orElseGet(this::notFound);
+    }
+
+    private ResponseEntity<String> notFound() {
+        return ResponseEntity.notFound().build();
     }
 
     @SetupRequestContext(save = false)
