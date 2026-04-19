@@ -69,6 +69,8 @@ class SecretObjectiveWinChanceStatisticsServiceTest extends BaseTi4Test {
         assertEquals(1, winsBySecretPhaseCombination.get("1|2"));
         assertEquals(1, playersBySecretPhaseCombination.get("0|3"));
         assertEquals(0, winsBySecretPhaseCombination.getOrDefault("0|3", 0));
+        assertEquals(1, playersByExactScoredSecretCountAndMinimumAPCount[1][0]);
+        assertEquals(1, winsByExactScoredSecretCountAndMinimumAPCount[1][0]);
         assertEquals(1, playersByExactScoredSecretCountAndMinimumAPCount[1][1]);
         assertEquals(1, winsByExactScoredSecretCountAndMinimumAPCount[1][1]);
     }
@@ -81,7 +83,7 @@ class SecretObjectiveWinChanceStatisticsServiceTest extends BaseTi4Test {
         String report = SecretObjectiveWinChanceStatisticsService.buildSecretPhaseCombinationWinChanceSection(
                 playersBySecretPhaseCombination, winsBySecretPhaseCombination);
 
-        assertTrue(report.contains("__**Scored + Unscored Secret Phase Combination Win Chance**__"));
+        assertTrue(report.contains("__**Scored + Unscored Secret Combination Win Chance**__"));
         assertTrue(report.contains("`2 actions` `100%` (1/1)"));
         assertTrue(report.contains("`3 statuses` `  0%` (0/1)"));
         assertTrue(report.contains("`1 action and 2 statuses` ` 50%` (1/2)"));
@@ -93,18 +95,26 @@ class SecretObjectiveWinChanceStatisticsServiceTest extends BaseTi4Test {
     void buildConditionedActionPhaseWinChanceSectionFormatsRequestedTotalsAndThresholds() {
         int[][] playersByExactScoredSecretCountAndMinimumAPCount = new int[5][5];
         int[][] winsByExactScoredSecretCountAndMinimumAPCount = new int[5][5];
+        playersByExactScoredSecretCountAndMinimumAPCount[1][0] = 4;
+        winsByExactScoredSecretCountAndMinimumAPCount[1][0] = 1;
         playersByExactScoredSecretCountAndMinimumAPCount[1][1] = 2;
         winsByExactScoredSecretCountAndMinimumAPCount[1][1] = 1;
+        playersByExactScoredSecretCountAndMinimumAPCount[2][0] = 6;
+        winsByExactScoredSecretCountAndMinimumAPCount[2][0] = 1;
         playersByExactScoredSecretCountAndMinimumAPCount[2][1] = 3;
         winsByExactScoredSecretCountAndMinimumAPCount[2][1] = 2;
         playersByExactScoredSecretCountAndMinimumAPCount[2][2] = 1;
         winsByExactScoredSecretCountAndMinimumAPCount[2][2] = 1;
+        playersByExactScoredSecretCountAndMinimumAPCount[3][0] = 8;
+        winsByExactScoredSecretCountAndMinimumAPCount[3][0] = 3;
         playersByExactScoredSecretCountAndMinimumAPCount[3][1] = 4;
         winsByExactScoredSecretCountAndMinimumAPCount[3][1] = 2;
         playersByExactScoredSecretCountAndMinimumAPCount[3][2] = 2;
         winsByExactScoredSecretCountAndMinimumAPCount[3][2] = 1;
         playersByExactScoredSecretCountAndMinimumAPCount[3][3] = 1;
         winsByExactScoredSecretCountAndMinimumAPCount[3][3] = 1;
+        playersByExactScoredSecretCountAndMinimumAPCount[4][0] = 10;
+        winsByExactScoredSecretCountAndMinimumAPCount[4][0] = 6;
         playersByExactScoredSecretCountAndMinimumAPCount[4][1] = 5;
         winsByExactScoredSecretCountAndMinimumAPCount[4][1] = 3;
         playersByExactScoredSecretCountAndMinimumAPCount[4][2] = 4;
@@ -122,11 +132,15 @@ class SecretObjectiveWinChanceStatisticsServiceTest extends BaseTi4Test {
         assertTrue(report.contains("**2 total scored secrets**"));
         assertTrue(report.contains("**3 total scored secrets**"));
         assertTrue(report.contains("**4 total scored secrets**"));
+        assertTrue(report.contains("`0 AP` ` 25%` (1/4)"));
         assertTrue(report.contains("`1 AP` ` 50%` (1/2)"));
+        assertTrue(report.contains("`0 AP` ` 17%` (1/6)"));
         assertTrue(report.contains("`1+ AP` ` 67%` (2/3)"));
         assertTrue(report.contains("`2 AP` `100%` (1/1)"));
+        assertTrue(report.contains("`0 AP` ` 38%` (3/8)"));
         assertTrue(report.contains("`2+ AP` ` 50%` (1/2)"));
         assertTrue(report.contains("`3 AP` `100%` (1/1)"));
+        assertTrue(report.contains("`0 AP` ` 60%` (6/10)"));
         assertTrue(report.contains("`3+ AP` ` 50%` (1/2)"));
         assertTrue(report.contains("`4 AP` `100%` (1/1)"));
     }
