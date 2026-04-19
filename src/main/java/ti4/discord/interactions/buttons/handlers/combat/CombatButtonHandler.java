@@ -6,6 +6,7 @@ import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.tree.MessageComponentTree;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
@@ -81,15 +82,8 @@ class CombatButtonHandler {
     }
 
     static void removeDeclineButtonAndCleanupIfDone(ButtonInteractionEvent event) {
-        List<ActionRow> updatedRows = event.getMessage().getComponentTree().findAll(ActionRow.class).stream()
-                .map(row -> row.getComponents().stream()
-                        .filter(component -> !(component instanceof Button button
-                                && Objects.equals(
-                                        button.getCustomId(), event.getButton().getCustomId())))
-                        .toList())
-                .filter(components -> !components.isEmpty())
-                .map(ActionRow::of)
-                .toList();
+        List<ActionRow> updatedRows = buildUpdatedSpaceCannonDeclineRows(
+                event.getMessage().getComponentTree(), event.getButton().getCustomId());
 
         boolean hasRemainingDeclineButtons = hasRemainingSpaceCannonDeclineButtons(updatedRows);
 
@@ -98,6 +92,18 @@ class CombatButtonHandler {
         } else {
             event.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
         }
+    }
+
+    static List<ActionRow> buildUpdatedSpaceCannonDeclineRows(
+            MessageComponentTree componentTree, String clickedButtonId) {
+        return componentTree.findAll(ActionRow.class).stream()
+                .map(row -> row.getComponents().stream()
+                        .filter(component -> !(component instanceof Button button
+                                && Objects.equals(button.getCustomId(), clickedButtonId)))
+                        .toList())
+                .filter(components -> !components.isEmpty())
+                .map(ActionRow::of)
+                .toList();
     }
 
     static boolean hasRemainingSpaceCannonDeclineButtons(List<ActionRow> actionRows) {
