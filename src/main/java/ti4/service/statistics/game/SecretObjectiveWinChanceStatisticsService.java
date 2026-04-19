@@ -240,8 +240,10 @@ class SecretObjectiveWinChanceStatisticsService {
                     .append(" total scored secret")
                     .append(totalSecretCount == 1 ? "" : "s")
                     .append("**\n");
-            for (int minimumAPCount = 1; minimumAPCount <= totalSecretCount; minimumAPCount++) {
-                String label = minimumAPCount == totalSecretCount ? minimumAPCount + " AP" : minimumAPCount + "+ AP";
+            for (int minimumAPCount = 0; minimumAPCount <= totalSecretCount; minimumAPCount++) {
+                String label = minimumAPCount == 0
+                        ? "0 AP"
+                        : minimumAPCount == totalSecretCount ? minimumAPCount + " AP" : minimumAPCount + "+ AP";
                 appendSecretCountWinChanceLine(
                         sb,
                         label,
@@ -258,7 +260,7 @@ class SecretObjectiveWinChanceStatisticsService {
 
     static String buildSecretPhaseCombinationWinChanceSection(
             Map<String, Integer> playersBySecretPhaseCombination, Map<String, Integer> winsBySecretPhaseCombination) {
-        StringBuilder sb = new StringBuilder("__**Scored + Unscored Secret Phase Combination Win Chance**__\n")
+        StringBuilder sb = new StringBuilder("__**Scored + Unscored Secret Combination Win Chance**__\n")
                 .append("_(What is a player's win chance for each end-of-game action/status secret mix?)_\n\n");
 
         playersBySecretPhaseCombination.entrySet().stream()
@@ -323,7 +325,7 @@ class SecretObjectiveWinChanceStatisticsService {
         if (totalScoredSecretCount > 4) {
             return;
         }
-        for (int minimumAPCount = 1; minimumAPCount <= totalScoredSecretCount; minimumAPCount++) {
+        for (int minimumAPCount = 0; minimumAPCount <= totalScoredSecretCount; minimumAPCount++) {
             if (actionPhaseSecretCount >= minimumAPCount) {
                 countsByExactScoredSecretCountAndMinimumAPCount[totalScoredSecretCount][minimumAPCount]++;
             }
@@ -356,6 +358,16 @@ class SecretObjectiveWinChanceStatisticsService {
             }
         }
         return secretNames;
+    }
+
+    private static int countRealSecretObjectives(Iterable<String> secretIds) {
+        int count = 0;
+        for (String secretId : secretIds) {
+            if (Mapper.getSecretObjective(secretId) != null) {
+                count++;
+            }
+        }
+        return count;
     }
 
     private static SecretWinChanceEntry buildSecretWinChanceEntry(
@@ -412,7 +424,8 @@ class SecretObjectiveWinChanceStatisticsService {
                     countSecretPhases(player.getSecretsScored().keySet());
             int actionPhaseSecretCount = scoredSecretPhaseCounts.actionCount();
             int statusPhaseSecretCount = scoredSecretPhaseCounts.statusCount();
-            int totalScoredSecretCount = player.getSecretsScored().size();
+            int totalScoredSecretCount =
+                    countRealSecretObjectives(player.getSecretsScored().keySet());
             Set<String> scoredSecrets = getSecretNames(player.getSecretsScored().keySet());
 
             int actionBucket = Math.min(4, actionPhaseSecretCount);
