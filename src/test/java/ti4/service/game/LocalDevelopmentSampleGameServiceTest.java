@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import ti4.game.Game;
@@ -18,7 +19,12 @@ import ti4.testUtils.BaseTi4Test;
 
 class LocalDevelopmentSampleGameServiceTest extends BaseTi4Test {
 
-    private final String originalResourcePath = Storage.getResourcePath();
+    private String originalResourcePath;
+
+    @BeforeEach
+    void captureResourcePath() {
+        originalResourcePath = Storage.getResourcePath();
+    }
 
     @AfterEach
     void restoreResourcePath() {

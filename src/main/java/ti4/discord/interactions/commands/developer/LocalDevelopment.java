@@ -82,10 +82,15 @@ class LocalDevelopment extends Subcommand {
                                 .getProxy()
                                 .downloadToFile(downloadedSourceFile.toFile())
                                 .get();
+                    } catch (Exception e) {
+                        MessageHelper.replyToMessage(event, "Failed to download the uploaded source file.");
+                        return;
+                    }
+                    try {
                         result = LocalDevelopmentSampleGameService.createAndRecreateTestGameFromSourceFile(
                                 guild, event.getUser().getId(), downloadedSourceFile);
                     } catch (Exception e) {
-                        MessageHelper.replyToMessage(event, "Failed to download the uploaded source file.");
+                        MessageHelper.replyToMessage(event, "Failed to process the uploaded source file.");
                         return;
                     } finally {
                         if (downloadedSourceFile != null) {

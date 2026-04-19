@@ -208,7 +208,10 @@ public class LocalDevelopmentSampleGameService {
         }
         Path sourceMapsPath = getMapsSourcePath(sourceGameName + Constants.TXT);
         if (sourceMapsPath == null) {
-            BotLogger.warning("LocalDevelopmentSampleGameService: source maps path unavailable for " + sourceGameName);
+            BotLogger.warning(
+                    "LocalDevelopmentSampleGameService: source maps path unavailable for "
+                            + sourceGameName
+                            + " because the resource path or its parent directory is missing.");
             return null;
         }
         try {
