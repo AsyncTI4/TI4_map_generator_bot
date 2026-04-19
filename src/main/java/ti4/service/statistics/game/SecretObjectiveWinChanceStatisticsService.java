@@ -348,9 +348,10 @@ class SecretObjectiveWinChanceStatisticsService {
             if (secretObjective == null) {
                 continue;
             }
-            if ("action".equalsIgnoreCase(secretObjective.getPhase())) {
+            String phase = secretObjective.getPhase();
+            if ("action".equalsIgnoreCase(phase)) {
                 actionPhaseSecretCount++;
-            } else {
+            } else if ("status".equalsIgnoreCase(phase)) {
                 statusPhaseSecretCount++;
             }
         }
