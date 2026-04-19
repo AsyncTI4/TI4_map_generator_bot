@@ -44,8 +44,8 @@ public class GameManager {
 
     public static synchronized void startManagedGamesWarmupIfNeeded() {
         indexManagedGameNamesIfNeeded();
-        if (WARMUP_LATCH.getCount() == 0
-                || !currentInstanceOwnsLeaseForWarmup()
+        if (!currentInstanceOwnsLeaseForWarmup()
+                || WARMUP_LATCH.getCount() == 0
                 || !WARMUP_STARTED.compareAndSet(false, true)) {
             return;
         }
@@ -55,7 +55,7 @@ public class GameManager {
                 validGameNames.forEach(GameManager::getManagedGame);
                 WARMUP_LATCH.countDown();
             } catch (Exception e) {
-                WARMUP_STARTED.set(false);
+                WARMUP_STARTED.compareAndSet(true, false);
                 BotLogger.critical("Failed during managed game warmup.", e);
             } finally {
                 if (JdaService.jda != null) {
