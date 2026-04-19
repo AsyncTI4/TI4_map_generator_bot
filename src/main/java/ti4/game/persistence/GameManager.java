@@ -27,10 +27,17 @@ public class GameManager {
     private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, ManagedPlayer> userIdToManagedPlayer = new ConcurrentHashMap<>();
     private static final CountDownLatch WARMUP_LATCH = new CountDownLatch(1);
-    private static final long WAIT_FOR_WARMUP_TIMEOUT_SECONDS = 10;
+    private static final long WAIT_FOR_WARMUP_TIMEOUT_SECONDS = 30;
 
-    public static void initialize() {
+    public synchronized static void initialize() {
+        if (WARMUP_LATCH.getCount() == 0) return;
+
         validGameNames.addAll(GameLoadService.loadManagedGameNames());
+        if (JdaService.testingMode) {
+            WARMUP_LATCH.countDown();
+            return;
+        }
+
         ExecutorServiceManager.runAsync("GameManager managed game warmup", () -> {
             try {
                 validGameNames.forEach(GameManager::getManagedGame);
@@ -50,7 +57,9 @@ public class GameManager {
         if (game == null) {
             return null;
         }
+
         if (doesNotHaveMatchingManagedGame(game)) {
+            validGameNames.add(game.getName());
             gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
         }
         return game;
@@ -89,12 +98,14 @@ public class GameManager {
         if (!hasLeaseToMakeChanges(game, reason)) {
             return false;
         }
+
         boolean wasActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
                 .map(ManagedGame::isActive)
                 .orElse(false);
         if (!GameSaveService.save(game, reason)) {
             return false;
         }
+
         validGameNames.add(game.getName());
         gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
 
@@ -142,6 +153,7 @@ public class GameManager {
             return null;
         }
         if (doesNotHaveMatchingManagedGame(undo)) {
+            validGameNames.add(undo.getName());
             gameNameToManagedGame.put(undo.getName(), new ManagedGame(undo));
         }
         return undo;
@@ -221,6 +233,7 @@ public class GameManager {
                 throw new IllegalStateException("GameManager is still warming up!");
             }
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
     }

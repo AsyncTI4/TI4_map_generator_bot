@@ -204,6 +204,9 @@ public final class TIGLHelper {
             removeFracturedTag(game);
         }
         game.setCompetitiveTIGLGame(true);
+        if (!game.isCompetitiveTIGLGame()) {
+            return;
+        }
         sendTIGLSetupText(game);
         setTIGLRankSnapshotAtSetup(game, isFractured);
     }
@@ -407,7 +410,7 @@ public final class TIGLHelper {
         return game.getTags().contains(Constants.TIGL_FRACTURED_TAG);
     }
 
-    public static void addFracturedTag(Game game) {
+    private static void addFracturedTag(Game game) {
         if (!isFracturedTIGLGame(game)) {
             game.addTag(Constants.TIGL_FRACTURED_TAG);
         }

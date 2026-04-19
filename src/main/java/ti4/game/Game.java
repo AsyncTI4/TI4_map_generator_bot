@@ -832,22 +832,11 @@ public class Game extends GameProperties {
     private void clearTIGLSetupState() {
         TIGLHelper.removeFracturedTag(this);
         setMinimumTIGLRankAtGameStart(null);
-        for (Player player : getPlayers().values()) {
-            player.setPlayerTIGLRankAtGameStart(null);
-        }
-    }
-
-    @Override
-    public boolean isAllianceMode() {
-        for (Player player : getRealPlayers()) {
-            if (player.getAllianceMembers() != null
-                    && !player.getAllianceMembers()
-                            .replace(player.getFaction(), "")
-                            .isEmpty()) {
-                setAllianceMode(true);
+        for (Player player : players.values()) {
+            if (player != null) {
+                player.setPlayerTIGLRankAtGameStart(null);
             }
         }
-        return super.isAllianceMode();
     }
 
     @Override
