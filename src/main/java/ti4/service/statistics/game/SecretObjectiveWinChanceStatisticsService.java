@@ -340,11 +340,11 @@ class SecretObjectiveWinChanceStatisticsService {
         }
     }
 
-    private static SecretPhaseCounts countSecretPhases(Iterable<String> secretIds) {
+    private static SecretPhaseCounts countSecretPhases(Iterable<String> secretIds, Set<String> convertedSecretIds) {
         int actionPhaseSecretCount = 0;
         int statusPhaseSecretCount = 0;
         for (String secretId : secretIds) {
-            SecretObjectiveModel secretObjective = Mapper.getSecretObjective(secretId);
+            SecretObjectiveModel secretObjective = getTrackableSecretObjective(secretId, convertedSecretIds);
             if (secretObjective == null) {
                 continue;
             }
@@ -357,10 +357,10 @@ class SecretObjectiveWinChanceStatisticsService {
         return new SecretPhaseCounts(actionPhaseSecretCount, statusPhaseSecretCount);
     }
 
-    private static Set<String> getSecretNames(Iterable<String> secretIds) {
+    private static Set<String> getSecretNames(Iterable<String> secretIds, Set<String> convertedSecretIds) {
         Set<String> secretNames = new HashSet<>();
         for (String secretId : secretIds) {
-            SecretObjectiveModel secretObjective = Mapper.getSecretObjective(secretId);
+            SecretObjectiveModel secretObjective = getTrackableSecretObjective(secretId, convertedSecretIds);
             if (secretObjective != null) {
                 secretNames.add(secretObjective.getName());
             }
@@ -368,21 +368,29 @@ class SecretObjectiveWinChanceStatisticsService {
         return secretNames;
     }
 
-    private static int countRealSecretObjectives(Iterable<String> secretIds) {
+    private static int countRealSecretObjectives(Iterable<String> secretIds, Set<String> convertedSecretIds) {
         int count = 0;
         for (String secretId : secretIds) {
-            if (Mapper.getSecretObjective(secretId) != null) {
+            if (getTrackableSecretObjective(secretId, convertedSecretIds) != null) {
                 count++;
             }
         }
         return count;
     }
 
+    private static SecretObjectiveModel getTrackableSecretObjective(String secretId, Set<String> convertedSecretIds) {
+        if (convertedSecretIds.contains(secretId)) {
+            return null;
+        }
+        return Mapper.getSecretObjective(secretId);
+    }
+
     static boolean shouldIgnoreGameForSecretObjectiveStats(Game game) {
+        Set<String> convertedSecretIds = new HashSet<>(game.getSoToPoList());
         for (Player player : game.getRealAndEliminatedPlayers()) {
             int totalRealSecrets = countRealSecretObjectives(
-                            player.getSecretsScored().keySet())
-                    + countRealSecretObjectives(player.getSecretsUnscored().keySet());
+                            player.getSecretsScored().keySet(), convertedSecretIds)
+                    + countRealSecretObjectives(player.getSecretsUnscored().keySet(), convertedSecretIds);
             if (totalRealSecrets > 4) {
                 return true;
             }
@@ -449,16 +457,18 @@ class SecretObjectiveWinChanceStatisticsService {
         Optional<Player> winner = game.getWinner();
         if (winner.isEmpty()) return;
 
+        Set<String> convertedSecretIds = new HashSet<>(game.getSoToPoList());
+
         for (Player player : game.getRealAndEliminatedPlayers()) {
             boolean isWinner = player == winner.get();
 
             SecretPhaseCounts scoredSecretPhaseCounts =
-                    countSecretPhases(player.getSecretsScored().keySet());
+                    countSecretPhases(player.getSecretsScored().keySet(), convertedSecretIds);
             int actionPhaseSecretCount = scoredSecretPhaseCounts.actionCount();
             int statusPhaseSecretCount = scoredSecretPhaseCounts.statusCount();
             int totalScoredSecretCount =
-                    countRealSecretObjectives(player.getSecretsScored().keySet());
-            Set<String> scoredSecrets = getSecretNames(player.getSecretsScored().keySet());
+                    countRealSecretObjectives(player.getSecretsScored().keySet(), convertedSecretIds);
+            Set<String> scoredSecrets = getSecretNames(player.getSecretsScored().keySet(), convertedSecretIds);
 
             int actionBucket = Math.min(4, actionPhaseSecretCount);
             playersByScoredAPSecretCount[actionBucket]++;
@@ -476,8 +486,9 @@ class SecretObjectiveWinChanceStatisticsService {
             }
 
             Map<String, Integer> unscoredSecrets = player.getSecretsUnscored();
-            Set<String> inHandSecrets = getSecretNames(unscoredSecrets.keySet());
-            SecretPhaseCounts unscoredSecretPhaseCounts = countSecretPhases(unscoredSecrets.keySet());
+            Set<String> inHandSecrets = getSecretNames(unscoredSecrets.keySet(), convertedSecretIds);
+            SecretPhaseCounts unscoredSecretPhaseCounts =
+                    countSecretPhases(unscoredSecrets.keySet(), convertedSecretIds);
             actionPhaseSecretCount += unscoredSecretPhaseCounts.actionCount();
             statusPhaseSecretCount += unscoredSecretPhaseCounts.statusCount();
 

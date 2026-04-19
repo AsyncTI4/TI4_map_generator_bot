@@ -195,17 +195,66 @@ class SecretObjectiveWinChanceStatisticsServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void collectSecretObjectiveWinChanceStatsIgnoresSecretsConvertedToPublicObjectives() {
+        Game game = new Game();
+        game.setName("converted-secret");
+        game.setVp(1);
+        game.setHasEnded(true);
+        game.addToSoToPoList("accept_bribes_pbd100");
+
+        Player winner = game.addPlayer("winner", "Winner");
+        winner.setFaction("jolnar");
+        winner.setColor("yellow");
+        winner.setSecretScored("accept_bribes_pbd100");
+        winner.setSecretScored("rule_a_diverse_empire_pbd100");
+
+        int[] playersByScoredAPSecretCount = new int[5];
+        int[] winsByScoredAPSecretCount = new int[5];
+        int[] playersByScoredSecretCount = new int[5];
+        int[] winsByScoredSecretCount = new int[5];
+        int[][] playersByExactScoredSecretCountAndMinimumAPCount = new int[5][5];
+        int[][] winsByExactScoredSecretCountAndMinimumAPCount = new int[5][5];
+
+        SecretObjectiveWinChanceStatisticsService.collectSecretObjectiveWinChanceStats(
+                game,
+                playersByScoredAPSecretCount,
+                winsByScoredAPSecretCount,
+                playersByScoredSecretCount,
+                winsByScoredSecretCount,
+                playersByExactScoredSecretCountAndMinimumAPCount,
+                winsByExactScoredSecretCountAndMinimumAPCount,
+                new HashMap<>(),
+                new HashMap<>(),
+                new HashMap<>(),
+                new HashMap<>(),
+                new HashMap<>(),
+                new HashMap<>(),
+                new HashMap<>(),
+                new HashMap<>());
+
+        assertEquals(0, playersByScoredSecretCount[0]);
+        assertEquals(0, winsByScoredSecretCount[0]);
+        assertEquals(1, playersByScoredSecretCount[1]);
+        assertEquals(1, winsByScoredSecretCount[1]);
+        assertEquals(0, playersByScoredSecretCount[2]);
+        assertEquals(0, winsByScoredSecretCount[2]);
+        assertEquals(1, playersByScoredAPSecretCount[0]);
+        assertEquals(1, winsByScoredAPSecretCount[0]);
+    }
+
+    @Test
     void shouldIgnoreGameForSecretObjectiveStatsOnlyWhenAPlayerHasMoreThanFourRealSecrets() {
         Game validGame = new Game();
         validGame.setName("valid-game");
         Player validPlayer = validGame.addPlayer("valid", "Valid");
         validPlayer.setFaction("obsidian");
         validPlayer.setColor("red");
+        validGame.addToSoToPoList("accept_bribes_pbd100");
         validPlayer.setSecretScored("accept_bribes_pbd100");
-        validPlayer.setSecretScored("fake_plotted_secret");
         validPlayer.setSecret("rule_a_diverse_empire_pbd100");
         validPlayer.setSecret("deep_space_research_pbd100");
         validPlayer.setSecret("monopolize_production_pbd100");
+        validPlayer.setSecret("sponsor_data_archives_pbd100");
 
         Game ignoredGame = new Game();
         ignoredGame.setName("ignored-game");
