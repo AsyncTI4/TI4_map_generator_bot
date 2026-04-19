@@ -39,6 +39,7 @@ class CardsInfoButtonHandler {
         if (player == null) {
             return;
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, KnownActionCardsService.getKnownActionCardsText(game, player));
+        MessageHelper.sendMessageToPlayerCardsInfoThread(
+                player, KnownActionCardsService.getKnownActionCardsText(game, player));
     }
 }

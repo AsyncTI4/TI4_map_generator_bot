@@ -19,9 +19,9 @@ class KnownActionCardsServiceTest extends BaseTi4Test {
         Player target = createPlayer(game, "target", "hacan", "yellow");
         Player other = createPlayer(game, "other", "saar", "black");
 
-        target.setActionCard("direct_hit1", 11);
-        target.setActionCard("skilled_retreat1", 12);
-        target.setActionCard("skilled_retreat2", 13);
+        target.setActionCard("dh1", 11);
+        target.setActionCard("s_retreat1", 12);
+        target.setActionCard("s_retreat2", 13);
 
         LinkedHashMap<String, Player> players = new LinkedHashMap<>();
         players.put(viewer.getUserID(), viewer);
@@ -32,12 +32,11 @@ class KnownActionCardsServiceTest extends BaseTi4Test {
         KnownActionCardsService.rememberViewedHand(viewer, target);
 
         assertThat(viewer.getStoredList("knownActionCards_hacan"))
-                .containsExactlyInAnyOrder("direct_hit1", "skilled_retreat1", "skilled_retreat2");
+                .containsExactlyInAnyOrder("dh1", "s_retreat1", "s_retreat2");
 
         target.removeActionCard(12);
 
-        assertThat(viewer.getStoredList("knownActionCards_hacan"))
-                .containsExactlyInAnyOrder("direct_hit1", "skilled_retreat2");
+        assertThat(viewer.getStoredList("knownActionCards_hacan")).containsExactlyInAnyOrder("dh1", "s_retreat2");
     }
 
     @Test
@@ -54,14 +53,14 @@ class KnownActionCardsServiceTest extends BaseTi4Test {
         players.put(secondTarget.getUserID(), secondTarget);
         game.setPlayers(players);
 
-        viewer.addToStoredList("knownActionCards_hacan", "direct_hit1", "skilled_retreat1");
-        viewer.addToStoredList("knownActionCards_saar", "skilled_retreat2");
+        viewer.addToStoredList("knownActionCards_hacan", "dh1", "s_retreat1");
+        viewer.addToStoredList("knownActionCards_saar", "s_retreat2");
 
         String text = KnownActionCardsService.getKnownActionCardsText(game, viewer);
 
         assertThat(text).contains("Known action cards in other players' hands");
-        assertThat(text).contains("hacan");
-        assertThat(text).contains("saar");
+        assertThat(text).contains("Hacan");
+        assertThat(text).contains("Saar");
         assertThat(text).contains("Direct Hit");
         assertThat(text).contains("Skilled Retreat");
     }
@@ -71,14 +70,17 @@ class KnownActionCardsServiceTest extends BaseTi4Test {
         Game game = new Game();
         Player viewer = createPlayer(game, "viewer", "yssaril", "blue");
 
-        assertThat(KnownActionCardsService.shouldShowKnownActionCardsButton(viewer)).isFalse();
+        assertThat(KnownActionCardsService.shouldShowKnownActionCardsButton(viewer))
+                .isFalse();
 
         viewer.setTechs(List.of("mi"));
-        assertThat(KnownActionCardsService.shouldShowKnownActionCardsButton(viewer)).isTrue();
+        assertThat(KnownActionCardsService.shouldShowKnownActionCardsButton(viewer))
+                .isTrue();
 
         viewer.setTechs(List.of());
-        viewer.addToStoredList("knownActionCards_hacan", "direct_hit1");
-        assertThat(KnownActionCardsService.shouldShowKnownActionCardsButton(viewer)).isTrue();
+        viewer.addToStoredList("knownActionCards_hacan", "dh1");
+        assertThat(KnownActionCardsService.shouldShowKnownActionCardsButton(viewer))
+                .isTrue();
     }
 
     private Player createPlayer(Game game, String userId, String faction, String color) {

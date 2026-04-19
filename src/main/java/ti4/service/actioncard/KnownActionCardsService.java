@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
+import ti4.helpers.StringHelper;
 
 @UtilityClass
 public class KnownActionCardsService {
@@ -44,6 +45,7 @@ public class KnownActionCardsService {
                 && (player.hasTech("mi")
                         || player.getExhaustedTechs().contains("mi")
                         || player.getStoredValueMap().keySet().stream()
+                                .map(StringHelper::unescape)
                                 .anyMatch(key -> key.startsWith(KNOWN_ACTION_CARDS_PREFIX)));
     }
 
@@ -63,7 +65,8 @@ public class KnownActionCardsService {
 
             hasAnyKnownCards = true;
             sb.append("\n### ").append(target.getRepresentationNoPing()).append('\n');
-            sb.append(ActionCardHelper.actionCardListCondensedNoIds(knownCards, null)).append('\n');
+            sb.append(ActionCardHelper.actionCardListCondensedNoIds(knownCards, null))
+                    .append('\n');
         }
 
         if (!hasAnyKnownCards) {
