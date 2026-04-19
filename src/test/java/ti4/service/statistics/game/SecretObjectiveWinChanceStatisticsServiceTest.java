@@ -1,10 +1,12 @@
 package ti4.service.statistics.game;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -190,5 +192,44 @@ class SecretObjectiveWinChanceStatisticsServiceTest extends BaseTi4Test {
         assertEquals(1, winsByExactScoredSecretCountAndMinimumAPCount[1][0]);
         assertEquals(1, playersByExactScoredSecretCountAndMinimumAPCount[1][1]);
         assertEquals(1, winsByExactScoredSecretCountAndMinimumAPCount[1][1]);
+    }
+
+    @Test
+    void shouldIgnoreGameForSecretObjectiveStatsOnlyWhenAPlayerHasMoreThanFourRealSecrets() {
+        Game validGame = new Game();
+        validGame.setName("valid-game");
+        Player validPlayer = validGame.addPlayer("valid", "Valid");
+        validPlayer.setFaction("obsidian");
+        validPlayer.setColor("red");
+        validPlayer.setSecretScored("accept_bribes_pbd100");
+        validPlayer.setSecretScored("fake_plotted_secret");
+        validPlayer.setSecret("rule_a_diverse_empire_pbd100");
+        validPlayer.setSecret("deep_space_research_pbd100");
+        validPlayer.setSecret("monopolize_production_pbd100");
+
+        Game ignoredGame = new Game();
+        ignoredGame.setName("ignored-game");
+        Player ignoredPlayer = ignoredGame.addPlayer("ignored", "Ignored");
+        ignoredPlayer.setFaction("hacan");
+        ignoredPlayer.setColor("blue");
+        ignoredPlayer.setSecretScored("accept_bribes_pbd100");
+        ignoredPlayer.setSecret("rule_a_diverse_empire_pbd100");
+        ignoredPlayer.setSecret("deep_space_research_pbd100");
+        ignoredPlayer.setSecret("gather_a_legion_pbd100");
+        ignoredPlayer.setSecret("sponsor_data_archives_pbd100");
+
+        assertFalse(SecretObjectiveWinChanceStatisticsService.shouldIgnoreGameForSecretObjectiveStats(validGame));
+        assertTrue(SecretObjectiveWinChanceStatisticsService.shouldIgnoreGameForSecretObjectiveStats(ignoredGame));
+    }
+
+    @Test
+    void buildIgnoredGamesSectionListsIgnoredGamesAtEnd() {
+        String report =
+                SecretObjectiveWinChanceStatisticsService.buildIgnoredGamesSection(Set.of("omega-game", "alpha-game"));
+
+        assertTrue(report.startsWith("\n__**Ignored Games**__\n"));
+        assertTrue(report.contains("- alpha-game\n"));
+        assertTrue(report.contains("- omega-game\n"));
+        assertTrue(report.indexOf("- alpha-game\n") < report.indexOf("- omega-game\n"));
     }
 }
