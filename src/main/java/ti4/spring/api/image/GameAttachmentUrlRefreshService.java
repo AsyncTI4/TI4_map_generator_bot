@@ -82,21 +82,23 @@ public class GameAttachmentUrlRefreshService {
                 return existingThread;
             }
 
-            existingThread = findThreadByName(chroniclesChannel.retrieveArchivedPublicThreadChannels().complete());
+            existingThread = findThreadByName(
+                    chroniclesChannel.retrieveArchivedPublicThreadChannels().complete());
             if (existingThread != null) {
                 return reopenThread(existingThread);
             }
 
-            existingThread = findThreadByName(chroniclesChannel.retrieveArchivedPrivateThreadChannels().complete());
+            existingThread = findThreadByName(
+                    chroniclesChannel.retrieveArchivedPrivateThreadChannels().complete());
             if (existingThread != null) {
                 return reopenThread(existingThread);
             }
 
-            return chroniclesChannel.createThreadChannel(REFRESHED_MAP_IMAGES_THREAD_NAME).complete();
+            return chroniclesChannel
+                    .createThreadChannel(REFRESHED_MAP_IMAGES_THREAD_NAME)
+                    .complete();
         } catch (Exception e) {
-            BotLogger.error(
-                    "Failed to get or create refresh thread in " + chroniclesChannel.getJumpUrl(),
-                    e);
+            BotLogger.error("Failed to get or create refresh thread in " + chroniclesChannel.getJumpUrl(), e);
             return null;
         }
     }

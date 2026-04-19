@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -28,11 +29,13 @@ class GameImageServiceTest {
 
         Message message = mock(Message.class);
         Attachment attachment = mock(Attachment.class);
+        net.dv8tion.jda.api.entities.Guild guild = mock(net.dv8tion.jda.api.entities.Guild.class);
+        MessageChannelUnion channel = mock(MessageChannelUnion.class);
         when(message.getIdLong()).thenReturn(11L);
-        when(message.getGuild()).thenReturn(mock(net.dv8tion.jda.api.entities.Guild.class));
-        when(message.getChannel()).thenReturn(mock(net.dv8tion.jda.api.entities.channel.middleman.MessageChannel.class));
-        when(message.getGuild().getIdLong()).thenReturn(22L);
-        when(message.getChannel().getIdLong()).thenReturn(33L);
+        when(message.getGuild()).thenReturn(guild);
+        when(message.getChannel()).thenReturn(channel);
+        when(guild.getIdLong()).thenReturn(22L);
+        when(channel.getIdLong()).thenReturn(33L);
         when(message.getAttachments()).thenReturn(List.of(attachment));
         when(attachment.getUrl()).thenReturn("https://cdn.discordapp.com/example.png");
         when(mapImageDataRepository.findById("pbd11223")).thenReturn(Optional.empty());

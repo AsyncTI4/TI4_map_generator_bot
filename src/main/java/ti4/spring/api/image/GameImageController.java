@@ -97,8 +97,7 @@ public class GameImageController {
             return ResponseEntity.notFound().build();
         }
         if (managedGame.isFowMode()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Refresh is unavailable for Fog of War games");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Refresh is unavailable for Fog of War games");
         }
 
         Game game = managedGame.getGame();
@@ -106,9 +105,8 @@ public class GameImageController {
             return ResponseEntity.notFound().build();
         }
 
-        return refreshAttachmentUrl(game)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return refreshAttachmentUrl(game).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound()
+                .build());
     }
 
     /**
@@ -130,7 +128,8 @@ public class GameImageController {
             return ResponseEntity.notFound().build();
         }
 
-        String attachmentUrl = gameImageService.getLatestAttachmentUrl(game.getName()).orElse(null);
+        String attachmentUrl =
+                gameImageService.getLatestAttachmentUrl(game.getName()).orElse(null);
         if (attachmentUrl != null && !attachmentUrl.isBlank()) {
             return ResponseEntity.ok(attachmentUrl);
         }
@@ -141,9 +140,8 @@ public class GameImageController {
             if (game.isFowMode()) {
                 return ResponseEntity.notFound().build();
             }
-            return refreshAttachmentUrl(game)
-                    .map(ResponseEntity::ok)
-                    .orElseGet(() -> ResponseEntity.notFound().build());
+            return refreshAttachmentUrl(game).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound()
+                    .build());
         }
 
         Long messageId = mapImageData.getLatestDiscordMessageId();
@@ -153,9 +151,8 @@ public class GameImageController {
             if (game.isFowMode()) {
                 return ResponseEntity.notFound().build();
             }
-            return refreshAttachmentUrl(game)
-                    .map(ResponseEntity::ok)
-                    .orElseGet(() -> ResponseEntity.notFound().build());
+            return refreshAttachmentUrl(game).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound()
+                    .build());
         }
 
         ResponseEntity<String> response = fetchDiscordAttachmentUrl(messageId, channelId, game);
@@ -167,9 +164,8 @@ public class GameImageController {
             return response;
         }
 
-        return refreshAttachmentUrl(game)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return refreshAttachmentUrl(game).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound()
+                .build());
     }
 
     /**

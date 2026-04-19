@@ -57,7 +57,11 @@ public class GameImageService {
                 ? null
                 : message.getAttachments().getFirst().getUrl();
         saveDiscordMessage(
-                game, message.getIdLong(), message.getGuild().getIdLong(), message.getChannel().getIdLong(), attachmentUrl);
+                game,
+                message.getIdLong(),
+                message.getGuild().getIdLong(),
+                message.getChannel().getIdLong(),
+                attachmentUrl);
     }
 
     public void saveDiscordMessage(
