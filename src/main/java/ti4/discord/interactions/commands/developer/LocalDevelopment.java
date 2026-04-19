@@ -2,6 +2,9 @@ package ti4.discord.interactions.commands.developer;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Set;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -10,6 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.LocalDevelopmentSampleGameService;
 
@@ -73,7 +77,7 @@ class LocalDevelopment extends Subcommand {
                     }
                     Path downloadedSourceFile = null;
                     try {
-                        downloadedSourceFile = Files.createTempFile("ti4-local-dev-source-", Constants.TXT);
+                        downloadedSourceFile = createRestrictedTempFile();
                         sourceFile
                                 .getProxy()
                                 .downloadToFile(downloadedSourceFile.toFile())
@@ -87,8 +91,11 @@ class LocalDevelopment extends Subcommand {
                         if (downloadedSourceFile != null) {
                             try {
                                 Files.deleteIfExists(downloadedSourceFile);
-                            } catch (Exception ignored) {
-                                // ignore temporary file cleanup errors
+                            } catch (Exception e) {
+                                BotLogger.warning(
+                                        "LocalDevelopment: failed to delete temporary source file "
+                                                + downloadedSourceFile,
+                                        e);
                             }
                         }
                     }
@@ -117,6 +124,16 @@ class LocalDevelopment extends Subcommand {
                 MessageHelper.replyToMessage(event, "Unknown local development action: `" + action + "`.");
                 return;
             }
+        }
+    }
+
+    private static Path createRestrictedTempFile() throws Exception {
+        try {
+            Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rw-------");
+            return Files.createTempFile(
+                    "ti4-local-dev-source-", Constants.TXT, PosixFilePermissions.asFileAttribute(permissions));
+        } catch (UnsupportedOperationException e) {
+            return Files.createTempFile("ti4-local-dev-source-", Constants.TXT);
         }
     }
 }

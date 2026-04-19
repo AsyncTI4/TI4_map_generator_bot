@@ -35,6 +35,9 @@ public class LocalDevelopmentSampleGameService {
     private static final int GAME_NAME_LINE_INDEX = 2;
     private static final int MIN_GAME_FILE_LINES = GAME_NAME_LINE_INDEX + 1;
     private static final int MAX_TEST_GAME_SUFFIX = 99_999;
+    private static final String TEST_SOURCES_ROOT_DIR = "test";
+    private static final String TEST_SOURCES_RESOURCE_DIR = "resources";
+    private static final String TEST_SOURCES_MAPS_DIR = "maps";
 
     public static boolean isLocalDevelopmentStartup() {
         return isLocalDevelopmentStartup(System.getenv(ENV_VAR_LOCAL_DEV_STARTUP));
@@ -261,9 +264,9 @@ public class LocalDevelopmentSampleGameService {
             return null;
         }
         return parentPath
-                .resolveSibling("test")
-                .resolve("resources")
-                .resolve("maps")
+                .resolveSibling(TEST_SOURCES_ROOT_DIR)
+                .resolve(TEST_SOURCES_RESOURCE_DIR)
+                .resolve(TEST_SOURCES_MAPS_DIR)
                 .resolve(fileName)
                 .normalize();
     }
