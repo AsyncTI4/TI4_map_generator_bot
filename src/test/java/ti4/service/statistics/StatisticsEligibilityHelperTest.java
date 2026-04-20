@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.game.persistence.ManagedGame;
 import ti4.spring.service.persistence.GameEntity;
 import ti4.spring.service.persistence.PlayerEntity;
@@ -42,7 +43,9 @@ class StatisticsEligibilityHelperTest extends BaseTi4Test {
         Game game = new Game();
         game.setName(name);
         for (int i = 1; i <= playerCount; i++) {
-            game.addPlayer(name + "-user-" + i, "Player " + i);
+            Player player = game.addPlayer(name + "-user-" + i, "Player " + i);
+            player.setFaction("faction" + i);
+            player.setColor(i % 2 == 0 ? "blue" : "red");
         }
         return game;
     }
@@ -51,6 +54,7 @@ class StatisticsEligibilityHelperTest extends BaseTi4Test {
         GameEntity game = new GameEntity();
         game.setPlayerCount(playerCount);
         PlayerEntity player = new PlayerEntity();
+        player.setId(playerCount);
         player.setGame(game);
         return player;
     }
