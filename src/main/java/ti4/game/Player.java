@@ -675,6 +675,11 @@ public class Player extends PlayerProperties {
      */
     @Nullable
     public ThreadChannel getCardsInfoThread() {
+        return getCardsInfoThread(true);
+    }
+
+    @Nullable
+    private ThreadChannel getCardsInfoThread(boolean createIfMissing) {
         if (isNpc() || isDummy()) {
             return null;
         }
@@ -803,6 +808,10 @@ public class Player extends PlayerProperties {
                     e);
         }
 
+        if (!createIfMissing) {
+            return null;
+        }
+
         // CREATE NEW THREAD
         // Make card info thread a public thread in community mode
         boolean isPrivateChannel = !game.isFowMode();
@@ -820,9 +829,18 @@ public class Player extends PlayerProperties {
     }
 
     public String getCardsInfoThreadJumpLink() {
-        ThreadChannel threadChannel = getCardsInfoThread();
-        if (threadChannel == null) return null;
-        return threadChannel.getJumpUrl();
+        try {
+            ThreadChannel threadChannel = getCardsInfoThread(false);
+            if (threadChannel == null) return null;
+            return threadChannel.getJumpUrl();
+        } catch (RuntimeException e) {
+            BotLogger.warning(
+                    new LogOrigin(this),
+                    "`Player.getCardsInfoThreadJumpLink`: Could not retrieve #cards-info jump link for game: "
+                            + game.getName(),
+                    e);
+            return null;
+        }
     }
 
     /**
