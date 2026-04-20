@@ -90,8 +90,7 @@ public class ManagedGame {
                 .collect(toUnmodifiableSet());
         playerToIsReal = game.getPlayers().values().stream()
                 .collect(Collectors.toUnmodifiableMap(
-                        p -> getPlayer(p.getUserID()),
-                        p -> ((p.isRealPlayer() && !p.isNpc()) || (p.isEliminated() && game.isHasEnded()))));
+                        p -> getPlayer(p.getUserID()), p -> ((p.isRealPlayer() && !p.isNpc()) || p.isEliminated())));
 
         final long sixtyDays = 1000L * 60 * 60 * 24 * 60;
         stale = (System.currentTimeMillis() - game.getLastModifiedDate()) > sixtyDays;
