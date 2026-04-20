@@ -445,9 +445,9 @@ public class CreateGameButtonHandler {
         return game -> {
             List<Player> realAndEliminatedPlayers = game.getRealAndEliminatedPlayers();
             return realAndEliminatedPlayers.size() >= 3
-                && realAndEliminatedPlayers.stream()
-                .map(Player::getUserID)
-                .anyMatch(id -> managedPlayer.getId().equals(id));
+                    && realAndEliminatedPlayers.stream()
+                            .map(Player::getUserID)
+                            .anyMatch(id -> managedPlayer.getId().equals(id));
         };
     }
 
