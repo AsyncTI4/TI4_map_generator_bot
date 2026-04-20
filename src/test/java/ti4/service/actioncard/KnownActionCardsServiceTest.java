@@ -31,12 +31,12 @@ class KnownActionCardsServiceTest extends BaseTi4Test {
 
         KnownActionCardsService.rememberViewedHand(viewer, target);
 
-        assertThat(viewer.getStoredList("knownActionCards_hacan"))
+        assertThat(viewer.getStoredList("knownActionCards_target"))
                 .containsExactlyInAnyOrder("dh1", "s_retreat1", "s_retreat2");
 
         target.removeActionCard(12);
 
-        assertThat(viewer.getStoredList("knownActionCards_hacan")).containsExactlyInAnyOrder("dh1", "s_retreat2");
+        assertThat(viewer.getStoredList("knownActionCards_target")).containsExactlyInAnyOrder("dh1", "s_retreat2");
     }
 
     @Test
@@ -53,8 +53,8 @@ class KnownActionCardsServiceTest extends BaseTi4Test {
         players.put(secondTarget.getUserID(), secondTarget);
         game.setPlayers(players);
 
-        viewer.addToStoredList("knownActionCards_hacan", "dh1", "s_retreat1");
-        viewer.addToStoredList("knownActionCards_saar", "s_retreat2");
+        viewer.addToStoredList("knownActionCards_first", "dh1", "s_retreat1");
+        viewer.addToStoredList("knownActionCards_second", "s_retreat2");
 
         String text = KnownActionCardsService.getKnownActionCardsText(game, viewer);
 
@@ -87,8 +87,8 @@ class KnownActionCardsServiceTest extends BaseTi4Test {
 
         target.removeActionCard(11);
 
-        assertThat(firstViewer.getStoredList("knownActionCards_hacan")).containsExactly("s_retreat1");
-        assertThat(secondViewer.getStoredList("knownActionCards_hacan")).containsExactly("s_retreat1");
+        assertThat(firstViewer.getStoredList("knownActionCards_target")).containsExactly("s_retreat1");
+        assertThat(secondViewer.getStoredList("knownActionCards_target")).containsExactly("s_retreat1");
     }
 
     @Test
@@ -117,7 +117,7 @@ class KnownActionCardsServiceTest extends BaseTi4Test {
 
         KnownActionCardsService.rememberShownActionCard(viewer, target, "dh1");
 
-        assertThat(viewer.getStoredList("knownActionCards_hacan")).containsExactly("dh1");
+        assertThat(viewer.getStoredList("knownActionCards_target")).containsExactly("dh1");
     }
 
     @Test
@@ -135,9 +135,9 @@ class KnownActionCardsServiceTest extends BaseTi4Test {
 
         KnownActionCardsService.rememberShownActionCardToAll(game, source, "dh1");
 
-        assertThat(source.getStoredList("knownActionCards_sol")).isEmpty();
-        assertThat(viewerOne.getStoredList("knownActionCards_sol")).containsExactly("dh1");
-        assertThat(viewerTwo.getStoredList("knownActionCards_sol")).containsExactly("dh1");
+        assertThat(source.getStoredList("knownActionCards_source")).isEmpty();
+        assertThat(viewerOne.getStoredList("knownActionCards_source")).containsExactly("dh1");
+        assertThat(viewerTwo.getStoredList("knownActionCards_source")).containsExactly("dh1");
     }
 
     private Player createPlayer(Game game, String userId, String faction, String color) {

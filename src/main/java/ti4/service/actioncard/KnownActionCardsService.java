@@ -1,7 +1,9 @@
 package ti4.service.actioncard;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -18,11 +20,10 @@ public class KnownActionCardsService {
             return;
         }
 
-        String storageKey = getStorageKey(target);
-        viewer.removeStoredValue(storageKey);
+        removeTrackedKnowledge(viewer, target);
         List<String> knownCards = new ArrayList<>(target.getActionCards().keySet());
         if (!knownCards.isEmpty()) {
-            viewer.addToStoredList(storageKey, knownCards.toArray(String[]::new));
+            viewer.addToStoredList(getStorageKey(target), knownCards.toArray(String[]::new));
         }
     }
 
@@ -54,10 +55,14 @@ public class KnownActionCardsService {
 
         String storageKey = getStorageKey(target);
         for (Player player : game.getPlayers().values()) {
-            if (player == target || !player.hasStoredValue(storageKey)) {
+            if (player == target) {
                 continue;
             }
-            player.removeFromStoredList(storageKey, actionCardId);
+            for (String key : getStorageKeys(target)) {
+                if (player.hasStoredValue(key)) {
+                    player.removeFromStoredList(key, actionCardId);
+                }
+            }
         }
     }
 
@@ -79,7 +84,7 @@ public class KnownActionCardsService {
                 continue;
             }
 
-            List<String> knownCards = viewer.getStoredList(getStorageKey(target));
+            List<String> knownCards = getKnownCards(viewer, target);
             if (knownCards.isEmpty()) {
                 continue;
             }
@@ -98,6 +103,13 @@ public class KnownActionCardsService {
     }
 
     private static String getStorageKey(Player target) {
+        return KNOWN_ACTION_CARDS_PREFIX + target.getUserID();
+    }
+
+    private static List<String> getStorageKeys(Player target) {
+        Set<String> keys = new LinkedHashSet<>();
+        keys.add(getStorageKey(target));
+
         String targetId = target.getFaction();
         if (isUnset(targetId)) {
             targetId = target.getColor();
@@ -111,7 +123,22 @@ public class KnownActionCardsService {
         if (isUnset(targetId)) {
             targetId = "unknownPlayer";
         }
-        return KNOWN_ACTION_CARDS_PREFIX + targetId;
+        keys.add(KNOWN_ACTION_CARDS_PREFIX + targetId);
+        return new ArrayList<>(keys);
+    }
+
+    private static List<String> getKnownCards(Player viewer, Player target) {
+        Set<String> knownCards = new LinkedHashSet<>();
+        for (String key : getStorageKeys(target)) {
+            knownCards.addAll(viewer.getStoredList(key));
+        }
+        return new ArrayList<>(knownCards);
+    }
+
+    private static void removeTrackedKnowledge(Player viewer, Player target) {
+        for (String key : getStorageKeys(target)) {
+            viewer.removeStoredValue(key);
+        }
     }
 
     private static boolean isUnset(String value) {
