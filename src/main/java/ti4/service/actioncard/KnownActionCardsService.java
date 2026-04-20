@@ -26,6 +26,27 @@ public class KnownActionCardsService {
         }
     }
 
+    public static void rememberShownActionCard(Player viewer, Player target, String actionCardId) {
+        if (viewer == null || target == null || viewer == target || isUnset(actionCardId)) {
+            return;
+        }
+
+        String storageKey = getStorageKey(target);
+        if (!viewer.getStoredList(storageKey).contains(actionCardId)) {
+            viewer.addToStoredList(storageKey, actionCardId);
+        }
+    }
+
+    public static void rememberShownActionCardToAll(Game game, Player target, String actionCardId) {
+        if (game == null || target == null || isUnset(actionCardId)) {
+            return;
+        }
+
+        for (Player player : game.getRealPlayers()) {
+            rememberShownActionCard(player, target, actionCardId);
+        }
+    }
+
     public static void forgetCardFromKnownHands(Game game, Player target, String actionCardId) {
         if (game == null || target == null || actionCardId == null || actionCardId.isBlank()) {
             return;

@@ -109,6 +109,37 @@ class KnownActionCardsServiceTest extends BaseTi4Test {
                 .isTrue();
     }
 
+    @Test
+    void rememberShownActionCardTracksSingleReveal() {
+        Game game = new Game();
+        Player viewer = createPlayer(game, "viewer", "sol", "blue");
+        Player target = createPlayer(game, "target", "hacan", "yellow");
+
+        KnownActionCardsService.rememberShownActionCard(viewer, target, "dh1");
+
+        assertThat(viewer.getStoredList("knownActionCards_hacan")).containsExactly("dh1");
+    }
+
+    @Test
+    void rememberShownActionCardToAllTracksPublicRevealForEveryoneElse() {
+        Game game = new Game();
+        Player source = createPlayer(game, "source", "sol", "blue");
+        Player viewerOne = createPlayer(game, "viewer1", "hacan", "yellow");
+        Player viewerTwo = createPlayer(game, "viewer2", "saar", "black");
+
+        LinkedHashMap<String, Player> players = new LinkedHashMap<>();
+        players.put(source.getUserID(), source);
+        players.put(viewerOne.getUserID(), viewerOne);
+        players.put(viewerTwo.getUserID(), viewerTwo);
+        game.setPlayers(players);
+
+        KnownActionCardsService.rememberShownActionCardToAll(game, source, "dh1");
+
+        assertThat(source.getStoredList("knownActionCards_sol")).isEmpty();
+        assertThat(viewerOne.getStoredList("knownActionCards_sol")).containsExactly("dh1");
+        assertThat(viewerTwo.getStoredList("knownActionCards_sol")).containsExactly("dh1");
+    }
+
     private Player createPlayer(Game game, String userId, String faction, String color) {
         Player player = new Player(userId, userId, game);
         player.setFaction(faction);
