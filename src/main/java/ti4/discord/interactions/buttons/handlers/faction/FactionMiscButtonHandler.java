@@ -17,7 +17,6 @@ import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.message.MessageHelper;
-import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
@@ -75,8 +74,7 @@ class FactionMiscButtonHandler {
         for (Tile tile1 : game.getTileMap().values()) {
             if (Helper.getProductionValue(player, game, tile1, false) > 0) {
                 String pos1 = tile1.getPosition();
-                flagButtons.add(Buttons.blue(
-                        player.finChecker() + "anarchy7Build_" + pos1, "Build in " + pos1, FactionEmojis.Muaat));
+                flagButtons.add(Buttons.blue(player.finChecker() + "anarchy7Build_" + pos1, "Build in " + pos1));
             }
         }
         String flagMessage = player.getRepresentationUnfogged()

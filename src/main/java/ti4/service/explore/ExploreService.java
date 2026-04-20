@@ -701,7 +701,7 @@ public class ExploreService {
                                     && !game.didPlayerScoreThisAlready(player.getUserID(), "deep_space")) {
                                 DisasterWatchHelper.sendMessageInDisasterWatch(
                                         game,
-                                        player.getRepresentation() + " is attempting to _Expore Deep Space_ in "
+                                        player.getRepresentation() + " is attempting to _Explore Deep Space_ in "
                                                 + game.getName() + ". Alas, alack, they have discovered Mirage!");
                             } else if (game.getRevealedPublicObjectives().containsKey("vast_territories")
                                     && !game.didPlayerScoreThisAlready(player.getUserID(), "vast_territories")) {
