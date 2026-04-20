@@ -132,7 +132,7 @@ public class GameImageController {
             return refreshAttachmentUrlResponse(gameName);
         }
 
-        ResponseEntity<String> response = fetchDiscordAttachmentUrl(gameName, messageId, channelId, !fowMode);
+        ResponseEntity<String> response = fetchDiscordAttachmentUrl(gameName, messageId, channelId, false);
         if (response.getStatusCode() != HttpStatus.NOT_FOUND) {
             return response;
         }
