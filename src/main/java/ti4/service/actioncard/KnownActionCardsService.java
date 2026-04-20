@@ -101,7 +101,14 @@ public class KnownActionCardsService {
     }
 
     private static String getStorageKey(Player target) {
-        return KNOWN_ACTION_CARDS_PREFIX + target.getUserID();
+        String targetId = target.getUserID();
+        if (isUnset(targetId)) {
+            targetId = target.getUserName();
+        }
+        if (isUnset(targetId)) {
+            targetId = "unknownPlayer";
+        }
+        return KNOWN_ACTION_CARDS_PREFIX + targetId;
     }
 
     private static List<String> getStorageKeys(Player target) {
