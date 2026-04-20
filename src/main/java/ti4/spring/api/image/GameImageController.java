@@ -82,7 +82,7 @@ public class GameImageController {
                 .body(
                         "To see this Fog of War map, please make sure you are logged in and are participating in this game");
     }
-    
+
     /**
      * Get the user ID if authenticated, null otherwise.
      */
