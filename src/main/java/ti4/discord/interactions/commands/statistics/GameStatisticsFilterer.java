@@ -299,8 +299,7 @@ public class GameStatisticsFilterer {
 
     private static boolean filterOnMinPlayerCount(Integer minPlayerCount, Game game) {
         int realAndEliminatedPlayersCount = game.getRealAndEliminatedPlayers().size();
-        return realAndEliminatedPlayersCount <= 2
-                || minPlayerCount == null
-                || minPlayerCount <= realAndEliminatedPlayersCount;
+        return realAndEliminatedPlayersCount > 2
+                && (minPlayerCount == null || minPlayerCount <= realAndEliminatedPlayersCount);
     }
 }
