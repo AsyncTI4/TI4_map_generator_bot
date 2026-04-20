@@ -44,14 +44,16 @@ class RunAgainstAllGames extends Subcommand {
 
         long creationDateTime = game.getCreationDateTime();
         long endedDate = game.getEndedDate();
-        long daysToEnd = Duration.ofMillis(endedDate - creationDateTime).toDays();
 
-        if (daysToEnd < 0) {
+        if (endedDate < creationDateTime) {
+            long daysToEnd = Duration.ofMillis(endedDate - creationDateTime).toDays();
+            long newEndedDate = Math.min(creationDateTime + THIRTY_DAYS_MILLIS, System.currentTimeMillis());
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
-                    game.getName() + " ended before it started (" + daysToEnd
-                            + " days). Updating end date to 30 days after start.");
-            game.setEndedDate(creationDateTime + THIRTY_DAYS_MILLIS);
+                    game.getName() + " ended before it started (" + daysToEnd + " days). creationDateTime="
+                            + creationDateTime + ", endedDate=" + endedDate
+                            + ". Updating end date to " + newEndedDate + ".");
+            game.setEndedDate(newEndedDate);
             return true;
         }
 
