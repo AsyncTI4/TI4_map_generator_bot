@@ -31,10 +31,10 @@ class CreateGameButtonHandlerTest {
                 mockManagedGame(List.of(userId, "user-2", "user-3"), false, false, true));
 
         // ongoing only: the one non-FoW, non-ended, 3-player game
-        assertThat(CreateGameButtonHandler.countGamesThatAffectJoinLimit(userId, false, games))
+        assertThat(CreateGameButtonHandler.countOngoingGamesThatAffectJoinLimit(userId, false, games))
                 .isEqualTo(1);
         // ongoing + completed: the ongoing one + the ended-with-winner one
-        assertThat(CreateGameButtonHandler.countGamesThatAffectJoinLimit(userId, true, games))
+        assertThat(CreateGameButtonHandler.countOngoingGamesThatAffectJoinLimit(userId, true, games))
                 .isEqualTo(2);
     }
 
@@ -48,7 +48,7 @@ class CreateGameButtonHandlerTest {
                 List.of(userId, "user-2", "user-3", "user-4", "user-5", "user-6"), false, false, false));
 
         // The game has >= 3 real+eliminated players and userId is among them — should count
-        assertThat(CreateGameButtonHandler.countGamesThatAffectJoinLimit(userId, false, games))
+        assertThat(CreateGameButtonHandler.countOngoingGamesThatAffectJoinLimit(userId, false, games))
                 .isEqualTo(1);
     }
 
@@ -58,7 +58,7 @@ class CreateGameButtonHandlerTest {
 
         List<ManagedGame> games = List.of(mockManagedGame(List.of("user-2", "user-3", "user-4"), false, false, false));
 
-        assertThat(CreateGameButtonHandler.countGamesThatAffectJoinLimit(userId, false, games))
+        assertThat(CreateGameButtonHandler.countOngoingGamesThatAffectJoinLimit(userId, false, games))
                 .isEqualTo(0);
     }
 
