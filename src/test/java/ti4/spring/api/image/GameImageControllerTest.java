@@ -8,10 +8,8 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
-import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
-import ti4.spring.context.RequestContext;
 
 class GameImageControllerTest {
 
@@ -21,18 +19,15 @@ class GameImageControllerTest {
         GameAttachmentUrlRefreshService refreshService = mock(GameAttachmentUrlRefreshService.class);
         GameImageController controller = new GameImageController(gameImageService, refreshService);
         ManagedGame managedGame = mock(ManagedGame.class);
-        Game game = new Game();
-        game.setName("pbd11223");
 
         when(managedGame.isFowMode()).thenReturn(false);
+        when(managedGame.getName()).thenReturn("pbd11223");
         when(gameImageService.getLatestMapImageData("pbd11223")).thenReturn(Optional.empty());
         when(refreshService.refreshAttachmentUrl("pbd11223"))
                 .thenReturn(Optional.of("https://cdn.discordapp.com/new.png"));
 
-        try (MockedStatic<GameManager> gameManager = mockStatic(GameManager.class);
-                MockedStatic<RequestContext> requestContext = mockStatic(RequestContext.class)) {
+        try (MockedStatic<GameManager> gameManager = mockStatic(GameManager.class)) {
             gameManager.when(() -> GameManager.getManagedGame("pbd11223")).thenReturn(managedGame);
-            requestContext.when(RequestContext::getGame).thenReturn(game);
 
             var response = controller.getAttachmentUrl("pbd11223");
 
@@ -47,22 +42,19 @@ class GameImageControllerTest {
         GameAttachmentUrlRefreshService refreshService = mock(GameAttachmentUrlRefreshService.class);
         GameImageController controller = new GameImageController(gameImageService, refreshService);
         ManagedGame managedGame = mock(ManagedGame.class);
-        Game game = new Game();
-        game.setName("pbd11223");
         MapImageData mapImageData = new MapImageData();
         mapImageData.setGameName("pbd11223");
         mapImageData.setLatestMapImageName("map.png");
         mapImageData.setLatestDiscordGuildId(1L);
 
         when(managedGame.isFowMode()).thenReturn(false);
+        when(managedGame.getName()).thenReturn("pbd11223");
         when(gameImageService.getLatestMapImageData("pbd11223")).thenReturn(Optional.of(mapImageData));
         when(refreshService.refreshAttachmentUrl("pbd11223"))
                 .thenReturn(Optional.of("https://cdn.discordapp.com/new.png"));
 
-        try (MockedStatic<GameManager> gameManager = mockStatic(GameManager.class);
-                MockedStatic<RequestContext> requestContext = mockStatic(RequestContext.class)) {
+        try (MockedStatic<GameManager> gameManager = mockStatic(GameManager.class)) {
             gameManager.when(() -> GameManager.getManagedGame("pbd11223")).thenReturn(managedGame);
-            requestContext.when(RequestContext::getGame).thenReturn(game);
 
             var response = controller.getAttachmentUrl("pbd11223");
 
