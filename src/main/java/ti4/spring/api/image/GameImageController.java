@@ -82,21 +82,7 @@ public class GameImageController {
                 .body(
                         "To see this Fog of War map, please make sure you are logged in and are participating in this game");
     }
-
-    @SetupRequestContext(save = false)
-    @PostMapping("/attachment-url/refresh")
-    public ResponseEntity<String> refreshAttachmentUrl(@PathVariable String gameName) {
-        ManagedGame managedGame = GameManager.getManagedGame(gameName);
-        if (managedGame == null) {
-            return ResponseEntity.notFound().build();
-        }
-        if (managedGame.isFowMode()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Refresh is unavailable for Fog of War games");
-        }
-
-        return refreshAttachmentUrlResponse(gameName);
-    }
-
+    
     /**
      * Get the user ID if authenticated, null otherwise.
      */
