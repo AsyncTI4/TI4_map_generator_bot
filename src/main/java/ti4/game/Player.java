@@ -42,6 +42,7 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.exceptions.MissingAccessException;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -675,6 +676,11 @@ public class Player extends PlayerProperties {
      */
     @Nullable
     public ThreadChannel getCardsInfoThread() {
+        return getCardsInfoThread(true);
+    }
+
+    @Nullable
+    private ThreadChannel getCardsInfoThread(boolean createIfMissing) {
         if (isNpc() || isDummy()) {
             return null;
         }
@@ -747,11 +753,11 @@ public class Player extends PlayerProperties {
                 }
             }
         } catch (Exception e) {
-            BotLogger.error(
-                    new LogOrigin(this),
+            logCardsInfoThreadLookupFailure(
                     "`Player.getCardsInfoThread`: Could not find existing #cards-info thread using ID: "
                             + getCardsInfoThreadID() + " for potential thread name: " + threadName,
-                    e);
+                    e,
+                    createIfMissing);
         }
 
         // ATTEMPT TO FIND BY NAME
@@ -797,10 +803,14 @@ public class Player extends PlayerProperties {
                 }
             }
         } catch (Exception e) {
-            BotLogger.error(
-                    new LogOrigin(this),
+            logCardsInfoThreadLookupFailure(
                     "`Player.getCardsInfoThread`: Could not find existing #cards-info thread using name: " + threadName,
-                    e);
+                    e,
+                    createIfMissing);
+        }
+
+        if (!createIfMissing) {
+            return null;
         }
 
         // CREATE NEW THREAD
@@ -820,9 +830,29 @@ public class Player extends PlayerProperties {
     }
 
     public String getCardsInfoThreadJumpLink() {
-        ThreadChannel threadChannel = getCardsInfoThread();
-        if (threadChannel == null) return null;
-        return threadChannel.getJumpUrl();
+        try {
+            ThreadChannel threadChannel = getCardsInfoThread(false);
+            if (threadChannel == null) return null;
+            return threadChannel.getJumpUrl();
+        } catch (RuntimeException e) {
+            BotLogger.warning(
+                    new LogOrigin(this),
+                    "`Player.getCardsInfoThreadJumpLink`: Could not retrieve #cards-info jump link for game: "
+                            + game.getName(),
+                    e);
+            return null;
+        }
+    }
+
+    private void logCardsInfoThreadLookupFailure(String message, Exception error, boolean createIfMissing) {
+        if (!createIfMissing && error instanceof MissingAccessException) {
+            return;
+        }
+        if (createIfMissing) {
+            BotLogger.error(new LogOrigin(this), message, error);
+            return;
+        }
+        BotLogger.warning(new LogOrigin(this), message, error);
     }
 
     /**
