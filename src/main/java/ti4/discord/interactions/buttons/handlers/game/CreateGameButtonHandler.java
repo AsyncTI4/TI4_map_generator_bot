@@ -214,9 +214,8 @@ public class CreateGameButtonHandler {
                     .append(member.getUser().getAsMention());
 
             ManagedPlayer managedPlayer = GameManager.getManagedPlayer(member.getId());
-
-            int ongoingAmount = countOngoingGamesThatAffectJoinLimit(managedPlayer.getGames());
-            int completedGames = countCompletedGamesThatAffectJoinLimit(managedPlayer.getGames());
+            int ongoingAmount = countOngoingGamesThatAffectJoinLimit(managedPlayer);
+            int completedGames = countCompletedGamesThatAffectJoinLimit(managedPlayer);
             if (ongoingAmount > completedGames + 2) {
                 memberList
                         .append("⚠️ (Above or equal game limit: ")
@@ -420,14 +419,18 @@ public class CreateGameButtonHandler {
         return true;
     }
 
-    private static int countOngoingGamesThatAffectJoinLimit(Set<ManagedGame> managedGames) {
+    private static int countOngoingGamesThatAffectJoinLimit(ManagedPlayer managedPlayer) {
+        if (managedPlayer == null) return 0;
+        Set<ManagedGame> managedGames = managedPlayer.getGames();
         return (int) managedGames.stream()
                 .filter(game -> game.getRealPlayers().size() >= 3)
                 .filter(game -> !game.isHasEnded())
                 .count();
     }
 
-    private static int countCompletedGamesThatAffectJoinLimit(Set<ManagedGame> managedGames) {
+    private static int countCompletedGamesThatAffectJoinLimit(ManagedPlayer managedPlayer) {
+        if (managedPlayer == null) return 0;
+        Set<ManagedGame> managedGames = managedPlayer.getGames();
         return (int) managedGames.stream()
                 .filter(game -> game.getRealPlayers().size() >= 3)
                 .filter(ManagedGame::isHasWinner)
