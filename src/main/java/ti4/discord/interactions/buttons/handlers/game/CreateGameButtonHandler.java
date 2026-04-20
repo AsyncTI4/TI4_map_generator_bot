@@ -393,8 +393,8 @@ public class CreateGameButtonHandler {
                 && !CommandHelper.hasRole(event, JdaService.developerRoles)
                 && !CommandHelper.hasRole(event, JdaService.bothelperRoles)) {
             ManagedPlayer managedPlayer = GameManager.getManagedPlayer(member.getId());
-            int ongoingAmount = countOngoingGamesThatAffectJoinLimit(managedPlayer.getGames());
-            int completedGames = countCompletedGamesThatAffectJoinLimit(managedPlayer.getGames());
+            int ongoingAmount = countOngoingGamesThatAffectJoinLimit(managedPlayer);
+            int completedGames = countCompletedGamesThatAffectJoinLimit(managedPlayer);
             if (ongoingAmount > completedGames + 2) {
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(),
@@ -425,6 +425,7 @@ public class CreateGameButtonHandler {
         return (int) managedGames.stream()
                 .filter(game -> game.getRealPlayers().size() >= 3)
                 .filter(game -> !game.isHasEnded())
+                .filter(game -> game.isRealPlayer(managedPlayer))
                 .count();
     }
 
@@ -434,6 +435,7 @@ public class CreateGameButtonHandler {
         return (int) managedGames.stream()
                 .filter(game -> game.getRealPlayers().size() >= 3)
                 .filter(ManagedGame::isHasWinner)
+                .filter(game -> game.isRealPlayer(managedPlayer))
                 .count();
     }
 
