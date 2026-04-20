@@ -3191,6 +3191,7 @@ public final class AgendaHelper {
                 int totalVotes = 0;
                 StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
                 String outcomeSummary;
+                String rawOutcome = outcome;
                 outcome = getAgendaOutcomeName(game, outcome, capitalize);
                 StringBuilder outcomeSummaryBuilder = new StringBuilder();
                 while (vote_info.hasMoreTokens()) {
@@ -3279,12 +3280,13 @@ public final class AgendaHelper {
 
                     } else if (!game.isHomebrewSCMode()
                             && game.getCurrentAgendaInfo().contains("Elect Strategy Card")
-                            && NumberUtils.isDigits(outcome)) {
+                            && NumberUtils.isDigits(rawOutcome)) {
+                        int scNumber = Integer.parseInt(rawOutcome);
                         summaryBuilder
                                 .append("- ")
-                                .append(CardEmojis.getSCFrontFromInteger(Integer.parseInt(outcome)))
+                                .append(CardEmojis.getSCFrontFromInteger(scNumber))
                                 .append(" **")
-                                .append(Helper.getSCName(Integer.parseInt(outcome), game))
+                                .append(Helper.getSCName(scNumber, game))
                                 .append("**: ")
                                 .append(totalVotes);
                         if (!redactFactionInfo) {

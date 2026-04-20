@@ -60,6 +60,30 @@ class AgendaHelperTest extends BaseTi4Test {
     }
 
     @Test
+    void getSummaryOfVotesFormatsStrategyCardOutcomeWithEmoji() {
+        Game game = new Game();
+        Player player = playerWithFaction(game, "arborec");
+        game.setPlayers(Map.of(player.getUserID(), player));
+        game.setCurrentAgendaInfo("agenda_Elect Strategy Card");
+        game.setCurrentAgendaVote("4", "arborec_10");
+
+        String summary = AgendaHelper.getSummaryOfVotes(game, true);
+        assertThat(summary).contains("**Construction**");
+    }
+
+    @Test
+    void getSummaryOfVotesDoesNotThrowForNonNumericStrategyCardOutcome() {
+        Game game = new Game();
+        Player player = playerWithFaction(game, "arborec");
+        game.setPlayers(Map.of(player.getUserID(), player));
+        game.setCurrentAgendaInfo("agenda_Elect Strategy Card");
+        game.setCurrentAgendaVote("Construction", "arborec_10");
+
+        String summary = AgendaHelper.getSummaryOfVotes(game, true);
+        assertThat(summary).contains("Construction: 10");
+    }
+
+    @Test
     void getVoteCountMessageShowsTotalVotesNormally() {
         Game game = voteCountGame();
 
