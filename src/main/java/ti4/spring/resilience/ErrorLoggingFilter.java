@@ -25,6 +25,7 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
     private static final int START_OF_HTTP_ERROR_RANGE = 400;
     private static final int START_OF_HTTP_SERVER_ERROR_RANGE = 500;
     private static final String HTTP_ERROR_THREAD_NAME = "http-errors";
+    private static final String READY_PATH = "/api/public/ready";
 
     @Override
     protected void doFilterInternal(
@@ -55,16 +56,19 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
                 throw e;
             }
 
-            if (shouldReportResponseStatus(cachingResponse.getStatus())) {
+            String requestUri = request.getRequestURI();
+            int status = cachingResponse.getStatus();
+            if (shouldReportResponseStatus(requestUri, status)) {
                 String body =
                         new String(cachingResponse.getContentAsByteArray(), cachingResponse.getCharacterEncoding());
-                String error = String.format(
-                        "Request to %s returned status %s with body: %s",
-                        request.getRequestURI(), cachingResponse.getStatus(), body);
-                BotLogger.errorToThread(error, HTTP_ERROR_THREAD_NAME);
-                SREStats.incrementWebserverRequestErrorCount();
-                if (cachingResponse.getStatus() >= START_OF_HTTP_SERVER_ERROR_RANGE) {
-                    RollbarManager.report(com.rollbar.api.payload.data.Level.ERROR, null, error, null);
+                if (!shouldSkipReadyProbeHandoffReport(requestUri, status, body)) {
+                    String error =
+                            String.format("Request to %s returned status %s with body: %s", requestUri, status, body);
+                    BotLogger.errorToThread(error, HTTP_ERROR_THREAD_NAME);
+                    SREStats.incrementWebserverRequestErrorCount();
+                    if (status >= START_OF_HTTP_SERVER_ERROR_RANGE) {
+                        RollbarManager.report(com.rollbar.api.payload.data.Level.ERROR, null, error, null);
+                    }
                 }
             }
 
@@ -74,11 +78,25 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
         }
     }
 
-    private static boolean shouldReportResponseStatus(int statusCode) {
+    private static boolean shouldReportResponseStatus(String requestUri, int statusCode) {
+        if (READY_PATH.equals(requestUri) && statusCode == HttpStatus.SERVICE_UNAVAILABLE.value()) {
+            return true;
+        }
         return statusCode >= START_OF_HTTP_SERVER_ERROR_RANGE
                 || (statusCode >= START_OF_HTTP_ERROR_RANGE
                         && statusCode != HttpStatus.UNAUTHORIZED.value()
                         && statusCode != HttpStatus.FORBIDDEN.value());
+    }
+
+    static boolean shouldSkipReadyProbeHandoffReport(String requestUri, int statusCode, String body) {
+        if (!READY_PATH.equals(requestUri) || statusCode != HttpStatus.SERVICE_UNAVAILABLE.value()) {
+            return false;
+        }
+
+        return body.contains("\"ready\":false")
+                && body.contains("\"leaseOwned\":")
+                && ((body.contains("\"active\":false") && body.contains("\"draining\":false"))
+                        || (body.contains("\"active\":true") && body.contains("\"draining\":true")));
     }
 
     private static boolean isAuthenticationNoise(Exception exception) {
