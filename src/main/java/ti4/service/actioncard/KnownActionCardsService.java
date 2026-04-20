@@ -59,9 +59,7 @@ public class KnownActionCardsService {
                 continue;
             }
             for (String key : storageKeys) {
-                if (player.hasStoredValue(key)) {
-                    player.removeFromStoredList(key, actionCardId);
-                }
+                player.removeFromStoredList(key, actionCardId);
             }
         }
     }
@@ -110,6 +108,8 @@ public class KnownActionCardsService {
         Set<String> keys = new LinkedHashSet<>();
         keys.add(getStorageKey(target));
 
+        // Keep reading/removing the older non-userID keys so tracked knowledge survives migration
+        // from the earlier faction/color-based storage format.
         String targetId = target.getFaction();
         if (isUnset(targetId)) {
             targetId = target.getColor();
