@@ -13,6 +13,7 @@ import ti4.message.MessageHelper;
 
 class RunAgainstAllGames extends Subcommand {
 
+    private static final long ONE_DAY_MILLIS = Duration.ofDays(1).toMillis();
     private static final long THIRTY_DAYS_MILLIS = Duration.ofDays(30).toMillis();
 
     RunAgainstAllGames() {
@@ -42,21 +43,34 @@ class RunAgainstAllGames extends Subcommand {
             return false;
         }
 
+        long now = System.currentTimeMillis();
         long creationDateTime = game.getCreationDateTime();
         long endedDate = game.getEndedDate();
+        boolean changed = false;
+
+        if (creationDateTime > now) {
+            long newCreationDateTime = now - ONE_DAY_MILLIS;
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    game.getName() + " has creationDateTime in the future. creationDateTime=" + creationDateTime
+                            + ". Setting to " + newCreationDateTime + ".");
+            game.setCreationDateTime(newCreationDateTime);
+            creationDateTime = newCreationDateTime;
+            changed = true;
+        }
 
         if (endedDate < creationDateTime) {
             long daysToEnd = Duration.ofMillis(endedDate - creationDateTime).toDays();
-            long newEndedDate = Math.min(creationDateTime + THIRTY_DAYS_MILLIS, System.currentTimeMillis());
+            long newEndedDate = Math.min(creationDateTime + THIRTY_DAYS_MILLIS, now);
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     game.getName() + " ended before it started (" + daysToEnd + " days). creationDateTime="
                             + creationDateTime + ", endedDate=" + endedDate
                             + ". Updating end date to " + newEndedDate + ".");
             game.setEndedDate(newEndedDate);
-            return true;
+            changed = true;
         }
 
-        return false;
+        return changed;
     }
 }
