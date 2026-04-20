@@ -46,7 +46,7 @@ public class CombatContestService {
 
     private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives";
     private static final Duration CONTEST_COOLDOWN = Duration.ofMinutes(10);
-    private static final double MIN_FLEET_RESOURCES = 6.0;
+    private static final double MIN_FLEET_RESOURCES = 8.0;
     private static final double MIN_HP_RATIO = 0.7;
     private static final double ZERO_EPSILON = 0.0001;
     private static final boolean PREDICTION_LOCK_ENABLED = false;
