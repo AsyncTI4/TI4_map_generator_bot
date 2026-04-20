@@ -3278,7 +3278,8 @@ public final class AgendaHelper {
                         }
 
                     } else if (!game.isHomebrewSCMode()
-                            && game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
+                            && game.getCurrentAgendaInfo().contains("Elect Strategy Card")
+                            && NumberUtils.isDigits(outcome)) {
                         summaryBuilder
                                 .append("- ")
                                 .append(CardEmojis.getSCFrontFromInteger(Integer.parseInt(outcome)))
