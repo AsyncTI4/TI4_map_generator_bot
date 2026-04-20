@@ -1,6 +1,7 @@
 package ti4.spring.service.contest;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -43,6 +44,7 @@ import ti4.service.emoji.ColorEmojis;
 public class CombatContestService {
 
     private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives";
+    private static final Duration CONTEST_COOLDOWN = Duration.ofMinutes(30);
     private static final double MIN_FLEET_VALUE = 12.0;
     private static final double MIN_STRENGTH_RATIO = 0.7;
     private static final Set<CombatContestStatus> ACTIVE_STATUSES = Set.of(CombatContestStatus.POSTED);
@@ -135,7 +137,12 @@ public class CombatContestService {
     }
 
     private boolean cooldownElapsed() {
-        return true;
+        return repository
+                .findFirstByOrderByPostedAtDesc()
+                .map(contest -> Duration.between(contest.getPostedAt(), LocalDateTime.now())
+                                .compareTo(CONTEST_COOLDOWN)
+                        >= 0)
+                .orElse(true);
     }
 
     private boolean isEligibleCombat(Game game, Player attacker, Player defender, Tile tile) {
