@@ -49,6 +49,8 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.contest.CombatContestService;
 
 @UtilityClass
 public class ActionCardHelper {
@@ -822,6 +824,9 @@ public class ActionCardHelper {
             if (bEvent.getChannel().getName().toLowerCase().contains("-vs-")) {
                 MessageHelper.sendMessageToChannelWithEmbed(bEvent.getChannel(), message, acEmbed);
             }
+        }
+        if (isCombatActionCard(actionCard)) {
+            SpringContext.getBean(CombatContestService.class).mirrorCombatActionCard(game, player, actionCard);
         }
         if (actionCardIsSabotageOrShatter) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
@@ -1811,6 +1816,24 @@ public class ActionCardHelper {
 
         sendActionCardInfo(game, player);
         return null;
+    }
+
+    private static boolean isCombatActionCard(ActionCardModel actionCard) {
+        return containsCombatKeyword(actionCard.getWindow())
+                || containsCombatKeyword(actionCard.getText())
+                || containsCombatKeyword(actionCard.getNotes());
+    }
+
+    private static boolean containsCombatKeyword(String text) {
+        if (text == null || text.isBlank()) return false;
+        String normalized = text.toLowerCase();
+        return normalized.contains("combat")
+                || normalized.contains("ship is destroyed")
+                || normalized.contains("ships is destroyed")
+                || normalized.contains("space cannon")
+                || normalized.contains("anti-fighter barrage")
+                || normalized.contains("bombardment")
+                || normalized.contains("invasion");
     }
 
     public static boolean isSabotageOrShatter(String acID) {
