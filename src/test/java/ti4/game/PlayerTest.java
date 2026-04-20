@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -55,9 +54,9 @@ class PlayerTest {
                 .thenReturn(List.of());
         when(guild.retrieveActiveThreads()).thenReturn(activeThreads);
         when(activeThreads.complete()).thenReturn(List.of());
+        RuntimeException archivedLookupFailure = mock(MissingAccessException.class);
         when(actionsChannel.retrieveArchivedPrivateThreadChannels()).thenReturn(archivedPrivateThreads);
-        when(archivedPrivateThreads.complete())
-                .thenThrow(new MissingAccessException(actionsChannel, Permission.VIEW_CHANNEL));
+        when(archivedPrivateThreads.complete()).thenThrow(archivedLookupFailure);
 
         assertThat(player.getCardsInfoThreadJumpLink()).isNull();
         verify(actionsChannel, never()).createThreadChannel(anyString(), anyBoolean());
