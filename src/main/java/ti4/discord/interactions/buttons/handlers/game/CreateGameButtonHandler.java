@@ -23,6 +23,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.SearchGameHelper;
 import ti4.logging.BotLogger;
@@ -210,10 +211,9 @@ public class CreateGameButtonHandler {
                     .append(". ")
                     .append(member.getUser().getAsMention());
 
-            int ongoingAmount = SearchGameHelper.searchGames(
-                    member.getUser(), null, false, false, false, true, false, true, true, true);
-            int completedAndOngoingAmount = SearchGameHelper.searchGames(
-                    member.getUser(), null, false, true, false, true, false, true, true, true);
+            int ongoingAmount = countGamesThatAffectJoinLimit(member.getId(), false, GameManager.getManagedGames());
+            int completedAndOngoingAmount =
+                    countGamesThatAffectJoinLimit(member.getId(), true, GameManager.getManagedGames());
             int completedGames = completedAndOngoingAmount - ongoingAmount;
             if (ongoingAmount > completedGames + 2) {
                 memberList
@@ -391,10 +391,9 @@ public class CreateGameButtonHandler {
         if (!member.getUser().isBot()
                 && !CommandHelper.hasRole(event, JdaService.developerRoles)
                 && !CommandHelper.hasRole(event, JdaService.bothelperRoles)) {
-            int ongoingAmount = SearchGameHelper.searchGames(
-                    member.getUser(), event, false, false, false, true, false, true, true, true);
-            int completedAndOngoingAmount = SearchGameHelper.searchGames(
-                    member.getUser(), event, false, true, false, true, false, true, true, true);
+            int ongoingAmount = countGamesThatAffectJoinLimit(member.getId(), false, GameManager.getManagedGames());
+            int completedAndOngoingAmount =
+                    countGamesThatAffectJoinLimit(member.getId(), true, GameManager.getManagedGames());
             int completedGames = completedAndOngoingAmount - ongoingAmount;
             if (ongoingAmount > completedGames + 2) {
                 MessageHelper.sendMessageToChannel(
@@ -418,6 +417,16 @@ public class CreateGameButtonHandler {
             }
         }
         return true;
+    }
+
+    static int countGamesThatAffectJoinLimit(String userId, boolean includeEndedGames, List<ManagedGame> managedGames) {
+        return (int) managedGames.stream()
+                .filter(game -> game.getRealPlayers().size() >= 3)
+                .filter(game -> game.getRealPlayers().stream().anyMatch(player -> player.getId().equals(userId)))
+                .filter(game -> includeEndedGames || (!game.isHasEnded() && !game.isFowMode()))
+                .filter(game -> !game.isFowMode() || game.isHasEnded())
+                .filter(game -> !game.isHasEnded() || game.isHasWinner())
+                .count();
     }
 
     private static boolean isLikelyDoublePressedButton(
