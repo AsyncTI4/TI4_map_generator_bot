@@ -30,6 +30,8 @@ public class StatisticsEligibilityHelper {
     }
 
     public static <T extends PlayerEntity> List<T> filterPlayersInEligibleGames(Collection<T> players) {
-        return players.stream().filter(StatisticsEligibilityHelper::isEligibleForStatistics).toList();
+        return players.stream()
+                .filter(StatisticsEligibilityHelper::isEligibleForStatistics)
+                .toList();
     }
 }
