@@ -57,7 +57,7 @@ public class CombatContestService {
     public void onSpaceCombatStarted(Game game, Player attacker, Player defender, Tile tile) {
         try {
             if (!isEligibleGame(game) || !isEligibleCombat(game, attacker, defender, tile)) return;
-            if (!cooldownElapsed()) return;
+            // if (!cooldownElapsed()) return;
             if (repository
                     .findFirstByGameNameAndTilePositionAndCombatTypeAndStatusInOrderByPostedAtDesc(
                             game.getName(), tile.getPosition(), CombatContestType.SPACE, ACTIVE_STATUSES)
