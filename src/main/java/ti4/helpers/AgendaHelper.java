@@ -3182,12 +3182,6 @@ public final class AgendaHelper {
             StringBuilder summaryBuilder =
                     new StringBuilder("# _" + agendaName + "_\nCurrent status of votes and outcomes is: \n");
             for (String outcome : outcomes.keySet()) {
-                if (StringUtils.countMatches(game.getCurrentAgendaInfo(), "_") > 1) {
-                    agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
-                } else {
-                    agendaDetails = game.getCurrentAgendaInfo();
-                }
-
                 int totalVotes = 0;
                 StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
                 String outcomeSummary;
