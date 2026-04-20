@@ -54,6 +54,7 @@ public class DiceLuckService {
 
     @NotNull
     private static Map<UserEntity, DiceLuckAccumulator> getUsersToDiceLuckAccumulator(List<PlayerEntity> players) {
+        players = StatisticsEligibilityHelper.filterPlayersInEligibleGames(players);
         Map<UserEntity, DiceLuckAccumulator> usersToDiceLuckAccumulators = new HashMap<>();
         for (PlayerEntity player : players) {
             if (player.getExpectedHits() == 0) continue;

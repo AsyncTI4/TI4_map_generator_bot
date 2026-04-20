@@ -50,6 +50,7 @@ public class AverageTurnTimeService {
 
     private List<UserAverageTurnTimeAccumulator> getAverageTurnTimes(
             List<PlayerEntity> players, int minTurns, int topLimit) {
+        players = StatisticsEligibilityHelper.filterPlayersInEligibleGames(players);
         Map<UserEntity, UserAverageTurnTimeAccumulator> statsMap = new HashMap<>();
         for (PlayerEntity player : players) {
             if (player.getTotalNumberOfTurns() == 0) continue;

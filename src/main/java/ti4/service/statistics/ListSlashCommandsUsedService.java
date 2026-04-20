@@ -35,17 +35,19 @@ public class ListSlashCommandsUsedService {
         Map<String, Integer> actionCards = new HashMap<>();
         Map<String, Integer> actionCardsPlayed = new HashMap<>();
 
-        GamesPage.consumeAllGames(game -> listSlashCommandsUsed(
-                game,
-                useOnlyLastMonth,
-                slashCommands,
-                actionCards,
-                actionCardsPlayed,
-                largestGame,
-                largestAmountOfButtonsIn1Game,
-                buttonsPressed,
-                slashCommandsUsed,
-                acsSabod));
+        GamesPage.consumeAllGames(
+                StatisticsEligibilityHelper::isEligibleForStatistics,
+                game -> listSlashCommandsUsed(
+                        game,
+                        useOnlyLastMonth,
+                        slashCommands,
+                        actionCards,
+                        actionCardsPlayed,
+                        largestGame,
+                        largestAmountOfButtonsIn1Game,
+                        buttonsPressed,
+                        slashCommandsUsed,
+                        acsSabod));
 
         StringBuilder longMsg = new StringBuilder("The number of button pressed so far recorded is " + buttonsPressed
                 + ". The largest number of buttons pressed in a single game is " + largestAmountOfButtonsIn1Game

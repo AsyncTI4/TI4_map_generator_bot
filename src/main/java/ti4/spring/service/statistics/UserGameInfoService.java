@@ -30,6 +30,7 @@ public class UserGameInfoService {
     }
 
     private static Map<String, UserGameStatsAccumulator> buildUserStats(List<PlayerEntity> players) {
+        players = StatisticsEligibilityHelper.filterPlayersInEligibleGames(players);
         Map<String, UserGameStatsAccumulator> statsByUserId = new HashMap<>();
         for (PlayerEntity player : players) {
             UserGameStatsAccumulator stats = statsByUserId.computeIfAbsent(

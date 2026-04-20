@@ -24,6 +24,7 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.async.BanCleanupService;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.statistics.StatisticsEligibilityHelper;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
@@ -75,6 +76,7 @@ class UserLeaveServerListener extends ListenerAdapter {
 
     private static int userTotalGames(ManagedPlayer user) {
         return (int) user.getGames().stream()
+                .filter(StatisticsEligibilityHelper::isEligibleForStatistics)
                 .filter(mg -> !mg.isHasEnded() && !mg.isHasWinner() && !mg.isVpGoalReached())
                 .count();
     }
@@ -190,7 +192,9 @@ class UserLeaveServerListener extends ListenerAdapter {
         msg.append("\nUser has **__")
                 .append(userTotalGames(player))
                 .append("__** in-progress games and **__")
-                .append(player.getGames().size())
+                .append(player.getGames().stream()
+                        .filter(StatisticsEligibilityHelper::isEligibleForStatistics)
+                        .count())
                 .append("__** lifetime games across all servers.");
         if (!foundOne) {
             return "dud";

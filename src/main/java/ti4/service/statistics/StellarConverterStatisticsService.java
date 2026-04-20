@@ -31,7 +31,9 @@ public class StellarConverterStatisticsService {
         Map<String, Integer> numberConverts = new HashMap<>();
         AtomicInteger count = new AtomicInteger();
 
-        GamesPage.consumeAllGames(game -> getStellarConverterInfo(game, count, numberConverts));
+        GamesPage.consumeAllGames(
+                StatisticsEligibilityHelper::isEligibleForStatistics,
+                game -> getStellarConverterInfo(game, count, numberConverts));
 
         Comparator<Map.Entry<String, Integer>> comparator =
                 (p1, p2) -> (-1) * p1.getValue().compareTo(p2.getValue());

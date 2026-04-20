@@ -1,6 +1,5 @@
 package ti4.spring.service.statistics;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -76,10 +75,10 @@ public class AverageHitsPerTurnService {
     }
 
     @NotNull
-    private static Map<UserEntity, HitsPerTurnAccumulator> getUsersToHitsPerTurnAccumulators(
-            Iterable<PlayerEntity> players) {
+    private static Map<UserEntity, HitsPerTurnAccumulator> getUsersToHitsPerTurnAccumulators(List<PlayerEntity> players) {
+        List<PlayerEntity> eligiblePlayers = StatisticsEligibilityHelper.filterPlayersInEligibleGames(players);
         Map<UserEntity, HitsPerTurnAccumulator> userToAccumulators = new HashMap<>();
-        for (PlayerEntity player : players) {
+        for (PlayerEntity player : eligiblePlayers) {
             if (player.getTotalNumberOfTurns() == 0) continue;
             // Ignore anomaly games (infinite combats, spamming buttons, Franken/TF madness)
             if (player.getExpectedHits() >= ANOMALOUS_NUMBER_OF_HITS_THRESHOLD) continue;

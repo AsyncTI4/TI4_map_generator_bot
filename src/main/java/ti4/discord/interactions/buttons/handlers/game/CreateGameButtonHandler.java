@@ -29,6 +29,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
+import ti4.service.statistics.StatisticsEligibilityHelper;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.statistics.AverageTurnTimeService;
 
@@ -211,9 +212,29 @@ public class CreateGameButtonHandler {
                     .append(member.getUser().getAsMention());
 
             int ongoingAmount = SearchGameHelper.searchGames(
-                    member.getUser(), null, false, false, false, true, false, true, true, true);
+                    member.getUser(),
+                    null,
+                    false,
+                    false,
+                    false,
+                    true,
+                    false,
+                    true,
+                    true,
+                    true,
+                    StatisticsEligibilityHelper::isEligibleForStatistics);
             int completedAndOngoingAmount = SearchGameHelper.searchGames(
-                    member.getUser(), null, false, true, false, true, false, true, true, true);
+                    member.getUser(),
+                    null,
+                    false,
+                    true,
+                    false,
+                    true,
+                    false,
+                    true,
+                    true,
+                    true,
+                    StatisticsEligibilityHelper::isEligibleForStatistics);
             int completedGames = completedAndOngoingAmount - ongoingAmount;
             if (ongoingAmount > completedGames + 2) {
                 memberList
@@ -392,9 +413,29 @@ public class CreateGameButtonHandler {
                 && !CommandHelper.hasRole(event, JdaService.developerRoles)
                 && !CommandHelper.hasRole(event, JdaService.bothelperRoles)) {
             int ongoingAmount = SearchGameHelper.searchGames(
-                    member.getUser(), event, false, false, false, true, false, true, true, true);
+                    member.getUser(),
+                    event,
+                    false,
+                    false,
+                    false,
+                    true,
+                    false,
+                    true,
+                    true,
+                    true,
+                    StatisticsEligibilityHelper::isEligibleForStatistics);
             int completedAndOngoingAmount = SearchGameHelper.searchGames(
-                    member.getUser(), event, false, true, false, true, false, true, true, true);
+                    member.getUser(),
+                    event,
+                    false,
+                    true,
+                    false,
+                    true,
+                    false,
+                    true,
+                    true,
+                    true,
+                    StatisticsEligibilityHelper::isEligibleForStatistics);
             int completedGames = completedAndOngoingAmount - ongoingAmount;
             if (ongoingAmount > completedGames + 2) {
                 MessageHelper.sendMessageToChannel(

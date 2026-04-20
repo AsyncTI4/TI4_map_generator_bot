@@ -39,6 +39,7 @@ public class MedianTurnTimeService {
         List<PlayerEntity> players = ignoreEndedGames
                 ? playerEntityRepository.findAllWithUsersByActiveGame()
                 : playerEntityRepository.findAllWithUsers();
+        players = StatisticsEligibilityHelper.filterPlayersInEligibleGames(players);
 
         Map<UserEntity, PlayerStatsAccumulator> statsMap = new HashMap<>();
         for (PlayerEntity player : players) {

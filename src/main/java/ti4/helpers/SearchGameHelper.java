@@ -47,6 +47,7 @@ public class SearchGameHelper {
                 ignoreSpectate,
                 ignoreAborted,
                 wantNum,
+                null,
                 null);
     }
 
@@ -61,7 +62,62 @@ public class SearchGameHelper {
             boolean ignoreSpectate,
             boolean ignoreAborted,
             boolean wantNum,
+            Predicate<ManagedGame> additionalFilter) {
+        return searchGames(
+                user,
+                event,
+                onlyMyTurn,
+                includeEndedGames,
+                showAverageTurnTime,
+                showSecondaries,
+                showGameModes,
+                ignoreSpectate,
+                ignoreAborted,
+                wantNum,
+                null,
+                additionalFilter);
+    }
+
+    public static int searchGames(
+            User user,
+            GenericInteractionCreateEvent event,
+            boolean onlyMyTurn,
+            boolean includeEndedGames,
+            boolean showAverageTurnTime,
+            boolean showSecondaries,
+            boolean showGameModes,
+            boolean ignoreSpectate,
+            boolean ignoreAborted,
+            boolean wantNum,
             User user2) {
+        return searchGames(
+                user,
+                event,
+                onlyMyTurn,
+                includeEndedGames,
+                showAverageTurnTime,
+                showSecondaries,
+                showGameModes,
+                ignoreSpectate,
+                ignoreAborted,
+                wantNum,
+                user2,
+                null);
+    }
+
+    public static int searchGames(
+            User user,
+            GenericInteractionCreateEvent event,
+            boolean onlyMyTurn,
+            boolean includeEndedGames,
+            boolean showAverageTurnTime,
+            boolean showSecondaries,
+            boolean showGameModes,
+            boolean ignoreSpectate,
+            boolean ignoreAborted,
+            boolean wantNum,
+            User user2,
+            Predicate<ManagedGame> additionalFilter) {
         String userID = user.getId();
 
         Predicate<ManagedGame> ignoreSpectateFilter = ignoreSpectate
@@ -85,11 +141,13 @@ public class SearchGameHelper {
         Predicate<ManagedGame> onlyEndedFoWGames = game -> !game.isFowMode() || game.isHasEnded();
         Predicate<ManagedGame> ignoreAbortedFilter =
                 ignoreAborted ? game -> !game.isHasEnded() || game.isHasWinner() : game -> true;
+        Predicate<ManagedGame> extraFilter = additionalFilter == null ? game -> true : additionalFilter;
         Predicate<ManagedGame> allFilterPredicates = ignoreSpectateFilter
                 .and(onlyMyTurnFilter)
                 .and(endedGamesFilter)
                 .and(onlyEndedFoWGames)
-                .and(ignoreAbortedFilter);
+                .and(ignoreAbortedFilter)
+                .and(extraFilter);
 
         var filteredManagedGames = GameManager.getManagedGames().stream()
                 .filter(allFilterPredicates)
