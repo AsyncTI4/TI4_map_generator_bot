@@ -75,7 +75,7 @@ class UserLeaveServerListener extends ListenerAdapter {
 
     private static int getInProgressGamesCount(ManagedPlayer user) {
         return (int) user.getGames().stream()
-                .filter(managedGame -> managedGame.getRealPlayers().size() > 2)
+                .filter(managedGame -> managedGame.getRealPlayers().size() > 1)
                 .filter(mg -> !mg.isHasEnded() && !mg.isHasWinner() && !mg.isVpGoalReached())
                 .count();
     }
@@ -192,7 +192,7 @@ class UserLeaveServerListener extends ListenerAdapter {
                 .append(getInProgressGamesCount(player))
                 .append("__** in-progress games and **__")
                 .append(player.getGames().stream()
-                        .filter(managedGame -> managedGame.getRealPlayers().size() > 2)
+                        .filter(managedGame -> managedGame.getRealPlayers().size() > 1)
                         .count())
                 .append("__** lifetime 3+ player games across all servers.");
         if (!foundOne) {
