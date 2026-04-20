@@ -36,6 +36,7 @@ import ti4.image.TileGenerator;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ColorEmojis;
 
@@ -45,7 +46,7 @@ public class CombatContestService {
 
     private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives";
     private static final Duration CONTEST_COOLDOWN = Duration.ofMinutes(10);
-    private static final double MIN_FLEET_RESOURCES = 8.0;
+    private static final double MIN_FLEET_RESOURCES = 6.0;
     private static final double MIN_HP_RATIO = 0.7;
     private static final double ZERO_EPSILON = 0.0001;
     private static final boolean PREDICTION_LOCK_ENABLED = false;
@@ -126,6 +127,29 @@ public class CombatContestService {
             MessageHelper.splitAndSentWithAction("## Roll Update\n" + message, threadOrChannel, null);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Combat contest roll mirror failed.", e);
+        }
+    }
+
+    public void mirrorCombatActionCard(Game game, Player player, ActionCardModel actionCard) {
+        try {
+            if (game == null || player == null || actionCard == null) return;
+            List<CombatContestEntity> activeContests =
+                    repository.findByGameNameAndStatusIn(game.getName(), ACTIVE_STATUSES);
+            if (activeContests.isEmpty()) return;
+
+            for (CombatContestEntity contest : activeContests) {
+                if (!matchesParticipant(contest, player)) continue;
+
+                MessageChannel threadOrChannel = getContestThreadOrChannel(contest);
+                if (threadOrChannel == null) continue;
+
+                String message = "## Combat Action Card\n" + player.getRepresentation() + " played _"
+                        + actionCard.getName() + "_.";
+                MessageHelper.sendMessageToChannelWithEmbed(
+                        threadOrChannel, message, actionCard.getRepresentationEmbed(false, true, game));
+            }
+        } catch (Exception e) {
+            BotLogger.error(new LogOrigin(game), "Combat contest action card relay failed.", e);
         }
     }
 
@@ -819,12 +843,7 @@ public class CombatContestService {
         }
         if (!changed) return;
 
-        if (Objects.equals(contest.getAttackerHitAssignedRound(), round)
-                && Objects.equals(contest.getDefenderHitAssignedRound(), round)
-                && !Objects.equals(contest.getLastPostedHitImageRound(), round)) {
-            postAssignedHitsImage(game, event, contest, round);
-            contest.setLastPostedHitImageRound(round);
-        }
+        postAssignedHitsImage(game, player, event, contest, round);
         repository.save(contest);
     }
 
@@ -873,7 +892,7 @@ public class CombatContestService {
     }
 
     private void postAssignedHitsImage(
-            Game game, ButtonInteractionEvent event, CombatContestEntity contest, int round) {
+            Game game, Player player, ButtonInteractionEvent event, CombatContestEntity contest, int round) {
         MessageChannel threadOrChannel = getContestThreadOrChannel(contest);
         if (threadOrChannel == null) return;
 
@@ -881,7 +900,9 @@ public class CombatContestService {
         if (tile == null) return;
 
         String roundLabel = round > 0 ? "round #" + round : "the current exchange";
-        String message = "## Combat Update\nBoth players have assigned hits for " + roundLabel + ".";
+        String message = "## Combat Update\n"
+                + player.getFactionEmoji() + " " + player.getFaction() + " " + player.getUserName()
+                + " assigned hits for " + roundLabel + ".";
         try (FileUpload fileUpload = new TileGenerator(game, event, null, 0, tile.getPosition()).createFileUpload()) {
             MessageHelper.sendMessageWithFile(threadOrChannel, fileUpload, message, false, false);
         } catch (IOException e) {
