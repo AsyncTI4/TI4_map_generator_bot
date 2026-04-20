@@ -114,11 +114,6 @@ public class ManagedGame {
         return players.stream().anyMatch(p -> p.getId().equals(id));
     }
 
-    public boolean isRealPlayer(ManagedPlayer managedPlayer) {
-        Boolean isRealPlayer = playerToIsReal.get(managedPlayer);
-        return Boolean.TRUE.equals(isRealPlayer);
-    }
-
     public boolean isActive() {
         return !hasEnded && !hasWinner && !vpGoalReached && !stale;
     }
