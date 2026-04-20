@@ -48,6 +48,7 @@ public class CombatContestService {
     private static final double MIN_FLEET_RESOURCES = 12.0;
     private static final double MIN_HP_RATIO = 0.7;
     private static final double ZERO_EPSILON = 0.0001;
+    private static final boolean PREDICTION_LOCK_ENABLED = false;
     private static final Set<CombatContestStatus> ACTIVE_STATUSES = Set.of(CombatContestStatus.POSTED);
 
     private final CombatContestRepository repository;
@@ -56,7 +57,7 @@ public class CombatContestService {
     public void onSpaceCombatStarted(Game game, Player attacker, Player defender, Tile tile) {
         try {
             if (!isEligibleGame(game) || !isEligibleCombat(game, attacker, defender, tile)) return;
-            if (!cooldownElapsed()) return;
+            // if (!cooldownElapsed()) return;
             if (repository
                     .findFirstByGameNameAndTilePositionAndCombatTypeAndStatusInOrderByPostedAtDesc(
                             game.getName(), tile.getPosition(), CombatContestType.SPACE, ACTIVE_STATUSES)
@@ -119,7 +120,9 @@ public class CombatContestService {
 
             MessageChannel threadOrChannel = getContestThreadOrChannel(contest);
             if (threadOrChannel == null) return;
-            lockPredictions(game, contest, threadOrChannel);
+            if (PREDICTION_LOCK_ENABLED) {
+                lockPredictions(game, contest, threadOrChannel);
+            }
             MessageHelper.splitAndSentWithAction("## Roll Update\n" + message, threadOrChannel, null);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Combat contest roll mirror failed.", e);
@@ -549,6 +552,7 @@ public class CombatContestService {
             Tile tile,
             Player winner,
             String loserFaction) {
+        capturePredictionsAtResolution(game, contest);
         contest.setStatus(CombatContestStatus.RESOLVED);
         contest.setResolvedAt(LocalDateTime.now());
         contest.setWinnerFaction(winner.getFaction());
@@ -586,6 +590,24 @@ public class CombatContestService {
         if (threadOrChannel != null)
             MessageHelper.sendMessageToChannel(threadOrChannel, "## Contest Closed\n" + reason);
         refreshParentMessageSummary(game, contest, "Cancelled", reason);
+    }
+
+    private void capturePredictionsAtResolution(Game game, CombatContestEntity contest) {
+        if (PREDICTION_LOCK_ENABLED) return;
+        if (!predictionRepository.findByContestId(contest.getId()).isEmpty()) return;
+        if (contest.getPublicChannelId() == null || contest.getPublicMessageId() == null) return;
+
+        TextChannel contestChannel = JdaService.guildPrimary.getTextChannelById(contest.getPublicChannelId());
+        if (contestChannel == null) return;
+
+        try {
+            Message message = contestChannel
+                    .retrieveMessageById(contest.getPublicMessageId())
+                    .complete();
+            capturePredictions(game, message, contest);
+        } catch (Exception e) {
+            BotLogger.error(new LogOrigin(game), "Failed to capture combat contest predictions at resolution.", e);
+        }
     }
 
     private void refreshParentMessageSummary(
