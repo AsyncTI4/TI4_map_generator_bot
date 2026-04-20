@@ -190,7 +190,7 @@ class UserLeaveServerListener extends ListenerAdapter {
         msg.append("\nUser has **__")
                 .append(getInProgressGamesCount(player))
                 .append("__** in-progress games and **__")
-                .append(player.getGames())
+                .append(player.getGames().size())
                 .append("__** lifetime games across all servers.");
         if (!foundOne) {
             return "dud";
