@@ -5,7 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,7 +15,17 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "combat_predictor_prediction")
+@Table(
+        name = "combat_predictor_prediction",
+        indexes = {
+            @Index(name = "idx_combat_prediction_contest_id", columnList = "contest_id"),
+            @Index(name = "idx_combat_prediction_points_user", columnList = "points_awarded, discord_user_id")
+        },
+        uniqueConstraints = {
+            @UniqueConstraint(
+                    name = "uk_combat_prediction_contest_user",
+                    columnNames = {"contest_id", "discord_user_id"})
+        })
 public class CombatContestPredictionEntity {
 
     @Id

@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.Data;
@@ -15,7 +16,15 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "combat_predictor_contest")
+@Table(
+        name = "combat_predictor_contest",
+        indexes = {
+            @Index(name = "idx_combat_contest_posted_at", columnList = "posted_at"),
+            @Index(name = "idx_combat_contest_game_status", columnList = "game_name, status"),
+            @Index(
+                    name = "idx_combat_contest_lookup",
+                    columnList = "game_name, tile_position, combat_type, status, posted_at")
+        })
 public class CombatContestEntity {
 
     @Id

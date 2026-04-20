@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +22,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ti4.discord.JdaService;
 import ti4.game.Game;
@@ -126,11 +126,8 @@ public class CombatContestService {
     private boolean isEligibleGame(Game game) {
         return game != null
                 && !game.isHasEnded()
-                //                TODO: Temporary disable
-                //                && !game.isAllianceMode()
+                && !game.isAllianceMode()
                 && !game.isFowMode()
-                && !game.isHomebrew()
-                && !game.isDiscordantStarsMode()
                 && !game.isAbsolMode()
                 && !game.isFrankenGame()
                 && !game.isTwilightsFallMode();
@@ -288,48 +285,27 @@ public class CombatContestService {
         TextChannel contestChannel = getContestChannel();
         if (contestChannel == null) return;
 
-        List<CombatContestPredictionEntity> predictions = predictionRepository.findByPointsAwardedIsNotNull();
-        if (predictions.isEmpty()) return;
-
-        Map<String, LeaderboardEntry> byUser = new HashMap<>();
-        for (CombatContestPredictionEntity prediction : predictions) {
-            LeaderboardEntry entry =
-                    byUser.computeIfAbsent(prediction.getDiscordUserId(), key -> new LeaderboardEntry());
-            entry.userName = prediction.getDiscordUserName();
-            entry.points += prediction.getPointsAwarded();
-            entry.predictions++;
-            if (Boolean.TRUE.equals(prediction.getCorrect())) {
-                entry.correctPredictions++;
-            }
-        }
-
-        List<Map.Entry<String, LeaderboardEntry>> topEntries = byUser.entrySet().stream()
-                .sorted(Comparator.<Map.Entry<String, LeaderboardEntry>>comparingInt(e -> e.getValue().points)
-                        .reversed()
-                        .thenComparingInt(e -> e.getValue().correctPredictions)
-                        .reversed()
-                        .thenComparing(e -> e.getValue().userName.toLowerCase()))
-                .limit(10)
-                .toList();
+        List<CombatContestLeaderboardRow> topEntries = predictionRepository.findLeaderboardRows(PageRequest.of(0, 10));
+        if (topEntries.isEmpty()) return;
 
         StringBuilder message = new StringBuilder("## Lazax War Archives Leaderboard\n");
         message.append("-# Posted daily at 15:00 UTC (9:00 CST).\n");
         int rank = 1;
-        for (Map.Entry<String, LeaderboardEntry> entry : topEntries) {
-            LeaderboardEntry value = entry.getValue();
-            int accuracy =
-                    value.predictions == 0 ? 0 : Math.round((100f * value.correctPredictions) / value.predictions);
+        for (CombatContestLeaderboardRow entry : topEntries) {
+            long predictions = entry.getPredictionCount() == null ? 0 : entry.getPredictionCount();
+            long correctPredictions = entry.getCorrectPredictions() == null ? 0 : entry.getCorrectPredictions();
+            int accuracy = predictions == 0 ? 0 : Math.round((100f * correctPredictions) / predictions);
             message.append('`')
                     .append(rank++)
                     .append(".` ")
-                    .append(value.userName)
+                    .append(entry.getDiscordUserName())
                     .append(" - **")
-                    .append(value.points)
+                    .append(entry.getTotalPoints())
                     .append("** points")
                     .append(" (`")
-                    .append(value.correctPredictions)
+                    .append(correctPredictions)
                     .append('/')
-                    .append(value.predictions)
+                    .append(predictions)
                     .append("` correct, ")
                     .append(accuracy)
                     .append("%)\n");
@@ -793,13 +769,6 @@ public class CombatContestService {
             BotLogger.error(new LogOrigin(game), "Failed to create combat contest hit-assignment image.", e);
             MessageHelper.sendMessageToChannel(threadOrChannel, message);
         }
-    }
-
-    private static class LeaderboardEntry {
-        private String userName;
-        private int points;
-        private int predictions;
-        private int correctPredictions;
     }
 
     private record PredictionSnapshot(
