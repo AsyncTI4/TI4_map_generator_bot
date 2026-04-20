@@ -3182,16 +3182,10 @@ public final class AgendaHelper {
             StringBuilder summaryBuilder =
                     new StringBuilder("# _" + agendaName + "_\nCurrent status of votes and outcomes is: \n");
             for (String outcome : outcomes.keySet()) {
-                if (StringUtils.countMatches(game.getCurrentAgendaInfo(), "_") > 1) {
-                    agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
-                } else {
-                    agendaDetails = game.getCurrentAgendaInfo();
-                }
-
                 int totalVotes = 0;
                 StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
                 String outcomeSummary;
-                outcome = getAgendaOutcomeName(game, outcome, capitalize);
+                String outcomeName = getAgendaOutcomeName(game, outcome, capitalize);
                 StringBuilder outcomeSummaryBuilder = new StringBuilder();
                 while (vote_info.hasMoreTokens()) {
                     String specificVote = vote_info.nextToken();
@@ -3257,9 +3251,9 @@ public final class AgendaHelper {
                     }
 
                     if (!game.isFowMode() && game.getCurrentAgendaInfo().contains("Elect Player")) {
-                        String emoji = FactionEmojis.getFactionIcon(outcome.toLowerCase())
+                        String emoji = FactionEmojis.getFactionIcon(outcomeName.toLowerCase())
                                 .toString();
-                        Player outcomerP = game.getPlayerFromColorOrFaction(outcome.toLowerCase());
+                        Player outcomerP = game.getPlayerFromColorOrFaction(outcomeName.toLowerCase());
                         if (outcomerP != null) {
                             emoji = outcomerP.getFactionEmoji();
                         }
@@ -3268,7 +3262,7 @@ public final class AgendaHelper {
                                 .append("- ")
                                 .append(emoji)
                                 .append(' ')
-                                .append(outcome)
+                                .append(outcomeName)
                                 .append(": ")
                                 .append(totalVotes);
                         if (!redactFactionInfo) {
@@ -3278,12 +3272,14 @@ public final class AgendaHelper {
                         }
 
                     } else if (!game.isHomebrewSCMode()
-                            && game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
+                            && game.getCurrentAgendaInfo().contains("Elect Strategy Card")
+                            && NumberUtils.isDigits(outcome)) {
+                        int scNumber = Integer.parseInt(outcome);
                         summaryBuilder
                                 .append("- ")
-                                .append(CardEmojis.getSCFrontFromInteger(Integer.parseInt(outcome)))
+                                .append(CardEmojis.getSCFrontFromInteger(scNumber))
                                 .append(" **")
-                                .append(Helper.getSCName(Integer.parseInt(outcome), game))
+                                .append(Helper.getSCName(scNumber, game))
                                 .append("**: ")
                                 .append(totalVotes);
                         if (!redactFactionInfo) {
@@ -3292,7 +3288,11 @@ public final class AgendaHelper {
                             summaryBuilder.append('\n');
                         }
                     } else {
-                        summaryBuilder.append("- ").append(outcome).append(": ").append(totalVotes);
+                        summaryBuilder
+                                .append("- ")
+                                .append(outcomeName)
+                                .append(": ")
+                                .append(totalVotes);
                         if (!redactFactionInfo) {
                             summaryBuilder.append(". (").append(outcomeSummary).append(")\n");
                         } else {
@@ -3302,7 +3302,7 @@ public final class AgendaHelper {
                 } else {
                     summaryBuilder
                             .append("- ")
-                            .append(outcome)
+                            .append(outcomeName)
                             .append(": Total votes ")
                             .append(totalVotes);
                     if (!redactFactionInfo) {
