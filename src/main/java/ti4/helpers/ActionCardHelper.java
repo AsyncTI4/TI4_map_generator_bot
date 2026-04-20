@@ -242,7 +242,7 @@ public class ActionCardHelper {
     private static List<Button> getPlotCardButtons(Player player) {
         boolean hasManageAbility = player.hasAbility("plotsplots");
         if (player.hasLeader("firmamenthero")) hasManageAbility = true;
-        if (!hasManageAbility) return new ArrayList<>();
+        if (!hasManageAbility && player.getPlotCards().isEmpty()) return new ArrayList<>();
 
         List<Button> buttons = new ArrayList<>();
         Set<Entry<String, Integer>> plotCards = player.getPlotCards().entrySet();
@@ -267,7 +267,9 @@ public class ActionCardHelper {
                         buttons.add(Buttons.red(buttonID, buttonText));
                     }
                 });
-        buttons.add(Buttons.blue("scoreOtherPlayersSecrets", "Score Other Players' Secrets (Max 5)"));
+        if (player.hasAbility("plotsplots")) {
+            buttons.add(Buttons.blue("scoreOtherPlayersSecrets", "Score Other Players' Secrets (Max 5)"));
+        }
         return buttons;
     }
 

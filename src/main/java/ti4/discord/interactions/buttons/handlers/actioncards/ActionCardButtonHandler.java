@@ -59,7 +59,8 @@ public class ActionCardButtonHandler {
         GameMessageManager.remove(game.getName(), event.getMessageId());
         boolean sendReact = true;
         if ("empy".equalsIgnoreCase(type)) {
-            message += "a Watcher (Empyrean mech)! The relevant Watcher should now be removed by the owner.";
+            message +=
+                    "a Watcher (Empyrean mech)! The relevant Watcher should now be removed by the owner. Note that the bot offers buttons to remove any mech, but the owner should remove one that was next to the player who played the action card.";
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     "Remove the Watcher",

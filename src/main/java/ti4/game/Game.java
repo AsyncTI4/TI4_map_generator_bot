@@ -1,7 +1,7 @@
 package ti4.game;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -2948,7 +2948,8 @@ public class Game extends GameProperties {
     }
 
     private boolean shouldPutCardOnRalnel(Player discardingPlayer) {
-        if (!"action".equals(getPhaseOfGame())) return false;
+        if (!"action".equals(getPhaseOfGame())
+                && getStoredValue("executiveOrder").isEmpty()) return false;
         for (Player p : getRealPlayers()) {
             if (p == discardingPlayer) continue;
             if (p.hasUnlockedBreakthrough("ralnelbt") && !p.isPassed()) return true;

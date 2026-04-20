@@ -360,8 +360,8 @@ public class CombatRollService {
                 }
                 DisasterWatchHelper.sendMessageInDisasterWatch(game, disaster.toString());
             }
+            List<Button> buttons = new ArrayList<>();
             if (rollType == CombatRollType.combatround && opponent != player) {
-                List<Button> buttons = new ArrayList<>();
                 if (combatOnHolder instanceof Planet) {
                     String msg2 = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered " + h
                             + " hit" + (h == 1 ? "" : "s") + " in round #" + round2 + ".";
@@ -498,6 +498,27 @@ public class CombatRollService {
                         }
                     }
                 }
+            }
+            if (rollType == CombatRollType.AFB) {
+                String msg2 = opponent.getRepresentation() + ", you may automatically assign "
+                        + (h == 1 ? "the hit" : "hits") + " from AFB.";
+                if (opponent.isNpc() || opponent.isDummy()) {
+                    buttons.add(Buttons.green(
+                            opponent.dummyPlayerSpoof() + "autoAssignAFBHits_" + tile.getPosition() + "_" + h,
+                            "Auto-assign Hit" + (h == 1 ? "" : "s For Dummy")));
+                } else {
+                    buttons.add(Buttons.green(
+                            opponent.getFinsFactionCheckerPrefix() + "autoAssignAFBHits_" + tile.getPosition() + "_"
+                                    + h,
+                            "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                    buttons.add(Buttons.red(
+                            opponent.getFinsFactionCheckerPrefix() + "getDamageButtons_" + tile.getPosition() + "_afb",
+                            "Manually Assign Hit" + (h == 1 ? "" : "s")));
+                    buttons.add(Buttons.gray(
+                            opponent.getFinsFactionCheckerPrefix() + "cancelAFBHits_" + tile.getPosition() + "_" + h,
+                            "Cancel a Hit"));
+                }
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
             }
         } else {
             if (isFoWPrivateChannelRoll(player, event)) {
