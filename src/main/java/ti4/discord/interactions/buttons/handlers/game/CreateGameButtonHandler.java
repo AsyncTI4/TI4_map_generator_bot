@@ -441,7 +441,7 @@ public class CreateGameButtonHandler {
                 .count();
     }
 
-    private Predicate<Game> isRealPlayerIn3PlusPlayerGame(ManagedPlayer managedPlayer) {
+    private static Predicate<Game> isRealPlayerIn3PlusPlayerGame(ManagedPlayer managedPlayer) {
         return game -> {
             List<Player> realAndEliminatedPlayers = game.getRealAndEliminatedPlayers();
             return realAndEliminatedPlayers.size() >= 3
