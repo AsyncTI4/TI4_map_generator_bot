@@ -5,6 +5,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+import java.util.function.Predicate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,13 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
     private static final int START_OF_HTTP_SERVER_ERROR_RANGE = 500;
     private static final String HTTP_ERROR_THREAD_NAME = "http-errors";
     private static final String READY_PATH = "/api/public/ready";
+    private static final List<IgnoredHttpErrorRule> IGNORED_HTTP_ERROR_RULES = List.of(new IgnoredHttpErrorRule(
+            READY_PATH,
+            HttpStatus.SERVICE_UNAVAILABLE.value(),
+            body -> body.contains("\"ready\":false")
+                    && body.contains("\"leaseOwned\":")
+                    && ((body.contains("\"active\":false") && body.contains("\"draining\":false"))
+                            || (body.contains("\"active\":true") && body.contains("\"draining\":true")))));
 
     @Override
     protected void doFilterInternal(
@@ -61,7 +70,7 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
             if (shouldReportResponseStatus(requestUri, status)) {
                 String body =
                         new String(cachingResponse.getContentAsByteArray(), cachingResponse.getCharacterEncoding());
-                if (!shouldSkipReadyProbeHandoffReport(requestUri, status, body)) {
+                if (!shouldIgnoreReportedStatus(requestUri, status, body)) {
                     String error =
                             String.format("Request to %s returned status %s with body: %s", requestUri, status, body);
                     BotLogger.errorToThread(error, HTTP_ERROR_THREAD_NAME);
@@ -88,20 +97,20 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
                         && statusCode != HttpStatus.FORBIDDEN.value());
     }
 
-    static boolean shouldSkipReadyProbeHandoffReport(String requestUri, int statusCode, String body) {
-        if (!READY_PATH.equals(requestUri) || statusCode != HttpStatus.SERVICE_UNAVAILABLE.value()) {
-            return false;
-        }
-
-        return body.contains("\"ready\":false")
-                && body.contains("\"leaseOwned\":")
-                && ((body.contains("\"active\":false") && body.contains("\"draining\":false"))
-                        || (body.contains("\"active\":true") && body.contains("\"draining\":true")));
+    static boolean shouldIgnoreReportedStatus(String requestUri, int statusCode, String body) {
+        return IGNORED_HTTP_ERROR_RULES.stream().anyMatch(rule -> rule.matches(requestUri, statusCode, body));
     }
 
     private static boolean isAuthenticationNoise(Exception exception) {
         return exception instanceof OAuth2AuthenticationException
                 || exception instanceof AccessDeniedException
                 || exception instanceof UserNotInGameForbiddenException;
+    }
+
+    private record IgnoredHttpErrorRule(String requestPath, int statusCode, Predicate<String> bodyPredicate) {
+
+        private boolean matches(String requestUri, int responseStatusCode, String body) {
+            return requestPath.equals(requestUri) && statusCode == responseStatusCode && bodyPredicate.test(body);
+        }
     }
 }

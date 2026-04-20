@@ -11,7 +11,7 @@ class ErrorLoggingFilterTest {
         String body =
                 "{\"ready\":false,\"startupComplete\":true,\"active\":false,\"draining\":false,\"leaseOwned\":false}";
 
-        assertThat(ErrorLoggingFilter.shouldSkipReadyProbeHandoffReport("/api/public/ready", 503, body))
+        assertThat(ErrorLoggingFilter.shouldIgnoreReportedStatus("/api/public/ready", 503, body))
                 .isTrue();
     }
 
@@ -20,7 +20,7 @@ class ErrorLoggingFilterTest {
         String body =
                 "{\"ready\":false,\"startupComplete\":false,\"active\":true,\"draining\":true,\"leaseOwned\":true}";
 
-        assertThat(ErrorLoggingFilter.shouldSkipReadyProbeHandoffReport("/api/public/ready", 503, body))
+        assertThat(ErrorLoggingFilter.shouldIgnoreReportedStatus("/api/public/ready", 503, body))
                 .isTrue();
     }
 
@@ -29,7 +29,7 @@ class ErrorLoggingFilterTest {
         String body =
                 "{\"ready\":false,\"startupComplete\":true,\"active\":true,\"draining\":false,\"leaseOwned\":true}";
 
-        assertThat(ErrorLoggingFilter.shouldSkipReadyProbeHandoffReport("/api/public/ready", 503, body))
+        assertThat(ErrorLoggingFilter.shouldIgnoreReportedStatus("/api/public/ready", 503, body))
                 .isFalse();
     }
 
@@ -38,7 +38,16 @@ class ErrorLoggingFilterTest {
         String body =
                 "{\"ready\":false,\"startupComplete\":true,\"active\":false,\"draining\":false,\"leaseOwned\":false}";
 
-        assertThat(ErrorLoggingFilter.shouldSkipReadyProbeHandoffReport("/api/public/ping", 503, body))
+        assertThat(ErrorLoggingFilter.shouldIgnoreReportedStatus("/api/public/ping", 503, body))
+                .isFalse();
+    }
+
+    @Test
+    void keepsDifferentStatusCodesReportable() {
+        String body =
+                "{\"ready\":false,\"startupComplete\":true,\"active\":false,\"draining\":false,\"leaseOwned\":false}";
+
+        assertThat(ErrorLoggingFilter.shouldIgnoreReportedStatus("/api/public/ready", 500, body))
                 .isFalse();
     }
 }
