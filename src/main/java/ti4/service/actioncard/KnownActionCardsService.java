@@ -53,12 +53,12 @@ public class KnownActionCardsService {
             return;
         }
 
-        String storageKey = getStorageKey(target);
+        List<String> storageKeys = getStorageKeys(target);
         for (Player player : game.getPlayers().values()) {
             if (player == target) {
                 continue;
             }
-            for (String key : getStorageKeys(target)) {
+            for (String key : storageKeys) {
                 if (player.hasStoredValue(key)) {
                     player.removeFromStoredList(key, actionCardId);
                 }
