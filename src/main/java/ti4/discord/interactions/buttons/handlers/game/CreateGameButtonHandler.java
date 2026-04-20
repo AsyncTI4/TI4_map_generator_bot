@@ -425,7 +425,7 @@ public class CreateGameButtonHandler {
         if (managedPlayer == null) return 0;
         Set<ManagedGame> managedGames = managedPlayer.getGames();
         return (int) managedGames.stream()
-                .filter(managedGame -> !managedGame.isHasWinner())
+                .filter(managedGame -> !managedGame.isHasEnded())
                 .map(ManagedGame::getGame)
                 .filter(isRealPlayerIn3PlusPlayerGame(managedPlayer))
                 .count();
