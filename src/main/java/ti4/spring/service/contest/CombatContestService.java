@@ -229,6 +229,7 @@ public class CombatContestService {
                 + " = " + defender.getUserName();
         return "## A New Combat Contest Has Emerged!\n"
                 + "**Game:** `" + game.getName() + "`\n"
+                + "**Game Link:** [Open Game](https://asyncti4.com/game/" + game.getName() + ")\n"
                 + "**System:** " + tile.getRepresentationForButtons() + "\n"
                 + "**Combat:** Space Combat\n"
                 + "**Outlook:** "
@@ -567,6 +568,7 @@ public class CombatContestService {
                 BotLogger.error(new LogOrigin(game), "Failed to create combat contest result image.", e);
                 MessageHelper.sendMessageToChannel(threadOrChannel, resultMessage);
             }
+            postPredictionPointsSummary(threadOrChannel, contest);
         }
         refreshParentMessageSummary(
                 game,
@@ -651,6 +653,41 @@ public class CombatContestService {
                             : 0);
         }
         predictionRepository.saveAll(predictions);
+    }
+
+    private void postPredictionPointsSummary(MessageChannel threadOrChannel, CombatContestEntity contest) {
+        List<CombatContestPredictionEntity> predictions = predictionRepository.findByContestId(contest.getId());
+        if (predictions.isEmpty()) return;
+
+        Map<String, Integer> totalsByUser = predictionRepository
+                .findPointTotalsByDiscordUserIdIn(predictions.stream()
+                        .map(CombatContestPredictionEntity::getDiscordUserId)
+                        .toList())
+                .stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        CombatContestUserPointsRow::getDiscordUserId, row -> safeInt(row.getTotalPoints())));
+
+        StringBuilder message = new StringBuilder("## Prediction Points\n");
+        predictions.stream()
+                .sorted((left, right) -> {
+                    int pointsComparison =
+                            Integer.compare(safeInt(right.getPointsAwarded()), safeInt(left.getPointsAwarded()));
+                    if (pointsComparison != 0) return pointsComparison;
+                    return left.getDiscordUserName().compareToIgnoreCase(right.getDiscordUserName());
+                })
+                .forEach(prediction -> {
+                    int pointsAwarded = safeInt(prediction.getPointsAwarded());
+                    int totalPoints = totalsByUser.getOrDefault(prediction.getDiscordUserId(), 0);
+                    message.append("<@")
+                            .append(prediction.getDiscordUserId())
+                            .append("> - ")
+                            .append(totalPoints)
+                            .append(" points (+")
+                            .append(pointsAwarded)
+                            .append(")\n");
+                });
+
+        MessageHelper.splitAndSentWithAction(message.toString().trim(), threadOrChannel, null);
     }
 
     private int calculatePredictionPoints(

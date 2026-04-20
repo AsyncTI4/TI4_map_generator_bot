@@ -1,5 +1,6 @@
 package ti4.spring.service.contest;
 
+import java.util.Collection;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +11,16 @@ public interface CombatContestPredictionRepository extends JpaRepository<CombatC
     List<CombatContestPredictionEntity> findByContestId(Long contestId);
 
     List<CombatContestPredictionEntity> findByPointsAwardedIsNotNull();
+
+    @Query("""
+            select p.discordUserId as discordUserId,
+                   sum(p.pointsAwarded) as totalPoints
+            from CombatContestPredictionEntity p
+            where p.pointsAwarded is not null
+              and p.discordUserId in :discordUserIds
+            group by p.discordUserId
+            """)
+    List<CombatContestUserPointsRow> findPointTotalsByDiscordUserIdIn(Collection<String> discordUserIds);
 
     @Query("""
             select p.discordUserId as discordUserId,
