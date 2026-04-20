@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.function.Predicate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -28,13 +27,8 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
     private static final int START_OF_HTTP_SERVER_ERROR_RANGE = 500;
     private static final String HTTP_ERROR_THREAD_NAME = "http-errors";
     private static final String READY_PATH = "/api/public/ready";
-    private static final List<IgnoredHttpErrorRule> IGNORED_HTTP_ERROR_RULES = List.of(new IgnoredHttpErrorRule(
-            READY_PATH,
-            HttpStatus.SERVICE_UNAVAILABLE.value(),
-            body -> body.contains("\"ready\":false")
-                    && body.contains("\"leaseOwned\":")
-                    && ((body.contains("\"active\":false") && body.contains("\"draining\":false"))
-                            || (body.contains("\"active\":true") && body.contains("\"draining\":true")))));
+    private static final List<IgnoredHttpErrorRule> IGNORED_HTTP_ERROR_RULES =
+            List.of(new IgnoredHttpErrorRule(READY_PATH, HttpStatus.SERVICE_UNAVAILABLE.value()));
 
     @Override
     protected void doFilterInternal(
@@ -107,10 +101,10 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
                 || exception instanceof UserNotInGameForbiddenException;
     }
 
-    private record IgnoredHttpErrorRule(String requestPath, int statusCode, Predicate<String> bodyPredicate) {
+    private record IgnoredHttpErrorRule(String requestPath, int statusCode) {
 
         private boolean matches(String requestUri, int responseStatusCode, String body) {
-            return requestPath.equals(requestUri) && statusCode == responseStatusCode && bodyPredicate.test(body);
+            return requestPath.equals(requestUri) && statusCode == responseStatusCode;
         }
     }
 }
