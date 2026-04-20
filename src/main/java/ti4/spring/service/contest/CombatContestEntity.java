@@ -93,6 +93,12 @@ public class CombatContestEntity {
     @Column(name = "initial_strength_defender", nullable = false)
     private Double initialStrengthDefender;
 
+    @Column(name = "initial_hp_attacker")
+    private Double initialHpAttacker;
+
+    @Column(name = "initial_hp_defender")
+    private Double initialHpDefender;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "upset_index")
     private CombatContestUpsetIndex upsetIndex;
