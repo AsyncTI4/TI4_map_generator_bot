@@ -1347,7 +1347,7 @@ public final class ButtonHelperFactionSpecific {
         int modifierToHit = 0;
         int extraRollsForUnit = 0;
         int numRollsPerUnit = 1;
-        int numRolls = 4;
+        int numRolls = 3;
         RoundStatsTracker.recordDiceRolled(player.getGame(), player, numRolls);
         List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
         player.setExpectedHitsTimes10(player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));

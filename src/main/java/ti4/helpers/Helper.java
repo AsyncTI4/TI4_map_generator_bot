@@ -1192,6 +1192,14 @@ public final class Helper {
                     .append(" on the outcome \"**")
                     .append(formattedOutcome)
                     .append("**\".");
+        } else if (game.getCurrentAgendaInfo().contains("Planet")) {
+            msg.append("For a total of **")
+                    .append(votes)
+                    .append("** vote")
+                    .append(votes == 1 ? "" : "s")
+                    .append(" on the outcome \"**")
+                    .append(Helper.getPlanetRepresentation(formattedOutcome, game))
+                    .append("**\".");
         } else {
             msg.append("For a total of **")
                     .append(votes)
