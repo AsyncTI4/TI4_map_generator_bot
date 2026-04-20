@@ -194,7 +194,7 @@ class UserLeaveServerListener extends ListenerAdapter {
                 .append(player.getGames().stream()
                         .filter(managedGame -> managedGame.getRealPlayers().size() > 1)
                         .count())
-                .append("__** lifetime 3+ player games across all servers.");
+                .append("__** lifetime 2+ player games across all servers.");
         if (!foundOne) {
             return "dud";
         }
