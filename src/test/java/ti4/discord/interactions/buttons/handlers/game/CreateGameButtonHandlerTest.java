@@ -5,9 +5,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.junit.jupiter.api.Test;
 import ti4.game.persistence.ManagedGame;
+import ti4.game.persistence.ManagedPlayer;
 
 class CreateGameButtonHandlerTest {
 
@@ -23,17 +23,28 @@ class CreateGameButtonHandlerTest {
                 mockManagedGame(List.of(userId, "user-2", "user-3"), true, false, false),
                 mockManagedGame(List.of(userId, "user-2", "user-3"), false, false, true));
 
-        assertThat(CreateGameButtonHandler.countGamesThatAffectJoinLimit(userId, false, games)).isEqualTo(1);
-        assertThat(CreateGameButtonHandler.countGamesThatAffectJoinLimit(userId, true, games)).isEqualTo(2);
+        assertThat(CreateGameButtonHandler.countGamesThatAffectJoinLimit(userId, false, games))
+                .isEqualTo(1);
+        assertThat(CreateGameButtonHandler.countGamesThatAffectJoinLimit(userId, true, games))
+                .isEqualTo(2);
     }
 
     private static ManagedGame mockManagedGame(
             List<String> realPlayerIds, boolean hasEnded, boolean hasWinner, boolean fowMode) {
         ManagedGame managedGame = mock(ManagedGame.class);
-        when(managedGame.getRealPlayers()).thenReturn(realPlayerIds.stream().map(UserSnowflake::fromId).toList());
+        List<ManagedPlayer> realPlayers = realPlayerIds.stream()
+                .map(CreateGameButtonHandlerTest::mockManagedPlayer)
+                .toList();
+        when(managedGame.getRealPlayers()).thenReturn(realPlayers);
         when(managedGame.isHasEnded()).thenReturn(hasEnded);
         when(managedGame.isHasWinner()).thenReturn(hasWinner);
         when(managedGame.isFowMode()).thenReturn(fowMode);
         return managedGame;
+    }
+
+    private static ManagedPlayer mockManagedPlayer(String userId) {
+        ManagedPlayer managedPlayer = mock(ManagedPlayer.class);
+        when(managedPlayer.getId()).thenReturn(userId);
+        return managedPlayer;
     }
 }

@@ -422,7 +422,8 @@ public class CreateGameButtonHandler {
     static int countGamesThatAffectJoinLimit(String userId, boolean includeEndedGames, List<ManagedGame> managedGames) {
         return (int) managedGames.stream()
                 .filter(game -> game.getRealPlayers().size() >= 3)
-                .filter(game -> game.getRealPlayers().stream().anyMatch(player -> player.getId().equals(userId)))
+                .filter(game -> game.getRealPlayers().stream()
+                        .anyMatch(player -> player.getId().equals(userId)))
                 .filter(game -> includeEndedGames || (!game.isHasEnded() && !game.isFowMode()))
                 .filter(game -> !game.isFowMode() || game.isHasEnded())
                 .filter(game -> !game.isHasEnded() || game.isHasWinner())
