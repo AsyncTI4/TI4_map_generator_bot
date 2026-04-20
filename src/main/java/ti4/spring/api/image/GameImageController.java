@@ -26,16 +26,13 @@ import ti4.spring.context.SetupRequestContext;
 
 @RequiredArgsConstructor
 @RestController
-// TODO: this should be /image
-@RequestMapping("/api/public/game/{gameName}")
+@RequestMapping("/api/public/game/{gameName}/image")
 public class GameImageController {
 
     private final GameImageService gameImageService;
     private final GameAttachmentUrlRefreshService gameAttachmentUrlRefreshService;
 
-    // TODO: once the above is /image, this doesn't need to specify anything
-    @SetupRequestContext(save = false)
-    @GetMapping("/image")
+    @GetMapping
     public ResponseEntity<String> get(@PathVariable String gameName) {
         return gameImageService
                 .getLatestMapImageData(gameName)
@@ -44,22 +41,16 @@ public class GameImageController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @SetupRequestContext(save = false)
-    @GetMapping("/image/attachment-url")
+    @GetMapping("/attachment-url")
     public ResponseEntity<String> getAttachmentUrl(@PathVariable String gameName) {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame == null) {
             return ResponseEntity.notFound().build();
         }
 
-        Game game = RequestContext.getGame();
-        if (game == null) {
-            return ResponseEntity.notFound().build();
-        }
-
         // Non-FoW game: return full map to anyone
-        if (!game.isFowMode()) {
-            return getFullMapUrl(gameName, false);
+        if (!managedGame.isFowMode()) {
+            return getFullMapUrl(managedGame);
         }
 
         // FoW game: check for authentication
@@ -69,15 +60,16 @@ public class GameImageController {
                     .body("Authentication required to view Fog of War maps");
         }
 
+        Game game = managedGame.getGame();
         // FoW game: GM (owner) gets full map
         if (userId.equals(game.getOwnerID())) {
-            return getFullMapUrl(gameName, true);
+            return getFullMapUrl(managedGame);
         }
 
         // FoW game: Check if user is a GM via Discord role
         boolean isGm = game.getPlayersWithGMRole().stream().anyMatch(p -> userId.equals(p.getUserID()));
         if (isGm) {
-            return getFullMapUrl(gameName, true);
+            return getFullMapUrl(managedGame);
         }
 
         // FoW game: Player gets their FoW map
@@ -91,14 +83,13 @@ public class GameImageController {
                         "To see this Fog of War map, please make sure you are logged in and are participating in this game");
     }
 
-    @SetupRequestContext(save = false)
-    @PostMapping("/image/attachment-url/refresh")
+    @PostMapping("/attachment-url/refresh")
     public ResponseEntity<String> refreshAttachmentUrl(@PathVariable String gameName) {
-        Game game = RequestContext.getGame();
-        if (game == null) {
+        ManagedGame managedGame = GameManager.getManagedGame(gameName);
+        if (managedGame == null) {
             return ResponseEntity.notFound().build();
         }
-        if (game.isFowMode()) {
+        if (managedGame.isFowMode()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Refresh is unavailable for Fog of War games");
         }
 
@@ -119,7 +110,9 @@ public class GameImageController {
     /**
      * Get the full (non-FoW) map URL for a game.
      */
-    private ResponseEntity<String> getFullMapUrl(String gameName, boolean fowMode) {
+    private ResponseEntity<String> getFullMapUrl(ManagedGame managedGame) {
+        String gameName = managedGame.getName();
+        boolean fowMode = managedGame.isFowMode();
         MapImageData mapImageData =
                 gameImageService.getLatestMapImageData(gameName).orElse(null);
         if (mapImageData == null) {
@@ -219,9 +212,6 @@ public class GameImageController {
     @PostMapping("/refresh")
     public ResponseEntity<String> refresh(@PathVariable String gameName) {
         Game game = RequestContext.getGame();
-        if (game == null) {
-            return ResponseEntity.notFound().build();
-        }
         MapRenderPipeline.queue(game, null, DisplayType.all, null);
         return ResponseEntity.ok("Queued");
     }
