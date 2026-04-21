@@ -50,6 +50,8 @@ import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.tech.BastionTechService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.contest.CombatContestService;
 
 @UtilityClass
 public class StartCombatService {
@@ -118,6 +120,7 @@ public class StartCombatService {
             GenericInteractionCreateEvent event,
             String specialCombatTitle) {
         RoundStatsTracker.incrementCombatsInitiated(game, player);
+        SpringContext.getBean(CombatContestService.class).onSpaceCombatStarted(game, player, player2, tile);
         String threadName = combatThreadName(game, player, player2, tile, specialCombatTitle);
         if (!game.isFowMode()) {
             findOrCreateCombatThread(

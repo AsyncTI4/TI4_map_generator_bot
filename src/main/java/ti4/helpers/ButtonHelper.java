@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -2315,12 +2312,8 @@ public class ButtonHelper {
             }
 
             List<Button> buttonsWeb = Buttons.mapImageButtons(game);
-            Consumer<Message> persistMessageId = msg -> SpringContext.getBean(GameImageService.class)
-                    .saveDiscordMessageId(
-                            game,
-                            msg.getIdLong(),
-                            msg.getGuild().getIdLong(),
-                            msg.getChannel().getIdLong());
+            Consumer<Message> persistMessageId =
+                    msg -> SpringContext.getBean(GameImageService.class).saveDiscordMessage(game.getName(), msg);
 
             for (ThreadChannel thread : threadChannels) {
                 if (threadName.equals(thread.getName())) {
@@ -3525,6 +3518,9 @@ public class ButtonHelper {
                         && !FoWHelper.getAdjacentTiles(game, pos, player, false).contains(tile.getPosition())) {
                     continue;
                 }
+            }
+            if (whatIsItFor.contains("intervention") && FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
+                continue;
             }
             if (FOWPlusService.preventRemovingCCFromTile(game, player, tile)) {
                 continue;

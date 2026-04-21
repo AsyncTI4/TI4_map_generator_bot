@@ -110,8 +110,8 @@ public class ManagedGame {
         return players.stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null);
     }
 
-    public boolean hasPlayer(String playerId) {
-        return players.stream().anyMatch(p -> p.getId().equals(playerId));
+    public boolean hasPlayer(String id) {
+        return players.stream().anyMatch(p -> p.getId().equals(id));
     }
 
     public boolean isActive() {

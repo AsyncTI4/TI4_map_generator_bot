@@ -11,6 +11,7 @@ public class ListenerManager {
                 // Priority Listeners First
                 new BotRuntimeStatsListener(),
                 new MessageListener(),
+                new LazaxMinigameReactionListener(),
                 new SlashCommandListener(),
                 new ContextMenuListener(),
                 ButtonListener.getInstance(),

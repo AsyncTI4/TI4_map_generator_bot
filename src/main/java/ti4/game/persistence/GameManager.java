@@ -42,9 +42,6 @@ public class GameManager {
 
         validGameNames.addAll(GameLoadService.loadManagedGameNames());
         gameNamesIndexed.set(true);
-        if (JdaService.testingMode) {
-            return;
-        }
     }
 
     /**

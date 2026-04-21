@@ -26,15 +26,13 @@ import ti4.spring.context.SetupRequestContext;
 
 @RequiredArgsConstructor
 @RestController
-// TODO: this should be /image
-@RequestMapping("/api/public/game/{gameName}")
+@RequestMapping("/api/public/game/{gameName}/image")
 public class GameImageController {
 
     private final GameImageService gameImageService;
+    private final GameAttachmentUrlRefreshService gameAttachmentUrlRefreshService;
 
-    // TODO: once the above is /image, this doesn't need to specify anything
-    @SetupRequestContext(false)
-    @GetMapping("/image")
+    @GetMapping
     public ResponseEntity<String> get(@PathVariable String gameName) {
         return gameImageService
                 .getLatestMapImageData(gameName)
@@ -43,8 +41,7 @@ public class GameImageController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @SetupRequestContext(false)
-    @GetMapping("/image/attachment-url")
+    @GetMapping("/attachment-url")
     public ResponseEntity<String> getAttachmentUrl(@PathVariable String gameName) {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame == null) {
@@ -53,7 +50,7 @@ public class GameImageController {
 
         // Non-FoW game: return full map to anyone
         if (!managedGame.isFowMode()) {
-            return getFullMapUrl(gameName);
+            return getFullMapUrl(managedGame);
         }
 
         // FoW game: check for authentication
@@ -63,18 +60,16 @@ public class GameImageController {
                     .body("Authentication required to view Fog of War maps");
         }
 
-        // FoW game: GM (owner) gets full map
         Game game = managedGame.getGame();
-        if (game != null && userId.equals(game.getOwnerID())) {
-            return getFullMapUrl(gameName);
+        // FoW game: GM (owner) gets full map
+        if (userId.equals(game.getOwnerID())) {
+            return getFullMapUrl(managedGame);
         }
 
         // FoW game: Check if user is a GM via Discord role
-        if (game != null) {
-            boolean isGm = game.getPlayersWithGMRole().stream().anyMatch(p -> userId.equals(p.getUserID()));
-            if (isGm) {
-                return getFullMapUrl(gameName);
-            }
+        boolean isGm = game.getPlayersWithGMRole().stream().anyMatch(p -> userId.equals(p.getUserID()));
+        if (isGm) {
+            return getFullMapUrl(managedGame);
         }
 
         // FoW game: Player gets their FoW map
@@ -102,21 +97,38 @@ public class GameImageController {
     /**
      * Get the full (non-FoW) map URL for a game.
      */
-    private ResponseEntity<String> getFullMapUrl(String gameName) {
+    private ResponseEntity<String> getFullMapUrl(ManagedGame managedGame) {
+        String gameName = managedGame.getName();
+        boolean fowMode = managedGame.isFowMode();
         MapImageData mapImageData =
                 gameImageService.getLatestMapImageData(gameName).orElse(null);
         if (mapImageData == null) {
-            return ResponseEntity.notFound().build();
+            if (fowMode) {
+                return notFound();
+            }
+            return refreshAttachmentUrlResponse(gameName);
         }
 
         Long messageId = mapImageData.getLatestDiscordMessageId();
         Long channelId = mapImageData.getLatestDiscordChannelId();
 
         if (messageId == null || messageId == 0 || channelId == null || channelId == 0) {
-            return ResponseEntity.notFound().build();
+            if (fowMode) {
+                return notFound();
+            }
+            return refreshAttachmentUrlResponse(gameName);
         }
 
-        return fetchDiscordAttachmentUrl(messageId, channelId, gameName);
+        ResponseEntity<String> response = fetchDiscordAttachmentUrl(gameName, messageId, channelId, false);
+        if (response.getStatusCode() != HttpStatus.NOT_FOUND) {
+            return response;
+        }
+
+        if (fowMode) {
+            return response;
+        }
+
+        return refreshAttachmentUrlResponse(gameName);
     }
 
     /**
@@ -136,13 +148,14 @@ public class GameImageController {
             return ResponseEntity.notFound().build();
         }
 
-        return fetchDiscordAttachmentUrl(messageId, channelId, gameName);
+        return fetchDiscordAttachmentUrl(gameName, messageId, channelId, false);
     }
 
     /**
      * Fetch the attachment URL from a Discord message.
      */
-    private ResponseEntity<String> fetchDiscordAttachmentUrl(Long messageId, Long channelId, String gameName) {
+    private ResponseEntity<String> fetchDiscordAttachmentUrl(
+            String gameName, Long messageId, Long channelId, boolean persistDiscordMessage) {
         MessageChannel channel = JdaService.jda.getChannelById(MessageChannel.class, channelId);
         if (channel == null) {
             return ResponseEntity.notFound().build();
@@ -157,6 +170,9 @@ public class GameImageController {
             }
 
             String attachmentUrl = message.getAttachments().getFirst().getUrl();
+            if (persistDiscordMessage) {
+                gameImageService.saveDiscordMessage(gameName, message);
+            }
             return ResponseEntity.ok(attachmentUrl);
         } catch (Exception e) {
             if (!DiscordHelper.isUnknownMessageError(e)) {
@@ -168,13 +184,21 @@ public class GameImageController {
         }
     }
 
+    private ResponseEntity<String> refreshAttachmentUrlResponse(String gameName) {
+        return gameAttachmentUrlRefreshService
+                .refreshAttachmentUrl(gameName)
+                .map(ResponseEntity::ok)
+                .orElseGet(this::notFound);
+    }
+
+    private ResponseEntity<String> notFound() {
+        return ResponseEntity.notFound().build();
+    }
+
     @SetupRequestContext(save = false)
     @PostMapping("/refresh")
     public ResponseEntity<String> refresh(@PathVariable String gameName) {
         Game game = RequestContext.getGame();
-        if (game == null) {
-            return ResponseEntity.notFound().build();
-        }
         MapRenderPipeline.queue(game, null, DisplayType.all, null);
         return ResponseEntity.ok("Queued");
     }

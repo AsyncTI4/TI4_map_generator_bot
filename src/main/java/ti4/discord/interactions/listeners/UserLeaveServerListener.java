@@ -73,7 +73,7 @@ class UserLeaveServerListener extends ListenerAdapter {
         return JdaService.isValidGuild(eventGuild);
     }
 
-    private static int userTotalGames(ManagedPlayer user) {
+    private static int getInProgressGamesCount(ManagedPlayer user) {
         return (int) user.getGames().stream()
                 .filter(mg -> !mg.isHasEnded() && !mg.isHasWinner() && !mg.isVpGoalReached())
                 .count();
@@ -188,7 +188,7 @@ class UserLeaveServerListener extends ListenerAdapter {
             msg.append(separator);
         }
         msg.append("\nUser has **__")
-                .append(userTotalGames(player))
+                .append(getInProgressGamesCount(player))
                 .append("__** in-progress games and **__")
                 .append(player.getGames().size())
                 .append("__** lifetime games across all servers.");
