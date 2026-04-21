@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import ti4.discord.JdaService;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.service.ShowGameService;
 import ti4.testUtils.BaseTi4Test;
 
@@ -101,33 +102,39 @@ class RecreateGameServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void recreateGameReturnsIncompatibleMessageForFogOfWarGames() {
+    void fogOfWarGamesUseAnonymousAnnouncementsChannelName() {
         Game game = mock(Game.class);
-        Guild guild = mock(Guild.class);
-        when(game.getName()).thenReturn("fow-game");
         when(game.isFowMode()).thenReturn(true);
+        when(game.getName()).thenReturn("fow-game");
 
-        String result = RecreateGameService.recreateGame(game, guild);
-
-        assertEquals(
-                "Could not recreate game resources for `fow-game`.\nNotes: Fog of War games are not compatible with recreate game and must be recreated manually.",
-                result);
+        assertEquals("fow-game-anonymous-announcements-private", RecreateGameService.getActionsChannelName(game));
     }
 
     @Test
-    void recreateGameUsesGameGuild() {
+    void fogOfWarGamesUseGmChannelName() {
         Game game = mock(Game.class);
-        Guild guild = mock(Guild.class);
         when(game.getName()).thenReturn("fow-game");
-        when(game.isFowMode()).thenReturn(true);
-        when(game.getGuild()).thenReturn(guild);
 
-        String result = RecreateGameService.recreateGame(game);
+        assertEquals("fow-game-gm-room", RecreateGameService.getFogOfWarGmChannelName(game));
+    }
 
-        verify(game).getGuild();
-        assertEquals(
-                "Could not recreate game resources for `fow-game`.\nNotes: Fog of War games are not compatible with recreate game and must be recreated manually.",
-                result);
+    @Test
+    void postShowGameToFogOfWarPrivateChannelsDelegatesForEachNonGmPlayer() {
+        Game game = mock(Game.class);
+        Player gm = mock(Player.class);
+        Player player = mock(Player.class);
+        TextChannel privateChannel = mock(TextChannel.class);
+
+        when(game.getRealPlayers()).thenReturn(List.of(gm, player));
+        when(gm.isGM()).thenReturn(true);
+        when(player.isGM()).thenReturn(false);
+        when(player.getPrivateChannel()).thenReturn(privateChannel);
+
+        try (MockedStatic<ShowGameService> showGameService = mockStatic(ShowGameService.class)) {
+            RecreateGameService.postShowGameToFogOfWarPrivateChannels(game);
+
+            showGameService.verify(() -> ShowGameService.postShowGame(game, privateChannel, player));
+        }
     }
 
     @Test
