@@ -55,13 +55,10 @@ public class CombatContestService {
     public static final String LAZAX_MINIGAME_SUBSCRIPTION_MARKER = "-# Lazax Minigame Subscription";
     public static final String LAZAX_MINIGAME_ROLE_NAME = "Lazax Minigame";
     private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives";
-    private static final Duration CONTEST_COOLDOWN = Duration.ofMinutes(10);
-    private static final double MIN_FLEET_RESOURCES = 18.0;
     private static final String THREAD_SUMMARY_HEADER = "## Combat Units\n";
     private static final Set<String> COMBAT_SUMMARY_TECH_ALIASES = Set.of("da", "asc", "x89", "x89c4");
     private static final Set<String> COMBAT_SUMMARY_RELIC_ALIASES = Set.of(
             "metalivoidarmaments", "metalivoidshielding", "lightrailordnance", "baldrick_crownofthalnos", "pi_thalnos");
-    private static final double MIN_HP_RATIO = 0.8;
     private static final double ZERO_EPSILON = 0.0001;
     private static final String SUBSCRIBE_EMOJI = "\uD83D\uDFE2";
     private static final String UNSUBSCRIBE_EMOJI = "\uD83D\uDD34";
@@ -73,26 +70,41 @@ public class CombatContestService {
 
     private final CombatContestRepository repository;
     private final CombatContestPredictionRepository predictionRepository;
+    private final CombatContestSampleRepository sampleRepository;
+    private final CombatContestSelectionService selectionService;
 
     // ==================== Public Entry Points ====================
 
     public void onSpaceCombatStarted(Game game, Player attacker, Player defender, Tile tile) {
         try {
             if (!isEligibleGame(game) || !isEligibleCombat(game, attacker, defender, tile)) return;
+
+            SpaceCombatSnapshot snapshot = buildSnapshot(game, attacker, defender, tile);
+            if (snapshot == null) return;
+
+            CombatContestSelectionService.Evaluation evaluation = selectionService.evaluate(
+                    snapshot.attackerStrength(),
+                    snapshot.defenderStrength(),
+                    snapshot.attackerHp(),
+                    snapshot.defenderHp());
+            CombatContestSelectionService.Settings settings = selectionService.getCurrentSettings();
+            CombatContestSampleEntity sample =
+                    sampleRepository.save(buildSampleEntity(game, tile, snapshot, evaluation, settings));
+
             if (repository
                     .findFirstByGameNameAndTilePositionAndCombatTypeAndStatusInOrderByPostedAtDesc(
                             game.getName(), tile.getPosition(), CombatContestType.SPACE, ACTIVE_STATUSES)
                     .isPresent()) {
                 return;
             }
-
-            SpaceCombatSnapshot snapshot = buildSnapshot(game, attacker, defender, tile);
-            if (snapshot == null || !snapshot.isMeaningful()) return;
+            if (!evaluation.eligibleUnderCurrentThresholds() || !cooldownElapsed()) return;
 
             TextChannel contestChannel = getContestChannel();
             if (contestChannel == null) return;
 
             CombatContestEntity contest = repository.save(buildContestEntity(game, attacker, defender, tile, snapshot));
+            sample.setContestPosted(true);
+            sampleRepository.save(sample);
             postContestMessage(game, attacker, defender, tile, contestChannel, contest, snapshot);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Combat contest nomination failed.", e);
@@ -170,10 +182,12 @@ public class CombatContestService {
     }
 
     private boolean cooldownElapsed() {
+        Duration cooldown =
+                Duration.ofMinutes(selectionService.getCurrentSettings().cooldownMinutes());
         return repository
                 .findFirstByOrderByPostedAtDesc()
                 .map(contest -> Duration.between(contest.getPostedAt(), LocalDateTime.now())
-                                .compareTo(CONTEST_COOLDOWN)
+                                .compareTo(cooldown)
                         >= 0)
                 .orElse(true);
     }
@@ -211,6 +225,33 @@ public class CombatContestService {
         return contest;
     }
 
+    private CombatContestSampleEntity buildSampleEntity(
+            Game game,
+            Tile tile,
+            SpaceCombatSnapshot snapshot,
+            CombatContestSelectionService.Evaluation evaluation,
+            CombatContestSelectionService.Settings settings) {
+        CombatContestSampleEntity sample = new CombatContestSampleEntity();
+        sample.setStartedAt(LocalDateTime.now());
+        sample.setGameName(game.getName());
+        sample.setTilePosition(tile.getPosition());
+        sample.setAttackerStrength(snapshot.attackerStrength());
+        sample.setDefenderStrength(snapshot.defenderStrength());
+        sample.setAttackerHp(snapshot.attackerHp());
+        sample.setDefenderHp(snapshot.defenderHp());
+        sample.setWeakerStrength(evaluation.weakerStrength());
+        sample.setStrongerStrength(evaluation.strongerStrength());
+        sample.setWeakerHp(evaluation.weakerHp());
+        sample.setStrongerHp(evaluation.strongerHp());
+        sample.setFairnessRatio(evaluation.fairnessRatio());
+        sample.setContestScore(evaluation.contestScore());
+        sample.setScoreCutoffAtStart(settings.scoreCutoff());
+        sample.setSelectionModeAtStart(settings.selectionMode());
+        sample.setEligibleUnderCurrentThresholds(evaluation.eligibleUnderCurrentThresholds());
+        sample.setContestPosted(false);
+        return sample;
+    }
+
     // ==================== Combat Snapshot & Strength ====================
 
     private SpaceCombatSnapshot buildSnapshot(Game game, Player attacker, Player defender, Tile tile) {
@@ -219,7 +260,6 @@ public class CombatContestService {
 
         FleetStrength attackerStrength = calculateFleetStrength(game, attacker, space);
         FleetStrength defenderStrength = calculateFleetStrength(game, defender, space);
-        if (!attackerStrength.hasNonFighterShip() || !defenderStrength.hasNonFighterShip()) return null;
 
         double stronger = Math.max(attackerStrength.hp(), defenderStrength.hp());
         double weaker = Math.min(attackerStrength.hp(), defenderStrength.hp());
@@ -249,7 +289,6 @@ public class CombatContestService {
     private FleetStrength calculateFleetStrength(Game game, Player player, UnitHolder space) {
         double total = 0;
         double hp = 0;
-        boolean hasNonFighterShip = false;
         for (UnitKey unitKey : space.getUnitKeys()) {
             if (!unitKey.getColorID().equalsIgnoreCase(player.getColorID())) {
                 continue;
@@ -270,11 +309,8 @@ public class CombatContestService {
                     hp += undamagedUnits;
                 }
             }
-            if (!"fighter".equalsIgnoreCase(unitModel.getBaseType())) {
-                hasNonFighterShip = true;
-            }
         }
-        return new FleetStrength(total, hp, hasNonFighterShip);
+        return new FleetStrength(total, hp);
     }
 
     private String extractSpaceOnlySummary(String summary) {
@@ -972,7 +1008,7 @@ public class CombatContestService {
 
     // ==================== Records ====================
 
-    private record FleetStrength(double value, double hp, boolean hasNonFighterShip) {}
+    private record FleetStrength(double value, double hp) {}
 
     private record SpaceCombatSnapshot(
             String parentPostText,
@@ -982,15 +1018,5 @@ public class CombatContestService {
             double defenderStrength,
             double attackerHp,
             double defenderHp,
-            double strengthRatio) {
-        private boolean isMeaningful() {
-            double strongerResources = Math.max(attackerStrength, defenderStrength);
-            double weakerResources = Math.min(attackerStrength, defenderStrength);
-            return strongerResources >= MIN_FLEET_RESOURCES
-                    && weakerResources >= MIN_FLEET_RESOURCES
-                    && attackerHp > 0
-                    && defenderHp > 0
-                    && strengthRatio >= MIN_HP_RATIO;
-        }
-    }
+            double strengthRatio) {}
 }
