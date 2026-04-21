@@ -49,6 +49,8 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.contest.CombatContestService;
 
 @UtilityClass
 public class ActionCardHelper {
@@ -242,7 +244,7 @@ public class ActionCardHelper {
     private static List<Button> getPlotCardButtons(Player player) {
         boolean hasManageAbility = player.hasAbility("plotsplots");
         if (player.hasLeader("firmamenthero")) hasManageAbility = true;
-        if (!hasManageAbility) return new ArrayList<>();
+        if (!hasManageAbility && player.getPlotCards().isEmpty()) return new ArrayList<>();
 
         List<Button> buttons = new ArrayList<>();
         Set<Entry<String, Integer>> plotCards = player.getPlotCards().entrySet();
@@ -267,7 +269,9 @@ public class ActionCardHelper {
                         buttons.add(Buttons.red(buttonID, buttonText));
                     }
                 });
-        buttons.add(Buttons.blue("scoreOtherPlayersSecrets", "Score Other Players' Secrets (Max 5)"));
+        if (player.hasAbility("plotsplots")) {
+            buttons.add(Buttons.blue("scoreOtherPlayersSecrets", "Score Other Players' Secrets (Max 5)"));
+        }
         return buttons;
     }
 
@@ -347,9 +351,9 @@ public class ActionCardHelper {
                         .append("_ `(")
                         .append(Helper.leftpad("" + ac.getValue(), 3))
                         .append(")`\n> ")
-                        .append(actionCard.getWindow())
+                        .append(actionCard.hasWildText(game) ? actionCard.getWildWildWindow() : actionCard.getWindow())
                         .append(": ")
-                        .append(actionCard.getText())
+                        .append(actionCard.hasWildText(game) ? actionCard.getWildWildText() : actionCard.getText())
                         .append('\n');
                 if (actionCard.getNotes() != null) {
                     sb.append("> -# [").append(actionCard.getNotes()).append("]\n");
@@ -821,6 +825,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithEmbed(bEvent.getChannel(), message, acEmbed);
             }
         }
+        SpringContext.getBean(CombatContestService.class).mirrorCombatActionCard(game, player, actionCard);
         if (actionCardIsSabotageOrShatter) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
             if (game.isWildWildGalaxyMode()) {

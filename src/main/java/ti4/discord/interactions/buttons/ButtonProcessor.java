@@ -36,6 +36,8 @@ import ti4.service.button.ReactionService;
 import ti4.service.game.GameNameService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.contest.CombatContestService;
 
 @UtilityClass
 public class ButtonProcessor {
@@ -85,6 +87,10 @@ public class ButtonProcessor {
 
                 beforeTime = System.currentTimeMillis();
                 context.save();
+                if (context.getGame() != null) {
+                    SpringContext.getBean(CombatContestService.class)
+                            .onButtonInteractionSettled(context.getGame(), context.getPlayer(), event);
+                }
                 saveRuntime = System.currentTimeMillis() - beforeTime;
             }
         } catch (Exception e) {

@@ -58,6 +58,8 @@ public class PersistAllEntitiesService {
         List<TitleEntity> titleEntities = new ArrayList<>();
         for (ManagedGame managedGame : GameManager.getManagedGames()) {
             Game game = managedGame.getGame();
+            if (game.getRealAndEliminatedPlayers().size() < 3) continue;
+
             var gameEntity = toEntity(game, userCache);
             gameEntities.add(gameEntity);
             titleEntities.addAll(toTitleEntities(game, gameEntity, userCache));
