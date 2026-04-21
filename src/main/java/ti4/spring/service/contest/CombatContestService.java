@@ -53,12 +53,12 @@ public class CombatContestService {
     public static final String LAZAX_MINIGAME_ROLE_NAME = "Lazax Minigame";
     private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives";
     private static final Duration CONTEST_COOLDOWN = Duration.ofMinutes(10);
-    private static final double MIN_FLEET_RESOURCES = 20.0;
+    private static final double MIN_FLEET_RESOURCES = 18.0;
     private static final String THREAD_SUMMARY_HEADER = "## Combat Units\n";
     private static final Set<String> COMBAT_SUMMARY_TECH_ALIASES = Set.of("da", "asc", "x89", "x89c4");
     private static final Set<String> COMBAT_SUMMARY_RELIC_ALIASES = Set.of(
             "metalivoidarmaments", "metalivoidshielding", "lightrailordnance", "baldrick_crownofthalnos", "pi_thalnos");
-    private static final double MIN_HP_RATIO = 0.7;
+    private static final double MIN_HP_RATIO = 0.9;
     private static final double ZERO_EPSILON = 0.0001;
     private static final boolean PREDICTION_LOCK_ENABLED = false;
     private static final String SUBSCRIBE_EMOJI = "🟢";
@@ -274,10 +274,11 @@ public class CombatContestService {
             }
             int totalUnits = space.getUnitCount(unitKey);
             int damagedUnits = space.getDamagedUnitCount(unitKey);
-            int undamagedUnits = totalUnits - damagedUnits;
+            int undamagedUnits = Math.max(0, totalUnits - damagedUnits);
 
             total += unitModel.getCost() * totalUnits;
-            hp += totalUnits;
+            hp += damagedUnits;
+            hp += undamagedUnits;
             if (unitModel.getSustainDamage(player, space)) {
                 hp += undamagedUnits;
                 if (player.hasTech("nes")) {
