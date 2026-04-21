@@ -28,6 +28,7 @@ class CombatStatsServiceTest extends BaseTi4Test {
 
     private static Game testGame;
     private static Player neutral;
+    private static Player bluetf;
     private static Player winnu;
 
     @BeforeAll
@@ -39,6 +40,7 @@ class CombatStatsServiceTest extends BaseTi4Test {
         testGame.setCcNPlasticLimit(false);
 
         neutral = testGame.setupNeutralPlayer("gray");
+        bluetf = setupPlayer("bluetf");
         winnu = setupPlayer("winnu");
     }
 
@@ -89,6 +91,95 @@ class CombatStatsServiceTest extends BaseTi4Test {
         Assertions.assertEquals(3, displayProfile.diceCount());
         Assertions.assertEquals(0, rollProfile.diceCount());
         Assertions.assertEquals(3, extraRollCount);
+    }
+
+    @Test
+    void echoOfAscensionDoesNotDoubleApplyCombatThreshold() {
+        Tile tile = new Tile("112", getNextPosition());
+        testGame.setTile(tile);
+
+        bluetf.addOwnedUnitByID("tf-echoofascension");
+        try {
+            tile.addUnit("space", Units.getUnitKey(UnitType.Flagship, bluetf.getColorID()), 1);
+            tile.addUnit("space", Units.getUnitKey(UnitType.Mech, bluetf.getColorID()), 4);
+            tile.addUnit("space", Units.getUnitKey(UnitType.Carrier, neutral.getColorID()), 1);
+
+            Map<UnitModel, Integer> bluetfUnits = CombatRollService.getUnitsInCombat(
+                    tile, tile.getUnitHolders().get("space"), bluetf, null, CombatRollType.combatround, testGame);
+            Map<UnitModel, Integer> neutralUnits = CombatRollService.getUnitsInCombat(
+                    tile, tile.getUnitHolders().get("space"), neutral, null, CombatRollType.combatround, testGame);
+
+            String rollOutput = getCombatRollOutput(tile, bluetfUnits, neutralUnits);
+
+            Assertions.assertTrue(rollOutput.contains("Tizona 2 rolls (+4 rolls), hits on **2**"));
+            Assertions.assertFalse(rollOutput.contains("always hits (+1 mods)"));
+        } finally {
+            bluetf.removeOwnedUnitByID("tf-echoofascension");
+        }
+    }
+
+    @Test
+    void superchargeOnlyAppliesItsOwnModifierOnTopOfIntrinsicCombatStats() {
+        Tile tile = new Tile("112", getNextPosition());
+        testGame.setTile(tile);
+
+        bluetf.addOwnedUnitByID("tf-echoofascension");
+        bluetf.addTech("tf-supercharge");
+        try {
+            tile.addUnit("space", Units.getUnitKey(UnitType.Flagship, bluetf.getColorID()), 1);
+            tile.addUnit("space", Units.getUnitKey(UnitType.Mech, bluetf.getColorID()), 4);
+            tile.addUnit("space", Units.getUnitKey(UnitType.Carrier, neutral.getColorID()), 1);
+
+            Map<UnitModel, Integer> bluetfUnits = CombatRollService.getUnitsInCombat(
+                    tile, tile.getUnitHolders().get("space"), bluetf, null, CombatRollType.combatround, testGame);
+            Map<UnitModel, Integer> neutralUnits = CombatRollService.getUnitsInCombat(
+                    tile, tile.getUnitHolders().get("space"), neutral, null, CombatRollType.combatround, testGame);
+
+            String rollOutput = getCombatRollOutput(tile, bluetfUnits, neutralUnits);
+
+            Assertions.assertTrue(rollOutput.contains("Applied +2 to the rolls of 1 unit with _Supercharge_."));
+            Assertions.assertTrue(rollOutput.contains("Tizona 2 rolls (+4 rolls), always hits (+2 mods)"));
+            Assertions.assertFalse(rollOutput.contains("always hits (+3 mods)"));
+        } finally {
+            bluetf.removeOwnedUnitByID("tf-echoofascension");
+            bluetf.removeTech("tf-supercharge");
+        }
+    }
+
+    private static String getCombatRollOutput(
+            Tile tile, Map<UnitModel, Integer> playerUnits, Map<UnitModel, Integer> opponentUnits) {
+        TileModel tileModel = tile.getTileModel();
+        List<NamedCombatModifierModel> modifiers = CombatModHelper.getModifiers(
+                bluetf,
+                neutral,
+                playerUnits,
+                opponentUnits,
+                tileModel,
+                testGame,
+                CombatRollType.combatround,
+                Constants.COMBAT_MODIFIERS);
+        List<NamedCombatModifierModel> extraRolls = CombatModHelper.getModifiers(
+                bluetf,
+                neutral,
+                playerUnits,
+                opponentUnits,
+                tileModel,
+                testGame,
+                CombatRollType.combatround,
+                Constants.COMBAT_EXTRA_ROLLS);
+
+        return CombatRollService.rollForUnits(
+                playerUnits,
+                extraRolls,
+                modifiers,
+                List.of(),
+                bluetf,
+                neutral,
+                testGame,
+                CombatRollType.combatround,
+                null,
+                tile,
+                tile.getUnitHolders().get("space"));
     }
 
     private static Player setupPlayer(String faction) {
