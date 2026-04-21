@@ -374,7 +374,7 @@ public class MapGenerator implements AutoCloseable {
             fowPlayer = CommandHelper.getPlayerFromGame(
                     game, event.getMember(), event.getUser().getId());
         } else {
-            // This path is used for non-player-scoped FoW renders, such as website-only generation.
+            // This only applies when neither an explicit FoW player nor an interaction event is available.
             isFoWPrivate = false;
             return;
         }

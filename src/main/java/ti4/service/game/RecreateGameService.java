@@ -91,10 +91,10 @@ public class RecreateGameService {
                     result);
             if (actionsChannel != null) {
                 game.setMainChannelID(actionsChannel.getId());
-                // Fog of War maps are delivered directly to player private channels instead of a shared bot thread.
+                // Fog of War games use player private channels for maps and do not use shared bot threads.
                 game.setBotMapUpdatesThreadID(null);
             }
-            // Fog of War games do not use a public table-talk channel.
+            // Fog of War games also do not use a public table-talk channel.
             game.setTableTalkChannelID(null);
 
             ensureFogOfWarPrivateChannels(game, targetGuild, targetCategory, extraAccessMember, result);
@@ -219,6 +219,8 @@ public class RecreateGameService {
             Member member = guild.getMemberById(player.getUserID());
             if (member != null) {
                 guild.addRoleToMember(member, role).complete();
+            } else {
+                result.addNote("Player role member missing for " + player.getUserName());
             }
         }
         return role;
@@ -231,6 +233,8 @@ public class RecreateGameService {
             Member member = guild.getMemberById(player.getUserID());
             if (member != null) {
                 guild.addRoleToMember(member, gmRole).complete();
+            } else {
+                result.addNote("GM role member missing for " + player.getUserName());
             }
         }
         if (extraAccessMember != null) {
@@ -365,6 +369,8 @@ public class RecreateGameService {
                 privateChannel = getPrivateChannel(player);
                 if (privateChannel != null) {
                     result.getCreatedChannels().add(privateChannel.getName());
+                } else {
+                    result.addNote("Private channel recreation failed for " + player.getUserName());
                 }
             }
             moveChannelIfNeeded(privateChannel, targetCategory, result);
