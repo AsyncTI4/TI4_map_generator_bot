@@ -90,6 +90,9 @@ public class CombatContestEntity {
     @Column(name = "initial_summary_text", nullable = false, columnDefinition = "TEXT")
     private String initialSummaryText;
 
+    @Column(name = "active_player_summary", columnDefinition = "TEXT")
+    private String activePlayerSummary;
+
     @Column(name = "initial_strength_attacker", nullable = false)
     private Double initialStrengthAttacker;
 

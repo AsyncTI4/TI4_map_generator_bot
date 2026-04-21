@@ -97,6 +97,7 @@ public class CombatContestService {
             contest.setDefenderColor(defender.getColor());
             contest.setPostedAt(LocalDateTime.now());
             contest.setInitialSummaryText(snapshot.parentPostText());
+            contest.setActivePlayerSummary(snapshot.activePlayerSummary());
             contest.setInitialStrengthAttacker(snapshot.attackerStrength());
             contest.setInitialStrengthDefender(snapshot.defenderStrength());
             contest.setInitialHpAttacker(snapshot.attackerHp());
@@ -239,7 +240,8 @@ public class CombatContestService {
         String summary = extractSpaceOnlySummary(ButtonHelper.getCombatTileSummaryMessage(
                 game, tile, attacker, null, "space", Constants.SPACE, List.of(attacker, defender)));
 
-        String openerText = formatContestPostHeader(game, tile, attacker, defender);
+        String activePlayerSummary = formatActivePlayerSummary(game);
+        String openerText = formatContestPostHeader(game, tile, attacker, defender, activePlayerSummary);
         String threadSummaryText = null;
         String parentPostText = openerText + "\n\n" + summary;
         if (parentPostText.length() > Message.MAX_CONTENT_LENGTH) {
@@ -249,6 +251,7 @@ public class CombatContestService {
         return new SpaceCombatSnapshot(
                 parentPostText,
                 threadSummaryText,
+                activePlayerSummary,
                 attackerStrength.value(),
                 defenderStrength.value(),
                 attackerStrength.hp(),
@@ -288,7 +291,8 @@ public class CombatContestService {
         return new FleetStrength(total, hp, hasNonFighterShip);
     }
 
-    private String formatContestPostHeader(Game game, Tile tile, Player attacker, Player defender) {
+    private String formatContestPostHeader(
+            Game game, Tile tile, Player attacker, Player defender, String activePlayerSummary) {
         String attackerLegend = ColorEmojis.getColorEmoji(attacker.getColor()) + " " + attacker.getFactionEmoji()
                 + " = " + attacker.getUserName();
         String defenderLegend = ColorEmojis.getColorEmoji(defender.getColor()) + " " + defender.getFactionEmoji()
@@ -298,11 +302,24 @@ public class CombatContestService {
                 + "\n"
                 + "**Game:** `" + game.getName() + "`\n"
                 + "**Game Link:** [Open Game](https://asyncti4.com/game/" + game.getName() + ")\n"
+                + activePlayerSummary
                 + "**System:** " + tile.getRepresentationForButtons() + "\n"
                 + "**Combat:** Space Combat\n"
                 + "**Predict the winner by reacting below.**\n"
                 + "- " + attackerLegend + "\n"
                 + "- " + defenderLegend;
+    }
+
+    private String formatActivePlayerSummary(Game game) {
+        Player activePlayer = game.getActivePlayer();
+        if (activePlayer == null) {
+            return "**Active Player:** None\n";
+        }
+        String factionName = activePlayer.getFactionModel() == null
+                ? activePlayer.getFaction()
+                : activePlayer.getFactionModel().getFactionName();
+        return "**Active Player:** " + activePlayer.getFactionEmoji() + " " + factionName + " "
+                + activePlayer.getUserName() + "\n";
     }
 
     private String getLazaxMinigameRoleMention() {
@@ -1063,6 +1080,7 @@ public class CombatContestService {
     private record SpaceCombatSnapshot(
             String parentPostText,
             String threadSummaryText,
+            String activePlayerSummary,
             double attackerStrength,
             double defenderStrength,
             double attackerHp,
