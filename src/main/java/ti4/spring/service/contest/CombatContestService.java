@@ -152,8 +152,8 @@ public class CombatContestService {
                 MessageChannel threadOrChannel = getContestThreadOrChannel(contest);
                 if (threadOrChannel == null) continue;
 
-                String message = "## Combat Action Card\n" + player.getRepresentation() + " played _"
-                        + actionCard.getName() + "_.";
+                String message =
+                        "## Action Card\n" + player.getRepresentation() + " played _" + actionCard.getName() + "_.";
                 MessageHelper.sendMessageToChannelWithEmbed(
                         threadOrChannel, message, actionCard.getRepresentationEmbed(false, true, game));
             }
@@ -175,8 +175,9 @@ public class CombatContestService {
                 MessageChannel threadOrChannel = getContestThreadOrChannel(contest);
                 if (threadOrChannel == null) continue;
 
-                String message = "## Combat Agent\n" + player.getRepresentation() + " used _" + agent.getName() + "_.";
-                MessageHelper.sendMessageToChannel(threadOrChannel, message);
+                String message = "## Agent\n" + player.getRepresentation() + " used _" + agent.getName() + "_.";
+
+                MessageHelper.sendMessageToChannelWithEmbed(threadOrChannel, message, agent.getRepresentationEmbed());
             }
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Combat contest agent relay failed.", e);
