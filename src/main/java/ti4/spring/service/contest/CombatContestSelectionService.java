@@ -2,8 +2,6 @@ package ti4.spring.service.contest;
 
 import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +26,6 @@ public class CombatContestSelectionService {
     private static final double WEAKER_STRENGTH_WEIGHT = 0.30;
     private static final double WEAKER_HP_WEIGHT = 0.20;
     private static final double FAIRNESS_WEIGHT = 0.50;
-    private static final double SCALE_PERCENTILE = 0.90;
 
     private final CombatContestSampleRepository sampleRepository;
     private final CombatContestSelectionConfigRepository configRepository;
@@ -94,33 +91,19 @@ public class CombatContestSelectionService {
                     defaults.minimumSampleCount());
         }
 
-        double strengthScale = Math.max(
-                DEFAULT_STRENGTH_SCALE,
-                percentile(
-                        samples.stream()
-                                .map(CombatContestSampleEntity::getWeakerStrength)
-                                .toList(),
-                        SCALE_PERCENTILE));
-        double hpScale = Math.max(
-                DEFAULT_HP_SCALE,
-                percentile(
-                        samples.stream()
-                                .map(CombatContestSampleEntity::getWeakerHp)
-                                .toList(),
-                        SCALE_PERCENTILE));
-
-        List<Double> scores = new ArrayList<>(samples.size());
-        for (CombatContestSampleEntity sample : samples) {
-            scores.add(computeScore(
-                    sample.getWeakerStrength(),
-                    sample.getWeakerHp(),
-                    sample.getFairnessRatio(),
-                    strengthScale,
-                    hpScale,
-                    WEAKER_STRENGTH_WEIGHT,
-                    WEAKER_HP_WEIGHT,
-                    FAIRNESS_WEIGHT));
-        }
+        double strengthScale = DEFAULT_STRENGTH_SCALE;
+        double hpScale = DEFAULT_HP_SCALE;
+        List<Double> scores = samples.stream()
+                .map(sample -> computeScore(
+                        sample.getWeakerStrength(),
+                        sample.getWeakerHp(),
+                        sample.getFairnessRatio(),
+                        strengthScale,
+                        hpScale,
+                        WEAKER_STRENGTH_WEIGHT,
+                        WEAKER_HP_WEIGHT,
+                        FAIRNESS_WEIGHT))
+                .toList();
 
         double observedCombatsPerHour = samples.size() * 60.0 / LOOKBACK_MINUTES;
         double targetSelectionFraction = clamp(
@@ -251,7 +234,7 @@ public class CombatContestSelectionService {
 
     private double percentile(List<Double> values, double percentile) {
         if (values.isEmpty()) return 0.0;
-        List<Double> sorted = values.stream().sorted(Comparator.naturalOrder()).toList();
+        List<Double> sorted = values.stream().sorted().toList();
         int index = (int) Math.ceil(clamp(percentile, 0.0, 1.0) * (sorted.size() - 1));
         return sorted.get(index);
     }
