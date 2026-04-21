@@ -122,7 +122,7 @@ class RecreateGameServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void postShowGameToFogOfWarPrivateChannelsDelegatesForEachNonGmPlayer() {
+    void postShowGameToFowPrivateChannelsCallsShowGameForNonGmPlayers() {
         Game game = mock(Game.class);
         Player gm = mock(Player.class);
         Player player = mock(Player.class);
@@ -141,7 +141,7 @@ class RecreateGameServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void postShowGameToFogOfWarPrivateChannelsSkipsPlayersWithoutPrivateChannels() {
+    void postShowGameToFowPrivateChannelsSkipsPlayersWithoutChannel() {
         Game game = mock(Game.class);
         Player player = mock(Player.class);
 

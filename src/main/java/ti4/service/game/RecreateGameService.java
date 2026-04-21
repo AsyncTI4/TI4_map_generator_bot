@@ -34,6 +34,8 @@ public class RecreateGameService {
     private static final String LEGACY_TEST_GAME_MARKER = "::test::";
     private static final String FOW_GM_CHANNEL_SUFFIX = "-gm-room";
     private static final String FOW_ACTIONS_CHANNEL_SUFFIX = "-anonymous-announcements-private";
+    private static final String FOW_GM_MAP_MESSAGE =
+            "Use `/show_game_as_player` for a player-scoped Fog of War map view.";
     private static final Pattern TEST_GAME_NAME_PATTERN =
             Pattern.compile("^(?<source>.+?)" + Pattern.quote(TEST_GAME_MARKER) + "(?<suffix>\\d+)$");
 
@@ -89,8 +91,10 @@ public class RecreateGameService {
                     result);
             if (actionsChannel != null) {
                 game.setMainChannelID(actionsChannel.getId());
+                // Fog of War maps are delivered directly to player private channels instead of a shared bot thread.
                 game.setBotMapUpdatesThreadID(null);
             }
+            // Fog of War games do not use a public table-talk channel.
             game.setTableTalkChannelID(null);
 
             ensureFogOfWarPrivateChannels(game, targetGuild, targetCategory, extraAccessMember, result);
@@ -546,8 +550,7 @@ public class RecreateGameService {
         if (gmChannel == null) {
             return;
         }
-        MessageHelper.sendMessageToChannel(
-                gmChannel, "Use `/show_game_as_player` for a player-scoped Fog of War map view.");
+        MessageHelper.sendMessageToChannel(gmChannel, FOW_GM_MAP_MESSAGE);
     }
 
     static String getTableTalkChannelName(Game game) {
