@@ -61,7 +61,41 @@ public class RecreateGameService {
         }
 
         if (game.isFowMode()) {
-            recreateFogOfWarGame(game, targetGuild, extraAccessMember, result);
+            Role gmRole = ensureFogOfWarGmRole(game, targetGuild, extraAccessMember, result);
+            Role gameRole = ensureFogOfWarPlayerRole(game, targetGuild, result);
+            Category targetCategory = ensureTargetCategory(game, targetGuild);
+
+            TextChannel gmChannel = ensurePrimaryTextChannel(
+                    targetGuild,
+                    game,
+                    targetCategory,
+                    getFogOfWarGmChannelName(game),
+                    getExistingFogOfWarGmChannel(game),
+                    gmRole,
+                    extraAccessMember,
+                    result);
+            if (gmChannel != null) {
+                postShowGameToFogOfWarGmChannel(game, gmChannel);
+            }
+
+            TextChannel actionsChannel = ensurePrimaryTextChannel(
+                    targetGuild,
+                    game,
+                    targetCategory,
+                    getActionsChannelName(game),
+                    game.getMainGameChannel(),
+                    gameRole,
+                    extraAccessMember,
+                    result);
+            if (actionsChannel != null) {
+                game.setMainChannelID(actionsChannel.getId());
+                game.setBotMapUpdatesThreadID(null);
+            }
+            game.setTableTalkChannelID(null);
+
+            ensureFogOfWarPrivateChannels(game, targetGuild, targetCategory, extraAccessMember, result);
+            ensureCardsInfoThreads(game, result);
+            postShowGameToFogOfWarPrivateChannels(game);
             Helper.fixGameChannelPermissions(targetGuild, game);
             List<String> missingPlayers = collectMissingPlayers(game, targetGuild);
             result.getMissingPlayers().addAll(missingPlayers);
@@ -111,45 +145,6 @@ public class RecreateGameService {
         result.getMissingPlayers().addAll(missingPlayers);
         pingGame(game, result, extraAccessMember);
         return result;
-    }
-
-    private static void recreateFogOfWarGame(
-            Game game, Guild targetGuild, @Nullable Member extraAccessMember, RecreateGameResult result) {
-        Role gmRole = ensureFogOfWarGmRole(game, targetGuild, extraAccessMember, result);
-        Role gameRole = ensureFogOfWarPlayerRole(game, targetGuild, result);
-        Category targetCategory = ensureTargetCategory(game, targetGuild);
-
-        TextChannel gmChannel = ensurePrimaryTextChannel(
-                targetGuild,
-                game,
-                targetCategory,
-                getFogOfWarGmChannelName(game),
-                getExistingFogOfWarGmChannel(game),
-                gmRole,
-                extraAccessMember,
-                result);
-        if (gmChannel != null) {
-            postShowGameToFogOfWarGmChannel(game, gmChannel);
-        }
-
-        TextChannel actionsChannel = ensurePrimaryTextChannel(
-                targetGuild,
-                game,
-                targetCategory,
-                getActionsChannelName(game),
-                game.getMainGameChannel(),
-                gameRole,
-                extraAccessMember,
-                result);
-        if (actionsChannel != null) {
-            game.setMainChannelID(actionsChannel.getId());
-            game.setBotMapUpdatesThreadID(null);
-        }
-        game.setTableTalkChannelID(null);
-
-        ensureFogOfWarPrivateChannels(game, targetGuild, targetCategory, extraAccessMember, result);
-        ensureCardsInfoThreads(game, result);
-        postShowGameToFogOfWarPrivateChannels(game);
     }
 
     @Nullable
@@ -211,7 +206,7 @@ public class RecreateGameService {
         return role;
     }
 
-    private static Role ensureFogOfWarPlayerRole(Game game, Guild guild, RecreateGameResult result) {
+    static Role ensureFogOfWarPlayerRole(Game game, Guild guild, RecreateGameResult result) {
         Role role = ensureNamedRole(guild, game.getName(), true, result);
         for (Player player : game.getRealPlayers()) {
             if (player.isGM()) {
@@ -225,7 +220,7 @@ public class RecreateGameService {
         return role;
     }
 
-    private static Role ensureFogOfWarGmRole(
+    static Role ensureFogOfWarGmRole(
             Game game, Guild guild, @Nullable Member extraAccessMember, RecreateGameResult result) {
         Role gmRole = ensureNamedRole(guild, game.getName() + " GM", true, result);
         for (Player player : game.getPlayersWithGMRole()) {
@@ -345,7 +340,7 @@ public class RecreateGameService {
         return channel;
     }
 
-    private static void ensureFogOfWarPrivateChannels(
+    static void ensureFogOfWarPrivateChannels(
             Game game,
             Guild guild,
             @Nullable Category targetCategory,
