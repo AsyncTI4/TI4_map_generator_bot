@@ -105,15 +105,6 @@ public class CombatContestEntity {
     @Column(name = "initial_hp_defender")
     private Double initialHpDefender;
 
-    @Column(name = "prediction_locked_at")
-    private LocalDateTime predictionLockedAt;
-
-    @Column(name = "locked_attacker_predictions")
-    private Integer lockedAttackerPredictions;
-
-    @Column(name = "locked_defender_predictions")
-    private Integer lockedDefenderPredictions;
-
     @Column(name = "attacker_hit_assigned_round")
     private Integer attackerHitAssignedRound;
 
