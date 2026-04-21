@@ -420,35 +420,10 @@ public class CombatContestService {
     }
 
     public boolean postLeaderboard() {
-        TextChannel contestChannel = getContestChannel();
-        if (contestChannel == null) return false;
+        String message = buildLeaderboardMessage();
+        if (message == null) return false;
 
-        List<CombatContestLeaderboardRow> topEntries = predictionRepository.findLeaderboardRows(PageRequest.of(0, 10));
-        if (topEntries.isEmpty()) return false;
-
-        StringBuilder message = new StringBuilder("## Lazax War Archives Leaderboard\n");
-        message.append("-# Posted daily at 15:00 UTC (9:00 CST).\n");
-        int rank = 1;
-        for (CombatContestLeaderboardRow entry : topEntries) {
-            long predictions = entry.getPredictionCount() == null ? 0 : entry.getPredictionCount();
-            long correctPredictions = entry.getCorrectPredictions() == null ? 0 : entry.getCorrectPredictions();
-            int accuracy = predictions == 0 ? 0 : Math.round((100f * correctPredictions) / predictions);
-            message.append('`')
-                    .append(rank++)
-                    .append(".` ")
-                    .append(getSafeLeaderboardName(entry.getDiscordUserName()))
-                    .append(" - **")
-                    .append(entry.getTotalPoints())
-                    .append("** points")
-                    .append(" (`")
-                    .append(correctPredictions)
-                    .append('/')
-                    .append(predictions)
-                    .append("` correct, ")
-                    .append(accuracy)
-                    .append("%)\n");
-        }
-        MessageHelper.sendMessageToChannel(contestChannel, message.toString().trim());
+        postLeaderboardMessage(message);
         return true;
     }
 
@@ -459,9 +434,7 @@ public class CombatContestService {
         if (pendingBatch.size() < 5) return;
         if (!postLeaderboard()) return;
 
-        LocalDateTime postedAt = LocalDateTime.now();
-        pendingBatch.forEach(contest -> contest.setLeaderboardPostedAt(postedAt));
-        repository.saveAll(pendingBatch);
+        markLeaderboardBatchPosted(pendingBatch);
     }
 
     private String getSafeLeaderboardName(String userName) {
@@ -588,19 +561,64 @@ public class CombatContestService {
                                 "Failed to create combat predictor thread for contest " + contestId, error));
     }
 
+    private String buildLeaderboardMessage() {
+        List<CombatContestLeaderboardRow> topEntries = predictionRepository.findLeaderboardRows(PageRequest.of(0, 10));
+        if (topEntries.isEmpty()) return null;
+
+        StringBuilder message = new StringBuilder("## Lazax War Archives Leaderboard\n");
+        message.append("-# Posted daily at 15:00 UTC (9:00 CST).\n");
+        int rank = 1;
+        for (CombatContestLeaderboardRow entry : topEntries) {
+            long predictions = entry.getPredictionCount() == null ? 0 : entry.getPredictionCount();
+            long correctPredictions = entry.getCorrectPredictions() == null ? 0 : entry.getCorrectPredictions();
+            int accuracy = predictions == 0 ? 0 : Math.round((100f * correctPredictions) / predictions);
+            message.append('`')
+                    .append(rank++)
+                    .append(".` ")
+                    .append(getSafeLeaderboardName(entry.getDiscordUserName()))
+                    .append(" - **")
+                    .append(entry.getTotalPoints())
+                    .append("** points")
+                    .append(" (`")
+                    .append(correctPredictions)
+                    .append('/')
+                    .append(predictions)
+                    .append("` correct, ")
+                    .append(accuracy)
+                    .append("%)\n");
+        }
+        return message.toString().trim();
+    }
+
+    private void postLeaderboardMessage(String message) {
+        TextChannel contestChannel = getContestChannel();
+        if (contestChannel == null) return;
+        MessageHelper.sendMessageToChannel(contestChannel, message);
+    }
+
+    private void markLeaderboardBatchPosted(List<CombatContestEntity> pendingBatch) {
+        LocalDateTime postedAt = LocalDateTime.now();
+        pendingBatch.forEach(contest -> contest.setLeaderboardPostedAt(postedAt));
+        repository.saveAll(pendingBatch);
+    }
+
     private void postContestThreadIntro(
             Game game, CombatContestEntity contest, ThreadChannel thread, String threadSummaryText) {
-        String intro =
-                "Use this thread for combat follow-up. The bot will post the result here when the space combat resolves.";
-        if (threadSummaryText != null) {
+        postThreadSummaryThen(game, contest, thread, threadSummaryText, () -> {
+            String intro =
+                    "Use this thread for combat follow-up. The bot will post the result here when the space combat resolves.";
             MessageHelper.splitAndSentWithAction(
-                    threadSummaryText,
-                    thread,
-                    message -> MessageHelper.splitAndSentWithAction(
-                            intro, thread, ignored -> postCombatTechSummary(game, contest, thread)));
+                    intro, thread, ignored -> postCombatTechSummary(game, contest, thread));
+        });
+    }
+
+    private void postThreadSummaryThen(
+            Game game, CombatContestEntity contest, ThreadChannel thread, String threadSummaryText, Runnable nextStep) {
+        if (threadSummaryText == null) {
+            nextStep.run();
             return;
         }
-        MessageHelper.splitAndSentWithAction(intro, thread, ignored -> postCombatTechSummary(game, contest, thread));
+        MessageHelper.splitAndSentWithAction(threadSummaryText, thread, ignored -> nextStep.run());
     }
 
     private void postCombatTechSummary(Game game, CombatContestEntity contest, MessageChannel threadOrChannel) {
@@ -639,10 +657,7 @@ public class CombatContestService {
                 .map(tech -> tech.getCondensedReqsEmojis(false) + " " + tech.getName())
                 .reduce((left, right) -> left + ", " + right)
                 .orElse("No technologies");
-        String factionName = player.getFactionModel() == null
-                ? player.getFaction()
-                : player.getFactionModel().getFactionName();
-        return "- " + player.getFactionEmoji() + " " + factionName + " " + player.getUserName() + ": " + techSummary;
+        return formatPlayerSummaryLine(player, techSummary);
     }
 
     private String formatCombatRelicSection(Player attacker, Player defender) {
@@ -672,10 +687,14 @@ public class CombatContestService {
                 .orElse(null);
         if (relicSummary == null) return null;
 
+        return formatPlayerSummaryLine(player, relicSummary);
+    }
+
+    private String formatPlayerSummaryLine(Player player, String summary) {
         String factionName = player.getFactionModel() == null
                 ? player.getFaction()
                 : player.getFactionModel().getFactionName();
-        return "- " + player.getFactionEmoji() + " " + factionName + " " + player.getUserName() + ": " + relicSummary;
+        return "- " + player.getFactionEmoji() + " " + factionName + " " + player.getUserName() + ": " + summary;
     }
 
     private int getTechTypeOrder(TechnologyModel tech) {
@@ -859,11 +878,11 @@ public class CombatContestService {
         for (CombatContestPredictionEntity prediction : predictions) {
             boolean correct = prediction.getPredictedFaction().equalsIgnoreCase(contest.getWinnerFaction());
             prediction.setCorrect(correct);
-            prediction.setPointsAwarded(
-                    correct
-                            ? calculatePredictionPoints(
-                                    contest, prediction.getPredictedFaction(), attackerPredictions, defenderPredictions)
-                            : 0);
+            int winnerPredictions = contest.getWinnerFaction().equalsIgnoreCase(contest.getAttackerFaction())
+                    ? attackerPredictions
+                    : defenderPredictions;
+            int totalPredictions = attackerPredictions + defenderPredictions;
+            prediction.setPointsAwarded(correct ? calculatePredictionPoints(winnerPredictions, totalPredictions) : 0);
         }
         predictionRepository.saveAll(predictions);
     }
@@ -940,12 +959,8 @@ public class CombatContestService {
         MessageHelper.sendMessageToChannel(threadOrChannel, message);
     }
 
-    private int calculatePredictionPoints(
-            CombatContestEntity contest, String predictedFaction, int attackerPredictions, int defenderPredictions) {
-        int totalPredictions = Math.max(1, attackerPredictions + defenderPredictions);
-        int winnerPredictions = predictedFaction.equalsIgnoreCase(contest.getAttackerFaction())
-                ? attackerPredictions
-                : defenderPredictions;
+    private int calculatePredictionPoints(int winnerPredictions, int totalPredictions) {
+        totalPredictions = Math.max(1, totalPredictions);
         double winnerShare = winnerPredictions / (double) totalPredictions;
         double scaledPoints = 4.0 / Math.max(winnerShare, ZERO_EPSILON);
         return (int) Math.round(Math.max(4.0, Math.min(12.0, scaledPoints)));
