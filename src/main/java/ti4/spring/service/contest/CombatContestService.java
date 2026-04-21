@@ -397,9 +397,14 @@ public class CombatContestService {
         TextChannel contestChannel = getContestPublicChannel(contest);
         if (contestChannel == null) return;
 
-        Message message =
-                contestChannel.retrieveMessageById(contest.getPublicMessageId()).complete();
-        capturePredictions(game, message, contest);
+        try {
+            Message message = contestChannel
+                    .retrieveMessageById(contest.getPublicMessageId())
+                    .complete();
+            capturePredictions(game, message, contest);
+        } catch (Exception e) {
+            BotLogger.error(new LogOrigin(game), "Failed to capture combat contest predictions at resolution.", e);
+        }
     }
 
     private void refreshParentMessageSummary(
@@ -812,9 +817,12 @@ public class CombatContestService {
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS)
                 .queue(
                         thread -> {
-                            contest.setPublicThreadId(thread.getIdLong());
-                            repository.save(contest);
-                            postContestThreadIntro(game, contest, thread, threadSummaryText);
+                            CombatContestEntity latest =
+                                    repository.findById(contest.getId()).orElse(null);
+                            if (latest == null) return;
+                            latest.setPublicThreadId(thread.getIdLong());
+                            repository.save(latest);
+                            postContestThreadIntro(game, latest, thread, threadSummaryText);
                         },
                         error -> BotLogger.error(
                                 "Failed to create combat predictor thread for contest " + contest.getId(), error));
