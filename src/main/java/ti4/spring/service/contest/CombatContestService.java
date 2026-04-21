@@ -274,10 +274,11 @@ public class CombatContestService {
             }
             int totalUnits = space.getUnitCount(unitKey);
             int damagedUnits = space.getDamagedUnitCount(unitKey);
-            int undamagedUnits = totalUnits - damagedUnits;
+            int undamagedUnits = Math.max(0, totalUnits - damagedUnits);
 
             total += unitModel.getCost() * totalUnits;
-            hp += totalUnits;
+            hp += damagedUnits;
+            hp += undamagedUnits;
             if (unitModel.getSustainDamage(player, space)) {
                 hp += undamagedUnits;
                 if (player.hasTech("nes")) {
