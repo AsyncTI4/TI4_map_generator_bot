@@ -11,6 +11,9 @@ public interface CombatContestRepository extends JpaRepository<CombatContestEnti
 
     List<CombatContestEntity> findByGameNameAndStatusIn(String gameName, Collection<CombatContestStatus> statuses);
 
+    List<CombatContestEntity> findTop5ByStatusAndResolvedAtIsNotNullAndLeaderboardPostedAtIsNullOrderByResolvedAtAsc(
+            CombatContestStatus status);
+
     Optional<CombatContestEntity> findFirstByGameNameAndTilePositionAndCombatTypeAndStatusInOrderByPostedAtDesc(
             String gameName,
             String tilePosition,

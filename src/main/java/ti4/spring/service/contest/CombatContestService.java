@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
@@ -41,6 +40,7 @@ import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.LeaderModel;
+import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ColorEmojis;
@@ -53,7 +53,11 @@ public class CombatContestService {
     public static final String LAZAX_MINIGAME_ROLE_NAME = "Lazax Minigame";
     private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives";
     private static final Duration CONTEST_COOLDOWN = Duration.ofMinutes(10);
-    private static final double MIN_FLEET_RESOURCES = 15.0;
+    private static final double MIN_FLEET_RESOURCES = 20.0;
+    private static final String THREAD_SUMMARY_HEADER = "## Combat Units\n";
+    private static final Set<String> COMBAT_SUMMARY_TECH_ALIASES = Set.of("da", "asc", "x89", "x89c4");
+    private static final Set<String> COMBAT_SUMMARY_RELIC_ALIASES = Set.of(
+            "metalivoidarmaments", "metalivoidshielding", "lightrailordnance", "baldrick_crownofthalnos", "pi_thalnos");
     private static final double MIN_HP_RATIO = 0.7;
     private static final double ZERO_EPSILON = 0.0001;
     private static final boolean PREDICTION_LOCK_ENABLED = false;
@@ -92,14 +96,22 @@ public class CombatContestService {
             contest.setAttackerColor(attacker.getColor());
             contest.setDefenderColor(defender.getColor());
             contest.setPostedAt(LocalDateTime.now());
-            contest.setInitialSummaryText(snapshot.postText());
+            contest.setInitialSummaryText(snapshot.parentPostText());
             contest.setInitialStrengthAttacker(snapshot.attackerStrength());
             contest.setInitialStrengthDefender(snapshot.defenderStrength());
             contest.setInitialHpAttacker(snapshot.attackerHp());
             contest.setInitialHpDefender(snapshot.defenderHp());
             contest.setUpsetIndex(snapshot.upsetIndex());
             long contestId = repository.save(contest).getId();
-            postContestMessage(game, attacker, defender, tile, contestChannel, contestId, snapshot.postText());
+            postContestMessage(
+                    game,
+                    attacker,
+                    defender,
+                    tile,
+                    contestChannel,
+                    contestId,
+                    snapshot.parentPostText(),
+                    snapshot.threadSummaryText());
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Combat contest nomination failed.", e);
         }
@@ -229,10 +241,17 @@ public class CombatContestService {
         String summary = extractSpaceOnlySummary(ButtonHelper.getCombatTileSummaryMessage(
                 game, tile, attacker, null, "space", Constants.SPACE, List.of(attacker, defender)));
 
-        String postText = formatContestPost(
-                game, tile, attacker, defender, summary, upsetIndex, attackerStrength, defenderStrength);
+        String openerText =
+                formatContestPostHeader(game, tile, attacker, defender, upsetIndex, attackerStrength, defenderStrength);
+        String threadSummaryText = null;
+        String parentPostText = openerText + "\n\n" + summary;
+        if (parentPostText.length() > Message.MAX_CONTENT_LENGTH) {
+            parentPostText = openerText;
+            threadSummaryText = THREAD_SUMMARY_HEADER + summary;
+        }
         return new SpaceCombatSnapshot(
-                postText,
+                parentPostText,
+                threadSummaryText,
                 attackerStrength.value(),
                 defenderStrength.value(),
                 attackerStrength.hp(),
@@ -272,12 +291,11 @@ public class CombatContestService {
         return new FleetStrength(total, hp, hasNonFighterShip);
     }
 
-    private String formatContestPost(
+    private String formatContestPostHeader(
             Game game,
             Tile tile,
             Player attacker,
             Player defender,
-            String summary,
             CombatContestUpsetIndex upsetIndex,
             FleetStrength attackerStrength,
             FleetStrength defenderStrength) {
@@ -296,8 +314,7 @@ public class CombatContestService {
                 + formatUpsetIndex(upsetIndex, attacker, defender, attackerStrength.hp(), defenderStrength.hp()) + "\n"
                 + "**Predict the winner by reacting below.**\n"
                 + "- " + attackerLegend + "\n"
-                + "- " + defenderLegend + "\n\n"
-                + summary;
+                + "- " + defenderLegend;
     }
 
     private String getLazaxMinigameRoleMention() {
@@ -315,26 +332,27 @@ public class CombatContestService {
             Tile tile,
             TextChannel contestChannel,
             long contestId,
-            String postText) {
+            String parentPostText,
+            String threadSummaryText) {
         try {
             FileUpload fileUpload =
                     new TileGenerator(game, null, null, 0, tile.getPosition(), attacker).createFileUpload();
             contestChannel
                     .sendMessage(new MessageCreateBuilder()
-                            .addContent(postText)
+                            .addContent(parentPostText)
                             .addFiles(fileUpload)
                             .build())
                     .queue(
                             message -> {
-                                persistMessageAndThread(game, contestId, contestChannel, message);
+                                persistMessageAndThread(game, contestId, contestChannel, message, threadSummaryText);
                                 addPredictionReactions(game, attacker, defender, message);
                             },
                             error -> BotLogger.error(
                                     new LogOrigin(game), "Failed to post combat contest opener.", error));
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Failed to create combat contest opener image.", e);
-            MessageHelper.splitAndSentWithAction(postText, contestChannel, message -> {
-                persistMessageAndThread(game, contestId, contestChannel, message);
+            MessageHelper.splitAndSentWithAction(parentPostText, contestChannel, message -> {
+                persistMessageAndThread(game, contestId, contestChannel, message, threadSummaryText);
                 addPredictionReactions(game, attacker, defender, message);
             });
         }
@@ -401,12 +419,12 @@ public class CombatContestService {
                 safeDouble(contest.getInitialHpDefender()));
     }
 
-    public void postLeaderboard() {
+    public boolean postLeaderboard() {
         TextChannel contestChannel = getContestChannel();
-        if (contestChannel == null) return;
+        if (contestChannel == null) return false;
 
         List<CombatContestLeaderboardRow> topEntries = predictionRepository.findLeaderboardRows(PageRequest.of(0, 10));
-        if (topEntries.isEmpty()) return;
+        if (topEntries.isEmpty()) return false;
 
         StringBuilder message = new StringBuilder("## Lazax War Archives Leaderboard\n");
         message.append("-# Posted daily at 15:00 UTC (9:00 CST).\n");
@@ -418,7 +436,7 @@ public class CombatContestService {
             message.append('`')
                     .append(rank++)
                     .append(".` ")
-                    .append(entry.getDiscordUserName())
+                    .append(getSafeLeaderboardName(entry.getDiscordUserName()))
                     .append(" - **")
                     .append(entry.getTotalPoints())
                     .append("** points")
@@ -431,6 +449,24 @@ public class CombatContestService {
                     .append("%)\n");
         }
         MessageHelper.sendMessageToChannel(contestChannel, message.toString().trim());
+        return true;
+    }
+
+    private void maybePostLeaderboardAfterResolvedContest() {
+        List<CombatContestEntity> pendingBatch =
+                repository.findTop5ByStatusAndResolvedAtIsNotNullAndLeaderboardPostedAtIsNullOrderByResolvedAtAsc(
+                        CombatContestStatus.RESOLVED);
+        if (pendingBatch.size() < 5) return;
+        if (!postLeaderboard()) return;
+
+        LocalDateTime postedAt = LocalDateTime.now();
+        pendingBatch.forEach(contest -> contest.setLeaderboardPostedAt(postedAt));
+        repository.saveAll(pendingBatch);
+    }
+
+    private String getSafeLeaderboardName(String userName) {
+        if (userName == null || userName.isBlank()) return "Unknown User";
+        return userName.replace("@", "@\u200B");
     }
 
     private void lockPredictions(Game game, CombatContestEntity contest, MessageChannel threadOrChannel) {
@@ -529,7 +565,8 @@ public class CombatContestService {
                 + "*May fortune favor the bold.*";
     }
 
-    private void persistMessageAndThread(Game game, Long contestId, TextChannel contestChannel, Message message) {
+    private void persistMessageAndThread(
+            Game game, Long contestId, TextChannel contestChannel, Message message, String threadSummaryText) {
         CombatContestEntity contest = repository.findById(contestId).orElse(null);
         if (contest == null) return;
         contest.setPublicChannelId(contestChannel.getIdLong());
@@ -545,13 +582,25 @@ public class CombatContestService {
                             if (latest == null) return;
                             latest.setPublicThreadId(thread.getIdLong());
                             repository.save(latest);
-                            MessageHelper.sendMessageToChannel(
-                                    thread,
-                                    "Use this thread for combat follow-up. The bot will post the result here when the space combat resolves.");
-                            postCombatTechSummary(game, latest, thread);
+                            postContestThreadIntro(game, latest, thread, threadSummaryText);
                         },
                         error -> BotLogger.error(
                                 "Failed to create combat predictor thread for contest " + contestId, error));
+    }
+
+    private void postContestThreadIntro(
+            Game game, CombatContestEntity contest, ThreadChannel thread, String threadSummaryText) {
+        String intro =
+                "Use this thread for combat follow-up. The bot will post the result here when the space combat resolves.";
+        if (threadSummaryText != null) {
+            MessageHelper.splitAndSentWithAction(
+                    threadSummaryText,
+                    thread,
+                    message -> MessageHelper.splitAndSentWithAction(
+                            intro, thread, ignored -> postCombatTechSummary(game, contest, thread)));
+            return;
+        }
+        MessageHelper.splitAndSentWithAction(intro, thread, ignored -> postCombatTechSummary(game, contest, thread));
     }
 
     private void postCombatTechSummary(Game game, CombatContestEntity contest, MessageChannel threadOrChannel) {
@@ -559,16 +608,25 @@ public class CombatContestService {
         Player defender = game.getPlayerFromColorOrFaction(contest.getDefenderFaction());
         if (attacker == null || defender == null) return;
 
-        String message =
-                "## Combat Technologies\n" + formatCombatTechLine(attacker) + "\n" + formatCombatTechLine(defender);
-        MessageHelper.sendMessageToChannel(threadOrChannel, message);
+        StringBuilder message = new StringBuilder("## Combat Technologies\n")
+                .append(formatCombatTechLine(attacker))
+                .append("\n")
+                .append(formatCombatTechLine(defender));
+        String relicSection = formatCombatRelicSection(attacker, defender);
+        if (relicSection != null) {
+            message.append("\n\n").append(relicSection);
+        }
+        MessageHelper.sendMessageToChannel(threadOrChannel, message.toString());
     }
 
     private String formatCombatTechLine(Player player) {
-        String techSummary = Stream.concat(player.getFactionTechs().stream(), player.getTechs().stream())
-                .distinct()
+        String techSummary = player.getTechs().stream()
                 .map(Mapper::getTech)
                 .filter(Objects::nonNull)
+                .filter(tech -> !player.getPurgedTechs().contains(tech.getAlias()))
+                .filter(tech -> tech.isFactionTech()
+                        || tech.isUnitUpgrade()
+                        || COMBAT_SUMMARY_TECH_ALIASES.contains(tech.getAlias()))
                 .sorted((left, right) -> {
                     int typeComparison = Integer.compare(getTechTypeOrder(left), getTechTypeOrder(right));
                     if (typeComparison != 0) return typeComparison;
@@ -585,6 +643,39 @@ public class CombatContestService {
                 ? player.getFaction()
                 : player.getFactionModel().getFactionName();
         return "- " + player.getFactionEmoji() + " " + factionName + " " + player.getUserName() + ": " + techSummary;
+    }
+
+    private String formatCombatRelicSection(Player attacker, Player defender) {
+        String attackerRelics = formatCombatRelicLine(attacker);
+        String defenderRelics = formatCombatRelicLine(defender);
+        if (attackerRelics == null && defenderRelics == null) return null;
+
+        StringBuilder section = new StringBuilder("## Relics");
+        if (attackerRelics != null) {
+            section.append("\n").append(attackerRelics);
+        }
+        if (defenderRelics != null) {
+            section.append("\n").append(defenderRelics);
+        }
+        return section.toString();
+    }
+
+    private String formatCombatRelicLine(Player player) {
+        String relicSummary = player.getRelics().stream()
+                .distinct()
+                .filter(COMBAT_SUMMARY_RELIC_ALIASES::contains)
+                .map(Mapper::getRelic)
+                .filter(Objects::nonNull)
+                .map(RelicModel::getName)
+                .sorted(String::compareToIgnoreCase)
+                .reduce((left, right) -> left + ", " + right)
+                .orElse(null);
+        if (relicSummary == null) return null;
+
+        String factionName = player.getFactionModel() == null
+                ? player.getFaction()
+                : player.getFactionModel().getFactionName();
+        return "- " + player.getFactionEmoji() + " " + factionName + " " + player.getUserName() + ": " + relicSummary;
     }
 
     private int getTechTypeOrder(TechnologyModel tech) {
@@ -694,6 +785,7 @@ public class CombatContestService {
                 contest,
                 buildResultStamp(contest, tile, winner),
                 buildLossSummary(game, tile, contest, winner, loserFaction));
+        maybePostLeaderboardAfterResolvedContest();
     }
 
     private void cancelContest(Game game, CombatContestEntity contest, String reason) {
@@ -784,8 +876,16 @@ public class CombatContestService {
             return;
         }
 
+        List<CombatContestPredictionEntity> winningPredictions = predictions.stream()
+                .filter(prediction -> safeInt(prediction.getPointsAwarded()) > 0)
+                .toList();
+        if (winningPredictions.isEmpty()) {
+            if (afterPost != null) afterPost.run();
+            return;
+        }
+
         Map<String, Integer> totalsByUser = predictionRepository
-                .findPointTotalsByDiscordUserIdIn(predictions.stream()
+                .findPointTotalsByDiscordUserIdIn(winningPredictions.stream()
                         .map(CombatContestPredictionEntity::getDiscordUserId)
                         .toList())
                 .stream()
@@ -793,7 +893,7 @@ public class CombatContestService {
                         CombatContestUserPointsRow::getDiscordUserId, row -> safeInt(row.getTotalPoints())));
 
         StringBuilder message = new StringBuilder("## Prediction Points\n");
-        predictions.stream()
+        winningPredictions.stream()
                 .sorted((left, right) -> {
                     int pointsComparison =
                             Integer.compare(safeInt(right.getPointsAwarded()), safeInt(left.getPointsAwarded()));
@@ -846,26 +946,9 @@ public class CombatContestService {
         int winnerPredictions = predictedFaction.equalsIgnoreCase(contest.getAttackerFaction())
                 ? attackerPredictions
                 : defenderPredictions;
-        double marketShare = winnerPredictions / (double) totalPredictions;
-        int crowdBonus = (int) Math.round((1.0 - marketShare) * 4.0);
-        boolean pickedUnderdog = isUnderdog(contest, predictedFaction);
-        int upsetBonus =
-                switch (contest.getUpsetIndex()) {
-                    case EVEN_FIGHT -> 1;
-                    case FAVORED -> pickedUnderdog ? 3 : 0;
-                    case LONG_SHOT -> pickedUnderdog ? 6 : 0;
-                };
-        return 6 + crowdBonus + upsetBonus;
-    }
-
-    private boolean isUnderdog(CombatContestEntity contest, String faction) {
-        if (Objects.equals(safeDouble(contest.getInitialHpAttacker()), safeDouble(contest.getInitialHpDefender())))
-            return false;
-        boolean attackerUnderdog =
-                safeDouble(contest.getInitialHpAttacker()) < safeDouble(contest.getInitialHpDefender());
-        return attackerUnderdog
-                ? faction.equalsIgnoreCase(contest.getAttackerFaction())
-                : faction.equalsIgnoreCase(contest.getDefenderFaction());
+        double winnerShare = winnerPredictions / (double) totalPredictions;
+        double scaledPoints = 4.0 / Math.max(winnerShare, ZERO_EPSILON);
+        return (int) Math.round(Math.max(4.0, Math.min(12.0, scaledPoints)));
     }
 
     private String buildResultStamp(CombatContestEntity contest, Tile tile, Player winner) {
@@ -1021,7 +1104,8 @@ public class CombatContestService {
     private record FleetStrength(double value, double hp, boolean hasNonFighterShip) {}
 
     private record SpaceCombatSnapshot(
-            String postText,
+            String parentPostText,
+            String threadSummaryText,
             double attackerStrength,
             double defenderStrength,
             double attackerHp,
