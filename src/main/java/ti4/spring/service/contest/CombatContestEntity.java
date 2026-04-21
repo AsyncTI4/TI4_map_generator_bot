@@ -78,6 +78,9 @@ public class CombatContestEntity {
     @Column(name = "resolved_at")
     private LocalDateTime resolvedAt;
 
+    @Column(name = "leaderboard_posted_at")
+    private LocalDateTime leaderboardPostedAt;
+
     @Column(name = "winner_faction")
     private String winnerFaction;
 
