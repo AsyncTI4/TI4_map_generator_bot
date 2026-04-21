@@ -551,7 +551,8 @@ public class RecreateGameService {
         if (gmChannel == null) {
             return;
         }
-        MessageHelper.sendMessageToChannel(gmChannel, "Use `/show_game_as_player` for a player-scoped Fog of War map view.");
+        MessageHelper.sendMessageToChannel(
+                gmChannel, "Use `/show_game_as_player` for a player-scoped Fog of War map view.");
     }
 
     static String getTableTalkChannelName(Game game) {

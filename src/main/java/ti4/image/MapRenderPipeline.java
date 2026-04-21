@@ -35,12 +35,8 @@ public class MapRenderPipeline {
         String gameName = renderEvent.game.getName();
         var timedRunnable =
                 new TimedRunnable("Render event task for " + gameName, EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
-                    try (var mapGenerator =
-                            new MapGenerator(
-                                    renderEvent.game,
-                                    renderEvent.displayType,
-                                    renderEvent.event,
-                                    renderEvent.fowPlayer)) {
+                    try (var mapGenerator = new MapGenerator(
+                            renderEvent.game, renderEvent.displayType, renderEvent.event, renderEvent.fowPlayer)) {
                         mapGenerator.draw();
                         if (renderEvent.uploadToDiscord) {
                             uploadToDiscord(mapGenerator, renderEvent.callback());

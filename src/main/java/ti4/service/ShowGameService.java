@@ -108,14 +108,19 @@ public class ShowGameService {
                                 msg.getChannel().getIdLong())
                 : null;
 
-        MapRenderPipeline.queue(game, null, displayType, fileUpload -> {
-            if (includeButtons(displayType)) {
-                ButtonHelper.sendFileWithCorrectButtons(
-                        channel, fileUpload, null, Buttons.mapImageButtons(game), game, persistMessageId);
-            } else {
-                MessageHelper.sendFileUploadToChannel(channel, fileUpload, persistMessageId);
-            }
-        }, fowPlayer);
+        MapRenderPipeline.queue(
+                game,
+                null,
+                displayType,
+                fileUpload -> {
+                    if (includeButtons(displayType)) {
+                        ButtonHelper.sendFileWithCorrectButtons(
+                                channel, fileUpload, null, Buttons.mapImageButtons(game), game, persistMessageId);
+                    } else {
+                        MessageHelper.sendFileUploadToChannel(channel, fileUpload, persistMessageId);
+                    }
+                },
+                fowPlayer);
     }
 
     /**
