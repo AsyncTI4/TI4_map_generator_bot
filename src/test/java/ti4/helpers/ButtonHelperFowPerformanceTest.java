@@ -42,7 +42,7 @@ class ButtonHelperFowPerformanceTest extends BaseTi4Test {
 
             List<Button> buttons = ButtonHelper.getTileInARing(player, game, "ring_1");
 
-            assertThat(buttons).extracting(Button::getLabel).contains("Mellon/Zohbat", "Lodor");
+            assertThat(buttons).extracting(Button::getLabel).contains("101 (Mecatol Rex)", "102 (Lodor)");
             fowHelper.verify(() -> FoWHelper.getTilePositionsToShow(game, player), times(1));
         }
     }

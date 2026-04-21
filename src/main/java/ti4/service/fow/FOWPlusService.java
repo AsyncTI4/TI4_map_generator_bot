@@ -119,8 +119,7 @@ public final class FOWPlusService {
         return canActivatePosition(position, player, game, null);
     }
 
-    public static boolean canActivatePosition(
-            String position, Player player, Game game, Set<String> visiblePositions) {
+    public static boolean canActivatePosition(String position, Player player, Game game, Set<String> visiblePositions) {
         return !isActive(game)
                 || resolveVisiblePositions(game, player, visiblePositions).contains(position)
                 || game.isWarfareAction();
@@ -186,7 +185,8 @@ public final class FOWPlusService {
         filterRingButtons(ringButtons, player, game, null);
     }
 
-    public static void filterRingButtons(List<Button> ringButtons, Player player, Game game, Set<String> visiblePositions) {
+    public static void filterRingButtons(
+            List<Button> ringButtons, Player player, Game game, Set<String> visiblePositions) {
         Set<String> resolvedVisiblePositions = resolveVisiblePositions(game, player, visiblePositions);
         Tile centerTile = game.getTileByPosition("000");
         if (!resolvedVisiblePositions.contains("000")

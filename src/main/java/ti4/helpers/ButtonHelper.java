@@ -5073,7 +5073,7 @@ public class ButtonHelper {
         if (canActivateTile(game, player, centerTile, visiblePositions)) {
             Button rex = Buttons.green(
                     finChecker + "ringTile_000",
-                    centerTile.getRepresentationForButtons(game, player),
+                    getTileRepresentationForButtons(centerTile, game, player, visiblePositions),
                     centerTile.getTileEmoji(player));
             ringButtons.add(rex);
         }
@@ -5082,7 +5082,7 @@ public class ButtonHelper {
             if (!canActivateTile(game, player, tile, visiblePositions)) continue;
             ringButtons.add(Buttons.green(
                     finChecker + "ringTile_" + tile.getPosition(),
-                    tile.getRepresentationForButtons(game, player),
+                    getTileRepresentationForButtons(tile, game, player, visiblePositions),
                     UnitEmojis.spacedock));
         }
         for (int x = 1; x < rings + 1; x++) {
@@ -5105,7 +5105,9 @@ public class ButtonHelper {
     }
 
     public static boolean canActivateTile(Game game, Player player, Tile tile, @Nullable Set<String> visiblePositions) {
-        if (tile == null || tile.getRepresentationForButtons(game, player).contains("Hyperlane")) return false;
+        if (tile == null) return false;
+        String tileRepresentation = getTileRepresentationForButtons(tile, game, player, visiblePositions);
+        if (tileRepresentation.contains("Hyperlane")) return false;
         if (game.isNaaluAgent() && tile.isHomeSystem(game)) return false;
         if (!FOWPlusService.canActivatePosition(tile.getPosition(), player, game, visiblePositions)) return false;
         if ("silver_flame".equalsIgnoreCase(tile.getTileID())) return false;
@@ -5143,7 +5145,7 @@ public class ButtonHelper {
                 if (canActivateTile(game, player, t, resolvedVisiblePositions)) {
                     Button corners = Buttons.green(
                             finChecker + "ringTile_" + pos,
-                            t.getRepresentationForButtons(game, player),
+                            getTileRepresentationForButtons(t, game, player, resolvedVisiblePositions),
                             t.getTileEmoji(player));
                     ringButtons.add(corners);
                 }
@@ -5164,7 +5166,8 @@ public class ButtonHelper {
                         Tile tile = game.getTileByPosition(pos);
                         if (canActivateTile(game, player, tile, resolvedVisiblePositions)) {
                             String id = finChecker + "ringTile_" + pos;
-                            String label = tile.getRepresentationForButtons(game, player);
+                            String label =
+                                    getTileRepresentationForButtons(tile, game, player, resolvedVisiblePositions);
                             ringButtons.add(Buttons.green(id, label, tile.getTileEmoji(player)));
                         }
                     }
@@ -5172,7 +5175,7 @@ public class ButtonHelper {
                     Tile tile = game.getTileByPosition(pos);
                     if (canActivateTile(game, player, tile, resolvedVisiblePositions)) {
                         String id = finChecker + "ringTile_" + pos;
-                        String label = tile.getRepresentationForButtons(game, player);
+                        String label = getTileRepresentationForButtons(tile, game, player, resolvedVisiblePositions);
                         ringButtons.add(Buttons.green(id, label, tile.getTileEmoji(player)));
                     }
                 } else {
@@ -5184,7 +5187,8 @@ public class ButtonHelper {
                         Tile tile = game.getTileByPosition(pos);
                         if (canActivateTile(game, player, tile, resolvedVisiblePositions)) {
                             String id = finChecker + "ringTile_" + pos;
-                            String label = tile.getRepresentationForButtons(game, player);
+                            String label =
+                                    getTileRepresentationForButtons(tile, game, player, resolvedVisiblePositions);
                             ringButtons.add(Buttons.green(id, label, tile.getTileEmoji(player)));
                         }
                     }
@@ -5199,7 +5203,8 @@ public class ButtonHelper {
                         Tile tile = game.getTileByPosition(pos);
                         if (canActivateTile(game, player, tile, resolvedVisiblePositions)) {
                             String id = finChecker + "ringTile_" + pos;
-                            String label = tile.getRepresentationForButtons(game, player);
+                            String label =
+                                    getTileRepresentationForButtons(tile, game, player, resolvedVisiblePositions);
                             ringButtons.add(Buttons.green(id, label, tile.getTileEmoji(player)));
                         }
                     }
@@ -5217,6 +5222,18 @@ public class ButtonHelper {
     @Nullable
     private static Set<String> getVisiblePositionsForActivation(Game game, Player player) {
         return FOWPlusService.isActive(game) ? FoWHelper.getTilePositionsToShow(game, player) : null;
+    }
+
+    private static String getTileRepresentationForButtons(
+            Tile tile, Game game, Player player, @Nullable Set<String> visiblePositions) {
+        if (!game.isFowMode() || player == null || visiblePositions == null) {
+            return tile.getRepresentationForButtons(game, player);
+        }
+        String representation = tile.getRepresentation();
+        if (visiblePositions.contains(tile.getPosition()) && !isEmpty(representation)) {
+            return tile.getPosition() + " (" + representation + ")";
+        }
+        return tile.getPosition();
     }
 
     public static int getNumberOfUnitUpgrades(Player player) {
