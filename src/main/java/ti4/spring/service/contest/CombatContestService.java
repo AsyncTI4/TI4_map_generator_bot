@@ -11,9 +11,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -32,10 +34,14 @@ import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitKey;
+import ti4.image.Mapper;
 import ti4.image.TileGenerator;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
+import ti4.model.LeaderModel;
+import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ColorEmojis;
 
@@ -43,12 +49,16 @@ import ti4.service.emoji.ColorEmojis;
 @RequiredArgsConstructor
 public class CombatContestService {
 
+    public static final String LAZAX_MINIGAME_SUBSCRIPTION_MARKER = "-# Lazax Minigame Subscription";
+    public static final String LAZAX_MINIGAME_ROLE_NAME = "Lazax Minigame";
     private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives";
     private static final Duration CONTEST_COOLDOWN = Duration.ofMinutes(10);
     private static final double MIN_FLEET_RESOURCES = 8.0;
     private static final double MIN_HP_RATIO = 0.7;
     private static final double ZERO_EPSILON = 0.0001;
     private static final boolean PREDICTION_LOCK_ENABLED = false;
+    private static final String SUBSCRIBE_EMOJI = "🟢";
+    private static final String UNSUBSCRIBE_EMOJI = "🔴";
     private static final Set<CombatContestStatus> ACTIVE_STATUSES = Set.of(CombatContestStatus.POSTED);
 
     private final CombatContestRepository repository;
@@ -126,6 +136,51 @@ public class CombatContestService {
             MessageHelper.splitAndSentWithAction("## Roll Update\n" + message, threadOrChannel, null);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Combat contest roll mirror failed.", e);
+        }
+    }
+
+    public void mirrorCombatActionCard(Game game, Player player, ActionCardModel actionCard) {
+        try {
+            if (game == null || player == null || actionCard == null) return;
+            List<CombatContestEntity> activeContests =
+                    repository.findByGameNameAndStatusIn(game.getName(), ACTIVE_STATUSES);
+            if (activeContests.isEmpty()) return;
+
+            for (CombatContestEntity contest : activeContests) {
+                if (!matchesParticipant(contest, player)) continue;
+
+                MessageChannel threadOrChannel = getContestThreadOrChannel(contest);
+                if (threadOrChannel == null) continue;
+
+                String message =
+                        "## Action Card\n" + player.getRepresentation() + " played _" + actionCard.getName() + "_.";
+                MessageHelper.sendMessageToChannelWithEmbed(
+                        threadOrChannel, message, actionCard.getRepresentationEmbed(false, true, game));
+            }
+        } catch (Exception e) {
+            BotLogger.error(new LogOrigin(game), "Combat contest action card relay failed.", e);
+        }
+    }
+
+    public void mirrorCombatAgent(Game game, Player player, LeaderModel agent) {
+        try {
+            if (game == null || player == null || agent == null) return;
+            List<CombatContestEntity> activeContests =
+                    repository.findByGameNameAndStatusIn(game.getName(), ACTIVE_STATUSES);
+            if (activeContests.isEmpty()) return;
+
+            for (CombatContestEntity contest : activeContests) {
+                if (!matchesParticipant(contest, player)) continue;
+
+                MessageChannel threadOrChannel = getContestThreadOrChannel(contest);
+                if (threadOrChannel == null) continue;
+
+                String message = "## Agent\n" + player.getRepresentation() + " used _" + agent.getName() + "_.";
+
+                MessageHelper.sendMessageToChannelWithEmbed(threadOrChannel, message, agent.getRepresentationEmbed());
+            }
+        } catch (Exception e) {
+            BotLogger.error(new LogOrigin(game), "Combat contest agent relay failed.", e);
         }
     }
 
@@ -231,6 +286,8 @@ public class CombatContestService {
         String defenderLegend = ColorEmojis.getColorEmoji(defender.getColor()) + " " + defender.getFactionEmoji()
                 + " = " + defender.getUserName();
         return "## A New Combat Contest Has Emerged!\n"
+                + getLazaxMinigameRoleMention()
+                + "\n"
                 + "**Game:** `" + game.getName() + "`\n"
                 + "**Game Link:** [Open Game](https://asyncti4.com/game/" + game.getName() + ")\n"
                 + "**System:** " + tile.getRepresentationForButtons() + "\n"
@@ -241,6 +298,14 @@ public class CombatContestService {
                 + "- " + attackerLegend + "\n"
                 + "- " + defenderLegend + "\n\n"
                 + summary;
+    }
+
+    private String getLazaxMinigameRoleMention() {
+        if (JdaService.guildPrimary == null) return "";
+        Role role = JdaService.guildPrimary.getRolesByName(LAZAX_MINIGAME_ROLE_NAME, true).stream()
+                .findFirst()
+                .orElse(null);
+        return role == null ? "" : role.getAsMention();
     }
 
     private void postContestMessage(
@@ -261,7 +326,7 @@ public class CombatContestService {
                             .build())
                     .queue(
                             message -> {
-                                persistMessageAndThread(contestId, contestChannel, message);
+                                persistMessageAndThread(game, contestId, contestChannel, message);
                                 addPredictionReactions(game, attacker, defender, message);
                             },
                             error -> BotLogger.error(
@@ -269,7 +334,7 @@ public class CombatContestService {
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Failed to create combat contest opener image.", e);
             MessageHelper.splitAndSentWithAction(postText, contestChannel, message -> {
-                persistMessageAndThread(contestId, contestChannel, message);
+                persistMessageAndThread(game, contestId, contestChannel, message);
                 addPredictionReactions(game, attacker, defender, message);
             });
         }
@@ -464,7 +529,7 @@ public class CombatContestService {
                 + "*May fortune favor the bold.*";
     }
 
-    private void persistMessageAndThread(Long contestId, TextChannel contestChannel, Message message) {
+    private void persistMessageAndThread(Game game, Long contestId, TextChannel contestChannel, Message message) {
         CombatContestEntity contest = repository.findById(contestId).orElse(null);
         if (contest == null) return;
         contest.setPublicChannelId(contestChannel.getIdLong());
@@ -483,9 +548,56 @@ public class CombatContestService {
                             MessageHelper.sendMessageToChannel(
                                     thread,
                                     "Use this thread for combat follow-up. The bot will post the result here when the space combat resolves.");
+                            postCombatTechSummary(game, latest, thread);
                         },
                         error -> BotLogger.error(
                                 "Failed to create combat predictor thread for contest " + contestId, error));
+    }
+
+    private void postCombatTechSummary(Game game, CombatContestEntity contest, MessageChannel threadOrChannel) {
+        Player attacker = game.getPlayerFromColorOrFaction(contest.getAttackerFaction());
+        Player defender = game.getPlayerFromColorOrFaction(contest.getDefenderFaction());
+        if (attacker == null || defender == null) return;
+
+        String message =
+                "## Combat Technologies\n" + formatCombatTechLine(attacker) + "\n" + formatCombatTechLine(defender);
+        MessageHelper.sendMessageToChannel(threadOrChannel, message);
+    }
+
+    private String formatCombatTechLine(Player player) {
+        String techSummary = Stream.concat(player.getFactionTechs().stream(), player.getTechs().stream())
+                .distinct()
+                .map(Mapper::getTech)
+                .filter(Objects::nonNull)
+                .sorted((left, right) -> {
+                    int typeComparison = Integer.compare(getTechTypeOrder(left), getTechTypeOrder(right));
+                    if (typeComparison != 0) return typeComparison;
+                    int tierComparison = Integer.compare(
+                            left.getRequirements().orElse("").length(),
+                            right.getRequirements().orElse("").length());
+                    if (tierComparison != 0) return tierComparison;
+                    return left.getName().compareToIgnoreCase(right.getName());
+                })
+                .map(tech -> tech.getCondensedReqsEmojis(false) + " " + tech.getName())
+                .reduce((left, right) -> left + ", " + right)
+                .orElse("No technologies");
+        String factionName = player.getFactionModel() == null
+                ? player.getFaction()
+                : player.getFactionModel().getFactionName();
+        return "- " + player.getFactionEmoji() + " " + factionName + " " + player.getUserName() + ": " + techSummary;
+    }
+
+    private int getTechTypeOrder(TechnologyModel tech) {
+        TechnologyModel.TechnologyType type = tech.getFirstType();
+        return switch (type) {
+            case PROPULSION -> 0;
+            case BIOTIC -> 1;
+            case CYBERNETIC -> 2;
+            case WARFARE -> 3;
+            case UNITUPGRADE -> 4;
+            case GENERICTF -> 5;
+            case NONE -> 6;
+        };
     }
 
     private void addPredictionReactions(Game game, Player attacker, Player defender, Message message) {
@@ -572,7 +684,7 @@ public class CombatContestService {
                 BotLogger.error(new LogOrigin(game), "Failed to create combat contest result image.", e);
                 MessageHelper.sendMessageToChannel(threadOrChannel, resultMessage);
             }
-            postPredictionPointsSummary(threadOrChannel, contest);
+            postPredictionPointsSummary(threadOrChannel, contest, () -> postSubscriptionPrompt(threadOrChannel));
         }
         refreshParentMessageSummary(
                 game,
@@ -615,27 +727,21 @@ public class CombatContestService {
         if (contest.getPublicChannelId() == null || contest.getPublicMessageId() == null) return;
         TextChannel contestChannel = JdaService.guildPrimary.getTextChannelById(contest.getPublicChannelId());
         if (contestChannel == null) return;
+        StringBuilder updated = new StringBuilder(contest.getInitialSummaryText());
+        updated.append("\n\n-# Contest outlook: ").append(formatUpsetIndex(game, contest));
+        if (contest.getPredictionLockedAt() != null) {
+            int totalPredictions =
+                    safeInt(contest.getLockedAttackerPredictions()) + safeInt(contest.getLockedDefenderPredictions());
+            updated.append("\n-# Contest lock: Predictions locked at first dice roll (")
+                    .append(totalPredictions)
+                    .append(" captured).");
+        }
+        if (resultStamp != null) updated.append("\n-# Contest result: ").append(resultStamp);
+        if (detailStamp != null) updated.append("\n-# Contest details: ").append(detailStamp);
         contestChannel
                 .retrieveMessageById(contest.getPublicMessageId())
                 .queue(
-                        message -> {
-                            String content = message.getContentRaw();
-                            if (!content.contains("Combat Contest")) return;
-                            StringBuilder updated = new StringBuilder(stripContestMetadata(content));
-                            updated.append("\n\n-# Contest outlook: ").append(formatUpsetIndex(game, contest));
-                            if (contest.getPredictionLockedAt() != null) {
-                                int totalPredictions = safeInt(contest.getLockedAttackerPredictions())
-                                        + safeInt(contest.getLockedDefenderPredictions());
-                                updated.append("\n-# Contest lock: Predictions locked at first dice roll (")
-                                        .append(totalPredictions)
-                                        .append(" captured).");
-                            }
-                            if (resultStamp != null)
-                                updated.append("\n-# Contest result: ").append(resultStamp);
-                            if (detailStamp != null)
-                                updated.append("\n-# Contest details: ").append(detailStamp);
-                            message.editMessage(updated.toString()).queueAfter(100, TimeUnit.MILLISECONDS);
-                        },
+                        message -> message.editMessage(updated.toString()).queueAfter(100, TimeUnit.MILLISECONDS),
                         BotLogger::catchRestError);
     }
 
@@ -645,16 +751,6 @@ public class CombatContestService {
 
     private double safeDouble(Double value) {
         return value == null ? 0 : value;
-    }
-
-    private String stripContestMetadata(String content) {
-        StringBuilder stripped = new StringBuilder();
-        for (String line : content.split("\n")) {
-            if (line.startsWith("-# Contest ")) continue;
-            if (stripped.length() > 0) stripped.append('\n');
-            stripped.append(line);
-        }
-        return stripped.toString().trim();
     }
 
     private void awardPredictionPoints(CombatContestEntity contest) {
@@ -677,9 +773,13 @@ public class CombatContestService {
         predictionRepository.saveAll(predictions);
     }
 
-    private void postPredictionPointsSummary(MessageChannel threadOrChannel, CombatContestEntity contest) {
+    private void postPredictionPointsSummary(
+            MessageChannel threadOrChannel, CombatContestEntity contest, Runnable afterPost) {
         List<CombatContestPredictionEntity> predictions = predictionRepository.findByContestId(contest.getId());
-        if (predictions.isEmpty()) return;
+        if (predictions.isEmpty()) {
+            if (afterPost != null) afterPost.run();
+            return;
+        }
 
         Map<String, Integer> totalsByUser = predictionRepository
                 .findPointTotalsByDiscordUserIdIn(predictions.stream()
@@ -709,7 +809,20 @@ public class CombatContestService {
                             .append(")\n");
                 });
 
-        MessageHelper.splitAndSentWithAction(message.toString().trim(), threadOrChannel, null);
+        MessageHelper.splitAndSentWithAction(message.toString().trim(), threadOrChannel, postedMessage -> {
+            if (afterPost != null) afterPost.run();
+        });
+    }
+
+    private void postSubscriptionPrompt(MessageChannel threadOrChannel) {
+        String message = "Did you like this? React " + SUBSCRIBE_EMOJI
+                + " to subscribe to more, " + UNSUBSCRIBE_EMOJI
+                + " to opt out if already subscribed.\n"
+                + LAZAX_MINIGAME_SUBSCRIPTION_MARKER;
+        MessageHelper.splitAndSentWithAction(message, threadOrChannel, postedMessage -> {
+            postedMessage.addReaction(Emoji.fromUnicode(SUBSCRIBE_EMOJI)).queue(null, BotLogger::catchRestError);
+            postedMessage.addReaction(Emoji.fromUnicode(UNSUBSCRIBE_EMOJI)).queue(null, BotLogger::catchRestError);
+        });
     }
 
     private int calculatePredictionPoints(
@@ -819,12 +932,7 @@ public class CombatContestService {
         }
         if (!changed) return;
 
-        if (Objects.equals(contest.getAttackerHitAssignedRound(), round)
-                && Objects.equals(contest.getDefenderHitAssignedRound(), round)
-                && !Objects.equals(contest.getLastPostedHitImageRound(), round)) {
-            postAssignedHitsImage(game, event, contest, round);
-            contest.setLastPostedHitImageRound(round);
-        }
+        postAssignedHitsImage(game, player, event, contest, round);
         repository.save(contest);
     }
 
@@ -873,7 +981,7 @@ public class CombatContestService {
     }
 
     private void postAssignedHitsImage(
-            Game game, ButtonInteractionEvent event, CombatContestEntity contest, int round) {
+            Game game, Player player, ButtonInteractionEvent event, CombatContestEntity contest, int round) {
         MessageChannel threadOrChannel = getContestThreadOrChannel(contest);
         if (threadOrChannel == null) return;
 
@@ -881,7 +989,9 @@ public class CombatContestService {
         if (tile == null) return;
 
         String roundLabel = round > 0 ? "round #" + round : "the current exchange";
-        String message = "## Combat Update\nBoth players have assigned hits for " + roundLabel + ".";
+        String message = "## Combat Update\n"
+                + player.getFactionEmoji() + " " + player.getFaction() + " " + player.getUserName()
+                + " assigned hits for " + roundLabel + ".";
         try (FileUpload fileUpload = new TileGenerator(game, event, null, 0, tile.getPosition()).createFileUpload()) {
             MessageHelper.sendMessageWithFile(threadOrChannel, fileUpload, message, false, false);
         } catch (IOException e) {

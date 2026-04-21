@@ -49,6 +49,8 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.contest.CombatContestService;
 
 @UtilityClass
 public class ActionCardHelper {
@@ -823,6 +825,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithEmbed(bEvent.getChannel(), message, acEmbed);
             }
         }
+        SpringContext.getBean(CombatContestService.class).mirrorCombatActionCard(game, player, actionCard);
         if (actionCardIsSabotageOrShatter) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
             if (game.isWildWildGalaxyMode()) {
