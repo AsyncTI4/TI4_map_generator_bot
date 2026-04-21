@@ -514,7 +514,6 @@ public class CombatContestService {
         if (topEntries.isEmpty()) return null;
 
         StringBuilder message = new StringBuilder("## Lazax War Archives Leaderboard\n");
-        message.append("-# Posted daily at 15:00 UTC (9:00 CST).\n");
         int rank = 1;
         for (CombatContestLeaderboardRow entry : topEntries) {
             long predictions = entry.getPredictionCount() == null ? 0 : entry.getPredictionCount();
