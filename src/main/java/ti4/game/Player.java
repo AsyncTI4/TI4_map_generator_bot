@@ -698,10 +698,12 @@ public class Player extends PlayerProperties {
             actionsChannel = game.getMainGameChannel();
         }
         if (actionsChannel == null) {
-            BotLogger.warning(
-                    new LogOrigin(this),
-                    "`Player.getCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: "
-                            + game.getName());
+            if (!game.isHasEnded()) {
+                BotLogger.warning(
+                        new LogOrigin(this),
+                        "`Player.getCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: "
+                                + game.getName());
+            }
             return null;
         }
         String userName = getUserName().replace("/", "");
@@ -852,7 +854,9 @@ public class Player extends PlayerProperties {
             BotLogger.error(new LogOrigin(this), message, error);
             return;
         }
-        BotLogger.warning(new LogOrigin(this), message, error);
+        if (!game.isHasEnded()) {
+            BotLogger.warning(new LogOrigin(this), message, error);
+        }
     }
 
     /**

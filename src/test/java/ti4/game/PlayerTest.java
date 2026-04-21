@@ -8,6 +8,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
@@ -22,10 +25,13 @@ import ti4.discord.JdaService;
 
 class PlayerTest {
 
+    private final PrintStream originalSystemOut = System.out;
+
     @AfterEach
     void afterEach() {
         JdaService.jda = null;
         JdaService.testingMode = false;
+        System.setOut(originalSystemOut);
     }
 
     @Test
@@ -60,5 +66,21 @@ class PlayerTest {
 
         assertThat(player.getCardsInfoThreadJumpLink()).isNull();
         verify(actionsChannel, never()).createThreadChannel(anyString(), anyBoolean());
+    }
+
+    @Test
+    void getCardsInfoThreadJumpLinkDoesNotWarnWhenEndedGameHasNoActionsChannel() {
+        JdaService.testingMode = true;
+
+        Game game = new Game();
+        game.setName("old-game");
+        game.setHasEnded(true);
+
+        Player player = new Player("user-id", "user/name", game);
+        ByteArrayOutputStream capturedStdout = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(capturedStdout, true, StandardCharsets.UTF_8));
+
+        assertThat(player.getCardsInfoThreadJumpLink()).isNull();
+        assertThat(capturedStdout.toString(StandardCharsets.UTF_8)).doesNotContain("Player.getCardsInfoThread");
     }
 }
