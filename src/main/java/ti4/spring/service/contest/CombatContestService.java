@@ -61,7 +61,7 @@ public class CombatContestService {
     private static final Set<String> COMBAT_SUMMARY_TECH_ALIASES = Set.of("da", "asc", "x89", "x89c4");
     private static final Set<String> COMBAT_SUMMARY_RELIC_ALIASES = Set.of(
             "metalivoidarmaments", "metalivoidshielding", "lightrailordnance", "baldrick_crownofthalnos", "pi_thalnos");
-    private static final double MIN_HP_RATIO = 0.9;
+    private static final double MIN_HP_RATIO = 0.8;
     private static final double ZERO_EPSILON = 0.0001;
     private static final String SUBSCRIBE_EMOJI = "\uD83D\uDFE2";
     private static final String UNSUBSCRIBE_EMOJI = "\uD83D\uDD34";
