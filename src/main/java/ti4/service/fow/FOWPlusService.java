@@ -116,8 +116,13 @@ public final class FOWPlusService {
 
     // Only allow activating positions player can see
     public static boolean canActivatePosition(String position, Player player, Game game) {
+        return canActivatePosition(position, player, game, null);
+    }
+
+    public static boolean canActivatePosition(
+            String position, Player player, Game game, Set<String> visiblePositions) {
         return !isActive(game)
-                || FoWHelper.getTilePositionsToShow(game, player).contains(position)
+                || resolveVisiblePositions(game, player, visiblePositions).contains(position)
                 || game.isWarfareAction();
     }
 
@@ -178,25 +183,30 @@ public final class FOWPlusService {
 
     // Remove ring buttons player has no tiles they can activate
     public static void filterRingButtons(List<Button> ringButtons, Player player, Game game) {
-        Set<String> visiblePositions = FoWHelper.getTilePositionsToShow(game, player);
+        filterRingButtons(ringButtons, player, game, null);
+    }
+
+    public static void filterRingButtons(List<Button> ringButtons, Player player, Game game, Set<String> visiblePositions) {
+        Set<String> resolvedVisiblePositions = resolveVisiblePositions(game, player, visiblePositions);
         Tile centerTile = game.getTileByPosition("000");
-        if (!visiblePositions.contains("000")
+        if (!resolvedVisiblePositions.contains("000")
                 || centerTile != null
                         && centerTile.getTileModel() != null
                         && centerTile.getTileModel().isHyperlane()) {
             ringButtons.removeIf(b -> b.getCustomId().contains("ringTile_000"));
         }
         if (Collections.disjoint(
-                visiblePositions,
+                resolvedVisiblePositions,
                 Arrays.asList("tl", "tr", "bl", "br", "frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7"))) {
             ringButtons.removeIf(b -> b.getCustomId().contains("ring_corners"));
         }
         for (Button button : new ArrayList<>(ringButtons)) {
             if (button.getLabel().startsWith("Ring #")) {
                 String ring = button.getLabel().replace("Ring #", "");
-                int availableTiles = ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_left")
+                int availableTiles = ButtonHelper.getTileInARing(
+                                        player, game, "ring_" + ring + "_left", resolvedVisiblePositions)
                                 .size()
-                        + ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_right")
+                        + ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_right", resolvedVisiblePositions)
                                 .size()
                         - 2;
                 if (availableTiles == 0) {
@@ -204,6 +214,13 @@ public final class FOWPlusService {
                 }
             }
         }
+    }
+
+    private static Set<String> resolveVisiblePositions(Game game, Player player, Set<String> visiblePositions) {
+        if (!isActive(game)) {
+            return Collections.emptySet();
+        }
+        return visiblePositions != null ? visiblePositions : FoWHelper.getTilePositionsToShow(game, player);
     }
 
     public static void resolveVoidActivation(Player player, Game game) {

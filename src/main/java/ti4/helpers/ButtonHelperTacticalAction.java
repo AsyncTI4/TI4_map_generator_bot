@@ -510,9 +510,14 @@ public final class ButtonHelperTacticalAction {
             }
         } else {
             LoreService.showSystemLore(player, game, pos, LoreService.TRIGGER.ACTIVATED);
+            Map<Player, Set<String>> visiblePositionsByPlayer = new HashMap<>();
             for (Player player_ : game.getRealPlayers()) {
-                if (player_ == player
-                        || !FoWHelper.getTilePositionsToShow(game, player_).contains(pos)) {
+                if (player_ == player) {
+                    continue;
+                }
+                Set<String> visiblePositions = visiblePositionsByPlayer.computeIfAbsent(
+                        player_, p -> FoWHelper.getTilePositionsToShow(game, p));
+                if (!visiblePositions.contains(pos)) {
                     continue;
                 }
                 String playerMessage = player_.getRepresentationUnfogged() + " - System "
