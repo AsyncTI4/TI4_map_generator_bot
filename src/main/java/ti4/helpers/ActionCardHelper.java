@@ -825,9 +825,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithEmbed(bEvent.getChannel(), message, acEmbed);
             }
         }
-        if (isCombatActionCard(actionCard)) {
-            SpringContext.getBean(CombatContestService.class).mirrorCombatActionCard(game, player, actionCard);
-        }
+        SpringContext.getBean(CombatContestService.class).mirrorCombatActionCard(game, player, actionCard);
         if (actionCardIsSabotageOrShatter) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
             if (game.isWildWildGalaxyMode()) {
@@ -1816,24 +1814,6 @@ public class ActionCardHelper {
 
         sendActionCardInfo(game, player);
         return null;
-    }
-
-    private static boolean isCombatActionCard(ActionCardModel actionCard) {
-        return containsCombatKeyword(actionCard.getWindow())
-                || containsCombatKeyword(actionCard.getText())
-                || containsCombatKeyword(actionCard.getNotes());
-    }
-
-    private static boolean containsCombatKeyword(String text) {
-        if (text == null || text.isBlank()) return false;
-        String normalized = text.toLowerCase();
-        return normalized.contains("combat")
-                || normalized.contains("ship is destroyed")
-                || normalized.contains("ships is destroyed")
-                || normalized.contains("space cannon")
-                || normalized.contains("anti-fighter barrage")
-                || normalized.contains("bombardment")
-                || normalized.contains("invasion");
     }
 
     public static boolean isSabotageOrShatter(String acID) {
