@@ -351,9 +351,9 @@ public class ActionCardHelper {
                         .append("_ `(")
                         .append(Helper.leftpad("" + ac.getValue(), 3))
                         .append(")`\n> ")
-                        .append(actionCard.getWindow())
+                        .append(actionCard.hasWildText(game) ? actionCard.getWildWildWindow() : actionCard.getWindow())
                         .append(": ")
-                        .append(actionCard.getText())
+                        .append(actionCard.hasWildText(game) ? actionCard.getWildWildText() : actionCard.getText())
                         .append('\n');
                 if (actionCard.getNotes() != null) {
                     sb.append("> -# [").append(actionCard.getNotes()).append("]\n");
