@@ -102,10 +102,6 @@ public class CombatContestEntity {
     @Column(name = "initial_hp_defender")
     private Double initialHpDefender;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "upset_index")
-    private CombatContestUpsetIndex upsetIndex;
-
     @Column(name = "prediction_locked_at")
     private LocalDateTime predictionLockedAt;
 

@@ -101,7 +101,6 @@ public class CombatContestService {
             contest.setInitialStrengthDefender(snapshot.defenderStrength());
             contest.setInitialHpAttacker(snapshot.attackerHp());
             contest.setInitialHpDefender(snapshot.defenderHp());
-            contest.setUpsetIndex(snapshot.upsetIndex());
             long contestId = repository.save(contest).getId();
             postContestMessage(
                     game,
@@ -237,12 +236,10 @@ public class CombatContestService {
         double stronger = Math.max(attackerStrength.hp(), defenderStrength.hp());
         double weaker = Math.min(attackerStrength.hp(), defenderStrength.hp());
         double ratio = stronger == 0 ? 0 : weaker / stronger;
-        CombatContestUpsetIndex upsetIndex = getUpsetIndex(ratio);
         String summary = extractSpaceOnlySummary(ButtonHelper.getCombatTileSummaryMessage(
                 game, tile, attacker, null, "space", Constants.SPACE, List.of(attacker, defender)));
 
-        String openerText =
-                formatContestPostHeader(game, tile, attacker, defender, upsetIndex, attackerStrength, defenderStrength);
+        String openerText = formatContestPostHeader(game, tile, attacker, defender);
         String threadSummaryText = null;
         String parentPostText = openerText + "\n\n" + summary;
         if (parentPostText.length() > Message.MAX_CONTENT_LENGTH) {
@@ -256,8 +253,7 @@ public class CombatContestService {
                 defenderStrength.value(),
                 attackerStrength.hp(),
                 defenderStrength.hp(),
-                ratio,
-                upsetIndex);
+                ratio);
     }
 
     private FleetStrength calculateFleetStrength(Game game, Player player, UnitHolder space) {
@@ -292,14 +288,7 @@ public class CombatContestService {
         return new FleetStrength(total, hp, hasNonFighterShip);
     }
 
-    private String formatContestPostHeader(
-            Game game,
-            Tile tile,
-            Player attacker,
-            Player defender,
-            CombatContestUpsetIndex upsetIndex,
-            FleetStrength attackerStrength,
-            FleetStrength defenderStrength) {
+    private String formatContestPostHeader(Game game, Tile tile, Player attacker, Player defender) {
         String attackerLegend = ColorEmojis.getColorEmoji(attacker.getColor()) + " " + attacker.getFactionEmoji()
                 + " = " + attacker.getUserName();
         String defenderLegend = ColorEmojis.getColorEmoji(defender.getColor()) + " " + defender.getFactionEmoji()
@@ -311,8 +300,6 @@ public class CombatContestService {
                 + "**Game Link:** [Open Game](https://asyncti4.com/game/" + game.getName() + ")\n"
                 + "**System:** " + tile.getRepresentationForButtons() + "\n"
                 + "**Combat:** Space Combat\n"
-                + "**Outlook:** "
-                + formatUpsetIndex(upsetIndex, attacker, defender, attackerStrength.hp(), defenderStrength.hp()) + "\n"
                 + "**Predict the winner by reacting below.**\n"
                 + "- " + attackerLegend + "\n"
                 + "- " + defenderLegend;
@@ -378,46 +365,6 @@ public class CombatContestService {
             if ("----------".equals(line.trim())) break;
         }
         return trimmed.toString().trim();
-    }
-
-    private CombatContestUpsetIndex getUpsetIndex(double ratio) {
-        if (ratio >= 0.9) return CombatContestUpsetIndex.EVEN_FIGHT;
-        if (ratio >= 0.78) return CombatContestUpsetIndex.FAVORED;
-        return CombatContestUpsetIndex.LONG_SHOT;
-    }
-
-    private String formatUpsetIndex(
-            CombatContestUpsetIndex upsetIndex,
-            Player attacker,
-            Player defender,
-            double attackerHp,
-            double defenderHp) {
-        return switch (upsetIndex) {
-            case EVEN_FIGHT -> "Even Fight";
-            case FAVORED, LONG_SHOT -> {
-                Player favoredPlayer = attackerHp >= defenderHp ? attacker : defender;
-                String label = upsetIndex == CombatContestUpsetIndex.FAVORED ? "Favored" : "Long Shot";
-                yield favoredPlayer.getFactionEmoji() + " " + label;
-            }
-        };
-    }
-
-    private String formatUpsetIndex(Game game, CombatContestEntity contest) {
-        Player attacker = game.getPlayerFromColorOrFaction(contest.getAttackerFaction());
-        Player defender = game.getPlayerFromColorOrFaction(contest.getDefenderFaction());
-        if (attacker == null || defender == null) {
-            return switch (contest.getUpsetIndex()) {
-                case EVEN_FIGHT -> "Even Fight";
-                case FAVORED -> "Favored";
-                case LONG_SHOT -> "Long Shot";
-            };
-        }
-        return formatUpsetIndex(
-                contest.getUpsetIndex(),
-                attacker,
-                defender,
-                safeDouble(contest.getInitialHpAttacker()),
-                safeDouble(contest.getInitialHpDefender()));
     }
 
     public boolean postLeaderboard() {
@@ -843,7 +790,6 @@ public class CombatContestService {
         TextChannel contestChannel = JdaService.guildPrimary.getTextChannelById(contest.getPublicChannelId());
         if (contestChannel == null) return;
         StringBuilder updated = new StringBuilder(contest.getInitialSummaryText());
-        updated.append("\n\n-# Contest outlook: ").append(formatUpsetIndex(game, contest));
         if (contest.getPredictionLockedAt() != null) {
             int totalPredictions =
                     safeInt(contest.getLockedAttackerPredictions()) + safeInt(contest.getLockedDefenderPredictions());
@@ -861,10 +807,6 @@ public class CombatContestService {
     }
 
     private int safeInt(Integer value) {
-        return value == null ? 0 : value;
-    }
-
-    private double safeDouble(Double value) {
         return value == null ? 0 : value;
     }
 
@@ -1126,8 +1068,7 @@ public class CombatContestService {
             double defenderStrength,
             double attackerHp,
             double defenderHp,
-            double strengthRatio,
-            CombatContestUpsetIndex upsetIndex) {
+            double strengthRatio) {
         private boolean isMeaningful() {
             double strongerResources = Math.max(attackerStrength, defenderStrength);
             double weakerResources = Math.min(attackerStrength, defenderStrength);
