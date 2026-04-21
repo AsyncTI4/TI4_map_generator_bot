@@ -684,7 +684,10 @@ public class CombatContestService {
                 BotLogger.error(new LogOrigin(game), "Failed to create combat contest result image.", e);
                 MessageHelper.sendMessageToChannel(threadOrChannel, resultMessage);
             }
-            postPredictionPointsSummary(threadOrChannel, contest, () -> postSubscriptionPrompt(threadOrChannel));
+            postPredictionPointsSummary(threadOrChannel, contest, () -> {
+                postParticipantFollowup(game, contest, threadOrChannel);
+                postSubscriptionPrompt(threadOrChannel);
+            });
         }
         refreshParentMessageSummary(
                 game,
@@ -823,6 +826,18 @@ public class CombatContestService {
             postedMessage.addReaction(Emoji.fromUnicode(SUBSCRIBE_EMOJI)).queue(null, BotLogger::catchRestError);
             postedMessage.addReaction(Emoji.fromUnicode(UNSUBSCRIBE_EMOJI)).queue(null, BotLogger::catchRestError);
         });
+    }
+
+    private void postParticipantFollowup(Game game, CombatContestEntity contest, MessageChannel threadOrChannel) {
+        Player attacker = game.getPlayerFromColorOrFaction(contest.getAttackerFaction());
+        Player defender = game.getPlayerFromColorOrFaction(contest.getDefenderFaction());
+        if (attacker == null || defender == null) return;
+
+        String message = "## Summons From The Archives\n"
+                + "<@" + attacker.getUserID() + "> <@" + defender.getUserID() + ">\n"
+                + "By decree of the Lazax War Game, your fleets have been judged worthy of remembrance. "
+                + "If it pleases the honored claimants, tarry a moment and read the commentaries, acclaim, and quiet condemnation recorded above concerning your struggle.";
+        MessageHelper.sendMessageToChannel(threadOrChannel, message);
     }
 
     private int calculatePredictionPoints(
