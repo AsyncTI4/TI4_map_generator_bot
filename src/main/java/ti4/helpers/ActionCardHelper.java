@@ -825,7 +825,13 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithEmbed(bEvent.getChannel(), message, acEmbed);
             }
         }
-        SpringContext.getBean(CombatContestService.class).mirrorCombatActionCard(game, player, actionCard);
+        SpringContext.getBean(CombatContestService.class)
+                .mirrorCombatEvent(
+                        game,
+                        player,
+                        "Action Card",
+                        "played _" + actionCard.getName() + "_.",
+                        actionCard.getRepresentationEmbed(false, true, game));
         if (actionCardIsSabotageOrShatter) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
             if (game.isWildWildGalaxyMode()) {

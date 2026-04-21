@@ -90,6 +90,9 @@ public class CombatContestEntity {
     @Column(name = "initial_summary_text", nullable = false, columnDefinition = "TEXT")
     private String initialSummaryText;
 
+    @Column(name = "active_player_summary", columnDefinition = "TEXT")
+    private String activePlayerSummary;
+
     @Column(name = "initial_strength_attacker", nullable = false)
     private Double initialStrengthAttacker;
 
@@ -101,19 +104,6 @@ public class CombatContestEntity {
 
     @Column(name = "initial_hp_defender")
     private Double initialHpDefender;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "upset_index")
-    private CombatContestUpsetIndex upsetIndex;
-
-    @Column(name = "prediction_locked_at")
-    private LocalDateTime predictionLockedAt;
-
-    @Column(name = "locked_attacker_predictions")
-    private Integer lockedAttackerPredictions;
-
-    @Column(name = "locked_defender_predictions")
-    private Integer lockedDefenderPredictions;
 
     @Column(name = "attacker_hit_assigned_round")
     private Integer attackerHitAssignedRound;
