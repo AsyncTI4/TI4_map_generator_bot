@@ -141,6 +141,7 @@ public final class ButtonHelperFactionSpecific {
                 event.getChannel(),
                 player.getRepresentation() + ", please choose the intrigue card you wish to pay for.",
                 getIntrigueCardButtons(player, activePlayerFaction, game));
+        ButtonHelper.deleteMessage(event);
     }
 
     public static List<Button> getIntrigueCardButtons(Player player, String faction, Game game) {
@@ -232,7 +233,7 @@ public final class ButtonHelperFactionSpecific {
         }
 
         MessageHelper.sendMessageToChannel(
-                event.getChannel(), p2.getRepresentation() + " is resolving the " + card + " intrigue card.");
+                p2.getCorrectChannel(), p2.getRepresentation() + " is resolving the " + card + " intrigue card.");
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation()
@@ -248,7 +249,7 @@ public final class ButtonHelperFactionSpecific {
                 }
                 String buildMessage = p2.getRepresentationUnfogged()
                         + ", you may resolve PRODUCTION of 1 of your units in any system.";
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), buildMessage, buildButtons);
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), buildMessage, buildButtons);
                 player.setSteelbalanceCounter(player.getSteelbalanceCounter() - 2);
             }
             case "Intervention" -> {
