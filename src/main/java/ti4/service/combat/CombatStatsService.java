@@ -19,18 +19,33 @@ public class CombatStatsService {
 
     public static CombatRoundProfile getCombatRoundProfile(
             boolean participates, UnitModel unitModel, Player player, Tile activeSystem, @Nullable Player opponent) {
-        EffectiveCombatStats effectiveCombatStats = getEffectiveCombatStats(unitModel, player, activeSystem, opponent);
+        return getCombatRoundProfile(participates, unitModel, player, activeSystem, opponent, true);
+    }
+
+    public static CombatRoundProfile getCombatRoundProfile(
+            boolean participates,
+            UnitModel unitModel,
+            Player player,
+            Tile activeSystem,
+            @Nullable Player opponent,
+            boolean includeDisplayOnlyScaling) {
+        EffectiveCombatStats effectiveCombatStats =
+                getEffectiveCombatStats(unitModel, player, activeSystem, opponent, includeDisplayOnlyScaling);
         return new CombatRoundProfile(participates, effectiveCombatStats.diceCount(), effectiveCombatStats.hitsOn());
     }
 
     private static EffectiveCombatStats getEffectiveCombatStats(
-            UnitModel unitModel, Player player, Tile activeSystem, @Nullable Player opponent) {
+            UnitModel unitModel,
+            Player player,
+            Tile activeSystem,
+            @Nullable Player opponent,
+            boolean includeDisplayOnlyScaling) {
         int numRollsPerUnit = unitModel.getCombatDieCountForAbility(CombatRollType.combatround, player);
         int extraDice = 0;
         if (isEidolonLandwasterMech(unitModel, player)) extraDice++;
         if (isEchoOfAscensionFlagship(unitModel, player)) extraDice++;
         numRollsPerUnit += extraDice;
-        if (isWinnuFlagship(unitModel) && numRollsPerUnit <= 0) {
+        if (includeDisplayOnlyScaling && isBaseWinnuFlagship(unitModel) && numRollsPerUnit <= 0) {
             if (opponent != null) {
                 numRollsPerUnit = ButtonHelper.checkNumberNonFighterShips(opponent, activeSystem);
             }
@@ -56,8 +71,8 @@ public class CombatStatsService {
         return unitModel.getUnitType() == UnitType.Mech && player.ownsUnit("tf-eidolonterminus");
     }
 
-    private static boolean isWinnuFlagship(UnitModel unitModel) {
-        return unitModel.getId() != null && unitModel.getId().contains("winnu_flagship");
+    private static boolean isBaseWinnuFlagship(UnitModel unitModel) {
+        return "winnu_flagship".equals(unitModel.getId());
     }
 
     /**
