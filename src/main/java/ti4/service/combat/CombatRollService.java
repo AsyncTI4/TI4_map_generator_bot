@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -499,7 +500,7 @@ public class CombatRollService {
                     }
                 }
             }
-            if (rollType == CombatRollType.AFB) {
+            if (rollType == CombatRollType.AFB && h > 0) {
                 String msg2 = opponent.getRepresentation() + ", you may automatically assign "
                         + (h == 1 ? "the hit" : "hits") + " from AFB.";
                 if (opponent.isNpc() || opponent.isDummy()) {
