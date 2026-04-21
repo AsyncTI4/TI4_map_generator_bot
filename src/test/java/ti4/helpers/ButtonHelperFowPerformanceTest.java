@@ -16,11 +16,13 @@ import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.testUtils.BaseTi4Test;
 
 class ButtonHelperFowPerformanceTest extends BaseTi4Test {
+    private static final String PLAYER_ID = "1";
+    private static final String PLAYER_NAME = "Alice";
 
     @Test
     void getPossibleRingsOnlyComputesVisibleTilesOnceInFowPlus() {
         Game game = createFowPlusGame();
-        Player player = game.getPlayer("1");
+        Player player = game.getPlayer(PLAYER_ID);
 
         try (MockedStatic<FoWHelper> fowHelper = mockStatic(FoWHelper.class)) {
             fowHelper.when(() -> FoWHelper.getTilePositionsToShow(game, player)).thenReturn(Set.of("101", "102"));
@@ -35,7 +37,7 @@ class ButtonHelperFowPerformanceTest extends BaseTi4Test {
     @Test
     void getTileInARingOnlyComputesVisibleTilesOnceInFowPlus() {
         Game game = createFowPlusGame();
-        Player player = game.getPlayer("1");
+        Player player = game.getPlayer(PLAYER_ID);
 
         try (MockedStatic<FoWHelper> fowHelper = mockStatic(FoWHelper.class)) {
             fowHelper.when(() -> FoWHelper.getTilePositionsToShow(game, player)).thenReturn(Set.of("101", "102"));
@@ -54,7 +56,7 @@ class ButtonHelperFowPerformanceTest extends BaseTi4Test {
         game.setTile(new Tile("18", "101"));
         game.setTile(new Tile("26", "102"));
 
-        Player player = game.addPlayer("1", "Alice");
+        Player player = game.addPlayer(PLAYER_ID, PLAYER_NAME);
         player.setFaction(game, "arborec");
         player.setColor("red");
         return game;
