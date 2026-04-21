@@ -53,7 +53,7 @@ public class CombatContestService {
     public static final String LAZAX_MINIGAME_ROLE_NAME = "Lazax Minigame";
     private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives";
     private static final Duration CONTEST_COOLDOWN = Duration.ofMinutes(10);
-    private static final double MIN_FLEET_RESOURCES = 20.0;
+    private static final double MIN_FLEET_RESOURCES = 18.0;
     private static final String THREAD_SUMMARY_HEADER = "## Combat Units\n";
     private static final Set<String> COMBAT_SUMMARY_TECH_ALIASES = Set.of("da", "asc", "x89", "x89c4");
     private static final Set<String> COMBAT_SUMMARY_RELIC_ALIASES = Set.of(
