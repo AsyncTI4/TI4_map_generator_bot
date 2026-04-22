@@ -126,6 +126,10 @@ public class ActiveLeaseService {
         this.ready.set(ready);
     }
 
+    public boolean isLeaseParticipationEnabled() {
+        return leaseParticipationEnabled.get();
+    }
+
     public boolean shouldServeTraffic() {
         return isReady() && mayMutate() && !isDraining();
     }
