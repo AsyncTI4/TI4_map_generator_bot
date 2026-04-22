@@ -255,11 +255,16 @@ public class CombatReplayService {
         List<Double> weakerStrengthValues = window.stream()
                 .map(observation -> Math.min(observation.getAttackerStrength(), observation.getDefenderStrength()))
                 .toList();
+        double jointScoreCutoff = computeCutoff(window, fairnessValues, weakerStrengthValues);
+        List<SelectionObservationDebugView> observations = window.stream()
+                .map(observation -> toSelectionObservationDebugView(observation, fairnessValues, weakerStrengthValues))
+                .toList();
         selectionSnapshot = new SelectionSnapshot(
                 window.size(),
                 List.copyOf(fairnessValues),
                 List.copyOf(weakerStrengthValues),
-                computeCutoff(window, fairnessValues, weakerStrengthValues));
+                jointScoreCutoff,
+                List.copyOf(observations));
     }
 
     public SelectionDebugView getSelectionDebugView() {
@@ -270,7 +275,8 @@ public class CombatReplayService {
                 snapshot.windowSize(),
                 snapshot.jointScoreCutoff(),
                 average(snapshot.fairnessValues()),
-                average(snapshot.weakerStrengthValues()));
+                average(snapshot.weakerStrengthValues()),
+                snapshot.observations());
     }
 
     private boolean isSpaceCombatHitAssignment(Game game, Player player, ButtonInteractionEvent event) {
@@ -362,6 +368,20 @@ public class CombatReplayService {
             List<Double> weakerStrengthValues,
             double weakerStrength) {
         return percentileRank(fairnessValues, fairnessRatio) * percentileRank(weakerStrengthValues, weakerStrength);
+    }
+
+    private SelectionObservationDebugView toSelectionObservationDebugView(
+            CombatObservationEntity observation, List<Double> fairnessValues, List<Double> weakerStrengthValues) {
+        double weakerStrength = Math.min(observation.getAttackerStrength(), observation.getDefenderStrength());
+        double fairnessPercentile = percentileRank(fairnessValues, observation.getFairnessRatio());
+        double weakerStrengthPercentile = percentileRank(weakerStrengthValues, weakerStrength);
+        return new SelectionObservationDebugView(
+                observation,
+                weakerStrength,
+                fairnessPercentile,
+                weakerStrengthPercentile,
+                fairnessPercentile * weakerStrengthPercentile,
+                Boolean.TRUE.equals(observation.getEligibleAsCandidate()));
     }
 
     private double computeCutoff(
@@ -531,7 +551,11 @@ public class CombatReplayService {
             List<String> specialLines) {}
 
     private record SelectionSnapshot(
-            int windowSize, List<Double> fairnessValues, List<Double> weakerStrengthValues, double jointScoreCutoff) {
+            int windowSize,
+            List<Double> fairnessValues,
+            List<Double> weakerStrengthValues,
+            double jointScoreCutoff,
+            List<SelectionObservationDebugView> observations) {
         private boolean hasWindow() {
             return windowSize > 0;
         }
@@ -545,5 +569,14 @@ public class CombatReplayService {
             int windowSize,
             double jointScoreCutoff,
             double averageFairnessRatio,
-            double averageWeakerStrength) {}
+            double averageWeakerStrength,
+            List<SelectionObservationDebugView> observations) {}
+
+    public record SelectionObservationDebugView(
+            CombatObservationEntity observation,
+            double weakerStrength,
+            double fairnessPercentile,
+            double weakerStrengthPercentile,
+            double jointScore,
+            boolean eligibleAsCandidate) {}
 }
