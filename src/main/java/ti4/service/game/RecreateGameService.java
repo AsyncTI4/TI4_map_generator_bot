@@ -23,6 +23,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
+import ti4.service.fow.CreateFoWGameService;
 import ti4.service.fow.GMService;
 
 @UtilityClass
@@ -31,6 +32,10 @@ public class RecreateGameService {
     public static final String LIMBO_CATEGORY_NAME = "The in-limbo PBD Archive";
     public static final String TEST_GAME_MARKER = "-test-";
     private static final String LEGACY_TEST_GAME_MARKER = "::test::";
+    private static final String FOW_GM_CHANNEL_SUFFIX = "-gm-room";
+    private static final String FOW_ACTIONS_CHANNEL_SUFFIX = "-anonymous-announcements-private";
+    private static final String FOW_GM_MAP_MESSAGE =
+            "Use `/show_game_as_player` for a player-scoped Fog of War map view.";
     private static final Pattern TEST_GAME_NAME_PATTERN =
             Pattern.compile("^(?<source>.+?)" + Pattern.quote(TEST_GAME_MARKER) + "(?<suffix>\\d+)$");
 
@@ -49,16 +54,56 @@ public class RecreateGameService {
      */
     static RecreateGameResult recreateGameResult(Game game, Guild guild, @Nullable Member extraAccessMember) {
         RecreateGameResult result = new RecreateGameResult(game.getName());
-        if (game.isFowMode()) {
-            result.setStatusLine("Could not recreate game resources for `" + game.getName() + "`.");
-            result.addNote("Fog of War games are not compatible with recreate game and must be recreated manually.");
-            return result;
-        }
 
         Guild targetGuild = resolveTargetGuild(game, guild);
         if (targetGuild == null) {
             result.setStatusLine("Could not recreate game resources for `" + game.getName() + "`.");
             result.addNote("No guild with capacity was available.");
+            return result;
+        }
+
+        if (game.isFowMode()) {
+            Role gmRole = ensureFogOfWarGmRole(game, targetGuild, extraAccessMember, result);
+            Role gameRole = ensureFogOfWarPlayerRole(game, targetGuild, result);
+            Category targetCategory = ensureTargetCategory(game, targetGuild);
+
+            TextChannel gmChannel = ensurePrimaryTextChannel(
+                    targetGuild,
+                    game,
+                    targetCategory,
+                    getFogOfWarGmChannelName(game),
+                    getExistingFogOfWarGmChannel(game),
+                    gmRole,
+                    extraAccessMember,
+                    result);
+            if (gmChannel != null) {
+                postShowGameToFogOfWarGmChannel(game, gmChannel);
+            }
+
+            TextChannel actionsChannel = ensurePrimaryTextChannel(
+                    targetGuild,
+                    game,
+                    targetCategory,
+                    getActionsChannelName(game),
+                    game.getMainGameChannel(),
+                    gameRole,
+                    extraAccessMember,
+                    result);
+            if (actionsChannel != null) {
+                game.setMainChannelID(actionsChannel.getId());
+                // Fog of War games use player private channels for maps and do not use shared bot threads.
+                game.setBotMapUpdatesThreadID(null);
+            }
+            // Fog of War games also do not use a public table-talk channel.
+            game.setTableTalkChannelID(null);
+
+            ensureFogOfWarPrivateChannels(game, targetGuild, targetCategory, extraAccessMember, result);
+            ensureCardsInfoThreads(game, result);
+            postShowGameToFogOfWarPrivateChannels(game);
+            Helper.fixGameChannelPermissions(targetGuild, game);
+            List<String> missingPlayers = collectMissingPlayers(game, targetGuild);
+            result.getMissingPlayers().addAll(missingPlayers);
+            pingGame(game, result, extraAccessMember);
             return result;
         }
 
@@ -165,6 +210,39 @@ public class RecreateGameService {
         return role;
     }
 
+    static Role ensureFogOfWarPlayerRole(Game game, Guild guild, RecreateGameResult result) {
+        Role role = ensureNamedRole(guild, game.getName(), true, result);
+        for (Player player : game.getRealPlayers()) {
+            if (player.isGM()) {
+                continue;
+            }
+            Member member = guild.getMemberById(player.getUserID());
+            if (member != null) {
+                guild.addRoleToMember(member, role).complete();
+            } else {
+                result.addNote("Player role member missing for " + player.getUserName());
+            }
+        }
+        return role;
+    }
+
+    static Role ensureFogOfWarGmRole(
+            Game game, Guild guild, @Nullable Member extraAccessMember, RecreateGameResult result) {
+        Role gmRole = ensureNamedRole(guild, game.getName() + " GM", true, result);
+        for (Player player : game.getPlayersWithGMRole()) {
+            Member member = guild.getMemberById(player.getUserID());
+            if (member != null) {
+                guild.addRoleToMember(member, gmRole).complete();
+            } else {
+                result.addNote("GM role member missing for " + player.getUserName());
+            }
+        }
+        if (extraAccessMember != null) {
+            guild.addRoleToMember(extraAccessMember, gmRole).complete();
+        }
+        return gmRole;
+    }
+
     private static void recreateCommunityRoles(Game game, Guild guild, RecreateGameResult result) {
         if (!game.isCommunityMode()) {
             return;
@@ -268,6 +346,38 @@ public class RecreateGameService {
             ensureExtraMemberPermission(channel, extraAccessMember);
         }
         return channel;
+    }
+
+    static void ensureFogOfWarPrivateChannels(
+            Game game,
+            Guild guild,
+            @Nullable Category targetCategory,
+            @Nullable Member extraAccessMember,
+            RecreateGameResult result) {
+        for (Player player : game.getRealPlayers()) {
+            if (player.isGM()) {
+                continue;
+            }
+            TextChannel privateChannel = getPrivateChannel(player);
+            if (privateChannel == null && targetCategory != null) {
+                Member member = guild.getMemberById(player.getUserID());
+                if (member == null) {
+                    result.addNote("Private channel missing for " + player.getUserName());
+                    continue;
+                }
+                CreateFoWGameService.createPrivateChannelForPlayer(member, game);
+                privateChannel = getPrivateChannel(player);
+                if (privateChannel != null) {
+                    result.getCreatedChannels().add(privateChannel.getName());
+                } else {
+                    result.addNote("Private channel recreation failed for " + player.getUserName());
+                }
+            }
+            moveChannelIfNeeded(privateChannel, targetCategory, result);
+            if (privateChannel != null && extraAccessMember != null) {
+                ensureExtraMemberPermission(privateChannel, extraAccessMember);
+            }
+        }
     }
 
     private static TextChannel createPrimaryTextChannel(
@@ -430,6 +540,25 @@ public class RecreateGameService {
         ShowGameService.postShowGame(game, botThread);
     }
 
+    static void postShowGameToFogOfWarPrivateChannels(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            if (player.isGM()) {
+                continue;
+            }
+            TextChannel privateChannel = getPrivateChannel(player);
+            if (privateChannel != null) {
+                ShowGameService.postShowGame(game, privateChannel, player);
+            }
+        }
+    }
+
+    static void postShowGameToFogOfWarGmChannel(Game game, @Nullable TextChannel gmChannel) {
+        if (gmChannel == null) {
+            return;
+        }
+        MessageHelper.sendMessageToChannel(gmChannel, FOW_GM_MAP_MESSAGE);
+    }
+
     static String getTableTalkChannelName(Game game) {
         if (isTestGame(game.getName())) {
             return getSanitizedGameChannelPrefix(game.getName());
@@ -441,8 +570,32 @@ public class RecreateGameService {
         return getSanitizedGameChannelPrefix(game.getName()) + "-" + customName;
     }
 
-    private static String getActionsChannelName(Game game) {
+    static String getActionsChannelName(Game game) {
+        if (game.isFowMode()) {
+            return game.getName() + FOW_ACTIONS_CHANNEL_SUFFIX;
+        }
         return getSanitizedGameChannelPrefix(game.getName()) + Constants.ACTIONS_CHANNEL_SUFFIX;
+    }
+
+    static String getFogOfWarGmChannelName(Game game) {
+        return game.getName() + FOW_GM_CHANNEL_SUFFIX;
+    }
+
+    @Nullable
+    private static TextChannel getExistingFogOfWarGmChannel(Game game) {
+        if (game.getGuild() == null) {
+            return null;
+        }
+        List<TextChannel> channels = game.getGuild().getTextChannelsByName(getFogOfWarGmChannelName(game), true);
+        return channels.isEmpty() ? null : channels.getFirst();
+    }
+
+    @Nullable
+    private static TextChannel getPrivateChannel(Player player) {
+        if (player.getPrivateChannel() instanceof TextChannel textChannel) {
+            return textChannel;
+        }
+        return null;
     }
 
     private static String sanitizeTextChannelSegment(String name) {

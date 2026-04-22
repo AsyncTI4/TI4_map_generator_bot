@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.executors.CircuitBreaker;
 import ti4.executors.ExecutionHistoryManager;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.DisplayType;
 import ti4.helpers.TimedRunnable;
 import ti4.logging.BotLogger;
@@ -34,8 +35,8 @@ public class MapRenderPipeline {
         String gameName = renderEvent.game.getName();
         var timedRunnable =
                 new TimedRunnable("Render event task for " + gameName, EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
-                    try (var mapGenerator =
-                            new MapGenerator(renderEvent.game, renderEvent.displayType, renderEvent.event)) {
+                    try (var mapGenerator = new MapGenerator(
+                            renderEvent.game, renderEvent.displayType, renderEvent.event, renderEvent.fowPlayer)) {
                         mapGenerator.draw();
                         if (renderEvent.uploadToDiscord) {
                             uploadToDiscord(mapGenerator, renderEvent.callback());
@@ -66,13 +67,22 @@ public class MapRenderPipeline {
                 GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(),
                 Boolean.class,
                 Boolean.FALSE)) {
-            queue(game, event, null, null, false, true);
+            queue(game, event, null, null, null, false, true);
         }
     }
 
     public static void queue(
             Game game, @Nullable SlashCommandInteractionEvent event, @Nullable Consumer<FileUpload> callback) {
-        queue(game, event, null, callback, true, true);
+        queue(game, event, null, callback, null, true, true);
+    }
+
+    public static void queue(
+            Game game,
+            @Nullable GenericInteractionCreateEvent event,
+            @Nullable DisplayType displayType,
+            @Nullable Consumer<FileUpload> callback,
+            @Nullable Player fowPlayer) {
+        queue(game, event, displayType, callback, fowPlayer, true, true);
     }
 
     public static void queue(
@@ -80,7 +90,7 @@ public class MapRenderPipeline {
             @Nullable GenericInteractionCreateEvent event,
             @Nullable DisplayType displayType,
             @Nullable Consumer<FileUpload> callback) {
-        queue(game, event, displayType, callback, true, true);
+        queue(game, event, displayType, callback, null, true, true);
     }
 
     private static void queue(
@@ -88,12 +98,13 @@ public class MapRenderPipeline {
             @Nullable GenericInteractionCreateEvent event,
             @Nullable DisplayType displayType,
             @Nullable Consumer<FileUpload> callback,
+            @Nullable Player fowPlayer,
             boolean uploadToDiscord,
             boolean uploadToWebsite) {
         if (game == null) {
             throw new IllegalArgumentException("game cannot be null in render pipeline");
         }
-        render(new RenderEvent(game, event, displayType, callback, uploadToDiscord, uploadToWebsite));
+        render(new RenderEvent(game, event, displayType, callback, fowPlayer, uploadToDiscord, uploadToWebsite));
     }
 
     public static boolean shutdown() {
@@ -112,6 +123,7 @@ public class MapRenderPipeline {
             GenericInteractionCreateEvent event,
             DisplayType displayType,
             Consumer<FileUpload> callback,
+            Player fowPlayer,
             boolean uploadToDiscord,
             boolean uploadToWebsite) {}
 }

@@ -37,6 +37,10 @@ public class ShowGameService {
         postShowGame(game, channel, DisplayType.all);
     }
 
+    public static void postShowGame(Game game, MessageChannel channel, Player fowPlayer) {
+        postShowGame(game, channel, DisplayType.all, fowPlayer);
+    }
+
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
         boolean shouldPersistFullMapMessageId = displayType == DisplayType.all && !game.isFowMode();
         boolean shouldPersistFowMapMessageId = displayType == DisplayType.all && game.isFowMode();
@@ -82,6 +86,10 @@ public class ShowGameService {
     }
 
     static void postShowGame(Game game, MessageChannel channel, DisplayType displayType) {
+        postShowGame(game, channel, displayType, null);
+    }
+
+    static void postShowGame(Game game, MessageChannel channel, DisplayType displayType, Player fowPlayer) {
         if (channel == null) {
             return;
         }
@@ -95,14 +103,19 @@ public class ShowGameService {
                                 msg.getChannel().getIdLong())
                 : null;
 
-        MapRenderPipeline.queue(game, null, displayType, fileUpload -> {
-            if (includeButtons(displayType)) {
-                ButtonHelper.sendFileWithCorrectButtons(
-                        channel, fileUpload, null, Buttons.mapImageButtons(game), game, persistMessageId);
-            } else {
-                MessageHelper.sendFileUploadToChannel(channel, fileUpload, persistMessageId);
-            }
-        });
+        MapRenderPipeline.queue(
+                game,
+                null,
+                displayType,
+                fileUpload -> {
+                    if (includeButtons(displayType)) {
+                        ButtonHelper.sendFileWithCorrectButtons(
+                                channel, fileUpload, null, Buttons.mapImageButtons(game), game, persistMessageId);
+                    } else {
+                        MessageHelper.sendFileUploadToChannel(channel, fileUpload, persistMessageId);
+                    }
+                },
+                fowPlayer);
     }
 
     /**

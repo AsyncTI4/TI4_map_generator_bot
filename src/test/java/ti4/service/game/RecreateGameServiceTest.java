@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -20,13 +21,16 @@ import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import ti4.discord.JdaService;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.service.ShowGameService;
+import ti4.service.fow.CreateFoWGameService;
 import ti4.testUtils.BaseTi4Test;
 
 class RecreateGameServiceTest extends BaseTi4Test {
@@ -101,33 +105,178 @@ class RecreateGameServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void recreateGameReturnsIncompatibleMessageForFogOfWarGames() {
+    void fogOfWarGamesUseAnonymousAnnouncementsChannelName() {
         Game game = mock(Game.class);
-        Guild guild = mock(Guild.class);
-        when(game.getName()).thenReturn("fow-game");
         when(game.isFowMode()).thenReturn(true);
+        when(game.getName()).thenReturn("fow-game");
 
-        String result = RecreateGameService.recreateGame(game, guild);
-
-        assertEquals(
-                "Could not recreate game resources for `fow-game`.\nNotes: Fog of War games are not compatible with recreate game and must be recreated manually.",
-                result);
+        assertEquals("fow-game-anonymous-announcements-private", RecreateGameService.getActionsChannelName(game));
     }
 
     @Test
-    void recreateGameUsesGameGuild() {
+    void fogOfWarGamesUseGmChannelName() {
+        Game game = mock(Game.class);
+        when(game.getName()).thenReturn("fow-game");
+
+        assertEquals("fow-game-gm-room", RecreateGameService.getFogOfWarGmChannelName(game));
+    }
+
+    @Test
+    void postShowGameToFowPrivateChannelsCallsShowGameForNonGmPlayers() {
+        Game game = mock(Game.class);
+        Player gm = mock(Player.class);
+        Player player = mock(Player.class);
+        TextChannel privateChannel = mock(TextChannel.class);
+
+        when(game.getRealPlayers()).thenReturn(List.of(gm, player));
+        when(gm.isGM()).thenReturn(true);
+        when(player.isGM()).thenReturn(false);
+        when(player.getPrivateChannel()).thenReturn(privateChannel);
+
+        try (MockedStatic<ShowGameService> showGameService = mockStatic(ShowGameService.class)) {
+            RecreateGameService.postShowGameToFogOfWarPrivateChannels(game);
+
+            showGameService.verify(() -> ShowGameService.postShowGame(game, privateChannel, player));
+        }
+    }
+
+    @Test
+    void postShowGameToFowPrivateChannelsSkipsPlayersWithoutChannel() {
+        Game game = mock(Game.class);
+        Player player = mock(Player.class);
+
+        when(game.getRealPlayers()).thenReturn(List.of(player));
+        when(player.isGM()).thenReturn(false);
+        when(player.getPrivateChannel()).thenReturn(null);
+
+        try (MockedStatic<ShowGameService> showGameService = mockStatic(ShowGameService.class)) {
+            RecreateGameService.postShowGameToFogOfWarPrivateChannels(game);
+
+            showGameService.verifyNoInteractions();
+        }
+    }
+
+    @Test
+    void ensureFogOfWarPlayerRoleSkipsGmPlayers() {
         Game game = mock(Game.class);
         Guild guild = mock(Guild.class);
+        Role role = mock(Role.class);
+        Player gm = mock(Player.class);
+        Player player = mock(Player.class);
+        Member member = mock(Member.class);
+        @SuppressWarnings("unchecked")
+        AuditableRestAction<Void> roleAction = mock(AuditableRestAction.class);
+
         when(game.getName()).thenReturn("fow-game");
-        when(game.isFowMode()).thenReturn(true);
-        when(game.getGuild()).thenReturn(guild);
+        when(game.getRealPlayers()).thenReturn(List.of(gm, player));
+        when(gm.isGM()).thenReturn(true);
+        when(player.isGM()).thenReturn(false);
+        when(player.getUserID()).thenReturn("player-id");
+        when(guild.getRolesByName("fow-game", true)).thenReturn(List.of(role));
+        when(guild.getMemberById("player-id")).thenReturn(member);
+        when(guild.addRoleToMember(member, role)).thenReturn(roleAction);
 
-        String result = RecreateGameService.recreateGame(game);
+        RecreateGameService.ensureFogOfWarPlayerRole(
+                game, guild, new RecreateGameService.RecreateGameResult("fow-game"));
 
-        verify(game).getGuild();
-        assertEquals(
-                "Could not recreate game resources for `fow-game`.\nNotes: Fog of War games are not compatible with recreate game and must be recreated manually.",
-                result);
+        verify(guild).addRoleToMember(member, role);
+        verify(gm, never()).getUserID();
+    }
+
+    @Test
+    void ensureFogOfWarGmRoleAddsExistingGmsAndRunner() {
+        Game game = mock(Game.class);
+        Guild guild = mock(Guild.class);
+        Role gmRole = mock(Role.class);
+        Player gm = mock(Player.class);
+        Member gmMember = mock(Member.class);
+        Member runner = mock(Member.class);
+        @SuppressWarnings("unchecked")
+        AuditableRestAction<Void> gmAction = mock(AuditableRestAction.class);
+        @SuppressWarnings("unchecked")
+        AuditableRestAction<Void> runnerAction = mock(AuditableRestAction.class);
+
+        when(game.getName()).thenReturn("fow-game");
+        when(game.getPlayersWithGMRole()).thenReturn(List.of(gm));
+        when(gm.getUserID()).thenReturn("gm-id");
+        when(guild.getRolesByName("fow-game GM", true)).thenReturn(List.of(gmRole));
+        when(guild.getMemberById("gm-id")).thenReturn(gmMember);
+        when(guild.addRoleToMember(gmMember, gmRole)).thenReturn(gmAction);
+        when(guild.addRoleToMember(runner, gmRole)).thenReturn(runnerAction);
+
+        RecreateGameService.ensureFogOfWarGmRole(
+                game, guild, runner, new RecreateGameService.RecreateGameResult("fow-game"));
+
+        verify(guild).addRoleToMember(gmMember, gmRole);
+        verify(guild).addRoleToMember(runner, gmRole);
+    }
+
+    @Test
+    void ensureFogOfWarPrivateChannelsAddsNoteWhenGuildMemberIsMissing() {
+        Game game = mock(Game.class);
+        Guild guild = mock(Guild.class);
+        Category category = mock(Category.class);
+        Player player = mock(Player.class);
+        RecreateGameService.RecreateGameResult result = new RecreateGameService.RecreateGameResult("fow-game");
+
+        when(game.getRealPlayers()).thenReturn(List.of(player));
+        when(player.isGM()).thenReturn(false);
+        when(player.getPrivateChannel()).thenReturn(null);
+        when(player.getUserID()).thenReturn("player-id");
+        when(player.getUserName()).thenReturn("Player One");
+        when(guild.getMemberById("player-id")).thenReturn(null);
+
+        RecreateGameService.ensureFogOfWarPrivateChannels(game, guild, category, null, result);
+
+        assertEquals(List.of("Private channel missing for Player One"), result.getNotes());
+    }
+
+    @Test
+    void ensureFogOfWarPrivateChannelsSkipsCreationWithoutTargetCategory() {
+        Game game = mock(Game.class);
+        Guild guild = mock(Guild.class);
+        Player player = mock(Player.class);
+        RecreateGameService.RecreateGameResult result = new RecreateGameService.RecreateGameResult("fow-game");
+
+        when(game.getRealPlayers()).thenReturn(List.of(player));
+        when(player.isGM()).thenReturn(false);
+        when(player.getPrivateChannel()).thenReturn(null);
+
+        try (MockedStatic<CreateFoWGameService> createFoWGameService = mockStatic(CreateFoWGameService.class)) {
+            RecreateGameService.ensureFogOfWarPrivateChannels(game, guild, null, null, result);
+
+            createFoWGameService.verifyNoInteractions();
+        }
+        assertTrue(result.getCreatedChannels().isEmpty());
+        assertTrue(result.getNotes().isEmpty());
+    }
+
+    @Test
+    void ensureFogOfWarPrivateChannelsCreatesMissingPrivateChannel() {
+        Game game = mock(Game.class);
+        Guild guild = mock(Guild.class);
+        Category category = mock(Category.class);
+        Player player = mock(Player.class);
+        Member member = mock(Member.class);
+        TextChannel privateChannel = mock(TextChannel.class);
+        RecreateGameService.RecreateGameResult result = new RecreateGameService.RecreateGameResult("fow-game");
+
+        when(game.getRealPlayers()).thenReturn(List.of(player));
+        when(player.isGM()).thenReturn(false);
+        when(player.getPrivateChannel()).thenReturn(null, privateChannel);
+        when(player.getUserID()).thenReturn("player-id");
+        when(guild.getMemberById("player-id")).thenReturn(member);
+        when(category.getId()).thenReturn("category-id");
+        when(privateChannel.getName()).thenReturn("player-private");
+        when(privateChannel.getParentCategory()).thenReturn(category);
+        when(privateChannel.getParentCategoryId()).thenReturn("category-id");
+
+        try (MockedStatic<CreateFoWGameService> createFoWGameService = mockStatic(CreateFoWGameService.class)) {
+            RecreateGameService.ensureFogOfWarPrivateChannels(game, guild, category, null, result);
+
+            createFoWGameService.verify(() -> CreateFoWGameService.createPrivateChannelForPlayer(member, game));
+        }
+        assertEquals(List.of("player-private"), result.getCreatedChannels());
     }
 
     @Test
