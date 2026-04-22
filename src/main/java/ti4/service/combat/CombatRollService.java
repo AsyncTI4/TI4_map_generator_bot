@@ -502,7 +502,7 @@ public class CombatRollService {
                     }
                 }
             }
-            if (rollType == CombatRollType.AFB) {
+            if (rollType == CombatRollType.AFB && h > 0) {
                 String msg2 = opponent.getRepresentation() + ", you may automatically assign "
                         + (h == 1 ? "the hit" : "hits") + " from AFB.";
                 if (opponent.isNpc() || opponent.isDummy()) {
@@ -760,6 +760,9 @@ public class CombatRollService {
                         activeSystem,
                         unitHolder);
                 int numRollsPerUnit = unitModel.getCombatDieCountForAbility(CombatRollType.combatround, player);
+                CombatStatsService.CombatRoundProfile combatRoundProfile = CombatStatsService.getCombatRoundProfile(
+                        true, unitModel, player, activeSystem, opponent, false);
+                numRollsPerUnit = combatRoundProfile.diceCount();
                 if (numRollsPerUnit + Math.min(1, extraRollsForUnit) > max && unitUndecided) {
                     max = numRollsPerUnit + Math.min(1, extraRollsForUnit);
                     game.setStoredValue("highestValueSingleUnit" + player.getFaction(), unitModel.getAsyncId());
@@ -807,9 +810,8 @@ public class CombatRollService {
                     unitHolder);
             int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player);
             if (rollType == CombatRollType.combatround) {
-                CombatStatsService.CombatRoundProfile combatRoundProfile =
-                        CombatStatsService.getCombatRoundProfile(true, unitModel, player, activeSystem, opponent);
-                modifierToHit += toHit - combatRoundProfile.hitsOn();
+                CombatStatsService.CombatRoundProfile combatRoundProfile = CombatStatsService.getCombatRoundProfile(
+                        true, unitModel, player, activeSystem, opponent, false);
                 toHit = combatRoundProfile.hitsOn();
                 numRollsPerUnit = combatRoundProfile.diceCount();
             }

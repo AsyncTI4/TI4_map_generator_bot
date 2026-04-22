@@ -606,7 +606,13 @@ public final class ButtonHelperAgents {
         ExhaustLeaderService.exhaustLeader(game, player, playerLeader);
         LeaderModel agentModel = playerLeader.getLeaderModel().orElse(null);
         if (agentModel != null) {
-            SpringContext.getBean(CombatContestService.class).mirrorCombatAgent(game, player, agentModel);
+            SpringContext.getBean(CombatContestService.class)
+                    .mirrorCombatEvent(
+                            game,
+                            player,
+                            "Agent",
+                            "used _" + agentModel.getName() + "_.",
+                            agentModel.getRepresentationEmbed());
         }
 
         MessageChannel channel = player.getCorrectChannel();
