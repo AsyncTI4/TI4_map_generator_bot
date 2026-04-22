@@ -37,10 +37,10 @@ public class GameManager {
         if (!currentInstanceOwnsLeaseForWarmup() || !WARMUP_STARTED.compareAndSet(false, true)) {
             return;
         }
-
-        BotLogger.info("LOADING GAME NAMES");
+        
         gameNames.addAll(GameLoadService.loadGameNames());
         GAME_NAMES_LOADED_LATCH.countDown();
+        BotLogger.info("LOADED " + gameNames.size() + " GAME NAMES");
 
         ExecutorServiceManager.runAsync("GameManager warmup", () -> {
             try {
