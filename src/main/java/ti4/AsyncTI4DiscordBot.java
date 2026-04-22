@@ -1,5 +1,8 @@
 package ti4;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -25,10 +28,10 @@ public class AsyncTI4DiscordBot {
         BotLogger.info("\n# __BOT IS STARTING UP__");
 
         ConfigurableApplicationContext applicationContext = SpringApplication.run(AsyncTI4DiscordBot.class, args);
-        JdaLifecycleService jdaLifecycleService = applicationContext.getBean(JdaLifecycleService.class);
+        applicationContext.getBean(JdaLifecycleService.class);
         ActiveLeaseService activeLeaseService = applicationContext.getBean(ActiveLeaseService.class);
 
-        String[] resolvedArgs = jdaLifecycleService.resolveSourceArgs();
+        String[] resolvedArgs = resolveSourceArgs(args);
         JdaService.startJdaAndRegisterListeners(resolvedArgs);
         if (!JdaService.waitForJdaReadyAndInitializeGuilds(resolvedArgs)) {
             applicationContext.close();
@@ -51,5 +54,30 @@ public class AsyncTI4DiscordBot {
         } else {
             BotLogger.info("DEFERRED BACKGROUND MANAGED GAME WARMUP UNTIL THIS PROCESS BECOMES ACTIVE");
         }
+    }
+
+    private static String[] resolveSourceArgs(String[] sourceArgs) {
+        if (sourceArgs.length >= 3) {
+            return sourceArgs;
+        }
+
+        // Compatibility bridge: the legacy startup path passes Discord config as positional args,
+        // while the Compose/docker-rollout deployment path provides the same values via env vars.
+        String botToken = System.getenv("DISCORD_BOT_TOKEN");
+        String botUserId = System.getenv("DISCORD_BOT_USERID");
+        String guildIdList = System.getenv("GUILDID_LIST");
+        if (isBlank(botToken) || isBlank(botUserId) || isBlank(guildIdList)) {
+            return sourceArgs;
+        }
+
+        List<String> resolvedArgs = new ArrayList<>();
+        resolvedArgs.add(botToken);
+        resolvedArgs.add(botUserId);
+        resolvedArgs.addAll(Arrays.asList(guildIdList.trim().split("\\s+")));
+        return resolvedArgs.toArray(String[]::new);
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 }
