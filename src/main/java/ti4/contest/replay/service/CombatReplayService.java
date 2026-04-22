@@ -1,7 +1,6 @@
 package ti4.contest.replay.service;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +32,7 @@ public class CombatReplayService {
     private final CombatObservationRepository observationRepository;
     private final CombatCandidateRepository candidateRepository;
     private final CombatCandidateEventRepository candidateEventRepository;
-    private final CombatReplayEventPayloadSerde payloadSerde;
+    private final CombatReplayEventAppender eventAppender;
     private volatile SelectionSnapshot selectionSnapshot;
 
     @PostConstruct
@@ -65,7 +64,7 @@ public class CombatReplayService {
         observation.setCandidateId(candidate.getId());
         observationRepository.save(observation);
 
-        appendEvent(
+        eventAppender.appendEvent(
                 candidate,
                 CombatCandidateEventType.START,
                 null,
@@ -87,7 +86,7 @@ public class CombatReplayService {
         if (candidate == null || !matchesParticipants(candidate, player, opponent)) return;
 
         int round = getCurrentRound(game, candidate);
-        appendEvent(
+        eventAppender.appendEvent(
                 candidate,
                 CombatCandidateEventType.ROLL,
                 round,
@@ -111,7 +110,7 @@ public class CombatReplayService {
 
         String summary = "## " + header + "\n" + player.getRepresentation() + " " + name;
         CombatReplayEventPayload payload = buildMirrorEventPayload(eventType, componentId);
-        appendEvent(candidate, eventType, null, player.getFaction(), summary, payload);
+        eventAppender.appendEvent(candidate, eventType, null, player.getFaction(), summary, payload);
     }
 
     private CombatCandidateEventType mapEventType(String header) {
@@ -199,7 +198,7 @@ public class CombatReplayService {
         candidateRepository.save(candidate);
 
         CombatReplayEventPayload payload = new CombatReplayEventPayload.ResolvedPayload();
-        appendEvent(
+        eventAppender.appendEvent(
                 candidate,
                 CombatCandidateEventType.RESOLVED,
                 roundsObserved,
@@ -218,7 +217,8 @@ public class CombatReplayService {
         candidateRepository.save(candidate);
 
         CombatReplayEventPayload payload = new CombatReplayEventPayload.CancelledPayload();
-        appendEvent(candidate, CombatCandidateEventType.CANCELLED, null, null, "## Contest Closed\n" + reason, payload);
+        eventAppender.appendEvent(
+                candidate, CombatCandidateEventType.CANCELLED, null, null, "## Contest Closed\n" + reason, payload);
     }
 
     private void trackHitAssignments(
@@ -242,7 +242,8 @@ public class CombatReplayService {
         CombatReplayEventPayload payload = new CombatReplayEventPayload.HitAssignPayload(
                 candidate.getTilePosition(),
                 CombatReplayRenderSnapshotSupport.captureHitAssignmentSnapshot(game, candidate.getTilePosition()));
-        appendEvent(candidate, CombatCandidateEventType.HIT_ASSIGN, round, player.getFaction(), message, payload);
+        eventAppender.appendEvent(
+                candidate, CombatCandidateEventType.HIT_ASSIGN, round, player.getFaction(), message, payload);
     }
 
     public void refreshSelectionSnapshot() {
@@ -287,38 +288,6 @@ public class CombatReplayService {
     private int getCurrentRound(Game game, String faction, String tilePosition) {
         String tracker = game.getStoredValue("combatRoundTracker" + faction + tilePosition + Constants.SPACE);
         return tracker.isBlank() ? 0 : Integer.parseInt(tracker);
-    }
-
-    @Transactional
-    protected void appendEvent(
-            CombatCandidateEntity candidate,
-            CombatCandidateEventType eventType,
-            Integer roundNumber,
-            String actorFaction,
-            String summaryText,
-            CombatReplayEventPayload payload) {
-        CombatCandidateEntity freshCandidate =
-                candidateRepository.findByIdForUpdate(candidate.getId()).orElse(null);
-        if (freshCandidate == null
-                || (freshCandidate.getStatus() != CombatCandidateStatus.TRACKING
-                        && eventType != CombatCandidateEventType.RESOLVED
-                        && eventType != CombatCandidateEventType.CANCELLED)) {
-            return;
-        }
-
-        CombatCandidateEventEntity event = new CombatCandidateEventEntity();
-        event.setCandidateId(freshCandidate.getId());
-        event.setOccurredAt(LocalDateTime.now());
-        event.setSequenceNumber(freshCandidate.getNextEventSequence());
-        event.setEventType(eventType);
-        event.setRoundNumber(roundNumber);
-        event.setActorFaction(actorFaction);
-        event.setSummaryText(summaryText);
-        event.setPayloadJson(payloadSerde.write(payload));
-        candidateEventRepository.save(event);
-
-        freshCandidate.setNextEventSequence(freshCandidate.getNextEventSequence() + 1);
-        candidateRepository.save(freshCandidate);
     }
 
     private CombatObservationEntity buildObservation(
