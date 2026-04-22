@@ -16,7 +16,7 @@ public class CombatContestSelectionService {
     private static final String MODE_WARMUP = "WARMUP";
     private static final String MODE_DYNAMIC = "DYNAMIC";
     private static final int LOOKBACK_MINUTES = 60;
-    private static final int MINIMUM_SAMPLE_COUNT = 24;
+    private static final int MINIMUM_SAMPLE_COUNT = 8;
     private static final int COOLDOWN_MINUTES = 60;
     private static final double TARGET_POSTS_PER_HOUR = 1.0;
     private static final double MIN_TARGET_SELECTION_FRACTION = 0.08;
