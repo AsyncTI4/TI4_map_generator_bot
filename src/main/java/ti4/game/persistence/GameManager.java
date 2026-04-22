@@ -49,8 +49,7 @@ public class GameManager {
             JdaService.shutdown();
         }
 
-        JdaService.jda.getPresence()
-            .setPresence(OnlineStatus.ONLINE, Activity.customStatus("Ready to play"));
+        JdaService.jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.customStatus("Ready to play"));
 
         ExecutorServiceManager.runAsync("GameManager warmup", () -> {
             try {
