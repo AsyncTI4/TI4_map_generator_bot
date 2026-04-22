@@ -615,9 +615,11 @@ public class MessageHelper {
         buttons = sanitizeButtons(buttons, channel);
 
         String gameName = GameNameService.getGameNameFromChannel(channel);
-        ManagedGame managedGame = GameManager.getManagedGame(gameName);
-        if (managedGame != null && !managedGame.isInjectRules()) {
-            messageText = injectRules(messageText);
+        if (GameManager.isValid(gameName)) {
+            ManagedGame managedGame = GameManager.getManagedGame(gameName);
+            if (!managedGame.isInjectRules()) {
+                messageText = injectRules(messageText);
+            }
         }
 
         String finalMessageText = messageText;

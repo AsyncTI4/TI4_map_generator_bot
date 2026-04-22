@@ -17,7 +17,7 @@ import ti4.helpers.Constants;
 @UtilityClass
 public class GameNameService {
 
-    @Nullable
+    @NotNull
     public static String getGameName(SlashCommandInteractionEvent event) {
         OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
         if (gameNameOption != null) {
@@ -33,12 +33,11 @@ public class GameNameService {
         return getGameNameFromChannel(channel);
     }
 
-    @Nullable
     public static String getGameNameFromChannel(Interaction event) {
         return getGameNameFromChannel(event.getChannel());
     }
 
-    @Nullable
+    @NotNull
     public static String getGameNameFromChannel(@NotNull Channel channel) {
         String gameName = getGameNameFromChannelName(channel.getName());
         if (GameManager.isValid(gameName)) {
@@ -48,10 +47,7 @@ public class GameNameService {
             IThreadContainerUnion parentChannel = ((ThreadChannel) channel).getParentChannel();
             gameName = getGameNameFromChannelName(parentChannel.getName());
         }
-        if (GameManager.isValid(gameName)) {
-            return gameName;
-        }
-        return null;
+        return gameName;
     }
 
     private static String getGameNameFromChannelName(String channelName) {
