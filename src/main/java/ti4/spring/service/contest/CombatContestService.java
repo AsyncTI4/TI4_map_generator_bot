@@ -565,7 +565,7 @@ public class CombatContestService {
         totalPredictions = Math.max(1, totalPredictions);
         double winnerShare = winnerPredictions / (double) totalPredictions;
         double scaledPoints = 4.0 / Math.max(winnerShare, ZERO_EPSILON);
-        return (int) Math.round(Math.max(4.0, Math.min(12.0, scaledPoints)));
+        return (int) Math.round(Math.max(4.0, Math.min(100.0, scaledPoints)));
     }
 
     private void postPredictionPointsSummary(
