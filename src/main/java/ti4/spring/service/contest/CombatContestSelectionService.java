@@ -18,10 +18,13 @@ public class CombatContestSelectionService {
     private static final int MINIMUM_SAMPLE_COUNT = 8;
     private static final int COOLDOWN_MINUTES = 60;
     private static final double TARGET_POSTS_PER_HOUR = 1.0;
+    private static final double TARGET_FAIR_CANDIDATES_PER_HOUR = 4.0;
     private static final double MIN_TARGET_SELECTION_FRACTION = 0.08;
     private static final double MAX_TARGET_SELECTION_FRACTION = 1.0;
     private static final double DEFAULT_COMBAT_SIZE_CUTOFF = 14.0;
-    private static final double FAIRNESS_FLOOR = 0.72;
+    private static final double DEFAULT_FAIRNESS_FLOOR = 0.72;
+    private static final double MIN_FAIRNESS_FLOOR = 0.60;
+    private static final double MAX_FAIRNESS_FLOOR = 0.85;
 
     private final CombatContestSampleRepository sampleRepository;
     private final CombatContestSelectionConfigRepository configRepository;
@@ -106,21 +109,37 @@ public class CombatContestSelectionService {
                     defaults.targetSelectionFraction(),
                     defaults.combatSizeCutoff(),
                     defaults.fairnessFloor(),
+                    defaults.fairnessPercentile(),
+                    defaults.averageFairness(),
                     defaults.cooldownMinutes(),
                     defaults.minimumSampleCount());
         }
 
+        List<Double> fairnessRatios =
+                samples.stream().map(this::computeSampleFairnessRatio).toList();
+        double averageFairness = average(fairnessRatios);
         double observedCombatsPerHour = samples.size() * 60.0 / LOOKBACK_MINUTES;
-        double targetSelectionFraction = clamp(
-                TARGET_POSTS_PER_HOUR / Math.max(observedCombatsPerHour, 1.0),
+        double fairnessSelectionFraction = clamp(
+                TARGET_FAIR_CANDIDATES_PER_HOUR / Math.max(observedCombatsPerHour, 1.0),
                 MIN_TARGET_SELECTION_FRACTION,
                 MAX_TARGET_SELECTION_FRACTION);
-        double combatSizeCutoff = samples.isEmpty()
+        double fairnessPercentile = 1.0 - fairnessSelectionFraction;
+        double fairnessFloor =
+                clamp(percentile(fairnessRatios, fairnessPercentile), MIN_FAIRNESS_FLOOR, MAX_FAIRNESS_FLOOR);
+        List<CombatContestSampleEntity> fairSamples = samples.stream()
+                .filter(sample -> computeSampleFairnessRatio(sample) >= fairnessFloor)
+                .toList();
+        double fairCombatsPerHour = fairSamples.size() * 60.0 / LOOKBACK_MINUTES;
+        double targetSelectionFraction = clamp(
+                TARGET_POSTS_PER_HOUR / Math.max(fairCombatsPerHour, 1.0),
+                MIN_TARGET_SELECTION_FRACTION,
+                MAX_TARGET_SELECTION_FRACTION);
+        double combatSizeCutoff = fairSamples.isEmpty()
                 ? DEFAULT_COMBAT_SIZE_CUTOFF
                 : Math.max(
                         DEFAULT_COMBAT_SIZE_CUTOFF,
                         percentile(
-                                samples.stream()
+                                fairSamples.stream()
                                         .map(CombatContestSampleEntity::getWeakerStrength)
                                         .toList(),
                                 1.0 - targetSelectionFraction));
@@ -133,7 +152,9 @@ public class CombatContestSelectionService {
                 TARGET_POSTS_PER_HOUR,
                 targetSelectionFraction,
                 combatSizeCutoff,
-                FAIRNESS_FLOOR,
+                fairnessFloor,
+                fairnessPercentile,
+                averageFairness,
                 COOLDOWN_MINUTES,
                 MINIMUM_SAMPLE_COUNT);
     }
@@ -148,6 +169,8 @@ public class CombatContestSelectionService {
                 currentSettings.targetSelectionFraction(),
                 currentSettings.combatSizeCutoff(),
                 currentSettings.fairnessFloor(),
+                currentSettings.fairnessPercentile(),
+                currentSettings.averageFairness(),
                 currentSettings.cooldownMinutes(),
                 MINIMUM_SAMPLE_COUNT);
     }
@@ -163,9 +186,9 @@ public class CombatContestSelectionService {
         entity.setTargetSelectionFraction(settings.targetSelectionFraction());
         entity.setScoreCutoff(settings.combatSizeCutoff());
         entity.setStrengthScale(DEFAULT_COMBAT_SIZE_CUTOFF);
-        entity.setHpScale(0.0);
+        entity.setHpScale(settings.averageFairness());
         entity.setWeakerStrengthWeight(1.0);
-        entity.setWeakerHpWeight(0.0);
+        entity.setWeakerHpWeight(settings.fairnessPercentile());
         entity.setFairnessWeight(settings.fairnessFloor());
         entity.setCooldownMinutes(settings.cooldownMinutes());
         entity.setMinimumWeakerStrength(0.0);
@@ -174,6 +197,12 @@ public class CombatContestSelectionService {
     }
 
     private Settings fromEntity(CombatContestSelectionConfigEntity entity) {
+        double fairnessPercentile = entity.getWeakerHpWeight() != null && entity.getWeakerHpWeight() > 0
+                ? entity.getWeakerHpWeight()
+                : 1.0 - entity.getTargetSelectionFraction();
+        double averageFairness = entity.getHpScale() != null && entity.getHpScale() > 0
+                ? entity.getHpScale()
+                : entity.getFairnessWeight();
         return new Settings(
                 entity.getUpdatedAt(),
                 entity.getSelectionMode(),
@@ -183,6 +212,8 @@ public class CombatContestSelectionService {
                 entity.getTargetSelectionFraction(),
                 entity.getScoreCutoff(),
                 entity.getFairnessWeight(),
+                fairnessPercentile,
+                averageFairness,
                 entity.getCooldownMinutes(),
                 MINIMUM_SAMPLE_COUNT);
     }
@@ -196,7 +227,9 @@ public class CombatContestSelectionService {
                 TARGET_POSTS_PER_HOUR,
                 0.15,
                 DEFAULT_COMBAT_SIZE_CUTOFF,
-                FAIRNESS_FLOOR,
+                DEFAULT_FAIRNESS_FLOOR,
+                0.85,
+                DEFAULT_FAIRNESS_FLOOR,
                 COOLDOWN_MINUTES,
                 MINIMUM_SAMPLE_COUNT);
     }
@@ -251,6 +284,15 @@ public class CombatContestSelectionService {
         return total / fairnessRatios.length;
     }
 
+    private double average(List<Double> values) {
+        if (values.isEmpty()) return 0.0;
+        double total = 0.0;
+        for (double value : values) {
+            total += value;
+        }
+        return total / values.size();
+    }
+
     private double percentile(List<Double> values, double percentile) {
         if (values.isEmpty()) return 0.0;
         List<Double> sorted = values.stream().sorted(Comparator.naturalOrder()).toList();
@@ -283,6 +325,8 @@ public class CombatContestSelectionService {
             double targetSelectionFraction,
             double combatSizeCutoff,
             double fairnessFloor,
+            double fairnessPercentile,
+            double averageFairness,
             int cooldownMinutes,
             int minimumSampleCount) {
 

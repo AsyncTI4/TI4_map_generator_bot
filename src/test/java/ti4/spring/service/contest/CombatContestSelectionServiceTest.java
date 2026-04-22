@@ -75,6 +75,8 @@ class CombatContestSelectionServiceTest {
         assertEquals(8, selectionService.getCurrentSettings().minimumSampleCount());
         assertEquals(14.0, selectionService.getCurrentSettings().combatSizeCutoff(), 0.0001);
         assertEquals(0.72, selectionService.getCurrentSettings().fairnessFloor(), 0.0001);
+        assertEquals(0.85, selectionService.getCurrentSettings().fairnessPercentile(), 0.0001);
+        assertEquals(0.72, selectionService.getCurrentSettings().averageFairness(), 0.0001);
     }
 
     @Test
@@ -111,6 +113,8 @@ class CombatContestSelectionServiceTest {
         assertEquals(0, recomputed.windowSampleCount());
         assertEquals(16.0, recomputed.combatSizeCutoff(), 0.0001);
         assertEquals(0.72, recomputed.fairnessFloor(), 0.0001);
+        assertEquals(0.90, recomputed.fairnessPercentile(), 0.0001);
+        assertEquals(0.72, recomputed.averageFairness(), 0.0001);
         assertEquals(8, recomputed.minimumSampleCount());
     }
 
@@ -134,10 +138,12 @@ class CombatContestSelectionServiceTest {
         CombatContestSelectionService.Settings recomputed = selectionService.recomputeAndPersistSettings();
 
         assertEquals("DYNAMIC", recomputed.selectionMode());
-        assertEquals(0.125, recomputed.targetSelectionFraction(), 0.0001);
-        assertEquals(50.0, recomputed.combatSizeCutoff(), 0.0001);
-        assertEquals(0.875, recomputed.combatSizePercentile(), 0.0001);
-        assertEquals(0.72, recomputed.fairnessFloor(), 0.0001);
+        assertEquals(0.25, recomputed.targetSelectionFraction(), 0.0001);
+        assertEquals(30.0, recomputed.combatSizeCutoff(), 0.0001);
+        assertEquals(0.75, recomputed.combatSizePercentile(), 0.0001);
+        assertEquals(0.76, recomputed.fairnessFloor(), 0.0001);
+        assertEquals(0.50, recomputed.fairnessPercentile(), 0.0001);
+        assertEquals(0.733_75, recomputed.averageFairness(), 0.0001);
     }
 
     private CombatContestSelectionConfigEntity configEntity(
