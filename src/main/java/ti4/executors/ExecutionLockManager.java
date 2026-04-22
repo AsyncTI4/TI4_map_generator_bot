@@ -1,8 +1,5 @@
 package ti4.executors;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lombok.experimental.UtilityClass;
@@ -42,7 +39,6 @@ public class ExecutionLockManager {
     }
 
     private static ReentrantReadWriteLock getLock(String lockName) {
-        if (isBlank(lockName)) lockName = UUID.randomUUID().toString();
         return locks.computeIfAbsent(lockName, k -> new ReentrantReadWriteLock());
     }
 
