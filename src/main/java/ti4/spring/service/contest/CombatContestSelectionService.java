@@ -212,7 +212,9 @@ public class CombatContestSelectionService {
         double strongerStrength = Math.max(attackerStrength, defenderStrength);
         double weakerHp = Math.min(attackerHp, defenderHp);
         double strongerHp = Math.max(attackerHp, defenderHp);
-        double fairnessRatio = strongerHp <= 0 ? 0.0 : weakerHp / strongerHp;
+        double strengthFairnessRatio = computeFairnessRatio(weakerStrength, strongerStrength);
+        double hpFairnessRatio = computeFairnessRatio(weakerHp, strongerHp);
+        double fairnessRatio = (strengthFairnessRatio + hpFairnessRatio) / 2.0;
         double contestScore = computeScore(
                 weakerStrength,
                 weakerHp,
@@ -228,6 +230,11 @@ public class CombatContestSelectionService {
                 && contestScore >= settings.scoreCutoff();
         return new Evaluation(
                 weakerStrength, strongerStrength, weakerHp, strongerHp, fairnessRatio, contestScore, eligible);
+    }
+
+    private double computeFairnessRatio(double weakerValue, double strongerValue) {
+        if (strongerValue <= 0) return 0.0;
+        return clamp(weakerValue / strongerValue, 0.0, 1.0);
     }
 
     private double computeScore(

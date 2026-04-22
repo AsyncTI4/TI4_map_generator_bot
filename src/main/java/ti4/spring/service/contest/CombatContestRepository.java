@@ -11,7 +11,9 @@ public interface CombatContestRepository extends JpaRepository<CombatContestEnti
     @Query(value = """
             select *
             from combat_predictor_contest
-            where dice_rolled is null or dice_rolled = true
+            where status <> 'CANCELLED'
+               or dice_rolled is null
+               or dice_rolled = true
             order by posted_at desc
             limit 1
             """, nativeQuery = true)
