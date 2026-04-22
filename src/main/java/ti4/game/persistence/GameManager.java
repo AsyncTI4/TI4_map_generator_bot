@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
@@ -30,7 +32,7 @@ public class GameManager {
     private static final CountDownLatch GAME_NAMES_LOADED_LATCH = new CountDownLatch(1);
     private static final AtomicBoolean WARMUP_STARTED = new AtomicBoolean(false);
     private static final CountDownLatch WARMUP_FINISHED_LATCH = new CountDownLatch(1);
-    private static final int WAIT_FOR_WARMUP_TIMEOUT_SECONDS = 10;
+    private static final int WAIT_FOR_WARMUP_TIMEOUT_SECONDS = 20;
 
     public static void warmup() {
         if (!WARMUP_STARTED.compareAndSet(false, true)) {
@@ -49,7 +51,10 @@ public class GameManager {
         ExecutorServiceManager.runAsync("GameManager warmup", () -> {
             try {
                 BotLogger.info("STARTED BUILDING MANAGED GAMES");
-                gameNames.forEach(GameManager::getManagedGame);
+                try (ExecutorService executorService =
+                        Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2)) {
+                    gameNames.forEach(name -> executorService.submit(() -> getManagedGame(name)));
+                }
                 WARMUP_FINISHED_LATCH.countDown();
                 BotLogger.info("FINISHED BUILDING MANAGED GAMES");
                 if (JdaService.jda != null) {
