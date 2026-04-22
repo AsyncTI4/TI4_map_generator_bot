@@ -34,7 +34,7 @@ public class GameManager {
     private static final int WAIT_FOR_WARMUP_TIMEOUT_SECONDS = 10;
 
     public static void warmup() {
-        if (!currentInstanceOwnsLeaseForWarmup() || !WARMUP_STARTED.compareAndSet(false, true)) {
+        if (!ownsActiveMutationLease() || !WARMUP_STARTED.compareAndSet(false, true)) {
             return;
         }
 
@@ -58,10 +58,12 @@ public class GameManager {
         });
     }
 
-    private static boolean currentInstanceOwnsLeaseForWarmup() {
+    private static boolean ownsActiveMutationLease() {
         try {
             return SpringContext.getBean(ActiveLeaseService.class).mayMutate();
-        } catch (IllegalStateException e) {
+        } catch (Exception e) {
+            if (JdaService.testingMode) return true;
+            BotLogger.error("Failed to check ActiveLeaseService", e);
             return false;
         }
     }

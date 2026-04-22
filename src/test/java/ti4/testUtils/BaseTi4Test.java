@@ -3,6 +3,7 @@ package ti4.testUtils;
 import org.junit.jupiter.api.BeforeAll;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.selections.SelectionManager;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Storage;
 import ti4.image.Mapper;
@@ -38,6 +39,8 @@ public class BaseTi4Test {
         Storage.init();
         SelectionManager.init();
         ApplicationEmojiService.spoofEmojis();
+
+        GameManager.warmup();
     }
 
     /**
