@@ -47,6 +47,12 @@ public class CombatContestSampleEntity {
     @Column(name = "defender_hp", nullable = false)
     private Double defenderHp;
 
+    @Column(name = "attacker_expected_hits")
+    private Double attackerExpectedHits;
+
+    @Column(name = "defender_expected_hits")
+    private Double defenderExpectedHits;
+
     @Column(name = "weaker_strength", nullable = false)
     private Double weakerStrength;
 

@@ -2,7 +2,6 @@ package ti4.spring.service.contest;
 
 import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,16 +18,13 @@ public class CombatContestSelectionService {
     private static final int MINIMUM_SAMPLE_COUNT = 8;
     private static final int COOLDOWN_MINUTES = 60;
     private static final double TARGET_POSTS_PER_HOUR = 1.0;
+    private static final double TARGET_FAIR_CANDIDATES_PER_HOUR = 4.0;
     private static final double MIN_TARGET_SELECTION_FRACTION = 0.08;
-    private static final double MAX_TARGET_SELECTION_FRACTION = 0.50;
-    private static final double DEFAULT_STRENGTH_SCALE = 28.0;
-    private static final double DEFAULT_HP_SCALE = 10.0;
-    private static final double DEFAULT_SCORE_CUTOFF = 0.78;
-    private static final double MINIMUM_WEAKER_STRENGTH = 8.0;
-    private static final double WEAKER_STRENGTH_WEIGHT = 0.30;
-    private static final double WEAKER_HP_WEIGHT = 0.20;
-    private static final double FAIRNESS_WEIGHT = 0.50;
-    private static final double SCALE_PERCENTILE = 0.90;
+    private static final double MAX_TARGET_SELECTION_FRACTION = 1.0;
+    private static final double DEFAULT_COMBAT_SIZE_CUTOFF = 14.0;
+    private static final double DEFAULT_FAIRNESS_FLOOR = 0.72;
+    private static final double MIN_FAIRNESS_FLOOR = 0.60;
+    private static final double MAX_FAIRNESS_FLOOR = 0.85;
 
     private final CombatContestSampleRepository sampleRepository;
     private final CombatContestSelectionConfigRepository configRepository;
@@ -40,8 +36,21 @@ public class CombatContestSelectionService {
         loadPersistedSettings();
     }
 
-    public Evaluation evaluate(double attackerStrength, double defenderStrength, double attackerHp, double defenderHp) {
-        return evaluate(attackerStrength, defenderStrength, attackerHp, defenderHp, currentSettings);
+    public Evaluation evaluate(
+            double attackerStrength,
+            double defenderStrength,
+            double attackerHp,
+            double defenderHp,
+            double attackerExpectedHits,
+            double defenderExpectedHits) {
+        return evaluate(
+                attackerStrength,
+                defenderStrength,
+                attackerHp,
+                defenderHp,
+                attackerExpectedHits,
+                defenderExpectedHits,
+                currentSettings);
     }
 
     public Settings getCurrentSettings() {
@@ -58,6 +67,14 @@ public class CombatContestSelectionService {
         return new Snapshot(settings, sampleCountLastHour, observedCombatsPerHour, LocalDateTime.now());
     }
 
+    public Snapshot recomputeAndGetSelectionSnapshot() {
+        LocalDateTime now = LocalDateTime.now();
+        List<CombatContestSampleEntity> samples =
+                sampleRepository.findByStartedAtGreaterThanEqualOrderByStartedAtAsc(now.minusMinutes(LOOKBACK_MINUTES));
+        Settings recomputed = recomputeAndPersistSettings(samples, now);
+        return new Snapshot(recomputed, samples.size(), samples.size() * 60.0 / LOOKBACK_MINUTES, now);
+    }
+
     public void loadPersistedSettings() {
         configRepository.findById(CONFIG_ID).ifPresent(config -> currentSettings = fromEntity(config));
     }
@@ -66,6 +83,10 @@ public class CombatContestSelectionService {
         LocalDateTime now = LocalDateTime.now();
         List<CombatContestSampleEntity> samples =
                 sampleRepository.findByStartedAtGreaterThanEqualOrderByStartedAtAsc(now.minusMinutes(LOOKBACK_MINUTES));
+        return recomputeAndPersistSettings(samples, now);
+    }
+
+    private Settings recomputeAndPersistSettings(List<CombatContestSampleEntity> samples, LocalDateTime now) {
         Settings recomputed = recomputeSettings(samples, now);
         CombatContestSelectionConfigEntity entity = toEntity(recomputed);
         configRepository.save(entity);
@@ -75,6 +96,9 @@ public class CombatContestSelectionService {
 
     private Settings recomputeSettings(List<CombatContestSampleEntity> samples, LocalDateTime now) {
         if (samples.size() < MINIMUM_SAMPLE_COUNT) {
+            if (MODE_DYNAMIC.equals(currentSettings.selectionMode())) {
+                return preserveDynamicSettings(now, samples.size());
+            }
             Settings defaults = defaultSettings(now);
             return new Settings(
                     defaults.updatedAt(),
@@ -83,51 +107,42 @@ public class CombatContestSelectionService {
                     samples.size(),
                     defaults.targetPostsPerHour(),
                     defaults.targetSelectionFraction(),
-                    defaults.scoreCutoff(),
-                    defaults.strengthScale(),
-                    defaults.hpScale(),
-                    defaults.weakerStrengthWeight(),
-                    defaults.weakerHpWeight(),
-                    defaults.fairnessWeight(),
+                    defaults.combatSizeCutoff(),
+                    defaults.fairnessFloor(),
+                    defaults.fairnessPercentile(),
+                    defaults.averageFairness(),
                     defaults.cooldownMinutes(),
-                    defaults.minimumWeakerStrength(),
                     defaults.minimumSampleCount());
         }
 
-        double strengthScale = Math.max(
-                DEFAULT_STRENGTH_SCALE,
-                percentile(
-                        samples.stream()
-                                .map(CombatContestSampleEntity::getWeakerStrength)
-                                .toList(),
-                        SCALE_PERCENTILE));
-        double hpScale = Math.max(
-                DEFAULT_HP_SCALE,
-                percentile(
-                        samples.stream()
-                                .map(CombatContestSampleEntity::getWeakerHp)
-                                .toList(),
-                        SCALE_PERCENTILE));
-
-        List<Double> scores = new ArrayList<>(samples.size());
-        for (CombatContestSampleEntity sample : samples) {
-            scores.add(computeScore(
-                    sample.getWeakerStrength(),
-                    sample.getWeakerHp(),
-                    sample.getFairnessRatio(),
-                    strengthScale,
-                    hpScale,
-                    WEAKER_STRENGTH_WEIGHT,
-                    WEAKER_HP_WEIGHT,
-                    FAIRNESS_WEIGHT));
-        }
-
+        List<Double> fairnessRatios =
+                samples.stream().map(this::computeSampleFairnessRatio).toList();
+        double averageFairness = average(fairnessRatios);
         double observedCombatsPerHour = samples.size() * 60.0 / LOOKBACK_MINUTES;
-        double targetSelectionFraction = clamp(
-                TARGET_POSTS_PER_HOUR / Math.max(observedCombatsPerHour, 1.0),
+        double fairnessSelectionFraction = clamp(
+                TARGET_FAIR_CANDIDATES_PER_HOUR / Math.max(observedCombatsPerHour, 1.0),
                 MIN_TARGET_SELECTION_FRACTION,
                 MAX_TARGET_SELECTION_FRACTION);
-        double scoreCutoff = percentile(scores, 1.0 - targetSelectionFraction);
+        double fairnessPercentile = 1.0 - fairnessSelectionFraction;
+        double fairnessFloor =
+                clamp(percentile(fairnessRatios, fairnessPercentile), MIN_FAIRNESS_FLOOR, MAX_FAIRNESS_FLOOR);
+        List<CombatContestSampleEntity> fairSamples = samples.stream()
+                .filter(sample -> computeSampleFairnessRatio(sample) >= fairnessFloor)
+                .toList();
+        double fairCombatsPerHour = fairSamples.size() * 60.0 / LOOKBACK_MINUTES;
+        double targetSelectionFraction = clamp(
+                TARGET_POSTS_PER_HOUR / Math.max(fairCombatsPerHour, 1.0),
+                MIN_TARGET_SELECTION_FRACTION,
+                MAX_TARGET_SELECTION_FRACTION);
+        double combatSizeCutoff = fairSamples.isEmpty()
+                ? DEFAULT_COMBAT_SIZE_CUTOFF
+                : Math.max(
+                        DEFAULT_COMBAT_SIZE_CUTOFF,
+                        percentile(
+                                fairSamples.stream()
+                                        .map(CombatContestSampleEntity::getWeakerStrength)
+                                        .toList(),
+                                1.0 - targetSelectionFraction));
 
         return new Settings(
                 now,
@@ -136,14 +151,27 @@ public class CombatContestSelectionService {
                 samples.size(),
                 TARGET_POSTS_PER_HOUR,
                 targetSelectionFraction,
-                scoreCutoff,
-                strengthScale,
-                hpScale,
-                WEAKER_STRENGTH_WEIGHT,
-                WEAKER_HP_WEIGHT,
-                FAIRNESS_WEIGHT,
+                combatSizeCutoff,
+                fairnessFloor,
+                fairnessPercentile,
+                averageFairness,
                 COOLDOWN_MINUTES,
-                MINIMUM_WEAKER_STRENGTH,
+                MINIMUM_SAMPLE_COUNT);
+    }
+
+    private Settings preserveDynamicSettings(LocalDateTime now, int sampleCount) {
+        return new Settings(
+                now,
+                MODE_DYNAMIC,
+                currentSettings.lookbackMinutes(),
+                sampleCount,
+                currentSettings.targetPostsPerHour(),
+                currentSettings.targetSelectionFraction(),
+                currentSettings.combatSizeCutoff(),
+                currentSettings.fairnessFloor(),
+                currentSettings.fairnessPercentile(),
+                currentSettings.averageFairness(),
+                currentSettings.cooldownMinutes(),
                 MINIMUM_SAMPLE_COUNT);
     }
 
@@ -156,19 +184,25 @@ public class CombatContestSelectionService {
         entity.setWindowSampleCount(settings.windowSampleCount());
         entity.setTargetPostsPerHour(settings.targetPostsPerHour());
         entity.setTargetSelectionFraction(settings.targetSelectionFraction());
-        entity.setScoreCutoff(settings.scoreCutoff());
-        entity.setStrengthScale(settings.strengthScale());
-        entity.setHpScale(settings.hpScale());
-        entity.setWeakerStrengthWeight(settings.weakerStrengthWeight());
-        entity.setWeakerHpWeight(settings.weakerHpWeight());
-        entity.setFairnessWeight(settings.fairnessWeight());
+        entity.setScoreCutoff(settings.combatSizeCutoff());
+        entity.setStrengthScale(DEFAULT_COMBAT_SIZE_CUTOFF);
+        entity.setHpScale(settings.averageFairness());
+        entity.setWeakerStrengthWeight(1.0);
+        entity.setWeakerHpWeight(settings.fairnessPercentile());
+        entity.setFairnessWeight(settings.fairnessFloor());
         entity.setCooldownMinutes(settings.cooldownMinutes());
-        entity.setMinimumWeakerStrength(settings.minimumWeakerStrength());
+        entity.setMinimumWeakerStrength(0.0);
         entity.setMinimumSampleCount(settings.minimumSampleCount());
         return entity;
     }
 
     private Settings fromEntity(CombatContestSelectionConfigEntity entity) {
+        double fairnessPercentile = entity.getWeakerHpWeight() != null && entity.getWeakerHpWeight() > 0
+                ? entity.getWeakerHpWeight()
+                : 1.0 - entity.getTargetSelectionFraction();
+        double averageFairness = entity.getHpScale() != null && entity.getHpScale() > 0
+                ? entity.getHpScale()
+                : entity.getFairnessWeight();
         return new Settings(
                 entity.getUpdatedAt(),
                 entity.getSelectionMode(),
@@ -177,14 +211,11 @@ public class CombatContestSelectionService {
                 entity.getTargetPostsPerHour(),
                 entity.getTargetSelectionFraction(),
                 entity.getScoreCutoff(),
-                entity.getStrengthScale(),
-                entity.getHpScale(),
-                entity.getWeakerStrengthWeight(),
-                entity.getWeakerHpWeight(),
                 entity.getFairnessWeight(),
+                fairnessPercentile,
+                averageFairness,
                 entity.getCooldownMinutes(),
-                entity.getMinimumWeakerStrength(),
-                entity.getMinimumSampleCount());
+                MINIMUM_SAMPLE_COUNT);
     }
 
     private Settings defaultSettings(LocalDateTime now) {
@@ -195,41 +226,48 @@ public class CombatContestSelectionService {
                 0,
                 TARGET_POSTS_PER_HOUR,
                 0.15,
-                DEFAULT_SCORE_CUTOFF,
-                DEFAULT_STRENGTH_SCALE,
-                DEFAULT_HP_SCALE,
-                WEAKER_STRENGTH_WEIGHT,
-                WEAKER_HP_WEIGHT,
-                FAIRNESS_WEIGHT,
+                DEFAULT_COMBAT_SIZE_CUTOFF,
+                DEFAULT_FAIRNESS_FLOOR,
+                0.85,
+                DEFAULT_FAIRNESS_FLOOR,
                 COOLDOWN_MINUTES,
-                MINIMUM_WEAKER_STRENGTH,
                 MINIMUM_SAMPLE_COUNT);
     }
 
     private Evaluation evaluate(
-            double attackerStrength, double defenderStrength, double attackerHp, double defenderHp, Settings settings) {
+            double attackerStrength,
+            double defenderStrength,
+            double attackerHp,
+            double defenderHp,
+            double attackerExpectedHits,
+            double defenderExpectedHits,
+            Settings settings) {
         double weakerStrength = Math.min(attackerStrength, defenderStrength);
         double strongerStrength = Math.max(attackerStrength, defenderStrength);
         double weakerHp = Math.min(attackerHp, defenderHp);
         double strongerHp = Math.max(attackerHp, defenderHp);
         double strengthFairnessRatio = computeFairnessRatio(weakerStrength, strongerStrength);
         double hpFairnessRatio = computeFairnessRatio(weakerHp, strongerHp);
-        double fairnessRatio = (strengthFairnessRatio + hpFairnessRatio) / 2.0;
-        double contestScore = computeScore(
-                weakerStrength,
-                weakerHp,
-                fairnessRatio,
-                settings.strengthScale(),
-                settings.hpScale(),
-                settings.weakerStrengthWeight(),
-                settings.weakerHpWeight(),
-                settings.fairnessWeight());
-        boolean eligible = weakerStrength >= settings.minimumWeakerStrength()
-                && attackerHp > 0
-                && defenderHp > 0
-                && contestScore >= settings.scoreCutoff();
+        double weakerExpectedHits = Math.min(attackerExpectedHits, defenderExpectedHits);
+        double strongerExpectedHits = Math.max(attackerExpectedHits, defenderExpectedHits);
+        double expectedHitsFairnessRatio = computeFairnessRatio(weakerExpectedHits, strongerExpectedHits);
+        double fairnessRatio = averageFairnessRatios(strengthFairnessRatio, hpFairnessRatio, expectedHitsFairnessRatio);
+        double contestScore = weakerStrength;
+        boolean eligible = fairnessRatio >= settings.fairnessFloor() && contestScore >= settings.combatSizeCutoff();
         return new Evaluation(
                 weakerStrength, strongerStrength, weakerHp, strongerHp, fairnessRatio, contestScore, eligible);
+    }
+
+    private double computeSampleFairnessRatio(CombatContestSampleEntity sample) {
+        if (sample.getAttackerExpectedHits() == null || sample.getDefenderExpectedHits() == null) {
+            return sample.getFairnessRatio();
+        }
+        return averageFairnessRatios(
+                computeFairnessRatio(sample.getWeakerStrength(), sample.getStrongerStrength()),
+                computeFairnessRatio(sample.getWeakerHp(), sample.getStrongerHp()),
+                computeFairnessRatio(
+                        Math.min(sample.getAttackerExpectedHits(), sample.getDefenderExpectedHits()),
+                        Math.max(sample.getAttackerExpectedHits(), sample.getDefenderExpectedHits())));
     }
 
     private double computeFairnessRatio(double weakerValue, double strongerValue) {
@@ -237,23 +275,22 @@ public class CombatContestSelectionService {
         return clamp(weakerValue / strongerValue, 0.0, 1.0);
     }
 
-    private double computeScore(
-            double weakerStrength,
-            double weakerHp,
-            double fairnessRatio,
-            double strengthScale,
-            double hpScale,
-            double weakerStrengthWeight,
-            double weakerHpWeight,
-            double fairnessWeight) {
-        return weakerStrengthWeight * normalize(weakerStrength, strengthScale)
-                + weakerHpWeight * normalize(weakerHp, hpScale)
-                + fairnessWeight * clamp(fairnessRatio, 0.0, 1.0);
+    private double averageFairnessRatios(double... fairnessRatios) {
+        if (fairnessRatios.length == 0) return 0.0;
+        double total = 0.0;
+        for (double fairnessRatio : fairnessRatios) {
+            total += fairnessRatio;
+        }
+        return total / fairnessRatios.length;
     }
 
-    private double normalize(double value, double scale) {
-        if (scale <= 0) return 0.0;
-        return clamp(value / scale, 0.0, 1.0);
+    private double average(List<Double> values) {
+        if (values.isEmpty()) return 0.0;
+        double total = 0.0;
+        for (double value : values) {
+            total += value;
+        }
+        return total / values.size();
     }
 
     private double percentile(List<Double> values, double percentile) {
@@ -286,13 +323,15 @@ public class CombatContestSelectionService {
             int windowSampleCount,
             double targetPostsPerHour,
             double targetSelectionFraction,
-            double scoreCutoff,
-            double strengthScale,
-            double hpScale,
-            double weakerStrengthWeight,
-            double weakerHpWeight,
-            double fairnessWeight,
+            double combatSizeCutoff,
+            double fairnessFloor,
+            double fairnessPercentile,
+            double averageFairness,
             int cooldownMinutes,
-            double minimumWeakerStrength,
-            int minimumSampleCount) {}
+            int minimumSampleCount) {
+
+        public double combatSizePercentile() {
+            return 1.0 - targetSelectionFraction;
+        }
+    }
 }
