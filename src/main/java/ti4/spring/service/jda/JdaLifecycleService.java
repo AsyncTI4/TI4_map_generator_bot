@@ -1,6 +1,5 @@
 package ti4.spring.service.jda;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,21 +11,16 @@ import ti4.discord.JdaService;
 
 @Service
 @RequiredArgsConstructor
-class JdaLifecycleService {
+public class JdaLifecycleService {
 
     private final ApplicationArguments applicationArguments;
-
-    @PostConstruct
-    private void init() {
-        JdaService.initialize(resolveSourceArgs());
-    }
 
     @PreDestroy
     private void shutdown() {
         JdaService.shutdown();
     }
 
-    private String[] resolveSourceArgs() {
+    public String[] resolveSourceArgs() {
         String[] sourceArgs = applicationArguments.getSourceArgs();
         if (sourceArgs.length >= 3) {
             return sourceArgs;
