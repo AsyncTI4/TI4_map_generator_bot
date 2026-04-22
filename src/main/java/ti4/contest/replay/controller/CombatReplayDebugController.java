@@ -52,15 +52,27 @@ public class CombatReplayDebugController {
                 candidateRepository.findAll(PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "startedAt"))).stream()
                         .map(this::toCandidateSummary)
                         .toList();
-        return ResponseEntity.ok(MAPPER.writeValueAsString(
-                new CandidateListResponse(CombatReplayRuntimeSettings.SHADOW_MODE, candidates)));
+        return ResponseEntity.ok(MAPPER.writeValueAsString(new CandidateListResponse(runtimeState(), candidates)));
+    }
+
+    @SneakyThrows
+    @GetMapping(value = "/runtime", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getRuntimeState() {
+        return ResponseEntity.ok(MAPPER.writeValueAsString(runtimeState()));
+    }
+
+    @SneakyThrows
+    @GetMapping(value = "/runtime/posting/toggle", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> toggleDiscordPosting() {
+        CombatReplayRuntimeSettings.toggleDiscordPostingEnabled();
+        return ResponseEntity.ok(MAPPER.writeValueAsString(runtimeState()));
     }
 
     @SneakyThrows
     @GetMapping(value = "/selection", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getSelectionSnapshot() {
-        return ResponseEntity.ok(MAPPER.writeValueAsString(new SelectionResponse(
-                CombatReplayRuntimeSettings.SHADOW_MODE, combatReplayService.getSelectionDebugView())));
+        return ResponseEntity.ok(MAPPER.writeValueAsString(
+                new SelectionResponse(runtimeState(), combatReplayService.getSelectionDebugView())));
     }
 
     @SneakyThrows
@@ -79,8 +91,8 @@ public class CombatReplayDebugController {
                 candidateEventRepository.findByCandidateIdOrderBySequenceNumberAsc(candidateId).stream()
                         .map(this::toEventResponse)
                         .toList();
-        return ResponseEntity.ok(MAPPER.writeValueAsString(new CandidateDetailResponse(
-                CombatReplayRuntimeSettings.SHADOW_MODE, candidate, observation, contest, events)));
+        return ResponseEntity.ok(MAPPER.writeValueAsString(
+                new CandidateDetailResponse(runtimeState(), candidate, observation, contest, events)));
     }
 
     @SneakyThrows
@@ -104,13 +116,7 @@ public class CombatReplayDebugController {
                         .map(this::toEventResponse)
                         .toList();
         return ResponseEntity.ok(MAPPER.writeValueAsString(new ForcePromoteResponse(
-                CombatReplayRuntimeSettings.SHADOW_MODE,
-                result.promoted(),
-                result.reason(),
-                candidate,
-                observation,
-                contest,
-                events)));
+                runtimeState(), result.promoted(), result.reason(), candidate, observation, contest, events)));
     }
 
     @SneakyThrows
@@ -122,8 +128,7 @@ public class CombatReplayDebugController {
                         .stream()
                         .map(this::toContestSummary)
                         .toList();
-        return ResponseEntity.ok(
-                MAPPER.writeValueAsString(new ContestListResponse(CombatReplayRuntimeSettings.SHADOW_MODE, contests)));
+        return ResponseEntity.ok(MAPPER.writeValueAsString(new ContestListResponse(runtimeState(), contests)));
     }
 
     @SneakyThrows
@@ -144,8 +149,13 @@ public class CombatReplayDebugController {
                 : candidateEventRepository.findByCandidateIdOrderBySequenceNumberAsc(candidate.getId()).stream()
                         .map(this::toEventResponse)
                         .toList();
-        return ResponseEntity.ok(MAPPER.writeValueAsString(new ContestDetailResponse(
-                CombatReplayRuntimeSettings.SHADOW_MODE, contest, candidate, observation, events)));
+        return ResponseEntity.ok(MAPPER.writeValueAsString(
+                new ContestDetailResponse(runtimeState(), contest, candidate, observation, events)));
+    }
+
+    private RuntimeStateResponse runtimeState() {
+        return new RuntimeStateResponse(
+                CombatReplayRuntimeSettings.SHADOW_MODE, CombatReplayRuntimeSettings.isDiscordPostingEnabled());
     }
 
     private CandidateSummary toCandidateSummary(CombatCandidateEntity candidate) {
@@ -174,9 +184,11 @@ public class CombatReplayDebugController {
         return new EventResponse(event, payloadSerde.read(event));
     }
 
-    private record CandidateListResponse(boolean shadowMode, List<CandidateSummary> candidates) {}
+    private record RuntimeStateResponse(boolean shadowMode, boolean discordPostingEnabled) {}
 
-    private record SelectionResponse(boolean shadowMode, CombatReplayService.SelectionDebugView selection) {}
+    private record CandidateListResponse(RuntimeStateResponse runtime, List<CandidateSummary> candidates) {}
+
+    private record SelectionResponse(RuntimeStateResponse runtime, CombatReplayService.SelectionDebugView selection) {}
 
     private record CandidateSummary(
             CombatCandidateEntity candidate,
@@ -185,14 +197,14 @@ public class CombatReplayDebugController {
             long eventCount) {}
 
     private record CandidateDetailResponse(
-            boolean shadowMode,
+            RuntimeStateResponse runtime,
             CombatCandidateEntity candidate,
             CombatObservationEntity observation,
             CombatReplayContestEntity contest,
             List<EventResponse> events) {}
 
     private record ForcePromoteResponse(
-            boolean shadowMode,
+            RuntimeStateResponse runtime,
             boolean promoted,
             String reason,
             CombatCandidateEntity candidate,
@@ -200,13 +212,13 @@ public class CombatReplayDebugController {
             CombatReplayContestEntity contest,
             List<EventResponse> events) {}
 
-    private record ContestListResponse(boolean shadowMode, List<ContestSummary> contests) {}
+    private record ContestListResponse(RuntimeStateResponse runtime, List<ContestSummary> contests) {}
 
     private record ContestSummary(
             CombatReplayContestEntity contest, CombatCandidateEntity candidate, long eventCount) {}
 
     private record ContestDetailResponse(
-            boolean shadowMode,
+            RuntimeStateResponse runtime,
             CombatReplayContestEntity contest,
             CombatCandidateEntity candidate,
             CombatObservationEntity observation,

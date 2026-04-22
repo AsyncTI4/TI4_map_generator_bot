@@ -91,7 +91,7 @@ public class CombatReplayContestLifecycleService {
         if (game == null) return null;
 
         String message = LazaxCombatSupport.formatReplayAnnouncement(game, observation, winner, getLazaxRoleMention());
-        if (CombatReplayRuntimeSettings.SHADOW_MODE) {
+        if (!CombatReplayRuntimeSettings.isDiscordPostingEnabled()) {
             return createShadowReplayContest(game, observation, winner, message);
         }
 
@@ -132,7 +132,7 @@ public class CombatReplayContestLifecycleService {
                 candidateRepository.findById(contest.getCandidateId()).orElse(null);
         Game game = candidate == null ? null : loadGame(candidate.getGameName());
         try {
-            if (!CombatReplayRuntimeSettings.SHADOW_MODE) {
+            if (CombatReplayRuntimeSettings.isDiscordPostingEnabled()) {
                 MessageChannel channel = getContestThreadOrChannel(contest);
                 if (channel == null) {
                     rescheduleReplay(contest, "Replay channel unavailable.");
