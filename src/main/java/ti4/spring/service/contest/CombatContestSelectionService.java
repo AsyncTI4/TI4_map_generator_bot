@@ -21,7 +21,7 @@ public class CombatContestSelectionService {
     private static final double TARGET_FAIR_CANDIDATES_PER_HOUR = 4.0;
     private static final double MIN_TARGET_SELECTION_FRACTION = 0.08;
     private static final double MAX_TARGET_SELECTION_FRACTION = 1.0;
-    private static final double DEFAULT_COMBAT_SIZE_CUTOFF = 14.0;
+    private static final double DEFAULT_COMBAT_SIZE_CUTOFF = 8.0;
     private static final double DEFAULT_FAIRNESS_FLOOR = 0.72;
     private static final double MIN_FAIRNESS_FLOOR = 0.60;
     private static final double MAX_FAIRNESS_FLOOR = 0.85;
