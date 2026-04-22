@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
-import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
@@ -175,15 +174,16 @@ public class GameManager {
                 .count();
     }
 
-    @NotNull
+    @Nullable
     public static ManagedGame getManagedGame(String gameName) {
+        if (!isValid(gameName)) return null;
         waitFor(GAME_NAMES_LOADED_LATCH);
         return gameNameToManagedGame.computeIfAbsent(gameName, k -> {
             Game game = GameLoadService.load(gameName);
             if (game == null) {
+                BotLogger.error("Failed to load ManagedGame for " + gameName + ".");
                 throw new IllegalStateException("Failed to load ManagedGame for " + gameName);
             }
-            gameNames.add(game.getName());
             return new ManagedGame(game);
         });
     }
