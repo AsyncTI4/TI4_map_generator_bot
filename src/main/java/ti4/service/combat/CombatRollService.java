@@ -335,7 +335,8 @@ public class CombatRollService {
             message = message.substring(0, message.length() - 2);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        SpringContext.getBean(CombatContestService.class).mirrorCombatRoll(game, player, opponent, tile, message);
+        SpringContext.getBean(CombatContestService.class)
+                .mirrorCombatRoll(game, player, opponent, tile, message, rollType.name(), h);
         if (message.contains("adding +1, at the risk of your")) {
             Button thalnosButton = Buttons.green(
                     "startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos", ExploreEmojis.Relic);

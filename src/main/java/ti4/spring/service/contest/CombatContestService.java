@@ -30,6 +30,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -74,10 +75,13 @@ public class CombatContestService {
     private final CombatContestPredictionRepository predictionRepository;
     private final CombatContestSampleRepository sampleRepository;
     private final CombatContestSelectionService selectionService;
+    private final CombatReplayService combatReplayService;
 
     // ==================== Public Entry Points ====================
 
     public void onSpaceCombatStarted(Game game, Player attacker, Player defender, Tile tile) {
+        runReplayHook(
+                game, "combat start", () -> combatReplayService.onSpaceCombatStarted(game, attacker, defender, tile));
         try {
             if (!isEligibleGame(game) || !isEligibleCombat(game, attacker, defender, tile)) return;
 
@@ -118,6 +122,8 @@ public class CombatContestService {
     }
 
     public void onButtonInteractionSettled(Game game, Player player, ButtonInteractionEvent event) {
+        runReplayHook(
+                game, "button settlement", () -> combatReplayService.onButtonInteractionSettled(game, player, event));
         try {
             List<CombatContestEntity> activeContests =
                     repository.findByGameNameAndStatusIn(game.getName(), ACTIVE_STATUSES);
@@ -131,7 +137,12 @@ public class CombatContestService {
         }
     }
 
-    public void mirrorCombatRoll(Game game, Player player, Player opponent, Tile tile, String message) {
+    public void mirrorCombatRoll(
+            Game game, Player player, Player opponent, Tile tile, String message, String rollType, Integer hits) {
+        runReplayHook(
+                game,
+                "roll mirror",
+                () -> combatReplayService.mirrorCombatRoll(game, player, opponent, tile, message, rollType, hits));
         try {
             CombatContestEntity contest = repository
                     .findFirstByGameNameAndTilePositionAndCombatTypeAndStatusInOrderByPostedAtDesc(
@@ -151,7 +162,20 @@ public class CombatContestService {
         }
     }
 
-    public void mirrorCombatEvent(Game game, Player player, String header, String name, MessageEmbed embed) {
+    public void mirrorCombatEvent(
+            Game game,
+            Player player,
+            String header,
+            String name,
+            MessageEmbed embed,
+            String sourceChannelName,
+            String componentKind,
+            String componentId) {
+        runReplayHook(
+                game,
+                "event mirror",
+                () -> combatReplayService.mirrorCombatEvent(
+                        game, player, header, name, embed, sourceChannelName, componentKind, componentId));
         try {
             List<CombatContestEntity> activeContests =
                     repository.findByGameNameAndStatusIn(game.getName(), ACTIVE_STATUSES);
@@ -177,6 +201,14 @@ public class CombatContestService {
         if (contestChannel == null) return false;
         MessageHelper.sendMessageToChannel(contestChannel, message);
         return true;
+    }
+
+    private void runReplayHook(Game game, String action, Runnable hook) {
+        try {
+            hook.run();
+        } catch (Exception e) {
+            BotLogger.error(new LogOrigin(game), "Replay combat hook failed on " + action + ".", e);
+        }
     }
 
     // ==================== Contest Creation & Eligibility ====================
