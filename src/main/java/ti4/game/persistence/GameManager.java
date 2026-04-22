@@ -14,6 +14,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.Activity;
 import ti4.discord.JdaService;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
@@ -46,6 +48,9 @@ public class GameManager {
             BotLogger.critical("Failed to warmup due to error while loading game names. Shutting down.", e);
             JdaService.shutdown();
         }
+
+        JdaService.jda.getPresence()
+            .setPresence(OnlineStatus.ONLINE, Activity.customStatus("Ready to play"));
 
         ExecutorServiceManager.runAsync("GameManager warmup", () -> {
             try {
