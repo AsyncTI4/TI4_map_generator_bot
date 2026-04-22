@@ -46,7 +46,8 @@ import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
-import ti4.service.combat.CombatRollType;
+import ti4.service.combat.CombatStatsService;
+import ti4.service.combat.CombatUnitSelectionHelper;
 import ti4.service.emoji.ColorEmojis;
 
 @Service
@@ -275,8 +276,8 @@ public class CombatContestService {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         if (space == null) return null;
 
-        FleetStrength attackerStrength = calculateFleetStrength(game, attacker, space);
-        FleetStrength defenderStrength = calculateFleetStrength(game, defender, space);
+        FleetStrength attackerStrength = calculateFleetStrength(game, attacker, defender, tile, space);
+        FleetStrength defenderStrength = calculateFleetStrength(game, defender, attacker, tile, space);
 
         double stronger = Math.max(attackerStrength.hp(), defenderStrength.hp());
         double weaker = Math.min(attackerStrength.hp(), defenderStrength.hp());
@@ -305,27 +306,26 @@ public class CombatContestService {
                 ratio);
     }
 
-    private FleetStrength calculateFleetStrength(Game game, Player player, UnitHolder space) {
+    private FleetStrength calculateFleetStrength(
+            Game game, Player player, Player opponent, Tile tile, UnitHolder space) {
         double total = 0;
         double hp = 0;
         double expectedHits = 0;
-        for (UnitKey unitKey : space.getUnitKeys()) {
-            if (!unitKey.getColorID().equalsIgnoreCase(player.getColorID())) {
-                continue;
-            }
-            UnitModel unitModel = player.getPriorityUnitByAsyncID(unitKey.asyncID(), space);
-            if (unitModel == null || !unitModel.getIsShip()) {
-                continue;
-            }
-            int totalUnits = space.getUnitCount(unitKey);
-            int damagedUnits = space.getDamagedUnitCount(unitKey);
+        Map<UnitModel, Integer> unitsInCombat = CombatUnitSelectionHelper.collectCombatRoundUnits(tile, space, player);
+        Map<String, Integer> damagedCountsByAsyncId = getDamagedCountsByAsyncId(tile, player);
+        for (Map.Entry<UnitModel, Integer> entry : unitsInCombat.entrySet()) {
+            UnitModel unitModel = entry.getKey();
+            if (unitModel == null) continue;
+
+            int totalUnits = entry.getValue();
+            int damagedUnits = Math.min(totalUnits, damagedCountsByAsyncId.getOrDefault(unitModel.getAsyncId(), 0));
             int undamagedUnits = Math.max(0, totalUnits - damagedUnits);
 
             total += unitModel.getCost() * totalUnits;
             hp += totalUnits;
-            int combatDice = unitModel.getCombatDieCountForAbility(CombatRollType.combatround, player);
-            int hitsOn = unitModel.getCombatDieHitsOnForAbility(CombatRollType.combatround, player, space);
-            expectedHits += computeExpectedHits(totalUnits * combatDice, hitsOn);
+            CombatStatsService.CombatRoundProfile combatProfile =
+                    CombatStatsService.getCombatRoundProfile(true, unitModel, player, tile, opponent);
+            expectedHits += computeExpectedHits(totalUnits * combatProfile.diceCount(), combatProfile.hitsOn());
             if (unitModel.getSustainDamage(player, space)) {
                 hp += undamagedUnits;
                 if (player.hasTech("nes")) {
@@ -334,6 +334,19 @@ public class CombatContestService {
             }
         }
         return new FleetStrength(total, hp, expectedHits);
+    }
+
+    private Map<String, Integer> getDamagedCountsByAsyncId(Tile tile, Player player) {
+        Map<String, Integer> damagedCountsByAsyncId = new HashMap<>();
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            for (UnitKey unitKey : unitHolder.getUnitKeys()) {
+                if (!unitKey.getColorID().equalsIgnoreCase(player.getColorID())) continue;
+                int damagedUnits = unitHolder.getDamagedUnitCount(unitKey);
+                if (damagedUnits <= 0) continue;
+                damagedCountsByAsyncId.merge(unitKey.asyncID(), damagedUnits, Integer::sum);
+            }
+        }
+        return damagedCountsByAsyncId;
     }
 
     private double computeExpectedHits(int totalDice, int hitsOn) {
@@ -512,8 +525,10 @@ public class CombatContestService {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         if (space == null || loser == null) return null;
 
-        double winnerRemaining = calculateFleetStrength(game, winner, space).value();
-        double loserRemaining = calculateFleetStrength(game, loser, space).value();
+        double winnerRemaining =
+                calculateFleetStrength(game, winner, loser, tile, space).value();
+        double loserRemaining =
+                calculateFleetStrength(game, loser, winner, tile, space).value();
         double winnerInitial = winner.getFaction().equalsIgnoreCase(contest.getAttackerFaction())
                 ? contest.getInitialStrengthAttacker()
                 : contest.getInitialStrengthDefender();
