@@ -46,6 +46,7 @@ import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.ColorEmojis;
 
 @Service
@@ -86,7 +87,9 @@ public class CombatContestService {
                     snapshot.attackerStrength(),
                     snapshot.defenderStrength(),
                     snapshot.attackerHp(),
-                    snapshot.defenderHp());
+                    snapshot.defenderHp(),
+                    snapshot.attackerExpectedHits(),
+                    snapshot.defenderExpectedHits());
             CombatContestSelectionService.Settings settings = selectionService.getCurrentSettings();
             boolean eligibleForContest =
                     evaluation.eligibleUnderCurrentThresholds() && !hasExcludedFlagship(attacker, defender);
@@ -247,13 +250,15 @@ public class CombatContestService {
         sample.setDefenderStrength(snapshot.defenderStrength());
         sample.setAttackerHp(snapshot.attackerHp());
         sample.setDefenderHp(snapshot.defenderHp());
+        sample.setAttackerExpectedHits(snapshot.attackerExpectedHits());
+        sample.setDefenderExpectedHits(snapshot.defenderExpectedHits());
         sample.setWeakerStrength(evaluation.weakerStrength());
         sample.setStrongerStrength(evaluation.strongerStrength());
         sample.setWeakerHp(evaluation.weakerHp());
         sample.setStrongerHp(evaluation.strongerHp());
         sample.setFairnessRatio(evaluation.fairnessRatio());
         sample.setContestScore(evaluation.contestScore());
-        sample.setScoreCutoffAtStart(settings.scoreCutoff());
+        sample.setScoreCutoffAtStart(settings.combatSizeCutoff());
         sample.setSelectionModeAtStart(settings.selectionMode());
         sample.setEligibleUnderCurrentThresholds(eligibleForContest);
         sample.setContestPosted(false);
@@ -295,12 +300,15 @@ public class CombatContestService {
                 defenderStrength.value(),
                 attackerStrength.hp(),
                 defenderStrength.hp(),
+                attackerStrength.expectedHits(),
+                defenderStrength.expectedHits(),
                 ratio);
     }
 
     private FleetStrength calculateFleetStrength(Game game, Player player, UnitHolder space) {
         double total = 0;
         double hp = 0;
+        double expectedHits = 0;
         for (UnitKey unitKey : space.getUnitKeys()) {
             if (!unitKey.getColorID().equalsIgnoreCase(player.getColorID())) {
                 continue;
@@ -315,6 +323,9 @@ public class CombatContestService {
 
             total += unitModel.getCost() * totalUnits;
             hp += totalUnits;
+            int combatDice = unitModel.getCombatDieCountForAbility(CombatRollType.combatround, player);
+            int hitsOn = unitModel.getCombatDieHitsOnForAbility(CombatRollType.combatround, player, space);
+            expectedHits += computeExpectedHits(totalUnits * combatDice, hitsOn);
             if (unitModel.getSustainDamage(player, space)) {
                 hp += undamagedUnits;
                 if (player.hasTech("nes")) {
@@ -322,7 +333,12 @@ public class CombatContestService {
                 }
             }
         }
-        return new FleetStrength(total, hp);
+        return new FleetStrength(total, hp, expectedHits);
+    }
+
+    private double computeExpectedHits(int totalDice, int hitsOn) {
+        if (totalDice <= 0 || hitsOn <= 0) return 0;
+        return totalDice * Math.max(0, 11 - hitsOn) / 10.0;
     }
 
     private String extractSpaceOnlySummary(String summary) {
@@ -1031,7 +1047,7 @@ public class CombatContestService {
 
     // ==================== Records ====================
 
-    private record FleetStrength(double value, double hp) {}
+    private record FleetStrength(double value, double hp, double expectedHits) {}
 
     private record SpaceCombatSnapshot(
             String parentPostText,
@@ -1041,5 +1057,7 @@ public class CombatContestService {
             double defenderStrength,
             double attackerHp,
             double defenderHp,
+            double attackerExpectedHits,
+            double defenderExpectedHits,
             double strengthRatio) {}
 }
