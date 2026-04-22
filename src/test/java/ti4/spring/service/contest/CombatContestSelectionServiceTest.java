@@ -146,6 +146,28 @@ class CombatContestSelectionServiceTest {
         assertEquals(0.733_75, recomputed.averageFairness(), 0.0001);
     }
 
+    @Test
+    void recomputeAllowsCombatSizeCutoffToDropToNewMinimumFloor() {
+        CombatContestSampleRepository sampleRepository = mock(CombatContestSampleRepository.class);
+        CombatContestSelectionConfigRepository configRepository = mock(CombatContestSelectionConfigRepository.class);
+        CombatContestSelectionService selectionService =
+                new CombatContestSelectionService(sampleRepository, configRepository);
+        when(sampleRepository.findByStartedAtGreaterThanEqualOrderByStartedAtAsc(any()))
+                .thenReturn(List.of(
+                        sample(7, 0.90),
+                        sample(6, 0.88),
+                        sample(5, 0.85),
+                        sample(4, 0.83),
+                        sample(3, 0.80),
+                        sample(2, 0.78),
+                        sample(1, 0.76),
+                        sample(0.5, 0.74)));
+
+        CombatContestSelectionService.Settings recomputed = selectionService.recomputeAndPersistSettings();
+
+        assertEquals(8.0, recomputed.combatSizeCutoff(), 0.0001);
+    }
+
     private CombatContestSelectionConfigEntity configEntity(
             String mode, double combatSizeCutoff, double fairnessFloor) {
         CombatContestSelectionConfigEntity entity = new CombatContestSelectionConfigEntity();
