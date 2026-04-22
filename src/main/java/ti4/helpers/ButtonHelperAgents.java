@@ -612,7 +612,10 @@ public final class ButtonHelperAgents {
                             player,
                             "Agent",
                             "used _" + agentModel.getName() + "_.",
-                            agentModel.getRepresentationEmbed());
+                            agentModel.getRepresentationEmbed(),
+                            event.getChannel().getName(),
+                            "leader",
+                            playerLeader.getId());
         }
 
         MessageChannel channel = player.getCorrectChannel();

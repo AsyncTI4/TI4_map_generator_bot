@@ -2,6 +2,27 @@
 
 This file captures the current planning baseline for the Lazax candidate-recording and hourly-promotion redesign.
 
+## Implementation Status
+
+This plan now tracks both the intended design and the current implemented state of the replay pipeline.
+
+Implemented in code:
+
+- A greenfield replay-based Lazax pipeline now exists in parallel with Lazax v1.
+- Existing combat hooks fan out to both systems; the legacy live-posting flow still runs unchanged.
+- Replay persistence exists for `combat_selection_run`, `combat_observation`, `combat_candidate`, `combat_candidate_event`, and replay-driven `combat_contest`.
+- Replay promotion, replay posting, and janitor cleanup are wired through dedicated cron jobs.
+- Replay contests now integrate with the existing prediction and leaderboard flow by creating a shadow legacy predictor contest row and awarding points when the replay contest resolves.
+- Combat event routing for replay now prefers the specific combat location inferred from the combat thread channel name, with a single-candidate fallback only when the source combat is unambiguous.
+- Candidate event sequencing now locks the candidate row before allocating `next_event_sequence`.
+- Candidate event retention now keys off candidate terminal timestamps (`promoted_at` or `resolved_at`) rather than individual event age.
+- Replay event payloads are now the primary durable replay source, and replay rendering prefers `payload_json` with `summary_text` as fallback.
+
+Known implementation deltas still open:
+
+- `combat_selection_run` is still persisted on each combat-start evaluation, not only on periodic recompute passes.
+- Cancelled candidates still use `promotion_status = EXPIRED`, even though the enum intent below reserves `EXPIRED` for resolved candidates that age out of the promotion window.
+
 ## Core Flow
 
 - Listen to every eligible combat start.
@@ -19,7 +40,7 @@ This file captures the current planning baseline for the Lazax candidate-recordi
 - `combat_candidate` exists only for starts that pass the active threshold snapshot.
 - `combat_candidate_event` is append-only and is the main replay source for future public recap generation.
 - `combat_contest` is the public artifact created after promotion, not the live combat-tracking record.
-- Prediction and leaderboard tables are intentionally excluded from this baseline for now.
+- Prediction and leaderboard tables are not part of the core replay schema, but the implemented system now bridges replay contests into the existing legacy prediction and leaderboard tables at promotion and final resolution time.
 - `combat_selection_run` is intentionally minimal here, but we may later add explicit threshold columns such as `fairness_floor` and `combat_size_cutoff` if phase 1 still uses the current sequential thresholding model instead of a pure joint score.
 - This should be built as a greenfield Lazax pipeline.
 - It may reuse shared logic from the existing Lazax implementation, but it should not replace or mutate the current live system in place.
@@ -201,7 +222,7 @@ Responsibilities:
 - delete old `combat_candidate_event` rows only when:
   - candidate is `RESOLVED`, `CANCELLED`, or `PROMOTED`
   - associated replay is `COMPLETED` or no contest exists
-  - event age is past retention
+  - candidate terminal timestamp (`promoted_at` or `resolved_at`) is past retention
 - optionally clear stale `replay_error` values on completed contests
 
 ### Janitor scheduling
