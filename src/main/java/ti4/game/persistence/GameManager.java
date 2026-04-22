@@ -37,7 +37,7 @@ public class GameManager {
         if (!currentInstanceOwnsLeaseForWarmup() || !WARMUP_STARTED.compareAndSet(false, true)) {
             return;
         }
-        
+
         gameNames.addAll(GameLoadService.loadGameNames());
         GAME_NAMES_LOADED_LATCH.countDown();
         BotLogger.info("LOADED " + gameNames.size() + " GAME NAMES");
@@ -230,7 +230,7 @@ public class GameManager {
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to wait for warmup.", e);
         }
     }
 }
