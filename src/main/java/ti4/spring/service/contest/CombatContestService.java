@@ -88,8 +88,10 @@ public class CombatContestService {
                     snapshot.attackerHp(),
                     snapshot.defenderHp());
             CombatContestSelectionService.Settings settings = selectionService.getCurrentSettings();
-            CombatContestSampleEntity sample =
-                    sampleRepository.save(buildSampleEntity(game, tile, snapshot, evaluation, settings));
+            boolean eligibleForContest =
+                    evaluation.eligibleUnderCurrentThresholds() && !hasExcludedFlagship(attacker, defender);
+            CombatContestSampleEntity sample = sampleRepository.save(
+                    buildSampleEntity(game, tile, snapshot, evaluation, settings, eligibleForContest));
 
             if (repository
                     .findFirstByGameNameAndTilePositionAndCombatTypeAndStatusInOrderByPostedAtDesc(
@@ -97,7 +99,7 @@ public class CombatContestService {
                     .isPresent()) {
                 return;
             }
-            if (!evaluation.eligibleUnderCurrentThresholds() || !cooldownElapsed()) return;
+            if (!eligibleForContest || !cooldownElapsed()) return;
 
             TextChannel contestChannel = getContestChannel();
             if (contestChannel == null) return;
@@ -230,7 +232,8 @@ public class CombatContestService {
             Tile tile,
             SpaceCombatSnapshot snapshot,
             CombatContestSelectionService.Evaluation evaluation,
-            CombatContestSelectionService.Settings settings) {
+            CombatContestSelectionService.Settings settings,
+            boolean eligibleForContest) {
         CombatContestSampleEntity sample = new CombatContestSampleEntity();
         sample.setStartedAt(LocalDateTime.now());
         sample.setGameName(game.getName());
@@ -247,9 +250,13 @@ public class CombatContestService {
         sample.setContestScore(evaluation.contestScore());
         sample.setScoreCutoffAtStart(settings.scoreCutoff());
         sample.setSelectionModeAtStart(settings.selectionMode());
-        sample.setEligibleUnderCurrentThresholds(evaluation.eligibleUnderCurrentThresholds());
+        sample.setEligibleUnderCurrentThresholds(eligibleForContest);
         sample.setContestPosted(false);
         return sample;
+    }
+
+    private boolean hasExcludedFlagship(Player attacker, Player defender) {
+        return attacker.hasUnit("yin_flagship") || defender.hasUnit("yin_flagship");
     }
 
     // ==================== Combat Snapshot & Strength ====================
