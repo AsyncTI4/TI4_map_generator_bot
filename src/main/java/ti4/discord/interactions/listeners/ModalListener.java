@@ -19,7 +19,7 @@ import ti4.logging.RollbarManager;
 import ti4.service.game.GameNameService;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
-final class ModalListener extends ListenerAdapter {
+public final class ModalListener extends ListenerAdapter {
 
     private static ModalListener instance;
 
@@ -28,6 +28,10 @@ final class ModalListener extends ListenerAdapter {
     public static ModalListener getInstance() {
         if (instance == null) instance = new ModalListener();
         return instance;
+    }
+
+    public static void warmupKnownHandlers() {
+        getInstance();
     }
 
     private ModalListener() {

@@ -19,6 +19,10 @@ public final class SelectionMenuProcessor {
     private static final Map<String, Consumer<SelectionMenuContext>> knownMenus =
             AnnotationHandler.findKnownHandlers(SelectionMenuContext.class, SelectionHandler.class);
 
+    public static void warmupKnownHandlers() {
+        knownMenus.size();
+    }
+
     public static void queue(StringSelectInteractionEvent event) {
         String gameName = GameNameService.getGameNameFromChannel(event);
         ExecutorServiceManager.runAsync(
