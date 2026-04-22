@@ -59,10 +59,10 @@ public class GameManager {
     }
 
     private static boolean ownsActiveMutationLease() {
+        if (JdaService.testingMode) return true;
         try {
             return SpringContext.getBean(ActiveLeaseService.class).mayMutate();
         } catch (Exception e) {
-            if (JdaService.testingMode) return true;
             BotLogger.error("Failed to check ActiveLeaseService", e);
             return false;
         }
