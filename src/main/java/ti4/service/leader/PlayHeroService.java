@@ -57,6 +57,8 @@ import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.contest.CombatContestService;
 
 @UtilityClass
 public class PlayHeroService {
@@ -75,6 +77,14 @@ public class PlayHeroService {
         boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(game.getOutputVerbosity());
         StringBuilder sb = new StringBuilder();
         if (leaderModel != null) {
+            SpringContext.getBean(CombatContestService.class)
+                    .mirrorCombatEvent(
+                            game,
+                            player,
+                            "Hero",
+                            "played _" + leaderModel.getName() + "_.",
+                            leaderModel.getRepresentationEmbed(
+                                    false, true, false, showFlavourText, game.isTwilightsFallMode()));
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " played:");
             player.getCorrectChannel()
                     .sendMessageEmbeds(leaderModel.getRepresentationEmbed(
