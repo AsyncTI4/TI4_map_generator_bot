@@ -40,6 +40,7 @@ import ti4.spring.service.contest.CombatContestUserPointsRow;
 public class CombatReplayLeaderboardService {
 
     private static final double ZERO_EPSILON = 0.0001;
+    private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives-dev";
 
     private final CombatContestRepository contestRepository;
     private final CombatContestPredictionRepository predictionRepository;
@@ -232,8 +233,10 @@ public class CombatReplayLeaderboardService {
                 .map(prediction -> {
                     int pointsAwarded = safeInt(prediction.getPointsAwarded());
                     int totalPoints = totalsByUser.getOrDefault(prediction.getDiscordUserId(), 0);
-                    return "<@" + prediction.getDiscordUserId() + "> - " + totalPoints + " points (+" + pointsAwarded
-                            + ")";
+                    // return "<@" + prediction.getDiscordUserId() + "> - " + totalPoints + " points (+"
+                    //         + pointsAwarded + ")";
+                    return getSafeLeaderboardName(prediction.getDiscordUserName()) + " - " + totalPoints + " points (+"
+                            + pointsAwarded + ")";
                 })
                 .collect(Collectors.joining("\n", "## Prediction Points\n", ""));
         MessageHelper.splitAndSentWithAction(message, threadOrChannel, null);
@@ -285,7 +288,7 @@ public class CombatReplayLeaderboardService {
 
     private TextChannel getContestPublicChannelByName() {
         if (JdaService.guildPrimary == null) return null;
-        return JdaService.guildPrimary.getTextChannelsByName("lazax-war-archives", true).stream()
+        return JdaService.guildPrimary.getTextChannelsByName(CONTEST_CHANNEL_NAME, true).stream()
                 .findFirst()
                 .orElse(null);
     }

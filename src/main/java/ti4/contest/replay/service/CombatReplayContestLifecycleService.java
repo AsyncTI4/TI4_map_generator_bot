@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -29,13 +28,12 @@ import ti4.image.TileGenerator;
 import ti4.logging.BotLogger;
 import ti4.model.ActionCardModel;
 import ti4.model.LeaderModel;
-import ti4.spring.service.contest.CombatContestService;
 
 @Service
 @RequiredArgsConstructor
 public class CombatReplayContestLifecycleService {
 
-    private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives";
+    private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives-dev";
     private static final long SHADOW_DISCORD_ID = 0L;
 
     private final CombatCandidateRepository candidateRepository;
@@ -286,11 +284,13 @@ public class CombatReplayContestLifecycleService {
     }
 
     private String getLazaxRoleMention() {
-        if (JdaService.guildPrimary == null) return "";
-        Role role = JdaService.guildPrimary.getRolesByName(CombatContestService.LAZAX_MINIGAME_ROLE_NAME, true).stream()
-                .findFirst()
-                .orElse(null);
-        return role == null ? "" : role.getAsMention();
+        // if (JdaService.guildPrimary == null) return "";
+        // Role role = JdaService.guildPrimary.getRolesByName(CombatContestService.LAZAX_MINIGAME_ROLE_NAME, true)
+        //         .stream()
+        //         .findFirst()
+        //         .orElse(null);
+        // return role == null ? "" : role.getAsMention();
+        return "";
     }
 
     private Game loadGame(String gameName) {
