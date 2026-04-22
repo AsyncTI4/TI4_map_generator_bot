@@ -257,7 +257,6 @@ public class JdaService {
                             + "\nPlease set a valid bot-log Webhook URL using `/developer setting setting_name:bot_log_webhook_url setting_type:string setting_value:<url>`");
         }
 
-        // LOAD DATA
         BotLogger.info("LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
         ApplicationEmojiService.uploadNewEmojis();
@@ -275,13 +274,6 @@ public class JdaService {
         SelectionManager.init();
         initializeWhitelistedRoles();
         TIGLHelper.validateTIGLness();
-
-        jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Indexing Game Names"));
-
-        BotLogger.info("INDEXING GAME NAMES");
-        GameManager.initialize();
-        BotLogger.info("FINISHED INDEXING GAME NAMES");
-        BotLogger.info("MANAGED GAME WARMUP WILL RUN ON THE ACTIVE INSTANCE");
 
         if (DataMigrationManager.runMigrations()) {
             BotLogger.info("FINISHED RUNNING MIGRATIONS");
@@ -308,14 +300,8 @@ public class JdaService {
         LongExecutionHistoryCron.register();
         CategoryCleanupCron.register();
 
-        // BOT IS READY
         ActiveLeaseService.setCurrentProcessReady(true);
         BotLogger.info("BOT IS READY TO RECEIVE COMMANDS");
-        if (GameManager.areAllManagedGamesLoaded()) {
-            updatePresence();
-        } else {
-            jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.customStatus("Warming game index"));
-        }
     }
 
     private static Guild tryToInitGuild(String guildID, boolean addToNewGameServerList) {

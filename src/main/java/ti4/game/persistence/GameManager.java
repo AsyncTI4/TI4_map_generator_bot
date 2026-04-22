@@ -23,51 +23,39 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 @UtilityClass
 public class GameManager {
 
-    private static final Set<String> validGameNames = ConcurrentHashMap.newKeySet();
     // TODO: We can evaluate dropping the managed objects entirely
+    private static final Set<String> gameNames = ConcurrentHashMap.newKeySet();
     private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, ManagedPlayer> userIdToManagedPlayer = new ConcurrentHashMap<>();
-    private static final AtomicBoolean GAME_NAMES_INDEXED = new AtomicBoolean(false);
+
+    private static final CountDownLatch GAME_NAMES_LOADED_LATCH = new CountDownLatch(1);
     private static final AtomicBoolean WARMUP_STARTED = new AtomicBoolean(false);
-    private static final CountDownLatch WARMUP_LATCH = new CountDownLatch(1);
-    private static final long WAIT_FOR_WARMUP_TIMEOUT_SECONDS = 30;
+    private static final CountDownLatch WARMUP_FINISHED_LATCH = new CountDownLatch(1);
+    private static final int WAIT_FOR_WARMUP_TIMEOUT_SECONDS = 10;
 
-    public static synchronized void initialize() {
-        indexManagedGameNamesIfNeeded();
-        if (JdaService.testingMode) {
-            WARMUP_LATCH.countDown();
+    public static void warmup() {
+        if (!currentInstanceOwnsLeaseForWarmup() || !WARMUP_STARTED.compareAndSet(false, true)) {
             return;
         }
 
-        startManagedGamesWarmupIfNeeded();
-    }
+        BotLogger.info("LOADING GAME NAMES");
+        gameNames.addAll(GameLoadService.loadGameNames());
+        GAME_NAMES_LOADED_LATCH.countDown();
 
-    public static synchronized void startManagedGamesWarmupIfNeeded() {
-        indexManagedGameNamesIfNeeded();
-        if (!currentInstanceOwnsLeaseForWarmup()
-                || WARMUP_LATCH.getCount() == 0
-                || !WARMUP_STARTED.compareAndSet(false, true)) {
-            return;
-        }
-
-        ExecutorServiceManager.runAsync("GameManager managed game warmup", () -> {
+        ExecutorServiceManager.runAsync("GameManager warmup", () -> {
             try {
-                validGameNames.forEach(GameManager::getManagedGame);
-                WARMUP_LATCH.countDown();
-            } catch (Exception e) {
-                BotLogger.critical("Failed during managed game warmup.", e);
-            } finally {
+                BotLogger.info("STARTED BUILDING MANAGED GAMES");
+                gameNames.forEach(GameManager::getManagedGame);
+                WARMUP_FINISHED_LATCH.countDown();
+                BotLogger.info("FINISHED BUILDING MANAGED GAMES");
                 if (JdaService.jda != null) {
                     JdaService.updatePresence();
                 }
+            } catch (Exception e) {
+                BotLogger.critical("Failed during GameManager warmup. Shutting down.", e);
+                JdaService.shutdown();
             }
         });
-    }
-
-    private static void indexManagedGameNamesIfNeeded() {
-        if (GAME_NAMES_INDEXED.compareAndSet(false, true)) {
-            validGameNames.addAll(GameLoadService.loadManagedGameNames());
-        }
     }
 
     private static boolean currentInstanceOwnsLeaseForWarmup() {
@@ -85,7 +73,6 @@ public class GameManager {
         }
 
         if (doesNotHaveMatchingManagedGame(game)) {
-            validGameNames.add(game.getName());
             gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
         }
         return game;
@@ -109,7 +96,6 @@ public class GameManager {
     }
 
     private static void handleManagedGameRemoval(String gameName) {
-        validGameNames.remove(gameName);
         var managedGame = gameNameToManagedGame.remove(gameName);
         if (managedGame != null) {
             managedGame.getPlayers().forEach(player -> player.getGames().remove(managedGame));
@@ -117,22 +103,19 @@ public class GameManager {
     }
 
     public static boolean isValid(String gameName) {
-        return gameName != null && validGameNames.contains(gameName);
+        waitFor(GAME_NAMES_LOADED_LATCH);
+        return gameName != null && gameNames.contains(gameName);
     }
 
-    public static boolean save(Game game, String reason) {
-        if (!hasLeaseToMakeChanges(game, reason)) {
-            return false;
-        }
-
+    public static void save(Game game, String reason) {
+        waitFor(GAME_NAMES_LOADED_LATCH);
         boolean wasActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
                 .map(ManagedGame::isActive)
                 .orElse(false);
         if (!GameSaveService.save(game, reason)) {
-            return false;
+            throw new RuntimeException("Failed to save game " + game.getName() + ".");
         }
 
-        validGameNames.add(game.getName());
         gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
 
         boolean isActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
@@ -141,26 +124,10 @@ public class GameManager {
         if (wasActive != isActive) {
             JdaService.updatePresence();
         }
-        return true;
-    }
-
-    private static boolean hasLeaseToMakeChanges(Game game, String reason) {
-        try {
-            ActiveLeaseService activeLeaseService = SpringContext.getBean(ActiveLeaseService.class);
-            if (activeLeaseService.mayMutate()) {
-                return true;
-            }
-            String gameName = game == null ? "unknown" : game.getName();
-            BotLogger.warning("Rejected game save because this instance does not own the active lease. Game: `"
-                    + gameName + "` Reason: " + reason);
-            return false;
-        } catch (IllegalStateException e) {
-            // Spring may not be initialized in some startup or test paths; preserve legacy behavior there.
-            return true;
-        }
     }
 
     public static boolean delete(String gameName) {
+        waitFor(WARMUP_FINISHED_LATCH);
         if (!GameSaveService.delete(gameName)) {
             return false;
         }
@@ -170,6 +137,7 @@ public class GameManager {
 
     @Nullable
     public static Game undo(Game game) {
+        waitFor(GAME_NAMES_LOADED_LATCH);
         Game undo = GameUndoService.undo(game);
         return handleUndo(undo);
     }
@@ -179,7 +147,7 @@ public class GameManager {
             return null;
         }
         if (doesNotHaveMatchingManagedGame(undo)) {
-            validGameNames.add(undo.getName());
+            gameNames.add(undo.getName());
             gameNameToManagedGame.put(undo.getName(), new ManagedGame(undo));
         }
         return undo;
@@ -187,12 +155,14 @@ public class GameManager {
 
     @Nullable
     public static Game undo(Game game, int undoIndex) {
+        waitFor(GAME_NAMES_LOADED_LATCH);
         Game undo = GameUndoService.undo(game, undoIndex);
         return handleUndo(undo);
     }
 
     @Nullable
     public static Game reload(String gameName) {
+        waitFor(GAME_NAMES_LOADED_LATCH);
         Game game = load(gameName);
         if (game == null) {
             game = GameUndoService.loadUndoForMissingGame(gameName);
@@ -202,20 +172,24 @@ public class GameManager {
     }
 
     public static List<String> getGameNames() {
-        return new ArrayList<>(validGameNames);
+        waitFor(GAME_NAMES_LOADED_LATCH);
+        return new ArrayList<>(gameNames);
     }
 
     public static int getGameCount() {
-        return validGameNames.size();
+        waitFor(GAME_NAMES_LOADED_LATCH);
+        return gameNames.size();
     }
 
     public static long getActiveGameCount() {
+        waitFor(GAME_NAMES_LOADED_LATCH);
         return gameNameToManagedGame.values().stream()
                 .filter(ManagedGame::isActive)
                 .count();
     }
 
     public static ManagedGame getManagedGame(String gameName) {
+        waitFor(GAME_NAMES_LOADED_LATCH);
         if (!isValid(gameName)) {
             return null;
         }
@@ -223,17 +197,17 @@ public class GameManager {
     }
 
     public static List<ManagedGame> getManagedGames() {
-        waitForAllManagedGamesToLoad();
+        waitFor(WARMUP_FINISHED_LATCH);
         return new ArrayList<>(gameNameToManagedGame.values());
     }
 
     public static ManagedPlayer getManagedPlayer(String playerId) {
-        waitForAllManagedGamesToLoad();
+        waitFor(WARMUP_FINISHED_LATCH);
         return userIdToManagedPlayer.get(playerId);
     }
 
     public static Set<ManagedPlayer> getManagedPlayers() {
-        waitForAllManagedGamesToLoad();
+        waitFor(WARMUP_FINISHED_LATCH);
         return new HashSet<>(userIdToManagedPlayer.values());
     }
 
@@ -248,15 +222,11 @@ public class GameManager {
         return managedPlayer;
     }
 
-    public static boolean areAllManagedGamesLoaded() {
-        return WARMUP_LATCH.getCount() == 0;
-    }
-
-    private static void waitForAllManagedGamesToLoad() {
+    private static void waitFor(CountDownLatch latch) {
         try {
-            boolean success = WARMUP_LATCH.await(WAIT_FOR_WARMUP_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            boolean success = latch.await(WAIT_FOR_WARMUP_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             if (!success) {
-                throw new IllegalStateException("GameManager is still warming up!");
+                throw new IllegalStateException("Failed to wait for warmup.");
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

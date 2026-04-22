@@ -29,7 +29,7 @@ class ActiveLeaseServiceTest {
 
             assertThat(acquired).isTrue();
             verify(repository).save(any(ActiveLeaseEntity.class));
-            gameManager.verify(GameManager::startManagedGamesWarmupIfNeeded, times(1));
+            gameManager.verify(GameManager::warmup, times(1));
         }
     }
 

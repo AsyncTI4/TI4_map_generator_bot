@@ -56,7 +56,7 @@ public class ActiveLeaseService {
         activeLeaseRepository.save(buildLease(now));
         setActive(true);
         setDraining(false);
-        GameManager.startManagedGamesWarmupIfNeeded();
+        GameManager.warmup();
         return true;
     }
 
@@ -149,13 +149,8 @@ public class ActiveLeaseService {
         return true;
     }
 
-    /** Returns the randomly generated identifier used for this process in the lease row. */
-    public String currentInstanceId() {
-        return instanceId;
-    }
-
     /** Returns a log prefix for non-serving process states, or an empty string for the active serving instance. */
-    public String currentProcessLogPrefix() {
+    private String currentProcessLogPrefix() {
         if (shouldServeTraffic()) {
             return "";
         }

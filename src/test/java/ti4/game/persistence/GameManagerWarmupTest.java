@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import ti4.discord.JdaService;
@@ -45,7 +46,7 @@ class GameManagerWarmupTest {
                 MockedStatic<SpringContext> springContext = Mockito.mockStatic(SpringContext.class);
                 MockedStatic<ExecutorServiceManager> executorServiceManager =
                         Mockito.mockStatic(ExecutorServiceManager.class)) {
-            gameLoadService.when(GameLoadService::loadManagedGameNames).thenReturn(List.of("pbd1000"));
+            gameLoadService.when(GameLoadService::loadGameNames).thenReturn(List.of("pbd1000"));
             springContext
                     .when(() -> SpringContext.getBean(ActiveLeaseService.class))
                     .thenReturn(activeLeaseService);
@@ -53,7 +54,9 @@ class GameManagerWarmupTest {
             GameManager.initialize();
 
             executorServiceManager.verify(
-                    () -> ExecutorServiceManager.runAsync(Mockito.anyString(), Mockito.any(Runnable.class)), never());
+                    () -> ExecutorServiceManager.runAsync(
+                            ArgumentMatchers.anyString(), ArgumentMatchers.any(Runnable.class)),
+                    never());
         }
     }
 

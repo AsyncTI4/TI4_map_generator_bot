@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -93,13 +94,15 @@ class GameLoadService {
     private static final Pattern PATTERN = Pattern.compile("—");
     private static final String GAME_FILE_EXTENSION = Constants.TXT;
 
-    static List<String> loadManagedGameNames() {
+    static List<String> loadGameNames() {
         try (Stream<Path> pathStream = Files.list(Storage.getGamesDirectory().toPath())) {
             return pathStream
                     .filter(path -> path.toString().toLowerCase().endsWith(GAME_FILE_EXTENSION))
                     .map(Path::getFileName)
                     .map(Path::toString)
                     .map(GameLoadService::stripGameFileExtension)
+                    // newer games first
+                    .sorted(Comparator.reverseOrder())
                     .toList();
         } catch (IOException e) {
             BotLogger.critical("Exception occurred while getting all game names.", e);
