@@ -8,6 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.ButtonProcessor;
+import ti4.discord.interactions.listeners.ModalListener;
+import ti4.discord.interactions.selections.SelectionMenuProcessor;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.migration.DataMigrationManager;
 import ti4.logging.BotLogger;
@@ -39,6 +42,11 @@ public class AsyncTI4DiscordBot {
         }
         JdaService.loadStaticDataAndResources();
         JdaService.indexGameNames();
+        BotLogger.info("WARMING INTERACTION HANDLERS");
+        ButtonProcessor.warmupKnownHandlers();
+        SelectionMenuProcessor.warmupKnownHandlers();
+        ModalListener.warmupKnownHandlers();
+        BotLogger.info("FINISHED WARMING INTERACTION HANDLERS");
         activeLeaseService.beginLeaseParticipation(AsyncTI4DiscordBot::runLeaseOwnedStartupWork);
         JdaService.registerAndStartCronJobs();
         JdaService.markProcessReady();
