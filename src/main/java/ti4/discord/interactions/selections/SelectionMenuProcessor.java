@@ -1,7 +1,6 @@
 package ti4.discord.interactions.selections;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
@@ -23,7 +22,9 @@ public final class SelectionMenuProcessor {
             AnnotationHandler.findKnownHandlers(SelectionMenuContext.class, SelectionHandler.class);
 
     public static void checkSelectionMenuHandlersSetup() {
-        Objects.requireNonNull(knownMenus);
+        if (knownMenus.isEmpty()) {
+            throw new IllegalStateException("No button handlers were registered");
+        }
     }
 
     public static void queue(StringSelectInteractionEvent event) {
