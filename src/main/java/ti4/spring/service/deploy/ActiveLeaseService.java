@@ -1,15 +1,12 @@
 package ti4.spring.service.deploy;
 
-import jakarta.annotation.PostConstruct;
 import java.time.Instant;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import ti4.game.persistence.GameManager;
 import ti4.logging.BotLogger;
 import ti4.spring.context.SpringContext;
 
@@ -23,81 +20,85 @@ public class ActiveLeaseService {
 
     private final ActiveLeaseRepository activeLeaseRepository;
     private final LeaseProperties leaseProperties;
+    private final ActiveLeaseTransactionService activeLeaseTransactionService;
 
     private final String instanceId = UUID.randomUUID().toString();
     private final AtomicBoolean active = new AtomicBoolean(false);
     private final AtomicBoolean draining = new AtomicBoolean(false);
     private final AtomicBoolean ready = new AtomicBoolean(false);
-    private final AtomicBoolean leaseParticipationEnabled = new AtomicBoolean(true);
+    private final AtomicBoolean leaseParticipationEnabled = new AtomicBoolean(false);
+    private volatile Runnable onLeaseAcquired = () -> {};
 
-    @PostConstruct
-    void acquireOnStartup() {
-        boolean acquired = tryAcquireLease();
-        setActive(acquired);
+    public boolean beginLeaseParticipation(Runnable onLeaseAcquired) {
+        this.onLeaseAcquired = Objects.requireNonNull(onLeaseAcquired);
+        leaseParticipationEnabled.set(true);
+
+        boolean acquired = tryAcquireLease(onLeaseAcquired);
         if (acquired) {
             BotLogger.info("Acquired active lease for instance " + instanceId);
         } else {
             BotLogger.warning("Did not acquire active lease on startup for instance " + instanceId);
         }
+        return acquired;
     }
 
-    /** Attempts to acquire or steal an expired lease for the current process. */
-    @Transactional
     public boolean tryAcquireLease() {
-        Instant now = Instant.now();
-        Optional<ActiveLeaseEntity> existing = activeLeaseRepository.findById(leaseProperties.getLeaseKey());
-        if (existing.isPresent()) {
-            ActiveLeaseEntity lease = existing.get();
-            if (!instanceId.equals(lease.getInstanceId()) && !isExpired(lease, now)) {
-                return false;
-            }
+        if (!activeLeaseTransactionService.tryAcquireLease(instanceId)) {
+            return false;
         }
 
-        activeLeaseRepository.save(buildLease(now));
         setActive(true);
         setDraining(false);
-        GameManager.warmup();
+        onLeaseAcquired.run();
         return true;
     }
 
-    /** Extends the lease while this process remains active. */
-    @Transactional
-    public void renewLease() {
+    private boolean tryAcquireLease(Runnable onLeaseAcquired) {
+        if (!activeLeaseTransactionService.tryAcquireLease(instanceId)) {
+            return false;
+        }
+
+        setActive(true);
+        setDraining(false);
+        onLeaseAcquired.run();
+        return true;
+    }
+
+    private void renewLease() {
         if (!isActive()) {
             return;
         }
-        activeLeaseRepository.save(buildLease(Instant.now()));
+
+        if (!activeLeaseTransactionService.renewLease(instanceId)) {
+            BotLogger.warning("Active instance lost lease ownership: " + instanceId);
+            setReady(false);
+            setActive(false);
+        }
     }
 
-    /** Releases the lease if it is currently owned by this process. */
-    @Transactional
     public void releaseLease() {
-        Optional<ActiveLeaseEntity> existing = activeLeaseRepository.findById(leaseProperties.getLeaseKey());
-        if (existing.isPresent() && instanceId.equals(existing.get().getInstanceId())) {
-            activeLeaseRepository.delete(existing.get());
-        }
+        activeLeaseTransactionService.releaseLease(instanceId);
         setActive(false);
     }
 
-    /** Returns whether the shared lease row is still owned by this process. */
     public boolean stillOwnsLease() {
+        Instant now = Instant.now();
         return activeLeaseRepository
                 .findById(leaseProperties.getLeaseKey())
-                .map(lease -> instanceId.equals(lease.getInstanceId()))
+                .map(lease -> instanceId.equals(lease.getInstanceId())
+                        && lease.getLeaseExpiresAt() != null
+                        && lease.getLeaseExpiresAt().isAfter(now))
                 .orElse(false);
     }
 
-    /** Returns whether this process may perform persistent game mutations right now. */
     public boolean mayMutate() {
         return isActive() && stillOwnsLease();
     }
 
-    /** Returns whether this process is the currently active instance. */
     public boolean isActive() {
         return active.get();
     }
 
-    /** Marks this process active or inactive, clearing drain state when deactivating. */
     public void setActive(boolean active) {
         this.active.set(active);
         if (!active) {
@@ -105,37 +106,34 @@ public class ActiveLeaseService {
         }
     }
 
-    /** Returns whether this process is draining and refusing new work. */
     public boolean isDraining() {
         return draining.get();
     }
 
-    /** Marks this process as draining or not draining. */
-    public void setDraining(boolean draining) {
+    private void setDraining(boolean draining) {
         this.draining.set(draining);
     }
 
-    /** Returns whether this process should handle Discord interaction ingress. */
-    public boolean shouldHandleDiscordInteraction() {
+    private boolean shouldHandleDiscordInteraction() {
         return isActive() && !isDraining();
     }
 
-    /** Returns whether startup has completed for this process. */
     public boolean isReady() {
         return ready.get();
     }
 
-    /** Marks this process ready or not ready for normal traffic. */
     public void setReady(boolean ready) {
         this.ready.set(ready);
     }
 
-    /** Returns whether this process should currently serve normal HTTP traffic. */
-    public boolean shouldServeTraffic() {
+    public boolean isLeaseParticipationEnabled() {
+        return leaseParticipationEnabled.get();
+    }
+
+    private boolean shouldServeTraffic() {
         return isReady() && mayMutate() && !isDraining();
     }
 
-    /** Initiates drain and closes the Spring context on a background thread. */
     public boolean requestDrain() {
         if (!isActive() || isDraining()) {
             return false;
@@ -149,7 +147,6 @@ public class ActiveLeaseService {
         return true;
     }
 
-    /** Returns a log prefix for non-serving process states, or an empty string for the active serving instance. */
     private String currentProcessLogPrefix() {
         if (shouldServeTraffic()) {
             return "";
@@ -170,13 +167,7 @@ public class ActiveLeaseService {
         }
 
         if (isActive()) {
-            if (stillOwnsLease()) {
-                renewLease();
-            } else {
-                BotLogger.warning("Active instance lost lease ownership: " + instanceId);
-                setReady(false);
-                setActive(false);
-            }
+            renewLease();
             return;
         }
 
@@ -190,20 +181,6 @@ public class ActiveLeaseService {
         }
     }
 
-    private ActiveLeaseEntity buildLease(Instant now) {
-        ActiveLeaseEntity lease = new ActiveLeaseEntity();
-        lease.setLeaseKey(leaseProperties.getLeaseKey());
-        lease.setInstanceId(instanceId);
-        lease.setHeartbeatAt(now);
-        lease.setLeaseExpiresAt(now.plusSeconds(leaseProperties.getLeaseDurationSeconds()));
-        return lease;
-    }
-
-    private boolean isExpired(ActiveLeaseEntity lease, Instant now) {
-        return lease.getLeaseExpiresAt() == null || lease.getLeaseExpiresAt().isBefore(now);
-    }
-
-    /** Returns current-process readiness, defaulting to false before Spring has initialized. */
     public static boolean isCurrentProcessReady() {
         try {
             return SpringContext.getBean(ActiveLeaseService.class).isReady();
@@ -212,7 +189,6 @@ public class ActiveLeaseService {
         }
     }
 
-    /** Updates current-process readiness if Spring has initialized. */
     public static void setCurrentProcessReady(boolean ready) {
         try {
             SpringContext.getBean(ActiveLeaseService.class).setReady(ready);
@@ -221,7 +197,6 @@ public class ActiveLeaseService {
         }
     }
 
-    /** Returns whether the current process should handle a Discord interaction. */
     public static boolean shouldHandleCurrentProcessInteraction() {
         try {
             return SpringContext.getBean(ActiveLeaseService.class).shouldHandleDiscordInteraction();
@@ -230,7 +205,6 @@ public class ActiveLeaseService {
         }
     }
 
-    /** Returns whether the current process should serve normal HTTP traffic. */
     public static boolean shouldCurrentProcessServeTraffic() {
         try {
             return SpringContext.getBean(ActiveLeaseService.class).shouldServeTraffic();
@@ -239,7 +213,6 @@ public class ActiveLeaseService {
         }
     }
 
-    /** Returns whether the current process should run active-instance scheduled work. */
     public static boolean shouldCurrentProcessRunScheduledWork() {
         try {
             ActiveLeaseService activeLeaseService = SpringContext.getBean(ActiveLeaseService.class);
@@ -249,7 +222,6 @@ public class ActiveLeaseService {
         }
     }
 
-    /** Returns a log prefix for non-serving process states, defaulting to startup when Spring is unavailable. */
     public static String getCurrentProcessLogPrefix() {
         try {
             return SpringContext.getBean(ActiveLeaseService.class).currentProcessLogPrefix();

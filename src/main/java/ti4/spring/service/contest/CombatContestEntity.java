@@ -105,6 +105,9 @@ public class CombatContestEntity {
     @Column(name = "initial_hp_defender")
     private Double initialHpDefender;
 
+    @Column(name = "dice_rolled")
+    private Boolean diceRolled;
+
     @Column(name = "attacker_hit_assigned_round")
     private Integer attackerHitAssignedRound;
 

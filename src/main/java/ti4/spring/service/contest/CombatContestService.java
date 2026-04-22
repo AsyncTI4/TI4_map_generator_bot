@@ -46,6 +46,8 @@ import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.combat.CombatStatsService;
+import ti4.service.combat.CombatUnitSelectionHelper;
 import ti4.service.emoji.ColorEmojis;
 
 @Service
@@ -86,10 +88,14 @@ public class CombatContestService {
                     snapshot.attackerStrength(),
                     snapshot.defenderStrength(),
                     snapshot.attackerHp(),
-                    snapshot.defenderHp());
+                    snapshot.defenderHp(),
+                    snapshot.attackerExpectedHits(),
+                    snapshot.defenderExpectedHits());
             CombatContestSelectionService.Settings settings = selectionService.getCurrentSettings();
-            CombatContestSampleEntity sample =
-                    sampleRepository.save(buildSampleEntity(game, tile, snapshot, evaluation, settings));
+            boolean eligibleForContest =
+                    evaluation.eligibleUnderCurrentThresholds() && !hasExcludedFlagship(attacker, defender);
+            CombatContestSampleEntity sample = sampleRepository.save(
+                    buildSampleEntity(game, tile, snapshot, evaluation, settings, eligibleForContest));
 
             if (repository
                     .findFirstByGameNameAndTilePositionAndCombatTypeAndStatusInOrderByPostedAtDesc(
@@ -97,7 +103,7 @@ public class CombatContestService {
                     .isPresent()) {
                 return;
             }
-            if (!evaluation.eligibleUnderCurrentThresholds() || !cooldownElapsed()) return;
+            if (!eligibleForContest || !cooldownElapsed()) return;
 
             TextChannel contestChannel = getContestChannel();
             if (contestChannel == null) return;
@@ -132,6 +138,10 @@ public class CombatContestService {
                             game.getName(), tile.getPosition(), CombatContestType.SPACE, ACTIVE_STATUSES)
                     .orElse(null);
             if (contest == null || !matchesParticipants(contest, player, opponent)) return;
+            if (!hasRecordedRolls(contest)) {
+                contest.setDiceRolled(true);
+                repository.save(contest);
+            }
 
             MessageChannel threadOrChannel = getContestThreadOrChannel(contest);
             if (threadOrChannel == null) return;
@@ -185,7 +195,7 @@ public class CombatContestService {
         Duration cooldown =
                 Duration.ofMinutes(selectionService.getCurrentSettings().cooldownMinutes());
         return repository
-                .findFirstByOrderByPostedAtDesc()
+                .findLatestContestCountingTowardCooldown()
                 .map(contest -> Duration.between(contest.getPostedAt(), LocalDateTime.now())
                                 .compareTo(cooldown)
                         >= 0)
@@ -222,6 +232,7 @@ public class CombatContestService {
         contest.setInitialStrengthDefender(snapshot.defenderStrength());
         contest.setInitialHpAttacker(snapshot.attackerHp());
         contest.setInitialHpDefender(snapshot.defenderHp());
+        contest.setDiceRolled(false);
         return contest;
     }
 
@@ -230,7 +241,8 @@ public class CombatContestService {
             Tile tile,
             SpaceCombatSnapshot snapshot,
             CombatContestSelectionService.Evaluation evaluation,
-            CombatContestSelectionService.Settings settings) {
+            CombatContestSelectionService.Settings settings,
+            boolean eligibleForContest) {
         CombatContestSampleEntity sample = new CombatContestSampleEntity();
         sample.setStartedAt(LocalDateTime.now());
         sample.setGameName(game.getName());
@@ -239,17 +251,23 @@ public class CombatContestService {
         sample.setDefenderStrength(snapshot.defenderStrength());
         sample.setAttackerHp(snapshot.attackerHp());
         sample.setDefenderHp(snapshot.defenderHp());
+        sample.setAttackerExpectedHits(snapshot.attackerExpectedHits());
+        sample.setDefenderExpectedHits(snapshot.defenderExpectedHits());
         sample.setWeakerStrength(evaluation.weakerStrength());
         sample.setStrongerStrength(evaluation.strongerStrength());
         sample.setWeakerHp(evaluation.weakerHp());
         sample.setStrongerHp(evaluation.strongerHp());
         sample.setFairnessRatio(evaluation.fairnessRatio());
         sample.setContestScore(evaluation.contestScore());
-        sample.setScoreCutoffAtStart(settings.scoreCutoff());
+        sample.setScoreCutoffAtStart(settings.combatSizeCutoff());
         sample.setSelectionModeAtStart(settings.selectionMode());
-        sample.setEligibleUnderCurrentThresholds(evaluation.eligibleUnderCurrentThresholds());
+        sample.setEligibleUnderCurrentThresholds(eligibleForContest);
         sample.setContestPosted(false);
         return sample;
+    }
+
+    private boolean hasExcludedFlagship(Player attacker, Player defender) {
+        return attacker.hasUnit("yin_flagship") || defender.hasUnit("yin_flagship");
     }
 
     // ==================== Combat Snapshot & Strength ====================
@@ -258,8 +276,8 @@ public class CombatContestService {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         if (space == null) return null;
 
-        FleetStrength attackerStrength = calculateFleetStrength(game, attacker, space);
-        FleetStrength defenderStrength = calculateFleetStrength(game, defender, space);
+        FleetStrength attackerStrength = calculateFleetStrength(game, attacker, defender, tile, space);
+        FleetStrength defenderStrength = calculateFleetStrength(game, defender, attacker, tile, space);
 
         double stronger = Math.max(attackerStrength.hp(), defenderStrength.hp());
         double weaker = Math.min(attackerStrength.hp(), defenderStrength.hp());
@@ -283,26 +301,31 @@ public class CombatContestService {
                 defenderStrength.value(),
                 attackerStrength.hp(),
                 defenderStrength.hp(),
+                attackerStrength.expectedHits(),
+                defenderStrength.expectedHits(),
                 ratio);
     }
 
-    private FleetStrength calculateFleetStrength(Game game, Player player, UnitHolder space) {
+    private FleetStrength calculateFleetStrength(
+            Game game, Player player, Player opponent, Tile tile, UnitHolder space) {
         double total = 0;
         double hp = 0;
-        for (UnitKey unitKey : space.getUnitKeys()) {
-            if (!unitKey.getColorID().equalsIgnoreCase(player.getColorID())) {
-                continue;
-            }
-            UnitModel unitModel = player.getPriorityUnitByAsyncID(unitKey.asyncID(), space);
-            if (unitModel == null || !unitModel.getIsShip()) {
-                continue;
-            }
-            int totalUnits = space.getUnitCount(unitKey);
-            int damagedUnits = space.getDamagedUnitCount(unitKey);
+        double expectedHits = 0;
+        Map<UnitModel, Integer> unitsInCombat = CombatUnitSelectionHelper.collectCombatRoundUnits(tile, space, player);
+        Map<String, Integer> damagedCountsByAsyncId = getDamagedCountsByAsyncId(tile, player);
+        for (Map.Entry<UnitModel, Integer> entry : unitsInCombat.entrySet()) {
+            UnitModel unitModel = entry.getKey();
+            if (unitModel == null) continue;
+
+            int totalUnits = entry.getValue();
+            int damagedUnits = Math.min(totalUnits, damagedCountsByAsyncId.getOrDefault(unitModel.getAsyncId(), 0));
             int undamagedUnits = Math.max(0, totalUnits - damagedUnits);
 
             total += unitModel.getCost() * totalUnits;
             hp += totalUnits;
+            CombatStatsService.CombatRoundProfile combatProfile =
+                    CombatStatsService.getCombatRoundProfile(true, unitModel, player, tile, opponent);
+            expectedHits += computeExpectedHits(totalUnits * combatProfile.diceCount(), combatProfile.hitsOn());
             if (unitModel.getSustainDamage(player, space)) {
                 hp += undamagedUnits;
                 if (player.hasTech("nes")) {
@@ -310,7 +333,25 @@ public class CombatContestService {
                 }
             }
         }
-        return new FleetStrength(total, hp);
+        return new FleetStrength(total, hp, expectedHits);
+    }
+
+    private Map<String, Integer> getDamagedCountsByAsyncId(Tile tile, Player player) {
+        Map<String, Integer> damagedCountsByAsyncId = new HashMap<>();
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            for (UnitKey unitKey : unitHolder.getUnitKeys()) {
+                if (!unitKey.getColorID().equalsIgnoreCase(player.getColorID())) continue;
+                int damagedUnits = unitHolder.getDamagedUnitCount(unitKey);
+                if (damagedUnits <= 0) continue;
+                damagedCountsByAsyncId.merge(unitKey.asyncID(), damagedUnits, Integer::sum);
+            }
+        }
+        return damagedCountsByAsyncId;
+    }
+
+    private double computeExpectedHits(int totalDice, int hitsOn) {
+        if (totalDice <= 0 || hitsOn <= 0) return 0;
+        return totalDice * Math.max(0, 11 - hitsOn) / 10.0;
     }
 
     private String extractSpaceOnlySummary(String summary) {
@@ -345,6 +386,10 @@ public class CombatContestService {
                 .filter(player -> !player.isDummy())
                 .toList();
         if (remainingShipPlayers.size() == 1) {
+            if (!hasRecordedRolls(contest)) {
+                cancelContest(game, contest, "The tracked space combat ended before any dice were rolled.");
+                return true;
+            }
             Player winner = remainingShipPlayers.getFirst();
             String loserFaction = winner.getFaction().equalsIgnoreCase(contest.getAttackerFaction())
                     ? contest.getDefenderFaction()
@@ -354,7 +399,10 @@ public class CombatContestService {
         }
 
         if (remainingShipPlayers.isEmpty()) {
-            cancelContest(game, contest, "The tracked space combat ended with no ships remaining.");
+            String reason = hasRecordedRolls(contest)
+                    ? "The tracked space combat ended with no ships remaining."
+                    : "The tracked space combat ended before any dice were rolled.";
+            cancelContest(game, contest, reason);
             return true;
         }
 
@@ -428,6 +476,10 @@ public class CombatContestService {
         repository.save(contest);
     }
 
+    private boolean hasRecordedRolls(CombatContestEntity contest) {
+        return !Boolean.FALSE.equals(contest.getDiceRolled());
+    }
+
     private void capturePredictionsAtResolution(Game game, CombatContestEntity contest) {
         if (!predictionRepository.findByContestId(contest.getId()).isEmpty()) return;
         TextChannel contestChannel = getContestPublicChannel(contest);
@@ -473,8 +525,10 @@ public class CombatContestService {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         if (space == null || loser == null) return null;
 
-        double winnerRemaining = calculateFleetStrength(game, winner, space).value();
-        double loserRemaining = calculateFleetStrength(game, loser, space).value();
+        double winnerRemaining =
+                calculateFleetStrength(game, winner, loser, tile, space).value();
+        double loserRemaining =
+                calculateFleetStrength(game, loser, winner, tile, space).value();
         double winnerInitial = winner.getFaction().equalsIgnoreCase(contest.getAttackerFaction())
                 ? contest.getInitialStrengthAttacker()
                 : contest.getInitialStrengthDefender();
@@ -565,7 +619,7 @@ public class CombatContestService {
         totalPredictions = Math.max(1, totalPredictions);
         double winnerShare = winnerPredictions / (double) totalPredictions;
         double scaledPoints = 4.0 / Math.max(winnerShare, ZERO_EPSILON);
-        return (int) Math.round(Math.max(4.0, Math.min(12.0, scaledPoints)));
+        return (int) Math.round(Math.max(4.0, Math.min(100.0, scaledPoints)));
     }
 
     private void postPredictionPointsSummary(
@@ -1008,7 +1062,7 @@ public class CombatContestService {
 
     // ==================== Records ====================
 
-    private record FleetStrength(double value, double hp) {}
+    private record FleetStrength(double value, double hp, double expectedHits) {}
 
     private record SpaceCombatSnapshot(
             String parentPostText,
@@ -1018,5 +1072,7 @@ public class CombatContestService {
             double defenderStrength,
             double attackerHp,
             double defenderHp,
+            double attackerExpectedHits,
+            double defenderExpectedHits,
             double strengthRatio) {}
 }

@@ -48,7 +48,6 @@ import ti4.discord.interactions.listeners.ListenerManager;
 import ti4.discord.interactions.selections.SelectionManager;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.persistence.GameManager;
-import ti4.game.persistence.migration.DataMigrationManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -102,7 +101,7 @@ public class JdaService {
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
     public static final List<Guild> fowServers = new ArrayList<>();
 
-    public static void initialize(String[] args) {
+    public static void startJdaAndRegisterListeners(String[] args) {
         BotLogger.info("STARTING JDA");
         jda = JDABuilder.createDefault(args[0])
                 // This is a privileged gateway intent that is used to update user information and join/leaves
@@ -124,13 +123,15 @@ public class JdaService {
 
         BotLogger.info("INITIALIZING LISTENERS");
         ListenerManager.registerListeners(jda);
+    }
 
+    public static boolean waitForJdaReadyAndInitializeGuilds(String[] args) {
         BotLogger.info("AWAITING JDA READY");
         try {
             jda.awaitReady();
         } catch (Throwable t) {
             BotLogger.critical("Error waiting for bot to get ready", t);
-            return;
+            return false;
         }
 
         jda.getPresence()
@@ -144,7 +145,7 @@ public class JdaService {
 
         if (guildPrimary == null) {
             BotLogger.critical("Failed to start the bot on the primary guild. Aborting.");
-            return;
+            return false;
         }
 
         // Community Plays TI
@@ -256,7 +257,10 @@ public class JdaService {
                     "BOT-LOG WEBHOOK NOT FOUND for Primary GuildID:" + guildPrimaryID
                             + "\nPlease set a valid bot-log Webhook URL using `/developer setting setting_name:bot_log_webhook_url setting_type:string setting_value:<url>`");
         }
+        return true;
+    }
 
+    public static void loadStaticDataAndResources() {
         BotLogger.info("LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
         ApplicationEmojiService.uploadNewEmojis();
@@ -274,12 +278,16 @@ public class JdaService {
         SelectionManager.init();
         initializeWhitelistedRoles();
         TIGLHelper.validateTIGLness();
+    }
 
-        if (DataMigrationManager.runMigrations()) {
-            BotLogger.info("FINISHED RUNNING MIGRATIONS");
-        }
+    public static void indexGameNames() {
+        jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Indexing Game Names"));
+        BotLogger.info("INDEXING GAME NAMES");
+        GameManager.initialize();
+        BotLogger.info("FINISHED INDEXING GAME NAMES");
+    }
 
-        // START CRONS
+    public static void registerAndStartCronJobs() {
         AutoPingCron.register();
         ReuploadStaleEmojisCron.register();
         LogCacheStatsCron.register();
@@ -299,7 +307,9 @@ public class JdaService {
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
         CategoryCleanupCron.register();
+    }
 
+    public static void markProcessReady() {
         ActiveLeaseService.setCurrentProcessReady(true);
         BotLogger.info("BOT IS READY TO RECEIVE COMMANDS");
     }
