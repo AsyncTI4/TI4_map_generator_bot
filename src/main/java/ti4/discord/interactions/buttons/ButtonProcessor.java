@@ -46,8 +46,10 @@ public class ButtonProcessor {
             AnnotationHandler.findKnownHandlers(ButtonContext.class, ButtonHandler.class);
     private static final ButtonRuntimeWarningService runtimeWarningService = new ButtonRuntimeWarningService();
 
-    public static void warmupKnownHandlers() {
-        knownButtons.size();
+    public static void checkButtonHandlersSetup() {
+        if (knownButtons.isEmpty()) {
+            throw new IllegalStateException("No button handlers were registered");
+        }
     }
 
     public static void queue(ButtonInteractionEvent event) {
