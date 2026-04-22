@@ -264,7 +264,12 @@ public class CombatReplayService {
     public SelectionDebugView getSelectionDebugView() {
         SelectionSnapshot snapshot = getSelectionSnapshot();
         return new SelectionDebugView(
-                LOOKBACK_MINUTES, TARGET_CANDIDATES_PER_HOUR, snapshot.windowSize(), snapshot.jointScoreCutoff());
+                LOOKBACK_MINUTES,
+                TARGET_CANDIDATES_PER_HOUR,
+                snapshot.windowSize(),
+                snapshot.jointScoreCutoff(),
+                average(snapshot.fairnessValues()),
+                average(snapshot.weakerStrengthValues()));
     }
 
     private boolean isSpaceCombatHitAssignment(Game game, Player player, ButtonInteractionEvent event) {
@@ -408,6 +413,11 @@ public class CombatReplayService {
         if (values.isEmpty()) return 0.0;
         long count = values.stream().filter(candidate -> candidate <= value).count();
         return count / (double) values.size();
+    }
+
+    private double average(List<Double> values) {
+        if (values.isEmpty()) return 0.0;
+        return values.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
     }
 
     private CombatCandidateEntity buildCandidate(
@@ -561,5 +571,10 @@ public class CombatReplayService {
     public record Evaluation(double fairnessRatio, double jointScore, boolean eligible, int windowSize) {}
 
     public record SelectionDebugView(
-            int lookbackMinutes, int targetCandidatesPerHour, int windowSize, double jointScoreCutoff) {}
+            int lookbackMinutes,
+            int targetCandidatesPerHour,
+            int windowSize,
+            double jointScoreCutoff,
+            double averageFairnessRatio,
+            double averageWeakerStrength) {}
 }
