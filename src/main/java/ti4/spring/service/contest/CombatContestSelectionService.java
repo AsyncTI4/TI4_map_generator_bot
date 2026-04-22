@@ -184,7 +184,7 @@ public class CombatContestSelectionService {
                 entity.getFairnessWeight(),
                 entity.getCooldownMinutes(),
                 entity.getMinimumWeakerStrength(),
-                entity.getMinimumSampleCount());
+                MINIMUM_SAMPLE_COUNT);
     }
 
     private Settings defaultSettings(LocalDateTime now) {
