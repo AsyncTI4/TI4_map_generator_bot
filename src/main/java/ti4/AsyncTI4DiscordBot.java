@@ -29,7 +29,7 @@ public class AsyncTI4DiscordBot {
     public static final String SHORT_INSTANCE_ID = INSTANCE_ID.substring(0, 8);
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
 
-  public static void main(String[] args) {
+    public static void main(String[] args) {
         GlobalSettings.loadSettings();
         RollbarManager.init();
         BotLogger.info("\n# __BOT IS STARTING UP__");
@@ -58,10 +58,7 @@ public class AsyncTI4DiscordBot {
     static void runLeaseOwnedStartupWork() {
         BotLogger.info("STARTED BACKGROUND MANAGED GAME WARMUP");
         GameManager.warmup();
-
-        if (DataMigrationManager.runMigrations()) {
-            BotLogger.info("FINISHED RUNNING MIGRATIONS");
-        }
+        DataMigrationManager.runMigrations();
     }
 
     private static String[] resolveSourceArgs(String[] sourceArgs) {
