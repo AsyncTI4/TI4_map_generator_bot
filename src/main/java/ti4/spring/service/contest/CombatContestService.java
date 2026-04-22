@@ -134,6 +134,10 @@ public class CombatContestService {
                             game.getName(), tile.getPosition(), CombatContestType.SPACE, ACTIVE_STATUSES)
                     .orElse(null);
             if (contest == null || !matchesParticipants(contest, player, opponent)) return;
+            if (!hasRecordedRolls(contest)) {
+                contest.setDiceRolled(true);
+                repository.save(contest);
+            }
 
             MessageChannel threadOrChannel = getContestThreadOrChannel(contest);
             if (threadOrChannel == null) return;
@@ -187,7 +191,7 @@ public class CombatContestService {
         Duration cooldown =
                 Duration.ofMinutes(selectionService.getCurrentSettings().cooldownMinutes());
         return repository
-                .findFirstByOrderByPostedAtDesc()
+                .findLatestContestCountingTowardCooldown()
                 .map(contest -> Duration.between(contest.getPostedAt(), LocalDateTime.now())
                                 .compareTo(cooldown)
                         >= 0)
@@ -224,6 +228,7 @@ public class CombatContestService {
         contest.setInitialStrengthDefender(snapshot.defenderStrength());
         contest.setInitialHpAttacker(snapshot.attackerHp());
         contest.setInitialHpDefender(snapshot.defenderHp());
+        contest.setDiceRolled(false);
         return contest;
     }
 
@@ -352,6 +357,10 @@ public class CombatContestService {
                 .filter(player -> !player.isDummy())
                 .toList();
         if (remainingShipPlayers.size() == 1) {
+            if (!hasRecordedRolls(contest)) {
+                cancelContest(game, contest, "The tracked space combat ended before any dice were rolled.");
+                return true;
+            }
             Player winner = remainingShipPlayers.getFirst();
             String loserFaction = winner.getFaction().equalsIgnoreCase(contest.getAttackerFaction())
                     ? contest.getDefenderFaction()
@@ -361,7 +370,10 @@ public class CombatContestService {
         }
 
         if (remainingShipPlayers.isEmpty()) {
-            cancelContest(game, contest, "The tracked space combat ended with no ships remaining.");
+            String reason = hasRecordedRolls(contest)
+                    ? "The tracked space combat ended with no ships remaining."
+                    : "The tracked space combat ended before any dice were rolled.";
+            cancelContest(game, contest, reason);
             return true;
         }
 
@@ -433,6 +445,10 @@ public class CombatContestService {
         contest.setWinnerFaction(winnerFaction);
         contest.setLoserFaction(loserFaction);
         repository.save(contest);
+    }
+
+    private boolean hasRecordedRolls(CombatContestEntity contest) {
+        return !Boolean.FALSE.equals(contest.getDiceRolled());
     }
 
     private void capturePredictionsAtResolution(Game game, CombatContestEntity contest) {
