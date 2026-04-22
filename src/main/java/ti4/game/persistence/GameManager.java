@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
@@ -38,9 +39,14 @@ public class GameManager {
             return;
         }
 
-        gameNames.addAll(GameLoadService.loadGameNames());
-        GAME_NAMES_LOADED_LATCH.countDown();
-        BotLogger.info("LOADED " + gameNames.size() + " GAME NAMES");
+        try {
+            gameNames.addAll(GameLoadService.loadGameNames());
+            GAME_NAMES_LOADED_LATCH.countDown();
+            BotLogger.info("LOADED " + gameNames.size() + " GAME NAMES");
+        } catch (Exception e) {
+            BotLogger.critical("Failed to warmup due to error while loading game names. Shutting down.", e);
+            JdaService.shutdown();
+        }
 
         ExecutorServiceManager.runAsync("GameManager warmup", () -> {
             try {
@@ -68,29 +74,9 @@ public class GameManager {
         }
     }
 
-    private static Game load(String gameName) {
-        Game game = GameLoadService.load(gameName);
-        if (game == null) {
-            return null;
-        }
-
-        if (doesNotHaveMatchingManagedGame(game)) {
-            gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
-        }
-        return game;
-    }
-
-    private static boolean doesNotHaveMatchingManagedGame(Game game) {
-        var managedGame = gameNameToManagedGame.get(game.getName());
-        return managedGame == null || !managedGame.matches(game);
-    }
-
     @Nullable
     static Game get(String gameName) {
-        if (!isValid(gameName)) {
-            return null;
-        }
-        Game game = load(gameName);
+        Game game = GameLoadService.load(gameName);
         if (game == null) {
             handleManagedGameRemoval(gameName);
         }
@@ -98,6 +84,7 @@ public class GameManager {
     }
 
     private static void handleManagedGameRemoval(String gameName) {
+        gameNames.remove(gameName);
         var managedGame = gameNameToManagedGame.remove(gameName);
         if (managedGame != null) {
             managedGame.getPlayers().forEach(player -> player.getGames().remove(managedGame));
@@ -118,6 +105,7 @@ public class GameManager {
             throw new RuntimeException("Failed to save game " + game.getName() + ".");
         }
 
+        gameNames.add(game.getName());
         gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
 
         boolean isActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
@@ -145,14 +133,17 @@ public class GameManager {
     }
 
     private static Game handleUndo(Game undo) {
-        if (undo == null) {
-            return null;
-        }
-        if (doesNotHaveMatchingManagedGame(undo)) {
-            gameNames.add(undo.getName());
-            gameNameToManagedGame.put(undo.getName(), new ManagedGame(undo));
-        }
+        handleMissingMatchingManagedGame(undo);
         return undo;
+    }
+
+    private static void handleMissingMatchingManagedGame(Game game) {
+        if (game == null) return;
+        var managedGame = gameNameToManagedGame.get(game.getName());
+        if (managedGame == null || !managedGame.matches(game)) {
+            gameNames.add(game.getName());
+            gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
+        }
     }
 
     @Nullable
@@ -165,7 +156,8 @@ public class GameManager {
     @Nullable
     public static Game reload(String gameName) {
         waitFor(GAME_NAMES_LOADED_LATCH);
-        Game game = load(gameName);
+        Game game = GameLoadService.load(gameName);
+        handleMissingMatchingManagedGame(game);
         if (game == null) {
             game = GameUndoService.loadUndoForMissingGame(gameName);
             handleUndo(game);
@@ -190,12 +182,17 @@ public class GameManager {
                 .count();
     }
 
+    @NotNull
     public static ManagedGame getManagedGame(String gameName) {
         waitFor(GAME_NAMES_LOADED_LATCH);
-        if (!isValid(gameName)) {
-            return null;
-        }
-        return gameNameToManagedGame.computeIfAbsent(gameName, GameLoadService::loadManagedGame);
+        return gameNameToManagedGame.computeIfAbsent(gameName, k -> {
+            Game game = GameLoadService.load(gameName);
+            if (game == null) {
+                throw new IllegalStateException("Failed to load ManagedGame for " + gameName);
+            }
+            gameNames.add(game.getName());
+            return new ManagedGame(game);
+        });
     }
 
     public static List<ManagedGame> getManagedGames() {
@@ -214,17 +211,18 @@ public class GameManager {
     }
 
     static ManagedPlayer addOrMergePlayer(ManagedGame game, Player player) {
-        var managedPlayer = userIdToManagedPlayer.get(player.getUserID());
-        if (managedPlayer == null) {
-            managedPlayer = new ManagedPlayer(game, player);
-            userIdToManagedPlayer.put(player.getUserID(), managedPlayer);
-            return managedPlayer;
-        }
-        managedPlayer.addOrReplaceGame(game, player);
-        return managedPlayer;
+        return userIdToManagedPlayer.compute(player.getUserID(), (id, existing) -> {
+            if (existing == null) {
+                return new ManagedPlayer(game, player);
+            }
+            existing.addOrReplaceGame(game, player);
+            return existing;
+        });
     }
 
     private static void waitFor(CountDownLatch latch) {
+        if (latch.getCount() == 0) return;
+
         try {
             boolean success = latch.await(WAIT_FOR_WARMUP_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             if (!success) {

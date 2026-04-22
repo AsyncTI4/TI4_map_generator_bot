@@ -28,7 +28,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -101,13 +100,13 @@ class GameLoadService {
                     .map(Path::getFileName)
                     .map(Path::toString)
                     .map(GameLoadService::stripGameFileExtension)
+                    .map(String::toLowerCase)
                     // newer games first
                     .sorted(Comparator.reverseOrder())
                     .toList();
         } catch (IOException e) {
-            BotLogger.critical("Exception occurred while getting all game names.", e);
+            throw new RuntimeException(e);
         }
-        return Collections.emptyList();
     }
 
     @Nullable
@@ -119,15 +118,6 @@ class GameLoadService {
             }
             return readGame(gameFile);
         });
-    }
-
-    @Nullable
-    static ManagedGame loadManagedGame(String gameName) {
-        Game game = load(gameName);
-        if (game == null) {
-            return null;
-        }
-        return new ManagedGame(game);
     }
 
     private static String stripGameFileExtension(String fileName) {
