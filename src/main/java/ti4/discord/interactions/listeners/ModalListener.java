@@ -2,6 +2,7 @@ package ti4.discord.interactions.listeners;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -30,8 +31,8 @@ public final class ModalListener extends ListenerAdapter {
         return instance;
     }
 
-    public static void warmupKnownHandlers() {
-        getInstance();
+    public static void checkModalHandlersSetup() {
+        Objects.requireNonNull(getInstance().knownModals);
     }
 
     private ModalListener() {

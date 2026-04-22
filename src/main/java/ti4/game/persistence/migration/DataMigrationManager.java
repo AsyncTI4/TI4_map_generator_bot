@@ -58,6 +58,7 @@ public class DataMigrationManager {
 
     public static boolean runMigrations() {
         if (migrations.isEmpty()) return false;
+        BotLogger.info("STARTED MIGRATIONS");
         Map<String, List<String>> migrationNamesToAppliedGameNames = new HashMap<>();
 
         try {
@@ -92,6 +93,8 @@ public class DataMigrationManager {
                         "Migration %s run on following maps successfully: \n%s", entry.getKey(), gameNames));
             }
         }
+
+        BotLogger.info("FINISHED MIGRATIONS");
         return true;
     }
 

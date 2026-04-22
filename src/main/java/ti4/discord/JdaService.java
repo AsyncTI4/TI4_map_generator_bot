@@ -280,13 +280,6 @@ public class JdaService {
         TIGLHelper.validateTIGLness();
     }
 
-    public static void indexGameNames() {
-        jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Indexing Game Names"));
-        BotLogger.info("INDEXING GAME NAMES");
-        GameManager.initialize();
-        BotLogger.info("FINISHED INDEXING GAME NAMES");
-    }
-
     public static void registerAndStartCronJobs() {
         AutoPingCron.register();
         ReuploadStaleEmojisCron.register();

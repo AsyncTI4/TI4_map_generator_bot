@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -46,8 +47,9 @@ public class ButtonProcessor {
             AnnotationHandler.findKnownHandlers(ButtonContext.class, ButtonHandler.class);
     private static final ButtonRuntimeWarningService runtimeWarningService = new ButtonRuntimeWarningService();
 
-    public static void warmupKnownHandlers() {
-        knownButtons.size();
+    public static void checkButtonHandlersSetup() {
+        Objects.requireNonNull(knownButtons);
+        Objects.requireNonNull(runtimeWarningService);
     }
 
     public static void queue(ButtonInteractionEvent event) {

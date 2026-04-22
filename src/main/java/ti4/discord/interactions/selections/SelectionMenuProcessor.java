@@ -1,7 +1,9 @@
 package ti4.discord.interactions.selections;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.context.SelectionMenuContext;
@@ -14,13 +16,14 @@ import ti4.logging.LogOrigin;
 import ti4.logging.RollbarManager;
 import ti4.service.game.GameNameService;
 
+@UtilityClass
 public final class SelectionMenuProcessor {
 
     private static final Map<String, Consumer<SelectionMenuContext>> knownMenus =
             AnnotationHandler.findKnownHandlers(SelectionMenuContext.class, SelectionHandler.class);
 
-    public static void warmupKnownHandlers() {
-        knownMenus.size();
+    public static void checkSelectionMenuHandlersSetup() {
+        Objects.requireNonNull(knownMenus);
     }
 
     public static void queue(StringSelectInteractionEvent event) {

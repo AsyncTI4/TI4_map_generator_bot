@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
@@ -18,23 +17,28 @@ import ti4.game.persistence.GameManager;
 class ActiveLeaseServiceTest {
 
     @Test
-    void tryAcquireLeaseStartsManagedGameWarmupAfterAcquiringLease() throws Exception {
+    void beginLeaseParticipationRunsCallableAfter() throws Exception {
         ActiveLeaseRepository repository = mock(ActiveLeaseRepository.class);
         LeaseProperties leaseProperties = leaseProperties();
         when(repository.findById("discord-bot")).thenReturn(Optional.empty());
 
-        ActiveLeaseService service = new ActiveLeaseService(repository, leaseProperties);
-        try (MockedStatic<GameManager> gameManager = Mockito.mockStatic(GameManager.class)) {
-            boolean acquired = service.tryAcquireLease();
+        ActiveLeaseTransactionService activeLeaseTransactionService = mock(ActiveLeaseTransactionService.class);
+        when(activeLeaseTransactionService.tryAcquireLease(any())).thenReturn(true);
 
-            assertThat(acquired).isTrue();
-            verify(repository).save(any(ActiveLeaseEntity.class));
+        ActiveLeaseService service = new ActiveLeaseService(repository, leaseProperties, activeLeaseTransactionService);
+        try (MockedStatic<GameManager> gameManager = Mockito.mockStatic(GameManager.class)) {
+            service.beginLeaseParticipation(() -> {
+                service.setReady(true);
+                GameManager.warmup();
+            });
+
+            assertThat(service.isReady()).isTrue();
             gameManager.verify(GameManager::warmup, times(1));
         }
     }
 
     @Test
-    void tryAcquireLeaseDoesNotStartWarmupWhenAnotherInstanceStillOwnsLease() throws Exception {
+    void beginLeaseParticipationDoesNotRunCallableWhenAnotherInstanceStillOwnsLease() throws Exception {
         ActiveLeaseRepository repository = mock(ActiveLeaseRepository.class);
         LeaseProperties leaseProperties = leaseProperties();
         ActiveLeaseEntity existingLease = new ActiveLeaseEntity();
@@ -43,12 +47,17 @@ class ActiveLeaseServiceTest {
         existingLease.setLeaseExpiresAt(Instant.now().plusSeconds(60));
         when(repository.findById("discord-bot")).thenReturn(Optional.of(existingLease));
 
-        ActiveLeaseService service = new ActiveLeaseService(repository, leaseProperties);
-        try (MockedStatic<GameManager> gameManager = Mockito.mockStatic(GameManager.class)) {
-            boolean acquired = service.tryAcquireLease();
+        ActiveLeaseTransactionService activeLeaseTransactionService = mock(ActiveLeaseTransactionService.class);
+        when(activeLeaseTransactionService.tryAcquireLease(any())).thenReturn(false);
 
-            assertThat(acquired).isFalse();
-            verify(repository, times(0)).save(any(ActiveLeaseEntity.class));
+        ActiveLeaseService service = new ActiveLeaseService(repository, leaseProperties, activeLeaseTransactionService);
+        try (MockedStatic<GameManager> gameManager = Mockito.mockStatic(GameManager.class)) {
+            service.beginLeaseParticipation(() -> {
+                service.setReady(true);
+                GameManager.warmup();
+            });
+
+            assertThat(service.isReady()).isFalse();
             gameManager.verifyNoInteractions();
         }
     }

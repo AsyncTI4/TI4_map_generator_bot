@@ -2,11 +2,11 @@ package ti4.spring.service.deploy;
 
 import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import ti4.AsyncTI4DiscordBot;
 import ti4.logging.BotLogger;
 import ti4.spring.context.SpringContext;
 
@@ -22,28 +22,26 @@ public class ActiveLeaseService {
     private final LeaseProperties leaseProperties;
     private final ActiveLeaseTransactionService activeLeaseTransactionService;
 
-    private final String instanceId = UUID.randomUUID().toString();
     private final AtomicBoolean active = new AtomicBoolean(false);
     private final AtomicBoolean draining = new AtomicBoolean(false);
     private final AtomicBoolean ready = new AtomicBoolean(false);
     private final AtomicBoolean leaseParticipationEnabled = new AtomicBoolean(false);
     private volatile Runnable onLeaseAcquired = () -> {};
 
-    public boolean beginLeaseParticipation(Runnable onLeaseAcquired) {
+    public void beginLeaseParticipation(Runnable onLeaseAcquired) {
         this.onLeaseAcquired = Objects.requireNonNull(onLeaseAcquired);
         leaseParticipationEnabled.set(true);
 
         boolean acquired = tryAcquireLease(onLeaseAcquired);
         if (acquired) {
-            BotLogger.info("Acquired active lease for instance " + instanceId);
+            BotLogger.info("Acquired active lease for instance " + AsyncTI4DiscordBot.INSTANCE_ID);
         } else {
-            BotLogger.warning("Did not acquire active lease on startup for instance " + instanceId);
+            BotLogger.warning("Did not acquire active lease on startup for instance " + AsyncTI4DiscordBot.INSTANCE_ID);
         }
-        return acquired;
     }
 
-    public boolean tryAcquireLease() {
-        if (!activeLeaseTransactionService.tryAcquireLease(instanceId)) {
+    private boolean tryAcquireLease() {
+        if (!activeLeaseTransactionService.tryAcquireLease(AsyncTI4DiscordBot.INSTANCE_ID)) {
             return false;
         }
 
@@ -54,7 +52,7 @@ public class ActiveLeaseService {
     }
 
     private boolean tryAcquireLease(Runnable onLeaseAcquired) {
-        if (!activeLeaseTransactionService.tryAcquireLease(instanceId)) {
+        if (!activeLeaseTransactionService.tryAcquireLease(AsyncTI4DiscordBot.INSTANCE_ID)) {
             return false;
         }
 
@@ -69,15 +67,15 @@ public class ActiveLeaseService {
             return;
         }
 
-        if (!activeLeaseTransactionService.renewLease(instanceId)) {
-            BotLogger.warning("Active instance lost lease ownership: " + instanceId);
+        if (!activeLeaseTransactionService.renewLease(AsyncTI4DiscordBot.INSTANCE_ID)) {
+            BotLogger.warning("Active instance lost lease ownership: " + AsyncTI4DiscordBot.INSTANCE_ID);
             setReady(false);
             setActive(false);
         }
     }
 
     public void releaseLease() {
-        activeLeaseTransactionService.releaseLease(instanceId);
+        activeLeaseTransactionService.releaseLease(AsyncTI4DiscordBot.INSTANCE_ID);
         setActive(false);
     }
 
@@ -85,7 +83,7 @@ public class ActiveLeaseService {
         Instant now = Instant.now();
         return activeLeaseRepository
                 .findById(leaseProperties.getLeaseKey())
-                .map(lease -> instanceId.equals(lease.getInstanceId())
+                .map(lease -> AsyncTI4DiscordBot.INSTANCE_ID.equals(lease.getInstanceId())
                         && lease.getLeaseExpiresAt() != null
                         && lease.getLeaseExpiresAt().isAfter(now))
                 .orElse(false);
@@ -142,7 +140,7 @@ public class ActiveLeaseService {
         leaseParticipationEnabled.set(false);
         setDraining(true);
         setReady(false);
-        BotLogger.info("Drain requested for active instance " + instanceId);
+        BotLogger.info("Drain requested for active instance " + AsyncTI4DiscordBot.INSTANCE_ID);
         Thread.ofPlatform().name("bot-drain-shutdown").start(SpringContext::closeApplicationContext);
         return true;
     }
@@ -152,12 +150,12 @@ public class ActiveLeaseService {
             return "";
         }
         if (isDraining()) {
-            return "[DRAINING " + shortInstanceId() + "] ";
+            return "[DRAINING " + AsyncTI4DiscordBot.SHORT_INSTANCE_ID + "] ";
         }
         if (!isActive()) {
-            return "[STANDBY " + shortInstanceId() + "] ";
+            return "[STANDBY " + AsyncTI4DiscordBot.SHORT_INSTANCE_ID + "] ";
         }
-        return "[WARMING " + shortInstanceId() + "] ";
+        return "[WARMING " + AsyncTI4DiscordBot.SHORT_INSTANCE_ID + "] ";
     }
 
     @Scheduled(fixedDelayString = "#{@leaseProperties.heartbeatIntervalMillis}")
@@ -177,7 +175,7 @@ public class ActiveLeaseService {
 
         if (tryAcquireLease()) {
             setReady(true);
-            BotLogger.info("Inactive instance acquired active lease: " + instanceId);
+            BotLogger.info("Inactive instance acquired active lease: " + AsyncTI4DiscordBot.INSTANCE_ID);
         }
     }
 
@@ -213,6 +211,7 @@ public class ActiveLeaseService {
         }
     }
 
+    // TODO: Can we avoid littering these throughout the code?
     public static boolean shouldCurrentProcessRunScheduledWork() {
         try {
             ActiveLeaseService activeLeaseService = SpringContext.getBean(ActiveLeaseService.class);
@@ -228,9 +227,5 @@ public class ActiveLeaseService {
         } catch (IllegalStateException e) {
             return "[STARTUP] ";
         }
-    }
-
-    private String shortInstanceId() {
-        return instanceId.substring(0, 8);
     }
 }
