@@ -502,7 +502,7 @@ public class CombatRollService {
                     }
                 }
             }
-            if (rollType == CombatRollType.AFB) {
+            if (rollType == CombatRollType.AFB && h > 0) {
                 String msg2 = opponent.getRepresentation() + ", you may automatically assign "
                         + (h == 1 ? "the hit" : "hits") + " from AFB.";
                 if (opponent.isNpc() || opponent.isDummy()) {

@@ -669,9 +669,9 @@ public class StartPhaseService {
                             + ", a reminder this is the window to play The Oracle, the Naalu Hero. You may use the buttons to start the process.",
                     buttons);
         }
+        playerLeader = player.getLeader("poisonhero").orElse(null);
         if (player.hasLeader("poisonhero")
                 && player.getLeaderByID("poisonhero").isPresent()
-                && playerLeader != null
                 && !playerLeader.isLocked()) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("poisonHeroInitiation", "Play Poison Hero", LeaderEmojis.NaaluHero));
