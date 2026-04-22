@@ -284,13 +284,6 @@ public class JdaService {
         TIGLHelper.validateTIGLness();
     }
 
-    public static void indexGameNames() {
-        jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Indexing Game Names"));
-        BotLogger.info("INDEXING GAME NAMES");
-        GameManager.initialize();
-        BotLogger.info("FINISHED INDEXING GAME NAMES");
-    }
-
     public static void registerAndStartCronJobs() {
         AutoPingCron.register();
         ReuploadStaleEmojisCron.register();
@@ -320,11 +313,6 @@ public class JdaService {
     public static void markProcessReady() {
         ActiveLeaseService.setCurrentProcessReady(true);
         BotLogger.info("BOT IS READY TO RECEIVE COMMANDS");
-        if (GameManager.isManagedGamesWarmupComplete()) {
-            updatePresence();
-        } else {
-            jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.customStatus("Warming game index"));
-        }
     }
 
     private static Guild tryToInitGuild(String guildID, boolean addToNewGameServerList) {
