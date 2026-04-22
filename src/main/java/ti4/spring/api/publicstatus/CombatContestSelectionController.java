@@ -29,6 +29,50 @@ public class CombatContestSelectionController {
     public ResponseEntity<String> getSelection() {
         CombatContestSelectionService.Snapshot snapshot =
                 combatContestSelectionService.recomputeAndGetSelectionSnapshot();
-        return ResponseEntity.ok(MAPPER.writeValueAsString(snapshot));
+        return ResponseEntity.ok(MAPPER.writeValueAsString(SelectionResponse.from(snapshot)));
     }
+
+    private record SelectionResponse(Metadata metadata, LiveWindow liveWindow, Thresholds thresholds, Tuning tuning) {
+
+        static SelectionResponse from(CombatContestSelectionService.Snapshot snapshot) {
+            CombatContestSelectionService.Settings settings = snapshot.settings();
+            return new SelectionResponse(
+                    new Metadata(settings.updatedAt(), snapshot.generatedAt(), settings.selectionMode()),
+                    new LiveWindow(
+                            settings.lookbackMinutes(),
+                            settings.windowSampleCount(),
+                            snapshot.sampleCountLastHour(),
+                            snapshot.observedCombatsPerHour()),
+                    new Thresholds(
+                            settings.combatSizeCutoff(),
+                            settings.combatSizePercentile(),
+                            settings.fairnessFloor(),
+                            settings.fairnessPercentile(),
+                            settings.averageFairness()),
+                    new Tuning(
+                            settings.targetPostsPerHour(),
+                            settings.targetSelectionFraction(),
+                            settings.cooldownMinutes(),
+                            settings.minimumSampleCount()));
+        }
+    }
+
+    private record Metadata(
+            java.time.LocalDateTime settingsUpdatedAt, java.time.LocalDateTime generatedAt, String selectionMode) {}
+
+    private record LiveWindow(
+            int lookbackMinutes,
+            int configuredWindowSampleCount,
+            int sampleCountLastHour,
+            double observedCombatsPerHour) {}
+
+    private record Thresholds(
+            double combatSizeCutoff,
+            double combatSizePercentile,
+            double fairnessFloor,
+            double fairnessPercentile,
+            double averageFairness) {}
+
+    private record Tuning(
+            double targetPostsPerHour, double targetSelectionFraction, int cooldownMinutes, int minimumSampleCount) {}
 }
