@@ -18,8 +18,6 @@ import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.logging.BotLogger;
-import ti4.spring.context.SpringContext;
-import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class GameManager {
@@ -35,7 +33,7 @@ public class GameManager {
     private static final int WAIT_FOR_WARMUP_TIMEOUT_SECONDS = 10;
 
     public static void warmup() {
-        if (!ownsActiveMutationLease() || !WARMUP_STARTED.compareAndSet(false, true)) {
+        if (!WARMUP_STARTED.compareAndSet(false, true)) {
             return;
         }
 
@@ -62,16 +60,6 @@ public class GameManager {
                 JdaService.shutdown();
             }
         });
-    }
-
-    private static boolean ownsActiveMutationLease() {
-        if (JdaService.testingMode) return true;
-        try {
-            return SpringContext.getBean(ActiveLeaseService.class).mayMutate();
-        } catch (Exception e) {
-            BotLogger.error("Failed to check ActiveLeaseService", e);
-            return false;
-        }
     }
 
     @Nullable
