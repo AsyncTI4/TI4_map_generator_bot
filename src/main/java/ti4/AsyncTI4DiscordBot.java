@@ -55,7 +55,7 @@ public class AsyncTI4DiscordBot {
         JdaService.markProcessReady();
     }
 
-    static void runLeaseOwnedStartupWork() {
+    private static void runLeaseOwnedStartupWork() {
         BotLogger.info("STARTED BACKGROUND MANAGED GAME WARMUP");
         GameManager.warmup();
         DataMigrationManager.runMigrations();
