@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.Getter;
@@ -46,7 +47,17 @@ public class ManagedGame {
     private final Map<ManagedPlayer, Boolean> playerToIsReal;
     private final boolean stale;
 
+    @Nullable
+    private final AtomicReference<Game> preloadedGame;
+
     public ManagedGame(Game game) {
+        this(game, ManagedGameLoadMode.WARMUP);
+    }
+
+    /**
+     * Builds lightweight metadata from a parsed game and optionally retains that parsed Game for one immediate read.
+     */
+    public ManagedGame(Game game, ManagedGameLoadMode loadMode) {
         name = game.getName();
         hasEnded = game.isHasEnded();
         hasWinner = game.hasWinner();
@@ -84,6 +95,7 @@ public class ManagedGame {
 
         final long sixtyDays = 1000L * 60 * 60 * 24 * 60;
         stale = (System.currentTimeMillis() - game.getLastModifiedDate()) > sixtyDays;
+        preloadedGame = loadMode == ManagedGameLoadMode.LAZY_REQUEST ? new AtomicReference<>(game) : null;
     }
 
     private static String sanitizeToNull(String str) {
@@ -121,7 +133,16 @@ public class ManagedGame {
         return name.equals(game.getName()) && lastModifiedDate == game.getLastModifiedDate();
     }
 
+    /**
+     * Reuses the one-shot preloaded Game when available, otherwise reloads the current game state from disk.
+     */
     public Game getGame() {
+        if (preloadedGame != null) {
+            Game game = preloadedGame.getAndSet(null);
+            if (game != null) {
+                return game;
+            }
+        }
         return GameManager.get(name);
     }
 

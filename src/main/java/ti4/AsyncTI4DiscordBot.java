@@ -2,8 +2,7 @@ package ti4;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.UUID;
-import java.util.regex.Pattern;
+import java.util.List;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -25,9 +24,6 @@ import ti4.spring.service.jda.JdaLifecycleService;
 public class AsyncTI4DiscordBot {
 
     public static final long START_TIME_MILLISECONDS = System.currentTimeMillis();
-    public static final String INSTANCE_ID = UUID.randomUUID().toString();
-    public static final String SHORT_INSTANCE_ID = INSTANCE_ID.substring(0, 8);
-    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
 
     public static void main(String[] args) {
         GlobalSettings.loadSettings();
@@ -45,20 +41,27 @@ public class AsyncTI4DiscordBot {
             throw new IllegalStateException("Failed to initialize JDA and guilds");
         }
         JdaService.loadStaticDataAndResources();
+        JdaService.indexGameNames();
         BotLogger.info("WARMING INTERACTION HANDLERS");
-        ButtonProcessor.checkButtonHandlersSetup();
-        SelectionMenuProcessor.checkSelectionMenuHandlersSetup();
-        ModalListener.checkModalHandlersSetup();
+        ButtonProcessor.warmupKnownHandlers();
+        SelectionMenuProcessor.warmupKnownHandlers();
+        ModalListener.warmupKnownHandlers();
         BotLogger.info("FINISHED WARMING INTERACTION HANDLERS");
         activeLeaseService.beginLeaseParticipation(AsyncTI4DiscordBot::runLeaseOwnedStartupWork);
         JdaService.registerAndStartCronJobs();
         JdaService.markProcessReady();
     }
 
-    private static void runLeaseOwnedStartupWork() {
-        BotLogger.info("STARTED BACKGROUND MANAGED GAME WARMUP");
-        GameManager.warmup();
-        DataMigrationManager.runMigrations();
+    static void runLeaseOwnedStartupWork() {
+        if (DataMigrationManager.runMigrations()) {
+            BotLogger.info("FINISHED RUNNING MIGRATIONS");
+        }
+
+        if (GameManager.startManagedGamesWarmupIfNeeded()) {
+            BotLogger.info("STARTED BACKGROUND MANAGED GAME WARMUP");
+        } else {
+            BotLogger.info("DEFERRED BACKGROUND MANAGED GAME WARMUP UNTIL THIS PROCESS BECOMES ACTIVE");
+        }
     }
 
     private static String[] resolveSourceArgs(String[] sourceArgs) {
@@ -75,10 +78,10 @@ public class AsyncTI4DiscordBot {
             return sourceArgs;
         }
 
-        var resolvedArgs = new ArrayList<String>();
+        List<String> resolvedArgs = new ArrayList<>();
         resolvedArgs.add(botToken);
         resolvedArgs.add(botUserId);
-        resolvedArgs.addAll(Arrays.asList(WHITESPACE_PATTERN.split(guildIdList.trim())));
+        resolvedArgs.addAll(Arrays.asList(guildIdList.trim().split("\\s+")));
         return resolvedArgs.toArray(String[]::new);
     }
 
