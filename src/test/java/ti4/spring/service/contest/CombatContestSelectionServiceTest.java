@@ -138,9 +138,9 @@ class CombatContestSelectionServiceTest {
         CombatContestSelectionService.Settings recomputed = selectionService.recomputeAndPersistSettings();
 
         assertEquals("DYNAMIC", recomputed.selectionMode());
-        assertEquals(0.25, recomputed.targetSelectionFraction(), 0.0001);
-        assertEquals(30.0, recomputed.combatSizeCutoff(), 0.0001);
-        assertEquals(0.75, recomputed.combatSizePercentile(), 0.0001);
+        assertEquals(0.75, recomputed.targetSelectionFraction(), 0.0001);
+        assertEquals(22.0, recomputed.combatSizeCutoff(), 0.0001);
+        assertEquals(0.25, recomputed.combatSizePercentile(), 0.0001);
         assertEquals(0.76, recomputed.fairnessFloor(), 0.0001);
         assertEquals(0.50, recomputed.fairnessPercentile(), 0.0001);
         assertEquals(0.733_75, recomputed.averageFairness(), 0.0001);

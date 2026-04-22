@@ -17,7 +17,7 @@ public class CombatContestSelectionService {
     private static final int LOOKBACK_MINUTES = 60;
     private static final int MINIMUM_SAMPLE_COUNT = 8;
     private static final int COOLDOWN_MINUTES = 30;
-    private static final double TARGET_POSTS_PER_HOUR = 1.0;
+    private static final double TARGET_POSTS_PER_HOUR = 3.0;
     private static final double TARGET_FAIR_CANDIDATES_PER_HOUR = 4.0;
     private static final double MIN_TARGET_SELECTION_FRACTION = 0.08;
     private static final double MAX_TARGET_SELECTION_FRACTION = 1.0;
