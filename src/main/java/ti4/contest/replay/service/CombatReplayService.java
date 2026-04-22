@@ -27,7 +27,7 @@ public class CombatReplayService {
 
     private static final Pattern SYSTEM_TILE_PATTERN = Pattern.compile("-system-([^-]+)-");
     private static final int LOOKBACK_MINUTES = 60;
-    private static final int TARGET_CANDIDATES_PER_HOUR = 1;
+    private static final int TARGET_CANDIDATES_PER_HOUR = 4;
 
     private final CombatObservationRepository observationRepository;
     private final CombatCandidateRepository candidateRepository;
