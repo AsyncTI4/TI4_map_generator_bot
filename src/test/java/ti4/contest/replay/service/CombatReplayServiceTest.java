@@ -49,20 +49,21 @@ class CombatReplayServiceTest {
 
         CombatReplayService.SelectionObservationDebugView firstObservation =
                 view.observations().getFirst();
-        assertEquals(1L, firstObservation.observation().getId());
-        assertEquals("pbd100", firstObservation.observation().getGameName());
-        assertEquals(20.0, firstObservation.weakerStrength(), 0.0001);
-        assertEquals(2.0 / 3.0, firstObservation.fairnessPercentile(), 0.0001);
-        assertEquals(2.0 / 3.0, firstObservation.weakerStrengthPercentile(), 0.0001);
-        assertEquals(4.0 / 9.0, firstObservation.jointScore(), 0.0001);
-        assertTrue(firstObservation.eligibleAsCandidate());
-        assertEquals(11L, firstObservation.observation().getCandidateId());
+        assertEquals(3L, firstObservation.observation().getId());
+        assertFalse(firstObservation.eligibleAsCandidate());
+        assertEquals("pbd102", firstObservation.observation().getGameName());
+        assertEquals(1.0 / 9.0, firstObservation.jointScore(), 0.0001);
 
         CombatReplayService.SelectionObservationDebugView lastObservation =
                 view.observations().get(2);
-        assertFalse(lastObservation.eligibleAsCandidate());
-        assertEquals("pbd102", lastObservation.observation().getGameName());
-        assertEquals(1.0 / 9.0, lastObservation.jointScore(), 0.0001);
+        assertEquals(1L, lastObservation.observation().getId());
+        assertEquals("pbd100", lastObservation.observation().getGameName());
+        assertEquals(20.0, lastObservation.weakerStrength(), 0.0001);
+        assertEquals(2.0 / 3.0, lastObservation.fairnessPercentile(), 0.0001);
+        assertEquals(2.0 / 3.0, lastObservation.weakerStrengthPercentile(), 0.0001);
+        assertEquals(4.0 / 9.0, lastObservation.jointScore(), 0.0001);
+        assertTrue(lastObservation.eligibleAsCandidate());
+        assertEquals(11L, lastObservation.observation().getCandidateId());
     }
 
     private CombatObservationEntity observation(

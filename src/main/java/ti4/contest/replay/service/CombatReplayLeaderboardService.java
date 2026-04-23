@@ -16,8 +16,8 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.springframework.stereotype.Service;
-import ti4.contest.replay.core.CombatContestReplayStatus;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
@@ -30,7 +30,9 @@ import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.json.JsonMapperManager;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.spring.service.contest.CombatContestService;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +42,10 @@ import ti4.message.MessageHelper;
 public class CombatReplayLeaderboardService {
 
     private static final double ZERO_EPSILON = 0.0001;
-    private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives-dev";
+    private static final String SUBSCRIBE_EMOJI = "\uD83D\uDFE2";
+    private static final String UNSUBSCRIBE_EMOJI = "\uD83D\uDD34";
+    private static final String CONTEST_CHANNEL_NAME_V1 = "lazax-war-archives-dev";
+    private static final String CONTEST_CHANNEL_NAME_V2 = "lazax-war-archives";
     private static final Comparator<LockedPrediction> LOCKED_PREDICTION_COMPARATOR = Comparator.comparing(
                     LockedPrediction::discordUserName, String.CASE_INSENSITIVE_ORDER)
             .thenComparing(LockedPrediction::discordUserId);
@@ -93,24 +98,28 @@ public class CombatReplayLeaderboardService {
     }
 
     public void finalizeReplayLeaderboardContest(
-            CombatReplayContestEntity replayContest, CombatCandidateEntity candidate) {
+            Game game, CombatReplayContestEntity replayContest, CombatCandidateEntity candidate) {
         if (!settings.getRuntime().isDiscordPostingEnabled()) return;
         if (replayContest.getId() == null) return;
+        if (replayContest.getLeaderboardPostedAt() != null) return;
 
         CombatReplayPredictionEntity lockedPrediction = replayPredictionRepository
                 .findByContestId(replayContest.getId())
                 .orElse(null);
         if (lockedPrediction == null) {
-            maybePostLeaderboardAfterResolvedContest();
+            markLeaderboardPostedIfPublished(replayContest);
             return;
         }
 
         ScoredContestResult result = scoreContest(candidate, lockedPrediction);
         MessageChannel threadOrChannel = getContestThreadOrChannel(replayContest);
         if (threadOrChannel != null) {
-            postPredictionPointsSummary(threadOrChannel, result.winningPredictions());
+            postPredictionResultsSummary(game, threadOrChannel, candidate, result, () -> {
+                postParticipantFollowup(game, candidate, threadOrChannel);
+                postSubscriptionPrompt(threadOrChannel);
+            });
         }
-        maybePostLeaderboardAfterResolvedContest();
+        markLeaderboardPostedIfPublished(replayContest);
     }
 
     public boolean postLeaderboard() {
@@ -243,7 +252,7 @@ public class CombatReplayLeaderboardService {
                     return left.discordUserName().compareToIgnoreCase(right.discordUserName());
                 })
                 .toList();
-        return new ScoredContestResult(summaries);
+        return new ScoredContestResult(totalPredictions, summaries);
     }
 
     private void applyContestResult(
@@ -281,27 +290,73 @@ public class CombatReplayLeaderboardService {
         return entry;
     }
 
-    private void postPredictionPointsSummary(
-            MessageChannel threadOrChannel, List<WinningPredictionSummary> winningPredictions) {
-        if (winningPredictions.isEmpty()) return;
-
-        String message = winningPredictions.stream()
-                .map(prediction -> getSafeLeaderboardName(prediction.discordUserName()) + " - "
-                        + prediction.totalPoints() + " points (+" + prediction.pointsAwarded() + ")")
-                .collect(Collectors.joining("\n", "## Prediction Points\n", ""));
-        MessageHelper.splitAndSentWithAction(message, threadOrChannel, null);
+    private void postPredictionResultsSummary(
+            Game game,
+            MessageChannel threadOrChannel,
+            CombatCandidateEntity candidate,
+            ScoredContestResult result,
+            Runnable afterPost) {
+        String winnerDisplay = getWinnerDisplay(game, candidate);
+        List<WinningPredictionSummary> winningPredictions = result.winningPredictions();
+        String message = "## Prediction Results\n"
+                + "Winner: " + winnerDisplay + "\n"
+                + "Predictions locked: **" + result.totalPredictions() + "**\n"
+                + "Correct predictions: **" + winningPredictions.size() + "**";
+        if (result.totalPredictions() == 0) {
+            message += "\nNo predictions were locked for this contest.";
+        } else if (winningPredictions.isEmpty()) {
+            message += "\nNo one called it.";
+        } else {
+            message += "\n\n"
+                    + winningPredictions.stream()
+                            .map(prediction -> "<@" + prediction.discordUserId() + "> - " + prediction.totalPoints()
+                                    + " points (+" + prediction.pointsAwarded() + ")")
+                            .collect(Collectors.joining("\n"));
+        }
+        MessageHelper.splitAndSentWithAction(message, threadOrChannel, ignored -> {
+            if (afterPost != null) {
+                afterPost.run();
+            }
+        });
     }
 
-    private void maybePostLeaderboardAfterResolvedContest() {
-        List<CombatReplayContestEntity> pendingBatch = replayContestRepository
-                .findTop5ByReplayStatusAndReplayCompletedAtIsNotNullAndLeaderboardPostedAtIsNullOrderByReplayCompletedAtAsc(
-                        CombatContestReplayStatus.COMPLETED);
-        if (pendingBatch.size() < 5) return;
-        if (!postLeaderboard()) return;
+    private String getWinnerDisplay(Game game, CombatCandidateEntity candidate) {
+        if (game != null && candidate.getWinnerFaction() != null) {
+            Player winner = game.getPlayerFromColorOrFaction(candidate.getWinnerFaction());
+            if (winner != null) {
+                return winner.getFactionEmoji() + " **" + getSafeLeaderboardName(winner.getUserName()) + "**";
+            }
+        }
+        return "**" + (candidate.getWinnerFaction() == null ? "Unknown" : candidate.getWinnerFaction()) + "**";
+    }
 
-        LocalDateTime postedAt = LocalDateTime.now();
-        pendingBatch.forEach(contest -> contest.setLeaderboardPostedAt(postedAt));
-        replayContestRepository.saveAll(pendingBatch);
+    private void postParticipantFollowup(Game game, CombatCandidateEntity candidate, MessageChannel threadOrChannel) {
+        if (game == null) return;
+        Player attacker = game.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
+        Player defender = game.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
+        if (attacker == null || defender == null) return;
+
+        String message = "## Summons From The Archives\n"
+                + "<@" + attacker.getUserID() + "> <@" + defender.getUserID() + ">\n"
+                + "By decree of the Lazax War Game, your fleets have been judged worthy of remembrance. "
+                + "If it pleases the honored claimants, tarry a moment and read the commentaries, acclaim, and quiet condemnation recorded above concerning your struggle.";
+        MessageHelper.sendMessageToChannel(threadOrChannel, message);
+    }
+
+    private void postSubscriptionPrompt(MessageChannel threadOrChannel) {
+        String message = "Did you like this? React " + SUBSCRIBE_EMOJI
+                + " to subscribe to more, " + UNSUBSCRIBE_EMOJI
+                + " to opt out if already subscribed.\n"
+                + CombatContestService.LAZAX_MINIGAME_SUBSCRIPTION_MARKER;
+        MessageHelper.splitAndSentWithAction(message, threadOrChannel, postedMessage -> {
+            postedMessage.addReaction(Emoji.fromUnicode(SUBSCRIBE_EMOJI)).queue(null, BotLogger::catchRestError);
+            postedMessage.addReaction(Emoji.fromUnicode(UNSUBSCRIBE_EMOJI)).queue(null, BotLogger::catchRestError);
+        });
+    }
+
+    private void markLeaderboardPostedIfPublished(CombatReplayContestEntity replayContest) {
+        if (!postLeaderboard()) return;
+        replayContest.setLeaderboardPostedAt(LocalDateTime.now());
     }
 
     private TextChannel getContestPublicChannel(Long publicChannelId) {
@@ -311,9 +366,18 @@ public class CombatReplayLeaderboardService {
 
     private TextChannel getContestPublicChannelByName() {
         if (JdaService.guildPrimary == null) return null;
-        return JdaService.guildPrimary.getTextChannelsByName(CONTEST_CHANNEL_NAME, true).stream()
+        return JdaService.guildPrimary.getTextChannelsByName(getContestChannelName(), true).stream()
                 .findFirst()
                 .orElse(null);
+    }
+
+    private String getContestChannelName() {
+        return isReplayV2Enabled() ? CONTEST_CHANNEL_NAME_V2 : CONTEST_CHANNEL_NAME_V1;
+    }
+
+    private boolean isReplayV2Enabled() {
+        String versionEnabled = settings.getRuntime().getVersionEnabled();
+        return "v2".equalsIgnoreCase(versionEnabled);
     }
 
     private MessageChannel getContestThreadOrChannel(CombatReplayContestEntity contest) {
@@ -333,7 +397,7 @@ public class CombatReplayLeaderboardService {
     private String buildLockedPredictionMessage(
             Game game, CombatCandidateEntity candidate, CombatReplayPredictionEntity lockedPrediction) {
         return "## Predictions Locked\n"
-                + "Votes are now frozen before the replay begins.\n"
+                + "Votes are now frozen before the combat begins.\n"
                 + getFactionEmoji(game, candidate.getAttackerFaction()) + " " + candidate.getAttackerFaction() + ": **"
                 + safeInt(lockedPrediction.getAttackerPredictionCount()) + "**\n"
                 + getFactionEmoji(game, candidate.getDefenderFaction()) + " " + candidate.getDefenderFaction() + ": **"
@@ -380,5 +444,5 @@ public class CombatReplayLeaderboardService {
     private record WinningPredictionSummary(
             String discordUserId, String discordUserName, int pointsAwarded, int totalPoints) {}
 
-    private record ScoredContestResult(List<WinningPredictionSummary> winningPredictions) {}
+    private record ScoredContestResult(int totalPredictions, List<WinningPredictionSummary> winningPredictions) {}
 }

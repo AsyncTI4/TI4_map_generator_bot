@@ -16,7 +16,7 @@ public class CombatReplayCron {
 
     public static void register() {
         CronManager.schedulePeriodically(
-                CombatReplayCron.class, CombatReplayCron::runReplayTick, 5, 5, TimeUnit.SECONDS);
+                CombatReplayCron.class, CombatReplayCron::runReplayTick, 2, 2, TimeUnit.SECONDS);
     }
 
     private static void runReplayTick() {

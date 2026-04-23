@@ -1,5 +1,6 @@
 package ti4.game;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.awt.Point;
@@ -59,10 +60,19 @@ public class Tile {
     @JsonIgnore
     private final HashMap<String, String> fogLabel = new LinkedHashMap<>();
 
-    public Tile(@JsonProperty("tileID") String tileID, @JsonProperty("position") String position) {
+    public Tile(String tileID, String position) {
+        this(tileID, position, (Map<String, UnitHolder>) null);
+    }
+
+    @JsonCreator
+    public Tile(
+            @JsonProperty("tileID") String tileID,
+            @JsonProperty("position") String position,
+            @JsonProperty("unitHolders") Map<String, UnitHolder> unitHolders) {
         this.tileID = tileID;
         this.position = position != null ? position.toLowerCase() : null;
         initPlanetsAndSpace(tileID);
+        mergeUnitHolders(unitHolders);
     }
 
     public Tile(String tileID, String position, Player player, Boolean fog_, String fogLabel_) {
@@ -98,6 +108,23 @@ public class Tile {
         if (tilePlanetPositions != null)
             tilePlanetPositions.forEach(
                     (planetName, position) -> unitHolders.put(planetName, new Planet(planetName, position)));
+    }
+
+    private void mergeUnitHolders(@Nullable Map<String, UnitHolder> unitHolders) {
+        if (unitHolders == null) return;
+
+        for (Map.Entry<String, UnitHolder> entry : unitHolders.entrySet()) {
+            UnitHolder incomingHolder = entry.getValue();
+            if (incomingHolder == null) continue;
+
+            String holderName = StringUtils.defaultIfBlank(entry.getKey(), incomingHolder.getName());
+            UnitHolder existingHolder = this.unitHolders.get(holderName);
+            if (existingHolder != null) {
+                existingHolder.inheritEverythingFrom(incomingHolder);
+            } else {
+                this.unitHolders.put(holderName, incomingHolder);
+            }
+        }
     }
 
     public static Predicate<Tile> tileMayHaveThundersEdge() {

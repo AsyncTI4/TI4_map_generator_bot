@@ -1,5 +1,6 @@
 package ti4.discord.interactions.slashcommands.special;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,7 +43,7 @@ public class SetupNeutralPlayer extends GameStateSubcommand {
     }
 
     public static String pickNeutralColor(Game game) {
-        List<String> unusedColors = getUnusedColors(game);
+        List<String> unusedColors = new ArrayList<>(getUnusedColors(game));
         if (unusedColors.contains("aberration")) {
             return "aberration";
         }

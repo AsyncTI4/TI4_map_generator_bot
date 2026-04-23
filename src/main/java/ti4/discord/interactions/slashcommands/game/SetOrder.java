@@ -9,13 +9,14 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.slashcommands.GameStateSubcommand;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.service.game.SetOrderService;
 
 class SetOrder extends GameStateSubcommand {
 
     public SetOrder() {
         super(Constants.SET_ORDER, "Set player order in game", true, false);
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1").setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Player4"));
@@ -35,6 +36,10 @@ class SetOrder extends GameStateSubcommand {
             }
             users.add(member);
         }
-        SetOrderService.setPlayerOrder(event, getGame(), users);
+        if (users.isEmpty()) {
+            Helper.setOrder(getGame());
+        } else {
+            SetOrderService.setPlayerOrder(event, getGame(), users);
+        }
     }
 }

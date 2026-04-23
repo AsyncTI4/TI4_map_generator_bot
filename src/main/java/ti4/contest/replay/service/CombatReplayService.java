@@ -60,7 +60,11 @@ public class CombatReplayService {
 
         if (!eligible) return;
 
-        CombatCandidateEntity candidate = buildCandidate(observation, attacker, defender);
+        CombatCandidateEntity candidate = buildCandidate(
+                observation,
+                attacker,
+                defender,
+                CombatReplayRenderSnapshotSupport.captureHitAssignmentSnapshot(game, tile.getPosition()));
         candidateRepository.save(candidate);
 
         observation.setCandidateId(candidate.getId());
@@ -185,14 +189,18 @@ public class CombatReplayService {
         candidate.setPromotionScore(roundsObserved + mutualLossScore);
         candidateRepository.save(candidate);
 
-        appendDiscordEvent(
+        appendTileRenderEvent(
                 candidate,
                 CombatCandidateEventType.RESOLVED,
                 roundsObserved,
                 winner.getFaction(),
+                tile.getPosition(),
+                CombatReplayRenderSnapshotSupport.captureHitAssignmentSnapshot(game, tile.getPosition()),
                 "## Contest Result\n"
                         + winner.getFactionEmoji() + " " + winner.getUserName() + " won the space combat in "
-                        + tile.getRepresentationForButtons() + ".");
+                        + tile.getRepresentationForButtons() + ".\n"
+                        + "Game " + game.getName() + ": [Open Game](https://asyncti4.com/game/" + game.getName()
+                        + ")");
     }
 
     private void cancelCandidate(Game game, CombatCandidateEntity candidate, String reason) {
@@ -247,6 +255,9 @@ public class CombatReplayService {
         double jointScoreCutoff = computeCutoff(window, fairnessValues, weakerStrengthValues);
         List<SelectionObservationDebugView> observations = window.stream()
                 .map(observation -> toSelectionObservationDebugView(observation, fairnessValues, weakerStrengthValues))
+                .sorted((left, right) -> right.observation()
+                        .getStartedAt()
+                        .compareTo(left.observation().getStartedAt()))
                 .toList();
         selectionSnapshot = new SelectionSnapshot(
                 window.size(),
@@ -403,7 +414,7 @@ public class CombatReplayService {
     }
 
     private CombatCandidateEntity buildCandidate(
-            CombatObservationEntity observation, Player attacker, Player defender) {
+            CombatObservationEntity observation, Player attacker, Player defender, String initialRenderSnapshotJson) {
         CombatCandidateEntity candidate = new CombatCandidateEntity();
         candidate.setObservationId(observation.getId());
         candidate.setStatus(CombatCandidateStatus.TRACKING);
@@ -416,6 +427,7 @@ public class CombatReplayService {
         candidate.setAttackerFaction(attacker.getFaction());
         candidate.setDefenderFaction(defender.getFaction());
         candidate.setPreReplayContextText(LazaxCombatSupport.formatCombatTechSummary(attacker, defender));
+        candidate.setInitialRenderSnapshotJson(initialRenderSnapshotJson);
         return candidate;
     }
 
@@ -462,6 +474,23 @@ public class CombatReplayService {
                 actorFaction,
                 message,
                 ReplayDispatchPayload.discordMessage(message, embed));
+    }
+
+    private void appendTileRenderEvent(
+            CombatCandidateEntity candidate,
+            CombatCandidateEventType eventType,
+            Integer roundNumber,
+            String actorFaction,
+            String tilePosition,
+            String snapshotJson,
+            String message) {
+        eventAppender.appendEvent(
+                candidate,
+                eventType,
+                roundNumber,
+                actorFaction,
+                message,
+                ReplayDispatchPayload.tileRenderMessage(tilePosition, snapshotJson, message));
     }
 
     private CombatCandidateEntity resolveCandidateForMirrorEvent(Game game, Player player, String sourceChannelName) {
