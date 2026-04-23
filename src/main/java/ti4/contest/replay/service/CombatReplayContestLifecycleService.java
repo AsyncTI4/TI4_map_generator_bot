@@ -28,6 +28,7 @@ import ti4.contest.replay.repository.*;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.RandomHelper;
 import ti4.image.TileGenerator;
@@ -183,6 +184,7 @@ public class CombatReplayContestLifecycleService {
             return contestChannel.sendMessage(message).complete();
         }
 
+        removeReplayCommandCounters(snapshotGame, candidate.getTilePosition());
         snapshotGame.setName(CombatReplayRenderSnapshotSupport.buildReplaySnapshotName(
                 candidate.getAttackerFaction(), candidate.getDefenderFaction()));
         try (FileUpload fileUpload =
@@ -560,6 +562,7 @@ public class CombatReplayContestLifecycleService {
             return;
         }
         if (candidate != null) {
+            removeReplayCommandCounters(snapshotGame, tilePosition);
             snapshotGame.setName(CombatReplayRenderSnapshotSupport.buildReplaySnapshotName(
                     candidate.getAttackerFaction(), candidate.getDefenderFaction()));
         }
@@ -571,6 +574,13 @@ public class CombatReplayContestLifecycleService {
                             .build())
                     .complete();
         }
+    }
+
+    private void removeReplayCommandCounters(Game snapshotGame, String tilePosition) {
+        if (snapshotGame == null || tilePosition == null || tilePosition.isBlank()) return;
+        Tile tile = snapshotGame.getTileByPosition(tilePosition);
+        if (tile == null) return;
+        tile.removeAllCC();
     }
 
     private void sendDiscordMessage(
