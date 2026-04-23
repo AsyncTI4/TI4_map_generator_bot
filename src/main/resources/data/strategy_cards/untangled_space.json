@@ -8,9 +8,8 @@
             "Then perform the Ghost hero ability."
         ],
         "secondaryTexts": [
-            "Perform the Planetary Stabilisation action, without spending a Command Counter from your Strategy Pool, but you are not allowed to activate the system."
+            "Then perform the Planetary Stabilisation action, without spending a Command Counter from your Strategy Pool, but you are not allowed to activate the system."
         ],
-        "imageFileName": "us9",
         "colourHexCode": "#9b59b6",
         "source": "untangled_space"
     }
