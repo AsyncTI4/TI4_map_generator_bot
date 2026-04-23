@@ -2,6 +2,7 @@ package ti4.discord.interactions.slashcommands.special;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -63,6 +64,6 @@ public class SetupNeutralPlayer extends GameStateSubcommand {
     private static List<String> getUnusedColors(Game game) {
         return GameColorsService.getUnusedColors(game).stream()
                 .map(ColorModel::getName)
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 }
