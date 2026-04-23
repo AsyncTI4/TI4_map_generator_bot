@@ -108,7 +108,7 @@ public class CombatReplayLeaderboardService {
         ScoredContestResult result = scoreContest(candidate, lockedPrediction);
         MessageChannel threadOrChannel = getContestThreadOrChannel(replayContest);
         if (threadOrChannel != null) {
-            postPredictionPointsSummary(threadOrChannel, result.winningPredictions());
+            postPredictionResultsSummary(threadOrChannel, candidate, result);
         }
         maybePostLeaderboardAfterResolvedContest();
     }
@@ -243,7 +243,7 @@ public class CombatReplayLeaderboardService {
                     return left.discordUserName().compareToIgnoreCase(right.discordUserName());
                 })
                 .toList();
-        return new ScoredContestResult(summaries);
+        return new ScoredContestResult(totalPredictions, summaries);
     }
 
     private void applyContestResult(
@@ -281,14 +281,25 @@ public class CombatReplayLeaderboardService {
         return entry;
     }
 
-    private void postPredictionPointsSummary(
-            MessageChannel threadOrChannel, List<WinningPredictionSummary> winningPredictions) {
-        if (winningPredictions.isEmpty()) return;
-
-        String message = winningPredictions.stream()
-                .map(prediction -> getSafeLeaderboardName(prediction.discordUserName()) + " - "
-                        + prediction.totalPoints() + " points (+" + prediction.pointsAwarded() + ")")
-                .collect(Collectors.joining("\n", "## Prediction Points\n", ""));
+    private void postPredictionResultsSummary(
+            MessageChannel threadOrChannel, CombatCandidateEntity candidate, ScoredContestResult result) {
+        String winnerFaction = candidate.getWinnerFaction() == null ? "Unknown" : candidate.getWinnerFaction();
+        List<WinningPredictionSummary> winningPredictions = result.winningPredictions();
+        String message = "## Prediction Results\n"
+                + "Winner: **" + winnerFaction + "**\n"
+                + "Predictions locked: **" + result.totalPredictions() + "**\n"
+                + "Correct predictions: **" + winningPredictions.size() + "**";
+        if (result.totalPredictions() == 0) {
+            message += "\nNo predictions were locked for this contest.";
+        } else if (winningPredictions.isEmpty()) {
+            message += "\nNo one called it.";
+        } else {
+            message += "\n\n"
+                    + winningPredictions.stream()
+                            .map(prediction -> "<@" + prediction.discordUserId() + "> - " + prediction.totalPoints()
+                                    + " points (+" + prediction.pointsAwarded() + ")")
+                            .collect(Collectors.joining("\n"));
+        }
         MessageHelper.splitAndSentWithAction(message, threadOrChannel, null);
     }
 
@@ -333,7 +344,7 @@ public class CombatReplayLeaderboardService {
     private String buildLockedPredictionMessage(
             Game game, CombatCandidateEntity candidate, CombatReplayPredictionEntity lockedPrediction) {
         return "## Predictions Locked\n"
-                + "Votes are now frozen before the replay begins.\n"
+                + "Votes are now frozen before the combat begins.\n"
                 + getFactionEmoji(game, candidate.getAttackerFaction()) + " " + candidate.getAttackerFaction() + ": **"
                 + safeInt(lockedPrediction.getAttackerPredictionCount()) + "**\n"
                 + getFactionEmoji(game, candidate.getDefenderFaction()) + " " + candidate.getDefenderFaction() + ": **"
@@ -380,5 +391,5 @@ public class CombatReplayLeaderboardService {
     private record WinningPredictionSummary(
             String discordUserId, String discordUserName, int pointsAwarded, int totalPoints) {}
 
-    private record ScoredContestResult(List<WinningPredictionSummary> winningPredictions) {}
+    private record ScoredContestResult(int totalPredictions, List<WinningPredictionSummary> winningPredictions) {}
 }

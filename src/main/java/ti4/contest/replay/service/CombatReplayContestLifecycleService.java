@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.*;
 import ti4.contest.replay.dispatch.ReplayDispatchPayload;
@@ -28,6 +29,7 @@ import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
+import ti4.helpers.RandomHelper;
 import ti4.image.TileGenerator;
 import ti4.logging.BotLogger;
 
@@ -40,6 +42,26 @@ public class CombatReplayContestLifecycleService {
 
     private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives-dev";
     private static final long SHADOW_DISCORD_ID = 0L;
+    private static final List<String> PREDICTION_LOCK_TITLES = List.of(
+            "Final Wagers",
+            "Closing the Archives",
+            "Last Wagers",
+            "Final Predictions",
+            "The Betting Window Narrows",
+            "The Archives Seal Soon",
+            "Last Call Before First Fire",
+            "The War Ledger Closes");
+    private static final List<String> PREDICTION_LOCK_SUBTITLES = List.of(
+            "_The archives remain open for a few moments longer._",
+            "_The scribes still accept wagers before the first salvo._",
+            "_The war ledger has not yet been sealed._",
+            "_A few final predictions may yet be entered into the record._",
+            "_The Lazax recorders await your final judgment._",
+            "_Soon the record closes and steel decides the truth._",
+            "_The betting hall quiets as the battle draws near._",
+            "_The last whispers of speculation echo through the archives._",
+            "_Place your faith now; the guns will speak soon enough._",
+            "_The final odds are still being written in the margin._");
 
     private final CombatContestSettings settings;
     private final CombatCandidateRepository candidateRepository;
@@ -121,10 +143,10 @@ public class CombatReplayContestLifecycleService {
         if (contestChannel == null) return null;
 
         try {
-            Message posted = contestChannel.sendMessage(message).complete();
+            Message posted = postPromotionMessage(contestChannel, message, game, winner);
             addPredictionReactions(game, winner, posted);
             ThreadChannel thread = createReplayThread(posted, winner);
-            return persistPromotedReplayContest(
+            CombatReplayContestEntity contest = persistPromotedReplayContest(
                     game,
                     observation,
                     winner,
@@ -134,9 +156,43 @@ public class CombatReplayContestLifecycleService {
                     posted,
                     thread,
                     existingContest);
+            try {
+                MessageChannel replayChannel = thread != null ? thread : contestChannel;
+                announcePreReplayContextIfNeeded(replayChannel, contest, winner);
+                announcePredictionLockCountdown(replayChannel);
+            } catch (Exception e) {
+                BotLogger.error("Failed to post replay context at promotion.", e);
+            }
+            return contest;
         } catch (Exception e) {
             BotLogger.error("Replay contest promotion failed.", e);
             return null;
+        }
+    }
+
+    @SneakyThrows
+    private Message postPromotionMessage(
+            TextChannel contestChannel, String message, Game game, CombatCandidateEntity candidate) {
+        String snapshotJson = candidate.getInitialRenderSnapshotJson();
+        if (snapshotJson == null || snapshotJson.isBlank()) {
+            return contestChannel.sendMessage(message).complete();
+        }
+
+        Game snapshotGame = CombatReplayRenderSnapshotSupport.restoreGame(snapshotJson, game);
+        if (snapshotGame == null) {
+            return contestChannel.sendMessage(message).complete();
+        }
+
+        snapshotGame.setName(CombatReplayRenderSnapshotSupport.buildReplaySnapshotName(
+                candidate.getAttackerFaction(), candidate.getDefenderFaction()));
+        try (FileUpload fileUpload =
+                new TileGenerator(snapshotGame, null, null, 0, candidate.getTilePosition()).createFileUpload()) {
+            return contestChannel
+                    .sendMessage(new MessageCreateBuilder()
+                            .addContent(message)
+                            .addFiles(fileUpload)
+                            .build())
+                    .complete();
         }
     }
 
@@ -210,6 +266,17 @@ public class CombatReplayContestLifecycleService {
         }
         contest.setPreReplayContextPostedAt(LocalDateTime.now());
         replayContestRepository.save(contest);
+    }
+
+    private void announcePredictionLockCountdown(MessageChannel channel) {
+        int startDelayMinutes = settings.getReplayExecution().getStartDelayMinutes();
+        String title = RandomHelper.pickRandomFromList(PREDICTION_LOCK_TITLES);
+        String subtitle = RandomHelper.pickRandomFromList(PREDICTION_LOCK_SUBTITLES);
+        String message = startDelayMinutes <= 0
+                ? "## " + title + "\n" + subtitle + "\nVoting is now locked. The combat begins immediately."
+                : "## " + title + "\n" + subtitle + "\nVoting will be locked in **" + startDelayMinutes + "** "
+                        + (startDelayMinutes == 1 ? "minute" : "minutes") + ".";
+        channel.sendMessage(message).complete();
     }
 
     private void completeReplayContest(CombatReplayContestEntity contest) {
@@ -299,9 +366,28 @@ public class CombatReplayContestLifecycleService {
     }
 
     private ThreadChannel createReplayThread(Message posted, CombatCandidateEntity winner) {
-        return posted.createThreadChannel("combat-archive-" + winner.getGameName() + "-" + winner.getTilePosition())
+        return posted.createThreadChannel(buildReplayThreadName(winner))
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS)
                 .complete();
+    }
+
+    private String buildReplayThreadName(CombatCandidateEntity candidate) {
+        String attacker = normalizeThreadNamePart(candidate.getAttackerFaction());
+        String defender = normalizeThreadNamePart(candidate.getDefenderFaction());
+        String tilePosition = StringUtils.defaultIfBlank(candidate.getTilePosition(), "unknown");
+        String candidateId =
+                candidate.getId() == null ? "unknown" : candidate.getId().toString();
+        return "combat-archive-c" + candidateId + "-t" + tilePosition + "-" + attacker + "-v-" + defender;
+    }
+
+    private String normalizeThreadNamePart(String value) {
+        String normalized = StringUtils.defaultIfBlank(value, "unknown")
+                .trim()
+                .toLowerCase()
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("(^-+|-+$)", "");
+        if (normalized.isBlank()) return "unknown";
+        return StringUtils.abbreviate(normalized, 18);
     }
 
     private CombatReplayContestEntity buildReplayContest(

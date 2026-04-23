@@ -60,7 +60,11 @@ public class CombatReplayService {
 
         if (!eligible) return;
 
-        CombatCandidateEntity candidate = buildCandidate(observation, attacker, defender);
+        CombatCandidateEntity candidate = buildCandidate(
+                observation,
+                attacker,
+                defender,
+                CombatReplayRenderSnapshotSupport.captureHitAssignmentSnapshot(game, tile.getPosition()));
         candidateRepository.save(candidate);
 
         observation.setCandidateId(candidate.getId());
@@ -192,7 +196,8 @@ public class CombatReplayService {
                 winner.getFaction(),
                 "## Contest Result\n"
                         + winner.getFactionEmoji() + " " + winner.getUserName() + " won the space combat in "
-                        + tile.getRepresentationForButtons() + ".");
+                        + tile.getRepresentationForButtons() + ".\n"
+                        + "Game Link: [Open Game](https://asyncti4.com/game/" + game.getName() + ")");
     }
 
     private void cancelCandidate(Game game, CombatCandidateEntity candidate, String reason) {
@@ -406,7 +411,7 @@ public class CombatReplayService {
     }
 
     private CombatCandidateEntity buildCandidate(
-            CombatObservationEntity observation, Player attacker, Player defender) {
+            CombatObservationEntity observation, Player attacker, Player defender, String initialRenderSnapshotJson) {
         CombatCandidateEntity candidate = new CombatCandidateEntity();
         candidate.setObservationId(observation.getId());
         candidate.setStatus(CombatCandidateStatus.TRACKING);
@@ -419,6 +424,7 @@ public class CombatReplayService {
         candidate.setAttackerFaction(attacker.getFaction());
         candidate.setDefenderFaction(defender.getFaction());
         candidate.setPreReplayContextText(LazaxCombatSupport.formatCombatTechSummary(attacker, defender));
+        candidate.setInitialRenderSnapshotJson(initialRenderSnapshotJson);
         return candidate;
     }
 

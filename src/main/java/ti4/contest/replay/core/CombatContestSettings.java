@@ -105,7 +105,7 @@ public class CombatContestSettings {
     public static class ReplayExecution {
         private int startDelayMinutes = 10;
         private int replayIntervalSeconds = 15;
-        private int maxEventGapSeconds = 60;
+        private int maxEventGapSeconds = 30;
     }
 
     @Data

@@ -90,6 +90,9 @@ public class CombatCandidateEntity {
     @Column(name = "pre_replay_context_text", columnDefinition = "TEXT")
     private String preReplayContextText;
 
+    @Column(name = "initial_render_snapshot_json", columnDefinition = "TEXT")
+    private String initialRenderSnapshotJson;
+
     @Column(name = "promotion_score")
     private Double promotionScore;
 }
