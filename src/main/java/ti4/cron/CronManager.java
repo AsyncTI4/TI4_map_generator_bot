@@ -30,10 +30,6 @@ public class CronManager {
         SCHEDULER.schedule(timedRunnable, initialDelay, unit);
     }
 
-    public static void registerManual(Class<?> clazz, Runnable runnable) {
-        CRONS.put(clazz.getSimpleName(), runnable);
-    }
-
     public static void schedulePeriodicallyAtTime(
             Class<?> clazz, Runnable runnable, int hour, int minute, ZoneId zoneId) {
         CRONS.put(clazz.getSimpleName(), runnable);

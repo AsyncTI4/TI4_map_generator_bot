@@ -23,8 +23,6 @@ public interface CombatCandidateRepository extends JpaRepository<CombatCandidate
 
     List<CombatCandidateEntity> findByGameNameAndStatus(String gameName, CombatCandidateStatus status);
 
-    List<CombatCandidateEntity> findByStatus(CombatCandidateStatus status);
-
     @Query("""
             select c from CombatCandidateEntity c
             where c.gameName = :gameName

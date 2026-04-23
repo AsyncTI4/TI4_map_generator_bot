@@ -173,21 +173,21 @@ public class CombatReplayService {
                 .value();
         double defenderRemaining = LazaxCombatSupport.calculateFleetStrength(game, defender, attacker, tile, space)
                 .value();
-        double attackerLossRatio = CombatReplayPromotionScoreSupport.computeLossRatio(
-                observation.getAttackerStrength(), attackerRemaining);
-        double defenderLossRatio = CombatReplayPromotionScoreSupport.computeLossRatio(
-                observation.getDefenderStrength(), defenderRemaining);
+        double attackerLossRatio = computeLossRatio(observation.getAttackerStrength(), attackerRemaining);
+        double defenderLossRatio = computeLossRatio(observation.getDefenderStrength(), defenderRemaining);
         int roundsObserved = candidateEventRepository
                 .findMaxRoundNumberByCandidateId(candidate.getId())
                 .orElse(0);
+        double mutualLossScore =
+                Math.min(attackerLossRatio, defenderLossRatio) + ((attackerLossRatio + defenderLossRatio) / 2.0);
+        double blowoutPenalty = 0.75 * Math.abs(attackerLossRatio - defenderLossRatio);
 
         candidate.setStatus(CombatCandidateStatus.RESOLVED);
         candidate.setResolvedAt(LocalDateTime.now());
         candidate.setWinnerFaction(winner.getFaction());
         candidate.setLoserFaction(loserFaction);
         candidate.setResolutionReason("Winner determined from remaining fleets.");
-        candidate.setPromotionScore(CombatReplayPromotionScoreSupport.computePromotionScore(
-                attackerLossRatio, defenderLossRatio, roundsObserved));
+        candidate.setPromotionScore(roundsObserved + mutualLossScore - blowoutPenalty);
         candidateRepository.save(candidate);
 
         appendTileRenderEvent(
@@ -532,6 +532,11 @@ public class CombatReplayService {
         int secondUnderscore = buttonId.indexOf('_', 5);
         if (secondUnderscore < 0) return buttonId;
         return buttonId.substring(secondUnderscore + 1);
+    }
+
+    private double computeLossRatio(double initialStrength, double remainingStrength) {
+        if (initialStrength <= 0) return 0.0;
+        return Math.max(0.0, Math.min(1.0, (initialStrength - remainingStrength) / initialStrength));
     }
 
     private record SelectionSnapshot(

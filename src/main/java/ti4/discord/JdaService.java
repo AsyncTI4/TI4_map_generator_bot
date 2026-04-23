@@ -25,7 +25,6 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.cron.CombatContestJanitorCron;
 import ti4.contest.cron.CombatReplayCron;
 import ti4.contest.cron.CombatReplayPromotionCron;
-import ti4.contest.cron.CombatReplayPromotionScoreBackfillCron;
 import ti4.contest.cron.CombatReplaySelectionCron;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CategoryCleanupCron;
@@ -304,7 +303,6 @@ public class JdaService {
         CombatContestLeaderboardCron.register();
         CombatReplaySelectionCron.register();
         CombatReplayPromotionCron.register();
-        CombatReplayPromotionScoreBackfillCron.register();
         CombatReplayCron.register();
         CombatContestJanitorCron.register();
         InteractionLogCron.register();
