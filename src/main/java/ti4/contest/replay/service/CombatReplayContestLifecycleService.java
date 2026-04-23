@@ -530,6 +530,10 @@ public class CombatReplayContestLifecycleService {
             postHitAssignmentReplayEvent(channel, game, candidate, event, hit);
             return;
         }
+        if (payload instanceof ReplayDispatchPayload.TileRenderMessageDispatch tileRender) {
+            postTileRenderReplayEvent(channel, game, candidate, event.getSummaryText(), tileRender);
+            return;
+        }
         if (payload instanceof ReplayDispatchPayload.DiscordMessageDispatch messageDispatch) {
             sendDiscordMessage(channel, messageDispatch.message(), event.getSummaryText());
             return;
@@ -545,9 +549,40 @@ public class CombatReplayContestLifecycleService {
             CombatCandidateEntity candidate,
             CombatCandidateEventEntity event,
             ReplayDispatchPayload.HitAssignDispatch payload) {
-        String message = event.getSummaryText();
-        String tilePosition = payload.tilePosition();
-        String snapshotJson = payload.combatStateSnapshotJson();
+        postTileRenderReplayEvent(
+                channel,
+                game,
+                candidate,
+                event.getSummaryText(),
+                List.of(),
+                payload.tilePosition(),
+                payload.combatStateSnapshotJson());
+    }
+
+    @SneakyThrows
+    private void postTileRenderReplayEvent(
+            MessageChannel channel,
+            Game game,
+            CombatCandidateEntity candidate,
+            String fallbackMessage,
+            ReplayDispatchPayload.TileRenderMessageDispatch payload) {
+        ReplayDispatchPayload.DiscordMessage replayMessage = payload.message();
+        String message = replayMessage == null ? fallbackMessage : replayMessage.content();
+        List<MessageEmbed> embeds =
+                replayMessage == null ? List.of() : ReplayDispatchSerializer.toMessageEmbeds(replayMessage.embeds());
+        postTileRenderReplayEvent(
+                channel, game, candidate, message, embeds, payload.tilePosition(), payload.combatStateSnapshotJson());
+    }
+
+    @SneakyThrows
+    private void postTileRenderReplayEvent(
+            MessageChannel channel,
+            Game game,
+            CombatCandidateEntity candidate,
+            String message,
+            List<MessageEmbed> embeds,
+            String tilePosition,
+            String snapshotJson) {
         if (tilePosition == null || snapshotJson == null) {
             channel.sendMessage(message).complete();
             return;
@@ -564,11 +599,12 @@ public class CombatReplayContestLifecycleService {
         }
 
         try (FileUpload fileUpload = new TileGenerator(snapshotGame, null, null, 0, tilePosition).createFileUpload()) {
-            channel.sendMessage(new MessageCreateBuilder()
-                            .addContent(message)
-                            .addFiles(fileUpload)
-                            .build())
-                    .complete();
+            MessageCreateBuilder builder =
+                    new MessageCreateBuilder().addContent(message).addFiles(fileUpload);
+            if (!embeds.isEmpty()) {
+                builder.addEmbeds(embeds);
+            }
+            channel.sendMessage(builder.build()).complete();
         }
     }
 
