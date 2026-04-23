@@ -46,10 +46,6 @@ public class CombatContestSettings {
         }
     }
 
-    public synchronized void toggleDiscordPostingEnabled() {
-        runtime.setDiscordPostingEnabled(!runtime.isDiscordPostingEnabled());
-    }
-
     public void validate() {
         require(candidateSelection != null, "candidateSelection is required.");
         require(candidateSelection.window != null, "candidateSelection.window is required.");

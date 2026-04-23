@@ -64,12 +64,6 @@ public class CombatReplayDebugController {
         return ok(runtimeState());
     }
 
-    @GetMapping(value = "/runtime/posting/toggle", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> toggleDiscordPosting() {
-        settings.toggleDiscordPostingEnabled();
-        return ok(runtimeState());
-    }
-
     @GetMapping(value = "/settings", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getSettings() {
         return ok(settings.snapshot());
