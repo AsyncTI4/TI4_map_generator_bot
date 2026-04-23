@@ -247,6 +247,9 @@ public class CombatReplayService {
         double jointScoreCutoff = computeCutoff(window, fairnessValues, weakerStrengthValues);
         List<SelectionObservationDebugView> observations = window.stream()
                 .map(observation -> toSelectionObservationDebugView(observation, fairnessValues, weakerStrengthValues))
+                .sorted((left, right) -> right.observation()
+                        .getStartedAt()
+                        .compareTo(left.observation().getStartedAt()))
                 .toList();
         selectionSnapshot = new SelectionSnapshot(
                 window.size(),
