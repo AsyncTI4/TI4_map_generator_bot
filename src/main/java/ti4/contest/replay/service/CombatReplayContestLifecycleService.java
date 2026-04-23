@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -28,10 +29,12 @@ import ti4.contest.replay.repository.*;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.RandomHelper;
 import ti4.image.TileGenerator;
 import ti4.logging.BotLogger;
+import ti4.spring.service.contest.CombatContestService;
 
 @Service
 @RequiredArgsConstructor
@@ -43,25 +46,25 @@ public class CombatReplayContestLifecycleService {
     private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives-dev";
     private static final long SHADOW_DISCORD_ID = 0L;
     private static final List<String> PREDICTION_LOCK_TITLES = List.of(
-            "Final Wagers",
-            "Closing the Archives",
-            "Last Wagers",
-            "Final Predictions",
-            "The Betting Window Narrows",
-            "The Archives Seal Soon",
-            "Last Call Before First Fire",
-            "The War Ledger Closes");
+            "The Wagers Open",
+            "The Archives Open",
+            "Predictions Are Open",
+            "The War Ledger Opens",
+            "The Betting Hall Opens",
+            "Call for Predictions",
+            "The Scribes Await",
+            "Cast Your Wager");
     private static final List<String> PREDICTION_LOCK_SUBTITLES = List.of(
-            "_The archives remain open for a few moments longer._",
-            "_The scribes still accept wagers before the first salvo._",
-            "_The war ledger has not yet been sealed._",
-            "_A few final predictions may yet be entered into the record._",
-            "_The Lazax recorders await your final judgment._",
-            "_Soon the record closes and steel decides the truth._",
-            "_The betting hall quiets as the battle draws near._",
-            "_The last whispers of speculation echo through the archives._",
-            "_Place your faith now; the guns will speak soon enough._",
-            "_The final odds are still being written in the margin._");
+            "_The Lazax recorders now accept predictions for the coming clash._",
+            "_The archives invite your judgment before the battle unfolds._",
+            "_The war ledger opens to all who would call the victor._",
+            "_The betting hall stirs as a new contest enters the record._",
+            "_The scribes stand ready to record your chosen champion._",
+            "_A new combat has been entered into the annals; predictions are welcome._",
+            "_The archives seek your verdict before the first volleys are fired._",
+            "_The next battle stands before the record; declare your pick._",
+            "_The Lazax ledgers are open to those bold enough to choose a side._",
+            "_Another clash enters the chronicles; place your wager in the record._");
 
     private final CombatContestSettings settings;
     private final CombatCandidateRepository candidateRepository;
@@ -183,6 +186,7 @@ public class CombatReplayContestLifecycleService {
             return contestChannel.sendMessage(message).complete();
         }
 
+        removeReplayCommandCounters(snapshotGame, candidate.getTilePosition());
         snapshotGame.setName(CombatReplayRenderSnapshotSupport.buildReplaySnapshotName(
                 candidate.getAttackerFaction(), candidate.getDefenderFaction()));
         try (FileUpload fileUpload =
@@ -273,8 +277,8 @@ public class CombatReplayContestLifecycleService {
         String title = RandomHelper.pickRandomFromList(PREDICTION_LOCK_TITLES);
         String subtitle = RandomHelper.pickRandomFromList(PREDICTION_LOCK_SUBTITLES);
         String message = startDelayMinutes <= 0
-                ? "## " + title + "\n" + subtitle + "\nVoting is now locked. The combat begins immediately."
-                : "## " + title + "\n" + subtitle + "\nVoting will be locked in **" + startDelayMinutes + "** "
+                ? "## " + title + "\n" + subtitle + "\nVoting is now open. The combat begins immediately."
+                : "## " + title + "\n" + subtitle + "\nVoting is now open for **" + startDelayMinutes + "** "
                         + (startDelayMinutes == 1 ? "minute" : "minutes") + ".";
         channel.sendMessage(message).complete();
     }
@@ -282,8 +286,9 @@ public class CombatReplayContestLifecycleService {
     private void completeReplayContest(CombatReplayContestEntity contest) {
         CombatCandidateEntity candidate =
                 candidateRepository.findById(contest.getCandidateId()).orElse(null);
+        Game game = candidate == null ? null : loadGame(candidate.getGameName());
         if (candidate != null) {
-            replayLeaderboardService.finalizeReplayLeaderboardContest(contest, candidate);
+            replayLeaderboardService.finalizeReplayLeaderboardContest(game, contest, candidate);
         }
 
         contest.setReplayStatus(CombatContestReplayStatus.COMPLETED);
@@ -504,13 +509,11 @@ public class CombatReplayContestLifecycleService {
     }
 
     private String getLazaxRoleMention() {
-        // if (JdaService.guildPrimary == null) return "";
-        // Role role = JdaService.guildPrimary.getRolesByName(CombatContestService.LAZAX_MINIGAME_ROLE_NAME, true)
-        //         .stream()
-        //         .findFirst()
-        //         .orElse(null);
-        // return role == null ? "" : role.getAsMention();
-        return "";
+        if (JdaService.guildPrimary == null) return "";
+        Role role = JdaService.guildPrimary.getRolesByName(CombatContestService.LAZAX_MINIGAME_ROLE_NAME, true).stream()
+                .findFirst()
+                .orElse(null);
+        return role == null ? "" : role.getAsMention();
     }
 
     private Game loadGame(String gameName) {
@@ -559,6 +562,7 @@ public class CombatReplayContestLifecycleService {
             return;
         }
         if (candidate != null) {
+            removeReplayCommandCounters(snapshotGame, tilePosition);
             snapshotGame.setName(CombatReplayRenderSnapshotSupport.buildReplaySnapshotName(
                     candidate.getAttackerFaction(), candidate.getDefenderFaction()));
         }
@@ -570,6 +574,13 @@ public class CombatReplayContestLifecycleService {
                             .build())
                     .complete();
         }
+    }
+
+    private void removeReplayCommandCounters(Game snapshotGame, String tilePosition) {
+        if (snapshotGame == null || tilePosition == null || tilePosition.isBlank()) return;
+        Tile tile = snapshotGame.getTileByPosition(tilePosition);
+        if (tile == null) return;
+        tile.removeAllCC();
     }
 
     private void sendDiscordMessage(
