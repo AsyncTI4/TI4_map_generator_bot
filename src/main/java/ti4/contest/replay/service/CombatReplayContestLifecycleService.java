@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -33,6 +34,7 @@ import ti4.game.persistence.GameManager;
 import ti4.helpers.RandomHelper;
 import ti4.image.TileGenerator;
 import ti4.logging.BotLogger;
+import ti4.spring.service.contest.CombatContestService;
 
 @Service
 @RequiredArgsConstructor
@@ -507,13 +509,11 @@ public class CombatReplayContestLifecycleService {
     }
 
     private String getLazaxRoleMention() {
-        // if (JdaService.guildPrimary == null) return "";
-        // Role role = JdaService.guildPrimary.getRolesByName(CombatContestService.LAZAX_MINIGAME_ROLE_NAME, true)
-        //         .stream()
-        //         .findFirst()
-        //         .orElse(null);
-        // return role == null ? "" : role.getAsMention();
-        return "";
+        if (JdaService.guildPrimary == null) return "";
+        Role role = JdaService.guildPrimary.getRolesByName(CombatContestService.LAZAX_MINIGAME_ROLE_NAME, true).stream()
+                .findFirst()
+                .orElse(null);
+        return role == null ? "" : role.getAsMention();
     }
 
     private Game loadGame(String gameName) {
