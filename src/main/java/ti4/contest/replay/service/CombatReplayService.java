@@ -180,6 +180,7 @@ public class CombatReplayService {
         int roundsObserved = candidateEventRepository
                 .findMaxRoundNumberByCandidateId(candidate.getId())
                 .orElse(0);
+        double roundScore = Math.sqrt(Math.max(0, roundsObserved));
         double mutualLossScore =
                 Math.min(attackerLossRatio, defenderLossRatio) + ((attackerLossRatio + defenderLossRatio) / 2.0);
         double winnerRemainingHp = winner.getFaction().equalsIgnoreCase(attacker.getFaction())
@@ -192,7 +193,7 @@ public class CombatReplayService {
         candidate.setWinnerFaction(winner.getFaction());
         candidate.setLoserFaction(loserFaction);
         candidate.setResolutionReason("Winner determined from remaining fleets.");
-        candidate.setPromotionScore(roundsObserved + clutchScore + (0.25 * mutualLossScore));
+        candidate.setPromotionScore(roundScore + clutchScore + (0.25 * mutualLossScore));
         candidateRepository.save(candidate);
 
         appendTileRenderEvent(
