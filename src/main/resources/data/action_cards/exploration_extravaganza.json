@@ -1,0 +1,10 @@
+[
+    {
+        "alias": "ee-ghost_splice",
+        "name": "Ghost Splice Experiment",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Place a ghost wormhole token into a system. Then perform your Ghost hero ability.",
+        "source": "exploration_extravaganza"
+    }
+]

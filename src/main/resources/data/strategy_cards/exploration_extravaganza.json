@@ -1,0 +1,18 @@
+[
+    {
+        "id": "ee9",
+        "initiative": 9,
+        "name": "Ghost Splice Experiment",
+        "primaryTexts": [
+            "Place a ghost wormhole token into a system.",
+            "Perform the Planetary Stabilisation action without spending a Command Counter from your Strategy Pool, choosing the result of the die roll.",
+            "Then perform your Ghost hero ability."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to perform the Planetary Stabilisation action without spending a Command Counter from your Strategy Pool. You may not activate the placed system."
+        ],
+        "imageFileName": "ee9",
+        "colourHexCode": "#9b59b6",
+        "source": "exploration_extravaganza"
+    }
+]
