@@ -18,6 +18,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.json.JsonMapperManager;
 import ti4.json.UnitKeyMapKeyDeserializer;
 import ti4.json.UnitKeyMapKeySerializer;
+import ti4.model.FactionModel;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
 
@@ -128,9 +129,8 @@ public class CombatReplayRenderSnapshotSupport {
 
         Player fallbackPlayer = new Player(playerSnapshot.getUserId(), playerSnapshot.getUserName(), new Game());
         fallbackPlayer.setFaction(playerSnapshot.getFaction());
-        if (fallbackPlayer.getFactionSetupInfo() != null) {
-            return new HashSet<>(fallbackPlayer.getFactionSetupInfo().getUnits());
-        }
+        FactionModel factionSetupInfo = fallbackPlayer.getFactionSetupInfo();
+        if (factionSetupInfo != null) return new HashSet<>(factionSetupInfo.getUnits());
 
         return new HashSet<>();
     }
