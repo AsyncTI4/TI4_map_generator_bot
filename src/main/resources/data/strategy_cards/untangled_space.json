@@ -4,7 +4,7 @@
         "initiative": 9,
         "name": "Ghost Experiment",
         "primaryTexts": [
-            "Place a ghost wormhole token into a system. Then perform the Planetary Stabilisation action, without spending a Command Counter from your Strategy Pool, picking the result of the die roll.",
+            "Place a ghost wormhole token into a system. Then perform the Planetary Stabilisation action, without spending a Command Counter and trade goods, also picking the result of the die roll.",
             "Then perform the Ghost hero ability."
         ],
         "secondaryTexts": [
