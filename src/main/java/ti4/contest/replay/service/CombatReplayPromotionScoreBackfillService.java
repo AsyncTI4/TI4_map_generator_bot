@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.CombatCandidateStatus;
+import ti4.contest.replay.core.CombatReplayPromotionScoreSupport;
 import ti4.contest.replay.core.CombatReplayRenderSnapshotSupport;
 import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.dispatch.ReplayDispatchPayload;
@@ -92,16 +93,15 @@ public class CombatReplayPromotionScoreBackfillService {
         double defenderRemaining = LazaxCombatSupport.calculateFleetStrength(
                         snapshotGame, defender, attacker, tile, space)
                 .value();
-        double attackerLossRatio = computeLossRatio(observation.getAttackerStrength(), attackerRemaining);
-        double defenderLossRatio = computeLossRatio(observation.getDefenderStrength(), defenderRemaining);
+        double attackerLossRatio = CombatReplayPromotionScoreSupport.computeLossRatio(
+                observation.getAttackerStrength(), attackerRemaining);
+        double defenderLossRatio = CombatReplayPromotionScoreSupport.computeLossRatio(
+                observation.getDefenderStrength(), defenderRemaining);
         int roundsObserved = candidateEventRepository
                 .findMaxRoundNumberByCandidateId(candidate.getId())
                 .orElse(0);
-        double mutualLossScore =
-                Math.min(attackerLossRatio, defenderLossRatio) + ((attackerLossRatio + defenderLossRatio) / 2.0);
-        double blowoutPenalty = 0.75 * Math.abs(attackerLossRatio - defenderLossRatio);
-
-        candidate.setPromotionScore(roundsObserved + mutualLossScore - blowoutPenalty);
+        candidate.setPromotionScore(CombatReplayPromotionScoreSupport.computePromotionScore(
+                attackerLossRatio, defenderLossRatio, roundsObserved));
         candidateRepository.save(candidate);
         return true;
     }
@@ -120,10 +120,5 @@ public class CombatReplayPromotionScoreBackfillService {
             }
         }
         return null;
-    }
-
-    private double computeLossRatio(double initialStrength, double remainingStrength) {
-        if (initialStrength <= 0) return 0.0;
-        return Math.max(0.0, Math.min(1.0, (initialStrength - remainingStrength) / initialStrength));
     }
 }
