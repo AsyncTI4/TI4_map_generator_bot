@@ -84,13 +84,26 @@ public class CombatReplayContestLifecycleService {
             return;
         }
 
-        List<CombatCandidateEntity> candidates = candidateRepository.findResolvedPromotionCandidates(
-                CombatCandidateStatus.RESOLVED,
-                CombatCandidatePromotionStatus.PENDING,
-                now.minusHours(settings.getPromotion().getCandidateLookbackHours()));
+        List<CombatCandidateEntity> candidates = findPromotionCandidates(now);
         CombatCandidateEntity winner = selectPromotionWinner(candidates);
         if (winner == null) return;
         promoteCandidate(winner);
+    }
+
+    private List<CombatCandidateEntity> findPromotionCandidates(LocalDateTime now) {
+        int configuredLookbackHours = settings.getPromotion().getCandidateLookbackHours();
+        int maxLookbackHours =
+                Math.max(configuredLookbackHours, CombatContestSettings.PROMOTION_LOOKBACK_FALLBACK_MAX_HOURS);
+        for (int lookbackHours = configuredLookbackHours; lookbackHours <= maxLookbackHours; lookbackHours++) {
+            List<CombatCandidateEntity> candidates = candidateRepository.findResolvedPromotionCandidates(
+                    CombatCandidateStatus.RESOLVED,
+                    CombatCandidatePromotionStatus.PENDING,
+                    now.minusHours(lookbackHours));
+            if (!candidates.isEmpty()) {
+                return candidates;
+            }
+        }
+        return List.of();
     }
 
     public ForcePromoteResult forcePromoteCandidate(Long candidateId) {

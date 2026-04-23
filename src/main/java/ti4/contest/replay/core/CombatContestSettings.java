@@ -15,6 +15,7 @@ import tools.jackson.databind.ObjectMapper;
 public class CombatContestSettings {
 
     private static final ObjectMapper MAPPER = JsonMapperManager.basic();
+    public static final int PROMOTION_LOOKBACK_FALLBACK_MAX_HOURS = 8;
 
     private CandidateSelection candidateSelection = new CandidateSelection();
     private Promotion promotion = new Promotion();

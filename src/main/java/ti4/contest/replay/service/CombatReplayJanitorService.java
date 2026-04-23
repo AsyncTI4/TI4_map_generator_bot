@@ -36,10 +36,12 @@ public class CombatReplayJanitorService {
     }
 
     private void expireStaleResolvedCandidates(LocalDateTime now) {
+        int expirationLookbackHours = Math.max(
+                settings.getPromotion().getCandidateLookbackHours(),
+                CombatContestSettings.PROMOTION_LOOKBACK_FALLBACK_MAX_HOURS);
         candidateRepository
                 .findByPromotionStatusAndResolvedAtBefore(
-                        CombatCandidatePromotionStatus.PENDING,
-                        now.minusHours(settings.getPromotion().getCandidateLookbackHours()))
+                        CombatCandidatePromotionStatus.PENDING, now.minusHours(expirationLookbackHours))
                 .stream()
                 .filter(candidate -> candidate.getStatus() == CombatCandidateStatus.RESOLVED)
                 .forEach(candidate -> {
