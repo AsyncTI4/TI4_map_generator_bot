@@ -124,6 +124,6 @@ public class CombatContestSettings {
     @NoArgsConstructor
     public static class Runtime {
         private boolean discordPostingEnabled = true;
-        private String versionEnabled = "v1";
+        private String versionEnabled = "v2";
     }
 }
