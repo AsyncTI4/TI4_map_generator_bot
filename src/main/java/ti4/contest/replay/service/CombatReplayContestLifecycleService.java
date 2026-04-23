@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.*;
 import ti4.contest.replay.dispatch.ReplayDispatchPayload;
@@ -365,9 +366,28 @@ public class CombatReplayContestLifecycleService {
     }
 
     private ThreadChannel createReplayThread(Message posted, CombatCandidateEntity winner) {
-        return posted.createThreadChannel("combat-archive-" + winner.getGameName() + "-" + winner.getTilePosition())
+        return posted.createThreadChannel(buildReplayThreadName(winner))
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS)
                 .complete();
+    }
+
+    private String buildReplayThreadName(CombatCandidateEntity candidate) {
+        String attacker = normalizeThreadNamePart(candidate.getAttackerFaction());
+        String defender = normalizeThreadNamePart(candidate.getDefenderFaction());
+        String tilePosition = StringUtils.defaultIfBlank(candidate.getTilePosition(), "unknown");
+        String candidateId =
+                candidate.getId() == null ? "unknown" : candidate.getId().toString();
+        return "combat-archive-c" + candidateId + "-t" + tilePosition + "-" + attacker + "-v-" + defender;
+    }
+
+    private String normalizeThreadNamePart(String value) {
+        String normalized = StringUtils.defaultIfBlank(value, "unknown")
+                .trim()
+                .toLowerCase()
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("(^-+|-+$)", "");
+        if (normalized.isBlank()) return "unknown";
+        return StringUtils.abbreviate(normalized, 18);
     }
 
     private CombatReplayContestEntity buildReplayContest(
