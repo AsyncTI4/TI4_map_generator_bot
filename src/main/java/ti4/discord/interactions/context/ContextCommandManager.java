@@ -10,9 +10,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class ContextCommandManager {
 
-    private static final Map<String, ContextCommand> commands = Stream.of(
-        new BanUser(),
-            new DeleteMessage())
+    private static final Map<String, ContextCommand> commands = Stream.of(new BanUser(), new DeleteMessage())
             .collect(Collectors.toMap(ContextCommand::getName, Function.identity()));
 
     public static ContextCommand getCommand(String name) {

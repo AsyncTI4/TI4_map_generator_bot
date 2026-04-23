@@ -17,7 +17,7 @@ public class ExecutorServiceManager {
 
     public static void runAsyncWithLock(
             String name, String gameName, MessageChannel messageChannel, Runnable runnable) {
-        runAsyncWithLock(name, gameName, messageChannel, runnable, ExecutionLockManager.LockType.WRITE);
+        runAsyncWithLock(name, gameName, messageChannel, runnable, ExecutionLockType.WRITE);
     }
 
     public static void runAsyncWithLock(
@@ -25,7 +25,7 @@ public class ExecutorServiceManager {
             String gameName,
             MessageChannel messageChannel,
             Runnable runnable,
-            ExecutionLockManager.LockType lockType) {
+            ExecutionLockType lockType) {
         if (CircuitBreaker.checkIsOpenAndPostWarningIfTrue(messageChannel)) {
             return;
         }
@@ -44,7 +44,7 @@ public class ExecutorServiceManager {
             return;
         }
         var lockReleaseRunnable =
-                ExecutionLockManager.wrapWithTryLockAndRelease(taskName, ExecutionLockManager.LockType.WRITE, runnable);
+                ExecutionLockManager.wrapWithTryLockAndRelease(taskName, ExecutionLockType.WRITE, runnable);
         var timedRunnable = new TimedRunnable(taskName, lockReleaseRunnable);
         runAsync(timedRunnable);
     }

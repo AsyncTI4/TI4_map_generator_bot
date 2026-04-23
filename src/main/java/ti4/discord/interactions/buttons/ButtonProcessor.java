@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
-import ti4.executors.ExecutionLockManager;
+import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -69,9 +69,7 @@ public class ButtonProcessor {
                 gameName,
                 event.getMessageChannel(),
                 () -> process(buttonContext, event),
-                buttonContext.isShouldSave()
-                        ? ExecutionLockManager.LockType.WRITE
-                        : ExecutionLockManager.LockType.READ);
+                buttonContext.isShouldSave() ? ExecutionLockType.WRITE : ExecutionLockType.READ);
     }
 
     private static String eventToString(ButtonInteractionEvent event, String gameName) {

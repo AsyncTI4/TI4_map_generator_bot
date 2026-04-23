@@ -8,8 +8,11 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.slashcommands.Command;
+import ti4.discord.interactions.slashcommands.GameStateContainer;
 import ti4.discord.interactions.slashcommands.ParentCommand;
 import ti4.discord.interactions.slashcommands.SlashCommandManager;
+import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
@@ -38,8 +41,10 @@ class SlashCommandListener extends ListenerAdapter implements ListenerInterface 
 
     public void queue(SlashCommandInteractionEvent event) {
         String gameName = GameNameService.getGameName(event);
+        ParentCommand command = SlashCommandManager.getCommand(event.getName());
+        ExecutionLockType lockType = getLockType(event, command);
         ExecutorServiceManager.runAsyncWithLock(
-                eventToString(event), gameName, event.getMessageChannel(), () -> process(event));
+                eventToString(event), gameName, event.getMessageChannel(), () -> process(command, event), lockType);
     }
 
     public String eventToString(GenericCommandInteractionEvent event) {
@@ -50,13 +55,12 @@ class SlashCommandListener extends ListenerAdapter implements ListenerInterface 
                 + event.getCommandString() + "`";
     }
 
-    private void process(SlashCommandInteractionEvent event) {
+    private void process(Command<SlashCommandInteractionEvent> command, SlashCommandInteractionEvent event) {
         long startTime = System.currentTimeMillis();
         RollbarManager.putInteractionMetadata("slash_command", event);
         RollbarManager.put("command_name", event.getCommandString());
         RollbarManager.put("game_name", GameNameService.getGameName(event));
 
-        ParentCommand command = SlashCommandManager.getCommand(event.getName());
         try {
             if (command.accept(event)) {
                 command.preExecute(event);
@@ -96,5 +100,14 @@ class SlashCommandListener extends ListenerAdapter implements ListenerInterface 
                             SusSlashCommandService.checkIfShouldReportSusSlashCommand(event, m.getJumpUrl());
                         },
                         BotLogger::catchRestError);
+    }
+
+    private static ExecutionLockType getLockType(SlashCommandInteractionEvent event, ParentCommand command) {
+        Command<SlashCommandInteractionEvent> subcommand = command.getSubcommand(event);
+        Command<SlashCommandInteractionEvent> commandToRun = subcommand == null ? command : subcommand;
+        if (commandToRun instanceof GameStateContainer gameStateContainer) {
+            return gameStateContainer.isSaveGame() ? ExecutionLockType.WRITE : ExecutionLockType.READ;
+        }
+        return ExecutionLockType.READ;
     }
 }

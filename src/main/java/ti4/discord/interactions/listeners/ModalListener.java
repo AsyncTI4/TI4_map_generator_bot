@@ -11,7 +11,7 @@ import ti4.discord.JdaService;
 import ti4.discord.interactions.listeners.context.ModalContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.ModalHandler;
-import ti4.executors.ExecutionLockManager;
+import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.logging.BotLogger;
@@ -62,7 +62,7 @@ public final class ModalListener extends ListenerAdapter {
                 gameName,
                 event.getMessageChannel(),
                 () -> handleModal(modalContext, event),
-                modalContext.isShouldSave() ? ExecutionLockManager.LockType.WRITE : ExecutionLockManager.LockType.READ);
+                modalContext.isShouldSave() ? ExecutionLockType.WRITE : ExecutionLockType.READ);
     }
 
     private void handleModal(ModalContext context, ModalInteractionEvent event) {

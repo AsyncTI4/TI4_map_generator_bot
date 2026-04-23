@@ -9,17 +9,10 @@ import ti4.logging.RollbarManager;
 import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
 
-class CommandGameState {
+record CommandGameState(boolean saveGame, boolean playerCommand) {
 
-    private final boolean saveGame;
-    private final boolean isPlayerCommand;
     private static final ThreadLocal<Game> game = new ThreadLocal<>();
     private static final ThreadLocal<Player> player = new ThreadLocal<>();
-
-    CommandGameState(boolean saveGame, boolean isPlayerCommand) {
-        this.saveGame = saveGame;
-        this.isPlayerCommand = isPlayerCommand;
-    }
 
     void preExecute(SlashCommandInteractionEvent event) {
         String gameName = GameNameService.getGameName(event);
@@ -31,7 +24,9 @@ class CommandGameState {
         CommandGameState.game.set(game);
         RollbarManager.put("game_name", game.getName());
 
-        if (!isPlayerCommand) return;
+        if (!playerCommand) {
+            return;
+        }
         var player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             throw new IllegalArgumentException("Unable to determine player while attempting to run event "
@@ -61,7 +56,7 @@ class CommandGameState {
 
     @NotNull
     public Player getPlayer() {
-        if (!isPlayerCommand) {
+        if (!playerCommand) {
             throw new IllegalStateException(
                     "CommandGameStateHelper cannot get player state because command was not set to be a player command. This is a bug.");
         }

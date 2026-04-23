@@ -8,7 +8,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.listeners.context.SelectionMenuContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.SelectionHandler;
-import ti4.executors.ExecutionLockManager;
+import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.logging.BotLogger;
@@ -36,7 +36,7 @@ public final class SelectionMenuProcessor {
                 gameName,
                 event.getMessageChannel(),
                 () -> process(context, event),
-                context.isShouldSave() ? ExecutionLockManager.LockType.WRITE : ExecutionLockManager.LockType.READ);
+                context.isShouldSave() ? ExecutionLockType.WRITE : ExecutionLockType.READ);
     }
 
     private static void process(SelectionMenuContext context, StringSelectInteractionEvent event) {

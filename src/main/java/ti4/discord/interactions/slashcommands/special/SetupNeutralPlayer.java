@@ -43,7 +43,7 @@ public class SetupNeutralPlayer extends GameStateSubcommand {
     }
 
     public static String pickNeutralColor(Game game) {
-        List<String> unusedColors = new ArrayList<>(getUnusedColors(game));
+        List<String> unusedColors = getUnusedColors(game);
         if (unusedColors.contains("aberration")) {
             return "aberration";
         }

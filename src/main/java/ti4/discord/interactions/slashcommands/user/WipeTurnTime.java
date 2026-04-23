@@ -4,6 +4,7 @@ import java.util.HashSet;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.slashcommands.Subcommand;
 import ti4.executors.ExecutionLockManager;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
@@ -31,9 +32,7 @@ class WipeTurnTime extends Subcommand {
                         .map(ManagedGame::getName)
                         .distinct()
                         .forEach(gameName -> ExecutionLockManager.wrapWithLockAndRelease(
-                                        gameName,
-                                        ExecutionLockManager.LockType.WRITE,
-                                        () -> wipeTurnTime(gameName, userId))
+                                        gameName, ExecutionLockType.WRITE, () -> wipeTurnTime(gameName, userId))
                                 .run());
 
         MessageHelper.sendMessageToChannel(event.getChannel(), "Wiped all of your turn times");
