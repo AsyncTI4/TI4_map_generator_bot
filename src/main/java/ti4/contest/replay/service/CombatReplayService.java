@@ -180,13 +180,14 @@ public class CombatReplayService {
                 .orElse(0);
         double mutualLossScore =
                 Math.min(attackerLossRatio, defenderLossRatio) + ((attackerLossRatio + defenderLossRatio) / 2.0);
+        double blowoutPenalty = 0.75 * Math.abs(attackerLossRatio - defenderLossRatio);
 
         candidate.setStatus(CombatCandidateStatus.RESOLVED);
         candidate.setResolvedAt(LocalDateTime.now());
         candidate.setWinnerFaction(winner.getFaction());
         candidate.setLoserFaction(loserFaction);
         candidate.setResolutionReason("Winner determined from remaining fleets.");
-        candidate.setPromotionScore(roundsObserved + mutualLossScore);
+        candidate.setPromotionScore(roundsObserved + mutualLossScore - blowoutPenalty);
         candidateRepository.save(candidate);
 
         appendTileRenderEvent(
