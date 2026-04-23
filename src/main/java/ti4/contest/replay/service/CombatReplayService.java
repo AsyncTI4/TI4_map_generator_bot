@@ -196,7 +196,8 @@ public class CombatReplayService {
                 winner.getFaction(),
                 "## Contest Result\n"
                         + winner.getFactionEmoji() + " " + winner.getUserName() + " won the space combat in "
-                        + tile.getRepresentationForButtons() + ".");
+                        + tile.getRepresentationForButtons() + ".\n"
+                        + "Game Link: [Open Game](https://asyncti4.com/game/" + game.getName() + ")");
     }
 
     private void cancelCandidate(Game game, CombatCandidateEntity candidate, String reason) {
