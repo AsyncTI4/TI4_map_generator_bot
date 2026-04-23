@@ -43,7 +43,8 @@ import ti4.spring.service.contest.CombatContestService;
  */
 public class CombatReplayContestLifecycleService {
 
-    private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives-dev";
+    private static final String CONTEST_CHANNEL_NAME_V1 = "lazax-war-archives-dev";
+    private static final String CONTEST_CHANNEL_NAME_V2 = "lazax-war-archives";
     private static final long SHADOW_DISCORD_ID = 0L;
     private static final List<String> PREDICTION_LOCK_TITLES = List.of(
             "The Wagers Open",
@@ -246,8 +247,12 @@ public class CombatReplayContestLifecycleService {
                     .findByCandidateIdAndSequenceNumber(contest.getCandidateId(), contest.getNextEventSequence() + 1)
                     .orElse(null);
             contest.setNextEventSequence(contest.getNextEventSequence() + 1);
-            contest.setReplayStatus(CombatContestReplayStatus.REPLAYING);
             contest.setReplayError(null);
+            if (nextEvent == null) {
+                completeReplayContest(contest);
+                return;
+            }
+            contest.setReplayStatus(CombatContestReplayStatus.REPLAYING);
             contest.setNextReplayAt(computeConfiguredNextReplayAt(LocalDateTime.now(), event, nextEvent));
         } catch (Exception e) {
             rescheduleReplay(contest, e.getMessage());
@@ -503,9 +508,18 @@ public class CombatReplayContestLifecycleService {
 
     private TextChannel getContestChannel() {
         if (JdaService.guildPrimary == null) return null;
-        return JdaService.guildPrimary.getTextChannelsByName(CONTEST_CHANNEL_NAME, true).stream()
+        return JdaService.guildPrimary.getTextChannelsByName(getContestChannelName(), true).stream()
                 .findFirst()
                 .orElse(null);
+    }
+
+    private String getContestChannelName() {
+        return isReplayV2Enabled() ? CONTEST_CHANNEL_NAME_V2 : CONTEST_CHANNEL_NAME_V1;
+    }
+
+    private boolean isReplayV2Enabled() {
+        String versionEnabled = settings.getRuntime().getVersionEnabled();
+        return "v2".equalsIgnoreCase(versionEnabled);
     }
 
     private String getLazaxRoleMention() {

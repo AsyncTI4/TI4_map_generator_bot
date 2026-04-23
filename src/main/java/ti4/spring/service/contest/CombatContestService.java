@@ -30,7 +30,9 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.LazaxCombatSupport;
+import ti4.contest.replay.service.CombatReplayLeaderboardService;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.JdaService;
 import ti4.game.Game;
@@ -76,6 +78,8 @@ public class CombatContestService {
     private final CombatContestPredictionRepository predictionRepository;
     private final CombatContestSampleRepository sampleRepository;
     private final CombatContestSelectionService selectionService;
+    private final CombatContestSettings replaySettings;
+    private final CombatReplayLeaderboardService combatReplayLeaderboardService;
     private final CombatReplayService combatReplayService;
 
     // ==================== Public Entry Points ====================
@@ -83,6 +87,7 @@ public class CombatContestService {
     public void onSpaceCombatStarted(Game game, Player attacker, Player defender, Tile tile) {
         runReplayHook(
                 game, "combat start", () -> combatReplayService.onSpaceCombatStarted(game, attacker, defender, tile));
+        if (isReplayV2Enabled()) return;
         try {
             if (!isEligibleGame(game) || !isEligibleCombat(game, attacker, defender, tile)) return;
 
@@ -125,6 +130,7 @@ public class CombatContestService {
     public void onButtonInteractionSettled(Game game, Player player, ButtonInteractionEvent event) {
         runReplayHook(
                 game, "button settlement", () -> combatReplayService.onButtonInteractionSettled(game, player, event));
+        if (isReplayV2Enabled()) return;
         try {
             List<CombatContestEntity> activeContests =
                     repository.findByGameNameAndStatusIn(game.getName(), ACTIVE_STATUSES);
@@ -144,6 +150,7 @@ public class CombatContestService {
                 game,
                 "roll mirror",
                 () -> combatReplayService.mirrorCombatRoll(game, player, opponent, tile, message, rollType, hits));
+        if (isReplayV2Enabled()) return;
         try {
             CombatContestEntity contest = repository
                     .findFirstByGameNameAndTilePositionAndCombatTypeAndStatusInOrderByPostedAtDesc(
@@ -169,6 +176,7 @@ public class CombatContestService {
                 game,
                 "event mirror",
                 () -> combatReplayService.mirrorCombatEvent(game, player, header, name, embed, sourceChannelName));
+        if (isReplayV2Enabled()) return;
         try {
             List<CombatContestEntity> activeContests =
                     repository.findByGameNameAndStatusIn(game.getName(), ACTIVE_STATUSES);
@@ -187,6 +195,9 @@ public class CombatContestService {
     }
 
     public boolean postLeaderboard() {
+        if (isReplayV2Enabled()) {
+            return combatReplayLeaderboardService.postLeaderboard();
+        }
         String message = buildLeaderboardMessage();
         if (message == null) return false;
 
@@ -202,6 +213,11 @@ public class CombatContestService {
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Replay combat hook failed on " + action + ".", e);
         }
+    }
+
+    private boolean isReplayV2Enabled() {
+        String versionEnabled = replaySettings.getRuntime().getVersionEnabled();
+        return "v2".equalsIgnoreCase(versionEnabled);
     }
 
     // ==================== Contest Creation & Eligibility ====================

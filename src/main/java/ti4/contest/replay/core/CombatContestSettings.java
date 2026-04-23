@@ -70,6 +70,10 @@ public class CombatContestSettings {
         require(replayExecution.maxEventGapSeconds >= 0, "replayExecution.maxEventGapSeconds must be >= 0.");
         require(retention.observationRetentionDays > 0, "retention.observationRetentionDays must be > 0.");
         require(retention.eventRetentionDays > 0, "retention.eventRetentionDays must be > 0.");
+        require(runtime.versionEnabled != null, "runtime.versionEnabled is required.");
+        require(
+                "v1".equalsIgnoreCase(runtime.versionEnabled) || "v2".equalsIgnoreCase(runtime.versionEnabled),
+                "runtime.versionEnabled must be 'v1' or 'v2'.");
     }
 
     private void require(boolean condition, String message) {
@@ -118,6 +122,7 @@ public class CombatContestSettings {
     @Data
     @NoArgsConstructor
     public static class Runtime {
-        private boolean discordPostingEnabled = false;
+        private boolean discordPostingEnabled = true;
+        private String versionEnabled = "v1";
     }
 }
