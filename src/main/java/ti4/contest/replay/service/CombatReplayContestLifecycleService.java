@@ -28,6 +28,7 @@ import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
+import ti4.helpers.RandomHelper;
 import ti4.image.TileGenerator;
 import ti4.logging.BotLogger;
 
@@ -40,6 +41,26 @@ public class CombatReplayContestLifecycleService {
 
     private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives-dev";
     private static final long SHADOW_DISCORD_ID = 0L;
+    private static final List<String> PREDICTION_LOCK_TITLES = List.of(
+            "Final Wagers",
+            "Closing the Archives",
+            "Last Wagers",
+            "Final Predictions",
+            "The Betting Window Narrows",
+            "The Archives Seal Soon",
+            "Last Call Before First Fire",
+            "The War Ledger Closes");
+    private static final List<String> PREDICTION_LOCK_SUBTITLES = List.of(
+            "_The archives remain open for a few moments longer._",
+            "_The scribes still accept wagers before the first salvo._",
+            "_The war ledger has not yet been sealed._",
+            "_A few final predictions may yet be entered into the record._",
+            "_The Lazax recorders await your final judgment._",
+            "_Soon the record closes and steel decides the truth._",
+            "_The betting hall quiets as the battle draws near._",
+            "_The last whispers of speculation echo through the archives._",
+            "_Place your faith now; the guns will speak soon enough._",
+            "_The final odds are still being written in the margin._");
 
     private final CombatContestSettings settings;
     private final CombatCandidateRepository candidateRepository;
@@ -248,10 +269,11 @@ public class CombatReplayContestLifecycleService {
 
     private void announcePredictionLockCountdown(MessageChannel channel) {
         int startDelayMinutes = settings.getReplayExecution().getStartDelayMinutes();
-        String subtitle = "_The archives remain open for a few moments longer._";
+        String title = RandomHelper.pickRandomFromList(PREDICTION_LOCK_TITLES);
+        String subtitle = RandomHelper.pickRandomFromList(PREDICTION_LOCK_SUBTITLES);
         String message = startDelayMinutes <= 0
-                ? "## Final Wagers\n" + subtitle + "\nVoting is now locked. The combat begins immediately."
-                : "## Final Wagers\n" + subtitle + "\nVoting will be locked in **" + startDelayMinutes + "** "
+                ? "## " + title + "\n" + subtitle + "\nVoting is now locked. The combat begins immediately."
+                : "## " + title + "\n" + subtitle + "\nVoting will be locked in **" + startDelayMinutes + "** "
                         + (startDelayMinutes == 1 ? "minute" : "minutes") + ".";
         channel.sendMessage(message).complete();
     }
