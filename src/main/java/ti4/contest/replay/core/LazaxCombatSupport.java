@@ -285,7 +285,8 @@ public class LazaxCombatSupport {
             Game game, Tile tile, Player attacker, Player defender, String activePlayerSummary) {
         return "## Lazax Candidate Recorded\n"
                 + "**Game:** `" + game.getName() + "`\n"
-                + "**Game Link:** [Open Game](https://asyncti4.com/game/" + game.getName() + ")\n"
+                + "**Game " + game.getName() + ":** [Open Game](https://asyncti4.com/game/" + game.getName()
+                + ")\n"
                 + activePlayerSummary
                 + "**System:** " + tile.getRepresentationForButtons() + "\n"
                 + "**Combat:** Space Combat\n"

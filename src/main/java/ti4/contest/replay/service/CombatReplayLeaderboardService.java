@@ -18,7 +18,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.springframework.stereotype.Service;
-import ti4.contest.replay.core.CombatContestReplayStatus;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
@@ -43,9 +42,10 @@ import ti4.spring.service.contest.CombatContestService;
 public class CombatReplayLeaderboardService {
 
     private static final double ZERO_EPSILON = 0.0001;
-    private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives-dev";
     private static final String SUBSCRIBE_EMOJI = "\uD83D\uDFE2";
     private static final String UNSUBSCRIBE_EMOJI = "\uD83D\uDD34";
+    private static final String CONTEST_CHANNEL_NAME_V1 = "lazax-war-archives-dev";
+    private static final String CONTEST_CHANNEL_NAME_V2 = "lazax-war-archives";
     private static final Comparator<LockedPrediction> LOCKED_PREDICTION_COMPARATOR = Comparator.comparing(
                     LockedPrediction::discordUserName, String.CASE_INSENSITIVE_ORDER)
             .thenComparing(LockedPrediction::discordUserId);
@@ -101,12 +101,13 @@ public class CombatReplayLeaderboardService {
             Game game, CombatReplayContestEntity replayContest, CombatCandidateEntity candidate) {
         if (!settings.getRuntime().isDiscordPostingEnabled()) return;
         if (replayContest.getId() == null) return;
+        if (replayContest.getLeaderboardPostedAt() != null) return;
 
         CombatReplayPredictionEntity lockedPrediction = replayPredictionRepository
                 .findByContestId(replayContest.getId())
                 .orElse(null);
         if (lockedPrediction == null) {
-            maybePostLeaderboardAfterResolvedContest();
+            markLeaderboardPostedIfPublished(replayContest);
             return;
         }
 
@@ -118,7 +119,7 @@ public class CombatReplayLeaderboardService {
                 postSubscriptionPrompt(threadOrChannel);
             });
         }
-        maybePostLeaderboardAfterResolvedContest();
+        markLeaderboardPostedIfPublished(replayContest);
     }
 
     public boolean postLeaderboard() {
@@ -353,16 +354,9 @@ public class CombatReplayLeaderboardService {
         });
     }
 
-    private void maybePostLeaderboardAfterResolvedContest() {
-        List<CombatReplayContestEntity> pendingBatch = replayContestRepository
-                .findTop5ByReplayStatusAndReplayCompletedAtIsNotNullAndLeaderboardPostedAtIsNullOrderByReplayCompletedAtAsc(
-                        CombatContestReplayStatus.COMPLETED);
-        if (pendingBatch.size() < 5) return;
+    private void markLeaderboardPostedIfPublished(CombatReplayContestEntity replayContest) {
         if (!postLeaderboard()) return;
-
-        LocalDateTime postedAt = LocalDateTime.now();
-        pendingBatch.forEach(contest -> contest.setLeaderboardPostedAt(postedAt));
-        replayContestRepository.saveAll(pendingBatch);
+        replayContest.setLeaderboardPostedAt(LocalDateTime.now());
     }
 
     private TextChannel getContestPublicChannel(Long publicChannelId) {
@@ -372,9 +366,18 @@ public class CombatReplayLeaderboardService {
 
     private TextChannel getContestPublicChannelByName() {
         if (JdaService.guildPrimary == null) return null;
-        return JdaService.guildPrimary.getTextChannelsByName(CONTEST_CHANNEL_NAME, true).stream()
+        return JdaService.guildPrimary.getTextChannelsByName(getContestChannelName(), true).stream()
                 .findFirst()
                 .orElse(null);
+    }
+
+    private String getContestChannelName() {
+        return isReplayV2Enabled() ? CONTEST_CHANNEL_NAME_V2 : CONTEST_CHANNEL_NAME_V1;
+    }
+
+    private boolean isReplayV2Enabled() {
+        String versionEnabled = settings.getRuntime().getVersionEnabled();
+        return "v2".equalsIgnoreCase(versionEnabled);
     }
 
     private MessageChannel getContestThreadOrChannel(CombatReplayContestEntity contest) {
