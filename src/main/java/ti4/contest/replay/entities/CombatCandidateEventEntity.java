@@ -26,6 +26,9 @@ import ti4.contest.replay.core.CombatCandidateEventType;
                     unique = true),
             @Index(name = "idx_combat_candidate_event_candidate_occurred_at", columnList = "candidate_id, occurred_at")
         })
+/**
+ * Persists the ordered replay event stream for a single combat candidate.
+ */
 public class CombatCandidateEventEntity {
 
     @Id

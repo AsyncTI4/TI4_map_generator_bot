@@ -2,17 +2,18 @@ package ti4.contest.replay.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ti4.contest.replay.core.CombatReplayEventPayloadSerde;
-import ti4.contest.replay.core.CombatReplayRuntimeSettings;
+import ti4.contest.replay.core.CombatContestSettings;
+import ti4.contest.replay.dispatch.ReplayDispatchSerializer;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatCandidateEventEntity;
 import ti4.contest.replay.entities.CombatObservationEntity;
@@ -30,6 +31,9 @@ import tools.jackson.databind.json.JsonMapper;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/public/contest/replay")
+/**
+ * Exposes lightweight admin/debug endpoints for inspecting replay observations, candidates, events, and contests.
+ */
 public class CombatReplayDebugController {
 
     private static final JsonMapper MAPPER = JsonMapperManager.basic()
@@ -41,41 +45,47 @@ public class CombatReplayDebugController {
     private final CombatCandidateEventRepository candidateEventRepository;
     private final CombatObservationRepository observationRepository;
     private final CombatReplayContestRepository replayContestRepository;
-    private final CombatReplayEventPayloadSerde payloadSerde;
+    private final CombatContestSettings settings;
+    private final ReplayDispatchSerializer payloadSerializer;
     private final CombatReplayContestLifecycleService contestLifecycleService;
     private final CombatReplayService combatReplayService;
 
-    @SneakyThrows
     @GetMapping(value = "/candidates", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getTopCandidates() {
         List<CandidateSummary> candidates =
                 candidateRepository.findAll(PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "startedAt"))).stream()
                         .map(this::toCandidateSummary)
                         .toList();
-        return ResponseEntity.ok(MAPPER.writeValueAsString(new CandidateListResponse(runtimeState(), candidates)));
+        return ok(new CandidateListResponse(runtimeState(), candidates));
     }
 
-    @SneakyThrows
     @GetMapping(value = "/runtime", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getRuntimeState() {
-        return ResponseEntity.ok(MAPPER.writeValueAsString(runtimeState()));
+        return ok(runtimeState());
     }
 
-    @SneakyThrows
-    @GetMapping(value = "/runtime/posting/toggle", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> toggleDiscordPosting() {
-        CombatReplayRuntimeSettings.toggleDiscordPostingEnabled();
-        return ResponseEntity.ok(MAPPER.writeValueAsString(runtimeState()));
+    @GetMapping(value = "/settings", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getSettings() {
+        return ok(settings.snapshot());
     }
 
-    @SneakyThrows
+    @PostMapping(
+            value = "/settings",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> updateSettings(@RequestBody String payloadJson) {
+        try {
+            return ok(settings.update(payloadJson));
+        } catch (IllegalArgumentException e) {
+            return badRequest(new ErrorResponse(e.getMessage()));
+        }
+    }
+
     @GetMapping(value = "/selection", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getSelectionSnapshot() {
-        return ResponseEntity.ok(MAPPER.writeValueAsString(
-                new SelectionResponse(runtimeState(), combatReplayService.getSelectionDebugView())));
+        return ok(new SelectionResponse(runtimeState(), combatReplayService.getSelectionDebugView()));
     }
 
-    @SneakyThrows
     @GetMapping(value = "/candidates/{candidateId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getCandidate(@PathVariable Long candidateId) {
         CombatCandidateEntity candidate =
@@ -91,11 +101,9 @@ public class CombatReplayDebugController {
                 candidateEventRepository.findByCandidateIdOrderBySequenceNumberAsc(candidateId).stream()
                         .map(this::toEventResponse)
                         .toList();
-        return ResponseEntity.ok(MAPPER.writeValueAsString(
-                new CandidateDetailResponse(runtimeState(), candidate, observation, contest, events)));
+        return ok(new CandidateDetailResponse(runtimeState(), candidate, observation, contest, events));
     }
 
-    @SneakyThrows
     @GetMapping(value = "/candidates/{candidateId}/promote", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> forcePromoteCandidate(@PathVariable Long candidateId) {
         CombatCandidateEntity candidate =
@@ -115,11 +123,10 @@ public class CombatReplayDebugController {
                 candidateEventRepository.findByCandidateIdOrderBySequenceNumberAsc(candidateId).stream()
                         .map(this::toEventResponse)
                         .toList();
-        return ResponseEntity.ok(MAPPER.writeValueAsString(new ForcePromoteResponse(
-                runtimeState(), result.promoted(), result.reason(), candidate, observation, contest, events)));
+        return ok(new ForcePromoteResponse(
+                runtimeState(), result.promoted(), result.reason(), candidate, observation, contest, events));
     }
 
-    @SneakyThrows
     @GetMapping(value = "/contests", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getLatestContests() {
         List<ContestSummary> contests =
@@ -128,10 +135,9 @@ public class CombatReplayDebugController {
                         .stream()
                         .map(this::toContestSummary)
                         .toList();
-        return ResponseEntity.ok(MAPPER.writeValueAsString(new ContestListResponse(runtimeState(), contests)));
+        return ok(new ContestListResponse(runtimeState(), contests));
     }
 
-    @SneakyThrows
     @GetMapping(value = "/contests/{contestId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getContest(@PathVariable Long contestId) {
         CombatReplayContestEntity contest =
@@ -149,13 +155,27 @@ public class CombatReplayDebugController {
                 : candidateEventRepository.findByCandidateIdOrderBySequenceNumberAsc(candidate.getId()).stream()
                         .map(this::toEventResponse)
                         .toList();
-        return ResponseEntity.ok(MAPPER.writeValueAsString(
-                new ContestDetailResponse(runtimeState(), contest, candidate, observation, events)));
+        return ok(new ContestDetailResponse(runtimeState(), contest, candidate, observation, events));
+    }
+
+    private ResponseEntity<String> ok(Object body) {
+        return ResponseEntity.ok(writeJson(body));
+    }
+
+    private ResponseEntity<String> badRequest(Object body) {
+        return ResponseEntity.badRequest().body(writeJson(body));
+    }
+
+    private String writeJson(Object body) {
+        try {
+            return MAPPER.writeValueAsString(body);
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to serialize replay debug response.", e);
+        }
     }
 
     private RuntimeStateResponse runtimeState() {
-        return new RuntimeStateResponse(
-                CombatReplayRuntimeSettings.SHADOW_MODE, CombatReplayRuntimeSettings.isDiscordPostingEnabled());
+        return new RuntimeStateResponse(settings.getRuntime().isDiscordPostingEnabled());
     }
 
     private CandidateSummary toCandidateSummary(CombatCandidateEntity candidate) {
@@ -181,10 +201,10 @@ public class CombatReplayDebugController {
     }
 
     private EventResponse toEventResponse(CombatCandidateEventEntity event) {
-        return new EventResponse(event, payloadSerde.read(event));
+        return new EventResponse(event, payloadSerializer.read(event));
     }
 
-    private record RuntimeStateResponse(boolean shadowMode, boolean discordPostingEnabled) {}
+    private record RuntimeStateResponse(boolean discordPostingEnabled) {}
 
     private record CandidateListResponse(RuntimeStateResponse runtime, List<CandidateSummary> candidates) {}
 
@@ -225,4 +245,6 @@ public class CombatReplayDebugController {
             List<EventResponse> events) {}
 
     private record EventResponse(CombatCandidateEventEntity event, Object payload) {}
+
+    private record ErrorResponse(String error) {}
 }

@@ -832,9 +832,7 @@ public class ActionCardHelper {
                         "Action Card",
                         "played _" + actionCard.getName() + "_.",
                         actionCard.getRepresentationEmbed(false, true, game),
-                        event.getChannel().getName(),
-                        "action_card",
-                        actionCard.getAlias());
+                        event.getChannel().getName());
         if (actionCardIsSabotageOrShatter) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
             if (game.isWildWildGalaxyMode()) {
