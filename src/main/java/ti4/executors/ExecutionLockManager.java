@@ -1,5 +1,7 @@
 package ti4.executors;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lombok.experimental.UtilityClass;
@@ -48,6 +50,7 @@ public class ExecutionLockManager {
 
     public static Runnable wrapWithTryLockAndRelease(
             String lockName, LockType lockType, Runnable task, MessageChannel messageChannel) {
+        if (isBlank(lockName)) throw new IllegalArgumentException("Lock name cannot be blank.");
         return () -> {
             boolean gotLock = tryLock(lockName, lockType);
             if (gotLock) {
@@ -73,6 +76,7 @@ public class ExecutionLockManager {
     }
 
     public static Runnable wrapWithLockAndRelease(String lockName, LockType lockType, Runnable task) {
+        if (isBlank(lockName)) throw new IllegalArgumentException("Lock name cannot be blank.");
         return () -> {
             lock(lockName, lockType);
             runAndUnlock(lockName, lockType, task);

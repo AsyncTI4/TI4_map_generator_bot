@@ -1,5 +1,7 @@
 package ti4.executors;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -18,10 +20,13 @@ public class ExecutorServiceManager {
             return;
         }
 
-        // TODO: We can do read/write based on if it is a save command
-        var lockReleaseRunnable = ExecutionLockManager.wrapWithTryLockAndRelease(
+        if (isNotBlank(gameName)) {
+            // TODO: We can do read/write based on if it is a save command
+            runnable = ExecutionLockManager.wrapWithTryLockAndRelease(
                 gameName, ExecutionLockManager.LockType.WRITE, runnable, messageChannel);
-        var timedRunnable = new TimedRunnable(name, lockReleaseRunnable);
+        }
+
+        var timedRunnable = new TimedRunnable(name, runnable);
         runAsync(timedRunnable);
     }
 
