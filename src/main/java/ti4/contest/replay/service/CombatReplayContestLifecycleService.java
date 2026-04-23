@@ -43,25 +43,25 @@ public class CombatReplayContestLifecycleService {
     private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives-dev";
     private static final long SHADOW_DISCORD_ID = 0L;
     private static final List<String> PREDICTION_LOCK_TITLES = List.of(
-            "Final Wagers",
-            "Closing the Archives",
-            "Last Wagers",
-            "Final Predictions",
-            "The Betting Window Narrows",
-            "The Archives Seal Soon",
-            "Last Call Before First Fire",
-            "The War Ledger Closes");
+            "The Wagers Open",
+            "The Archives Open",
+            "Predictions Are Open",
+            "The War Ledger Opens",
+            "The Betting Hall Opens",
+            "Call for Predictions",
+            "The Scribes Await",
+            "Cast Your Wager");
     private static final List<String> PREDICTION_LOCK_SUBTITLES = List.of(
-            "_The archives remain open for a few moments longer._",
-            "_The scribes still accept wagers before the first salvo._",
-            "_The war ledger has not yet been sealed._",
-            "_A few final predictions may yet be entered into the record._",
-            "_The Lazax recorders await your final judgment._",
-            "_Soon the record closes and steel decides the truth._",
-            "_The betting hall quiets as the battle draws near._",
-            "_The last whispers of speculation echo through the archives._",
-            "_Place your faith now; the guns will speak soon enough._",
-            "_The final odds are still being written in the margin._");
+            "_The Lazax recorders now accept predictions for the coming clash._",
+            "_The archives invite your judgment before the battle unfolds._",
+            "_The war ledger opens to all who would call the victor._",
+            "_The betting hall stirs as a new contest enters the record._",
+            "_The scribes stand ready to record your chosen champion._",
+            "_A new combat has been entered into the annals; predictions are welcome._",
+            "_The archives seek your verdict before the first volleys are fired._",
+            "_The next battle stands before the record; declare your pick._",
+            "_The Lazax ledgers are open to those bold enough to choose a side._",
+            "_Another clash enters the chronicles; place your wager in the record._");
 
     private final CombatContestSettings settings;
     private final CombatCandidateRepository candidateRepository;
@@ -273,8 +273,8 @@ public class CombatReplayContestLifecycleService {
         String title = RandomHelper.pickRandomFromList(PREDICTION_LOCK_TITLES);
         String subtitle = RandomHelper.pickRandomFromList(PREDICTION_LOCK_SUBTITLES);
         String message = startDelayMinutes <= 0
-                ? "## " + title + "\n" + subtitle + "\nVoting is now locked. The combat begins immediately."
-                : "## " + title + "\n" + subtitle + "\nVoting will be locked in **" + startDelayMinutes + "** "
+                ? "## " + title + "\n" + subtitle + "\nVoting is now open. The combat begins immediately."
+                : "## " + title + "\n" + subtitle + "\nVoting is now open for **" + startDelayMinutes + "** "
                         + (startDelayMinutes == 1 ? "minute" : "minutes") + ".";
         channel.sendMessage(message).complete();
     }
