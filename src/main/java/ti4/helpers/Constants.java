@@ -866,7 +866,7 @@ public final class Constants {
     public static final String SO_LIST_SCORED = "list_scored";
 
     public static final String TURN_ORDER = "turn_order";
-    public static final String TURN_STATS = "turn_stats";
+    public static final String AVERAGE_TURN_STATS = "average_turn_stats";
     public static final String VOTE_COUNT = "vote_count";
     public static final String SC_TRADE_GOODS = "sc_trade_goods";
     public static final String SC_COUNT = "sc_count";
@@ -1337,7 +1337,7 @@ public final class Constants {
     public static final String RUN_DATA_MIGRATIONS = "run_data_migrations";
     public static final String ENDED_DATE = "ended_date";
     public static final String REPLACEMENT_MADE = "replacement_made";
-    public static final String AVERAGE_TURN_TIME = "average_turn_time";
+    public static final String GLOBAL_AVERAGE_TURN_TIME = "global_average_turn_time";
     public static final String DICE_LUCK = "dice_luck";
     public static final String HITS_PER_TURN = "hits_per_turn";
     public static final String LIFETIME_RECORD = "lifetime_record";

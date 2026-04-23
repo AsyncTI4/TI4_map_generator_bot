@@ -10,7 +10,7 @@ import ti4.spring.service.statistics.AverageTurnTimeService;
 class AverageTurnTime extends Subcommand {
 
     AverageTurnTime() {
-        super(Constants.AVERAGE_TURN_TIME, "Average turn time across all games for all players");
+        super(Constants.GLOBAL_AVERAGE_TURN_TIME, "Average turn time across all games for all players");
         addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (Default = 50)"));
         addOptions(new OptionData(
                 OptionType.INTEGER,

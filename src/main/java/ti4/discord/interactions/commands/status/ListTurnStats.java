@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 class ListTurnStats extends GameStateSubcommand {
 
     public ListTurnStats() {
-        super(Constants.TURN_STATS, "List average amount of time players take on their turns", false, false);
+        super(Constants.AVERAGE_TURN_STATS, "List average amount of time players take on their turns", false, false);
     }
 
     @Override
