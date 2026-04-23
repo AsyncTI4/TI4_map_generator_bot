@@ -113,7 +113,7 @@ public class CombatReplayLeaderboardService {
         ScoredContestResult result = scoreContest(candidate, lockedPrediction);
         MessageChannel threadOrChannel = getContestThreadOrChannel(replayContest);
         if (threadOrChannel != null) {
-            postPredictionResultsSummary(threadOrChannel, candidate, result, () -> {
+            postPredictionResultsSummary(game, threadOrChannel, candidate, result, () -> {
                 postParticipantFollowup(game, candidate, threadOrChannel);
                 postSubscriptionPrompt(threadOrChannel);
             });
@@ -290,14 +290,15 @@ public class CombatReplayLeaderboardService {
     }
 
     private void postPredictionResultsSummary(
+            Game game,
             MessageChannel threadOrChannel,
             CombatCandidateEntity candidate,
             ScoredContestResult result,
             Runnable afterPost) {
-        String winnerFaction = candidate.getWinnerFaction() == null ? "Unknown" : candidate.getWinnerFaction();
+        String winnerDisplay = getWinnerDisplay(game, candidate);
         List<WinningPredictionSummary> winningPredictions = result.winningPredictions();
         String message = "## Prediction Results\n"
-                + "Winner: **" + winnerFaction + "**\n"
+                + "Winner: " + winnerDisplay + "\n"
                 + "Predictions locked: **" + result.totalPredictions() + "**\n"
                 + "Correct predictions: **" + winningPredictions.size() + "**";
         if (result.totalPredictions() == 0) {
@@ -316,6 +317,16 @@ public class CombatReplayLeaderboardService {
                 afterPost.run();
             }
         });
+    }
+
+    private String getWinnerDisplay(Game game, CombatCandidateEntity candidate) {
+        if (game != null && candidate.getWinnerFaction() != null) {
+            Player winner = game.getPlayerFromColorOrFaction(candidate.getWinnerFaction());
+            if (winner != null) {
+                return winner.getFactionEmoji() + " **" + getSafeLeaderboardName(winner.getUserName()) + "**";
+            }
+        }
+        return "**" + (candidate.getWinnerFaction() == null ? "Unknown" : candidate.getWinnerFaction()) + "**";
     }
 
     private void postParticipantFollowup(Game game, CombatCandidateEntity candidate, MessageChannel threadOrChannel) {
