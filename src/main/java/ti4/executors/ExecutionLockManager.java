@@ -1,16 +1,30 @@
 package ti4.executors;
 
-import java.util.concurrent.ConcurrentHashMap;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import ti4.cache.CacheManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
 @UtilityClass
 public class ExecutionLockManager {
 
-    private static final ConcurrentHashMap<String, ReentrantReadWriteLock> locks = new ConcurrentHashMap<>();
+    private static final int LOCK_EXPIRE_AFTER_ACCESS_TIME_MINUTES = 20;
+    private static final Cache<String, ReentrantReadWriteLock> locks;
+
+    static {
+        locks = Caffeine.newBuilder()
+                .expireAfterAccess(LOCK_EXPIRE_AFTER_ACCESS_TIME_MINUTES, TimeUnit.MINUTES)
+                .recordStats()
+                .build();
+        CacheManager.registerCache("executionLocks", locks);
+    }
 
     public static void lock(String lockName, LockType lockType) {
         var lock = getLock(lockName);
@@ -39,7 +53,7 @@ public class ExecutionLockManager {
     }
 
     private static ReentrantReadWriteLock getLock(String lockName) {
-        return locks.computeIfAbsent(lockName, k -> new ReentrantReadWriteLock());
+        return locks.get(lockName, k -> new ReentrantReadWriteLock());
     }
 
     public static Runnable wrapWithTryLockAndRelease(String lockName, LockType lockType, Runnable task) {
@@ -48,6 +62,7 @@ public class ExecutionLockManager {
 
     public static Runnable wrapWithTryLockAndRelease(
             String lockName, LockType lockType, Runnable task, MessageChannel messageChannel) {
+        if (isBlank(lockName)) throw new IllegalArgumentException("Lock name cannot be blank.");
         return () -> {
             boolean gotLock = tryLock(lockName, lockType);
             if (gotLock) {
@@ -73,6 +88,7 @@ public class ExecutionLockManager {
     }
 
     public static Runnable wrapWithLockAndRelease(String lockName, LockType lockType, Runnable task) {
+        if (isBlank(lockName)) throw new IllegalArgumentException("Lock name cannot be blank.");
         return () -> {
             lock(lockName, lockType);
             runAndUnlock(lockName, lockType, task);

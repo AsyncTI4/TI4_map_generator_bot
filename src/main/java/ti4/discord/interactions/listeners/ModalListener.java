@@ -30,8 +30,10 @@ public final class ModalListener extends ListenerAdapter {
         return instance;
     }
 
-    public static void warmupKnownHandlers() {
-        getInstance();
+    public static void checkModalHandlersSetup() {
+        if (getInstance().knownModals.isEmpty()) {
+            throw new IllegalStateException("No modal handlers were registered");
+        }
     }
 
     private ModalListener() {
