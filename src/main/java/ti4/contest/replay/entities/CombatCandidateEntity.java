@@ -27,6 +27,9 @@ import ti4.spring.service.contest.CombatContestType;
             @Index(name = "idx_combat_candidate_game_tile_status", columnList = "game_name, tile_position, status"),
             @Index(name = "idx_combat_candidate_promoted_at", columnList = "promoted_at")
         })
+/**
+ * Represents a replay-worthy combat that is being tracked, resolved, promoted, or expired.
+ */
 public class CombatCandidateEntity {
 
     @Id
@@ -83,6 +86,9 @@ public class CombatCandidateEntity {
 
     @Column(name = "cancellation_reason", columnDefinition = "TEXT")
     private String cancellationReason;
+
+    @Column(name = "pre_replay_context_text", columnDefinition = "TEXT")
+    private String preReplayContextText;
 
     @Column(name = "promotion_score")
     private Double promotionScore;

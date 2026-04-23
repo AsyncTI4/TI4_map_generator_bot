@@ -1,8 +1,11 @@
 package ti4.contest.replay.core;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatObservationEntity;
@@ -13,13 +16,29 @@ import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitKey;
+import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
+import ti4.model.RelicModel;
+import ti4.model.TechnologyModel;
+import ti4.model.UnitModel;
 import ti4.service.combat.CombatStatsService;
 import ti4.service.combat.CombatUnitSelectionHelper;
+import ti4.service.emoji.ColorEmojis;
 import ti4.spring.service.contest.CombatContestType;
 
 @UtilityClass
+/**
+ * Shared combat helper logic for replay candidate filtering, scoring inputs, and Lazax replay text generation.
+ */
 public class LazaxCombatSupport {
+
+    private static final Set<String> COMBAT_SUMMARY_TECH_ALIASES = Set.of("da", "asc", "x89", "x89c4");
+    private static final Set<String> COMBAT_SUMMARY_RELIC_ALIASES = Set.of(
+            "metalivoidarmaments", "metalivoidshielding", "lightrailordnance", "baldrick_crownofthalnos", "pi_thalnos");
+    private static final Comparator<TechnologyModel> TECH_COMPARATOR = Comparator.comparingInt(
+                    LazaxCombatSupport::getTechTypeOrder)
+            .thenComparingInt(tech -> tech.getRequirements().orElse("").length())
+            .thenComparing(TechnologyModel::getName, String.CASE_INSENSITIVE_ORDER);
 
     public boolean isEligibleGame(Game game) {
         return game != null
@@ -77,10 +96,10 @@ public class LazaxCombatSupport {
         double hp = 0;
         double expectedHits = 0;
         Map<String, Integer> damagedCountsByAsyncId = getDamagedCountsByAsyncId(tile, player);
-        for (Map.Entry<ti4.model.UnitModel, Integer> entry : CombatUnitSelectionHelper.collectCombatRoundUnits(
+        for (Map.Entry<UnitModel, Integer> entry : CombatUnitSelectionHelper.collectCombatRoundUnits(
                         tile, space, player)
                 .entrySet()) {
-            ti4.model.UnitModel unitModel = entry.getKey();
+            UnitModel unitModel = entry.getKey();
             if (unitModel == null) continue;
             int totalUnits = entry.getValue();
             int damagedUnits = Math.min(totalUnits, damagedCountsByAsyncId.getOrDefault(unitModel.getAsyncId(), 0));
@@ -101,30 +120,51 @@ public class LazaxCombatSupport {
         return new FleetStrength(total, hp, expectedHits);
     }
 
+    public String formatCombatTechSummary(Player attacker, Player defender) {
+        if (attacker == null || defender == null) return null;
+
+        StringBuilder message = new StringBuilder("## Combat Technologies\n")
+                .append(formatCombatTechLine(attacker))
+                .append("\n")
+                .append(formatCombatTechLine(defender));
+        String relicSection = formatCombatRelicSection(attacker, defender);
+        if (relicSection != null) {
+            message.append("\n\n").append(relicSection);
+        }
+        return message.toString();
+    }
+
     public String formatReplayAnnouncement(
-            Game game, CombatObservationEntity observation, CombatCandidateEntity candidate, String roleMention) {
+            Game game,
+            CombatObservationEntity observation,
+            CombatCandidateEntity candidate,
+            String roleMention,
+            String startSummaryText) {
         Player attacker = game.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
         Player defender = game.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
         Tile tile = game.getTileByPosition(candidate.getTilePosition());
         String tileRepresentation = tile == null ? candidate.getTilePosition() : tile.getRepresentationForButtons();
-        String attackerLine = attacker == null
-                ? "- `" + candidate.getAttackerFaction() + "`"
-                : "- " + attacker.getFactionEmoji() + " = " + attacker.getUserName();
-        String defenderLine = defender == null
-                ? "- `" + candidate.getDefenderFaction() + "`"
-                : "- " + defender.getFactionEmoji() + " = " + defender.getUserName();
-        return "## Lazax War Archives Replay\n"
+        String activePlayerSummary = extractRecordedActivePlayerSummary(startSummaryText);
+        if (activePlayerSummary == null) {
+            activePlayerSummary = formatActivePlayerSummary(game);
+        }
+        String attackerLine = formatReplayLegendLine(attacker, candidate.getAttackerFaction());
+        String defenderLine = formatReplayLegendLine(defender, candidate.getDefenderFaction());
+
+        String openerText = "## A New Combat Contest Has Emerged!\n"
                 + roleMention
                 + "\n"
-                + "**Game:** `" + candidate.getGameName() + "`\n"
-                + "**Game Link:** [Open Game](https://asyncti4.com/game/" + candidate.getGameName() + ")\n"
+                + activePlayerSummary
                 + "**System:** " + tileRepresentation + "\n"
                 + "**Combat:** Space Combat\n"
-                + "**Joint Score:** `" + formatDecimal(observation.getJointScore()) + "`\n"
                 + "**Predict the winner by reacting below.**\n"
-                + "**Replay begins in 10 minutes.**\n"
                 + attackerLine + "\n"
                 + defenderLine;
+        String boardSummary = extractRecordedBoardSummary(startSummaryText);
+        if (boardSummary == null || boardSummary.isBlank()) {
+            return openerText;
+        }
+        return openerText + "\n\n" + boardSummary;
     }
 
     public double computeFairnessRatio(
@@ -154,6 +194,58 @@ public class LazaxCombatSupport {
             }
         }
         return damagedCountsByAsyncId;
+    }
+
+    private String formatCombatTechLine(Player player) {
+        String techSummary = player.getTechs().stream()
+                .map(Mapper::getTech)
+                .filter(Objects::nonNull)
+                .filter(tech -> !player.getPurgedTechs().contains(tech.getAlias()))
+                .filter(tech -> tech.isFactionTech()
+                        || tech.isUnitUpgrade()
+                        || COMBAT_SUMMARY_TECH_ALIASES.contains(tech.getAlias()))
+                .sorted(TECH_COMPARATOR)
+                .map(tech -> tech.getCondensedReqsEmojis(false) + " " + tech.getName())
+                .reduce((left, right) -> left + ", " + right)
+                .orElse("No technologies");
+        return formatPlayerSummaryLine(player, techSummary);
+    }
+
+    private String formatCombatRelicSection(Player attacker, Player defender) {
+        String attackerRelics = formatCombatRelicLine(attacker);
+        String defenderRelics = formatCombatRelicLine(defender);
+        if (attackerRelics == null && defenderRelics == null) return null;
+
+        StringBuilder section = new StringBuilder("## Relics");
+        if (attackerRelics != null) {
+            section.append("\n").append(attackerRelics);
+        }
+        if (defenderRelics != null) {
+            section.append("\n").append(defenderRelics);
+        }
+        return section.toString();
+    }
+
+    private String formatCombatRelicLine(Player player) {
+        String relicSummary = player.getRelics().stream()
+                .distinct()
+                .filter(COMBAT_SUMMARY_RELIC_ALIASES::contains)
+                .map(Mapper::getRelic)
+                .filter(Objects::nonNull)
+                .map(RelicModel::getName)
+                .sorted(String::compareToIgnoreCase)
+                .reduce((left, right) -> left + ", " + right)
+                .orElse(null);
+        if (relicSummary == null) return null;
+
+        return formatPlayerSummaryLine(player, relicSummary);
+    }
+
+    private String formatPlayerSummaryLine(Player player, String summary) {
+        String factionName = player.getFactionModel() == null
+                ? player.getFaction()
+                : player.getFactionModel().getFactionName();
+        return "- " + player.getFactionEmoji() + " " + factionName + " " + player.getUserName() + ": " + summary;
     }
 
     private double computeExpectedHits(int totalDice, int hitsOn) {
@@ -206,8 +298,44 @@ public class LazaxCombatSupport {
                 + defender.getFactionEmoji() + " `" + defender.getFaction() + "`";
     }
 
-    private String formatDecimal(double value) {
-        return String.format(java.util.Locale.US, "%.3f", value);
+    private static int getTechTypeOrder(TechnologyModel tech) {
+        TechnologyModel.TechnologyType type = tech.getFirstType();
+        return switch (type) {
+            case PROPULSION -> 0;
+            case BIOTIC -> 1;
+            case CYBERNETIC -> 2;
+            case WARFARE -> 3;
+            case UNITUPGRADE -> 4;
+            case GENERICTF -> 5;
+            case NONE -> 6;
+        };
+    }
+
+    private String formatReplayLegendLine(Player player, String fallbackFaction) {
+        if (player == null) {
+            return "- `" + fallbackFaction + "`";
+        }
+        return "- " + ColorEmojis.getColorEmoji(player.getColor()) + " " + player.getFactionEmoji() + " = "
+                + player.getUserName();
+    }
+
+    private String extractRecordedActivePlayerSummary(String summaryText) {
+        if (summaryText == null || summaryText.isBlank()) return null;
+        for (String line : summaryText.split("\n")) {
+            if (line.startsWith("**Active Player:**")) {
+                return line + "\n";
+            }
+        }
+        return null;
+    }
+
+    private String extractRecordedBoardSummary(String summaryText) {
+        if (summaryText == null || summaryText.isBlank()) return null;
+        int separator = summaryText.indexOf("\n\n");
+        if (separator < 0 || separator + 2 >= summaryText.length()) {
+            return null;
+        }
+        return summaryText.substring(separator + 2).trim();
     }
 
     public String toJson(Object value) {

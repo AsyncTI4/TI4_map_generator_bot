@@ -13,8 +13,12 @@ import ti4.contest.replay.repository.*;
 
 @Service
 @RequiredArgsConstructor
+/**
+ * Cleans up stale replay data and expires candidates that were never promoted in time.
+ */
 public class CombatReplayJanitorService {
 
+    private final CombatContestSettings settings;
     private final CombatCandidateRepository candidateRepository;
     private final CombatObservationRepository observationRepository;
     private final CombatCandidateEventRepository candidateEventRepository;
@@ -25,14 +29,17 @@ public class CombatReplayJanitorService {
 
         expireStaleResolvedCandidates(now);
 
-        observationRepository.deleteAll(observationRepository.findByStartedAtBefore(now.minusDays(14)));
+        observationRepository.deleteAll(observationRepository.findByStartedAtBefore(
+                now.minusDays(settings.getRetention().getObservationRetentionDays())));
         deleteExpiredCandidateEvents(now);
         clearCompletedReplayErrors();
     }
 
     private void expireStaleResolvedCandidates(LocalDateTime now) {
         candidateRepository
-                .findByPromotionStatusAndResolvedAtBefore(CombatCandidatePromotionStatus.PENDING, now.minusHours(4))
+                .findByPromotionStatusAndResolvedAtBefore(
+                        CombatCandidatePromotionStatus.PENDING,
+                        now.minusHours(settings.getPromotion().getCandidateLookbackHours()))
                 .stream()
                 .filter(candidate -> candidate.getStatus() == CombatCandidateStatus.RESOLVED)
                 .forEach(candidate -> {
@@ -42,7 +49,8 @@ public class CombatReplayJanitorService {
     }
 
     private void deleteExpiredCandidateEvents(LocalDateTime now) {
-        List<CombatCandidateEventEntity> oldEvents = candidateEventRepository.findByOccurredAtBefore(now.minusDays(14));
+        List<CombatCandidateEventEntity> oldEvents = candidateEventRepository.findByOccurredAtBefore(
+                now.minusDays(settings.getRetention().getEventRetentionDays()));
         if (oldEvents.isEmpty()) return;
 
         List<Long> candidateIds = oldEvents.stream()
@@ -63,7 +71,10 @@ public class CombatReplayJanitorService {
 
             LocalDateTime terminalAt =
                     candidate.getPromotedAt() != null ? candidate.getPromotedAt() : candidate.getResolvedAt();
-            if (terminalAt == null || terminalAt.isAfter(now.minusDays(14))) continue;
+            if (terminalAt == null
+                    || terminalAt.isAfter(now.minusDays(settings.getRetention().getEventRetentionDays()))) {
+                continue;
+            }
 
             CombatReplayContestEntity contest = contestsByCandidateId.get(candidate.getId());
             if (contest != null && contest.getReplayStatus() != CombatContestReplayStatus.COMPLETED) continue;

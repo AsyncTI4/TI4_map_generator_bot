@@ -2,6 +2,7 @@ package ti4.contest.replay.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,136 +16,136 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ti4.contest.replay.core.*;
-import ti4.contest.replay.entities.*;
-import ti4.contest.replay.repository.*;
+import ti4.contest.replay.core.CombatContestReplayStatus;
+import ti4.contest.replay.core.CombatContestSettings;
+import ti4.contest.replay.entities.CombatCandidateEntity;
+import ti4.contest.replay.entities.CombatReplayContestEntity;
+import ti4.contest.replay.entities.CombatReplayLeaderboardEntryEntity;
+import ti4.contest.replay.entities.CombatReplayPredictionEntity;
+import ti4.contest.replay.repository.CombatReplayContestRepository;
+import ti4.contest.replay.repository.CombatReplayLeaderboardEntryRepository;
+import ti4.contest.replay.repository.CombatReplayPredictionRepository;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.logging.BotLogger;
+import ti4.json.JsonMapperManager;
 import ti4.message.MessageHelper;
-import ti4.spring.service.contest.CombatContestEntity;
-import ti4.spring.service.contest.CombatContestLeaderboardRow;
-import ti4.spring.service.contest.CombatContestPredictionEntity;
-import ti4.spring.service.contest.CombatContestPredictionRepository;
-import ti4.spring.service.contest.CombatContestRepository;
-import ti4.spring.service.contest.CombatContestStatus;
-import ti4.spring.service.contest.CombatContestType;
-import ti4.spring.service.contest.CombatContestUserPointsRow;
 
 @Service
 @RequiredArgsConstructor
+/**
+ * Manages replay-native prediction locking, scoring, and leaderboard posting.
+ */
 public class CombatReplayLeaderboardService {
 
     private static final double ZERO_EPSILON = 0.0001;
     private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives-dev";
+    private static final Comparator<LockedPrediction> LOCKED_PREDICTION_COMPARATOR = Comparator.comparing(
+                    LockedPrediction::discordUserName, String.CASE_INSENSITIVE_ORDER)
+            .thenComparing(LockedPrediction::discordUserId);
 
-    private final CombatContestRepository contestRepository;
-    private final CombatContestPredictionRepository predictionRepository;
+    private final CombatContestSettings settings;
+    private final CombatReplayContestRepository replayContestRepository;
+    private final CombatReplayPredictionRepository replayPredictionRepository;
+    private final CombatReplayLeaderboardEntryRepository leaderboardEntryRepository;
 
-    public Long initializeReplayLeaderboardContest(
-            Game game,
-            CombatObservationEntity observation,
-            CombatCandidateEntity candidate,
-            Long publicChannelId,
-            Long publicMessageId,
-            Long publicThreadId,
-            String initialSummaryText) {
-        if (CombatReplayRuntimeSettings.SHADOW_MODE) {
-            return null;
+    public void lockPredictionsAtReplayStart(
+            Game game, CombatReplayContestEntity replayContest, CombatCandidateEntity candidate) {
+        if (!settings.getRuntime().isDiscordPostingEnabled()) return;
+        if (replayContest.getId() == null) return;
+        if (replayPredictionRepository.findByContestId(replayContest.getId()).isPresent()) return;
+
+        TextChannel contestChannel = getContestPublicChannel(replayContest.getPublicChannelId());
+        if (contestChannel == null || replayContest.getPublicMessageId() == null) {
+            throw new IllegalStateException("Replay contest message unavailable for prediction lock.");
         }
-        Player attacker = game.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
-        Player defender = game.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
-        if (attacker == null || defender == null) return null;
 
-        CombatContestEntity contest = new CombatContestEntity();
-        contest.setStatus(CombatContestStatus.POSTED);
-        contest.setCombatType(CombatContestType.SPACE);
-        contest.setGameName(candidate.getGameName());
-        contest.setTilePosition(candidate.getTilePosition());
-        contest.setTileRepresentation(resolveTileRepresentation(game, candidate));
-        contest.setAttackerFaction(candidate.getAttackerFaction());
-        contest.setDefenderFaction(candidate.getDefenderFaction());
-        contest.setAttackerColor(attacker.getColor());
-        contest.setDefenderColor(defender.getColor());
-        contest.setPublicChannelId(publicChannelId);
-        contest.setPublicMessageId(publicMessageId);
-        contest.setPublicThreadId(publicThreadId);
-        contest.setPostedAt(LocalDateTime.now());
-        contest.setInitialSummaryText(initialSummaryText);
-        contest.setInitialStrengthAttacker(observation.getAttackerStrength());
-        contest.setInitialStrengthDefender(observation.getDefenderStrength());
-        contest.setInitialHpAttacker(observation.getAttackerHp());
-        contest.setInitialHpDefender(observation.getDefenderHp());
-        contest.setDiceRolled(true);
-        contestRepository.save(contest);
+        Message message = contestChannel
+                .retrieveMessageById(replayContest.getPublicMessageId())
+                .complete();
+        replayPredictionRepository.save(buildLockedPredictionSnapshot(game, replayContest, candidate, message));
+    }
 
-        addPredictionReactions(attacker, defender, publicMessageId, publicChannelId);
-        return contest.getId();
+    public void announceLockedPredictionsIfNeeded(
+            MessageChannel replayChannel,
+            Game game,
+            CombatReplayContestEntity replayContest,
+            CombatCandidateEntity candidate) {
+        if (!settings.getRuntime().isDiscordPostingEnabled()) return;
+        if (replayContest.getId() == null) return;
+
+        CombatReplayPredictionEntity lockedPrediction = replayPredictionRepository
+                .findByContestId(replayContest.getId())
+                .orElse(null);
+        if (lockedPrediction == null || lockedPrediction.getAnnouncedAt() != null) return;
+
+        replayChannel
+                .sendMessage(buildLockedPredictionMessage(game, candidate, lockedPrediction))
+                .complete();
+        lockedPrediction.setAnnouncedAt(LocalDateTime.now());
+        replayPredictionRepository.save(lockedPrediction);
+    }
+
+    public void clearLockedPredictions(Long replayContestId) {
+        if (replayContestId == null) return;
+        replayPredictionRepository.deleteByContestId(replayContestId);
     }
 
     public void finalizeReplayLeaderboardContest(
-            Game game, CombatReplayContestEntity replayContest, CombatCandidateEntity candidate) {
-        if (CombatReplayRuntimeSettings.SHADOW_MODE) {
+            CombatReplayContestEntity replayContest, CombatCandidateEntity candidate) {
+        if (!settings.getRuntime().isDiscordPostingEnabled()) return;
+        if (replayContest.getId() == null) return;
+
+        CombatReplayPredictionEntity lockedPrediction = replayPredictionRepository
+                .findByContestId(replayContest.getId())
+                .orElse(null);
+        if (lockedPrediction == null) {
+            maybePostLeaderboardAfterResolvedContest();
             return;
         }
-        Long legacyContestId = replayContest.getLegacyPredictorContestId();
-        if (legacyContestId == null) return;
-        CombatContestEntity contest =
-                contestRepository.findById(legacyContestId).orElse(null);
-        if (contest == null || contest.getStatus() == CombatContestStatus.RESOLVED) return;
 
-        contest.setStatus(CombatContestStatus.RESOLVED);
-        contest.setResolvedAt(LocalDateTime.now());
-        contest.setWinnerFaction(candidate.getWinnerFaction());
-        contest.setLoserFaction(candidate.getLoserFaction());
-        contestRepository.save(contest);
-
-        capturePredictionsAtResolution(game, contest);
-        List<CombatContestPredictionEntity> predictions = awardPredictionPoints(contest);
-        MessageChannel threadOrChannel = getContestThreadOrChannel(contest);
+        ScoredContestResult result = scoreContest(candidate, lockedPrediction);
+        MessageChannel threadOrChannel = getContestThreadOrChannel(replayContest);
         if (threadOrChannel != null) {
-            postPredictionPointsSummary(threadOrChannel, predictions);
+            postPredictionPointsSummary(threadOrChannel, result.winningPredictions());
         }
         maybePostLeaderboardAfterResolvedContest();
     }
 
-    private void addPredictionReactions(Player attacker, Player defender, Long publicMessageId, Long publicChannelId) {
-        TextChannel channel = getContestPublicChannel(publicChannelId);
-        if (channel == null || publicMessageId == null) return;
-        try {
-            Message message = channel.retrieveMessageById(publicMessageId).complete();
-            addReaction(attacker, message);
-            addReaction(defender, message);
-        } catch (Exception e) {
-            BotLogger.error("Failed to add replay contest prediction reactions.", e);
-        }
+    public boolean postLeaderboard() {
+        if (!settings.getRuntime().isDiscordPostingEnabled()) return false;
+        List<CombatReplayLeaderboardEntryEntity> topEntries =
+                leaderboardEntryRepository
+                        .findTop10ByOrderByTotalPointsDescCorrectPredictionsDescPredictionCountDescDiscordUserNameAsc();
+        if (topEntries.isEmpty()) return false;
+
+        TextChannel contestChannel = getContestPublicChannelByName();
+        if (contestChannel == null) return false;
+
+        final int[] rank = {1};
+        String message = topEntries.stream()
+                .map(entry -> {
+                    int predictions = safeInt(entry.getPredictionCount());
+                    int correctPredictions = safeInt(entry.getCorrectPredictions());
+                    int accuracy = predictions == 0 ? 0 : Math.round((100f * correctPredictions) / predictions);
+                    return '`' + Integer.toString(rank[0]++) + ".` "
+                            + getSafeLeaderboardName(entry.getDiscordUserName()) + " - **"
+                            + safeInt(entry.getTotalPoints()) + "** points (`" + correctPredictions + "/" + predictions
+                            + "` correct, " + accuracy + "%)";
+                })
+                .collect(Collectors.joining("\n", "## Lazax War Archives Leaderboard\n", ""));
+        MessageHelper.sendMessageToChannel(contestChannel, message);
+        return true;
     }
 
-    private void capturePredictionsAtResolution(Game game, CombatContestEntity contest) {
-        if (!predictionRepository.findByContestId(contest.getId()).isEmpty()) return;
-        TextChannel contestChannel = getContestPublicChannel(contest.getPublicChannelId());
-        if (contestChannel == null || contest.getPublicMessageId() == null) return;
-
-        try {
-            Message message = contestChannel
-                    .retrieveMessageById(contest.getPublicMessageId())
-                    .complete();
-            capturePredictions(game, message, contest);
-        } catch (Exception e) {
-            BotLogger.error("Failed to capture replay contest predictions.", e);
-        }
-    }
-
-    private void capturePredictions(Game game, Message message, CombatContestEntity contest) {
+    private CombatReplayPredictionEntity buildLockedPredictionSnapshot(
+            Game game, CombatReplayContestEntity replayContest, CombatCandidateEntity candidate, Message message) {
         Map<String, Set<String>> factionsByUser = new HashMap<>();
         Map<String, String> namesByUser = new HashMap<>();
         Map<String, String> factionToEmoji = Map.of(
-                contest.getAttackerFaction(), getFactionEmoji(game, contest.getAttackerFaction()),
-                contest.getDefenderFaction(), getFactionEmoji(game, contest.getDefenderFaction()));
+                candidate.getAttackerFaction(), getFactionEmoji(game, candidate.getAttackerFaction()),
+                candidate.getDefenderFaction(), getFactionEmoji(game, candidate.getDefenderFaction()));
 
         for (MessageReaction reaction : message.getReactions()) {
             String predictedFaction = null;
@@ -156,8 +157,7 @@ public class CombatReplayLeaderboardService {
             }
             if (predictedFaction == null) continue;
 
-            List<User> users = reaction.retrieveUsers().complete();
-            for (User user : users) {
+            for (User user : reaction.retrieveUsers().complete()) {
                 if (user.isBot()) continue;
                 factionsByUser
                         .computeIfAbsent(user.getId(), key -> new HashSet<>())
@@ -166,119 +166,142 @@ public class CombatReplayLeaderboardService {
             }
         }
 
-        List<CombatContestPredictionEntity> predictions = new ArrayList<>();
+        List<LockedPrediction> attackerPredictions = new ArrayList<>();
+        List<LockedPrediction> defenderPredictions = new ArrayList<>();
         for (Map.Entry<String, Set<String>> entry : factionsByUser.entrySet()) {
             if (entry.getValue().size() != 1) continue;
-            CombatContestPredictionEntity prediction = new CombatContestPredictionEntity();
-            prediction.setContestId(contest.getId());
-            prediction.setDiscordUserId(entry.getKey());
-            prediction.setDiscordUserName(namesByUser.getOrDefault(entry.getKey(), "Unknown User"));
-            prediction.setPredictedFaction(entry.getValue().iterator().next());
-            prediction.setLockedAt(LocalDateTime.now());
-            predictions.add(prediction);
+            LockedPrediction prediction =
+                    new LockedPrediction(entry.getKey(), namesByUser.getOrDefault(entry.getKey(), "Unknown User"));
+            String predictedFaction = entry.getValue().iterator().next();
+            if (predictedFaction.equalsIgnoreCase(candidate.getAttackerFaction())) {
+                attackerPredictions.add(prediction);
+                continue;
+            }
+            if (predictedFaction.equalsIgnoreCase(candidate.getDefenderFaction())) {
+                defenderPredictions.add(prediction);
+            }
         }
-        predictionRepository.saveAll(predictions);
+
+        attackerPredictions.sort(LOCKED_PREDICTION_COMPARATOR);
+        defenderPredictions.sort(LOCKED_PREDICTION_COMPARATOR);
+
+        CombatReplayPredictionEntity lockedPrediction = new CombatReplayPredictionEntity();
+        lockedPrediction.setContestId(replayContest.getId());
+        lockedPrediction.setLockedAt(LocalDateTime.now());
+        lockedPrediction.setAnnouncedAt(null);
+        lockedPrediction.setScoredAt(null);
+        lockedPrediction.setAttackerPredictionCount(attackerPredictions.size());
+        lockedPrediction.setDefenderPredictionCount(defenderPredictions.size());
+        lockedPrediction.setAttackerPredictionsJson(writeLockedPredictions(attackerPredictions));
+        lockedPrediction.setDefenderPredictionsJson(writeLockedPredictions(defenderPredictions));
+        return lockedPrediction;
     }
 
-    private List<CombatContestPredictionEntity> awardPredictionPoints(CombatContestEntity contest) {
-        List<CombatContestPredictionEntity> predictions = predictionRepository.findByContestId(contest.getId());
-        if (predictions.isEmpty()) return predictions;
+    private ScoredContestResult scoreContest(
+            CombatCandidateEntity candidate, CombatReplayPredictionEntity lockedPrediction) {
+        List<LockedPrediction> attackerPredictions =
+                readLockedPredictions(lockedPrediction.getAttackerPredictionsJson());
+        List<LockedPrediction> defenderPredictions =
+                readLockedPredictions(lockedPrediction.getDefenderPredictionsJson());
+        boolean attackerWon = candidate.getWinnerFaction() != null
+                && candidate.getWinnerFaction().equalsIgnoreCase(candidate.getAttackerFaction());
 
-        int attackerPredictions = (int) predictions.stream()
-                .filter(prediction -> prediction.getPredictedFaction().equalsIgnoreCase(contest.getAttackerFaction()))
-                .count();
-        int defenderPredictions = predictions.size() - attackerPredictions;
-        int winnerPredictions = contest.getWinnerFaction().equalsIgnoreCase(contest.getAttackerFaction())
-                ? attackerPredictions
-                : defenderPredictions;
-        int totalPredictions = attackerPredictions + defenderPredictions;
-        for (CombatContestPredictionEntity prediction : predictions) {
-            boolean correct = prediction.getPredictedFaction().equalsIgnoreCase(contest.getWinnerFaction());
-            prediction.setCorrect(correct);
-            prediction.setPointsAwarded(correct ? calculatePredictionPoints(winnerPredictions, totalPredictions) : 0);
+        List<LockedPrediction> winningPredictions = attackerWon ? attackerPredictions : defenderPredictions;
+        List<LockedPrediction> allPredictions =
+                new ArrayList<>(attackerPredictions.size() + defenderPredictions.size());
+        allPredictions.addAll(attackerPredictions);
+        allPredictions.addAll(defenderPredictions);
+        int winnerPredictions = winningPredictions.size();
+        int totalPredictions = allPredictions.size();
+        int pointsAwarded = winnerPredictions == 0 ? 0 : calculatePredictionPoints(winnerPredictions, totalPredictions);
+
+        List<String> userIds =
+                allPredictions.stream().map(LockedPrediction::discordUserId).toList();
+        Map<String, CombatReplayLeaderboardEntryEntity> entriesByUser =
+                leaderboardEntryRepository.findByDiscordUserIdIn(userIds).stream()
+                        .collect(
+                                Collectors.toMap(CombatReplayLeaderboardEntryEntity::getDiscordUserId, entry -> entry));
+
+        if (lockedPrediction.getScoredAt() == null) {
+            applyContestResult(allPredictions, winningPredictions, pointsAwarded, entriesByUser);
+            lockedPrediction.setScoredAt(LocalDateTime.now());
+            replayPredictionRepository.save(lockedPrediction);
         }
-        predictionRepository.saveAll(predictions);
-        return predictions;
+
+        List<WinningPredictionSummary> summaries = winningPredictions.stream()
+                .map(prediction -> {
+                    CombatReplayLeaderboardEntryEntity entry = entriesByUser.get(prediction.discordUserId());
+                    return new WinningPredictionSummary(
+                            prediction.discordUserId(),
+                            prediction.discordUserName(),
+                            pointsAwarded,
+                            entry == null ? 0 : safeInt(entry.getTotalPoints()));
+                })
+                .sorted((left, right) -> {
+                    int totalPointsComparison = Integer.compare(right.totalPoints(), left.totalPoints());
+                    if (totalPointsComparison != 0) return totalPointsComparison;
+                    return left.discordUserName().compareToIgnoreCase(right.discordUserName());
+                })
+                .toList();
+        return new ScoredContestResult(summaries);
     }
 
-    private int calculatePredictionPoints(int winnerPredictions, int totalPredictions) {
-        totalPredictions = Math.max(1, totalPredictions);
-        double winnerShare = winnerPredictions / (double) totalPredictions;
-        double scaledPoints = 4.0 / Math.max(winnerShare, ZERO_EPSILON);
-        return (int) Math.round(Math.max(4.0, Math.min(100.0, scaledPoints)));
+    private void applyContestResult(
+            List<LockedPrediction> allPredictions,
+            List<LockedPrediction> winningPredictions,
+            int pointsAwarded,
+            Map<String, CombatReplayLeaderboardEntryEntity> entriesByUser) {
+        Set<String> winningUserIds =
+                winningPredictions.stream().map(LockedPrediction::discordUserId).collect(Collectors.toSet());
+        LocalDateTime now = LocalDateTime.now();
+
+        for (LockedPrediction prediction : allPredictions) {
+            CombatReplayLeaderboardEntryEntity entry = entriesByUser.computeIfAbsent(
+                    prediction.discordUserId(), ignored -> newLeaderboardEntry(prediction));
+            entry.setDiscordUserName(prediction.discordUserName());
+            entry.setPredictionCount(safeInt(entry.getPredictionCount()) + 1);
+            if (winningUserIds.contains(prediction.discordUserId())) {
+                entry.setCorrectPredictions(safeInt(entry.getCorrectPredictions()) + 1);
+                entry.setTotalPoints(safeInt(entry.getTotalPoints()) + pointsAwarded);
+            }
+            entry.setUpdatedAt(now);
+        }
+
+        leaderboardEntryRepository.saveAll(entriesByUser.values());
+    }
+
+    private CombatReplayLeaderboardEntryEntity newLeaderboardEntry(LockedPrediction prediction) {
+        CombatReplayLeaderboardEntryEntity entry = new CombatReplayLeaderboardEntryEntity();
+        entry.setDiscordUserId(prediction.discordUserId());
+        entry.setDiscordUserName(prediction.discordUserName());
+        entry.setTotalPoints(0);
+        entry.setPredictionCount(0);
+        entry.setCorrectPredictions(0);
+        entry.setUpdatedAt(LocalDateTime.now());
+        return entry;
     }
 
     private void postPredictionPointsSummary(
-            MessageChannel threadOrChannel, List<CombatContestPredictionEntity> predictions) {
-        List<CombatContestPredictionEntity> winningPredictions = predictions.stream()
-                .filter(prediction -> safeInt(prediction.getPointsAwarded()) > 0)
-                .toList();
+            MessageChannel threadOrChannel, List<WinningPredictionSummary> winningPredictions) {
         if (winningPredictions.isEmpty()) return;
 
-        Map<String, Integer> totalsByUser = predictionRepository
-                .findPointTotalsByDiscordUserIdIn(winningPredictions.stream()
-                        .map(CombatContestPredictionEntity::getDiscordUserId)
-                        .toList())
-                .stream()
-                .collect(Collectors.toMap(
-                        CombatContestUserPointsRow::getDiscordUserId, row -> safeInt(row.getTotalPoints())));
-
         String message = winningPredictions.stream()
-                .sorted((left, right) -> {
-                    int pointsComparison =
-                            Integer.compare(safeInt(right.getPointsAwarded()), safeInt(left.getPointsAwarded()));
-                    if (pointsComparison != 0) return pointsComparison;
-                    return left.getDiscordUserName().compareToIgnoreCase(right.getDiscordUserName());
-                })
-                .map(prediction -> {
-                    int pointsAwarded = safeInt(prediction.getPointsAwarded());
-                    int totalPoints = totalsByUser.getOrDefault(prediction.getDiscordUserId(), 0);
-                    // return "<@" + prediction.getDiscordUserId() + "> - " + totalPoints + " points (+"
-                    //         + pointsAwarded + ")";
-                    return getSafeLeaderboardName(prediction.getDiscordUserName()) + " - " + totalPoints + " points (+"
-                            + pointsAwarded + ")";
-                })
+                .map(prediction -> getSafeLeaderboardName(prediction.discordUserName()) + " - "
+                        + prediction.totalPoints() + " points (+" + prediction.pointsAwarded() + ")")
                 .collect(Collectors.joining("\n", "## Prediction Points\n", ""));
         MessageHelper.splitAndSentWithAction(message, threadOrChannel, null);
     }
 
     private void maybePostLeaderboardAfterResolvedContest() {
-        List<CombatContestEntity> pendingBatch =
-                contestRepository
-                        .findTop5ByStatusAndResolvedAtIsNotNullAndLeaderboardPostedAtIsNullOrderByResolvedAtAsc(
-                                CombatContestStatus.RESOLVED);
+        List<CombatReplayContestEntity> pendingBatch = replayContestRepository
+                .findTop5ByReplayStatusAndReplayCompletedAtIsNotNullAndLeaderboardPostedAtIsNullOrderByReplayCompletedAtAsc(
+                        CombatContestReplayStatus.COMPLETED);
         if (pendingBatch.size() < 5) return;
         if (!postLeaderboard()) return;
 
         LocalDateTime postedAt = LocalDateTime.now();
         pendingBatch.forEach(contest -> contest.setLeaderboardPostedAt(postedAt));
-        contestRepository.saveAll(pendingBatch);
-    }
-
-    public boolean postLeaderboard() {
-        String message = buildLeaderboardMessage();
-        if (message == null) return false;
-        TextChannel contestChannel = getContestPublicChannelByName();
-        if (contestChannel == null) return false;
-        MessageHelper.sendMessageToChannel(contestChannel, message);
-        return true;
-    }
-
-    private String buildLeaderboardMessage() {
-        List<CombatContestLeaderboardRow> topEntries = predictionRepository.findLeaderboardRows(PageRequest.of(0, 10));
-        if (topEntries.isEmpty()) return null;
-        final int[] rank = {1};
-        return topEntries.stream()
-                .map(entry -> {
-                    long predictions = entry.getPredictionCount() == null ? 0 : entry.getPredictionCount();
-                    long correctPredictions = entry.getCorrectPredictions() == null ? 0 : entry.getCorrectPredictions();
-                    int accuracy = predictions == 0 ? 0 : Math.round((100f * correctPredictions) / predictions);
-                    return '`' + Integer.toString(rank[0]++) + ".` "
-                            + getSafeLeaderboardName(entry.getDiscordUserName()) + " - **" + entry.getTotalPoints()
-                            + "** points (`" + correctPredictions + "/" + predictions + "` correct, " + accuracy
-                            + "%)";
-                })
-                .collect(Collectors.joining("\n", "## Lazax War Archives Leaderboard\n", ""));
+        replayContestRepository.saveAll(pendingBatch);
     }
 
     private TextChannel getContestPublicChannel(Long publicChannelId) {
@@ -293,7 +316,7 @@ public class CombatReplayLeaderboardService {
                 .orElse(null);
     }
 
-    private MessageChannel getContestThreadOrChannel(CombatContestEntity contest) {
+    private MessageChannel getContestThreadOrChannel(CombatReplayContestEntity contest) {
         if (JdaService.guildPrimary == null) return null;
         if (contest.getPublicThreadId() != null) {
             ThreadChannel thread = JdaService.guildPrimary.getThreadChannelById(contest.getPublicThreadId());
@@ -302,23 +325,19 @@ public class CombatReplayLeaderboardService {
         return getContestPublicChannel(contest.getPublicChannelId());
     }
 
-    private void addReaction(Player player, Message message) {
-        if (player == null) return;
-        try {
-            message.addReaction(Emoji.fromFormatted(player.getFactionEmoji())).queue(null, BotLogger::catchRestError);
-        } catch (Exception e) {
-            BotLogger.error("Failed to parse replay contest prediction reaction emoji.", e);
-        }
-    }
-
-    private String resolveTileRepresentation(Game game, CombatCandidateEntity candidate) {
-        var tile = game.getTileByPosition(candidate.getTilePosition());
-        return tile == null ? candidate.getTilePosition() : tile.getRepresentationForButtons();
-    }
-
     private String getFactionEmoji(Game game, String faction) {
         Player player = game.getPlayerFromColorOrFaction(faction);
         return player == null ? "" : player.getFactionEmoji();
+    }
+
+    private String buildLockedPredictionMessage(
+            Game game, CombatCandidateEntity candidate, CombatReplayPredictionEntity lockedPrediction) {
+        return "## Predictions Locked\n"
+                + "Votes are now frozen before the replay begins.\n"
+                + getFactionEmoji(game, candidate.getAttackerFaction()) + " " + candidate.getAttackerFaction() + ": **"
+                + safeInt(lockedPrediction.getAttackerPredictionCount()) + "**\n"
+                + getFactionEmoji(game, candidate.getDefenderFaction()) + " " + candidate.getDefenderFaction() + ": **"
+                + safeInt(lockedPrediction.getDefenderPredictionCount()) + "**";
     }
 
     private String getSafeLeaderboardName(String userName) {
@@ -326,7 +345,40 @@ public class CombatReplayLeaderboardService {
         return userName.replace("@", "@\u200B");
     }
 
+    private String writeLockedPredictions(List<LockedPrediction> predictions) {
+        try {
+            return JsonMapperManager.basic().writeValueAsString(predictions);
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to write replay prediction snapshot.", e);
+        }
+    }
+
+    private List<LockedPrediction> readLockedPredictions(String predictionsJson) {
+        if (predictionsJson == null || predictionsJson.isBlank()) return List.of();
+        try {
+            return JsonMapperManager.basic()
+                    .readerForListOf(LockedPrediction.class)
+                    .readValue(predictionsJson);
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to read replay prediction snapshot.", e);
+        }
+    }
+
+    private int calculatePredictionPoints(int winnerPredictions, int totalPredictions) {
+        totalPredictions = Math.max(1, totalPredictions);
+        double winnerShare = winnerPredictions / (double) totalPredictions;
+        double scaledPoints = 4.0 / Math.max(winnerShare, ZERO_EPSILON);
+        return (int) Math.round(Math.max(4.0, Math.min(100.0, scaledPoints)));
+    }
+
     private int safeInt(Integer value) {
         return value == null ? 0 : value;
     }
+
+    private record LockedPrediction(String discordUserId, String discordUserName) {}
+
+    private record WinningPredictionSummary(
+            String discordUserId, String discordUserName, int pointsAwarded, int totalPoints) {}
+
+    private record ScoredContestResult(List<WinningPredictionSummary> winningPredictions) {}
 }

@@ -23,6 +23,9 @@ import ti4.contest.replay.core.CombatContestReplayStatus;
             @Index(name = "idx_replay_contest_replay_status_due", columnList = "replay_status, next_replay_at"),
             @Index(name = "idx_replay_contest_posted_at", columnList = "posted_at")
         })
+/**
+ * Tracks the public replay contest lifecycle once a candidate has been promoted.
+ */
 public class CombatReplayContestEntity {
 
     @Id
@@ -44,9 +47,6 @@ public class CombatReplayContestEntity {
     @Column(name = "public_thread_id")
     private Long publicThreadId;
 
-    @Column(name = "legacy_predictor_contest_id")
-    private Long legacyPredictorContestId;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "replay_status", nullable = false)
     private CombatContestReplayStatus replayStatus;
@@ -62,6 +62,12 @@ public class CombatReplayContestEntity {
 
     @Column(name = "replay_completed_at")
     private LocalDateTime replayCompletedAt;
+
+    @Column(name = "pre_replay_context_posted_at")
+    private LocalDateTime preReplayContextPostedAt;
+
+    @Column(name = "leaderboard_posted_at")
+    private LocalDateTime leaderboardPostedAt;
 
     @Column(name = "replay_error", columnDefinition = "TEXT")
     private String replayError;

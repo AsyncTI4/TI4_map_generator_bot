@@ -85,9 +85,7 @@ public class PlayHeroService {
                             "played _" + leaderModel.getName() + "_.",
                             leaderModel.getRepresentationEmbed(
                                     false, true, false, showFlavourText, game.isTwilightsFallMode()),
-                            event.getChannel().getName(),
-                            "leader",
-                            playerLeader.getId());
+                            event.getChannel().getName());
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " played:");
             player.getCorrectChannel()
                     .sendMessageEmbeds(leaderModel.getRepresentationEmbed(

@@ -30,6 +30,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.JdaService;
 import ti4.game.Game;
@@ -163,19 +164,11 @@ public class CombatContestService {
     }
 
     public void mirrorCombatEvent(
-            Game game,
-            Player player,
-            String header,
-            String name,
-            MessageEmbed embed,
-            String sourceChannelName,
-            String componentKind,
-            String componentId) {
+            Game game, Player player, String header, String name, MessageEmbed embed, String sourceChannelName) {
         runReplayHook(
                 game,
                 "event mirror",
-                () -> combatReplayService.mirrorCombatEvent(
-                        game, player, header, name, embed, sourceChannelName, componentKind, componentId));
+                () -> combatReplayService.mirrorCombatEvent(game, player, header, name, embed, sourceChannelName));
         try {
             List<CombatContestEntity> activeContests =
                     repository.findByGameNameAndStatusIn(game.getName(), ACTIVE_STATUSES);
@@ -968,17 +961,9 @@ public class CombatContestService {
     private void postCombatTechSummary(Game game, CombatContestEntity contest, MessageChannel threadOrChannel) {
         Player attacker = game.getPlayerFromColorOrFaction(contest.getAttackerFaction());
         Player defender = game.getPlayerFromColorOrFaction(contest.getDefenderFaction());
-        if (attacker == null || defender == null) return;
-
-        StringBuilder message = new StringBuilder("## Combat Technologies\n")
-                .append(formatCombatTechLine(attacker))
-                .append("\n")
-                .append(formatCombatTechLine(defender));
-        String relicSection = formatCombatRelicSection(attacker, defender);
-        if (relicSection != null) {
-            message.append("\n\n").append(relicSection);
-        }
-        MessageHelper.sendMessageToChannel(threadOrChannel, message.toString());
+        String message = LazaxCombatSupport.formatCombatTechSummary(attacker, defender);
+        if (message == null || message.isBlank()) return;
+        MessageHelper.sendMessageToChannel(threadOrChannel, message);
     }
 
     private void addPredictionReactions(Game game, Player attacker, Player defender, Message message) {
