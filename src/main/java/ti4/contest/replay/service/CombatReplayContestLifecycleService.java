@@ -282,8 +282,9 @@ public class CombatReplayContestLifecycleService {
     private void completeReplayContest(CombatReplayContestEntity contest) {
         CombatCandidateEntity candidate =
                 candidateRepository.findById(contest.getCandidateId()).orElse(null);
+        Game game = candidate == null ? null : loadGame(candidate.getGameName());
         if (candidate != null) {
-            replayLeaderboardService.finalizeReplayLeaderboardContest(contest, candidate);
+            replayLeaderboardService.finalizeReplayLeaderboardContest(game, contest, candidate);
         }
 
         contest.setReplayStatus(CombatContestReplayStatus.COMPLETED);

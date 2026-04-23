@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.CombatContestReplayStatus;
 import ti4.contest.replay.core.CombatContestSettings;
@@ -30,7 +31,9 @@ import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.json.JsonMapperManager;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.spring.service.contest.CombatContestService;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +44,8 @@ public class CombatReplayLeaderboardService {
 
     private static final double ZERO_EPSILON = 0.0001;
     private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives-dev";
+    private static final String SUBSCRIBE_EMOJI = "\uD83D\uDFE2";
+    private static final String UNSUBSCRIBE_EMOJI = "\uD83D\uDD34";
     private static final Comparator<LockedPrediction> LOCKED_PREDICTION_COMPARATOR = Comparator.comparing(
                     LockedPrediction::discordUserName, String.CASE_INSENSITIVE_ORDER)
             .thenComparing(LockedPrediction::discordUserId);
@@ -93,7 +98,7 @@ public class CombatReplayLeaderboardService {
     }
 
     public void finalizeReplayLeaderboardContest(
-            CombatReplayContestEntity replayContest, CombatCandidateEntity candidate) {
+            Game game, CombatReplayContestEntity replayContest, CombatCandidateEntity candidate) {
         if (!settings.getRuntime().isDiscordPostingEnabled()) return;
         if (replayContest.getId() == null) return;
 
@@ -108,7 +113,10 @@ public class CombatReplayLeaderboardService {
         ScoredContestResult result = scoreContest(candidate, lockedPrediction);
         MessageChannel threadOrChannel = getContestThreadOrChannel(replayContest);
         if (threadOrChannel != null) {
-            postPredictionResultsSummary(threadOrChannel, candidate, result);
+            postPredictionResultsSummary(threadOrChannel, candidate, result, () -> {
+                postParticipantFollowup(game, candidate, threadOrChannel);
+                postSubscriptionPrompt(threadOrChannel);
+            });
         }
         maybePostLeaderboardAfterResolvedContest();
     }
@@ -282,7 +290,10 @@ public class CombatReplayLeaderboardService {
     }
 
     private void postPredictionResultsSummary(
-            MessageChannel threadOrChannel, CombatCandidateEntity candidate, ScoredContestResult result) {
+            MessageChannel threadOrChannel,
+            CombatCandidateEntity candidate,
+            ScoredContestResult result,
+            Runnable afterPost) {
         String winnerFaction = candidate.getWinnerFaction() == null ? "Unknown" : candidate.getWinnerFaction();
         List<WinningPredictionSummary> winningPredictions = result.winningPredictions();
         String message = "## Prediction Results\n"
@@ -300,7 +311,35 @@ public class CombatReplayLeaderboardService {
                                     + " points (+" + prediction.pointsAwarded() + ")")
                             .collect(Collectors.joining("\n"));
         }
-        MessageHelper.splitAndSentWithAction(message, threadOrChannel, null);
+        MessageHelper.splitAndSentWithAction(message, threadOrChannel, ignored -> {
+            if (afterPost != null) {
+                afterPost.run();
+            }
+        });
+    }
+
+    private void postParticipantFollowup(Game game, CombatCandidateEntity candidate, MessageChannel threadOrChannel) {
+        if (game == null) return;
+        Player attacker = game.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
+        Player defender = game.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
+        if (attacker == null || defender == null) return;
+
+        String message = "## Summons From The Archives\n"
+                + "<@" + attacker.getUserID() + "> <@" + defender.getUserID() + ">\n"
+                + "By decree of the Lazax War Game, your fleets have been judged worthy of remembrance. "
+                + "If it pleases the honored claimants, tarry a moment and read the commentaries, acclaim, and quiet condemnation recorded above concerning your struggle.";
+        MessageHelper.sendMessageToChannel(threadOrChannel, message);
+    }
+
+    private void postSubscriptionPrompt(MessageChannel threadOrChannel) {
+        String message = "Did you like this? React " + SUBSCRIBE_EMOJI
+                + " to subscribe to more, " + UNSUBSCRIBE_EMOJI
+                + " to opt out if already subscribed.\n"
+                + CombatContestService.LAZAX_MINIGAME_SUBSCRIPTION_MARKER;
+        MessageHelper.splitAndSentWithAction(message, threadOrChannel, postedMessage -> {
+            postedMessage.addReaction(Emoji.fromUnicode(SUBSCRIBE_EMOJI)).queue(null, BotLogger::catchRestError);
+            postedMessage.addReaction(Emoji.fromUnicode(UNSUBSCRIBE_EMOJI)).queue(null, BotLogger::catchRestError);
+        });
     }
 
     private void maybePostLeaderboardAfterResolvedContest() {
