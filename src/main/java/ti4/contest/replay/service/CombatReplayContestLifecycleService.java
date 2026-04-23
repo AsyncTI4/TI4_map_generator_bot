@@ -135,7 +135,9 @@ public class CombatReplayContestLifecycleService {
                     thread,
                     existingContest);
             try {
-                announcePreReplayContextIfNeeded(thread != null ? thread : contestChannel, contest, winner);
+                MessageChannel replayChannel = thread != null ? thread : contestChannel;
+                announcePreReplayContextIfNeeded(replayChannel, contest, winner);
+                announcePredictionLockCountdown(replayChannel);
             } catch (Exception e) {
                 BotLogger.error("Failed to post replay context at promotion.", e);
             }
@@ -242,6 +244,15 @@ public class CombatReplayContestLifecycleService {
         }
         contest.setPreReplayContextPostedAt(LocalDateTime.now());
         replayContestRepository.save(contest);
+    }
+
+    private void announcePredictionLockCountdown(MessageChannel channel) {
+        int startDelayMinutes = settings.getReplayExecution().getStartDelayMinutes();
+        String message = startDelayMinutes <= 0
+                ? "## Final Wagers\nVoting is now locked. The combat begins immediately."
+                : "## Final Wagers\nVoting will be locked in **" + startDelayMinutes + "** "
+                        + (startDelayMinutes == 1 ? "minute" : "minutes") + ".";
+        channel.sendMessage(message).complete();
     }
 
     private void completeReplayContest(CombatReplayContestEntity contest) {
