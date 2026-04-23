@@ -98,6 +98,12 @@ public class Source {
             return super.toString().toLowerCase();
         }
 
+        /**
+         * Converts a string identifier to the corresponding ComponentSource enum value.
+         *
+         * @param id the string identifier
+         * @return the ComponentSource enum value, or null if not found
+         */
         public static ComponentSource fromString(String id) {
             for (ComponentSource source : values()) {
                 if (source.toString().equals(id)) {
@@ -147,6 +153,7 @@ public class Source {
 
         public boolean isHiddenFromSearch(ComponentSource source) {
             if (this == source) return false;
+
             return !isOfficial();
         }
 
@@ -172,6 +179,10 @@ public class Source {
             return emoji == null ? "" : emoji.toString();
         }
 
+        /**
+         * Switch to Source Model and \data\sources\ once they are completed
+         * @return
+         */
         public String prettyName() {
             return switch (this) {
                 case base -> "Twilight Imperium 4th Edition (Base Game)";
@@ -188,7 +199,6 @@ public class Source {
                 case monuments -> "Monuments+ [Homebrew]";
                 case omega_phase -> "Omega Phase [Homebrew]";
                 case voices_of_the_council -> "Voices of the Council [Homebrew]";
-                case untangled_space -> "Untangled Space [Homebrew]";
                 default -> toString();
             };
         }
