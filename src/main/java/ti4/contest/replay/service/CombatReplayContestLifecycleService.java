@@ -248,9 +248,10 @@ public class CombatReplayContestLifecycleService {
 
     private void announcePredictionLockCountdown(MessageChannel channel) {
         int startDelayMinutes = settings.getReplayExecution().getStartDelayMinutes();
+        String subtitle = "_The archives remain open for a few moments longer._";
         String message = startDelayMinutes <= 0
-                ? "## Final Wagers\nVoting is now locked. The combat begins immediately."
-                : "## Final Wagers\nVoting will be locked in **" + startDelayMinutes + "** "
+                ? "## Final Wagers\n" + subtitle + "\nVoting is now locked. The combat begins immediately."
+                : "## Final Wagers\n" + subtitle + "\nVoting will be locked in **" + startDelayMinutes + "** "
                         + (startDelayMinutes == 1 ? "minute" : "minutes") + ".";
         channel.sendMessage(message).complete();
     }
