@@ -118,6 +118,6 @@ public class CombatContestSettings {
     @Data
     @NoArgsConstructor
     public static class Runtime {
-        private boolean discordPostingEnabled = false;
+        private boolean discordPostingEnabled = true;
     }
 }
