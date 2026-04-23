@@ -8,7 +8,8 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "kind")
 @JsonSubTypes({
     @JsonSubTypes.Type(value = ReplayDispatchPayload.DiscordMessageDispatch.class, name = "DISCORD_MESSAGE"),
-    @JsonSubTypes.Type(value = ReplayDispatchPayload.HitAssignDispatch.class, name = "HIT_ASSIGN")
+    @JsonSubTypes.Type(value = ReplayDispatchPayload.HitAssignDispatch.class, name = "HIT_ASSIGN"),
+    @JsonSubTypes.Type(value = ReplayDispatchPayload.TileRenderMessageDispatch.class, name = "TILE_RENDER_MESSAGE")
 })
 /**
  * Canonical persisted replay action model.
@@ -35,9 +36,26 @@ public interface ReplayDispatchPayload {
         return new HitAssignDispatch(tilePosition, combatStateSnapshotJson);
     }
 
+    static ReplayDispatchPayload tileRenderMessage(
+            String tilePosition, String combatStateSnapshotJson, String content) {
+        return new TileRenderMessageDispatch(
+                tilePosition, combatStateSnapshotJson, new DiscordMessage(content, List.of()));
+    }
+
+    static ReplayDispatchPayload tileRenderMessage(
+            String tilePosition, String combatStateSnapshotJson, String content, List<MessageEmbed> embeds) {
+        return new TileRenderMessageDispatch(
+                tilePosition,
+                combatStateSnapshotJson,
+                new DiscordMessage(content, ReplayDispatchSerializer.fromMessageEmbeds(embeds)));
+    }
+
     record DiscordMessageDispatch(DiscordMessage message) implements ReplayDispatchPayload {}
 
     record HitAssignDispatch(String tilePosition, String combatStateSnapshotJson) implements ReplayDispatchPayload {}
+
+    record TileRenderMessageDispatch(String tilePosition, String combatStateSnapshotJson, DiscordMessage message)
+            implements ReplayDispatchPayload {}
 
     record DiscordMessage(String content, List<DiscordEmbed> embeds) {
 

@@ -189,11 +189,13 @@ public class CombatReplayService {
         candidate.setPromotionScore(roundsObserved + mutualLossScore);
         candidateRepository.save(candidate);
 
-        appendDiscordEvent(
+        appendTileRenderEvent(
                 candidate,
                 CombatCandidateEventType.RESOLVED,
                 roundsObserved,
                 winner.getFaction(),
+                tile.getPosition(),
+                CombatReplayRenderSnapshotSupport.captureHitAssignmentSnapshot(game, tile.getPosition()),
                 "## Contest Result\n"
                         + winner.getFactionEmoji() + " " + winner.getUserName() + " won the space combat in "
                         + tile.getRepresentationForButtons() + ".\n"
@@ -471,6 +473,23 @@ public class CombatReplayService {
                 actorFaction,
                 message,
                 ReplayDispatchPayload.discordMessage(message, embed));
+    }
+
+    private void appendTileRenderEvent(
+            CombatCandidateEntity candidate,
+            CombatCandidateEventType eventType,
+            Integer roundNumber,
+            String actorFaction,
+            String tilePosition,
+            String snapshotJson,
+            String message) {
+        eventAppender.appendEvent(
+                candidate,
+                eventType,
+                roundNumber,
+                actorFaction,
+                message,
+                ReplayDispatchPayload.tileRenderMessage(tilePosition, snapshotJson, message));
     }
 
     private CombatCandidateEntity resolveCandidateForMirrorEvent(Game game, Player player, String sourceChannelName) {
