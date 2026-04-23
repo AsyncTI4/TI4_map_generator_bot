@@ -113,9 +113,6 @@ class GameLoadService {
     public static Game load(String gameName) {
         return GameFileLockManager.wrapWithReadLock(gameName, () -> {
             File gameFile = Storage.getGameFile(gameName + GAME_FILE_EXTENSION);
-            if (!gameFile.exists()) {
-                return null;
-            }
             return readGame(gameFile);
         });
     }
@@ -127,7 +124,7 @@ class GameLoadService {
     @Nullable
     private static Game readGame(@NotNull File gameFile) {
         if (!gameFile.exists()) {
-            BotLogger.critical("Could not load map, map file does not exist: " + gameFile.getAbsolutePath());
+            BotLogger.critical("Could not load map, file does not exist: " + gameFile.getAbsolutePath());
             return null;
         }
         try {
@@ -136,7 +133,7 @@ class GameLoadService {
                     .listIterator();
             game.setOwnerID(gameFileLines.next());
             game.setOwnerName(gameFileLines.next());
-            game.setName(gameFileLines.next());
+            game.setName(gameFileLines.next().toLowerCase());
             while (gameFileLines.hasNext()) {
                 String data = gameFileLines.next();
                 if (MAPINFO.equals(data)) {
