@@ -81,6 +81,7 @@ public class Source {
         memephilosopher,
         omega_phase,
         fowplus,
+        exploration_extravaganza,
 
         // eronous' stuff
         eronous,
@@ -198,6 +199,7 @@ public class Source {
                 case monuments -> "Monuments+ [Homebrew]";
                 case omega_phase -> "Omega Phase [Homebrew]";
                 case voices_of_the_council -> "Voices of the Council [Homebrew]";
+                case exploration_extravaganza -> "Exploration Extravaganza [Homebrew]";
                 default -> toString();
             };
         }

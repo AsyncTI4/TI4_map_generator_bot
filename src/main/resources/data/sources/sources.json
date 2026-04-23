@@ -282,5 +282,13 @@
         "data": [
             "Official channel: https://discord.com/channels/743629929484386395/1422472031949029396"
         ]
+    },
+    {
+        "source": "exploration_extravaganza",
+        "name": "Exploration Extravaganza",
+        "canal": "community",
+        "subcanal": "personal projs",
+        "credits": "paven",
+        "description": "Planetary Stabilisation action available to all players; Ghost Splice Experiment SC and AC"
     }
 ]
