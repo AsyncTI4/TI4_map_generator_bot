@@ -169,24 +169,30 @@ public class CombatReplayService {
             return;
         }
 
-        double attackerRemaining = LazaxCombatSupport.calculateFleetStrength(game, attacker, defender, tile, space)
-                .value();
-        double defenderRemaining = LazaxCombatSupport.calculateFleetStrength(game, defender, attacker, tile, space)
-                .value();
-        double attackerLossRatio = computeLossRatio(observation.getAttackerStrength(), attackerRemaining);
-        double defenderLossRatio = computeLossRatio(observation.getDefenderStrength(), defenderRemaining);
+        LazaxCombatSupport.FleetStrength attackerRemainingStrength =
+                LazaxCombatSupport.calculateFleetStrength(game, attacker, defender, tile, space);
+        LazaxCombatSupport.FleetStrength defenderRemainingStrength =
+                LazaxCombatSupport.calculateFleetStrength(game, defender, attacker, tile, space);
+        double attackerLossRatio =
+                computeLossRatio(observation.getAttackerStrength(), attackerRemainingStrength.value());
+        double defenderLossRatio =
+                computeLossRatio(observation.getDefenderStrength(), defenderRemainingStrength.value());
         int roundsObserved = candidateEventRepository
                 .findMaxRoundNumberByCandidateId(candidate.getId())
                 .orElse(0);
         double mutualLossScore =
                 Math.min(attackerLossRatio, defenderLossRatio) + ((attackerLossRatio + defenderLossRatio) / 2.0);
+        double winnerRemainingHp = winner.getFaction().equalsIgnoreCase(attacker.getFaction())
+                ? attackerRemainingStrength.hp()
+                : defenderRemainingStrength.hp();
+        double clutchScore = 3.0 * Math.exp(-0.9 * Math.max(0.0, winnerRemainingHp - 1.0));
 
         candidate.setStatus(CombatCandidateStatus.RESOLVED);
         candidate.setResolvedAt(LocalDateTime.now());
         candidate.setWinnerFaction(winner.getFaction());
         candidate.setLoserFaction(loserFaction);
         candidate.setResolutionReason("Winner determined from remaining fleets.");
-        candidate.setPromotionScore(roundsObserved + mutualLossScore);
+        candidate.setPromotionScore(roundsObserved + clutchScore + (0.25 * mutualLossScore));
         candidateRepository.save(candidate);
 
         appendTileRenderEvent(
