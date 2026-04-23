@@ -121,10 +121,10 @@ public class CombatReplayContestLifecycleService {
         if (contestChannel == null) return null;
 
         try {
-            Message posted = contestChannel.sendMessage(message).complete();
+            Message posted = postPromotionMessage(contestChannel, message, game, winner);
             addPredictionReactions(game, winner, posted);
             ThreadChannel thread = createReplayThread(posted, winner);
-            return persistPromotedReplayContest(
+            CombatReplayContestEntity contest = persistPromotedReplayContest(
                     game,
                     observation,
                     winner,
@@ -134,9 +134,41 @@ public class CombatReplayContestLifecycleService {
                     posted,
                     thread,
                     existingContest);
+            try {
+                announcePreReplayContextIfNeeded(thread != null ? thread : contestChannel, contest, winner);
+            } catch (Exception e) {
+                BotLogger.error("Failed to post replay context at promotion.", e);
+            }
+            return contest;
         } catch (Exception e) {
             BotLogger.error("Replay contest promotion failed.", e);
             return null;
+        }
+    }
+
+    @SneakyThrows
+    private Message postPromotionMessage(
+            TextChannel contestChannel, String message, Game game, CombatCandidateEntity candidate) {
+        String snapshotJson = candidate.getInitialRenderSnapshotJson();
+        if (snapshotJson == null || snapshotJson.isBlank()) {
+            return contestChannel.sendMessage(message).complete();
+        }
+
+        Game snapshotGame = CombatReplayRenderSnapshotSupport.restoreGame(snapshotJson, game);
+        if (snapshotGame == null) {
+            return contestChannel.sendMessage(message).complete();
+        }
+
+        snapshotGame.setName(CombatReplayRenderSnapshotSupport.buildReplaySnapshotName(
+                candidate.getAttackerFaction(), candidate.getDefenderFaction()));
+        try (FileUpload fileUpload =
+                new TileGenerator(snapshotGame, null, null, 0, candidate.getTilePosition()).createFileUpload()) {
+            return contestChannel
+                    .sendMessage(new MessageCreateBuilder()
+                            .addContent(message)
+                            .addFiles(fileUpload)
+                            .build())
+                    .complete();
         }
     }
 
