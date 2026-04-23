@@ -1,0 +1,57 @@
+package ti4.discord.interactions.slashcommands.franken;
+
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import ti4.discord.interactions.slashcommands.ParentCommand;
+import ti4.discord.interactions.slashcommands.Subcommand;
+import ti4.discord.interactions.slashcommands.franken.ban.Ban;
+import ti4.helpers.Constants;
+
+public class FrankenCommand implements ParentCommand {
+
+    private final Map<String, Subcommand> subcommands = Stream.of(
+                    new AbilityAdd(),
+                    new AbilityRemove(),
+                    new LeaderAdd(),
+                    new LeaderRemove(),
+                    new FactionTechAdd(),
+                    new FactionTechRemove(),
+                    new PNAdd(),
+                    new PNRemove(),
+                    new UnitAdd(),
+                    new UnitRemove(),
+                    new BreakthroughAdd(),
+                    new BreakthroughRemove(),
+                    // WARNING: Franken commands are at 25/25 capacity.
+                    //          Reorganization must happen in order to add more commands
+                    new StartFrankenDraft(),
+                    new SetFactionIcon(),
+                    new SetFactionDisplayName(),
+                    new FrankenEdit(),
+                    new ShowFrankenBag(),
+                    new ShowFrankenHand(),
+                    new FrankenViewCard(),
+                    new Ban(),
+                    new DraftLimits(),
+                    new BanFaction(),
+                    new ApplyDraftBags(),
+                    new SetHomeSystemPosition(),
+                    new BuildMap())
+            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+
+    @Override
+    public String getName() {
+        return Constants.FRANKEN;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Franken";
+    }
+
+    @Override
+    public Map<String, Subcommand> getSubcommands() {
+        return subcommands;
+    }
+}

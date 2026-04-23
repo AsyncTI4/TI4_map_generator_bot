@@ -15,22 +15,31 @@ public class ExecutorServiceManager {
     private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newVirtualThreadPerTaskExecutor();
 
-    public static void runAsync(String name, String gameName, MessageChannel messageChannel, Runnable runnable) {
+    public static void runAsyncWithLock(
+            String name, String gameName, MessageChannel messageChannel, Runnable runnable) {
+        runAsyncWithLock(name, gameName, messageChannel, runnable, ExecutionLockManager.LockType.WRITE);
+    }
+
+    public static void runAsyncWithLock(
+            String name,
+            String gameName,
+            MessageChannel messageChannel,
+            Runnable runnable,
+            ExecutionLockManager.LockType lockType) {
         if (CircuitBreaker.checkIsOpenAndPostWarningIfTrue(messageChannel)) {
             return;
         }
 
         if (isNotBlank(gameName)) {
             // TODO: We can do read/write based on if it is a save command
-            runnable = ExecutionLockManager.wrapWithTryLockAndRelease(
-                    gameName, ExecutionLockManager.LockType.WRITE, runnable, messageChannel);
+            runnable = ExecutionLockManager.wrapWithTryLockAndRelease(gameName, lockType, runnable, messageChannel);
         }
 
         var timedRunnable = new TimedRunnable(name, runnable);
         runAsync(timedRunnable);
     }
 
-    public static void runAsyncIfNotRunning(String taskName, Runnable runnable) {
+    public static void runAsyncWithLock(String taskName, Runnable runnable) {
         if (CircuitBreaker.isOpen()) {
             return;
         }

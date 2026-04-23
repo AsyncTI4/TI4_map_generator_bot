@@ -1,0 +1,50 @@
+package ti4.discord.interactions.slashcommands.cardspn;
+
+import java.util.ArrayList;
+import java.util.List;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.slashcommands.GameStateSubcommand;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.helpers.AliasHandler;
+import ti4.helpers.Constants;
+import ti4.helpers.PromissoryNoteHelper;
+import ti4.image.Mapper;
+import ti4.message.MessageHelper;
+
+class PNReset extends GameStateSubcommand {
+
+    PNReset() {
+        super(
+                Constants.PN_RESET,
+                "Reset your promissory notes and send details to your #cards-info thread",
+                true,
+                true);
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+    }
+
+    @Override
+    public void execute(SlashCommandInteractionEvent event) {
+        Game game = getGame();
+        Player player = getPlayer();
+        String playerColor = AliasHandler.resolveColor(player.getColor());
+        String playerFaction = player.getFaction();
+        if (Mapper.isValidColor(playerColor) && Mapper.isValidFaction(playerFaction)) {
+            List<String> promissoryNotes = new ArrayList<>(Mapper.getColorPromissoryNoteIDs(game, playerColor));
+            for (String promissoryNote : promissoryNotes) {
+                game.removePurgedPN(promissoryNote);
+            }
+        }
+        game.checkPromissoryNotes();
+        PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, true, event);
+        MessageHelper.sendMessageToEventChannel(event, "Promissory note information sent.");
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
+}

@@ -1,0 +1,30 @@
+package ti4.discord.interactions.slashcommands.tf;
+
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.slashcommands.GameStateSubcommand;
+import ti4.game.Player;
+import ti4.helpers.ButtonHelperTwilightsFall;
+import ti4.helpers.Constants;
+
+class DrawRandomGenome extends GameStateSubcommand {
+
+    DrawRandomGenome() {
+        super(Constants.DRAW_RANDOM_GENOME, "Draw a random Twilight's Fall genome splice card", true, true);
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
+    }
+
+    @Override
+    public void execute(SlashCommandInteractionEvent event) {
+        Player player = getPlayer();
+        ButtonHelperTwilightsFall.drawSingularNewSpliceCard(getGame(), "spoof_genome", player, event);
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
+}

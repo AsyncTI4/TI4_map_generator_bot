@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.commands.planet.PlanetExhaust;
+import ti4.discord.interactions.slashcommands.planet.PlanetExhaust;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;

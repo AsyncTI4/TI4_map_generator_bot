@@ -29,7 +29,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import ti4.ResourceHelper;
-import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.slashcommands.CommandHelper;
 import ti4.game.Expeditions;
 import ti4.game.Game;
 import ti4.game.Planet;

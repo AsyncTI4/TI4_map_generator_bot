@@ -1,0 +1,30 @@
+package ti4.discord.interactions.slashcommands.player;
+
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.slashcommands.GameStateSubcommand;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.helpers.Constants;
+import ti4.message.MessageHelper;
+import ti4.service.emoji.MiscEmojis;
+
+class Speaker extends GameStateSubcommand {
+
+    public Speaker() {
+        super(Constants.SPEAKER, "Speaker selection", true, true);
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
+    }
+
+    @Override
+    public void execute(SlashCommandInteractionEvent event) {
+        Game game = getGame();
+        Player player = getPlayer();
+        game.setSpeakerUserID(player.getUserID());
+        String msg = MiscEmojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentationNoPing();
+        MessageHelper.sendMessageToEventChannel(event, msg);
+    }
+}

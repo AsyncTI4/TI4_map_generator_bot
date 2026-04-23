@@ -1,0 +1,201 @@
+package ti4.discord.interactions.slashcommands.help;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.ResourceHelper;
+import ti4.discord.interactions.slashcommands.Subcommand;
+import ti4.helpers.Constants;
+import ti4.helpers.Storage;
+import ti4.image.DrawingUtil;
+import ti4.image.ImageHelper;
+import ti4.image.MapGenerator;
+import ti4.image.Mapper;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
+import ti4.message.MessageHelper;
+import ti4.model.ColorModel;
+import ti4.service.image.FileUploadService;
+
+class SampleColors extends Subcommand {
+
+    SampleColors() {
+        super(Constants.SAMPLE_COLORS, "Show a sample image of dreadnoughts in various player colors.");
+        addOptions(new OptionData(OptionType.STRING, Constants.HUE, "General hue of colors to show (default: all)")
+                .setAutoComplete(true));
+    }
+
+    @Override
+    public void execute(SlashCommandInteractionEvent event) {
+        int SPACING = 2;
+        int DREADWIDTH = 77 + 2 * SPACING;
+        int DREADSUBHIGHT = 76;
+        int DREADTEXHIGHT = DREADSUBHIGHT + 23 + 2 * SPACING;
+        int LINEHEIGHT = 12;
+        Font bigFont = Storage.getFont12();
+        Font smallFont = Storage.getFont8();
+        int PAGEWIDTH = 2400;
+        int PAGEHIGHT = 3600;
+        BasicStroke stroke = new BasicStroke(2.0f);
+
+        OptionMapping input = event.getOption(Constants.HUE);
+        List<String> hues = new ArrayList<>();
+        int fewer = 0;
+        if (input == null
+                || Constants.ALL.equals(input.getAsString())
+                || input.getAsString().isEmpty()) {
+            hues = Arrays.asList(
+                    "RED", "GRAY", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK", "MULTI1", "MULTI2", "MULTI3");
+            fewer = 3;
+        } else {
+            SPACING = 12;
+            DREADWIDTH = 77 + 2 * SPACING;
+            DREADSUBHIGHT = 76;
+            DREADTEXHIGHT = DREADSUBHIGHT + 32 + 2 * SPACING;
+            LINEHEIGHT = 20;
+            bigFont = Storage.getFont16();
+            smallFont = Storage.getFont12();
+            if ("MULTI".equals(input.getAsString())) {
+                hues = Arrays.asList("MULTI1", "MULTI2", "MULTI3");
+                fewer = 3;
+            } else {
+                hues.add(input.getAsString());
+            }
+            stroke = new BasicStroke(3.0f);
+        }
+
+        int maxColorCount = 0;
+        for (String h : hues) {
+            int count = 0;
+            for (ColorModel c : Mapper.getColors()) {
+                if (c.getHue().equals(h)) {
+                    count++;
+                }
+            }
+            maxColorCount = Math.max(maxColorCount, count);
+        }
+
+        int maxWidth = maxColorCount * DREADWIDTH;
+        int maxHeight = (2 * hues.size() - fewer) * DREADTEXHIGHT;
+
+        int leftBound = PAGEWIDTH - maxWidth;
+        int topBound = PAGEHIGHT - maxHeight;
+        int left = leftBound > 0 ? ThreadLocalRandom.current().nextInt(leftBound) : 0;
+        int top = topBound > 0 ? ThreadLocalRandom.current().nextInt(topBound) : 0;
+        int right = left;
+        int bottom = top + maxHeight;
+        int x;
+        int y = top;
+
+        BufferedImage coloursImage = new BufferedImage(PAGEWIDTH, PAGEHIGHT, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage backgroundImage =
+                ImageHelper.read(ResourceHelper.getInstance().getExtraFile("starfield.png"));
+        Graphics graphic = coloursImage.getGraphics();
+        graphic.drawImage(backgroundImage, 0, 0, null);
+
+        for (String h : hues) {
+            x = left;
+            boolean multi = h.contains("MULTI");
+            for (ColorModel c : Mapper.getColors()) {
+                if (!c.getHue().equals(h)) {
+                    continue;
+                }
+                String alias = c.getAlias();
+
+                BufferedImage dread =
+                        ImageHelper.read(ResourceHelper.getInstance().getUnitFile(alias + "_dn.png"));
+                graphic.drawImage(dread, x + SPACING, y + SPACING, null);
+                graphic.setFont(bigFont);
+                DrawingUtil.superDrawString(
+                        graphic,
+                        c.getName(),
+                        x + DREADWIDTH / 2,
+                        y + DREADSUBHIGHT + SPACING,
+                        Color.WHITE,
+                        MapGenerator.HorizontalAlign.Center,
+                        MapGenerator.VerticalAlign.Top,
+                        stroke,
+                        Color.BLACK);
+                graphic.setFont(smallFont);
+                DrawingUtil.superDrawString(
+                        graphic,
+                        alias,
+                        x + DREADWIDTH / 2,
+                        y + DREADSUBHIGHT + LINEHEIGHT + SPACING,
+                        Color.WHITE,
+                        MapGenerator.HorizontalAlign.Center,
+                        MapGenerator.VerticalAlign.Top,
+                        stroke,
+                        Color.BLACK);
+
+                String file = ResourceHelper.getInstance()
+                        .getUnitFile(("lgy".equals(alias) ? "orca" : "split" + alias) + "_dn.png");
+                if (file != null) {
+                    dread = ImageHelper.read(file);
+                    graphic.drawImage(
+                            dread,
+                            x + SPACING + (multi ? DREADWIDTH : 0),
+                            y + SPACING + (multi ? 0 : DREADTEXHIGHT),
+                            null);
+                    graphic.setFont(bigFont);
+                    DrawingUtil.superDrawString(
+                            graphic,
+                            ("lgy".equals(alias) ? "orca" : "split" + c.getName()),
+                            x + (multi ? 3 : 1) * DREADWIDTH / 2,
+                            y + (multi ? 0 : DREADTEXHIGHT) + DREADSUBHIGHT + SPACING,
+                            Color.WHITE,
+                            MapGenerator.HorizontalAlign.Center,
+                            MapGenerator.VerticalAlign.Top,
+                            stroke,
+                            Color.BLACK);
+                    graphic.setFont(smallFont);
+                    DrawingUtil.superDrawString(
+                            graphic,
+                            ("lgy".equals(alias) ? "orca" : "split" + alias),
+                            x + (multi ? 3 : 1) * DREADWIDTH / 2,
+                            y + (multi ? 0 : DREADTEXHIGHT) + DREADSUBHIGHT + LINEHEIGHT + SPACING,
+                            Color.WHITE,
+                            MapGenerator.HorizontalAlign.Center,
+                            MapGenerator.VerticalAlign.Top,
+                            stroke,
+                            Color.BLACK);
+                    x += (multi ? DREADWIDTH : 0);
+                }
+
+                x += DREADWIDTH;
+            }
+            right = Math.max(right, x);
+            y += (multi ? 1 : 2) * DREADTEXHIGHT;
+        }
+        if (left == right) {
+            MessageHelper.sendMessageToEventChannel(event, "No colours found. Something has probably gone wrong.");
+            return;
+        }
+        right = Math.min(right, PAGEWIDTH);
+        bottom = Math.min(bottom, PAGEHIGHT);
+
+        int subWidth = Math.max(1, right - left);
+        int subHeight = Math.max(1, bottom - top);
+        coloursImage = coloursImage.getSubimage(left, top, subWidth, subHeight);
+        String fileNamePrefix =
+                "colour_sample_" + top + "_" + left + "_" + (hues.size() == 1 ? hues.getFirst() : Constants.ALL);
+        try (var fileUpload = FileUploadService.createFileUpload(coloursImage, fileNamePrefix)) {
+            fileUpload.setDescription(
+                    "Colour samples for " + (hues.size() == 1 ? "all the " + hues.getFirst() : "ALL the") + " units.");
+            MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
+        } catch (IOException e) {
+            BotLogger.error(new LogOrigin(event), "Exception when closing FileUpload.", e);
+        }
+    }
+}

@@ -8,9 +8,10 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
-import ti4.discord.interactions.context.ModalContext;
+import ti4.discord.interactions.listeners.context.ModalContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.ModalHandler;
+import ti4.executors.ExecutionLockManager;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.logging.BotLogger;
@@ -55,19 +56,20 @@ public final class ModalListener extends ListenerAdapter {
         event.deferEdit().queue(Consumers.nop(), BotLogger::catchRestError);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        ExecutorServiceManager.runAsync(
+        var modalContext = new ModalContext(event);
+        ExecutorServiceManager.runAsyncWithLock(
                 "ModalListener task for  `" + gameName + "`",
                 gameName,
                 event.getMessageChannel(),
-                () -> handleModal(event));
+                () -> handleModal(modalContext, event),
+                modalContext.isShouldSave() ? ExecutionLockManager.LockType.WRITE : ExecutionLockManager.LockType.READ);
     }
 
-    private void handleModal(@Nonnull ModalInteractionEvent event) {
+    private void handleModal(ModalContext context, ModalInteractionEvent event) {
         try {
             RollbarManager.putInteractionMetadata("modal", event);
             RollbarManager.put("modal_id", event.getModalId());
             RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
-            ModalContext context = new ModalContext(event);
             if (context.isValid()) {
                 resolveModalInteractionEvent(context);
                 context.save();

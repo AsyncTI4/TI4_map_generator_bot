@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
-import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.discord.interactions.slashcommands.statistics.GameStatisticsFilterer;
 import ti4.game.Game;
 import ti4.game.persistence.GamesPage;
 import ti4.json.PersistenceManager;

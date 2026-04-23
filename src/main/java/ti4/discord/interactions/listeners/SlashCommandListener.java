@@ -8,8 +8,8 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.discord.interactions.commands.ParentCommand;
-import ti4.discord.interactions.commands.SlashCommandManager;
+import ti4.discord.interactions.slashcommands.ParentCommand;
+import ti4.discord.interactions.slashcommands.SlashCommandManager;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
@@ -38,11 +38,12 @@ class SlashCommandListener extends ListenerAdapter implements ListenerInterface 
 
     public void queue(SlashCommandInteractionEvent event) {
         String gameName = GameNameService.getGameName(event);
-        ExecutorServiceManager.runAsync(
-                eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event));
+        ExecutorServiceManager.runAsyncWithLock(
+                eventToString(event), gameName, event.getMessageChannel(), () -> process(event));
     }
 
-    public String eventToString(GenericCommandInteractionEvent event, String gameName) {
+    public String eventToString(GenericCommandInteractionEvent event) {
+        String gameName = GameNameService.getGameName(event);
         return "SlashCommandListener task for `" + event.getUser().getEffectiveName() + "`"
                 + (gameName == null ? "" : " in `" + gameName + "`")
                 + ": `"

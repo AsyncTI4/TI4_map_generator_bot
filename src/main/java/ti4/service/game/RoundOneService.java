@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
+import ti4.discord.interactions.slashcommands.special.SetupNeutralPlayer;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
