@@ -221,10 +221,10 @@ public class CombatContestService {
                 game,
                 player,
                 "## Combat Ability\n"
-                        + TechEmojis.WarfareTech
-                        + " "
                         + player.getRepresentationNoPing()
-                        + " used _Assault Cannon_.");
+                        + " used _Assault Cannon_ "
+                        + TechEmojis.WarfareTech
+                        + ".");
     }
 
     public boolean postLeaderboard() {

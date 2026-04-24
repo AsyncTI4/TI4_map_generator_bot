@@ -142,10 +142,10 @@ public class CombatReplayService {
                 getCurrentRound(game, candidate),
                 player.getFaction(),
                 "## Combat Ability\n"
-                        + TechEmojis.WarfareTech
-                        + " "
                         + player.getRepresentationNoPing()
-                        + " used _Assault Cannon_.");
+                        + " used _Assault Cannon_ "
+                        + TechEmojis.WarfareTech
+                        + ".");
     }
 
     public void mirrorGravitonExhausted(Game game, Player player, String sourceChannelName) {
@@ -158,10 +158,10 @@ public class CombatReplayService {
                 getCurrentRound(game, candidate),
                 player.getFaction(),
                 "## Combat Ability\n"
-                        + TechEmojis.CyberneticTech
-                        + " "
                         + player.getRepresentationNoPing()
-                        + " exhausted _Graviton Laser System_.");
+                        + " exhausted _Graviton Laser System_ "
+                        + TechEmojis.CyberneticTech
+                        + ".");
     }
 
     private boolean evaluateCandidateCompletion(Game game, CombatCandidateEntity candidate) {
