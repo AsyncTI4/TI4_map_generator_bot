@@ -173,10 +173,6 @@ public class CombatReplayService {
                 LazaxCombatSupport.calculateFleetStrength(game, attacker, defender, tile, space);
         LazaxCombatSupport.FleetStrength defenderRemainingStrength =
                 LazaxCombatSupport.calculateFleetStrength(game, defender, attacker, tile, space);
-        double attackerLossRatio =
-                computeLossRatio(observation.getAttackerStrength(), attackerRemainingStrength.value());
-        double defenderLossRatio =
-                computeLossRatio(observation.getDefenderStrength(), defenderRemainingStrength.value());
         int roundsObserved = candidateEventRepository
                 .findMaxRoundNumberByCandidateId(candidate.getId())
                 .orElse(0);
@@ -277,20 +273,22 @@ public class CombatReplayService {
             LazaxCombatSupport.FleetStrength defenderRemainingStrength,
             String winnerFaction,
             int roundsObserved) {
-        double attackerLossRatio =
-                computeLossRatio(observation.getAttackerStrength(), attackerRemainingStrength.value());
-        double defenderLossRatio =
-                computeLossRatio(observation.getDefenderStrength(), defenderRemainingStrength.value());
-        double roundScore = Math.sqrt(Math.max(0, roundsObserved));
-        double mutualLossScore =
-                Math.min(attackerLossRatio, defenderLossRatio) + ((attackerLossRatio + defenderLossRatio) / 2.0);
+        double weakerHp = Math.min(observation.getAttackerHp(), observation.getDefenderHp());
+        double weakerStrength = Math.min(observation.getAttackerStrength(), observation.getDefenderStrength());
+        double strongerStrength = Math.max(observation.getAttackerStrength(), observation.getDefenderStrength());
         double winnerRemainingHp = winnerFaction.equalsIgnoreCase(observation.getAttackerFaction())
                 ? attackerRemainingStrength.hp()
                 : defenderRemainingStrength.hp();
-        double totalInitialHp = observation.getAttackerHp() + observation.getDefenderHp();
-        double sizeFactor = Math.min(1.0, totalInitialHp / 12.0);
-        double clutchScore = sizeFactor * 3.0 * Math.exp(-0.9 * Math.max(0.0, winnerRemainingHp - 1.0));
-        return roundScore + clutchScore + (0.25 * mutualLossScore);
+        double winnerInitialHp = winnerFaction.equalsIgnoreCase(observation.getAttackerFaction())
+                ? observation.getAttackerHp()
+                : observation.getDefenderHp();
+        double sizeFactor = Math.min(1.0, weakerHp / 8.0);
+        double strengthRatio = safeRatio(weakerStrength, strongerStrength);
+        double winnerSurvivalRatio = safeRatio(winnerRemainingHp, winnerInitialHp);
+        double roundScore = Math.sqrt(Math.max(0, roundsObserved)) * sizeFactor;
+        double openingBalanceScore = 0.9 * Math.pow(strengthRatio, 3.0);
+        double endingTensionScore = winnerRemainingHp <= 0 ? 0.0 : 5.0 * Math.exp(-6.0 * winnerSurvivalRatio);
+        return roundScore + openingBalanceScore + endingTensionScore;
     }
 
     public SelectionDebugView getSelectionDebugView() {
@@ -559,9 +557,9 @@ public class CombatReplayService {
         return buttonId.substring(secondUnderscore + 1);
     }
 
-    private static double computeLossRatio(double initialStrength, double remainingStrength) {
-        if (initialStrength <= 0) return 0.0;
-        return Math.max(0.0, Math.min(1.0, (initialStrength - remainingStrength) / initialStrength));
+    private static double safeRatio(double weaker, double stronger) {
+        if (stronger <= 0) return 0.0;
+        return Math.max(0.0, Math.min(1.0, weaker / stronger));
     }
 
     private record SelectionSnapshot(
