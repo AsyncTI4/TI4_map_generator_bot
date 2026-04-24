@@ -20,6 +20,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.service.combat.CombatRollType;
 import ti4.service.combat.CombatUnitSelectionHelper;
 import ti4.service.emoji.TechEmojis;
 import ti4.spring.context.SpringContext;
@@ -39,6 +40,7 @@ public class CombatReplayService {
     private final CombatCandidateRepository candidateRepository;
     private final CombatCandidateEventRepository candidateEventRepository;
     private final CombatReplayEventAppender eventAppender;
+    private final CombatReplaySideBetTriggerService sideBetTriggerService;
     private volatile SelectionSnapshot selectionSnapshot;
 
     @PostConstruct
@@ -94,7 +96,7 @@ public class CombatReplayService {
             Player opponent,
             Tile tile,
             String message,
-            String rollType,
+            CombatRollType rollType,
             boolean whiff,
             boolean slam) {
         CombatCandidateEntity candidate = getTrackingCandidate(game, tile.getPosition());
@@ -104,6 +106,8 @@ public class CombatReplayService {
         updateCandidateRollTracking(candidate, player, rollType, whiff, slam, round);
         appendDiscordEvent(
                 candidate, CombatCandidateEventType.ROLL, round, player.getFaction(), "## Roll Update\n" + message);
+        appendSideBetTriggerEvents(
+                candidate, sideBetTriggerService.fromRoll(candidate, player, rollType, whiff, slam, round));
     }
 
     @Transactional
@@ -125,13 +129,9 @@ public class CombatReplayService {
         if (candidate == null) return;
         updateCandidateEventTracking(candidate, player, trackedEvent);
 
-        appendDiscordEvent(
-                candidate,
-                CombatCandidateEventType.INFO,
-                null,
-                player.getFaction(),
-                "## " + header + "\n" + player.getRepresentation() + " " + name,
-                embed);
+        String message = "## " + header + "\n" + player.getRepresentation() + " " + name;
+        appendDiscordEvent(candidate, CombatCandidateEventType.INFO, null, player.getFaction(), message, embed);
+        appendSideBetTriggerEvents(candidate, sideBetTriggerService.fromTrackedEvent(candidate, player, trackedEvent));
     }
 
     public void mirrorRetreatDeclared(Game game, Player player, String sourceChannelName) {
@@ -286,6 +286,8 @@ public class CombatReplayService {
                         + tile.getRepresentationForButtons() + ".\n"
                         + "Game " + game.getName() + ": [Open Game](https://asyncti4.com/game/" + game.getName()
                         + ")");
+        appendSideBetTriggerEvents(
+                candidate, CombatCandidateEventType.RESOLVED, sideBetTriggerService.fromResolution(candidate, winner));
 
         if (settings.getRuntime().isImmediatePromotionOnResolve()) {
             SpringContext.getBean(CombatReplayContestLifecycleService.class).forcePromoteCandidate(candidate.getId());
@@ -428,11 +430,16 @@ public class CombatReplayService {
     }
 
     private void updateCandidateRollTracking(
-            CombatCandidateEntity candidate, Player player, String rollType, boolean whiff, boolean slam, int round) {
+            CombatCandidateEntity candidate,
+            Player player,
+            CombatRollType rollType,
+            boolean whiff,
+            boolean slam,
+            int round) {
         if (candidate == null || player == null) return;
-        boolean rolledAfb = "AFB".equalsIgnoreCase(rollType);
+        boolean rolledAfb = rollType == CombatRollType.AFB;
         boolean afbWhiff = rolledAfb && whiff;
-        boolean roundOneCombatRoll = "combatround".equalsIgnoreCase(rollType) && round == 1;
+        boolean roundOneCombatRoll = rollType == CombatRollType.combatround && round == 1;
         boolean roundOneWhiff = roundOneCombatRoll && whiff;
         boolean roundOneSlam = roundOneCombatRoll && slam;
         if (!rolledAfb && !afbWhiff && !roundOneWhiff && !roundOneSlam) return;
@@ -442,6 +449,21 @@ public class CombatReplayService {
             markDefenderRollFlags(candidate, rolledAfb, afbWhiff, roundOneWhiff, roundOneSlam);
         }
         candidateRepository.save(candidate);
+    }
+
+    private void appendSideBetTriggerEvents(
+            CombatCandidateEntity candidate,
+            List<CombatReplaySideBetTriggerService.SideBetTriggerAnnouncement> announcements) {
+        appendSideBetTriggerEvents(candidate, CombatCandidateEventType.INFO, announcements);
+    }
+
+    private void appendSideBetTriggerEvents(
+            CombatCandidateEntity candidate,
+            CombatCandidateEventType eventType,
+            List<CombatReplaySideBetTriggerService.SideBetTriggerAnnouncement> announcements) {
+        for (CombatReplaySideBetTriggerService.SideBetTriggerAnnouncement announcement : announcements) {
+            appendDiscordEvent(candidate, eventType, null, announcement.faction(), announcement.message());
+        }
     }
 
     private void markAttackerRollFlags(

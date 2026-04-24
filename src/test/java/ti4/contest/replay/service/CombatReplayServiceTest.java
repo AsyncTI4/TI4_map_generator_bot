@@ -87,7 +87,8 @@ class CombatReplayServiceTest {
                 observationRepository,
                 mock(CombatCandidateRepository.class),
                 mock(CombatCandidateEventRepository.class),
-                mock(CombatReplayEventAppender.class));
+                mock(CombatReplayEventAppender.class),
+                mock(CombatReplaySideBetTriggerService.class));
 
         CombatObservationEntity first = observation(
                 1L, LocalDateTime.of(2026, 4, 22, 10, 0), "pbd100", "19", 20, 40, 8, 8, 3, 3, 0.80, true, 11L);
