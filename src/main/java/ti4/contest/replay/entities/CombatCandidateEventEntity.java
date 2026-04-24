@@ -2,8 +2,6 @@ package ti4.contest.replay.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -44,7 +42,6 @@ public class CombatCandidateEventEntity {
     @Column(name = "sequence_number", nullable = false)
     private Integer sequenceNumber;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "event_type", nullable = false)
     private CombatCandidateEventType eventType;
 

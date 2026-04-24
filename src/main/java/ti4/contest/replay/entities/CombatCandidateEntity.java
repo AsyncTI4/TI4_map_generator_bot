@@ -2,8 +2,6 @@ package ti4.contest.replay.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -39,11 +37,9 @@ public class CombatCandidateEntity {
     @Column(name = "observation_id", nullable = false, unique = true)
     private Long observationId;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CombatCandidateStatus status;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "promotion_status", nullable = false)
     private CombatCandidatePromotionStatus promotionStatus;
 
@@ -65,7 +61,6 @@ public class CombatCandidateEntity {
     @Column(name = "tile_position", nullable = false)
     private String tilePosition;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "combat_type", nullable = false)
     private CombatContestType combatType;
 

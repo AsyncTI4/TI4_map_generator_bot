@@ -42,7 +42,7 @@ import ti4.spring.service.contest.CombatContestType;
  */
 public class LazaxCombatSupport {
 
-    private static final Set<String> COMBAT_SUMMARY_TECH_ALIASES = Set.of("da", "asc", "x89", "x89c4");
+    private static final Set<String> COMBAT_SUMMARY_TECH_ALIASES = Set.of("da", "asc", "gls", "x89", "x89c4");
     private static final Set<String> COMBAT_SUMMARY_RELIC_ALIASES = Set.of(
             "metalivoidarmaments",
             "metalivoidshielding",
@@ -150,19 +150,19 @@ public class LazaxCombatSupport {
                 .append(formatCombatTechLine(defender));
         String relicSection = formatCombatRelicSection(attacker, defender);
         if (relicSection != null) {
-            message.append("\n\n").append(relicSection);
+            message.append("\n").append(relicSection);
         }
         String lawSection = formatCombatLawSection(attacker, defender);
         if (lawSection != null) {
-            message.append("\n\n").append(lawSection);
+            message.append("\n").append(lawSection);
         }
         String effectSection = formatCombatEffectSection(attacker.getGame());
         if (effectSection != null) {
-            message.append("\n\n").append(effectSection);
+            message.append("\n").append(effectSection);
         }
         String leaderSection = formatCombatLeaderSection(tile, attacker, defender);
         if (leaderSection != null) {
-            message.append("\n\n").append(leaderSection);
+            message.append("\n").append(leaderSection);
         }
         return message.toString();
     }
@@ -234,10 +234,18 @@ public class LazaxCombatSupport {
                         || tech.isUnitUpgrade()
                         || COMBAT_SUMMARY_TECH_ALIASES.contains(tech.getAlias()))
                 .sorted(TECH_COMPARATOR)
-                .map(tech -> tech.getCondensedReqsEmojis(false) + " " + tech.getName())
+                .map(tech -> formatCombatTech(player, tech))
                 .reduce((left, right) -> left + ", " + right)
                 .orElse("No technologies");
         return formatPlayerSummaryLine(player, techSummary);
+    }
+
+    private String formatCombatTech(Player player, TechnologyModel tech) {
+        String techSummary = tech.getCondensedReqsEmojis(false) + " " + tech.getName();
+        if (!player.getExhaustedTechs().contains(tech.getAlias())) {
+            return techSummary;
+        }
+        return "~~" + techSummary + "~~";
     }
 
     private String formatCombatRelicSection(Player attacker, Player defender) {
@@ -286,7 +294,8 @@ public class LazaxCombatSupport {
     }
 
     private String formatCombatLawLine(Player player) {
-        if (!IsPlayerElectedService.isPlayerElected(player.getGame(), player, "prophecy")) {
+        Game game = player.getGame();
+        if (game == null || !IsPlayerElectedService.isPlayerElected(game, player, "prophecy")) {
             return null;
         }
         return formatPlayerSummaryLine(player, CardEmojis.Agenda + " Prophecy of Ixth");
@@ -302,7 +311,7 @@ public class LazaxCombatSupport {
 
     private String formatCombatLeaderSection(Tile tile, Player attacker, Player defender) {
         Game game = attacker.getGame();
-        if (tile == null) return null;
+        if (game == null || tile == null) return null;
 
         StringBuilder section = new StringBuilder("## Leaders");
         boolean hasLines = false;
@@ -376,6 +385,7 @@ public class LazaxCombatSupport {
 
     private String buildAllianceCommanderSummary(Player player) {
         Game game = player.getGame();
+        if (game == null) return null;
         return player.getPromissoryNotesInPlayArea().stream()
                 .filter(pnId -> pnId.contains("_an") || "dspnceld".equals(pnId))
                 .map(game::getPNOwner)
