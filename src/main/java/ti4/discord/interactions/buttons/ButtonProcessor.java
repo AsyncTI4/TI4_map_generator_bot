@@ -79,7 +79,7 @@ public class ButtonProcessor {
                 + ButtonHelper.getButtonRepresentation(event.getButton());
     }
 
-    private static void process(ButtonContext buttonContext, ButtonInteractionEvent event) {
+    private static void process(ButtonContext context, ButtonInteractionEvent event) {
         long startTime = System.currentTimeMillis();
         long contextRuntime = 0;
         long resolveRuntime = 0;
@@ -89,24 +89,23 @@ public class ButtonProcessor {
             RollbarManager.put("button_id", event.getButton().getCustomId());
             RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
             long beforeTime = System.currentTimeMillis();
-            buttonContext = new ButtonContext(event);
             contextRuntime = System.currentTimeMillis() - beforeTime;
 
-            if (buttonContext.isValid()) {
+            if (context.isValid()) {
                 beforeTime = System.currentTimeMillis();
-                resolveButtonInteractionEvent(buttonContext);
+                resolveButtonInteractionEvent(context);
                 resolveRuntime = System.currentTimeMillis() - beforeTime;
 
                 beforeTime = System.currentTimeMillis();
-                buttonContext.save();
-                if (buttonContext.getGame() != null) {
+                context.save();
+                if (context.getGame() != null) {
                     SpringContext.getBean(CombatContestService.class)
-                            .onButtonInteractionSettled(buttonContext.getGame(), buttonContext.getPlayer(), event);
+                            .onButtonInteractionSettled(context.getGame(), context.getPlayer(), event);
                 }
                 saveRuntime = System.currentTimeMillis() - beforeTime;
             }
         } catch (Exception e) {
-            LogOrigin origin = new LogOrigin(event, buttonContext);
+            LogOrigin origin = new LogOrigin(event, context);
             BotLogger.error(origin, "Something went wrong with button interaction", e);
         } finally {
             RollbarManager.clear();
