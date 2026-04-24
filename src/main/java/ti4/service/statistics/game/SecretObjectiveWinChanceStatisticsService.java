@@ -10,7 +10,7 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
-import ti4.discord.interactions.slashcommands.statistics.GameStatisticsFilterer;
+import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GamesPage;

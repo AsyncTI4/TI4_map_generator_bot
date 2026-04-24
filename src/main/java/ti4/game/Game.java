@@ -41,7 +41,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
-import ti4.discord.interactions.slashcommands.planet.PlanetRemove;
+import ti4.discord.interactions.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftCategory;
 import ti4.draft.FrankenDraft;

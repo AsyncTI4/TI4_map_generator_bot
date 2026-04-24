@@ -8,10 +8,10 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.discord.interactions.slashcommands.Command;
-import ti4.discord.interactions.slashcommands.GameStateContainer;
-import ti4.discord.interactions.slashcommands.ParentCommand;
-import ti4.discord.interactions.slashcommands.SlashCommandManager;
+import ti4.discord.interactions.commands.Command;
+import ti4.discord.interactions.commands.GameStateContainer;
+import ti4.discord.interactions.commands.ParentCommand;
+import ti4.discord.interactions.commands.SlashCommandManager;
 import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.Constants;

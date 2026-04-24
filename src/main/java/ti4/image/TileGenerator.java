@@ -30,7 +30,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
-import ti4.discord.interactions.slashcommands.CommandHelper;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;

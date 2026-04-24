@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.Command.Type;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.discord.interactions.slashcommands.Command;
+import ti4.discord.interactions.commands.Command;
 
 public interface ContextCommand extends Command<GenericContextInteractionEvent<?>> {
 

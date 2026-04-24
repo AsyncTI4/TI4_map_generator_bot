@@ -17,7 +17,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.ButtonHandler;
-import ti4.discord.interactions.slashcommands.planet.PlanetExhaust;
+import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;

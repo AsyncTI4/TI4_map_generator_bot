@@ -5,7 +5,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.routing.ButtonHandler;
-import ti4.discord.interactions.slashcommands.tokens.AddTokenCommand;
+import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;

@@ -49,7 +49,7 @@ import ti4.cron.WinningPathCron;
 import ti4.discord.interactions.context.ContextCommandManager;
 import ti4.discord.interactions.listeners.ListenerManager;
 import ti4.discord.interactions.selections.SelectionManager;
-import ti4.discord.interactions.slashcommands.SlashCommandManager;
+import ti4.discord.interactions.commands.SlashCommandManager;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.AliasHandler;

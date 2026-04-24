@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
-import ti4.discord.interactions.slashcommands.CommandHelper;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
