@@ -57,9 +57,26 @@ class CombatReplayServiceTest {
                 "muaat",
                 4);
 
-        assertEquals(2.2033, blowoutScore, 0.0001);
-        assertEquals(3.6705, squeakerScore, 0.0001);
+        assertEquals(3.2033, blowoutScore, 0.0001);
+        assertEquals(4.6705, squeakerScore, 0.0001);
         assertTrue(squeakerScore > blowoutScore);
+    }
+
+    @Test
+    void promotionScoreAddsFlatBonusWhenDefenderWins() {
+        CombatObservationEntity observation = observation(
+                10L, LocalDateTime.of(2026, 4, 23, 20, 22), "pbd22333", "307", 12, 12, 8, 8, 2, 2, 1, true, 10L);
+        observation.setAttackerFaction("sol");
+        observation.setDefenderFaction("yin");
+
+        LazaxCombatSupport.FleetStrength attackerRemaining = new LazaxCombatSupport.FleetStrength(4.0, 2.0, 0.0);
+        LazaxCombatSupport.FleetStrength defenderRemaining = new LazaxCombatSupport.FleetStrength(4.0, 2.0, 0.0);
+        double attackerWinScore =
+                CombatReplayService.computePromotionScore(observation, attackerRemaining, defenderRemaining, "sol", 2);
+        double defenderWinScore =
+                CombatReplayService.computePromotionScore(observation, attackerRemaining, defenderRemaining, "yin", 2);
+
+        assertEquals(attackerWinScore + 1.0, defenderWinScore, 0.0001);
     }
 
     @Test
