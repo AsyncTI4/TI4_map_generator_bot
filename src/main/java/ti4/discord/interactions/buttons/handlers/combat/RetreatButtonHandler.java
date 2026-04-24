@@ -22,6 +22,8 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.LoreService;
 import ti4.service.unit.CheckUnitContainmentService;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.contest.CombatContestService;
 
 @UtilityClass
 class RetreatButtonHandler {
@@ -94,6 +96,12 @@ class RetreatButtonHandler {
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " retreated all units in space to "
                         + game.getTileByPosition(pos2).getRepresentationForButtons(game, player) + ".");
+        SpringContext.getBean(CombatContestService.class)
+                .mirrorRetreatResolved(
+                        game,
+                        player,
+                        game.getTileByPosition(pos2).getRepresentationForButtons(game, player),
+                        event.getChannel().getName());
         LoreService.showSystemLore(player, game, pos2, LoreService.TRIGGER.CONTROLLED);
         FOWCombatThreadMirroring.mirrorMessage(
                 event, game, player.getRepresentationNoPing() + " retreated all units in space.");

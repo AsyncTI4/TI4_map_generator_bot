@@ -5,21 +5,19 @@ import org.jetbrains.annotations.NotNull;
 import ti4.game.Game;
 import ti4.game.Player;
 
-public abstract class GameStateCommand implements ParentCommand {
+public abstract class GameStateCommand implements ParentCommand, GameStateContainer {
 
     private final CommandGameState commandGameState;
-    private final boolean saveGame;
-    private final boolean playerCommand;
 
     protected GameStateCommand(boolean saveGame, boolean playerCommand) {
-        this.saveGame = saveGame;
-        this.playerCommand = playerCommand;
         commandGameState = new CommandGameState(saveGame, playerCommand);
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return ParentCommand.super.accept(event) && CommandHelper.acceptIfValidGame(event, saveGame, playerCommand);
+        return ParentCommand.super.accept(event)
+                && CommandHelper.acceptIfValidGame(
+                        event, commandGameState.saveGame(), commandGameState.playerCommand());
     }
 
     @Override
@@ -41,12 +39,19 @@ public abstract class GameStateCommand implements ParentCommand {
     }
 
     @NotNull
-    protected Game getGame() {
+    @Override
+    public Game getGame() {
         return commandGameState.getGame();
     }
 
     @NotNull
-    protected Player getPlayer() {
+    @Override
+    public Player getPlayer() {
         return commandGameState.getPlayer();
+    }
+
+    @Override
+    public boolean isSaveGame() {
+        return commandGameState.saveGame();
     }
 }

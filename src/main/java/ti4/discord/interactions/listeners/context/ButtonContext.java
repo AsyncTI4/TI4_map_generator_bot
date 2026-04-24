@@ -1,4 +1,4 @@
-package ti4.discord.interactions.context;
+package ti4.discord.interactions.listeners.context;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;

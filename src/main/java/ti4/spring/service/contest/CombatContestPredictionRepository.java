@@ -14,7 +14,7 @@ public interface CombatContestPredictionRepository extends JpaRepository<CombatC
 
     @Query("""
             select p.discordUserId as discordUserId,
-                   sum(p.pointsAwarded) as totalPoints
+                   case when sum(p.pointsAwarded) < 0 then 0 else sum(p.pointsAwarded) end as totalPoints
             from CombatContestPredictionEntity p
             where p.pointsAwarded is not null
               and p.discordUserId in :discordUserIds
@@ -25,13 +25,13 @@ public interface CombatContestPredictionRepository extends JpaRepository<CombatC
     @Query("""
             select p.discordUserId as discordUserId,
                    max(p.discordUserName) as discordUserName,
-                   sum(p.pointsAwarded) as totalPoints,
+                   case when sum(p.pointsAwarded) < 0 then 0 else sum(p.pointsAwarded) end as totalPoints,
                    count(p.id) as predictionCount,
                    sum(case when p.correct = true then 1 else 0 end) as correctPredictions
             from CombatContestPredictionEntity p
             where p.pointsAwarded is not null
             group by p.discordUserId
-            order by sum(p.pointsAwarded) desc,
+            order by case when sum(p.pointsAwarded) < 0 then 0 else sum(p.pointsAwarded) end desc,
                      sum(case when p.correct = true then 1 else 0 end) desc,
                      max(p.discordUserName) asc
             """)

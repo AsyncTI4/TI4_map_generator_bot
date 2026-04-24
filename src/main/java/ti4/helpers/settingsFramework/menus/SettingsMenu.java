@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.discord.interactions.context.ListenerContext;
+import ti4.discord.interactions.listeners.context.ListenerContext;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;

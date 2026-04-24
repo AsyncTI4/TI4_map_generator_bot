@@ -1,4 +1,4 @@
-package ti4.discord.interactions.commands.context;
+package ti4.discord.interactions.context;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
@@ -7,9 +7,9 @@ import ti4.logging.BotLogger;
 import ti4.service.message.MessageDeletionService;
 import ti4.spring.service.messagecache.SavedBotMessagesService;
 
-public class DeleteMessage extends MessageCommand {
+class DeleteMessage extends MessageCommand {
 
-    public DeleteMessage() {
+    DeleteMessage() {
         super("Delete Message", Permission.PIN_MESSAGES);
     }
 

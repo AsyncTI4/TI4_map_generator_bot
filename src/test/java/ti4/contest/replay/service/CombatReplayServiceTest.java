@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.contest.replay.core.CombatContestSettings;
+import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.entities.CombatObservationEntity;
 import ti4.contest.replay.repository.CombatCandidateEventRepository;
 import ti4.contest.replay.repository.CombatCandidateRepository;
@@ -18,6 +19,48 @@ import ti4.contest.replay.repository.CombatObservationRepository;
 import ti4.spring.service.contest.CombatContestType;
 
 class CombatReplayServiceTest {
+
+    @Test
+    void promotionScorePrioritizesEndingTensionOverOpeningBalance() {
+        CombatObservationEntity blowout = observation(
+                10L, LocalDateTime.of(2026, 4, 23, 20, 22), "pbd22333", "307", 15, 20, 9, 9, 2.2, 2.6, 0.86, true, 10L);
+        blowout.setAttackerFaction("sol");
+        blowout.setDefenderFaction("mahact");
+
+        CombatObservationEntity squeaker = observation(
+                19L,
+                LocalDateTime.of(2026, 4, 23, 22, 41),
+                "pbd19963f",
+                "306",
+                22.5,
+                24.5,
+                16,
+                11,
+                4.5,
+                6.2,
+                0.77,
+                true,
+                19L);
+        squeaker.setAttackerFaction("naalu");
+        squeaker.setDefenderFaction("muaat");
+
+        double blowoutScore = CombatReplayService.computePromotionScore(
+                blowout,
+                new LazaxCombatSupport.FleetStrength(3.0, 0.0, 0.0),
+                new LazaxCombatSupport.FleetStrength(10.0, 6.0, 0.0),
+                "mahact",
+                3);
+        double squeakerScore = CombatReplayService.computePromotionScore(
+                squeaker,
+                new LazaxCombatSupport.FleetStrength(0.0, 0.0, 0.0),
+                new LazaxCombatSupport.FleetStrength(8.0, 3.0, 0.0),
+                "muaat",
+                4);
+
+        assertEquals(2.2033, blowoutScore, 0.0001);
+        assertEquals(3.6705, squeakerScore, 0.0001);
+        assertTrue(squeakerScore > blowoutScore);
+    }
 
     @Test
     void selectionDebugViewExposesObservationWindowDetails() {

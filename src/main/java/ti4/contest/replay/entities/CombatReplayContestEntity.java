@@ -2,8 +2,6 @@ package ti4.contest.replay.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -47,7 +45,6 @@ public class CombatReplayContestEntity {
     @Column(name = "public_thread_id")
     private Long publicThreadId;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "replay_status", nullable = false)
     private CombatContestReplayStatus replayStatus;
 

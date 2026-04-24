@@ -44,6 +44,8 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.contest.CombatContestService;
 
 @UtilityClass
 public class ComponentActionHelper {
@@ -537,6 +539,24 @@ public class ComponentActionHelper {
                 } else if (buttonID.contains("hero")) {
                     PlayHeroService.playHero(
                             event, game, p1, p1.getLeader(buttonID).orElse(null));
+                } else {
+                    LeaderModel leaderModel = Mapper.getLeader(buttonID);
+                    if (leaderModel != null) {
+                        String leaderType =
+                                switch (leaderModel.getType()) {
+                                    case "commander" -> "Commander";
+                                    case "envoy" -> "Envoy";
+                                    default -> "Leader";
+                                };
+                        SpringContext.getBean(CombatContestService.class)
+                                .mirrorCombatEvent(
+                                        game,
+                                        p1,
+                                        leaderType,
+                                        "used _" + leaderModel.getName() + "_.",
+                                        leaderModel.getRepresentationEmbed(),
+                                        event.getChannel().getName());
+                    }
                 }
             }
             case "relic" -> resolveRelicComponentAction(game, p1, event, buttonID);

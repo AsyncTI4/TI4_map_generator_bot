@@ -5,9 +5,10 @@ import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.discord.interactions.context.SelectionMenuContext;
+import ti4.discord.interactions.listeners.context.SelectionMenuContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.SelectionHandler;
+import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.logging.BotLogger;
@@ -29,19 +30,21 @@ public final class SelectionMenuProcessor {
 
     public static void queue(StringSelectInteractionEvent event) {
         String gameName = GameNameService.getGameNameFromChannel(event);
-        ExecutorServiceManager.runAsync(
+        SelectionMenuContext context = new SelectionMenuContext(event);
+        ExecutorServiceManager.runAsyncWithLock(
                 "SelectionMenuProcessor task for `" + gameName + "`",
                 gameName,
                 event.getMessageChannel(),
-                () -> process(event));
+                () -> process(context, event),
+                context.isShouldSave() ? ExecutionLockType.WRITE : ExecutionLockType.READ);
     }
 
-    private static void process(StringSelectInteractionEvent event) {
+    private static void process(SelectionMenuContext context, StringSelectInteractionEvent event) {
         try {
             RollbarManager.putInteractionMetadata("select_menu", event);
             RollbarManager.put("menu_id", event.getComponentId());
             RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
-            SelectionMenuContext context = new SelectionMenuContext(event);
+
             if (context.isValid()) {
                 resolveSelectionMenu(context);
                 context.save();

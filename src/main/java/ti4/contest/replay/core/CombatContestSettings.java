@@ -15,6 +15,7 @@ import tools.jackson.databind.ObjectMapper;
 public class CombatContestSettings {
 
     private static final ObjectMapper MAPPER = JsonMapperManager.basic();
+    public static final int PROMOTION_LOOKBACK_FALLBACK_MAX_HOURS = 8;
 
     private CandidateSelection candidateSelection = new CandidateSelection();
     private Promotion promotion = new Promotion();
@@ -107,9 +108,15 @@ public class CombatContestSettings {
     @Data
     @NoArgsConstructor
     public static class ReplayExecution {
+        // prod settings
         private int startDelayMinutes = 10;
         private int replayIntervalSeconds = 15;
         private int maxEventGapSeconds = 30;
+
+        // dev settings
+        //        private int startDelayMinutes = 0;
+        //        private int replayIntervalSeconds = 1;
+        //        private int maxEventGapSeconds = 1;
     }
 
     @Data
@@ -123,6 +130,13 @@ public class CombatContestSettings {
     @NoArgsConstructor
     public static class Runtime {
         private boolean discordPostingEnabled = true;
-        private String versionEnabled = "v1";
+        private String versionEnabled = "v2";
+        // prod settings
+        private boolean trackAllCombatsAsCandidates = false;
+        private boolean immediatePromotionOnResolve = false;
+
+        // dev settings
+        //        private boolean trackAllCombatsAsCandidates = true;
+        //        private boolean immediatePromotionOnResolve = true;
     }
 }

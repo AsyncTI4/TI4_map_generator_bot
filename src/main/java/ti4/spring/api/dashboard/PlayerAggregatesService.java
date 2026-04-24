@@ -271,7 +271,7 @@ class PlayerAggregatesService {
      */
     private void queueRecompute(String userId, List<String> completedGameIds, String completedGamesHash) {
         String taskName = "dashboard-player-aggregates:" + userId;
-        ExecutorServiceManager.runAsyncIfNotRunning(
+        ExecutorServiceManager.runAsyncWithLock(
                 taskName, () -> recomputeAndPersist(userId, completedGameIds, completedGamesHash));
     }
 

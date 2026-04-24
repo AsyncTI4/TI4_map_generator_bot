@@ -6,7 +6,6 @@ import ti4.discord.JdaService;
 import ti4.helpers.DateTimeHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
-import ti4.service.game.GameNameService;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
 interface ListenerInterface {
@@ -28,7 +27,7 @@ interface ListenerInterface {
         return true;
     }
 
-    <T extends GenericCommandInteractionEvent> String eventToString(T event, String gameName);
+    <T extends GenericCommandInteractionEvent> String eventToString(T event);
 
     default <T extends GenericCommandInteractionEvent> void warnForLongRunningCommands(T event, long startTime) {
         long eventTime = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
@@ -37,11 +36,10 @@ interface ListenerInterface {
         long endTime = System.currentTimeMillis();
         long processingRuntime = endTime - startTime;
 
-        String gameName = GameNameService.getGameName(event);
         if (eventDelay > DELAY_THRESHOLD_MILLISECONDS || processingRuntime > DELAY_THRESHOLD_MILLISECONDS) {
             String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(eventDelay);
             String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(processingRuntime);
-            String message = eventToString(event, gameName) + "`\n> Warning: "
+            String message = eventToString(event) + "`\n> Warning: "
                     + "This command took over "
                     + DELAY_THRESHOLD_MILLISECONDS + "ms to respond or execute\n> "
                     + DateTimeHelper.getTimestampFromMillisecondsEpoch(eventTime)

@@ -41,7 +41,6 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
 import ti4.logging.BotLogger;
@@ -49,10 +48,8 @@ import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
-import ti4.model.UnitModel;
-import ti4.service.combat.CombatStatsService;
-import ti4.service.combat.CombatUnitSelectionHelper;
 import ti4.service.emoji.ColorEmojis;
+import ti4.service.emoji.TechEmojis;
 
 @Service
 @RequiredArgsConstructor
@@ -62,10 +59,11 @@ public class CombatContestService {
     public static final String LAZAX_MINIGAME_ROLE_NAME = "Lazax Minigame";
     private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives";
     private static final String THREAD_SUMMARY_HEADER = "## Combat Units\n";
-    private static final Set<String> COMBAT_SUMMARY_TECH_ALIASES = Set.of("da", "asc", "x89", "x89c4");
+    private static final Set<String> COMBAT_SUMMARY_TECH_ALIASES = Set.of("da", "asc", "gls", "x89", "x89c4");
     private static final Set<String> COMBAT_SUMMARY_RELIC_ALIASES = Set.of(
             "metalivoidarmaments", "metalivoidshielding", "lightrailordnance", "baldrick_crownofthalnos", "pi_thalnos");
     private static final double ZERO_EPSILON = 0.0001;
+    private static final int WRONG_PREDICTION_PENALTY = -4;
     private static final String SUBSCRIBE_EMOJI = "\uD83D\uDFE2";
     private static final String UNSUBSCRIBE_EMOJI = "\uD83D\uDD34";
     private static final Set<CombatContestStatus> ACTIVE_STATUSES = Set.of(CombatContestStatus.POSTED);
@@ -194,6 +192,41 @@ public class CombatContestService {
         }
     }
 
+    public void mirrorRetreatDeclared(Game game, Player player, String sourceChannelName) {
+        runReplayHook(
+                game,
+                "retreat declaration mirror",
+                () -> combatReplayService.mirrorRetreatDeclared(game, player, sourceChannelName));
+        if (isReplayV2Enabled()) return;
+        relayContestMessage(game, player, "## Retreat\n" + player.getRepresentationNoPing() + " announced a retreat.");
+    }
+
+    public void mirrorRetreatResolved(Game game, Player player, String destination, String sourceChannelName) {
+        runReplayHook(
+                game,
+                "retreat resolution mirror",
+                () -> combatReplayService.mirrorRetreatResolved(game, player, destination, sourceChannelName));
+        if (isReplayV2Enabled()) return;
+        relayContestMessage(
+                game, player, "## Retreat\n" + player.getRepresentationNoPing() + " retreated to " + destination + ".");
+    }
+
+    public void mirrorAssaultCannonAssigned(Game game, Player player, String sourceChannelName) {
+        runReplayHook(
+                game,
+                "assault cannon mirror",
+                () -> combatReplayService.mirrorAssaultCannonAssigned(game, player, sourceChannelName));
+        if (isReplayV2Enabled()) return;
+        relayContestMessage(
+                game,
+                player,
+                "## Combat Ability\n"
+                        + player.getRepresentationNoPing()
+                        + " used _Assault Cannon_ "
+                        + TechEmojis.WarfareTech
+                        + ".");
+    }
+
     public boolean postLeaderboard() {
         if (isReplayV2Enabled()) {
             return combatReplayLeaderboardService.postLeaderboard();
@@ -218,6 +251,18 @@ public class CombatContestService {
     private boolean isReplayV2Enabled() {
         String versionEnabled = replaySettings.getRuntime().getVersionEnabled();
         return "v2".equalsIgnoreCase(versionEnabled);
+    }
+
+    private void relayContestMessage(Game game, Player player, String message) {
+        List<CombatContestEntity> activeContests =
+                repository.findByGameNameAndStatusIn(game.getName(), ACTIVE_STATUSES);
+        if (activeContests.isEmpty()) return;
+        for (CombatContestEntity contest : activeContests) {
+            if (!matchesParticipant(contest, player)) continue;
+            MessageChannel threadOrChannel = getContestThreadOrChannel(contest);
+            if (threadOrChannel == null) continue;
+            MessageHelper.splitAndSentWithAction(message, threadOrChannel, null);
+        }
     }
 
     // ==================== Contest Creation & Eligibility ====================
@@ -317,8 +362,10 @@ public class CombatContestService {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         if (space == null) return null;
 
-        FleetStrength attackerStrength = calculateFleetStrength(game, attacker, defender, tile, space);
-        FleetStrength defenderStrength = calculateFleetStrength(game, defender, attacker, tile, space);
+        FleetStrength attackerStrength =
+                toFleetStrength(LazaxCombatSupport.calculateFleetStrength(game, attacker, defender, tile, space));
+        FleetStrength defenderStrength =
+                toFleetStrength(LazaxCombatSupport.calculateFleetStrength(game, defender, attacker, tile, space));
 
         double stronger = Math.max(attackerStrength.hp(), defenderStrength.hp());
         double weaker = Math.min(attackerStrength.hp(), defenderStrength.hp());
@@ -347,52 +394,13 @@ public class CombatContestService {
                 ratio);
     }
 
-    private FleetStrength calculateFleetStrength(
-            Game game, Player player, Player opponent, Tile tile, UnitHolder space) {
-        double total = 0;
-        double hp = 0;
-        double expectedHits = 0;
-        Map<UnitModel, Integer> unitsInCombat = CombatUnitSelectionHelper.collectCombatRoundUnits(tile, space, player);
-        Map<String, Integer> damagedCountsByAsyncId = getDamagedCountsByAsyncId(tile, player);
-        for (Map.Entry<UnitModel, Integer> entry : unitsInCombat.entrySet()) {
-            UnitModel unitModel = entry.getKey();
-            if (unitModel == null) continue;
-
-            int totalUnits = entry.getValue();
-            int damagedUnits = Math.min(totalUnits, damagedCountsByAsyncId.getOrDefault(unitModel.getAsyncId(), 0));
-            int undamagedUnits = Math.max(0, totalUnits - damagedUnits);
-
-            total += unitModel.getCost() * totalUnits;
-            hp += totalUnits;
-            CombatStatsService.CombatRoundProfile combatProfile =
-                    CombatStatsService.getCombatRoundProfile(true, unitModel, player, tile, opponent);
-            expectedHits += computeExpectedHits(totalUnits * combatProfile.diceCount(), combatProfile.hitsOn());
-            if (unitModel.getSustainDamage(player, space)) {
-                hp += undamagedUnits;
-                if (player.hasTech("nes")) {
-                    hp += undamagedUnits;
-                }
-            }
-        }
-        return new FleetStrength(total, hp, expectedHits);
-    }
-
-    private Map<String, Integer> getDamagedCountsByAsyncId(Tile tile, Player player) {
-        Map<String, Integer> damagedCountsByAsyncId = new HashMap<>();
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            for (UnitKey unitKey : unitHolder.getUnitKeys()) {
-                if (!unitKey.getColorID().equalsIgnoreCase(player.getColorID())) continue;
-                int damagedUnits = unitHolder.getDamagedUnitCount(unitKey);
-                if (damagedUnits <= 0) continue;
-                damagedCountsByAsyncId.merge(unitKey.asyncID(), damagedUnits, Integer::sum);
-            }
-        }
-        return damagedCountsByAsyncId;
-    }
-
     private double computeExpectedHits(int totalDice, int hitsOn) {
         if (totalDice <= 0 || hitsOn <= 0) return 0;
         return totalDice * Math.max(0, 11 - hitsOn) / 10.0;
+    }
+
+    private FleetStrength toFleetStrength(LazaxCombatSupport.FleetStrength fleetStrength) {
+        return new FleetStrength(fleetStrength.value(), fleetStrength.hp(), fleetStrength.expectedHits());
     }
 
     private String extractSpaceOnlySummary(String summary) {
@@ -566,10 +574,10 @@ public class CombatContestService {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         if (space == null || loser == null) return null;
 
-        double winnerRemaining =
-                calculateFleetStrength(game, winner, loser, tile, space).value();
-        double loserRemaining =
-                calculateFleetStrength(game, loser, winner, tile, space).value();
+        double winnerRemaining = LazaxCombatSupport.calculateFleetStrength(game, winner, loser, tile, space)
+                .value();
+        double loserRemaining = LazaxCombatSupport.calculateFleetStrength(game, loser, winner, tile, space)
+                .value();
         double winnerInitial = winner.getFaction().equalsIgnoreCase(contest.getAttackerFaction())
                 ? contest.getInitialStrengthAttacker()
                 : contest.getInitialStrengthDefender();
@@ -650,7 +658,10 @@ public class CombatContestService {
         for (CombatContestPredictionEntity prediction : predictions) {
             boolean correct = prediction.getPredictedFaction().equalsIgnoreCase(contest.getWinnerFaction());
             prediction.setCorrect(correct);
-            prediction.setPointsAwarded(correct ? calculatePredictionPoints(winnerPredictions, totalPredictions) : 0);
+            prediction.setPointsAwarded(
+                    correct
+                            ? calculatePredictionPoints(winnerPredictions, totalPredictions)
+                            : WRONG_PREDICTION_PENALTY);
         }
         predictionRepository.saveAll(predictions);
         return predictions;
@@ -821,6 +832,7 @@ public class CombatContestService {
                 + "**System:** " + tile.getRepresentationForButtons() + "\n"
                 + "**Combat:** Space Combat\n"
                 + "**Predict the winner by reacting below.**\n"
+                + "_Losers get -4 points._\n"
                 + "- " + attackerLegend + "\n"
                 + "- " + defenderLegend;
     }
@@ -846,10 +858,18 @@ public class CombatContestService {
                         || tech.isUnitUpgrade()
                         || COMBAT_SUMMARY_TECH_ALIASES.contains(tech.getAlias()))
                 .sorted(TECH_COMPARATOR)
-                .map(tech -> tech.getCondensedReqsEmojis(false) + " " + tech.getName())
+                .map(tech -> formatCombatTech(player, tech))
                 .reduce((left, right) -> left + ", " + right)
                 .orElse("No technologies");
         return formatPlayerSummaryLine(player, techSummary);
+    }
+
+    private String formatCombatTech(Player player, TechnologyModel tech) {
+        String techSummary = tech.getCondensedReqsEmojis(false) + " " + tech.getName();
+        if (!player.getExhaustedTechs().contains(tech.getAlias())) {
+            return techSummary;
+        }
+        return "~~" + techSummary + "~~";
     }
 
     private String formatCombatRelicSection(Player attacker, Player defender) {
@@ -977,7 +997,8 @@ public class CombatContestService {
     private void postCombatTechSummary(Game game, CombatContestEntity contest, MessageChannel threadOrChannel) {
         Player attacker = game.getPlayerFromColorOrFaction(contest.getAttackerFaction());
         Player defender = game.getPlayerFromColorOrFaction(contest.getDefenderFaction());
-        String message = LazaxCombatSupport.formatCombatTechSummary(attacker, defender);
+        Tile tile = game.getTileByPosition(contest.getTilePosition());
+        String message = LazaxCombatSupport.formatCombatTechSummary(tile, attacker, defender);
         if (message == null || message.isBlank()) return;
         MessageHelper.sendMessageToChannel(threadOrChannel, message);
     }

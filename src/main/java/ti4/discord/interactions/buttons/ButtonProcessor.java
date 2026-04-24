@@ -11,9 +11,10 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.discord.interactions.context.ButtonContext;
+import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -35,6 +36,7 @@ import ti4.message.MessageHelper;
 import ti4.service.button.ReactionService;
 import ti4.service.game.GameNameService;
 import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.contest.CombatContestService;
@@ -55,14 +57,19 @@ public class ButtonProcessor {
     public static void queue(ButtonInteractionEvent event) {
         BotLogger.logButton(event);
         User user = event.getUser();
-        var userSettings = UserSettingsManager.get(user.getId());
+        UserSettings userSettings = UserSettingsManager.get(user.getId());
         int currentHourUTC = ZonedDateTime.now(ZoneId.of("UTC")).getHour();
         userSettings.addActiveHour(currentHourUTC);
         UserSettingsManager.save(userSettings);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        ExecutorServiceManager.runAsync(
-                eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event));
+        var buttonContext = new ButtonContext(event);
+        ExecutorServiceManager.runAsyncWithLock(
+                eventToString(event, gameName),
+                gameName,
+                event.getMessageChannel(),
+                () -> process(buttonContext, event),
+                buttonContext.isShouldSave() ? ExecutionLockType.WRITE : ExecutionLockType.READ);
     }
 
     private static String eventToString(ButtonInteractionEvent event, String gameName) {
@@ -72,18 +79,16 @@ public class ButtonProcessor {
                 + ButtonHelper.getButtonRepresentation(event.getButton());
     }
 
-    private static void process(ButtonInteractionEvent event) {
+    private static void process(ButtonContext context, ButtonInteractionEvent event) {
         long startTime = System.currentTimeMillis();
         long contextRuntime = 0;
         long resolveRuntime = 0;
         long saveRuntime = 0;
-        ButtonContext context = null;
         try {
             RollbarManager.putInteractionMetadata("button", event);
             RollbarManager.put("button_id", event.getButton().getCustomId());
             RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
             long beforeTime = System.currentTimeMillis();
-            context = new ButtonContext(event);
             contextRuntime = System.currentTimeMillis() - beforeTime;
 
             if (context.isValid()) {

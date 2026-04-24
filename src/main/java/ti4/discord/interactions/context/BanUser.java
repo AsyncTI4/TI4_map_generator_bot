@@ -1,4 +1,4 @@
-package ti4.discord.interactions.commands.context;
+package ti4.discord.interactions.context;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
@@ -7,9 +7,9 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.logging.BotLogger;
 import ti4.service.async.BanCleanupService;
 
-public class BanUser extends UserCommand {
+class BanUser extends UserCommand {
 
-    public BanUser() {
+    BanUser() {
         super("Ban", Permission.BAN_MEMBERS);
     }
 
