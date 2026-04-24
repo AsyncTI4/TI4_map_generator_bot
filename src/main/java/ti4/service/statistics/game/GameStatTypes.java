@@ -13,8 +13,7 @@ public enum GameStatTypes {
     SOS_SCORED("Times a secret objective has been scored", "Show the amount of times each secret objective was scored"),
     FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"),
     FACTION_CUSTODIAN_PERCENT(
-            "Faction custodian percent",
-            "Shows how often each faction takes the custodian token, rounded to the nearest integer"),
+            "Faction custodian percent", "Shows custodian percent for each faction, rounded to the nearest integer"),
     FACTION_PERFORMANCE(
             "Faction performance", "Shows how much each faction over or under performs its expected win rate"),
     COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
