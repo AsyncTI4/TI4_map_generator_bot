@@ -37,7 +37,7 @@ public class GameStatisticsService {
                 case FACTION_WIN_PERCENT -> FactionWinPercentStatisticsService.getFactionWinPercent(event);
                 case FACTION_CUSTODIAN_PERCENT ->
                     FactionCustodianPercentStatisticsService.getFactionCustodianPercent(event);
-                case FACTION_IXTH_PERCENT -> FactionIxthPercentStatisticsService.getFactionIxthPercent(event);
+                case FACTION_STYX_PERCENT -> FactionStyxPercentStatisticsService.getFactionStyxPercent(event);
                 case FACTION_PERFORMANCE -> FactionPerformanceStatisticsService.showFactionPerformance(event);
                 case COLOUR_WINS -> MostWinningColorStatisticsService.showMostWinningColor(event);
                 case GAME_COUNT -> GameCountStatisticsService.getGameCount(event);
