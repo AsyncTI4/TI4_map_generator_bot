@@ -142,7 +142,7 @@ public class CombatContestSettings {
     @Getter
     @Setter
     public static class SideBets {
-        private boolean enableSideBets = false;
+        private boolean enableSideBets = true;
         private int maxBetsPerUser = 5;
         private int costPoints = 1;
     }
