@@ -607,8 +607,14 @@ public class CombatReplayContestLifecycleService {
             return sendDiscordMessage(channel, message, embeds);
         }
         try (FileUpload fileUpload = new TileGenerator(snapshotGame, null, null, 0, tilePosition).createFileUpload()) {
-            MessageCreateBuilder builder =
-                    new MessageCreateBuilder().addContent(message).addFiles(fileUpload);
+            List<String> messageParts = MessageHelper.splitLargeText(message, 2000);
+            for (int i = 0; i < Math.max(0, messageParts.size() - 1); i++) {
+                channel.sendMessage(messageParts.get(i)).complete();
+            }
+            MessageCreateBuilder builder = new MessageCreateBuilder().addFiles(fileUpload);
+            if (!messageParts.isEmpty()) {
+                builder.addContent(messageParts.get(messageParts.size() - 1));
+            }
             if (!embeds.isEmpty()) builder.addEmbeds(embeds);
             return channel.sendMessage(builder.build()).complete();
         }
