@@ -1,4 +1,4 @@
-package ti4.discord.interactions.commands.context;
+package ti4.discord.interactions.context;
 
 import java.util.List;
 import net.dv8tion.jda.api.Permission;
@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.discord.interactions.commands.Command;
 
 public interface ContextCommand extends Command<GenericContextInteractionEvent<?>> {
+
+    String getName();
 
     Type getType();
 
@@ -24,9 +26,5 @@ public interface ContextCommand extends Command<GenericContextInteractionEvent<?
         var command = Commands.context(getType(), getName())
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(getPermissions()));
         commands.addCommands(command);
-    }
-
-    default void registerSearchCommands(CommandListUpdateAction commands) {
-        return;
     }
 }

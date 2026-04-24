@@ -26,26 +26,26 @@ public class ExecutionLockManager {
         CacheManager.registerCache("executionLocks", locks);
     }
 
-    public static void lock(String lockName, LockType lockType) {
+    public static void lock(String lockName, ExecutionLockType lockType) {
         var lock = getLock(lockName);
-        if (lockType == LockType.READ) {
+        if (lockType == ExecutionLockType.READ) {
             lock.readLock().lock();
         } else {
             lock.writeLock().lock();
         }
     }
 
-    private static boolean tryLock(String lockName, LockType lockType) {
+    private static boolean tryLock(String lockName, ExecutionLockType lockType) {
         var lock = getLock(lockName);
-        if (lockType == LockType.READ) {
+        if (lockType == ExecutionLockType.READ) {
             return lock.readLock().tryLock();
         }
         return lock.writeLock().tryLock();
     }
 
-    public static void unlock(String lockName, LockType lockType) {
+    public static void unlock(String lockName, ExecutionLockType lockType) {
         var lock = getLock(lockName);
-        if (lockType == LockType.READ) {
+        if (lockType == ExecutionLockType.READ) {
             lock.readLock().unlock();
         } else {
             lock.writeLock().unlock();
@@ -56,12 +56,12 @@ public class ExecutionLockManager {
         return locks.get(lockName, k -> new ReentrantReadWriteLock());
     }
 
-    public static Runnable wrapWithTryLockAndRelease(String lockName, LockType lockType, Runnable task) {
+    public static Runnable wrapWithTryLockAndRelease(String lockName, ExecutionLockType lockType, Runnable task) {
         return wrapWithTryLockAndRelease(lockName, lockType, task, null);
     }
 
     public static Runnable wrapWithTryLockAndRelease(
-            String lockName, LockType lockType, Runnable task, MessageChannel messageChannel) {
+            String lockName, ExecutionLockType lockType, Runnable task, MessageChannel messageChannel) {
         if (isBlank(lockName)) throw new IllegalArgumentException("Lock name cannot be blank.");
         return () -> {
             boolean gotLock = tryLock(lockName, lockType);
@@ -79,7 +79,7 @@ public class ExecutionLockManager {
         };
     }
 
-    private static void runAndUnlock(String lockName, LockType lockType, Runnable task) {
+    private static void runAndUnlock(String lockName, ExecutionLockType lockType, Runnable task) {
         try {
             task.run();
         } finally {
@@ -87,16 +87,11 @@ public class ExecutionLockManager {
         }
     }
 
-    public static Runnable wrapWithLockAndRelease(String lockName, LockType lockType, Runnable task) {
+    public static Runnable wrapWithLockAndRelease(String lockName, ExecutionLockType lockType, Runnable task) {
         if (isBlank(lockName)) throw new IllegalArgumentException("Lock name cannot be blank.");
         return () -> {
             lock(lockName, lockType);
             runAndUnlock(lockName, lockType, task);
         };
-    }
-
-    public enum LockType {
-        READ,
-        WRITE
     }
 }

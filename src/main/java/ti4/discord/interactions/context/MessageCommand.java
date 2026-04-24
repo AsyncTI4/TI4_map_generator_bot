@@ -1,4 +1,4 @@
-package ti4.discord.interactions.commands.context;
+package ti4.discord.interactions.context;
 
 import java.util.List;
 import net.dv8tion.jda.api.Permission;
@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.GenericContextInteractionE
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command.Type;
 
-public abstract class MessageCommand implements ContextCommand {
+abstract class MessageCommand implements ContextCommand {
 
     private final String name;
     private final List<Permission> perms;
@@ -16,14 +16,17 @@ public abstract class MessageCommand implements ContextCommand {
         this.perms = List.of(perms);
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public Type getType() {
         return Type.MESSAGE;
     }
 
+    @Override
     public List<Permission> getPermissions() {
         return perms;
     }

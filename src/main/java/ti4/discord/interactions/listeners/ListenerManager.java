@@ -13,7 +13,7 @@ public class ListenerManager {
                 new MessageListener(),
                 new LazaxMinigameReactionListener(),
                 new SlashCommandListener(),
-                new ContextMenuListener(),
+                new ContextInteractionListener(),
                 ButtonListener.getInstance(),
                 new UserJoinServerListener(),
                 new AutoCompleteListener(),

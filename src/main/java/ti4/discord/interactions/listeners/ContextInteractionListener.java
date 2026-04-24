@@ -6,14 +6,14 @@ import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionE
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.discord.interactions.commands.context.ContextCommand;
-import ti4.discord.interactions.commands.context.ContextCommandManager;
+import ti4.discord.interactions.context.ContextCommand;
+import ti4.discord.interactions.context.ContextCommandManager;
 import ti4.executors.ExecutorServiceManager;
 import ti4.logging.BotLogger;
 import ti4.logging.RollbarManager;
 import ti4.service.game.GameNameService;
 
-class ContextMenuListener extends ListenerAdapter implements ListenerInterface {
+class ContextInteractionListener extends ListenerAdapter implements ListenerInterface {
 
     @Override
     public void onMessageContextInteraction(MessageContextInteractionEvent event) {
@@ -32,15 +32,11 @@ class ContextMenuListener extends ListenerAdapter implements ListenerInterface {
     }
 
     private void queue(GenericContextInteractionEvent<?> event) {
-        String gameName = GameNameService.getGameName(event);
-        String lock = gameName == null ? "async" : gameName;
-        ExecutorServiceManager.runAsync(
-                eventToString(event, gameName), lock, event.getMessageChannel(), () -> process(event));
+        ExecutorServiceManager.runAsync(eventToString(event), () -> process(event));
     }
 
-    public String eventToString(GenericCommandInteractionEvent event, String gameName) {
-        return "ContextMenuListener task for `" + event.getUser().getEffectiveName() + "`"
-                + (gameName == null ? "" : " in `" + gameName + "`")
+    public String eventToString(GenericCommandInteractionEvent event) {
+        return "ContextInteractionListener task for `" + event.getUser().getEffectiveName() + "`"
                 + ": `"
                 + event.getCommandString() + "`";
     }
