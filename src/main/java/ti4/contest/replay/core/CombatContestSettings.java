@@ -1,50 +1,34 @@
 package ti4.contest.replay.core;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
-import ti4.json.JsonMapperManager;
-import tools.jackson.databind.ObjectMapper;
 
 /**
  * Mutable in-memory settings for the replay contest system.
  */
 @Component
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
 public class CombatContestSettings {
 
-    private static final ObjectMapper MAPPER = JsonMapperManager.basic();
     public static final int PROMOTION_LOOKBACK_FALLBACK_MAX_HOURS = 8;
+
+    @Setter(AccessLevel.NONE)
+    private boolean isProd = true;
 
     private CandidateSelection candidateSelection = new CandidateSelection();
     private Promotion promotion = new Promotion();
     private ReplayExecution replayExecution = new ReplayExecution();
     private Retention retention = new Retention();
     private Runtime runtime = new Runtime();
+    private SideBets sideBets = new SideBets();
 
-    public synchronized CombatContestSettings update(String payloadJson) {
-        CombatContestSettings updated = snapshot();
-        try {
-            MAPPER.readerForUpdating(updated).readValue(payloadJson);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid settings JSON.", e);
-        }
-        updated.validate();
-        candidateSelection = updated.candidateSelection;
-        promotion = updated.promotion;
-        replayExecution = updated.replayExecution;
-        retention = updated.retention;
-        runtime = updated.runtime;
-        return snapshot();
-    }
-
-    public synchronized CombatContestSettings snapshot() {
-        try {
-            return MAPPER.readValue(MAPPER.writeValueAsBytes(this), CombatContestSettings.class);
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed to snapshot replay settings.", e);
-        }
+    public CombatContestSettings() {
+        applyEnvironmentDefaults();
+        validate();
     }
 
     public void validate() {
@@ -54,6 +38,7 @@ public class CombatContestSettings {
         require(replayExecution != null, "replayExecution is required.");
         require(retention != null, "retention is required.");
         require(runtime != null, "runtime is required.");
+        require(sideBets != null, "sideBets is required.");
         require(
                 candidateSelection.window.lookbackMinutes > 0,
                 "candidateSelection.window.lookbackMinutes must be > 0.");
@@ -72,6 +57,8 @@ public class CombatContestSettings {
         require(retention.observationRetentionDays > 0, "retention.observationRetentionDays must be > 0.");
         require(retention.eventRetentionDays > 0, "retention.eventRetentionDays must be > 0.");
         require(runtime.versionEnabled != null, "runtime.versionEnabled is required.");
+        require(sideBets.maxBetsPerUser >= 0, "sideBets.maxBetsPerUser must be >= 0.");
+        require(sideBets.costPoints >= 0, "sideBets.costPoints must be >= 0.");
         require(
                 "v1".equalsIgnoreCase(runtime.versionEnabled) || "v2".equalsIgnoreCase(runtime.versionEnabled),
                 "runtime.versionEnabled must be 'v1' or 'v2'.");
@@ -83,60 +70,80 @@ public class CombatContestSettings {
         }
     }
 
-    @Data
-    @NoArgsConstructor
+    @JsonProperty("isProd")
+    public boolean isProd() {
+        return isProd;
+    }
+
+    private void applyEnvironmentDefaults() {
+        if (isProd) {
+            replayExecution.setStartDelayMinutes(10);
+            replayExecution.setReplayIntervalSeconds(15);
+            replayExecution.setMaxEventGapSeconds(30);
+            runtime.setTrackAllCombatsAsCandidates(false);
+            runtime.setImmediatePromotionOnResolve(false);
+            sideBets.setEnableSideBets(true);
+        } else {
+            replayExecution.setStartDelayMinutes(1);
+            replayExecution.setReplayIntervalSeconds(1);
+            replayExecution.setMaxEventGapSeconds(1);
+            runtime.setTrackAllCombatsAsCandidates(true);
+            runtime.setImmediatePromotionOnResolve(true);
+            sideBets.setEnableSideBets(true);
+        }
+    }
+
+    @Getter
+    @Setter
     public static class CandidateSelection {
         private Window window = new Window();
         private int targetCandidatesPerHour = 4;
     }
 
-    @Data
-    @NoArgsConstructor
+    @Getter
+    @Setter
     public static class Window {
         private int lookbackMinutes = 60;
         private int refreshCronIntervalSeconds = 300;
     }
 
-    @Data
-    @NoArgsConstructor
+    @Getter
+    @Setter
     public static class Promotion {
         private int intervalSeconds = 60;
         private int candidateLookbackHours = 4;
         private int maxPromotionsPerHour = 1;
     }
 
-    @Data
-    @NoArgsConstructor
+    @Getter
+    @Setter
     public static class ReplayExecution {
-        // prod settings
         private int startDelayMinutes = 10;
         private int replayIntervalSeconds = 15;
         private int maxEventGapSeconds = 30;
-
-        // dev settings
-        //        private int startDelayMinutes = 0;
-        //        private int replayIntervalSeconds = 1;
-        //        private int maxEventGapSeconds = 1;
     }
 
-    @Data
-    @NoArgsConstructor
+    @Getter
+    @Setter
     public static class Retention {
         private int observationRetentionDays = 2;
         private int eventRetentionDays = 2;
     }
 
-    @Data
-    @NoArgsConstructor
+    @Getter
+    @Setter
     public static class Runtime {
         private boolean discordPostingEnabled = true;
         private String versionEnabled = "v2";
-        // prod settings
         private boolean trackAllCombatsAsCandidates = false;
         private boolean immediatePromotionOnResolve = false;
+    }
 
-        // dev settings
-        //        private boolean trackAllCombatsAsCandidates = true;
-        //        private boolean immediatePromotionOnResolve = true;
+    @Getter
+    @Setter
+    public static class SideBets {
+        private boolean enableSideBets = true;
+        private int maxBetsPerUser = 5;
+        private int costPoints = 1;
     }
 }
