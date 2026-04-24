@@ -2196,6 +2196,7 @@ public final class AgendaHelper {
                             }
                             message += " and the " + MiscEmojis.SpeakerToken + " Speaker Token";
                             game.setSpeakerUserID(winningR.getUserID());
+                            game.setStoredValue("oldSpeakerExecutiveOrder", game.getSpeakerUserID());
                             MessageHelper.sendMessageToChannel(channel, message);
                             ActionCardHelper.drawActionCardsSilent(winningR, 3);
                         }
