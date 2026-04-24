@@ -4,11 +4,6 @@ public enum CombatCandidateEventType {
     START,
     ROLL,
     HIT_ASSIGN,
-    CARD,
-    AGENT,
-    LEADER,
-    RETREAT,
-    ASSAULT,
     INFO,
     RESOLVED,
     CANCELLED

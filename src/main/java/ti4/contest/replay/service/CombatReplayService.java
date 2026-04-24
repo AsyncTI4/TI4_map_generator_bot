@@ -19,6 +19,8 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.service.emoji.TechEmojis;
+import ti4.spring.context.SpringContext;
 import ti4.spring.service.contest.CombatContestType;
 
 @Service
@@ -43,8 +45,10 @@ public class CombatReplayService {
     }
 
     public void onSpaceCombatStarted(Game game, Player attacker, Player defender, Tile tile) {
-        if (!LazaxCombatSupport.isEligibleGame(game)
-                || !LazaxCombatSupport.isEligibleCombat(game, attacker, defender, tile)) {
+        boolean trackAllCombatsAsCandidates = settings.getRuntime().isTrackAllCombatsAsCandidates();
+        if (!trackAllCombatsAsCandidates
+                && (!LazaxCombatSupport.isEligibleGame(game)
+                        || !LazaxCombatSupport.isEligibleCombat(game, attacker, defender, tile))) {
             return;
         }
 
@@ -92,13 +96,12 @@ public class CombatReplayService {
 
     public void mirrorCombatEvent(
             Game game, Player player, String header, String name, MessageEmbed embed, String sourceChannelName) {
-        CombatCandidateEventType eventType = mapEventType(header);
         CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
         if (candidate == null) return;
 
         appendDiscordEvent(
                 candidate,
-                eventType,
+                CombatCandidateEventType.INFO,
                 null,
                 player.getFaction(),
                 "## " + header + "\n" + player.getRepresentation() + " " + name,
@@ -111,7 +114,7 @@ public class CombatReplayService {
 
         appendDiscordEvent(
                 candidate,
-                CombatCandidateEventType.RETREAT,
+                CombatCandidateEventType.INFO,
                 getCurrentRound(game, candidate),
                 player.getFaction(),
                 "## Retreat\n" + player.getRepresentationNoPing() + " announced a retreat.");
@@ -123,7 +126,7 @@ public class CombatReplayService {
 
         appendDiscordEvent(
                 candidate,
-                CombatCandidateEventType.RETREAT,
+                CombatCandidateEventType.INFO,
                 getCurrentRound(game, candidate),
                 player.getFaction(),
                 "## Retreat\n" + player.getRepresentationNoPing() + " retreated to " + destination + ".");
@@ -135,20 +138,30 @@ public class CombatReplayService {
 
         appendDiscordEvent(
                 candidate,
-                CombatCandidateEventType.ASSAULT,
+                CombatCandidateEventType.INFO,
                 getCurrentRound(game, candidate),
                 player.getFaction(),
-                "## Combat Ability\n" + player.getRepresentationNoPing() + " used _Assault Cannon_.");
+                "## Combat Ability\n"
+                        + TechEmojis.WarfareTech
+                        + " "
+                        + player.getRepresentationNoPing()
+                        + " used _Assault Cannon_.");
     }
 
-    private CombatCandidateEventType mapEventType(String header) {
-        String normalized = header == null ? "" : header.trim().toLowerCase();
-        return switch (normalized) {
-            case "action card" -> CombatCandidateEventType.CARD;
-            case "agent" -> CombatCandidateEventType.AGENT;
-            case "leader", "hero", "commander", "envoy" -> CombatCandidateEventType.LEADER;
-            default -> CombatCandidateEventType.INFO;
-        };
+    public void mirrorGravitonExhausted(Game game, Player player, String sourceChannelName) {
+        CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
+        if (candidate == null) return;
+
+        appendDiscordEvent(
+                candidate,
+                CombatCandidateEventType.INFO,
+                getCurrentRound(game, candidate),
+                player.getFaction(),
+                "## Combat Ability\n"
+                        + TechEmojis.CyberneticTech
+                        + " "
+                        + player.getRepresentationNoPing()
+                        + " exhausted _Graviton Laser System_.");
     }
 
     private boolean evaluateCandidateCompletion(Game game, CombatCandidateEntity candidate) {
@@ -159,38 +172,53 @@ public class CombatReplayService {
                 .filter(Player::isRealPlayer)
                 .filter(player -> !player.isDummy())
                 .toList();
-        if (remainingShipPlayers.size() == 1) {
-            if (!hasRecordedRoll(candidate)) {
-                cancelCandidate(game, candidate, "The tracked space combat ended before any dice were rolled.");
-                return true;
+        boolean hasRecordedRoll = hasRecordedRoll(candidate);
+        return switch (remainingShipPlayers.size()) {
+            case 0 -> {
+                cancelCandidate(
+                        game,
+                        candidate,
+                        hasRecordedRoll
+                                ? "The tracked space combat ended with no ships remaining."
+                                : "The tracked space combat ended before any dice were rolled.");
+                yield true;
             }
-            Player winner = remainingShipPlayers.getFirst();
-            String loserFaction = winner.getFaction().equalsIgnoreCase(candidate.getAttackerFaction())
-                    ? candidate.getDefenderFaction()
-                    : candidate.getAttackerFaction();
-            resolveCandidate(game, candidate, tile, winner, loserFaction);
-            return true;
-        }
-        if (remainingShipPlayers.isEmpty()) {
-            String reason = hasRecordedRoll(candidate)
-                    ? "The tracked space combat ended with no ships remaining."
-                    : "The tracked space combat ended before any dice were rolled.";
-            cancelCandidate(game, candidate, reason);
-            return true;
-        }
-        if (remainingShipPlayers.size() > 2) {
-            cancelCandidate(game, candidate, "The tracked space combat no longer has exactly two sides.");
-            return true;
-        }
-        boolean containsBothParticipants = remainingShipPlayers.stream()
+            case 1 -> {
+                if (!hasRecordedRoll) {
+                    cancelCandidate(game, candidate, "The tracked space combat ended before any dice were rolled.");
+                    yield true;
+                }
+                Player winner = remainingShipPlayers.getFirst();
+                resolveCandidate(game, candidate, tile, winner, loserFaction(candidate, winner));
+                yield true;
+            }
+            case 2 -> {
+                if (containsOnlyOriginalParticipants(candidate, remainingShipPlayers)) {
+                    yield false;
+                }
+                cancelCandidate(
+                        game, candidate, "The tracked space combat drifted away from the original participants.");
+                yield true;
+            }
+            default -> {
+                cancelCandidate(game, candidate, "The tracked space combat no longer has exactly two sides.");
+                yield true;
+            }
+        };
+    }
+
+    private boolean containsOnlyOriginalParticipants(
+            CombatCandidateEntity candidate, List<Player> remainingShipPlayers) {
+        return remainingShipPlayers.stream()
                 .map(Player::getFaction)
                 .allMatch(faction -> faction.equalsIgnoreCase(candidate.getAttackerFaction())
                         || faction.equalsIgnoreCase(candidate.getDefenderFaction()));
-        if (!containsBothParticipants) {
-            cancelCandidate(game, candidate, "The tracked space combat drifted away from the original participants.");
-            return true;
-        }
-        return false;
+    }
+
+    private String loserFaction(CombatCandidateEntity candidate, Player winner) {
+        return winner.getFaction().equalsIgnoreCase(candidate.getAttackerFaction())
+                ? candidate.getDefenderFaction()
+                : candidate.getAttackerFaction();
     }
 
     private void resolveCandidate(
@@ -198,18 +226,11 @@ public class CombatReplayService {
         CombatObservationEntity observation =
                 observationRepository.findById(candidate.getObservationId()).orElse(null);
         if (observation == null) return;
-        Player attacker = game.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
-        Player defender = game.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
-        if (attacker == null || defender == null || space == null) {
+        ResolutionState resolution = buildResolutionState(game, candidate, tile);
+        if (resolution == null) {
             cancelCandidate(game, candidate, "The tracked space combat could not be resolved cleanly.");
             return;
         }
-
-        LazaxCombatSupport.FleetStrength attackerRemainingStrength =
-                LazaxCombatSupport.calculateFleetStrength(game, attacker, defender, tile, space);
-        LazaxCombatSupport.FleetStrength defenderRemainingStrength =
-                LazaxCombatSupport.calculateFleetStrength(game, defender, attacker, tile, space);
         int roundsObserved = candidateEventRepository
                 .findMaxRoundNumberByCandidateId(candidate.getId())
                 .orElse(0);
@@ -220,8 +241,8 @@ public class CombatReplayService {
         candidate.setResolutionReason("Winner determined from remaining fleets.");
         candidate.setPromotionScore(computePromotionScore(
                 observation,
-                attackerRemainingStrength,
-                defenderRemainingStrength,
+                resolution.attackerRemainingStrength(),
+                resolution.defenderRemainingStrength(),
                 winner.getFaction(),
                 roundsObserved));
         candidateRepository.save(candidate);
@@ -238,6 +259,10 @@ public class CombatReplayService {
                         + tile.getRepresentationForButtons() + ".\n"
                         + "Game " + game.getName() + ": [Open Game](https://asyncti4.com/game/" + game.getName()
                         + ")");
+
+        if (settings.getRuntime().isImmediatePromotionOnResolve()) {
+            SpringContext.getBean(CombatReplayContestLifecycleService.class).forcePromoteCandidate(candidate.getId());
+        }
     }
 
     private void cancelCandidate(Game game, CombatCandidateEntity candidate, String reason) {
@@ -278,6 +303,18 @@ public class CombatReplayService {
                         candidate.getTilePosition(),
                         CombatReplayRenderSnapshotSupport.captureHitAssignmentSnapshot(
                                 game, candidate.getTilePosition())));
+    }
+
+    private ResolutionState buildResolutionState(Game game, CombatCandidateEntity candidate, Tile tile) {
+        Player attacker = game.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
+        Player defender = game.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
+        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        if (attacker == null || defender == null || space == null) {
+            return null;
+        }
+        return new ResolutionState(
+                LazaxCombatSupport.calculateFleetStrength(game, attacker, defender, tile, space),
+                LazaxCombatSupport.calculateFleetStrength(game, defender, attacker, tile, space));
     }
 
     public void refreshSelectionSnapshot() {
@@ -388,6 +425,9 @@ public class CombatReplayService {
     }
 
     private boolean isEligibleCandidate(Game game, Player attacker, Player defender, Tile tile, Evaluation evaluation) {
+        if (settings.getRuntime().isTrackAllCombatsAsCandidates()) {
+            return getTrackingCandidate(game, tile.getPosition()) == null;
+        }
         return evaluation.eligible()
                 && !LazaxCombatSupport.hasExcludedFlagship(attacker, defender)
                 && getTrackingCandidate(game, tile.getPosition()) == null;
@@ -629,4 +669,8 @@ public class CombatReplayService {
             double weakerStrengthPercentile,
             double jointScore,
             boolean eligibleAsCandidate) {}
+
+    private record ResolutionState(
+            LazaxCombatSupport.FleetStrength attackerRemainingStrength,
+            LazaxCombatSupport.FleetStrength defenderRemainingStrength) {}
 }

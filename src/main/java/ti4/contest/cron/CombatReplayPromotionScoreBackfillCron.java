@@ -1,6 +1,5 @@
 package ti4.contest.cron;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.experimental.UtilityClass;
@@ -68,9 +67,9 @@ public class CombatReplayPromotionScoreBackfillCron {
     }
 
     private static boolean recomputePromotionScore(CombatCandidateEntity candidate) {
-        CombatObservationRepository observationRepository = SpringContext.getBean(CombatObservationRepository.class);
-        CombatObservationEntity observation =
-                observationRepository.findById(candidate.getObservationId()).orElse(null);
+        CombatObservationEntity observation = SpringContext.getBean(CombatObservationRepository.class)
+                .findById(candidate.getObservationId())
+                .orElse(null);
         if (observation == null) return false;
 
         String snapshotJson = extractLatestSnapshotJson(candidate.getId());
@@ -109,9 +108,9 @@ public class CombatReplayPromotionScoreBackfillCron {
     private static String extractLatestSnapshotJson(Long candidateId) {
         List<CombatCandidateEventEntity> events = SpringContext.getBean(CombatCandidateEventRepository.class)
                 .findByCandidateIdOrderBySequenceNumberAsc(candidateId);
-        Collections.reverse(events);
         ReplayDispatchSerializer payloadSerializer = SpringContext.getBean(ReplayDispatchSerializer.class);
-        for (CombatCandidateEventEntity event : events) {
+        for (int i = events.size() - 1; i >= 0; i--) {
+            CombatCandidateEventEntity event = events.get(i);
             ReplayDispatchPayload payload = payloadSerializer.read(event);
             if (payload instanceof ReplayDispatchPayload.HitAssignDispatch hitAssign) {
                 return hitAssign.combatStateSnapshotJson();

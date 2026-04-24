@@ -108,9 +108,15 @@ public class CombatContestSettings {
     @Data
     @NoArgsConstructor
     public static class ReplayExecution {
-        private int startDelayMinutes = 10;
-        private int replayIntervalSeconds = 15;
-        private int maxEventGapSeconds = 30;
+        // prod settings
+        // private int startDelayMinutes = 10;
+        // private int replayIntervalSeconds = 15;
+        // private int maxEventGapSeconds = 30;
+
+        // dev settings
+        private int startDelayMinutes = 0;
+        private int replayIntervalSeconds = 1;
+        private int maxEventGapSeconds = 1;
     }
 
     @Data
@@ -125,5 +131,12 @@ public class CombatContestSettings {
     public static class Runtime {
         private boolean discordPostingEnabled = true;
         private String versionEnabled = "v2";
+        // prod settings
+        // private boolean trackAllCombatsAsCandidates = false;
+        // private boolean immediatePromotionOnResolve = false;
+
+        // dev settings
+        private boolean trackAllCombatsAsCandidates = true;
+        private boolean immediatePromotionOnResolve = true;
     }
 }

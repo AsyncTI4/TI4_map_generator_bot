@@ -26,11 +26,10 @@ public class CombatReplayJanitorService {
 
     public void runJanitor() {
         LocalDateTime now = LocalDateTime.now();
+        LocalDateTime observationCutoff = now.minusDays(settings.getRetention().getObservationRetentionDays());
 
         expireStaleResolvedCandidates(now);
-
-        observationRepository.deleteAll(observationRepository.findByStartedAtBefore(
-                now.minusDays(settings.getRetention().getObservationRetentionDays())));
+        observationRepository.deleteAll(observationRepository.findByStartedAtBefore(observationCutoff));
         deleteExpiredCandidateEvents(now);
         clearCompletedReplayErrors();
     }
@@ -51,8 +50,8 @@ public class CombatReplayJanitorService {
     }
 
     private void deleteExpiredCandidateEvents(LocalDateTime now) {
-        List<CombatCandidateEventEntity> oldEvents = candidateEventRepository.findByOccurredAtBefore(
-                now.minusDays(settings.getRetention().getEventRetentionDays()));
+        LocalDateTime retentionCutoff = now.minusDays(settings.getRetention().getEventRetentionDays());
+        List<CombatCandidateEventEntity> oldEvents = candidateEventRepository.findByOccurredAtBefore(retentionCutoff);
         if (oldEvents.isEmpty()) return;
 
         List<Long> candidateIds = oldEvents.stream()
@@ -71,10 +70,7 @@ public class CombatReplayJanitorService {
             CombatCandidateEntity candidate = candidatesById.get(event.getCandidateId());
             if (candidate == null || candidate.getStatus() == CombatCandidateStatus.TRACKING) continue;
 
-            LocalDateTime terminalAt =
-                    candidate.getPromotedAt() != null ? candidate.getPromotedAt() : candidate.getResolvedAt();
-            if (terminalAt == null
-                    || terminalAt.isAfter(now.minusDays(settings.getRetention().getEventRetentionDays()))) {
+            if (!isPastRetentionCutoff(candidate, retentionCutoff)) {
                 continue;
             }
 
@@ -94,5 +90,11 @@ public class CombatReplayJanitorService {
                     contest.setReplayError(null);
                     replayContestRepository.save(contest);
                 });
+    }
+
+    private boolean isPastRetentionCutoff(CombatCandidateEntity candidate, LocalDateTime retentionCutoff) {
+        LocalDateTime terminalAt =
+                candidate.getPromotedAt() != null ? candidate.getPromotedAt() : candidate.getResolvedAt();
+        return terminalAt != null && !terminalAt.isAfter(retentionCutoff);
     }
 }
