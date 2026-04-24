@@ -60,7 +60,11 @@ public class CombatReplayService {
 
         if (!eligible) return;
 
-        CombatCandidateEntity candidate = buildCandidate(observation, attacker, defender);
+        CombatCandidateEntity candidate = buildCandidate(
+                observation,
+                attacker,
+                defender,
+                CombatReplayRenderSnapshotSupport.captureHitAssignmentSnapshot(game, tile.getPosition()));
         candidateRepository.save(candidate);
 
         observation.setCandidateId(candidate.getId());
@@ -165,34 +169,38 @@ public class CombatReplayService {
             return;
         }
 
-        double attackerRemaining = LazaxCombatSupport.calculateFleetStrength(game, attacker, defender, tile, space)
-                .value();
-        double defenderRemaining = LazaxCombatSupport.calculateFleetStrength(game, defender, attacker, tile, space)
-                .value();
-        double attackerLossRatio = computeLossRatio(observation.getAttackerStrength(), attackerRemaining);
-        double defenderLossRatio = computeLossRatio(observation.getDefenderStrength(), defenderRemaining);
+        LazaxCombatSupport.FleetStrength attackerRemainingStrength =
+                LazaxCombatSupport.calculateFleetStrength(game, attacker, defender, tile, space);
+        LazaxCombatSupport.FleetStrength defenderRemainingStrength =
+                LazaxCombatSupport.calculateFleetStrength(game, defender, attacker, tile, space);
         int roundsObserved = candidateEventRepository
                 .findMaxRoundNumberByCandidateId(candidate.getId())
                 .orElse(0);
-        double mutualLossScore =
-                Math.min(attackerLossRatio, defenderLossRatio) + ((attackerLossRatio + defenderLossRatio) / 2.0);
-
         candidate.setStatus(CombatCandidateStatus.RESOLVED);
         candidate.setResolvedAt(LocalDateTime.now());
         candidate.setWinnerFaction(winner.getFaction());
         candidate.setLoserFaction(loserFaction);
         candidate.setResolutionReason("Winner determined from remaining fleets.");
-        candidate.setPromotionScore(roundsObserved + mutualLossScore);
+        candidate.setPromotionScore(computePromotionScore(
+                observation,
+                attackerRemainingStrength,
+                defenderRemainingStrength,
+                winner.getFaction(),
+                roundsObserved));
         candidateRepository.save(candidate);
 
-        appendDiscordEvent(
+        appendTileRenderEvent(
                 candidate,
                 CombatCandidateEventType.RESOLVED,
                 roundsObserved,
                 winner.getFaction(),
+                tile.getPosition(),
+                CombatReplayRenderSnapshotSupport.captureHitAssignmentSnapshot(game, tile.getPosition()),
                 "## Contest Result\n"
                         + winner.getFactionEmoji() + " " + winner.getUserName() + " won the space combat in "
-                        + tile.getRepresentationForButtons() + ".");
+                        + tile.getRepresentationForButtons() + ".\n"
+                        + "Game " + game.getName() + ": [Open Game](https://asyncti4.com/game/" + game.getName()
+                        + ")");
     }
 
     private void cancelCandidate(Game game, CombatCandidateEntity candidate, String reason) {
@@ -247,6 +255,9 @@ public class CombatReplayService {
         double jointScoreCutoff = computeCutoff(window, fairnessValues, weakerStrengthValues);
         List<SelectionObservationDebugView> observations = window.stream()
                 .map(observation -> toSelectionObservationDebugView(observation, fairnessValues, weakerStrengthValues))
+                .sorted((left, right) -> right.observation()
+                        .getStartedAt()
+                        .compareTo(left.observation().getStartedAt()))
                 .toList();
         selectionSnapshot = new SelectionSnapshot(
                 window.size(),
@@ -254,6 +265,30 @@ public class CombatReplayService {
                 List.copyOf(weakerStrengthValues),
                 jointScoreCutoff,
                 List.copyOf(observations));
+    }
+
+    public static double computePromotionScore(
+            CombatObservationEntity observation,
+            LazaxCombatSupport.FleetStrength attackerRemainingStrength,
+            LazaxCombatSupport.FleetStrength defenderRemainingStrength,
+            String winnerFaction,
+            int roundsObserved) {
+        double weakerHp = Math.min(observation.getAttackerHp(), observation.getDefenderHp());
+        double weakerStrength = Math.min(observation.getAttackerStrength(), observation.getDefenderStrength());
+        double strongerStrength = Math.max(observation.getAttackerStrength(), observation.getDefenderStrength());
+        double winnerRemainingHp = winnerFaction.equalsIgnoreCase(observation.getAttackerFaction())
+                ? attackerRemainingStrength.hp()
+                : defenderRemainingStrength.hp();
+        double winnerInitialHp = winnerFaction.equalsIgnoreCase(observation.getAttackerFaction())
+                ? observation.getAttackerHp()
+                : observation.getDefenderHp();
+        double sizeFactor = Math.min(1.0, weakerHp / 8.0);
+        double strengthRatio = safeRatio(weakerStrength, strongerStrength);
+        double winnerSurvivalRatio = safeRatio(winnerRemainingHp, winnerInitialHp);
+        double roundScore = Math.sqrt(Math.max(0, roundsObserved)) * sizeFactor;
+        double openingBalanceScore = 0.9 * Math.pow(strengthRatio, 3.0);
+        double endingTensionScore = winnerRemainingHp <= 0 ? 0.0 : 5.0 * Math.exp(-6.0 * winnerSurvivalRatio);
+        return roundScore + openingBalanceScore + endingTensionScore;
     }
 
     public SelectionDebugView getSelectionDebugView() {
@@ -403,7 +438,7 @@ public class CombatReplayService {
     }
 
     private CombatCandidateEntity buildCandidate(
-            CombatObservationEntity observation, Player attacker, Player defender) {
+            CombatObservationEntity observation, Player attacker, Player defender, String initialRenderSnapshotJson) {
         CombatCandidateEntity candidate = new CombatCandidateEntity();
         candidate.setObservationId(observation.getId());
         candidate.setStatus(CombatCandidateStatus.TRACKING);
@@ -416,6 +451,7 @@ public class CombatReplayService {
         candidate.setAttackerFaction(attacker.getFaction());
         candidate.setDefenderFaction(defender.getFaction());
         candidate.setPreReplayContextText(LazaxCombatSupport.formatCombatTechSummary(attacker, defender));
+        candidate.setInitialRenderSnapshotJson(initialRenderSnapshotJson);
         return candidate;
     }
 
@@ -464,6 +500,23 @@ public class CombatReplayService {
                 ReplayDispatchPayload.discordMessage(message, embed));
     }
 
+    private void appendTileRenderEvent(
+            CombatCandidateEntity candidate,
+            CombatCandidateEventType eventType,
+            Integer roundNumber,
+            String actorFaction,
+            String tilePosition,
+            String snapshotJson,
+            String message) {
+        eventAppender.appendEvent(
+                candidate,
+                eventType,
+                roundNumber,
+                actorFaction,
+                message,
+                ReplayDispatchPayload.tileRenderMessage(tilePosition, snapshotJson, message));
+    }
+
     private CombatCandidateEntity resolveCandidateForMirrorEvent(Game game, Player player, String sourceChannelName) {
         String tilePosition = extractTilePosition(sourceChannelName);
         if (tilePosition != null) {
@@ -504,9 +557,9 @@ public class CombatReplayService {
         return buttonId.substring(secondUnderscore + 1);
     }
 
-    private double computeLossRatio(double initialStrength, double remainingStrength) {
-        if (initialStrength <= 0) return 0.0;
-        return Math.max(0.0, Math.min(1.0, (initialStrength - remainingStrength) / initialStrength));
+    private static double safeRatio(double weaker, double stronger) {
+        if (stronger <= 0) return 0.0;
+        return Math.max(0.0, Math.min(1.0, weaker / stronger));
     }
 
     private record SelectionSnapshot(

@@ -12,12 +12,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.*;
 import ti4.contest.replay.dispatch.ReplayDispatchPayload;
@@ -27,9 +29,12 @@ import ti4.contest.replay.repository.*;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.game.persistence.GameManager;
+import ti4.helpers.RandomHelper;
 import ti4.image.TileGenerator;
 import ti4.logging.BotLogger;
+import ti4.spring.service.contest.CombatContestService;
 
 @Service
 @RequiredArgsConstructor
@@ -38,8 +43,29 @@ import ti4.logging.BotLogger;
  */
 public class CombatReplayContestLifecycleService {
 
-    private static final String CONTEST_CHANNEL_NAME = "lazax-war-archives-dev";
+    private static final String CONTEST_CHANNEL_NAME_V1 = "lazax-war-archives-dev";
+    private static final String CONTEST_CHANNEL_NAME_V2 = "lazax-war-archives";
     private static final long SHADOW_DISCORD_ID = 0L;
+    private static final List<String> PREDICTION_LOCK_TITLES = List.of(
+            "The Wagers Open",
+            "The Archives Open",
+            "Predictions Are Open",
+            "The War Ledger Opens",
+            "The Betting Hall Opens",
+            "Call for Predictions",
+            "The Scribes Await",
+            "Cast Your Wager");
+    private static final List<String> PREDICTION_LOCK_SUBTITLES = List.of(
+            "_The Lazax recorders now accept predictions for the coming clash._",
+            "_The archives invite your judgment before the battle unfolds._",
+            "_The war ledger opens to all who would call the victor._",
+            "_The betting hall stirs as a new contest enters the record._",
+            "_The scribes stand ready to record your chosen champion._",
+            "_A new combat has been entered into the annals; predictions are welcome._",
+            "_The archives seek your verdict before the first volleys are fired._",
+            "_The next battle stands before the record; declare your pick._",
+            "_The Lazax ledgers are open to those bold enough to choose a side._",
+            "_Another clash enters the chronicles; place your wager in the record._");
 
     private final CombatContestSettings settings;
     private final CombatCandidateRepository candidateRepository;
@@ -58,13 +84,26 @@ public class CombatReplayContestLifecycleService {
             return;
         }
 
-        List<CombatCandidateEntity> candidates = candidateRepository.findResolvedPromotionCandidates(
-                CombatCandidateStatus.RESOLVED,
-                CombatCandidatePromotionStatus.PENDING,
-                now.minusHours(settings.getPromotion().getCandidateLookbackHours()));
+        List<CombatCandidateEntity> candidates = findPromotionCandidates(now);
         CombatCandidateEntity winner = selectPromotionWinner(candidates);
         if (winner == null) return;
         promoteCandidate(winner);
+    }
+
+    private List<CombatCandidateEntity> findPromotionCandidates(LocalDateTime now) {
+        int configuredLookbackHours = settings.getPromotion().getCandidateLookbackHours();
+        int maxLookbackHours =
+                Math.max(configuredLookbackHours, CombatContestSettings.PROMOTION_LOOKBACK_FALLBACK_MAX_HOURS);
+        for (int lookbackHours = configuredLookbackHours; lookbackHours <= maxLookbackHours; lookbackHours++) {
+            List<CombatCandidateEntity> candidates = candidateRepository.findResolvedPromotionCandidates(
+                    CombatCandidateStatus.RESOLVED,
+                    CombatCandidatePromotionStatus.PENDING,
+                    now.minusHours(lookbackHours));
+            if (!candidates.isEmpty()) {
+                return candidates;
+            }
+        }
+        return List.of();
     }
 
     public ForcePromoteResult forcePromoteCandidate(Long candidateId) {
@@ -121,10 +160,10 @@ public class CombatReplayContestLifecycleService {
         if (contestChannel == null) return null;
 
         try {
-            Message posted = contestChannel.sendMessage(message).complete();
+            Message posted = postPromotionMessage(contestChannel, message, game, winner);
             addPredictionReactions(game, winner, posted);
             ThreadChannel thread = createReplayThread(posted, winner);
-            return persistPromotedReplayContest(
+            CombatReplayContestEntity contest = persistPromotedReplayContest(
                     game,
                     observation,
                     winner,
@@ -134,9 +173,44 @@ public class CombatReplayContestLifecycleService {
                     posted,
                     thread,
                     existingContest);
+            try {
+                MessageChannel replayChannel = thread != null ? thread : contestChannel;
+                announcePreReplayContextIfNeeded(replayChannel, contest, winner);
+                announcePredictionLockCountdown(replayChannel);
+            } catch (Exception e) {
+                BotLogger.error("Failed to post replay context at promotion.", e);
+            }
+            return contest;
         } catch (Exception e) {
             BotLogger.error("Replay contest promotion failed.", e);
             return null;
+        }
+    }
+
+    @SneakyThrows
+    private Message postPromotionMessage(
+            TextChannel contestChannel, String message, Game game, CombatCandidateEntity candidate) {
+        String snapshotJson = candidate.getInitialRenderSnapshotJson();
+        if (snapshotJson == null || snapshotJson.isBlank()) {
+            return contestChannel.sendMessage(message).complete();
+        }
+
+        Game snapshotGame = CombatReplayRenderSnapshotSupport.restoreGame(snapshotJson, game);
+        if (snapshotGame == null) {
+            return contestChannel.sendMessage(message).complete();
+        }
+
+        removeReplayCommandCounters(snapshotGame, candidate.getTilePosition());
+        snapshotGame.setName(CombatReplayRenderSnapshotSupport.buildReplaySnapshotName(
+                candidate.getAttackerFaction(), candidate.getDefenderFaction()));
+        try (FileUpload fileUpload =
+                new TileGenerator(snapshotGame, null, null, 0, candidate.getTilePosition()).createFileUpload()) {
+            return contestChannel
+                    .sendMessage(new MessageCreateBuilder()
+                            .addContent(message)
+                            .addFiles(fileUpload)
+                            .build())
+                    .complete();
         }
     }
 
@@ -186,8 +260,12 @@ public class CombatReplayContestLifecycleService {
                     .findByCandidateIdAndSequenceNumber(contest.getCandidateId(), contest.getNextEventSequence() + 1)
                     .orElse(null);
             contest.setNextEventSequence(contest.getNextEventSequence() + 1);
-            contest.setReplayStatus(CombatContestReplayStatus.REPLAYING);
             contest.setReplayError(null);
+            if (nextEvent == null) {
+                completeReplayContest(contest);
+                return;
+            }
+            contest.setReplayStatus(CombatContestReplayStatus.REPLAYING);
             contest.setNextReplayAt(computeConfiguredNextReplayAt(LocalDateTime.now(), event, nextEvent));
         } catch (Exception e) {
             rescheduleReplay(contest, e.getMessage());
@@ -212,11 +290,23 @@ public class CombatReplayContestLifecycleService {
         replayContestRepository.save(contest);
     }
 
+    private void announcePredictionLockCountdown(MessageChannel channel) {
+        int startDelayMinutes = settings.getReplayExecution().getStartDelayMinutes();
+        String title = RandomHelper.pickRandomFromList(PREDICTION_LOCK_TITLES);
+        String subtitle = RandomHelper.pickRandomFromList(PREDICTION_LOCK_SUBTITLES);
+        String message = startDelayMinutes <= 0
+                ? "## " + title + "\n" + subtitle + "\nVoting is now open. The combat begins immediately."
+                : "## " + title + "\n" + subtitle + "\nVoting is now open for **" + startDelayMinutes + "** "
+                        + (startDelayMinutes == 1 ? "minute" : "minutes") + ".";
+        channel.sendMessage(message).complete();
+    }
+
     private void completeReplayContest(CombatReplayContestEntity contest) {
         CombatCandidateEntity candidate =
                 candidateRepository.findById(contest.getCandidateId()).orElse(null);
+        Game game = candidate == null ? null : loadGame(candidate.getGameName());
         if (candidate != null) {
-            replayLeaderboardService.finalizeReplayLeaderboardContest(contest, candidate);
+            replayLeaderboardService.finalizeReplayLeaderboardContest(game, contest, candidate);
         }
 
         contest.setReplayStatus(CombatContestReplayStatus.COMPLETED);
@@ -299,9 +389,28 @@ public class CombatReplayContestLifecycleService {
     }
 
     private ThreadChannel createReplayThread(Message posted, CombatCandidateEntity winner) {
-        return posted.createThreadChannel("combat-archive-" + winner.getGameName() + "-" + winner.getTilePosition())
+        return posted.createThreadChannel(buildReplayThreadName(winner))
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS)
                 .complete();
+    }
+
+    private String buildReplayThreadName(CombatCandidateEntity candidate) {
+        String attacker = normalizeThreadNamePart(candidate.getAttackerFaction());
+        String defender = normalizeThreadNamePart(candidate.getDefenderFaction());
+        String tilePosition = StringUtils.defaultIfBlank(candidate.getTilePosition(), "unknown");
+        String candidateId =
+                candidate.getId() == null ? "unknown" : candidate.getId().toString();
+        return "combat-archive-c" + candidateId + "-t" + tilePosition + "-" + attacker + "-v-" + defender;
+    }
+
+    private String normalizeThreadNamePart(String value) {
+        String normalized = StringUtils.defaultIfBlank(value, "unknown")
+                .trim()
+                .toLowerCase()
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("(^-+|-+$)", "");
+        if (normalized.isBlank()) return "unknown";
+        return StringUtils.abbreviate(normalized, 18);
     }
 
     private CombatReplayContestEntity buildReplayContest(
@@ -412,19 +521,26 @@ public class CombatReplayContestLifecycleService {
 
     private TextChannel getContestChannel() {
         if (JdaService.guildPrimary == null) return null;
-        return JdaService.guildPrimary.getTextChannelsByName(CONTEST_CHANNEL_NAME, true).stream()
+        return JdaService.guildPrimary.getTextChannelsByName(getContestChannelName(), true).stream()
                 .findFirst()
                 .orElse(null);
     }
 
+    private String getContestChannelName() {
+        return isReplayV2Enabled() ? CONTEST_CHANNEL_NAME_V2 : CONTEST_CHANNEL_NAME_V1;
+    }
+
+    private boolean isReplayV2Enabled() {
+        String versionEnabled = settings.getRuntime().getVersionEnabled();
+        return "v2".equalsIgnoreCase(versionEnabled);
+    }
+
     private String getLazaxRoleMention() {
-        // if (JdaService.guildPrimary == null) return "";
-        // Role role = JdaService.guildPrimary.getRolesByName(CombatContestService.LAZAX_MINIGAME_ROLE_NAME, true)
-        //         .stream()
-        //         .findFirst()
-        //         .orElse(null);
-        // return role == null ? "" : role.getAsMention();
-        return "";
+        if (JdaService.guildPrimary == null) return "";
+        Role role = JdaService.guildPrimary.getRolesByName(CombatContestService.LAZAX_MINIGAME_ROLE_NAME, true).stream()
+                .findFirst()
+                .orElse(null);
+        return role == null ? "" : role.getAsMention();
     }
 
     private Game loadGame(String gameName) {
@@ -444,6 +560,10 @@ public class CombatReplayContestLifecycleService {
             postHitAssignmentReplayEvent(channel, game, candidate, event, hit);
             return;
         }
+        if (payload instanceof ReplayDispatchPayload.TileRenderMessageDispatch tileRender) {
+            postTileRenderReplayEvent(channel, game, candidate, event.getSummaryText(), tileRender);
+            return;
+        }
         if (payload instanceof ReplayDispatchPayload.DiscordMessageDispatch messageDispatch) {
             sendDiscordMessage(channel, messageDispatch.message(), event.getSummaryText());
             return;
@@ -459,9 +579,40 @@ public class CombatReplayContestLifecycleService {
             CombatCandidateEntity candidate,
             CombatCandidateEventEntity event,
             ReplayDispatchPayload.HitAssignDispatch payload) {
-        String message = event.getSummaryText();
-        String tilePosition = payload.tilePosition();
-        String snapshotJson = payload.combatStateSnapshotJson();
+        postTileRenderReplayEvent(
+                channel,
+                game,
+                candidate,
+                event.getSummaryText(),
+                List.of(),
+                payload.tilePosition(),
+                payload.combatStateSnapshotJson());
+    }
+
+    @SneakyThrows
+    private void postTileRenderReplayEvent(
+            MessageChannel channel,
+            Game game,
+            CombatCandidateEntity candidate,
+            String fallbackMessage,
+            ReplayDispatchPayload.TileRenderMessageDispatch payload) {
+        ReplayDispatchPayload.DiscordMessage replayMessage = payload.message();
+        String message = replayMessage == null ? fallbackMessage : replayMessage.content();
+        List<MessageEmbed> embeds =
+                replayMessage == null ? List.of() : ReplayDispatchSerializer.toMessageEmbeds(replayMessage.embeds());
+        postTileRenderReplayEvent(
+                channel, game, candidate, message, embeds, payload.tilePosition(), payload.combatStateSnapshotJson());
+    }
+
+    @SneakyThrows
+    private void postTileRenderReplayEvent(
+            MessageChannel channel,
+            Game game,
+            CombatCandidateEntity candidate,
+            String message,
+            List<MessageEmbed> embeds,
+            String tilePosition,
+            String snapshotJson) {
         if (tilePosition == null || snapshotJson == null) {
             channel.sendMessage(message).complete();
             return;
@@ -473,17 +624,26 @@ public class CombatReplayContestLifecycleService {
             return;
         }
         if (candidate != null) {
+            removeReplayCommandCounters(snapshotGame, tilePosition);
             snapshotGame.setName(CombatReplayRenderSnapshotSupport.buildReplaySnapshotName(
                     candidate.getAttackerFaction(), candidate.getDefenderFaction()));
         }
 
         try (FileUpload fileUpload = new TileGenerator(snapshotGame, null, null, 0, tilePosition).createFileUpload()) {
-            channel.sendMessage(new MessageCreateBuilder()
-                            .addContent(message)
-                            .addFiles(fileUpload)
-                            .build())
-                    .complete();
+            MessageCreateBuilder builder =
+                    new MessageCreateBuilder().addContent(message).addFiles(fileUpload);
+            if (!embeds.isEmpty()) {
+                builder.addEmbeds(embeds);
+            }
+            channel.sendMessage(builder.build()).complete();
         }
+    }
+
+    private void removeReplayCommandCounters(Game snapshotGame, String tilePosition) {
+        if (snapshotGame == null || tilePosition == null || tilePosition.isBlank()) return;
+        Tile tile = snapshotGame.getTileByPosition(tilePosition);
+        if (tile == null) return;
+        tile.removeAllCC();
     }
 
     private void sendDiscordMessage(

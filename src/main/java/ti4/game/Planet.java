@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -18,6 +19,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
 import ti4.model.AttachmentModel;
 import ti4.model.PlanetModel;
@@ -59,9 +61,19 @@ public class Planet extends UnitHolder {
     @Getter
     private float radius;
 
+    public Planet(String name, Point holderCenterPosition) {
+        this(name, holderCenterPosition, null, null, null, null);
+    }
+
     @JsonCreator
-    public Planet(@JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
-        super(name, holderCenterPosition);
+    public Planet(
+            @JsonProperty("name") String name,
+            @JsonProperty("holderCenterPosition") Point holderCenterPosition,
+            @JsonProperty("unitsByState") Map<UnitKey, List<Integer>> unitsByState,
+            @JsonProperty("ccList") Set<String> ccList,
+            @JsonProperty("controlList") Set<String> controlList,
+            @JsonProperty("tokenList") Set<String> tokenList) {
+        super(name, holderCenterPosition, unitsByState, ccList, controlList, tokenList);
         PlanetModel planetInfo = Mapper.getPlanet(name);
         if (planetInfo != null) {
             if (planetInfo.getPlanetTypes() != null) {

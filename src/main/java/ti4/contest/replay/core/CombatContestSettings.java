@@ -15,6 +15,7 @@ import tools.jackson.databind.ObjectMapper;
 public class CombatContestSettings {
 
     private static final ObjectMapper MAPPER = JsonMapperManager.basic();
+    public static final int PROMOTION_LOOKBACK_FALLBACK_MAX_HOURS = 8;
 
     private CandidateSelection candidateSelection = new CandidateSelection();
     private Promotion promotion = new Promotion();
@@ -70,6 +71,10 @@ public class CombatContestSettings {
         require(replayExecution.maxEventGapSeconds >= 0, "replayExecution.maxEventGapSeconds must be >= 0.");
         require(retention.observationRetentionDays > 0, "retention.observationRetentionDays must be > 0.");
         require(retention.eventRetentionDays > 0, "retention.eventRetentionDays must be > 0.");
+        require(runtime.versionEnabled != null, "runtime.versionEnabled is required.");
+        require(
+                "v1".equalsIgnoreCase(runtime.versionEnabled) || "v2".equalsIgnoreCase(runtime.versionEnabled),
+                "runtime.versionEnabled must be 'v1' or 'v2'.");
     }
 
     private void require(boolean condition, String message) {
@@ -105,7 +110,7 @@ public class CombatContestSettings {
     public static class ReplayExecution {
         private int startDelayMinutes = 10;
         private int replayIntervalSeconds = 15;
-        private int maxEventGapSeconds = 60;
+        private int maxEventGapSeconds = 30;
     }
 
     @Data
@@ -118,6 +123,7 @@ public class CombatContestSettings {
     @Data
     @NoArgsConstructor
     public static class Runtime {
-        private boolean discordPostingEnabled = false;
+        private boolean discordPostingEnabled = true;
+        private String versionEnabled = "v2";
     }
 }
