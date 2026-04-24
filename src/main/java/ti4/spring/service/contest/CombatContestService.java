@@ -66,6 +66,7 @@ public class CombatContestService {
     private static final Set<String> COMBAT_SUMMARY_RELIC_ALIASES = Set.of(
             "metalivoidarmaments", "metalivoidshielding", "lightrailordnance", "baldrick_crownofthalnos", "pi_thalnos");
     private static final double ZERO_EPSILON = 0.0001;
+    private static final int WRONG_PREDICTION_PENALTY = -4;
     private static final String SUBSCRIBE_EMOJI = "\uD83D\uDFE2";
     private static final String UNSUBSCRIBE_EMOJI = "\uD83D\uDD34";
     private static final Set<CombatContestStatus> ACTIVE_STATUSES = Set.of(CombatContestStatus.POSTED);
@@ -194,6 +195,35 @@ public class CombatContestService {
         }
     }
 
+    public void mirrorRetreatDeclared(Game game, Player player, String sourceChannelName) {
+        runReplayHook(
+                game,
+                "retreat declaration mirror",
+                () -> combatReplayService.mirrorRetreatDeclared(game, player, sourceChannelName));
+        if (isReplayV2Enabled()) return;
+        relayContestMessage(game, player, "## Retreat\n" + player.getRepresentationNoPing() + " announced a retreat.");
+    }
+
+    public void mirrorRetreatResolved(Game game, Player player, String destination, String sourceChannelName) {
+        runReplayHook(
+                game,
+                "retreat resolution mirror",
+                () -> combatReplayService.mirrorRetreatResolved(game, player, destination, sourceChannelName));
+        if (isReplayV2Enabled()) return;
+        relayContestMessage(
+                game, player, "## Retreat\n" + player.getRepresentationNoPing() + " retreated to " + destination + ".");
+    }
+
+    public void mirrorAssaultCannonAssigned(Game game, Player player, String sourceChannelName) {
+        runReplayHook(
+                game,
+                "assault cannon mirror",
+                () -> combatReplayService.mirrorAssaultCannonAssigned(game, player, sourceChannelName));
+        if (isReplayV2Enabled()) return;
+        relayContestMessage(
+                game, player, "## Combat Ability\n" + player.getRepresentationNoPing() + " used _Assault Cannon_.");
+    }
+
     public boolean postLeaderboard() {
         if (isReplayV2Enabled()) {
             return combatReplayLeaderboardService.postLeaderboard();
@@ -218,6 +248,18 @@ public class CombatContestService {
     private boolean isReplayV2Enabled() {
         String versionEnabled = replaySettings.getRuntime().getVersionEnabled();
         return "v2".equalsIgnoreCase(versionEnabled);
+    }
+
+    private void relayContestMessage(Game game, Player player, String message) {
+        List<CombatContestEntity> activeContests =
+                repository.findByGameNameAndStatusIn(game.getName(), ACTIVE_STATUSES);
+        if (activeContests.isEmpty()) return;
+        for (CombatContestEntity contest : activeContests) {
+            if (!matchesParticipant(contest, player)) continue;
+            MessageChannel threadOrChannel = getContestThreadOrChannel(contest);
+            if (threadOrChannel == null) continue;
+            MessageHelper.splitAndSentWithAction(message, threadOrChannel, null);
+        }
     }
 
     // ==================== Contest Creation & Eligibility ====================
@@ -650,7 +692,10 @@ public class CombatContestService {
         for (CombatContestPredictionEntity prediction : predictions) {
             boolean correct = prediction.getPredictedFaction().equalsIgnoreCase(contest.getWinnerFaction());
             prediction.setCorrect(correct);
-            prediction.setPointsAwarded(correct ? calculatePredictionPoints(winnerPredictions, totalPredictions) : 0);
+            prediction.setPointsAwarded(
+                    correct
+                            ? calculatePredictionPoints(winnerPredictions, totalPredictions)
+                            : WRONG_PREDICTION_PENALTY);
         }
         predictionRepository.saveAll(predictions);
         return predictions;
@@ -821,6 +866,7 @@ public class CombatContestService {
                 + "**System:** " + tile.getRepresentationForButtons() + "\n"
                 + "**Combat:** Space Combat\n"
                 + "**Predict the winner by reacting below.**\n"
+                + "_Losers get -4 points._\n"
                 + "- " + attackerLegend + "\n"
                 + "- " + defenderLegend;
     }
@@ -977,7 +1023,8 @@ public class CombatContestService {
     private void postCombatTechSummary(Game game, CombatContestEntity contest, MessageChannel threadOrChannel) {
         Player attacker = game.getPlayerFromColorOrFaction(contest.getAttackerFaction());
         Player defender = game.getPlayerFromColorOrFaction(contest.getDefenderFaction());
-        String message = LazaxCombatSupport.formatCombatTechSummary(attacker, defender);
+        Tile tile = game.getTileByPosition(contest.getTilePosition());
+        String message = LazaxCombatSupport.formatCombatTechSummary(tile, attacker, defender);
         if (message == null || message.isBlank()) return;
         MessageHelper.sendMessageToChannel(threadOrChannel, message);
     }

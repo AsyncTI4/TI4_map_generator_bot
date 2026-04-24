@@ -105,11 +105,48 @@ public class CombatReplayService {
                 embed);
     }
 
+    public void mirrorRetreatDeclared(Game game, Player player, String sourceChannelName) {
+        CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
+        if (candidate == null) return;
+
+        appendDiscordEvent(
+                candidate,
+                CombatCandidateEventType.RETREAT,
+                getCurrentRound(game, candidate),
+                player.getFaction(),
+                "## Retreat\n" + player.getRepresentationNoPing() + " announced a retreat.");
+    }
+
+    public void mirrorRetreatResolved(Game game, Player player, String destination, String sourceChannelName) {
+        CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
+        if (candidate == null) return;
+
+        appendDiscordEvent(
+                candidate,
+                CombatCandidateEventType.RETREAT,
+                getCurrentRound(game, candidate),
+                player.getFaction(),
+                "## Retreat\n" + player.getRepresentationNoPing() + " retreated to " + destination + ".");
+    }
+
+    public void mirrorAssaultCannonAssigned(Game game, Player player, String sourceChannelName) {
+        CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
+        if (candidate == null) return;
+
+        appendDiscordEvent(
+                candidate,
+                CombatCandidateEventType.ASSAULT,
+                getCurrentRound(game, candidate),
+                player.getFaction(),
+                "## Combat Ability\n" + player.getRepresentationNoPing() + " used _Assault Cannon_.");
+    }
+
     private CombatCandidateEventType mapEventType(String header) {
         String normalized = header == null ? "" : header.trim().toLowerCase();
         return switch (normalized) {
             case "action card" -> CombatCandidateEventType.CARD;
             case "agent" -> CombatCandidateEventType.AGENT;
+            case "leader", "hero", "commander", "envoy" -> CombatCandidateEventType.LEADER;
             default -> CombatCandidateEventType.INFO;
         };
     }
@@ -450,7 +487,8 @@ public class CombatReplayService {
         candidate.setCombatType(observation.getCombatType());
         candidate.setAttackerFaction(attacker.getFaction());
         candidate.setDefenderFaction(defender.getFaction());
-        candidate.setPreReplayContextText(LazaxCombatSupport.formatCombatTechSummary(attacker, defender));
+        candidate.setPreReplayContextText(LazaxCombatSupport.formatCombatTechSummary(
+                attacker.getGame().getTileByPosition(observation.getTilePosition()), attacker, defender));
         candidate.setInitialRenderSnapshotJson(initialRenderSnapshotJson);
         return candidate;
     }
