@@ -90,41 +90,29 @@ public class CombatReplayDebugController {
     public ResponseEntity<String> getCandidate(@PathVariable Long candidateId) {
         CombatCandidateEntity candidate =
                 candidateRepository.findById(candidateId).orElse(null);
-        if (candidate == null) {
-            return ResponseEntity.notFound().build();
-        }
-        CombatObservationEntity observation =
-                observationRepository.findById(candidate.getObservationId()).orElse(null);
-        CombatReplayContestEntity contest =
-                replayContestRepository.findByCandidateId(candidateId).orElse(null);
-        List<EventResponse> events =
-                candidateEventRepository.findByCandidateIdOrderBySequenceNumberAsc(candidateId).stream()
-                        .map(this::toEventResponse)
-                        .toList();
-        return ok(new CandidateDetailResponse(runtimeState(), candidate, observation, contest, events));
+        if (candidate == null) return ResponseEntity.notFound().build();
+        return ok(buildCandidateDetailResponse(candidate));
     }
 
     @GetMapping(value = "/candidates/{candidateId}/promote", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> forcePromoteCandidate(@PathVariable Long candidateId) {
         CombatCandidateEntity candidate =
                 candidateRepository.findById(candidateId).orElse(null);
-        if (candidate == null) {
-            return ResponseEntity.notFound().build();
-        }
+        if (candidate == null) return ResponseEntity.notFound().build();
 
         CombatReplayContestLifecycleService.ForcePromoteResult result =
                 contestLifecycleService.forcePromoteCandidate(candidateId);
         CombatReplayContestEntity contest = result.contest() != null
                 ? result.contest()
                 : replayContestRepository.findByCandidateId(candidateId).orElse(null);
-        CombatObservationEntity observation =
-                observationRepository.findById(candidate.getObservationId()).orElse(null);
-        List<EventResponse> events =
-                candidateEventRepository.findByCandidateIdOrderBySequenceNumberAsc(candidateId).stream()
-                        .map(this::toEventResponse)
-                        .toList();
         return ok(new ForcePromoteResponse(
-                runtimeState(), result.promoted(), result.reason(), candidate, observation, contest, events));
+                runtimeState(),
+                result.promoted(),
+                result.reason(),
+                candidate,
+                observationRepository.findById(candidate.getObservationId()).orElse(null),
+                contest,
+                loadEvents(candidateId)));
     }
 
     @GetMapping(value = "/contests", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -142,20 +130,19 @@ public class CombatReplayDebugController {
     public ResponseEntity<String> getContest(@PathVariable Long contestId) {
         CombatReplayContestEntity contest =
                 replayContestRepository.findById(contestId).orElse(null);
-        if (contest == null) {
-            return ResponseEntity.notFound().build();
-        }
+        if (contest == null) return ResponseEntity.notFound().build();
         CombatCandidateEntity candidate =
                 candidateRepository.findById(contest.getCandidateId()).orElse(null);
-        CombatObservationEntity observation = candidate == null
-                ? null
-                : observationRepository.findById(candidate.getObservationId()).orElse(null);
-        List<EventResponse> events = candidate == null
-                ? List.of()
-                : candidateEventRepository.findByCandidateIdOrderBySequenceNumberAsc(candidate.getId()).stream()
-                        .map(this::toEventResponse)
-                        .toList();
-        return ok(new ContestDetailResponse(runtimeState(), contest, candidate, observation, events));
+        return ok(new ContestDetailResponse(
+                runtimeState(),
+                contest,
+                candidate,
+                candidate == null
+                        ? null
+                        : observationRepository
+                                .findById(candidate.getObservationId())
+                                .orElse(null),
+                candidate == null ? List.of() : loadEvents(candidate.getId())));
     }
 
     private ResponseEntity<String> ok(Object body) {
@@ -179,25 +166,39 @@ public class CombatReplayDebugController {
     }
 
     private CandidateSummary toCandidateSummary(CombatCandidateEntity candidate) {
-        CombatObservationEntity observation =
-                observationRepository.findById(candidate.getObservationId()).orElse(null);
-        CombatReplayContestEntity contest =
-                replayContestRepository.findByCandidateId(candidate.getId()).orElse(null);
-        long eventCount = candidateEventRepository
-                .findByCandidateIdOrderBySequenceNumberAsc(candidate.getId())
-                .size();
-        return new CandidateSummary(candidate, observation, contest, eventCount);
+        return new CandidateSummary(
+                candidate,
+                observationRepository.findById(candidate.getObservationId()).orElse(null),
+                replayContestRepository.findByCandidateId(candidate.getId()).orElse(null),
+                eventCount(candidate.getId()));
     }
 
     private ContestSummary toContestSummary(CombatReplayContestEntity contest) {
         CombatCandidateEntity candidate =
                 candidateRepository.findById(contest.getCandidateId()).orElse(null);
-        long eventCount = candidate == null
-                ? 0
-                : candidateEventRepository
-                        .findByCandidateIdOrderBySequenceNumberAsc(candidate.getId())
-                        .size();
+        long eventCount = candidate == null ? 0 : eventCount(candidate.getId());
         return new ContestSummary(contest, candidate, eventCount);
+    }
+
+    private CandidateDetailResponse buildCandidateDetailResponse(CombatCandidateEntity candidate) {
+        return new CandidateDetailResponse(
+                runtimeState(),
+                candidate,
+                observationRepository.findById(candidate.getObservationId()).orElse(null),
+                replayContestRepository.findByCandidateId(candidate.getId()).orElse(null),
+                loadEvents(candidate.getId()));
+    }
+
+    private List<EventResponse> loadEvents(Long candidateId) {
+        return candidateEventRepository.findByCandidateIdOrderBySequenceNumberAsc(candidateId).stream()
+                .map(this::toEventResponse)
+                .toList();
+    }
+
+    private long eventCount(Long candidateId) {
+        return candidateEventRepository
+                .findByCandidateIdOrderBySequenceNumberAsc(candidateId)
+                .size();
     }
 
     private EventResponse toEventResponse(CombatCandidateEventEntity event) {
