@@ -4,7 +4,7 @@
         "name": "Planetary Stabilisation",
         "faction": "neutral",
         "window": "ACTION",
-        "windowEffect": "Spend 1 Command Counter from your Strategy Pool to roll 1 die. On a result of 1–4, draw a random unused red tile; on a result of 5–10, draw a random unused blue tile. Place that tile adjacent to an unactivated system containing your ships, so that it is touching a system. If the system contains no planets, place a frontier token there and either gain 2 commodities or convert up to 2 commodities to trade goods. Then you may spend half your trade goods minus 1 for each tile touching the placed tile, to activate it with a token from your reinforcements and continue with a tactical action.",
+        "windowEffect": "Spend 1 Command Counter from your Strategy Pool to roll 1 die. On a result of 1–4, draw a random unused red tile; on a result of 5–10, draw a random unused blue tile. Place that tile adjacent to an unactivated system containing your ships, so that it is touching a system. If the system contains no planets, place a frontier token there and either gain 2 commodities or convert up to 2 commodities to trade goods. Then you may activate the placed system with a token from your reinforcements and continue with a tactical action. If you do, spend trade goods equal to half your trade goods (rounded down), minus 1 for each system tile adjacent to the placed system (minimum 0).",
         "source": "untangled_space"
     }
 ]
