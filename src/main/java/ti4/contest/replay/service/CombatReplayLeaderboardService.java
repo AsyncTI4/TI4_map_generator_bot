@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +27,8 @@ import ti4.contest.replay.entities.CombatReplayPredictionEntity;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
 import ti4.contest.replay.repository.CombatReplayLeaderboardEntryRepository;
 import ti4.contest.replay.repository.CombatReplayPredictionRepository;
+import ti4.contest.replay.service.CombatReplaySideBetService.ResolvedSideBet;
+import ti4.contest.replay.service.CombatReplaySideBetService.SideBetResolution;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -55,6 +58,7 @@ public class CombatReplayLeaderboardService {
     private final CombatReplayContestRepository replayContestRepository;
     private final CombatReplayPredictionRepository replayPredictionRepository;
     private final CombatReplayLeaderboardEntryRepository leaderboardEntryRepository;
+    private final CombatReplaySideBetService sideBetService;
 
     public void lockPredictionsAtReplayStart(
             Game game, CombatReplayContestEntity replayContest, CombatCandidateEntity candidate) {
@@ -107,15 +111,13 @@ public class CombatReplayLeaderboardService {
         CombatReplayPredictionEntity lockedPrediction = replayPredictionRepository
                 .findByContestId(replayContest.getId())
                 .orElse(null);
-        if (lockedPrediction == null) {
-            markLeaderboardPostedIfPublished(replayContest);
-            return;
-        }
-
-        ScoredContestResult result = scoreContest(candidate, lockedPrediction);
+        ScoredContestResult result = lockedPrediction == null
+                ? scoreSideBetOnlyContest(candidate, replayContest)
+                : scoreContest(candidate, replayContest, lockedPrediction);
         MessageChannel threadOrChannel = getContestThreadOrChannel(replayContest);
         if (threadOrChannel != null) {
             postPredictionResultsSummary(game, threadOrChannel, candidate, result, () -> {
+                postSideBetResultsSummary(threadOrChannel, result);
                 postParticipantFollowup(game, candidate, threadOrChannel);
                 postSubscriptionPrompt(threadOrChannel);
             });
@@ -207,8 +209,16 @@ public class CombatReplayLeaderboardService {
         return lockedPrediction;
     }
 
+    private ScoredContestResult scoreSideBetOnlyContest(
+            CombatCandidateEntity candidate, CombatReplayContestEntity replayContest) {
+        SideBetResolution sideBetResolution = sideBetService.resolveSideBets(candidate, replayContest);
+        return new ScoredContestResult(0, List.of(), sideBetResolution.resolvedSideBets());
+    }
+
     private ScoredContestResult scoreContest(
-            CombatCandidateEntity candidate, CombatReplayPredictionEntity lockedPrediction) {
+            CombatCandidateEntity candidate,
+            CombatReplayContestEntity replayContest,
+            CombatReplayPredictionEntity lockedPrediction) {
         List<LockedPrediction> attackerPredictions =
                 readLockedPredictions(lockedPrediction.getAttackerPredictionsJson());
         List<LockedPrediction> defenderPredictions =
@@ -232,28 +242,19 @@ public class CombatReplayLeaderboardService {
                         .collect(
                                 Collectors.toMap(CombatReplayLeaderboardEntryEntity::getDiscordUserId, entry -> entry));
 
+        List<ResolvedSideBet> resolvedSideBets = List.of();
         if (lockedPrediction.getScoredAt() == null) {
             applyContestResult(allPredictions, winningPredictions, pointsAwarded, entriesByUser);
+            leaderboardEntryRepository.saveAll(entriesByUser.values());
+            SideBetResolution sideBetResolution = sideBetService.resolveSideBets(candidate, replayContest);
+            sideBetResolution.leaderboardEntries().forEach(entry -> entriesByUser.put(entry.getDiscordUserId(), entry));
+            resolvedSideBets = sideBetResolution.resolvedSideBets();
             lockedPrediction.setScoredAt(LocalDateTime.now());
             replayPredictionRepository.save(lockedPrediction);
         }
 
-        List<WinningPredictionSummary> summaries = winningPredictions.stream()
-                .map(prediction -> {
-                    CombatReplayLeaderboardEntryEntity entry = entriesByUser.get(prediction.discordUserId());
-                    return new WinningPredictionSummary(
-                            prediction.discordUserId(),
-                            prediction.discordUserName(),
-                            pointsAwarded,
-                            entry == null ? 0 : safeInt(entry.getTotalPoints()));
-                })
-                .sorted((left, right) -> {
-                    int totalPointsComparison = Integer.compare(right.totalPoints(), left.totalPoints());
-                    if (totalPointsComparison != 0) return totalPointsComparison;
-                    return left.discordUserName().compareToIgnoreCase(right.discordUserName());
-                })
-                .toList();
-        return new ScoredContestResult(totalPredictions, summaries);
+        return new ScoredContestResult(
+                totalPredictions, resultSummaries(winningPredictions, pointsAwarded, entriesByUser), resolvedSideBets);
     }
 
     private void applyContestResult(
@@ -267,7 +268,8 @@ public class CombatReplayLeaderboardService {
 
         for (LockedPrediction prediction : allPredictions) {
             CombatReplayLeaderboardEntryEntity entry = entriesByUser.computeIfAbsent(
-                    prediction.discordUserId(), ignored -> newLeaderboardEntry(prediction));
+                    prediction.discordUserId(),
+                    ignored -> newLeaderboardEntry(prediction.discordUserId(), prediction.discordUserName()));
             entry.setDiscordUserName(prediction.discordUserName());
             entry.setPredictionCount(safeInt(entry.getPredictionCount()) + 1);
             if (winningUserIds.contains(prediction.discordUserId())) {
@@ -278,14 +280,13 @@ public class CombatReplayLeaderboardService {
             }
             entry.setUpdatedAt(now);
         }
-
-        leaderboardEntryRepository.saveAll(entriesByUser.values());
     }
 
-    private CombatReplayLeaderboardEntryEntity newLeaderboardEntry(LockedPrediction prediction) {
+    private CombatReplayLeaderboardEntryEntity newLeaderboardEntry(String discordUserId, String discordUserName) {
         CombatReplayLeaderboardEntryEntity entry = new CombatReplayLeaderboardEntryEntity();
-        entry.setDiscordUserId(prediction.discordUserId());
-        entry.setDiscordUserName(prediction.discordUserName());
+        entry.setDiscordUserId(discordUserId);
+        entry.setDiscordUserName(
+                discordUserName == null || discordUserName.isBlank() ? "Unknown User" : discordUserName);
         entry.setTotalPoints(0);
         entry.setPredictionCount(0);
         entry.setCorrectPredictions(0);
@@ -313,7 +314,7 @@ public class CombatReplayLeaderboardService {
             message += "\n\n"
                     + winningPredictions.stream()
                             .map(prediction -> "<@" + prediction.discordUserId() + "> - " + prediction.totalPoints()
-                                    + " points (+" + prediction.pointsAwarded() + ")")
+                                    + " points (pred +" + prediction.pointsAwarded() + ")")
                             .collect(Collectors.joining("\n"));
         }
         MessageHelper.splitAndSentWithAction(message, threadOrChannel, ignored -> {
@@ -321,6 +322,21 @@ public class CombatReplayLeaderboardService {
                 afterPost.run();
             }
         });
+    }
+
+    private void postSideBetResultsSummary(MessageChannel threadOrChannel, ScoredContestResult result) {
+        List<AggregatedSideBetSummary> aggregatedSideBets = aggregateSideBetSummaries(result.winningSideBets());
+        if (aggregatedSideBets.isEmpty()) return;
+
+        String message = "## Side Bets\n"
+                + aggregatedSideBets.stream()
+                        .map(sideBet -> {
+                            String repeats = sideBet.hitCount() > 1 ? " x" + sideBet.hitCount() : "";
+                            return "<@" + sideBet.discordUserId() + "> - *" + sideBet.label() + "*" + repeats
+                                    + " (side +" + sideBet.totalProfit() + ")";
+                        })
+                        .collect(Collectors.joining("\n"));
+        MessageHelper.sendMessageToChannel(threadOrChannel, message);
     }
 
     private String getWinnerDisplay(Game game, CombatCandidateEntity candidate) {
@@ -438,14 +454,61 @@ public class CombatReplayLeaderboardService {
         return (int) Math.round(Math.max(4.0, Math.min(100.0, scaledPoints)));
     }
 
+    private List<WinningPredictionSummary> resultSummaries(
+            List<LockedPrediction> winningPredictions,
+            int predictionPointsAwarded,
+            Map<String, CombatReplayLeaderboardEntryEntity> entriesByUser) {
+        return winningPredictions.stream()
+                .map(prediction -> {
+                    CombatReplayLeaderboardEntryEntity entry = entriesByUser.get(prediction.discordUserId());
+                    return new WinningPredictionSummary(
+                            prediction.discordUserId(),
+                            prediction.discordUserName(),
+                            predictionPointsAwarded,
+                            entry == null ? 0 : safeInt(entry.getTotalPoints()));
+                })
+                .sorted((left, right) -> {
+                    int totalPointsComparison = Integer.compare(right.totalPoints(), left.totalPoints());
+                    if (totalPointsComparison != 0) return totalPointsComparison;
+                    return left.discordUserName().compareToIgnoreCase(right.discordUserName());
+                })
+                .toList();
+    }
+
+    private List<AggregatedSideBetSummary> aggregateSideBetSummaries(List<ResolvedSideBet> resolvedSideBets) {
+        record SideBetKey(String discordUserId, String discordUserName, String label) {}
+
+        Map<SideBetKey, List<ResolvedSideBet>> grouped = resolvedSideBets.stream()
+                .collect(Collectors.groupingBy(
+                        sideBet -> new SideBetKey(sideBet.discordUserId(), sideBet.discordUserName(), sideBet.label()),
+                        LinkedHashMap::new,
+                        Collectors.toList()));
+
+        return grouped.entrySet().stream()
+                .map(entry -> new AggregatedSideBetSummary(
+                        entry.getKey().discordUserId(),
+                        entry.getKey().discordUserName(),
+                        entry.getKey().label(),
+                        entry.getValue().size(),
+                        entry.getValue().stream()
+                                .mapToInt(ResolvedSideBet::profitPoints)
+                                .sum()))
+                .toList();
+    }
+
     private int safeInt(Integer value) {
         return value == null ? 0 : value;
     }
 
     private record LockedPrediction(String discordUserId, String discordUserName) {}
 
-    private record WinningPredictionSummary(
-            String discordUserId, String discordUserName, int pointsAwarded, int totalPoints) {}
+    private record AggregatedSideBetSummary(
+            String discordUserId, String discordUserName, String label, int hitCount, int totalProfit) {}
 
-    private record ScoredContestResult(int totalPredictions, List<WinningPredictionSummary> winningPredictions) {}
+    record WinningPredictionSummary(String discordUserId, String discordUserName, int pointsAwarded, int totalPoints) {}
+
+    record ScoredContestResult(
+            int totalPredictions,
+            List<WinningPredictionSummary> winningPredictions,
+            List<ResolvedSideBet> winningSideBets) {}
 }

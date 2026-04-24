@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
@@ -67,6 +68,8 @@ public class ActionCardHelper {
             "war_machine2_acd2",
             "war_machine3_acd2",
             "war_machine4_acd2");
+    private static final Set<String> MORALE_BOOST_IDS = Set.of("mb1", "mb2", "mb3", "mb4", "morale_boost_ds");
+    private static final Set<String> SHIELDS_HOLDING_IDS = Set.of("sh1", "sh2", "sh3", "sh4", "shields_holding_ds");
 
     public enum ACStatus {
         ralnelbt,
@@ -832,7 +835,8 @@ public class ActionCardHelper {
                         "Action Card",
                         "played _" + actionCard.getName() + "_.",
                         actionCard.getRepresentationEmbed(false, true, game),
-                        player.getCorrectChannel().getName());
+                        player.getCorrectChannel().getName(),
+                        getCombatReplayTrackedEvent(actionCard));
 
         if (actionCardIsSabotageOrShatter) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
@@ -2323,5 +2327,12 @@ public class ActionCardHelper {
 
     static boolean playerHasWarMachine(Player player) {
         return player.getPlayableActionCards().stream().anyMatch(WAR_MACHINE_IDS::contains);
+    }
+
+    private CombatReplayTrackedEvent getCombatReplayTrackedEvent(ActionCardModel actionCard) {
+        if (actionCard == null || actionCard.getAlias() == null) return CombatReplayTrackedEvent.NONE;
+        if (MORALE_BOOST_IDS.contains(actionCard.getAlias())) return CombatReplayTrackedEvent.MORALE_BOOST;
+        if (SHIELDS_HOLDING_IDS.contains(actionCard.getAlias())) return CombatReplayTrackedEvent.SHIELDS_HOLDING;
+        return CombatReplayTrackedEvent.NONE;
     }
 }

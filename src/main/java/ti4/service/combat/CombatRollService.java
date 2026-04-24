@@ -276,8 +276,7 @@ public class CombatRollService {
                 opponent, tileModel, combatOnHolder, true, rollType);
         tempMods.addAll(tempOpponentMods);
 
-        String message = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
-        message += rollForUnits(
+        CombatRollResult rollResult = rollForUnitsWithResult(
                 playerUnitsByQuantity,
                 extraRolls,
                 modifiers,
@@ -289,10 +288,10 @@ public class CombatRollService {
                 event,
                 tile,
                 combatOnHolder);
+        String message =
+                CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType) + rollResult.message();
         FOWCombatThreadMirroring.mirrorCombatMessage(event, player, game, message);
-        String hits = substringAfter(message, "Total hits ");
-        hits = hits.split(" ")[0].replace("*", "");
-        int h = Integer.parseInt(hits);
+        int h = rollResult.totalHits();
         int round;
         String combatName =
                 "combatRoundTracker" + opponent.getFaction() + tile.getPosition() + combatOnHolder.getName();
@@ -336,7 +335,8 @@ public class CombatRollService {
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         SpringContext.getBean(CombatContestService.class)
-                .mirrorCombatRoll(game, player, opponent, tile, message, rollType.name(), h);
+                .mirrorCombatRoll(
+                        game, player, opponent, tile, message, rollType.name(), rollResult.whiff(), rollResult.slam());
         if (message.contains("adding +1, at the risk of your")) {
             Button thalnosButton = Buttons.green(
                     "startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos", ExploreEmojis.Relic);
@@ -683,6 +683,33 @@ public class CombatRollService {
     }
 
     public static String rollForUnits(
+            Map<UnitModel, Integer> playerUnits,
+            List<NamedCombatModifierModel> extraRolls,
+            List<NamedCombatModifierModel> autoMods,
+            List<NamedCombatModifierModel> tempMods,
+            Player player,
+            Player opponent,
+            Game game,
+            CombatRollType rollType,
+            GenericInteractionCreateEvent event,
+            Tile activeSystem,
+            UnitHolder unitHolder) {
+        return rollForUnitsWithResult(
+                        playerUnits,
+                        extraRolls,
+                        autoMods,
+                        tempMods,
+                        player,
+                        opponent,
+                        game,
+                        rollType,
+                        event,
+                        activeSystem,
+                        unitHolder)
+                .message();
+    }
+
+    private static CombatRollResult rollForUnitsWithResult(
             Map<UnitModel, Integer> playerUnits,
             List<NamedCombatModifierModel> extraRolls,
             List<NamedCombatModifierModel> autoMods,
@@ -1281,6 +1308,8 @@ public class CombatRollService {
             game.setStoredValue("surprisingDiceRoll", "none");
         }
 
+        boolean whiff = maximumHits > 0 && totalHits == 0;
+        boolean slam = maximumHits > 0 && totalHits == maximumHits;
         if (usesX89c4) {
             totalHits *= 2;
         }
@@ -1318,8 +1347,10 @@ public class CombatRollService {
                 && rollType == CombatRollType.combatround) {
             game.setStoredValue("munitionsReserves", "");
         }
-        return result;
+        return new CombatRollResult(result, totalHits, whiff, slam);
     }
+
+    private record CombatRollResult(String message, int totalHits, boolean whiff, boolean slam) {}
 
     public static Player getOpponent(Player player, List<UnitHolder> unitHolders, Game game) {
         Player opponent = null;

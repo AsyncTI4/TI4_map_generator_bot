@@ -31,6 +31,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.CombatContestSettings;
+import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.service.CombatReplayLeaderboardService;
 import ti4.contest.replay.service.CombatReplayService;
@@ -143,11 +144,19 @@ public class CombatContestService {
     }
 
     public void mirrorCombatRoll(
-            Game game, Player player, Player opponent, Tile tile, String message, String rollType, Integer hits) {
+            Game game,
+            Player player,
+            Player opponent,
+            Tile tile,
+            String message,
+            String rollType,
+            boolean whiff,
+            boolean slam) {
         runReplayHook(
                 game,
                 "roll mirror",
-                () -> combatReplayService.mirrorCombatRoll(game, player, opponent, tile, message, rollType, hits));
+                () -> combatReplayService.mirrorCombatRoll(
+                        game, player, opponent, tile, message, rollType, whiff, slam));
         if (isReplayV2Enabled()) return;
         try {
             CombatContestEntity contest = repository
@@ -170,10 +179,22 @@ public class CombatContestService {
 
     public void mirrorCombatEvent(
             Game game, Player player, String header, String name, MessageEmbed embed, String sourceChannelName) {
+        mirrorCombatEvent(game, player, header, name, embed, sourceChannelName, CombatReplayTrackedEvent.NONE);
+    }
+
+    public void mirrorCombatEvent(
+            Game game,
+            Player player,
+            String header,
+            String name,
+            MessageEmbed embed,
+            String sourceChannelName,
+            CombatReplayTrackedEvent trackedEvent) {
         runReplayHook(
                 game,
                 "event mirror",
-                () -> combatReplayService.mirrorCombatEvent(game, player, header, name, embed, sourceChannelName));
+                () -> combatReplayService.mirrorCombatEvent(
+                        game, player, header, name, embed, sourceChannelName, trackedEvent));
         if (isReplayV2Enabled()) return;
         try {
             List<CombatContestEntity> activeContests =

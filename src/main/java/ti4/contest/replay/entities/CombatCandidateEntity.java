@@ -90,4 +90,52 @@ public class CombatCandidateEntity {
 
     @Column(name = "promotion_score")
     private Double promotionScore;
+
+    @Column(name = "side_bet_compatible", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean sideBetCompatible = false;
+
+    @Column(name = "attacker_destroyer_count", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+    private Integer attackerDestroyerCount = 0;
+
+    @Column(name = "defender_destroyer_count", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+    private Integer defenderDestroyerCount = 0;
+
+    @Column(name = "attacker_rolled_afb", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean attackerRolledAfb = false;
+
+    @Column(name = "defender_rolled_afb", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean defenderRolledAfb = false;
+
+    @Column(name = "attacker_afb_whiff", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean attackerAfbWhiff = false;
+
+    @Column(name = "defender_afb_whiff", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean defenderAfbWhiff = false;
+
+    @Column(name = "attacker_round_one_whiff", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean attackerRoundOneWhiff = false;
+
+    @Column(name = "defender_round_one_whiff", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean defenderRoundOneWhiff = false;
+
+    @Column(name = "attacker_round_one_slam", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean attackerRoundOneSlam = false;
+
+    @Column(name = "defender_round_one_slam", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean defenderRoundOneSlam = false;
+
+    @Column(name = "attacker_played_morale_boost", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean attackerPlayedMoraleBoost = false;
+
+    @Column(name = "defender_played_morale_boost", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean defenderPlayedMoraleBoost = false;
+
+    @Column(name = "attacker_played_shields_holding", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean attackerPlayedShieldsHolding = false;
+
+    @Column(name = "defender_played_shields_holding", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean defenderPlayedShieldsHolding = false;
+
+    @Column(name = "winner_one_hp_remaining", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean winnerOneHpRemaining = false;
 }

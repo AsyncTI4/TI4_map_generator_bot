@@ -34,6 +34,7 @@ import ti4.game.persistence.GameManager;
 import ti4.helpers.RandomHelper;
 import ti4.image.TileGenerator;
 import ti4.logging.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.spring.service.contest.CombatContestService;
 
 @Service
@@ -73,6 +74,7 @@ public class CombatReplayContestLifecycleService {
     private final CombatReplayContestRepository replayContestRepository;
     private final CombatCandidateEventRepository candidateEventRepository;
     private final CombatReplayLeaderboardService replayLeaderboardService;
+    private final CombatReplaySideBetService replaySideBetService;
     private final ReplayDispatchSerializer payloadSerializer;
 
     public void promoteBestCandidateIfDue() {
@@ -245,7 +247,7 @@ public class CombatReplayContestLifecycleService {
 
         String message = candidate.getPreReplayContextText();
         if (message != null && !message.isBlank()) {
-            channel.sendMessage(message).complete();
+            MessageHelper.sendMessageToChannel(channel, message);
         }
         contest.setPreReplayContextPostedAt(LocalDateTime.now());
         replayContestRepository.save(contest);
@@ -267,6 +269,8 @@ public class CombatReplayContestLifecycleService {
         try {
             announcePreReplayContextIfNeeded(replayChannel, contest, winner);
             announcePredictionLockCountdown(replayChannel);
+            Game game = loadGame(winner.getGameName());
+            replaySideBetService.postSideBetButtonsIfNeeded(replayChannel, game, contest, winner);
         } catch (Exception e) {
             BotLogger.error("Failed to post replay context at promotion.", e);
         }
