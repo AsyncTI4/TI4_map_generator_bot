@@ -20,6 +20,8 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.fow.FOWCombatThreadMirroring;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.contest.CombatContestService;
 
 @UtilityClass
 class CombatButtonHandler {
@@ -171,6 +173,8 @@ class CombatButtonHandler {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         }
         FOWCombatThreadMirroring.mirrorMessage(event, game, msg.replace("## ", ""));
+        SpringContext.getBean(CombatContestService.class)
+                .mirrorRetreatDeclared(game, player, event.getChannel().getName());
 
         if (Helper.getCCCount(game, player.getColor()) > 15) {
             MessageHelper.sendMessageToChannel(

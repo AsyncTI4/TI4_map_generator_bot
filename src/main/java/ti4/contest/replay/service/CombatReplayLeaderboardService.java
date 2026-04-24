@@ -42,6 +42,7 @@ import ti4.spring.service.contest.CombatContestService;
 public class CombatReplayLeaderboardService {
 
     private static final double ZERO_EPSILON = 0.0001;
+    private static final int WRONG_PREDICTION_PENALTY = -4;
     private static final String SUBSCRIBE_EMOJI = "\uD83D\uDFE2";
     private static final String UNSUBSCRIBE_EMOJI = "\uD83D\uDD34";
     private static final String CONTEST_CHANNEL_NAME_V1 = "lazax-war-archives-dev";
@@ -272,6 +273,8 @@ public class CombatReplayLeaderboardService {
             if (winningUserIds.contains(prediction.discordUserId())) {
                 entry.setCorrectPredictions(safeInt(entry.getCorrectPredictions()) + 1);
                 entry.setTotalPoints(safeInt(entry.getTotalPoints()) + pointsAwarded);
+            } else {
+                entry.setTotalPoints(Math.max(0, safeInt(entry.getTotalPoints()) + WRONG_PREDICTION_PENALTY));
             }
             entry.setUpdatedAt(now);
         }
