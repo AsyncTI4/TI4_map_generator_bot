@@ -15,6 +15,7 @@ import ti4.contest.replay.entities.CombatObservationEntity;
 import ti4.contest.replay.repository.CombatCandidateEventRepository;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatObservationRepository;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.cron.CronManager;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -92,24 +93,15 @@ public class CombatReplayPromotionScoreBackfillCron {
                 LazaxCombatSupport.calculateFleetStrength(snapshotGame, attacker, defender, tile, space);
         LazaxCombatSupport.FleetStrength defenderRemainingStrength =
                 LazaxCombatSupport.calculateFleetStrength(snapshotGame, defender, attacker, tile, space);
-        double attackerLossRatio =
-                computeLossRatio(observation.getAttackerStrength(), attackerRemainingStrength.value());
-        double defenderLossRatio =
-                computeLossRatio(observation.getDefenderStrength(), defenderRemainingStrength.value());
         int roundsObserved = SpringContext.getBean(CombatCandidateEventRepository.class)
                 .findMaxRoundNumberByCandidateId(candidate.getId())
                 .orElse(0);
-        double roundScore = Math.sqrt(Math.max(0, roundsObserved));
-        double mutualLossScore =
-                Math.min(attackerLossRatio, defenderLossRatio) + ((attackerLossRatio + defenderLossRatio) / 2.0);
-        double winnerRemainingHp = candidate.getWinnerFaction().equalsIgnoreCase(candidate.getAttackerFaction())
-                ? attackerRemainingStrength.hp()
-                : defenderRemainingStrength.hp();
-        double totalInitialHp = observation.getAttackerHp() + observation.getDefenderHp();
-        double sizeFactor = Math.min(1.0, totalInitialHp / 12.0);
-        double clutchScore = sizeFactor * 3.0 * Math.exp(-0.9 * Math.max(0.0, winnerRemainingHp - 1.0));
-
-        candidate.setPromotionScore(roundScore + clutchScore + (0.25 * mutualLossScore));
+        candidate.setPromotionScore(CombatReplayService.computePromotionScore(
+                observation,
+                attackerRemainingStrength,
+                defenderRemainingStrength,
+                candidate.getWinnerFaction(),
+                roundsObserved));
         SpringContext.getBean(CombatCandidateRepository.class).save(candidate);
         return true;
     }
@@ -129,10 +121,5 @@ public class CombatReplayPromotionScoreBackfillCron {
             }
         }
         return null;
-    }
-
-    private static double computeLossRatio(double initialStrength, double remainingStrength) {
-        if (initialStrength <= 0) return 0.0;
-        return Math.max(0.0, Math.min(1.0, (initialStrength - remainingStrength) / initialStrength));
     }
 }
