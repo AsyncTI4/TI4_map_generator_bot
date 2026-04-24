@@ -423,7 +423,11 @@ public final class ButtonHelperTwilightsFall {
 
     // @ButtonHandler("initiateASplice_")
     public static void initiateASplice(
-            GenericInteractionCreateEvent event, Game game, Player startPlayer, String buttonID, List<Player> participants) {
+            GenericInteractionCreateEvent event,
+            Game game,
+            Player startPlayer,
+            String buttonID,
+            List<Player> participants) {
         String spliceType = buttonID;
         if (buttonID.contains("_")) {
             spliceType = buttonID.split("_")[1];
