@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.contest.replay.buttons.CombatSideBetButtonIds;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.CommandHelper;
@@ -50,6 +51,10 @@ public abstract class ListenerContext {
         return contextIsValid;
     }
 
+    private boolean allowsNonPlayerInteraction() {
+        return "showGameAgain".equalsIgnoreCase(componentID) || componentID.startsWith(CombatSideBetButtonIds.PREFIX);
+    }
+
     ListenerContext(GenericInteractionCreateEvent event, String compID) {
         this.event = event;
         componentID = origComponentID = compID;
@@ -66,7 +71,7 @@ public abstract class ListenerContext {
             String userID = event.getUser().getId();
             player = CommandHelper.getPlayerFromGame(game, event.getMember(), userID);
 
-            if (player == null && !"showGameAgain".equalsIgnoreCase(componentID)) {
+            if (player == null && !allowsNonPlayerInteraction()) {
                 String message = event.getUser().getAsMention() + " is not a player of the game";
                 if (event instanceof IReplyCallback replyCallback) {
                     if (replyCallback.isAcknowledged()) {

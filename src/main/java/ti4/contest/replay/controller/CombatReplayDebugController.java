@@ -8,8 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ti4.contest.replay.core.CombatContestSettings;
@@ -66,19 +64,7 @@ public class CombatReplayDebugController {
 
     @GetMapping(value = "/settings", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getSettings() {
-        return ok(settings.snapshot());
-    }
-
-    @PostMapping(
-            value = "/settings",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateSettings(@RequestBody String payloadJson) {
-        try {
-            return ok(settings.update(payloadJson));
-        } catch (IllegalArgumentException e) {
-            return badRequest(new ErrorResponse(e.getMessage()));
-        }
+        return ok(settings);
     }
 
     @GetMapping(value = "/selection", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -147,10 +133,6 @@ public class CombatReplayDebugController {
 
     private ResponseEntity<String> ok(Object body) {
         return ResponseEntity.ok(writeJson(body));
-    }
-
-    private ResponseEntity<String> badRequest(Object body) {
-        return ResponseEntity.badRequest().body(writeJson(body));
     }
 
     private String writeJson(Object body) {
@@ -250,6 +232,4 @@ public class CombatReplayDebugController {
             List<EventResponse> events) {}
 
     private record EventResponse(CombatCandidateEventEntity event, Object payload) {}
-
-    private record ErrorResponse(String error) {}
 }

@@ -1,5 +1,6 @@
 package ti4.contest.replay.core;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +17,6 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
@@ -159,6 +159,10 @@ public class LazaxCombatSupport {
         String effectSection = formatCombatEffectSection(attacker.getGame());
         if (effectSection != null) {
             message.append("\n").append(effectSection);
+        }
+        String actionCardSection = formatActionCardSection(attacker, defender);
+        if (actionCardSection != null) {
+            message.append("\n").append(actionCardSection);
         }
         String leaderSection = formatCombatLeaderSection(tile, attacker, defender);
         if (leaderSection != null) {
@@ -316,107 +320,81 @@ public class LazaxCombatSupport {
         StringBuilder section = new StringBuilder("## Leaders");
         boolean hasLines = false;
 
-        for (Player player : game.getRealPlayers()) {
-            String line = formatCombatAgentLine(player);
-            if (line == null) continue;
-            section.append("\n").append(line);
-            hasLines = true;
-        }
-
-        String attackerLine = formatCombatParticipantLeaderLine(game, tile, attacker);
+        String attackerLine = formatCombatParticipantLeaderLine(attacker);
         if (attackerLine != null) {
             section.append("\n").append(attackerLine);
             hasLines = true;
         }
 
-        String defenderLine = formatCombatParticipantLeaderLine(game, tile, defender);
+        String defenderLine = formatCombatParticipantLeaderLine(defender);
         if (defenderLine != null) {
             section.append("\n").append(defenderLine);
+            hasLines = true;
+        }
+
+        String otherLeaderSection = formatOtherLeaderSection(game, attacker, defender);
+        if (otherLeaderSection != null) {
+            section.append("\n").append(otherLeaderSection);
             hasLines = true;
         }
 
         return hasLines ? section.toString() : null;
     }
 
-    private String formatCombatAgentLine(Player player) {
-        String summary = SPACE_COMBAT_AGENT_IDS.stream()
-                .filter(player::hasUnexhaustedLeader)
-                .map(player::getLeaderByID)
-                .flatMap(Optional::stream)
-                .filter(leader -> !leader.isActive())
-                .map(Leader::getLeaderModel)
-                .flatMap(Optional::stream)
-                .map(LazaxCombatSupport::formatLeaderSummary)
-                .reduce((left, right) -> left + ", " + right)
-                .orElse(null);
-        if (summary == null) return null;
-        return formatPlayerSummaryLine(player, summary);
-    }
-
-    private String formatCombatParticipantLeaderLine(Game game, Tile tile, Player player) {
-        String ownSummary = buildOwnCombatLeaderSummary(game, tile, player);
-        String allianceSummary = buildAllianceCommanderSummary(player);
-        if (ownSummary == null && allianceSummary == null) {
-            return null;
-        }
-        String summary = ownSummary;
-        if (summary == null) {
-            summary = allianceSummary;
-        } else if (allianceSummary != null) {
-            summary += ", " + allianceSummary;
-        }
-        return formatPlayerSummaryLine(player, summary);
-    }
-
-    private String buildOwnCombatLeaderSummary(Game game, Tile tile, Player player) {
-        return player.getLeaders().stream()
-                .filter(leader -> !leader.isLocked())
-                .filter(leader -> !leader.isExhausted())
-                .filter(leader -> !leader.isActive())
-                .filter(leader -> SPACE_COMBAT_COMMANDER_IDS.contains(leader.getId())
-                        || SPACE_COMBAT_HERO_IDS.contains(leader.getId()))
-                .filter(leader -> isApplicableCombatLeader(game, tile, player, leader.getId()))
-                .map(Leader::getLeaderModel)
-                .flatMap(Optional::stream)
-                .map(LazaxCombatSupport::formatLeaderSummary)
-                .reduce((left, right) -> left + ", " + right)
-                .orElse(null);
-    }
-
-    private String buildAllianceCommanderSummary(Player player) {
-        Game game = player.getGame();
-        if (game == null) return null;
-        return player.getPromissoryNotesInPlayArea().stream()
-                .filter(pnId -> pnId.contains("_an") || "dspnceld".equals(pnId))
-                .map(game::getPNOwner)
+    private String formatOtherLeaderSection(Game game, Player attacker, Player defender) {
+        List<String> lines = game.getRealPlayers().stream()
+                .filter(player -> !player.equals(attacker) && !player.equals(defender))
+                .map(LazaxCombatSupport::formatOtherCombatLeaderLine)
                 .filter(Objects::nonNull)
-                .filter(owner -> !owner.equals(player))
-                .flatMap(owner -> owner.getLeaders().stream())
-                .filter(leader -> SPACE_COMBAT_COMMANDER_IDS.contains(leader.getId()))
-                .filter(leader -> !leader.isLocked())
-                .filter(leader -> !leader.isExhausted())
-                .filter(leader -> !leader.isActive())
-                .map(Leader::getLeaderModel)
-                .flatMap(Optional::stream)
-                .map(model -> formatLeaderSummary(model) + " (alliance)")
-                .reduce((left, right) -> left + ", " + right)
-                .orElse(null);
+                .toList();
+        if (lines.isEmpty()) return null;
+        return "### Other Leaders\n" + String.join("\n", lines);
     }
 
-    private boolean isApplicableCombatLeader(Game game, Tile tile, Player player, String leaderId) {
-        if ("keleresherokuuasi".equals(leaderId)) {
-            return ButtonHelper.doesPlayerOwnAPlanetInThisSystem(tile, player, game);
-        }
-        if ("ralnelcommander".equals(leaderId)) {
-            return !ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, game.getActiveSystem(), false, false)
-                    .isEmpty();
-        }
-        return true;
+    private String formatOtherCombatLeaderLine(Player player) {
+        List<String> leaders = player.getLeaders().stream()
+                .filter(leader -> SPACE_COMBAT_AGENT_IDS.contains(leader.getId()))
+                .map(LazaxCombatSupport::formatLeaderSummary)
+                .toList();
+        return leaders.isEmpty() ? null : formatPlayerLeaderBlock(player, leaders);
     }
 
-    private String formatLeaderSummary(LeaderModel leaderModel) {
-        return LeaderEmojis.getLeaderTypeEmoji(leaderModel.getType()) + " " + leaderModel.getLeaderEmoji() + " "
-                + leaderModel.getName();
+    private String formatCombatParticipantLeaderLine(Player player) {
+        List<String> leaders = player.getLeaders().stream()
+                .map(LazaxCombatSupport::formatLeaderSummary)
+                .toList();
+        return leaders.isEmpty() ? null : formatPlayerLeaderBlock(player, leaders);
+    }
+
+    private String formatLeaderSummary(Leader leader) {
+        Optional<LeaderModel> leaderModel = leader.getLeaderModel();
+        if (leaderModel.isEmpty()) {
+            return leader.getId();
+        }
+
+        String summary = LeaderEmojis.getLeaderTypeEmoji(leaderModel.get().getType()) + " "
+                + leaderModel.get().getLeaderEmoji() + " " + leaderModel.get().getName();
+        if (leader.isLocked() || leader.isExhausted() || leader.isActive()) {
+            return "~~" + summary + "~~";
+        }
+        return summary;
+    }
+
+    private String formatActionCardSection(Player attacker, Player defender) {
+        List<String> lines = new ArrayList<>();
+        lines.add(formatPlayerSummaryLine(
+                attacker, CardEmojis.ActionCard + " " + attacker.getAcCount() + " action cards"));
+        lines.add(formatPlayerSummaryLine(
+                defender, CardEmojis.ActionCard + " " + defender.getAcCount() + " action cards"));
+        return "## Action Cards\n" + String.join("\n", lines);
+    }
+
+    private String formatPlayerLeaderBlock(Player player, List<String> leaders) {
+        StringBuilder builder = new StringBuilder(formatPlayerSummaryHeader(player));
+        for (String leader : leaders) {
+            builder.append("\n  - ").append(leader);
+        }
+        return builder.toString();
     }
 
     private boolean isQuietusActive(Game game) {
@@ -430,10 +408,15 @@ public class LazaxCombatSupport {
     }
 
     private String formatPlayerSummaryLine(Player player, String summary) {
-        String factionName = player.getFactionModel() == null
-                ? player.getFaction()
-                : player.getFactionModel().getFactionName();
-        return "- " + player.getFactionEmoji() + " " + factionName + " " + player.getUserName() + ": " + summary;
+        return formatPlayerSummaryHeader(player) + ": " + summary;
+    }
+
+    private String formatPlayerSummaryHeader(Player player) {
+        String emoji = player.getFactionEmoji();
+        if (emoji == null || emoji.isBlank()) {
+            return "- " + player.getFaction();
+        }
+        return "- " + emoji;
     }
 
     private double computeExpectedHits(int totalDice, int hitsOn) {
