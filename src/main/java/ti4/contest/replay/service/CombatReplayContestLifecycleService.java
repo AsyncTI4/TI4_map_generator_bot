@@ -551,7 +551,7 @@ public class CombatReplayContestLifecycleService {
                 game,
                 candidate,
                 event.getSummaryText(),
-                null,
+                List.of(),
                 payload.tilePosition(),
                 payload.combatStateSnapshotJson());
     }
