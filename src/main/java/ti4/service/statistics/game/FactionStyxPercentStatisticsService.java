@@ -16,23 +16,23 @@ import ti4.model.FactionModel;
 import ti4.service.statistics.FactionStatisticsHelper;
 
 @UtilityClass
-class FactionIxthPercentStatisticsService {
+class FactionStyxPercentStatisticsService {
 
-    static void getFactionIxthPercent(SlashCommandInteractionEvent event) {
-        Map<String, Integer> factionIxthCount = new HashMap<>();
+    static void getFactionStyxPercent(SlashCommandInteractionEvent event) {
+        Map<String, Integer> factionStyxCount = new HashMap<>();
         Map<String, Integer> factionGameCount = new HashMap<>();
 
         GamesPage.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event),
-                game -> getFactionIxthPercent(game, factionIxthCount, factionGameCount));
+                game -> getFactionStyxPercent(game, factionStyxCount, factionGameCount));
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Faction Ixth Percent:").append('\n');
+        sb.append("Faction Styx Percent:").append('\n');
         factionGameCount.keySet().stream()
                 .map(faction -> {
-                    double ixthCount = factionIxthCount.getOrDefault(faction, 0);
+                    double styxCount = factionStyxCount.getOrDefault(faction, 0);
                     double gameCount = factionGameCount.getOrDefault(faction, 0);
-                    return Map.entry(faction, gameCount == 0 ? 0 : Math.round(100 * ixthCount / gameCount));
+                    return Map.entry(faction, gameCount == 0 ? 0 : Math.round(100 * styxCount / gameCount));
                 })
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .forEach(entry -> {
@@ -55,22 +55,22 @@ class FactionIxthPercentStatisticsService {
                 (MessageChannelUnion) event.getMessageChannel(), "Faction Ixth Percent", sb.toString());
     }
 
-    private static void getFactionIxthPercent(
-            Game game, Map<String, Integer> factionIxthCount, Map<String, Integer> factionGameCount) {
-        Player ixthTaker = null;
+    private static void getFactionStyxPercent(
+            Game game, Map<String, Integer> factionStyxCount, Map<String, Integer> factionGameCount) {
+        Player styxTaker = null;
         for (Player player : game.getRealPlayers()) {
-            if (player.getPlanets().contains("ixth")) {
-                ixthTaker = player;
+            if (player.getPlanets().contains("styx")) {
+                styxTaker = player;
                 break;
             }
         }
-        if (ixthTaker == null) {
+        if (styxTaker == null) {
             return;
         }
 
-        String winningFaction = ixthTaker.getFaction();
-        FactionStatisticsHelper.incrementFactionsIntValue(factionIxthCount, winningFaction);
-        FactionStatisticsHelper.incrementFactionsIntValue(factionIxthCount, "allIxth");
+        String winningFaction = styxTaker.getFaction();
+        FactionStatisticsHelper.incrementFactionsIntValue(factionStyxCount, winningFaction);
+        FactionStatisticsHelper.incrementFactionsIntValue(factionStyxCount, "allStyx");
 
         game.getRealAndEliminatedAndDummyPlayers()
                 .forEach(player ->
