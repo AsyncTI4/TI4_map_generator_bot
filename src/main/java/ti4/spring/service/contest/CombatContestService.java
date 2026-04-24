@@ -49,6 +49,7 @@ import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
+import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.TechEmojis;
 
@@ -149,7 +150,7 @@ public class CombatContestService {
             Player opponent,
             Tile tile,
             String message,
-            String rollType,
+            CombatRollType rollType,
             boolean whiff,
             boolean slam) {
         runReplayHook(
