@@ -105,7 +105,9 @@ public class CombatReplayPromotionScoreBackfillCron {
         double winnerRemainingHp = candidate.getWinnerFaction().equalsIgnoreCase(candidate.getAttackerFaction())
                 ? attackerRemainingStrength.hp()
                 : defenderRemainingStrength.hp();
-        double clutchScore = 3.0 * Math.exp(-0.9 * Math.max(0.0, winnerRemainingHp - 1.0));
+        double totalInitialHp = observation.getAttackerHp() + observation.getDefenderHp();
+        double sizeFactor = Math.min(1.0, totalInitialHp / 12.0);
+        double clutchScore = sizeFactor * 3.0 * Math.exp(-0.9 * Math.max(0.0, winnerRemainingHp - 1.0));
 
         candidate.setPromotionScore(roundScore + clutchScore + (0.25 * mutualLossScore));
         SpringContext.getBean(CombatCandidateRepository.class).save(candidate);
