@@ -14,6 +14,7 @@ public enum GameStatTypes {
     FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"),
     FACTION_CUSTODIAN_PERCENT(
             "Faction custodian percent", "Shows custodian percent for each faction, rounded to the nearest integer"),
+    FACTION_IXTH_PERCENT("Faction ixth percent", "Shows ixth percent for each faction, rounded to the nearest integer"),
     FACTION_PERFORMANCE(
             "Faction performance", "Shows how much each faction over or under performs its expected win rate"),
     COLOUR_WINS("Wins per Colour", "Show the wins per colour"),

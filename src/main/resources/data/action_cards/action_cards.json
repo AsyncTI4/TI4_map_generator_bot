@@ -571,7 +571,7 @@
         "phase": "Action",
         "window": "Before you assign hits produced by another player's SPACE CANNON roll",
         "text": "Cancel 1 hit.",
-        "flavorText": "The fighter's thrusted boosted her just out of the cannon's firing solution, and a metal slug the size of a building rocketed past her crystalline ship.",
+        "flavorText": "The fighter's thruster boosted her just out of the cannon's firing solution, and a metal slug the size of a building rocketed past her crystalline ship.",
         "source": "base",
         "affectedByWildWildGalaxy": true,
         "wildWildWindow": "Before you assign hits produced by another player's SPACE CANNON roll",

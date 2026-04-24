@@ -21,6 +21,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.BreakthroughHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -219,6 +220,15 @@ public final class BreakthroughCommandHelper {
                     player.addOwnedUnitByID("tribune3");
                     player.removeOwnedUnitByID("dreadnought2");
                 }
+            }
+            if ("veldyrbt".equalsIgnoreCase(bt.getID())) {
+                Tile tile = player.getHomeSystemTile();
+                if (tile != null) {
+                    tile.addToken("token_nebula_async.png", "space");
+                }
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " Made your home system into a nebula.");
             }
 
             if ("cabalbt".equalsIgnoreCase(bt.getID())) {
