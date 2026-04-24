@@ -1,6 +1,7 @@
 package ti4.contest.replay.service;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -288,6 +289,9 @@ public class CombatReplayService {
                 candidate.getId(), CombatCandidateEventType.HIT_ASSIGN, player.getFaction(), round)) {
             return;
         }
+        if (!hasRecordedRoll(candidate)) {
+            refreshPromotionOpeningState(game, candidate);
+        }
 
         String roundLabel = round > 0 ? "round #" + round : "the current exchange";
         String message = "## Combat Update\n"
@@ -315,6 +319,35 @@ public class CombatReplayService {
         return new ResolutionState(
                 LazaxCombatSupport.calculateFleetStrength(game, attacker, defender, tile, space),
                 LazaxCombatSupport.calculateFleetStrength(game, defender, attacker, tile, space));
+    }
+
+    @Transactional
+    void refreshPromotionOpeningState(Game game, CombatCandidateEntity candidate) {
+        if (game == null || candidate == null) return;
+
+        CombatCandidateEntity lockedCandidate =
+                candidateRepository.findByIdForUpdate(candidate.getId()).orElse(null);
+        if (lockedCandidate == null || lockedCandidate.getStatus() != CombatCandidateStatus.TRACKING) return;
+
+        Tile tile = game.getTileByPosition(lockedCandidate.getTilePosition());
+        if (tile == null) return;
+
+        Player attacker = game.getPlayerFromColorOrFaction(lockedCandidate.getAttackerFaction());
+        Player defender = game.getPlayerFromColorOrFaction(lockedCandidate.getDefenderFaction());
+        LazaxCombatSupport.SpaceCombatSnapshot snapshot =
+                LazaxCombatSupport.buildSpaceCombatSnapshot(game, attacker, defender, tile);
+        if (snapshot == null) return;
+
+        lockedCandidate.setInitialRenderSnapshotJson(CombatReplayRenderSnapshotSupport.captureHitAssignmentSnapshot(
+                game, lockedCandidate.getTilePosition()));
+        candidateRepository.save(lockedCandidate);
+
+        candidateEventRepository
+                .findByCandidateIdAndSequenceNumber(lockedCandidate.getId(), 1)
+                .ifPresent(event -> {
+                    event.setSummaryText(snapshot.replaySummaryText());
+                    candidateEventRepository.save(event);
+                });
     }
 
     public void refreshSelectionSnapshot() {

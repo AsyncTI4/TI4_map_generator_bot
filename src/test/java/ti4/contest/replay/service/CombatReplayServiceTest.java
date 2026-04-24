@@ -2,23 +2,37 @@ package ti4.contest.replay.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import ti4.contest.replay.core.CombatCandidateStatus;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.LazaxCombatSupport;
+import ti4.contest.replay.entities.CombatCandidateEntity;
+import ti4.contest.replay.entities.CombatCandidateEventEntity;
 import ti4.contest.replay.entities.CombatObservationEntity;
 import ti4.contest.replay.repository.CombatCandidateEventRepository;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatObservationRepository;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.helpers.Constants;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitType;
 import ti4.spring.service.contest.CombatContestType;
+import ti4.testUtils.BaseTi4Test;
 
-class CombatReplayServiceTest {
+class CombatReplayServiceTest extends BaseTi4Test {
 
     @Test
     void promotionScorePrioritizesEndingTensionOverOpeningBalance() {
@@ -109,6 +123,47 @@ class CombatReplayServiceTest {
         assertEquals(11L, lastObservation.observation().getCandidateId());
     }
 
+    @Test
+    void refreshPromotionOpeningStateUpdatesStoredSnapshotAndStartSummary() {
+        CombatObservationRepository observationRepository = mock(CombatObservationRepository.class);
+        CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
+        CombatCandidateEventRepository candidateEventRepository = mock(CombatCandidateEventRepository.class);
+        CombatReplayService service = new CombatReplayService(
+                new CombatContestSettings(),
+                observationRepository,
+                candidateRepository,
+                candidateEventRepository,
+                mock(CombatReplayEventAppender.class));
+
+        Game game = createCombatGame();
+        CombatCandidateEntity candidate = new CombatCandidateEntity();
+        candidate.setId(11L);
+        candidate.setStatus(CombatCandidateStatus.TRACKING);
+        candidate.setTilePosition("19");
+        candidate.setAttackerFaction("hacan");
+        candidate.setDefenderFaction("sol");
+
+        CombatCandidateEventEntity startEvent = new CombatCandidateEventEntity();
+        startEvent.setCandidateId(11L);
+        startEvent.setSequenceNumber(1);
+        startEvent.setSummaryText("stale");
+
+        when(candidateRepository.findByIdForUpdate(11L)).thenReturn(Optional.of(candidate));
+        when(candidateEventRepository.findByCandidateIdAndSequenceNumber(11L, 1))
+                .thenReturn(Optional.of(startEvent));
+
+        service.refreshPromotionOpeningState(game, candidate);
+
+        verify(candidateRepository).save(eq(candidate));
+        verify(candidateEventRepository).save(eq(startEvent));
+        assertNotNull(candidate.getInitialRenderSnapshotJson());
+        assertTrue(!candidate.getInitialRenderSnapshotJson().isBlank());
+        assertTrue(startEvent.getSummaryText().contains("## Lazax Candidate Recorded"));
+        assertTrue(startEvent.getSummaryText().contains("Open Game"));
+        assertTrue(startEvent.getSummaryText().contains("Hacan"));
+        assertTrue(startEvent.getSummaryText().contains("Sol"));
+    }
+
     private CombatObservationEntity observation(
             Long id,
             LocalDateTime startedAt,
@@ -142,5 +197,34 @@ class CombatReplayServiceTest {
         observation.setEligibleAsCandidate(eligibleAsCandidate);
         observation.setCandidateId(candidateId);
         return observation;
+    }
+
+    private Game createCombatGame() {
+        Game game = new Game();
+        game.newGameSetup();
+        game.setName("pbd-test");
+        game.setActivePlayerID("1");
+
+        Player attacker = new Player("1", "Alice", game);
+        attacker.setColor("yellow");
+        attacker.setFaction(game, "hacan");
+        attacker.addOwnedUnitByID("cruiser");
+        attacker.addOwnedUnitByID("destroyer");
+        game.getPlayers().put(attacker.getUserID(), attacker);
+
+        Player defender = new Player("2", "Bob", game);
+        defender.setColor("blue");
+        defender.setFaction(game, "sol");
+        defender.addOwnedUnitByID("cruiser");
+        defender.addOwnedUnitByID("fighter");
+        game.getPlayers().put(defender.getUserID(), defender);
+
+        Tile tile = new Tile("18", "19");
+        game.setTile(tile);
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Cruiser, attacker.getColorID()), 1);
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Destroyer, attacker.getColorID()), 1);
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Cruiser, defender.getColorID()), 1);
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Fighter, defender.getColorID()), 2);
+        return game;
     }
 }
