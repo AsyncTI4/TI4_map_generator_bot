@@ -3,12 +3,17 @@ package ti4.contest.replay.service;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.buttons.CombatSideBetButtonIds;
 import ti4.contest.replay.core.CombatContestSettings;
@@ -25,6 +30,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
 @Service
@@ -47,6 +53,7 @@ public class CombatReplaySideBetService {
             MessageChannel channel, Game game, CombatReplayContestEntity contest, CombatCandidateEntity candidate) {
         if (channel == null || game == null || contest == null || !shouldShowButtons(candidate)) return;
         MessageHelper.sendMessageToChannel(channel, "## Side Bets\nPlace up to 5 side bets before the replay begins.");
+        ensureSummaryMessage(channel, game, contest);
         postFactionButtons(
                 channel, game, contest, candidate.getAttackerFaction(), candidate.getAttackerDestroyerCount());
         postFactionButtons(
@@ -139,10 +146,9 @@ public class CombatReplaySideBetService {
         sideBet.setPlacedAt(LocalDateTime.now());
         sideBetRepository.save(sideBet);
 
-        String emoji = getFactionEmoji(loadReplayGame(candidate), targetFaction);
-        String message = emoji + " **" + safeName(userName) + "** placed side bet *" + betType.label() + "* ("
-                + entry.getTotalPoints() + " points)";
-        return PlacementResult.accepted(message, entry.getTotalPoints());
+        refreshSummaryMessage(event.getMessageChannel(), contest, candidate);
+        String personalSummary = renderUserSummary(loadReplayGame(candidate), contest, userId, entry.getTotalPoints());
+        return PlacementResult.accepted(personalSummary, entry.getTotalPoints());
     }
 
     public SideBetResolution resolveSideBets(CombatCandidateEntity candidate, CombatReplayContestEntity replayContest) {
@@ -219,6 +225,141 @@ public class CombatReplaySideBetService {
 
     private String buttonLabel(CombatSideBetType type, String factionLabel) {
         return "[" + factionLabel + "] " + type.label() + " +" + type.profitPoints() + " pts";
+    }
+
+    private void ensureSummaryMessage(MessageChannel channel, Game game, CombatReplayContestEntity contest) {
+        if (channel == null || contest == null) return;
+        Long summaryMessageId = contest.getSideBetSummaryMessageId();
+        if (summaryMessageId != null && summaryMessageId > 0) {
+            refreshSummaryMessage(channel, contest, game);
+            return;
+        }
+
+        try {
+            Message summary =
+                    channel.sendMessage(renderSummaryMessage(game, contest)).complete();
+            contest.setSideBetSummaryMessageId(summary.getIdLong());
+            replayContestRepository.save(contest);
+        } catch (Exception e) {
+            BotLogger.error("Failed to create side bet summary message.", e);
+        }
+    }
+
+    private void refreshSummaryMessage(
+            MessageChannel channel, CombatReplayContestEntity contest, CombatCandidateEntity candidate) {
+        refreshSummaryMessage(channel, contest, loadReplayGame(candidate));
+    }
+
+    private void refreshSummaryMessage(MessageChannel channel, CombatReplayContestEntity contest, Game game) {
+        if (channel == null || contest == null) return;
+        Long summaryMessageId = contest.getSideBetSummaryMessageId();
+        if (summaryMessageId == null || summaryMessageId <= 0) {
+            ensureSummaryMessage(channel, game, contest);
+            return;
+        }
+
+        channel.retrieveMessageById(summaryMessageId)
+                .queue(
+                        message -> message.editMessage(renderSummaryMessage(game, contest))
+                                .queue(Consumers.nop(), BotLogger::catchRestError),
+                        error -> {
+                            contest.setSideBetSummaryMessageId(null);
+                            replayContestRepository.save(contest);
+                            ensureSummaryMessage(channel, game, contest);
+                        });
+    }
+
+    private String renderSummaryMessage(Game game, CombatReplayContestEntity contest) {
+        List<CombatContestSideBetEntity> sideBets = sideBetRepository.findByContestId(contest.getId()).stream()
+                .sorted(Comparator.comparing(
+                                CombatContestSideBetEntity::getPlacedAt,
+                                Comparator.nullsLast(Comparator.naturalOrder()))
+                        .thenComparing(
+                                CombatContestSideBetEntity::getId, Comparator.nullsLast(Comparator.naturalOrder())))
+                .toList();
+        StringBuilder message = new StringBuilder();
+        if (sideBets.isEmpty()) {
+            message.append("```text\n");
+            message.append(String.format("%-3s | %s%n", "Qty", "Bet"));
+            message.append("----+------------------------------\n");
+            message.append(" -  | Waiting for the first bet\n");
+            message.append("```");
+            return message.toString();
+        }
+
+        Map<String, Long> countsByBet = summarizeBetCounts(sideBets, game);
+        message.append("```text\n");
+        message.append(String.format("%-3s | %s%n", "Qty", "Bet"));
+        message.append("----+------------------------------\n");
+        for (Map.Entry<String, Long> entry : countsByBet.entrySet()) {
+            message.append(String.format("%-3s | %s%n", entry.getValue() + "x", entry.getKey()));
+        }
+        message.append("```");
+        return message.toString();
+    }
+
+    private String renderUserSummary(Game game, CombatReplayContestEntity contest, String userId, int remainingPoints) {
+        List<CombatContestSideBetEntity> bets = sideBetRepository.findByContestId(contest.getId()).stream()
+                .filter(sideBet -> Objects.equals(sideBet.getDiscordUserId(), userId))
+                .sorted(Comparator.comparing(
+                                CombatContestSideBetEntity::getPlacedAt,
+                                Comparator.nullsLast(Comparator.naturalOrder()))
+                        .thenComparing(
+                                CombatContestSideBetEntity::getId, Comparator.nullsLast(Comparator.naturalOrder())))
+                .toList();
+
+        StringBuilder message = new StringBuilder("## Your Side Bets\n");
+        message.append("Remaining points: **").append(remainingPoints).append("**\n");
+        if (bets.isEmpty()) {
+            message.append("No side bets recorded.");
+            return message.toString();
+        }
+
+        for (Map.Entry<String, Long> entry : summarizeUserBetCounts(bets, game).entrySet()) {
+            message.append("- ")
+                    .append(entry.getValue())
+                    .append("x ")
+                    .append(entry.getKey())
+                    .append("\n");
+        }
+        return message.toString().trim();
+    }
+
+    private Map<String, Long> summarizeBetCounts(List<CombatContestSideBetEntity> sideBets, Game game) {
+        Map<String, Long> countsByBet = new LinkedHashMap<>();
+        for (CombatContestSideBetEntity sideBet : sideBets) {
+            String label = formatFriendlyBetLabel(game, sideBet, true);
+            countsByBet.merge(label, 1L, Long::sum);
+        }
+        return sortBetCountsByQuantityDesc(countsByBet);
+    }
+
+    private Map<String, Long> summarizeUserBetCounts(List<CombatContestSideBetEntity> sideBets, Game game) {
+        Map<String, Long> countsByBet = new LinkedHashMap<>();
+        for (CombatContestSideBetEntity sideBet : sideBets) {
+            String label = formatFriendlyBetLabel(game, sideBet, false);
+            countsByBet.merge(label, 1L, Long::sum);
+        }
+        return countsByBet;
+    }
+
+    private Map<String, Long> sortBetCountsByQuantityDesc(Map<String, Long> countsByBet) {
+        return countsByBet.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue(Comparator.reverseOrder())
+                        .thenComparing(Map.Entry.comparingByKey()))
+                .collect(java.util.stream.Collectors.toMap(
+                        Map.Entry::getKey, Map.Entry::getValue, (left, right) -> left, LinkedHashMap::new));
+    }
+
+    private String formatFriendlyBetLabel(Game game, CombatContestSideBetEntity sideBet) {
+        return formatFriendlyBetLabel(game, sideBet, false);
+    }
+
+    private String formatFriendlyBetLabel(Game game, CombatContestSideBetEntity sideBet, boolean useShortFactionId) {
+        String faction = useShortFactionId
+                ? buttonFactionIdLabel(game, sideBet.getTargetFaction())
+                : buttonFactionDisplayName(game, sideBet.getTargetFaction());
+        return faction + " " + sideBet.getBetType().label();
     }
 
     private String factionSectionTitle(Game game, String faction) {

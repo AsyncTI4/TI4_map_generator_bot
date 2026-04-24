@@ -268,9 +268,9 @@ public class CombatReplayContestLifecycleService {
             MessageChannel replayChannel, CombatReplayContestEntity contest, CombatCandidateEntity winner) {
         try {
             announcePreReplayContextIfNeeded(replayChannel, contest, winner);
-            announcePredictionLockCountdown(replayChannel);
             Game game = loadGame(winner.getGameName());
             replaySideBetService.postSideBetButtonsIfNeeded(replayChannel, game, contest, winner);
+            announcePredictionLockCountdown(replayChannel);
         } catch (Exception e) {
             BotLogger.error("Failed to post replay context at promotion.", e);
         }
@@ -456,6 +456,7 @@ public class CombatReplayContestLifecycleService {
         existingContest.setReplayCompletedAt(null);
         existingContest.setPreReplayContextPostedAt(null);
         existingContest.setLeaderboardPostedAt(null);
+        existingContest.setSideBetSummaryMessageId(null);
         existingContest.setReplayError(null);
         replayLeaderboardService.clearLockedPredictions(existingContest.getId());
         return existingContest;
