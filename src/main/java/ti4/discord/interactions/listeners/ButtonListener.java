@@ -76,27 +76,32 @@ class ButtonListener extends ListenerAdapter {
     private static final class EventLatencyChecker {
 
         private static final long THRESHOLD_MS = 1000;
-        private static final Duration WINDOW = Duration.ofMinutes(5);
+        private static final Duration WARNING_COOLDOWN_WINDOW = Duration.ofMinutes(5);
         private static final int EVENT_COUNT_THRESHOLD = 10;
 
         private static final ConcurrentLinkedDeque<Long> slowEvents = new ConcurrentLinkedDeque<>();
         private static final AtomicLong lastWarningTimeMs = new AtomicLong(0);
 
         static void check(GenericInteractionCreateEvent event) {
+            long now = System.currentTimeMillis();
+            long lastWarning = lastWarningTimeMs.get();
+
+            if (now - lastWarning < WARNING_COOLDOWN_WINDOW.toMillis()) {
+                return;
+            }
+
             long eventTimeMs = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
-            long latencyMs = System.currentTimeMillis() - eventTimeMs;
+            long latencyMs = now - eventTimeMs;
 
             if (latencyMs <= THRESHOLD_MS) {
                 return;
             }
 
-            long now = System.currentTimeMillis();
-
             slowEvents.addLast(now);
 
             // trim old entries outside 5-minute window
             Long ts;
-            long windowMs = WINDOW.toMillis();
+            long windowMs = WARNING_COOLDOWN_WINDOW.toMillis();
 
             while ((ts = slowEvents.peekFirst()) != null && now - ts > windowMs) {
                 slowEvents.pollFirst();
@@ -106,17 +111,14 @@ class ButtonListener extends ListenerAdapter {
                 return;
             }
 
-            long lastWarn = lastWarningTimeMs.get();
-            if (now - lastWarn < windowMs) {
+            if (!lastWarningTimeMs.compareAndSet(lastWarning, now)) {
                 return;
             }
-
-            lastWarningTimeMs.set(now);
 
             slowEvents.clear();
 
             BotLogger.error("⚠ **High Discord/JDA latency detected: " + EVENT_COUNT_THRESHOLD
-                    + "+ slow events in the last " + WINDOW.toMinutes() + "  minutes.**");
+                    + "+ slow events in the last " + WARNING_COOLDOWN_WINDOW.toMinutes() + "  minutes.**");
         }
     }
 }
