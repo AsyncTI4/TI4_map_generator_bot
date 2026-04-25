@@ -74,14 +74,14 @@ class ButtonRuntimeWarningService {
 
         String eventTime = DateTimeHelper.getTimestampFromMillisecondsEpoch(eventTimeMs);
 
-        String preprocessingTime = DateTimeHelper.getTimeRepresentationToMilliseconds(preprocessingTimeMs);
-        String processingTime = DateTimeHelper.getTimeRepresentationToMilliseconds(processingTimeMs);
+        String preprocessingTime = formatMillisecondsWithWarning(preprocessingTimeMs);
+        String processingTime = formatMillisecondsWithWarning(processingTimeMs);
 
-        String contextTime = DateTimeHelper.getTimeRepresentationToMilliseconds(contextCreationRuntimeMs);
-        String queueTime = DateTimeHelper.getTimeRepresentationToMilliseconds(timeInQueueMs);
-        String resolveTime = DateTimeHelper.getTimeRepresentationToMilliseconds(resolveRuntimeMs);
-        String saveTime = DateTimeHelper.getTimeRepresentationToMilliseconds(saveRuntimeMs);
-        String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(processingEndTimeMs - eventTimeMs);
+        String contextTime = formatMillisecondsWithWarning(contextCreationRuntimeMs);
+        String queueTime = formatMillisecondsWithWarning(timeInQueueMs);
+        String resolveTime = formatMillisecondsWithWarning(resolveRuntimeMs);
+        String saveTime = formatMillisecondsWithWarning(saveRuntimeMs);
+        String responseTime = formatMillisecondsWithWarning(processingEndTimeMs - eventTimeMs);
 
         String message = event.getUser().getEffectiveName()
                 + " pressed button: "
@@ -94,9 +94,9 @@ class ButtonRuntimeWarningService {
                 + "\n> 📦 Queued for: `" + queueTime + "`"
                 + "\n> 🛠 Executed in: `" + resolveTime + "`"
                 + "\n> 💾 Saved in: `" + saveTime + "`"
-                + "\n> ⚡ Responded after: `" + responseTime + "`"
-                + "\n> ⚡ Preprocessing time: `" + preprocessingTime + "`"
-                + "\n> ⚡ Processing time: `" + processingTime + "`";
+                + "\n> ⚡ Total preprocessing time: `" + preprocessingTime + "`"
+                + "\n> ⚡ Total processing time: `" + processingTime + "`"
+                + "\n> 🕒 Total response time: `" + responseTime + "`";
 
         BotLogger.warning(message);
 
@@ -109,5 +109,13 @@ class ButtonRuntimeWarningService {
         }
 
         lastWarningTime = now;
+    }
+
+    private static String formatMillisecondsWithWarning(long runtimeMs) {
+        String formattedRuntime = DateTimeHelper.getTimeRepresentationToMilliseconds(runtimeMs);
+        if (runtimeMs > 500) {
+            return formattedRuntime + " ❗";
+        }
+        return formattedRuntime;
     }
 }
