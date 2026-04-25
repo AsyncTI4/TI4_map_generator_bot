@@ -1,8 +1,10 @@
 package ti4.draft;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ti4.testUtils.BaseTi4Test;
@@ -48,33 +50,24 @@ class FrankenItemTest extends BaseTi4Test {
     @Test
     void errataFileSanityTest() {
         beforeAll();
+        Set<String> unexpectedAliases = Set.of(
+                // PoK
+                "ABILITY:mitosis",
+                "ABILITY:hubris",
+                "ABILITY:fragile",
+                "STARTINGTECH:sardakk",
+                "AGENT:mentakagent",
+                "ABILITY:creuss_gate",
+                // DS
+                "ABILITY:probability_algorithms",
+                "MECH:kjalengard_mech",
+                "ABILITY:singularity_point",
+                "AGENT:mykomentoriagent",
+                "ABILITY:stealth_insertion");
         List<DraftItem> cards = DraftItem.generateAllDraftableCards();
         for (DraftItem card : cards) {
-            // PoK
-            Assertions.assertNotEquals("ABILITY:mitosis", card.getAlias(),
-                () -> "DraftItem was present but not expected: " + card.getAlias());
-            Assertions.assertNotEquals("ABILITY:hubris", card.getAlias(),
-                () -> "DraftItem was present but not expected: " + card.getAlias());
-            Assertions.assertNotEquals("ABILITY:fragile", card.getAlias(),
-                () -> "DraftItem was present but not expected: " + card.getAlias());
-            Assertions.assertNotEquals("STARTINGTECH:sardakk", card.getAlias(),
-                () -> "DraftItem was present but not expected: " + card.getAlias());
-            Assertions.assertNotEquals("AGENT:mentakagent", card.getAlias(),
-                () -> "DraftItem was present but not expected: " + card.getAlias());
-            Assertions.assertNotEquals("ABILITY:creuss_gate", card.getAlias(),
-                () -> "DraftItem was present but not expected: " + card.getAlias());
-
-            // DS
-            Assertions.assertNotEquals("ABILITY:probability_algorithms", card.getAlias(),
-                () -> "DraftItem was present but not expected: " + card.getAlias());
-            Assertions.assertNotEquals("MECH:kjalengard_mech", card.getAlias(),
-                () -> "DraftItem was present but not expected: " + card.getAlias());
-            Assertions.assertNotEquals("ABILITY:singularity_point", card.getAlias(),
-                () -> "DraftItem was present but not expected: " + card.getAlias());
-            Assertions.assertNotEquals("AGENT:mykomentoriagent", card.getAlias(),
-                () -> "DraftItem was present but not expected: " + card.getAlias());
-            Assertions.assertNotEquals("ABILITY:stealth_insertion", card.getAlias(),
-                () -> "DraftItem was present but not expected: " + card.getAlias());
+            String alias = card.getAlias();
+            assertFalse(unexpectedAliases.contains(alias), () -> "DraftItem was present but not expected: " + alias);
         }
     }
 }
