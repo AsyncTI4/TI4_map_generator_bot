@@ -55,6 +55,9 @@ public class ButtonProcessor {
     }
 
     public static void queue(ButtonInteractionEvent event) {
+        var buttonContext = new ButtonContext(event);
+        if (!buttonContext.isValid()) return;
+
         BotLogger.logButton(event);
         User user = event.getUser();
         UserSettings userSettings = UserSettingsManager.get(user.getId());
@@ -63,11 +66,6 @@ public class ButtonProcessor {
         UserSettingsManager.save(userSettings);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        var buttonContext = new ButtonContext(event);
-        if (!buttonContext.isValid()) {
-            BotLogger.warning(new LogOrigin(event), "Invalid button context.");
-            return;
-        }
         ExecutorServiceManager.runAsyncWithLock(
                 eventToString(event, gameName),
                 gameName,
