@@ -1,0 +1,42 @@
+name: Warm Maven Cache
+
+on:
+  push:
+    branches: ["master"]
+    paths:
+      - "pom.xml"
+      - "src/**"
+  workflow_dispatch:
+
+concurrency:
+  group: warm-cache
+  cancel-in-progress: true
+
+jobs:
+  warm-cache:
+    name: Warm Maven Cache on Master
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21 for x64
+        uses: actions/setup-java@v5
+        with:
+          java-version: "21"
+          distribution: "corretto"
+          architecture: x64
+      - name: Cache Maven local repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Cache Spotless index
+        uses: actions/cache@v4
+        with:
+          path: target/.spotless/
+          key: ${{ runner.os }}-spotless-${{ hashFiles('src/**', 'pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-spotless-
+      - name: Warm cache (compile, Spotless check, skip tests)
+        run: mvn --batch-mode --no-transfer-progress verify -DskipTests
