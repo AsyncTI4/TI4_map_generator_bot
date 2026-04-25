@@ -415,12 +415,18 @@ public class ButtonProcessor {
 
     public static String getButtonProcessingStatistics() {
         var decimalFormatter = new DecimalFormat("#.##");
-        return "Button Processor Statistics: " + DateTimeHelper.getCurrentTimestamp() + "\n"
-                + "> Total button presses: "
-                + runtimeWarningService.getTotalRuntimeSubmissionCount() + ".\n" + "> Total threshold misses: "
-                + runtimeWarningService.getTotalRuntimeThresholdMissCount() + ".\n" + "> Average preprocessing time: "
-                + decimalFormatter.format(runtimeWarningService.getAveragePreprocessingTime()) + "ms.\n"
-                + "> Average processing time: "
-                + decimalFormatter.format(runtimeWarningService.getAverageProcessingTime()) + "ms.";
+        double thresholdMissPercent = runtimeWarningService.getTotalRuntimeSubmissionCount() == 0
+                ? 0
+                : (double) runtimeWarningService.getTotalRuntimeThresholdMissCount()
+                        / runtimeWarningService.getTotalRuntimeSubmissionCount();
+        return "Button Processor Statistics: " + DateTimeHelper.getCurrentTimestamp()
+                + "\n> Total button presses: "
+                + runtimeWarningService.getTotalRuntimeSubmissionCount()
+                + "\n> Threshold misses: "
+                + decimalFormatter.format(thresholdMissPercent) + "%"
+                + "\n> Average preprocessing time: "
+                + decimalFormatter.format(runtimeWarningService.getAveragePreprocessingTime()) + "ms"
+                + "\n> Average processing time: "
+                + decimalFormatter.format(runtimeWarningService.getAverageProcessingTime()) + "ms";
     }
 }
