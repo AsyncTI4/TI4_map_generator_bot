@@ -71,7 +71,7 @@ jobs:
       - name: Cache Spotless index
         uses: actions/cache@v4
         with:
-          path: target/.spotless/
+          path: target/spotless-index
           key: ${{ runner.os }}-spotless-${{ hashFiles('src/**', 'pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-spotless-
