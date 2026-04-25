@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
@@ -32,6 +33,7 @@ import ti4.contest.replay.service.CombatReplaySideBetService.SideBetResolution;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.ThreadGetter;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -97,6 +99,7 @@ public class CombatReplayLeaderboardService {
         replayPredictionRepository.save(lockedPrediction);
     }
 
+    @Transactional
     public void clearLockedPredictions(Long replayContestId) {
         if (replayContestId == null) return;
         replayPredictionRepository.deleteByContestId(replayContestId);
@@ -401,11 +404,13 @@ public class CombatReplayLeaderboardService {
 
     private MessageChannel getContestThreadOrChannel(CombatReplayContestEntity contest) {
         if (JdaService.guildPrimary == null) return null;
+        TextChannel contestChannel = getContestPublicChannel(contest.getPublicChannelId());
+        if (contestChannel == null) return null;
         if (contest.getPublicThreadId() != null) {
-            ThreadChannel thread = JdaService.guildPrimary.getThreadChannelById(contest.getPublicThreadId());
+            ThreadChannel thread = ThreadGetter.getThreadInChannelById(contestChannel, contest.getPublicThreadId());
             if (thread != null) return thread;
         }
-        return getContestPublicChannel(contest.getPublicChannelId());
+        return contestChannel;
     }
 
     private String getFactionEmoji(Game game, String faction) {

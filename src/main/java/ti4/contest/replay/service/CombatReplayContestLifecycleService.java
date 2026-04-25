@@ -32,6 +32,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.RandomHelper;
+import ti4.helpers.ThreadGetter;
 import ti4.image.TileGenerator;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -484,11 +485,13 @@ public class CombatReplayContestLifecycleService {
 
     private MessageChannel getContestThreadOrChannel(CombatReplayContestEntity contest) {
         if (JdaService.guildPrimary == null) return null;
+        TextChannel contestChannel = JdaService.guildPrimary.getTextChannelById(contest.getPublicChannelId());
+        if (contestChannel == null) return null;
         if (contest.getPublicThreadId() != null) {
-            ThreadChannel thread = JdaService.guildPrimary.getThreadChannelById(contest.getPublicThreadId());
+            ThreadChannel thread = ThreadGetter.getThreadInChannelById(contestChannel, contest.getPublicThreadId());
             if (thread != null) return thread;
         }
-        return JdaService.guildPrimary.getTextChannelById(contest.getPublicChannelId());
+        return contestChannel;
     }
 
     private TextChannel getContestChannel() {
