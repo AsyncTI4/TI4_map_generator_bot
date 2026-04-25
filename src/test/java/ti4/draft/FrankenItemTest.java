@@ -1,8 +1,10 @@
 package ti4.draft;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ti4.testUtils.BaseTi4Test;
@@ -48,22 +50,24 @@ class FrankenItemTest extends BaseTi4Test {
     @Test
     void errataFileSanityTest() {
         beforeAll();
+        Set<String> unexpectedAliases = Set.of(
+                // PoK
+                "ABILITY:mitosis",
+                "ABILITY:hubris",
+                "ABILITY:fragile",
+                "STARTINGTECH:sardakk",
+                "AGENT:mentakagent",
+                "ABILITY:creuss_gate",
+                // DS
+                "ABILITY:probability_algorithms",
+                "MECH:kjalengard_mech",
+                "ABILITY:singularity_point",
+                "AGENT:mykomentoriagent",
+                "ABILITY:stealth_insertion");
         List<DraftItem> cards = DraftItem.generateAllDraftableCards();
         for (DraftItem card : cards) {
-            // PoK
-            assert (!"ABILITY:mitosis".equals(card.getAlias()));
-            assert (!"ABILITY:hubris".equals(card.getAlias()));
-            assert (!"ABILITY:fragile".equals(card.getAlias()));
-            assert (!"STARTINGTECH:sardakk".equals(card.getAlias()));
-            assert (!"AGENT:mentakagent".equals(card.getAlias()));
-            assert (!"ABILITY:creuss_gate".equals(card.getAlias()));
-
-            // DS
-            assert (!"ABILITY:probability_algorithms".equals(card.getAlias()));
-            assert (!"MECH:kjalengard_mech".equals(card.getAlias()));
-            assert (!"ABILITY:singularity_point".equals(card.getAlias()));
-            assert (!"AGENT:mykomentoriagent".equals(card.getAlias()));
-            assert (!"ABILITY:stealth_insertion".equals(card.getAlias()));
+            String alias = card.getAlias();
+            assertFalse(unexpectedAliases.contains(alias), () -> "DraftItem was present but not expected: " + alias);
         }
     }
 }
