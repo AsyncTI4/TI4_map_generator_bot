@@ -282,5 +282,13 @@
         "data": [
             "Official channel: https://discord.com/channels/743629929484386395/1422472031949029396"
         ]
+    },
+    {
+        "source": "untangled_space",
+        "name": "Untangled Space",
+        "canal": "community",
+        "subcanal": "personal projs",
+        "credits": "pvn",
+        "description": "Planetary Stabilisation action available to all players; Ghost Experiment SC and AC"
     }
 ]
