@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.other.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -57,6 +58,7 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.context.SpringContext;
 
 @UtilityClass
 public class PlayerTechService {
@@ -239,6 +241,11 @@ public class PlayerTechService {
                         event.getMessageChannel(),
                         player.getRepresentation()
                                 + " exhausted _Graviton Laser System_. The auto-assign hits button for SPACE CANNON OFFENSE fire will now kill fighters last.");
+                if (event instanceof ButtonInteractionEvent buttonEvent) {
+                    SpringContext.getBean(CombatReplayService.class)
+                            .mirrorGravitonExhausted(
+                                    game, player, buttonEvent.getChannel().getName());
+                }
                 game.setStoredValue(player.getFaction() + "graviton", "true");
                 deleteTheOneButtonIfButtonEvent(event);
             }

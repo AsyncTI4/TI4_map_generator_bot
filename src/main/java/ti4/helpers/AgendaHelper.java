@@ -1068,10 +1068,11 @@ public final class AgendaHelper {
     private static void exhaustPlanetsForVotingVersion2(
             String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String outcome = buttonID.substring(buttonID.indexOf('_') + 1);
-        String voteMessage = "Chose to vote for " + StringUtils.capitalize(outcome)
+        String formattedOutcome = getAgendaOutcomeName(game, outcome, true);
+        String voteMessage = "Chose to vote for " + formattedOutcome
                 + ". Click buttons to exhaust planets and use abilities for votes.";
         if (game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
-            voteMessage = "Chose to vote for **" + Helper.getSCName(Integer.parseInt(outcome), game)
+            voteMessage = "Chose to vote for **" + formattedOutcome
                     + "**. Click buttons to exhaust planets and use abilities for votes.";
         }
         game.setLatestOutcomeVotedFor(outcome);
@@ -1504,9 +1505,9 @@ public final class AgendaHelper {
         game.setPhaseOfGame("agendaEnd");
         game.setActivePlayerID(null);
         StringBuilder message = new StringBuilder();
-        String formattedWinner = StringUtils.capitalize(winner);
+        String formattedWinner = getAgendaOutcomeName(game, winner, true);
         if (game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
-            formattedWinner = "**" + Helper.getSCName(Integer.parseInt(winner), game) + "**";
+            formattedWinner = "**" + formattedWinner + "**";
         }
         message.append(game.getPing())
                 .append(", the current winner is \"")
@@ -2195,6 +2196,7 @@ public final class AgendaHelper {
                             }
                             message += " and the " + MiscEmojis.SpeakerToken + " Speaker Token";
                             game.setSpeakerUserID(winningR.getUserID());
+                            game.setStoredValue("oldSpeakerExecutiveOrder", game.getSpeakerUserID());
                             MessageHelper.sendMessageToChannel(channel, message);
                             ActionCardHelper.drawActionCardsSilent(winningR, 3);
                         }
@@ -3122,6 +3124,38 @@ public final class AgendaHelper {
         return winner.toString();
     }
 
+    static String getAgendaOutcomeName(Game game, String outcome, boolean capitalize) {
+        String agendaDetails = game.getCurrentAgendaInfo();
+        if (StringUtils.countMatches(agendaDetails, "_") > 1) {
+            agendaDetails = agendaDetails.split("_")[1];
+        }
+        if (StringUtils.containsIgnoreCase(agendaDetails, "Secret")) {
+            return Mapper.getSecretObjectivesJustNames().getOrDefault(outcome, outcome);
+        }
+        if (StringUtils.containsIgnoreCase(agendaDetails, "Elect Law")) {
+            String lawTitle = Mapper.getAgendaTitleNoCap(outcome);
+            if (StringUtils.isNotBlank(lawTitle)) {
+                return lawTitle;
+            }
+        }
+        if (StringUtils.containsIgnoreCase(agendaDetails, "unit upgrade") && Mapper.getTech(outcome) != null) {
+            String techName = Mapper.getTech(outcome).getName();
+            if (StringUtils.isNotBlank(techName)) {
+                return techName;
+            }
+        }
+        if (StringUtils.containsIgnoreCase(agendaDetails, "Elect Strategy Card") && NumberUtils.isDigits(outcome)) {
+            return Helper.getSCName(Integer.parseInt(outcome), game);
+        }
+        if (StringUtils.containsIgnoreCase(agendaDetails, "Planet")) {
+            PlanetModel planetModel = Mapper.getPlanet(outcome);
+            if (planetModel != null && StringUtils.isNotBlank(planetModel.getName())) {
+                return planetModel.getName();
+            }
+        }
+        return capitalize ? StringUtils.capitalize(outcome) : outcome;
+    }
+
     public static String getSummaryOfVotes(Game game, boolean capitalize) {
         return getSummaryOfVotes(game, capitalize, false, false);
     }
@@ -3149,24 +3183,10 @@ public final class AgendaHelper {
             StringBuilder summaryBuilder =
                     new StringBuilder("# _" + agendaName + "_\nCurrent status of votes and outcomes is: \n");
             for (String outcome : outcomes.keySet()) {
-                if (StringUtils.countMatches(game.getCurrentAgendaInfo(), "_") > 1) {
-                    agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
-                } else {
-                    agendaDetails = game.getCurrentAgendaInfo();
-                }
-
                 int totalVotes = 0;
                 StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
                 String outcomeSummary;
-                if (agendaDetails.contains("Secret") || agendaDetails.contains("secret")) {
-                    outcome = Mapper.getSecretObjectivesJustNames().get(outcome);
-                } else if (agendaDetails.contains("Elect Law") || agendaDetails.contains("elect law")) {
-                    outcome = Mapper.getAgendaTitleNoCap(outcome);
-                } else if (agendaDetails.toLowerCase().contains("unit upgrade")) {
-                    outcome = Mapper.getTech(outcome).getName();
-                } else if (capitalize) {
-                    outcome = StringUtils.capitalize(outcome);
-                }
+                String outcomeName = getAgendaOutcomeName(game, outcome, capitalize);
                 StringBuilder outcomeSummaryBuilder = new StringBuilder();
                 while (vote_info.hasMoreTokens()) {
                     String specificVote = vote_info.nextToken();
@@ -3232,9 +3252,9 @@ public final class AgendaHelper {
                     }
 
                     if (!game.isFowMode() && game.getCurrentAgendaInfo().contains("Elect Player")) {
-                        String emoji = FactionEmojis.getFactionIcon(outcome.toLowerCase())
+                        String emoji = FactionEmojis.getFactionIcon(outcomeName.toLowerCase())
                                 .toString();
-                        Player outcomerP = game.getPlayerFromColorOrFaction(outcome.toLowerCase());
+                        Player outcomerP = game.getPlayerFromColorOrFaction(outcomeName.toLowerCase());
                         if (outcomerP != null) {
                             emoji = outcomerP.getFactionEmoji();
                         }
@@ -3243,7 +3263,7 @@ public final class AgendaHelper {
                                 .append("- ")
                                 .append(emoji)
                                 .append(' ')
-                                .append(outcome)
+                                .append(outcomeName)
                                 .append(": ")
                                 .append(totalVotes);
                         if (!redactFactionInfo) {
@@ -3253,12 +3273,14 @@ public final class AgendaHelper {
                         }
 
                     } else if (!game.isHomebrewSCMode()
-                            && game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
+                            && game.getCurrentAgendaInfo().contains("Elect Strategy Card")
+                            && NumberUtils.isDigits(outcome)) {
+                        int scNumber = Integer.parseInt(outcome);
                         summaryBuilder
                                 .append("- ")
-                                .append(CardEmojis.getSCFrontFromInteger(Integer.parseInt(outcome)))
+                                .append(CardEmojis.getSCFrontFromInteger(scNumber))
                                 .append(" **")
-                                .append(Helper.getSCName(Integer.parseInt(outcome), game))
+                                .append(Helper.getSCName(scNumber, game))
                                 .append("**: ")
                                 .append(totalVotes);
                         if (!redactFactionInfo) {
@@ -3267,7 +3289,11 @@ public final class AgendaHelper {
                             summaryBuilder.append('\n');
                         }
                     } else {
-                        summaryBuilder.append("- ").append(outcome).append(": ").append(totalVotes);
+                        summaryBuilder
+                                .append("- ")
+                                .append(outcomeName)
+                                .append(": ")
+                                .append(totalVotes);
                         if (!redactFactionInfo) {
                             summaryBuilder.append(". (").append(outcomeSummary).append(")\n");
                         } else {
@@ -3277,7 +3303,7 @@ public final class AgendaHelper {
                 } else {
                     summaryBuilder
                             .append("- ")
-                            .append(outcome)
+                            .append(outcomeName)
                             .append(": Total votes ")
                             .append(totalVotes);
                     if (!redactFactionInfo) {
@@ -3657,9 +3683,10 @@ public final class AgendaHelper {
             player.resetSpentThings();
             player.addSpentThing("representative_1");
             String outcome = buttonID.substring(buttonID.indexOf('_') + 1);
-            String voteMessage = "Chose to vote for " + StringUtils.capitalize(outcome);
+            String formattedOutcome = getAgendaOutcomeName(game, outcome, true);
+            String voteMessage = "Chose to vote for " + formattedOutcome;
             if (game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
-                voteMessage = "Chose to vote for **" + Helper.getSCName(Integer.parseInt(outcome), game) + "**";
+                voteMessage = "Chose to vote for **" + formattedOutcome + "**";
             }
             game.setStoredValue("latestOutcomeVotedFor" + player.getFaction(), outcome);
             game.setLatestOutcomeVotedFor(outcome);
@@ -4161,12 +4188,17 @@ public final class AgendaHelper {
     }
 
     public static void listVoteCount(Game game, MessageChannel channel) {
+        MessageHelper.sendMessageToChannel(channel, getVoteCountMessage(game));
+    }
+
+    static String getVoteCountMessage(Game game) {
         List<Player> orderList = getVotingOrder(game);
         int votes = 0;
         for (Player player : orderList) {
             votes += getTotalVoteCount(game, player);
         }
-        boolean hideTotalVotes = game.getFowOption(FOWOption.HIDE_TOTAL_VOTES);
+        boolean hideTotalVotes =
+                game.getFowOption(FOWOption.HIDE_TOTAL_VOTES) || isRepresentativeGovernmentInEffect(game);
         boolean hideVoteOrder = game.getFowOption(FOWOption.HIDE_VOTE_ORDER);
         StringBuilder sb = new StringBuilder("# Vote Count");
         if (!hideTotalVotes) sb.append("\nTotal votes: ").append(votes);
@@ -4180,7 +4212,13 @@ public final class AgendaHelper {
             sb.append(getPlayerVoteText(game, player));
             itemNo++;
         }
-        MessageHelper.sendMessageToChannel(channel, sb.toString());
+        return sb.toString();
+    }
+
+    private static boolean isRepresentativeGovernmentInEffect(Game game) {
+        return game.getLaws() != null
+                && game.getLaws().containsKey("rep_govt")
+                && game.getStoredValue("executiveOrder").isEmpty();
     }
 
     public static void putTop(int agendaID, Game game) {

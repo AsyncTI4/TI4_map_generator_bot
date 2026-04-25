@@ -20,7 +20,8 @@ class ShuffleACBackIntoDeck extends GameStateSubcommand {
                 false);
         addOptions(new OptionData(
                         OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, which is found between ()")
-                .setRequired(true));
+                .setRequired(true)
+                .setAutoComplete(true));
     }
 
     @Override

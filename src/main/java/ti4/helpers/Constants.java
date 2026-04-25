@@ -233,6 +233,7 @@ public final class Constants {
 
     /* From \data\ */
     public static final String SEARCH_ABILITIES = "abilities";
+    public static final String SEARCH_PLOTS = "plots";
     public static final String SEARCH_BREAKTHROUGHS = "breakthroughs";
     public static final String SEARCH_GALACTIC_EVENTS = "galactic_events";
     public static final String SEARCH_ACTION_CARDS = "action_cards";
@@ -337,6 +338,8 @@ public final class Constants {
     public static final String REMOVE_CUSTOM_ADJACENT_TILES = "remove_custom_adjacent_tiles";
     public static final String REMOVE_ALL_CUSTOM_ADJACENT_TILES = "remove_all_custom_adjacent_tiles";
     public static final String ADD_TILE = "add_tile";
+    public static final String ROTATE_HYPERLANE = "rotate_hyperlane";
+    public static final String ROTATION = "rotation";
     public static final String ADD_TILE_RANDOM = "add_tile_random";
     public static final String RANDOM_TYPE = "random_type";
     public static final String INCLUDE_ERONOUS_TILES = "eronous_tiles";
@@ -364,6 +367,7 @@ public final class Constants {
     public static final String ADD_TILE_LIST = "add_tile_list";
     public static final String ADD_FRONTIER_TOKENS = "add_frontier_tokens";
     public static final String ADD_UNITS = "add_units";
+    public static final String LAND_UNITS = "land_units";
     public static final String ADD_UNIT_DAMAGE = "add_sustain_damage";
     public static final String MOVE_UNITS = "move_units";
     public static final String NO_MAPGEN = "no_mapgen";
@@ -865,7 +869,7 @@ public final class Constants {
     public static final String SO_LIST_SCORED = "list_scored";
 
     public static final String TURN_ORDER = "turn_order";
-    public static final String TURN_STATS = "turn_stats";
+    public static final String AVERAGE_TURN_STATS = "average_turn_stats";
     public static final String VOTE_COUNT = "vote_count";
     public static final String SC_TRADE_GOODS = "sc_trade_goods";
     public static final String SC_COUNT = "sc_count";
@@ -1282,6 +1286,8 @@ public final class Constants {
     public static final String NORMAL_GAME = "normal_game";
     public static final String INCLUDE_ALIASES = "include_aliases";
     public static final String SEARCH = "search";
+    public static final String FIND = "find";
+    public static final String SEARCH_TYPE = "type";
     public static final String BENTOR_HAS_FOUND_CFRAG = "has_found_cfrag";
     public static final String BENTOR_HAS_FOUND_HFRAG = "has_found_hfrag";
     public static final String BENTOR_HAS_FOUND_IFRAG = "has_found_ifrag";
@@ -1334,7 +1340,7 @@ public final class Constants {
     public static final String RUN_DATA_MIGRATIONS = "run_data_migrations";
     public static final String ENDED_DATE = "ended_date";
     public static final String REPLACEMENT_MADE = "replacement_made";
-    public static final String AVERAGE_TURN_TIME = "average_turn_time";
+    public static final String GLOBAL_AVERAGE_TURN_TIME = "global_average_turn_time";
     public static final String DICE_LUCK = "dice_luck";
     public static final String HITS_PER_TURN = "hits_per_turn";
     public static final String LIFETIME_RECORD = "lifetime_record";

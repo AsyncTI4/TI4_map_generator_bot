@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
@@ -49,6 +50,8 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.contest.CombatContestService;
 
 @UtilityClass
 public class ActionCardHelper {
@@ -65,6 +68,8 @@ public class ActionCardHelper {
             "war_machine2_acd2",
             "war_machine3_acd2",
             "war_machine4_acd2");
+    private static final Set<String> MORALE_BOOST_IDS = Set.of("mb1", "mb2", "mb3", "mb4", "morale_boost_ds");
+    private static final Set<String> SHIELDS_HOLDING_IDS = Set.of("sh1", "sh2", "sh3", "sh4", "shields_holding_ds");
 
     public enum ACStatus {
         ralnelbt,
@@ -242,7 +247,7 @@ public class ActionCardHelper {
     private static List<Button> getPlotCardButtons(Player player) {
         boolean hasManageAbility = player.hasAbility("plotsplots");
         if (player.hasLeader("firmamenthero")) hasManageAbility = true;
-        if (!hasManageAbility) return new ArrayList<>();
+        if (!hasManageAbility && player.getPlotCards().isEmpty()) return new ArrayList<>();
 
         List<Button> buttons = new ArrayList<>();
         Set<Entry<String, Integer>> plotCards = player.getPlotCards().entrySet();
@@ -267,7 +272,9 @@ public class ActionCardHelper {
                         buttons.add(Buttons.red(buttonID, buttonText));
                     }
                 });
-        buttons.add(Buttons.blue("scoreOtherPlayersSecrets", "Score Other Players' Secrets (Max 5)"));
+        if (player.hasAbility("plotsplots")) {
+            buttons.add(Buttons.blue("scoreOtherPlayersSecrets", "Score Other Players' Secrets (Max 5)"));
+        }
         return buttons;
     }
 
@@ -347,9 +354,9 @@ public class ActionCardHelper {
                         .append("_ `(")
                         .append(Helper.leftpad("" + ac.getValue(), 3))
                         .append(")`\n> ")
-                        .append(actionCard.getWindow())
+                        .append(actionCard.hasWildText(game) ? actionCard.getWildWildWindow() : actionCard.getWindow())
                         .append(": ")
-                        .append(actionCard.getText())
+                        .append(actionCard.hasWildText(game) ? actionCard.getWildWildText() : actionCard.getText())
                         .append('\n');
                 if (actionCard.getNotes() != null) {
                     sb.append("> -# [").append(actionCard.getNotes()).append("]\n");
@@ -821,6 +828,16 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithEmbed(bEvent.getChannel(), message, acEmbed);
             }
         }
+        SpringContext.getBean(CombatContestService.class)
+                .mirrorCombatEvent(
+                        game,
+                        player,
+                        "Action Card",
+                        "played _" + actionCard.getName() + "_.",
+                        actionCard.getRepresentationEmbed(false, true, game),
+                        player.getCorrectChannel().getName(),
+                        getCombatReplayTrackedEvent(actionCard));
+
         if (actionCardIsSabotageOrShatter) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
             if (game.isWildWildGalaxyMode()) {
@@ -2310,5 +2327,12 @@ public class ActionCardHelper {
 
     static boolean playerHasWarMachine(Player player) {
         return player.getPlayableActionCards().stream().anyMatch(WAR_MACHINE_IDS::contains);
+    }
+
+    private CombatReplayTrackedEvent getCombatReplayTrackedEvent(ActionCardModel actionCard) {
+        if (actionCard == null || actionCard.getAlias() == null) return CombatReplayTrackedEvent.NONE;
+        if (MORALE_BOOST_IDS.contains(actionCard.getAlias())) return CombatReplayTrackedEvent.MORALE_BOOST;
+        if (SHIELDS_HOLDING_IDS.contains(actionCard.getAlias())) return CombatReplayTrackedEvent.SHIELDS_HOLDING;
+        return CombatReplayTrackedEvent.NONE;
     }
 }

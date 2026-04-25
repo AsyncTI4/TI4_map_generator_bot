@@ -1,0 +1,16 @@
+[
+    {
+        "id": "us9",
+        "initiative": 9,
+        "name": "Ghost Experiment",
+        "primaryTexts": [
+            "Place a Creuss wormhole token into a system. Then perform the Planetary Stabilisation action, without spending a Command Counter and trade goods, also picking the result of the die roll.",
+            "Then perform the Creuss Paradigm or hero ability."
+        ],
+        "secondaryTexts": [
+            "Then perform the Planetary Stabilisation action, without spending a Command Counter from your Strategy Pool, but you are not allowed to activate the system."
+        ],
+        "colourHexCode": "#9b59b6",
+        "source": "untangled_space"
+    }
+]

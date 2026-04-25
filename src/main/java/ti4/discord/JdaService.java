@@ -22,9 +22,16 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.contest.cron.CombatContestJanitorCron;
+import ti4.contest.cron.CombatReplayCron;
+import ti4.contest.cron.CombatReplayPromotionCron;
+import ti4.contest.cron.CombatReplayPromotionScoreBackfillCron;
+import ti4.contest.cron.CombatReplaySelectionCron;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CategoryCleanupCron;
 import ti4.cron.CloseLaunchThreadsCron;
+import ti4.cron.CombatContestLeaderboardCron;
+import ti4.cron.CombatContestSelectionCron;
 import ti4.cron.CronManager;
 import ti4.cron.EndOldGamesCron;
 import ti4.cron.FastScFollowCron;
@@ -41,12 +48,11 @@ import ti4.cron.UploadRecentStatsCron;
 import ti4.cron.UploadStatsCron;
 import ti4.cron.WinningPathCron;
 import ti4.discord.interactions.commands.SlashCommandManager;
-import ti4.discord.interactions.commands.context.ContextCommandManager;
+import ti4.discord.interactions.context.ContextCommandManager;
 import ti4.discord.interactions.listeners.ListenerManager;
 import ti4.discord.interactions.selections.SelectionManager;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.persistence.GameManager;
-import ti4.game.persistence.migration.DataMigrationManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -100,7 +106,7 @@ public class JdaService {
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
     public static final List<Guild> fowServers = new ArrayList<>();
 
-    public static void initialize(String[] args) {
+    public static void startJdaAndRegisterListeners(String[] args) {
         BotLogger.info("STARTING JDA");
         jda = JDABuilder.createDefault(args[0])
                 // This is a privileged gateway intent that is used to update user information and join/leaves
@@ -122,13 +128,15 @@ public class JdaService {
 
         BotLogger.info("INITIALIZING LISTENERS");
         ListenerManager.registerListeners(jda);
+    }
 
+    public static boolean waitForJdaReadyAndInitializeGuilds(String[] args) {
         BotLogger.info("AWAITING JDA READY");
         try {
             jda.awaitReady();
         } catch (Throwable t) {
             BotLogger.critical("Error waiting for bot to get ready", t);
-            return;
+            return false;
         }
 
         jda.getPresence()
@@ -142,7 +150,7 @@ public class JdaService {
 
         if (guildPrimary == null) {
             BotLogger.critical("Failed to start the bot on the primary guild. Aborting.");
-            return;
+            return false;
         }
 
         // Community Plays TI
@@ -254,8 +262,10 @@ public class JdaService {
                     "BOT-LOG WEBHOOK NOT FOUND for Primary GuildID:" + guildPrimaryID
                             + "\nPlease set a valid bot-log Webhook URL using `/developer setting setting_name:bot_log_webhook_url setting_type:string setting_value:<url>`");
         }
+        return true;
+    }
 
-        // LOAD DATA
+    public static void loadStaticDataAndResources() {
         BotLogger.info("LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
         ApplicationEmojiService.uploadNewEmojis();
@@ -273,23 +283,9 @@ public class JdaService {
         SelectionManager.init();
         initializeWhitelistedRoles();
         TIGLHelper.validateTIGLness();
+    }
 
-        jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Indexing Game Names"));
-
-        BotLogger.info("INDEXING GAME NAMES");
-        GameManager.initialize();
-        BotLogger.info("FINISHED INDEXING GAME NAMES");
-        if (GameManager.startManagedGamesWarmupIfNeeded()) {
-            BotLogger.info("STARTED BACKGROUND MANAGED GAME WARMUP");
-        } else {
-            BotLogger.info("DEFERRED BACKGROUND MANAGED GAME WARMUP UNTIL THIS PROCESS BECOMES ACTIVE");
-        }
-
-        if (DataMigrationManager.runMigrations()) {
-            BotLogger.info("FINISHED RUNNING MIGRATIONS");
-        }
-
-        // START CRONS
+    public static void registerAndStartCronJobs() {
         AutoPingCron.register();
         ReuploadStaleEmojisCron.register();
         LogCacheStatsCron.register();
@@ -304,18 +300,21 @@ public class JdaService {
         SabotageAutoReactCron.register();
         FastScFollowCron.register();
         CloseLaunchThreadsCron.register();
+        CombatContestSelectionCron.register();
+        CombatContestLeaderboardCron.register();
+        CombatReplaySelectionCron.register();
+        CombatReplayPromotionCron.register();
+        CombatReplayPromotionScoreBackfillCron.register();
+        CombatReplayCron.register();
+        CombatContestJanitorCron.register();
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
         CategoryCleanupCron.register();
+    }
 
-        // BOT IS READY
+    public static void markProcessReady() {
         ActiveLeaseService.setCurrentProcessReady(true);
         BotLogger.info("BOT IS READY TO RECEIVE COMMANDS");
-        if (GameManager.isManagedGamesWarmupComplete()) {
-            updatePresence();
-        } else {
-            jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.customStatus("Warming game index"));
-        }
     }
 
     private static Guild tryToInitGuild(String guildID, boolean addToNewGameServerList) {

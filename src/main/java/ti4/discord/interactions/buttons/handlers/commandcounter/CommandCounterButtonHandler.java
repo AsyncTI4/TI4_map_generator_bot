@@ -21,7 +21,6 @@ import ti4.helpers.Helper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.button.ReactionService;
-import ti4.service.game.StartPhaseService;
 
 @UtilityClass
 public class CommandCounterButtonHandler {
@@ -217,7 +216,6 @@ public class CommandCounterButtonHandler {
                                 + ButtonHelper.checkFleetInEveryTile(player, game)
                                 + ". That's how many command tokens you'll need to retain in your fleet pool to avoid removing ships.");
             }
-            StartPhaseService.sendStatusReminders(event, game, player);
         }
     }
 

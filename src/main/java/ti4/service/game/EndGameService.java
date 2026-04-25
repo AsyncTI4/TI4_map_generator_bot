@@ -229,13 +229,7 @@ public class EndGameService {
                                                 success -> {
                                                     // Save message ID to SQLite, same as show game
                                                     SpringContext.getBean(GameImageService.class)
-                                                            .saveDiscordMessageId(
-                                                                    game,
-                                                                    success.getIdLong(),
-                                                                    success.getGuild()
-                                                                            .getIdLong(),
-                                                                    success.getChannel()
-                                                                            .getIdLong());
+                                                            .saveDiscordMessage(game.getName(), success);
                                                 },
                                                 BotLogger::catchRestError); // ADD MAP FILE TO MESSAGE
                                 m.createThreadChannel(game.getName()).queueAfter(2, TimeUnit.SECONDS, t -> {

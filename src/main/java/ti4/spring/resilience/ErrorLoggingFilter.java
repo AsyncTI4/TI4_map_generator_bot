@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,9 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
     private static final int START_OF_HTTP_ERROR_RANGE = 400;
     private static final int START_OF_HTTP_SERVER_ERROR_RANGE = 500;
     private static final String HTTP_ERROR_THREAD_NAME = "http-errors";
+    private static final String READY_PATH = "/api/public/ready";
+    private static final List<IgnoredHttpErrorRule> IGNORED_HTTP_ERROR_RULES =
+            List.of(new IgnoredHttpErrorRule(READY_PATH, HttpStatus.SERVICE_UNAVAILABLE.value()));
 
     @Override
     protected void doFilterInternal(
@@ -55,16 +59,19 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
                 throw e;
             }
 
-            if (shouldReportResponseStatus(cachingResponse.getStatus())) {
+            String requestUri = request.getRequestURI();
+            int status = cachingResponse.getStatus();
+            if (shouldReportResponseStatus(requestUri, status)) {
                 String body =
                         new String(cachingResponse.getContentAsByteArray(), cachingResponse.getCharacterEncoding());
-                String error = String.format(
-                        "Request to %s returned status %s with body: %s",
-                        request.getRequestURI(), cachingResponse.getStatus(), body);
-                BotLogger.errorToThread(error, HTTP_ERROR_THREAD_NAME);
-                SREStats.incrementWebserverRequestErrorCount();
-                if (cachingResponse.getStatus() >= START_OF_HTTP_SERVER_ERROR_RANGE) {
-                    RollbarManager.report(com.rollbar.api.payload.data.Level.ERROR, null, error, null);
+                if (!shouldIgnoreReportedStatus(requestUri, status, body)) {
+                    String error =
+                            String.format("Request to %s returned status %s with body: %s", requestUri, status, body);
+                    BotLogger.errorToThread(error, HTTP_ERROR_THREAD_NAME);
+                    SREStats.incrementWebserverRequestErrorCount();
+                    if (status >= START_OF_HTTP_SERVER_ERROR_RANGE) {
+                        RollbarManager.report(com.rollbar.api.payload.data.Level.ERROR, null, error, null);
+                    }
                 }
             }
 
@@ -74,16 +81,30 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
         }
     }
 
-    private static boolean shouldReportResponseStatus(int statusCode) {
+    private static boolean shouldReportResponseStatus(String requestUri, int statusCode) {
+        if (READY_PATH.equals(requestUri) && statusCode == HttpStatus.SERVICE_UNAVAILABLE.value()) {
+            return true;
+        }
         return statusCode >= START_OF_HTTP_SERVER_ERROR_RANGE
                 || (statusCode >= START_OF_HTTP_ERROR_RANGE
                         && statusCode != HttpStatus.UNAUTHORIZED.value()
                         && statusCode != HttpStatus.FORBIDDEN.value());
     }
 
+    static boolean shouldIgnoreReportedStatus(String requestUri, int statusCode, String body) {
+        return IGNORED_HTTP_ERROR_RULES.stream().anyMatch(rule -> rule.matches(requestUri, statusCode, body));
+    }
+
     private static boolean isAuthenticationNoise(Exception exception) {
         return exception instanceof OAuth2AuthenticationException
                 || exception instanceof AccessDeniedException
                 || exception instanceof UserNotInGameForbiddenException;
+    }
+
+    private record IgnoredHttpErrorRule(String requestPath, int statusCode) {
+
+        private boolean matches(String requestUri, int responseStatusCode, String body) {
+            return requestPath.equals(requestUri) && statusCode == responseStatusCode;
+        }
     }
 }

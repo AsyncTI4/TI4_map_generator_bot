@@ -6,9 +6,11 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 
 @Service
@@ -33,20 +35,21 @@ public class GameImageService {
                 .orElse(null);
     }
 
-    public void saveMapImageName(Game game, String mapImageName) {
-        if (game == null || isBlank(mapImageName)) return;
-        MapImageData mapImageData = loadOrCreate(game.getName());
-        mapImageData.setLatestMapImageName(mapImageName);
-        mapImageDataRepository.save(mapImageData);
-    }
-
-    public void saveDiscordMessageId(Game game, long discordMessageId, long guildId, long channelId) {
-        if (game == null || !GameManager.isValid(game.getName())) return;
-        MapImageData mapImageData = loadOrCreate(game.getName());
+    public void saveDiscordMessageId(String gameName, long discordMessageId, long guildId, long channelId) {
+        if (isBlank(gameName) || !GameManager.isValid(gameName)) return;
+        MapImageData mapImageData = loadOrCreate(gameName);
         mapImageData.setLatestDiscordMessageId(discordMessageId);
         mapImageData.setLatestDiscordGuildId(guildId);
         mapImageData.setLatestDiscordChannelId(channelId);
         mapImageDataRepository.save(mapImageData);
+    }
+
+    public void saveDiscordMessage(String gameName, Message message) {
+        if (isBlank(gameName) || message == null) return;
+        Guild guild = message.getGuild();
+        MessageChannel channel = message.getChannel();
+        if (guild == null || channel == null) return;
+        saveDiscordMessageId(gameName, message.getIdLong(), guild.getIdLong(), channel.getIdLong());
     }
 
     private MapImageData loadOrCreate(String gameName) {

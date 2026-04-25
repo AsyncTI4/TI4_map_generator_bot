@@ -12,6 +12,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
+import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -21,6 +22,8 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.LoreService;
 import ti4.service.unit.CheckUnitContainmentService;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.contest.CombatContestService;
 
 @UtilityClass
 class RetreatButtonHandler {
@@ -93,6 +96,12 @@ class RetreatButtonHandler {
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " retreated all units in space to "
                         + game.getTileByPosition(pos2).getRepresentationForButtons(game, player) + ".");
+        SpringContext.getBean(CombatContestService.class)
+                .mirrorRetreatResolved(
+                        game,
+                        player,
+                        game.getTileByPosition(pos2).getRepresentationForButtons(game, player),
+                        event.getChannel().getName());
         LoreService.showSystemLore(player, game, pos2, LoreService.TRIGGER.CONTROLLED);
         FOWCombatThreadMirroring.mirrorMessage(
                 event, game, player.getRepresentationNoPing() + " retreated all units in space.");
@@ -117,6 +126,19 @@ class RetreatButtonHandler {
                     + game.getTileByPosition(pos2).getRepresentationForButtons(game, player) + ".";
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(), breakthroughMessage, breakthroughButtons);
+        }
+
+        if (player.ownsUnit("greentf_flagship")
+                && CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Flagship)
+                        .contains(game.getTileByPosition(pos2))
+                && Helper.getProductionValue(player, game, game.getTileByPosition(pos1), false) > 0) {
+            List<Button> flagButtons = new ArrayList<>();
+            flagButtons.add(Buttons.blue(
+                    player.finChecker() + "anarchy7Build_" + pos1, "Build in " + pos1, FactionEmojis.Muaat));
+            flagButtons.add(Buttons.red("deleteButtons", "Decline"));
+            String flagMessage = player.getRepresentationUnfogged()
+                    + ", you may build in the system your flagship is retreating from.";
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), flagMessage, flagButtons);
         }
 
         ButtonHelper.deleteMessage(event);

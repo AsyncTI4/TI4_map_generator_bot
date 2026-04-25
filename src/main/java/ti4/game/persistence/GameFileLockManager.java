@@ -3,7 +3,9 @@ package ti4.game.persistence;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 final class GameFileLockManager {
 
     private static final ConcurrentHashMap<String, ReentrantReadWriteLock> locks = new ConcurrentHashMap<>();

@@ -466,6 +466,6 @@
         "playArea": true,
         "playImmediately": false,
         "source": "ds",
-        "text": "ACTION: Place this card face up in your play area. Once per action, when you win a combat against a player with more victory points than you, gain 3 commodities. If you activate a system that contains the Toldar player's units, purge 1 of your command tokens from your reinforcements and return this card to that player."
+        "text": "ACTION: Place this card face up in your play area. Once per action, when you win a combat against a player with more victory points than you, gain 3 commodities. You must spend 1 token from your fleet pool and return this card to the Toldar player to activate a system that contains that player’s units."
     }
 ]

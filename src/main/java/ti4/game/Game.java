@@ -1,7 +1,7 @@
 package ti4.game;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -800,27 +800,43 @@ public class Game extends GameProperties {
 
     @Override
     public void setCompetitiveTIGLGame(boolean competitiveTIGLGame) {
-        if (isAbsolMode()
-                || isMiltyModMode()
-                || isDiscordantStarsMode()
-                || isHomebrewSCMode()
-                || isFowMode()
-                || isAllianceMode()
-                || isCommunityMode()) competitiveTIGLGame = false;
+        boolean isFracturedTIGL = TIGLHelper.isFracturedTIGLGame(this);
+        boolean hasAlwaysIncompatibleMode = isAllianceMode() || isCommunityMode();
+        boolean hasStandardOnlyIncompatibleMode =
+                isAbsolMode() || isMiltyModMode() || isDiscordantStarsMode() || isHomebrewSCMode() || isFowMode();
+        if (hasAlwaysIncompatibleMode || (!isFracturedTIGL && hasStandardOnlyIncompatibleMode)) {
+            competitiveTIGLGame = false;
+        }
         super.setCompetitiveTIGLGame(competitiveTIGLGame);
+        if (!competitiveTIGLGame) {
+            clearTIGLSetupState();
+        }
     }
 
     @Override
-    public boolean isAllianceMode() {
-        for (Player player : getRealPlayers()) {
-            if (player.getAllianceMembers() != null
-                    && !player.getAllianceMembers()
-                            .replace(player.getFaction(), "")
-                            .isEmpty()) {
-                setAllianceMode(true);
+    public void setAllianceMode(boolean allianceMode) {
+        super.setAllianceMode(allianceMode);
+        if (allianceMode) {
+            setCompetitiveTIGLGame(false);
+        }
+    }
+
+    @Override
+    public void setCommunityMode(boolean communityMode) {
+        super.setCommunityMode(communityMode);
+        if (communityMode) {
+            setCompetitiveTIGLGame(false);
+        }
+    }
+
+    private void clearTIGLSetupState() {
+        TIGLHelper.removeFracturedTag(this);
+        setMinimumTIGLRankAtGameStart(null);
+        for (Player player : players.values()) {
+            if (player != null) {
+                player.setPlayerTIGLRankAtGameStart(null);
             }
         }
-        return super.isAllianceMode();
     }
 
     @Override
@@ -1766,6 +1782,29 @@ public class Game extends GameProperties {
             }
         }
         return custodiansTaken;
+    }
+
+    public Player getCustodiansTakerPlayer() {
+        String idC = "";
+        for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+            if (po.getValue().equals(0)) {
+                idC = po.getKey();
+                break;
+            }
+        }
+        if (!idC.isEmpty()) {
+            List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(idC, key -> new ArrayList<>());
+            if (!scoredPlayerList.isEmpty()) {
+                String playerID = scoredPlayerList.getFirst();
+                for (Player player : getRealAndEliminatedPlayers()) {
+                    if (player.getUserID().equalsIgnoreCase(playerID)) {
+                        return player;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     public boolean isCustodiansScored() {
@@ -2932,7 +2971,8 @@ public class Game extends GameProperties {
     }
 
     private boolean shouldPutCardOnRalnel(Player discardingPlayer) {
-        if (!"action".equals(getPhaseOfGame())) return false;
+        if (!"action".equals(getPhaseOfGame())
+                && getStoredValue("executiveOrder").isEmpty()) return false;
         for (Player p : getRealPlayers()) {
             if (p == discardingPlayer) continue;
             if (p.hasUnlockedBreakthrough("ralnelbt") && !p.isPassed()) return true;

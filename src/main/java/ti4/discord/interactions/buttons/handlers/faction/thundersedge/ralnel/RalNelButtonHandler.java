@@ -28,12 +28,18 @@ public class RalNelButtonHandler {
 
     @ButtonHandler("ralnelCommander_")
     public static void ralnelCommander(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        if (ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, game.getActiveSystem(), false, false)
+                .isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "## There are no valid systems to retreat to!");
+            return;
+        }
         ButtonHelper.deleteTheOneButton(event);
         List<Button> buttons = ButtonHelperModifyUnits.getRalnelCommanderButtons(player, game, buttonID.split("_")[1]);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged()
-                        + ", is using Watchful Ojz, the Ral Nel commander, to immediately retreat 2 ships (and maybe transport).\nReminder: Dane has ruled that you need a valid retreat location before you can even announce retreats and use this commander.");
+                        + ", is using Watchful Ojz, the Ral Nel commander, to immediately retreat 2 ships (and maybe transport).\nReminder: You need a valid retreat location before you can announce retreats and use this commander, but after you clear that hurdle, the system this commander retreats to does not have to follow a conventionally valid retreat path.");
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + ", please choose which system you wish to move units to.",

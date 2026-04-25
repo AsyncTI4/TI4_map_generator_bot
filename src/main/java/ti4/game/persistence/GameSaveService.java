@@ -143,7 +143,7 @@ class GameSaveService {
             writer.write(System.lineSeparator());
             writer.write(game.getOwnerName());
             writer.write(System.lineSeparator());
-            writer.write(game.getName());
+            writer.write(game.getName().toLowerCase());
             writer.write(System.lineSeparator());
             saveGameInfo(writer, game);
 

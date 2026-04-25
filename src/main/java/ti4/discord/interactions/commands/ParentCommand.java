@@ -43,7 +43,7 @@ public interface ParentCommand extends Command<SlashCommandInteractionEvent> {
         if (subcommand != null) subcommand.onException(event, throwable);
     }
 
-    private Command<SlashCommandInteractionEvent> getSubcommand(SlashCommandInteractionEvent event) {
+    default Command<SlashCommandInteractionEvent> getSubcommand(SlashCommandInteractionEvent event) {
         String subcommandGroupName = event.getInteraction().getSubcommandGroup();
         if (subcommandGroupName != null) {
             return getSubcommandGroups().get(subcommandGroupName);

@@ -422,7 +422,12 @@ public final class ButtonHelperTwilightsFall {
     }
 
     // @ButtonHandler("initiateASplice_")
-    public static void initiateASplice(Game game, Player startPlayer, String buttonID, List<Player> participants) {
+    public static void initiateASplice(
+            GenericInteractionCreateEvent event,
+            Game game,
+            Player startPlayer,
+            String buttonID,
+            List<Player> participants) {
         String spliceType = buttonID;
         if (buttonID.contains("_")) {
             spliceType = buttonID.split("_")[1];
@@ -446,13 +451,13 @@ public final class ButtonHelperTwilightsFall {
             if (game.getStoredValue("Reverse Splice") != null
                     && game.getStoredValue("Reverse Splice").contains(player2.getFaction())
                     && player2.getPlayableActionCards().contains("tf-reverse")) {
-                ActionCardHelper.playAC(null, game, player2, "tf-reverse", game.getMainGameChannel());
+                ActionCardHelper.playAC(event, game, player2, "tf-reverse", game.getMainGameChannel());
             }
             if (game.getStoredValue("Manipulate Splice") != null
                     && game.getStoredValue("Manipulate Splice").contains(player2.getFaction())
                     && player2.getPlayableActionCards().contains("tf-manipulate")
                     && !participants.contains(player2)) {
-                ActionCardHelper.playAC(null, game, player2, "tf-manipulate", game.getMainGameChannel());
+                ActionCardHelper.playAC(event, game, player2, "tf-manipulate", game.getMainGameChannel());
             }
         }
         if (!game.getStoredValue("paid6ForSplice").isEmpty()) {
@@ -669,7 +674,7 @@ public final class ButtonHelperTwilightsFall {
             }
             game.removeStoredValue("willParticipateInSplice");
         }
-        initiateASplice(game, player, spliceType, participants);
+        initiateASplice(event, game, player, spliceType, participants);
     }
 
     public static void triggerYellowUnits(Game game, Player player) {
@@ -1297,7 +1302,7 @@ public final class ButtonHelperTwilightsFall {
         }
         if ("units".equalsIgnoreCase(type)) {
             for (String unit : player.getUnitsOwned()) {
-                if (unit.contains("tf_")) {
+                if (unit.contains("tf_") || !unit.contains("tf-")) {
                     continue;
                 }
                 buttons.add(Buttons.red(

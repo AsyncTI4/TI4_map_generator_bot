@@ -18,6 +18,7 @@ public class MapCommand implements ParentCommand {
                     new RemoveBorderAnomaly(),
                     new InteractiveBuilder(),
                     new Preset(),
+                    new RotateHyperlane(),
                     new ShowMapSetup(),
                     new ShowMapString(),
                     new SetMapTemplate(),

@@ -67,6 +67,9 @@ public class GameEntity {
     @Column(name = "is_twilight_imperium_global_league")
     private boolean twilightImperiumGlobalLeague;
 
+    @Column(name = "is_twilight_imperium_global_league_fractured")
+    private boolean twilightImperiumGlobalLeagueFractured;
+
     @Column(name = "twilight_imperium_global_league_rank")
     private String twilightImperiumGlobalLeagueRank;
 

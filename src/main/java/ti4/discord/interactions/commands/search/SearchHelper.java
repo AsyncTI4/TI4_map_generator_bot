@@ -11,6 +11,10 @@ import ti4.message.MessageHelper;
 @UtilityClass
 class SearchHelper {
 
+    public static void sendSearchMessageToEventChannel(SlashCommandInteractionEvent event, String message) {
+        event.getChannel().sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
     public static void sendSearchEmbedsToEventChannel(
             SlashCommandInteractionEvent event, List<MessageEmbed> messageEmbeds) {
         if (messageEmbeds.size() > 3) {

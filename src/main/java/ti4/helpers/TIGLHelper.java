@@ -3,12 +3,15 @@ package ti4.helpers;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -27,6 +30,11 @@ import ti4.service.emoji.MiscEmojis;
 
 public final class TIGLHelper {
 
+    private enum TIGLLadder {
+        STANDARD,
+        FRACTURED
+    }
+
     public enum TIGLRank {
         UNRANKED("TIGL - Unranked", 0), // <- because current formatter settings will oneline this list
         MINISTER("TIGL - Minister", 1), //
@@ -36,6 +44,13 @@ public final class TIGLHelper {
         EMPEROR(
                 "TIGL - Galactic Emperor",
                 99), // this is only obtainable once per TIGL season, not per HERO rankup game
+        THRALL("TIGL - Thrall", 1, TIGLLadder.FRACTURED),
+        ACOLYTE("TIGL - Acolyte", 2, TIGLLadder.FRACTURED),
+        LEGIONNAIRE("TIGL - Legionnaire", 3, TIGLLadder.FRACTURED),
+        STARLANCER("TIGL - Starlancer", 4, TIGLLadder.FRACTURED),
+        GENESORCERER("TIGL - Gene-Sorcerer", 5, TIGLLadder.FRACTURED),
+        IXTHLORD("TIGL - Ixth-Lord", 6, TIGLLadder.FRACTURED),
+        ARCHON("TIGL - Archon", 7, TIGLLadder.FRACTURED),
         HERO_ARBOREC("TIGL - Letani Miasmiala", -1), //
         HERO_ARGENT("TIGL - Mirik Aun Sissiri", -1), //
         HERO_CABAL("TIGL - It Feeds on Carrion", -1), //
@@ -68,10 +83,20 @@ public final class TIGLHelper {
         private final String name;
 
         private final Integer index;
+        private final Set<TIGLLadder> ladders;
 
         TIGLRank(String name, int index) {
+            this(name, index, Set.of(TIGLLadder.STANDARD));
+        }
+
+        TIGLRank(String name, int index, TIGLLadder ladder) {
+            this(name, index, Set.of(ladder));
+        }
+
+        TIGLRank(String name, int index, Set<TIGLLadder> ladders) {
             this.name = name;
             this.index = index;
+            this.ladders = ladders;
         }
 
         public String getShortName() {
@@ -84,7 +109,7 @@ public final class TIGLHelper {
 
         @Override
         public String toString() {
-            return super.toString().toLowerCase();
+            return super.toString().toLowerCase(Locale.ROOT);
         }
 
         public Role getRole() {
@@ -93,6 +118,11 @@ public final class TIGLHelper {
                 return null;
             }
             return roles.getFirst();
+        }
+
+        boolean belongsToLadder(boolean isFractured) {
+            TIGLLadder ladder = isFractured ? TIGLLadder.FRACTURED : TIGLLadder.STANDARD;
+            return ladders.contains(ladder);
         }
 
         TIGLRank getNextRank() {
@@ -107,26 +137,31 @@ public final class TIGLHelper {
         }
 
         public static List<TIGLRank> getSortedRanks() {
-            return Stream.of(values())
+            return Arrays.stream(values())
                     .filter(rank -> rank.index >= 0)
                     .sorted(Comparator.comparing(TIGLRank::getIndex))
                     .toList();
         }
 
         /**
-         * Converts a string identifier to the corresponding SimpleStatistics enum value.
+         * Converts a string identifier to the corresponding TIGL rank.
          *
          * @param id the string identifier
-         * @return the SimpleStatistics enum value, or null if not found
+         * @return the TIGL rank, or null if not found
          */
         public static TIGLRank fromString(String id) {
             if (isBlank(id)) return null;
+            String normalizedInput = normalizeRankId(id);
             for (TIGLRank rank : values()) {
-                if (id.equals(rank.toString())) {
+                if (id.equals(rank.toString()) || normalizedInput.equals(normalizeRankId(rank.toString()))) {
                     return rank;
                 }
             }
             return null;
+        }
+
+        private static String normalizeRankId(String id) {
+            return id.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
         }
     }
 
@@ -163,13 +198,20 @@ public final class TIGLHelper {
     }
 
     public static void initializeTIGLGame(Game game, boolean isFractured) {
-        game.setCompetitiveTIGLGame(true);
         if (isFractured) {
             addFracturedTag(game);
         } else {
             removeFracturedTag(game);
         }
+        game.setCompetitiveTIGLGame(true);
+        if (!game.isCompetitiveTIGLGame()) {
+            return;
+        }
         sendTIGLSetupText(game);
+        setTIGLRankSnapshotAtSetup(game, isFractured);
+    }
+
+    private static void setTIGLRankSnapshotAtSetup(Game game, boolean isFractured) {
         List<User> users =
                 game.getPlayers().values().stream().map(Player::getUser).toList();
         if (!allUsersAreMembersOfHubServer(users)) {
@@ -178,10 +220,10 @@ public final class TIGLHelper {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
             return;
         }
-        TIGLRank lowestRank = getLowestCommonRankBetweenPlayers(users);
+        TIGLRank lowestRank = getLowestCommonRankBetweenPlayers(users, isFractured);
         game.setMinimumTIGLRankAtGameStart(lowestRank);
         for (Player player : game.getPlayers().values()) {
-            player.setPlayerTIGLRankAtGameStart(getUsersHighestTIGLRank(player.getUser()));
+            player.setPlayerTIGLRankAtGameStart(getUsersHighestTIGLRank(player.getUser(), isFractured));
         }
     }
 
@@ -192,14 +234,6 @@ public final class TIGLHelper {
                 + "By continuing forward with this game, it is assumed you have accepted and are subject to the TIGL Code of Conduct.\n\n"
                 + "For more information, please see this channel: https://discord.com/channels/943410040369479690/1003741148017336360\n and the [Rules Document](https://docs.google.com/document/d/1WoFPiluIz5cw80x1-WxUeckADIdYszNFZFTb6d648tk/edit?tab=t.0)";
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
-    }
-
-    private static List<Role> getAllTIGLRoles() {
-        List<Role> roles = new ArrayList<>();
-        for (TIGLRank rank : TIGLRank.values()) {
-            roles.add(rank.getRole());
-        }
-        return roles;
     }
 
     private static List<TIGLRank> getAllTIGLRanks() {
@@ -213,22 +247,21 @@ public final class TIGLHelper {
                 .toList();
     }
 
-    private static TIGLRank getTIGLRankFromRole(@Nullable Role role) {
-        if (role == null) {
-            return null;
-        }
+    private static Map<Long, TIGLRank> getTIGLRoleIdToRankMap() {
+        Map<Long, TIGLRank> roleIdToRank = new HashMap<>();
         for (TIGLRank rank : getAllTIGLRanks()) {
-            if (role.equals(rank.getRole())) {
-                return rank;
+            Role role = rank.getRole();
+            if (role != null) {
+                roleIdToRank.put(role.getIdLong(), rank);
             }
         }
-        return null;
+        return roleIdToRank;
     }
 
-    private static TIGLRank getLowestCommonRankBetweenPlayers(List<User> users) {
-        TIGLRank lowestRank = TIGLRank.HERO;
+    private static TIGLRank getLowestCommonRankBetweenPlayers(List<User> users, boolean isFractured) {
+        TIGLRank lowestRank = isFractured ? TIGLRank.ARCHON : TIGLRank.HERO;
         for (User user : users) {
-            TIGLRank rank = getUsersHighestTIGLRank(user);
+            TIGLRank rank = getUsersHighestTIGLRank(user, isFractured);
             if (lowestRank.getIndex() > rank.getIndex()) {
                 lowestRank = rank;
             }
@@ -236,21 +269,26 @@ public final class TIGLHelper {
         return lowestRank;
     }
 
-    private static List<TIGLRank> getUsersTIGLRanks(User user) {
+    private static List<TIGLRank> getUsersTIGLRanks(User user, boolean isFractured) {
         Member hubMember = JdaService.guildPrimary.getMemberById(user.getId());
         if (hubMember == null) {
             return new ArrayList<>();
         }
+        Map<Long, TIGLRank> roleIdToRank = getTIGLRoleIdToRankMap();
         return hubMember.getRoles().stream()
-                .filter(r -> getAllTIGLRoles().contains(r))
-                .map(TIGLHelper::getTIGLRankFromRole)
+                .map(r -> roleIdToRank.get(r.getIdLong()))
                 .filter(Objects::nonNull)
+                .filter(r -> r.belongsToLadder(isFractured))
                 .sorted(Comparator.comparing(TIGLRank::getIndex))
                 .toList();
     }
 
     private static TIGLRank getUsersHighestTIGLRank(User user) {
-        List<TIGLRank> ranks = getUsersTIGLRanks(user);
+        return getUsersHighestTIGLRank(user, false);
+    }
+
+    private static TIGLRank getUsersHighestTIGLRank(User user, boolean isFractured) {
+        List<TIGLRank> ranks = getUsersTIGLRanks(user, isFractured);
         if (ranks.isEmpty()) {
             return TIGLRank.UNRANKED;
         }
@@ -311,6 +349,10 @@ public final class TIGLHelper {
         // do stuff
     }
 
+    /**
+     * @deprecated Obsolete legacy TIGL rank-up flow. No active code paths call this method.
+     */
+    @Deprecated(forRemoval = true, since = "2026-04")
     public static void checkIfTIGLRankUpOnGameEnd(Game game) {
         TIGLRank gameRank = game.getMinimumTIGLRankAtGameStart();
         Player winner = game.getWinner().orElse(null);
@@ -320,6 +362,9 @@ public final class TIGLHelper {
         User user = winner.getUser();
         TIGLRank userCurrentRank = getUsersHighestTIGLRank(user);
         TIGLRank nextRank = gameRank.getNextRank();
+        if (nextRank == null) {
+            return;
+        }
         if (nextRank.getIndex() - userCurrentRank.getIndex() == 1) {
             promoteUser(user, nextRank);
         }
@@ -365,7 +410,7 @@ public final class TIGLHelper {
         return game.getTags().contains(Constants.TIGL_FRACTURED_TAG);
     }
 
-    public static void addFracturedTag(Game game) {
+    private static void addFracturedTag(Game game) {
         if (!isFracturedTIGLGame(game)) {
             game.addTag(Constants.TIGL_FRACTURED_TAG);
         }

@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
-import ti4.discord.interactions.context.ButtonContext;
+import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -559,7 +559,7 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " is looking at the top card of a deck.");
-        List<Button> buttons = getUydaiCommanderButtons(game, false, player);
+        List<Button> buttons = getUydaiCommanderButtons(game, true, player);
         String message =
                 player.getRepresentationUnfogged() + ", please choose which deck you wish to look at the top of.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);

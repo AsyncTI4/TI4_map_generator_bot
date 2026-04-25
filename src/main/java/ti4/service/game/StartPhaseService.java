@@ -669,9 +669,9 @@ public class StartPhaseService {
                             + ", a reminder this is the window to play The Oracle, the Naalu Hero. You may use the buttons to start the process.",
                     buttons);
         }
+        playerLeader = player.getLeader("poisonhero").orElse(null);
         if (player.hasLeader("poisonhero")
                 && player.getLeaderByID("poisonhero").isPresent()
-                && playerLeader != null
                 && !playerLeader.isLocked()) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("poisonHeroInitiation", "Play Poison Hero", LeaderEmojis.NaaluHero));
@@ -766,11 +766,6 @@ public class StartPhaseService {
         }
 
         for (String pn : player.getPromissoryNotes().keySet()) {
-            if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
-                String cyberMessage =
-                        player.getRepresentationUnfogged() + ", a reminder to use _Cybernetic Enhancements_.";
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), cyberMessage);
-            }
             if (!player.ownsPromissoryNote("malevolency") && "malevolency".equalsIgnoreCase(pn)) {
                 boolean mahactMalev = !player.getMahactCC().isEmpty();
                 if (mahactMalev) {

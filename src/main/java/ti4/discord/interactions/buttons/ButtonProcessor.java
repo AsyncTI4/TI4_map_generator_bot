@@ -11,9 +11,10 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.discord.interactions.context.ButtonContext;
+import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -35,7 +36,10 @@ import ti4.message.MessageHelper;
 import ti4.service.button.ReactionService;
 import ti4.service.game.GameNameService;
 import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.contest.CombatContestService;
 
 @UtilityClass
 public class ButtonProcessor {
@@ -44,17 +48,30 @@ public class ButtonProcessor {
             AnnotationHandler.findKnownHandlers(ButtonContext.class, ButtonHandler.class);
     private static final ButtonRuntimeWarningService runtimeWarningService = new ButtonRuntimeWarningService();
 
+    public static void checkButtonHandlersSetup() {
+        if (knownButtons.isEmpty()) {
+            throw new IllegalStateException("No button handlers were registered");
+        }
+    }
+
     public static void queue(ButtonInteractionEvent event) {
+        var buttonContext = new ButtonContext(event);
+        if (!buttonContext.isValid()) return;
+
         BotLogger.logButton(event);
         User user = event.getUser();
-        var userSettings = UserSettingsManager.get(user.getId());
+        UserSettings userSettings = UserSettingsManager.get(user.getId());
         int currentHourUTC = ZonedDateTime.now(ZoneId.of("UTC")).getHour();
         userSettings.addActiveHour(currentHourUTC);
         UserSettingsManager.save(userSettings);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        ExecutorServiceManager.runAsync(
-                eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event));
+        ExecutorServiceManager.runAsyncWithLock(
+                eventToString(event, gameName),
+                gameName,
+                event.getMessageChannel(),
+                () -> process(buttonContext, event),
+                buttonContext.isShouldSave() ? ExecutionLockType.WRITE : ExecutionLockType.READ);
     }
 
     private static String eventToString(ButtonInteractionEvent event, String gameName) {
@@ -64,27 +81,26 @@ public class ButtonProcessor {
                 + ButtonHelper.getButtonRepresentation(event.getButton());
     }
 
-    private static void process(ButtonInteractionEvent event) {
-        long startTime = System.currentTimeMillis();
-        long contextRuntime = 0;
+    private static void process(ButtonContext context, ButtonInteractionEvent event) {
+        long processStartTime = System.currentTimeMillis();
         long resolveRuntime = 0;
         long saveRuntime = 0;
-        ButtonContext context = null;
         try {
             RollbarManager.putInteractionMetadata("button", event);
             RollbarManager.put("button_id", event.getButton().getCustomId());
             RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
-            long beforeTime = System.currentTimeMillis();
-            context = new ButtonContext(event);
-            contextRuntime = System.currentTimeMillis() - beforeTime;
 
             if (context.isValid()) {
-                beforeTime = System.currentTimeMillis();
+                long beforeTime = System.currentTimeMillis();
                 resolveButtonInteractionEvent(context);
                 resolveRuntime = System.currentTimeMillis() - beforeTime;
 
                 beforeTime = System.currentTimeMillis();
                 context.save();
+                if (context.getGame() != null) {
+                    SpringContext.getBean(CombatContestService.class)
+                            .onButtonInteractionSettled(context.getGame(), context.getPlayer(), event);
+                }
                 saveRuntime = System.currentTimeMillis() - beforeTime;
             }
         } catch (Exception e) {
@@ -94,8 +110,16 @@ public class ButtonProcessor {
             RollbarManager.clear();
         }
 
+        long contextCreationRuntime = context.getCreationEndTime() - context.getCreationStartTime();
+        long timeInQueue = processStartTime - context.getCreationEndTime();
         runtimeWarningService.submitNewRuntime(
-                event, startTime, System.currentTimeMillis(), contextRuntime, resolveRuntime, saveRuntime);
+                event,
+                processStartTime,
+                System.currentTimeMillis(),
+                contextCreationRuntime,
+                timeInQueue,
+                resolveRuntime,
+                saveRuntime);
     }
 
     private static boolean handleKnownButtons(ButtonContext context) {
@@ -133,7 +157,6 @@ public class ButtonProcessor {
         Game game = context.getGame();
         MessageChannel privateChannel = context.getPrivateChannel();
         MessageChannel mainGameChannel = context.getMainGameChannel();
-        MessageChannel actionsChannel = context.getActionsChannel();
 
         // Check the list of ButtonHandlers first
         if (handleKnownButtons(context)) return;
@@ -350,24 +373,23 @@ public class ButtonProcessor {
 
     private static void gain1TG(
             ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
-        String message = "";
-        String labelP = event.getButton().getLabel();
-        boolean failed = false;
-        if (labelP.contains("inf") && labelP.contains("mech")) {
-            message += "Please resolve removing infantry manually, if applicable.";
-            failed = message.contains("Please try again.");
+
+        String label = event.getButton().getLabel();
+
+        if (label.contains("inf") && label.contains("mech")) {
+            String message = "Please resolve removing infantry manually, if applicable.";
+            ReactionService.addReaction(event, game, player, message);
+            return;
         }
-        if (!failed) {
-            message += "Gained 1 trade good " + player.gainTG(1, true) + ".";
-            ButtonHelperAgents.resolveArtunoCheck(player, 1);
-        }
+
+        String message = "Gained 1 trade good " + player.gainTG(1, true) + ".";
+        ButtonHelperAgents.resolveArtunoCheck(player, 1);
         ReactionService.addReaction(event, game, player, message);
-        if (!failed) {
-            ButtonHelper.deleteMessage(event);
-            if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
-                String pF = player.getFactionEmoji();
-                MessageHelper.sendMessageToChannel(mainGameChannel, pF + " " + message);
-            }
+
+        ButtonHelper.deleteMessage(event);
+
+        if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
+            MessageHelper.sendMessageToChannel(mainGameChannel, player.getFactionEmoji() + " " + message);
         }
     }
 
@@ -391,12 +413,15 @@ public class ButtonProcessor {
 
     public static String getButtonProcessingStatistics() {
         var decimalFormatter = new DecimalFormat("#.##");
-        return "Button Processor Statistics: " + DateTimeHelper.getCurrentTimestamp() + "\n"
-                + "> Total button presses: "
-                + runtimeWarningService.getTotalRuntimeSubmissionCount() + ".\n" + "> Total threshold misses: "
-                + runtimeWarningService.getTotalRuntimeThresholdMissCount() + ".\n" + "> Average preprocessing time: "
-                + decimalFormatter.format(runtimeWarningService.getAveragePreprocessingTime()) + "ms.\n"
-                + "> Average processing time: "
-                + decimalFormatter.format(runtimeWarningService.getAverageProcessingTime()) + "ms.";
+        double thresholdMissPercent = runtimeWarningService.getThresholdMissPercent();
+        return "Button Processor Statistics: " + DateTimeHelper.getCurrentTimestamp()
+                + "\n> Total button presses: "
+                + runtimeWarningService.getRuntimeSubmissionCount()
+                + "\n> Threshold misses: "
+                + decimalFormatter.format(thresholdMissPercent) + "%"
+                + "\n> Average preprocessing time: "
+                + decimalFormatter.format(runtimeWarningService.getAveragePreprocessingTime()) + "ms"
+                + "\n> Average processing time: "
+                + decimalFormatter.format(runtimeWarningService.getAverageProcessingTime()) + "ms";
     }
 }

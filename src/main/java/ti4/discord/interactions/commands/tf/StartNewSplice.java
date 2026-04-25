@@ -48,6 +48,6 @@ class StartNewSplice extends GameStateSubcommand {
             }
         }
 
-        ButtonHelperTwilightsFall.initiateASplice(game, player, spliceType, participants);
+        ButtonHelperTwilightsFall.initiateASplice(event, game, player, spliceType, participants);
     }
 }

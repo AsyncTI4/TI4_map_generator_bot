@@ -74,6 +74,9 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("hacanagent")) {
             buttons.add(Buttons.gray("exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
         }
+        if (player.hasAbility("intrigue")) {
+            buttons.add(Buttons.blue("startIntrigueCard", "Pay For Intrigue Card", FactionEmojis.xin));
+        }
         if (player.hasRelicReady("superweaponavailyn")) {
             String finChecker = "FFCC_" + player.getFaction() + "_";
             buttons.add(Buttons.gray(

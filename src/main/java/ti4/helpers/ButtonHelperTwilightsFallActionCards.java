@@ -910,7 +910,6 @@ public final class ButtonHelperTwilightsFallActionCards {
     // timestop
 
     // linkship is ralnel FS ability
-    // 3 mech abilities of TF factions
 
     // Ral nel flagship
 

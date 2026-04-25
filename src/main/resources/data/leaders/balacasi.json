@@ -233,7 +233,7 @@
         "title": "The Invincible",
         "abilityName": "Titles Are Silly",
         "abilityWindow": "ACTION:",
-        "abilityText": "For each system that contains 1 or more of your ships, you may move 1 ship in that system into an adjacent system that doesn’t contain another player's ships.",
+        "abilityText": "Move up to 1 ship from each system that contains 1 or more of your ships into an adjacent system. Then, resolve space combat in each system that contains both yours and another player's ships and purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "balacasi"
     },

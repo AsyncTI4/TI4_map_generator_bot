@@ -48,4 +48,15 @@ class UnitHolderTest {
 
         assertThat(sum(actuallyRemoved)).isEqualTo(2);
     }
+
+    @Test
+    void testUnitCountIncludesGalvanizedStates() {
+        Units.UnitKey unitKey = new Units.UnitKey(Units.UnitType.Dreadnought, "red");
+
+        UnitHolder unitHolder = new Space("whatever", new Point(0, 0));
+        unitHolder.addUnitsWithStates(unitKey, List.of(1, 2, 3, 4));
+
+        assertThat(unitHolder.getUnitCount(unitKey)).isEqualTo(10);
+        assertThat(unitHolder.getUnitCount()).isEqualTo(10);
+    }
 }
