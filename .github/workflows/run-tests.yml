@@ -61,16 +61,22 @@ jobs:
           java-version: "21"
           distribution: "corretto"
           architecture: x64
-          cache: maven
-      - name: Cache Spotless index
+      - name: Cache Maven local repository
         uses: actions/cache@v4
         with:
-          path: target/spotless/
-          key: spotless-${{ runner.os }}-${{ hashFiles('src/**/*.java', 'pom.xml') }}
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            spotless-${{ runner.os }}-
-      - name: Ensure Spotless cache directory exists
-        run: mkdir -p target/spotless/
+            ${{ runner.os }}-maven-
+      - name: Cache Maven target directory
+        uses: actions/cache@v4
+        with:
+          path: target/
+          key: ${{ runner.os }}-maven-target-${{ hashFiles('src/**', 'pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-target-
+      - name: Ensure Maven target directory exists
+        run: mkdir -p target/
       - name: Run the Maven verify phase
         run: mvn --batch-mode --no-transfer-progress verify
       - name: Publish Test Report for PRs
