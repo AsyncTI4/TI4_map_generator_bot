@@ -3,7 +3,14 @@ name: Warm Maven Cache
 on:
   push:
     branches: ["master"]
+    paths:
+      - "pom.xml"
+      - "src/**"
   workflow_dispatch:
+
+concurrency:
+  group: warm-cache
+  cancel-in-progress: true
 
 jobs:
   warm-cache:
