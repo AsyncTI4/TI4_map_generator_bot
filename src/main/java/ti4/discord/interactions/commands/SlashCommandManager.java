@@ -62,6 +62,7 @@ import ti4.discord.interactions.commands.uncategorized.ShowGameCommand;
 import ti4.discord.interactions.commands.units.AddUnitDamage;
 import ti4.discord.interactions.commands.units.AddUnits;
 import ti4.discord.interactions.commands.units.CaptureCommand;
+import ti4.discord.interactions.commands.units.LandUnits;
 import ti4.discord.interactions.commands.units.ModifyUnitsButtons;
 import ti4.discord.interactions.commands.units.MoveUnits;
 import ti4.discord.interactions.commands.units.RemoveAllUnitDamage;
@@ -75,6 +76,7 @@ public class SlashCommandManager {
 
     private static final Map<String, ParentCommand> commands = Stream.of(
                     new AddUnits(),
+                    new LandUnits(),
                     new RemoveUnits(),
                     new RemoveAllUnits(),
                     new AllInfoCommand(),

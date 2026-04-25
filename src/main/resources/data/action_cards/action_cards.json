@@ -948,7 +948,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Choose 1 system that contains 1 or more of your units that have BOMBARDMENT. Exhaust each planet controlled by other players in that system.",
-        "notes": "This may be played to target a system that does not contain readied or any planets controlled by another player, including to target an empty system.",
+        "notes": "This may target a system that does not contain any planets controlled by another player, including empty systems or a system containing only your planets. It will have no effect in such a case besides to stall.",
         "automationID": "tactical",
         "flavorText": "A6's red eyes flickered with activity, and a string of numbers flashed briefly across the screen before he spoke. \"Bombardment complete. All enemy installations have been neutralized.\"",
         "source": "base"

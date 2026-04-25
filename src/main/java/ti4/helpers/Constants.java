@@ -338,6 +338,8 @@ public final class Constants {
     public static final String REMOVE_CUSTOM_ADJACENT_TILES = "remove_custom_adjacent_tiles";
     public static final String REMOVE_ALL_CUSTOM_ADJACENT_TILES = "remove_all_custom_adjacent_tiles";
     public static final String ADD_TILE = "add_tile";
+    public static final String ROTATE_HYPERLANE = "rotate_hyperlane";
+    public static final String ROTATION = "rotation";
     public static final String ADD_TILE_RANDOM = "add_tile_random";
     public static final String RANDOM_TYPE = "random_type";
     public static final String INCLUDE_ERONOUS_TILES = "eronous_tiles";
@@ -365,6 +367,7 @@ public final class Constants {
     public static final String ADD_TILE_LIST = "add_tile_list";
     public static final String ADD_FRONTIER_TOKENS = "add_frontier_tokens";
     public static final String ADD_UNITS = "add_units";
+    public static final String LAND_UNITS = "land_units";
     public static final String ADD_UNIT_DAMAGE = "add_sustain_damage";
     public static final String MOVE_UNITS = "move_units";
     public static final String NO_MAPGEN = "no_mapgen";
