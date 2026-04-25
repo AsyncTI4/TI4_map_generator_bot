@@ -31,14 +31,12 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-      - name: Cache Maven target directory
+      - name: Cache Spotless index
         uses: actions/cache@v4
         with:
-          path: target/
-          key: ${{ runner.os }}-maven-target-${{ hashFiles('src/**', 'pom.xml') }}
+          path: target/.spotless/
+          key: ${{ runner.os }}-spotless-${{ hashFiles('src/**', 'pom.xml') }}
           restore-keys: |
-            ${{ runner.os }}-maven-target-
-      - name: Ensure Maven target directory exists
-        run: mkdir -p target/
+            ${{ runner.os }}-spotless-
       - name: Warm cache (compile, Spotless check, skip tests)
         run: mvn --batch-mode --no-transfer-progress verify -DskipTests
