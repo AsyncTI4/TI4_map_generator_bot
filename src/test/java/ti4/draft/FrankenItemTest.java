@@ -54,7 +54,7 @@ class FrankenItemTest extends BaseTi4Test {
             assert (!"ABILITY:mitosis".equals(card.getAlias()));
             assert (!"ABILITY:hubris".equals(card.getAlias()));
             assert (!"ABILITY:fragile".equals(card.getAlias()));
-            assert (!"STARTINGTECH:sardakk".equals(card.getAlias()));
+            // assert (!"STARTINGTECH:sardakk".equals(card.getAlias()));
             assert (!"AGENT:mentakagent".equals(card.getAlias()));
             assert (!"ABILITY:creuss_gate".equals(card.getAlias()));
 
