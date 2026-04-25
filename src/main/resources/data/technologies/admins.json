@@ -1,7 +1,7 @@
 [
     {
         "alias": "adminsy",
-        "name": "Molecular Transference",
+        "name": "Molecular Transference (PR Test)",
         "types": ["CYBERNETIC"],
         "requirements": "Y",
         "faction": "admins",
