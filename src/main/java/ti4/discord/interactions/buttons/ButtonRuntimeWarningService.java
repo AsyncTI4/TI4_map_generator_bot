@@ -122,4 +122,8 @@ class ButtonRuntimeWarningService {
     synchronized double getAverageProcessingTime() {
         return runtimeSubmissionCount == 0 ? 0 : totalProcessingTime / (double) runtimeSubmissionCount;
     }
+
+    synchronized double getThresholdMissPercent() {
+        return runtimeSubmissionCount == 0 ? 0 : runtimeThresholdMissCount / (double) runtimeSubmissionCount;
+    }
 }

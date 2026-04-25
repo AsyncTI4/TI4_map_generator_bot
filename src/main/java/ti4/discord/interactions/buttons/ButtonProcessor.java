@@ -415,10 +415,7 @@ public class ButtonProcessor {
 
     public static String getButtonProcessingStatistics() {
         var decimalFormatter = new DecimalFormat("#.##");
-        double thresholdMissPercent = runtimeWarningService.getRuntimeSubmissionCount() == 0
-                ? 0
-                : (double) runtimeWarningService.getRuntimeThresholdMissCount()
-                        / runtimeWarningService.getRuntimeSubmissionCount();
+        double thresholdMissPercent = runtimeWarningService.getThresholdMissPercent();
         return "Button Processor Statistics: " + DateTimeHelper.getCurrentTimestamp()
                 + "\n> Total button presses: "
                 + runtimeWarningService.getRuntimeSubmissionCount()
