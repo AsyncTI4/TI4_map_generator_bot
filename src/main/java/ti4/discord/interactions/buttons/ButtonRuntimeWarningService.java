@@ -1,6 +1,6 @@
 package ti4.discord.interactions.buttons;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
@@ -14,22 +14,22 @@ class ButtonRuntimeWarningService {
     private static final int RUNTIME_WARNING_COUNT_THRESHOLD = 20;
 
     private int runtimeWarningCount;
-    private LocalDateTime pauseWarningsUntil = LocalDateTime.now();
-    private LocalDateTime lastWarningTime = LocalDateTime.now();
+    private Instant pauseWarningsUntil = Instant.now();
+    private Instant lastWarningTime = Instant.now();
 
     @Getter
-    private int totalRuntimeSubmissionCount;
+    private long runtimeSubmissionCount;
 
     @Getter
-    private int totalRuntimeThresholdMissCount;
+    private long runtimeThresholdMissCount;
 
     @Getter
-    private double averageProcessingTime;
+    private long totalProcessingTime;
 
     @Getter
-    private double averagePreprocessingTime;
+    private long totalPreprocessingTime;
 
-    void submitNewRuntime(
+    synchronized void submitNewRuntime(
             ButtonInteractionEvent event,
             long processingStartTimeMs,
             long processingEndTimeMs,
@@ -38,35 +38,31 @@ class ButtonRuntimeWarningService {
             long resolveRuntimeMs,
             long saveRuntimeMs) {
 
-        totalRuntimeSubmissionCount++;
+        runtimeSubmissionCount++;
 
         long processingTimeMs = processingEndTimeMs - processingStartTimeMs;
-        averageProcessingTime = ((averageProcessingTime * (totalRuntimeSubmissionCount - 1)) + processingTimeMs)
-                / totalRuntimeSubmissionCount;
+        totalProcessingTime += processingTimeMs;
 
         long eventTimeMs = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
         long preprocessingTimeMs = processingStartTimeMs - eventTimeMs;
-
-        averagePreprocessingTime =
-                ((averagePreprocessingTime * (totalRuntimeSubmissionCount - 1)) + preprocessingTimeMs)
-                        / totalRuntimeSubmissionCount;
+        totalPreprocessingTime += preprocessingTimeMs;
 
         SREStats.recordButtonPreprocessingMillis(preprocessingTimeMs);
         SREStats.recordButtonProcessingMillis(processingTimeMs);
 
-        var now = LocalDateTime.now();
-        if (now.minusMinutes(1).isAfter(lastWarningTime)) {
+        var now = Instant.now();
+        if (lastWarningTime.isBefore(now.minusSeconds(60))) {
             runtimeWarningCount = 0;
         }
 
-        boolean slowPreprocess = preprocessingTimeMs > WARNING_THRESHOLD_MILLISECONDS;
-        boolean slowExecution = processingTimeMs > WARNING_THRESHOLD_MILLISECONDS;
+        boolean slowPreprocess = preprocessingTimeMs >= WARNING_THRESHOLD_MILLISECONDS;
+        boolean slowExecution = processingTimeMs >= WARNING_THRESHOLD_MILLISECONDS;
 
         if (!slowPreprocess && !slowExecution) {
             return;
         }
 
-        totalRuntimeThresholdMissCount++;
+        runtimeThresholdMissCount++;
 
         if (pauseWarningsUntil.isAfter(now)) {
             return;
@@ -81,7 +77,7 @@ class ButtonRuntimeWarningService {
         String queueTime = formatMillisecondsWithWarning(timeInQueueMs);
         String resolveTime = formatMillisecondsWithWarning(resolveRuntimeMs);
         String saveTime = formatMillisecondsWithWarning(saveRuntimeMs);
-        String responseTime = formatMillisecondsWithWarning(processingEndTimeMs - eventTimeMs);
+        String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(processingEndTimeMs - eventTimeMs);
 
         String message = event.getUser().getEffectiveName()
                 + " pressed button: "
@@ -100,10 +96,10 @@ class ButtonRuntimeWarningService {
 
         BotLogger.warning(message);
 
-        ++runtimeWarningCount;
+        runtimeWarningCount++;
 
         if (runtimeWarningCount > RUNTIME_WARNING_COUNT_THRESHOLD) {
-            pauseWarningsUntil = now.plusMinutes(5);
+            pauseWarningsUntil = now.plusSeconds(300);
             BotLogger.error("**Buttons are processing slowly. Pausing warnings for 5 minutes.**");
             runtimeWarningCount = 0;
         }
@@ -113,9 +109,17 @@ class ButtonRuntimeWarningService {
 
     private static String formatMillisecondsWithWarning(long runtimeMs) {
         String formattedRuntime = DateTimeHelper.getTimeRepresentationToMilliseconds(runtimeMs);
-        if (runtimeMs > 500) {
+        if (runtimeMs >= WARNING_THRESHOLD_MILLISECONDS) {
             return formattedRuntime + " ❗";
         }
         return formattedRuntime;
+    }
+
+    synchronized double getAveragePreprocessingTime() {
+        return runtimeSubmissionCount == 0 ? 0 : totalPreprocessingTime / (double) runtimeSubmissionCount;
+    }
+
+    synchronized double getAverageProcessingTime() {
+        return runtimeSubmissionCount == 0 ? 0 : totalProcessingTime / (double) runtimeSubmissionCount;
     }
 }
