@@ -55,6 +55,9 @@ public class ButtonProcessor {
     }
 
     public static void queue(ButtonInteractionEvent event) {
+        var buttonContext = new ButtonContext(event);
+        if (!buttonContext.isValid()) return;
+
         BotLogger.logButton(event);
         User user = event.getUser();
         UserSettings userSettings = UserSettingsManager.get(user.getId());
@@ -63,11 +66,6 @@ public class ButtonProcessor {
         UserSettingsManager.save(userSettings);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        var buttonContext = new ButtonContext(event);
-        if (!buttonContext.isValid()) {
-            BotLogger.warning(new LogOrigin(event), "Invalid button context.");
-            return;
-        }
         ExecutorServiceManager.runAsyncWithLock(
                 eventToString(event, gameName),
                 gameName,
@@ -415,13 +413,10 @@ public class ButtonProcessor {
 
     public static String getButtonProcessingStatistics() {
         var decimalFormatter = new DecimalFormat("#.##");
-        double thresholdMissPercent = runtimeWarningService.getTotalRuntimeSubmissionCount() == 0
-                ? 0
-                : (double) runtimeWarningService.getTotalRuntimeThresholdMissCount()
-                        / runtimeWarningService.getTotalRuntimeSubmissionCount();
+        double thresholdMissPercent = runtimeWarningService.getThresholdMissPercent();
         return "Button Processor Statistics: " + DateTimeHelper.getCurrentTimestamp()
                 + "\n> Total button presses: "
-                + runtimeWarningService.getTotalRuntimeSubmissionCount()
+                + runtimeWarningService.getRuntimeSubmissionCount()
                 + "\n> Threshold misses: "
                 + decimalFormatter.format(thresholdMissPercent) + "%"
                 + "\n> Average preprocessing time: "
