@@ -48,7 +48,7 @@ class SlashCommandListener extends ListenerAdapter implements CommandListenerInt
                 eventToString(event),
                 gameName,
                 event.getMessageChannel(),
-                () -> process(queueStartTime, command, event),
+                () -> process(command, event, queueStartTime),
                 lockType);
     }
 
@@ -61,7 +61,7 @@ class SlashCommandListener extends ListenerAdapter implements CommandListenerInt
     }
 
     private void process(
-            long queueStarTime, Command<SlashCommandInteractionEvent> command, SlashCommandInteractionEvent event) {
+            Command<SlashCommandInteractionEvent> command, SlashCommandInteractionEvent event, long queueStarTime) {
         long processStartTime = System.currentTimeMillis();
         RollbarManager.putInteractionMetadata("slash_command", event);
         RollbarManager.put("command_name", event.getCommandString());
