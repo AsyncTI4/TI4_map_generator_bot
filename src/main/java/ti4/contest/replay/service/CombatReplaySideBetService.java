@@ -76,6 +76,7 @@ public class CombatReplaySideBetService {
         List<Button> buttons = new ArrayList<>();
         String factionLabel = buttonFactionIdLabel(game, faction);
         for (CombatSideBetType type : CombatSideBetType.values()) {
+            if (type == CombatSideBetType.AFB_SKIPPED) continue;
             if (!type.isAvailable(safeInt(destroyerCount))) continue;
             buttons.add(Buttons.gray(
                     buttonId(contest.getId(), type, faction), buttonLabel(type, factionLabel), type.emoji()));
