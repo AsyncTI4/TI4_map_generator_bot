@@ -70,7 +70,7 @@ jobs:
         with:
           report_paths: "**/target/surefire-reports/TEST-*.xml"
           fail_on_failure: true
-      - name: Upload Surefire Reports
+      - name: Upload Surefire Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
