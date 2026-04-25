@@ -31,6 +31,10 @@ public final class SelectionMenuProcessor {
     public static void queue(StringSelectInteractionEvent event) {
         String gameName = GameNameService.getGameNameFromChannel(event);
         SelectionMenuContext context = new SelectionMenuContext(event);
+        if (!context.isValid()) {
+            BotLogger.warning(new LogOrigin(event), "Invalid selection menu context.");
+            return;
+        }
         ExecutorServiceManager.runAsyncWithLock(
                 "SelectionMenuProcessor task for `" + gameName + "`",
                 gameName,

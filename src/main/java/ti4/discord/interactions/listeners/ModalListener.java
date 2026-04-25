@@ -57,6 +57,10 @@ public final class ModalListener extends ListenerAdapter {
 
         String gameName = GameNameService.getGameNameFromChannel(event);
         var modalContext = new ModalContext(event);
+        if (!modalContext.isValid()) {
+            BotLogger.warning(new LogOrigin(event), "Invalid modal context.");
+            return;
+        }
         ExecutorServiceManager.runAsyncWithLock(
                 "ModalListener task for  `" + gameName + "`",
                 gameName,

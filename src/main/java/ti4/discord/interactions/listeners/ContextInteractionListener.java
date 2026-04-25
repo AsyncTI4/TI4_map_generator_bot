@@ -13,7 +13,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.RollbarManager;
 import ti4.service.game.GameNameService;
 
-class ContextInteractionListener extends ListenerAdapter implements ListenerInterface {
+class ContextInteractionListener extends ListenerAdapter implements CommandListenerInterface {
 
     @Override
     public void onMessageContextInteraction(MessageContextInteractionEvent event) {
@@ -32,7 +32,8 @@ class ContextInteractionListener extends ListenerAdapter implements ListenerInte
     }
 
     private void queue(GenericContextInteractionEvent<?> event) {
-        ExecutorServiceManager.runAsync(eventToString(event), () -> process(event));
+        long queueStartTime = System.currentTimeMillis();
+        ExecutorServiceManager.runAsync(eventToString(event), () -> process(event, queueStartTime));
     }
 
     public String eventToString(GenericCommandInteractionEvent event) {
@@ -41,8 +42,8 @@ class ContextInteractionListener extends ListenerAdapter implements ListenerInte
                 + event.getCommandString() + "`";
     }
 
-    private void process(GenericContextInteractionEvent<?> event) {
-        long startTime = System.currentTimeMillis();
+    private void process(GenericContextInteractionEvent<?> event, long queueStartTime) {
+        long processStartTime = System.currentTimeMillis();
         RollbarManager.putInteractionMetadata("context_menu", event);
         RollbarManager.put("command_name", event.getCommandString());
         RollbarManager.put("game_name", GameNameService.getGameName(event));
@@ -60,6 +61,6 @@ class ContextInteractionListener extends ListenerAdapter implements ListenerInte
             RollbarManager.clear();
         }
 
-        warnForLongRunningCommands(event, startTime);
+        warnForLongRunningCommands(event, queueStartTime, processStartTime);
     }
 }

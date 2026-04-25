@@ -64,6 +64,10 @@ public class ButtonProcessor {
 
         String gameName = GameNameService.getGameNameFromChannel(event);
         var buttonContext = new ButtonContext(event);
+        if (!buttonContext.isValid()) {
+            BotLogger.warning(new LogOrigin(event), "Invalid button context.");
+            return;
+        }
         ExecutorServiceManager.runAsyncWithLock(
                 eventToString(event, gameName),
                 gameName,
@@ -80,19 +84,16 @@ public class ButtonProcessor {
     }
 
     private static void process(ButtonContext context, ButtonInteractionEvent event) {
-        long startTime = System.currentTimeMillis();
-        long contextRuntime = 0;
+        long processStartTime = System.currentTimeMillis();
         long resolveRuntime = 0;
         long saveRuntime = 0;
         try {
             RollbarManager.putInteractionMetadata("button", event);
             RollbarManager.put("button_id", event.getButton().getCustomId());
             RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
-            long beforeTime = System.currentTimeMillis();
-            contextRuntime = System.currentTimeMillis() - beforeTime;
 
             if (context.isValid()) {
-                beforeTime = System.currentTimeMillis();
+                long beforeTime = System.currentTimeMillis();
                 resolveButtonInteractionEvent(context);
                 resolveRuntime = System.currentTimeMillis() - beforeTime;
 
@@ -111,8 +112,16 @@ public class ButtonProcessor {
             RollbarManager.clear();
         }
 
+        long contextCreationRuntime = context.getCreationEndTime() - context.getCreationStartTime();
+        long timeInQueue = processStartTime - context.getCreationEndTime();
         runtimeWarningService.submitNewRuntime(
-                event, startTime, System.currentTimeMillis(), contextRuntime, resolveRuntime, saveRuntime);
+                event,
+                processStartTime,
+                System.currentTimeMillis(),
+                contextCreationRuntime,
+                timeInQueue,
+                resolveRuntime,
+                saveRuntime);
     }
 
     private static boolean handleKnownButtons(ButtonContext context) {
@@ -150,7 +159,6 @@ public class ButtonProcessor {
         Game game = context.getGame();
         MessageChannel privateChannel = context.getPrivateChannel();
         MessageChannel mainGameChannel = context.getMainGameChannel();
-        MessageChannel actionsChannel = context.getActionsChannel();
 
         // Check the list of ButtonHandlers first
         if (handleKnownButtons(context)) return;
@@ -367,24 +375,23 @@ public class ButtonProcessor {
 
     private static void gain1TG(
             ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
-        String message = "";
-        String labelP = event.getButton().getLabel();
-        boolean failed = false;
-        if (labelP.contains("inf") && labelP.contains("mech")) {
-            message += "Please resolve removing infantry manually, if applicable.";
-            failed = message.contains("Please try again.");
+
+        String label = event.getButton().getLabel();
+
+        if (label.contains("inf") && label.contains("mech")) {
+            String message = "Please resolve removing infantry manually, if applicable.";
+            ReactionService.addReaction(event, game, player, message);
+            return;
         }
-        if (!failed) {
-            message += "Gained 1 trade good " + player.gainTG(1, true) + ".";
-            ButtonHelperAgents.resolveArtunoCheck(player, 1);
-        }
+
+        String message = "Gained 1 trade good " + player.gainTG(1, true) + ".";
+        ButtonHelperAgents.resolveArtunoCheck(player, 1);
         ReactionService.addReaction(event, game, player, message);
-        if (!failed) {
-            ButtonHelper.deleteMessage(event);
-            if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
-                String pF = player.getFactionEmoji();
-                MessageHelper.sendMessageToChannel(mainGameChannel, pF + " " + message);
-            }
+
+        ButtonHelper.deleteMessage(event);
+
+        if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
+            MessageHelper.sendMessageToChannel(mainGameChannel, player.getFactionEmoji() + " " + message);
         }
     }
 
@@ -408,12 +415,18 @@ public class ButtonProcessor {
 
     public static String getButtonProcessingStatistics() {
         var decimalFormatter = new DecimalFormat("#.##");
-        return "Button Processor Statistics: " + DateTimeHelper.getCurrentTimestamp() + "\n"
-                + "> Total button presses: "
-                + runtimeWarningService.getTotalRuntimeSubmissionCount() + ".\n" + "> Total threshold misses: "
-                + runtimeWarningService.getTotalRuntimeThresholdMissCount() + ".\n" + "> Average preprocessing time: "
-                + decimalFormatter.format(runtimeWarningService.getAveragePreprocessingTime()) + "ms.\n"
-                + "> Average processing time: "
-                + decimalFormatter.format(runtimeWarningService.getAverageProcessingTime()) + "ms.";
+        double thresholdMissPercent = runtimeWarningService.getTotalRuntimeSubmissionCount() == 0
+                ? 0
+                : (double) runtimeWarningService.getTotalRuntimeThresholdMissCount()
+                        / runtimeWarningService.getTotalRuntimeSubmissionCount();
+        return "Button Processor Statistics: " + DateTimeHelper.getCurrentTimestamp()
+                + "\n> Total button presses: "
+                + runtimeWarningService.getTotalRuntimeSubmissionCount()
+                + "\n> Threshold misses: "
+                + decimalFormatter.format(thresholdMissPercent) + "%"
+                + "\n> Average preprocessing time: "
+                + decimalFormatter.format(runtimeWarningService.getAveragePreprocessingTime()) + "ms"
+                + "\n> Average processing time: "
+                + decimalFormatter.format(runtimeWarningService.getAverageProcessingTime()) + "ms";
     }
 }
