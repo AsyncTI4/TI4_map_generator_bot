@@ -70,6 +70,7 @@ jobs:
         with:
           report_paths: "**/target/surefire-reports/TEST-*.xml"
           fail_on_failure: true
+          annotate_only: true # forked repo cannot write to checks so just do annotations     
       - name: Upload Surefire Report
         if: always()
         uses: actions/upload-artifact@v4
