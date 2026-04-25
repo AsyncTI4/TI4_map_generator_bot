@@ -80,8 +80,6 @@ class ButtonListener extends ListenerAdapter {
         private static final int EVENT_COUNT_THRESHOLD = 10;
 
         private static final ConcurrentLinkedDeque<Long> slowEvents = new ConcurrentLinkedDeque<>();
-
-        // prevents repeated alerts
         private static final AtomicLong lastWarningTimeMs = new AtomicLong(0);
 
         static void check(GenericInteractionCreateEvent event) {
