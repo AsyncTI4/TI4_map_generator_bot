@@ -30,7 +30,7 @@ public class LandUnits extends GameStateCommand {
 
     @Override
     public String getName() {
-        return Constants.ADD_UNITS;
+        return Constants.LAND_UNITS;
     }
 
     @Override
