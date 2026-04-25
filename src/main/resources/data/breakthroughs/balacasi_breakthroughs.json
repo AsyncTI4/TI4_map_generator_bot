@@ -1,8 +1,8 @@
 [
     {
         "alias": "arvaxibt",
-        "name": "Arvaxi Mobilization Engine",
-        "shortName": "Arvaxi\nMobilization Engine",
+        "name": " Experimental Mechanisms",
+        "shortName": " Experimental\nMechanisms",
         "faction": "arvaxi",
         "synergy": [
             "CYBERNETIC",
@@ -13,8 +13,8 @@
     },
     {
         "alias": "xanbt",
-        "name": "Kinetic Probe Network ",
-        "shortName": "Kinetic\nProbe Network ",
+        "name": "Kinetic Probe Network",
+        "shortName": "Kinetic\nProbe Network",
         "faction": "xan",
         "synergy": [
             "PROPULSION",
