@@ -1,6 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.tech;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +34,7 @@ class TechUseButtonHandler {
         TechnologyModel techModel = Mapper.getTech(tech);
         if (!"st".equalsIgnoreCase(tech)) {
             String useMessage =
-                    player.getRepresentation() + " used the _" + techModel.getRepresentation(false) + "_ technology.";
+                    player.getRepresentation() + " used the " + techModel.getRepresentation(false) + " technology.";
             if (game.isShowFullComponentTextEmbeds()) {
                 MessageHelper.sendMessageToChannelWithEmbed(
                         event.getMessageChannel(), useMessage, techModel.getRepresentationEmbed());

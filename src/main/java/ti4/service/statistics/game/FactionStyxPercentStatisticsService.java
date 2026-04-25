@@ -52,7 +52,7 @@ class FactionStyxPercentStatisticsService {
                 });
 
         MessageHelper.sendMessageToThread(
-                (MessageChannelUnion) event.getMessageChannel(), "Faction Ixth Percent", sb.toString());
+                (MessageChannelUnion) event.getMessageChannel(), "Faction Styx Percent", sb.toString());
     }
 
     private static void getFactionStyxPercent(
