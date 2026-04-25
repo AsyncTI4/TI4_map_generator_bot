@@ -62,6 +62,13 @@ jobs:
           distribution: "corretto"
           architecture: x64
           cache: maven
+      - name: Cache Spotless index
+        uses: actions/cache@v4
+        with:
+          path: target/spotless/
+          key: spotless-${{ runner.os }}-${{ hashFiles('src/**/*.java', 'pom.xml') }}
+          restore-keys: |
+            spotless-${{ runner.os }}-
       - name: Run the Maven verify phase
         run: mvn --batch-mode --no-transfer-progress verify
       - name: Publish Test Report for PRs
