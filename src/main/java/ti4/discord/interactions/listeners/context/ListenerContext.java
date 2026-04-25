@@ -31,6 +31,8 @@ import ti4.settings.users.UserSettingsManager;
 @Getter
 public abstract class ListenerContext {
 
+    private final long creationStartTime;
+    private final long creationEndTime;
     protected boolean contextIsValid = true;
     protected final String origComponentID;
     protected String componentID;
@@ -56,6 +58,8 @@ public abstract class ListenerContext {
     }
 
     ListenerContext(GenericInteractionCreateEvent event, String compID) {
+        creationStartTime = System.currentTimeMillis();
+
         this.event = event;
         componentID = origComponentID = compID;
 
@@ -90,6 +94,7 @@ public abstract class ListenerContext {
                     event.getMessageChannel().sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
                 }
                 contextIsValid = false;
+                creationEndTime = System.currentTimeMillis();
                 return;
             }
 
@@ -128,6 +133,7 @@ public abstract class ListenerContext {
 
         if (!checkFinsFactionChecker()) {
             contextIsValid = false;
+            creationEndTime = System.currentTimeMillis();
             return;
         }
 
@@ -138,6 +144,7 @@ public abstract class ListenerContext {
                 break;
             }
         }
+        creationEndTime = System.currentTimeMillis();
     }
 
     private boolean checkFinsFactionChecker() {

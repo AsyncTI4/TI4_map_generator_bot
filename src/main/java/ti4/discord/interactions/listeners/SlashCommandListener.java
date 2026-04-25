@@ -20,7 +20,7 @@ import ti4.logging.RollbarManager;
 import ti4.service.SusSlashCommandService;
 import ti4.service.game.GameNameService;
 
-class SlashCommandListener extends ListenerAdapter implements ListenerInterface {
+class SlashCommandListener extends ListenerAdapter implements CommandListenerInterface {
 
     private static final List<String> SLASHCOMMANDS_WITH_MODALS = Arrays.asList(
             Constants.ADD_TILE_LIST,
@@ -43,8 +43,13 @@ class SlashCommandListener extends ListenerAdapter implements ListenerInterface 
         String gameName = GameNameService.getGameName(event);
         ParentCommand command = SlashCommandManager.getCommand(event.getName());
         ExecutionLockType lockType = getLockType(event, command);
+        long queueStartTime = System.currentTimeMillis();
         ExecutorServiceManager.runAsyncWithLock(
-                eventToString(event), gameName, event.getMessageChannel(), () -> process(command, event), lockType);
+                eventToString(event),
+                gameName,
+                event.getMessageChannel(),
+                () -> process(queueStartTime, command, event),
+                lockType);
     }
 
     public String eventToString(GenericCommandInteractionEvent event) {
@@ -55,8 +60,9 @@ class SlashCommandListener extends ListenerAdapter implements ListenerInterface 
                 + event.getCommandString() + "`";
     }
 
-    private void process(Command<SlashCommandInteractionEvent> command, SlashCommandInteractionEvent event) {
-        long startTime = System.currentTimeMillis();
+    private void process(
+            long queueStarTime, Command<SlashCommandInteractionEvent> command, SlashCommandInteractionEvent event) {
+        long processStartTime = System.currentTimeMillis();
         RollbarManager.putInteractionMetadata("slash_command", event);
         RollbarManager.put("command_name", event.getCommandString());
         RollbarManager.put("game_name", GameNameService.getGameName(event));
@@ -77,7 +83,7 @@ class SlashCommandListener extends ListenerAdapter implements ListenerInterface 
             RollbarManager.clear();
         }
 
-        warnForLongRunningCommands(event, startTime);
+        warnForLongRunningCommands(event, queueStarTime, processStartTime);
     }
 
     private static boolean isModalCommand(SlashCommandInteractionEvent event) {

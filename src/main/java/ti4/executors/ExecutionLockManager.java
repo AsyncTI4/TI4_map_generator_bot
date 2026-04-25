@@ -28,10 +28,15 @@ public class ExecutionLockManager {
 
     public static void lock(String lockName, ExecutionLockType lockType) {
         var lock = getLock(lockName);
+        long lockStartTime = System.currentTimeMillis();
         if (lockType == ExecutionLockType.READ) {
             lock.readLock().lock();
         } else {
             lock.writeLock().lock();
+        }
+        long timeToGetLock = System.currentTimeMillis() - lockStartTime;
+        if (timeToGetLock >= 1000) {
+            BotLogger.warning("Took " + timeToGetLock + " ms to get lock \"" + lockName + "\"");
         }
     }
 
