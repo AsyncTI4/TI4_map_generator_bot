@@ -69,6 +69,8 @@ jobs:
           key: spotless-${{ runner.os }}-${{ hashFiles('src/**/*.java', 'pom.xml') }}
           restore-keys: |
             spotless-${{ runner.os }}-
+      - name: Ensure Spotless cache directory exists
+        run: mkdir -p target/spotless/
       - name: Run the Maven verify phase
         run: mvn --batch-mode --no-transfer-progress verify
       - name: Publish Test Report for PRs
