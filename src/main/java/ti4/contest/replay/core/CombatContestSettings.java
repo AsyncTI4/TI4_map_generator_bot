@@ -144,6 +144,6 @@ public class CombatContestSettings {
     public static class SideBets {
         private boolean enableSideBets = true;
         private int maxBetsPerUser = 5;
-        private int costPoints = 2;
+        private int costPoints = 1;
     }
 }
