@@ -56,6 +56,8 @@ jobs:
       security-events: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Fetch master branch for spotless
         run: |
           git fetch --no-tags --depth=1 origin master
@@ -73,7 +75,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
       - name: Run the Maven verify phase
-        run: mvn --batch-mode --no-transfer-progress verify -Dspotless.ratchetFrom=origin/master -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss.SSS
+        run: mvn --batch-mode --no-transfer-progress verify -P ci-spotless -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss.SSS
       - name: Publish Test Report for PRs
         if: ${{ always()  &&  (github.event.pull_request.head.repo.full_name == github.repository) }}
         uses: mikepenz/action-junit-report@v6
