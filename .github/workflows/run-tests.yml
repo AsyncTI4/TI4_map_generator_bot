@@ -108,9 +108,9 @@ jobs:
                           in_section = True
                           continue
                       if in_section:
-                          # Spotless prints file names as: [ERROR]     path/to/File.java
-                          # (4 spaces after "[ERROR]"), diff lines are indented further (8+ spaces)
-                          m = re.match(r'^\[ERROR\]    ([^ ].*)', line)
+                          # Maven+SLF4J lines are: "HH:MM:SS.SSS [ERROR]     path/to/File.java"
+                          # File names have 5 spaces after "[ERROR]"; diff lines have 9+ spaces.
+                          m = re.search(r'\[ERROR\]     ([^ ].*)', line)
                           if m:
                               candidate = m.group(1).strip()
                               # skip diff markers and the "Run mvn spotless:apply" line
