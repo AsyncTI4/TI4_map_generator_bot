@@ -53,6 +53,7 @@ jobs:
     if: always() && needs.changes.outputs.java == 'true' && (needs.validate-json.result == 'success' || needs.validate-json.result == 'skipped')
     permissions:
       checks: write
+      security-events: write
     steps:
       - uses: actions/checkout@v4
       - name: Fetch master branch for spotless
@@ -91,3 +92,18 @@ jobs:
         with:
           name: surefire-reports
           path: target/surefire-reports/
+      - name: Upload SpotBugs Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotbugs-reports
+          path: |
+            target/spotbugsXml.xml
+            target/spotbugs.html
+            target/spotbugs.sarif
+      - name: Upload SpotBugs SARIF to GitHub Code Scanning
+        if: always() && github.event.pull_request.head.repo.full_name == github.repository
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: target/spotbugs.sarif
+          category: spotbugs
