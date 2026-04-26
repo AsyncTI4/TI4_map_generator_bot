@@ -82,7 +82,7 @@
         "id": "patience",
         "name": "Patience",
         "faction": "onyxxa",
-        "permanentEffect": "At the end of the strategy phase, place the Onyxxa Infinity token on your strategy card. You are last in initiative order. When you perform a strategic action, resolve your strategy card’s secondary ability instead of its primary ability.",
+        "permanentEffect": "At the end of the strategy phase, place the Onyxxa Infinity token on your strategy card; you are last in initiative order.",
         "source": "balacasi"
     },
     {
@@ -93,10 +93,10 @@
         "source": "balacasi"
     },
     {
-        "id": "increased_surveillance",
-        "name": "Increased Surveillance",
+        "id": "detachment",
+        "name": "Detachment",
         "faction": "onyxxa",
-        "permanentEffect": "When you resolve the primary ability of a strategy card, place a control token on your commander. At the start of the status phase, remove your control tokens from your commander.",
+        "permanentEffect": "During the strategy phase, you cannot choose or be given the “Politics” strategy card if there is another unchosen strategy card. When you perform a strategic action, resolve your strategy card’s secondary ability instead of its primary ability.",
         "source": "balacasi"
     },
     {
@@ -117,7 +117,7 @@
         "id": "phantom_energy",
         "name": "Phantom Energy",
         "faction": "tyris",
-        "permanentEffect": "After you explore a frontier token during a tactical action, you may place a control token on a unit space on your faction sheet that matches a ship in the active system. You may move ships that have a control token on your faction sheet out of systems containing your command tokens. At the end of your turn, remove control tokens from your faction sheet for any ships matching those you have in systems that contain your command tokens.",
+        "permanentEffect": "After you explore a frontier token during a tactical action, you may place a control token on a unit space on your faction sheet that matches a ship in the active system. You may move ships that have a control token on your faction sheet out of systems containing your command tokens, and transport units that started in that ship’s system. At the end of your turn, remove control tokens from your faction sheet for any ships matching those you have in systems that contain your command tokens.",
         "source": "balacasi"
     },
     {
@@ -138,7 +138,7 @@
         "id": "marked_prey",
         "name": "Marked Prey",
         "faction": "zephyrion",
-        "permanentEffect": "At the start of the strategy phase, place any number of your bounty tokens from your reinforcements on the unit space of non-fighter ships on other players’ factions sheets. You can have a maximum of 1 bounty token on each unit space.",
+        "permanentEffect": "You have 3 bounty tokens. At the start of the strategy phase, place any number of your bounty tokens from your reinforcements on the unit space of non-fighter ships on other players’ factions sheets. You can have a maximum of 1 bounty token on each unit space.",
         "source": "balacasi"
     },
     {

@@ -5,11 +5,12 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
-import ti4.map.Leader;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.service.leader.HeroUnlockCheckService;
@@ -18,6 +19,17 @@ import ti4.service.leader.HeroUnlockCheckService;
 public class FrankenLeaderService {
 
     public static void addLeaders(GenericInteractionCreateEvent event, Player player, List<String> leaderIDs) {
+        if (player.getGame().isVeiledHeartMode()) {
+            String msg = "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it";
+            MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
+
+            String key = "veiledCards" + player.getFaction();
+            String val = player.getGame().getStoredValue(key);
+            val += "_" + String.join("_", leaderIDs);
+            player.getGame().setStoredValue(key, val);
+            return;
+        }
+
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added leaders:\n");
         Boolean fakeCommanders = false;
         if (event instanceof SlashCommandInteractionEvent slash) {
@@ -32,9 +44,10 @@ public class FrankenLeaderService {
             }
             if (fakeCommanders != null && fakeCommanders) {
                 player.getGame().addFakeCommander(leaderID);
+                player.getLeader(leaderID).ifPresent(leader -> leader.setLocked(false));
             }
         }
-        MessageHelper.sendMessageToEventChannel(event, sb.toString());
+        MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }
 
     public static String getAddLeaderText(Player player, String leaderID) {
@@ -45,12 +58,13 @@ public class FrankenLeaderService {
             Leader leader = new Leader(leaderID);
             sb.append("> ").append(Helper.getLeaderFullRepresentation(leader));
         }
-        sb.append("\n");
+        sb.append('\n');
         return sb.toString();
     }
 
     public static void removeLeaders(GenericInteractionCreateEvent event, Player player, List<String> leaderIDs) {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed leaders:\n");
+        Game game = player.getGame();
         for (String leaderID : leaderIDs) {
             if (!player.hasLeader(leaderID)) {
                 sb.append("> ").append(leaderID).append(" (player did not have this leader)");
@@ -58,9 +72,12 @@ public class FrankenLeaderService {
                 Leader leader = new Leader(leaderID);
                 sb.append("> ").append(Helper.getLeaderFullRepresentation(leader));
             }
-            sb.append("\n");
+            sb.append('\n');
             player.removeLeader(leaderID);
+            game.setStoredValue(
+                    "savedParadigms",
+                    game.getStoredValue("savedParadigms").replace(leaderID, "").replace("__", "_"));
         }
-        MessageHelper.sendMessageToEventChannel(event, sb.toString());
+        MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }
 }

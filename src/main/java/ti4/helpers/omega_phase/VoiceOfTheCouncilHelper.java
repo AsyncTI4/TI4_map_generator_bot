@@ -1,14 +1,14 @@
 package ti4.helpers.omega_phase;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class VoiceOfTheCouncilHelper {
+public final class VoiceOfTheCouncilHelper {
     public static void ResetVoiceOfTheCouncil(Game game) {
         // Clean everything in case it got put somewhere weird
         game.getLaws().remove(Constants.VOICE_OF_THE_COUNCIL_ID);

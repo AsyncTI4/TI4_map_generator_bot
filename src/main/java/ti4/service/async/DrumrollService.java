@@ -4,15 +4,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import ti4.map.Game;
-import ti4.map.persistence.GameManager;
+import ti4.discord.JdaService;
+import ti4.game.Game;
+import ti4.game.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.MiscEmojis;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class DrumrollService {
@@ -26,13 +27,13 @@ public class DrumrollService {
 
     private static String drumrollString(String message, int iteration) {
         StringBuilder sb = new StringBuilder();
-        if (message != null) sb.append(message).append("\n");
-        sb.append("# Drumroll please.... ").append(MiscEmojis.RollDice).append("\n");
+        if (message != null) sb.append(message).append('\n');
+        sb.append("# Drumroll please.... ").append(MiscEmojis.RollDice).append('\n');
         sb.append("# 🥁").append(" 🥁".repeat(iteration));
         return sb.toString();
     }
 
-    private MessageHelper.MessageFunction drumrollFunction(
+    private Consumer<Message> drumrollFunction(
             List<Message> bonusMessages, int seconds, String message, String gameName, Predicate<Game> resolve) {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + seconds * 1000L;
@@ -78,7 +79,7 @@ public class DrumrollService {
         doDrumrollMultiChannel(main, msg, sec, gameName, resolve, chans, msgs);
     }
 
-    public void doDrumrollMultiChannel(
+    private void doDrumrollMultiChannel(
             MessageChannel main,
             String msg,
             int sec,
@@ -100,7 +101,7 @@ public class DrumrollService {
         }
 
         String initialDrumroll = drumrollString(msg, 0);
-        MessageHelper.MessageFunction function = drumrollFunction(bonusMessages, sec, msg, gameName, resolve);
+        Consumer<Message> function = drumrollFunction(bonusMessages, sec, msg, gameName, resolve);
         MessageHelper.splitAndSentWithAction(initialDrumroll, main, function);
     }
 }

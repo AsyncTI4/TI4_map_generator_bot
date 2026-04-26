@@ -1,0 +1,40 @@
+{
+    "id": "nf3",
+    "name": "Nerot/Zardell/Garer/Aldim - Explanetary",
+    "aliases": [
+        "ba3",
+        "hexaraii",
+        "vyseraiii",
+        "tala9",
+        "explanetary"
+    ],
+    "imagePath": "NF3_Explanetary.png",
+    "shipPositionsType": "TYPE03",
+    "spaceTokenLocations": [
+        {
+            "x": 250.0,
+            "y": 90.0
+        },
+        {
+            "x": 80.0,
+            "y": 10.0
+        },
+        {
+            "x": 135.0,
+            "y": 105.0
+        },
+        {
+            "x": 80.0,
+            "y": 185.0
+        }
+    ],
+    "wormholes": [],
+    "planets": [
+        "nerot",
+        "zardell",
+        "garer",
+        "aldim"
+    ],
+    "source": "nomadfalcon",
+    "tileBack": "green"
+}

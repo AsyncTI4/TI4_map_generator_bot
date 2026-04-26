@@ -8,10 +8,10 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
 
 @UtilityClass
 public class CloneGameService {
@@ -25,7 +25,7 @@ public class CloneGameService {
         String newActionsChannelName = cloneName + Constants.ACTIONS_CHANNEL_SUFFIX;
         String newBotThreadName = cloneName + Constants.BOT_CHANNEL_SUFFIX;
 
-        long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+        long permission = Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
         Role gameRole =
                 guild.createRole().setName(cloneName).setMentionable(true).complete();

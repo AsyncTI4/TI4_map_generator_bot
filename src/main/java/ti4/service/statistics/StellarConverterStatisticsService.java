@@ -7,12 +7,12 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.game.Game;
+import ti4.game.UnitHolder;
+import ti4.game.persistence.GamesPage;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.UnitHolder;
-import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -47,7 +47,7 @@ public class StellarConverterStatisticsService {
                     .append(Helper.leftpad(String.valueOf(index), width))
                     .append(")` ");
             output.append(planetName).append(": ").append(planetStats.getValue());
-            output.append("\n");
+            output.append('\n');
             index++;
         }
 

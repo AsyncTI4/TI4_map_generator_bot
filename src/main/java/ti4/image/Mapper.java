@@ -1,15 +1,7 @@
 package ti4.image;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import java.awt.Color;
@@ -34,15 +26,17 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
+import ti4.game.Game;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
-import ti4.map.Game;
-import ti4.message.logging.BotLogger;
+import ti4.json.JsonMapperManager;
+import ti4.logging.BotLogger;
 import ti4.model.AbilityModel;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
@@ -79,11 +73,17 @@ import ti4.model.TokenModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.emoji.CardEmojis;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 @UtilityClass
 public class Mapper {
 
-    // private static final Properties colors = new Properties();
     private static final Properties decals = new Properties();
     private static final Properties general = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
@@ -102,11 +102,17 @@ public class Mapper {
     private static final Map<String, EventModel> events = new HashMap<>();
     private static final Map<String, ExploreModel> explores = new HashMap<>();
     private static final Map<String, FactionModel> factions = new HashMap<>();
+
+    @Getter
     private static final Map<String, DraftErrataModel> frankenErrata = new HashMap<>();
+
     private static final Map<String, GenericCardModel> genericCards = new HashMap<>();
     private static final Map<String, LeaderModel> leaders = new HashMap<>();
     private static final Map<String, MapTemplateModel> mapTemplates = new HashMap<>();
+
+    @Getter
     private static final Map<String, PromissoryNoteModel> promissoryNotes = new HashMap<>();
+
     private static final Map<String, PublicObjectiveModel> publicObjectives = new HashMap<>();
     private static final Map<String, RelicModel> relics = new HashMap<>();
     private static final Map<String, SpaceTokenModel> spaceTokens = new HashMap<>();
@@ -117,16 +123,22 @@ public class Mapper {
     private static final Map<String, TechnologyModel> technologies = new HashMap<>();
     private static final Map<String, TokenModel> tokens = new HashMap<>();
     private static final Map<String, GalacticEventModel> galacticevents = new HashMap<>();
+
+    @Getter
     private static final Map<String, UnitModel> units = new HashMap<>();
+
+    @Getter
     private static final Map<String, BreakthroughModel> breakthroughs = new HashMap<>();
 
     private static final Cache<String, ColorModel> colorToColorModelCache =
             Caffeine.newBuilder().maximumSize(1000).build();
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final JsonMapper jsonMapper = JsonMapperManager.basic()
+            .rebuild()
+            .addModule(new SimpleModule().addDeserializer(Color.class, new ColorDeserializer()))
+            .build();
 
     public static void init() {
-        objectMapper.registerModule(new SimpleModule().addDeserializer(Color.class, new ColorDeserializer()));
         try {
             loadData();
         } catch (Exception e) {
@@ -148,7 +160,6 @@ public class Mapper {
         importJsonObjectsFromFolder("decks", decks, DeckModel.class);
         importJsonObjectsFromFolder("events", events, EventModel.class);
         importJsonObjectsFromFolder("explores", explores, ExploreModel.class);
-        importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class);
         importJsonObjectsFromFolder("genericcards", genericCards, GenericCardModel.class);
         importJsonObjectsFromFolder("leaders", leaders, LeaderModel.class);
         importJsonObjectsFromFolder("map_templates", mapTemplates, MapTemplateModel.class);
@@ -166,6 +177,7 @@ public class Mapper {
         importJsonObjectsFromFolder("tokens", tokens, TokenModel.class);
         importJsonObjectsFromFolder("tokens", spaceTokens, SpaceTokenModel.class);
         importJsonObjectsFromFolder("units", units, UnitModel.class);
+        importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class);
         readData("decals.properties", decals);
         readData("general.properties", general);
         readData("hyperlanes.properties", hyperlaneAdjacencies);
@@ -190,10 +202,10 @@ public class Mapper {
     }
 
     private static <T extends ModelInterface> void importJsonObjectsFromFolder(
-            String jsonFolderName, Map<String, T> objectMap, Class<T> target) throws InvalidFormatException {
+            String jsonFolderName, Map<String, T> objectMap, Class<T> target) {
         String folderPath = ResourceHelper.getInstance().getDataFolder(jsonFolderName);
-        objectMap.clear(); // Added to prevent duplicates when running Mapper.init() over and over with *ModelTest
-        // classes
+        // Added to prevent duplicates when running Mapper.init() over and over with ModelTest classes
+        objectMap.clear();
 
         File folder = new File(folderPath);
         File[] listOfFiles = folder.listFiles();
@@ -203,11 +215,8 @@ public class Mapper {
             }
             try {
                 importJsonObjects(jsonFolderName + File.separator + file.getName(), objectMap, target);
-            } catch (InvalidFormatException e) {
-                BotLogger.error("JSON File may be formatted incorrectly: " + jsonFolderName + "/" + file.getName(), e);
-                throw e;
             } catch (Exception e) {
-                BotLogger.error("Could not import JSON Objects from File: " + jsonFolderName + "/" + file.getName(), e);
+                BotLogger.error("Could not import JSON Objects from file: " + jsonFolderName + "/" + file.getName(), e);
             }
         }
     }
@@ -245,14 +254,14 @@ public class Mapper {
             String jsonFileName, Map<String, T> objectMap, Class<T> target) throws Exception {
         List<T> allObjects = new ArrayList<>();
         String filePath = ResourceHelper.getInstance().getDataFile(jsonFileName);
-        JavaType type = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, target);
+        JavaType type = jsonMapper.getTypeFactory().constructCollectionType(ArrayList.class, target);
 
         if (filePath != null) {
             try {
                 InputStream input = new FileInputStream(filePath);
-                allObjects = objectMapper.readValue(input, type);
+                allObjects = jsonMapper.readValue(input, type);
             } catch (Exception e) {
-                BotLogger.error("Could not import JSON Objects from File: " + jsonFileName, e);
+                BotLogger.error("Could not import JSON Objects from file: " + jsonFileName, e);
                 throw e;
             }
         }
@@ -439,10 +448,6 @@ public class Mapper {
     }
     // breakthroughs
 
-    public static Map<String, BreakthroughModel> getBreakthroughs() {
-        return breakthroughs;
-    }
-
     public static BreakthroughModel getBreakthrough(String id) {
         return breakthroughs.get(id);
     }
@@ -482,11 +487,10 @@ public class Mapper {
         return agendaModel.getName().toUpperCase();
     }
 
+    @Nullable
     public static String getAgendaTitleNoCap(String id) {
         AgendaModel agendaModel = agendas.get(id);
-        if (agendaModel == null) {
-            return null;
-        }
+        if (agendaModel == null) return null;
         return agendaModel.getName();
     }
 
@@ -498,25 +502,10 @@ public class Mapper {
         return agendaList;
     }
 
-    public static Map<String, String> getAgendaJustNames(Game game) {
-        Map<String, String> agendaList = new HashMap<>();
-        for (AgendaModel agenda : agendas.values()) {
-            if (game.isAbsolMode() && agenda.getAlias().contains("absol_")) {
-                agendaList.put(agenda.getAlias(), agenda.getName());
-            }
-            if (!game.isAbsolMode() && !agenda.getAlias().contains("absol_")) {
-                agendaList.put(agenda.getAlias(), agenda.getName());
-            }
-        }
-        return agendaList;
-    }
-
     @Nullable
     public static String getAgendaText(String id) {
         AgendaModel agendaModel = agendas.get(id);
-        if (agendaModel == null) {
-            return null;
-        }
+        if (agendaModel == null) return null;
         return agendaModel.getMapText();
     }
 
@@ -528,8 +517,11 @@ public class Mapper {
         return agendaModel.displayElectedFaction() ? "0" : "1";
     }
 
+    @Nullable
     public static String getAgendaForOnly(String id) {
         AgendaModel agenda = agendas.get(id);
+        if (agenda == null) return null;
+
         StringBuilder sb = new StringBuilder();
         sb.append(agenda.getName()).append(";");
         sb.append(agenda.getType()).append(";");
@@ -550,10 +542,6 @@ public class Mapper {
 
     public static Map<String, AttachmentModel> getAttachments() {
         return new HashMap<>(attachments);
-    }
-
-    public static List<AttachmentModel> getAttachmentsValues() {
-        return new ArrayList<>(attachments.values());
     }
 
     public static boolean isValidAttachment(String id) {
@@ -753,15 +741,8 @@ public class Mapper {
     // ####################
     // Franken Errata
 
-    public static Map<String, DraftErrataModel> getFrankenErrata() {
-        return frankenErrata;
-    }
-
-    public static List<String> getDraftErratasSources(ComponentSource CompSource) {
-        return frankenErrata.values().stream()
-                .filter(model -> model.searchSource(CompSource)) // searchSource not implemented
-                .map(model -> model.getSource().toString())
-                .toList();
+    public static DraftErrataModel getFrankenErrata(String alias) {
+        return frankenErrata.getOrDefault(alias, null);
     }
 
     // ####################
@@ -880,10 +861,6 @@ public class Mapper {
 
     // ####################
     // Promissory Notes
-
-    public static Map<String, PromissoryNoteModel> getPromissoryNotes() {
-        return promissoryNotes;
-    }
 
     public static PromissoryNoteModel getPromissoryNote(String id) {
         return promissoryNotes.get(id);
@@ -1203,7 +1180,6 @@ public class Mapper {
             String val = token.getValue().getImagePath();
             if (tokenID.equalsIgnoreCase(val) || tokenID.equalsIgnoreCase(key)) return key;
         }
-        System.out.println("Could not resolve token: " + tokenID);
         return tokenID;
     }
 
@@ -1254,10 +1230,6 @@ public class Mapper {
 
     // ####################
     // Units
-
-    public static Map<String, UnitModel> getUnits() {
-        return units;
-    }
 
     public static UnitModel getUnit(String unitID) {
         return units.get(unitID);
@@ -1449,23 +1421,31 @@ public class Mapper {
                 .collect(Collectors.toSet());
     }
 
-    private static class ColorDeserializer extends JsonDeserializer<Color> {
+    private static class ColorDeserializer extends ValueDeserializer<Color> {
         @Override
-        public Color deserialize(JsonParser p, DeserializationContext c) throws IOException {
-            JsonNode n = p.getCodec().readTree(p);
-            // "#RRGGBB" or "0xRRGGBB"
-            if (n.isTextual()) return Color.decode(n.asText());
-            // ARGB
-            if (n.isInt()) return new Color(n.asInt(), true);
-            // { "red" : ###, "green": ###, "blue": ###, "alpha": ### } where alpha is optional
-            if (n.has("red")) {
-                int r = n.get("red").asInt(),
-                        g = n.get("green").asInt(),
-                        b = n.get("blue").asInt();
+        public Color deserialize(JsonParser p, DeserializationContext c) {
+            JsonNode n = p.readValueAsTree();
+
+            // Handle "#RRGGBB" or "0xRRGGBB"
+            if (n.isTextual()) {
+                return Color.decode(n.asText());
+            }
+
+            // Handle ARGB integer
+            if (n.isNumber()) {
+                return new Color(n.asInt(), true);
+            }
+
+            // Handle { "red" : ###, "green": ###, "blue": ###, "alpha": ### }
+            if (n.isObject() && n.has("red")) {
+                int r = n.get("red").asInt();
+                int g = n.get("green").asInt();
+                int b = n.get("blue").asInt();
                 int a = n.has("alpha") ? n.get("alpha").asInt() : 255;
                 return new Color(r, g, b, a);
             }
-            throw c.weirdStringException(n.toString(), Color.class, "Unsupported color format");
+
+            throw new RuntimeException("Unable to deserialize color: " + n);
         }
     }
 }

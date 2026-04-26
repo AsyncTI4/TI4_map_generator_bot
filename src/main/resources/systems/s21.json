@@ -1,1 +1,15 @@
-{"id":"s21","name":"Briis Theta","aliases":["s21","briistheta"],"imagePath":"S21_BriisTheta.png","planets":["briistheta"],"shipPositionsType":"TYPE04","tileBack":"blue","source":"somno"}
+{
+    "id": "s21",
+    "name": "Briis Theta",
+    "aliases": [
+        "s21",
+        "briistheta"
+    ],
+    "imagePath": "S21_BriisTheta.png",
+    "planets": [
+        "briistheta"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "blue",
+    "source": "somno"
+}

@@ -3,7 +3,7 @@ package ti4.website.model;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel.BorderAnomalyType;
 

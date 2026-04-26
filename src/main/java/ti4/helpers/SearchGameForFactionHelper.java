@@ -8,11 +8,11 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
-import ti4.map.persistence.ManagedGame;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
@@ -22,7 +22,6 @@ import ti4.service.game.ManagedGameService;
 public class SearchGameForFactionHelper {
 
     public static int searchGames(String faction, GenericInteractionCreateEvent event, boolean includeEndedGames) {
-
         Predicate<ManagedGame> factionFilter = game -> game.getGame().getPlayerFromColorOrFaction(faction) != null;
         Predicate<ManagedGame> endedGamesFilter =
                 includeEndedGames ? game -> true : game -> !game.isHasEnded() && !game.isFowMode();
@@ -41,11 +40,11 @@ public class SearchGameForFactionHelper {
                 .append(Mapper.getFaction(faction).getFactionName())
                 .append("'s Games__**\n");
         for (var managedGame : filteredManagedGames) {
-            sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
+            sb.append('`').append(Helper.leftpad("" + index, 2)).append(".`");
             var game = managedGame.getGame();
             sb.append(getPlayerMapListRepresentation(
                     game, game.getPlayerFromColorOrFaction(faction).getUserID(), false, false, false));
-            sb.append("\n");
+            sb.append('\n');
             index++;
         }
         if (event instanceof SlashCommandInteractionEvent slash) {

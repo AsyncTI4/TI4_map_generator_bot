@@ -1,8 +1,10 @@
 package ti4.helpers.thundersedge;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,16 +12,22 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.buttons.Buttons;
-import ti4.commands.CommandHelper;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.BreakthroughHelper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
 import ti4.service.breakthrough.AlRaithService;
@@ -32,7 +40,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.map.FractureService;
 
-public class BreakthroughCommandHelper {
+public final class BreakthroughCommandHelper {
 
     public static List<String> getBreakthroughsFromEvent(SlashCommandInteractionEvent event, Player player) {
         return getBreakthroughsFromEvent(event, player, false);
@@ -72,11 +80,11 @@ public class BreakthroughCommandHelper {
         BreakthroughModel bt = player.getBreakthroughModel(btID);
         if (bt == null) {
             BreakthroughModel model = Mapper.getBreakthrough(btID);
-            String message = "Player does not have a breakthrough";
+            String message = "Player does not have a breakthrough.";
             if (model == null) {
-                message = "Breakthrough " + btID + " does not exist.";
+                message = "Breakthrough `" + btID + "` does not exist.";
             } else if (!player.getBreakthroughIDs().isEmpty()) {
-                message = player.getRepresentationNoPing() + " does not have " + model.getName() + ".";
+                message = player.getRepresentationNoPing() + " does not have _" + model.getName() + "_.";
             }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         } else {
@@ -102,7 +110,7 @@ public class BreakthroughCommandHelper {
     private static void withAllBreakthroughs(Player player, Consumer<List<BreakthroughModel>> action) {
         List<BreakthroughModel> models = player.getBreakthroughModels();
         if (models.isEmpty()) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Player does not have a breakthrough");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Player does not have a breakthrough.");
         } else {
             action.accept(models);
         }
@@ -130,7 +138,7 @@ public class BreakthroughCommandHelper {
     public static void exhaustBreakthroughs(Player player, List<String> btIDs) {
         withEachBreakthrough(player, btIDs, bt -> {
             player.getBreakthroughExhausted().put(bt.getAlias(), true);
-            String message = player.getRepresentation() + " exhausted their breakthrough " + bt.getName() + ":";
+            String message = player.getRepresentation() + " exhausted their _" + bt.getName() + "_ breakthrough.";
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(), message, bt.getRepresentationEmbed());
         });
@@ -143,7 +151,7 @@ public class BreakthroughCommandHelper {
     public static void readyBreakthroughs(Player player, List<String> btIDs) {
         withEachBreakthrough(player, btIDs, bt -> {
             player.getBreakthroughExhausted().put(bt.getAlias(), false);
-            String message = player.getRepresentation() + " readied their breakthrough " + bt.getName() + ":";
+            String message = player.getRepresentation() + " readied their _" + bt.getName() + "_ breakthrough.";
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(), message, bt.getRepresentationEmbed());
         });
@@ -156,7 +164,7 @@ public class BreakthroughCommandHelper {
     public static void unlockAllBreakthroughs(Game game, Player player) {
         List<String> lockedBtIDs = player.getBreakthroughUnlocked().entrySet().stream()
                 .filter(e -> !e.getValue())
-                .map(e -> e.getKey())
+                .map(Map.Entry::getKey)
                 .toList();
         if (!lockedBtIDs.isEmpty()) {
             unlockBreakthroughs(game, player, lockedBtIDs);
@@ -170,7 +178,11 @@ public class BreakthroughCommandHelper {
 
             player.setBreakthroughUnlocked(btID, true);
             player.setBreakthroughExhausted(btID, false);
-            String message = player.getRepresentation() + " unlocked their breakthrough " + bt.getName() + ".";
+            String message = player.getRepresentation() + " unlocked their _" + bt.getName() + "_ breakthrough.";
+            if ("naazbt".equalsIgnoreCase(bt.getID())) {
+                message +=
+                        "\n-# You may choose a style of Eidolon Maximum with the `/user set_preferred_settings voltron_style:` command.";
+            }
             List<MessageEmbed> embeds = Collections.singletonList(bt.getRepresentationEmbed());
             MessageHelper.sendMessageToChannelWithEmbeds(player.getCorrectChannel(), message, embeds);
             if ("yinbt".equalsIgnoreCase(bt.getID())) {
@@ -181,7 +193,7 @@ public class BreakthroughCommandHelper {
                 Planet grove = game.getPlanetsInfo().get("grove");
                 if (grove != null) grove.updateGroveStats(player);
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(), "Added the Grove \"planet card\" to your play area.");
+                        player.getCorrectChannel(), "Added the Grove \"planet\" card to your play area.");
             }
             if ("mentakbt".equalsIgnoreCase(bt.getID())) {
                 if (player.hasTech("cr2")) {
@@ -191,7 +203,8 @@ public class BreakthroughCommandHelper {
             }
             if ("celdauribt".equalsIgnoreCase(bt.getID())) {
                 player.addOwnedUnitByID("celdauri_celagrom");
-                String output = player.getRepresentation() + " Use buttons to put the Celagrom with your ships.";
+                String output = player.getRepresentation()
+                        + ", please choose the system in which you wish to place the _Celagrom_.";
                 List<Button> buttons =
                         Helper.getTileWithShipsPlaceUnitButtons(player, game, "celagrom", "placeOneNDone_skipbuild");
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), output, buttons);
@@ -208,14 +221,23 @@ public class BreakthroughCommandHelper {
                     player.removeOwnedUnitByID("dreadnought2");
                 }
             }
+            if ("veldyrbt".equalsIgnoreCase(bt.getID())) {
+                Tile tile = player.getHomeSystemTile();
+                if (tile != null) {
+                    tile.addToken("token_nebula_async.png", "space");
+                }
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " Made your home system into a nebula.");
+            }
 
             if ("cabalbt".equalsIgnoreCase(bt.getID())) {
                 if (btIDs.size() == 1) {
                     // If there are other BTs to potentially roll, don't automatically spawn
                     if (!FractureService.isFractureInPlay(game)) {
                         String msg = player.getRepresentation(false, false)
-                                + " has Cabal breakthrough so the Fracture enters automatically"
-                                + "! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
+                                + " has gained _Al'Raith Ix Ianovar_, and so The Fracture enters play automatically!"
+                                + " Ingress tokens will be placed in their position on the map, if there were no choices to be made.";
                         FractureService.spawnFracture(null, game);
                         FractureService.spawnIngressTokens(null, game, player, bt.getID());
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
@@ -228,7 +250,7 @@ public class BreakthroughCommandHelper {
             }
 
             if (!FractureService.isFractureInPlay(game) && !game.isNoFractureMode())
-                serveRollFractureButtons(game, player, btID);
+                serveRollFractureButtons(player, btID);
             if ("muaatbt".equals(bt.getAlias())) StellarGenesisService.serveAvernusButtons(game, player);
             if ("keleresbt".equals(bt.getAlias())) player.gainCustodiaVigilia();
         });
@@ -238,15 +260,16 @@ public class BreakthroughCommandHelper {
         unlockBreakthroughs(game, player, Arrays.asList(btIDs));
     }
 
-    public static void serveRollFractureButtons(Game game, Player player, String btID) {
+    private static void serveRollFractureButtons(Player player, String btID) {
         String id = player.finChecker() + "rollFracture_" + btID;
-        Button rollFracture = Buttons.green(id, "Roll for the fracture", MiscEmojis.RollDice);
-        String message = "It looks like the fracture isn't in play yet. Use the button to roll for the fracture!";
-        message += "\n> If you roll a [" + DiceEmojis.d10blue_1 + "] or ";
-        message += "[" + DiceEmojis.d10blue_0 + "], the fracture will appear.";
+        Button rollFracture = Buttons.green(id, "Roll For The Fracture", MiscEmojis.RollDice);
+        String message = "It looks like The Fracture isn't in play yet. Use the button to roll for The Fracture!"
+                + "\n If you roll a " + DiceEmojis.d10blue_1 + " or a"
+                + DiceEmojis.d10blue_0 + ", The Fracture will appear.";
         if ("cabalbt".equals(btID)) {
             rollFracture = rollFracture.withLabel("Spawn Fracture").withEmoji(FactionEmojis.Cabal.asEmoji());
-            message = "You can roll for other breakthroughs first and then spawn the fracture with cabal breakthrough.";
+            message =
+                    "You can roll for other breakthroughs first and then spawn The Fracture with _Al'Raith Ix Ianovar_.";
         }
         MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, rollFracture);
     }
@@ -257,7 +280,7 @@ public class BreakthroughCommandHelper {
             if (!player.isBreakthroughUnlocked(btID)) return;
 
             player.setBreakthroughUnlocked(btID, false);
-            String message = player.getRepresentation() + " locked their breakthrough " + bt.getName() + ".";
+            String message = player.getRepresentation() + " locked their _" + bt.getName() + "_ breakthrough.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         });
     }
@@ -273,20 +296,38 @@ public class BreakthroughCommandHelper {
             if (activatable.contains(btID)) {
                 if (!player.isBreakthroughActive(btID)) {
                     player.setBreakthroughActive(btID, true);
-                    String message = player.getRepresentation() + " activated their breakthrough: " + bt.getName();
+                    String message =
+                            player.getRepresentation() + " activated their _" + bt.getName() + "_ breakthrough.";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     if ("naazbt".equalsIgnoreCase(bt.getAlias())) {
                         player.addOwnedUnitByID("naaz_voltron");
                         player.removeOwnedUnitByID("naaz_mech");
                         player.removeOwnedUnitByID("naaz_mech_space");
                     }
+                } else {
+                    player.setBreakthroughActive(btID, false);
+                    String message =
+                            player.getRepresentation() + " deactivated their _" + bt.getName() + "_ breakthrough.";
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                    if ("naazbt".equalsIgnoreCase(bt.getAlias())) {
+                        player.removeOwnedUnitByID("naaz_voltron");
+                        player.addOwnedUnitByID("naaz_mech");
+                        player.addOwnedUnitByID("naaz_mech_space");
+                    }
                 }
             } else {
                 switch (btID) {
                     case "ralnelbt" -> DataSkimmerService.fixDataSkimmer(player.getGame(), player);
                     case "empyreanbt" -> VoidTetherService.fixVoidTether(player.getGame(), player);
+                    case "nekrobt" -> {
+                        Game game = player.getGame();
+                        List<Button> buttons = getNekroBtFixButtons(game, player);
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(), "Use these buttons to fix the breakthrough", buttons);
+                    }
                     default -> {
-                        String msg = player.getRepresentation() + "'s breakthrough cannot be activated.";
+                        String msg = player.getRepresentation() + " could not activate their _" + bt.getName()
+                                + "_ breakthrough.";
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                     }
                 }
@@ -294,16 +335,62 @@ public class BreakthroughCommandHelper {
         });
     }
 
+    @ButtonHandler("removeNekroToken_")
+    public static void removeNekroToken(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String f2 = buttonID.split("_")[1];
+        game.setStoredValue("valefarZ", game.getStoredValue("valefarZ").replace(f2 + "|", ""));
+        List<Button> buttons = getNekroBtFixButtons(game, player);
+        event.getMessage()
+                .editMessage(event.getMessage().getContentRaw())
+                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully removed a token");
+    }
+
+    @ButtonHandler("addNekroToken_")
+    public static void addNekroToken(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String f2 = buttonID.split("_")[1];
+        game.setStoredValue("valefarZ", game.getStoredValue("valefarZ") + f2 + "|");
+        List<Button> buttons = getNekroBtFixButtons(game, player);
+        event.getMessage()
+                .editMessage(event.getMessage().getContentRaw())
+                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully added a token");
+    }
+
+    private static List<Button> getNekroBtFixButtons(Game game, Player player) {
+        List<String> factionsWithToken =
+                Arrays.asList(game.getStoredValue("valefarZ").split("\\|"));
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+            if (factionsWithToken.contains(p2.getFaction())) {
+                buttons.add(Buttons.red(
+                        "removeNekroToken_" + p2.getFaction(),
+                        "Remove " + p2.getFactionNameOrColor() + " Token",
+                        p2.getFactionEmojiOrColor()));
+            } else {
+                buttons.add(Buttons.green(
+                        "addNekroToken_" + p2.getFaction(),
+                        "Add " + p2.getFactionNameOrColor() + " Token",
+                        p2.getFactionEmojiOrColor()));
+            }
+        }
+        buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+        return buttons;
+    }
+
     public static void activateBreakthrough(GenericInteractionCreateEvent event, Player player, String... btIDs) {
         activateBreakthroughs(event, player, Arrays.asList(btIDs));
     }
 
-    public static void deactivateBreakthroughs(Player player, List<String> btIDs) {
+    private static void deactivateBreakthroughs(Player player, List<String> btIDs) {
         withEachBreakthrough(player, btIDs, bt -> {
             String btID = bt.getID();
             if (player.isBreakthroughActive(btID)) {
                 player.setBreakthroughActive(btID, false);
-                String message = player.getRepresentation() + " de-activated their breakthrough: " + bt.getName();
+                String message =
+                        player.getRepresentation() + " de-activated their _" + bt.getName() + "_ breakthrough.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 if ("naazbt".equalsIgnoreCase(bt.getAlias())) {
                     player.removeOwnedUnitByID("naaz_voltron");
@@ -318,7 +405,7 @@ public class BreakthroughCommandHelper {
         deactivateBreakthroughs(player, Arrays.asList(btIDs));
     }
 
-    public static void setBreakthroughTGs(Player player, int newTgs, String btID) {
+    private static void setBreakthroughTGs(Player player, int newTgs, String btID) {
         if (newTgs < 0) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), "You cannot have negative trade goods on your breakthrough.");
@@ -329,8 +416,8 @@ public class BreakthroughCommandHelper {
         } else {
             int initial = player.getBreakthroughTGs(btID);
             player.getBreakthroughTGs().put(btID, newTgs);
-            String msg = player.getRepresentation() + " set the TGs on their breakthrough to " + newTgs + ". ("
-                    + initial + "->" + newTgs + ")";
+            String msg = player.getRepresentation() + " set the trade goods on their breakthrough to " + newTgs + " ("
+                    + initial + "->" + newTgs + ").";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         }
     }

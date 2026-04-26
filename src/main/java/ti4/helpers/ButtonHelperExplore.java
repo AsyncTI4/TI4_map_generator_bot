@@ -6,10 +6,10 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -21,7 +21,7 @@ class ButtonHelperExplore {
     public static void exploreFront(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("exploreFront_", "");
         ButtonHelper.resolveFullFrontierExplore(game, player, game.getTileByPosition(pos), event);
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler("freelancersBuild_")
@@ -53,13 +53,13 @@ class ButtonHelperExplore {
             }
         }
         if (fragmentsToPurge.size() == count) {
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         }
         while (fragmentsToPurge.size() > count) {
             fragmentsToPurge.removeFirst();
         }
 
-        StringBuilder message = new StringBuilder(player.getRepresentation() + " purged");
+        StringBuilder message = new StringBuilder(player.getRepresentation() + " purged ");
         if (fragmentsToPurge.size() == 1) {
             String fragId = fragmentsToPurge.getFirst();
             player.removeFragment(fragId);
@@ -72,7 +72,7 @@ class ButtonHelperExplore {
                 case "irf1", "irf2", "irf3", "irf4", "irf5" ->
                     message.append(" an " + ExploreEmojis.IFrag + "industrial");
                 case "urf1", "urf2", "urf3" -> message.append(" an " + ExploreEmojis.UFrag + "unknown");
-                default -> message.append(" ").append(fragId);
+                default -> message.append(' ').append(fragId);
             }
             message.append(" relic fragment.");
         } else {
@@ -85,7 +85,7 @@ class ButtonHelperExplore {
                     case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> message.append(ExploreEmojis.HFrag);
                     case "irf1", "irf2", "irf3", "irf4", "irf5" -> message.append(ExploreEmojis.IFrag);
                     case "urf1", "urf2", "urf3" -> message.append(ExploreEmojis.UFrag);
-                    default -> message.append(" ").append(fragId);
+                    default -> message.append(' ').append(fragId);
                 }
             }
             message.append(" relic fragments.");

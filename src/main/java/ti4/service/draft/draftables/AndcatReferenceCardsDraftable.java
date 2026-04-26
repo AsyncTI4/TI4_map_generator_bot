@@ -15,7 +15,10 @@ import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.collections4.ListUtils;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.MapTemplateHelper;
@@ -27,12 +30,9 @@ import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.helpers.twilightsfall.TwilightsFallInfoHelper;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.draft.AndcatReferenceCardsMessageHelper;
@@ -42,12 +42,13 @@ import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftableType;
 import ti4.service.draft.PartialMapService;
 import ti4.service.draft.PlayerDraftState;
-import ti4.service.draft.PlayerSetupService.PlayerSetupState;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.milty.MiltyService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.unit.AddUnitService;
 
+@Getter
 public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
 
     public record ReferenceCardPackage(
@@ -58,7 +59,6 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             String speakerOrderFaction,
             Boolean choicesFinal) {}
 
-    @Getter
     private final Map<Integer, ReferenceCardPackage> referenceCardPackages = new HashMap<>();
 
     public static final DraftableType TYPE = DraftableType.of("AndcatRefPackage");
@@ -121,11 +121,11 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         // First add powerful factions
         for (int i = 0; i < buildPackages; i++) {
             packages.add(new ArrayList<>());
-            packages.get(i).add(strongFactions.remove(0));
+            packages.get(i).add(strongFactions.removeFirst());
         }
         // Then add weak factions
         for (int i = 0; i < buildPackages; i++) {
-            packages.get(i).add(weakFactions.remove(0));
+            packages.get(i).add(weakFactions.removeFirst());
         }
         // Then mix ALL remaining factions together
         List<String> remainingFactions = new ArrayList<>();
@@ -138,7 +138,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         // We only need to finish numPackages
         for (int i = 0; i < numPackages; i++) {
             List<String> currentPackage = packages.get(i);
-            currentPackage.add(remainingFactions.remove(0));
+            currentPackage.add(remainingFactions.removeFirst());
             currentPackage.sort((p1, p2) -> {
                 FactionModel f1 = Mapper.getFaction(p1);
                 FactionModel f2 = Mapper.getFaction(p2);
@@ -179,7 +179,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             return null;
         }
         try {
-            Integer packageKey = Integer.parseInt(choiceKey.substring("package".length()));
+            Integer packageKey = Integer.valueOf(choiceKey.substring("package".length()));
             return referenceCardPackages.get(packageKey);
         } catch (NumberFormatException e) {
             return null;
@@ -216,7 +216,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         for (int i = 0; i < 3; ++i) {
             FactionModel pFaction = factionsInPackage.get(i);
             if (includeEmojis) {
-                formattedNameBuilder.append(pFaction.getFactionEmoji()).append(" ");
+                formattedNameBuilder.append(pFaction.getFactionEmoji()).append(' ');
             }
             if (pFaction.getShortName().toLowerCase().contains("keleres")) {
                 formattedNameBuilder.append("Keleres");
@@ -358,7 +358,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             if (!packageToken.startsWith("package")) {
                 continue;
             }
-            Integer packageKey = Integer.parseInt(packageToken.substring("package".length()));
+            Integer packageKey = Integer.valueOf(packageToken.substring("package".length()));
             List<String> factions = List.of(tokens[i + 1].split("\\."));
             String homeSystemFaction = "null".equals(tokens[i + 2]) ? null : tokens[i + 2];
             String startingUnitsFaction = "null".equals(tokens[i + 3]) ? null : tokens[i + 3];
@@ -437,6 +437,16 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         AndcatReferenceCardsDraftableSettings settings = draftSystemSettings.getAndcatReferenceCardsDraftableSettings();
         SourceSettings sourceSettings = draftSystemSettings.getSourceSettings();
 
+        // Use preset packages when provided
+        if (settings.getParsedPackages() != null
+                && !settings.getParsedPackages().isEmpty()) {
+            referenceCardPackages.clear();
+            for (ReferenceCardPackage refPackage : settings.getParsedPackages()) {
+                referenceCardPackages.put(refPackage.key(), refPackage);
+            }
+            return null;
+        }
+
         return initialize(
                 settings.getNumPackages().getVal(),
                 sourceSettings.getFactionSources(),
@@ -506,11 +516,11 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         // Determine speaker position and set home system location
         List<String> speakerOrder = getSpeakerOrder(draftManager);
         int speakerPosition = speakerOrder.indexOf(playerUserId) + 1;
-        playerSetupState.setSetSpeaker(speakerPosition == 1);
+        playerSetupState.setSpeaker(speakerPosition == 1);
         String homeTilePosition =
                 MapTemplateHelper.getPlayerHomeSystemLocation(speakerPosition, game.getMapTemplateID());
-        if (shouldAlsoSetSeat(draftManager)) {
-            playerSetupState.setPositionHS(homeTilePosition);
+        if (isSourceOfSeat(draftManager)) {
+            playerSetupState.setHomeSystemPosition(homeTilePosition);
         }
 
         // If the home system faction is Keleres, we switch them here to a random unused faction.
@@ -552,23 +562,48 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         return (Player player) -> doPostSetupWork(draftManager, player, updatedPackage);
     }
 
+    // What is this method for? Setup tasks which require a Player reference.
+    // Once a draft finishes, things happen in this order:
+    // onDraftEnd(): Trigger card-picking, which needs to finish before setupPlayer() is called
+    // setupPlayer(): Sets up the player's home system tile and player order (tasks which DON'T require a Player
+    // reference)
+    // Then the player setup service is invoked, which sets up faction and game state for start (setting up Player
+    // objects)
+    // doPostSetupWork(): Gives player their home system planets and units (tasks which require a Player reference)
     private void doPostSetupWork(DraftManager draftManager, Player player, ReferenceCardPackage refPackage) {
 
         Game game = draftManager.getGame();
         List<String> speakerOrder = getSpeakerOrder(draftManager);
         int speakerPosition = speakerOrder.indexOf(player.getUserID()) + 1;
 
-        // If not setting seat, Speaker Order needs to be set via Priority Track
-        if (!shouldAlsoSetSeat(draftManager)) {
+        String homeTilePosition;
+        if (isSourceOfSeat(draftManager)) {
+            // Get the HS tile from speaker order
+            homeTilePosition = MapTemplateHelper.getPlayerHomeSystemLocation(speakerPosition, game.getMapTemplateID());
+        } else {
             if (game.getPriorityTrackMode() == PriorityTrackMode.NONE) {
                 game.setPriorityTrackMode(PriorityTrackMode.THIS_ROUND_ONLY);
             }
+            // If not setting seat, Speaker Order needs to be set via Priority Track
             PriorityTrackHelper.AssignPlayerToPriority(draftManager.getGame(), player, speakerPosition);
+
+            List<DraftChoice> seatChoices = draftManager.getPlayerPicks(player.getUserID(), SeatDraftable.TYPE);
+            if (seatChoices.isEmpty()) {
+                BotLogger.error(
+                        new LogOrigin(game),
+                        Constants.jabberwockyPing()
+                                + " Could not find a seat choice for player " + player.getUserID()
+                                + " despite drafting for Seat, which should not happen. Is there some other way the players are being assigned seats?");
+                throw new IllegalStateException(
+                        "No seat choice found for player " + player.getUserID() + " despite drafting for Seat.");
+            }
+            DraftChoice seatChoice = seatChoices.getFirst();
+            Integer seatNumber = SeatDraftable.getSeatNumberFromChoiceKey(seatChoice.getChoiceKey());
+
+            // Get the HS tile from selected seat
+            homeTilePosition = MapTemplateHelper.getPlayerHomeSystemLocation(seatNumber, game.getMapTemplateID());
         }
 
-        // Get the HS tile
-        String homeTilePosition =
-                MapTemplateHelper.getPlayerHomeSystemLocation(speakerPosition, game.getMapTemplateID());
         Tile hsTile = game.getTileByPosition(homeTilePosition);
 
         // Add home system extra tiles if needed
@@ -639,7 +674,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         return playerStates.stream().map(Entry::getKey).toList();
     }
 
-    private boolean shouldAlsoSetSeat(DraftManager draftManager) {
+    private boolean isSourceOfSeat(DraftManager draftManager) {
         return draftManager.getDraftables().stream().noneMatch(d -> d instanceof SeatDraftable);
     }
 
@@ -681,6 +716,6 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
                 .filter(f -> !f.getAlias().contains("keleres"))
                 .collect(Collectors.toList());
         Collections.shuffle(availableFactions);
-        return availableFactions.isEmpty() ? null : availableFactions.get(0);
+        return availableFactions.isEmpty() ? null : availableFactions.getFirst();
     }
 }

@@ -7,21 +7,22 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.Helper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
 import ti4.service.emoji.CardEmojis;
 
 @UtilityClass
 public class SecretObjectiveInfoService {
+
+    private static final String PINNED_SO_INFO_MESSAGE_ID = "pinned_so_info_message_id";
 
     public static void sendSecretObjectiveInfo(Game game, Player player, ButtonInteractionEvent event) {
         sendSecretObjectiveInfo(game, player, event, false, false);
@@ -35,8 +36,7 @@ public class SecretObjectiveInfoService {
             boolean autoScoreButtons) {
         String headerText = player.getRepresentationUnfogged() + " pressed button: "
                 + event.getButton().getLabel();
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
-        sendSecretObjectiveInfo(game, player, autoDiscardButtons, autoScoreButtons);
+        sendSecretObjectiveInfoWithHeaderText(game, player, headerText, autoDiscardButtons, autoScoreButtons);
     }
 
     public static void sendSecretObjectiveInfo(Game game, Player player, SlashCommandInteractionEvent event) {
@@ -50,33 +50,24 @@ public class SecretObjectiveInfoService {
             boolean autoDiscardButtons,
             boolean autoScoreButtons) {
         String headerText = player.getRepresentationUnfogged() + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
-        sendSecretObjectiveInfo(game, player, autoDiscardButtons, autoScoreButtons);
-    }
-
-    public static void sendSecretObjectiveInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        sendSecretObjectiveInfo(game, player, event, false, false);
-    }
-
-    public static void sendSecretObjectiveInfo(
-            Game game,
-            Player player,
-            GenericInteractionCreateEvent event,
-            boolean autoDiscardButtons,
-            boolean autoScoreButtons) {
-        String headerText = player.getRepresentationUnfogged() + " used something";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
-        sendSecretObjectiveInfo(game, player, autoDiscardButtons, autoScoreButtons);
+        sendSecretObjectiveInfoWithHeaderText(game, player, headerText, autoDiscardButtons, autoScoreButtons);
     }
 
     public static void sendSecretObjectiveInfo(Game game, Player player) {
         sendSecretObjectiveInfo(game, player, false, false);
     }
 
+    public static void sendSecretObjectiveInfoWithHeaderText(
+            Game game, Player player, String headerText, boolean autoDiscardButtons, boolean autoScoreButtons) {
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
+        sendSecretObjectiveInfo(game, player, autoDiscardButtons, autoScoreButtons);
+    }
+
     public static void sendSecretObjectiveInfo(
             Game game, Player player, boolean autoDiscardButtons, boolean autoScoreButtons) {
         // SO INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, getSecretObjectiveCardInfo(game, player));
+        MessageHelper.sendMessageToPlayerCardsInfoThreadAndPin(
+                game, player, PINNED_SO_INFO_MESSAGE_ID, getSecretObjectiveCardInfo(game, player));
 
         if (player.getSecretsUnscored().isEmpty()) return;
 
@@ -116,10 +107,10 @@ public class SecretObjectiveInfoService {
         // SCORED SECRET OBJECTIVES
         sb.append("__Scored Secret Objectives__ (")
                 .append(player.getSoScored())
-                .append("/")
+                .append('/')
                 .append(player.getMaxSOCount())
                 .append("):")
-                .append("\n");
+                .append('\n');
         if (scoredSecretObjective.isEmpty()) {
             sb.append("> None");
         } else {
@@ -136,10 +127,10 @@ public class SecretObjectiveInfoService {
                 index++;
             }
         }
-        sb.append("\n");
+        sb.append('\n');
 
         // UNSCORED SECRET OBJECTIVES
-        sb.append("__Unscored Secret Objectives:__").append("\n");
+        sb.append("__Unscored Secret Objectives:__").append('\n');
         if (secretObjective != null) {
             if (secretObjective.isEmpty()) {
                 sb.append("> None");
@@ -163,11 +154,14 @@ public class SecretObjectiveInfoService {
                     if (threshold > 0) {
                         sb.append(" (")
                                 .append(ListPlayerInfoService.getPlayerProgressOnObjective(so.getKey(), game, player))
-                                .append("/")
+                                .append('/')
                                 .append(threshold)
                                 .append(")");
                     }
-                    sb.append("\n");
+                    if (soModel.getNotes() != null) {
+                        sb.append("\n> -# [").append(soModel.getNotes()).append("]");
+                    }
+                    sb.append('\n');
                 }
             }
         }
@@ -182,7 +176,7 @@ public class SecretObjectiveInfoService {
                 .append("_")
                 .append(soName)
                 .append("_")
-                .append("\n");
+                .append('\n');
         return sb.toString();
     }
 
@@ -208,8 +202,11 @@ public class SecretObjectiveInfoService {
                 .append(soPhase)
                 .append(" Phase): ")
                 .append(soDescription);
+        if (so.getNotes() != null) {
+            sb.append("\n> -# [").append(so.getNotes()).append("]");
+        }
         if (newLine) {
-            sb.append("\n");
+            sb.append('\n');
         }
         return sb.toString();
     }

@@ -9,17 +9,17 @@ import lombok.Data;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
 import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 
 @Data
 public class WebPlayerArea {
@@ -140,6 +140,7 @@ public class WebPlayerArea {
     private String flexibleDisplayName;
     private Set<Integer> scs;
     private Boolean isSpeaker;
+    private Boolean isTyrant;
     private List<String> neighbors;
 
     // army values
@@ -191,6 +192,9 @@ public class WebPlayerArea {
 
     // Decal ID
     private String decalId;
+
+    // Nekro Z Assimilator targets (Thunder's Edge) - factions whose flagships have been assimilated
+    private List<String> valefarZTargets;
 
     public static WebPlayerArea fromPlayer(Player player, Game game) {
         WebPlayerArea webPlayerArea = new WebPlayerArea();
@@ -293,17 +297,7 @@ public class WebPlayerArea {
 
         // Planets
         webPlayerArea.setPlanets(player.getPlanets());
-        List<String> exhaustedPlanets = new ArrayList<>(player.getExhaustedPlanets());
-        // Ensure Custodia Vigilia is in exhausted planets if the player has it
-        // (it's always exhausted when gained via gainCustodiaVigilia())
-        if (player.getPlanets().contains("custodiavigilia") && !exhaustedPlanets.contains("custodiavigilia")) {
-            exhaustedPlanets.add("custodiavigilia");
-        }
-        // Also handle custodiavigiliaplus if it exists
-        if (player.getPlanets().contains("custodiavigiliaplus") && !exhaustedPlanets.contains("custodiavigiliaplus")) {
-            exhaustedPlanets.add("custodiavigiliaplus");
-        }
-        webPlayerArea.setExhaustedPlanets(exhaustedPlanets);
+        webPlayerArea.setExhaustedPlanets(new ArrayList<>(player.getExhaustedPlanets()));
         webPlayerArea.setExhaustedPlanetAbilities(player.getExhaustedPlanetsAbilities());
 
         // Relics and fragments
@@ -316,22 +310,21 @@ public class WebPlayerArea {
         webPlayerArea.setLeaderIDs(player.getLeaderIDs());
         webPlayerArea.setSecretsScored(player.getSecretsScored());
 
+        Map<String, Integer> unscoredSecrets = player.getSecretsUnscored();
         // Known unscored secrets (populated if search warrant is in play)
         if (player.isSearchWarrant()) {
-            webPlayerArea.setKnownUnscoredSecrets(player.getSecretsUnscored());
+            webPlayerArea.setKnownUnscoredSecrets(unscoredSecrets);
         } else {
             webPlayerArea.setKnownUnscoredSecrets(new HashMap<>());
         }
 
-        webPlayerArea.setNumUnscoredSecrets(
-                player.getSecretsUnscored() != null
-                        ? player.getSecretsUnscored().size()
-                        : 0);
+        webPlayerArea.setNumUnscoredSecrets(unscoredSecrets.size());
 
         // Additional properties
         webPlayerArea.setFlexibleDisplayName(player.getFlexibleDisplayName());
         webPlayerArea.setScs(player.getSCs());
         webPlayerArea.setIsSpeaker(player.isSpeaker());
+        webPlayerArea.setIsTyrant(player.isTyrant());
         webPlayerArea.setNeighbors(player.getNeighbouringPlayers(false).stream()
                 .map(Player::getColor)
                 .toList());
@@ -361,6 +354,21 @@ public class WebPlayerArea {
         // Decal ID
         webPlayerArea.setDecalId(player.getDecalSet());
 
+        // Nekro Z Assimilator targets (Thunder's Edge)
+        // Parse valefarZ stored value which contains factions whose flagships have been assimilated
+        List<String> valefarZTargets = new ArrayList<>();
+        if (player.hasUnlockedBreakthrough("nekrobt")) {
+            String valefarZValue = game.getStoredValue("valefarZ");
+            if (!valefarZValue.isEmpty()) {
+                for (String faction : valefarZValue.split("\\|")) {
+                    if (!faction.isEmpty()) {
+                        valefarZTargets.add(faction);
+                    }
+                }
+            }
+        }
+        webPlayerArea.setValefarZTargets(valefarZTargets);
+
         // Breakthrough info (Thunder's Edge)
         if (game.isThundersEdge()) {
             List<BreakthroughInfo> breakthroughs = new ArrayList<>();
@@ -377,7 +385,7 @@ public class WebPlayerArea {
             }
 
             // TODO: MemePhilosopher make this a list
-            if (breakthroughs.size() > 0) {
+            if (!breakthroughs.isEmpty()) {
                 webPlayerArea.setBreakthrough(breakthroughs.getFirst());
             } else {
                 webPlayerArea.setBreakthrough(null);
@@ -448,7 +456,7 @@ public class WebPlayerArea {
                     .flatMap(t -> t.getUnitHolders().values().stream())
                     .flatMap(uh -> uh.getTokenList().stream())
                     .filter(tok ->
-                            tok.equals(Constants.TOKEN_BREACH_ACTIVE) || tok.equals(Constants.TOKEN_BREACH_INACTIVE))
+                            Constants.TOKEN_BREACH_ACTIVE.equals(tok) || Constants.TOKEN_BREACH_INACTIVE.equals(tok))
                     .count();
             webPlayerArea.setBreachTokensReinf(Math.max(0, maxBreachTokens - totalBreaches));
         } else {

@@ -6,11 +6,11 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.draft.TwilightsFallFrankenDraft;
+import ti4.game.Game;
 import ti4.helpers.ButtonHelper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.service.franken.FrankenDraftBagService;
 
@@ -32,7 +32,9 @@ public class TEOptionService {
             The second option is closer to Rules As Written, the first is closer to a classic franken draft.""";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("startTFDraft_bag", "Use Bag Draft of Everything"));
-        buttons.add(Buttons.gray("startDraftSystem_andcatPreset", "Start Milty Draft + Later Inaugural Splice"));
+        buttons.add(Buttons.gray("startDraftSystem_andcatPresetMilty", "Start Milty Draft + Later Inaugural Splice"));
+        buttons.add(
+                Buttons.gray("startDraftSystem_andcatPresetNucleus", "Start Nucleus Draft + Later Inaugural Splice"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
     }
 
@@ -48,7 +50,6 @@ public class TEOptionService {
 
     @ButtonHandler("chooseExp_")
     public static void chooseExp(Game game, ButtonInteractionEvent event, String buttonID) {
-
         String choice = buttonID.split("_")[1];
         switch (choice.toLowerCase()) {
             case "newpok" -> {
@@ -182,22 +183,20 @@ public class TEOptionService {
         } else {
             galacticEventButtons.add(Buttons.green("enableDaneMode_Cosmic_enable", "Enable Cosmic Phenomenae"));
         }
-        // if (game.isMonumentToTheAgesMode()) {
-        //     galacticEventButtons.add(Buttons.red("enableDaneMode_Monument_disable", "Disable Monuments to the
-        // Ages"));
-        // } else {
-        //     galacticEventButtons.add(Buttons.green("enableDaneMode_Monument_enable", "Enable Monuments to the
-        // Ages"));
-        // }
+        if (game.isMonumentToTheAgesMode()) {
+            galacticEventButtons.add(Buttons.red("enableDaneMode_Monument_disable", "Disable Monuments to the Ages"));
+        } else {
+            galacticEventButtons.add(Buttons.green("enableDaneMode_Monument_enable", "Enable Monuments to the Ages"));
+        }
         if (game.isWeirdWormholesMode()) {
             galacticEventButtons.add(Buttons.red("enableDaneMode_WeirdWormholes_disable", "Disable Weird Wormholes"));
         } else {
             galacticEventButtons.add(Buttons.green("enableDaneMode_WeirdWormholes_enable", "Enable Weird Wormholes"));
         }
         if (game.isWildWildGalaxyMode()) {
-            galacticEventButtons.add(Buttons.red("enableDaneMode_WildGalaxy_disable", "Disable Wild Wild Galaxy"));
+            galacticEventButtons.add(Buttons.red("enableDaneMode_WildGalaxy_disable", "Disable Wild, Wild Galaxy"));
         } else {
-            galacticEventButtons.add(Buttons.green("enableDaneMode_WildGalaxy_enable", "Enable Wild Wild Galaxy"));
+            galacticEventButtons.add(Buttons.green("enableDaneMode_WildGalaxy_enable", "Enable Wild, Wild Galaxy"));
         }
         if (game.isCallOfTheVoidMode()) {
             galacticEventButtons.add(Buttons.red("enableDaneMode_CallOfTheVoid_disable", "Disable Call of the Void"));

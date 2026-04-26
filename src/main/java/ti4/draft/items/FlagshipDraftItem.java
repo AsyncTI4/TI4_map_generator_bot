@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
+import ti4.game.Game;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
-import ti4.map.Game;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.UnitModel;
@@ -18,12 +19,18 @@ import ti4.service.emoji.UnitEmojis;
 public class FlagshipDraftItem extends DraftItem {
 
     public FlagshipDraftItem(String itemId) {
-        super(Category.FLAGSHIP, itemId);
+        super(DraftCategory.FLAGSHIP, itemId);
+    }
+
+    @JsonIgnore
+    @Override
+    public String getTitle(Game game) {
+        return getUnit().getNameRepresentation();
     }
 
     @JsonIgnore
     private UnitModel getUnit() {
-        return Mapper.getUnit(ItemId);
+        return Mapper.getUnit(getItemId());
     }
 
     @JsonIgnore
@@ -39,7 +46,7 @@ public class FlagshipDraftItem extends DraftItem {
         if (unit == null) {
             return getAlias();
         }
-        return "Flagship - " + unit.getName();
+        return unit.getName();
     }
 
     @JsonIgnore
@@ -47,7 +54,7 @@ public class FlagshipDraftItem extends DraftItem {
     public String getLongDescriptionImpl() {
         UnitModel unit = getUnit();
         if (unit == null) {
-            return ItemId;
+            return getItemId();
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Cost: ");
@@ -62,7 +69,7 @@ public class FlagshipDraftItem extends DraftItem {
         sb.append(unit.getMoveValue());
         sb.append(" Capacity: ");
         sb.append(unit.getCapacityValue());
-        sb.append(" ");
+        sb.append(' ');
         if (unit.getSustainDamage()) {
             sb.append("SUSTAIN DAMAGE ");
         }
@@ -71,7 +78,7 @@ public class FlagshipDraftItem extends DraftItem {
                     .append(unit.getAfbHitsOn())
                     .append("x")
                     .append(unit.getAfbDieCount())
-                    .append(" ");
+                    .append(' ');
         }
         if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get());
         return sb.toString();
@@ -85,7 +92,7 @@ public class FlagshipDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = buildAllItems(factions);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.FLAGSHIP);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.FLAGSHIP);
         return allItems;
     }
 
@@ -96,14 +103,14 @@ public class FlagshipDraftItem extends DraftItem {
             var units = faction.getUnits();
             units.removeIf(
                     (String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
-            allItems.add(generate(Category.FLAGSHIP, units.getFirst()));
+            allItems.add(generate(DraftCategory.FLAGSHIP, units.getFirst()));
         }
         return allItems;
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.FLAGSHIP);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.FLAGSHIP);
         return allItems;
     }
 
@@ -118,7 +125,7 @@ public class FlagshipDraftItem extends DraftItem {
             var units = faction.getUnits();
             units.removeIf(
                     (String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
-            allItems.add(generate(Category.FLAGSHIP, units.getFirst()));
+            allItems.add(generate(DraftCategory.FLAGSHIP, units.getFirst()));
         }
         return allItems;
     }

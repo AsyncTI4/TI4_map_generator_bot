@@ -5,17 +5,19 @@ import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.helpers.ImageTestHelper.TestMode;
 import ti4.image.helpers.TileImageTestHelper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.model.FactionModel;
 import ti4.service.map.TokenPlanetService;
 import ti4.testUtils.BaseTi4Test;
@@ -28,6 +30,7 @@ import ti4.testUtils.BaseTi4Test;
  * <p><p> For advanced tips & complaints, ping Jazzxhands in discord
  */
 @org.junit.jupiter.api.Disabled
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TileImageTest extends BaseTi4Test {
 
     public static Game testGame;
@@ -35,7 +38,7 @@ public class TileImageTest extends BaseTi4Test {
     private static Player testPlayer2;
     private static Player testPlayer3;
 
-    public static final TestMode testMode = TestMode.SaveTemp;
+    public static final TestMode testMode = TestMode.Compare;
 
     @AfterAll
     static void readyForProduction() {

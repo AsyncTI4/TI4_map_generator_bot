@@ -10,22 +10,25 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Space;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ComponentActionHelper;
+import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Space;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.GenericCardModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.leader.HeroUnlockCheckService;
+import ti4.service.planet.AddPlanetService;
 
 @UtilityClass
 public class PuppetSoftHeBladeService {
@@ -48,17 +51,18 @@ public class PuppetSoftHeBladeService {
         flipFactionToObsidian(game, player);
 
         // Announce Plots
-        StringBuilder plotInfo = new StringBuilder("## __The Obsidian's plots are now revealed:__");
+        String factionName = player.getDisplayName();
+        StringBuilder plotInfo = new StringBuilder("## __" + factionName + " plots are now revealed:__");
         for (String plotID : player.getPlotCards().keySet()) {
             GenericCardModel plot = Mapper.getPlot(plotID);
-            plotInfo.append("\n").append(plot.getRepresentation());
+            plotInfo.append('\n').append(plot.getRepresentation());
 
             List<String> puppetedFactions = player.getPuppetedFactionsForPlot(plotID);
             if (puppetedFactions != null && !puppetedFactions.isEmpty()) {
                 StringBuilder factions = new StringBuilder();
                 for (String faction : puppetedFactions) {
                     Player p2 = game.getPlayerFromColorOrFaction(faction);
-                    if (p2 != null) factions.append(p2.fogSafeEmoji()).append(" ");
+                    if (p2 != null) factions.append(p2.fogSafeEmoji()).append(' ');
                 }
                 plotInfo.append("\n> - Puppeted Factions for ")
                         .append(plot.getName())
@@ -127,6 +131,25 @@ public class PuppetSoftHeBladeService {
                 "### " + player.getRepresentation(false, true) + " the following components have been updated:\n> ";
         output += String.join("\n> ", outputStrings);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), output);
+        resolveFirmamentMechFlip(game, player);
+    }
+
+    private static void resolveFirmamentMechFlip(Game game, Player player) {
+        int count = 0;
+        StringBuilder output = new StringBuilder("### " + player.getRepresentation(false, true)
+                + ", the following planets have been taken control of by Vipers Hollow:");
+        for (String planet : game.getPlanetsPlayerIsCoexistingOn(player)) {
+            UnitHolder uH = game.getUnitHolderFromPlanet(planet);
+            if (uH != null && uH.getUnitCount(UnitType.Mech, player) > 0) {
+                count++;
+                output.append("\n> ").append(Helper.getPlanetRepresentation(planet, game));
+                AddPlanetService.addPlanet(player, planet, game);
+            }
+        }
+
+        if (count > 0) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), output.toString());
+        }
     }
 
     // Replacing home system MUST be done before changing faction sheets

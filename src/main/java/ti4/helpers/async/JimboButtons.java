@@ -12,18 +12,18 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.ListUtils;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
+import ti4.game.Tile;
 import ti4.helpers.RegexHelper;
 import ti4.image.TileHelper;
-import ti4.map.Game;
-import ti4.map.Tile;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.model.TileModel;
 
 // Jazz's Interactive Map Builder
-class JimboButtons {
+final class JimboButtons {
     // Main Page
     public static final Button MAIN_PAGE = Buttons.gray(JimboConst.mainPage, "Go back to main menu");
     private static final Button EXIT = Buttons.red(JimboConst.exit, "Exit");
@@ -123,7 +123,6 @@ class JimboButtons {
         try {
             int pagenum;
             String prefix;
-            System.out.println("pagination: " + all.size() + " - " + buttonID);
             Matcher page = Pattern.compile(RegexHelper.pageRegex()).matcher(buttonID);
             if (!page.find()) return false; // no pagenum, don't paginate
             pagenum = Integer.parseInt(page.group("page"));

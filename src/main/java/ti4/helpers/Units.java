@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
@@ -11,11 +12,14 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import lombok.Data;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import ti4.discord.JdaService;
 import ti4.image.Mapper;
+import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
-import ti4.spring.jda.JdaService;
 
+@UtilityClass
 public class Units {
 
     private static final String EMDASH = "—";
@@ -82,11 +86,6 @@ public class Units {
             return String.format("%s_%s.png", colorID, asyncID());
         }
 
-        @JsonIgnore
-        public String getOldUnitID() {
-            return String.format("%s_%s.png", colorID, asyncID());
-        }
-
         public String toString() {
             return String.format("%s—%s", colorID, unitType.humanReadableName());
         }
@@ -101,6 +100,7 @@ public class Units {
         }
     }
 
+    @Getter
     public enum UnitType {
         Infantry("gf"),
         Mech("mf"),
@@ -119,9 +119,9 @@ public class Units {
         Lady("lady"),
         Celagrom("celagrom"),
         Cavalry("cavalry"), // relics
-        StarfallPds("starfallpds");
+        StarfallPds("starfallpds"),
+        MetaliVoidArmaments("metalivoidarmaments");
 
-        @Getter
         public final String value;
 
         UnitType(String value) {
@@ -147,6 +147,7 @@ public class Units {
                 case Lady -> "The Lady";
                 case Celagrom -> "The Celagrom";
                 case Monument -> "Monument";
+                case MetaliVoidArmaments -> "Metali Void Armaments";
             };
         }
 
@@ -169,6 +170,7 @@ public class Units {
                 case Lady -> "lady";
                 case Celagrom -> "celagrom";
                 case Monument -> "monument";
+                case MetaliVoidArmaments -> "metalivoidarmaments";
             };
         }
 
@@ -188,12 +190,33 @@ public class Units {
                 case TyrantsLament -> UnitEmojis.TyrantsLament;
                 case Warsun -> UnitEmojis.warsun;
                 case Monument -> UnitEmojis.Monument;
+                case MetaliVoidArmaments -> ExploreEmojis.Relic;
             };
         }
 
         @Override
         public String toString() {
             return value;
+        }
+
+        @JsonCreator
+        public static UnitType fromJson(String unitType) {
+            if (unitType == null) {
+                return null;
+            }
+
+            UnitType resolved = findUnitType(unitType);
+            if (resolved != null) {
+                return resolved;
+            }
+
+            for (UnitType candidate : values()) {
+                if (candidate.name().equalsIgnoreCase(unitType)) {
+                    return candidate;
+                }
+            }
+
+            throw new IllegalArgumentException("Unknown unit type: " + unitType);
         }
     }
 
@@ -206,6 +229,13 @@ public class Units {
 
         public static final int DMG = 0b0000001;
         public static final int GLV = 0b0000010;
+
+        public static UnitState of(boolean damaged, boolean galvanized) {
+            int ord = 0;
+            ord |= damaged ? DMG : 0;
+            ord |= galvanized ? GLV : 0;
+            return values()[ord];
+        }
 
         public boolean isDamaged() {
             return (ordinal() & DMG) > 0;
@@ -244,8 +274,8 @@ public class Units {
         public String humanDescr() {
             return switch (this) {
                 case none -> "";
-                case dmg -> "damaged";
-                case glv -> "galvanized";
+                case dmg -> "Damaged";
+                case glv -> "Galvanized";
                 case dmg_glv -> "Dmg+Glv";
             };
         }
@@ -299,6 +329,7 @@ public class Units {
             case "celagrom" -> UnitType.Celagrom;
             case "cavalry" -> UnitType.Cavalry;
             case "starfallpds" -> UnitType.StarfallPds;
+            case "metaliafb" -> UnitType.MetaliVoidArmaments;
             default -> null;
         };
     }

@@ -6,7 +6,10 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.CryypterHelper;
@@ -14,9 +17,6 @@ import ti4.helpers.omega_phase.OmegaPhaseModStatusHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.SourceEmojis;
@@ -76,7 +76,7 @@ public class HomebrewService {
                     .append(hb.name)
                     .append("**: ")
                     .append(hb.description)
-                    .append("\n");
+                    .append('\n');
             buttons.add(Buttons.green("setupHomebrew_" + hb, hb.name));
         }
         buttons.add(Buttons.red("setupHomebrewNone", "Remove All Homebrews"));
@@ -102,22 +102,22 @@ public class HomebrewService {
 
     @ButtonHandler("setupHomebrew_")
     public static void setUpHomebrew(Game game, ButtonInteractionEvent event, String buttonID) {
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         game.setHomebrew(true);
 
         Homebrew type = Homebrew.valueOf(buttonID.split("_")[1]);
         switch (type) {
             case HB444 -> {
                 game.setMaxSOCountPerPlayer(4);
-                game.setUpPeakableObjectives(4, 1);
-                game.setUpPeakableObjectives(4, 2);
+                game.setUpPeekableObjectives(4, 1);
+                game.setUpPeekableObjectives(4, 2);
                 game.setVp(12);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up 4/4/4.");
             }
             case HB456 -> {
                 game.setMaxSOCountPerPlayer(4);
-                game.setUpPeakableObjectives(5, 1);
-                game.setUpPeakableObjectives(6, 2);
+                game.setUpPeekableObjectives(5, 1);
+                game.setUpPeekableObjectives(6, 2);
                 game.setVp(14);
                 game.setStoredValue("homebrewMode", "456");
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up 4/5/6/14VP.");
@@ -220,9 +220,9 @@ public class HomebrewService {
                 game.setOmegaPhaseMode(true);
                 game.validateAndSetPublicObjectivesStage1Deck(
                         event, Mapper.getDeck("public_stage_1_objectives_omegaphase"));
-                game.setUpPeakableObjectives(9, 1);
+                game.setUpPeekableObjectives(9, 1);
                 game.shuffleInBottomObjective(Constants.IMPERIUM_REX_ID, 5, 1);
-                game.setUpPeakableObjectives(0, 2);
+                game.setUpPeekableObjectives(0, 2);
                 game.validateAndSetPublicObjectivesStage2Deck(
                         event, Mapper.getDeck("public_stage_2_objectives_omegaphase"));
                 game.setPriorityTrackMode(PriorityTrackMode.FULL);

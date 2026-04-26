@@ -9,21 +9,23 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
+import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.SpinRingsHelper;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.service.info.ListPlayerInfoService;
+import ti4.service.map.SpinService;
 import ti4.service.player.RefreshCardsService;
 
 @UtilityClass
@@ -33,6 +35,7 @@ public class StatusCleanupService {
         game.removeStoredValue("deflectedSC");
         game.removeStoredValue("pharadnPNUsed");
         game.removeStoredValue("willParticipateInSplice");
+        game.removeStoredValue("Puppets On A String");
         Map<String, Tile> tileMap = game.getTileMap();
         for (Tile tile : tileMap.values()) {
             for (Player toldar : game.getRealPlayers()) {
@@ -73,12 +76,18 @@ public class StatusCleanupService {
             sc.setValue(false);
         }
         closeRoundThreads(game);
-
-        Map<String, Player> players = game.getPlayers();
         if (ButtonHelper.isLawInPlay(game, "tf-censure")) {
             game.removeLaw("tf-censure");
         }
-        for (Player player : players.values()) {
+
+        game.setCurrentACDrawStatusInfo("");
+        if (!game.isFowMode()) {
+            for (Player p : game.getActionPhaseTurnOrder()) {
+                ButtonHelper.drawStatusACs(game, p, null);
+            }
+        }
+
+        for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
 
             player.setPassed(false);
             Set<Integer> SCs = player.getSCs();
@@ -114,6 +123,23 @@ public class StatusCleanupService {
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(), "_" + pnModel.getName() + "_ has been returned.");
             }
+            if (game.isCustodiansScored() && !game.isTwilightsFallMode()) {
+                List<String> whens = AgendaHelper.getPossibleWhenNames(player);
+                List<String> afters = AgendaHelper.getPossibleAfterNames(player);
+                if ((player.isAutoPassOnWhensAfters() && whens.isEmpty() && afters.isEmpty()) || player.isNpc()) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.red("undoPassOnAllWhensNAfters", "Undo Pass"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCardsInfoThread(),
+                            player.getRepresentation()
+                                    + ", at the start of the game you indicated a willingness to auto-pass on \"when\"s and \"after\"s if you had none, and so you have been auto-passed."
+                                    + " You can undo this during the agenda if necessary, or with this button.",
+                            buttons);
+                    game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "Yes");
+                } else {
+                    AgendaHelper.offerPlayerPassOnWhensNAfters(player);
+                }
+            }
         }
         for (int x = 0; x < 13; x++) {
             if (!game.getStoredValue("exhaustedSC" + x).isEmpty()) {
@@ -139,13 +165,14 @@ public class StatusCleanupService {
             if ("ON".equalsIgnoreCase(game.getSpinMode())) {
                 SpinRingsHelper.spinRings(game);
             } else {
-                SpinRingsHelper.spinRingsCustom(game, game.getSpinMode(), null);
+                SpinService.executeSpinsForTrigger(game, SpinService.AutoTrigger.STATUS);
             }
         }
-        if (!game.isFowMode() && game.getTableTalkChannel() != null && !game.isOmegaPhaseMode()) {
+        TextChannel tableTalkChannel = game.getTableTalkChannel();
+        if (!game.isFowMode() && tableTalkChannel != null && !game.isOmegaPhaseMode()) {
             MessageHelper.sendMessageToChannel(
-                    game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
-            ListPlayerInfoService.displayerScoringProgression(game, true, game.getTableTalkChannel(), "both");
+                    tableTalkChannel, "## End of Round #" + game.getRound() + " Scoring Info");
+            ListPlayerInfoService.displayerScoringProgression(game, true, tableTalkChannel, "both");
         }
         game.clearAllEmptyStoredValues();
     }
@@ -161,8 +188,8 @@ public class StatusCleanupService {
                     continue;
                 }
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
-                if ((pnModel.getText().contains("return this card")
-                        && pnModel.getText().contains("end of the status phase"))) {
+                if ((pnModel.getText().toLowerCase().contains("return this card")
+                        && pnModel.getText().toLowerCase().contains("end of the status phase"))) {
                     player.removePromissoryNote(pn);
                     pnOwner.setPromissoryNote(pn);
                     PromissoryNoteHelper.sendPromissoryNoteInfo(game, pnOwner, false);
@@ -186,8 +213,9 @@ public class StatusCleanupService {
                             && tech != null) {
                         game.removeStoredValue(shareKnowledgeConst);
                         player.removeTech(sharedKnowledge);
-                        String msg = player.getRepresentation() + " technology " + tech.getRepresentation(false)
-                                + " has been removed, and Share Knowledge has been returned to the owner.";
+                        String msg = player.getRepresentation() + ", " + tech.getRepresentation(false)
+                                + " has been removed, and _Share Knowledge_ has been returned to "
+                                + (game.isFrankenGame() ? "the owner" : "the Deepwrought player") + ".";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     }
                 }

@@ -7,7 +7,11 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CommandCounterHelper;
@@ -18,10 +22,6 @@ import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
@@ -73,8 +73,8 @@ public class TheIconService {
         buttons.add(Buttons.blue("useTheIcon", "Use The Icon", FactionEmojis.Bastion));
         buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Decline"));
 
-        String msg = player.getRepresentationUnfogged() + " you can use your breakthrough, " + theIcon()
-                + ", to place your produced ships in a different eligible system.";
+        String msg = player.getRepresentationUnfogged() + " you can use " + theIcon()
+                + " to place your produced ships in a different eligible system.";
         MessageHelper.sendMessageToChannel(event.getChannel(), msg, buttons);
     }
 
@@ -89,7 +89,7 @@ public class TheIconService {
                 || getEligibleIconDestinations(game, player).isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "Something went wrong, I don't know how to resolve The Icon right now. Please resolve it manually.");
+                    "Something went wrong, I don't know how to resolve _The Icon_ right now. Please resolve it manually.");
             return;
         }
 
@@ -108,7 +108,7 @@ public class TheIconService {
 
         String msg = "You produced the following ships:" + producedSummary;
         msg += "\n\nChoose a system that contains your command token, your ground force, and no other player's ships.";
-        msg += "\n> Warning: ALL of the listed ships will be moved to the destination system.";
+        msg += "\n> Warning: __All__ of the listed ships will be moved to the destination system.";
         List<Button> destButtons = new ArrayList<>();
         for (String pos : getEligibleIconDestinations(game, player)) {
             Tile tile = game.getTileByPosition(pos);

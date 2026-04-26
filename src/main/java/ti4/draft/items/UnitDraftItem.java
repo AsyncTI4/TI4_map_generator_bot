@@ -4,9 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
+import ti4.game.Game;
 import ti4.image.Mapper;
-import ti4.map.Game;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
@@ -16,17 +17,23 @@ import ti4.service.emoji.TI4Emoji;
 public class UnitDraftItem extends DraftItem {
 
     public UnitDraftItem(String itemId) {
-        super(Category.UNIT, itemId);
+        super(DraftCategory.UNIT, itemId);
+    }
+
+    @JsonIgnore
+    @Override
+    public String getTitle(Game game) {
+        return getUnit().getNameRepresentation();
     }
 
     private UnitModel getUnit() {
-        return Mapper.getUnit(ItemId);
+        return Mapper.getUnit(getItemId());
     }
 
     @JsonIgnore
     @Override
     public String getShortDescription() {
-        return "Unit - " + getUnit().getName() + " (" + getUnit().getUnitType().toString() + ")";
+        return getUnit().getName();
     }
 
     @JsonIgnore
@@ -51,7 +58,7 @@ public class UnitDraftItem extends DraftItem {
             if (unit.getCombatDieCount() > 1) {
                 sb.append("x").append(unit.getCombatDieCount());
             }
-            sb.append(" ");
+            sb.append(' ');
         }
 
         if (unit.getSustainDamage()) {
@@ -62,30 +69,35 @@ public class UnitDraftItem extends DraftItem {
                     .append(unit.getAfbHitsOn())
                     .append("x")
                     .append(unit.getAfbDieCount())
-                    .append(" ");
+                    .append(' ');
         }
         if (unit.getSpaceCannonDieCount() > 0) {
             sb.append("SPACE CANNON ")
                     .append(unit.getSpaceCannonHitsOn())
                     .append("x")
                     .append(unit.getSpaceCannonDieCount())
-                    .append(" ");
+                    .append(' ');
         }
         if (unit.getProductionValue() > 0) {
             sb.append("PRODUCTION ");
             sb.append(unit.getProductionValue());
-            sb.append(" ");
+            sb.append(' ');
         }
         if (unit.getCapacityValue() > 0) {
             sb.append("Capacity ");
             sb.append(unit.getCapacityValue());
-            sb.append(" ");
+            sb.append(' ');
         }
-        if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get()).append(" ");
+        if (unit.getMoveValue() > 0) {
+            sb.append("Move ");
+            sb.append(unit.getMoveValue());
+            sb.append(' ');
+        }
+        if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get()).append(' ');
         if (unit.getFaction().isPresent()) {
             sb.append("Faction: ").append(unit.getFaction().get());
         }
-        return sb.toString();
+        return sb + "\n";
     }
 
     @JsonIgnore
@@ -96,7 +108,7 @@ public class UnitDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems() {
         List<DraftItem> allItems = buildAllItems();
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.UNIT);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.UNIT);
         return allItems;
     }
 
@@ -108,7 +120,7 @@ public class UnitDraftItem extends DraftItem {
             if (mod.getFaction().isPresent() && mod.getSource() == ComponentSource.twilights_fall) {
                 FactionModel faction = Mapper.getFaction(mod.getFaction().get());
                 if (faction != null && faction.getSource() != ComponentSource.twilights_fall) {
-                    allItems.add(generate(Category.UNIT, entry.getKey()));
+                    allItems.add(generate(DraftCategory.UNIT, entry.getKey()));
                 }
             }
         }

@@ -13,18 +13,18 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.model.ActionCardModel;
 import ti4.service.emoji.CardEmojis;
 
-public class NewStuffHelper {
+public final class NewStuffHelper {
 
     public static List<Button> buttonPagination(List<Button> allButtons, String prefixID, int pageNum) {
         return buttonPagination(allButtons, null, prefixID, 25, pageNum, false);
@@ -72,7 +72,7 @@ public class NewStuffHelper {
                 buttonsToUse.add(nextPage);
             }
             if (extraButtons != null) buttonsToUse.addAll(extraButtons);
-            if (deleteButton) buttonsToUse.add(Buttons.red("deleteButtons", "Delete these buttons"));
+            if (deleteButton) buttonsToUse.add(Buttons.red("deleteButtons", "Delete These Buttons"));
             return buttonsToUse;
         }
         return allButtons;
@@ -109,8 +109,7 @@ public class NewStuffHelper {
 
     public static void sendOrEditButtons(
             GenericInteractionCreateEvent event, MessageChannel channel, String message, List<Button> buttons) {
-        if (event != null
-                && event instanceof ButtonInteractionEvent bEvent
+        if (event instanceof ButtonInteractionEvent bEvent
                 && bEvent.getMessage().getContentRaw().equals(message)) {
             // replace the buttons in the previous message
             List<List<ActionRow>> actionRows = MessageHelper.getPartitionedButtonLists(buttons);
@@ -129,7 +128,8 @@ public class NewStuffHelper {
     public static void resolveGarboziaTE(
             GenericInteractionCreateEvent event, Game game, Player player, String buttonID) {
         String buttonPrefix = player.getFinsFactionCheckerPrefix() + "garbozia_";
-        String message = "Use buttons to pick an action card from the discard and put it on Doc 'N Pic's Salvage Yard:";
+        String message =
+                "Use buttons to pick an action card from the discard and put it on _Doc 'N Pic's Salvage Yard_.";
         List<Button> buttons = garboziaButtons(game, player);
         if (checkAndHandlePaginationChange(
                 event, player.getCorrectChannel(), buttons, message, buttonPrefix, buttonID)) {
@@ -144,9 +144,9 @@ public class NewStuffHelper {
             game.getDiscardACStatus().put(acNum, ACStatus.garbozia);
 
             String msg = player.getRepresentation() + " picked up " + acModel.getName()
-                    + " from the discard and placed it on Doc 'N Pic's Salvage Yard.";
+                    + " from the discard and placed it on _Doc 'N Pic's Salvage Yard_.";
             msg +=
-                    "\n> You can check the cards on garbozia at any time by looking at the Action Card discard pile in the bot map thread";
+                    " You can check the cards on _Doc 'N Pic's Salvage Yard_ at any time by looking at the action card discard pile in the bot map thread.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             ActionCardHelper.sendActionCardInfo(game, player, event);
             ButtonHelper.deleteMessage(event);
@@ -164,7 +164,7 @@ public class NewStuffHelper {
         game.getDiscardActionCards().keySet().stream()
                 .filter(integer -> allowedStatus.contains(status.getOrDefault(integer, null)))
                 .map(integer -> Map.entry(integer, Mapper.getActionCard(integer).getName()))
-                .map(e -> Buttons.green(pre + e.getKey(), e.getValue(), CardEmojis.ActionCard))
+                .map(e -> Buttons.green(pre + e.getKey(), e.getValue(), CardEmojis.getACEmoji(game)))
                 .forEach(allButtons::add);
         return allButtons;
     }

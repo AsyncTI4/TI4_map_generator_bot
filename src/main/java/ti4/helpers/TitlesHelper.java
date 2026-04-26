@@ -10,10 +10,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.persistence.GameManager;
-import ti4.map.persistence.ManagedGame;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
 import ti4.service.game.ManagedGameService;
 
 @UtilityClass
@@ -50,7 +50,7 @@ public class TitlesHelper {
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         for (String title : titles2.keySet()) {
-            sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
+            sb.append('`').append(Helper.leftpad("" + index, 2)).append(".`");
             if (gamesIncluded) {
                 sb.append("**")
                         .append(title)
@@ -62,7 +62,7 @@ public class TitlesHelper {
             } else {
                 sb.append("**").append(title).append("** x").append(titles.get(title));
             }
-            sb.append("\n");
+            sb.append('\n');
             index++;
         }
         if (titles.isEmpty()) {

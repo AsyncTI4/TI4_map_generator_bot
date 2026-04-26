@@ -14,18 +14,18 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import org.apache.commons.lang3.math.NumberUtils;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Space;
+import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Space;
-import ti4.map.Tile;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
@@ -39,7 +39,7 @@ import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.unit.CheckUnitContainmentService;
 
-public class CryypterHelper {
+public final class CryypterHelper {
     // Revised Politics SC
     public static List<Button> getCryypterSC3Buttons(int sc) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
@@ -54,36 +54,8 @@ public class CryypterHelper {
     }
 
     private static void drawXPickYActionCards(Game game, Player player, int draw, boolean addScheming) {
-        if (draw > 10) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    "You probably shouldn't need to ever draw more than 10 cards, double check what you're doing please.");
-            return;
-        }
-        String message = player.getRepresentation() + " drew " + draw + " action card" + (draw == 1 ? "" : "s") + ".";
-        if (addScheming && player.hasAbility("scheming")) {
-            draw++;
-            message = player.getRepresentation() + " drew " + draw + " action card" + (draw == 1 ? "" : "s")
-                    + " (**Scheming** increases this from the normal " + (draw - 1) + " action card"
-                    + (draw == 2 ? "" : "s") + ").";
-        }
-
-        for (int i = 0; i < draw; i++) {
-            game.drawActionCard(player.getUserID());
-        }
-        ActionCardHelper.sendActionCardInfo(game, player);
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + " use buttons to discard 1 of the " + draw + " cards just drawn.",
-                ActionCardHelper.getDiscardActionCardButtons(player, false));
-
-        ButtonHelper.checkACLimit(game, player);
-        if (addScheming && player.hasAbility("scheming")) ActionCardHelper.sendDiscardActionCardButtons(player, false);
-        if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
-            CommanderUnlockCheckService.checkPlayer(player, "yssaril");
-        }
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        ActionCardHelper.drawActionCards(player, draw);
+        ActionCardHelper.sendACDiscardButtons(player);
     }
 
     // VotC Setup
@@ -590,7 +562,7 @@ public class CryypterHelper {
                                 message2.append(" " + ExploreEmojis.HFrag);
                             case "irf1", "irf2", "irf3", "irf4", "irf5" -> message2.append(" " + ExploreEmojis.IFrag);
                             case "urf1", "urf2", "urf3" -> message2.append(" " + ExploreEmojis.UFrag);
-                            default -> message2.append(" ").append(fragid);
+                            default -> message2.append(' ').append(fragid);
                         }
                     }
                     CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");

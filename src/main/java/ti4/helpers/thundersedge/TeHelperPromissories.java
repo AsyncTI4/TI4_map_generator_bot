@@ -6,7 +6,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -16,12 +22,6 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
@@ -31,7 +31,7 @@ import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
-public class TeHelperPromissories {
+public final class TeHelperPromissories {
 
     public static void offerShareKnowledgeButtons(Game game, Player player) {
         Player dws = game.getPNOwner("shareknowledge");
@@ -44,11 +44,14 @@ public class TeHelperPromissories {
                     && !techModel.getFaction().orElse("").isEmpty()) continue; // no faction techs
             if (techModel.isUnitUpgrade()) continue;
             if (player.hasTech(tech)) continue;
+            if (player.getPurgedTechs().contains(tech)) continue;
             techsToAdd.add(techModel);
         }
         List<Button> buttons = ListTechService.getTechButtons(techsToAdd, player, "shareKnowledge");
         MessageHelper.sendMessageToChannelWithButtons(
-                game.getActionsChannel(), "Choose a tech to copy until the end of status phase:", buttons);
+                player.getCorrectChannel(),
+                "Please choose the technology you wish to copy until the end of Status Phase.",
+                buttons);
     }
 
     @ButtonHandler("startCourierTransport_")
@@ -60,7 +63,7 @@ public class TeHelperPromissories {
             List<Button> buttons = getCourierTransportButtons(game, player, destination);
             buttons.add(Buttons.DONE_DELETE_BUTTONS);
 
-            String msg = player.getRepresentation() + " Choose which structures to move:";
+            String msg = player.getRepresentation() + ", please choose which structures you wish to move.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
     }
@@ -93,7 +96,7 @@ public class TeHelperPromissories {
             PromissoryNoteModel courier = Mapper.getPromissoryNote("nanolink");
             String name = courier.getNameRepresentation();
             if (game.isTwilightsFallMode()) {
-                name = "Courier Transport";
+                name = "_Courier Transport_";
             } else {
                 PromissoryNoteHelper.resolvePNPlay("nanolink", player, game, event);
             }
@@ -101,7 +104,7 @@ public class TeHelperPromissories {
                     "%s moved %s from %s to %s using %s.",
                     player.getRepresentation(), unit.humanReadableName(), srcStr, destStr, name);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         });
     }
 

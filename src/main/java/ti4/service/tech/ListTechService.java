@@ -8,7 +8,11 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -17,10 +21,6 @@ import ti4.helpers.RegexHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
@@ -66,26 +66,27 @@ public class ListTechService {
             TechnologyModel model = Mapper.getTech(tech);
 
             String error = null;
-            boolean scepter = player.hasRelicReady("scepter") || player.hasRelicReady("absol_scepter");
+            boolean scepter = player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar");
             if (player.getStrategicCC() < 1 && !scepter) {
                 error = player.getRepresentation()
-                        + " You seem to have misplaced your strategy tokens, and cannot use the Entropic Scar anomaly.";
+                        + ", you seem to have misplaced your strategy tokens, and cannot use the Entropic Scar anomaly.";
             } else if (model == null) {
                 error = "Could not find tech: " + tech;
             } else if (player.hasTech(tech)) {
-                error = player.getRepresentation() + " You already have " + model.getName();
+                error = player.getRepresentation() + ", you already have " + model.getName();
             } else {
-                String msg = player.getRepresentation() + " You gained " + model.getNameRepresentation()
+                String msg = player.getRepresentation() + ", you gained " + model.getNameRepresentation()
                         + " using the Entropic Scar anomaly.";
                 if (scepter) {
-                    msg += "\n> Exhausted the " + RelicHelper.sillySpelling();
+                    msg += " Exhausted the _" + RelicHelper.sillySpelling() + "_.";
                 } else {
-                    msg += "\n> Reduced Strategy CCs by 1 (" + player.getStrategicCC();
+                    msg += " Spent 1 token from their strategy pool (" + player.getStrategicCC();
                     player.setStrategicCC(player.getStrategicCC() - 1);
-                    msg += "->" + player.getStrategicCC() + ")";
+                    msg += "->" + player.getStrategicCC() + ").";
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
                 }
                 player.addTech(tech);
+                ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 ButtonHelper.deleteMessage(event);
             }
@@ -191,10 +192,10 @@ public class ListTechService {
             buttons.addAll(getTechButtons(techs, player, payType));
         }
 
-        if (game.isComponentAction()) {
-            buttons.add(Buttons.gray("acquireATech", "Get Other Technology"));
-        } else if (dwsBt) {
+        if (dwsBt) {
             buttons.add(Buttons.gray("acquireATechWithDwsBt_second", "Get Other Technology"));
+        } else if (game.isComponentAction()) {
+            buttons.add(Buttons.gray("acquireATech", "Get Other Technology"));
         } else {
             buttons.add(Buttons.gray("acquireATechWithSC_second", "Get Other Technology"));
         }
@@ -435,6 +436,7 @@ public class ListTechService {
                 .filter(tech -> !player.hasTech(tech.getAlias()) || deepwroughthero)
                 .filter(tech -> tech.getFaction().isEmpty()
                         || "".equalsIgnoreCase(tech.getFaction().get())
+                        || (deepwroughthero && player.hasTech(tech.getAlias()))
                         || player.getNotResearchedFactionTechs().contains(tech.getAlias()))
                 .toList();
 

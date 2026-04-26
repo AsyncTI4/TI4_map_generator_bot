@@ -8,12 +8,12 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.handlers.strategycard.PickStrategyCardButtonHandler;
+import ti4.discord.interactions.buttons.handlers.strategycard.PickStrategyCardButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.Helper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.game.StartPhaseService;
 import ti4.service.player.PlayerStatsService;
@@ -33,7 +33,7 @@ public class PickStrategyCardService {
             maxSCsPerPlayer = 1;
         }
         if (!game.getStoredValue("exhaustedSC" + scPicked).isEmpty()) {
-            game.setSCPlayed(scPicked, true);
+            game.setSCPlayed(scPicked, Boolean.TRUE);
         }
 
         boolean nextCorrectPing = false;
@@ -61,24 +61,22 @@ public class PickStrategyCardService {
 
         // SEND EXTRA MESSAGE
         if (isFowPrivateGame) {
-            String fail = "User for next faction not found. Report to ADMIN.";
-            String success = "The next player has been notified.";
-            MessageHelper.sendPrivateMessageToPlayer(privatePlayer, game, event, msgExtra, fail, success);
-            game.updateActivePlayer(privatePlayer);
-            if (!allPicked) {
-                game.setPhaseOfGame("strategy");
+            if (privatePlayer != null) {
+                MessageHelper.sendMessageToChannel(privatePlayer.getPrivateChannel(), msgExtra);
                 game.updateActivePlayer(privatePlayer);
-                boolean queuedPick = false;
-                if (event instanceof ButtonInteractionEvent bevent) {
-                    queuedPick = checkForQueuedSCPick(bevent, privatePlayer, game, msgExtra);
+                if (!allPicked) {
+                    game.setPhaseOfGame("strategy");
+                    game.updateActivePlayer(privatePlayer);
+                    boolean queuedPick = false;
+                    if (event instanceof ButtonInteractionEvent bevent) {
+                        queuedPick = checkForQueuedSCPick(bevent, privatePlayer, game, msgExtra);
+                    }
+                    if (!queuedPick) {
+                        checkForForcePickLastStratCard(event, privatePlayer, game, msgExtra);
+                    } else {
+                        return;
+                    }
                 }
-                if (!queuedPick) {
-                    checkForForcePickLastStratCard(event, privatePlayer, game, msgExtra);
-                } else {
-                    return;
-                }
-                // MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use buttons to pick
-                // your strategy card.", Helper.getRemainingSCButtons(game, privatePlayer));
             }
         } else {
             if (!allPicked) {
@@ -182,7 +180,7 @@ public class PickStrategyCardService {
 
     public static List<Player> getSCPickOrder(Game game) {
         if (game.hasAnyPriorityTrackMode()) {
-            List<Player> pickOrder = PriorityTrackHelper.GetPriorityTrack(game);
+            List<Player> pickOrder = PriorityTrackHelper.getPriorityTrack(game);
             if (game.getPriorityTrackMode() == PriorityTrackMode.AFTER_SPEAKER) {
                 Player speaker = game.getSpeaker();
                 if (speaker != null) {

@@ -17,21 +17,22 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.buttons.Buttons;
+import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
-import ti4.draft.DraftItem.Category;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.image.TileHelper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
 import ti4.service.draft.MantisMapBuildContext.PlayerTiles;
-import ti4.spring.jda.JdaService;
+import ti4.service.explore.AddFrontierTokensService;
 
 @UtilityClass
 public class MantisMapBuildService {
@@ -92,7 +93,8 @@ public class MantisMapBuildService {
         // Get these before placing the tile, since the tile won't be available afterwards
         PlayerTiles playerTiles = getPlayerTilesWithTileId(mapBuildContext.availablePlayerTiles(), tileId);
         Player player = mapBuildContext.game().getPlayer(playerTiles.playerUserId());
-        Category tileCategory = playerTiles.blueTileIds().contains(tileId) ? Category.BLUETILE : Category.REDTILE;
+        DraftCategory tileCategory =
+                playerTiles.blueTileIds().contains(tileId) ? DraftCategory.BLUETILE : DraftCategory.REDTILE;
         DraftItem placedTile = DraftItem.generate(tileCategory, tileId);
 
         if (!placeTile(mapBuildContext, position, tileId)) {
@@ -128,7 +130,8 @@ public class MantisMapBuildService {
         MantisMapBuildContext updatedContext = mapBuildContext.afterMulligan();
         PlayerTiles playerTiles = getPlayerTilesWithTileId(mapBuildContext.availablePlayerTiles(), tileId);
         Player player = mapBuildContext.game().getPlayer(playerTiles.playerUserId());
-        Category tileCategory = playerTiles.blueTileIds().contains(tileId) ? Category.BLUETILE : Category.REDTILE;
+        DraftCategory tileCategory =
+                playerTiles.blueTileIds().contains(tileId) ? DraftCategory.BLUETILE : DraftCategory.REDTILE;
         DraftItem oldTileItem = DraftItem.generate(tileCategory, tileId);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
@@ -164,7 +167,8 @@ public class MantisMapBuildService {
             return "Error: You do not have tile " + tileId + " drafted.";
         }
 
-        Category tileCategory = playerTiles.blueTileIds().contains(tileId) ? Category.BLUETILE : Category.REDTILE;
+        DraftCategory tileCategory =
+                playerTiles.blueTileIds().contains(tileId) ? DraftCategory.BLUETILE : DraftCategory.REDTILE;
 
         mapBuildContext.persistDiscard().accept(tileId);
 
@@ -177,7 +181,7 @@ public class MantisMapBuildService {
                 .findFirst()
                 .orElse(null);
 
-        boolean categoryNeedsDiscard = tileCategory == Category.BLUETILE
+        boolean categoryNeedsDiscard = tileCategory == DraftCategory.BLUETILE
                 ? playerRemainingTiles.blueTileIds().size()
                         > mapBuildContext.mapTemplateModel().bluePerPlayer()
                 : playerRemainingTiles.redTileIds().size()
@@ -192,7 +196,7 @@ public class MantisMapBuildService {
             return DraftButtonService.DELETE_MESSAGE;
         } else if (!categoryNeedsDiscard) {
             // This player is done discarding this one type
-            String tileType = tileCategory == Category.BLUETILE ? "blue" : "red";
+            String tileType = tileCategory == DraftCategory.BLUETILE ? "blue" : "red";
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "You've finished discarding " + tileType + " tiles.");
             return DraftButtonService.DELETE_MESSAGE;
@@ -304,6 +308,20 @@ public class MantisMapBuildService {
                     }
                 });
             }
+            Game game = mapBuildContext.game();
+            AddFrontierTokensService.addFrontierTokens(null, game);
+            if (game.getTileByPosition("tl") == null) {
+                game.setTile(new Tile("82a", "tl"));
+            } else {
+                if (game.getTileByPosition("tr") == null) {
+                    game.setTile(new Tile("82a", "tr"));
+                } else {
+                    if (game.getTileByPosition("bl") == null) {
+                        game.setTile(new Tile("82a", "bl"));
+                    }
+                }
+            }
+            game.setShowMapSetup(false);
             // Update the main game map
             ButtonHelper.updateMap(mapBuildContext.game(), event, "Mantis Map Build Completed");
             // Do any post-build work
@@ -363,7 +381,7 @@ public class MantisMapBuildService {
 
         // If only one position, do it now and call this recursively
         if (nextGroup.size() == 1 && !canMulligan) {
-            boolean success = placeTile(mapBuildContext, nextGroup.getFirst(), nextTile.ItemId);
+            boolean success = placeTile(mapBuildContext, nextGroup.getFirst(), nextTile.getItemId());
             if (!success) return;
 
             MessageHelper.sendMessageToChannel(
@@ -386,7 +404,7 @@ public class MantisMapBuildService {
                 : mapBuildContext.mulliganLimit() > 0 ? " (No mulligans remaining.)" : "";
 
         FileUpload mapImage = MantisBuildImageGeneratorService.tryGenerateImage(
-                mapBuildContext, IMAGE_UNIQUE_STRING, nextGroup, nextTile.ItemId);
+                mapBuildContext, IMAGE_UNIQUE_STRING, nextGroup, nextTile.getItemId());
         if (mapImage != null) {
             sendMapImage(event, responseChannel, mapImage);
         }
@@ -416,11 +434,11 @@ public class MantisMapBuildService {
         List<Button> buttons = new ArrayList<>();
         for (String pos : openPositions) {
             String buttonId =
-                    mapBuildContext.makeButtonId().apply(ACTION_PREFIX + "place_" + pos + "_" + nextTile.ItemId);
+                    mapBuildContext.makeButtonId().apply(ACTION_PREFIX + "place_" + pos + "_" + nextTile.getItemId());
             buttons.add(Buttons.blue(buttonId, pos));
         }
         if (canMulligan) {
-            String buttonId = mapBuildContext.makeButtonId().apply(ACTION_PREFIX + "mulligan_" + nextTile.ItemId);
+            String buttonId = mapBuildContext.makeButtonId().apply(ACTION_PREFIX + "mulligan_" + nextTile.getItemId());
             buttons.add(Buttons.gray(buttonId, "Mulligan"));
         }
         buttons.add(Buttons.gray(mapBuildContext.makeButtonId().apply(ACTION_PREFIX + "repost"), "Repost build info"));
@@ -502,9 +520,9 @@ public class MantisMapBuildService {
         String drawnTileId = mapBuildContext.drawnTileId();
         if (drawnTileId != null && !drawnTileId.isEmpty()) {
             if (playerRemainingTiles.blueTileIds().contains(drawnTileId)) {
-                return DraftItem.generate(Category.BLUETILE, drawnTileId);
+                return DraftItem.generate(DraftCategory.BLUETILE, drawnTileId);
             } else if (playerRemainingTiles.redTileIds().contains(drawnTileId)) {
-                return DraftItem.generate(Category.REDTILE, drawnTileId);
+                return DraftItem.generate(DraftCategory.REDTILE, drawnTileId);
             } else {
                 MessageHelper.sendMessageToChannel(
                         responseChannel,
@@ -535,8 +553,9 @@ public class MantisMapBuildService {
         Collections.shuffle(availableTileIDs);
         String selectedTileId = availableTileIDs.getFirst();
         mapBuildContext.persistDrawnTile().accept(selectedTileId);
-        Category category =
-                playerRemainingTiles.blueTileIds().contains(selectedTileId) ? Category.BLUETILE : Category.REDTILE;
+        DraftCategory category = playerRemainingTiles.blueTileIds().contains(selectedTileId)
+                ? DraftCategory.BLUETILE
+                : DraftCategory.REDTILE;
         return DraftItem.generate(category, selectedTileId);
     }
 
@@ -695,7 +714,7 @@ public class MantisMapBuildService {
                 sendDiscardButtons(
                         mapBuildContext,
                         player,
-                        Category.BLUETILE,
+                        DraftCategory.BLUETILE,
                         prt.blueTileIds(),
                         blueToDiscard,
                         mapBuildContext.mapTemplateModel().bluePerPlayer());
@@ -707,7 +726,7 @@ public class MantisMapBuildService {
                 sendDiscardButtons(
                         mapBuildContext,
                         player,
-                        Category.REDTILE,
+                        DraftCategory.REDTILE,
                         prt.redTileIds(),
                         redToDiscard,
                         mapBuildContext.mapTemplateModel().redPerPlayer());
@@ -718,20 +737,19 @@ public class MantisMapBuildService {
     private void sendDiscardButtons(
             MantisMapBuildContext mapBuildContext,
             Player player,
-            Category category,
+            DraftCategory category,
             List<String> tileIds,
             int toDiscard,
             int desiredAmount) {
         if (toDiscard <= 0) return;
         if (tileIds == null || tileIds.isEmpty()) return;
-        if (toDiscard > tileIds.size()) toDiscard = tileIds.size();
         List<Button> discardButtons = new ArrayList<>();
         for (String tileId : tileIds) {
             String buttonId = mapBuildContext.makeButtonId().apply(ACTION_PREFIX + "discard_" + tileId);
             DraftItem item = DraftItem.generate(category, tileId);
-            if (category == Category.BLUETILE) {
+            if (category == DraftCategory.BLUETILE) {
                 discardButtons.add(Buttons.blue(buttonId, item.getShortDescription(), item.getItemEmoji()));
-            } else if (category == Category.REDTILE) {
+            } else if (category == DraftCategory.REDTILE) {
                 discardButtons.add(Buttons.red(buttonId, item.getShortDescription(), item.getItemEmoji()));
             }
         }

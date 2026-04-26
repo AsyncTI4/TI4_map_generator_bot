@@ -14,7 +14,13 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
@@ -33,16 +39,9 @@ import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
-import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
@@ -63,6 +62,8 @@ import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.GMService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.ListTurnOrderService;
+import ti4.service.leader.PlayHeroService;
+import ti4.service.map.SpinService;
 import ti4.service.planet.PlanetService;
 import ti4.service.strategycard.PickStrategyCardService;
 import ti4.service.turn.StartTurnService;
@@ -106,7 +107,7 @@ public class StartPhaseService {
             }
             case "statusScoring" -> {
                 StatusHelper.AnnounceStatusPhase(game);
-                StatusHelper.BeginScoring(event, game, event.getMessageChannel());
+                StatusHelper.beginScoring(event, game, event.getMessageChannel());
                 StatusHelper.HandleStatusPhaseMiddle(event, game, event.getMessageChannel());
                 game.updateActivePlayer(null);
             }
@@ -121,7 +122,7 @@ public class StartPhaseService {
                             summary.append(player.getFactionEmoji())
                                     .append(": ")
                                     .append(game.getStoredValue("endofround" + x + player.getFaction()))
-                                    .append("\n");
+                                    .append('\n');
                         }
                     }
                     if (!summary.isEmpty()) {
@@ -146,11 +147,19 @@ public class StartPhaseService {
     public static List<Button> getQueueSCPickButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         String alreadyQueued = game.getStoredValue(player.getFaction() + "scpickqueue");
+        Set<Integer> alreadyPicked = new HashSet<>();
+        for (Player p : game.getRealPlayers()) {
+            if (p.getSCs() != null) {
+                alreadyPicked.addAll(p.getSCs());
+            }
+        }
         boolean hasQueue = false;
         for (int x = 1; x < 9; x++) {
             String num = x + "";
             if (alreadyQueued.contains(num)) {
                 hasQueue = true;
+                continue;
+            } else if (alreadyPicked.contains(x) && !game.isFowMode()) {
                 continue;
             }
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(x);
@@ -168,7 +177,7 @@ public class StartPhaseService {
         if (alreadyQueued.isEmpty()) {
             numQueued = 0;
         }
-        StringBuilder msg = new StringBuilder(player.getRepresentationNoPing() + " you are #" + number
+        StringBuilder msg = new StringBuilder(player.getRepresentationNoPing() + ", you are #" + number
                 + " pick in this Strategy Phase and so can queue " + number + " strategy cards."
                 + " So far you have queued " + numQueued + " cards. ");
         if (game.isFowMode()) {
@@ -187,9 +196,9 @@ public class StartPhaseService {
                 msg.append(count)
                         .append(". ")
                         .append(Helper.getSCName(Integer.parseInt(num), game))
-                        .append(" ")
+                        .append(' ')
                         .append(scEmoji)
-                        .append("\n");
+                        .append('\n');
             }
         }
         return msg.toString();
@@ -232,6 +241,15 @@ public class StartPhaseService {
             Helper.setOrder(game);
         }
         game.removeStoredValue("shouldntChangeTurnOrder");
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2.hasTech("tf-telepathic")) {
+                game.setStoredValue("TFTelepathicHolder", p2.getFaction());
+            } else {
+                game.setStoredValue(
+                        "TFTelepathicHolder",
+                        game.getStoredValue("TFTelepathicHolder").replace(p2.getFaction(), ""));
+            }
+        }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round " + round);
         if (game.isShowBanners()) {
             BannerGenerator.drawPhaseBanner("strategy", round, game.getActionsChannel());
@@ -284,8 +302,7 @@ public class StartPhaseService {
                         player2.getCorrectChannel(), msg + "the first technology.", buttons);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player2.getCorrectChannel(), msg + "the second technology.", buttons);
-                player2.removeLeader("zealotshero");
-                DSHelperBreakthroughs.doLanefirBtCheck(game, player2);
+                PlayHeroService.removeLeader(game, player2, player2.unsafeGetLeader("zealotshero"));
                 ButtonHelperHeroes.checkForMykoHero(game, "zealotshero", player2);
                 game.setStoredValue("zealotsHeroTechs", "");
                 game.setStoredValue("zealotsHeroPurged", "true");
@@ -455,13 +472,13 @@ public class StartPhaseService {
                 PriorityTrackHelper.PrintPriorityTrack(game);
             } else {
                 Player speaker = game.getSpeaker();
-                List<Player> priorityTrack = PriorityTrackHelper.GetPriorityTrack(game);
+                List<Player> priorityTrack = PriorityTrackHelper.getPriorityTrack(game);
                 StringBuilder sb = new StringBuilder("**Priority Track (Speaker first)**\n");
                 if (speaker != null) {
                     sb.append(MiscEmojis.SpeakerToken)
-                            .append(" ")
+                            .append(' ')
                             .append(speaker.getRepresentation())
-                            .append("\n");
+                            .append('\n');
                 }
                 for (var i = 0; i < priorityTrack.size(); i++) {
                     int priority = i + 1;
@@ -496,6 +513,7 @@ public class StartPhaseService {
         game.setPhaseOfGame("strategy");
         GMService.logActivity(game, "**Strategy** Phase for Round " + game.getRound() + " started.", true);
         FowCommunicationThreadService.checkAllCommThreads(game);
+        SpinService.executeSpinsForTrigger(game, SpinService.AutoTrigger.STRATEGY);
         String pickSCMsg = " Please use the buttons to pick a strategy card.";
         if (game.getLaws().containsKey("checks") || game.getLaws().containsKey("absol_checks")) {
             pickSCMsg = " Please use the buttons to pick the strategy card you wish to give to someone else.";
@@ -651,12 +669,26 @@ public class StartPhaseService {
                             + ", a reminder this is the window to play The Oracle, the Naalu Hero. You may use the buttons to start the process.",
                     buttons);
         }
+        playerLeader = player.getLeader("poisonhero").orElse(null);
+        if (player.hasLeader("poisonhero")
+                && player.getLeaderByID("poisonhero").isPresent()
+                && !playerLeader.isLocked()) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("poisonHeroInitiation", "Play Poison Hero", LeaderEmojis.NaaluHero));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged()
+                            + ", a reminder this is the window to play the Poison Hero. You may use the buttons to start the process.",
+                    buttons);
+        }
+
         if (player.getRelics() != null && player.hasRelic("mawofworlds") && game.isCustodiansScored()) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
                             + ", a reminder this is the window to purge _Maw of Worlds_, after you do your status homework things."
-                            + " _Maw of Worlds_ is technically start of agenda, but can be done now for efficiency");
+                            + " _Maw of Worlds_ is technically start of agenda, but can be done now for efficiency.");
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged() + ", you may use these buttons to resolve _Maw Of Worlds_.",
@@ -664,7 +696,8 @@ public class StartPhaseService {
         }
         if (player.hasTech("bio")) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), player.getRepresentationUnfogged() + " can resolve Bioplasmosis now");
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + " may resolve _Bioplasmosis_ now.");
             ButtonHelper.resolveTransitDiodesStep1(game, player);
         }
         if (game.isCustodiansScored() && player.hasTech("dsrohdy")) {
@@ -718,16 +751,14 @@ public class StartPhaseService {
             }
         }
 
-        if (player.getActionCards() != null && player.getPlayableActionCards().contains("stability")) {
+        if (player.getPlayableActionCards().contains("stability")) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
                             + ", a reminder that this is the window to play _Political Stability_.");
         }
 
-        if (player.getActionCards() != null
-                && player.getPlayableActionCards().contains("abs")
-                && game.isCustodiansScored()) {
+        if (player.getPlayableActionCards().contains("abs") && game.isCustodiansScored()) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
@@ -735,21 +766,16 @@ public class StartPhaseService {
         }
 
         for (String pn : player.getPromissoryNotes().keySet()) {
-            if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
-                String cyberMessage =
-                        player.getRepresentationUnfogged() + ", a reminder to use _Cybernetic Enhancements_.";
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), cyberMessage);
-            }
             if (!player.ownsPromissoryNote("malevolency") && "malevolency".equalsIgnoreCase(pn)) {
-                boolean mahactMalev = player.getMahactCC().size() > 0;
+                boolean mahactMalev = !player.getMahactCC().isEmpty();
                 if (mahactMalev) {
-                    String malevMsg = "## " + player.getRepresentationUnfogged() + " you should gain your normal";
-                    malevMsg += " amount of tokens now, and then you will have the option to lose your own or another";
-                    malevMsg += " player's command token from your fleet pool due to _Malevolency_. Plan accordingly.";
+                    String malevMsg = "## " + player.getRepresentationUnfogged() + " you should gain your normal"
+                            + " amount of tokens now, and then you will have the option to lose your own or another"
+                            + " player's command token from your fleet pool due to _Malevolency_. Plan accordingly.";
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), malevMsg);
                 } else {
                     String malevMsg = "## " + player.getRepresentationUnfogged() + ", a reminder";
-                    malevMsg += " you should gain 1 less Command token here due to _Malevolency";
+                    malevMsg += " you should gain 1 fewer command token here due to _Malevolency_.";
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), malevMsg);
                 }
             }
@@ -773,9 +799,9 @@ public class StartPhaseService {
                 playersWithSCs++;
             }
         }
+        String message2 = "Resolve status homework using the buttons. \n";
 
         if (playersWithSCs > 0) {
-            StatusCleanupService.runStatusCleanup(game);
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "### " + game.getPing() + " **Status Cleanup Run!**");
             if (!game.isFowMode()) {
@@ -785,14 +811,13 @@ public class StartPhaseService {
                         DisplayType.map,
                         fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
             }
+            StatusCleanupService.runStatusCleanup(game);
         }
-
         for (Player player : game.getRealPlayers()) {
             sendStatusReminders(event, game, player);
         }
-        String message2 = "Resolve status homework using the buttons. \n";
-        game.setCurrentACDrawStatusInfo("");
-        Button draw1AC = Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.ActionCard);
+
+        Button draw1AC = Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.getACEmoji(game));
         Button getCCs = Buttons.green("redistributeCCButtons", "Redistribute, Gain, & Confirm Command Tokens")
                 .withEmoji(Emoji.fromFormatted("🔺"));
         Button yssarilPolicy = null;
@@ -820,27 +845,39 @@ public class StartPhaseService {
         boolean custodiansTaken = game.isCustodiansScored();
         Button passOnAbilities;
         if (custodiansTaken || game.isOmegaPhaseMode()) {
-            passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Agenda");
-            message2 += """
-                This is the moment when you should resolve:\s
-                - _Political Stability_\s
-                - _Ancient Burial Sites_\s
-                - _Maw of Worlds_\s
-                - The Oracle, the Naalu hero
-                - Neuraloop purging to redraw an objective
-                - _The Crown of Emphidia_
-                Please click the "Ready For Agenda" button once you are done resolving these or if you decline to do so.""";
+            String agenda = "Agenda Phase";
+            if (game.isTwilightsFallMode()) {
+                agenda = "Benediction Phase";
+            }
+            passOnAbilities = Buttons.red("pass_on_abilities", "Ready For " + agenda);
+            message2 +=
+                    "This is the moment when you should resolve:\n- _Political Stability_\n- _Ancient Burial Sites_\n";
+            boolean crownPresent = false, mawPresent = false, neuraloopPresent = false, oraclePresent = false;
+            for (Player p : game.getRealPlayers()) {
+                crownPresent |= p.hasRelic("mawofworlds");
+                mawPresent |= p.hasRelic("mawofworlds");
+                neuraloopPresent |= p.hasRelic("neuraloop");
+                oraclePresent |= p.hasLeader("naaluHero");
+            }
+            if (crownPresent) message2 += "- _The Crown of Emphidia_\n";
+            if (mawPresent) message2 += "- _Maw of Worlds_\n";
+            if (neuraloopPresent) message2 += "- _Neuraloop_\n";
+            if (oraclePresent) message2 += "- The Oracle, the Naalu hero\n";
+            message2 += "Please click the \"Ready For " + agenda
+                    + "\" button once you are done resolving these, or if you decline to do so.";
         } else {
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Strategy Phase");
             message2 += """
-                This is the moment when you should resolve:\s
-                - _Political Stability_\s
-                - _Summit_\s
-                - _Manipulate Investments_
-                Please click the "Ready For Strategy Phase" button once you are done resolving these or if you decline to do so.""";
+                    This is the moment when you should resolve:
+                    - _Political Stability_
+                    - _Summit_
+                    - _Manipulate Investments_
+                    Please click the "Ready For Strategy Phase" button once you are done resolving these or if you decline to do so.""";
         }
         List<Button> buttons = new ArrayList<>();
-        buttons.add(draw1AC);
+        if (game.isFowMode()) {
+            buttons.add(draw1AC);
+        }
         buttons.add(getCCs);
         buttons.add(passOnAbilities);
         if (yssarilPolicy != null) {
@@ -874,6 +911,9 @@ public class StartPhaseService {
         GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, false);
         if (!game.isFowMode()) {
             ButtonHelper.updateMap(game, event, "Status Homework for round #" + game.getRound() + ".");
+        }
+        if (game.isCivilizedSocietyMode()) {
+            Helper.checkEndGameCivilizedSociety(game);
         }
     }
 
@@ -929,14 +969,14 @@ public class StartPhaseService {
                                 .getWhisperPref()
                                 .replace("No Preference", "No Stated Preference")
                                 .replace("No Preference", "No Stated Preference"))
-                        .append("\n");
+                        .append('\n');
                 question2
                         .append("* ")
                         .append(userSettings
                                 .getSupportPref()
                                 .replace("No Preference", "No Stated Preference")
                                 .replace("No Preference", "No Stated Preference"))
-                        .append("\n");
+                        .append('\n');
                 if (userSettings.getSupportPref().contains("Purge")) {
                     anyoneWantsToBan = true;
                 }
@@ -952,21 +992,21 @@ public class StartPhaseService {
                                 .getWinmakingPref()
                                 .replace("No Preference", "No Stated Preference")
                                 .replace("No Preference", "No Stated Preference"))
-                        .append("\n");
+                        .append('\n');
                 question3
                         .append("* ")
                         .append(userSettings
                                 .getTakebackPref()
                                 .replace("No Preference", "No Stated Preference")
                                 .replace("No Preference", "No Stated Preference"))
-                        .append("\n");
+                        .append('\n');
                 question5
                         .append("* ")
                         .append(userSettings
                                 .getMetaPref()
                                 .replace("No Preference", "No Stated Preference")
                                 .replace("No Preference", "No Stated Preference"))
-                        .append("\n");
+                        .append('\n');
             }
             MessageHelper.sendMessageToChannelAndPin(
                     game.getTableTalkChannel(),
@@ -1036,7 +1076,7 @@ public class StartPhaseService {
         List<Player> actionPhaseTurnOrder = game.getActionPhaseTurnOrder();
         if (actionPhaseTurnOrder.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Unable to start action phase: no turn order set.");
+                    game.getMainGameChannel(), "Unable to start Action Phase: no turn order set.");
             return;
         }
         Player nextPlayer = actionPhaseTurnOrder.getFirst();
@@ -1064,7 +1104,7 @@ public class StartPhaseService {
         //     nextPlayer.setInRoundTurnCount(1);
         // }
         if (isFowPrivateGame) {
-            for (Player p2 : game.getRealPlayers()) {
+            for (Player p2 : Helper.getSpeakerOrFullPriorityOrder(game)) {
                 if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("startQDN", "Use Quantum Datahub Node", TechEmojis.CyberneticTech));
@@ -1072,35 +1112,24 @@ public class StartPhaseService {
                     MessageHelper.sendMessageToChannelWithButtons(
                             p2.getCorrectChannel(),
                             "# " + p2.getRepresentationUnfogged()
-                                    + ", you have the opportunity to use _Quantum Datahub Node_. (Noone should take a turn until this is decided)",
+                                    + ", you have the opportunity to use _Quantum Datahub Node_ (nobody should take a turn until this is decided).",
                             buttons);
                 }
                 if (IsPlayerElectedService.isPlayerElected(game, p2, "arbiter")) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("startArbiter", "Use Imperial Arbiter", CardEmojis.Agenda));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons.add(Buttons.red("declineArbiter", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(
                             p2.getCorrectChannel(),
                             "# " + p2.getRepresentationUnfogged()
-                                    + ", you have the opportunity to use _Imperial Arbiter_. (Noone should take a turn until this is decided)",
+                                    + ", you have the opportunity to use _Imperial Arbiter_ (nobody should take a turn until this is decided).",
                             buttons);
+                    MessageHelper.sendMessageToChannel(
+                            game.getMainGameChannel(),
+                            game.getPing() + ", please wait while the use of _Imperial Arbiter_ is decided.");
                 }
             }
             StartTurnService.turnStart(event, game, nextPlayer);
-            // if (game.isShowBanners()) {
-            //     BannerGenerator.drawFactionBanner(nextPlayer);
-            // }
-            // String msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your "
-            //         + StringHelper.ordinal(nextPlayer.getInRoundTurnCount()) + " turn of round " + game.getRound()
-            //         + ").";
-            // game.updateActivePlayer(nextPlayer);
-
-            // StartTurnService.reviveInfantryII(nextPlayer);
-            // MessageHelper.sendMessageToChannelWithButtons(
-            //         nextPlayer.getPrivateChannel(),
-            //         msgExtra + "\n Use buttons to do turn.",
-            //         StartTurnService.getStartOfTurnButtons(nextPlayer, game, false, event));
-            // FowCommunicationThreadService.checkNewNeighbors(game, nextPlayer);
         } else {
             StringBuilder hold = new StringBuilder();
             MessageHelper.sendMessageToChannel(
@@ -1135,46 +1164,7 @@ public class StartPhaseService {
                 BannerGenerator.drawPhaseBanner("action", game.getRound(), game.getActionsChannel());
             }
             ListTurnOrderService.turnOrder(event, game);
-            // if (game.isShowBanners()) {
-            //     BannerGenerator.drawFactionBanner(nextPlayer);
-            // }
-            // String msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your "
-            //         + StringHelper.ordinal(nextPlayer.getInRoundTurnCount()) + " turn of round " + game.getRound()
-            //         + ").";
-            // Player nextNextPlayer = EndTurnService.findNextUnpassedPlayer(game, nextPlayer);
             StartTurnService.turnStart(event, game, nextPlayer);
-            // if (nextNextPlayer == nextPlayer) {
-            //     msgExtra +=
-            //             "\n-# All other players are passed; you will take consecutive turns until you pass, ending
-            // the Action Phase.";
-            // } else if (nextNextPlayer != null) {
-            //     String ping =
-            //             UserSettingsManager.get(nextNextPlayer.getUserID()).isPingOnNextTurn()
-            //                     ? nextNextPlayer.getRepresentationUnfogged()
-            //                     : nextNextPlayer.getRepresentationNoPing();
-            //     int numUnpassed = -2;
-            //     for (Player p2 : game.getPlayers().values()) {
-            //         numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
-            //     }
-            //     msgExtra += "\n-# " + ping + " will start their turn once you've ended yours. ";
-            //     if (numUnpassed == 0) {
-            //         msgExtra += "No other players are unpassed.";
-            //     } else {
-            //         msgExtra +=
-            //                 numUnpassed + " other player" + (numUnpassed == 1 ? " is" : "s are") + " still
-            // unpassed.";
-            //     }
-            // }
-            // if (hold.length() > 0) {
-            //     msgExtra += "\nYou may wish to hold your turn until you have confirmation of no " + hold + ".";
-            // }
-            // MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
-
-            // StartTurnService.reviveInfantryII(nextPlayer);
-            // MessageHelper.sendMessageToChannelWithButtons(
-            //         game.getMainGameChannel(),
-            //         "Use buttons to do turn.",
-            //         StartTurnService.getStartOfTurnButtons(nextPlayer, game, false, event));
         }
         for (Player p2 : game.getRealPlayers()) {
             if (!game.isFowMode()) {

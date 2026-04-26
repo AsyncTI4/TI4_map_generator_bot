@@ -7,11 +7,11 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.game.Game;
+import ti4.game.Tile;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Tile;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.model.EventModel;
 import ti4.service.emoji.TileEmojis;
 import ti4.service.milty.MiltyDraftTile;
@@ -54,9 +54,9 @@ public class EventHelper {
                 .toList());
 
         for (Tile tile : unusedBlueTiles) {
-            sb.append("\n")
+            sb.append('\n')
                     .append(TileEmojis.TileBlueBack)
-                    .append(" ")
+                    .append(' ')
                     .append(tile.getRepresentation())
                     .append(" (`")
                     .append(tile.getTileID())
@@ -64,9 +64,9 @@ public class EventHelper {
         }
 
         for (Tile tile : unusedRedTiles) {
-            sb.append("\n")
+            sb.append('\n')
                     .append(TileEmojis.TileRedBack)
-                    .append(" ")
+                    .append(' ')
                     .append(tile.getRepresentation())
                     .append(" (`")
                     .append(tile.getTileID())

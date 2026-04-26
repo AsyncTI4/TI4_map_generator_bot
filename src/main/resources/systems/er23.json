@@ -8,9 +8,7 @@
     ],
     "imagePath": "er_23_async.png",
     "shipPositionsType": "TYPE10",
-    "wormholes": [
-        null
-    ],
+    "wormholes": [],
     "planets": [
         "xyon"
     ],

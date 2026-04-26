@@ -1,11 +1,9 @@
 package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -14,22 +12,26 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.buttons.Buttons;
+import org.jetbrains.annotations.NotNull;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
 import ti4.helpers.MapTemplateHelper;
+import ti4.helpers.TIGLHelper;
 import ti4.helpers.settingsFramework.menus.MiltySettings.DraftingMode;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
+import ti4.helpers.settingsFramework.settings.BooleanSettingWithCustomAction;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
-import ti4.map.Game;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.model.MapTemplateModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
+import tools.jackson.databind.JsonNode;
 
 // This is a sub-menu
 @Getter
@@ -47,6 +49,7 @@ public class GameSettings extends SettingsMenu {
     private final IntegerSetting stage2s;
     private final IntegerSetting secrets;
     private final BooleanSetting tigl;
+    private final BooleanSetting tiglFractured;
     private final BooleanSetting alliance;
     private final ChoiceSetting<MapTemplateModel> mapTemplate;
 
@@ -55,17 +58,24 @@ public class GameSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
-    public GameSettings(Game game, JsonNode json, SettingsMenu parent) {
+    GameSettings(@NotNull Game game, JsonNode json, SettingsMenu parent) {
         super("game", "General Game Settings", "Adjust settings for the game such as point total", parent);
 
         // Initialize Settings to default values
-        int defaultVP = game == null ? 10 : game.getVp();
+        int defaultVP = game.getVp();
         pointTotal = new IntegerSetting("Points", "Point Total", defaultVP, 1, 20, 1);
         stage1s = new IntegerSetting("Stage1s", "number of Stage 1 public objectives", 5, 1, 20, 1);
         stage2s = new IntegerSetting("Stage2s", "number of Stage 2 public objectives", 5, 1, 20, 1);
         secrets = new IntegerSetting("Secrets", "Max number of secret objectives", 3, 1, 10, 1);
-        boolean defaultTigl = game != null && game.isCompetitiveTIGLGame();
-        tigl = new BooleanSetting("TIGL", "TIGL Game", defaultTigl);
+        boolean defaultTigl = game.isCompetitiveTIGLGame();
+        boolean defaultTiglFractured = defaultTigl && TIGLHelper.isFracturedTIGLGame(game);
+        tigl = new BooleanSettingWithCustomAction(
+                "TIGL", "TIGL Game", defaultTigl, (value) -> ensureFracturedDisabledWhenTiglOff());
+        tiglFractured = new BooleanSettingWithCustomAction(
+                "TIGL Fractured",
+                "TIGL Fractured Game",
+                defaultTiglFractured,
+                (value) -> ensureTiglEnabledWhenFracturedOn());
         alliance = new BooleanSetting("Alliance", "Alliance Mode", false);
         mapTemplate = new ChoiceSetting<>("Template", "Map Template", "6pStandard");
 
@@ -75,6 +85,7 @@ public class GameSettings extends SettingsMenu {
         stage2s.setEmoji(CardEmojis.Public2);
         secrets.setEmoji(CardEmojis.SecretObjective);
         tigl.setEmoji(MiscEmojis.TIGL);
+        tiglFractured.setEmoji(MiscEmojis.TIGL);
         alliance.setEmoji(SourceEmojis.StrategicAlliance);
         mapTemplate.setEmoji(MiltyDraftEmojis.sliceA);
 
@@ -103,12 +114,13 @@ public class GameSettings extends SettingsMenu {
             stage2s.initialize(json.get("stage2s"));
             secrets.initialize(json.get("secrets"));
             tigl.initialize(json.get("tigl"));
+            tiglFractured.initialize(json.get("tiglFractured"));
             alliance.initialize(json.get("alliance"));
             mapTemplate.initialize(json.get("mapTemplate"));
         }
 
         bpp = mapTemplate.getValue().bluePerPlayer();
-        decks = new DeckSettings(json, this, Optional.ofNullable(game));
+        decks = new DeckSettings(json, this, game);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -122,6 +134,7 @@ public class GameSettings extends SettingsMenu {
         ls.add(stage2s);
         ls.add(secrets);
         ls.add(tigl);
+        ls.add(tiglFractured);
         ls.add(alliance);
         ls.add(mapTemplate);
         return ls;
@@ -182,6 +195,18 @@ public class GameSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Specific Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
+    private void ensureFracturedDisabledWhenTiglOff() {
+        if (!tigl.isVal()) {
+            tiglFractured.setVal(false);
+        }
+    }
+
+    private void ensureTiglEnabledWhenFracturedOn() {
+        if (tiglFractured.isVal()) {
+            tigl.setVal(true);
+        }
+    }
+
     private String preset444() {
         pointTotal.setVal(12);
         stage1s.setVal(4);

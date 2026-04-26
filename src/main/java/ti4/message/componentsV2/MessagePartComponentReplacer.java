@@ -16,9 +16,9 @@ import net.dv8tion.jda.api.components.mediagallery.MediaGalleryItem;
 import net.dv8tion.jda.api.components.replacer.IReplaceable;
 import net.dv8tion.jda.api.components.section.Section;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
+import ti4.logging.BotLogger;
 import ti4.message.componentsV2.MessageV2Editor.MessagePartType;
 import ti4.message.componentsV2.MessageV2Editor.ReplaceMessagePart;
-import ti4.message.logging.BotLogger;
 
 public class MessagePartComponentReplacer implements TrackingComponentReplacer {
     private final Map<String, ReplaceMessagePart> replaceByCustomId;
@@ -49,7 +49,7 @@ public class MessagePartComponentReplacer implements TrackingComponentReplacer {
      * in the message's component tree. If the input component is returned, nothing happens.
      * If null is returned, the component is removed. If a different component is returned,
      * the component is replaced.
-     *
+     * <p>
      * This also populates the changedMessages set when any action is performed; this
      * allows the caller to know if any changes were made at all. (to help save on PATCH
      * requests)
@@ -97,7 +97,10 @@ public class MessagePartComponentReplacer implements TrackingComponentReplacer {
                     case ActionRow actionRow -> actionRow.getComponents();
                     case Container container -> container.getComponents();
                     case Section section -> section.getContentComponents();
-                    case Label label -> label.getChild() == null ? List.of() : List.of(label.getChild());
+                    case Label label -> {
+                        label.getChild();
+                        yield List.of(label.getChild());
+                    }
                     default ->
                         throw new IllegalArgumentException("Unknown IReplaceable component type: "
                                 + curComponent.getClass().getName());
@@ -132,6 +135,10 @@ public class MessagePartComponentReplacer implements TrackingComponentReplacer {
             } else if (replacement.getType() == MessagePartType.MEDIA_GALLERY
                     && curComponent instanceof MediaGallery mediaGallery) {
                 if (matchText(mediaGallery, replacement.getReplaceKey())) {
+                    return replacement;
+                }
+            } else if (replacement.getPred() != null) {
+                if (replacement.getPred().test(curComponent)) {
                     return replacement;
                 }
             }

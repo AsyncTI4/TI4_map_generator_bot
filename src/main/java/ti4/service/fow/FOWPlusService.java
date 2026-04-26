@@ -17,8 +17,14 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.buttons.Buttons;
-import ti4.commands.tokens.AddTokenCommand;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.commands.tokens.AddTokenCommand;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.ModalHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.Constants;
@@ -27,14 +33,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.PositionMapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.listeners.annotations.ModalHandler;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.combat.StartCombatService;
@@ -57,7 +57,7 @@ import ti4.service.unit.RemoveUnitService.RemovedUnit;
  * To remove a token from the board, you need to see it
  * Prevents looking at explore/relic decks
 */
-public class FOWPlusService {
+public final class FOWPlusService {
     private static final String FOWPLUS_TAG = "FoW+";
     private static final String VOID_TILEID = "-1";
 
@@ -69,7 +69,7 @@ public class FOWPlusService {
     private static final String FOWPLUS_EXPLORE_SPOOR = "fowplus_spoor";
     private static final String FOWPLUS_EXPLORE_SACRIFICE = "fowplus_sacrifice";
 
-    public static final List<Pair<FOWOption, Boolean>> FORCED_FOWPLUS_OPTIONS = Arrays.asList(
+    public static final List<Pair<FOWOption, Boolean>> FORCED_FOWPLUS_OPTIONS = List.of(
             Pair.of(FOWOption.ALLOW_AGENDA_COMMS, false),
             Pair.of(FOWOption.HIDE_TOTAL_VOTES, true),
             Pair.of(FOWOption.HIDE_VOTE_ORDER, true),

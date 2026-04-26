@@ -17,4 +17,24 @@ class GameUndoNameServiceTest {
         int undoNumber = GameUndoNameService.getUndoNumberFromFileName("pbd14_321.txt");
         assertThat(undoNumber).isEqualTo(321);
     }
+
+    @Test
+    void shouldParseUndoNumberFromRawSelection() {
+        Integer undoNumber = GameUndoNameService.getUndoNumberFromSelection("pbd21740", "pbd21740_1668.txt");
+        assertThat(undoNumber).isEqualTo(1668);
+    }
+
+    @Test
+    void shouldParseUndoNumberFromDecoratedSelection() {
+        Integer undoNumber = GameUndoNameService.getUndoNumberFromSelection(
+                "pbd21740",
+                "pbd21740_1668.txt (00h:20m:38s ago):  gabs2482 pressed button: argentHeroStep4_310_311_space_fighter");
+        assertThat(undoNumber).isEqualTo(1668);
+    }
+
+    @Test
+    void shouldRejectSelectionForAnotherGame() {
+        Integer undoNumber = GameUndoNameService.getUndoNumberFromSelection("pbd21740", "pbd21741_1668.txt");
+        assertThat(undoNumber).isNull();
+    }
 }

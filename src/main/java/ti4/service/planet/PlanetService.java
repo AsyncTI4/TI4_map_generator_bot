@@ -1,9 +1,9 @@
 package ti4.service.planet;
 
 import lombok.experimental.UtilityClass;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.Constants;
-import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 @UtilityClass

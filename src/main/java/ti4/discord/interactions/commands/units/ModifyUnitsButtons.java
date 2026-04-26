@@ -1,0 +1,43 @@
+package ti4.discord.interactions.commands.units;
+
+import java.util.List;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.discord.interactions.commands.GameStateCommand;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
+import ti4.message.MessageHelper;
+
+public class ModifyUnitsButtons extends GameStateCommand {
+
+    public ModifyUnitsButtons() {
+        super(true, true);
+    }
+
+    @Override
+    public String getName() {
+        return Constants.MODIFY_UNITS;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Modify units on map";
+    }
+
+    @Override
+    public void execute(SlashCommandInteractionEvent event) {
+        Game game = getGame();
+        Player player = getPlayer();
+
+        List<Button> buttons = ButtonHelper.getTilesToModify(player, game);
+        String message = player.getRepresentation() + ", please choose the system in which you wish to modify units. ";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
+}

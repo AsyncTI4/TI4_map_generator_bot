@@ -10,23 +10,23 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTwilightsFallActionCards;
 import ti4.helpers.DiceHelper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Helper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.async.DrumrollService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.relic.HeartOfIxthService;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class IxthianArtifactService {
@@ -91,10 +91,10 @@ public class IxthianArtifactService {
     }
 
     private String resultMessage(Die result, boolean heartUsed) {
-        String msg = "## Rolled a " + result.getGreenDieIfSuccessOrRedDieIfFailure() + " for Ixthian Artifact";
+        String msg = "## Rolled a " + result.getGreenDieIfSuccessOrRedDieIfFailure() + " for _Ixthian Artifact_";
 
         if (!heartUsed) {
-            msg += "!!";
+            msg += "!";
             if (result.isSuccess()) {
                 msg += TechEmojis.Propulsion3.toString();
                 msg += TechEmojis.Biotic3.toString();
@@ -103,8 +103,8 @@ public class IxthianArtifactService {
             } else {
                 msg += "💥💥💥💥";
             }
-        } else if (heartUsed) {
-            msg += "........\n# BUT THE HEART OF IXTH PLAYER CHANGED THE OUTCOME!!!";
+        } else {
+            msg += "............\n# But the _Heart of Ixth_ has changed the outcome!";
             if (result.isSuccess()) {
                 msg += "💥💥💥💥";
             } else {
@@ -142,13 +142,13 @@ public class IxthianArtifactService {
             Player heartPlayer = HeartOfIxthService.getHeartOfIxthPlayer(game, true);
             String buttonID = heartPlayer.finChecker() + "resolveIxthian_" + result.getResult();
             buttonID += publish ? "_publish" : "";
-            Button good = Buttons.green(buttonID, "Get Tech", TechEmojis.PropulsionTech);
+            Button good = Buttons.green(buttonID, "Get Technology", TechEmojis.PropulsionTech);
             Button bad = Buttons.red(buttonID, "Explode", MiscEmojis.DoubleBoom);
 
             List<Button> buttons = HeartOfIxthService.makeHeartOfIxthButtons(game, heartPlayer, good, bad, result);
             String msg = resultMessage(result, false).replaceFirst("## ", "");
-            msg += "\nHOWEVER, " + heartPlayer.getRepresentation() + " you can use the Heart of Ixth";
-            msg += " to modify the outcome of Ixthian Artifact.";
+            msg += "\nHOWEVER, " + heartPlayer.getRepresentation() + " you can use the _Heart of Ixth_";
+            msg += " to modify the outcome of _Ixthian Artifact_.";
             MessageHelper.sendMessageToChannelWithButtons(heartPlayer.getCorrectChannel(), msg, buttons);
 
             if (game.isFowMode()) {

@@ -2,6 +2,7 @@ package ti4.spring.api.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +17,7 @@ public class DiscordAuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> authenticate(@RequestBody AuthRequest request) {
-        if (request.getUserId() == null || request.getCode() == null) {
+        if (!StringUtils.hasText(request.getUserId()) || !StringUtils.hasText(request.getCode())) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -26,7 +27,7 @@ public class DiscordAuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshTokenRequest request) {
-        if (request.getUserId() == null || request.getRefreshToken() == null) {
+        if (!StringUtils.hasText(request.getUserId()) || !StringUtils.hasText(request.getRefreshToken())) {
             return ResponseEntity.badRequest().build();
         }
 

@@ -5,11 +5,11 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
 
@@ -23,22 +23,20 @@ public class MahactTokenService {
                 // exactly 1 token in fleet
                 String color = player.getMahactCC().getFirst();
                 Player p2 = game.getPlayerFromColorOrFaction(color);
-                message += " has been forced to lose the " + p2.fogSafeEmoji();
-                message += " token from their fleet pool " + reason;
-
+                message += " has been forced to lose the " + p2.fogSafeEmoji() + " command token from their fleet pool "
+                        + reason + ".";
                 player.getMahactCC().remove(color);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 ButtonHelper.checkFleetInEveryTile(player, game);
             } else {
-                message += " you are being forced to lose 1 fleet token " + reason + ", and have the";
-                message += " option to remove another player's CC from your pool instead of your own.";
-
+                message += ", you are being forced to lose 1 command token from your fleet pool, " + reason
+                        + ", and have the option to remove another player's command token from your pool instead of your own.";
                 List<Button> options = removeFleetTokenOptions(game, player, true, false);
                 MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCorrectChannel(), message, options);
             }
         } else {
-            message += " has removed a command token from their fleet pool " + reason;
-            message += " " + player.gainFleetCC(-1);
+            message +=
+                    " has removed a command token from their fleet pool " + reason + " " + player.gainFleetCC(-1) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             ButtonHelper.checkFleetInEveryTile(player, game);
         }
@@ -49,7 +47,7 @@ public class MahactTokenService {
         String prefix = player.finChecker() + "loseMahactCC_";
         String suffix = keepButtons ? "_keep" : "";
         String label = "Lose your own token";
-        String emoji = "";
+        String emoji;
 
         if (includeSelf && player.getFleetCC() > 0) {
             emoji = player.getFactionEmoji();
@@ -97,6 +95,6 @@ public class MahactTokenService {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.checkFleetInEveryTile(player, game);
         if (delAll) ButtonHelper.deleteAllButtons(event);
-        else if (delOne) ButtonHelper.deleteTheOneButton(event);
+        else if (delOne) ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 }

@@ -3,7 +3,7 @@ package ti4.service.draft.draftables;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import ti4.map.Player;
+import ti4.game.Player;
 import ti4.service.draft.DraftButtonService;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;

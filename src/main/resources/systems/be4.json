@@ -1,0 +1,17 @@
+{
+    "tileBack": "green",
+    "id": "be4",
+    "name": "Kymore - Iron",
+    "aliases": [
+        "be4",
+        "iron",
+        "kymore"
+    ],
+    "imagePath": "be4_ironhs.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "kymore"
+    ],
+    "source": "beans"
+}

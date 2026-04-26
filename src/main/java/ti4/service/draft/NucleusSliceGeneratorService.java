@@ -13,14 +13,14 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Tile;
 import ti4.helpers.DistanceTool;
 import ti4.helpers.ListHelper;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Tile;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
 import ti4.model.PlanetTypeModel.PlanetType;
@@ -105,8 +105,7 @@ public class NucleusSliceGeneratorService {
      * @param nucleusSpecs
      * @return
      */
-    public NucleusOutcome generateNucleusAndSlices(
-            GenericInteractionCreateEvent event, Game game, NucleusSpecs nucleusSpecs) {
+    NucleusOutcome generateNucleusAndSlices(GenericInteractionCreateEvent event, Game game, NucleusSpecs nucleusSpecs) {
         String mapTemplateId = game.getMapTemplateID();
         MapTemplateModel mapTemplate = Mapper.getMapTemplate(mapTemplateId);
         if (!mapTemplate.isNucleusTemplate()) {
@@ -686,7 +685,7 @@ public class NucleusSliceGeneratorService {
                     candidateTiles = tieredAvailableTiles.entrySet().stream()
                             // Sorting an enum in java puts it in the order it was declared
                             // so this will check high -> mid -> low -> red / anomaly
-                            .sorted(Comparator.comparing(Map.Entry::getKey))
+                            .sorted(Map.Entry.comparingByKey())
                             .map(Map.Entry::getValue)
                             .map(tiles ->
                                     tiles.stream().filter(anomalyPredicate).toList())

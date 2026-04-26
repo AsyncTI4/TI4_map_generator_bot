@@ -3,15 +3,16 @@ package ti4.spring.context;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.context.SecurityContextHolder;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.logging.RollbarManager;
 
 @UtilityClass
 public class RequestContext {
 
     // TODO: Debate combining this with the Command/Button processing context
     private static final ThreadLocal<Game> game = new ThreadLocal<>();
-    private static final ThreadLocal<Boolean> saveGame = ThreadLocal.withInitial(() -> true);
+    private static final ThreadLocal<Boolean> saveGame = ThreadLocal.withInitial(() -> Boolean.TRUE);
 
     @NotNull
     public static String getUserId() {
@@ -20,6 +21,9 @@ public class RequestContext {
 
     static void setGame(Game game) {
         RequestContext.game.set(game);
+        if (game != null) {
+            RollbarManager.put("game_name", game.getName());
+        }
     }
 
     public static Game getGame() {

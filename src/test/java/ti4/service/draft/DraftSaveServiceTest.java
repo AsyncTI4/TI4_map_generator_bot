@@ -8,13 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import ti4.game.Game;
 import ti4.image.Mapper;
-import ti4.map.Game;
 import ti4.testUtils.BaseTi4Test;
 
-public class DraftSaveServiceTest extends BaseTi4Test {
+class DraftSaveServiceTest extends BaseTi4Test {
     @Test
-    public void testSaveAndLoad() {
+    void testSaveAndLoad() {
         beforeAll();
         Game game = createTestGame(6);
         DraftManager draftManager = new DraftManager(game);
@@ -98,7 +98,7 @@ public class DraftSaveServiceTest extends BaseTi4Test {
     }
 
     @Test
-    public void testSaveFormatUnchanged() {
+    void testSaveFormatUnchanged() {
         beforeAll();
         String draftSave = TestData.getTestFile(TestData.FINISHED_6P_DRAFT_FILE);
         assertNotNull(draftSave, "Test data for finished 6p draft is missing or empty");

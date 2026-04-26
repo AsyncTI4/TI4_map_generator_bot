@@ -1,6 +1,6 @@
 package ti4.draft;
 
-import ti4.map.Game;
+import ti4.game.Game;
 
 public class OnePickFrankenDraft extends FrankenDraft {
 

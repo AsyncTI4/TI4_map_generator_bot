@@ -2,21 +2,23 @@ package ti4.service.draft.draftables;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.NucleusSliceDraftableSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.helpers.settingsFramework.menus.SliceDraftableSettings;
 import ti4.helpers.settingsFramework.menus.SliceDraftableSettings.MapGenerationMode;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.model.MapTemplateModel;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
@@ -26,15 +28,15 @@ import ti4.service.draft.DraftableType;
 import ti4.service.draft.NucleusSliceGeneratorService.NucleusOutcome;
 import ti4.service.draft.NucleusSpecs;
 import ti4.service.draft.PartialMapService;
-import ti4.service.draft.PlayerSetupService.PlayerSetupState;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.draft.SliceGenerationPipeline;
 import ti4.service.draft.SliceImageGeneratorService;
 import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.milty.MiltyDraftSlice;
 
+@Getter
 public class SliceDraftable extends SinglePickDraftable {
 
-    @Getter
     private List<MiltyDraftSlice> slices = new ArrayList<>();
 
     public void initialize(List<MiltyDraftSlice> slices) {
@@ -146,6 +148,17 @@ public class SliceDraftable extends SinglePickDraftable {
         }
         SliceDraftableSettings sliceSettings = draftSystemSettings.getSliceSettings();
 
+        if (sliceSettings.getParsedSlices() != null
+                && !sliceSettings.getParsedSlices().isEmpty()) {
+            MapTemplateModel mapTemplate = sliceSettings.getMapTemplate().getValue();
+            if (mapTemplate == null) {
+                return "Error: No map template selected to shape preset slices.";
+            }
+            game.setMapTemplateID(mapTemplate.getID());
+            slices.addAll(sliceSettings.getParsedSlices());
+            return null;
+        }
+
         if (sliceSettings.getMapGenerationMode().getValue() == MapGenerationMode.Nucleus) {
             return doNucleusGeneration(
                     event,
@@ -169,6 +182,13 @@ public class SliceDraftable extends SinglePickDraftable {
         } else if (mapTemplate.getPlayerCount() != playerCount) {
             return "The selected map template " + mapTemplate.getAlias() + " is for a different number of players than "
                     + playerCount;
+        }
+
+        // Check if presets are provided - if so, use them directly instead of generating
+        List<MiltyDraftSlice> presetSlices = nucleusSettings.getParsedSlices();
+        Map<String, String> presetMapTiles = nucleusSettings.getParsedMapTiles();
+        if (presetSlices != null && !presetSlices.isEmpty() && presetMapTiles != null && !presetMapTiles.isEmpty()) {
+            return useNucleusPresets(event, game, mapTemplate, presetSlices, presetMapTiles);
         }
 
         NucleusSpecs specs = new NucleusSpecs(
@@ -236,9 +256,46 @@ public class SliceDraftable extends SinglePickDraftable {
         return null;
     }
 
+    private String useNucleusPresets(
+            GenericInteractionCreateEvent event,
+            Game game,
+            MapTemplateModel mapTemplate,
+            List<MiltyDraftSlice> presetSlices,
+            Map<String, String> presetMapTiles) {
+
+        // Clear any existing map and set template
+        game.clearTileMap();
+        game.setMapTemplateID(mapTemplate.getAlias());
+
+        // Place hyperlanes from template first (important for adjacency calculations)
+        PartialMapService.placeFromTemplate(mapTemplate, game);
+
+        // Place all preset map tiles at their positions (skipping -1 for slice positions)
+        for (Map.Entry<String, String> entry : presetMapTiles.entrySet()) {
+            String position = entry.getKey();
+            String tileId = entry.getValue();
+            // Skip -1 positions - those are reserved for player slice tiles
+            if (!"-1".equals(tileId)) {
+                game.setTile(new Tile(tileId, position));
+            }
+        }
+
+        // Initialize slices directly - no generation needed
+        initialize(presetSlices);
+
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                "## Using preset nucleus and slices!\nPreset map and " + presetSlices.size() + " slices loaded.");
+
+        // Immediately allow draft to start since we're not waiting for generation
+        game.getDraftManager().tryStartDraft();
+
+        return null;
+    }
+
     private String doMiltyGeneration(
             GenericInteractionCreateEvent event, Game game, DraftSystemSettings draftSystemSettings) {
-        DraftSpec specs = DraftSpec.SliceSpecsFromDraftSystemSettings(draftSystemSettings);
+        DraftSpec specs = DraftSpec.sliceSpecsFromDraftSystemSettings(draftSystemSettings);
         game.setMapTemplateID(specs.getTemplate().getID());
 
         // Ensure we can't start yet

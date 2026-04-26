@@ -1,20 +1,28 @@
 package ti4.testUtils;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.managers.Presence;
 import org.junit.jupiter.api.BeforeAll;
+import ti4.discord.JdaService;
+import ti4.discord.interactions.selections.SelectionManager;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Storage;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileHelper;
-import ti4.selections.SelectionManager;
 import ti4.service.emoji.ApplicationEmojiService;
-import ti4.spring.jda.JdaService;
 
 /**
  * Base test class for all Ti4 tests. Allows for proper global config.
  */
 public class BaseTi4Test {
+
     private static boolean isFirstRun = true;
+    protected static JDA jda = mock(JDA.class);
 
     /**
      * Logic which is run once at the start of the entire test suit (before any test class is ran).
@@ -23,14 +31,14 @@ public class BaseTi4Test {
         // Use this to turn off random chance things that may impact testing
         // and reroute all logging to the console
         JdaService.testingMode = true;
+        JdaService.jda = jda;
+        when(jda.getPresence()).thenReturn(mock(Presence.class));
 
         // This is set when running tests within docker. However, this must be manually
         // set when running tests within vs code for resources to be loaded properly.
         if (System.getenv(Storage.ENV_VAR_RESOURCE_PATH) == null) {
             Storage.setResourcePath("./src/main/resources");
         }
-        System.out.println("Storage Path: " + Storage.getStoragePath());
-        System.out.println("Resource Path: " + Storage.getResourcePath());
 
         // Init base static data
         TileHelper.init();
@@ -40,6 +48,8 @@ public class BaseTi4Test {
         Storage.init();
         SelectionManager.init();
         ApplicationEmojiService.spoofEmojis();
+
+        GameManager.warmup();
     }
 
     /**

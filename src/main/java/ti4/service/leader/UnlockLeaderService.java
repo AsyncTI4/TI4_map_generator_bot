@@ -2,11 +2,11 @@ package ti4.service.leader;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.service.emoji.LeaderEmojis;
@@ -16,6 +16,19 @@ import ti4.service.info.CardsInfoService;
 public class UnlockLeaderService {
 
     public static void unlockLeader(String leaderID, Game game, Player player) {
+        Leader playerLeader = player.unsafeGetLeader(leaderID);
+        LeaderModel leaderModel = playerLeader.getLeaderModel().orElse(null);
+        String message;
+        if (leaderModel != null) {
+            message = player.getRepresentation() + " has unlocked their " + leaderModel.getType() + ".";
+        } else {
+            message =
+                    player.getRepresentation() + " unlocked " + Helper.getLeaderFullRepresentation(playerLeader) + ".";
+        }
+        unlockLeader(leaderID, game, player, message);
+    }
+
+    public static void unlockLeader(String leaderID, Game game, Player player, String message) {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
         MessageChannel channel = game.getMainGameChannel();
         if (game.isFowMode()) {
@@ -34,13 +47,11 @@ public class UnlockLeaderService {
         if (leaderModel != null) {
             MessageHelper.sendMessageToChannelWithEmbed(
                     channel,
-                    player.getRepresentation() + " has unlocked their " + leaderModel.getType() + ".",
+                    message,
                     leaderModel.getRepresentationEmbed(false, true, true, showFlavourText, game.isTwilightsFallMode()));
         } else {
             MessageHelper.sendMessageToChannel(
                     channel, LeaderEmojis.getLeaderEmoji(playerLeader).toString());
-            String message =
-                    player.getRepresentation() + " unlocked " + Helper.getLeaderFullRepresentation(playerLeader) + ".";
             MessageHelper.sendMessageToChannel(channel, message);
         }
 

@@ -15,18 +15,18 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.ModalHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.FoWHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.listeners.annotations.ModalHandler;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 
 /*
  * Flow of Blind Selection:
@@ -74,7 +74,7 @@ public class BlindSelectionService {
             validTargets.append(target).append(VALID_SEPARATOR);
 
             boolean keep;
-            if (TYPE.equals(POSITION)) {
+            if (POSITION.equals(TYPE)) {
                 // position selection: visible tile only
                 keep = visibleTilePositions.contains(target);
             } else {
@@ -132,7 +132,7 @@ public class BlindSelectionService {
 
         boolean invalidTarget = false;
         // Check for position
-        if (type.equals(POSITION)) {
+        if (POSITION.equals(type)) {
             if (!PositionMapper.isTilePositionValid(target)) {
                 invalidTarget = true;
             }
@@ -160,7 +160,7 @@ public class BlindSelectionService {
                 Buttons.red("blindSelection~MDL_" + encodedButtonPrefix + "_" + type, "Change Selection"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", Please select the target:",
+                player.getRepresentation() + ", please choose the target.",
                 chooseTargetButtons);
 
         event.getMessageChannel().deleteMessageById(origMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
@@ -192,8 +192,8 @@ public class BlindSelectionService {
     private static String insertFactionToButtonId(String target, String type, String originalButtonPrefix, Game game) {
         if (!originalButtonPrefix.contains(TBD_FACTION)) return originalButtonPrefix;
 
-        Player owner = null;
-        if (type.equals(POSITION)) {
+        Player owner;
+        if (POSITION.equals(type)) {
             owner = game.getPlayerThatControlsTile(game.getTileByPosition(target));
         } else {
             owner = game.getPlayerThatControlsPlanet(target);

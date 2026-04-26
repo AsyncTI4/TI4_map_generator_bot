@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import ti4.game.Game;
 import ti4.image.Mapper;
-import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.RuleModel;
 
@@ -17,7 +17,7 @@ import ti4.model.RuleModel;
  * will go a long way toward players not getting too lost with all the new stuff. It will help prevent constant questions in rules channels,
  * and should waylay hard feelings that could come from misunderstanding the new stuff.
  */
-public class ThundersEdgeRulesService {
+public final class ThundersEdgeRulesService {
 
     private static List<MessageEmbed> getRuleEmbeds(String... rules) {
         return Arrays.stream(rules)
@@ -54,7 +54,7 @@ public class ThundersEdgeRulesService {
     public static void alertTabletalkWithRulesAtStartOfDraft(Game game) {
         String msg = "Hello " + game.getPing() + "!\n";
         msg +=
-                "It looks like you are playing with Thunder's Edge. Since it's brand new, you might like some of the rules posted here for your convenience:";
+                "It looks like you are playing with Thunder's Edge. Since it's new, you might like some of the rules posted here for your convenience:";
         if (game.getTableTalkChannel() != null) {
             List<MessageEmbed> embeds = startOfDraftRules(game);
             MessageHelper.sendMessageToChannelWithEmbeds(game.getTableTalkChannel(), msg, embeds);

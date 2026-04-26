@@ -1,9 +1,5 @@
 package ti4.settings;
 
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,9 +7,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import ti4.helpers.Storage;
-import ti4.message.logging.BotLogger;
+import ti4.json.JsonMapperManager;
+import ti4.logging.BotLogger;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectWriter;
 
-public class GlobalSettings {
+public final class GlobalSettings {
 
     // Adding an enum here will make it show up as an AutoComplete option in the /admin setting setting_name parameter,
     // and will allow you to get the setting easier
@@ -71,36 +70,32 @@ public class GlobalSettings {
     }
 
     private static void saveSettings() {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
+        ObjectWriter writer = JsonMapperManager.basic().writerWithDefaultPrettyPrinter();
         try {
             writer.writeValue(getFile(), settings);
-        } catch (IOException e) {
+        } catch (Exception e) {
             BotLogger.error("Error saving Global Settings", e);
         }
     }
 
     public static void loadSettings() {
-        ObjectMapper mapper = new ObjectMapper();
         try {
-            JavaType settingsType = mapper.getTypeFactory().constructMapType(HashMap.class, String.class, Object.class);
-            settings = mapper.readValue(Files.readString(getFile().toPath()), settingsType);
+            JavaType settingsType = JsonMapperManager.basic()
+                    .getTypeFactory()
+                    .constructMapType(HashMap.class, String.class, Object.class);
+            settings = JsonMapperManager.basic()
+                    .readValue(Files.readString(getFile().toPath()), settingsType);
         } catch (IOException e) {
             // THis _probably_ means there's no file, which isn't critical.
             // So this is intended to silently fail.
-            // e.printStackTrace();
         }
-    }
-
-    private static Map<String, Object> getSettings() {
-        return settings;
     }
 
     public static String getSettingsRepresentation() {
         StringBuilder sb = new StringBuilder("### Global Settings:\n```");
         for (Entry<String, Object> entries :
                 settings.entrySet().stream().sorted(Entry.comparingByKey()).toList()) {
-            sb.append(entries.getKey()).append(": ").append(entries.getValue()).append("\n");
+            sb.append(entries.getKey()).append(": ").append(entries.getValue()).append('\n');
         }
         sb.append("```");
         return sb.toString();

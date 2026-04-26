@@ -8,48 +8,51 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.experimental.UtilityClass;
 import org.apache.commons.collections4.ListUtils;
 import ti4.service.emoji.TI4Emoji;
 
+@UtilityClass
 public final class StringHelper {
 
+    private static final char ESCAPE_CHARACTER = '\\';
+    private static final Map<String, String> ESCAPABLES = createEscapables();
+    private static final String[] SUFFIXES = {"th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"};
+    private static final String[] FIRST_20_NUMBERS = {
+        "zero",
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six",
+        "seven",
+        "eight",
+        "nine",
+        "ten",
+        "eleven",
+        "twelve",
+        "thirteen",
+        "fourteen",
+        "fifteen",
+        "sixteen",
+        "seventeen",
+        "eighteen",
+        "nineteen",
+        "twenty"
+    };
+
     public static String ordinal(int i) {
-        String[] suffixes = {"th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"};
         return switch (i % 100) {
             case 11, 12, 13 -> i + "th";
-            default -> i + suffixes[i % 10];
+            default -> i + SUFFIXES[i % 10];
         };
     }
 
     public static String numberToWords(int i) {
-        String[] first20 = {
-            "zero",
-            "one",
-            "two",
-            "three",
-            "four",
-            "five",
-            "six",
-            "seven",
-            "eight",
-            "nine",
-            "ten",
-            "eleven",
-            "twelve",
-            "thirteen",
-            "fourteen",
-            "fifteen",
-            "sixteen",
-            "seventeen",
-            "eighteen",
-            "nineteen",
-            "twenty"
-        };
-        if (i >= 0 && i <= 20) return first20[i];
+        if (i >= 0 && i <= 20) return FIRST_20_NUMBERS[i];
         return Integer.toString(i);
     }
-
-    private static final Map<String, String> ESCAPABLES = createEscapables();
 
     private static Map<String, String> createEscapables() {
         Map<String, String> escape = new LinkedHashMap<>();
@@ -100,8 +103,6 @@ public final class StringHelper {
         }
         return "a".repeat(id.length() + 1);
     }
-
-    private static final char ESCAPE_CHARACTER = '\\';
 
     /**
      * For use in conjunction with safeSplit. First escapes any instance of the separator or

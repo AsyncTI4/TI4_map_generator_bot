@@ -6,9 +6,9 @@ import java.util.function.Consumer;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.map.AddTileListService;
 
@@ -24,6 +24,7 @@ import ti4.service.map.AddTileListService;
  * stage.
  * - Validating state consistency
  */
+@Getter
 public class DraftManager extends DraftPlayerManager {
     public DraftManager(Game game) {
         if (game == null) {
@@ -32,19 +33,17 @@ public class DraftManager extends DraftPlayerManager {
         this.game = game;
     }
 
-    @Getter
     private final Game game;
 
-    @Getter
     private DraftOrchestrator orchestrator;
     // The order of draftables is assumed to be the correct order for summarizing, applying, etc.
-    @Getter
     private final List<Draftable> draftables = new ArrayList<>();
 
     public enum CommandSource {
         BUTTON,
         SLASH_COMMAND,
-        DETERMINISTIC_PICK
+        DETERMINISTIC_PICK,
+        QUEUED_PICK
     }
 
     public static boolean hasDraftManager(Game game) {
@@ -178,7 +177,7 @@ public class DraftManager extends DraftPlayerManager {
         orchestrator.sendDraftButtons(this);
     }
 
-    public boolean canStartDraft() {
+    private boolean canStartDraft() {
         if (draftables.isEmpty() || orchestrator == null) {
             return false;
         }
@@ -190,7 +189,7 @@ public class DraftManager extends DraftPlayerManager {
         return whatsStoppingDraftStart() == null;
     }
 
-    public String whatsStoppingDraftStart() {
+    private String whatsStoppingDraftStart() {
         if (draftables.isEmpty()) {
             return "No draftables have been added to the draft. Try `/draft manage add_draftable`.";
         }
@@ -249,7 +248,7 @@ public class DraftManager extends DraftPlayerManager {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
                     game.getPing()
-                            + "The draft has ended. Some additional setup needs to happen before the game can start. Check your cards info threads for details.");
+                            + ", the draft has ended. Some additional setup needs to happen before the game can start. Check your `#cards-info` threads for details.");
         } else {
             trySetupPlayers(event);
         }
@@ -299,10 +298,9 @@ public class DraftManager extends DraftPlayerManager {
         }
 
         for (String userId : playerStates.keySet()) {
-
             // Collect all the setup decisions in a common object
-            PlayerSetupService.PlayerSetupState playerSetupState = new PlayerSetupService.PlayerSetupState();
-            List<Consumer<Player>> postSetupActions = new ArrayList<>();
+            PlayerSetupState playerSetupState = new PlayerSetupState();
+            var postSetupActions = new ArrayList<Consumer<Player>>();
             for (Draftable draftable : draftables) {
                 Consumer<Player> postSetupAction = draftable.setupPlayer(this, userId, playerSetupState);
                 if (postSetupAction != null) {
@@ -311,15 +309,6 @@ public class DraftManager extends DraftPlayerManager {
             }
 
             Player player = game.getPlayer(userId);
-
-            // Default color if not set
-            boolean playerHasColor = player.getColor() != null && !"null".equals(player.getColor());
-            if (!playerHasColor && playerSetupState.getColor() == null) {
-                String color = player.getNextAvailableColour();
-                playerSetupState.setColor(color);
-            } else if (playerHasColor && playerSetupState.getColor() == null) {
-                playerSetupState.setColor(player.getColor());
-            }
 
             // Do common setup chores
             PlayerSetupService.setupPlayer(playerSetupState, player, game, event);
@@ -353,25 +342,19 @@ public class DraftManager extends DraftPlayerManager {
     public void validateState() {
         // Errors that can't be fixed with slash commands, and should never happen
         super.validateState();
-        if (game == null) {
-            throw new IllegalStateException("Game not set");
-        }
-        if (draftables == null) {
-            throw new IllegalStateException("Draftables not set");
-        }
 
         MessageChannel issueChannel = game.getMainGameChannel();
         if (draftables.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    issueChannel, "Draft problem: Nothing to draft (try `/draft manage add_draftable`)");
+                    issueChannel, "Draft problem: Nothing to draft (try `/draft manage add_draftable`).");
         }
         if (orchestrator == null) {
             MessageHelper.sendMessageToChannel(
-                    issueChannel, "Draft problem: No way to draft (try `/draft manage set_orchestrator`)");
+                    issueChannel, "Draft problem: No way to draft (try `/draft manage set_orchestrator`).");
         }
         if (playerStates.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    issueChannel, "Draft problem: No players in draft (try `/draft manage add_all_game_players`)");
+                    issueChannel, "Draft problem: No players in draft (try `/draft manage add_all_game_players`).");
         }
         if (orchestrator != null) {
             String validationError = orchestrator.validateState(this);

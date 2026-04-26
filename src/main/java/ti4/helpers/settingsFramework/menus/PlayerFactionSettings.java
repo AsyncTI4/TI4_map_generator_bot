@@ -1,7 +1,6 @@
 package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -13,16 +12,17 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.SourceEmojis;
+import tools.jackson.databind.JsonNode;
 
 // This is a sub-menu
 @Getter
@@ -119,10 +119,11 @@ public class PlayerFactionSettings extends SettingsMenu {
     protected void updateTransientSettings() {
         if (parent instanceof MiltySettings m) {
             List<ComponentSource> sources = m.getSourceSettings().getFactionSources();
+            List<String> nonDraftable = List.of("obsidian", "neutral", "keleresa", "keleresx");
+
             Map<String, FactionModel> allFactions = Mapper.getFactionsValues().stream()
                     .filter(model -> sources.contains(model.getSource()))
-                    .filter(model -> !model.getAlias().contains("keleres")
-                            || "keleresm".equals(model.getAlias())) // Limit the pool to only 1 keleres flavor
+                    .filter(model -> !nonDraftable.contains(model.getAlias()))
                     .collect(Collectors.toMap(FactionModel::getAlias, f -> f));
             banFactions.setAllValues(allFactions);
             priFactions.setAllValues(allFactions);
@@ -142,10 +143,7 @@ public class PlayerFactionSettings extends SettingsMenu {
                 ls.add(Buttons.red(
                         idPrefix + "dsFactionsOnly", "Only DS and BR Factions", SourceEmojis.DiscordantStars));
         }
-        if (parent != null && parent instanceof MiltySettings ms) {
-            // if (ms.getSourceSettings().getBetaTestMode().isVal())
-            ls.add(Buttons.green(idPrefix + "teFactions", "Prioritize Thunder's Edge Factions"));
-        }
+        ls.add(Buttons.green(idPrefix + "teFactions", "Prioritize Thunder's Edge Factions"));
         return ls;
     }
 
@@ -182,9 +180,6 @@ public class PlayerFactionSettings extends SettingsMenu {
 
             List<String> newKeys = new ArrayList<>();
             for (FactionModel model : priFactions.getAllValues().values()) {
-                if ("obsidian".equalsIgnoreCase(model.getAlias())) {
-                    continue;
-                }
                 if (model.getSource() == ComponentSource.thunders_edge) newKeys.add(model.getAlias());
             }
             priFactions.setKeys(newKeys);

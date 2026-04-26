@@ -9,16 +9,19 @@ import java.time.ZoneId;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.executors.ExecutionLockManager;
-import ti4.map.Game;
-import ti4.map.persistence.GameManager;
-import ti4.map.persistence.ManagedGame;
+import ti4.executors.ExecutionLockType;
+import ti4.game.Game;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
+import ti4.logging.BotLogger;
 import ti4.message.GameMessageManager;
-import ti4.message.logging.BotLogger;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class EndOldGamesCron {
 
     private static final Period AUTOMATIC_GAME_END_INACTIVITY_THRESHOLD = Period.ofMonths(2);
+    private static final Period AUTOMATIC_GAME_END_NO_REAL_PLAYERS_THRESHOLD = Period.ofWeeks(2);
 
     public static void register() {
         CronManager.schedulePeriodicallyAtTime(
@@ -26,13 +29,14 @@ public class EndOldGamesCron {
     }
 
     private static void endOldGames() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running EndOldGamesCron.");
         try {
             GameManager.getManagedGames().stream()
                     .filter(not(ManagedGame::isHasEnded))
                     .map(ManagedGame::getName)
                     .forEach(gameName -> ExecutionLockManager.wrapWithLockAndRelease(
-                                    gameName, ExecutionLockManager.LockType.WRITE, () -> endIfOld(gameName))
+                                    gameName, ExecutionLockType.WRITE, () -> endIfOld(gameName))
                             .run());
         } catch (Exception e) {
             BotLogger.error("**Error ending inactive games!**", e);
@@ -46,7 +50,10 @@ public class EndOldGamesCron {
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
 
-        LocalDate oldestLastModifiedDateBeforeEnding = LocalDate.now().minus(AUTOMATIC_GAME_END_INACTIVITY_THRESHOLD);
+        Period inactivityThreshold = game.getRealPlayers().isEmpty()
+                ? AUTOMATIC_GAME_END_NO_REAL_PLAYERS_THRESHOLD
+                : AUTOMATIC_GAME_END_INACTIVITY_THRESHOLD;
+        LocalDate oldestLastModifiedDateBeforeEnding = LocalDate.now().minus(inactivityThreshold);
 
         if (lastModifiedDate.isBefore(oldestLastModifiedDateBeforeEnding)) {
             BotLogger.info("Game: " + game.getName() + " has not been modified since ~" + lastModifiedDate

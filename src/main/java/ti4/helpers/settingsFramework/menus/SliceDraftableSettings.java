@@ -2,7 +2,6 @@ package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -21,19 +20,20 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
 import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftSlice;
+import tools.jackson.databind.JsonNode;
 
 @Getter
 @JsonIgnoreProperties("messageId")
@@ -52,6 +52,7 @@ public class SliceDraftableSettings extends SettingsMenu {
     // Categories
     private final NucleusSliceDraftableSettings nucleusSettings;
     private final MiltySliceDraftableSettings miltySettings;
+    private final List<SettingsMenu> subMenus;
     // This is handled fully manually as there's a lot of validation to do
     private String presetSlices;
 
@@ -62,7 +63,7 @@ public class SliceDraftableSettings extends SettingsMenu {
 
     private static final String MENU_ID = "dsSlice";
 
-    public SliceDraftableSettings(Game game, JsonNode json, DraftSystemSettings parent) {
+    SliceDraftableSettings(Game game, JsonNode json, DraftSystemSettings parent) {
         super(MENU_ID, "Slice Settings", "Basic Slice draft setup.", parent);
 
         // Initialize settings
@@ -118,20 +119,23 @@ public class SliceDraftableSettings extends SettingsMenu {
         bpp = mapTemplate.getValue().bluePerPlayer();
 
         // Initialize sub-menus
+        subMenus = new ArrayList<>();
         nucleusSettings =
                 new NucleusSliceDraftableSettings(game, json != null ? json.get("nucleusSettings") : null, this);
-        miltySettings = new MiltySliceDraftableSettings(game, json != null ? json.get("miltySettings") : null, this);
+        subMenus.add(nucleusSettings);
+        miltySettings = new MiltySliceDraftableSettings(json != null ? json.get("miltySettings") : null, this);
+        subMenus.add(miltySettings);
     }
 
     @Override
     public List<SettingInterface> settings() {
         List<SettingInterface> ls = new ArrayList<>();
-        ls.add(numSlices);
         ls.add(mapTemplate);
         ls.add(mapGenerationMode);
         if (presetSlices != null) {
             return ls;
         }
+        ls.add(numSlices);
         ls.addAll(getCurrentModeSettings().settings());
         return ls;
     }
@@ -150,6 +154,9 @@ public class SliceDraftableSettings extends SettingsMenu {
         }
         if (!isNucleusMode()) {
             ls.add(Buttons.blue(idPrefix + "presetSlices~MDL", "Use preset slices", MiltyDraftEmojis.sliceA));
+        } else {
+            ls.add(Buttons.blue(
+                    idPrefix + "nucleusPresetSlicesAndMap~MDL", "Use preset slices and map", MiltyDraftEmojis.sliceA));
         }
         return ls;
     }
@@ -160,6 +167,8 @@ public class SliceDraftableSettings extends SettingsMenu {
                 switch (action) {
                     case "presetSlices~MDL" -> getPresetSlicesFromUser(event);
                     case "presetSlices" -> setPresetSlices(event);
+                    case "nucleusPresetSlicesAndMap~MDL" -> getNucleusPresetSlicesAndMapFromUser(event);
+                    case "nucleusPresetSlicesAndMap" -> setNucleusPresetSlicesAndMapFromEvent(event);
                     default -> getCurrentModeSettings().handleSpecialButtonAction(event, action);
                 };
 
@@ -174,7 +183,7 @@ public class SliceDraftableSettings extends SettingsMenu {
     public String menuSummaryString(String lastSettingTouched) {
         StringBuilder sb = new StringBuilder("# **__").append(menuName).append(":__**");
         for (String line : description) sb.append("\n- *").append(line).append("*");
-        sb.append("\n");
+        sb.append('\n');
 
         int pad = enabledSettings().stream()
                 .map(x -> x.getName().length())
@@ -183,11 +192,21 @@ public class SliceDraftableSettings extends SettingsMenu {
         for (SettingInterface setting : enabledSettings()) {
             sb.append("> ");
             sb.append(setting.longSummary(pad, lastSettingTouched));
-            sb.append("\n");
+            sb.append('\n');
         }
         if (presetSlices != null)
-            sb.append("> Using preset slices: ").append(presetSlices).append("\n");
-        if (!enabledSettings().isEmpty()) sb.append("\n"); // extra line for formatting
+            sb.append("> Using preset slices: ").append(presetSlices).append('\n');
+        if (isNucleusMode()) {
+            if (nucleusSettings.getPresetSlices() != null)
+                sb.append("> Using preset slices: ")
+                        .append(nucleusSettings.getPresetSlices())
+                        .append('\n');
+            if (nucleusSettings.getPresetMapString() != null)
+                sb.append("> Using preset map: ")
+                        .append(nucleusSettings.getPresetMapString())
+                        .append('\n');
+        }
+        if (!enabledSettings().isEmpty()) sb.append('\n'); // extra line for formatting
 
         if (!categories().isEmpty()) {
             List<String> catStrings = new ArrayList<>();
@@ -215,6 +234,17 @@ public class SliceDraftableSettings extends SettingsMenu {
             sb.append("\n> Using preset slices: ").append(presetSlices);
             return sb.toString();
         }
+        if (isNucleusMode()) {
+            boolean hasNucleusPresets =
+                    nucleusSettings.getPresetSlices() != null || nucleusSettings.getPresetMapString() != null;
+            if (hasNucleusPresets) {
+                if (nucleusSettings.getPresetSlices() != null)
+                    sb.append("\n> Using preset slices: ").append(nucleusSettings.getPresetSlices());
+                if (nucleusSettings.getPresetMapString() != null)
+                    sb.append("\n> Using preset map: ").append(nucleusSettings.getPresetMapString());
+                return sb.toString();
+            }
+        }
         return super.shortSummaryString(descrOnly);
     }
 
@@ -222,6 +252,7 @@ public class SliceDraftableSettings extends SettingsMenu {
     protected String resetSettings() {
         presetSlices = null;
         parsedSlices = null;
+        subMenus.forEach(SettingsMenu::resetSettings);
         return super.resetSettings();
     }
 
@@ -232,7 +263,7 @@ public class SliceDraftableSettings extends SettingsMenu {
             Map<String, MapTemplateModel> allowed = Mapper.getMapTemplatesForPlayerCount(players).stream()
                     .filter(getNucleusTemplatePredicate())
                     .collect(Collectors.toMap(MapTemplateModel::getAlias, x -> x));
-            MapTemplateModel defaultTemplate = null;
+            MapTemplateModel defaultTemplate;
             if (isNucleusMode()) {
                 defaultTemplate = Mapper.getDefaultNucleusTemplate(players);
             } else {
@@ -328,9 +359,15 @@ public class SliceDraftableSettings extends SettingsMenu {
             sources.addAll(dparent.getSourceSettings().getTileSources());
         }
 
-        parsedSlices = MiltyDraftHelper.parseSlicesFromString(sliceString, sources);
-        if (parsedSlices == null) {
+        String error = null;
+        try {
+            parsedSlices = MiltyDraftHelper.parseSlices(sliceString, sources);
+        } catch (Exception e) {
+            error = e.getMessage();
+        }
+        if (parsedSlices == null || error != null) {
             presetSlices = null;
+            if (error != null) return error;
             return "Invalid slice string";
         } else if (parsedSlices.size() < players) {
             presetSlices = null;
@@ -338,6 +375,54 @@ public class SliceDraftableSettings extends SettingsMenu {
             return "Not enough slices for the number of players.";
         }
         return null;
+    }
+
+    private String getNucleusPresetSlicesAndMapFromUser(GenericInteractionCreateEvent event) {
+        String modalId = menuAction + "_" + navId() + "_nucleusPresetSlicesAndMap";
+        TextInput sliceString = TextInput.create("sliceString", TextInputStyle.PARAGRAPH)
+                .setPlaceholder("25,69,34|24,28,46|...")
+                .setMinLength(1)
+                .setRequired(true)
+                .build();
+        TextInput mapString = TextInput.create("mapString", TextInputStyle.PARAGRAPH)
+                .setPlaceholder("{112} 25 30 -1 -1 -1 83a 35 40 ...")
+                .setMinLength(1)
+                .setRequired(true)
+                .build();
+        Modal modal = Modal.create(modalId, "\"Enter preset slices and preset map string\"")
+                .addComponents(
+                        Label.of("Slice String (pipe-separated, 3 tiles each)", sliceString),
+                        Label.of("Map String (use -1 for slice positions)", mapString))
+                .build();
+        if (event instanceof ButtonInteractionEvent buttonEvent) {
+            buttonEvent.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
+            return null;
+        }
+        return "Unknown Event";
+    }
+
+    private String setNucleusPresetSlicesAndMapFromEvent(GenericInteractionCreateEvent event) {
+        if (event instanceof ModalInteractionEvent modalEvent) {
+            String sliceString = modalEvent.getValue("sliceString").getAsString();
+            String mapString = modalEvent.getValue("mapString").getAsString();
+            String sliceStringError = nucleusSettings.setPresetSlices(sliceString);
+            String mapStringError = nucleusSettings.setPresetMapString(mapString);
+            if (sliceStringError == null && mapStringError == null) {
+                return null;
+            }
+            StringBuilder errorSb = new StringBuilder();
+            if (sliceStringError != null) {
+                errorSb.append(sliceStringError);
+            }
+            if (!errorSb.isEmpty()) {
+                errorSb.append('\n');
+            }
+            if (mapStringError != null) {
+                errorSb.append(mapStringError);
+            }
+            return errorSb.toString();
+        }
+        return "Unknown Event";
     }
 
     private boolean isNucleusMode() {

@@ -3,8 +3,9 @@ package ti4.cron;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.message.logging.BotLogger;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
+import ti4.logging.BotLogger;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class CategoryCleanupCron {
@@ -15,6 +16,7 @@ public class CategoryCleanupCron {
     }
 
     private static void cleanupCategories() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         JdaService.guilds.forEach(guild -> guild.getCategories().stream()
                 .filter(category -> category.getName().startsWith("PBD #"))
                 .filter(category -> category.getChannels().isEmpty())

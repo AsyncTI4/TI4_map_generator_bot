@@ -8,14 +8,14 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.math.NumberUtils;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.service.planet.PlanetService;
 
@@ -57,6 +57,9 @@ public class ParseUnitService {
     }
 
     private ParsedUnit parseUnit(String unitListToken, String color, Tile tile, GenericInteractionCreateEvent event) {
+        if (unitListToken != null) {
+            unitListToken = unitListToken.replace("space dock", "spacedock");
+        }
         StringTokenizer unitInfoTokenizer = new StringTokenizer(unitListToken, " ");
 
         String firstToken = unitInfoTokenizer.nextToken();
@@ -99,7 +102,7 @@ public class ParseUnitService {
             ParsedUnit parsedUnit, Tile tile, String unitListToken, GenericInteractionCreateEvent event) {
         boolean isValidUnit = parsedUnit.getUnitKey() != null;
         boolean isValidUnitHolder =
-                parsedUnit.getLocation().equals(Constants.SPACE) || tile.isSpaceHolderValid(parsedUnit.getLocation());
+                Constants.SPACE.equals(parsedUnit.getLocation()) || tile.isSpaceHolderValid(parsedUnit.getLocation());
 
         if (isValidUnit && isValidUnitHolder) {
             return true;

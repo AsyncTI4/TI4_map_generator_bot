@@ -1,8 +1,8 @@
 package ti4.service.tactical;
 
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 
 public final class PostMovementButtonContext {
     public final Game game;

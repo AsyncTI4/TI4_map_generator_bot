@@ -8,10 +8,10 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.statistics.GameStatisticsFilterer;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GamesPage;
+import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GamesPage;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -39,7 +39,7 @@ class PlayerWinPercentStatisticsService {
                 .toList();
 
         StringBuilder sb = new StringBuilder();
-        sb.append("__**Player Win Percent:**__").append("\n");
+        sb.append("__**Player Win Percent:**__").append('\n');
         if (entries.isEmpty()) {
             sb.append("No players found for the given filters!");
         }
@@ -53,7 +53,7 @@ class PlayerWinPercentStatisticsService {
                     .append("% (")
                     .append(playerGameCount.get(entry.getKey()))
                     .append(" games) ")
-                    .append("\n");
+                    .append('\n');
         }
 
         MessageHelper.sendMessageToThread(
@@ -70,13 +70,13 @@ class PlayerWinPercentStatisticsService {
         }
 
         for (Player winner : game.getWinners()) {
-            String winningUserId = winner.getUserID();
+            String winningUserId = winner.getStatsTrackedUserID();
             playerWinCount.put(winningUserId, 1 + playerWinCount.getOrDefault(winningUserId, 0));
         }
 
-        game.getRealPlayers().forEach(player -> {
-            String userId = player.getUserID();
-            playerUserIdToUsername.put(userId, player.getUserName());
+        game.getRealAndEliminatedPlayers().forEach(player -> {
+            String userId = player.getStatsTrackedUserID();
+            playerUserIdToUsername.put(userId, player.getStatsTrackedUserName());
             playerGameCount.put(userId, 1 + playerGameCount.getOrDefault(userId, 0));
         });
     }

@@ -1,9 +1,9 @@
 package ti4.service.map;
 
 import lombok.experimental.UtilityClass;
+import ti4.game.Game;
+import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
-import ti4.map.Game;
-import ti4.map.Tile;
 
 @UtilityClass
 public class TeaspoonMapService {

@@ -4,6 +4,7 @@
         "name": "Ancient Burial Sites",
         "phase": "Agenda",
         "window": "When an agenda is revealed",
+        "playTiming": "AGENDA_WHEN",
         "text": "Choose 1 player. Exhaust each cultural planet owned by that player.",
         "automationID": "abs",
         "flavorText": "The images depicted a race that Rin had never seen before. Curious. Could it be that this was a race that was exterminated by the Lazax?",
@@ -25,6 +26,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 1 structure from your reinforcements on a planet you control.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "The vote was nearly unanimous. The council would provide funding for the restoration. Ciel was furious.",
         "source": "miltymod"
     },

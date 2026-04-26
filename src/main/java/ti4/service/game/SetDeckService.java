@@ -6,10 +6,10 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.model.DeckModel;
 
 @UtilityClass
@@ -19,7 +19,7 @@ public class SetDeckService {
         if (Optional.ofNullable(deckModel).isEmpty()) {
             return false;
         }
-        boolean resetDeck = event.getOption("reset_deck", false, OptionMapping::getAsBoolean);
+        boolean resetDeck = event.getOption("reset_deck", Boolean.FALSE, OptionMapping::getAsBoolean);
         switch (deckType) {
             case Constants.AC_DECK -> {
                 if (resetDeck) {

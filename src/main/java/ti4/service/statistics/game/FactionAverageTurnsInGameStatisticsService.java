@@ -6,17 +6,18 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.statistics.GameStatisticsFilterer;
+import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GamesPage;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
+import ti4.service.statistics.FactionStatisticsHelper;
 
 @UtilityClass
 class FactionAverageTurnsInGameStatisticsService {
 
-    public static void averageTurnsInAGameByFaction(SlashCommandInteractionEvent event) {
+    static void averageTurnsInAGameByFaction(SlashCommandInteractionEvent event) {
         Map<String, Integer> factionCount = new HashMap<>();
         Map<String, Integer> factionTurnCount = new HashMap<>();
 
@@ -26,15 +27,19 @@ class FactionAverageTurnsInGameStatisticsService {
 
         StringBuilder sb = new StringBuilder();
         sb.append("Average Turns per Faction:").append("\n");
-        sb.append("All Factions Combined:")
-                .append(String.format(
-                        "%.2f", factionTurnCount.get("allFactions") / (double) factionCount.get("allFactions")))
-                .append("\n");
+        Integer allFactionGames = factionCount.get("allFactions");
+        Integer allFactionTurns = factionTurnCount.get("allFactions");
+        if (allFactionGames != null && allFactionTurns != null) {
+            sb.append("All Factions Combined:")
+                    .append(String.format("%.2f", allFactionTurns / (double) allFactionGames))
+                    .append('\n');
+        }
         factionCount.entrySet().stream()
-                .filter(entry -> Mapper.isValidFaction(entry.getKey()))
                 .sorted(Map.Entry.comparingByValue())
+                .filter(entry -> !"allFactions".equals(entry.getKey()))
                 .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
-                .forEach(entry -> sb.append("`")
+                .filter(entry -> entry.getKey() != null)
+                .forEach(entry -> sb.append('`')
                         .append(StringUtils.leftPad(
                                 String.format(
                                         "%.2f",
@@ -44,9 +49,10 @@ class FactionAverageTurnsInGameStatisticsService {
                         .append(entry.getValue())
                         .append(" games`")
                         .append(entry.getKey().getFactionEmoji())
-                        .append(" ")
+                        .append(' ')
                         .append(entry.getKey().getFactionNameWithSourceEmoji())
-                        .append("\n"));
+                        .append('\n'));
+
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Average Turns per Faction", sb.toString());
     }
@@ -66,7 +72,7 @@ class FactionAverageTurnsInGameStatisticsService {
 
     private static void updateStatistics(
             String faction, int turnCount, Map<String, Integer> factionCount, Map<String, Integer> factionTurnCount) {
-        factionCount.put(faction, factionCount.getOrDefault(faction, 0) + 1);
-        factionTurnCount.put(faction, factionTurnCount.getOrDefault(faction, 0) + turnCount);
+        FactionStatisticsHelper.incrementFactionsIntValue(factionCount, faction);
+        FactionStatisticsHelper.incrementFactionsIntValue(factionTurnCount, faction, turnCount);
     }
 }

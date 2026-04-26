@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
@@ -14,21 +16,19 @@ import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.model.MapTemplateModel;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftableType;
 import ti4.service.draft.NucleusImageGeneratorService;
 import ti4.service.draft.PlayerDraftState;
-import ti4.service.draft.PlayerSetupService.PlayerSetupState;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.emoji.MiltyDraftEmojis;
 
+@Setter
+@Getter
 public class SpeakerOrderDraftable extends SinglePickDraftable {
 
-    @Getter
-    @Setter
     private int numPicks;
 
     public void initialize(int numPlayers) {
@@ -150,12 +150,12 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
                     "Player " + playerUserId + " has an invalid speaker order choice key: " + speakerOrder);
         }
 
-        playerSetupState.setSetSpeaker(speakerNum == 1);
+        playerSetupState.setSpeaker(speakerNum == 1);
 
         if (shouldAlsoSetSeat(draftManager)) {
             String homeTilePosition = MapTemplateHelper.getPlayerHomeSystemLocation(
                     speakerNum, draftManager.getGame().getMapTemplateID());
-            playerSetupState.setPositionHS(homeTilePosition);
+            playerSetupState.setHomeSystemPosition(homeTilePosition);
         }
 
         return (Player p) -> {

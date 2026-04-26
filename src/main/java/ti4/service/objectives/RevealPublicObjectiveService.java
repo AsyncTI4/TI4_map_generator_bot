@@ -8,14 +8,14 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.service.StatusCleanupService;
@@ -38,6 +38,11 @@ public class RevealPublicObjectiveService {
             objective = game.revealStage2Random();
         } else {
             objective = game.revealStage2();
+        }
+        if (objective == null) {
+            MessageHelper.sendMessageToChannel(
+                    game.getActionsChannel(), "No unrevealed stage 2 public objectives remain.");
+            return;
         }
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
@@ -274,7 +279,7 @@ public class RevealPublicObjectiveService {
         PublicObjectiveModel po7 = Mapper.getPublicObjective(objective7.getKey());
         PublicObjectiveModel po8 = Mapper.getPublicObjective(objective8.getKey());
         PublicObjectiveModel po9 = Mapper.getPublicObjective(objective9.getKey());
-        if (game.getPublicObjectives1Peakable().isEmpty()) {
+        if (game.getPublicObjectives1Peekable().isEmpty()) {
             MessageHelper.sendMessageToChannel(channel, game.getPing() + ", all objectives have been revealed.");
             channel.sendMessageEmbeds(List.of(
                             po1.getRepresentationEmbed(),

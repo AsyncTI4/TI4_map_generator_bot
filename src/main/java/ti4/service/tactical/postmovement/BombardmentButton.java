@@ -2,7 +2,7 @@ package ti4.service.tactical.postmovement;
 
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.service.combat.CombatRollType;
 import ti4.service.tactical.PostMovementAbilityButton;
 import ti4.service.tactical.PostMovementButtonContext;

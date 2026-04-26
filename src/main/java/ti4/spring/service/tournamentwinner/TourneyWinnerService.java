@@ -4,7 +4,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
 import org.springframework.stereotype.Service;
-import ti4.spring.jda.JdaService;
+import ti4.discord.JdaService;
 
 @AllArgsConstructor
 @Service

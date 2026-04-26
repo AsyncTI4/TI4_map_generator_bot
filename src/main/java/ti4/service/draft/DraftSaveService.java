@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.StringHelper;
 
@@ -12,6 +13,7 @@ import ti4.helpers.StringHelper;
 public class DraftSaveService {
     public static final String KEY_SEPARATOR = ":";
     public static final String DATA_SEPARATOR = "|";
+    public static final String DATA_SEPARATOR_QUOTED = Pattern.quote(DATA_SEPARATOR);
     public static final char ENCODED_DATA_SEPARATOR = '&';
     public static final String PLAYER_DATA = "p";
     public static final String ORCHESTRATOR_DATA = "o";

@@ -16,7 +16,8 @@ public class PlanetTypeModel {
         SPACESTATION,
         FACTION,
         NONE,
-        MR;
+        MR,
+        LIGHTNING;
 
         @Override
         public String toString() {
@@ -31,6 +32,7 @@ public class PlanetTypeModel {
                         case MR -> PlanetEmojis.Mecatol;
                         case FACTION, NONE, FAKE -> TI4Emoji.getRandomGoodDog(toString());
                         case SPACESTATION -> PlanetEmojis.SpaceStation;
+                        case LIGHTNING -> PlanetEmojis.Lightning;
                     })
                     .toString();
         }

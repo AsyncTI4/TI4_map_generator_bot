@@ -10,22 +10,23 @@ import java.util.function.Function;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.collections4.ListUtils;
+import ti4.discord.JdaService;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
 import ti4.image.PositionMapper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.model.MapTemplateModel;
 import ti4.service.draft.draftables.SliceDraftable;
 import ti4.service.milty.MiltyDraftSlice;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.milty.TierList;
 import ti4.settings.GlobalSettings;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
-public class SliceGeneratorService {
-    public static boolean generateSlices(
+class SliceGeneratorService {
+
+    static boolean generateSlices(
             GenericInteractionCreateEvent event,
             SliceDraftable sliceDraftable,
             DraftTileManager tileManager,
@@ -139,24 +140,24 @@ public class SliceGeneratorService {
         }
 
         long elapsed = System.nanoTime() - startTime;
-        boolean debug =
-                GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
+        boolean debug = GlobalSettings.getSetting(
+                GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, Boolean.FALSE);
         if (!slicesCreated || elapsed >= 10000000000L || debug) {
             StringBuilder sb = new StringBuilder();
             sb.append("Milty draft took a while... jazz, take a look:\n");
             sb.append("`        Elapsed time:` ")
                     .append(DateTimeHelper.getTimeRepresentationNanoSeconds(elapsed))
-                    .append("\n");
+                    .append('\n');
             sb.append("`           Quit time:` ")
                     .append(DateTimeHelper.getTimeRepresentationNanoSeconds(quitDiff))
-                    .append("\n");
-            sb.append("`    Number of cycles:` ").append(i).append("\n");
+                    .append('\n');
+            sb.append("`    Number of cycles:` ").append(i).append('\n');
             for (Map.Entry<String, Integer> reason : reasons.entrySet()) {
-                sb.append("`")
+                sb.append('`')
                         .append(Helper.leftpad(reason.getKey(), 15))
                         .append(" fail:` ")
                         .append(reason.getValue())
-                        .append("\n");
+                        .append('\n');
             }
             BotLogger.warning(new LogOrigin(event), sb.toString());
         }

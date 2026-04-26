@@ -5,17 +5,17 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.regex.RegexService;
@@ -34,9 +34,9 @@ public class FealtyUplinkService {
                 player.finChecker() + "fealtyUplink_" + planetName,
                 "Use Fealty Uplink on " + prettyPlanet,
                 FactionEmojis.L1Z1X));
-        String message = "When you gain control of a planet, you can use " + fealtyRep();
+        String message = "When you gain control of a planet, you may use " + fealtyRep();
         message +=
-                " to place infantry equal to that planet's influence.\n-# > You may choose to do this either before or after exploring.";
+                " to place infantry equal to that planet's influence.\n-# You may choose to do this either before or after exploring.";
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCorrectChannel(), message, buttons);
     }
 

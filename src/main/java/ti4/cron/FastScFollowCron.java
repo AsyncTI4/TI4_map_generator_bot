@@ -5,17 +5,19 @@ import static java.util.function.Predicate.not;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import ti4.executors.ExecutionLockManager;
+import ti4.executors.ExecutionLockType;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
-import ti4.map.persistence.ManagedGame;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.model.StrategyCardModel;
 import ti4.service.button.ReactionService;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class FastScFollowCron {
@@ -28,6 +30,7 @@ public class FastScFollowCron {
     }
 
     private static void handleFastScFollow() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running FastScFollowCron");
 
         GameManager.getManagedGames().stream()
@@ -35,7 +38,7 @@ public class FastScFollowCron {
                 .filter(ManagedGame::isFastScFollowMode)
                 .map(ManagedGame::getName)
                 .forEach(gameName -> ExecutionLockManager.wrapWithLockAndRelease(
-                                gameName, ExecutionLockManager.LockType.WRITE, () -> handleFastScFollow(gameName))
+                                gameName, ExecutionLockType.WRITE, () -> handleFastScFollow(gameName))
                         .run());
 
         BotLogger.logCron("Finished FastScFollowCron");
@@ -108,7 +111,7 @@ public class FastScFollowCron {
         if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
             sb.append("Message link is: ")
                     .append(game.getStoredValue("scPlay" + sc))
-                    .append("\n");
+                    .append('\n');
         }
         sb.append("You currently have ")
                 .append(player.getStrategicCC())

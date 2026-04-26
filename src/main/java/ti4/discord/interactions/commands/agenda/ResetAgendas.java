@@ -1,0 +1,43 @@
+package ti4.discord.interactions.commands.agenda;
+
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.commands.GameStateSubcommand;
+import ti4.game.Game;
+import ti4.helpers.Constants;
+import ti4.message.MessageHelper;
+
+class ResetAgendas extends GameStateSubcommand {
+
+    ResetAgendas() {
+        super(Constants.RESET_AGENDAS, "Reset agenda deck", true, false);
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES")
+                .setRequired(true));
+    }
+
+    @Override
+    public void execute(SlashCommandInteractionEvent event) {
+        OptionMapping confirmOption = event.getOption(Constants.CONFIRM);
+        if (confirmOption == null || !"YES".equals(confirmOption.getAsString())) {
+            MessageHelper.replyToMessage(
+                    event,
+                    "Must confirm with `YES`"
+                            + ("YES".equalsIgnoreCase(confirmOption.getAsString()) ? " - this is case sensitive" : "")
+                            + ".");
+            return;
+        }
+
+        Game game = getGame();
+        game.resetAgendas();
+        MessageHelper.replyToMessage(
+                event,
+                "Agenda deck reset to deck: `" + game.getAgendaDeckID() + "`. Discards removed. All shuffled as new");
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
+}

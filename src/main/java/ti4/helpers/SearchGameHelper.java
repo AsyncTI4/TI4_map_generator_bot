@@ -1,11 +1,10 @@
 package ti4.helpers;
 
+import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Member;
@@ -13,11 +12,11 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
-import ti4.map.persistence.ManagedGame;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
@@ -101,18 +100,13 @@ public class SearchGameHelper {
         if (wantNum) {
             return filteredManagedGames.size();
         }
-        int days = 0;
-
         StringBuilder sb = new StringBuilder("**__").append(user.getName()).append("'s Games__**\n");
         for (var managedGame : filteredManagedGames) {
-            sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
+            sb.append('`').append(Helper.leftpad("" + index, 2)).append(".`");
             var game = managedGame.getGame();
             sb.append(
                     getPlayerMapListRepresentation(game, userID, showAverageTurnTime, showSecondaries, showGameModes));
-            sb.append("\n");
-            if (game.isHasEnded()) {
-                days += Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString());
-            }
+            sb.append('\n');
             index++;
         }
         if (event instanceof SlashCommandInteractionEvent slash) {
@@ -124,65 +118,10 @@ public class SearchGameHelper {
         return filteredManagedGames.size();
     }
 
-    private static List<Integer> getGameDaysLength(
-            User user,
-            GenericInteractionCreateEvent event,
-            boolean onlyMyTurn,
-            boolean includeEndedGames,
-            boolean showAverageTurnTime,
-            boolean showSecondaries,
-            boolean showGameModes,
-            boolean ignoreSpectate,
-            boolean ignoreAborted,
-            boolean wantNum) {
-        String userID = user.getId();
-
-        Predicate<ManagedGame> ignoreSpectateFilter = ignoreSpectate
-                ? game -> game.getRealPlayers().stream()
-                        .anyMatch(player -> player.getId().equals(user.getId()))
-                : game -> game.getPlayers().stream()
-                        .anyMatch(player -> player.getId().equals(user.getId()));
-        Predicate<ManagedGame> onlyMyTurnFilter =
-                onlyMyTurn ? game -> Objects.equals(game.getActivePlayerId(), user.getId()) : game -> true;
-        Predicate<ManagedGame> endedGamesFilter =
-                includeEndedGames ? game -> true : game -> !game.isHasEnded() && !game.isFowMode();
-        Predicate<ManagedGame> onlyEndedFoWGames = game -> !game.isFowMode() || game.isHasEnded();
-        Predicate<ManagedGame> ignoreAbortedFilter =
-                ignoreAborted ? game -> !game.isHasEnded() || game.isHasWinner() : game -> true;
-        Predicate<ManagedGame> allFilterPredicates = ignoreSpectateFilter
-                .and(onlyMyTurnFilter)
-                .and(endedGamesFilter)
-                .and(onlyEndedFoWGames)
-                .and(ignoreAbortedFilter);
-
-        var filteredManagedGames = GameManager.getManagedGames().stream()
-                .filter(allFilterPredicates)
-                .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
-                .toList();
-
-        var days = new ArrayList<Integer>();
-
-        for (var managedGame : filteredManagedGames) {
-            var game = managedGame.getGame();
-            if (game.isHasEnded()) {
-                if (Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString()) > 0) {
-                    days.add(Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString()));
-                }
-            }
-        }
-        Collections.sort(days);
-
-        return days;
-    }
-
     public static void msgGames(
             User user,
-            GenericInteractionCreateEvent event,
             boolean onlyMyTurn,
             boolean includeEndedGames,
-            boolean showAverageTurnTime,
-            boolean showSecondaries,
-            boolean showGameModes,
             boolean ignoreSpectate,
             boolean ignoreAborted,
             boolean pingGame,
@@ -230,91 +169,6 @@ public class SearchGameHelper {
         }
     }
 
-    private static double getWinPercentage(
-            User user,
-            GenericInteractionCreateEvent event,
-            boolean onlyMyTurn,
-            boolean includeEndedGames,
-            boolean showAverageTurnTime,
-            boolean showSecondaries,
-            boolean showGameModes,
-            boolean ignoreSpectate,
-            boolean ignoreAborted,
-            boolean wantNum) {
-        String userID = user.getId();
-
-        Predicate<ManagedGame> ignoreSpectateFilter = ignoreSpectate
-                ? game -> game.getRealPlayers().stream()
-                        .anyMatch(player -> player.getId().equals(user.getId()))
-                : game -> game.getPlayers().stream()
-                        .anyMatch(player -> player.getId().equals(user.getId()));
-        Predicate<ManagedGame> onlyMyTurnFilter =
-                onlyMyTurn ? game -> Objects.equals(game.getActivePlayerId(), user.getId()) : game -> true;
-        Predicate<ManagedGame> endedGamesFilter =
-                includeEndedGames ? game -> true : game -> !game.isHasEnded() && !game.isFowMode();
-        Predicate<ManagedGame> onlyEndedFoWGames = game -> !game.isFowMode() || game.isHasEnded();
-        Predicate<ManagedGame> ignoreAbortedFilter =
-                ignoreAborted ? game -> !game.isHasEnded() || game.isHasWinner() : game -> true;
-        Predicate<ManagedGame> allFilterPredicates = ignoreSpectateFilter
-                .and(onlyMyTurnFilter)
-                .and(endedGamesFilter)
-                .and(onlyEndedFoWGames)
-                .and(ignoreAbortedFilter);
-
-        var filteredManagedGames = GameManager.getManagedGames().stream()
-                .filter(allFilterPredicates)
-                .sorted(Comparator.comparing(ManagedGameService::getGameNameForSorting))
-                .toList();
-
-        int index = 0;
-
-        double wins = 0;
-        for (var managedGame : filteredManagedGames) {
-            var game = managedGame.getGame();
-            if (game.isHasEnded() && game.hasWinner()) {
-                if (game.getWinners().contains(game.getPlayer(userID))) {
-                    wins++;
-                }
-                index++;
-            }
-        }
-
-        return wins / index;
-    }
-
-    public static String getTotalCompletedNOngoingGames(List<User> users, GenericInteractionCreateEvent event) {
-        StringBuilder sb = new StringBuilder();
-        AtomicInteger index = new AtomicInteger(1);
-        sb.append("## __**Games**__\n");
-        for (User user : users) {
-            int ongoingAmount = searchGames(user, event, false, false, false, true, false, true, true, true);
-            int completedAndOngoingAmount = searchGames(user, event, false, true, false, true, false, true, true, true);
-            int completedGames = completedAndOngoingAmount - ongoingAmount;
-            sb.append("`")
-                    .append(Helper.leftpad(String.valueOf(index.get()), 3))
-                    .append(". ");
-            sb.append(completedGames);
-            sb.append("` Completed. `").append(ongoingAmount).append("` Ongoing -- ");
-            sb.append(user.getEffectiveName());
-            sb.append("\n");
-            if (completedGames > 0) {
-                sb.append("> The completed games took the following amount of time to complete (in days):");
-                List<Integer> days = getGameDaysLength(user, event, false, true, false, true, false, true, true, true);
-                for (int day : days) {
-                    sb.append(" ").append(day);
-                }
-                sb.append("\n");
-                double getWinPercentage =
-                        getWinPercentage(user, event, false, true, false, true, false, true, true, true);
-                sb.append("> Player win percentage across all games was: ")
-                        .append(String.format("%.2f", getWinPercentage))
-                        .append("\n");
-            }
-            index.getAndIncrement();
-        }
-        return sb.toString();
-    }
-
     private static String getPlayerMapListRepresentation(
             Game game, String userID, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes) {
         Player player = game.getPlayer(userID);
@@ -350,7 +204,21 @@ public class SearchGameHelper {
             }
         }
         if (showGameModes) sb.append(" | Game Modes: ").append(game.getGameModesText());
-        if (game.isHasEnded()) sb.append(" [GAME IS OVER]");
+        if (game.isHasEnded()) {
+            long creationDateTime = game.getCreationDateTime();
+            long endedDateTime = game.getEndedDate();
+            int daysPlayed =
+                    (int) Duration.ofMillis(endedDateTime - creationDateTime).toDays();
+            String dayLabel = (daysPlayed == 1) ? "DAY" : "DAYS";
+            String endedStatus = game.hasWinner() ? "COMPLETED" : "ABORTED";
+            sb.append(" [")
+                    .append(daysPlayed)
+                    .append(' ')
+                    .append(dayLabel)
+                    .append(", ")
+                    .append(endedStatus)
+                    .append("]");
+        }
         return sb.toString();
     }
 

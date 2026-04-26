@@ -9,22 +9,22 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
-import ti4.buttons.Buttons;
-import ti4.commands.special.SetupNeutralPlayer;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
-import ti4.model.ColorModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.breakthrough.AlRaithService;
 import ti4.service.emoji.DiceEmojis;
+import ti4.service.fow.GMService;
 import ti4.service.rules.ThundersEdgeRulesService;
 import ti4.service.unit.AddUnitService;
 
@@ -32,8 +32,9 @@ import ti4.service.unit.AddUnitService;
 public class FractureService {
 
     public static boolean isFractureInPlay(Game game) {
-        return Stream.of("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7")
-                .allMatch(pos -> game.getTileByPosition(pos) != null);
+        return game.getTileFromPlanet("styx") != null
+                || Stream.of("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7")
+                        .allMatch(pos -> game.getTileByPosition(pos) != null);
     }
 
     @ButtonHandler("rollFracture")
@@ -44,7 +45,7 @@ public class FractureService {
         int result = new Die(0).getResult();
         if ("cabalbt".equals(bt)) {
             String msg = player.getRepresentation(false, false)
-                    + " has Cabal breakthrough so the Fracture enters automatically"
+                    + " has _Al'Raith Ix Ianovar_ so The Fracture enters automatically"
                     + "! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             spawnFracture(event, game);
@@ -57,13 +58,18 @@ public class FractureService {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 spawnFracture(event, game);
                 spawnIngressTokens(event, game, player, bt);
+            } else if (result == 6) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        "> \"Thunder rolled...\n> It rolled a " + DiceEmojis.getGrayDieEmoji(6)
+                                + ".\"\n> \\- Terry Pratchett, _Guards! Guards!_");
             } else { // fail
                 String msg = player.getRepresentation(true, false) + " rolled a " + DiceEmojis.getGrayDieEmoji(result)
                         + ", better luck next time.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     public static void spawnFracture(GenericInteractionCreateEvent event, Game game) {
@@ -74,11 +80,8 @@ public class FractureService {
 
         Player neutral = game.getPlayerFromColorOrFaction("neutral");
         if (neutral == null) {
-            List<String> unusedColors =
-                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
-            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
-            game.setupNeutralPlayer(color);
-            neutral = game.getPlayerFromColorOrFaction("neutral");
+            String color = SetupNeutralPlayer.pickNeutralColor(game);
+            neutral = game.setupNeutralPlayer(color);
         }
         String neutralColorID = neutral.getColorID();
         List<String> units =
@@ -136,7 +139,7 @@ public class FractureService {
         for (Tile t : automaticAdds) {
             t.addToken(Constants.TOKEN_INGRESS, "space");
             if (!game.isFowMode()) {
-                automatic.append("\n> ").append(t.getRepresentationForButtons(game, player));
+                automatic.append("\n- ").append(t.getRepresentationForButtons(game, player));
             }
         }
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), automatic.toString());
@@ -149,15 +152,30 @@ public class FractureService {
             List<Button> buttons = new ArrayList<>(tilesWithSkip.stream()
                     .map(tile -> {
                         String id = player.finChecker() + "addIngressToken_" + tile.getPosition() + "_" + countPer;
-                        String label = "Add ingress to " + tile.getRepresentationForButtons(game, player);
+                        String label = "Add Ingress To " + tile.getRepresentationForButtons(game, player);
                         return Buttons.red(id, label, type.emoji());
                     })
                     .toList());
 
-            String msg =
-                    player.getRepresentation() + " choose tiles with a " + type.emoji() + " to place an Ingress token:";
-            buttons.add(Buttons.gray("deleteButtons", "Done resolving"));
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+            String msg = game.isFowMode()
+                    ? GMService.gmPing(game)
+                    : player.getRepresentation() + ", please a system with a " + type.emoji()
+                            + " to place an Ingress token.";
+            buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    game.isFowMode() ? GMService.getGMChannel(game) : player.getCorrectChannel(), msg, buttons);
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(
+                        player.getPrivateChannel(),
+                        player.getRepresentationUnfogged()
+                                + ", buttons to resolve Ingress tokens for The Fracture have been sent to the GM.");
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(),
+                        "## Please do not place more ingress tokens than legal."
+                                + " If brought in by breakthrough, that means up to 3 planets per technology type of the breakthrough (6 total)."
+                                + " Otherwise, 1 planet per technology type (4 total).");
+            }
         }
 
         ThundersEdgeRulesService.alertTabletalkWithFractureRules(game);
@@ -169,14 +187,14 @@ public class FractureService {
 
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(), "Placed an ingress token on " + tile.getRepresentationForButtons());
+                player.getCorrectChannel(), "Placed an ingress token in " + tile.getRepresentationForButtons() + ".");
         tile.addToken(Constants.TOKEN_INGRESS, "space");
 
         if (game.isFowMode()) {
-            FoWHelper.pingSystem(game, tile.getPosition(), "A new ingress tears into the Fracture.", false);
+            FoWHelper.pingSystem(game, tile.getPosition(), "A new ingress tears into The Fracture.", false);
         }
 
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     private static List<Tile> getTilesWithSkipAndNoIngressAndNotAdding(

@@ -4,18 +4,20 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.unions.IThreadContainerUnion;
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
-import ti4.map.persistence.GameManager;
 
 @UtilityClass
 public class GameNameService {
 
-    @NotNull
+    @Nullable
     public static String getGameName(SlashCommandInteractionEvent event) {
         OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
         if (gameNameOption != null) {
@@ -24,12 +26,20 @@ public class GameNameService {
         return getGameNameFromChannel(event);
     }
 
+    @Nullable
+    public static String getGameName(GenericCommandInteractionEvent event) {
+        Channel channel = event.getChannel();
+        if (channel == null) return null;
+        return getGameNameFromChannel(channel);
+    }
+
+    @Nullable
     public static String getGameNameFromChannel(Interaction event) {
         return getGameNameFromChannel(event.getChannel());
     }
 
-    @NotNull
-    public static String getGameNameFromChannel(Channel channel) {
+    @Nullable
+    public static String getGameNameFromChannel(@NotNull Channel channel) {
         String gameName = getGameNameFromChannelName(channel.getName());
         if (GameManager.isValid(gameName)) {
             return gameName;
@@ -38,7 +48,10 @@ public class GameNameService {
             IThreadContainerUnion parentChannel = ((ThreadChannel) channel).getParentChannel();
             gameName = getGameNameFromChannelName(parentChannel.getName());
         }
-        return gameName;
+        if (GameManager.isValid(gameName)) {
+            return gameName;
+        }
+        return null;
     }
 
     private static String getGameNameFromChannelName(String channelName) {

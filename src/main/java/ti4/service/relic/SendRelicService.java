@@ -2,11 +2,11 @@ package ti4.service.relic;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
 
@@ -25,7 +25,7 @@ public class SendRelicService {
         player2.addRelic(relicID);
 
         // Remove points etc from p1, then resolve effects for p2
-        RelicHelper.resolveRelicLossEffects(event, game, player1, relicID);
+        RelicHelper.resolveRelicLossEffects(game, player1, relicID);
         RelicHelper.resolveRelicEffects(event, game, player2, relicID);
 
         // Additionally exhaust the relic after gaining, if applicable

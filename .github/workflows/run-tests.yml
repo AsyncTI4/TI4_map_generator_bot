@@ -3,9 +3,38 @@ on:
   pull_request:
     branches: ["master"]
 jobs:
+  changes:
+    name: Detect changed files
+    runs-on: ubuntu-latest
+    outputs:
+      json: ${{ steps.filter.outputs.json }}
+      java: ${{ steps.filter.outputs.java }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Detect changed file types
+        id: filter
+        run: |
+          BASE=${{ github.event.pull_request.base.sha }}
+          HEAD=${{ github.event.pull_request.head.sha }}
+          CHANGED_FILES="$(git diff --name-only "$BASE" "$HEAD")"
+          if printf '%s\n' "$CHANGED_FILES" | grep -qE '\.json$'; then
+            echo "json=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "json=false" >> "$GITHUB_OUTPUT"
+          fi
+          if printf '%s\n' "$CHANGED_FILES" | grep -qE '^(src/|pom\.xml$)'; then
+            echo "java=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "java=false" >> "$GITHUB_OUTPUT"
+          fi
+
   validate-json:
     name: check for invalid json files
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.json == 'true'
     steps:
       - uses: actions/checkout@v4
       - name: check for invalid json files
@@ -20,14 +49,47 @@ jobs:
   ci:
     name: Run Tests On Pull Request
     runs-on: ubuntu-latest
-    needs: validate-json
+    needs: [changes, validate-json]
+    if: always() && needs.changes.outputs.java == 'true' && (needs.validate-json.result == 'success' || needs.validate-json.result == 'skipped')
+    permissions:
+      checks: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fetch master branch for spotless
+        run: |
+          git fetch --no-tags --depth=1 origin master
       - name: Set up JDK 21 for x64
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v5
         with:
           java-version: "21"
           distribution: "corretto"
           architecture: x64
+      - name: Cache Maven local repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
       - name: Run the Maven verify phase
-        run: mvn --batch-mode --update-snapshots --no-transfer-progress verify test-compile
+        run: mvn --batch-mode --no-transfer-progress verify -P ci-spotless -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss.SSS
+      - name: Publish Test Report for PRs
+        if: ${{ always()  &&  (github.event.pull_request.head.repo.full_name == github.repository) }}
+        uses: mikepenz/action-junit-report@v6
+        with:
+          report_paths: "**/target/surefire-reports/TEST-*.xml"
+          fail_on_failure: true 
+      - name: Add Annotations for PRs from a forked repo
+        if: ${{ failure() &&  (github.event.pull_request.head.repo.full_name != github.repository) }}
+        uses: mikepenz/action-junit-report@v6
+        with:
+          report_paths: "**/target/surefire-reports/TEST-*.xml"
+          annotate_only: true # forked repo cannot write to checks so just do annotations
+      - name: Upload Surefire Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports/

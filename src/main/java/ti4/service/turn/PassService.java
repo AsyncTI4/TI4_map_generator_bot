@@ -1,13 +1,14 @@
 package ti4.service.turn;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperCommanders;
@@ -15,8 +16,6 @@ import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -41,6 +40,12 @@ public class PassService {
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Passed.");
 
         String text = player.getRepresentation(true, false) + " has passed" + (autoPass ? " (preset)." : ".");
+
+        if (autoPass
+                && player.getPlanets().contains("ordinian")
+                && !player.getExhaustedPlanetsAbilities().contains("ordinian")) {
+            text += "\n# They did not use the Ordinian ability. If this was a mistake, let them do so now.";
+        }
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);
         if (player.hasTech("absol_aida")) {
@@ -73,16 +78,17 @@ public class PassService {
                     + player.getCCRepresentation() + ". Use buttons to gain a command token.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
-        if (player.hasAbility("bestow")) {
-            String msg = player.getRepresentation() + ", since you have the _Bestow_ Honor card,"
-                    + " you can allow your neighbors to each gain 2 commodities with the below button. If you do, for each one that does you will gain 1 commodity.";
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("startBestow", "Allow Neighbors To Gain 2 Commodities"));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(), "Use buttons to resolve.", buttons);
-        }
+        // if (player.hasAbility("bestow")) {
+        //     String msg = player.getRepresentation() + ", since you have the _Bestow_ Honor card,"
+        //             + " you can allow your neighbors to each gain 2 commodities with the below button. If you do, for
+        // each one that does you will gain 1 commodity.";
+        //     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        //     List<Button> buttons = new ArrayList<>();
+        //     buttons.add(Buttons.green("startBestow", "Allow Neighbors To Gain 2 Commodities"));
+        //     buttons.add(Buttons.red("deleteButtons", "Decline"));
+        //     MessageHelper.sendMessageToChannelWithButtons(
+        //             player.getCorrectChannel(), "Use buttons to resolve.", buttons);
+        // }
         if (player.hasTech("dskolug")) {
             int oldComm = player.getCommodities();
             for (Player p2 : game.getRealPlayers()) {
@@ -110,12 +116,16 @@ public class PassService {
         if ("yes".equals(game.getStoredValue("autoProveEndurance_" + player.getFaction()))) {
             for (Map.Entry<String, Integer> so : player.getSecrets().entrySet()) {
                 if ("pe".equals(so.getKey())) {
-                    SecretObjectiveHelper.scoreSO(
+                    boolean wonGame = SecretObjectiveHelper.scoreSO(
                             event,
                             game,
                             player,
                             so.getValue(),
                             (game.isFowMode() ? player.getPrivateChannel() : game.getMainGameChannel()));
+                    if (wonGame) {
+                        return;
+                    }
+
                     break;
                 }
             }

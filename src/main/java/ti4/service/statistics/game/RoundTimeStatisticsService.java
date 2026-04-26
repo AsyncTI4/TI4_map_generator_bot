@@ -8,9 +8,9 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.statistics.GameStatisticsFilterer;
-import ti4.map.Game;
-import ti4.map.persistence.GamesPage;
+import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.game.Game;
+import ti4.game.persistence.GamesPage;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -24,14 +24,14 @@ class RoundTimeStatisticsService {
                 GameStatisticsFilterer.getGamesFilter(event), game -> getRoundTimes(game, timeCount, amountCount));
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Time Per Phase:").append("\n");
+        sb.append("Time Per Phase:").append('\n');
         timeCount.forEach((key, value) -> sb.append(key)
                 .append(": ")
                 .append(StringUtils.leftPad(convertMillisecondsToDays((float) value / amountCount.get(key)), 4))
                 .append(" days (based on ")
                 .append(amountCount.get(key))
                 .append(" games)")
-                .append("\n"));
+                .append('\n'));
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Time per Phase", sb.toString());
     }

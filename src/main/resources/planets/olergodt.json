@@ -10,8 +10,9 @@
     "planetLayout": {
         "unitHolderName": "olergodt",
         "resourcesLocation": "BottomLeft",
-        "centerPosition": { "x": 170.0, "y": 150.0 },
+        "centerPosition": { "x": 172.0, "y": 150.0 },
         "extraIcons": 2
     },
+    "contrastColor": "orange",
     "source": "thunders_edge"
 }

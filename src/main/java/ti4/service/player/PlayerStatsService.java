@@ -8,12 +8,12 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.FoWHelper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 import ti4.service.emoji.ColorEmojis;
@@ -34,7 +34,7 @@ public class PlayerStatsService {
         sb.append("      ")
                 .append(MiscEmojis.comm)
                 .append(player.getCommodities())
-                .append("/")
+                .append('/')
                 .append(player.getCommoditiesTotal());
 
         sb.append("      ").append(ExploreEmojis.CFrag).append(player.getCrf());
@@ -42,7 +42,7 @@ public class PlayerStatsService {
         sb.append("   ").append(ExploreEmojis.HFrag).append(player.getHrf());
         sb.append("   ").append(ExploreEmojis.UFrag).append(player.getUrf());
 
-        sb.append("\n");
+        sb.append('\n');
         sb.append("> Base commodities: `").append(player.getCommoditiesBase()).append("`\n");
         sb.append("> Bonus commodities: `").append(player.getCommoditiesBonus()).append("`\n");
         sb.append("> Old total commodities: `")
@@ -53,7 +53,7 @@ public class PlayerStatsService {
         sb.append("> Unfollowed Strategy Cards: `")
                 .append(player.getUnfollowedSCs())
                 .append("`\n");
-        sb.append("> Debt: `").append(player.getDebtTokens()).append("`\n");
+        sb.append("> Debt: `").append(player.getAllDebtTokens()).append("`\n");
         sb.append("> Speaker: `")
                 .append(game.getSpeakerUserID().equals(player.getUserID()))
                 .append("`\n");
@@ -77,6 +77,11 @@ public class PlayerStatsService {
         sb.append("> Faction Technologies: `").append(player.getFactionTechs()).append("`\n");
         sb.append("> Fragments: `").append(player.getFragments()).append("`\n");
         sb.append("> Relics: `").append(player.getRelics()).append("`\n");
+        if (player.getBreakthroughIDs().isEmpty()) {
+            sb.append("> Breakthroughs: `None`\n");
+        } else {
+            sb.append("> Breakthroughs: `").append(player.getBreakthroughIDs()).append("`\n");
+        }
         sb.append("> Imperia Command Tokens: `").append(player.getMahactCC()).append("`\n");
         sb.append("> Leaders: `").append(player.getLeaderIDs()).append("`\n");
         sb.append("> Owned Promissory Notes: `")
@@ -88,7 +93,7 @@ public class PlayerStatsService {
         sb.append("> Owned Units: `").append(player.getUnitsOwned()).append("`\n");
         sb.append("> Alliance Members: ")
                 .append(player.getAllianceMembers().replace(player.getFaction(), ""))
-                .append("\n");
+                .append('\n');
         sb.append("> Followed SCs: `")
                 .append(player.getFollowedSCs().toString())
                 .append("`\n");
@@ -98,26 +103,26 @@ public class PlayerStatsService {
         sb.append("> Actual Hits: `").append(player.getActualHits()).append("`\n");
         sb.append("> Total Unit Resource Value: ")
                 .append(MiscEmojis.resources)
-                .append("`")
+                .append('`')
                 .append(player.getTotalResourceValueOfUnits("both"))
                 .append("`\n");
         sb.append("> Total Unit Hit-point Value: ")
                 .append("🩷")
-                .append("`")
+                .append('`')
                 .append(player.getTotalHPValueOfUnits("both"))
                 .append("`\n");
         sb.append("> Total Unit Combat Expected Hits: ")
                 .append("💥")
-                .append("`")
+                .append('`')
                 .append(player.getTotalCombatValueOfUnits("both"))
                 .append("`\n");
         sb.append("> Total Unit Ability Expected Hits: ")
                 .append(TechEmojis.UnitUpgradeTech)
-                .append("`")
+                .append('`')
                 .append(player.getTotalUnitAbilityValueOfUnits())
                 .append("`\n");
         sb.append("> Decal Set: `").append(player.getDecalName()).append("`\n");
-        sb.append("\n");
+        sb.append('\n');
         return sb.toString();
     }
 
@@ -161,7 +166,7 @@ public class PlayerStatsService {
         player.addSC(scNumber);
         if (game.isFowMode()) {
             String messageToSend =
-                    ColorEmojis.getColorEmojiWithName(player.getColor()) + " picked " + game.getSCName(scNumber);
+                    ColorEmojis.getColorEmojiWithName(player.getColor()) + " picked " + game.getSCName(scNumber) + ".";
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
         }
 
@@ -178,7 +183,7 @@ public class PlayerStatsService {
         }
 
         Integer tgCount = strategyCardToTradeGoodCount.get(scNumber);
-        String msg = player.getRepresentationUnfogged() + " picked " + scModel.getEmojiWordRepresentation();
+        String msg = player.getRepresentationUnfogged() + " picked " + scModel.getEmojiWordRepresentation() + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (tgCount != null && tgCount != 0) {
             int tg = player.getTg();
@@ -189,10 +194,11 @@ public class PlayerStatsService {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
-                            + " from picking " + game.getSCName(scNumber) + ".");
+                            + " from picking **" + game.getSCName(scNumber) + "**.");
             if (game.isFowMode()) {
-                String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
-                        + " trade good" + (tgCount == 1 ? "" : "s") + " from picking " + game.getSCName(scNumber) + ".";
+                String messageToSend =
+                        ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " trade good"
+                                + (tgCount == 1 ? "" : "s") + " from picking **" + game.getSCName(scNumber) + "**.";
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);

@@ -13,15 +13,15 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 
@@ -106,11 +106,8 @@ public class VeiledHeartService {
             veiledCardsByType.put(cardType, new ArrayList<>());
         }
 
-        getVeiledCards(player).forEach(card -> {
-            VeiledCardType.fromCard(card).ifPresent(type -> {
-                veiledCardsByType.get(type).add(card);
-            });
-        });
+        getVeiledCards(player).forEach(card -> VeiledCardType.fromCard(card)
+                .ifPresent(type -> veiledCardsByType.get(type).add(card)));
         return veiledCardsByType;
     }
 
@@ -165,18 +162,16 @@ public class VeiledHeartService {
         Stream.of(VeiledCardAction.values())
                 .filter(action -> actionString.equalsIgnoreCase(action.toString()))
                 .findAny()
-                .ifPresent(action -> {
-                    Stream.of(VeiledCardType.values())
-                            .filter(type -> typeString.equalsIgnoreCase(type.toString()))
-                            .findAny()
-                            .ifPresent(type -> {
-                                if (card.isEmpty()) {
-                                    sendVeiledButtons(action, type, player);
-                                } else {
-                                    doAction(action, type, player, card);
-                                }
-                            });
-                });
+                .ifPresent(action -> Stream.of(VeiledCardType.values())
+                        .filter(type -> typeString.equalsIgnoreCase(type.toString()))
+                        .findAny()
+                        .ifPresent(type -> {
+                            if (card.isEmpty()) {
+                                sendVeiledButtons(action, type, player);
+                            } else {
+                                doAction(action, type, player, card);
+                            }
+                        }));
         ButtonHelper.deleteMessage(event);
     }
 

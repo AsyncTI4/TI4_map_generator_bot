@@ -201,7 +201,7 @@
         "abilities": [
             "patience",
             "strategic_fluidity",
-            "increased_surveillance"
+            "detachment"
         ],
         "leaders": [
             "onyxxaagent",
@@ -329,7 +329,7 @@
             "bazephy"
         ],
         "startingTech": [
-            "sdn",
+            "st",
             "sar"
         ],
         "homePlanets": [

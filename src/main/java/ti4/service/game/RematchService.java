@@ -13,16 +13,16 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class RematchService {
@@ -69,7 +69,7 @@ public class RematchService {
                 }
             }
 
-            Set<Permission> allow = Set.of(Permission.MESSAGE_MANAGE, Permission.VIEW_CHANNEL);
+            Set<Permission> allow = Set.of(Permission.PIN_MESSAGES, Permission.VIEW_CHANNEL);
             tableTalkChannel.getManager().putRolePermissionOverride(gameRole.getIdLong(), allow, null);
             actionsChannel.getManager().putRolePermissionOverride(gameRole.getIdLong(), allow, null);
         }
@@ -134,8 +134,8 @@ public class RematchService {
         ThreadChannel botThread =
                 actionsChannel.createThreadChannel(newBotThreadName).complete();
         newGame.setBotMapUpdatesThreadID(botThread.getId());
-        newGame.setUpPeakableObjectives(5, 1);
-        newGame.setUpPeakableObjectives(5, 2);
+        newGame.setUpPeekableObjectives(5, 1);
+        newGame.setUpPeekableObjectives(5, 2);
         // INTRODUCTION TO TABLETALK CHANNEL
 
         // INTRODUCTION TO BOT-MAP THREAD

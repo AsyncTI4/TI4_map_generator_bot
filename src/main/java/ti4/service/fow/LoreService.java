@@ -28,7 +28,13 @@ import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.ModalHandler;
+import ti4.discord.interactions.routing.SelectionHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -37,17 +43,11 @@ import ti4.helpers.SortHelper;
 import ti4.helpers.URLReaderHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.listeners.annotations.ModalHandler;
-import ti4.listeners.annotations.SelectionHandler;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.model.PlanetModel;
 
-public class LoreService {
+public final class LoreService {
 
     private static final Map<String, Map<String, LoreEntry>> LORECACHE = new HashMap<>();
 
@@ -111,7 +111,7 @@ public class LoreService {
 
     public static class LoreEntry {
         public String target;
-        public String loreText;
+        public final String loreText;
         public String footerText = "";
         public RECEIVER receiver = RECEIVER.CURRENT;
         public TRIGGER trigger = TRIGGER.CONTROLLED;
@@ -209,18 +209,21 @@ public class LoreService {
     }
 
     @ButtonHandler("gmLore")
-    private static void showLoreButtons(ButtonInteractionEvent event, String buttonID, Game game) {
+    public static void showLoreButtons(GenericInteractionCreateEvent event, String buttonID, Game game) {
         String page = StringUtils.substringAfter(buttonID, "page");
         int pageNum = StringUtils.isBlank(page) ? 1 : Integer.parseInt(page);
         List<ActionRow> buttons = Buttons.paginateButtons(getLoreButtons(game), LORE_BUTTONS, pageNum, "gmLore");
 
         if (StringUtils.isBlank(page)) {
-            event.getChannel()
+            event.getMessageChannel()
                     .sendMessage("### Lore Management")
                     .setComponents(buttons)
                     .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
-            event.getHook().editOriginalComponents(buttons).queue(Consumers.nop(), BotLogger::catchRestError);
+            ((ButtonInteractionEvent) event)
+                    .getHook()
+                    .editOriginalComponents(buttons)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -285,19 +288,19 @@ public class LoreService {
         StringBuilder sb = new StringBuilder("\n");
         if (selectedValues.length > 0) {
             RECEIVER receiver = RECEIVER.valueOf(selectedValues[0]);
-            sb.append("1. Notify... ").append(receiver.name).append("\n");
+            sb.append("1. Notify... ").append(receiver.name).append('\n');
         }
         if (selectedValues.length > 1) {
             TRIGGER trigger = TRIGGER.valueOf(selectedValues[1]);
-            sb.append("2. When... ").append(trigger.name).append("\n");
+            sb.append("2. When... ").append(trigger.name).append('\n');
         }
         if (selectedValues.length > 2) {
             PING ping = PING.valueOf(selectedValues[2]);
-            sb.append("3. Ping GM... ").append(ping.name).append("\n");
+            sb.append("3. Ping GM... ").append(ping.name).append('\n');
         }
         if (selectedValues.length > 3) {
             PERSISTANCE persistance = PERSISTANCE.valueOf(selectedValues[3]);
-            sb.append("4. Trigger... ").append(persistance.name).append("\n");
+            sb.append("4. Trigger... ").append(persistance.name).append('\n');
         }
 
         return sb.toString();
@@ -333,7 +336,7 @@ public class LoreService {
 
     @SelectionHandler("loreAdd1")
     public static void handleReceiverSelectionChange(StringSelectInteractionEvent event, String menuId) {
-        RECEIVER selected = RECEIVER.valueOf(event.getValues().get(0));
+        RECEIVER selected = RECEIVER.valueOf(event.getValues().getFirst());
         StringSelectMenu.Builder selectMenu =
                 StringSelectMenu.create("loreAdd2_" + selected).setPlaceholder("When...");
         for (TRIGGER value : TRIGGER.values()) {
@@ -346,7 +349,7 @@ public class LoreService {
     @SelectionHandler("loreAdd2")
     public static void handleTriggerSelectionChange(StringSelectInteractionEvent event, String menuId) {
         String selected =
-                menuId.replace("loreAdd2_", "") + "_" + event.getValues().get(0);
+                menuId.replace("loreAdd2_", "") + "_" + event.getValues().getFirst();
         StringSelectMenu.Builder selectMenu =
                 StringSelectMenu.create("loreAdd3_" + selected).setPlaceholder("Ping GM...");
         for (PING value : PING.values()) {
@@ -359,7 +362,7 @@ public class LoreService {
     @SelectionHandler("loreAdd3")
     public static void handlePingSelectionChange(StringSelectInteractionEvent event, String menuId) {
         String selected =
-                menuId.replace("loreAdd3_", "") + "_" + event.getValues().get(0);
+                menuId.replace("loreAdd3_", "") + "_" + event.getValues().getFirst();
         StringSelectMenu.Builder selectMenu =
                 StringSelectMenu.create("loreAdd4_" + selected).setPlaceholder("Trigger...");
         for (PERSISTANCE value : PERSISTANCE.values()) {
@@ -372,7 +375,7 @@ public class LoreService {
     @SelectionHandler("loreAdd4")
     public static void handlePersistanceSelectionChange(StringSelectInteractionEvent event, String menuId) {
         String selected =
-                menuId.replace("loreAdd4_", "") + "_" + event.getValues().get(0);
+                menuId.replace("loreAdd4_", "") + "_" + event.getValues().getFirst();
         confirmAddLoreSettings(event.getChannel(), selected);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -445,10 +448,10 @@ public class LoreService {
 
         // Validate
         List<String> validTargets = new ArrayList<>();
-        for (int i = 0; i < targets.length; i++) {
-            String validatedTarget = validateLore(targets[i], newEntry, loreMap, game);
+        for (String s : targets) {
+            String validatedTarget = validateLore(s, newEntry, loreMap, game);
             if (validatedTarget == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), targets[i] + " is invalid to save lore");
+                MessageHelper.sendMessageToChannel(event.getChannel(), s + " is invalid to save lore");
                 continue;
             }
             validTargets.add(validatedTarget);
@@ -518,9 +521,8 @@ public class LoreService {
     }
 
     private static void saveLore(Game game) {
-        String loreString = getGameLore(game).entrySet().stream()
-                .map(entry -> entry.getValue().toString())
-                .collect(Collectors.joining("|"));
+        String loreString =
+                getGameLore(game).values().stream().map(LoreEntry::toString).collect(Collectors.joining("|"));
         game.setStoredValue(SYSTEM_LORE_KEY, loreString);
     }
 
@@ -586,9 +588,7 @@ public class LoreService {
     }
 
     private static boolean hasLoreToShow(Game game, String target, TRIGGER trigger) {
-        return game.isFowMode()
-                && getGameLore(game).containsKey(target)
-                && getGameLore(game).get(target).trigger == trigger;
+        return getGameLore(game).containsKey(target) && getGameLore(game).get(target).trigger == trigger;
     }
 
     public static void showSystemLore(Player player, Game game, String position, TRIGGER trigger) {
@@ -638,11 +638,11 @@ public class LoreService {
         String who = player.getRepresentation() + " ";
         switch (loreEntry.receiver) {
             case CURRENT:
-                channels.put(player.getPrivateChannel(), player.getRepresentationUnfogged());
+                channels.put(player.getCorrectChannel(), player.getRepresentationUnfogged());
                 break;
             case ADJACENT:
                 for (Player p : FoWHelper.getAdjacentPlayers(game, position, false)) {
-                    channels.put(p.getPrivateChannel(), p.getRepresentationUnfogged());
+                    channels.put(p.getCorrectChannel(), p.getRepresentationUnfogged());
                 }
                 break;
             case ALL:

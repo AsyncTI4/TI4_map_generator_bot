@@ -21,13 +21,12 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.JdaService;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.MessageHelper.MessageFunction;
-import ti4.message.logging.BotLogger;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class PublicDraftInfoService {
@@ -109,7 +108,7 @@ public class PublicDraftInfoService {
 
         MessageChannel channel = game.getMainGameChannel();
         if (channel == null) return;
-        MessageFunction clearOldFunc = clearOldPingsAndButtonsFunc(true, clearMessageHeaders, clearAttachments);
+        Consumer<Message> clearOldFunc = clearOldPingsAndButtonsFunc(true, clearMessageHeaders, clearAttachments);
         MessageHelper.splitAndSentWithAction(msg, channel, buttons, clearOldFunc);
     }
 
@@ -142,6 +141,7 @@ public class PublicDraftInfoService {
         Game game = draftManager.getGame();
         List<Draftable> draftables = draftManager.getDraftables();
         int padding = String.format("%s", playerOrder.size()).length() + 1;
+        List<String> skippedPlayerIds = new ArrayList<>();
 
         Map<DraftableType, DraftChoice> defaultChoices = draftables.stream()
                 .collect(HashMap::new, (m, d) -> m.put(d.getType(), d.getNothingPickedChoice()), Map::putAll);
@@ -151,8 +151,10 @@ public class PublicDraftInfoService {
         for (String userId : playerOrder) {
             Player player = game.getPlayer(userId);
             PlayerDraftState picks = draftManager.getPlayerStates().get(userId);
-            if (player == null || picks == null)
-                throw new IllegalStateException("Player or picks missing for playerID " + userId);
+            if (player == null || picks == null) {
+                skippedPlayerIds.add(userId);
+                continue;
+            }
 
             sb.append("\n> `").append(Helper.leftpad(pickNum + ".", padding)).append("` ");
             StringBuilder bulletSummary = new StringBuilder();
@@ -195,6 +197,13 @@ public class PublicDraftInfoService {
             if (userId.equals(nextPlayer)) sb.append("*");
 
             pickNum++;
+        }
+
+        if (!skippedPlayerIds.isEmpty()) {
+            BotLogger.warning("Skipping stale public draft summary entries for game `"
+                    + game.getName()
+                    + "`: "
+                    + String.join(", ", skippedPlayerIds));
         }
         return sb.toString();
     }
@@ -347,7 +356,7 @@ public class PublicDraftInfoService {
         }
     }
 
-    private MessageFunction clearOldPingsAndButtonsFunc(
+    private Consumer<Message> clearOldPingsAndButtonsFunc(
             boolean clearFirstPing, List<String> clearMessageHeaders, List<String> clearAttachments) {
         return msg -> msg.getChannel()
                 .getHistoryBefore(msg, 100)

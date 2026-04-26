@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.testUtils.BaseTi4Test;
 
@@ -79,47 +79,6 @@ class TurnOrderHelperTest extends BaseTi4Test {
         assertEquals("letnev", players.get(3).getFaction());
         assertEquals("argent", players.get(4).getFaction());
         assertEquals("nomad", players.get(5).getFaction());
-    }
-
-    @Test
-    void GetPlayerNonInitiativeNumber_IncompletePriorityTrack_OmegaPhase() {
-        var game = createTestGame(PriorityTrackMode.FULL);
-        game.getPlayerFromColorOrFaction("letnev").setPriorityPosition(-1);
-        game.getPlayerFromColorOrFaction("sol").setPriorityPosition(-1);
-        var player = game.getPlayerFromColorOrFaction("sol");
-        assertEquals(1, Helper.getPlayerSpeakerOrFullPriorityNumber(player, game));
-        player = game.getPlayerFromColorOrFaction("xxcha");
-        assertEquals(4, Helper.getPlayerSpeakerOrFullPriorityNumber(player, game));
-    }
-
-    @Test
-    void GetPlayerNonInitiativeNumber_NoSpeaker() {
-        var game = createTestGame(PriorityTrackMode.NONE);
-        game.setSpeakerUserID(null);
-        var player = game.getPlayerFromColorOrFaction("sol");
-        assertEquals(1, Helper.getPlayerSpeakerOrFullPriorityNumber(player, game));
-    }
-
-    @Test
-    void GetPlayerNonInitiativeNumber_NoSpeaker_OmegaPhase() {
-        var game = createTestGame(PriorityTrackMode.FULL);
-        game.setSpeakerUserID(null);
-        var player = game.getPlayerFromColorOrFaction("sol");
-        assertEquals(3, Helper.getPlayerSpeakerOrFullPriorityNumber(player, game));
-    }
-
-    @Test
-    void GetPlayerNonInitiativeNumber() {
-        var game = createTestGame(PriorityTrackMode.NONE);
-        var player = game.getPlayerFromColorOrFaction("nekro");
-        assertEquals(4, Helper.getPlayerSpeakerOrFullPriorityNumber(player, game));
-    }
-
-    @Test
-    void GetPlayerNonInitiativeNumber_OmegaPhase() {
-        var game = createTestGame(PriorityTrackMode.FULL);
-        var player = game.getPlayerFromColorOrFaction("sol");
-        assertEquals(3, Helper.getPlayerSpeakerOrFullPriorityNumber(player, game));
     }
 
     @Test

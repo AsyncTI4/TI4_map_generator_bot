@@ -9,13 +9,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.commands.statistics.GameStatisticsFilterer;
+import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GamesPage;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 
@@ -53,7 +53,7 @@ public class FactionRecordOfTechService {
                 .append(gamesThatHadThem)
                 .append(" Games)**__\n");
 
-        boolean sortOrderAscending = event.getOption("ascending", false, OptionMapping::getAsBoolean);
+        boolean sortOrderAscending = event.getOption("ascending", Boolean.FALSE, OptionMapping::getAsBoolean);
         Comparator<Map.Entry<String, Integer>> comparator = (o1, o2) -> {
             int o1total = o1.getValue();
             int o2total = o2.getValue();
@@ -63,12 +63,12 @@ public class FactionRecordOfTechService {
         AtomicInteger index = new AtomicInteger(1);
 
         techsResearched.entrySet().stream().sorted(comparator).forEach(techResearched -> {
-            sb.append("`")
+            sb.append('`')
                     .append(Helper.leftpad(String.valueOf(index.get()), 3))
                     .append(". ");
             sb.append("` ").append(techResearched.getKey());
             sb.append(": ").append(techResearched.getValue());
-            sb.append("\n");
+            sb.append('\n');
             index.getAndIncrement();
         });
 
@@ -92,7 +92,11 @@ public class FactionRecordOfTechService {
                     startingTech = factionModel.getStartingTech();
                 }
                 if (startingTech != null && !startingTech.contains(tech)) {
-                    String techName = Mapper.getTech(tech).getName();
+                    var techModel = Mapper.getTech(tech);
+                    if (techModel == null) {
+                        continue;
+                    }
+                    String techName = techModel.getName();
                     if (techsResearched.containsKey(techName)) {
                         techsResearched.put(techName, techsResearched.get(techName) + 1);
                     } else {

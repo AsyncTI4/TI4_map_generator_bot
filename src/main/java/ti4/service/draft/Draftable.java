@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
 
 public abstract class Draftable extends DraftLifecycleHooks {
@@ -41,7 +41,7 @@ public abstract class Draftable extends DraftLifecycleHooks {
      * Get all the draft choices that are available to this draft, just they keys.
      * @return A list of all draft choice keys.
      */
-    public final Set<String> getAllDraftChoiceKeys() {
+    private Set<String> getAllDraftChoiceKeys() {
         List<DraftChoice> allChoices = getAllDraftChoices();
         return allChoices.stream().map(DraftChoice::getChoiceKey).collect(Collectors.toSet());
     }
@@ -184,7 +184,7 @@ public abstract class Draftable extends DraftLifecycleHooks {
     /**
      * Separator used in save/load strings.
      */
-    public static final String SAVE_SEPARATOR = ",";
+    protected static final String SAVE_SEPARATOR = ",";
     /**
      * Serialize any state that this draftable needs to persist.
      * Ex. the number of seats in a SeatDraftable.

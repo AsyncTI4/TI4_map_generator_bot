@@ -57,7 +57,7 @@
         "source": "voices_of_the_council"
     },
     {
-        "alias": "cryypter_disarmamament",
+        "alias": "cryypter_disarmament",
         "name": "Compensated Disarmament",
         "type": "Directive",
         "target": "Elect 2 Planets controlled by different players",

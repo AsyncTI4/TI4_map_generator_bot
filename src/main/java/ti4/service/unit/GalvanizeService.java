@@ -2,34 +2,36 @@ package ti4.service.unit;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.regex.RegexService;
 
+@UtilityClass
 public class GalvanizeService {
 
     @ButtonHandler("getToggleGalvanizeTiles")
     public static void postToggleGalvanizeTiles(Game game, Player player) {
         List<Button> buttons = ButtonHelper.getTilesWithUnitsForAction(player, game, "toggleGalvanize", true);
         String message = player.getRepresentationUnfogged()
-                + " Use the buttons to select the tile in which you wish to modify units. ";
+                + ", please choose the system containing the unit you with to galvanize. ";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
@@ -51,9 +53,9 @@ public class GalvanizeService {
             String uhName = unitHolder.getName();
             String uhRepresentation;
             if ("space".equalsIgnoreCase(uhName)) {
-                uhRepresentation = " in Space " + tile.getPosition();
+                uhRepresentation = " In Space " + tile.getPosition();
             } else {
-                uhRepresentation = " on " + Helper.getPlanetRepresentation(uhName, game);
+                uhRepresentation = " On " + Helper.getPlanetRepresentation(uhName, game);
             }
             for (UnitKey unit : unitHolder.getUnitsByState().keySet()) {
                 int total = unitHolder.getUnitCount(unit);
@@ -76,7 +78,7 @@ public class GalvanizeService {
                             unit.unitEmoji()));
             }
         }
-        buttons.add(Buttons.blue("deleteButtons", "Done galvanizing units"));
+        buttons.add(Buttons.blue("deleteButtons", "Done Galvanizing Units"));
         return buttons;
     }
 

@@ -33,7 +33,8 @@
         "name": "Colonial Redistribution ω",
         "type": "Directive",
         "target": "Elect Non-Home Planet",
-        "text1": "Remove each unit on the elected planet. The player who controls that planet places those units on 1 or more planets they control, if able; otherwise, they return that unit to their reinforcements. Then, that player chooses another player with the fewest victory points; the chosen player gains control of the elected planet and places 3 infantry from their reinforcements on it. [Note: You always choose another player, even if you are the only one with the fewest victory points.]",
+        "text1": "Remove each unit on the elected planet. The player who controls that planet places those units on 1 or more planets they control, if able; otherwise, they return that unit to their reinforcements. Then, that player chooses another player with the fewest victory points; the chosen player gains control of the elected planet and places 3 infantry from their reinforcements on it.",
+        "notes": "You always choose another player, even if you are the only one with the fewest victory points.",
         "text2": "",
         "source": "little_omega"
     },

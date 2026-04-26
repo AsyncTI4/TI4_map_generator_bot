@@ -6,11 +6,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -24,15 +29,12 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
+@UtilityClass
 public class DestroyUnitService {
 
     public static void destroyAllUnitsInSystem(
@@ -140,7 +142,7 @@ public class DestroyUnitService {
     private static void handleDestroyedUnits(
             GenericInteractionCreateEvent event, Game game, List<RemovedUnit> units, boolean combat) {
         // batch up infantry for INF2-ish effects
-        for (Player player : game.getRealPlayers()) {
+        for (Player player : game.getRealPlayersNNeutral()) {
             int numInfantry = 0;
             for (RemovedUnit u : units) {
                 if (player.unitBelongsToPlayer(u.unitKey()) && u.unitKey().getUnitType() == UnitType.Infantry) {
@@ -149,7 +151,8 @@ public class DestroyUnitService {
             }
 
             if (numInfantry > 0) {
-                ButtonHelper.resolveInfantryDestroy(player, numInfantry);
+                ButtonHelper.resolveInfantryDestroy(
+                        player, numInfantry, units.getFirst().tile());
             }
         }
 
@@ -173,9 +176,7 @@ public class DestroyUnitService {
             capturing.addAll(devours);
         }
 
-        if (game.isTwilightsFallMode()
-                && (unit.unitKey().getUnitType() == UnitType.Infantry
-                        || unit.unitKey().getUnitType() == UnitType.Fighter)) {
+        if (game.isTwilightsFallMode() && (unit.unitKey().getUnitType() == UnitType.Fighter)) {
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (p2.ownsUnit("tf-vortexer")) {
                     for (String pos :
@@ -195,7 +196,7 @@ public class DestroyUnitService {
             case Infantry -> capturing.addAll(CaptureUnitService.listCapturingMechPlayers(game, allUnits, unit));
             case Mech -> {
                 handleSelfAssemblyRoutines(player, totalAmount, game);
-                if (player.hasUnit("mykomentori_mech")) {
+                if (player.hasUnit("mykomentori_mech") || player.hasTech("tf-specops")) {
                     for (int x = 0; x < totalAmount; x++) {
                         ButtonHelper.rollMykoMechRevival(game, player);
                     }
@@ -294,16 +295,23 @@ public class DestroyUnitService {
                 Player killer = killers.getFirst();
                 if (killer.isRealPlayer()) {
                     String planet = ButtonHelperActionCards.getBestResPlanetInHomeSystem(killer, game);
-                    int newAmount = game.changeCommsOnPlanet(winnings, planet);
-                    MessageHelper.sendMessageToChannel(
-                            killer.getCorrectChannel(),
-                            killer.getRepresentationNoPing() + " added " + winnings + " commodities to the planet of "
-                                    + Helper.getPlanetRepresentation(planet, game)
-                                    + " (which has " + newAmount + " commodities on it now) by destroying "
-                                    + unit.getTotalRemoved() + " of "
-                                    + player.getRepresentationNoPing() + "'s "
-                                    + unit.unitKey().getUnitType().getUnitTypeEmoji()
-                                    + "\nIf this was a mistake, adjust the commodities with `/ds set_planet_comms`.");
+                    if (planet.isEmpty()) {
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(), "Could not find a planet to place commodities on.");
+
+                    } else {
+                        int newAmount = game.changeCommsOnPlanet(winnings, planet);
+                        MessageHelper.sendMessageToChannel(
+                                killer.getCorrectChannel(),
+                                killer.getRepresentationNoPing() + " added " + winnings
+                                        + " commodities to the planet of "
+                                        + Helper.getPlanetRepresentation(planet, game)
+                                        + " (which has " + newAmount + " commodities on it now) by destroying "
+                                        + unit.getTotalRemoved() + " of "
+                                        + player.getRepresentationNoPing() + "'s "
+                                        + unit.unitKey().getUnitType().getUnitTypeEmoji()
+                                        + "\nIf this was a mistake, adjust the commodities with `/ds set_planet_comms`.");
+                    }
                 }
             }
         }

@@ -1,5 +1,5 @@
 {
-    "tileBack":"green",
+    "tileBack": "green",
     "id": "br4",
     "name": "Magna - Atokera",
     "aliases": [
@@ -27,6 +27,8 @@
         }
     ],
     "wormholes": [],
-    "planets": ["magna"],
+    "planets": [
+        "magna"
+    ],
     "source": "ds"
 }

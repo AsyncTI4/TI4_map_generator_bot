@@ -1,7 +1,6 @@
 package ti4.helpers.settingsFramework.settings;
 
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -9,6 +8,7 @@ import lombok.Setter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import tools.jackson.databind.JsonNode;
 
 @Getter
 @Setter
@@ -28,7 +28,7 @@ public class BooleanSetting extends SettingInterface {
         whenTrue = "Disable";
     }
 
-    public BooleanSetting(String id, String name, boolean val, String whenFalse, String whenTrue) {
+    BooleanSetting(String id, String name, boolean val, String whenFalse, String whenTrue) {
         super(id, name);
 
         defaultValue = val;

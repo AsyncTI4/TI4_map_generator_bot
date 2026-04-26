@@ -7,8 +7,8 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -34,8 +34,8 @@ public class ListTurnOrderService {
 
         StringBuilder msg = new StringBuilder("__Turn Order:__\n");
         for (Player p : game.getActionPhaseTurnOrder()) {
-            msg.append("`").append(p.getInitiative()).append(".`");
-            msg.append(buildPlayerScText(game, p, pingPeople)).append("\n");
+            msg.append('`').append(p.getInitiative()).append(".`");
+            msg.append(buildPlayerScText(game, p, pingPeople)).append('\n');
         }
         msg.append("_ _"); // forced extra line
 
@@ -72,7 +72,7 @@ public class ListTurnOrderService {
         if (pingPeople || game.isFowMode()) {
             textBuilder.append(player.getRepresentation());
         } else {
-            textBuilder.append(player.getFactionEmoji()).append(" ").append(player.getUserName());
+            textBuilder.append(player.getFactionEmoji()).append(' ').append(player.getUserName());
         }
 
         if (passed) {

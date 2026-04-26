@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.utils.FileUpload;
+import ti4.game.Game;
+import ti4.game.Tile;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
@@ -17,9 +19,7 @@ import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.PositionMapper;
 import ti4.image.TileGenerator;
 import ti4.image.TileStep;
-import ti4.map.Game;
-import ti4.map.Tile;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.image.FileUploadService;
 
 @UtilityClass

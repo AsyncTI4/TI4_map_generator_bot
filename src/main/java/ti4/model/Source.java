@@ -46,6 +46,8 @@ public class Source {
         flagshipping,
         promises_promises,
         balacasi,
+        viability_patch,
+        beans,
 
         // async homebrew
         draft,
@@ -79,6 +81,7 @@ public class Source {
         memephilosopher,
         omega_phase,
         fowplus,
+        untangled_space,
 
         // eronous' stuff
         eronous,
@@ -124,11 +127,34 @@ public class Source {
             };
         }
 
-        public boolean isDs() {
+        public boolean isTe() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3, codex4, ds, uncharted_space, blue_reverie -> true;
+                case base, pok, codex1, codex2, codex3, codex4, thunders_edge -> true;
                 default -> false;
             };
+        }
+
+        public boolean isDs() {
+            return switch (this) {
+                case base, pok, codex1, codex2, codex3, codex4, ds, thunders_edge, uncharted_space, blue_reverie ->
+                    true;
+                default -> false;
+            };
+        }
+
+        public boolean isHiddenFromSearch() {
+            return switch (this) {
+                case deprecated, miltymod, lazax, little_omega, admins, dane_leaks -> true;
+                case keleresplus, project_pi, asteroid -> true;
+                case pbd100, pbd500, pbd1000 -> true;
+                default -> false;
+            };
+        }
+
+        public boolean isHiddenFromSearch(ComponentSource source) {
+            if (this == source) return false;
+
+            return !isOfficial();
         }
 
         public String emoji() {

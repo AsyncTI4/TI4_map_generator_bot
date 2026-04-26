@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.Data;
+import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
@@ -16,9 +17,14 @@ import ti4.service.emoji.CardEmojis;
 
 @Data
 public class GalacticEventModel implements ModelInterface, EmbeddableModel {
+    @Getter
     private String alias;
+
+    @Getter
     private String name;
+
     private String text;
+    private String notes;
     private String mapText;
     private Integer complexity;
     private String errata;
@@ -28,14 +34,6 @@ public class GalacticEventModel implements ModelInterface, EmbeddableModel {
 
     public boolean isValid() {
         return alias != null && name != null && text != null && complexity != null && source != null;
-    }
-
-    public String getAlias() {
-        return alias;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getText() {
@@ -48,6 +46,10 @@ public class GalacticEventModel implements ModelInterface, EmbeddableModel {
 
     public String getFlavorText() {
         return Optional.ofNullable(flavorText).orElse("");
+    }
+
+    public String getNameRepresentation() {
+        return CardEmojis.Event + " _" + name + "_ " + complexityString();
     }
 
     public String getRepresentation() {
@@ -84,11 +86,14 @@ public class GalacticEventModel implements ModelInterface, EmbeddableModel {
         sb.append(CardEmojis.Event);
         sb.append("**__").append(name).append("__** ");
         sb.append(source.emoji());
-        sb.append("\n");
+        sb.append('\n');
 
         if (!getText().isEmpty()) {
             String arg = getText().replace("For:", "**For:**");
-            sb.append("> ").append(arg).append("\n");
+            sb.append("> ").append(arg).append('\n');
+        }
+        if (notes != null) {
+            sb.append("\n> -# [").append(notes).append("]");
         }
 
         return sb.toString();
@@ -105,6 +110,9 @@ public class GalacticEventModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(sb);
 
         eb.setDescription(getText());
+        if (notes != null) {
+            eb.setDescription(getText() + "\n-# [" + notes + "]");
+        }
 
         eb.setColor(Color.black);
         if (includeID) eb.setFooter("ID: " + alias + "  Source: " + source);

@@ -231,6 +231,18 @@
         ]
     },
     {
+        "source": "viability_patch",
+        "name": "Viability Patch",
+        "canal": "community",
+        "subcanal": "lil homebrew",
+        "credits": "mjb141",
+        "description": "Slightly improving underutilised components",
+        "data": [
+            "@vindico on Async TI4 Discord.",
+            "Goal: Slightly improve underperforming factions (bottom half of expected win rates) or underutilised components (never used/traded)."
+        ]
+    },
+    {
         "source": "eronous",
         "name": "Ascendent Sun",
         "canal": "community",
@@ -270,5 +282,13 @@
         "data": [
             "Official channel: https://discord.com/channels/743629929484386395/1422472031949029396"
         ]
+    },
+    {
+        "source": "untangled_space",
+        "name": "Untangled Space",
+        "canal": "community",
+        "subcanal": "personal projs",
+        "credits": "pvn",
+        "description": "Planetary Stabilisation action available to all players; Ghost Experiment SC and AC"
     }
 ]

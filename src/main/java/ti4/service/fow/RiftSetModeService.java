@@ -8,8 +8,15 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
-import ti4.commands.tokens.AddTokenCommand;
+import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.commands.tokens.AddTokenCommand;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -21,12 +28,6 @@ import ti4.helpers.RiftUnitsHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.UnitModel;
@@ -37,7 +38,6 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.relic.StellarConverterService;
-import ti4.spring.jda.JdaService;
 
 /*
  * For Eronous to run fow300
@@ -61,7 +61,7 @@ import ti4.spring.jda.JdaService;
  * - Exploring a planet has chance of Stellar Converting it (with a custom token)
  *
  */
-public class RiftSetModeService {
+public final class RiftSetModeService {
     private static final String CRUCIBLE_PN = "crucible";
     private static final String CRUCIBLE_AGENDA = "riftset_crucible";
     private static final String RIFTSET_INVASION_EXPLORE = "riftset_invasion";

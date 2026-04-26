@@ -3,13 +3,14 @@ package ti4.cron;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GameManager;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.model.metadata.TechSummariesMetadataManager;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class TechSummaryCron {
@@ -20,6 +21,7 @@ public class TechSummaryCron {
     }
 
     private static void postTechSummaries() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running TechSummaryCron.");
         TechSummariesMetadataManager.consumeAndPersist(TechSummaryCron::postTechSummaries);
         BotLogger.logCron("Finished TechSummaryCron.");
@@ -66,18 +68,18 @@ public class TechSummaryCron {
             if (techSummary.getResearchAgreementTech() != null) {
                 msg.append(" (from _Research Agreement_:");
                 for (String tech : techSummary.getResearchAgreementTech()) {
-                    msg.append(" ").append(Mapper.getTech(tech).getNameRepresentation());
+                    msg.append(' ').append(Mapper.getTech(tech).getNameRepresentation());
                 }
                 msg.append(")");
             }
             if (techSummary.getTech() != null) {
                 for (String tech : techSummary.getTech()) {
-                    msg.append(" ").append(Mapper.getTech(tech).getNameRepresentation());
+                    msg.append(' ').append(Mapper.getTech(tech).getNameRepresentation());
                 }
             } else {
                 msg.append(" Did not resolve **Technology** ability");
             }
-            msg.append("\n");
+            msg.append('\n');
         }
 
         MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), msg.toString());

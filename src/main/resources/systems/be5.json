@@ -1,0 +1,16 @@
+{
+    "tileBack": "green",
+    "id": "be5",
+    "name": "Ta - Ta",
+    "aliases": [
+        "be5",
+        "ta"
+    ],
+    "imagePath": "be5_tahs.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "ta"
+    ],
+    "source": "beans"
+}

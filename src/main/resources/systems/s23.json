@@ -1,1 +1,17 @@
-{"id":"s23","name":"Trisrodh/Brakke","aliases":["s23","trisrodh","brakke"],"imagePath":"S23_Trisrodh.png","planets":["trisrodh","brakke"],"shipPositionsType":"TYPE05","tileBack":"blue","source":"somno"}
+{
+    "id": "s23",
+    "name": "Trisrodh/Brakke",
+    "aliases": [
+        "s23",
+        "trisrodh",
+        "brakke"
+    ],
+    "imagePath": "S23_Trisrodh.png",
+    "planets": [
+        "trisrodh",
+        "brakke"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "blue",
+    "source": "somno"
+}

@@ -7,13 +7,13 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.buttons.Buttons;
-import ti4.commands.CommandHelper;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.commands.CommandHelper;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.emoji.FactionEmojis;
@@ -68,11 +68,12 @@ public class LeaderInfoService {
         if (player.hasLeader("yssarilagent")) {
             for (Player otherPlayer : game.getPlayers().values()) {
                 if (otherPlayer != player) {
-                    Leader otherPlayerAgent = otherPlayer.unsafeGetLeader(Constants.AGENT);
-                    if (otherPlayerAgent == null) {
-                        continue;
+                    for (String leaderID : otherPlayer.getLeaderIDs()) {
+                        if (leaderID.contains("agent") && (Mapper.getLeader(leaderID) != null)) {
+                            yssarilEmbeds.add(
+                                    Mapper.getLeader(leaderID).getRepresentationEmbed(game.isTwilightsFallMode()));
+                        }
                     }
-                    yssarilEmbeds.add(otherPlayerAgent.getLeaderEmbed(player.getGame()));
                 }
             }
         }

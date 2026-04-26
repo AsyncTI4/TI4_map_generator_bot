@@ -8,12 +8,13 @@ RUN --mount=type=cache,target=/root/.m2 \
     mvn -B -ntp -DskipTests dependency:go-offline
 
 # add sources late for better layer reuse
-COPY src/test ./src/test
-COPY src/main/resources ./src/main/resources
+# Only package classpath config; runtime assets are mounted from the host repo.
+COPY src/main/resources/config/application.yml ./src/main/resources/config/application.yml
+COPY src/main/resources/logback.xml ./src/main/resources/logback.xml
 COPY src/main/java ./src/main/java
 
 RUN --mount=type=cache,target=/root/.m2 \
-    mvn -B -ntp -DskipTests clean package
+    mvn -B -ntp -Dspotless.skip=true -Dmaven.test.skip=true clean package
 
 # ---- Runtime stage ----
 FROM amazoncorretto:21-alpine
@@ -22,7 +23,6 @@ WORKDIR /app
 # needed to handle fonts
 RUN apk add --no-cache fontconfig ttf-dejavu
 
-COPY --from=build /opt/app/src/main/resources /opt/resources
 COPY --from=build /opt/app/target/TI4_map_generator_discord_bot-1.0-SNAPSHOT.jar tibot.jar
 
 ENV DB_PATH=/opt/STORAGE

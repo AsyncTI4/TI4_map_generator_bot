@@ -1,0 +1,28 @@
+package ti4.discord.interactions.buttons.handlers.unit;
+
+import java.util.List;
+import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.helpers.ButtonHelper;
+import ti4.message.MessageHelper;
+
+@UtilityClass
+class ModifyUnitButtonHandler {
+
+    @ButtonHandler("getModifyTiles")
+    public static void getModifyTilesHandler(Player player, Game game) {
+        List<Button> buttons = ButtonHelper.getTilesToModify(player, game);
+        String message = player.getRepresentation() + ", please choose the system in which you wish to modify units. ";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+    }
+
+    @ButtonHandler("modifyUnitsAllTiles")
+    public static void modifyUnitsAllTiles(Player player, Game game) {
+        List<Button> buttons = ButtonHelper.getAllTilesToModify(player, game, "genericModifyAllTiles", true);
+        String message = player.getRepresentation() + ", please choose the system in which you wish to modify units. ";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+    }
+}

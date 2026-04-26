@@ -4,10 +4,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.statistics.GameStatisticsFilterer;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GamesPage;
+import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GamesPage;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -60,7 +60,7 @@ class SpendToWinCorrelationStatisticsService {
                     .append(" at ")
                     .append(highestP.getTotalExpenses())
                     .append(")");
-            names.append("\n");
+            names.append('\n');
             if (highestP == winner) {
                 gamesWhereHighestWon.incrementAndGet();
             }

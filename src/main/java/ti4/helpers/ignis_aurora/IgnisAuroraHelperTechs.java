@@ -6,26 +6,26 @@ import java.util.function.Predicate;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.SecretObjectiveHelper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 
-public class IgnisAuroraHelperTechs {
+public final class IgnisAuroraHelperTechs {
     public static void handleExhaustIgnisAuroraTech(
             GenericInteractionCreateEvent event, Game game, Player player, String tech) {
         boolean deleteMsg = true, deleteButton = true;
         switch (tech) {
-            case "baldrick_nm" -> ActionCardHelper.drawActionCards(game, player, 1, true);
+            case "baldrick_nm" -> ActionCardHelper.drawActionCards(player, 1);
             case "baldrick_hm" -> ButtonHelperStats.sendGainCCButtons(game, player, false);
             case "baldrick_lwd" -> deleteMsg = false;
             case "baldrick_gd" -> {
@@ -48,7 +48,7 @@ public class IgnisAuroraHelperTechs {
         if (deleteMsg) {
             ButtonHelper.deleteMessage(event);
         } else {
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         }
     }
 

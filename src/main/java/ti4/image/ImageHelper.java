@@ -1,5 +1,7 @@
 package ti4.image;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import com.luciad.imageio.webp.CompressionType;
 import com.luciad.imageio.webp.WebPWriteParam;
 import java.awt.Color;
@@ -11,6 +13,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
+import java.time.Duration;
 import javax.annotation.Nullable;
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -21,8 +27,9 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.jetbrains.annotations.NotNull;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.emoji.TI4Emoji;
+import ti4.website.EgressClientManager;
 
 @UtilityClass
 public class ImageHelper {
@@ -130,65 +137,95 @@ public class ImageHelper {
         return null;
     }
 
-    private static BufferedImage readImage(InputStream inputStream) {
+    @Nullable
+    private static BufferedImage readImageURL(String imageUrl) {
+        if (isBlank(imageUrl)) return null;
+
+        imageUrl = sanitizeUrl(imageUrl);
+
+        URI uri;
         try {
-            return ImageIO.read(inputStream);
+            uri = URI.create(imageUrl);
+        } catch (Exception e) {
+            BotLogger.error("Invalid image URL: " + imageUrl, e);
+            return null;
+        }
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri)
+                .timeout(Duration.ofSeconds(2))
+                .GET()
+                .build();
+
+        try {
+            HttpResponse<InputStream> response =
+                    EgressClientManager.getHttpClient().send(request, HttpResponse.BodyHandlers.ofInputStream());
+
+            try (InputStream inputStream = response.body()) {
+                if (response.statusCode() != 200) {
+                    BotLogger.error("Failed to read image. URL: " + imageUrl + " Status: " + response.statusCode());
+                    return null;
+                }
+
+                BufferedImage image = ImageIO.read(inputStream);
+                if (image == null) {
+                    BotLogger.error("ImageIO could not decode stream from: " + imageUrl);
+                }
+                return image;
+            }
+        } catch (HttpTimeoutException e) {
+            BotLogger.error("Timeout fetching image: " + imageUrl);
         } catch (IOException e) {
-            BotLogger.error("Failed to read image: ", e);
+            BotLogger.error("Network error fetching image: " + imageUrl, e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
         return null;
     }
 
-    @Nullable
-    private static BufferedImage readImageURL(String imageURL) {
-        if (imageURL == null) {
-            return null;
-        }
-        try (InputStream inputStream = URI.create(imageURL).toURL().openStream()) {
-            return readImage(inputStream);
-        } catch (IOException e) {
-            BotLogger.error("Failed to read image URL'" + imageURL + "': ", e);
-        }
-        return null;
+    private static String sanitizeUrl(String imageUrl) {
+        return imageUrl.replace("animated=true", "animated=false");
     }
 
     @SneakyThrows
     public static byte[] writeJpg(BufferedImage image) {
-        var imageWithoutAlpha = image.getColorModel().hasAlpha() ? redrawWithoutAlpha(image) : image;
-        try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
-            ImageIO.write(imageWithoutAlpha, "jpg", byteArrayOutputStream);
-            return byteArrayOutputStream.toByteArray();
-        }
+        image = image.getColorModel().hasAlpha() ? redrawWithoutAlpha(image) : image;
+        return writeImage(image, "jpg");
     }
 
     @SneakyThrows
     public static byte[] writePng(BufferedImage image) {
+        return writeImage(image, "png");
+    }
+
+    @SneakyThrows
+    private static byte[] writeImage(BufferedImage image, String format) {
         try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
-            ImageIO.write(image, "png", byteArrayOutputStream);
+            ImageIO.write(image, format, byteArrayOutputStream);
             return byteArrayOutputStream.toByteArray();
         }
     }
 
     @SneakyThrows
     public static byte[] writeWebp(BufferedImage image) {
-        var imageWithoutAlpha = image.getColorModel().hasAlpha() ? redrawWithoutAlpha(image) : image;
+        image = image.getColorModel().hasAlpha() ? redrawWithoutAlpha(image) : image;
+        ImageWriter writer = null;
         try (var byteArrayOutputStream = new ByteArrayOutputStream();
                 var imageOutputStream = ImageIO.createImageOutputStream(byteArrayOutputStream)) {
-            ImageWriter writer = ImageIO.getImageWritersByMIMEType("image/webp").next();
+            writer = ImageIO.getImageWritersByMIMEType("image/webp").next();
+            writer.setOutput(imageOutputStream);
 
             WebPWriteParam writeParam = ((WebPWriteParam) writer.getDefaultWriteParam());
             writeParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
             writeParam.setCompressionType(CompressionType.Lossy);
             writeParam.setUseSharpYUV(false);
             writeParam.setAlphaCompressionAlgorithm(0);
-            // writeParam.setCompressionQuality(.5f);
-            // writeParam.setMethod(1); //0-6, lower is faster, higher is better quality
 
-            writer.setOutput(imageOutputStream);
-
-            // Encode
-            writer.write(null, new IIOImage(imageWithoutAlpha, null, null), writeParam);
+            writer.write(null, new IIOImage(image, null, null), writeParam);
+            imageOutputStream.flush();
             return byteArrayOutputStream.toByteArray();
+        } finally {
+            if (writer != null) writer.dispose();
         }
     }
 

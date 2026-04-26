@@ -8,12 +8,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.statistics.GameStatisticsFilterer;
+import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GamesPage;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -35,10 +35,10 @@ class VictoryPointsScoredStatisticsService {
         int index = 1;
         StringBuilder sb = new StringBuilder("List of times a particular secret objective has been scored.\n");
         for (Map.Entry<String, Integer> entry : topThousand.entrySet()) {
-            sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
+            sb.append('`').append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
             sb.append("` ").append(entry.getKey()).append(": ");
             sb.append(entry.getValue());
-            sb.append("\n");
+            sb.append('\n');
             index++;
         }
         MessageHelper.sendMessageToThread(event.getChannel(), "Secret Objective Score Counts", sb.toString());
@@ -50,10 +50,10 @@ class VictoryPointsScoredStatisticsService {
         index = 1;
         sb = new StringBuilder("List of times a particular public objective has been revealed \n");
         for (Map.Entry<String, Integer> entry : topThousand.entrySet()) {
-            sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
+            sb.append('`').append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
             sb.append("` ").append(entry.getKey()).append(": ");
             sb.append(entry.getValue());
-            sb.append("\n");
+            sb.append('\n');
             index++;
         }
         MessageHelper.sendMessageToThread(event.getChannel(), "Public Objectives Revealed", sb.toString());
@@ -65,10 +65,10 @@ class VictoryPointsScoredStatisticsService {
         index = 1;
         sb = new StringBuilder("List of times a particular relic has been drawn \n");
         for (Map.Entry<String, Integer> entry : topThousand.entrySet()) {
-            sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
+            sb.append('`').append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
             sb.append("` ").append(entry.getKey()).append(": ");
             sb.append(entry.getValue());
-            sb.append("\n");
+            sb.append('\n');
             index++;
         }
         MessageHelper.sendMessageToThread(event.getChannel(), "Relics Drawn Count", sb.toString());

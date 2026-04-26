@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import net.dv8tion.jda.api.components.Component;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -31,18 +33,27 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
 import ti4.helpers.StringHelper;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 
 public class MessageV2Builder {
     private final MessageChannel channel;
     private final List<MessagePart> parts = new ArrayList<>();
     private final Integer maxSplits;
+    private final Boolean pin;
 
     public MessageV2Builder(MessageChannel channel) {
         Objects.requireNonNull(channel, "Channel cannot be null");
         this.channel = channel;
         maxSplits = null;
+        pin = false;
+    }
+
+    public MessageV2Builder(MessageChannel channel, boolean pin) {
+        Objects.requireNonNull(channel, "Channel cannot be null");
+        this.channel = channel;
+        maxSplits = null;
+        this.pin = pin;
     }
 
     /**
@@ -57,6 +68,7 @@ public class MessageV2Builder {
         Objects.requireNonNull(channel, "Channel cannot be null");
         this.channel = channel;
         this.maxSplits = maxSplits;
+        pin = false;
     }
 
     public enum MessagePartType {
@@ -67,6 +79,8 @@ public class MessageV2Builder {
 
     public static class MessagePart {
         private final Object part;
+
+        @Getter
         private final MessagePartType type;
 
         public MessagePart(String part) {
@@ -87,10 +101,6 @@ public class MessageV2Builder {
         public MessagePart(MessageTopLevelComponent part) {
             this.part = part;
             type = MessagePartType.TOP_LEVEL_COMPONENT;
-        }
-
-        public MessagePartType getType() {
-            return type;
         }
 
         public String asString() {
@@ -138,16 +148,19 @@ public class MessageV2Builder {
     }
 
     public MessageV2Builder append(Button button) {
+        if (button == null) return this;
         parts.add(new MessagePart(button));
         return this;
     }
 
     public MessageV2Builder append(List<Button> buttons) {
+        if (buttons == null) return this;
         parts.add(new MessagePart(buttons));
         return this;
     }
 
     public MessageV2Builder append(MessageTopLevelComponent component) {
+        if (component == null) return this;
         parts.add(new MessagePart(component));
         return this;
     }
@@ -175,7 +188,10 @@ public class MessageV2Builder {
                     + String.join("\n---\n", componentTrees));
             return;
         }
-        MessageHelper.sendMessagesWithRetry(channel, combinedComponents, null, "Failed to send v2 message", 1);
+
+        Consumer<Message> onSuccess = null;
+        if (pin) onSuccess = MessageHelper.pin();
+        MessageHelper.sendMessagesWithRetry(channel, combinedComponents, onSuccess, "Failed to send v2 message", 1);
     }
 
     private List<MessageCreateData> build() {
@@ -386,8 +402,10 @@ public class MessageV2Builder {
                                 .map(MessageV2Builder::ComponentTypeTree)
                                 .collect(Collectors.joining(", "))
                         + ")";
-            case Label label ->
-                "Label(" + (label.getChild() != null ? ComponentTypeTree(label.getChild()) : "no child") + ")";
+            case Label label -> {
+                label.getChild();
+                yield "Label(" + ComponentTypeTree(label.getChild()) + ")";
+            }
             case null -> "null";
             default ->
                 throw new IllegalArgumentException(

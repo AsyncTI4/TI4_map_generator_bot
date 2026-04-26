@@ -113,6 +113,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 1 space dock from your reinforcements on a planet you control.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "The vote was nearly unanimous. The council would provide funding for the restoration. Ciel was furious.",
         "source": "base"
     },
@@ -130,7 +131,8 @@
         "name": "Cripple Defenses",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose 1 planet. Destroy each PDS on that planet. [Note: You can play this on a planet with 0 PDS]",
+        "text": "Choose 1 planet. Destroy each PDS on that planet.",
+        "notes": "This may be played on a planet with zero PDS.",
         "automationID": "cripple",
         "flavorText": "Titanic vines burst forth from the ground, wrapping themselves around the system's primary firing cylinder, breaking it free from its moorings, and bringing it crashing down upon the installation below.",
         "source": "base"
@@ -141,6 +143,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, choose 1 system that contains a planet you control. Each other player places a command token from their reinforcements in that system.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "Ciel evaluated the other senators. Weak, all of them. This was his game to win.",
         "source": "base"
     },
@@ -152,7 +155,10 @@
         "text": "Destroy that ship.",
         "automationID": "direct_hit",
         "flavorText": "There it was! An opening! Neekuaq gestured wildly, a rare display for one normally quite reserved. \"Fire the main battery!\"",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "After another player's ship or mech uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
+        "wildWildText": "Destroy that unit."
     },
     {
         "alias": "dh2",
@@ -162,7 +168,10 @@
         "text": "Destroy that ship.",
         "automationID": "direct_hit",
         "flavorText": "The Loncara Ssodu's main battery flared to life, firing a volley directly into the flickering starboard shield of the Letnev dreadnought.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "After another player's ship or mech uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
+        "wildWildText": "Destroy that unit."
     },
     {
         "alias": "dh3",
@@ -172,7 +181,10 @@
         "text": "Destroy that ship.",
         "automationID": "direct_hit",
         "flavorText": "For a moment, it looked as if the dreadnought's shield would hold, but a moment later, the ship began to come apart where the attack had pierced its hull.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "After another player's ship or mech uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
+        "wildWildText": "Destroy that unit."
     },
     {
         "alias": "dh4",
@@ -182,7 +194,10 @@
         "text": "Destroy that ship.",
         "automationID": "direct_hit",
         "flavorText": "Neekuaq watched, satisfied, as the ship was wracked by a series of explosions from within, huge armored plates and other debris hurtling off into the darkness.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "After another player's ship or mech uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
+        "wildWildText": "Destroy that unit."
     },
     {
         "alias": "disable",
@@ -226,7 +241,8 @@
         "name": "Economic Initiative",
         "phase": "Action",
         "window": "Action",
-        "text": "Ready each cultural planet you control. [Note: You can play this even if you control 0 cultural planets.]",
+        "text": "Ready each cultural planet you control.",
+        "notes": "This may be played by a player that controls zero cultural planets.",
         "flavorText": "Large sum of Hacan currency flowed freely into the project, and somehow, defying all logic, the returns were even greater.",
         "source": "base"
     },
@@ -244,8 +260,9 @@
         "alias": "experimental",
         "name": "Experimental Battlestation",
         "phase": "Action",
-        "window": "After another player moves ships into a system during a tactical action",
-        "text": "Choose 1 of your space docks that is either in or adjacent to that system. That space dock uses SPACE CANNON 5(x3) against ships in the active system.",
+        "window": "After the active player moves ships into the active system during a tactical action",
+        "text": "Choose 1 of your space docks that is either in or adjacent to that system. That space dock uses SPACE CANNON 5(x3) against the active player's ships in the active system.",
+        "notes": "This resolves in the same window as normal SPACE CANNON fire, and any existing SPACE CANNON abilities will be rolled at the same time. This cannot be used against yourself.",
         "automationID": "experimental",
         "flavorText": "Arm the relay! Mendosa bared his fangs. \"The Saar will not submit!\"",
         "source": "base"
@@ -254,8 +271,9 @@
         "alias": "experimental2",
         "name": "Experimental Battlestation",
         "phase": "Action",
-        "window": "After another player moves ships into a system during a tactical action",
-        "text": "Choose 1 of your space docks that is either in or adjacent to that system. That space dock uses SPACE CANNON 5(x3) against ships in the active system.",
+        "window": "After the active player moves ships into the active system during a tactical action",
+        "text": "Choose 1 of your space docks that is either in or adjacent to that system. That space dock uses SPACE CANNON 5(x3) against the active player's ships in the active system.",
+        "notes": "This resolves in the same window as normal SPACE CANNON fire, and any existing SPACE CANNON abilities will be rolled at the same time. This cannot be used against yourself.",
         "automationID": "experimental",
         "flavorText": "Arm the relay! Mendosa bared his fangs. \"The Saar will not submit!\"",
         "source": "base"
@@ -286,7 +304,10 @@
         "text": "Apply +1 to the move value of each of your ships during this tactical action.",
         "automationID": "flank_speed",
         "flavorText": "Mendosa smirked. \"Don't ye fret now, girl. It sounds like ye've got somewhere ta be in a hurry, and it just se happens that I ken get ye there right quick.\"",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "After you activate a system",
+        "wildWildText": "Apply +2 to the move value of each of your ships during this tactical action."
     },
     {
         "alias": "fs2",
@@ -296,7 +317,10 @@
         "text": "Apply +1 to the move value of each of your ships during this tactical action.",
         "automationID": "flank_speed",
         "flavorText": "There was a low-pitched hum throughout the station and the gigantic, bulky constructions on the hull spat blue flame. Massive ion thrusters! So this was how the Saar moved the damned things.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "After you activate a system",
+        "wildWildText": "Apply +2 to the move value of each of your ships during this tactical action."
     },
     {
         "alias": "fs3",
@@ -306,7 +330,10 @@
         "text": "Apply +1 to the move value of each of your ships during this tactical action.",
         "automationID": "flank_speed",
         "flavorText": "Mendosa grinned at the young Mentak pilot's astonishment. \"Mobility-the Clan's greatest strength. Ye'd be amazed at how fast this thing ken go.\"",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "After you activate a system",
+        "wildWildText": "Apply +2 to the move value of each of your ships during this tactical action."
     },
     {
         "alias": "fs4",
@@ -316,7 +343,10 @@
         "text": "Apply +1 to the move value of each of your ships during this tactical action.",
         "automationID": "flank_speed",
         "flavorText": "With a sound like thunder and a flash of neon blue light, the thrusters accelerated full bore, nearly knocking Suffi off her feet.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "After you activate a system",
+        "wildWildText": "Apply +2 to the move value of each of your ships during this tactical action."
     },
     {
         "alias": "f_researched",
@@ -404,6 +434,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, gain 1 victory point.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "In a sweeping victory that surprised absolutely no one, the Winnu representative singlehandedly elected himself to oversee the analysis of a recently uncovered Lazax data cache.",
         "source": "base"
     },
@@ -432,7 +463,8 @@
         "name": "Industrial Initiative",
         "phase": "Action",
         "window": "Action",
-        "text": "Gain 1 trade good for each industrial planet you control. [Note: This can be played even if you have 0 industrial planets]",
+        "text": "Gain 1 trade good for each industrial planet you control.",
+        "notes": "This may be played by a player that controls zero industrial planets.",
         "flavorText": "The Gashlai reactors proved to be extremely effective. With the conversion rate practically doubled, the factories' output was immense.",
         "source": "base"
     },
@@ -480,6 +512,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, gain 3 command tokens.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "Rev's impassioned speech stunned the other councilors. Perhaps there was more to these humans than they had initially thought.",
         "source": "base"
     },
@@ -515,7 +548,8 @@
         "name": "Lucky Shot",
         "phase": "Action",
         "window": "Action",
-        "text": "Destroy 1 dreadnought, cruiser, or destroyer in a system that contains a planet you control. [Note: You cannot destroy your own units. You cannot play this card to no effect.]",
+        "text": "Destroy 1 dreadnought, cruiser, or destroyer in a system that contains a planet you control.",
+        "notes": "This cannot be played if there is not a valid target. A player cannot target their own ships.",
         "flavorText": "The missile - an insignificant spark against the darkness - struck the hull of the dreadnought. Moments later, the starboard flank erupted in flames.",
         "source": "base"
     },
@@ -526,7 +560,10 @@
         "window": "Before you assign hits produced by another player's SPACE CANNON roll",
         "text": "Cancel 1 hit.",
         "flavorText": "Something was wrong. T'esla sensed a flicker of movement on the planet's surface, followed by a faint glint of light. Reflexively, she veered her fighter to the side - an action that saved her life.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "Before you assign hits produced by another player's SPACE CANNON roll",
+        "wildWildText": "Cancel ALL hits."
     },
     {
         "alias": "mjets2",
@@ -534,8 +571,11 @@
         "phase": "Action",
         "window": "Before you assign hits produced by another player's SPACE CANNON roll",
         "text": "Cancel 1 hit.",
-        "flavorText": "The fighter's thrusted boosted her just out of the cannon's firing solution, and a metal slug the size of a building rocketed past her crystalline ship.",
-        "source": "base"
+        "flavorText": "The fighter's thruster boosted her just out of the cannon's firing solution, and a metal slug the size of a building rocketed past her crystalline ship.",
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "Before you assign hits produced by another player's SPACE CANNON roll",
+        "wildWildText": "Cancel ALL hits."
     },
     {
         "alias": "mjets3",
@@ -544,7 +584,10 @@
         "window": "Before you assign hits produced by another player's SPACE CANNON roll",
         "text": "Cancel 1 hit.",
         "flavorText": "T'esla breathed a sigh of relief as the massive slug disappeared into the distance. A touch slower and she would have been annihilated.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "Before you assign hits produced by another player's SPACE CANNON roll",
+        "wildWildText": "Cancel ALL hits."
     },
     {
         "alias": "mjets4",
@@ -553,7 +596,10 @@
         "window": "Before you assign hits produced by another player's SPACE CANNON roll",
         "text": "Cancel 1 hit.",
         "flavorText": "The flickering red warning lights on her control panel reflected in her scales as she regained her composure. \"Well,\" she said aloud. \"Zat was close.\"",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "Before you assign hits produced by another player's SPACE CANNON roll",
+        "wildWildText": "Cancel ALL hits."
     },
     {
         "alias": "mining_initiative",
@@ -571,7 +617,10 @@
         "window": "At the start of a combat round",
         "text": "Apply +1 to the result of each of your unit's combat rolls during this combat round.",
         "flavorText": "Harrugh stood before his warriors, searching for the words that would express the pride that swelled within him.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "At the start of a combat round",
+        "wildWildText": "Apply +2 to the result of each of your unit's combat rolls during this combat round."
     },
     {
         "alias": "mb2",
@@ -580,7 +629,10 @@
         "window": "At the start of a combat round",
         "text": "Apply +1 to the result of each of your unit's combat rolls during this combat round.",
         "flavorText": "We have done the impossible. I am proud to call you my brothers. My equals. My betters. Harrugh's whiskers bristled with energy as he spoke.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "At the start of a combat round",
+        "wildWildText": "Apply +2 to the result of each of your unit's combat rolls during this combat round."
     },
     {
         "alias": "mb3",
@@ -589,7 +641,10 @@
         "window": "At the start of a combat round",
         "text": "Apply +1 to the result of each of your unit's combat rolls during this combat round.",
         "flavorText": "Today we turn these invaders to ash and take back what is ours! Harrugh paused, noting the murmurs of approval rippling through the ranks.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "At the start of a combat round",
+        "wildWildText": "Apply +2 to the result of each of your unit's combat rolls during this combat round."
     },
     {
         "alias": "mb4",
@@ -598,7 +653,10 @@
         "window": "At the start of a combat round",
         "text": "Apply +1 to the result of each of your unit's combat rolls during this combat round.",
         "flavorText": "The whispering gradually died down and his warriors watched Harrugh expectantly. Every muscle in his body tensed, and he thrust his gyro-spear skyward. \"For Kenara!\"",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "At the start of a combat round",
+        "wildWildText": "Apply +2 to the result of each of your unit's combat rolls during this combat round."
     },
     {
         "alias": "parley",
@@ -614,7 +672,8 @@
         "name": "Plague",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose 1 planet that is controlled by another player. Roll 1 die for each infantry on that planet. For each result of 6 or greater, destroy 1 of those units. [Note: You can target a planet with 0 infantry]",
+        "text": "Choose 1 planet that is controlled by another player. Roll 1 die for each infantry on that planet. For each result of 6 or greater, destroy 1 of those units.",
+        "notes": "This may be played to target a planet with zero infantry. This cannot target a planet owned by the neutral player, as they are not a real player.",
         "flavorText": "The letani dipped a mossy limb beneath the surface of the reservoir, feeling the flow of the particles within, shifting them, changing them into something different. Something dangerous.",
         "source": "base"
     },
@@ -633,6 +692,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, draw 3 action cards and gain the speaker token.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "The Dirzuga had managed to negotiate themselves into a position of power amongst the other councilors, all of whom still looked terribly uncomfortable in their presence.",
         "source": "base"
     },
@@ -661,6 +721,7 @@
         "window": "Action",
         "text": "Destroy 1 space dock in a non-home system.",
         "automationID": "meltdown",
+        "notes": "As with most action cards, you cannot target your own units for destruction with this action card.",
         "flavorText": "Flames engulfed the shipyard, a vortex of fire and shrapnel that left nothing untouched.",
         "source": "base"
     },
@@ -669,7 +730,8 @@
         "name": "Reparations",
         "phase": "Action",
         "window": "After another player gains control of a planet you control",
-        "text": "Exhaust 1 planet that player controls and ready 1 planet you control. [Note: This can be played even if all the opponents planets are exhausted. If any are unexhausted, you must exhaust one though.]",
+        "text": "Exhaust 1 planet that player controls and ready 1 planet you control.",
+        "notes": "This may be played even if all the opponent's planets are exhausted. If any are unexhausted, one must be exhausted though.",
         "flavorText": "Gila oversaw the reconstruction of the Hacan outpost, but neglected to inform the N'orr representative that the damage was not nearly as severe as he was led to believe.",
         "source": "base"
     },
@@ -698,7 +760,10 @@
         "window": "When another player plays an action card other than 'Sabotage'",
         "text": "Cancel that action card.",
         "flavorText": "Q'uesh Sish tapped her claws impatiently. \"You were sssaying?\" But the confused Jol-Nar envoy stood silent. It was as if the words had escaped his thoughts entirely.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "When another player plays an action card other than 'Sabotage'",
+        "wildWildText": "Cancel that action card, and then take that card into your hand."
     },
     {
         "alias": "sabo2",
@@ -707,7 +772,10 @@
         "window": "When another player plays an action card other than 'Sabotage'",
         "text": "Cancel that action card.",
         "flavorText": "trjn.desgn.ALIZARIN introduced itself to each data nodes, incorporating them into its platform, expunging any data it deemed a threat to the Virus.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "When another player plays an action card other than 'Sabotage'",
+        "wildWildText": "Cancel that action card, and then take that card into your hand."
     },
     {
         "alias": "sabo3",
@@ -716,7 +784,10 @@
         "window": "When another player plays an action card other than 'Sabotage'",
         "text": "Cancel that action card.",
         "flavorText": "unit.desgn.BEELZEBUL followed the group of men through the winding hallways until they stopped at an intersection. Investigators would later find its cracked oculus at the center of a smoking crater, singed, but still functional.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "When another player plays an action card other than 'Sabotage'",
+        "wildWildText": "Cancel that action card, and then take that card into your hand."
     },
     {
         "alias": "sabo4",
@@ -725,7 +796,10 @@
         "window": "When another player plays an action card other than 'Sabotage'",
         "text": "Cancel that action card.",
         "flavorText": "Unlenn smashed a clenched fist into the bulkhead, green eyes ablaze with rage. The entire plan had been turned on its head. Such incompetence was unfathomable.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "When another player plays an action card other than 'Sabotage'",
+        "wildWildText": "Cancel that action card, and then take that card into your hand."
     },
     {
         "alias": "salvage",
@@ -744,7 +818,10 @@
         "window": "Before you assign hits to your ships during a space combat",
         "text": "Cancel up to 2 hits.",
         "flavorText": "T'ro stared unflinching at the incoming barrage through the bridge's observation deck. The shield would hold.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "Before you assign hits to your unit during a combat (space or ground)",
+        "wildWildText": "Cancel up to 2 hits."
     },
     {
         "alias": "sh2",
@@ -753,7 +830,10 @@
         "window": "Before you assign hits to your ships during a space combat",
         "text": "Cancel up to 2 hits.",
         "flavorText": "The blast from the enemy's main cannon slammed into the space in front of the warship, splitting into two streams across the bow.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "Before you assign hits to your unit during a combat (space or ground)",
+        "wildWildText": "Cancel up to 2 hits."
     },
     {
         "alias": "sh3",
@@ -762,7 +842,10 @@
         "window": "Before you assign hits to your ships during a space combat",
         "text": "Cancel up to 2 hits.",
         "flavorText": "The ship's shields sizzled and sparked but remained active despite the heavy assault.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "Before you assign hits to your unit during a combat (space or ground)",
+        "wildWildText": "Cancel up to 2 hits."
     },
     {
         "alias": "sh4",
@@ -771,7 +854,10 @@
         "window": "Before you assign hits to your ships during a space combat",
         "text": "Cancel up to 2 hits.",
         "flavorText": "As the assault died down and it became clear that the ship sustained no major damage, T'ro clicked his mandibles in anticipation. \"Return fire!\"",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "Before you assign hits to your unit during a combat (space or ground)",
+        "wildWildText": "Cancel up to 2 hits."
     },
     {
         "alias": "jamming",
@@ -786,41 +872,57 @@
         "alias": "s_retreat1",
         "name": "Skilled Retreat",
         "phase": "Action",
-        "window": "At the start of a [space] combat round",
+        "window": "At the start of a combat round",
+        "notes": "This may only be played during space combat",
         "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
         "automationID": "skilled_retreat",
         "flavorText": "In an instant, the Sol fleet vanished from the Barony's scanners.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "At the start of a combat round",
+        "wildWildText": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Do not place a command token from your reinforcements in that system."
     },
     {
         "alias": "s_retreat2",
         "name": "Skilled Retreat",
         "phase": "Action",
-        "window": "At the start of a [space] combat round",
+        "window": "At the start of a combat round",
+        "notes": "This may only be played during space combat",
         "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
         "automationID": "skilled_retreat",
         "flavorText": "The Creuss fleet was gone. No trace remained of their passage.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "At the start of a combat round",
+        "wildWildText": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Do not place a command token from your reinforcements in that system."
     },
     {
         "alias": "s_retreat3",
         "name": "Skilled Retreat",
         "phase": "Action",
-        "window": "At the start of a [space] combat round",
+        "window": "At the start of a combat round",
+        "notes": "This may only be played during space combat",
         "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
         "automationID": "skilled_retreat",
         "flavorText": "T'ro gave the order, and the entire fleet withdrew without question.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "At the start of a combat round",
+        "wildWildText": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Do not place a command token from your reinforcements in that system."
     },
     {
         "alias": "s_retreat4",
         "name": "Skilled Retreat",
         "phase": "Action",
-        "window": "At the start of a [space] combat round",
+        "window": "At the start of a combat round",
+        "notes": "This may only be played during space combat",
         "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
         "automationID": "skilled_retreat",
         "flavorText": "We have no choice, captain. Ciel looked nervous.\"We must retreat.\"",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "At the start of a combat round",
+        "wildWildText": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Do not place a command token from your reinforcements in that system."
     },
     {
         "alias": "spy",
@@ -828,7 +930,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Choose 1 player. That player gives you 1 random action card from their hand.",
-        "flavorText": "I'm no spy, Connor said, casually stuffing the data drives into his pack. \"Now, how can I get out of here without being seen?\"",
+        "flavorText": "\"I'm no spy\", Connor said, casually stuffing the data drives into his pack. \"Now, how can I get out of here without being seen?\"",
         "source": "base"
     },
     {
@@ -845,7 +947,8 @@
         "name": "Tactical Bombardment",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose 1 system that contains 1 or more of your units that have BOMBARDMENT. Exhaust each planet controlled by other players in that system. [Note, this does not have to result in any planets being exhausted]",
+        "text": "Choose 1 system that contains 1 or more of your units that have BOMBARDMENT. Exhaust each planet controlled by other players in that system.",
+        "notes": "This may target a system that does not contain any planets controlled by another player, including empty systems or a system containing only your planets. It will have no effect in such a case besides to stall.",
         "automationID": "tactical",
         "flavorText": "A6's red eyes flickered with activity, and a string of numbers flashed briefly across the screen before he spoke. \"Bombardment complete. All enemy installations have been neutralized.\"",
         "source": "base"
@@ -856,6 +959,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, research 1 technology.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "The Council granted the Yin funding to research an effective countermeasure to combat the virus. After all, keeping the Yin occupied with the virus meant killing two birds with one stone.",
         "source": "base"
     },
@@ -865,6 +969,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, gain 5 trade goods.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "The Letnev councilor begrudgingly accepted the N'orr's core mining contract, if only so that the \"gracious\" Hacan senator didn't secure yet another source of income for his clan.",
         "source": "base"
     },
@@ -893,7 +998,8 @@
         "name": "Unstable Planet",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose 1 hazardous planet. Exhaust that planet and destroy up to 3 infantry on it. [Note: You can use this on an exhausted planet and still kill the infantry. Also note the planet does not need to contain infantry. No targetting your own planet though]",
+        "text": "Choose 1 hazardous planet. Exhaust that planet and destroy up to 3 infantry on it.",
+        "notes": "This may be used on an exhausted planet and still kill the infantry. It may also be used on a planet containing no infantry. No targeting your own planet though.",
         "automationID": "unstable",
         "flavorText": "Another quake shook the planet, and a wave of dirt and rock rose up to swallow the Tekklar legion.",
         "source": "base"
@@ -913,7 +1019,8 @@
         "name": "Uprising",
         "phase": "Action",
         "window": "Action",
-        "text": "Exhaust 1 non-home planet controlled by another player. Then gain trade goods equal to its resource value. [Note: You cannot use this on an exhausted planet.]",
+        "text": "Exhaust 1 non-home planet controlled by another player. Then gain trade goods equal to its resource value.",
+        "notes": "This cannot be used to target an exhausted planet.",
         "flavorText": "Harrugh leapt down from the ledge, gyro-spear blazing in the sunlight. In front, the L1Z1X began to take notice. Behind his warriors stood at the ready. Win or lose, this would be the end.",
         "source": "base"
     },
@@ -922,6 +1029,7 @@
         "name": "Veto",
         "phase": "Agenda",
         "window": "When an agenda is revealed",
+        "playTiming": "AGENDA_WHEN",
         "text": "Discard that agenda and reveal 1 agenda from the top of the deck. Players vote on this agenda instead.",
         "automationID": "veto",
         "flavorText": "Magmus batted the now charred corpse aside with the back of his golden gauntlet. \"The Muuat reject your proposal.\"",
@@ -932,6 +1040,7 @@
         "name": "Veto",
         "phase": "Agenda",
         "window": "When an agenda is revealed",
+        "playTiming": "AGENDA_WHEN",
         "text": "Discard that agenda and reveal 1 agenda from the top of the deck. Players vote on this agenda instead.",
         "automationID": "veto",
         "flavorText": "Magmus batted the now charred corpse aside with the back of his golden gauntlet. \"The Muuat reject your proposal.\"",
@@ -942,6 +1051,7 @@
         "name": "Veto",
         "phase": "Agenda",
         "window": "When an agenda is revealed",
+        "playTiming": "AGENDA_WHEN",
         "text": "Discard that agenda and reveal 1 agenda from the top of the deck. Players vote on this agenda instead.",
         "automationID": "veto",
         "flavorText": "Magmus batted the now charred corpse aside with the back of his golden gauntlet. \"The Muuat reject your proposal.\"",
@@ -952,6 +1062,7 @@
         "name": "Veto",
         "phase": "Agenda",
         "window": "When an agenda is revealed",
+        "playTiming": "AGENDA_WHEN",
         "text": "Discard that agenda and reveal 1 agenda from the top of the deck. Players vote on this agenda instead.",
         "automationID": "veto",
         "flavorText": "Magmus batted the now charred corpse aside with the back of his golden gauntlet. \"The Muuat reject your proposal.\"",
@@ -972,6 +1083,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 1 dreadnought from your reinforcements in a system that contains 1 or more of your ships.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "Elder Junn sighed. \"Disarmament, it seems, has fallen out of fashion in these dark days.\"",
         "source": "base"
     },
@@ -1061,7 +1173,7 @@
         "name": "Insider Information",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "Look at the top 3 cards of the agenda deck. [Note: this effect was changed from 1 card to 3 based on revealed changes in the expansion announcement]",
+        "text": "Look at the top 3 cards of the agenda deck.",
         "automationID": "insider",
         "flavorText": "M'aban yawned. Another filibuster. Politics could be so flavorless at times. Besides, she already knew how this one was going to turn out. Not well. Not well at all...",
         "source": "codex1"
@@ -1118,7 +1230,7 @@
         "name": "Insider Information",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "Look at the top 3 cards of the agenda deck. [Note: this effect was changed from 1 card to 3 based on revealed changes in the expansion announcement]",
+        "text": "Look at the top 3 cards of the agenda deck.",
         "automationID": "insider",
         "flavorText": "M'aban yawned. Another filibuster. Politics could be so flavorless at times. Besides, she already knew how this one was going to turn out. Not well. Not well at all...",
         "source": "asteroid"
@@ -1138,6 +1250,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome returns 1 command token from their fleet supply to their reinforcements.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "Two can play at this game.",
         "source": "codex1"
     },
@@ -1167,7 +1280,10 @@
         "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
         "automationID": "war_machine",
         "flavorText": "This would take weeks to replace if you had run it backwards, Varish called as she rotated the massive capacitor bank. \"Okay, fire it up.\"",
-        "source": "codex1"
+        "source": "codex1",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "When 1 or more of your units use PRODUCTION",
+        "wildWildText": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 5."
     },
     {
         "alias": "war_machine2",
@@ -1177,7 +1293,10 @@
         "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
         "automationID": "war_machine",
         "flavorText": "The station vibrated as the device sputtered to life, emitting a high-pitched buzz to Varish's ears. \"Micro-wormholes are cycling at 19 kilohertz,\" Cole read. \"The entropic field tap's stable.\"",
-        "source": "codex1"
+        "source": "codex1",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "When 1 or more of your units use PRODUCTION",
+        "wildWildText": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 5."
     },
     {
         "alias": "war_machine3",
@@ -1187,7 +1306,10 @@
         "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
         "automationID": "war_machine",
         "flavorText": "The station's production facilities spooled up to new intensities, lights flaring as the assembly line drones increased their speeds to keep up.",
-        "source": "codex1"
+        "source": "codex1",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "When 1 or more of your units use PRODUCTION",
+        "wildWildText": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 5."
     },
     {
         "alias": "war_machine4",
@@ -1197,7 +1319,10 @@
         "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
         "automationID": "war_machine",
         "flavorText": "Varish, let the Commanders know they can contact the Tetrarchy. Tell them the fighter squadron assembly will be done ahead of schedule, and under budget.",
-        "source": "codex1"
+        "source": "codex1",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "When 1 or more of your units use PRODUCTION",
+        "wildWildText": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 5."
     },
     {
         "alias": "arch_expedition",
@@ -1290,40 +1415,60 @@
         "name": "Diplomatic Pressure",
         "phase": "Agenda",
         "window": "When an agenda is revealed",
-        "text": "Choose another player. That player must give you 1 promissory note from their hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
+        "playTiming": "AGENDA_WHEN",
+        "text": "Choose another player. That player must give you 1 promissory note from their hand.",
+        "notes": "One player cannot play multiple of these targeting the same player during the same agenda.",
         "automationID": "diplo_pressure",
         "flavorText": "The Arborec emissary leaned close, and Brother Milor flinched at the faint whiff of decay. \"You do not understand,\" Dirzuga Ohao rasped. \"You must support this measure.\"",
-        "source": "pok"
+        "source": "pok",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "When an agenda is revealed",
+        "wildWildText": "Choose another player. That player must give you 3 promissory notes from their hand."
     },
     {
         "alias": "dp2",
         "name": "Diplomatic Pressure",
         "phase": "Agenda",
         "window": "When an agenda is revealed",
-        "text": "Choose another player. That player must give you 1 promissory note from their hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
+        "playTiming": "AGENDA_WHEN",
+        "text": "Choose another player. That player must give you 1 promissory note from their hand.",
+        "notes": "One player cannot play multiple of these targeting the same player during the same agenda.",
         "automationID": "diplo_pressure",
-        "flavorText": "Brother Milor shook his head. \"The Brotherhood can not support your war against this extra-dimensional threat.\" Dirzuga Ohao raised an eyebrow. \"Are you certain?\"",
-        "source": "pok"
+        "flavorText": "Brother Milor shook his head. \"The Brotherhood cannot support your war against this extra-dimensional threat.\" Dirzuga Ohao raised an eyebrow. \"Are you certain?\"",
+        "source": "pok",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "When an agenda is revealed",
+        "wildWildText": "Choose another player. That player must give you 3 promissory notes from their hand."
     },
     {
         "alias": "dp3",
         "name": "Diplomatic Pressure",
         "phase": "Agenda",
         "window": "When an agenda is revealed",
-        "text": "Choose another player. That player must give you 1 promissory note from their hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
+        "playTiming": "AGENDA_WHEN",
+        "text": "Choose another player. That player must give you 1 promissory note from their hand.",
+        "notes": "One player cannot play multiple of these targeting the same player during the same agenda.",
         "automationID": "diplo_pressure",
         "flavorText": "It would be unfortunate, the Arborec Dirzuga said, \"if your supplies of diraxium were to dry up. How would your fleet defend you if we stopped supplying its fuel?\"",
-        "source": "pok"
+        "source": "pok",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "When an agenda is revealed",
+        "wildWildText": "Choose another player. That player must give you 3 promissory notes from their hand."
     },
     {
         "alias": "dp4",
         "name": "Diplomatic Pressure",
         "phase": "Agenda",
         "window": "When an agenda is revealed",
-        "text": "Choose another player. That player must give you 1 promissory note from their hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
+        "playTiming": "AGENDA_WHEN",
+        "text": "Choose another player. That player must give you 1 promissory note from their hand.",
+        "notes": "One player cannot play multiple of these targeting the same player during the same agenda.",
         "automationID": "diplo_pressure",
-        "flavorText": "Damn you! Brother MIlor hissed. \"You leave us no choice but to fight in your war.\" Dirzuga Ohao smiled, dead skin stretching over her teeth.",
-        "source": "pok"
+        "flavorText": "Damn you! Brother Milor hissed. \"You leave us no choice but to fight in your war.\" Dirzuga Ohao smiled, dead skin stretching over her teeth.",
+        "source": "pok",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "When an agenda is revealed",
+        "wildWildText": "Choose another player. That player must give you 3 promissory notes from their hand."
     },
     {
         "alias": "divert_funding",
@@ -1425,7 +1570,8 @@
         "name": "Reveal Prototype",
         "phase": "Action",
         "window": "At the start of a combat",
-        "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the prerequisites of the technology before you can research it. Nekro just gets command tokens from this card, no technology.]",
+        "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat.",
+        "notes": "You must still meet the prerequisites of the unit upgrade you wish to research, unless you are Nekro, who will get command tokens instead as usual.",
         "automationID": "reveal_prototype",
         "flavorText": "Varish and Cole completed the final linkages, activating the field harvester. The cruiser's beams roared with renewed power, cutting through the enemy ship.",
         "source": "pok"
@@ -1435,7 +1581,8 @@
         "name": "Reveal Prototype",
         "phase": "Action",
         "window": "At the start of a combat",
-        "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the prerequisites of the technology before you can research it.]",
+        "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat.",
+        "notes": "You must still meet the prerequisites of the unit upgrade you wish to research, unless you are Nekro, who will get command tokens instead as usual.",
         "automationID": "reveal_prototype",
         "flavorText": "Varish and Cole completed the final linkages, activating the field harvester. The cruiser's beams roared with renewed power, cutting through the enemy ship.",
         "source": "asteroid"
@@ -1445,7 +1592,8 @@
         "name": "Reveal Prototype",
         "phase": "Action",
         "window": "At the start of a combat",
-        "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the prerequisites of the technology before you can research it.]",
+        "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat.",
+        "notes": "You must still meet the prerequisites of the unit upgrade you wish to research, unless you are Nekro, who will get command tokens instead as usual.",
         "automationID": "reveal_prototype",
         "flavorText": "Varish and Cole completed the final linkages, activating the field harvester. The cruiser's beams roared with renewed power, cutting through the enemy ship.",
         "source": "asteroid"
@@ -1455,7 +1603,8 @@
         "name": "Reveal Prototype",
         "phase": "Action",
         "window": "At the start of a combat",
-        "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the prerequisites of the technology before you can research it.]",
+        "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat.",
+        "notes": "You must still meet the prerequisites of the unit upgrade you wish to research, unless you are Nekro, who will get command tokens instead as usual.",
         "automationID": "reveal_prototype",
         "flavorText": "Varish and Cole completed the final linkages, activating the field harvester. The cruiser's beams roared with renewed power, cutting through the enemy ship.",
         "source": "asteroid"
@@ -1501,7 +1650,8 @@
         "name": "Seize Artifact",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose 1 of your neighbors that has 1 or more relic fragments. That player must give you 1 relic fragment of your choice. [Note the neighbor requirement.]",
+        "text": "Choose 1 of your neighbors that has 1 or more relic fragments. That player must give you 1 relic fragment of your choice.",
+        "notes": "Note the neighbours requirement.",
         "flavorText": "Armored dropships crashed into the main dock. Hatches blew open, and Captain Mentarion and her commando raider charged into the facility's heart.",
         "source": "pok"
     },

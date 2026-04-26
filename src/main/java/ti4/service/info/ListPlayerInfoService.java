@@ -9,23 +9,26 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.Source;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.TileEmojis;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
@@ -214,6 +217,10 @@ public class ListPlayerInfoService {
             resources += influence;
             influence += planet.getResources();
         }
+        if (player.hasUnlockedBreakthrough("xxchabt")) {
+            resources = Math.max(resources, influence);
+            influence = Math.max(resources, influence);
+        }
         if (resources > 0) {
             ObjectiveResult resourceResult = backtrack(
                     planets,
@@ -269,6 +276,7 @@ public class ListPlayerInfoService {
         StringBuilder msg = new StringBuilder();
         int x = 1;
         if (onlyThisGameObj) {
+            msg.append("### Public Objectives\n");
             for (String id : game.getRevealedPublicObjectives().keySet()) {
                 if (Mapper.getPublicObjective(id) != null) {
                     msg.append(representScoring(game, id, x)).append("\n\n");
@@ -276,17 +284,17 @@ public class ListPlayerInfoService {
                 }
             }
             for (String id : game.getSoToPoList()) {
-                msg.append(representScoring(game, id, x, true)).append("\n");
+                msg.append(representScoring(game, id, x, true)).append('\n');
                 x++;
             }
-            msg.append(representSecrets(game)).append("\n");
+            msg.append(representSecrets(game)).append('\n');
             if (!game.isTwilightsFallMode()) {
-                msg.append(representSupports(game)).append("\n");
+                msg.append(representSupports(game)).append('\n');
             }
             if (gameHasTransferablePoints(game)) {
-                msg.append(representTransferablePoints(game)).append("\n");
+                msg.append(representTransferablePoints(game)).append('\n');
             }
-            msg.append(representTotalVPs(game)).append("\n");
+            msg.append(representTotalVPs(game)).append('\n');
         } else {
             for (String id : Mapper.getPublicObjectives().keySet()) {
                 if (Mapper.getPublicObjective(id).getSource() == Source.ComponentSource.pok
@@ -294,7 +302,7 @@ public class ListPlayerInfoService {
                     if (stage1sOrTwos.equalsIgnoreCase(
                                     "" + Mapper.getPublicObjective(id).getPoints())
                             || "both".equalsIgnoreCase(stage1sOrTwos)) {
-                        msg.append(representScoring(game, id, x)).append("\n");
+                        msg.append(representScoring(game, id, x)).append('\n');
                         x++;
                     }
                 }
@@ -323,66 +331,83 @@ public class ListPlayerInfoService {
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation.append(player.getFactionEmoji()).append(": ");
+                boolean scored = false;
+                int progress = getPlayerProgressOnObjective(objID, game, player);
+                int threshold = getObjectiveThreshold(objID, game);
+
                 if (secret) {
                     if (game.didPlayerScoreThisAlready(player.getUserID(), objID)
                             || game.didPlayerScoreThisAlready(
                                     player.getUserID(),
                                     Mapper.getSecretObjectivesJustNames().get(objID))) {
-                        representation.append("✅  ");
+                        representation.append("✅");
+                        scored = true;
                     } else {
-                        if (getObjectiveThreshold(objID, game) > 0) {
+                        if (threshold > 0) {
                             representation
-                                    .append(" (")
-                                    .append(getPlayerProgressOnObjective(objID, game, player))
-                                    .append("/")
-                                    .append(getObjectiveThreshold(objID, game))
-                                    .append(")  ");
+                                    .append(progress)
+                                    .append('/')
+                                    .append(threshold)
+                                    .append(progress >= threshold ? "#" : "");
                         } else {
-                            representation.append("0/1  ");
+                            representation.append("0/1");
                         }
                     }
                 } else {
                     if (game.getRevealedPublicObjectives().containsKey(objID)
                             && game.didPlayerScoreThisAlready(player.getUserID(), objID)) {
-                        representation.append("✅  ");
+                        representation.append("✅");
+                        scored = true;
                     } else {
                         representation
-                                .append(getPlayerProgressOnObjective(objID, game, player))
-                                .append("/")
-                                .append(getObjectiveThreshold(objID, game))
-                                .append("  ");
+                                .append(progress)
+                                .append('/')
+                                .append(threshold)
+                                .append(progress >= threshold ? "#" : "");
                     }
                 }
+
+                if (!scored && !player.hasAbility("nomadic") && !player.hasTech("tf-nomadic")) {
+                    if (player.getFaction().equals(game.getStoredValue("silverFlamed"))) {
+                        representation.append(ExploreEmojis.SilverFlame);
+                    } else if (!Helper.canPlayerScorePOs(game, player)) {
+                        representation.append(TileEmojis.TileGreenBack);
+                    }
+                }
+                representation.append(UnitEmojis.Blank).append(UnitEmojis.Blank);
             }
         }
         return representation.toString();
     }
 
     private static String representSecrets(Game game) {
-        StringBuilder representation = new StringBuilder("__**Scored Secret Objectives**__\n> ");
+        StringBuilder representation = new StringBuilder("### Scored Secret Objective Count\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation
                         .append(player.getFactionEmoji())
                         .append(": ")
                         .append(player.getSoScored())
-                        .append("/")
+                        .append('/')
                         .append(player.getMaxSOCount())
-                        .append("  ");
+                        .append(UnitEmojis.Blank)
+                        .append(UnitEmojis.Blank);
             }
         }
         return representation.toString();
     }
 
     private static String representSupports(Game game) {
-        StringBuilder representation = new StringBuilder("__**Support Victory Points**__\n> ");
+        StringBuilder representation = new StringBuilder("### _Supports For The Thrones_ Victory Points\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation
                         .append(player.getFactionEmoji())
                         .append(": ")
                         .append(player.getSupportForTheThroneVictoryPoints())
-                        .append("/1  ");
+                        .append("/1")
+                        .append(UnitEmojis.Blank)
+                        .append(UnitEmojis.Blank);
             }
         }
         return representation.toString();
@@ -403,7 +428,7 @@ public class ListPlayerInfoService {
     }
 
     private static String representTransferablePoints(Game game) {
-        StringBuilder representation = new StringBuilder("__**Transferable Points**__");
+        StringBuilder representation = new StringBuilder("### Transferable Victory Points");
         if (!game.isFowMode()) {
             for (var objective : game.getCustomPublicVP().entrySet()) {
                 String mutablePointRepresentation = getTransferablePointRepresentation(objective.getKey());
@@ -432,16 +457,17 @@ public class ListPlayerInfoService {
     }
 
     private static String representTotalVPs(Game game) {
-        StringBuilder representation = new StringBuilder("__**Total Victory Points**__\n> ");
+        StringBuilder representation = new StringBuilder("## Total Victory Points\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation
                         .append(player.getFactionEmoji())
                         .append(": ")
                         .append(player.getTotalVictoryPoints())
-                        .append("/")
+                        .append('/')
                         .append(game.getVp())
-                        .append("  ");
+                        .append(UnitEmojis.Blank)
+                        .append(UnitEmojis.Blank);
             }
         }
         return representation.toString();
@@ -457,7 +483,15 @@ public class ListPlayerInfoService {
                 int aboveN = 0;
                 for (Player p2 : player.getNeighbouringPlayers(true)) {
                     int p1count = player.getPlanetsForScoring(false).size();
-                    int p2count = p2.getPlanetsForScoring(false).size();
+                    int mutualPlanets = 0;
+                    for (String plan : game.getPlanetsPlayerIsCoexistingOn(player)) {
+                        if (game.getPlayersPlanetsThatOthersAreCoexistingOn(p2).contains(plan)) {
+                            mutualPlanets++;
+                        }
+                    }
+                    int p2count = p2.getPlanetsForScoring(false).size()
+                            - game.getPlanetsPlayerIsCoexistingOn(p2).size()
+                            - mutualPlanets;
                     if (p1count > p2count) {
                         aboveN++;
                     }
@@ -478,7 +512,8 @@ public class ListPlayerInfoService {
             case "make_history", "become_legend", "become_legend_omegaphase" -> {
                 int counter = 0;
                 for (Tile tile : game.getTileMap().values()) {
-                    boolean tileCounts = tile.isMecatol() || tile.isAnomaly(game) || ButtonHelper.isTileLegendary(tile);
+                    boolean tileCounts =
+                            tile.isMecatol(game) || tile.isAnomaly(game) || ButtonHelper.isTileLegendary(tile);
                     if (FoWHelper.playerHasUnitsInSystem(player, tile) && tileCounts) {
                         counter++;
                     }
@@ -534,6 +569,24 @@ public class ListPlayerInfoService {
                         }
                     } else if (ButtonHelper.getNumberOfCertainTypeOfTech(player, type) >= 2) {
                         numAbove1++;
+                    } else {
+                        if (game.isTwilightsFallMode()) {
+                            int amount = 0;
+                            for (String planet : player.getReadiedPlanets()) {
+                                if (ButtonHelper.checkForTechSkips(game, planet)) {
+                                    Planet unitHolder = game.getPlanetsInfo().get(planet);
+                                    List<String> techTypes = unitHolder.getTechSpecialities();
+                                    for (String typeT : techTypes) {
+                                        if (type.toString().equalsIgnoreCase(typeT)) {
+                                            amount++;
+                                        }
+                                    }
+                                }
+                            }
+                            if (ButtonHelper.getNumberOfCertainTypeOfTech(player, type) + amount > 1) {
+                                numAbove1++;
+                            }
+                        }
                     }
                 }
                 return numAbove1;
@@ -701,7 +754,7 @@ public class ListPlayerInfoService {
                         Units.UnitType.Warsun,
                         Units.UnitType.Lady,
                         Units.UnitType.Celagrom)) {
-                    if ((tile.isHomeSystem(game) && tile != player.getHomeSystemTile()) || tile.isMecatol()) {
+                    if ((tile.isHomeSystem(game) && tile != player.getHomeSystemTile()) || tile.isMecatol(game)) {
                         count++;
                     }
                 }
@@ -855,7 +908,7 @@ public class ListPlayerInfoService {
             }
             case "ose" -> {
                 Tile mecatol = game.getMecatolTile();
-                boolean controlsMecatol = player.getPlanets().stream().anyMatch(Constants.MECATOLS::contains);
+                boolean controlsMecatol = player.getPlanets().stream().anyMatch(game.mecatols()::contains);
                 if (!FoWHelper.playerHasUnitsInSystem(player, mecatol) || !controlsMecatol) {
                     return 0;
                 } else {

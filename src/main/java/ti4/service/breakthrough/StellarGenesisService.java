@@ -10,15 +10,15 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.commands.tokens.AddTokenCommand;
+import ti4.discord.interactions.commands.tokens.AddTokenCommand;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RegexHelper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.combat.StartCombatService;
 import ti4.service.map.TokenPlanetService;
@@ -41,7 +41,7 @@ public class StellarGenesisService {
         Predicate<Tile> nonHomeAndAdj = nonHome.and(adjToPlanetTiles::contains);
         List<Button> avernusLocations =
                 ButtonHelper.getTilesWithPredicateForAction(player, game, "placeAvernus", nonHomeAndAdj, false);
-        String message = "Choose a tile to place Avernus:";
+        String message = "Please choose which system you wish to place Avernus in.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, avernusLocations);
     }
 
@@ -72,13 +72,13 @@ public class StellarGenesisService {
             String destination = matcher.group("destination");
             Tile tile = game.getTileByPosition(destination);
             TokenPlanetService.moveTokenPlanet(game, player, tile, Constants.AVERNUS);
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
             if (playersWithPds2.contains(player)) {
                 List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
-                        "If avernus had PDS on it, you can fire the PDS with this button if this is the appropriate time to do so.",
+                        "If Avernus had PDS on it, you may fire the PDS with this button if this is the appropriate time to do so.",
                         spaceCannonButtons);
             }
         }

@@ -18,13 +18,12 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.buttons.Buttons;
-import ti4.helpers.ThreadArchiveHelper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass
@@ -48,7 +47,6 @@ public class FowCommunicationThreadService {
     public static void checkNewCommPartners(Game game, Player player) {
         if (!isActive(game)) return;
 
-        ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
         Set<String> checkedPairs = new HashSet<>();
         getGameThreadChannels(game).thenAccept(threads -> {
             for (Player p : game.getRealPlayers()) {
@@ -225,7 +223,6 @@ public class FowCommunicationThreadService {
         String color = buttonID.replace("fowCommsAccept_", "");
         Player inviteePlayer = game.getPlayerFromColorOrFaction(color);
 
-        ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
         String threadName = StringUtils.capitalize(inviteePlayer.getColor()) + " " + YES_CHAR + " "
                 + StringUtils.capitalize(player.getColor());
         game.getMainGameChannel()

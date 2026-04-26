@@ -2,8 +2,8 @@ package ti4.service.milty;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import ti4.map.Planet;
-import ti4.map.Tile;
+import ti4.game.Planet;
+import ti4.game.Tile;
 
 @Data
 public class MiltyDraftTile {

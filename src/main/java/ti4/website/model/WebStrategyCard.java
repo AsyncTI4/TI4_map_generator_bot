@@ -1,7 +1,7 @@
 package ti4.website.model;
 
 import lombok.Data;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.model.StrategyCardModel;
 
 @Data

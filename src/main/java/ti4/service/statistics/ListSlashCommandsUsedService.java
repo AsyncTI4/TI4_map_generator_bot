@@ -7,12 +7,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import ti4.game.Game;
+import ti4.game.persistence.GamesPage;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.SortHelper;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 
@@ -29,7 +29,8 @@ public class ListSlashCommandsUsedService {
         AtomicInteger acsSabod = new AtomicInteger();
         AtomicInteger largestAmountOfButtonsIn1Game = new AtomicInteger();
         AtomicReference<String> largestGame = new AtomicReference<>("");
-        boolean useOnlyLastMonth = event.getOption(Constants.ONLY_LAST_MONTH, false, OptionMapping::getAsBoolean);
+        boolean useOnlyLastMonth =
+                event.getOption(Constants.ONLY_LAST_MONTH, Boolean.FALSE, OptionMapping::getAsBoolean);
         Map<String, Integer> slashCommands = new HashMap<>();
         Map<String, Integer> actionCards = new HashMap<>();
         Map<String, Integer> actionCardsPlayed = new HashMap<>();
@@ -94,45 +95,24 @@ public class ListSlashCommandsUsedService {
         }
         buttonsPressed.addAndGet(game.getButtonPressCount());
         slashCommandsUsed.addAndGet(game.getSlashCommandsRunCount());
-        for (String command : game.getAllSlashCommandsUsed().keySet()) {
-            int numUsed = game.getAllSlashCommandsUsed().get(command);
-            int numUsed2 = 0;
-            if (slashCommands.containsKey(command)) {
-                numUsed2 = slashCommands.get(command);
-            }
-            slashCommands.put(command, numUsed + numUsed2);
-        }
+        game.getAllSlashCommandsUsed()
+                .forEach((command, numUsed) -> slashCommands.merge(command, numUsed, Integer::sum));
         if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1698724000011L)) >= 0) {
             return;
         }
-        for (String acName : game.getAllActionCardsSabod().keySet()) {
-            int numUsed = game.getAllActionCardsSabod().get(acName);
-            int numUsed2 = 0;
-            if (actionCards.containsKey(acName)) {
-                numUsed2 = actionCards.get(acName);
-            }
+        game.getAllActionCardsSabod().forEach((acName, numUsed) -> {
             acsSabod.addAndGet(numUsed);
-            actionCards.put(acName, numUsed + numUsed2);
-        }
+            actionCards.merge(acName, numUsed, Integer::sum);
+        });
         for (String acID : game.getDiscardActionCards().keySet()) {
             ActionCardModel ac = Mapper.getActionCard(acID);
             String acName = ac.getName();
-            int numUsed = 1;
-            int numUsed2 = 0;
-            if (actionCardsPlayed.containsKey(acName)) {
-                numUsed2 = actionCardsPlayed.get(acName);
-            }
-            actionCardsPlayed.put(acName, numUsed + numUsed2);
+            actionCardsPlayed.merge(acName, 1, Integer::sum);
         }
         for (String acID : game.getPurgedActionCards().keySet()) {
             ActionCardModel ac = Mapper.getActionCard(acID);
             String acName = ac.getName();
-            int numUsed = 1;
-            int numUsed2 = 0;
-            if (actionCardsPlayed.containsKey(acName)) {
-                numUsed2 = actionCardsPlayed.get(acName);
-            }
-            actionCardsPlayed.put(acName, numUsed + numUsed2);
+            actionCardsPlayed.merge(acName, 1, Integer::sum);
         }
     }
 }

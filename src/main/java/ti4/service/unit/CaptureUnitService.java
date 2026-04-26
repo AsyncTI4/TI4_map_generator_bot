@@ -5,19 +5,22 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.service.breakthrough.ValefarZService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
-class CaptureUnitService {
+@UtilityClass
+public class CaptureUnitService {
 
     public static List<Player> listCapturingMechPlayers(
             Game game, List<RemovedUnit> allUnits, RemovedUnit removedUnitType) {
@@ -29,7 +32,11 @@ class CaptureUnitService {
 
         List<Player> capturing = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {
-            if (player.hasUnlockedBreakthrough("mykomentoribt") && player != game.getActivePlayer()) {
+            if (player.hasUnlockedBreakthrough("mykomentoribt")
+                    && player != game.getActivePlayer()
+                    && !allUnits.isEmpty()
+                    && allUnits.getFirst().getPlayer(game) != player
+                    && !removedUnitType.uh().getPlayersUnitListOnHolder(player).isEmpty()) {
                 capturing.add(player);
                 continue;
             }
@@ -46,7 +53,8 @@ class CaptureUnitService {
 
         // "sigma_vuilraith_flagship_1" does not capture your own units
         List<Player> cabals = game.getRealPlayers().stream()
-                .filter(p -> p.hasUnit("cabal_flagship") || p.hasUnit("sigma_vuilraith_flagship_2"))
+                .filter(p -> ValefarZService.hasFlagshipAbility(game, p, "cabal_flagship")
+                        || p.hasUnit("sigma_vuilraith_flagship_2"))
                 .toList();
         List<Player> cabalsWithFs = new ArrayList<>();
         for (Player p : cabals) {

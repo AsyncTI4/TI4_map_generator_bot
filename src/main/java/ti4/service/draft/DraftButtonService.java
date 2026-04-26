@@ -4,12 +4,12 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class DraftButtonService {
@@ -30,8 +30,8 @@ public class DraftButtonService {
     public boolean isError(String outcome) {
         return outcome != null
                 && !outcome.isEmpty()
-                && !outcome.equals(DELETE_BUTTON)
-                && !outcome.equals(DELETE_MESSAGE);
+                && !DELETE_BUTTON.equals(outcome)
+                && !DELETE_MESSAGE.equals(outcome);
     }
 
     @ButtonHandler(DRAFT_BUTTON_SERVICE_PREFIX)
@@ -46,9 +46,9 @@ public class DraftButtonService {
         if (outcome == null) {
             return;
         }
-        if (outcome.equals(DELETE_BUTTON)) {
-            ButtonHelper.deleteTheOneButton(event);
-        } else if (outcome.equals(DELETE_MESSAGE)) {
+        if (DELETE_BUTTON.equals(outcome)) {
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        } else if (DELETE_MESSAGE.equals(outcome)) {
             ButtonHelper.deleteMessage(event);
         } else if (outcome.startsWith(USER_MISTAKE_PREFIX)) {
             String userMessage = outcome.substring(USER_MISTAKE_PREFIX.length());

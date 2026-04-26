@@ -2,7 +2,6 @@ package ti4.service.map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,28 +15,33 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ModalHandler;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.URLReaderHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
-import ti4.listeners.annotations.ModalHandler;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.json.JsonMapperManager;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.service.fow.LoreService;
 import ti4.service.fow.LoreService.LoreEntry;
+import tools.jackson.databind.json.JsonMapper;
 
 @UtilityClass
 public class MapJsonIOService {
-    private final ObjectMapper mapper = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    private static final JsonMapper mapper = JsonMapperManager.basic()
+            .rebuild()
+            .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
+            .build();
 
     @ModalHandler("importMapFromJSON")
     public void importMapFromJSON(ModalInteractionEvent event, Game game) {
@@ -154,7 +158,7 @@ public class MapJsonIOService {
         }
     }
 
-    public static void importMapFromJson(Game game, String jsonString, MessageChannel feedbackChannel) {
+    private static void importMapFromJson(Game game, String jsonString, MessageChannel feedbackChannel) {
         StringBuilder errorSb = new StringBuilder();
         try {
             MapDataIO mapData = mapper.readValue(jsonString, MapDataIO.class);
@@ -257,7 +261,7 @@ public class MapJsonIOService {
         if (tileIO.getBorderAnomalies() == null) return;
 
         for (BorderAnomalyIO anomalyIO : tileIO.getBorderAnomalies()) {
-            BorderAnomalyModel.BorderAnomalyType anomalyType = null;
+            BorderAnomalyModel.BorderAnomalyType anomalyType;
             try {
                 anomalyType = BorderAnomalyModel.BorderAnomalyType.valueOf(
                         anomalyIO.getType().toUpperCase());
@@ -371,7 +375,7 @@ public class MapJsonIOService {
                 .append(tileIO.getPosition())
                 .append(": ")
                 .append(message)
-                .append("\n");
+                .append('\n');
     }
 
     @Data

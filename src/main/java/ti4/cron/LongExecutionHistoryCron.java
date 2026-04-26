@@ -3,7 +3,8 @@ package ti4.cron;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import ti4.executors.ExecutionHistoryManager;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class LongExecutionHistoryCron {
@@ -14,6 +15,7 @@ public class LongExecutionHistoryCron {
     }
 
     private static void logCacheStats() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         try {
             ExecutionHistoryManager.logLongExecutions();
         } catch (Exception e) {

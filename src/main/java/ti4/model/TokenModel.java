@@ -61,6 +61,10 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
         return sb.toString();
     }
 
+    public String getNameRepresentation() {
+        return "_" + id + "_ " + source.emoji();
+    }
+
     @Override
     public MessageEmbed getRepresentationEmbed() {
         EmbedBuilder eb = new EmbedBuilder();
@@ -70,11 +74,11 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(sb.toString());
 
         sb = new StringBuilder();
-        if (spaceOrPlanet != null) sb.append("Location: ").append(spaceOrPlanet).append("\n");
+        if (spaceOrPlanet != null) sb.append("Location: ").append(spaceOrPlanet).append('\n');
         if (tokenPlanetName != null)
-            sb.append("Planet: ").append(tokenPlanetName).append("\n");
-        if (attachmentID != null) sb.append("Attachment: ").append(attachmentID).append("\n");
-        if (wormholes != null) sb.append("Wormhole(s): ").append(wormholes).append("\n");
+            sb.append("Planet: ").append(tokenPlanetName).append('\n');
+        if (attachmentID != null) sb.append("Attachment: ").append(attachmentID).append('\n');
+        if (wormholes != null) sb.append("Wormhole(s): ").append(wormholes).append('\n');
         if (isAnomaly != null) sb.append("Anomaly ");
         if (isAsteroids != null) sb.append("Asteroids ");
         if (isRift != null) sb.append("Rift ");

@@ -1,20 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.5.5</version>
+    <version>4.0.3</version>
   </parent>
 
   <groupId>me.terterro</groupId>
   <artifactId>TI4_map_generator_discord_bot</artifactId>
   <version>1.0-SNAPSHOT</version>
+
   <properties>
-    <maven.compiler.source>21</maven.compiler.source>
-    <maven.compiler.target>21</maven.compiler.target>
+    <java.version>21</java.version>
+    <jda.version>6.4.1</jda.version>
+    <aws.sdk.version>2.42.26</aws.sdk.version>
+    <hibernate-dialects.version>7.3.0.Final</hibernate-dialects.version>
+    <reflections.version>0.10.2</reflections.version>
+    <jskills.version>1.1</jskills.version>
+    <webp-imageio.version>0.10.2</webp-imageio.version>
+    <jemoji.version>1.7.6</jemoji.version>
+    <spotless.version>3.4.0</spotless.version>
+    <spotless.skip>false</spotless.skip>
+    <spotbugs.version>4.9.8</spotbugs.version>
+    <spotbugs-maven-plugin.version>4.9.8.2</spotbugs-maven-plugin.version>
+    <findsecbugs.version>1.14.0</findsecbugs.version>
+    <sb-contrib.version>7.7.4</sb-contrib.version>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>bom</artifactId>
+        <version>${aws.sdk.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -41,23 +67,26 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.xerial</groupId>
       <artifactId>sqlite-jdbc</artifactId>
-      <version>3.50.3.0</version>
     </dependency>
     <dependency>
       <groupId>org.hibernate.orm</groupId>
       <artifactId>hibernate-community-dialects</artifactId>
+      <version>${hibernate-dialects.version}</version>
     </dependency>
+
     <dependency>
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-registry-prometheus</artifactId>
     </dependency>
+
     <dependency>
       <groupId>net.dv8tion</groupId>
       <artifactId>JDA</artifactId>
-      <version>6.1.3</version>
+      <version>${jda.version}</version>
       <exclusions>
         <exclusion>
           <groupId>club.minnced</groupId>
@@ -65,64 +94,65 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
-      <groupId>com.amazonaws</groupId>
-      <artifactId>aws-java-sdk-batch</artifactId>
-      <version>1.12.794</version>
-    </dependency>
+
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>s3</artifactId>
-      <version>2.39.6</version>
     </dependency>
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>batch</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.20.0</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.42</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.github.ben-manes.caffeine</groupId>
       <artifactId>caffeine</artifactId>
-      <version>3.2.3</version>
     </dependency>
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
-      <version>0.10.2</version>
+      <version>${reflections.version}</version>
     </dependency>
     <dependency>
       <groupId>de.gesundkrank.jskills</groupId>
       <artifactId>jskills</artifactId>
-      <version>1.1</version>
+      <version>${jskills.version}</version>
     </dependency>
     <dependency>
       <groupId>com.github.usefulness</groupId>
       <artifactId>webp-imageio</artifactId>
-      <version>0.10.2</version>
-    </dependency>
-    <!-- TEST -->
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.12.2</version>
-      <scope>test</scope>
+      <version>${webp-imageio.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.assertj</groupId>
-      <artifactId>assertj-core</artifactId>
-      <version>3.27.4</version>
-      <scope>test</scope>
+      <groupId>net.fellbaum</groupId>
+      <artifactId>jemoji</artifactId>
+      <version>${jemoji.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>5.20.0</version>
+      <groupId>com.rollbar</groupId>
+      <artifactId>rollbar-java</artifactId>
+      <version>2.0.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.spotbugs</groupId>
+      <artifactId>spotbugs-annotations</artifactId>
+      <version>${spotbugs.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -132,18 +162,19 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <release>21</release>
+          <excludes>
+            <exclude>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+            </exclude>
+          </excludes>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.5.3</version>
         <configuration>
           <environmentVariables>
             <DB_PATH>./src/test/resources</DB_PATH>
@@ -151,27 +182,11 @@
           </environmentVariables>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>
-        <version>3.1.0</version>
-        <configuration>
-          <lineEndings>GIT_ATTRIBUTES</lineEndings>
-          <encoding>UTF-8</encoding>
-          <java>
-            <cleanthat/>
-            <removeUnusedImports/>
-            <formatAnnotations/>
-            <palantirJavaFormat/>
-            <toggleOffOn/>
-          </java>
-          <pom>
-            <sortPom>
-              <expandEmptyElements>false</expandEmptyElements>
-              <sortProperties>true</sortProperties>
-            </sortPom>
-          </pom>
-        </configuration>
+        <version>${spotless.version}</version>
         <executions>
           <execution>
             <goals>
@@ -180,7 +195,80 @@
             <phase>validate</phase>
           </execution>
         </executions>
+        <configuration>
+          <skip>${spotless.skip}</skip>
+          <java>
+            <cleanthat>
+              <sourceJdk>${java.version}</sourceJdk>
+              <mutators>
+                <mutator>SafeAndConsensual</mutator>
+                <mutator>SafeButNotConsensual</mutator>
+                <mutator>SafeButControversial</mutator>
+              </mutators>
+              <excludedMutators>
+                <excludedMutator>AvoidInlineConditionals</excludedMutator>
+              </excludedMutators>
+            </cleanthat>
+            <removeUnusedImports/>
+            <palantirJavaFormat/>
+            <toggleOffOn/>
+          </java>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+        <version>${spotbugs-maven-plugin.version}</version>
+        <configuration>
+          <effort>Max</effort>
+          <!-- Start to avoid drowning in lower-priority noise; tighten later -->
+          <threshold>High</threshold>
+          <failOnError>true</failOnError>
+          <xmlOutput>true</xmlOutput>
+          <htmlOutput>true</htmlOutput>
+          <sarifOutput>true</sarifOutput>
+          <excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
+          <plugins>
+            <plugin>
+              <groupId>com.h3xstream.findsecbugs</groupId>
+              <artifactId>findsecbugs-plugin</artifactId>
+              <version>${findsecbugs.version}</version>
+            </plugin>
+            <plugin>
+              <groupId>com.mebigfatguy.sb-contrib</groupId>
+              <artifactId>sb-contrib</artifactId>
+              <version>${sb-contrib.version}</version>
+            </plugin>
+          </plugins>
+        </configuration>
+        <executions>
+          <execution>
+            <id>spotbugs-check</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>ci-spotless</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.diffplug.spotless</groupId>
+            <artifactId>spotless-maven-plugin</artifactId>
+            <configuration>
+              <ratchetFrom>origin/master</ratchetFrom>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

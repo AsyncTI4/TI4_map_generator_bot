@@ -9,7 +9,9 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.BreakthroughHelper;
 import ti4.helpers.ButtonHelper;
@@ -19,8 +21,6 @@ import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.info.ListPlayerInfoService;
@@ -107,6 +107,14 @@ public class ScorePublicObjectiveService {
     private static void informAboutScoring(
             GenericInteractionCreateEvent event, MessageChannel channel, Game game, Player player, int poID) {
         String both = getNameNEMoji(game, poID);
+        String id = "";
+        Map<String, Integer> revealedPublicObjectives = game.getRevealedPublicObjectives();
+        for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+            if (po.getValue().equals(poID)) {
+                id = po.getKey();
+                break;
+            }
+        }
         String poName = both.split("_")[0];
         String emojiName = both.split("_")[1];
 
@@ -127,18 +135,20 @@ public class ScorePublicObjectiveService {
         }
         if (player.hasTech("tf-yinascendant") && !poName.toLowerCase().contains("custodian")) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), player.getRepresentation() + " gains 1 card due to Yin Ascendant.");
+                    player.getCorrectChannel(), player.getRepresentation() + " gains 1 card due to _Yin Ascendant_.");
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
             buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
             buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
-            buttons.add(Buttons.red("deleteButtons", "Done resolving"));
-            String message2 = player.getRepresentationUnfogged() + " use buttons to resolve.";
+            buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+            String message2 = player.getRepresentationUnfogged() + ", please use these buttons to resolve.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
         if (!poName.toLowerCase().contains("custodian")
                 && (player.hasAbility("yin_breakthrough") || player.hasUnlockedBreakthrough("yinbt"))) {
-            BreakthroughHelper.resolveYinBreakthroughAbility(game, player);
+            if (Mapper.getPublicObjective(id) != null || Mapper.getSecretObjective(id) != null) {
+                BreakthroughHelper.resolveYinBreakthroughAbility(game, player);
+            }
         }
         String idC = "";
         for (Entry<String, Integer> po : game.getRevealedPublicObjectives().entrySet()) {
@@ -152,11 +162,8 @@ public class ScorePublicObjectiveService {
                 Player p2 = game.getPlayerFromColorOrFaction(game.getStoredValue("toldarHeroPlayer"));
                 MessageHelper.sendMessageToChannel(
                         p2.getCorrectChannel(),
-                        p2.getRepresentation() + " gains 2 command tokens due to their Concord Renewed hero ability.");
-                List<Button> buttons = ButtonHelper.getGainCCButtons(p2);
-                String message2 = p2.getRepresentationUnfogged() + ", your current command tokens are "
-                        + p2.getCCRepresentation() + ". Use buttons to gain 2 command tokens.";
-                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message2, buttons);
+                        p2.getRepresentation() + " draws 1 secret objective due to their Toldar hero ability.");
+                DrawSecretService.drawSO(event, game, p2);
             }
         }
         if (player.hasAbility("reflect")) {
@@ -168,9 +175,7 @@ public class ScorePublicObjectiveService {
                         player.getCorrectChannel(),
                         player.getRepresentation()
                                 + " is drawing 1 action card due to scoring an objective someone else already scored while having the _Reflect_ Honor card.");
-                game.drawActionCard(player.getUserID());
-                ButtonHelper.checkACLimit(game, player);
-                ActionCardHelper.sendActionCardInfo(game, player, event);
+                ActionCardHelper.drawActionCardsSilent(player, 1);
             }
         }
         if (game.isOmegaPhaseMode()) {

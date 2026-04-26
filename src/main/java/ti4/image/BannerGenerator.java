@@ -6,10 +6,10 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.image.FileUploadService;
 
@@ -19,7 +19,7 @@ public class BannerGenerator {
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
     private static final BasicStroke stroke6 = new BasicStroke(6.0f);
     private static final BasicStroke stroke8 = new BasicStroke(8.0f);
-    private static final double NINETY_DEGREES_RADIANS = 1.5707963267948966;
+    private static final double NINETY_DEGREES_RADIANS = 1.570_796_326_794_896_6;
     private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -NINETY_DEGREES_RADIANS;
 
     public static void drawFactionBanner(Player player) {

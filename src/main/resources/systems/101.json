@@ -1,1 +1,15 @@
-{"id":"101","name":"Olergodt","aliases":["te18","olergodt"],"imagePath":"101_Olergodt.png","planets":["olergodt"],"shipPositionsType":"TYPE04","tileBack":"blue","source":"thunders_edge"}
+{
+    "id": "101",
+    "name": "Olergodt",
+    "aliases": [
+        "te18",
+        "olergodt"
+    ],
+    "imagePath": "101_Olergodt.png",
+    "planets": [
+        "olergodt"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "blue",
+    "source": "thunders_edge"
+}

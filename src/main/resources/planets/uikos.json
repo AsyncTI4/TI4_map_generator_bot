@@ -18,7 +18,7 @@
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": "Harvest",
-    "legendaryAbilityText": "After a player gains a Path token, place 1 commodity from the supply on this card. At the end of your turn, you may exhaust this card to gain all commodities on this card",
+    "legendaryAbilityText": "After a player gains a Path token, place 1 commodity from the supply on this card. When you pass, you may exhaust this card to gain all commodities on this card",
     "unitPositions": {
         "unitHolderName": "uikos",
         "coordinateMap": {

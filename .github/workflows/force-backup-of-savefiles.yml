@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: executing remote ssh commands using password
+        id: backup
+        continue-on-error: true
         uses: appleboy/ssh-action@master
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
@@ -20,11 +22,39 @@ jobs:
           username: ${{ secrets.HOSTINGER_SSH_USER }}
           password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
+          timeout: 60s
           envs: DISCORD_WEBHOOK_URL
           script: |
             set -eu
             cd ${{ vars.HOST_TI4_SAVES_DIR }}
             echo "FORCING BACKUP OF SAVE FILES"
+            rm -f .git/index.lock
+            git add -A
+            if git diff-index --quiet HEAD; then
+              echo "No changes to commit"
+            else
+              git commit -m "save files"
+            fi
+            git push
+            curl -X POST -H 'Content-Type: application/json' -d '{"content":"Backup Successful"}' $DISCORD_WEBHOOK_URL
+            echo "DONE!"
+
+      - name: retry executing remote ssh commands using password
+        if: steps.backup.outcome == 'failure'
+        uses: appleboy/ssh-action@master
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        with:
+          host: ${{ secrets.HOSTINGER_SSH_HOST }}
+          username: ${{ secrets.HOSTINGER_SSH_USER }}
+          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+          port: ${{ secrets.HOSTINGER_SSH_PORT }}
+          timeout: 60s
+          envs: DISCORD_WEBHOOK_URL
+          script: |
+            set -eu
+            cd ${{ vars.HOST_TI4_SAVES_DIR }}
+            echo "FORCING BACKUP OF SAVE FILES (retry)"
             rm -f .git/index.lock
             git add -A
             if git diff-index --quiet HEAD; then

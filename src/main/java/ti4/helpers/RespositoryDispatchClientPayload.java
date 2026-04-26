@@ -2,12 +2,14 @@ package ti4.helpers;
 
 import java.util.HashMap;
 import java.util.Map;
+import lombok.Getter;
 
+@Getter
 class RespositoryDispatchClientPayload {
     private final Map<String, String> records;
 
     /**
-     * https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#create-a-repository-dispatch-event
+     * <a href="https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#create-a-repository-dispatch-event">...</a>
      */
     public RespositoryDispatchClientPayload(Map<String, String> records) {
         this.records = records;
@@ -19,10 +21,6 @@ class RespositoryDispatchClientPayload {
 
     public void addRecord(String key, String value) {
         records.put(key, value);
-    }
-
-    public Map<String, String> getRecords() {
-        return records;
     }
 
     public boolean isValid() {

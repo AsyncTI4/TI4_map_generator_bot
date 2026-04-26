@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -31,25 +32,25 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
-import ti4.buttons.Buttons;
-import ti4.commands.CommandHelper;
+import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.commands.CommandHelper;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.image.ImageHelper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.service.async.ReserveGameNumberService;
 import ti4.service.image.FileUploadService;
 import ti4.settings.GlobalSettings;
 import ti4.settings.users.UserSettingsManager;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class CreateGameService {
@@ -84,7 +85,7 @@ public class CreateGameService {
         String threadName = "game-starts-and-ends";
         // SEARCH FOR EXISTING OPEN THREAD
         for (ThreadChannel threadChannel_ : threadChannels) {
-            if (threadChannel_.getName().equals(threadName)) {
+            if (threadName.equals(threadChannel_.getName())) {
                 String guildName = game.getGuild() == null
                         ? "Server Unknown"
                         : game.getGuild().getName();
@@ -113,7 +114,7 @@ public class CreateGameService {
         if (!serverCanHostNewGame(guild)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+                    "Server **" + guild.getName() + "** cannot host a new game - please contact @Admin to resolve.");
             return null;
         }
 
@@ -127,7 +128,7 @@ public class CreateGameService {
         }
 
         // CHECK IF GUILD HAS ALL PLAYERS LISTED
-        List<Member> missingMembers = inviteUsersToServer(guild, members, event.getMessageChannel());
+        List<Member> missingMembers = inviteUsersToServer(guild, members, event.getMessageChannel(), gameName);
 
         // CREATE ROLE
         Role role = guild.createRole().setName(gameName).setMentionable(true).complete();
@@ -140,6 +141,13 @@ public class CreateGameService {
 
         // CREATE GAME
         Game newGame = createNewGame(gameName, gameOwner);
+        if (event.getChannel() instanceof ThreadChannel thread) {
+            if (thread.getName().toLowerCase().contains("tigl")
+                    || newGame.getCustomName().toLowerCase().contains("tigl")
+                    || "making-tigl-games".equals(thread.getParentChannel().getName())) {
+                gameFunName = "TIGL " + gameFunName;
+            }
+        }
 
         // ADD PLAYERS
         for (Member member : members) {
@@ -157,7 +165,7 @@ public class CreateGameService {
         String newActionsChannelName = gameName + Constants.ACTIONS_CHANNEL_SUFFIX;
         String newBotThreadName = gameName + Constants.BOT_CHANNEL_SUFFIX;
         long gameRoleID = role.getIdLong();
-        long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+        long permission = Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
         // CREATE TABLETALK CHANNEL
         TextChannel chatChannel = guild.createTextChannel(newChatChannelName, categoryChannel)
@@ -207,6 +215,9 @@ public class CreateGameService {
 
         // Create Cards Info Threads
         for (Player player : newGame.getPlayers().values()) {
+            if (player.isNpc() || player.isDummy()) {
+                continue;
+            }
             player.getCardsInfoThread();
         }
 
@@ -224,15 +235,19 @@ public class CreateGameService {
         if (event.getChannel() instanceof ThreadChannel thread
                 && ("making-new-games".equals(thread.getParentChannel().getName())
                         || "making-private-games"
+                                .equals(thread.getParentChannel().getName())
+                        || "making-tigl-games".equals(thread.getParentChannel().getName())
+                        || "making-superfast-games"
                                 .equals(thread.getParentChannel().getName()))) {
             newGame.setLaunchPostThreadID(thread.getId());
+            if (thread.getName().toLowerCase().contains("tigl")
+                    || newGame.getCustomName().toLowerCase().contains("tigl")
+                    || "making-tigl-games".equals(thread.getParentChannel().getName())) {
+                TIGLHelper.initializeTIGLGame(newGame);
+            }
             ThreadChannelManager manager = thread.getManager()
                     .setName(StringUtils.left(newGame.getName() + "-launched [FULL] - " + thread.getName(), 100))
                     .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
-            if (thread.getName().toLowerCase().contains("tigl")
-                    || newGame.getCustomName().toLowerCase().contains("tigl")) {
-                TIGLHelper.initializeTIGLGame(newGame);
-            }
             if (missingMembers.isEmpty()) {
                 manager = manager.setArchived(true);
             }
@@ -280,10 +295,10 @@ public class CreateGameService {
         buttons.add(Buttons.gray("chooseExp_oldPoK", "Old PoK"));
         buttons.add(Buttons.blue("chooseExp_te", "Thunder's Edge + New PoK"));
         String expMsg = """
-                Which expansion are you using for this game?
+                ## Which expansion are you using for this game? (Required)
                 -# This will adjust available components accordingly. To elaborate on the options:
-                > **New PoK** - Use components from Prophecy of Kings and Thunder's Edge, but don't include the new factions, breakthroughs, ACs, or the fracture. This mode has the new relics, finalized codex cards (except Xxcha hero), new tiles, and new Strategy Cards. It is the default if you do not press any of these buttons.
-                > **Old PoK** - Use only components from Prophecy of Kings expansion + Codex 1-4.5
+                > **New PoK** - Use components from Prophecy of Kings and Thunder's Edge, but don't include the new factions, breakthroughs, action cards, or The Fracture. This mode has the new relics, finalized Codex cards (except Xxcha hero), new tiles, and new Strategy Cards. It is the default if you do not press any of these buttons.
+                > **Old PoK** - Use only components from Prophecy of Kings expansion + Codicies 1-4.5
                 > **Thunder's Edge + New PoK** - Use components from both expansions, including all mechanics from Thunder's Edge.\
 
                 -# Please realize that these are broad overviews and that some small components may not fit perfectly into these categories.""";
@@ -413,6 +428,11 @@ public class CreateGameService {
      * @return the list of missing members
      */
     public static List<Member> inviteUsersToServer(Guild guild, List<Member> members, MessageChannel channel) {
+        return inviteUsersToServer(guild, members, channel, null);
+    }
+
+    public static List<Member> inviteUsersToServer(
+            Guild guild, List<Member> members, MessageChannel channel, String gameName) {
         List<String> guildMemberIDs =
                 guild.getMembers().stream().map(ISnowflake::getId).toList();
         List<Member> missingMembers = new ArrayList<>();
@@ -427,21 +447,24 @@ public class CreateGameService {
                     "### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join our **");
             sb.append(guild.getName()).append("** server.\n");
             sb.append(Helper.getGuildInviteURL(guild, missingMembers.size() + 15))
-                    .append("\n");
+                    .append('\n');
             sb.append("The following players need to join the server:\n");
             for (Member member : missingMembers) {
-                sb.append("> ").append(member.getAsMention()).append("\n");
+                sb.append("> ").append(member.getAsMention()).append('\n');
             }
-            sb.append(
-                    "You will be automatically added to the game channels when you join the server."
-                            + "\nNote that if for some reason you are not automatically added to the game after joining the server,"
-                            + " you can fix this by having one of the other game members run `/game ping` in the actions channel.");
+            sb.append("You will be automatically added to the game channels when you join the server.");
             MessageHelper.sendMessageToChannel(channel, sb.toString());
+            String msg2 =
+                    "If you have joined the server and cannot find your game, please click this button. If the invite has expired, please press this other button.";
+            String findGameButtonId = gameName == null ? "pingGame" : "pingGame_" + gameName;
+            Button findGameButton = Buttons.green(findGameButtonId, "Locate My Game");
+            Button resendInvite = Buttons.blue("resendInvite_" + guild.getId(), "Resend Server Invite");
+            MessageHelper.sendMessageToChannelWithButtons(channel, msg2, List.of(findGameButton, resendInvite));
         }
         return missingMembers;
     }
 
-    public static Integer getNextGameNumber() {
+    private static Integer getNextGameNumber() {
         List<Integer> existingNums = getAllExistingPBDNumbers();
         if (existingNums.isEmpty()) {
             return 1;
@@ -723,6 +746,56 @@ public class CreateGameService {
 
     public static boolean isGameCreationAllowed() {
         return GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.ALLOW_GAME_CREATION.toString(), Boolean.class, true);
+                GlobalSettings.ImplementedSettings.ALLOW_GAME_CREATION.toString(), Boolean.class, Boolean.TRUE);
+    }
+
+    public String autoGenerateGameName() {
+        // spotless:off
+        // if these words are changed, please replace them in place, to avoid disrupting the generation algorithm
+        // i.e. avoid deleting a word and putting a new word at the end, instead put the new word where the old word was
+        List<String> words = new ArrayList<>(Arrays.asList(
+            "Relativity", "Photon", "Crystalline", "Exoplanet", "Lunar", "Ecosystem", "Metastable", "Halogen",
+            "Fluorescence", "Helium", "Tachyon", "Jetpack", "Pluto", "Interstellar", "Cryptography", "Blueprint",
+            "Fission", "Disruptor", "Monolith", "Domino", "Doppelganger", "Freefall", "Zeta", "Hypocube",
+            "Levitation", "Chemical", "Biohazard", "Frequency", "Equinox", "Extrapolate", "Nanocarbon", "Cygnus",
+            "Labyrinth", "Zenith", "Acidic", "Oxygen", "Primordial", "Havoc", "Neutrino", "Vorpal",
+            "Solstice", "Qubit", "Cephalopod", "Vertebrate", "Magnetron", "Obelisk", "Yggdrasil", "Jargon",
+            "Compass", "Machination", "Incorporeal", "Electron", "Maglev", "Radiant", "Cosmology", "Tensor",
+            "Cryosleep", "Incandescent", "Eigenvector", "Atomizer", "Retina", "Dragonfly", "Nanotube",  "Mnemonic",
+            "Muon", "Convex", "Nulldrive", "Failsafe", "Equilibrium", "Abyss", "Hydra", "Friction",
+            "Equatorial", "Incursion", "Solenoid", "Illusion", "Inhibitor", "Sundial", "Microchip", "Krypton",
+            "Gravitational", "Entropy", "Taurus", "Hyperion", "Deuterium", "Voltage", "Viscosity", "Logarithm",
+            "Centrifuge", "Mercury", "Ioniser", "Parabola", "Starlight", "Hydrocarbon", "Precursor", "Scorpius",
+            "Covalent", "Paradox", "Chromosome", "Incognita", "Polarity", "Wintermute", "Imprint", "Overclock",
+            "Thermodynamics", "Zephyr", "Quadrant", "Cortex", "Luminance", "Irradiated", "Polymer", "Fluctuation",
+            "Cryogenics", "Pegasus", "Ferrocore", "Quaternary", "Ultrasonic", "Quasar", "Kinetic", "Chimera",
+            "Turbine", "Transduction", "Isotope", "Quicksilver", "Jovian", "Lateral", "Lithium", "Neurotoxin",
+            "Osmosis", "Thunderchild", "Piezoelectric", "Ablation", "Gigawatt", "Leviathan", "Moonstone", "Emerald",
+            "Toxicology", "Immaterial", "Disintegration", "Harmonics", "Android", "Constellation", "Parallax", "Cyborg",
+            "Tesseract", "Jupiter", "Volatile", "Moebius", "Uranium", "Phoenix", "Hardwired", "Uninhabitable",
+            "Phosphorus", "Horizon", "Oscillation", "Waveform", "Banshee", "Dissonance", "Omicron", "Xenobiology",
+            "Continuum", "Spacetime", "Eclipse", "Ultimatum", "Junkyard", "Inertia", "Hovercraft", "Symbiotic",
+            "Cellular", "Celestial", "Instability", "Decontamination", "Valence", "Diffusion", "Fractal", "Radioactive",
+            "Caduceus", "Quotient", "Atmosphere", "Apparatus", "Infosphere", "Juggernaut", "Pendulum", "Spectral",
+            "Harbinger", "Venus", "Lambda", "Alkaline", "Voyage", "Ozone", "Iota", "Synapse",
+            "Datastream", "Redshift", "Cerebral", "Fungi", "Wetware", "Dendrite", "Ziggurat", "Vermilion",
+            "Neptune", "Pathology", "Orthogonal", "Yesteryear", "Dinosaur", "Andromeda", "Catalyst", "Fabricator",
+            "Portal", "Molecular", "Encryption", "Hydrogen", "Theta", "Angstrom", "Epoch", "Digital",
+            "Sentinel", "Synchronisation", "Coriolis", "Comet", "Resonance", "Topography", "Gargoyle", "Forcefield",
+            "Citadel", "Hologram", "Circuitry", "Gemini", "Cyberspace", "Graphite", "Synthetic", "Trajectory",
+            "Nitrogen", "Odyssey", "Bioluminescence", "Lagrange", "Lightspeed", "Helix", "Photosynthesis", "Interface",
+            "Nanite", "Glacier", "Astrolabe", "Ultraviolet", "Enthalpy", "Observatory", "Solar", "Vacuum",
+            "Infrared", "Kaleidoscope", "Magnetosphere", "Gyroscope", "Diamond", "Optic", "Enzyme", "Causality"));
+        // extra words: "Waypoint", "Faraday", "Perihelion", "Penumbra", "Barycentric", "Helical", "Stoichiometry", "Mechatronic", "Cognitive", "Newtonian"
+        // avoid words that are similar to names of TI4 components (or parts thereof) e.g. "Quantum"
+        // also avoid words that are similar to existing words or the list e.g. "Cyberspace" -> Nullspace", "Subspace", "Hyperspace"
+        // spotless:on
+        int gameNumber = getNextGameNumber();
+        int first = gameNumber & 0xFF;
+        int second = (gameNumber >> 8) & 0xFF;
+        int third = (gameNumber >> 16) & 0xFF;
+        second ^= first;
+        third ^= second;
+        return words.get(37 * first & 0xFF) + "-" + words.get(53 * second & 0xFF) + "-" + words.get(83 * third & 0xFF);
     }
 }

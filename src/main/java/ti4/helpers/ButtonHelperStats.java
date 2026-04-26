@@ -5,14 +5,14 @@ import java.util.regex.Pattern;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.message.MessageHelper;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.regex.RegexService;
 
-public class ButtonHelperStats {
+public final class ButtonHelperStats {
 
     private static final Pattern convertCommsRegex =
             Pattern.compile("convertComms_" + RegexHelper.intRegex("amt") + "(_stay)?");
@@ -49,22 +49,22 @@ public class ButtonHelperStats {
         if (player.getCommodities() >= amt) {
             player.setCommodities(player.getCommodities() - amt);
             player.setTg(player.getTg() + amt);
-            message = "Converted " + amt + " commodit" + (amt == 1 ? "y" : "ies") + " to " + amt + " trade good"
+            message = "onverted " + amt + " commodit" + (amt == 1 ? "y" : "ies") + " to " + amt + " trade good"
                     + (amt == 1 ? "" : "s") + ".";
         } else if (player.getCommodities() == 1) {
-            message = "Converted their last remaining commodity (less than " + amt + ") into 1 trade good.";
+            message = "onverted their last remaining commodity (less than " + amt + ") into 1 trade good.";
             player.setTg(player.getTg() + player.getCommodities());
             player.setCommodities(0);
         } else {
-            message = "Converted their " + player.getCommodities() + " remaining commodities (less than " + amt
+            message = "onverted their " + player.getCommodities() + " remaining commodities (less than " + amt
                     + ") into " + player.getCommodities() + " trade goods.";
             player.setTg(player.getTg() + player.getCommodities());
             player.setCommodities(0);
         }
-        if (game.isFowMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
+        if (game.isFowMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, "C" + message);
 
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ident + " " + message);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ident + " c" + message);
 
         if (deleteMsg) ButtonHelper.deleteMessage(event);
     }
@@ -148,9 +148,17 @@ public class ButtonHelperStats {
         CommanderUnlockCheckService.checkPlayer(player, "mykomentori");
         Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
         if (obsidian != null && obsidian.getPuppetedFactionsForPlot("siphon").contains(player.getFaction())) {
-            String siphonMsg = obsidian.getRepresentation()
-                    + " the puppeted player for Siphon has gained commodities, so you gain " + realGain
-                    + " trade goods. ";
+            String siphonMsg;
+            if (game.isFowMode()) {
+                siphonMsg = obsidian.getRepresentation()
+                        + ", the puppeted player for _Siphon_ has gained commodities, so you gain " + realGain
+                        + " trade goods. ";
+            } else {
+                siphonMsg = obsidian.getRepresentation()
+                        + ", your puppet, " + player.getRepresentationNoPing()
+                        + ", has gained commodities, and so you have _Siphon_'d " + realGain
+                        + " trade goods. ";
+            }
             siphonMsg += "(" + obsidian.getTg() + "->" + (obsidian.getTg() + realGain) + ")";
             MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), siphonMsg);
             obsidian.setTg(obsidian.getTg() + realGain);

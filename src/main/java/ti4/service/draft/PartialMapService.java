@@ -2,15 +2,16 @@ package ti4.service.draft;
 
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.game.Game;
+import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.MapTemplateHelper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
-import ti4.map.Game;
-import ti4.map.Tile;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
@@ -115,7 +116,7 @@ public class PartialMapService {
                     continue;
                 }
 
-                if (templateTile.getPlayerNumber() != position) {
+                if (!Objects.equals(templateTile.getPlayerNumber(), position)) {
                     // Doesn't pertain to this player
                     continue;
                 }

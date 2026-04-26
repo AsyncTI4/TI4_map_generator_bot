@@ -85,7 +85,7 @@ public class ManualPrometheusRegistryConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(MeterRegistry.class)
-    public MeterRegistry meterRegistry(PrometheusConfig config, Clock clock) {
+    public MeterRegistry meterRegistry(PrometheusConfig config) {
         // Use the default Prometheus CollectorRegistry to ensure Actuator (if present) sees the same registry.
         return new PrometheusMeterRegistry(config);
     }

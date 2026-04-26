@@ -1,0 +1,16 @@
+{
+    "id": "br9",
+    "name": "Sarcosa - Sarcosa",
+    "aliases": [
+        "br9",
+        "sarcosa"
+    ],
+    "imagePath": "BR9_Sarcosa.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "sarcosa"
+    ],
+    "source": "ds",
+    "tileBack": "green"
+}

@@ -7,27 +7,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.UnitHolder;
 import ti4.model.ColorModel;
 import ti4.model.PromissoryNoteModel;
 
 @UtilityClass
 public class ColorChangeHelper {
 
-    public static boolean colorIsExclusive(String color, Player player) {
+    public static boolean isColorAllowedForPlayer(String color, Player player) {
         String colorID = Mapper.getColorID(color);
         return switch (colorID) {
             // Riftset is exclusive to eronous always
-            case "ero" -> !player.getUserID().equals(Constants.eronousId);
+            case "ero" -> Constants.eronousId.equals(player.getUserID());
             // Lightgray is exclusive to chassit if chassit is in the game
             case "lgy" ->
-                !player.getUserID().equals(Constants.chassitId)
-                        && player.getGame().getPlayerIDs().contains(Constants.chassitId);
-            default -> false;
+                !player.getGame().getPlayerIDs().contains(Constants.chassitId)
+                        || Constants.chassitId.equals(player.getUserID());
+            default -> true;
         };
     }
 
@@ -70,13 +70,15 @@ public class ColorChangeHelper {
             }
 
             // Debt Tokens
-            Map<String, Integer> debtTokens = new LinkedHashMap<>(playerInfo.getDebtTokens());
-            for (Map.Entry<String, Integer> entry : debtTokens.entrySet()) {
-                String color = entry.getKey();
-                if (color.equals(oldColor)) {
-                    Integer count = entry.getValue();
-                    playerInfo.clearAllDebtTokens(color);
-                    playerInfo.addDebtTokens(newColor, count);
+            for (String pool : playerInfo.getAllDebtTokens().keySet()) {
+                Map<String, Integer> debtTokens = new LinkedHashMap<>(playerInfo.getDebtTokens(pool));
+                for (Map.Entry<String, Integer> entry : debtTokens.entrySet()) {
+                    String color = entry.getKey();
+                    if (color.equals(oldColor)) {
+                        Integer count = entry.getValue();
+                        playerInfo.clearAllDebtTokens(color, pool);
+                        playerInfo.addDebtTokens(newColor, count, pool);
+                    }
                 }
             }
         }
@@ -111,7 +113,7 @@ public class ColorChangeHelper {
         }
 
         PromissoryNoteModel genericPNModel = pnModel.getSourcePNModel();
-        return genericPNModel.getID().replace("<color>", newColorModel.getName());
+        return genericPNModel.getId().replace("<color>", newColorModel.getName());
     }
 
     private static void replaceIDsOnUnitHolder(UnitHolder unitHolder, String oldColorID, String newColorID) {

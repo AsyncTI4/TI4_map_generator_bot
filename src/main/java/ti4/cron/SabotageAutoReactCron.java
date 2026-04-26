@@ -6,16 +6,17 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
-import ti4.map.persistence.ManagedGame;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.button.ReactionService;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class SabotageAutoReactCron {
@@ -33,6 +34,7 @@ public class SabotageAutoReactCron {
     }
 
     private static void autoReact() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running SabotageAutoReactCron.");
 
         GameManager.getManagedGames().stream()
@@ -59,7 +61,7 @@ public class SabotageAutoReactCron {
         }
 
         for (Player player : game.getRealPlayers()) {
-            if (!playerShouldRandomlyReact(player) || SabotageService.canSabotage(player, game)) {
+            if (!playerShouldRandomlyReact(player, game)) {
                 continue;
             }
 
@@ -72,17 +74,16 @@ public class SabotageAutoReactCron {
         }
     }
 
-    private static boolean playerShouldRandomlyReact(Player player) {
-        if (player.isAFK() && player.getAcCount() != 0) {
+    private static boolean playerShouldRandomlyReact(Player player, Game game) {
+        if (player.isAFK() || player.getAutoSaboPassMedian() == 0) {
             return false;
         }
-        return shouldRandomlyReact(player);
-    }
 
-    private static boolean shouldRandomlyReact(Player player) {
-        if (player.getAutoSaboPassMedian() == 0) {
+        boolean canSabotage = SabotageService.canSabotage(player, game);
+        if (canSabotage) {
             return false;
         }
+
         int rollMax = player.getAutoSaboPassMedian() * RUNS_PER_HOUR;
         int rollResult = ThreadLocalRandom.current().nextInt(1, rollMax + 1);
         return rollResult == rollMax;

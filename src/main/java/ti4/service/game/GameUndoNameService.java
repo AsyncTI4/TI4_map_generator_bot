@@ -15,18 +15,19 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Storage;
-import ti4.map.Game;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 
 @UtilityClass
 public class GameUndoNameService {
 
     private static final Pattern lastestCommandPattern = Pattern.compile("^(?>latest_command ).*$");
     private static final Pattern lastModifiedPattern = Pattern.compile("^(?>last_modified_date ).*$");
+    private static final Pattern undoFileNamePattern = Pattern.compile("([A-Za-z0-9_-]+_\\d+\\.txt)");
     private static final Comparator<File> fileComparator =
             Comparator.comparingInt(file -> getUndoNumberFromFileName(file.getName()));
 
@@ -77,6 +78,23 @@ public class GameUndoNameService {
         String number = StringUtils.substringAfterLast(name, "_");
         number = StringUtils.substringBefore(number, ".txt");
         return StringUtils.isEmpty(number) ? 0 : Integer.parseInt(number);
+    }
+
+    public static Integer getUndoNumberFromSelection(String gameName, String selection) {
+        if (StringUtils.isBlank(selection)) {
+            return null;
+        }
+
+        // Accept either the raw filename or the human-readable autocomplete label.
+        var matcher = undoFileNamePattern.matcher(selection);
+        while (matcher.find()) {
+            String fileName = matcher.group(1);
+            if (StringUtils.startsWith(fileName, gameName + "_")) {
+                return getUndoNumberFromFileName(fileName);
+            }
+        }
+
+        return null;
     }
 
     public static List<Integer> getSortedUndoNumbers(String gameName) {

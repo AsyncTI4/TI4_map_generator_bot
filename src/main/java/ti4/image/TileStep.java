@@ -10,6 +10,7 @@ public enum TileStep {
     Wormholes,
     Anomalies,
     Aetherstream,
+    Exile,
     Legendaries,
     Empties,
     SpaceCannon,

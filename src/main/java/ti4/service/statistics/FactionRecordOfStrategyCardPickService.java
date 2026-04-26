@@ -7,15 +7,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.commands.statistics.GameStatisticsFilterer;
+import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GamesPage;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.StrategyCardModel;
 
 @UtilityClass
 public class FactionRecordOfStrategyCardPickService {
@@ -57,7 +58,7 @@ public class FactionRecordOfStrategyCardPickService {
                 .append(gamesThatHadThem)
                 .append(" Games)**__\n");
 
-        boolean sortOrderAscending = event.getOption("ascending", false, OptionMapping::getAsBoolean);
+        boolean sortOrderAscending = event.getOption("ascending", Boolean.FALSE, OptionMapping::getAsBoolean);
         Comparator<Map.Entry<String, Integer>> comparator = (o1, o2) -> {
             int o1total = o1.getValue();
             int o2total = o2.getValue();
@@ -67,7 +68,7 @@ public class FactionRecordOfStrategyCardPickService {
         AtomicInteger index = new AtomicInteger(1);
 
         scsPicked.entrySet().stream().sorted(comparator).forEach(techResearched -> {
-            sb.append("`")
+            sb.append('`')
                     .append(Helper.leftpad(String.valueOf(index.get()), 3))
                     .append(". ");
             sb.append("` ").append(techResearched.getKey());
@@ -77,7 +78,7 @@ public class FactionRecordOfStrategyCardPickService {
                         .append(custodians.getOrDefault(techResearched.getKey(), 0))
                         .append(" times)");
             }
-            sb.append("\n");
+            sb.append('\n');
             index.getAndIncrement();
         });
 
@@ -99,21 +100,20 @@ public class FactionRecordOfStrategyCardPickService {
             gamesThatHadThem.incrementAndGet();
             String[] scList = scs.split("_");
             for (String sc : scList) {
-                sc = game.getStrategyCardModelByInitiative(Integer.parseInt(sc))
-                        .get()
-                        .getName();
-                if (scsPicked.containsKey(sc)) {
-                    scsPicked.put(sc, scsPicked.get(sc) + 1);
-                } else {
-                    scsPicked.put(sc, 1);
+                if (!Helper.isInteger(sc)) {
+                    continue;
                 }
-                if (game.getCustodiansTaker() != null
-                        && game.getCustodiansTaker().equalsIgnoreCase(faction)) {
-                    if (custodians.containsKey(sc)) {
-                        custodians.put(sc, custodians.get(sc) + 1);
-                    } else {
-                        custodians.put(sc, 1);
-                    }
+                int scInitiative = Integer.parseInt(sc);
+                String scName = game.getStrategyCardModelByInitiative(scInitiative)
+                        .map(StrategyCardModel::getName)
+                        .orElse(null);
+                if (scName == null) {
+                    continue;
+                }
+                scsPicked.merge(scName, 1, Integer::sum);
+                String custodianTaker = game.getCustodiansTaker();
+                if (faction.equalsIgnoreCase(custodianTaker)) {
+                    custodians.merge(scName, 1, Integer::sum);
                 }
             }
         }

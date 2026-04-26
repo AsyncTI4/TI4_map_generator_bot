@@ -12,6 +12,11 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Constants;
@@ -19,11 +24,6 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
@@ -124,9 +124,9 @@ public class TacticalActionOutputService {
                     .append(" tile")
                     .append(distance == 1 ? "" : "s")
                     .append(" away)")
-                    .append("\n");
+                    .append('\n');
         } else {
-            summary.append(" (").append(distance).append(" away)").append("\n");
+            summary.append(" (").append(distance).append(" away)").append('\n');
         }
         if (movingUnitsFromTile.isEmpty()) {
             if (condensed) return null;
@@ -186,7 +186,7 @@ public class TacticalActionOutputService {
         }
         summary.append(String.join("\n", lines));
         String extraSummary = buildShortSummary(game, Set.of(tile.getPosition()));
-        if (extraSummary != null && inclSummary) summary.append("\n").append(extraSummary);
+        if (extraSummary != null && inclSummary) summary.append('\n').append(extraSummary);
         return summary.toString();
     }
 
@@ -227,9 +227,10 @@ public class TacticalActionOutputService {
         if (moveValue == 0) return "";
 
         String output = "";
+        int maxBonus = 0;
         if (distance > moveValue && distance < 90) {
             output += " (distance exceeds move value (" + distance + " > " + moveValue + ")";
-            int maxBonus = 0;
+
             if (player.hasTech("gd")) {
                 maxBonus++;
                 output += ", used _Gravity Drive_)";
@@ -239,7 +240,8 @@ public class TacticalActionOutputService {
             if (player.hasUnlockedBreakthrough("winnubt")
                     && game.getTileByPosition(game.getActiveSystem()).hasLegendary()) {
                 maxBonus++;
-                output += " (has Winnu Breakthrough for +1 movement for one ship when moving to a legendary tile)";
+                output +=
+                        " (has _Imperator_ for +1 movement for one ship when moving into a legendary planet's system)";
             }
             if (player.getTechs().contains("dsgledb")) {
                 maxBonus++;
@@ -250,9 +252,12 @@ public class TacticalActionOutputService {
                 output += " (gravity rifts along a path could add +" + (distance - riftDistance) + " movement if used)";
                 game.setStoredValue("possiblyUsedRift", "yes");
             }
-            if ((distance > (moveValue + maxBonus)) && game.isFowMode()) {
-                GMService.logPlayerActivity(game, player, output);
-            }
+        }
+        if ((distance > (moveValue + maxBonus)) && game.isFowMode()) {
+            GMService.logPlayerActivity(game, player, output);
+        }
+        if (distance > 90 && player.hasAbility("sundered")) {
+            output += " (__Warning__: has **Sundered**, and so cannot use wormholes)";
         }
         if (riftDistance < distance) {
             game.setStoredValue("possiblyUsedRift", "yes");
@@ -325,7 +330,10 @@ public class TacticalActionOutputService {
             bonusMoveValue++;
         }
 
-        if (player.hasAbility("song_of_something") && movingFromHome) {
+        if ((player.hasAbility("song_of_something")
+                        || player.hasAbility("echo_of_divergence")
+                        || player.hasAbility("echo_of_sacrifice"))
+                && movingFromHome) {
             bonusMoveValue++;
         }
         if (!game.getStoredValue("crucibleBoost").isEmpty()) {

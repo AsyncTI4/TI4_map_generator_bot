@@ -2,11 +2,11 @@ package ti4.helpers;
 
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.model.PublicObjectiveModel;
 
 @UtilityClass
@@ -27,7 +27,7 @@ public class ObjectiveHelper {
                     .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             String sb = player.getRepresentationUnfogged() + ", stage 1 public objective at location "
-                    + loc1 + ":\n" + po.getRepresentation(!po.getAlias().equalsIgnoreCase(Constants.IMPERIUM_REX_ID))
+                    + loc1 + ":\n" + po.getRepresentation(!Constants.IMPERIUM_REX_ID.equalsIgnoreCase(po.getAlias()))
                     + "\n";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb);
         }

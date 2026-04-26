@@ -2,15 +2,15 @@ package ti4.service.planet;
 
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 @UtilityClass
 public class EronousPlanetService {
     public static final String CANTRIS_ID = "cantris";
-    public static final String CANTRIS_PO = "The Starlight Throne";
+    private static final String CANTRIS_PO = "The Starlight Throne";
 
     public static void resolveCantrisPO(Game game, String planet, Player player) {
         if (!CANTRIS_ID.equalsIgnoreCase(planet)) return;

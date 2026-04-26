@@ -6,6 +6,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -13,10 +17,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.planet.AddPlanetToPlayAreaService;
@@ -100,6 +101,13 @@ public class AddUnitService {
             UnitType unitType = entry.getKey();
             Integer totalAmt = entry.getValue();
             String asyncId = unitType.getValue().toLowerCase();
+            if (player.getUnitsByAsyncID(asyncId).isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        game.getActionsChannel(),
+                        "Player " + player.getFactionEmojiOrColor() + " does not have any units of type "
+                                + unitType.humanReadableName() + ". Skipping.");
+                continue;
+            }
             UnitModel mod = player.getUnitsByAsyncID(asyncId).getFirst();
             // Ships go to space
             if (mod.getIsShip()
@@ -110,6 +118,12 @@ public class AddUnitService {
             }
 
             // Non-ships get distributed to planets, prioritizing high-resource planets
+            if (planetNames.isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        game.getActionsChannel(),
+                        "Could not find any planets for this unit list " + unitList + ". Let Fin know!");
+                continue;
+            }
             int minUnitsPerPlanet = totalAmt / planetNames.size();
             int remainder = totalAmt % planetNames.size();
             for (int i = 0; i < planetNames.size(); i++) {
@@ -133,9 +147,9 @@ public class AddUnitService {
             }
             unitListBuilder
                     .append(parsedUnit.getCount())
-                    .append(" ")
+                    .append(' ')
                     .append(parsedUnit.getUnitKey().asyncID())
-                    .append(" ")
+                    .append(' ')
                     .append(parsedUnit.getLocation());
             first = false;
         }

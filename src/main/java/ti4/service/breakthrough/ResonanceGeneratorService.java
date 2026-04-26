@@ -8,16 +8,17 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.service.combat.StartCombatService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
@@ -27,12 +28,15 @@ public class ResonanceGeneratorService {
         return Mapper.getBreakthrough("crimsonbt").getNameRepresentation();
     }
 
-    public void checkCrimsonCommanderUnlock(Game game, Player player, Tile tile) {
-        if (player.hasLeader("crimsoncommander")) {
-            for (Player p2 : game.getRealPlayers()) {
+    private void checkCrimsonCommanderUnlock(Game game, Player player, Tile tile) {
+        if (player.hasLeader("crimsoncommander") && !player.hasLeaderUnlocked("crimsoncommander")) {
+            for (Player p2 : game.getRealPlayersNNeutral()) {
                 if (p2 == player) continue;
                 if (tile.containsPlayersUnits(p2)) {
                     CommanderUnlockCheckService.checkPlayer(player, "crimson");
+                    for (Player p : game.getRealPlayers()) {
+                        StartCombatService.offerRedGhostCommanderButtons(p, game, tile, null);
+                    }
                     break;
                 }
             }
@@ -61,7 +65,7 @@ public class ResonanceGeneratorService {
         buttons.add(Buttons.red(player.finChecker() + "deleteButtons", "Delete these buttons"));
 
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(), "Choose a tile to place or flip a breach", buttons);
+                player.getCorrectChannel(), "Choose a tile to place or flip a breach.", buttons);
     }
 
     @ButtonHandler("flipBreach_")
@@ -85,11 +89,41 @@ public class ResonanceGeneratorService {
             newState = "inactive";
         }
 
-        String msg = player.getRepresentationNoPing() + " Flipped " + oldState + " breach to " + newState + " in tile "
-                + tile.getRepresentationForButtons(game, player);
+        String msg = player.getRepresentationNoPing() + " flipped " + oldState + " breach to " + newState + " in the "
+                + tile.getRepresentationForButtons(game, player) + " system.";
         // msg += " using " + resonanceRep() + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static void checkBreachLimit(Player player, Game game) {
+        int totalBreaches = (int) game.getTileMap().values().stream()
+                .flatMap(t -> t.getUnitHolders().values().stream())
+                .flatMap(uh -> uh.getTokenList().stream())
+                .filter(tok -> Constants.TOKEN_BREACH_ACTIVE.equals(tok) || Constants.TOKEN_BREACH_INACTIVE.equals(tok))
+                .count();
+        if (totalBreaches > 7) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " There are more than 7 breaches on the board. You will need to remove an inactive one or the one you just placed.");
+            sendRemoveBreachButtons(player, game);
+        }
+    }
+
+    public static void sendRemoveBreachButtons(Player player, Game game) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_INACTIVE)) {
+                String pos = tile.getPosition();
+                buttons.add(Buttons.red(
+                        player.finChecker() + "removeBreach_" + pos,
+                        "Remove from " + tile.getRepresentationForButtons(game, player)));
+            }
+        }
+        buttons.add(Buttons.red(player.finChecker() + "deleteButtons", "Delete these buttons"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(), "Please select an inactive breach to remove.", buttons);
     }
 
     @ButtonHandler("placeBreach_")
@@ -97,7 +131,7 @@ public class ResonanceGeneratorService {
         String pos = buttonID.replace("placeBreach_", "");
         String source = resonanceRep();
         if (pos.contains("_")) {
-            source = "a crimson destroyer";
+            source = "an Exile destroyer";
             pos = pos.split("_")[0];
         }
         Tile tile = game.getTileByPosition(pos);
@@ -108,11 +142,12 @@ public class ResonanceGeneratorService {
             space.addToken(Constants.TOKEN_BREACH_ACTIVE);
         }
 
-        String msg = "Placed active breach in tile " + tile.getRepresentation();
+        String msg = "Placed active breach in " + tile.getDetailedDescription();
         msg += " using " + source + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         checkCrimsonCommanderUnlock(game, player, tile);
         ButtonHelper.deleteMessage(event);
+        checkBreachLimit(player, game);
     }
 
     @ButtonHandler("placeInactiveBreach_")
@@ -127,10 +162,11 @@ public class ResonanceGeneratorService {
             space.addToken(Constants.TOKEN_BREACH_INACTIVE);
         }
 
-        String msg = "Placed inactive breach in tile " + tile.getRepresentation();
-        msg += " using the crimson destroyer.";
+        String msg = "Placed inactive breach in the " + tile.getRepresentation();
+        msg += " system using an Exile destroyer.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         checkCrimsonCommanderUnlock(game, player, tile);
         ButtonHelper.deleteMessage(event);
+        checkBreachLimit(player, game);
     }
 }
