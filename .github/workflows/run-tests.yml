@@ -4,7 +4,7 @@ on:
     branches: ["master"]
 jobs:
   ci:
-    name: Run Tests on Pull Request
+    name: Run Tests On Pull Request
     runs-on: ubuntu-latest
     permissions:
       checks: write
