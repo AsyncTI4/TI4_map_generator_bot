@@ -11,6 +11,7 @@ import ti4.game.Player;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.message.MessageHelper;
 import ti4.service.breakthrough.DeorbitBarrageService;
+import ti4.service.breakthrough.ExperimentalMechanismsService;
 import ti4.service.breakthrough.PsychosporeService;
 import ti4.service.breakthrough.ResonanceGeneratorService;
 import ti4.service.breakthrough.TheIconService;
@@ -22,6 +23,7 @@ public class TeHelperBreakthroughs {
     public static boolean handleBreakthroughExhaust(
             GenericInteractionCreateEvent event, Game game, Player player, String breakthroughID) {
         switch (breakthroughID) {
+            case "arvaxibt" -> ExperimentalMechanismsService.postInitialButtons(event, game, player);
             case "arborecbt" -> PsychosporeService.postInitialButtons(event, game, player);
             case "zooidbt" -> {
                 ThreadChannel channel = player.getCardsInfoThread();
