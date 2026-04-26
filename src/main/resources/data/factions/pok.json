@@ -9,7 +9,7 @@
         "startingTechOptions": ["nm", "st", "ps"],
         "startingTechAmount": 2,
         "homePlanets": ["valk", "ylir", "avar"],
-        "abilities": ["zeaL_FAILTHEJUNIT", "raid_formation"],
+        "abilities": ["zeal", "raid_formation"],
         "leaders": ["argentagent", "argentcommander", "argenthero"],
         "promissoryNotes": ["ambuscade"],
         "units": [
