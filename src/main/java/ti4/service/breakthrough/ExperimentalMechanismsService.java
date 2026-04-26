@@ -3,10 +3,10 @@ package ti4.service.breakthrough;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
-import org.apache.commons.lang3.StringUtils;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -21,8 +21,10 @@ import ti4.model.UnitModel;
 public class ExperimentalMechanismsService {
 
     private static final String STORED_KEY = "arvaxiMobilizationEngine";
-    private static final String BOON_TEXT = "The printed values of this unit have been adjusted: Cost -1, Combat -1, Move +1, Capacity +1.";
-    private static final String CURSE_TEXT = "The printed values of this unit have been adjusted: Cost +1, Combat +1, Move -1, Capacity -1.";
+    private static final String BOON_TEXT =
+            "The printed values of this unit have been adjusted: Cost -1, Combat -1, Move +1, Capacity +1.";
+    private static final String CURSE_TEXT =
+            "The printed values of this unit have been adjusted: Cost +1, Combat +1, Move -1, Capacity -1.";
 
     private String btRep() {
         return Mapper.getBreakthrough("arvaxibt").getNameRepresentation();
@@ -68,17 +70,18 @@ public class ExperimentalMechanismsService {
             UnitModel unit = Mapper.getUnitModelByTechUpgrade(techID);
             if (unit == null || !unit.getIsShip() || "fighter".equalsIgnoreCase(unit.getBaseType())) continue;
             buttons.add(Buttons.gray(
-                    player.finChecker() + "arvaxiEngineTech_" + targetFaction + "_" + techID,
-                    tech.getName()));
+                    player.finChecker() + "arvaxiEngineTech_" + targetFaction + "_" + techID, tech.getName()));
         }
 
         if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
                     target.getRepresentationNoPing() + " has no valid non-fighter ship unit upgrade technologies.");
             return;
         }
         buttons.add(Buttons.red(player.finChecker() + "deleteButtons", "Delete these buttons"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
                 "Choose which of " + target.getRepresentationNoPing()
                         + "'s unit upgrades to attach the Mobilization Engine to.",
                 buttons);
@@ -97,15 +100,15 @@ public class ExperimentalMechanismsService {
 
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
-                player.finChecker() + "arvaxiEngineAttach_" + targetFaction + "_" + techID + "_boon",
-                "Boon side"));
+                player.finChecker() + "arvaxiEngineAttach_" + targetFaction + "_" + techID + "_boon", "Boon side"));
         buttons.add(Buttons.blue(
-                player.finChecker() + "arvaxiEngineAttach_" + targetFaction + "_" + techID + "_curse",
-                "Curse side"));
+                player.finChecker() + "arvaxiEngineAttach_" + targetFaction + "_" + techID + "_curse", "Curse side"));
         buttons.add(Buttons.red(player.finChecker() + "deleteButtons", "Cancel"));
 
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                "Choose which side of the Mobilization Engine to attach to " + techName + ".", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                "Choose which side of the Mobilization Engine to attach to " + techName + ".",
+                buttons);
     }
 
     @ButtonHandler("arvaxiEngineAttach_")
