@@ -144,13 +144,6 @@ public class JdaService {
 
         BotLogger.info("INITIALIZING SERVERS");
 
-//to be reverted, forcing a spotless failure, hopefully 
-        if (true) { int i = 2; 
-                  return false;
-                  
-                  
-                  }
-        
         // Primary HUB Server
         guildPrimaryID = args[2];
         tryToInitGuild(args[2], false);
