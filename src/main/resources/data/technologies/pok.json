@@ -1116,7 +1116,7 @@
             "WARFARE"
         ],
         "requirements": "R",
-        "faction": "failthePRtest",
+        "faction": "nekro",
         "source": "pok",
         "text": "ACTION: Exhaust this card to place 1 PDS on a planet you control. \nACTION: Exhaust this card to repair all of your damaged units. \nACTION: Exhaust this card and discard 1 action card to draw 1 action card.",
         "shortName": "Error\nError",
