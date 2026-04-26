@@ -86,7 +86,43 @@ jobs:
       - name: Run the Maven verify phase
         if: steps.diff.outputs.has_java == 'true' && (steps.validate-json.outcome == 'success' || steps.validate-json.outcome == 'skipped')
         id: maven
-        run: mvn --batch-mode --no-transfer-progress verify -P ci-spotless -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss.SSS
+        shell: bash
+        run: |
+          set -o pipefail
+          mvn --batch-mode --no-transfer-progress verify -P ci-spotless \
+            -Dorg.slf4j.simpleLogger.showDateTime=true \
+            -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss.SSS \
+            2>&1 | tee /tmp/maven.log
+      - name: Parse Spotless violations
+        if: always() && steps.maven.outcome == 'failure'
+        run: |
+          python3 << 'PYEOF'
+          import json, re
+          violations = []
+          try:
+              with open('/tmp/maven.log') as f:
+                  in_section = False
+                  for line in f:
+                      line = line.rstrip()
+                      if 'had format violations' in line:
+                          in_section = True
+                          continue
+                      if in_section:
+                          # Spotless prints file names as: [ERROR]     path/to/File.java
+                          # (4 spaces after "[ERROR]"), diff lines are indented further (8+ spaces)
+                          m = re.match(r'^\[ERROR\]    ([^ ].*)', line)
+                          if m:
+                              candidate = m.group(1).strip()
+                              # skip diff markers and the "Run mvn spotless:apply" line
+                              if candidate and not candidate.startswith(('@', '+', '-', ' ', 'R')):
+                                  violations.append(candidate)
+                          elif re.search(r'spotless:apply|-> \[Help', line):
+                              break
+          except FileNotFoundError:
+              pass
+          with open('/tmp/spotless_violations.json', 'w') as f:
+              json.dump(violations, f)
+          PYEOF
       - name: Publish JUnit Report
         if: always() && steps.diff.outputs.has_java == 'true' && github.event.pull_request.head.repo.full_name == github.repository
         uses: mikepenz/action-junit-report@v6
@@ -128,49 +164,75 @@ jobs:
               jsonSection = '### ✅ JSON Validation\n\nNo JSON files changed.';
             }
 
-            // ── JUnit Test Results section ───────────────────────────────────
+            // ── Formatting Checks section ────────────────────────────────────
             const mavenOutcome = '${{ steps.maven.outcome }}';
+            let formatSection;
+            if (mavenOutcome === 'failure') {
+              let violations = [];
+              try {
+                violations = JSON.parse(fs.readFileSync('/tmp/spotless_violations.json', 'utf8'));
+              } catch (e) { /* file absent = no violations detected */ }
+              if (violations.length > 0) {
+                const bullets = violations.map(f => `- \`${f}\``).join('\n');
+                formatSection = `### ❌ Formatting Checks Failed\n\n`
+                  + `The following files have Spotless formatting violations:\n\n${bullets}\n\n`
+                  + `> **Fix:** run \`mvn spotless:apply\` locally and commit the result.`;
+              } else {
+                formatSection = null; // maven failed for another reason — handled in JUnit section
+              }
+            } else if (mavenOutcome === 'success') {
+              formatSection = '### ✅ Formatting Checks Passed\n\nAll files pass Spotless formatting.';
+            } else {
+              formatSection = null; // maven skipped — omit section entirely
+            }
+
+            // ── JUnit Test Results section ───────────────────────────────────
             let junitSection;
             if (mavenOutcome === 'success' || mavenOutcome === 'failure') {
-              const pythonLines = [
-                'import glob, xml.etree.ElementTree as ET, json',
-                'failures = []',
-                'for f in glob.glob("**/target/surefire-reports/TEST-*.xml", recursive=True):',
-                '    try:',
-                '        root = ET.parse(f).getroot()',
-                '        for tc in root.findall("testcase"):',
-                '            for e in list(tc.findall("failure")) + list(tc.findall("error")):',
-                '                cls = tc.get("classname", "").split(".")[-1]',
-                '                name = tc.get("name", "")',
-                '                msg = (e.get("message") or e.text or "").split("\\n")[0][:100]',
-                '                entry = cls + "#" + name + (": " + msg if msg else "")',
-                '                failures.append(entry)',
-                '    except Exception:',
-                '        pass',
-                'print(json.dumps(failures))',
-              ];
-              fs.writeFileSync('/tmp/parse_surefire.py', pythonLines.join('\n'));
-              let failures = [];
-              try {
-                const output = execSync('python3 /tmp/parse_surefire.py', { encoding: 'utf8' });
-                failures = JSON.parse(output.trim());
-              } catch (e) {
-                core.warning('Could not parse surefire reports: ' + e.message);
-              }
-              if (failures.length === 0) {
-                if (mavenOutcome === 'failure') {
-                  const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
-                  junitSection = `### ❌ Build Failed\n\nMaven build failed with no test-failure details captured — see the [Actions run](${runUrl}) for the full log.`;
-                } else {
-                  junitSection = '### ✅ JUnit Tests Passed\n\nAll tests passed successfully.';
-                }
+              // If the build failed because of Spotless, tests never ran — say so instead of "Build Failed"
+              if (mavenOutcome === 'failure' && formatSection !== null) {
+                junitSection = '### ⏭️ JUnit Tests\n\nSkipped — build failed at formatting checks (see above).';
               } else {
-                const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
-                if (failures.length > 5) {
-                  junitSection = `### ❌ JUnit Test Failures (${failures.length})\n\nToo many failures to list — see the [Actions run](${runUrl}) for details.`;
+                const pythonLines = [
+                  'import glob, xml.etree.ElementTree as ET, json',
+                  'failures = []',
+                  'for f in glob.glob("**/target/surefire-reports/TEST-*.xml", recursive=True):',
+                  '    try:',
+                  '        root = ET.parse(f).getroot()',
+                  '        for tc in root.findall("testcase"):',
+                  '            for e in list(tc.findall("failure")) + list(tc.findall("error")):',
+                  '                cls = tc.get("classname", "").split(".")[-1]',
+                  '                name = tc.get("name", "")',
+                  '                msg = (e.get("message") or e.text or "").split("\\n")[0][:100]',
+                  '                entry = cls + "#" + name + (": " + msg if msg else "")',
+                  '                failures.append(entry)',
+                  '    except Exception:',
+                  '        pass',
+                  'print(json.dumps(failures))',
+                ];
+                fs.writeFileSync('/tmp/parse_surefire.py', pythonLines.join('\n'));
+                let failures = [];
+                try {
+                  const output = execSync('python3 /tmp/parse_surefire.py', { encoding: 'utf8' });
+                  failures = JSON.parse(output.trim());
+                } catch (e) {
+                  core.warning('Could not parse surefire reports: ' + e.message);
+                }
+                if (failures.length === 0) {
+                  if (mavenOutcome === 'failure') {
+                    const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+                    junitSection = `### ❌ Build Failed\n\nMaven build failed with no test-failure details captured — see the [Actions run](${runUrl}) for the full log.`;
+                  } else {
+                    junitSection = '### ✅ JUnit Tests Passed\n\nAll tests passed successfully.';
+                  }
                 } else {
-                  const bullets = failures.map(f => `- \`${f}\``).join('\n');
-                  junitSection = `### ❌ JUnit Test Failures\n\n${bullets}\n\nSee the [Actions run](${runUrl}) for more details.`;
+                  const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+                  if (failures.length > 5) {
+                    junitSection = `### ❌ JUnit Test Failures (${failures.length})\n\nToo many failures to list — see the [Actions run](${runUrl}) for details.`;
+                  } else {
+                    const bullets = failures.map(f => `- \`${f}\``).join('\n');
+                    junitSection = `### ❌ JUnit Test Failures\n\n${bullets}\n\nSee the [Actions run](${runUrl}) for more details.`;
+                  }
                 }
               }
             } else {
@@ -178,7 +240,10 @@ jobs:
             }
 
             // ── Build and post/update the combined comment ───────────────────
-            const body = `${MARKER}\n## 🔬 Test Results\n\n${jsonSection}\n\n---\n\n${junitSection}`;
+            const sections = [jsonSection];
+            if (formatSection !== null) sections.push(formatSection);
+            sections.push(junitSection);
+            const body = `${MARKER}\n## 🔬 Test Results\n\n${sections.join('\n\n---\n\n')}`;
 
             const comments = await github.paginate(github.rest.issues.listComments, {
               owner: context.repo.owner,
