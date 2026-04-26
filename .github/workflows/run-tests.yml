@@ -6,6 +6,8 @@ jobs:
   validate-json:
     name: check for invalid json files
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -15,20 +17,104 @@ jobs:
         run: |
           BASE=${{ github.event.pull_request.base.sha }}
           HEAD=${{ github.event.pull_request.head.sha }}
-          if git diff --name-only "$BASE" "$HEAD" | grep -qE '\.json$'; then
-            echo "has_changes=true" >> "$GITHUB_OUTPUT"
-          else
+          CHANGED=$(git diff --name-only "$BASE" "$HEAD" | grep -E '\.json$' || true)
+          if [ -z "$CHANGED" ]; then
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            printf '%s\n' "$CHANGED" > /tmp/changed_json_files.txt
           fi
-      - name: check for invalid json files
+      - name: Validate changed JSON files
         if: steps.json-diff.outputs.has_changes == 'true'
+        id: validate
         run: |
-          find . -name "*.json" -print0 | while IFS= read -r -d $'\0' file; do
-            if ! python -mjson.tool "$file" > /dev/null; then
-              echo "INVALID $file" >&2
-              exit 1
-            fi
-          done
+          python3 - << 'PYEOF'
+          import sys, json, os
+
+          with open('/tmp/changed_json_files.txt') as f:
+              files = [line.strip() for line in f if line.strip()]
+
+          errors = []
+          for filepath in files:
+              if not os.path.isfile(filepath):
+                  continue
+              try:
+                  with open(filepath, encoding='utf-8') as fh:
+                      json.load(fh)
+              except json.JSONDecodeError as e:
+                  errors.append({'file': filepath, 'line': e.lineno, 'col': e.colno, 'msg': e.msg})
+                  print(f"::error file={filepath},line={e.lineno},col={e.colno}::{e.msg}", flush=True)
+
+          if errors:
+              summary_path = os.environ['GITHUB_STEP_SUMMARY']
+              with open(summary_path, 'a') as fh:
+                  fh.write('## \u274c Invalid JSON Files\n\n')
+                  fh.write('| File | Line | Column | Error |\n')
+                  fh.write('|------|------|--------|-------|\n')
+                  for e in errors:
+                      fh.write(f"| `{e['file']}` | {e['line']} | {e['col']} | {e['msg']} |\n")
+                  fh.write('\n> **Tip:** Open the file in a text editor that highlights JSON errors'
+                           ' (e.g. VS Code) or paste the contents into'
+                           ' [jsonlint.com](https://jsonlint.com) to find and fix the problem.\n')
+              import json as _json
+              with open('/tmp/json_errors.json', 'w') as fh:
+                  _json.dump(errors, fh)
+              sys.exit(1)
+          PYEOF
+      - name: Post JSON validation result as PR comment
+        if: always() && steps.json-diff.outputs.has_changes == 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const MARKER = '<!-- json-validation-report -->';
+            const stepOutcome = '${{ steps.validate.outcome }}';
+
+            let body;
+            if (stepOutcome === 'failure') {
+              let errors = [];
+              try {
+                errors = JSON.parse(fs.readFileSync('/tmp/json_errors.json', 'utf8'));
+              } catch (e) {
+                core.warning('Could not read JSON errors file: ' + e.message);
+                return;
+              }
+              const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+              const bullets = errors.map(e => `- \`${e.file}\` (line ${e.line}, col ${e.col}): ${e.msg}`).join('\n');
+              body = `${MARKER}\n## ❌ JSON Validation Errors\n\n${bullets}\n\n`
+                   + `> **Tip:** Open the file in a text editor that highlights JSON errors (e.g. VS Code) `
+                   + `or paste the contents into [jsonlint.com](https://jsonlint.com) to find and fix the problem.\n\n`
+                   + `See the [Actions run](${runUrl}) for more details.`;
+            } else if (stepOutcome === 'success') {
+              body = `${MARKER}\n## ✅ JSON Validation Passed\n\nAll changed JSON files are valid.`;
+            } else {
+              return; // skipped or cancelled — nothing to report
+            }
+
+            // Find an existing sticky comment to update, or create a new one on failure
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100,
+            });
+            const existing = comments.find(c => c.body && c.body.includes(MARKER));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else if (stepOutcome === 'failure') {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
 
   ci:
     name: Run Tests On Pull Request
