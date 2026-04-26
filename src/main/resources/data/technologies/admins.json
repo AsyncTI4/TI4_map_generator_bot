@@ -4,7 +4,7 @@
         "name": "Molecular Transference (PR Test 2)",
         "types": ["CYBERNETIC"],
         "requirements": "Y",
-        "faction": "admins",
+        "faction": "failthePRtests",
         "source": "admins",
         "text": "Systems that contain a planet with one of your Space Docks on it are considered adjacent to each other for all game effects."
     },
