@@ -111,13 +111,11 @@ public class ButtonProcessor {
         }
 
         long contextCreationRuntime = context.getCreationEndTime() - context.getCreationStartTime();
-        long timeInQueue = processStartTime - context.getCreationEndTime();
         runtimeWarningService.submitNewRuntime(
                 event,
                 processStartTime,
                 System.currentTimeMillis(),
                 contextCreationRuntime,
-                timeInQueue,
                 resolveRuntime,
                 saveRuntime);
     }

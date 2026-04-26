@@ -32,8 +32,7 @@ class ContextInteractionListener extends ListenerAdapter implements CommandListe
     }
 
     private void queue(GenericContextInteractionEvent<?> event) {
-        long queueStartTime = System.currentTimeMillis();
-        ExecutorServiceManager.runAsync(eventToString(event), () -> process(event, queueStartTime));
+        ExecutorServiceManager.runAsync(eventToString(event), () -> process(event));
     }
 
     public String eventToString(GenericCommandInteractionEvent event) {
@@ -42,7 +41,7 @@ class ContextInteractionListener extends ListenerAdapter implements CommandListe
                 + event.getCommandString() + "`";
     }
 
-    private void process(GenericContextInteractionEvent<?> event, long queueStartTime) {
+    private void process(GenericContextInteractionEvent<?> event) {
         long processStartTime = System.currentTimeMillis();
         RollbarManager.putInteractionMetadata("context_menu", event);
         RollbarManager.put("command_name", event.getCommandString());
@@ -61,6 +60,6 @@ class ContextInteractionListener extends ListenerAdapter implements CommandListe
             RollbarManager.clear();
         }
 
-        warnForLongRunningCommands(event, queueStartTime, processStartTime);
+        warnForLongRunningCommands(event, processStartTime);
     }
 }
