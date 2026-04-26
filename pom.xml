@@ -39,6 +39,14 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <!-- Force a version that includes @Unmodifiable (added in 23.0.0); the transitive
+           version pulled in via webp-imageio -> kotlin-stdlib is 13.0 which predates it,
+           causing SpotBugs to report the annotation class as missing. -->
+      <dependency>
+        <groupId>org.jetbrains</groupId>
+        <artifactId>annotations</artifactId>
+        <version>26.0.2</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -149,6 +157,16 @@
       <version>${spotbugs.version}</version>
       <optional>true</optional>
     </dependency>
+    <!-- JDA pulls in trove4j as runtime-scope, so SpotBugs (which only uses compile-scope
+         artifacts for its auxiliary classpath) cannot find gnu.trove classes. Declaring it
+         explicitly as optional puts it on the compile classpath without propagating it to
+         downstream consumers. -->
+    <dependency>
+      <groupId>net.sf.trove4j</groupId>
+      <artifactId>core</artifactId>
+      <version>3.1.0</version>
+      <optional>true</optional>
+    </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -229,6 +247,8 @@
           <htmlOutput>true</htmlOutput>
           <sarifOutput>true</sarifOutput>
           <excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
+          <!-- Give the SpotBugs fork more heap to reduce GC pressure and speed up analysis -->
+          <jvmArgs>-Xmx2048m</jvmArgs>
           <plugins>
             <plugin>
               <groupId>com.h3xstream.findsecbugs</groupId>
@@ -254,4 +274,21 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>ci-spotless</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.diffplug.spotless</groupId>
+            <artifactId>spotless-maven-plugin</artifactId>
+            <configuration>
+              <ratchetFrom>origin/master</ratchetFrom>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

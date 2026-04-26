@@ -40,16 +40,16 @@ class SlashCommandListener extends ListenerAdapter implements CommandListenerInt
     }
 
     public void queue(SlashCommandInteractionEvent event) {
+        Command<SlashCommandInteractionEvent> command = getCommand(event);
+        ExecutionLockType lockType = getLockType(command);
+        String eventString = eventToString(event);
+        if (lockType == null) {
+            ExecutorServiceManager.runAsync(eventString, () -> process(event));
+            return;
+        }
         String gameName = GameNameService.getGameName(event);
-        ParentCommand command = SlashCommandManager.getCommand(event.getName());
-        ExecutionLockType lockType = getLockType(event, command);
-        long queueStartTime = System.currentTimeMillis();
         ExecutorServiceManager.runAsyncWithLock(
-                eventToString(event),
-                gameName,
-                event.getMessageChannel(),
-                () -> process(command, event, queueStartTime),
-                lockType);
+                eventString, gameName, event.getMessageChannel(), () -> process(event), lockType);
     }
 
     public String eventToString(GenericCommandInteractionEvent event) {
@@ -60,13 +60,13 @@ class SlashCommandListener extends ListenerAdapter implements CommandListenerInt
                 + event.getCommandString() + "`";
     }
 
-    private void process(
-            Command<SlashCommandInteractionEvent> command, SlashCommandInteractionEvent event, long queueStarTime) {
+    private void process(SlashCommandInteractionEvent event) {
         long processStartTime = System.currentTimeMillis();
         RollbarManager.putInteractionMetadata("slash_command", event);
         RollbarManager.put("command_name", event.getCommandString());
         RollbarManager.put("game_name", GameNameService.getGameName(event));
 
+        ParentCommand command = SlashCommandManager.getCommand(event.getName());
         try {
             if (command.accept(event)) {
                 command.preExecute(event);
@@ -83,7 +83,7 @@ class SlashCommandListener extends ListenerAdapter implements CommandListenerInt
             RollbarManager.clear();
         }
 
-        warnForLongRunningCommands(event, queueStarTime, processStartTime);
+        warnForLongRunningCommands(event, processStartTime);
     }
 
     private static boolean isModalCommand(SlashCommandInteractionEvent event) {
@@ -108,12 +108,16 @@ class SlashCommandListener extends ListenerAdapter implements CommandListenerInt
                         BotLogger::catchRestError);
     }
 
-    private static ExecutionLockType getLockType(SlashCommandInteractionEvent event, ParentCommand command) {
-        Command<SlashCommandInteractionEvent> subcommand = command.getSubcommand(event);
-        Command<SlashCommandInteractionEvent> commandToRun = subcommand == null ? command : subcommand;
-        if (commandToRun instanceof GameStateContainer gameStateContainer) {
+    private static ExecutionLockType getLockType(Command<SlashCommandInteractionEvent> command) {
+        if (command instanceof GameStateContainer gameStateContainer) {
             return gameStateContainer.isSaveGame() ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         }
-        return ExecutionLockType.READ;
+        return null;
+    }
+
+    private static Command<SlashCommandInteractionEvent> getCommand(SlashCommandInteractionEvent event) {
+        ParentCommand command = SlashCommandManager.getCommand(event.getName());
+        Command<SlashCommandInteractionEvent> subcommand = command.getSubcommand(event);
+        return subcommand == null ? command : subcommand;
     }
 }

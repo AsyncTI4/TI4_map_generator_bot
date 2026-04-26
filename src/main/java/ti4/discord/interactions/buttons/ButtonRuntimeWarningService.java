@@ -34,7 +34,6 @@ class ButtonRuntimeWarningService {
             long processingStartTimeMs,
             long processingEndTimeMs,
             long contextCreationRuntimeMs,
-            long timeInQueueMs,
             long resolveRuntimeMs,
             long saveRuntimeMs) {
 
@@ -74,7 +73,6 @@ class ButtonRuntimeWarningService {
         String processingTime = formatMillisecondsWithWarning(processingTimeMs);
 
         String contextTime = formatMillisecondsWithWarning(contextCreationRuntimeMs);
-        String queueTime = formatMillisecondsWithWarning(timeInQueueMs);
         String resolveTime = formatMillisecondsWithWarning(resolveRuntimeMs);
         String saveTime = formatMillisecondsWithWarning(saveRuntimeMs);
         String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(processingEndTimeMs - eventTimeMs);
@@ -87,7 +85,6 @@ class ButtonRuntimeWarningService {
                 + "\n> ⚠ **Slow Button Warning:** Took over " + WARNING_THRESHOLD_MILLISECONDS + "ms"
                 + "\n> 🕒 Event start: `" + eventTime + "`"
                 + "\n> 🧩 Built context in: `" + contextTime + "`"
-                + "\n> 📦 Queued for: `" + queueTime + "`"
                 + "\n> 🛠 Executed in: `" + resolveTime + "`"
                 + "\n> 💾 Saved in: `" + saveTime + "`"
                 + "\n> ⚡ Total preprocessing time: `" + preprocessingTime + "`"

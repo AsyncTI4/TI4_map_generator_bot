@@ -30,14 +30,12 @@ interface CommandListenerInterface {
     <T extends GenericCommandInteractionEvent> String eventToString(T event);
 
     default <T extends GenericCommandInteractionEvent> void warnForLongRunningCommands(
-            T event, long queueStartTimeMs, long processStartTimeMs) {
-        long queueWaitMs = processStartTimeMs - queueStartTimeMs;
-
+            T event, long processStartTimeMs) {
         long endTime = System.currentTimeMillis();
         long eventTimeMs = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
         long responseTimeMs = endTime - eventTimeMs;
         long executionTimeMs = endTime - processStartTimeMs;
-        long reachedQueueInMs = queueStartTimeMs - eventTimeMs;
+        long preprocessTimeMs = processStartTimeMs - eventTimeMs;
 
         boolean slowResponse = responseTimeMs > DELAY_THRESHOLD_MILLISECONDS;
         boolean slowExecution = executionTimeMs > DELAY_THRESHOLD_MILLISECONDS;
@@ -49,13 +47,11 @@ interface CommandListenerInterface {
         String eventTime = DateTimeHelper.getTimestampFromMillisecondsEpoch(eventTimeMs);
         String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(responseTimeMs);
         String executionTime = DateTimeHelper.getTimeRepresentationToMilliseconds(executionTimeMs);
-        String queueTime = DateTimeHelper.getTimeRepresentationToMilliseconds(queueWaitMs);
-        String reachedQueueTime = DateTimeHelper.getTimeRepresentationToMilliseconds(reachedQueueInMs);
+        String preprocessTime = DateTimeHelper.getTimeRepresentationToMilliseconds(preprocessTimeMs);
 
         String message = "\n> ⚠ **Slow Command Warning:** Took over " + DELAY_THRESHOLD_MILLISECONDS + "ms"
                 + "\n> 🕒 Event start: `" + eventTime + "`"
-                + "\n> 📦 Reached queue in: `" + reachedQueueTime + "`"
-                + "\n> 📦 Queued for: `" + queueTime + "`"
+                + "\n> 📦 Preprocessed for: `" + preprocessTime + "`"
                 + "\n> 🛠 Executed in: `" + executionTime + "`"
                 + "\n> ⚡ Responded after: `" + responseTime + "`";
 

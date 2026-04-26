@@ -80,7 +80,7 @@
             "CYBERNETIC",
             "BIOTIC"
         ],
-        "text": "When you resolve the primary ability of a strategy card, if The Fracture is not already in play, roll a die. On a result of 1 or 10, put The Fracture into play. At the start of a ground combat on a planet in The Fracture or in the wormhole nexus, you may choose any number of your infantry on that planet; replace each of those infantry with 1 mech from your reinforcements.",
+        "text": "When you resolve the primary ability of a strategy card, roll a die. On a result of 1 or 10, put The Fracture into play if it is not already; if it is, move an ingress token into a system that contains your units. At the start of a ground combat on a planet in The Fracture or in the wormhole nexus, you may choose any number of your infantry on that planet; replace each of those infantry with 1 mech from your reinforcements.",
         "source": "balacasi"
     },
     {
@@ -116,7 +116,7 @@
             "BIOTIC",
             "CYBERNETIC"
         ],
-        "text": "When you spend resources, you may place any number of your non-unit upgrade technologies on this card. For each technology placed on this card, reduce the resources spent by 1. Technologies on this card are treated as though they have no ability text. At the start of the status phase, remove all technologies from this card.",
+        "text": "When you spend resources, you may place any number of your non-unit upgrade technologies on this card. For each technology placed on this card, reduce the resources spent by 1. Technologies on this card are treated as though they have no ability text. When a player passes, remove 1 technology from this card.",
         "source": "balacasi"
     }
 ]

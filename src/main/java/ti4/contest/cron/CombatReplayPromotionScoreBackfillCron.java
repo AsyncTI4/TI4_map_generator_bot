@@ -1,6 +1,7 @@
 package ti4.contest.cron;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.experimental.UtilityClass;
 import ti4.contest.replay.core.CombatCandidateStatus;
@@ -31,8 +32,11 @@ public class CombatReplayPromotionScoreBackfillCron {
     private static final AtomicBoolean HAS_RUN = new AtomicBoolean(false);
 
     public static void register() {
-        CronManager.registerManual(
-                CombatReplayPromotionScoreBackfillCron.class, CombatReplayPromotionScoreBackfillCron::runBackfill);
+        CronManager.scheduleOnce(
+                CombatReplayPromotionScoreBackfillCron.class,
+                CombatReplayPromotionScoreBackfillCron::runBackfill,
+                0,
+                TimeUnit.SECONDS);
     }
 
     private static void runBackfill() {
