@@ -53,6 +53,7 @@ jobs:
     if: always() && needs.changes.outputs.java == 'true' && (needs.validate-json.result == 'success' || needs.validate-json.result == 'skipped')
     permissions:
       checks: write
+      pull-requests: write
       security-events: write
     steps:
       - uses: actions/checkout@v4
@@ -88,6 +89,60 @@ jobs:
         with:
           report_paths: "**/target/surefire-reports/TEST-*.xml"
           annotate_only: true # forked repo cannot write to checks so just do annotations
+      - name: Post Test Failure Comment on PR
+        if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { execSync } = require('child_process');
+            const fs = require('fs');
+
+            // Write a Python script to a temp file to avoid escaping issues
+            const pythonLines = [
+              'import glob, xml.etree.ElementTree as ET, json',
+              'failures = []',
+              'for f in glob.glob("**/target/surefire-reports/TEST-*.xml", recursive=True):',
+              '    try:',
+              '        root = ET.parse(f).getroot()',
+              '        for tc in root.findall("testcase"):',
+              '            for e in list(tc.findall("failure")) + list(tc.findall("error")):',
+              '                cls = tc.get("classname", "").split(".")[-1]',
+              '                name = tc.get("name", "")',
+              '                msg = (e.get("message") or e.text or "").split("\\n")[0][:100]',
+              '                entry = cls + "#" + name + (": " + msg if msg else "")',
+              '                failures.append(entry)',
+              '    except Exception:',
+              '        pass',
+              'print(json.dumps(failures))',
+            ];
+            fs.writeFileSync('/tmp/parse_surefire.py', pythonLines.join('\n'));
+
+            let failures = [];
+            try {
+              const output = execSync('python3 /tmp/parse_surefire.py', { encoding: 'utf8' });
+              failures = JSON.parse(output.trim());
+            } catch (e) {
+              core.warning('Could not parse surefire reports: ' + e.message);
+              return;
+            }
+
+            if (failures.length === 0) return;
+
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            let body;
+            if (failures.length > 5) {
+              body = `## ❌ Test Failures (${failures.length})\n\nToo many failures to list — see the [Job Summary](${runUrl}) for details.`;
+            } else {
+              const bullets = failures.map(f => `- \`${f}\``).join('\n');
+              body = `## ❌ Test Failures\n\n${bullets}\n\nSee the [Job Summary](${runUrl}) for more details.`;
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });
       - name: Upload Surefire Report
         if: always()
         uses: actions/upload-artifact@v4
