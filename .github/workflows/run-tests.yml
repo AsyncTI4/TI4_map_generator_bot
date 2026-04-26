@@ -101,11 +101,11 @@ jobs:
           name: spotbugs-reports
           path: |
             target/spotbugsXml.xml
-            target/spotbugs.html
-            target/spotbugs.sarif
+            target/site/spotbugs.html
+            target/spotbugsSarif.json
       - name: Upload SpotBugs SARIF to GitHub Code Scanning
-        if: always() && github.event.pull_request.head.repo.full_name == github.repository && hashFiles('target/spotbugs.sarif') != ''
+        if: always() && github.event.pull_request.head.repo.full_name == github.repository && hashFiles('target/spotbugsSarif.json') != ''
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: target/spotbugs.sarif
+          sarif_file: target/spotbugsSarif.json
           category: spotbugs

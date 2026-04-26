@@ -245,11 +245,7 @@
           <failOnError>true</failOnError>
           <xmlOutput>true</xmlOutput>
           <htmlOutput>true</htmlOutput>
-          <!-- Write HTML directly into target/ so the workflow can find target/spotbugs.html -->
-          <outputDirectory>${project.build.directory}</outputDirectory>
           <sarifOutput>true</sarifOutput>
-          <!-- Default filename is spotbugsSarif.json; rename to match the workflow's expected path -->
-          <sarifOutputFilename>spotbugs.sarif</sarifOutputFilename>
           <excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
           <!-- Give the SpotBugs fork more heap to reduce GC pressure and speed up analysis -->
           <jvmArgs>-Xmx2048m</jvmArgs>
