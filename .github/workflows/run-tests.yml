@@ -235,6 +235,8 @@ jobs:
                   }
                 }
               }
+            } else if (jsonOutcome === 'failure') {
+              junitSection = '### ⏭️ JUnit Tests\n\nSkipped — tests did not run because JSON validation failed (see above).';
             } else {
               junitSection = '### ✅ JUnit Tests\n\nNo Java or JSON files changed — tests skipped.';
             }
@@ -269,13 +271,13 @@ jobs:
               });
             }
       - name: Upload Surefire Report
-        if: always() && steps.diff.outputs.has_java == 'true'
+        if: always() && steps.diff.outputs.has_java == 'true' && steps.maven.outcome != 'skipped'
         uses: actions/upload-artifact@v4
         with:
           name: surefire-reports
           path: target/surefire-reports/
       - name: Upload SpotBugs Reports
-        if: always() && steps.diff.outputs.has_java == 'true'
+        if: always() && steps.diff.outputs.has_java == 'true' && steps.maven.outcome != 'skipped'
         uses: actions/upload-artifact@v4
         with:
           name: spotbugs-reports
@@ -284,7 +286,7 @@ jobs:
             target/site/spotbugs.html
             target/spotbugsSarif.json
       - name: Upload SpotBugs SARIF to GitHub Code Scanning
-        if: always() && steps.diff.outputs.has_java == 'true' && github.event.pull_request.head.repo.full_name == github.repository && hashFiles('target/spotbugsSarif.json') != ''
+        if: always() && steps.diff.outputs.has_java == 'true' && steps.maven.outcome != 'skipped' && github.event.pull_request.head.repo.full_name == github.repository && hashFiles('target/spotbugsSarif.json') != ''
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: target/spotbugsSarif.json
