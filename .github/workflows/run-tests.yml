@@ -75,7 +75,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
       - name: Run the Maven verify phase
-        run: mvn --batch-mode --no-transfer-progress verify -P ci-spotless -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss.SSS
+        run: mvn --batch-mode --no-transfer-progress verify -P ci-spotless -Dspotbugs.htmlOutput=true -Dspotbugs.sarifOutput=true -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss.SSS
       - name: Publish Test Report for PRs
         if: ${{ always()  &&  (github.event.pull_request.head.repo.full_name == github.repository) }}
         uses: mikepenz/action-junit-report@v6
@@ -104,8 +104,8 @@ jobs:
             target/spotbugs.html
             target/spotbugs.sarif
       - name: Upload SpotBugs SARIF to GitHub Code Scanning
-        if: always() && github.event.pull_request.head.repo.full_name == github.repository
-        uses: github/codeql-action/upload-sarif@v3
+        if: always() && github.event.pull_request.head.repo.full_name == github.repository && hashFiles('target/spotbugs.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: target/spotbugs.sarif
           category: spotbugs
