@@ -197,7 +197,6 @@
         </executions>
         <configuration>
           <skip>${spotless.skip}</skip>
-          <ratchetFrom>origin/master</ratchetFrom>
           <java>
             <cleanthat>
               <sourceJdk>${java.version}</sourceJdk>
