@@ -31,7 +31,9 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.CombatContestSettings;
+import ti4.contest.replay.core.CombatPredictionPayout;
 import ti4.contest.replay.core.CombatReplayTrackedEvent;
+import ti4.contest.replay.core.CombatRollPayload;
 import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.service.CombatReplayLeaderboardService;
 import ti4.contest.replay.service.CombatReplayService;
@@ -47,6 +49,8 @@ import ti4.image.TileGenerator;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
+import ti4.model.LeaderModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.service.combat.CombatRollType;
@@ -152,12 +156,13 @@ public class CombatContestService {
             String message,
             CombatRollType rollType,
             boolean whiff,
-            boolean slam) {
+            boolean slam,
+            CombatRollPayload payload) {
         runReplayHook(
                 game,
                 "roll mirror",
                 () -> combatReplayService.mirrorCombatRoll(
-                        game, player, opponent, tile, message, rollType, whiff, slam));
+                        game, player, opponent, tile, message, rollType, whiff, slam, payload));
         if (isReplayV2Enabled()) return;
         try {
             CombatContestEntity contest = repository
@@ -197,6 +202,76 @@ public class CombatContestService {
                 () -> combatReplayService.mirrorCombatEvent(
                         game, player, header, name, embed, sourceChannelName, trackedEvent));
         if (isReplayV2Enabled()) return;
+        try {
+            List<CombatContestEntity> activeContests =
+                    repository.findByGameNameAndStatusIn(game.getName(), ACTIVE_STATUSES);
+            if (activeContests.isEmpty()) return;
+
+            String message = "## " + header + "\n" + player.getRepresentation() + " " + name;
+            for (CombatContestEntity contest : activeContests) {
+                if (!matchesParticipant(contest, player)) continue;
+                MessageChannel threadOrChannel = getContestThreadOrChannel(contest);
+                if (threadOrChannel == null) continue;
+                MessageHelper.sendMessageToChannelWithEmbed(threadOrChannel, message, embed);
+            }
+        } catch (Exception e) {
+            BotLogger.error(new LogOrigin(game), "Combat contest " + header.toLowerCase() + " relay failed.", e);
+        }
+    }
+
+    public void mirrorLeaderPlayed(Game game, Player player, String leaderId, String sourceChannelName) {
+        runReplayHook(
+                game,
+                "leader mirror",
+                () -> combatReplayService.mirrorLeaderPlayed(game, player, leaderId, sourceChannelName));
+        if (isReplayV2Enabled()) return;
+
+        LeaderModel leader = Mapper.getLeader(leaderId);
+        if (leader == null) return;
+        String header =
+                switch (leader.getType()) {
+                    case "agent" -> "Agent";
+                    case "hero" -> "Hero";
+                    case "commander" -> "Commander";
+                    case "envoy" -> "Envoy";
+                    default -> "Leader";
+                };
+        String verb = "hero".equalsIgnoreCase(leader.getType()) ? "played" : "used";
+        relayCombatEmbed(
+                game,
+                player,
+                header,
+                verb + " _" + leader.getName() + "_.",
+                leader.getRepresentationEmbed(
+                        false,
+                        true,
+                        false,
+                        Constants.VERBOSITY_VERBOSE.equals(game.getOutputVerbosity()),
+                        game.isTwilightsFallMode()));
+    }
+
+    public void mirrorActionCardPlayed(
+            Game game,
+            Player player,
+            ActionCardModel actionCard,
+            String sourceChannelName,
+            CombatReplayTrackedEvent trackedEvent) {
+        runReplayHook(
+                game,
+                "action card mirror",
+                () -> combatReplayService.mirrorActionCardPlayed(
+                        game, player, actionCard.getAlias(), sourceChannelName, trackedEvent));
+        if (isReplayV2Enabled()) return;
+
+        relayCombatEmbed(
+                game,
+                player,
+                "Action Card",
+                "played _" + actionCard.getName() + "_.",
+                actionCard.getRepresentationEmbed(false, true, game));
+    }
+
+    private void relayCombatEmbed(Game game, Player player, String header, String name, MessageEmbed embed) {
         try {
             List<CombatContestEntity> activeContests =
                     repository.findByGameNameAndStatusIn(game.getName(), ACTIVE_STATUSES);
@@ -690,10 +765,7 @@ public class CombatContestService {
     }
 
     private int calculatePredictionPoints(int winnerPredictions, int totalPredictions) {
-        totalPredictions = Math.max(1, totalPredictions);
-        double winnerShare = winnerPredictions / (double) totalPredictions;
-        double scaledPoints = 4.0 / Math.max(winnerShare, ZERO_EPSILON);
-        return (int) Math.round(Math.max(4.0, Math.min(100.0, scaledPoints)));
+        return CombatPredictionPayout.points(winnerPredictions, totalPredictions);
     }
 
     private void postPredictionPointsSummary(

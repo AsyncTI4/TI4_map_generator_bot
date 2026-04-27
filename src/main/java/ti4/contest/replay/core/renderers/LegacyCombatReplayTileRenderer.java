@@ -1,4 +1,4 @@
-package ti4.contest.replay.core;
+package ti4.contest.replay.core.renderers;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import tools.jackson.databind.module.SimpleModule;
 /**
  * Captures and restores the minimal game state needed to render replay hit-assignment images.
  */
-public class CombatReplayRenderSnapshotSupport {
+public class LegacyCombatReplayTileRenderer {
 
     private static final JsonMapper SNAPSHOT_MAPPER = JsonMapperManager.basic()
             .rebuild()

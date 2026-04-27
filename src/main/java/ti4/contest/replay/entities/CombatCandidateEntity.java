@@ -88,6 +88,9 @@ public class CombatCandidateEntity {
     @Column(name = "initial_render_snapshot_json", columnDefinition = "TEXT")
     private String initialRenderSnapshotJson;
 
+    @Column(name = "replay_abilities_json", columnDefinition = "TEXT")
+    private String replayAbilitiesJson;
+
     @Column(name = "promotion_score")
     private Double promotionScore;
 
@@ -105,6 +108,12 @@ public class CombatCandidateEntity {
 
     @Column(name = "defender_has_assault_cannon", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean defenderHasAssaultCannon = false;
+
+    @Column(name = "attacker_hp")
+    private Double attackerHp;
+
+    @Column(name = "defender_hp")
+    private Double defenderHp;
 
     @Column(name = "attacker_rolled_afb", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean attackerRolledAfb = false;

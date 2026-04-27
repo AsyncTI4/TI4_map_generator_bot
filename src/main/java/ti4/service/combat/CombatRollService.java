@@ -17,6 +17,11 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import ti4.contest.replay.core.CombatRollPayload;
+import ti4.contest.replay.core.CombatRollPayload.CombatRollNotePlacement;
+import ti4.contest.replay.core.CombatRollPayload.CombatRollNoteType;
+import ti4.contest.replay.core.CombatRollPayload.DieRollSource;
+import ti4.contest.replay.core.CombatRollPayload.RollSegmentType;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
@@ -44,6 +49,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
+import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetModel;
 import ti4.model.RelicModel;
@@ -51,6 +57,7 @@ import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -288,8 +295,11 @@ public class CombatRollService {
                 event,
                 tile,
                 combatOnHolder);
-        String message =
-                CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType) + rollResult.message();
+        String combatSummary = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
+        String message = combatSummary + rollResult.message();
+        CombatRollPayload.RollHeader rollHeader =
+                buildRollHeader(game, player, opponent, tile, combatOnHolder, rollType, combatSummary);
+        CombatRollPayload payload = rollResult.payload().withHeader(rollHeader);
         FOWCombatThreadMirroring.mirrorCombatMessage(event, player, game, message);
         int h = rollResult.totalHits();
         int round;
@@ -336,7 +346,15 @@ public class CombatRollService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         SpringContext.getBean(CombatContestService.class)
                 .mirrorCombatRoll(
-                        game, player, opponent, tile, message, rollType, rollResult.whiff(), rollResult.slam());
+                        game,
+                        player,
+                        opponent,
+                        tile,
+                        message,
+                        rollType,
+                        rollResult.whiff(),
+                        rollResult.slam(),
+                        payload);
         if (message.contains("adding +1, at the risk of your")) {
             Button thalnosButton = Buttons.green(
                     "startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos", ExploreEmojis.Relic);
@@ -709,7 +727,7 @@ public class CombatRollService {
                 .message();
     }
 
-    private static CombatRollResult rollForUnitsWithResult(
+    static CombatRollResult rollForUnitsWithResult(
             Map<UnitModel, Integer> playerUnits,
             List<NamedCombatModifierModel> extraRolls,
             List<NamedCombatModifierModel> autoMods,
@@ -722,6 +740,8 @@ public class CombatRollService {
             Tile activeSystem,
             UnitHolder unitHolder) {
         String result = "";
+        RollPayloadBuilder payloadBuilder = new RollPayloadBuilder();
+        List<CombatRollPayload.CombatRollNote> delayedAfterTotalNotes = new ArrayList<>();
 
         List<NamedCombatModifierModel> mods = new ArrayList<>(autoMods);
         mods.addAll(tempMods);
@@ -733,6 +753,8 @@ public class CombatRollService {
         Set<NamedCombatModifierModel> set = new HashSet<>(modAndExtraRolls);
         List<NamedCombatModifierModel> uniqueList = new ArrayList<>(set);
         result += CombatMessageHelper.displayModifiers("With modifiers: \n", playerUnits, uniqueList);
+        payloadBuilder.addModifierDisplays(
+                uniqueList, playerUnits, player, opponent, game, rollType, activeSystem, unitHolder);
 
         // Actually roll for each unit
         int totalHits = 0;
@@ -753,6 +775,13 @@ public class CombatRollService {
                 && "space".equalsIgnoreCase(unitHolder.getName())
                 && unitHolder.getDamagedUnitCount(UnitType.Flagship, player.getColorID()) > 0) {
             result = "Repaired the Arc Secundus at start of this combat round with its ability.\n" + result;
+            payloadBuilder.addNote(new CombatRollPayload.CombatRollNote(
+                    CombatRollNoteType.UNIT_REPAIRED,
+                    CombatRollNotePlacement.BEFORE_MODIFIERS,
+                    "letnev_flagship",
+                    "letnev_flagship",
+                    1,
+                    Map.of("timing", "START_OF_COMBAT_ROUND")));
             activeSystem.removeUnitDamage(
                     unitHolder.getName(), Mapper.getUnitKey(AliasHandler.resolveUnit("fs"), player.getColorID()), 1);
         }
@@ -761,6 +790,13 @@ public class CombatRollService {
                 && "space".equalsIgnoreCase(unitHolder.getName())
                 && unitHolder.getDamagedUnitCount(UnitType.Mech, player.getColorID()) > 0) {
             result = "The Eidolon Maximum self-repaired at the start of this combat round.\n" + result;
+            payloadBuilder.addNote(new CombatRollPayload.CombatRollNote(
+                    CombatRollNoteType.UNIT_REPAIRED,
+                    CombatRollNotePlacement.BEFORE_MODIFIERS,
+                    "naaz_voltron",
+                    "naaz_voltron",
+                    1,
+                    Map.of("timing", "START_OF_COMBAT_ROUND")));
             activeSystem.removeUnitDamage(
                     unitHolder.getName(), Mapper.getUnitKey(AliasHandler.resolveUnit("mf"), player.getColorID()), 1);
         }
@@ -801,12 +837,26 @@ public class CombatRollService {
             }
             if (player.hasTech("tf-supercharge")) {
                 resultBuilder.append("Applied +2 to the rolls of 1 unit with _Supercharge_.\n");
+                payloadBuilder.addNote(new CombatRollPayload.CombatRollNote(
+                        CombatRollNoteType.SINGLE_UNIT_ROLL_MOD_APPLIED,
+                        CombatRollNotePlacement.BEFORE_UNIT_ROLLS,
+                        "tf-supercharge",
+                        game.getStoredValue("highestValueSingleUnit" + player.getFaction()),
+                        1,
+                        Map.of("modifier", "2")));
                 letnevBTBoost = 2;
             } else {
                 resultBuilder
                         .append("Applied +")
                         .append(letnevBTBoost)
                         .append(" to the rolls of 1 unit with _Gravleash Maneuvers_.\n");
+                payloadBuilder.addNote(new CombatRollPayload.CombatRollNote(
+                        CombatRollNoteType.SINGLE_UNIT_ROLL_MOD_APPLIED,
+                        CombatRollNotePlacement.BEFORE_UNIT_ROLLS,
+                        "letnevbt",
+                        game.getStoredValue("highestValueSingleUnit" + player.getFaction()),
+                        1,
+                        Map.of("modifier", Integer.toString(letnevBTBoost))));
             }
         }
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
@@ -899,6 +949,18 @@ public class CombatRollService {
                 if (numRolls == 0) {
                     continue;
                 }
+                RollSegmentType segmentType =
+                        switch (singleUnit) {
+                            case "singleUnit" ->
+                                player.hasTech("tf-supercharge")
+                                        ? RollSegmentType.SUPERCHARGE_SELECTED_UNIT
+                                        : RollSegmentType.GRAVLEASH_SELECTED_UNIT;
+                            case "RestOfUnits" ->
+                                player.hasTech("tf-supercharge")
+                                        ? RollSegmentType.SUPERCHARGE_REST
+                                        : RollSegmentType.GRAVLEASH_REST;
+                            default -> RollSegmentType.PRIMARY;
+                        };
                 RoundStatsTracker.recordDiceRolled(game, player, numRolls);
                 List<DiceHelper.Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
                 int mult = 1;
@@ -1041,6 +1103,13 @@ public class CombatRollService {
                             .append(" due to ")
                             .append(misses == 1 ? "a Thalnos miss" : "Thalnos misses")
                             .append(".");
+                    delayedAfterTotalNotes.add(new CombatRollPayload.CombatRollNote(
+                            CombatRollNoteType.UNIT_DESTROYED_FROM_ROLL,
+                            CombatRollNotePlacement.AFTER_TOTAL,
+                            "thalnos",
+                            unitModel.getId(),
+                            misses,
+                            Map.of("actorEmoji", player.getFactionEmoji(), "unitName", unitModel.getName())));
                     for (String thalnosUnit : game.getThalnosUnits().keySet()) {
                         String pos = thalnosUnit.split("_")[0];
                         String unitHolderName = thalnosUnit.split("_")[1];
@@ -1081,6 +1150,17 @@ public class CombatRollService {
                         resultRolls,
                         hitRolls);
                 resultBuilder.append(unitRoll);
+                payloadBuilder.addUnitRoll(
+                        unitModel,
+                        toHit,
+                        modifierToHit,
+                        numOfUnit,
+                        numRollsPerUnit,
+                        extraRollsForUnit,
+                        segmentType,
+                        resultRolls,
+                        hitRolls,
+                        DieRollSource.PRIMARY);
                 List<DiceHelper.Die> resultRolls2 = new ArrayList<>();
                 int numMisses = numRolls - hitRolls;
                 if (player.ownsUnit("tf-justicerrail") && rollType == CombatRollType.SpaceCannonOffence) {
@@ -1108,6 +1188,17 @@ public class CombatRollService {
                                     extraRollsForUnit,
                                     resultRolls2,
                                     hitRolls2);
+                            payloadBuilder.addUnitRoll(
+                                    unitModel,
+                                    toHit,
+                                    modifierToHit,
+                                    numOfUnit,
+                                    numRollsPerUnit,
+                                    extraRollsForUnit,
+                                    RollSegmentType.JOL_NAR_COMMANDER_REROLL_HITS,
+                                    resultRolls2,
+                                    hitRolls2,
+                                    DieRollSource.REROLL_HIT);
                             resultBuilder
                                     .append("Rerolling ")
                                     .append(hitRolls)
@@ -1136,6 +1227,17 @@ public class CombatRollService {
                                     0,
                                     resultRolls2,
                                     hitRolls2);
+                            payloadBuilder.addUnitRoll(
+                                    unitModel,
+                                    toHit,
+                                    modifierToHit,
+                                    numOfUnit,
+                                    numRollsPerUnit,
+                                    0,
+                                    RollSegmentType.JOL_NAR_COMMANDER_REROLL_MISSES,
+                                    resultRolls2,
+                                    hitRolls2,
+                                    DieRollSource.REROLL_MISS);
                             resultBuilder
                                     .append("Rerolling ")
                                     .append(numMisses)
@@ -1225,6 +1327,17 @@ public class CombatRollService {
                                 0,
                                 resultRolls2,
                                 hitRolls2);
+                        payloadBuilder.addUnitRoll(
+                                unitModel,
+                                toHit,
+                                modifierToHit,
+                                numOfUnit,
+                                numRollsPerUnit,
+                                0,
+                                RollSegmentType.KALTRIM_COMMANDER_REROLL_ONES,
+                                resultRolls2,
+                                hitRolls2,
+                                DieRollSource.REROLL_ONE);
                         resultBuilder
                                 .append("Rerolling ")
                                 .append(num1s)
@@ -1261,6 +1374,17 @@ public class CombatRollService {
                     totalHits += hitRolls2;
                     String unitRoll2 = CombatMessageHelper.displayUnitRoll(
                             unitModel, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
+                    payloadBuilder.addUnitRoll(
+                            unitModel,
+                            toHit,
+                            modifierToHit,
+                            numOfUnit,
+                            numRollsPerUnit,
+                            0,
+                            RollSegmentType.MUNITIONS_RESERVES_REROLL,
+                            resultRolls2,
+                            hitRolls2,
+                            DieRollSource.MUNITIONS_RESERVES);
                     resultBuilder
                             .append("**Munitions Reserve** rerolling ")
                             .append(numMisses)
@@ -1293,6 +1417,13 @@ public class CombatRollService {
                     String kills = "\nDue to the Strike Wing Alpha II destroyer ability, " + argentInfKills + " of "
                             + opponent.getRepresentation(false, true) + " infantry were destroyed\n";
                     resultBuilder.append(kills);
+                    payloadBuilder.addNote(new CombatRollPayload.CombatRollNote(
+                            CombatRollNoteType.OPPONENT_UNIT_DESTROYED_FROM_ROLL,
+                            CombatRollNotePlacement.AFTER_UNIT_ROLLS,
+                            unitModel.getId(),
+                            "infantry",
+                            argentInfKills,
+                            Map.of("opponent", opponent.getRepresentation(false, true))));
                     UnitKey inf = Units.getUnitKey(UnitType.Infantry, opponent.getColorID());
                     DestroyUnitService.destroyUnit(event, activeSystem, game, inf, argentInfKills, space, true);
                 }
@@ -1335,11 +1466,19 @@ public class CombatRollService {
             result += "\n" + player.getFactionEmoji() + " You have _The Crown of Thalnos_ and may reroll "
                     + (totalMisses == 1 ? "the miss" : "misses")
                     + ", adding +1, at the risk of your " + (totalMisses == 1 ? "troop's life" : "troops' lives") + ".";
+            payloadBuilder.addNote(new CombatRollPayload.CombatRollNote(
+                    CombatRollNoteType.REROLL_AVAILABLE,
+                    CombatRollNotePlacement.AFTER_TOTAL,
+                    "thalnos",
+                    null,
+                    totalMisses,
+                    Map.of("actorEmoji", player.getFactionEmoji())));
         }
         if (totalHits > 0 && rollType == CombatRollType.bombardment && player.hasTech("dszelir")) {
             result += "\n" + player.getFactionEmoji()
                     + " You have _Shard Volley_ and thus should produce an additional hit to the ones rolled above.";
         }
+        delayedAfterTotalNotes.forEach(payloadBuilder::addNote);
         if (!extra.isEmpty()) {
             result += "\n\n" + extra;
         }
@@ -1347,10 +1486,169 @@ public class CombatRollService {
                 && rollType == CombatRollType.combatround) {
             game.setStoredValue("munitionsReserves", "");
         }
-        return new CombatRollResult(result, totalHits, whiff, slam);
+        CombatRollPayload payload = payloadBuilder.build(totalHits, totalMisses, maximumHits);
+        return new CombatRollResult(result, totalHits, whiff, slam, payload);
     }
 
-    private record CombatRollResult(String message, int totalHits, boolean whiff, boolean slam) {}
+    private CombatRollPayload.RollHeader buildRollHeader(
+            Game game,
+            Player player,
+            Player opponent,
+            Tile tile,
+            UnitHolder combatOnHolder,
+            CombatRollType rollType,
+            String combatSummary) {
+        String combatDisplayName = substringBetween(combatSummary, "rolls for ", " " + MiscEmojis.RollDice + " :");
+        if (combatDisplayName == null) {
+            combatDisplayName = substringBetween(combatSummary, "rolls for ", " :");
+        }
+        Integer combatRound = null;
+        if (rollType == CombatRollType.combatround) {
+            String combatName =
+                    "combatRoundTracker" + player.getFaction() + tile.getPosition() + combatOnHolder.getName();
+            if (!game.getStoredValue(combatName).isBlank()) {
+                combatRound = Integer.parseInt(game.getStoredValue(combatName));
+            }
+        }
+        boolean thalnosReroll = "true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"));
+        return new CombatRollPayload.RollHeader(
+                player.getFaction(),
+                player.getColor(),
+                player.getFactionEmoji(),
+                opponent == null ? null : opponent.getFaction(),
+                opponent == null ? null : opponent.getColor(),
+                tile.getPosition(),
+                tile.getTileID(),
+                combatOnHolder.getName(),
+                combatDisplayName,
+                rollType,
+                combatRound,
+                thalnosReroll,
+                game.isFowMode());
+    }
+
+    private static class RollPayloadBuilder {
+        private final List<CombatRollPayload.CombatRollNote> notes = new ArrayList<>();
+        private final List<CombatRollPayload.ModifierDisplay> modifiers = new ArrayList<>();
+        private final List<CombatRollPayload.UnitRoll> unitRolls = new ArrayList<>();
+        private int diceRolled;
+
+        void addNote(CombatRollPayload.CombatRollNote note) {
+            if (note != null) {
+                notes.add(note);
+            }
+        }
+
+        void addModifierDisplays(
+                List<NamedCombatModifierModel> namedModifiers,
+                Map<UnitModel, Integer> units,
+                Player player,
+                Player opponent,
+                Game game,
+                CombatRollType rollType,
+                Tile activeSystem,
+                UnitHolder unitHolder) {
+            if (namedModifiers.isEmpty()) return;
+
+            List<UnitModel> playerUnits = new ArrayList<>(units.keySet());
+            for (NamedCombatModifierModel namedModifier : namedModifiers) {
+                CombatModifierModel modifier = namedModifier.getModifier();
+                Map<String, Integer> effectiveValues = new HashMap<>();
+                for (Map.Entry<UnitModel, Integer> unitEntry : units.entrySet()) {
+                    UnitModel unit = unitEntry.getKey();
+                    int effectiveValue = CombatModHelper.getCombinedModifierForUnit(
+                            unit,
+                            unitEntry.getValue(),
+                            List.of(namedModifier),
+                            player,
+                            opponent,
+                            game,
+                            playerUnits,
+                            rollType,
+                            activeSystem,
+                            unitHolder);
+                    if (effectiveValue != 0) {
+                        effectiveValues.put(unit.getAsyncId(), effectiveValue);
+                    }
+                }
+                modifiers.add(new CombatRollPayload.ModifierDisplay(
+                        modifier.getAlias(),
+                        namedModifier.getName(),
+                        modifier.getValue(),
+                        modifier.getType(),
+                        modifier.getScope(),
+                        resolveScopeDisplay(modifier, units),
+                        effectiveValues));
+            }
+        }
+
+        void addUnitRoll(
+                UnitModel unitModel,
+                int toHit,
+                int modifier,
+                int unitQuantity,
+                int numRollsPerUnit,
+                int extraRolls,
+                RollSegmentType segmentType,
+                List<DiceHelper.Die> resultRolls,
+                int hits,
+                DieRollSource source) {
+            diceRolled += resultRolls.size();
+            unitRolls.add(new CombatRollPayload.UnitRoll(
+                    unitModel.getId(),
+                    unitModel.getAsyncId(),
+                    unitModel.getBaseType(),
+                    unitModel.getName(),
+                    getDisplayedUnitName(unitModel),
+                    unitModel.getUnitEmoji().toString(),
+                    unitQuantity,
+                    numRollsPerUnit,
+                    extraRolls,
+                    toHit,
+                    modifier,
+                    toHit - modifier,
+                    segmentType,
+                    toDieRolls(resultRolls, source),
+                    hits));
+        }
+
+        CombatRollPayload build(int displayedTotalHits, int misses, int maximumHits) {
+            return new CombatRollPayload(
+                    null,
+                    notes,
+                    modifiers,
+                    unitRolls,
+                    new CombatRollPayload.RollTotal(diceRolled, displayedTotalHits, misses, maximumHits));
+        }
+
+        private List<CombatRollPayload.DieRoll> toDieRolls(List<DiceHelper.Die> resultRolls, DieRollSource source) {
+            if (resultRolls.isEmpty()) return List.of();
+            return resultRolls.stream()
+                    .map(die ->
+                            new CombatRollPayload.DieRoll(die.getResult(), die.getThreshold(), die.isSuccess(), source))
+                    .toList();
+        }
+
+        private String getDisplayedUnitName(UnitModel unitModel) {
+            if (unitModel.getUpgradesFromUnitId().isPresent()
+                    || unitModel.getFaction().isPresent()) {
+                return unitModel.getName();
+            }
+            return "";
+        }
+
+        private String resolveScopeDisplay(CombatModifierModel modifier, Map<UnitModel, Integer> units) {
+            String unitScope = modifier.getScope();
+            if (isBlank(unitScope)) return "all";
+            return units.keySet().stream()
+                    .filter(unit -> unit.getAsyncId().equals(unitScope))
+                    .findFirst()
+                    .map(unit -> unit.getUnitEmoji().toString())
+                    .orElse(unitScope);
+        }
+    }
+
+    record CombatRollResult(String message, int totalHits, boolean whiff, boolean slam, CombatRollPayload payload) {}
 
     public static Player getOpponent(Player player, List<UnitHolder> unitHolders, Game game) {
         Player opponent = null;

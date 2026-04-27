@@ -22,6 +22,9 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.*;
+import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
+import ti4.contest.replay.core.renderers.CombatRollPayloadRenderer;
+import ti4.contest.replay.core.renderers.LegacyCombatReplayTileRenderer;
 import ti4.contest.replay.dispatch.ReplayDispatchPayload;
 import ti4.contest.replay.dispatch.ReplayDispatchSerializer;
 import ti4.contest.replay.entities.*;
@@ -31,11 +34,16 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.persistence.GameManager;
+import ti4.helpers.Constants;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.ThreadGetter;
+import ti4.image.Mapper;
 import ti4.image.TileGenerator;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
+import ti4.model.LeaderModel;
+import ti4.model.TechnologyModel;
 import ti4.spring.service.contest.CombatContestService;
 
 @Service
@@ -237,6 +245,7 @@ public class CombatReplayContestLifecycleService {
             contest.setNextEventSequence(contest.getNextEventSequence() + 1);
             contest.setReplayError(null);
             if (nextEvent == null) {
+                postReplayAbilityEpilogue(channel, candidate);
                 completeReplayContest(contest);
                 return;
             }
@@ -400,6 +409,7 @@ public class CombatReplayContestLifecycleService {
             LocalDateTime promotedAt) {
         CombatReplayContestEntity contest = new CombatReplayContestEntity();
         configureReplayContest(contest, winner, publicChannelId, publicMessageId, publicThreadId, promotedAt);
+        contest.setSideBetPayoutModel(CombatReplaySideBetPayoutService.ODDS_V1);
         return contest;
     }
 
@@ -550,8 +560,99 @@ public class CombatReplayContestLifecycleService {
             sendDiscordMessage(channel, messageDispatch.message(), event.getSummaryText());
             return;
         }
+        if (payload instanceof ReplayDispatchPayload.GenericMessageDispatch messageDispatch) {
+            sendDiscordMessage(channel, messageDispatch.message(), event.getSummaryText());
+            return;
+        }
+        ReplayDispatchPayload.DiscordMessage interactionMessage =
+                renderInteractionPayload(game, event.getActorFaction(), payload, event.getSummaryText());
+        if (interactionMessage != null) {
+            sendDiscordMessage(channel, interactionMessage, event.getSummaryText());
+            return;
+        }
+        if (payload instanceof ReplayDispatchPayload.CombatRollDispatch rollDispatch) {
+            CombatRollPayload payloadWithAbilities =
+                    CombatReplayDecoys.applyToRoll(rollDispatch.payload(), readReplayAbilities(candidate));
+            String rendered = CombatRollPayloadRenderer.render(payloadWithAbilities);
+            String renderedWithHeader = StringUtils.isBlank(rendered) ? null : "## Roll Update\n" + rendered;
+            String content = firstNonBlank(
+                    renderedWithHeader, firstNonBlank(rollDispatch.message().content(), event.getSummaryText()));
+            sendDiscordMessage(
+                    channel, new ReplayDispatchPayload.DiscordMessage(content, List.of()), event.getSummaryText());
+            return;
+        }
 
         sendDiscordMessage(channel, event.getSummaryText(), List.of());
+    }
+
+    private ReplayDispatchPayload.DiscordMessage renderInteractionPayload(
+            Game game, String actorFaction, ReplayDispatchPayload payload, String fallback) {
+        if (payload instanceof ReplayDispatchPayload.LeaderPlayedDispatch leaderDispatch) {
+            LeaderModel leader = Mapper.getLeader(leaderDispatch.leaderId());
+            if (leader == null) return plainReplayMessage(fallback);
+
+            String verb = "hero".equalsIgnoreCase(leader.getType()) ? "played" : "used";
+            MessageEmbed embed = leader.getRepresentationEmbed(
+                    false,
+                    true,
+                    false,
+                    game != null && Constants.VERBOSITY_VERBOSE.equals(game.getOutputVerbosity()),
+                    game != null && game.isTwilightsFallMode());
+            return replayMessage(
+                    "## " + leaderHeader(leader) + "\n" + actor(game, actorFaction, true) + " " + verb + " _"
+                            + leader.getName() + "_.",
+                    embed);
+        }
+        if (payload instanceof ReplayDispatchPayload.ActionCardPlayedDispatch actionCardDispatch) {
+            ActionCardModel actionCard = Mapper.getActionCard(actionCardDispatch.actionCardId());
+            if (actionCard == null) return plainReplayMessage(fallback);
+
+            return replayMessage(
+                    "## Action Card\n" + actor(game, actorFaction, true) + " played _" + actionCard.getName() + "_.",
+                    actionCard.getRepresentationEmbed(false, true, game));
+        }
+        if (payload instanceof ReplayDispatchPayload.TechPlayedDispatch techDispatch) {
+            return renderTech(game, actorFaction, techDispatch.techId(), "used", fallback);
+        }
+        if (payload instanceof ReplayDispatchPayload.TechExhaustedDispatch techDispatch) {
+            return renderTech(game, actorFaction, techDispatch.techId(), "exhausted", fallback);
+        }
+        return null;
+    }
+
+    private ReplayDispatchPayload.DiscordMessage renderTech(
+            Game game, String actorFaction, String techId, String verb, String fallback) {
+        TechnologyModel tech = Mapper.getTech(techId);
+        if (tech == null) return plainReplayMessage(fallback);
+
+        return replayMessage(
+                "## Combat Ability\n" + actor(game, actorFaction, false) + " " + verb + " _" + tech.getName() + "_.",
+                tech.getRepresentationEmbed());
+    }
+
+    private String leaderHeader(LeaderModel leader) {
+        return switch (StringUtils.lowerCase(leader.getType())) {
+            case "agent" -> "Agent";
+            case "hero" -> "Hero";
+            case "commander" -> "Commander";
+            case "envoy" -> "Envoy";
+            default -> "Leader";
+        };
+    }
+
+    private String actor(Game game, String actorFaction, boolean ping) {
+        Player player = game == null ? null : game.getPlayerFromColorOrFaction(actorFaction);
+        if (player == null) return actorFaction;
+        return ping ? player.getRepresentation() : player.getRepresentationNoPing();
+    }
+
+    private ReplayDispatchPayload.DiscordMessage replayMessage(String content, MessageEmbed embed) {
+        return new ReplayDispatchPayload.DiscordMessage(
+                content, ReplayDispatchSerializer.fromMessageEmbeds(embed == null ? List.of() : List.of(embed)));
+    }
+
+    private ReplayDispatchPayload.DiscordMessage plainReplayMessage(String content) {
+        return new ReplayDispatchPayload.DiscordMessage(content, List.of());
     }
 
     @SneakyThrows
@@ -603,12 +704,27 @@ public class CombatReplayContestLifecycleService {
     private Game restoreReplayGame(
             String snapshotJson, Game game, CombatCandidateEntity candidate, String tilePosition) {
         if (tilePosition == null || snapshotJson == null) return null;
-        Game snapshotGame = CombatReplayRenderSnapshotSupport.restoreGame(snapshotJson, game);
+        String initialContextJson = candidate == null ? snapshotJson : candidate.getInitialRenderSnapshotJson();
+        Game snapshotGame = CombatReplayTileRenderer.render(initialContextJson, snapshotJson, game);
         if (snapshotGame == null || candidate == null) return snapshotGame;
+        CombatReplayDecoys.applyToTile(snapshotGame, tilePosition, readReplayAbilities(candidate));
         removeReplayCommandCounters(snapshotGame, tilePosition);
-        snapshotGame.setName(CombatReplayRenderSnapshotSupport.buildReplaySnapshotName(
+        snapshotGame.setName(LegacyCombatReplayTileRenderer.buildReplaySnapshotName(
                 candidate.getAttackerFaction(), candidate.getDefenderFaction()));
         return snapshotGame;
+    }
+
+    private void postReplayAbilityEpilogue(MessageChannel channel, CombatCandidateEntity candidate) {
+        String decoyMessage = CombatReplayDecoys.renderDisappearanceMessage(readReplayAbilities(candidate));
+        if (StringUtils.isNotBlank(decoyMessage)) {
+            sendDiscordMessage(channel, decoyMessage, List.of());
+        }
+    }
+
+    private CombatReplayDecoys.Abilities readReplayAbilities(CombatCandidateEntity candidate) {
+        return candidate == null
+                ? new CombatReplayDecoys.Abilities(null)
+                : CombatReplayDecoys.read(candidate.getReplayAbilitiesJson());
     }
 
     @SneakyThrows

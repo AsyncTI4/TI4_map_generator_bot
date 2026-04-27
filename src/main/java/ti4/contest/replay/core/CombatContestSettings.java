@@ -59,6 +59,8 @@ public class CombatContestSettings {
         require(runtime.versionEnabled != null, "runtime.versionEnabled is required.");
         require(sideBets.maxBetsPerUser >= 0, "sideBets.maxBetsPerUser must be >= 0.");
         require(sideBets.costPoints >= 0, "sideBets.costPoints must be >= 0.");
+        require(sideBets.dynamicPayoutTargetReturn > 0, "sideBets.dynamicPayoutTargetReturn must be > 0.");
+        require(sideBets.dynamicPayoutCap >= 1, "sideBets.dynamicPayoutCap must be >= 1.");
         require(
                 "v1".equalsIgnoreCase(runtime.versionEnabled) || "v2".equalsIgnoreCase(runtime.versionEnabled),
                 "runtime.versionEnabled must be 'v1' or 'v2'.");
@@ -80,13 +82,15 @@ public class CombatContestSettings {
             replayExecution.setStartDelayMinutes(10);
             replayExecution.setReplayIntervalSeconds(15);
             replayExecution.setMaxEventGapSeconds(30);
+            runtime.setDevMode(false);
             runtime.setTrackAllCombatsAsCandidates(false);
             runtime.setImmediatePromotionOnResolve(false);
             sideBets.setEnableSideBets(true);
         } else {
-            replayExecution.setStartDelayMinutes(1);
+            replayExecution.setStartDelayMinutes(0);
             replayExecution.setReplayIntervalSeconds(1);
             replayExecution.setMaxEventGapSeconds(1);
+            runtime.setDevMode(true);
             runtime.setTrackAllCombatsAsCandidates(true);
             runtime.setImmediatePromotionOnResolve(true);
             sideBets.setEnableSideBets(true);
@@ -134,6 +138,7 @@ public class CombatContestSettings {
     @Getter
     @Setter
     public static class Runtime {
+        private boolean devMode = false;
         private boolean discordPostingEnabled = true;
         private String versionEnabled = "v2";
         private boolean trackAllCombatsAsCandidates = false;
@@ -146,5 +151,7 @@ public class CombatContestSettings {
         private boolean enableSideBets = true;
         private int maxBetsPerUser = 5;
         private int costPoints = 1;
+        private double dynamicPayoutTargetReturn = 0.75;
+        private int dynamicPayoutCap = 100;
     }
 }

@@ -1,0 +1,197 @@
+package ti4.contest.replay.core;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+import lombok.SneakyThrows;
+import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
+import ti4.contest.replay.core.CombatRollPayload.DieRollSource;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
+import ti4.helpers.Constants;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
+import ti4.json.JsonMapperManager;
+import tools.jackson.databind.json.JsonMapper;
+
+@UtilityClass
+public class CombatReplayDecoys {
+
+    private static final JsonMapper MAPPER = JsonMapperManager.basic();
+
+    public String buildJson(Player attacker, Player defender, Tile tile) {
+        Abilities abilities = build(attacker, defender, tile);
+        return abilities.hasDecoys() ? write(abilities) : null;
+    }
+
+    public Abilities read(String json) {
+        if (StringUtils.isBlank(json)) return new Abilities(null);
+        return readJson(json);
+    }
+
+    public Game applyToTile(Game game, String tilePosition, Abilities abilities) {
+        if (!abilities.hasDecoys()) return game;
+
+        Tile tile = game.getTileByPosition(tilePosition);
+        if (tile == null) return game;
+        for (DecoyUnit decoyUnit : abilities.decoy().units()) {
+            UnitHolder holder = tile.getUnitHolders().get(decoyUnit.unitHolderName());
+            if (holder == null) continue;
+            holder.addUnitsWithStates(
+                    Units.getUnitKey(decoyUnit.unitType(), decoyUnit.colorId()), List.of(decoyUnit.count(), 0, 0, 0));
+        }
+        return game;
+    }
+
+    public CombatRollPayload applyToRoll(CombatRollPayload payload, Abilities abilities) {
+        if (!abilities.hasDecoys()) return payload;
+
+        List<DecoyUnit> availableDecoys = new ArrayList<>(abilities.decoy().units());
+        List<CombatRollPayload.UnitRoll> unitRolls = new ArrayList<>();
+        for (CombatRollPayload.UnitRoll unitRoll : payload.unitRolls()) {
+            DecoyUnit decoyUnit = takeDecoyForRoll(payload, unitRoll, availableDecoys);
+            unitRolls.add(decoyUnit == null ? unitRoll : withDecoys(unitRoll, decoyUnit.count()));
+        }
+        return new CombatRollPayload(
+                payload.header(), payload.notes(), payload.modifiers(), unitRolls, payload.total());
+    }
+
+    public String renderDisappearanceMessage(Abilities abilities) {
+        if (!abilities.hasDecoys()) return null;
+
+        String vanished = abilities.decoy().units().stream()
+                .collect(Collectors.groupingBy(
+                        unit -> unit.factionEmoji() + "|" + unit.unitType().humanReadableName(),
+                        Collectors.summingInt(DecoyUnit::count)))
+                .entrySet()
+                .stream()
+                .map(CombatReplayDecoys::renderVanishedGroup)
+                .collect(Collectors.joining(", "));
+        return "## Sensor Echoes Fade\n"
+                + "As the Lazax recorders close the battlefile, "
+                + vanished
+                + " shimmer out of formation and vanish from every tactical display. No wreckage remains; only the "
+                + "uneasy certainty that some of those ships were never truly there.";
+    }
+
+    private Abilities build(Player attacker, Player defender, Tile tile) {
+        List<DecoyUnit> decoyUnits = new ArrayList<>();
+        addDecoyUnits(decoyUnits, attacker, tile);
+        addDecoyUnits(decoyUnits, defender, tile);
+        return new Abilities(decoyUnits.isEmpty() ? null : new Decoy(decoyUnits));
+    }
+
+    private void addDecoyUnits(List<DecoyUnit> decoyUnits, Player player, Tile tile) {
+        if (!player.hasAbility("decoy")) return;
+
+        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        for (UnitKey unitKey : space.getUnitsByState().keySet()) {
+            if (!player.getColorID().equals(unitKey.getColorID())) continue;
+            if (!isShip(unitKey.getUnitType())) continue;
+            decoyUnits.add(new DecoyUnit(
+                    player.getFaction(),
+                    player.getFactionEmoji(),
+                    player.getColorID(),
+                    unitKey.getUnitType(),
+                    Constants.SPACE,
+                    1));
+        }
+    }
+
+    private boolean isShip(UnitType unitType) {
+        return switch (unitType) {
+            case Fighter, Destroyer, Cruiser, Carrier, Dreadnought, Flagship, Warsun, Lady, Celagrom, Cavalry -> true;
+            default -> false;
+        };
+    }
+
+    private DecoyUnit takeDecoyForRoll(
+            CombatRollPayload payload, CombatRollPayload.UnitRoll unitRoll, List<DecoyUnit> availableDecoys) {
+        for (DecoyUnit decoyUnit : List.copyOf(availableDecoys)) {
+            if (matches(decoyUnit, payload, unitRoll)) {
+                availableDecoys.remove(decoyUnit);
+                return decoyUnit;
+            }
+        }
+        return null;
+    }
+
+    private boolean matches(DecoyUnit decoyUnit, CombatRollPayload payload, CombatRollPayload.UnitRoll unitRoll) {
+        return decoyUnit.unitType().plainName().equalsIgnoreCase(unitRoll.baseType())
+                && decoyUnit
+                        .colorId()
+                        .equalsIgnoreCase(Mapper.getColorID(payload.header().actorColor()));
+    }
+
+    private CombatRollPayload.UnitRoll withDecoys(CombatRollPayload.UnitRoll unitRoll, int decoyCount) {
+        List<CombatRollPayload.DieRoll> dice = new ArrayList<>(unitRoll.dice());
+        for (int i = 0; i < decoyCount * unitRoll.dicePerUnit(); i++) {
+            dice.add(new CombatRollPayload.DieRoll(
+                    randomMiss(unitRoll.effectiveThreshold()),
+                    unitRoll.effectiveThreshold(),
+                    false,
+                    DieRollSource.DECOY));
+        }
+        return new CombatRollPayload.UnitRoll(
+                unitRoll.unitId(),
+                unitRoll.asyncId(),
+                unitRoll.baseType(),
+                unitRoll.unitName(),
+                unitRoll.unitDisplayName(),
+                unitRoll.unitEmoji(),
+                unitRoll.quantity() + decoyCount,
+                unitRoll.dicePerUnit(),
+                unitRoll.extraDice(),
+                unitRoll.printedHitsOn(),
+                unitRoll.modifier(),
+                unitRoll.effectiveThreshold(),
+                unitRoll.segmentType(),
+                dice,
+                unitRoll.hits());
+    }
+
+    private int randomMiss(int effectiveThreshold) {
+        if (effectiveThreshold <= 1) return ThreadLocalRandom.current().nextInt(1, 11);
+        return ThreadLocalRandom.current().nextInt(1, Math.min(10, effectiveThreshold - 1) + 1);
+    }
+
+    private String renderVanishedGroup(Map.Entry<String, Integer> group) {
+        String[] parts = group.getKey().split("\\|", 2);
+        int count = group.getValue();
+        return parts[0] + " " + count + " " + StringUtils.uncapitalize(parts[1]) + (count == 1 ? "" : "s");
+    }
+
+    @SneakyThrows
+    private String write(Abilities abilities) {
+        return MAPPER.writeValueAsString(abilities);
+    }
+
+    @SneakyThrows
+    private Abilities readJson(String json) {
+        return MAPPER.readValue(json, Abilities.class);
+    }
+
+    public record Abilities(Decoy decoy) {
+
+        public boolean hasDecoys() {
+            return decoy != null && !decoy.units().isEmpty();
+        }
+    }
+
+    public record Decoy(List<DecoyUnit> units) {
+
+        public Decoy {
+            units = units == null ? List.of() : List.copyOf(units);
+        }
+    }
+
+    public record DecoyUnit(
+            String faction, String factionEmoji, String colorId, UnitType unitType, String unitHolderName, int count) {}
+}

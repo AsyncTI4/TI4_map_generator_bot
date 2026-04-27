@@ -78,13 +78,10 @@ public class PlayHeroService {
         StringBuilder sb = new StringBuilder();
         if (leaderModel != null) {
             SpringContext.getBean(CombatContestService.class)
-                    .mirrorCombatEvent(
+                    .mirrorLeaderPlayed(
                             game,
                             player,
-                            "Hero",
-                            "played _" + leaderModel.getName() + "_.",
-                            leaderModel.getRepresentationEmbed(
-                                    false, true, false, showFlavourText, game.isTwilightsFallMode()),
+                            leaderModel.getAlias(),
                             event.getChannel().getName());
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " played:");
             player.getCorrectChannel()

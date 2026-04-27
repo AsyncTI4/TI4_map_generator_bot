@@ -607,12 +607,10 @@ public final class ButtonHelperAgents {
         LeaderModel agentModel = playerLeader.getLeaderModel().orElse(null);
         if (agentModel != null) {
             SpringContext.getBean(CombatContestService.class)
-                    .mirrorCombatEvent(
+                    .mirrorLeaderPlayed(
                             game,
                             player,
-                            "Agent",
-                            "used _" + agentModel.getName() + "_.",
-                            agentModel.getRepresentationEmbed(),
+                            agentModel.getAlias(),
                             player.getCorrectChannel().getName());
         }
 

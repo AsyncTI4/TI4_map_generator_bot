@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.contest.replay.core.CombatContestSettings;
+import ti4.contest.replay.core.CombatPredictionPayout;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
 import ti4.contest.replay.entities.CombatReplayLeaderboardEntryEntity;
@@ -46,7 +47,6 @@ import ti4.spring.service.contest.CombatContestService;
  */
 public class CombatReplayLeaderboardService {
 
-    private static final double ZERO_EPSILON = 0.0001;
     private static final int WRONG_PREDICTION_PENALTY = -4;
     private static final String SUBSCRIBE_EMOJI = "\uD83D\uDFE2";
     private static final String UNSUBSCRIBE_EMOJI = "\uD83D\uDD34";
@@ -453,10 +453,7 @@ public class CombatReplayLeaderboardService {
     }
 
     private int calculatePredictionPoints(int winnerPredictions, int totalPredictions) {
-        totalPredictions = Math.max(1, totalPredictions);
-        double winnerShare = winnerPredictions / (double) totalPredictions;
-        double scaledPoints = 4.0 / Math.max(winnerShare, ZERO_EPSILON);
-        return (int) Math.round(Math.max(4.0, Math.min(100.0, scaledPoints)));
+        return CombatPredictionPayout.points(winnerPredictions, totalPredictions);
     }
 
     private List<WinningPredictionSummary> resultSummaries(

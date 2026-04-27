@@ -542,19 +542,11 @@ public class ComponentActionHelper {
                 } else {
                     LeaderModel leaderModel = Mapper.getLeader(buttonID);
                     if (leaderModel != null) {
-                        String leaderType =
-                                switch (leaderModel.getType()) {
-                                    case "commander" -> "Commander";
-                                    case "envoy" -> "Envoy";
-                                    default -> "Leader";
-                                };
                         SpringContext.getBean(CombatContestService.class)
-                                .mirrorCombatEvent(
+                                .mirrorLeaderPlayed(
                                         game,
                                         p1,
-                                        leaderType,
-                                        "used _" + leaderModel.getName() + "_.",
-                                        leaderModel.getRepresentationEmbed(),
+                                        leaderModel.getAlias(),
                                         event.getChannel().getName());
                     }
                 }

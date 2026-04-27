@@ -829,12 +829,10 @@ public class ActionCardHelper {
             }
         }
         SpringContext.getBean(CombatContestService.class)
-                .mirrorCombatEvent(
+                .mirrorActionCardPlayed(
                         game,
                         player,
-                        "Action Card",
-                        "played _" + actionCard.getName() + "_.",
-                        actionCard.getRepresentationEmbed(false, true, game),
+                        actionCard,
                         player.getCorrectChannel().getName(),
                         getCombatReplayTrackedEvent(actionCard));
 

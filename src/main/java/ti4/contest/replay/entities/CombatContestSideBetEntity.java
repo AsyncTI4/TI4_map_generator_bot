@@ -52,6 +52,9 @@ public class CombatContestSideBetEntity {
     @Column(name = "points_spent", nullable = false)
     private Integer pointsSpent;
 
+    @Column(name = "offered_profit_points")
+    private Integer offeredProfitPoints;
+
     @Column(name = "profit_awarded")
     private Integer profitAwarded;
 
