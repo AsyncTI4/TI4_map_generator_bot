@@ -156,7 +156,7 @@ public class LazaxCombatSupport {
         if (lawSection != null) {
             message.append("\n").append(lawSection);
         }
-        String effectSection = formatCombatEffectSection(attacker.getGame());
+        String effectSection = formatCombatEffectSection(tile, attacker.getGame());
         if (effectSection != null) {
             message.append("\n").append(effectSection);
         }
@@ -305,8 +305,8 @@ public class LazaxCombatSupport {
         return formatPlayerSummaryLine(player, CardEmojis.Agenda + " Prophecy of Ixth");
     }
 
-    private String formatCombatEffectSection(Game game) {
-        if (!isQuietusActive(game)) {
+    private String formatCombatEffectSection(Tile tile, Game game) {
+        if (!isQuietusActive(tile, game)) {
             return null;
         }
         return "## Combat Effects\n- " + FactionEmojis.Crimson + " " + UnitEmojis.flagship
@@ -397,14 +397,12 @@ public class LazaxCombatSupport {
         return builder.toString();
     }
 
-    private boolean isQuietusActive(Game game) {
-        if (game == null) return false;
+    private boolean isQuietusActive(Tile combatTile, Game game) {
+        if (combatTile == null || game == null) return false;
         Player quietusOwner = Helper.getPlayerFromUnit(game, "crimson_flagship");
         if (quietusOwner == null) return false;
-        return game.getTileMap().values().stream()
-                .map(Tile::getSpaceUnitHolder)
-                .filter(Objects::nonNull)
-                .anyMatch(holder -> holder.getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE));
+        UnitHolder combatSpace = combatTile.getSpaceUnitHolder();
+        return combatSpace != null && combatSpace.getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
     }
 
     private String formatPlayerSummaryLine(Player player, String summary) {
