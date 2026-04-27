@@ -29,8 +29,26 @@ jobs:
             cd ${{ vars.HOST_TI4_SAVES_DIR }}
             echo "FORCING BACKUP OF SAVE FILES"
             rm -f .git/index.lock
-            git add -A
-            if git diff-index --quiet HEAD; then
+            git fetch origin master
+            git reset --mixed origin/master
+            grep -qxF "*.bak" .git/info/exclude || printf "\n# Managed by ForceSaveFileBackup\n*.bak\n*.bak.*\n" >> .git/info/exclude
+            git add -A -- . ':(glob,exclude)*.bak' ':(glob,exclude)**/*.bak' ':(glob,exclude)*.bak.*' ':(glob,exclude)**/*.bak.*'
+            oversized_files="$(mktemp)"
+            git diff --cached --name-only | while IFS= read -r file; do
+              if [ -f "$file" ]; then
+                size="$(wc -c < "$file" | tr -d ' ')"
+                if [ "$size" -gt 95000000 ]; then
+                  printf '%s (%s bytes)\n' "$file" "$size" >> "$oversized_files"
+                  git reset -q HEAD -- "$file"
+                fi
+              fi
+            done
+            if [ -s "$oversized_files" ]; then
+              echo "Skipped files larger than GitHub's 100 MB limit:"
+              cat "$oversized_files"
+            fi
+            rm -f "$oversized_files"
+            if git diff --cached --quiet; then
               echo "No changes to commit"
             else
               git commit -m "save files"
@@ -56,8 +74,26 @@ jobs:
             cd ${{ vars.HOST_TI4_SAVES_DIR }}
             echo "FORCING BACKUP OF SAVE FILES (retry)"
             rm -f .git/index.lock
-            git add -A
-            if git diff-index --quiet HEAD; then
+            git fetch origin master
+            git reset --mixed origin/master
+            grep -qxF "*.bak" .git/info/exclude || printf "\n# Managed by ForceSaveFileBackup\n*.bak\n*.bak.*\n" >> .git/info/exclude
+            git add -A -- . ':(glob,exclude)*.bak' ':(glob,exclude)**/*.bak' ':(glob,exclude)*.bak.*' ':(glob,exclude)**/*.bak.*'
+            oversized_files="$(mktemp)"
+            git diff --cached --name-only | while IFS= read -r file; do
+              if [ -f "$file" ]; then
+                size="$(wc -c < "$file" | tr -d ' ')"
+                if [ "$size" -gt 95000000 ]; then
+                  printf '%s (%s bytes)\n' "$file" "$size" >> "$oversized_files"
+                  git reset -q HEAD -- "$file"
+                fi
+              fi
+            done
+            if [ -s "$oversized_files" ]; then
+              echo "Skipped files larger than GitHub's 100 MB limit:"
+              cat "$oversized_files"
+            fi
+            rm -f "$oversized_files"
+            if git diff --cached --quiet; then
               echo "No changes to commit"
             else
               git commit -m "save files"
