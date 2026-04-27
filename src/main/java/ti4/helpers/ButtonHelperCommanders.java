@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -13,6 +11,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
@@ -499,7 +498,7 @@ public class ButtonHelperCommanders {
         for (String planet : player.getExhaustedPlanets()) {
             Planet planetReal = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             if (planetReal != null
-                    && isNotBlank(planetReal.getOriginalPlanetType())
+                    && StringUtils.isNotBlank(planetReal.getOriginalPlanetType())
                     && player.getPlanetsAllianceMode().contains(planet)) {
                 List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
                 buttons.addAll(planetButtons);
