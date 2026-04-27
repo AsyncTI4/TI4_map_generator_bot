@@ -1,10 +1,11 @@
 package ti4.contest.replay.service;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -41,12 +42,35 @@ public class CombatReplayService {
     private final CombatCandidateEventRepository candidateEventRepository;
     private final CombatReplayEventAppender eventAppender;
     private final CombatReplaySideBetTriggerService sideBetTriggerService;
+    private final ThreadLocal<PreInteractionSnapshot> preInteractionSnapshot = new ThreadLocal<>();
     private CombatReplaySelection selection;
 
     @PostConstruct
     void initializeSelectionSnapshot() {
         selection = new CombatReplaySelection(settings);
         refreshSelectionSnapshot();
+    }
+
+    public PreInteractionSnapshot capturePreInteractionSnapshot(Game game) {
+        if (game == null) return PreInteractionSnapshot.empty();
+
+        Map<Long, CandidateInitialSnapshot> snapshots = new HashMap<>();
+        for (CombatCandidateEntity candidate : getTrackingCandidates(game)) {
+            if (isInitialSnapshotCaptured(candidate)) continue;
+            CandidateInitialSnapshot snapshot = captureCandidateInitialSnapshot(game, candidate);
+            if (snapshot != null) {
+                snapshots.put(candidate.getId(), snapshot);
+            }
+        }
+        return new PreInteractionSnapshot(snapshots);
+    }
+
+    public void setPreInteractionSnapshot(PreInteractionSnapshot snapshot) {
+        preInteractionSnapshot.set(snapshot);
+    }
+
+    public void clearPreInteractionSnapshot() {
+        preInteractionSnapshot.remove();
     }
 
     public void onSpaceCombatStarted(Game game, Player attacker, Player defender, Tile tile) {
@@ -68,25 +92,17 @@ public class CombatReplayService {
 
         if (!eligible) return;
 
-        CombatCandidateEntity candidate = buildCandidate(
-                observation,
-                attacker,
-                defender,
-                tile,
-                CombatReplayTileRenderer.captureInitialSnapshot(game, tile.getPosition()));
+        CombatCandidateEntity candidate = buildCandidate(observation, attacker, defender, tile);
         candidateRepository.save(candidate);
-
-        appendDiscordEvent(candidate, CombatCandidateEventType.START, null, null, snapshot.replaySummaryText());
     }
 
     public void onButtonInteractionSettled(Game game, Player player, ButtonInteractionEvent event) {
         for (CombatCandidateEntity candidate : getTrackingCandidates(game)) {
-            if (evaluateCandidateCompletion(game, candidate)) continue;
             trackHitAssignments(game, player, event, candidate);
+            evaluateCandidateCompletion(game, candidate);
         }
     }
 
-    @Transactional
     public void mirrorCombatRoll(
             Game game,
             Player player,
@@ -101,6 +117,7 @@ public class CombatReplayService {
         if (candidate == null || !matchesParticipants(candidate, player, opponent)) return;
         if (!isSpaceCombatRoll(rollType)) return;
 
+        ensureInitialSnapshot(candidate, game);
         int round = getCurrentRound(game, candidate);
         updateCandidateRollTracking(candidate, player, rollType, whiff, slam, round);
         appendDiscordEvent(
@@ -118,13 +135,11 @@ public class CombatReplayService {
         return rollType == CombatRollType.combatround || rollType == CombatRollType.AFB;
     }
 
-    @Transactional
     public void mirrorCombatEvent(
             Game game, Player player, String header, String name, MessageEmbed embed, String sourceChannelName) {
         mirrorCombatEvent(game, player, header, name, embed, sourceChannelName, CombatReplayTrackedEvent.NONE);
     }
 
-    @Transactional
     public void mirrorCombatEvent(
             Game game,
             Player player,
@@ -135,6 +150,7 @@ public class CombatReplayService {
             CombatReplayTrackedEvent trackedEvent) {
         CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
         if (candidate == null) return;
+        ensureInitialSnapshot(candidate, game);
         updateCandidateEventTracking(candidate, player, trackedEvent);
 
         String message = "## " + header + "\n" + player.getRepresentation() + " " + name;
@@ -142,10 +158,10 @@ public class CombatReplayService {
         appendSideBetTriggerEvents(candidate, sideBetTriggerService.fromTrackedEvent(candidate, player, trackedEvent));
     }
 
-    @Transactional
     public void mirrorLeaderPlayed(Game game, Player player, String leaderId, String sourceChannelName) {
         CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
         if (candidate == null) return;
+        ensureInitialSnapshot(candidate, game);
 
         appendStructuredEvent(
                 candidate,
@@ -156,7 +172,6 @@ public class CombatReplayService {
                 ReplayDispatchPayload.leaderPlayed(leaderId));
     }
 
-    @Transactional
     public void mirrorActionCardPlayed(
             Game game,
             Player player,
@@ -165,6 +180,7 @@ public class CombatReplayService {
             CombatReplayTrackedEvent trackedEvent) {
         CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
         if (candidate == null) return;
+        ensureInitialSnapshot(candidate, game);
         updateCandidateEventTracking(candidate, player, trackedEvent);
 
         appendStructuredEvent(
@@ -180,6 +196,7 @@ public class CombatReplayService {
     public void mirrorRetreatDeclared(Game game, Player player, String sourceChannelName) {
         CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
         if (candidate == null) return;
+        ensureInitialSnapshot(candidate, game);
 
         appendStructuredEvent(
                 candidate,
@@ -193,6 +210,7 @@ public class CombatReplayService {
     public void mirrorRetreatResolved(Game game, Player player, String destination, String sourceChannelName) {
         CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
         if (candidate == null) return;
+        ensureInitialSnapshot(candidate, game);
 
         appendStructuredEvent(
                 candidate,
@@ -206,6 +224,7 @@ public class CombatReplayService {
     public void mirrorAssaultCannonAssigned(Game game, Player player, String sourceChannelName) {
         CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
         if (candidate == null) return;
+        ensureInitialSnapshot(candidate, game);
 
         appendStructuredEvent(
                 candidate,
@@ -219,6 +238,7 @@ public class CombatReplayService {
     public void mirrorGravitonExhausted(Game game, Player player, String sourceChannelName) {
         CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
         if (candidate == null) return;
+        ensureInitialSnapshot(candidate, game);
 
         appendStructuredEvent(
                 candidate,
@@ -357,6 +377,7 @@ public class CombatReplayService {
                 .equals(getTilePosition(event.getButton().getCustomId()))) return;
         if (!matchesParticipant(candidate, player)) return;
 
+        ensureInitialSnapshot(candidate, game);
         int round = getCurrentRound(game, candidate);
         if (candidateEventRepository.existsByCandidateIdAndEventTypeAndActorFactionAndRoundNumber(
                 candidate.getId(), CombatCandidateEventType.HIT_ASSIGN, player.getFaction(), round)) {
@@ -376,6 +397,58 @@ public class CombatReplayService {
                 ReplayDispatchPayload.hitAssign(
                         candidate.getTilePosition(),
                         CombatReplayTileRenderer.captureUnitStateSnapshot(game, candidate.getTilePosition())));
+    }
+
+    private void ensureInitialSnapshot(CombatCandidateEntity candidate, Game fallbackGame) {
+        if (isInitialSnapshotCaptured(candidate)) return;
+
+        CandidateInitialSnapshot snapshot = null;
+        PreInteractionSnapshot currentSnapshot = preInteractionSnapshot.get();
+        if (currentSnapshot != null) {
+            snapshot = currentSnapshot.forCandidate(candidate.getId());
+        }
+        if (snapshot == null) {
+            snapshot = captureCandidateInitialSnapshot(fallbackGame, candidate);
+        }
+        if (snapshot == null) return;
+
+        candidate.setPreReplayContextText(snapshot.preReplayContextText());
+        candidate.setInitialRenderSnapshotJson(snapshot.initialRenderSnapshotJson());
+        candidate.setReplayAbilitiesJson(snapshot.replayAbilitiesJson());
+        candidate.setAttackerDestroyerCount(snapshot.attackerDestroyerCount());
+        candidate.setDefenderDestroyerCount(snapshot.defenderDestroyerCount());
+        candidate.setAttackerHasAssaultCannon(snapshot.attackerHasAssaultCannon());
+        candidate.setDefenderHasAssaultCannon(snapshot.defenderHasAssaultCannon());
+        candidate.setAttackerHp(snapshot.attackerHp());
+        candidate.setDefenderHp(snapshot.defenderHp());
+        candidateRepository.save(candidate);
+    }
+
+    private boolean isInitialSnapshotCaptured(CombatCandidateEntity candidate) {
+        return candidate.getInitialRenderSnapshotJson() != null
+                && !candidate.getInitialRenderSnapshotJson().isBlank();
+    }
+
+    private CandidateInitialSnapshot captureCandidateInitialSnapshot(Game game, CombatCandidateEntity candidate) {
+        if (game == null) return null;
+        Tile tile = game.getTileByPosition(candidate.getTilePosition());
+        Player attacker = game.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
+        Player defender = game.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
+        if (tile == null || attacker == null || defender == null) return null;
+
+        LazaxCombatSupport.SpaceCombatSnapshot combatSnapshot =
+                LazaxCombatSupport.buildSpaceCombatSnapshot(game, attacker, defender, tile);
+        if (combatSnapshot == null) return null;
+        return new CandidateInitialSnapshot(
+                LazaxCombatSupport.formatCombatTechSummary(tile, attacker, defender),
+                CombatReplayTileRenderer.captureInitialSnapshot(game, tile.getPosition()),
+                CombatReplayDecoys.buildJson(attacker, defender, tile),
+                countDestroyersInCombat(tile, attacker),
+                countDestroyersInCombat(tile, defender),
+                hasAssaultCannon(attacker),
+                hasAssaultCannon(defender),
+                combatSnapshot.attackerHp(),
+                combatSnapshot.defenderHp());
     }
 
     private ResolutionState buildResolutionState(Game game, CombatCandidateEntity candidate, Tile tile) {
@@ -565,11 +638,7 @@ public class CombatReplayService {
     }
 
     private CombatCandidateEntity buildCandidate(
-            CombatObservationEntity observation,
-            Player attacker,
-            Player defender,
-            Tile tile,
-            String initialRenderSnapshotJson) {
+            CombatObservationEntity observation, Player attacker, Player defender, Tile tile) {
         CombatCandidateEntity candidate = new CombatCandidateEntity();
         candidate.setObservationId(observation.getId());
         candidate.setStatus(CombatCandidateStatus.TRACKING);
@@ -580,10 +649,6 @@ public class CombatReplayService {
         candidate.setTilePosition(observation.getTilePosition());
         candidate.setAttackerFaction(attacker.getFaction());
         candidate.setDefenderFaction(defender.getFaction());
-        candidate.setPreReplayContextText(LazaxCombatSupport.formatCombatTechSummary(
-                attacker.getGame().getTileByPosition(observation.getTilePosition()), attacker, defender));
-        candidate.setInitialRenderSnapshotJson(initialRenderSnapshotJson);
-        candidate.setReplayAbilitiesJson(CombatReplayDecoys.buildJson(attacker, defender, tile));
         candidate.setSideBetCompatible(true);
         candidate.setAttackerDestroyerCount(countDestroyersInCombat(tile, attacker));
         candidate.setDefenderDestroyerCount(countDestroyersInCombat(tile, defender));
@@ -734,6 +799,32 @@ public class CombatReplayService {
     private String firstNonBlank(String first, String fallback) {
         return first == null || first.isBlank() ? fallback : first;
     }
+
+    public record PreInteractionSnapshot(Map<Long, CandidateInitialSnapshot> snapshotsByCandidateId) {
+
+        public PreInteractionSnapshot {
+            snapshotsByCandidateId = Map.copyOf(snapshotsByCandidateId);
+        }
+
+        public static PreInteractionSnapshot empty() {
+            return new PreInteractionSnapshot(Map.of());
+        }
+
+        private CandidateInitialSnapshot forCandidate(Long candidateId) {
+            return snapshotsByCandidateId.get(candidateId);
+        }
+    }
+
+    public record CandidateInitialSnapshot(
+            String preReplayContextText,
+            String initialRenderSnapshotJson,
+            String replayAbilitiesJson,
+            int attackerDestroyerCount,
+            int defenderDestroyerCount,
+            boolean attackerHasAssaultCannon,
+            boolean defenderHasAssaultCannon,
+            double attackerHp,
+            double defenderHp) {}
 
     private record SelectionSnapshot(
             int windowSize,

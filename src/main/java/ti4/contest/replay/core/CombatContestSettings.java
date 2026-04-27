@@ -17,7 +17,7 @@ public class CombatContestSettings {
     public static final int PROMOTION_LOOKBACK_FALLBACK_MAX_HOURS = 8;
 
     @Setter(AccessLevel.NONE)
-    private boolean isProd = true;
+    private boolean isProd = false;
 
     private CandidateSelection candidateSelection = new CandidateSelection();
     private Promotion promotion = new Promotion();

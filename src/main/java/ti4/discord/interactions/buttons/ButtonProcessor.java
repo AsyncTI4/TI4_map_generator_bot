@@ -91,17 +91,24 @@ public class ButtonProcessor {
             RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
 
             if (context.isValid()) {
+                CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
+                CombatReplayService.PreInteractionSnapshot preInteractionSnapshot =
+                        combatReplayService.capturePreInteractionSnapshot(context.getGame());
+                combatReplayService.setPreInteractionSnapshot(preInteractionSnapshot);
                 long beforeTime = System.currentTimeMillis();
-                resolveButtonInteractionEvent(context);
-                resolveRuntime = System.currentTimeMillis() - beforeTime;
+                try {
+                    resolveButtonInteractionEvent(context);
+                    resolveRuntime = System.currentTimeMillis() - beforeTime;
 
-                beforeTime = System.currentTimeMillis();
-                context.save();
-                if (context.getGame() != null) {
-                    SpringContext.getBean(CombatReplayService.class)
-                            .onButtonInteractionSettled(context.getGame(), context.getPlayer(), event);
+                    beforeTime = System.currentTimeMillis();
+                    context.save();
+                    if (context.getGame() != null) {
+                        combatReplayService.onButtonInteractionSettled(context.getGame(), context.getPlayer(), event);
+                    }
+                    saveRuntime = System.currentTimeMillis() - beforeTime;
+                } finally {
+                    combatReplayService.clearPreInteractionSnapshot();
                 }
-                saveRuntime = System.currentTimeMillis() - beforeTime;
             }
         } catch (Exception e) {
             LogOrigin origin = new LogOrigin(event, context);

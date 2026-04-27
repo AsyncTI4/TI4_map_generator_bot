@@ -1,6 +1,5 @@
 package ti4.contest.replay.service;
 
-import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,51 +48,68 @@ public class CombatReplaySideBetService {
         sideBetUiService.postSideBetButtonsIfNeeded(channel, game, contest, candidate);
     }
 
-    @Transactional
     public PlacementResult placeSideBet(
             ButtonInteractionEvent event, Long contestId, CombatSideBetType betType, String targetFaction) {
         if (contestId == null || event == null || event.getUser() == null) {
             return PlacementResult.rejected("Side bet context is incomplete.");
         }
 
+        String userId = event.getUser().getId();
+        String userName = event.getUser().getEffectiveName();
+        PlacementPersistenceResult persisted = persistSideBet(contestId, betType, targetFaction, userId, userName);
+        if (!persisted.result().accepted()) return persisted.result();
+
+        sideBetUiService.refreshSummaryMessage(event.getMessageChannel(), persisted.contest(), persisted.candidate());
+        String personalSummary = sideBetUiService.renderUserSummary(
+                persisted.contest(),
+                persisted.candidate(),
+                userId,
+                persisted.result().totalPoints());
+        return PlacementResult.accepted(personalSummary, persisted.result().totalPoints());
+    }
+
+    private synchronized PlacementPersistenceResult persistSideBet(
+            Long contestId, CombatSideBetType betType, String targetFaction, String userId, String userName) {
         CombatReplayContestEntity contest =
                 replayContestRepository.findById(contestId).orElse(null);
-        if (contest == null) return PlacementResult.rejected("This combat contest is no longer available.");
-        if (!settings.getSideBets().isEnableSideBets()) return PlacementResult.rejected("Side bets are disabled.");
+        if (contest == null) {
+            return PlacementPersistenceResult.rejected("This combat contest is no longer available.");
+        }
+        if (!settings.getSideBets().isEnableSideBets()) {
+            return PlacementPersistenceResult.rejected("Side bets are disabled.");
+        }
         if (contest.getReplayStartAt() == null || !LocalDateTime.now().isBefore(contest.getReplayStartAt())) {
-            return PlacementResult.rejected("The side-bet window is closed.");
+            return PlacementPersistenceResult.rejected("The side-bet window is closed.");
         }
 
         CombatCandidateEntity candidate =
                 candidateRepository.findById(contest.getCandidateId()).orElse(null);
         if (candidate == null || !Boolean.TRUE.equals(candidate.getSideBetCompatible())) {
-            return PlacementResult.rejected("This combat does not support side bets.");
+            return PlacementPersistenceResult.rejected("This combat does not support side bets.");
         }
         if (!isValidBet(candidate, betType, targetFaction)) {
-            return PlacementResult.rejected("That side bet is not available for this combat.");
+            return PlacementPersistenceResult.rejected("That side bet is not available for this combat.");
         }
 
-        String userId = event.getUser().getId();
-        String userName = event.getUser().getEffectiveName();
-
         CombatReplayLeaderboardEntryEntity entry =
-                leaderboardEntryRepository.findByDiscordUserIdForUpdate(userId).orElse(null);
+                leaderboardEntryRepository.findByDiscordUserId(userId).orElse(null);
         if (entry == null) {
-            return PlacementResult.rejected("You do not have any points to bet.");
+            return PlacementPersistenceResult.rejected("You do not have any points to bet.");
         }
 
         int existingCount = sideBetRepository.countByContestIdAndDiscordUserId(contestId, userId);
         if (existingCount >= settings.getSideBets().getMaxBetsPerUser()) {
-            return PlacementResult.rejected("You have already placed the maximum number of side bets for this combat.");
+            return PlacementPersistenceResult.rejected(
+                    "You have already placed the maximum number of side bets for this combat.");
         }
 
         int costPoints = settings.getSideBets().getCostPoints();
         int currentPoints = safeInt(entry.getTotalPoints());
         if (currentPoints <= 0) {
-            return PlacementResult.rejected("You do not have any points to bet.");
+            return PlacementPersistenceResult.rejected("You do not have any points to bet.");
         }
         if (currentPoints < costPoints) {
-            return PlacementResult.rejected("You do not have enough points to place that side bet.");
+            return PlacementPersistenceResult.rejected("You do not have enough points to place that side bet.");
         }
 
         entry.setDiscordUserName(userName);
@@ -111,12 +127,11 @@ public class CombatReplaySideBetService {
         sideBet.setPlacedAt(LocalDateTime.now());
         sideBetRepository.save(sideBet);
 
-        sideBetUiService.refreshSummaryMessage(event.getMessageChannel(), contest, candidate);
-        String personalSummary = sideBetUiService.renderUserSummary(contest, candidate, userId, entry.getTotalPoints());
-        return PlacementResult.accepted(personalSummary, entry.getTotalPoints());
+        return new PlacementPersistenceResult(PlacementResult.accepted("", entry.getTotalPoints()), contest, candidate);
     }
 
-    public SideBetResolution resolveSideBets(CombatCandidateEntity candidate, CombatReplayContestEntity replayContest) {
+    public synchronized SideBetResolution resolveSideBets(
+            CombatCandidateEntity candidate, CombatReplayContestEntity replayContest) {
         if (candidate == null || replayContest == null || replayContest.getId() == null) {
             return SideBetResolution.empty();
         }
@@ -182,6 +197,13 @@ public class CombatReplaySideBetService {
     }
 
     public record ResolvedSideBet(String discordUserId, String discordUserName, String label, int profitPoints) {}
+
+    private record PlacementPersistenceResult(
+            PlacementResult result, CombatReplayContestEntity contest, CombatCandidateEntity candidate) {
+        static PlacementPersistenceResult rejected(String message) {
+            return new PlacementPersistenceResult(PlacementResult.rejected(message), null, null);
+        }
+    }
 
     public record SideBetResolution(
             List<ResolvedSideBet> resolvedSideBets, List<CombatReplayLeaderboardEntryEntity> leaderboardEntries) {

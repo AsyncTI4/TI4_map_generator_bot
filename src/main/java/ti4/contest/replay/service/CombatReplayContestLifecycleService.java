@@ -29,6 +29,7 @@ import ti4.contest.replay.repository.*;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.ThreadGetter;
@@ -156,10 +157,7 @@ public class CombatReplayContestLifecycleService {
         Game game = loadGame(winner.getGameName());
         if (game == null) return null;
 
-        String startSummaryText = candidateEventRepository
-                .findByCandidateIdAndSequenceNumber(winner.getId(), 1)
-                .map(CombatCandidateEventEntity::getSummaryText)
-                .orElse(null);
+        String startSummaryText = snapshotStartSummaryText(winner);
         String message = LazaxCombatSupport.formatReplayAnnouncement(
                 game, observation, winner, getLazaxRoleMention(), startSummaryText);
         if (!settings.getRuntime().isDiscordPostingEnabled()) {
@@ -182,6 +180,22 @@ public class CombatReplayContestLifecycleService {
             BotLogger.error("Replay contest promotion failed.", e);
             return null;
         }
+    }
+
+    String snapshotStartSummaryText(CombatCandidateEntity candidate) {
+        if (StringUtils.isBlank(candidate.getInitialRenderSnapshotJson())) return null;
+
+        Game snapshotGame = CombatReplayTileRenderer.render(
+                candidate.getInitialRenderSnapshotJson(), candidate.getInitialRenderSnapshotJson());
+        if (snapshotGame == null) return null;
+        Player attacker = snapshotGame.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
+        Player defender = snapshotGame.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
+        Tile tile = snapshotGame.getTileByPosition(candidate.getTilePosition());
+        if (attacker == null || defender == null || tile == null) return null;
+
+        LazaxCombatSupport.SpaceCombatSnapshot snapshot =
+                LazaxCombatSupport.buildSpaceCombatSnapshot(snapshotGame, attacker, defender, tile);
+        return snapshot == null ? null : snapshot.replaySummaryText();
     }
 
     @SneakyThrows

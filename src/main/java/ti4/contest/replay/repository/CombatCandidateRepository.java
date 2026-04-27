@@ -1,11 +1,8 @@
 package ti4.contest.replay.repository;
 
-import jakarta.persistence.LockModeType;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ti4.contest.replay.core.CombatCandidatePromotionStatus;
@@ -15,10 +12,6 @@ import ti4.contest.replay.entities.CombatCandidateEntity;
 public interface CombatCandidateRepository extends JpaRepository<CombatCandidateEntity, Long> {
     CombatCandidateEntity findFirstByGameNameAndTilePositionAndStatus(
             String gameName, String tilePosition, CombatCandidateStatus status);
-
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select c from CombatCandidateEntity c where c.id = :id")
-    Optional<CombatCandidateEntity> findByIdForUpdate(@Param("id") Long id);
 
     List<CombatCandidateEntity> findByGameNameAndStatus(String gameName, CombatCandidateStatus status);
 

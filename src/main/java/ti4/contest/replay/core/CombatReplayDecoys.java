@@ -97,8 +97,6 @@ public class CombatReplayDecoys {
     }
 
     private void addDecoyUnits(List<DecoyUnit> decoyUnits, Player player, Tile tile) {
-        if (!player.hasAbility("decoy")) return;
-
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         for (UnitKey unitKey : space.getUnitsByState().keySet()) {
             if (!player.getColorID().equals(unitKey.getColorID())) continue;
