@@ -215,6 +215,7 @@ public class CombatReplaySideBetService {
     private boolean isValidBet(CombatCandidateEntity candidate, CombatSideBetType betType, String targetFaction) {
         CombatSideState state = CombatSideState.forFaction(candidate, targetFaction);
         if (state == null || !betType.isAvailable(state.destroyerCount())) return false;
+        if (betType == CombatSideBetType.AFB_WHIFF) return payoutService.hasAfbUnits(candidate, targetFaction);
         return betType != CombatSideBetType.AFB_SKIPPED || isAfbSkippedAvailable(candidate, targetFaction);
     }
 

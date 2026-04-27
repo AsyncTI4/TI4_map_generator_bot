@@ -79,7 +79,7 @@ public class CombatContestSettings {
 
     private void applyEnvironmentDefaults() {
         if (isProd) {
-            replayExecution.setStartDelayMinutes(10);
+            replayExecution.setStartDelayMinutes(15);
             replayExecution.setReplayIntervalSeconds(15);
             replayExecution.setMaxEventGapSeconds(30);
             runtime.setDevMode(false);
@@ -123,7 +123,7 @@ public class CombatContestSettings {
     @Getter
     @Setter
     public static class ReplayExecution {
-        private int startDelayMinutes = 10;
+        private int startDelayMinutes = 15;
         private int replayIntervalSeconds = 15;
         private int maxEventGapSeconds = 30;
     }

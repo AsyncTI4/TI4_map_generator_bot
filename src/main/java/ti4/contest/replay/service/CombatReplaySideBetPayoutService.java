@@ -78,6 +78,12 @@ public class CombatReplaySideBetPayoutService {
         return offeredProfitPoints == null ? sideBet.getBetType().profitPoints() : offeredProfitPoints;
     }
 
+    public boolean hasAfbUnits(CombatCandidateEntity candidate, String targetFaction) {
+        InitialSnapshotCombatContext context = initialSnapshotCombatContext(candidate, targetFaction);
+        return context != null
+                && !collectAfbUnits(context.tile(), context.player()).isEmpty();
+    }
+
     private int fixedPayout(CombatSideBetType betType) {
         return betType.profitPoints();
     }
@@ -152,6 +158,7 @@ public class CombatReplaySideBetPayoutService {
         if (context == null) return null;
 
         Map<UnitModel, Integer> playerUnits = collectAfbUnits(context.tile(), context.player());
+        if (playerUnits.isEmpty()) return null;
         Map<UnitModel, Integer> opponentUnits =
                 CombatUnitSelectionHelper.collectCombatRoundUnits(context.tile(), context.space(), context.opponent());
         TileModel tileModel = TileHelper.getTileById(context.tile().getTileID());

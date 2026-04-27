@@ -69,7 +69,20 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
 
         int payout = service.offeredPayout(contest, candidate, CombatSideBetType.AFB_WHIFF, "sol");
 
+        assertEquals(true, service.hasAfbUnits(candidate, "sol"));
         assertEquals(6, payout);
+        verifyNoInteractions(eventRepository);
+    }
+
+    @Test
+    void afbWhiffIsUnavailableWithoutInitialSnapshotAfbUnits() {
+        CombatReplayContestEntity contest = oddsContest();
+        CombatCandidateEntity candidate = snapshotCandidate(4, 1);
+
+        int payout = service.offeredPayout(contest, candidate, CombatSideBetType.AFB_WHIFF, "sol");
+
+        assertEquals(false, service.hasAfbUnits(candidate, "sol"));
+        assertEquals(4, payout);
         verifyNoInteractions(eventRepository);
     }
 

@@ -80,8 +80,10 @@ public class CombatReplayContestLifecycleService {
         if (!settings.getPromotion().isEnabled()) return;
 
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+        if (now.getMinute() != 0) return;
         int maxPromotionsPerHour = settings.getPromotion().getMaxPromotionsPerHour();
         if (maxPromotionsPerHour <= 0) return;
+        if (replayContestRepository.countByPostedAtGreaterThanEqual(now.minusHours(2)) > 0) return;
         if (replayContestRepository.countByPostedAtGreaterThanEqual(now.truncatedTo(ChronoUnit.HOURS))
                 >= maxPromotionsPerHour) {
             return;
