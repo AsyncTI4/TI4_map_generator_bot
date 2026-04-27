@@ -39,18 +39,18 @@ class FactionAverageTurnsInGameStatisticsService {
                 .filter(entry -> Mapper.getFaction(entry.getKey()) != null)
                 .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
                 .forEach(entry -> sb.append('`')
-                    .append(StringUtils.leftPad(
-                        String.format(
-                            "%.2f",
-                            (factionTurnCount.get(entry.getKey().getAlias()) / (double) entry.getValue())),
-                        4))
-                    .append(" turns from ")
-                    .append(entry.getValue())
-                    .append(" games`")
-                    .append(entry.getKey().getFactionEmoji())
-                    .append(' ')
-                    .append(entry.getKey().getFactionNameWithSourceEmoji())
-                    .append('\n'));
+                        .append(StringUtils.leftPad(
+                                String.format(
+                                        "%.2f",
+                                        (factionTurnCount.get(entry.getKey().getAlias()) / (double) entry.getValue())),
+                                4))
+                        .append(" turns from ")
+                        .append(entry.getValue())
+                        .append(" games`")
+                        .append(entry.getKey().getFactionEmoji())
+                        .append(' ')
+                        .append(entry.getKey().getFactionNameWithSourceEmoji())
+                        .append('\n'));
 
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Average Turns per Faction", sb.toString());
