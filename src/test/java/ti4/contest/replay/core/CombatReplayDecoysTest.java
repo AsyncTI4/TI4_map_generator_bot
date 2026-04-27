@@ -12,6 +12,7 @@ import ti4.contest.replay.core.CombatReplayDecoys.DecoyUnit;
 import ti4.contest.replay.core.CombatRollPayload.DieRollSource;
 import ti4.contest.replay.core.CombatRollPayload.RollSegmentType;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
@@ -102,7 +103,74 @@ class CombatReplayDecoysTest extends BaseTi4Test {
         assertTrue(message.contains("<yin> 1 destroyer"));
     }
 
+    @Test
+    void debugDecoyOverrideCapturesBuiltUnitMix() {
+        Game game = new Game();
+        Tile tile = new Tile("19", "000");
+        game.setTile(tile);
+        Player ghost = player(game, "ghost", "turquoise");
+        Player yin = player(game, "yin", "sunset");
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Cruiser, "tqs"), 1);
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Destroyer, "sns"), 1);
+        CombatReplayDecoys.clearDebugDecoys(game, tile);
+
+        CombatReplayDecoys.addDebugDecoyUnit(game, tile, ghost, UnitType.Destroyer);
+        CombatReplayDecoys.addDebugDecoyUnit(game, tile, ghost, UnitType.Destroyer);
+        CombatReplayDecoys.addDebugDecoyUnit(game, tile, ghost, UnitType.Fighter);
+        CombatReplayDecoys.Abilities abilities =
+                CombatReplayDecoys.read(CombatReplayDecoys.buildJson(ghost, yin, tile));
+
+        assertTrue(abilities.hasDecoys());
+        assertEquals(2, abilities.decoy().units().size());
+        assertEquals("ghost", abilities.decoy().units().getFirst().faction());
+        assertEquals(UnitType.Destroyer, abilities.decoy().units().getFirst().unitType());
+        assertEquals(2, abilities.decoy().units().getFirst().count());
+        assertEquals(UnitType.Fighter, abilities.decoy().units().get(1).unitType());
+    }
+
+    @Test
+    void debugDecoyOverrideCanSuppressDecoys() {
+        Game game = new Game();
+        Tile tile = new Tile("19", "000");
+        game.setTile(tile);
+        Player ghost = player(game, "ghost", "turquoise");
+        Player yin = player(game, "yin", "sunset");
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Cruiser, "tqs"), 1);
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Destroyer, "sns"), 1);
+        CombatReplayDecoys.clearDebugDecoys(game, tile);
+
+        CombatReplayDecoys.setDebugDecoyUnits(game, tile, List.of());
+
+        assertEquals(null, CombatReplayDecoys.buildJson(ghost, yin, tile));
+    }
+
+    @Test
+    void appendsDebugDecoysToTileSummary() {
+        Game game = new Game();
+        Tile tile = new Tile("19", "000");
+        game.setTile(tile);
+        Player ghost = player(game, "ghost", "turquoise");
+        CombatReplayDecoys.clearDebugDecoys(game, tile);
+
+        CombatReplayDecoys.addDebugDecoyUnit(game, tile, ghost, UnitType.Carrier);
+        CombatReplayDecoys.addDebugDecoyUnit(game, tile, ghost, UnitType.Carrier);
+
+        String summary = CombatReplayDecoys.appendDebugDecoySummary("Space\n", game, tile);
+
+        assertTrue(summary.contains("Replay-Only Decoys"));
+        assertTrue(summary.contains("2x"));
+        assertTrue(summary.contains("Carrier"));
+        assertTrue(summary.contains("[Decoy]"));
+    }
+
     private CombatReplayDecoys.Abilities abilities(DecoyUnit... units) {
         return new CombatReplayDecoys.Abilities(new Decoy(List.of(units)));
+    }
+
+    private Player player(Game game, String faction, String color) {
+        Player player = new Player(faction, faction, game);
+        player.setFaction(faction);
+        player.setColor(color);
+        return player;
     }
 }

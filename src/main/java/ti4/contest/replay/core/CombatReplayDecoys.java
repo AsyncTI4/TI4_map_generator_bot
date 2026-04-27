@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
@@ -19,6 +20,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
+import ti4.service.emoji.ColorEmojis;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -28,10 +30,77 @@ import tools.jackson.databind.json.JsonMapper;
 public class CombatReplayDecoys {
 
     private static final JsonMapper MAPPER = JsonMapperManager.basic();
+    private static final Map<String, List<DecoyUnit>> DEBUG_DECOY_UNITS_BY_COMBAT = new ConcurrentHashMap<>();
 
     public String buildJson(Player attacker, Player defender, Tile tile) {
-        Abilities abilities = build(attacker, defender, tile);
+        Abilities abilities = build(attacker, defender, tile, consumeDebugDecoyUnits(attacker, defender, tile));
         return abilities.hasDecoys() ? write(abilities) : null;
+    }
+
+    public void addDebugDecoyUnit(Game game, Tile tile, Player player, UnitType unitType) {
+        String key = debugCombatKey(game.getName(), tile.getPosition());
+        List<DecoyUnit> units = new ArrayList<>(DEBUG_DECOY_UNITS_BY_COMBAT.getOrDefault(key, List.of()));
+        for (int i = 0; i < units.size(); i++) {
+            DecoyUnit unit = units.get(i);
+            if (unit.faction().equalsIgnoreCase(player.getFaction()) && unit.unitType() == unitType) {
+                units.set(
+                        i,
+                        new DecoyUnit(
+                                unit.faction(),
+                                unit.factionEmoji(),
+                                unit.colorId(),
+                                unit.unitType(),
+                                unit.unitHolderName(),
+                                unit.count() + 1));
+                DEBUG_DECOY_UNITS_BY_COMBAT.put(key, units);
+                return;
+            }
+        }
+        units.add(new DecoyUnit(
+                player.getFaction(), player.getFactionEmoji(), player.getColorID(), unitType, Constants.SPACE, 1));
+        DEBUG_DECOY_UNITS_BY_COMBAT.put(key, units);
+    }
+
+    public void setDebugDecoyUnits(Game game, Tile tile, List<DecoyUnit> units) {
+        DEBUG_DECOY_UNITS_BY_COMBAT.put(debugCombatKey(game.getName(), tile.getPosition()), List.copyOf(units));
+    }
+
+    public boolean hasDebugDecoyState(Game game, Tile tile) {
+        return DEBUG_DECOY_UNITS_BY_COMBAT.containsKey(debugCombatKey(game.getName(), tile.getPosition()));
+    }
+
+    public String renderDebugDecoySummary(Game game, Tile tile) {
+        Abilities abilities = new Abilities(new Decoy(DEBUG_DECOY_UNITS_BY_COMBAT.getOrDefault(
+                debugCombatKey(game.getName(), tile.getPosition()), List.of())));
+        if (!abilities.hasDecoys()) return "No decoys selected.";
+        return renderVanishedUnits(abilities);
+    }
+
+    public String appendDebugDecoySummary(String summary, Game game, Tile tile) {
+        Abilities abilities = new Abilities(new Decoy(DEBUG_DECOY_UNITS_BY_COMBAT.getOrDefault(
+                debugCombatKey(game.getName(), tile.getPosition()), List.of())));
+        if (!abilities.hasDecoys()) return summary;
+
+        StringBuilder builder = new StringBuilder(summary);
+        if (!summary.endsWith("\n")) builder.append('\n');
+        builder.append("Replay-Only Decoys\n");
+        for (DecoyUnit unit : abilities.decoy().units()) {
+            builder.append(unit.factionEmoji())
+                    .append(ColorEmojis.getColorEmojiWithName(unit.colorId()))
+                    .append(" `")
+                    .append(unit.count())
+                    .append("x` ")
+                    .append(unit.unitType().getUnitTypeEmoji())
+                    .append(' ')
+                    .append(unit.unitType().humanReadableName())
+                    .append(" `[Decoy]`\n");
+        }
+        builder.append("----------\n");
+        return builder.toString();
+    }
+
+    public void clearDebugDecoys(Game game, Tile tile) {
+        DEBUG_DECOY_UNITS_BY_COMBAT.remove(debugCombatKey(game.getName(), tile.getPosition()));
     }
 
     public Abilities read(String json) {
@@ -69,19 +138,7 @@ public class CombatReplayDecoys {
     public String renderDisappearanceMessage(Abilities abilities) {
         if (!abilities.hasDecoys()) return null;
 
-        Map<String, Integer> vanishedGroups = new LinkedHashMap<>();
-        for (DecoyUnit unit : abilities.decoy().units()) {
-            String key = unit.factionEmoji() + "|" + unit.unitType().humanReadableName();
-            vanishedGroups.merge(key, unit.count(), Integer::sum);
-        }
-
-        StringBuilder vanished = new StringBuilder();
-        for (Map.Entry<String, Integer> group : vanishedGroups.entrySet()) {
-            if (!vanished.isEmpty()) {
-                vanished.append(", ");
-            }
-            vanished.append(renderVanishedGroup(group));
-        }
+        String vanished = renderVanishedUnits(abilities);
         return "## Sensor Echoes Fade\n"
                 + "As the Lazax recorders close the battlefile, "
                 + vanished
@@ -89,10 +146,14 @@ public class CombatReplayDecoys {
                 + "uneasy certainty that some of those ships were never truly there.";
     }
 
-    private Abilities build(Player attacker, Player defender, Tile tile) {
+    private Abilities build(Player attacker, Player defender, Tile tile, List<DecoyUnit> debugDecoyUnits) {
         List<DecoyUnit> decoyUnits = new ArrayList<>();
-        addDecoyUnits(decoyUnits, attacker, tile);
-        addDecoyUnits(decoyUnits, defender, tile);
+        if (debugDecoyUnits == null) {
+            addDecoyUnits(decoyUnits, attacker, tile);
+            addDecoyUnits(decoyUnits, defender, tile);
+        } else {
+            decoyUnits.addAll(debugDecoyUnits);
+        }
         return new Abilities(decoyUnits.isEmpty() ? null : new Decoy(decoyUnits));
     }
 
@@ -116,6 +177,34 @@ public class CombatReplayDecoys {
             case Fighter, Destroyer, Cruiser, Carrier, Dreadnought, Flagship, Warsun, Lady, Celagrom, Cavalry -> true;
             default -> false;
         };
+    }
+
+    private List<DecoyUnit> consumeDebugDecoyUnits(Player attacker, Player defender, Tile tile) {
+        Game game = attacker == null ? null : attacker.getGame();
+        if (game == null && defender != null) game = defender.getGame();
+        if (game == null || tile == null) return null;
+        return DEBUG_DECOY_UNITS_BY_COMBAT.remove(debugCombatKey(game.getName(), tile.getPosition()));
+    }
+
+    private String debugCombatKey(String gameName, String tilePosition) {
+        return gameName + "|" + tilePosition;
+    }
+
+    private String renderVanishedUnits(Abilities abilities) {
+        Map<String, Integer> vanishedGroups = new LinkedHashMap<>();
+        for (DecoyUnit unit : abilities.decoy().units()) {
+            String key = unit.factionEmoji() + "|" + unit.unitType().humanReadableName();
+            vanishedGroups.merge(key, unit.count(), Integer::sum);
+        }
+
+        StringBuilder vanished = new StringBuilder();
+        for (Map.Entry<String, Integer> group : vanishedGroups.entrySet()) {
+            if (!vanished.isEmpty()) {
+                vanished.append(", ");
+            }
+            vanished.append(renderVanishedGroup(group));
+        }
+        return vanished.toString();
     }
 
     private DecoyUnit takeDecoyForRoll(

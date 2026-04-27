@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
+import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.other.zephyrion.ZephyrionBountyButtonHandler;
@@ -357,8 +358,17 @@ public class StartCombatService {
         if (amount > 2 || tile.getNumberOfUnitsInSystem() > 2) {
             MessageHelper.sendMessageToChannel(
                     threadChannel,
-                    ButtonHelper.getCombatTileSummaryMessage(
-                            game, tile, player1, event, spaceOrGround, unitHolderName, List.of(player1, player2)));
+                    CombatReplayDecoys.appendDebugDecoySummary(
+                            ButtonHelper.getCombatTileSummaryMessage(
+                                    game,
+                                    tile,
+                                    player1,
+                                    event,
+                                    spaceOrGround,
+                                    unitHolderName,
+                                    List.of(player1, player2)),
+                            game,
+                            tile));
         }
 
         // Space Cannon Offense
