@@ -12,7 +12,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ti4.contest.replay.core.CombatCandidatePromotionStatus;
 import ti4.contest.replay.core.CombatCandidateStatus;
-import ti4.spring.service.contest.CombatContestType;
 
 @Data
 @NoArgsConstructor
@@ -61,9 +60,6 @@ public class CombatCandidateEntity {
     @Column(name = "tile_position", nullable = false)
     private String tilePosition;
 
-    @Column(name = "combat_type", nullable = false)
-    private CombatContestType combatType;
-
     @Column(name = "attacker_faction", nullable = false)
     private String attackerFaction;
 
@@ -88,6 +84,9 @@ public class CombatCandidateEntity {
     @Column(name = "initial_render_snapshot_json", columnDefinition = "TEXT")
     private String initialRenderSnapshotJson;
 
+    @Column(name = "replay_abilities_json", columnDefinition = "TEXT")
+    private String replayAbilitiesJson;
+
     @Column(name = "promotion_score")
     private Double promotionScore;
 
@@ -105,6 +104,12 @@ public class CombatCandidateEntity {
 
     @Column(name = "defender_has_assault_cannon", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean defenderHasAssaultCannon = false;
+
+    @Column(name = "attacker_hp")
+    private Double attackerHp;
+
+    @Column(name = "defender_hp")
+    private Double defenderHp;
 
     @Column(name = "attacker_rolled_afb", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean attackerRolledAfb = false;

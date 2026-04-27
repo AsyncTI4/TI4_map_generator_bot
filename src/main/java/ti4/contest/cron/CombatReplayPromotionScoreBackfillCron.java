@@ -5,8 +5,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.experimental.UtilityClass;
 import ti4.contest.replay.core.CombatCandidateStatus;
-import ti4.contest.replay.core.CombatReplayRenderSnapshotSupport;
 import ti4.contest.replay.core.LazaxCombatSupport;
+import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
 import ti4.contest.replay.dispatch.ReplayDispatchPayload;
 import ti4.contest.replay.dispatch.ReplayDispatchSerializer;
 import ti4.contest.replay.entities.CombatCandidateEntity;
@@ -79,7 +79,7 @@ public class CombatReplayPromotionScoreBackfillCron {
         String snapshotJson = extractLatestSnapshotJson(candidate.getId());
         if (snapshotJson == null || snapshotJson.isBlank()) return false;
 
-        Game snapshotGame = CombatReplayRenderSnapshotSupport.restoreGame(snapshotJson);
+        Game snapshotGame = CombatReplayTileRenderer.render(candidate.getInitialRenderSnapshotJson(), snapshotJson);
         if (snapshotGame == null) return false;
 
         Player attacker = snapshotGame.getPlayerFromColorOrFaction(candidate.getAttackerFaction());

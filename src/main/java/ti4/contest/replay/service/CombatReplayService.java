@@ -3,6 +3,7 @@ package ti4.contest.replay.service;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,6 +12,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.*;
+import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
 import ti4.contest.replay.dispatch.ReplayDispatchPayload;
 import ti4.contest.replay.entities.*;
 import ti4.contest.replay.repository.*;
@@ -22,15 +24,13 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.CombatUnitSelectionHelper;
-import ti4.service.emoji.TechEmojis;
 import ti4.spring.context.SpringContext;
-import ti4.spring.service.contest.CombatContestType;
 
-@Service
-@RequiredArgsConstructor
 /**
  * Observes live combats, scores them against the current replay thresholds, and records replay candidates/events.
  */
+@Service
+@RequiredArgsConstructor
 public class CombatReplayService {
 
     private static final Pattern SYSTEM_TILE_PATTERN = Pattern.compile("-system-([^-]+)-");
@@ -41,10 +41,11 @@ public class CombatReplayService {
     private final CombatCandidateEventRepository candidateEventRepository;
     private final CombatReplayEventAppender eventAppender;
     private final CombatReplaySideBetTriggerService sideBetTriggerService;
-    private volatile SelectionSnapshot selectionSnapshot;
+    private CombatReplaySelection selection;
 
     @PostConstruct
     void initializeSelectionSnapshot() {
+        selection = new CombatReplaySelection(settings);
         refreshSelectionSnapshot();
     }
 
@@ -60,10 +61,9 @@ public class CombatReplayService {
                 LazaxCombatSupport.buildSpaceCombatSnapshot(game, attacker, defender, tile);
         if (snapshot == null) return;
 
-        Evaluation evaluation = evaluateSelectionSnapshot(snapshot);
+        CombatReplaySelection.Evaluation evaluation = selection().evaluate(snapshot);
         CombatObservationEntity observation = buildObservation(game, attacker, defender, tile, snapshot, evaluation);
         boolean eligible = isEligibleCandidate(game, attacker, defender, tile, evaluation);
-        observation.setEligibleAsCandidate(eligible);
         observationRepository.save(observation);
 
         if (!eligible) return;
@@ -73,11 +73,8 @@ public class CombatReplayService {
                 attacker,
                 defender,
                 tile,
-                CombatReplayRenderSnapshotSupport.captureHitAssignmentSnapshot(game, tile.getPosition()));
+                CombatReplayTileRenderer.captureInitialSnapshot(game, tile.getPosition()));
         candidateRepository.save(candidate);
-
-        observation.setCandidateId(candidate.getId());
-        observationRepository.save(observation);
 
         appendDiscordEvent(candidate, CombatCandidateEventType.START, null, null, snapshot.replaySummaryText());
     }
@@ -98,16 +95,27 @@ public class CombatReplayService {
             String message,
             CombatRollType rollType,
             boolean whiff,
-            boolean slam) {
+            boolean slam,
+            CombatRollPayload payload) {
         CombatCandidateEntity candidate = getTrackingCandidate(game, tile.getPosition());
         if (candidate == null || !matchesParticipants(candidate, player, opponent)) return;
+        if (!isSpaceCombatRoll(rollType)) return;
 
         int round = getCurrentRound(game, candidate);
         updateCandidateRollTracking(candidate, player, rollType, whiff, slam, round);
         appendDiscordEvent(
-                candidate, CombatCandidateEventType.ROLL, round, player.getFaction(), "## Roll Update\n" + message);
+                candidate,
+                CombatCandidateEventType.ROLL,
+                round,
+                player.getFaction(),
+                "## Roll Update\n" + message,
+                payload);
         appendSideBetTriggerEvents(
                 candidate, sideBetTriggerService.fromRoll(candidate, player, rollType, whiff, slam, round));
+    }
+
+    private boolean isSpaceCombatRoll(CombatRollType rollType) {
+        return rollType == CombatRollType.combatround || rollType == CombatRollType.AFB;
     }
 
     @Transactional
@@ -134,70 +142,103 @@ public class CombatReplayService {
         appendSideBetTriggerEvents(candidate, sideBetTriggerService.fromTrackedEvent(candidate, player, trackedEvent));
     }
 
+    @Transactional
+    public void mirrorLeaderPlayed(Game game, Player player, String leaderId, String sourceChannelName) {
+        CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
+        if (candidate == null) return;
+
+        appendStructuredEvent(
+                candidate,
+                CombatCandidateEventType.INFO,
+                null,
+                player.getFaction(),
+                "## Leader\n" + player.getRepresentation() + " played a leader.",
+                ReplayDispatchPayload.leaderPlayed(leaderId));
+    }
+
+    @Transactional
+    public void mirrorActionCardPlayed(
+            Game game,
+            Player player,
+            String actionCardId,
+            String sourceChannelName,
+            CombatReplayTrackedEvent trackedEvent) {
+        CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
+        if (candidate == null) return;
+        updateCandidateEventTracking(candidate, player, trackedEvent);
+
+        appendStructuredEvent(
+                candidate,
+                CombatCandidateEventType.INFO,
+                null,
+                player.getFaction(),
+                "## Action Card\n" + player.getRepresentation() + " played an action card.",
+                ReplayDispatchPayload.actionCardPlayed(actionCardId));
+        appendSideBetTriggerEvents(candidate, sideBetTriggerService.fromTrackedEvent(candidate, player, trackedEvent));
+    }
+
     public void mirrorRetreatDeclared(Game game, Player player, String sourceChannelName) {
         CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
         if (candidate == null) return;
 
-        appendDiscordEvent(
+        appendStructuredEvent(
                 candidate,
                 CombatCandidateEventType.INFO,
                 getCurrentRound(game, candidate),
                 player.getFaction(),
-                "## Retreat\n" + player.getRepresentationNoPing() + " announced a retreat.");
+                "## Retreat\n" + player.getRepresentationNoPing() + " announced a retreat.",
+                ReplayDispatchPayload.retreatDeclared());
     }
 
     public void mirrorRetreatResolved(Game game, Player player, String destination, String sourceChannelName) {
         CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
         if (candidate == null) return;
 
-        appendDiscordEvent(
+        appendStructuredEvent(
                 candidate,
                 CombatCandidateEventType.INFO,
                 getCurrentRound(game, candidate),
                 player.getFaction(),
-                "## Retreat\n" + player.getRepresentationNoPing() + " retreated to " + destination + ".");
+                "## Retreat\n" + player.getRepresentationNoPing() + " retreated to " + destination + ".",
+                ReplayDispatchPayload.retreatResolved(destination));
     }
 
     public void mirrorAssaultCannonAssigned(Game game, Player player, String sourceChannelName) {
         CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
         if (candidate == null) return;
 
-        appendDiscordEvent(
+        appendStructuredEvent(
                 candidate,
                 CombatCandidateEventType.INFO,
                 getCurrentRound(game, candidate),
                 player.getFaction(),
-                "## Combat Ability\n"
-                        + player.getRepresentationNoPing()
-                        + " used _Assault Cannon_ "
-                        + TechEmojis.WarfareTech
-                        + ".");
+                "## Combat Ability\n" + player.getRepresentationNoPing() + " used _Assault Cannon_.",
+                ReplayDispatchPayload.techPlayed("asc"));
     }
 
     public void mirrorGravitonExhausted(Game game, Player player, String sourceChannelName) {
         CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
         if (candidate == null) return;
 
-        appendDiscordEvent(
+        appendStructuredEvent(
                 candidate,
                 CombatCandidateEventType.INFO,
                 getCurrentRound(game, candidate),
                 player.getFaction(),
-                "## Combat Ability\n"
-                        + player.getRepresentationNoPing()
-                        + " exhausted _Graviton Laser System_ "
-                        + TechEmojis.CyberneticTech
-                        + ".");
+                "## Combat Ability\n" + player.getRepresentationNoPing() + " exhausted _Graviton Laser System_.",
+                ReplayDispatchPayload.techExhausted("gls"));
     }
 
     private boolean evaluateCandidateCompletion(Game game, CombatCandidateEntity candidate) {
         Tile tile = game.getTileByPosition(candidate.getTilePosition());
         if (tile == null) return false;
 
-        List<Player> remainingShipPlayers = ButtonHelper.getPlayersWithShipsInTheSystem(game, tile).stream()
-                .filter(Player::isRealPlayer)
-                .filter(player -> !player.isDummy())
-                .toList();
+        List<Player> remainingShipPlayers = new ArrayList<>();
+        for (Player player : ButtonHelper.getPlayersWithShipsInTheSystem(game, tile)) {
+            if (player.isRealPlayer() && !player.isDummy()) {
+                remainingShipPlayers.add(player);
+            }
+        }
         boolean hasRecordedRoll = hasRecordedRoll(candidate);
         return switch (remainingShipPlayers.size()) {
             case 0 -> {
@@ -235,10 +276,14 @@ public class CombatReplayService {
 
     private boolean containsOnlyOriginalParticipants(
             CombatCandidateEntity candidate, List<Player> remainingShipPlayers) {
-        return remainingShipPlayers.stream()
-                .map(Player::getFaction)
-                .allMatch(faction -> faction.equalsIgnoreCase(candidate.getAttackerFaction())
-                        || faction.equalsIgnoreCase(candidate.getDefenderFaction()));
+        for (Player player : remainingShipPlayers) {
+            String faction = player.getFaction();
+            if (!faction.equalsIgnoreCase(candidate.getAttackerFaction())
+                    && !faction.equalsIgnoreCase(candidate.getDefenderFaction())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private String loserFaction(CombatCandidateEntity candidate, Player winner) {
@@ -280,7 +325,7 @@ public class CombatReplayService {
                 roundsObserved,
                 winner.getFaction(),
                 tile.getPosition(),
-                CombatReplayRenderSnapshotSupport.captureHitAssignmentSnapshot(game, tile.getPosition()),
+                CombatReplayTileRenderer.captureUnitStateSnapshot(game, tile.getPosition()),
                 "## Contest Result\n"
                         + winner.getFactionEmoji() + " " + winner.getUserName() + " won the space combat in "
                         + tile.getRepresentationForButtons() + ".\n"
@@ -330,8 +375,7 @@ public class CombatReplayService {
                 message,
                 ReplayDispatchPayload.hitAssign(
                         candidate.getTilePosition(),
-                        CombatReplayRenderSnapshotSupport.captureHitAssignmentSnapshot(
-                                game, candidate.getTilePosition())));
+                        CombatReplayTileRenderer.captureUnitStateSnapshot(game, candidate.getTilePosition())));
     }
 
     private ResolutionState buildResolutionState(Game game, CombatCandidateEntity candidate, Tile tile) {
@@ -350,24 +394,7 @@ public class CombatReplayService {
         LocalDateTime now = LocalDateTime.now();
         List<CombatObservationEntity> window = observationRepository.findByStartedAtGreaterThanEqualOrderByStartedAtAsc(
                 now.minusMinutes(settings.getCandidateSelection().getWindow().getLookbackMinutes()));
-        List<Double> fairnessValues =
-                window.stream().map(CombatObservationEntity::getFairnessRatio).toList();
-        List<Double> weakerStrengthValues = window.stream()
-                .map(observation -> Math.min(observation.getAttackerStrength(), observation.getDefenderStrength()))
-                .toList();
-        double jointScoreCutoff = computeCutoff(window, fairnessValues, weakerStrengthValues);
-        List<SelectionObservationDebugView> observations = window.stream()
-                .map(observation -> toSelectionObservationDebugView(observation, fairnessValues, weakerStrengthValues))
-                .sorted((left, right) -> right.observation()
-                        .getStartedAt()
-                        .compareTo(left.observation().getStartedAt()))
-                .toList();
-        selectionSnapshot = new SelectionSnapshot(
-                window.size(),
-                List.copyOf(fairnessValues),
-                List.copyOf(weakerStrengthValues),
-                jointScoreCutoff,
-                List.copyOf(observations));
+        selection().refresh(window);
     }
 
     public static double computePromotionScore(
@@ -395,16 +422,8 @@ public class CombatReplayService {
         return roundScore + openingBalanceScore + endingTensionScore + defenderWinBonus;
     }
 
-    public SelectionDebugView getSelectionDebugView() {
-        SelectionSnapshot snapshot = getSelectionSnapshot();
-        return new SelectionDebugView(
-                settings.getCandidateSelection().getWindow().getLookbackMinutes(),
-                settings.getCandidateSelection().getTargetCandidatesPerHour(),
-                snapshot.windowSize(),
-                snapshot.jointScoreCutoff(),
-                average(snapshot.fairnessValues()),
-                average(snapshot.weakerStrengthValues()),
-                snapshot.observations());
+    public CombatReplaySelection.SelectionDebugView getSelectionDebugView() {
+        return selection().debugView();
     }
 
     private boolean isSpaceCombatHitAssignment(Game game, Player player, ButtonInteractionEvent event) {
@@ -443,11 +462,7 @@ public class CombatReplayService {
         boolean roundOneWhiff = roundOneCombatRoll && whiff;
         boolean roundOneSlam = roundOneCombatRoll && slam;
         if (!rolledAfb && !afbWhiff && !roundOneWhiff && !roundOneSlam) return;
-        if (player.getFaction().equalsIgnoreCase(candidate.getAttackerFaction())) {
-            markAttackerRollFlags(candidate, rolledAfb, afbWhiff, roundOneWhiff, roundOneSlam);
-        } else {
-            markDefenderRollFlags(candidate, rolledAfb, afbWhiff, roundOneWhiff, roundOneSlam);
-        }
+        CombatSideState.markRollFlags(candidate, player.getFaction(), rolledAfb, afbWhiff, roundOneWhiff, roundOneSlam);
         candidateRepository.save(candidate);
     }
 
@@ -466,30 +481,6 @@ public class CombatReplayService {
         }
     }
 
-    private void markAttackerRollFlags(
-            CombatCandidateEntity candidate,
-            boolean rolledAfb,
-            boolean afbWhiff,
-            boolean roundOneWhiff,
-            boolean roundOneSlam) {
-        candidate.setAttackerRolledAfb(Boolean.TRUE.equals(candidate.getAttackerRolledAfb()) || rolledAfb);
-        candidate.setAttackerAfbWhiff(Boolean.TRUE.equals(candidate.getAttackerAfbWhiff()) || afbWhiff);
-        candidate.setAttackerRoundOneWhiff(Boolean.TRUE.equals(candidate.getAttackerRoundOneWhiff()) || roundOneWhiff);
-        candidate.setAttackerRoundOneSlam(Boolean.TRUE.equals(candidate.getAttackerRoundOneSlam()) || roundOneSlam);
-    }
-
-    private void markDefenderRollFlags(
-            CombatCandidateEntity candidate,
-            boolean rolledAfb,
-            boolean afbWhiff,
-            boolean roundOneWhiff,
-            boolean roundOneSlam) {
-        candidate.setDefenderRolledAfb(Boolean.TRUE.equals(candidate.getDefenderRolledAfb()) || rolledAfb);
-        candidate.setDefenderAfbWhiff(Boolean.TRUE.equals(candidate.getDefenderAfbWhiff()) || afbWhiff);
-        candidate.setDefenderRoundOneWhiff(Boolean.TRUE.equals(candidate.getDefenderRoundOneWhiff()) || roundOneWhiff);
-        candidate.setDefenderRoundOneSlam(Boolean.TRUE.equals(candidate.getDefenderRoundOneSlam()) || roundOneSlam);
-    }
-
     private void updateCandidateEventTracking(
             CombatCandidateEntity candidate, Player player, CombatReplayTrackedEvent trackedEvent) {
         if (candidate == null
@@ -504,18 +495,7 @@ public class CombatReplayService {
             candidate.setCancellationReason(firstNonBlank(
                     candidate.getCancellationReason(), "Ineligible for promotion because Rout was played."));
         }
-        boolean attacker = player.getFaction().equalsIgnoreCase(candidate.getAttackerFaction());
-        if (attacker) {
-            candidate.setAttackerPlayedMoraleBoost(
-                    Boolean.TRUE.equals(candidate.getAttackerPlayedMoraleBoost()) || moraleBoost);
-            candidate.setAttackerPlayedShieldsHolding(
-                    Boolean.TRUE.equals(candidate.getAttackerPlayedShieldsHolding()) || shieldsHolding);
-        } else {
-            candidate.setDefenderPlayedMoraleBoost(
-                    Boolean.TRUE.equals(candidate.getDefenderPlayedMoraleBoost()) || moraleBoost);
-            candidate.setDefenderPlayedShieldsHolding(
-                    Boolean.TRUE.equals(candidate.getDefenderPlayedShieldsHolding()) || shieldsHolding);
-        }
+        CombatSideState.markEventFlags(candidate, player.getFaction(), moraleBoost, shieldsHolding);
         candidateRepository.save(candidate);
     }
 
@@ -532,13 +512,15 @@ public class CombatReplayService {
         if (tile == null || player == null) return 0;
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         if (space == null) return 0;
-        return CombatUnitSelectionHelper.collectCombatRoundUnits(tile, space, player).entrySet().stream()
-                .filter(entry -> entry.getValue() != null
-                        && entry.getValue() > 0
-                        && entry.getKey() != null
-                        && "destroyer".equalsIgnoreCase(entry.getKey().getBaseType()))
-                .mapToInt(entry -> entry.getValue())
-                .sum();
+        int destroyers = 0;
+        for (var entry : CombatUnitSelectionHelper.collectCombatRoundUnits(tile, space, player)
+                .entrySet()) {
+            if (entry.getKey() == null || entry.getValue() == null || entry.getValue() <= 0) continue;
+            if ("destroyer".equalsIgnoreCase(entry.getKey().getBaseType())) {
+                destroyers += entry.getValue();
+            }
+        }
+        return destroyers;
     }
 
     private CombatObservationEntity buildObservation(
@@ -547,12 +529,11 @@ public class CombatReplayService {
             Player defender,
             Tile tile,
             LazaxCombatSupport.SpaceCombatSnapshot snapshot,
-            Evaluation evaluation) {
+            CombatReplaySelection.Evaluation evaluation) {
         CombatObservationEntity observation = new CombatObservationEntity();
         observation.setStartedAt(LocalDateTime.now());
         observation.setGameName(game.getName());
         observation.setTilePosition(tile.getPosition());
-        observation.setCombatType(snapshot.combatType());
         observation.setAttackerFaction(attacker.getFaction());
         observation.setDefenderFaction(defender.getFaction());
         observation.setAttackerStrength(snapshot.attackerStrength());
@@ -566,7 +547,8 @@ public class CombatReplayService {
         return observation;
     }
 
-    private boolean isEligibleCandidate(Game game, Player attacker, Player defender, Tile tile, Evaluation evaluation) {
+    private boolean isEligibleCandidate(
+            Game game, Player attacker, Player defender, Tile tile, CombatReplaySelection.Evaluation evaluation) {
         if (settings.getRuntime().isTrackAllCombatsAsCandidates()) {
             return getTrackingCandidate(game, tile.getPosition()) == null;
         }
@@ -575,85 +557,11 @@ public class CombatReplayService {
                 && getTrackingCandidate(game, tile.getPosition()) == null;
     }
 
-    private Evaluation evaluateSelectionSnapshot(LazaxCombatSupport.SpaceCombatSnapshot snapshot) {
-        SelectionSnapshot currentSnapshot = getSelectionSnapshot();
-        double fairnessRatio = LazaxCombatSupport.computeFairnessRatio(
-                snapshot.attackerStrength(),
-                snapshot.defenderStrength(),
-                snapshot.attackerHp(),
-                snapshot.defenderHp(),
-                snapshot.attackerExpectedHits(),
-                snapshot.defenderExpectedHits());
-        double weakerStrength = Math.min(snapshot.attackerStrength(), snapshot.defenderStrength());
-        double jointScore = computeJointScore(
-                currentSnapshot.fairnessValues(),
-                fairnessRatio,
-                currentSnapshot.weakerStrengthValues(),
-                weakerStrength);
-        boolean eligible = settings.getCandidateSelection().getTargetCandidatesPerHour() > 0
-                && currentSnapshot.hasWindow()
-                && jointScore >= currentSnapshot.jointScoreCutoff();
-        return new Evaluation(fairnessRatio, jointScore, eligible, currentSnapshot.windowSize());
-    }
-
-    private SelectionSnapshot getSelectionSnapshot() {
-        SelectionSnapshot currentSnapshot = selectionSnapshot;
-        if (currentSnapshot != null) return currentSnapshot;
-        synchronized (this) {
-            if (selectionSnapshot == null) {
-                refreshSelectionSnapshot();
-            }
-            return selectionSnapshot;
+    private CombatReplaySelection selection() {
+        if (selection == null) {
+            selection = new CombatReplaySelection(settings);
         }
-    }
-
-    private double computeJointScore(
-            List<Double> fairnessValues,
-            double fairnessRatio,
-            List<Double> weakerStrengthValues,
-            double weakerStrength) {
-        return percentileRank(fairnessValues, fairnessRatio) * percentileRank(weakerStrengthValues, weakerStrength);
-    }
-
-    private SelectionObservationDebugView toSelectionObservationDebugView(
-            CombatObservationEntity observation, List<Double> fairnessValues, List<Double> weakerStrengthValues) {
-        double weakerStrength = Math.min(observation.getAttackerStrength(), observation.getDefenderStrength());
-        double fairnessPercentile = percentileRank(fairnessValues, observation.getFairnessRatio());
-        double weakerStrengthPercentile = percentileRank(weakerStrengthValues, weakerStrength);
-        return new SelectionObservationDebugView(
-                observation,
-                weakerStrength,
-                fairnessPercentile,
-                weakerStrengthPercentile,
-                fairnessPercentile * weakerStrengthPercentile,
-                Boolean.TRUE.equals(observation.getEligibleAsCandidate()));
-    }
-
-    private double computeCutoff(
-            List<CombatObservationEntity> window, List<Double> fairnessValues, List<Double> weakerStrengthValues) {
-        if (window.isEmpty()) return 1.0;
-        int targetCandidatesPerHour = settings.getCandidateSelection().getTargetCandidatesPerHour();
-        if (targetCandidatesPerHour <= 0) return 1.0;
-        List<Double> sortedJointScores = window.stream()
-                .map(observation -> percentileRank(fairnessValues, observation.getFairnessRatio())
-                        * percentileRank(
-                                weakerStrengthValues,
-                                Math.min(observation.getAttackerStrength(), observation.getDefenderStrength())))
-                .sorted(java.util.Comparator.reverseOrder())
-                .toList();
-        int index = Math.max(0, Math.min(sortedJointScores.size() - 1, targetCandidatesPerHour - 1));
-        return sortedJointScores.get(index);
-    }
-
-    private double percentileRank(List<Double> values, double value) {
-        if (values.isEmpty()) return 0.0;
-        long count = values.stream().filter(candidate -> candidate <= value).count();
-        return count / (double) values.size();
-    }
-
-    private double average(List<Double> values) {
-        if (values.isEmpty()) return 0.0;
-        return values.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+        return selection;
     }
 
     private CombatCandidateEntity buildCandidate(
@@ -670,17 +578,19 @@ public class CombatReplayService {
         candidate.setStartedAt(observation.getStartedAt());
         candidate.setGameName(observation.getGameName());
         candidate.setTilePosition(observation.getTilePosition());
-        candidate.setCombatType(observation.getCombatType());
         candidate.setAttackerFaction(attacker.getFaction());
         candidate.setDefenderFaction(defender.getFaction());
         candidate.setPreReplayContextText(LazaxCombatSupport.formatCombatTechSummary(
                 attacker.getGame().getTileByPosition(observation.getTilePosition()), attacker, defender));
         candidate.setInitialRenderSnapshotJson(initialRenderSnapshotJson);
+        candidate.setReplayAbilitiesJson(CombatReplayDecoys.buildJson(attacker, defender, tile));
         candidate.setSideBetCompatible(true);
         candidate.setAttackerDestroyerCount(countDestroyersInCombat(tile, attacker));
         candidate.setDefenderDestroyerCount(countDestroyersInCombat(tile, defender));
         candidate.setAttackerHasAssaultCannon(hasAssaultCannon(attacker));
         candidate.setDefenderHasAssaultCannon(hasAssaultCannon(defender));
+        candidate.setAttackerHp(observation.getAttackerHp());
+        candidate.setDefenderHp(observation.getDefenderHp());
         return candidate;
     }
 
@@ -693,8 +603,8 @@ public class CombatReplayService {
     }
 
     private CombatCandidateEntity getTrackingCandidate(Game game, String tilePosition) {
-        return candidateRepository.findFirstByGameNameAndTilePositionAndCombatTypeAndStatus(
-                game.getName(), tilePosition, CombatContestType.SPACE, CombatCandidateStatus.TRACKING);
+        return candidateRepository.findFirstByGameNameAndTilePositionAndStatus(
+                game.getName(), tilePosition, CombatCandidateStatus.TRACKING);
     }
 
     private boolean hasRecordedRoll(CombatCandidateEntity candidate) {
@@ -714,7 +624,23 @@ public class CombatReplayService {
                 roundNumber,
                 actorFaction,
                 message,
-                ReplayDispatchPayload.discordMessage(message));
+                ReplayDispatchPayload.genericMessage(message));
+    }
+
+    private void appendDiscordEvent(
+            CombatCandidateEntity candidate,
+            CombatCandidateEventType eventType,
+            Integer roundNumber,
+            String actorFaction,
+            String message,
+            CombatRollPayload payload) {
+        eventAppender.appendEvent(
+                candidate,
+                eventType,
+                roundNumber,
+                actorFaction,
+                message,
+                ReplayDispatchPayload.combatRoll(message, payload));
     }
 
     private void appendDiscordEvent(
@@ -730,7 +656,17 @@ public class CombatReplayService {
                 roundNumber,
                 actorFaction,
                 message,
-                ReplayDispatchPayload.discordMessage(message, embed));
+                ReplayDispatchPayload.genericMessage(message, embed));
+    }
+
+    private void appendStructuredEvent(
+            CombatCandidateEntity candidate,
+            CombatCandidateEventType eventType,
+            Integer roundNumber,
+            String actorFaction,
+            String summaryText,
+            ReplayDispatchPayload payload) {
+        eventAppender.appendEvent(candidate, eventType, roundNumber, actorFaction, summaryText, payload);
     }
 
     private void appendTileRenderEvent(

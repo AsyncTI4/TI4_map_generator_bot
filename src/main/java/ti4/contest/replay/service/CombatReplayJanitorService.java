@@ -2,20 +2,22 @@ package ti4.contest.replay.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.*;
 import ti4.contest.replay.entities.*;
 import ti4.contest.replay.repository.*;
 
-@Service
-@RequiredArgsConstructor
 /**
  * Cleans up stale replay data and expires candidates that were never promoted in time.
  */
+@Service
+@RequiredArgsConstructor
 public class CombatReplayJanitorService {
 
     private final CombatContestSettings settings;
@@ -38,15 +40,13 @@ public class CombatReplayJanitorService {
         int expirationLookbackHours = Math.max(
                 settings.getPromotion().getCandidateLookbackHours(),
                 CombatContestSettings.PROMOTION_LOOKBACK_FALLBACK_MAX_HOURS);
-        candidateRepository
-                .findByPromotionStatusAndResolvedAtBefore(
-                        CombatCandidatePromotionStatus.PENDING, now.minusHours(expirationLookbackHours))
-                .stream()
-                .filter(candidate -> candidate.getStatus() == CombatCandidateStatus.RESOLVED)
-                .forEach(candidate -> {
-                    candidate.setPromotionStatus(CombatCandidatePromotionStatus.EXPIRED);
-                    candidateRepository.save(candidate);
-                });
+        List<CombatCandidateEntity> staleCandidates = candidateRepository.findByPromotionStatusAndResolvedAtBefore(
+                CombatCandidatePromotionStatus.PENDING, now.minusHours(expirationLookbackHours));
+        for (CombatCandidateEntity candidate : staleCandidates) {
+            if (candidate.getStatus() != CombatCandidateStatus.RESOLVED) continue;
+            candidate.setPromotionStatus(CombatCandidatePromotionStatus.EXPIRED);
+            candidateRepository.save(candidate);
+        }
     }
 
     private void deleteExpiredCandidateEvents(LocalDateTime now) {
@@ -54,16 +54,22 @@ public class CombatReplayJanitorService {
         List<CombatCandidateEventEntity> oldEvents = candidateEventRepository.findByOccurredAtBefore(retentionCutoff);
         if (oldEvents.isEmpty()) return;
 
-        List<Long> candidateIds = oldEvents.stream()
-                .map(CombatCandidateEventEntity::getCandidateId)
-                .distinct()
-                .toList();
-        Map<Long, CombatCandidateEntity> candidatesById = candidateRepository.findAllById(candidateIds).stream()
-                .collect(Collectors.toMap(CombatCandidateEntity::getId, c -> c));
-        Map<Long, CombatReplayContestEntity> contestsByCandidateId = candidateIds.stream()
-                .map(id -> replayContestRepository.findByCandidateId(id).orElse(null))
-                .filter(c -> c != null)
-                .collect(Collectors.toMap(CombatReplayContestEntity::getCandidateId, c -> c));
+        Set<Long> candidateIds = new HashSet<>();
+        for (CombatCandidateEventEntity event : oldEvents) {
+            candidateIds.add(event.getCandidateId());
+        }
+
+        Map<Long, CombatCandidateEntity> candidatesById = new HashMap<>();
+        for (CombatCandidateEntity candidate : candidateRepository.findAllById(candidateIds)) {
+            candidatesById.put(candidate.getId(), candidate);
+        }
+
+        Map<Long, CombatReplayContestEntity> contestsByCandidateId = new HashMap<>();
+        for (Long candidateId : candidateIds) {
+            replayContestRepository
+                    .findByCandidateId(candidateId)
+                    .ifPresent(contest -> contestsByCandidateId.put(contest.getCandidateId(), contest));
+        }
 
         List<CombatCandidateEventEntity> toDelete = new ArrayList<>();
         for (CombatCandidateEventEntity event : oldEvents) {
@@ -83,13 +89,12 @@ public class CombatReplayJanitorService {
     }
 
     private void clearCompletedReplayErrors() {
-        replayContestRepository.findAll().stream()
-                .filter(contest -> contest.getReplayStatus() == CombatContestReplayStatus.COMPLETED)
-                .filter(contest -> contest.getReplayError() != null)
-                .forEach(contest -> {
-                    contest.setReplayError(null);
-                    replayContestRepository.save(contest);
-                });
+        for (CombatReplayContestEntity contest : replayContestRepository.findAll()) {
+            if (contest.getReplayStatus() != CombatContestReplayStatus.COMPLETED) continue;
+            if (contest.getReplayError() == null) continue;
+            contest.setReplayError(null);
+            replayContestRepository.save(contest);
+        }
     }
 
     private boolean isPastRetentionCutoff(CombatCandidateEntity candidate, LocalDateTime retentionCutoff) {

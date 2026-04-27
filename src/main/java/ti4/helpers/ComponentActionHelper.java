@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -45,7 +46,6 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.spring.context.SpringContext;
-import ti4.spring.service.contest.CombatContestService;
 
 @UtilityClass
 public class ComponentActionHelper {
@@ -542,19 +542,11 @@ public class ComponentActionHelper {
                 } else {
                     LeaderModel leaderModel = Mapper.getLeader(buttonID);
                     if (leaderModel != null) {
-                        String leaderType =
-                                switch (leaderModel.getType()) {
-                                    case "commander" -> "Commander";
-                                    case "envoy" -> "Envoy";
-                                    default -> "Leader";
-                                };
-                        SpringContext.getBean(CombatContestService.class)
-                                .mirrorCombatEvent(
+                        SpringContext.getBean(CombatReplayService.class)
+                                .mirrorLeaderPlayed(
                                         game,
                                         p1,
-                                        leaderType,
-                                        "used _" + leaderModel.getName() + "_.",
-                                        leaderModel.getRepresentationEmbed(),
+                                        leaderModel.getAlias(),
                                         event.getChannel().getName());
                     }
                 }

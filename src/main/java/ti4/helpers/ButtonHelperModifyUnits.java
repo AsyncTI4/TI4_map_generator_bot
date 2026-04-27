@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -60,7 +61,6 @@ import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 import ti4.spring.context.SpringContext;
-import ti4.spring.service.contest.CombatContestService;
 
 public final class ButtonHelperModifyUnits {
 
@@ -2464,7 +2464,7 @@ public final class ButtonHelperModifyUnits {
         } else {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), player.getRepresentation(false, false) + " used _Assault Cannon_.");
-            SpringContext.getBean(CombatContestService.class)
+            SpringContext.getBean(CombatReplayService.class)
                     .mirrorAssaultCannonAssigned(
                             game, player, event.getChannel().getName());
             msg = opponent.getRepresentationUnfogged()

@@ -5,10 +5,14 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.core.CombatSideBetType;
+import ti4.contest.replay.core.CombatSideState;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.game.Player;
 import ti4.service.combat.CombatRollType;
 
+/**
+ * Converts tracked combat moments into replay announcements for side bets that just hit.
+ */
 @Service
 public class CombatReplaySideBetTriggerService {
 
@@ -27,14 +31,16 @@ public class CombatReplaySideBetTriggerService {
         }
 
         List<SideBetTriggerAnnouncement> announcements = new ArrayList<>();
-        int destroyerCount = destroyerCount(candidate, player.getFaction());
+        CombatSideState state = CombatSideState.forFaction(candidate, player.getFaction());
+        int destroyerCount = state == null ? 0 : state.destroyerCount();
         if (rollType == CombatRollType.AFB && whiff && CombatSideBetType.AFB_WHIFF.isAvailable(destroyerCount)) {
             announcements.add(announcement(player, "AFB Whiff!"));
         }
         if (rollType == CombatRollType.combatround
                 && round == 1
                 && isAfbSkippedAvailable(candidate, player.getFaction())
-                && !hasRolledAfb(candidate, player.getFaction())) {
+                && state != null
+                && !state.rolledAfb()) {
             announcements.add(announcement(player, "Skipped AFB!"));
         }
         if (rollType == CombatRollType.combatround && round == 1 && whiff) {
@@ -76,22 +82,10 @@ public class CombatReplaySideBetTriggerService {
                 player.getFaction(), "### " + player.getFactionEmoji() + " " + triggerLabel);
     }
 
-    private int destroyerCount(CombatCandidateEntity candidate, String faction) {
-        if (faction == null) return 0;
-        if (faction.equalsIgnoreCase(candidate.getAttackerFaction())) {
-            return safeInt(candidate.getAttackerDestroyerCount());
-        }
-        if (faction.equalsIgnoreCase(candidate.getDefenderFaction())) {
-            return safeInt(candidate.getDefenderDestroyerCount());
-        }
-        return 0;
-    }
-
     private boolean isAfbSkippedAvailable(CombatCandidateEntity candidate, String faction) {
-        if (faction == null || !CombatSideBetType.AFB_SKIPPED.isAvailable(destroyerCount(candidate, faction))) {
-            return false;
-        }
-        return !(destroyerCount(candidate, faction) == 1 && opponentHasAssaultCannon(candidate, faction));
+        CombatSideState state = CombatSideState.forFaction(candidate, faction);
+        if (state == null || !CombatSideBetType.AFB_SKIPPED.isAvailable(state.destroyerCount())) return false;
+        return !(state.destroyerCount() == 1 && opponentHasAssaultCannon(candidate, faction));
     }
 
     private boolean opponentHasAssaultCannon(CombatCandidateEntity candidate, String faction) {
@@ -102,21 +96,6 @@ public class CombatReplaySideBetTriggerService {
             return Boolean.TRUE.equals(candidate.getAttackerHasAssaultCannon());
         }
         return false;
-    }
-
-    private boolean hasRolledAfb(CombatCandidateEntity candidate, String faction) {
-        if (faction == null) return false;
-        if (faction.equalsIgnoreCase(candidate.getAttackerFaction())) {
-            return Boolean.TRUE.equals(candidate.getAttackerRolledAfb());
-        }
-        if (faction.equalsIgnoreCase(candidate.getDefenderFaction())) {
-            return Boolean.TRUE.equals(candidate.getDefenderRolledAfb());
-        }
-        return false;
-    }
-
-    private int safeInt(Integer value) {
-        return value == null ? 0 : value;
     }
 
     public record SideBetTriggerAnnouncement(String faction, String message) {}

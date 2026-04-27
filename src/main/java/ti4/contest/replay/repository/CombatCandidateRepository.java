@@ -11,11 +11,10 @@ import org.springframework.data.repository.query.Param;
 import ti4.contest.replay.core.CombatCandidatePromotionStatus;
 import ti4.contest.replay.core.CombatCandidateStatus;
 import ti4.contest.replay.entities.CombatCandidateEntity;
-import ti4.spring.service.contest.CombatContestType;
 
 public interface CombatCandidateRepository extends JpaRepository<CombatCandidateEntity, Long> {
-    CombatCandidateEntity findFirstByGameNameAndTilePositionAndCombatTypeAndStatus(
-            String gameName, String tilePosition, CombatContestType combatType, CombatCandidateStatus status);
+    CombatCandidateEntity findFirstByGameNameAndTilePositionAndStatus(
+            String gameName, String tilePosition, CombatCandidateStatus status);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select c from CombatCandidateEntity c where c.id = :id")

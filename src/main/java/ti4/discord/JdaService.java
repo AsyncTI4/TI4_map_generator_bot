@@ -30,8 +30,6 @@ import ti4.contest.cron.CombatReplaySelectionCron;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CategoryCleanupCron;
 import ti4.cron.CloseLaunchThreadsCron;
-import ti4.cron.CombatContestLeaderboardCron;
-import ti4.cron.CombatContestSelectionCron;
 import ti4.cron.CronManager;
 import ti4.cron.EndOldGamesCron;
 import ti4.cron.FastScFollowCron;
@@ -300,8 +298,6 @@ public class JdaService {
         SabotageAutoReactCron.register();
         FastScFollowCron.register();
         CloseLaunchThreadsCron.register();
-        CombatContestSelectionCron.register();
-        CombatContestLeaderboardCron.register();
         CombatReplaySelectionCron.register();
         CombatReplayPromotionCron.register();
         CombatReplayPromotionScoreBackfillCron.register();

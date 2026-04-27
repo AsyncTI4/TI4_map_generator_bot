@@ -13,11 +13,11 @@ import ti4.contest.replay.entities.CombatCandidateEventEntity;
 import ti4.contest.replay.repository.CombatCandidateEventRepository;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 
-@Service
-@RequiredArgsConstructor
 /**
  * Appends ordered events to a candidate while keeping the candidate sequence counter in sync.
  */
+@Service
+@RequiredArgsConstructor
 public class CombatReplayEventAppender {
 
     private final CombatCandidateRepository candidateRepository;

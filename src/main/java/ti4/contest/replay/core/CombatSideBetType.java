@@ -6,14 +6,24 @@ import ti4.service.emoji.DiceEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 
+/**
+ * Defines the supported combat side bets, their labels, availability gates, and legacy flat payouts.
+ */
 public enum CombatSideBetType {
-    AFB_SKIPPED("Skips AFB", UnitEmojis.destroyer, 1, 3),
-    AFB_WHIFF("AFB Whiff", UnitEmojis.destroyer, 2, 3),
-    ROUND_ONE_WHIFF("R1 Whiff", DiceEmojis.d10red_1, 0, 5),
-    ROUND_ONE_SLAM("R1 Slam", DiceEmojis.d10green_0, 0, 7),
-    MORALE_BOOST("Plays Morale Boost", CardEmojis.ActionCard, 0, 5),
-    SHIELDS_HOLDING("Plays Shields Holding", CardEmojis.ActionCard, 0, 5),
-    WINNER_ONE_HP("Wins On 1\uFE0F\u20E3 HP", "1\uFE0F\u20E3", 0, 15);
+    /** Current AFB side bet: player skips available anti-fighter barrage. */
+    AFB_SKIPPED("Skips AFB", UnitEmojis.destroyer, 1, 6),
+    /** Current AFB side bet: player rolls AFB and scores zero hits. */
+    AFB_WHIFF("AFB Whiff", UnitEmojis.destroyer, 2, 4),
+    /** Current dynamic side bet: player scores zero hits in their first combat roll. */
+    ROUND_ONE_WHIFF("R1 Whiff", DiceEmojis.d10red_1, 0, 10),
+    /** Current dynamic side bet: every die in player's first combat roll hits. */
+    ROUND_ONE_SLAM("R1 Slam", DiceEmojis.d10green_0, 0, 30),
+    /** Current tracked interaction side bet. */
+    MORALE_BOOST("Plays Morale Boost", CardEmojis.ActionCard, 0, 8),
+    /** Current tracked interaction side bet. */
+    SHIELDS_HOLDING("Plays Shields Holding", CardEmojis.ActionCard, 0, 8),
+    /** Current dynamic resolution side bet. */
+    WINNER_ONE_HP("Wins On 1\uFE0F\u20E3 HP", "1\uFE0F\u20E3", 0, 35);
 
     private final String label;
     private final TI4Emoji emoji;

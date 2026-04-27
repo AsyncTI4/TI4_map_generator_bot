@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -23,7 +24,6 @@ import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.LoreService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.spring.context.SpringContext;
-import ti4.spring.service.contest.CombatContestService;
 
 @UtilityClass
 class RetreatButtonHandler {
@@ -96,7 +96,7 @@ class RetreatButtonHandler {
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " retreated all units in space to "
                         + game.getTileByPosition(pos2).getRepresentationForButtons(game, player) + ".");
-        SpringContext.getBean(CombatContestService.class)
+        SpringContext.getBean(CombatReplayService.class)
                 .mirrorRetreatResolved(
                         game,
                         player,

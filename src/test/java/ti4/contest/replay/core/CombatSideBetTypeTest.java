@@ -17,13 +17,13 @@ class CombatSideBetTypeTest {
     @Test
     void usesConfiguredSideBetPayouts() {
         Map<CombatSideBetType, Integer> expectedPayouts = Map.of(
-                CombatSideBetType.AFB_SKIPPED, 3,
-                CombatSideBetType.AFB_WHIFF, 3,
-                CombatSideBetType.ROUND_ONE_WHIFF, 5,
-                CombatSideBetType.ROUND_ONE_SLAM, 7,
-                CombatSideBetType.MORALE_BOOST, 5,
-                CombatSideBetType.SHIELDS_HOLDING, 5,
-                CombatSideBetType.WINNER_ONE_HP, 15);
+                CombatSideBetType.AFB_SKIPPED, 6,
+                CombatSideBetType.AFB_WHIFF, 4,
+                CombatSideBetType.ROUND_ONE_WHIFF, 10,
+                CombatSideBetType.ROUND_ONE_SLAM, 30,
+                CombatSideBetType.MORALE_BOOST, 8,
+                CombatSideBetType.SHIELDS_HOLDING, 8,
+                CombatSideBetType.WINNER_ONE_HP, 35);
 
         expectedPayouts.forEach((type, expectedPayout) -> assertEquals(expectedPayout, type.profitPoints()));
     }
