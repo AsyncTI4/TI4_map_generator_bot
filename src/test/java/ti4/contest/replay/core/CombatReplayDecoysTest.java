@@ -91,6 +91,77 @@ class CombatReplayDecoysTest extends BaseTi4Test {
     }
 
     @Test
+    void addsForcedMissDiceToMatchingRerolls() {
+        CombatRollPayload payload = new CombatRollPayload(
+                new CombatRollPayload.RollHeader(
+                        "ghost",
+                        "turquoise",
+                        "<ghost>",
+                        "yin",
+                        "sunset",
+                        "000",
+                        "18",
+                        "space",
+                        "space combat",
+                        CombatRollType.combatround,
+                        1,
+                        false,
+                        false),
+                List.of(),
+                List.of(),
+                List.of(
+                        new CombatRollPayload.UnitRoll(
+                                "ghost_destroyer",
+                                "dd",
+                                "destroyer",
+                                "Destroyer I",
+                                "Destroyer I",
+                                "<destroyer>",
+                                1,
+                                1,
+                                0,
+                                9,
+                                0,
+                                9,
+                                RollSegmentType.PRIMARY,
+                                List.of(new CombatRollPayload.DieRoll(2, 9, false, DieRollSource.PRIMARY)),
+                                0),
+                        new CombatRollPayload.UnitRoll(
+                                "ghost_destroyer",
+                                "dd",
+                                "destroyer",
+                                "Destroyer I",
+                                "Destroyer I",
+                                "<destroyer>",
+                                1,
+                                1,
+                                0,
+                                9,
+                                0,
+                                9,
+                                RollSegmentType.JOL_NAR_COMMANDER_REROLL_MISSES,
+                                List.of(new CombatRollPayload.DieRoll(7, 9, false, DieRollSource.REROLL_MISS)),
+                                0)),
+                new CombatRollPayload.RollTotal(2, 0, 1, 2));
+        CombatReplayDecoys.Abilities abilities =
+                abilities(new DecoyUnit("ghost", "<ghost>", "tqs", UnitType.Destroyer, "space", 3));
+
+        CombatRollPayload transformed = CombatReplayDecoys.applyToRoll(payload, abilities);
+        CombatRollPayload.UnitRoll reroll = transformed.unitRolls().get(1);
+
+        assertEquals(4, reroll.quantity());
+        assertEquals(4, reroll.dice().size());
+        assertEquals(
+                3,
+                reroll.dice().stream()
+                        .filter(die -> die.source() == DieRollSource.DECOY)
+                        .count());
+        assertTrue(reroll.dice().stream()
+                .filter(die -> die.source() == DieRollSource.DECOY)
+                .noneMatch(CombatRollPayload.DieRoll::success));
+    }
+
+    @Test
     void rendersDecoyDisappearanceMessage() {
         CombatReplayDecoys.Abilities abilities = abilities(
                 new DecoyUnit("ghost", "<ghost>", "tqs", UnitType.Cruiser, "space", 2),
