@@ -21,7 +21,6 @@ import ti4.contest.replay.persistence.CombatSideBetTypeConverter;
         name = "combat_contest_side_bets",
         indexes = {
             @Index(name = "idx_side_bet_contest_user", columnList = "contest_id, discord_user_id"),
-            @Index(name = "idx_side_bet_candidate", columnList = "candidate_id"),
             @Index(name = "idx_side_bet_resolved", columnList = "resolved_at")
         })
 public class CombatContestSideBetEntity {
@@ -32,9 +31,6 @@ public class CombatContestSideBetEntity {
 
     @Column(name = "contest_id", nullable = false)
     private Long contestId;
-
-    @Column(name = "candidate_id", nullable = false)
-    private Long candidateId;
 
     @Column(name = "discord_user_id", nullable = false)
     private String discordUserId;
@@ -49,17 +45,8 @@ public class CombatContestSideBetEntity {
     @Column(name = "target_faction", nullable = false)
     private String targetFaction;
 
-    @Column(name = "points_spent", nullable = false)
-    private Integer pointsSpent;
-
     @Column(name = "offered_profit_points")
     private Integer offeredProfitPoints;
-
-    @Column(name = "profit_awarded")
-    private Integer profitAwarded;
-
-    @Column(name = "won")
-    private Boolean won;
 
     @Column(name = "placed_at", nullable = false)
     private LocalDateTime placedAt;

@@ -10,7 +10,6 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ti4.contest.replay.core.CombatContestType;
 
 @Data
 @NoArgsConstructor
@@ -19,9 +18,6 @@ import ti4.contest.replay.core.CombatContestType;
         name = "combat_observation",
         indexes = {
             @Index(name = "idx_combat_observation_started_at", columnList = "started_at"),
-            @Index(
-                    name = "idx_combat_observation_eligible_started_at",
-                    columnList = "eligible_as_candidate, started_at"),
             @Index(
                     name = "idx_combat_observation_game_tile_started_at",
                     columnList = "game_name, tile_position, started_at")
@@ -43,9 +39,6 @@ public class CombatObservationEntity {
 
     @Column(name = "tile_position", nullable = false)
     private String tilePosition;
-
-    @Column(name = "combat_type", nullable = false)
-    private CombatContestType combatType;
 
     @Column(name = "attacker_faction", nullable = false)
     private String attackerFaction;
@@ -76,10 +69,4 @@ public class CombatObservationEntity {
 
     @Column(name = "joint_score", nullable = false)
     private Double jointScore;
-
-    @Column(name = "eligible_as_candidate", nullable = false)
-    private Boolean eligibleAsCandidate;
-
-    @Column(name = "candidate_id", unique = true)
-    private Long candidateId;
 }

@@ -98,7 +98,6 @@ public class LazaxCombatSupport {
         String openerText = formatReplayHeader(game, tile, attacker, defender, activePlayerSummary);
         String parentPostText = openerText + "\n\n" + summary;
         return new SpaceCombatSnapshot(
-                CombatContestType.SPACE,
                 parentPostText,
                 activePlayerSummary,
                 summary,
@@ -521,7 +520,6 @@ public class LazaxCombatSupport {
     }
 
     public record SpaceCombatSnapshot(
-            CombatContestType combatType,
             String replaySummaryText,
             String activePlayerSummary,
             String boardSummary,

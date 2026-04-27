@@ -62,7 +62,6 @@ public class CombatReplayService {
         Evaluation evaluation = evaluateSelectionSnapshot(snapshot);
         CombatObservationEntity observation = buildObservation(game, attacker, defender, tile, snapshot, evaluation);
         boolean eligible = isEligibleCandidate(game, attacker, defender, tile, evaluation);
-        observation.setEligibleAsCandidate(eligible);
         observationRepository.save(observation);
 
         if (!eligible) return;
@@ -74,9 +73,6 @@ public class CombatReplayService {
                 tile,
                 CombatReplayTileRenderer.captureInitialSnapshot(game, tile.getPosition()));
         candidateRepository.save(candidate);
-
-        observation.setCandidateId(candidate.getId());
-        observationRepository.save(observation);
 
         appendDiscordEvent(candidate, CombatCandidateEventType.START, null, null, snapshot.replaySummaryText());
     }
@@ -395,7 +391,8 @@ public class CombatReplayService {
                 .toList();
         double jointScoreCutoff = computeCutoff(window, fairnessValues, weakerStrengthValues);
         List<SelectionObservationDebugView> observations = window.stream()
-                .map(observation -> toSelectionObservationDebugView(observation, fairnessValues, weakerStrengthValues))
+                .map(observation -> toSelectionObservationDebugView(
+                        observation, fairnessValues, weakerStrengthValues, jointScoreCutoff))
                 .sorted((left, right) -> right.observation()
                         .getStartedAt()
                         .compareTo(left.observation().getStartedAt()))
@@ -590,7 +587,6 @@ public class CombatReplayService {
         observation.setStartedAt(LocalDateTime.now());
         observation.setGameName(game.getName());
         observation.setTilePosition(tile.getPosition());
-        observation.setCombatType(snapshot.combatType());
         observation.setAttackerFaction(attacker.getFaction());
         observation.setDefenderFaction(defender.getFaction());
         observation.setAttackerStrength(snapshot.attackerStrength());
@@ -654,17 +650,21 @@ public class CombatReplayService {
     }
 
     private SelectionObservationDebugView toSelectionObservationDebugView(
-            CombatObservationEntity observation, List<Double> fairnessValues, List<Double> weakerStrengthValues) {
+            CombatObservationEntity observation,
+            List<Double> fairnessValues,
+            List<Double> weakerStrengthValues,
+            double jointScoreCutoff) {
         double weakerStrength = Math.min(observation.getAttackerStrength(), observation.getDefenderStrength());
         double fairnessPercentile = percentileRank(fairnessValues, observation.getFairnessRatio());
         double weakerStrengthPercentile = percentileRank(weakerStrengthValues, weakerStrength);
+        double jointScore = fairnessPercentile * weakerStrengthPercentile;
         return new SelectionObservationDebugView(
                 observation,
                 weakerStrength,
                 fairnessPercentile,
                 weakerStrengthPercentile,
-                fairnessPercentile * weakerStrengthPercentile,
-                Boolean.TRUE.equals(observation.getEligibleAsCandidate()));
+                jointScore,
+                settings.getCandidateSelection().getTargetCandidatesPerHour() > 0 && jointScore >= jointScoreCutoff);
     }
 
     private double computeCutoff(
@@ -708,7 +708,6 @@ public class CombatReplayService {
         candidate.setStartedAt(observation.getStartedAt());
         candidate.setGameName(observation.getGameName());
         candidate.setTilePosition(observation.getTilePosition());
-        candidate.setCombatType(observation.getCombatType());
         candidate.setAttackerFaction(attacker.getFaction());
         candidate.setDefenderFaction(defender.getFaction());
         candidate.setPreReplayContextText(LazaxCombatSupport.formatCombatTechSummary(
@@ -734,8 +733,8 @@ public class CombatReplayService {
     }
 
     private CombatCandidateEntity getTrackingCandidate(Game game, String tilePosition) {
-        return candidateRepository.findFirstByGameNameAndTilePositionAndCombatTypeAndStatus(
-                game.getName(), tilePosition, CombatContestType.SPACE, CombatCandidateStatus.TRACKING);
+        return candidateRepository.findFirstByGameNameAndTilePositionAndStatus(
+                game.getName(), tilePosition, CombatCandidateStatus.TRACKING);
     }
 
     private boolean hasRecordedRoll(CombatCandidateEntity candidate) {

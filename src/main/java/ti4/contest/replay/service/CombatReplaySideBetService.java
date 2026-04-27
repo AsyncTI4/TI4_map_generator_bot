@@ -151,12 +151,10 @@ public class CombatReplaySideBetService {
 
         CombatContestSideBetEntity sideBet = new CombatContestSideBetEntity();
         sideBet.setContestId(contestId);
-        sideBet.setCandidateId(candidate.getId());
         sideBet.setDiscordUserId(userId);
         sideBet.setDiscordUserName(userName);
         sideBet.setBetType(betType);
         sideBet.setTargetFaction(targetFaction);
-        sideBet.setPointsSpent(costPoints);
         sideBet.setOfferedProfitPoints(payoutService.offeredPayout(contest, candidate, betType, targetFaction));
         sideBet.setPlacedAt(LocalDateTime.now());
         sideBetRepository.save(sideBet);
@@ -181,8 +179,6 @@ public class CombatReplaySideBetService {
             boolean firstResolution = sideBet.getResolvedAt() == null;
             int profitPoints = payoutService.resolvedProfitPoints(sideBet);
             CombatReplayLeaderboardEntryEntity entry = entriesByUser.get(sideBet.getDiscordUserId());
-            sideBet.setWon(won);
-            sideBet.setProfitAwarded(won && entry != null ? profitPoints : 0);
             sideBet.setResolvedAt(now);
 
             if (entry != null) {

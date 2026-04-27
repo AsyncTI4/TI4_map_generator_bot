@@ -12,7 +12,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ti4.contest.replay.core.CombatCandidatePromotionStatus;
 import ti4.contest.replay.core.CombatCandidateStatus;
-import ti4.contest.replay.core.CombatContestType;
 
 @Data
 @NoArgsConstructor
@@ -60,9 +59,6 @@ public class CombatCandidateEntity {
 
     @Column(name = "tile_position", nullable = false)
     private String tilePosition;
-
-    @Column(name = "combat_type", nullable = false)
-    private CombatContestType combatType;
 
     @Column(name = "attacker_faction", nullable = false)
     private String attackerFaction;
