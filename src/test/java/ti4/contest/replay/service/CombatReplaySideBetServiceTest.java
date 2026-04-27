@@ -19,7 +19,9 @@ class CombatReplaySideBetServiceTest {
             mock(CombatReplayContestRepository.class),
             mock(CombatCandidateRepository.class),
             mock(CombatContestSideBetRepository.class),
-            mock(CombatReplayLeaderboardEntryRepository.class));
+            mock(CombatReplayLeaderboardEntryRepository.class),
+            mock(CombatReplaySideBetPayoutService.class),
+            mock(CombatReplaySideBetUiService.class));
 
     @Test
     void afbSkippedAvailableForSideWithDestroyerUnlessSingleDestroyerIsFacingAssaultCannon() {

@@ -7,7 +7,6 @@ import static org.mockito.Mockito.verifyNoInteractions;
 
 import org.junit.jupiter.api.Test;
 import ti4.contest.replay.core.CombatContestSettings;
-import ti4.contest.replay.dispatch.ReplayDispatchSerializer;
 import ti4.contest.replay.repository.CombatCandidateEventRepository;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatObservationRepository;
@@ -55,6 +54,6 @@ class CombatReplayContestLifecycleServiceTest {
                 mock(CombatCandidateEventRepository.class),
                 mock(CombatReplayLeaderboardService.class),
                 mock(CombatReplaySideBetService.class),
-                mock(ReplayDispatchSerializer.class));
+                mock(ReplayPayloadRenderer.class));
     }
 }

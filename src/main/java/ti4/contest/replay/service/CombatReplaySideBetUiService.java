@@ -83,8 +83,7 @@ public class CombatReplaySideBetUiService {
         CombatSideState state = CombatSideState.forFaction(candidate, faction);
         if (state == null) return buttons;
         for (CombatSideBetType type : CombatSideBetType.values()) {
-            if (type == CombatSideBetType.AFB_SKIPPED) continue;
-            if (!type.isAvailable(state.destroyerCount())) continue;
+            if (!isAvailableForFaction(type, candidate, faction, state)) continue;
             int profitPoints = payoutService.offeredPayout(contest, candidate, type, faction);
             buttons.add(Buttons.gray(
                     CombatSideBetButtonIds.format(contest.getId(), type, faction),
@@ -92,6 +91,24 @@ public class CombatReplaySideBetUiService {
                     type.emoji()));
         }
         return buttons;
+    }
+
+    private boolean isAvailableForFaction(
+            CombatSideBetType type, CombatCandidateEntity candidate, String faction, CombatSideState state) {
+        if (!type.isAvailable(state.destroyerCount())) return false;
+        if (type != CombatSideBetType.AFB_SKIPPED) return true;
+        return !(state.destroyerCount() == 1 && opponentHasAssaultCannon(candidate, faction));
+    }
+
+    private boolean opponentHasAssaultCannon(CombatCandidateEntity candidate, String faction) {
+        if (candidate == null || faction == null) return false;
+        if (faction.equalsIgnoreCase(candidate.getAttackerFaction())) {
+            return Boolean.TRUE.equals(candidate.getDefenderHasAssaultCannon());
+        }
+        if (faction.equalsIgnoreCase(candidate.getDefenderFaction())) {
+            return Boolean.TRUE.equals(candidate.getAttackerHasAssaultCannon());
+        }
+        return false;
     }
 
     private String buttonLabel(CombatSideBetType type, String factionLabel, int profitPoints) {
