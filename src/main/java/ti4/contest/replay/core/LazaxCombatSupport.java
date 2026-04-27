@@ -3,9 +3,9 @@ package ti4.contest.replay.core;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -35,10 +35,10 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.UnitEmojis;
 
-@UtilityClass
 /**
  * Shared combat helper logic for replay candidate filtering, scoring inputs, and Lazax replay text generation.
  */
+@UtilityClass
 public class LazaxCombatSupport {
 
     private static final Set<String> COMBAT_SUMMARY_TECH_ALIASES = Set.of("da", "asc", "gls", "x89", "x89c4");
@@ -75,11 +75,13 @@ public class LazaxCombatSupport {
         if (attacker.isDummy() || defender.isDummy() || !attacker.isRealPlayer() || !defender.isRealPlayer()) {
             return false;
         }
-        List<Player> shipPlayers = ButtonHelper.getPlayersWithShipsInTheSystem(game, tile).stream()
-                .filter(Player::isRealPlayer)
-                .filter(player -> !player.isDummy())
-                .toList();
-        return shipPlayers.size() == 2;
+        int realShipPlayers = 0;
+        for (Player player : ButtonHelper.getPlayersWithShipsInTheSystem(game, tile)) {
+            if (player.isRealPlayer() && !player.isDummy()) {
+                realShipPlayers++;
+            }
+        }
+        return realShipPlayers == 2;
     }
 
     public boolean hasExcludedFlagship(Player attacker, Player defender) {
@@ -228,17 +230,25 @@ public class LazaxCombatSupport {
     }
 
     private String formatCombatTechLine(Player player) {
-        String techSummary = player.getTechs().stream()
-                .map(Mapper::getTech)
-                .filter(Objects::nonNull)
-                .filter(tech -> !player.getPurgedTechs().contains(tech.getAlias()))
-                .filter(tech -> tech.isFactionTech()
-                        || tech.isUnitUpgrade()
-                        || COMBAT_SUMMARY_TECH_ALIASES.contains(tech.getAlias()))
-                .sorted(TECH_COMPARATOR)
-                .map(tech -> formatCombatTech(player, tech))
-                .reduce((left, right) -> left + ", " + right)
-                .orElse("No technologies");
+        List<TechnologyModel> combatTechs = new ArrayList<>();
+        for (String techId : player.getTechs()) {
+            TechnologyModel tech = Mapper.getTech(techId);
+            if (tech == null) continue;
+            if (player.getPurgedTechs().contains(tech.getAlias())) continue;
+            if (!tech.isFactionTech()
+                    && !tech.isUnitUpgrade()
+                    && !COMBAT_SUMMARY_TECH_ALIASES.contains(tech.getAlias())) {
+                continue;
+            }
+            combatTechs.add(tech);
+        }
+        combatTechs.sort(TECH_COMPARATOR);
+
+        List<String> techLines = new ArrayList<>(combatTechs.size());
+        for (TechnologyModel tech : combatTechs) {
+            techLines.add(formatCombatTech(player, tech));
+        }
+        String techSummary = techLines.isEmpty() ? "No technologies" : String.join(", ", techLines);
         return formatPlayerSummaryLine(player, techSummary);
     }
 
@@ -266,18 +276,20 @@ public class LazaxCombatSupport {
     }
 
     private String formatCombatRelicLine(Player player) {
-        String relicSummary = player.getRelics().stream()
-                .distinct()
-                .filter(COMBAT_SUMMARY_RELIC_ALIASES::contains)
-                .map(Mapper::getRelic)
-                .filter(Objects::nonNull)
-                .map(relic -> ExploreEmojis.Relic + " " + relic.getName())
-                .sorted(String::compareToIgnoreCase)
-                .reduce((left, right) -> left + ", " + right)
-                .orElse(null);
-        if (relicSummary == null) return null;
+        Set<String> seenRelics = new HashSet<>();
+        List<String> relics = new ArrayList<>();
+        for (String relicId : player.getRelics()) {
+            if (!seenRelics.add(relicId)) continue;
+            if (!COMBAT_SUMMARY_RELIC_ALIASES.contains(relicId)) continue;
+            var relic = Mapper.getRelic(relicId);
+            if (relic != null) {
+                relics.add(ExploreEmojis.Relic + " " + relic.getName());
+            }
+        }
+        if (relics.isEmpty()) return null;
 
-        return formatPlayerSummaryLine(player, relicSummary);
+        relics.sort(String::compareToIgnoreCase);
+        return formatPlayerSummaryLine(player, String.join(", ", relics));
     }
 
     private String formatCombatLawSection(Player attacker, Player defender) {
@@ -340,27 +352,33 @@ public class LazaxCombatSupport {
     }
 
     private String formatOtherLeaderSection(Game game, Player attacker, Player defender) {
-        List<String> lines = game.getRealPlayers().stream()
-                .filter(player -> !player.equals(attacker) && !player.equals(defender))
-                .map(LazaxCombatSupport::formatOtherCombatLeaderLine)
-                .filter(Objects::nonNull)
-                .toList();
+        List<String> lines = new ArrayList<>();
+        for (Player player : game.getRealPlayers()) {
+            if (player.equals(attacker) || player.equals(defender)) continue;
+            String line = formatOtherCombatLeaderLine(player);
+            if (line != null) {
+                lines.add(line);
+            }
+        }
         if (lines.isEmpty()) return null;
         return "### Other Leaders\n" + String.join("\n", lines);
     }
 
     private String formatOtherCombatLeaderLine(Player player) {
-        List<String> leaders = player.getLeaders().stream()
-                .filter(leader -> SPACE_COMBAT_AGENT_IDS.contains(leader.getId()))
-                .map(LazaxCombatSupport::formatLeaderSummary)
-                .toList();
+        List<String> leaders = new ArrayList<>();
+        for (Leader leader : player.getLeaders()) {
+            if (SPACE_COMBAT_AGENT_IDS.contains(leader.getId())) {
+                leaders.add(formatLeaderSummary(leader));
+            }
+        }
         return leaders.isEmpty() ? null : formatPlayerLeaderBlock(player, leaders);
     }
 
     private String formatCombatParticipantLeaderLine(Player player) {
-        List<String> leaders = player.getLeaders().stream()
-                .map(LazaxCombatSupport::formatLeaderSummary)
-                .toList();
+        List<String> leaders = new ArrayList<>();
+        for (Leader leader : player.getLeaders()) {
+            leaders.add(formatLeaderSummary(leader));
+        }
         return leaders.isEmpty() ? null : formatPlayerLeaderBlock(player, leaders);
     }
 

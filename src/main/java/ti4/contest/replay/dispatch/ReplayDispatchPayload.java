@@ -14,6 +14,8 @@ import ti4.contest.replay.core.CombatRollPayload;
     @JsonSubTypes.Type(value = ReplayDispatchPayload.ActionCardPlayedDispatch.class, name = "ACTION_CARD_PLAYED"),
     @JsonSubTypes.Type(value = ReplayDispatchPayload.TechPlayedDispatch.class, name = "TECH_PLAYED"),
     @JsonSubTypes.Type(value = ReplayDispatchPayload.TechExhaustedDispatch.class, name = "TECH_EXHAUSTED"),
+    @JsonSubTypes.Type(value = ReplayDispatchPayload.RetreatDeclaredDispatch.class, name = "RETREAT_DECLARED"),
+    @JsonSubTypes.Type(value = ReplayDispatchPayload.RetreatResolvedDispatch.class, name = "RETREAT_RESOLVED"),
     @JsonSubTypes.Type(value = ReplayDispatchPayload.HitAssignDispatch.class, name = "HIT_ASSIGN"),
     @JsonSubTypes.Type(value = ReplayDispatchPayload.TileRenderMessageDispatch.class, name = "TILE_RENDER_MESSAGE"),
     @JsonSubTypes.Type(value = ReplayDispatchPayload.CombatRollDispatch.class, name = "COMBAT_ROLL")
@@ -55,6 +57,14 @@ public interface ReplayDispatchPayload {
         return new TechExhaustedDispatch(techId);
     }
 
+    static ReplayDispatchPayload retreatDeclared() {
+        return new RetreatDeclaredDispatch();
+    }
+
+    static ReplayDispatchPayload retreatResolved(String destination) {
+        return new RetreatResolvedDispatch(destination);
+    }
+
     static ReplayDispatchPayload hitAssign(String tilePosition, String combatStateSnapshotJson) {
         return new HitAssignDispatch(tilePosition, combatStateSnapshotJson);
     }
@@ -88,6 +98,10 @@ public interface ReplayDispatchPayload {
     record TechPlayedDispatch(String techId) implements ReplayDispatchPayload {}
 
     record TechExhaustedDispatch(String techId) implements ReplayDispatchPayload {}
+
+    record RetreatDeclaredDispatch() implements ReplayDispatchPayload {}
+
+    record RetreatResolvedDispatch(String destination) implements ReplayDispatchPayload {}
 
     record HitAssignDispatch(String tilePosition, String combatStateSnapshotJson) implements ReplayDispatchPayload {}
 

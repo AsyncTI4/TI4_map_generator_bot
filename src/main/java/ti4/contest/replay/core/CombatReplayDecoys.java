@@ -1,10 +1,10 @@
 package ti4.contest.replay.core;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +21,9 @@ import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
 import tools.jackson.databind.json.JsonMapper;
 
+/**
+ * Captures, applies, and renders replay-only decoy unit state for combat recordings.
+ */
 @UtilityClass
 public class CombatReplayDecoys {
 
@@ -66,14 +69,19 @@ public class CombatReplayDecoys {
     public String renderDisappearanceMessage(Abilities abilities) {
         if (!abilities.hasDecoys()) return null;
 
-        String vanished = abilities.decoy().units().stream()
-                .collect(Collectors.groupingBy(
-                        unit -> unit.factionEmoji() + "|" + unit.unitType().humanReadableName(),
-                        Collectors.summingInt(DecoyUnit::count)))
-                .entrySet()
-                .stream()
-                .map(CombatReplayDecoys::renderVanishedGroup)
-                .collect(Collectors.joining(", "));
+        Map<String, Integer> vanishedGroups = new LinkedHashMap<>();
+        for (DecoyUnit unit : abilities.decoy().units()) {
+            String key = unit.factionEmoji() + "|" + unit.unitType().humanReadableName();
+            vanishedGroups.merge(key, unit.count(), Integer::sum);
+        }
+
+        StringBuilder vanished = new StringBuilder();
+        for (Map.Entry<String, Integer> group : vanishedGroups.entrySet()) {
+            if (!vanished.isEmpty()) {
+                vanished.append(", ");
+            }
+            vanished.append(renderVanishedGroup(group));
+        }
         return "## Sensor Echoes Fade\n"
                 + "As the Lazax recorders close the battlefile, "
                 + vanished

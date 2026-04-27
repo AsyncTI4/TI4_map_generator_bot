@@ -2,6 +2,9 @@ package ti4.contest.replay.core;
 
 import lombok.experimental.UtilityClass;
 
+/**
+ * Calculates prediction profit from the crowd split, rewarding even calls and underdog wins.
+ */
 @UtilityClass
 public class CombatPredictionPayout {
 

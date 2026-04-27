@@ -6,6 +6,9 @@ import ti4.service.emoji.DiceEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 
+/**
+ * Defines the supported combat side bets, their labels, availability gates, and legacy flat payouts.
+ */
 public enum CombatSideBetType {
     AFB_SKIPPED("Skips AFB", UnitEmojis.destroyer, 1, 3),
     AFB_WHIFF("AFB Whiff", UnitEmojis.destroyer, 2, 3),

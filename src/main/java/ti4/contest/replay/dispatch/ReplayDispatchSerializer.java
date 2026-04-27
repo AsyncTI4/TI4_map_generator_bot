@@ -31,7 +31,11 @@ public class ReplayDispatchSerializer {
     @SneakyThrows
     public ReplayDispatchPayload read(String payloadJson) {
         if (payloadJson == null || payloadJson.isBlank()) return null;
-        return JsonMapperManager.basic().readValue(payloadJson, ReplayDispatchPayload.class);
+        ReplayDispatchPayload payload = JsonMapperManager.basic().readValue(payloadJson, ReplayDispatchPayload.class);
+        if (payload instanceof ReplayDispatchPayload.DiscordMessageDispatch legacyMessage) {
+            return new ReplayDispatchPayload.GenericMessageDispatch(legacyMessage.message());
+        }
+        return payload;
     }
 
     public static ReplayDispatchPayload.DiscordEmbed fromMessageEmbed(MessageEmbed embed) {

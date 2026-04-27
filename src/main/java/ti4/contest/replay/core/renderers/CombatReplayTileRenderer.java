@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -25,10 +26,10 @@ import ti4.model.BorderAnomalyHolder;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
 
-@UtilityClass
 /**
  * Renders contest tile images from a stable combat context plus a per-event unit-state snapshot.
  */
+@UtilityClass
 public class CombatReplayTileRenderer {
 
     private static final JsonMapper TILE_PAYLOAD_MAPPER = JsonMapperManager.basic()
@@ -73,6 +74,15 @@ public class CombatReplayTileRenderer {
             return LegacyCombatReplayTileRenderer.restoreGame(unitStateJson, sourceGame);
         }
         return renderNew(initialContextJson, unitStateJson);
+    }
+
+    public String buildReplaySnapshotName(@Nullable String attackerFaction, @Nullable String defenderFaction) {
+        String attackerLabel = normalizeFactionLabel(attackerFaction);
+        String defenderLabel = normalizeFactionLabel(defenderFaction);
+        if (attackerLabel == null || defenderLabel == null) {
+            return "combat-snapshot";
+        }
+        return attackerLabel + "-" + defenderLabel;
     }
 
     private Game renderNew(String initialContextJson, String unitStateJson) {
@@ -234,6 +244,13 @@ public class CombatReplayTileRenderer {
     @SneakyThrows
     private Tile cloneTile(Tile tile) {
         return TILE_PAYLOAD_MAPPER.readValue(TILE_PAYLOAD_MAPPER.writeValueAsString(tile), Tile.class);
+    }
+
+    @Nullable
+    private String normalizeFactionLabel(@Nullable String faction) {
+        if (StringUtils.isBlank(faction)) return null;
+        String normalized = faction.trim().toLowerCase().replaceAll("[^a-z0-9_-]", "");
+        return normalized.isEmpty() ? null : normalized;
     }
 
     @SneakyThrows

@@ -18,6 +18,9 @@ import ti4.contest.replay.entities.CombatReplayContestEntity;
 import ti4.contest.replay.repository.CombatCandidateEventRepository;
 import ti4.service.combat.CombatRollType;
 
+/**
+ * Prices side bets from captured combat odds while preserving offered payouts for existing contests.
+ */
 @Service
 @RequiredArgsConstructor
 public class CombatReplaySideBetPayoutService {
@@ -89,14 +92,18 @@ public class CombatReplaySideBetPayoutService {
     }
 
     private CombatRollPayload roundOnePayload(CombatCandidateEntity candidate, String targetFaction) {
-        return candidateEventRepository.findByCandidateIdOrderBySequenceNumberAsc(candidate.getId()).stream()
-                .filter(event -> event.getEventType() == CombatCandidateEventType.ROLL)
-                .filter(event -> Integer.valueOf(1).equals(event.getRoundNumber()))
-                .filter(event -> targetFaction.equalsIgnoreCase(event.getActorFaction()))
-                .map(this::readCombatRollPayload)
-                .filter(this::isRoundOneCombatPayload)
-                .findFirst()
-                .orElse(null);
+        for (CombatCandidateEventEntity event :
+                candidateEventRepository.findByCandidateIdOrderBySequenceNumberAsc(candidate.getId())) {
+            if (event.getEventType() != CombatCandidateEventType.ROLL) continue;
+            if (!Integer.valueOf(1).equals(event.getRoundNumber())) continue;
+            if (!targetFaction.equalsIgnoreCase(event.getActorFaction())) continue;
+
+            CombatRollPayload payload = readCombatRollPayload(event);
+            if (isRoundOneCombatPayload(payload)) {
+                return payload;
+            }
+        }
+        return null;
     }
 
     private CombatRollPayload readCombatRollPayload(CombatCandidateEventEntity event) {

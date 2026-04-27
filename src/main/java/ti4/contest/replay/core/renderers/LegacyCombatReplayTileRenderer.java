@@ -10,7 +10,6 @@ import javax.annotation.Nullable;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
-import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -22,10 +21,10 @@ import ti4.model.FactionModel;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
 
-@UtilityClass
 /**
- * Captures and restores the minimal game state needed to render replay hit-assignment images.
+ * Restores pre-context replay tile snapshots that were captured before the current tile payload format.
  */
+@UtilityClass
 public class LegacyCombatReplayTileRenderer {
 
     private static final JsonMapper SNAPSHOT_MAPPER = JsonMapperManager.basic()
@@ -146,22 +145,6 @@ public class LegacyCombatReplayTileRenderer {
         if (player != null) return player;
 
         return sourceGame.getPlayerFromColorOrFaction(playerSnapshot.getColor());
-    }
-
-    public String buildReplaySnapshotName(@Nullable String attackerFaction, @Nullable String defenderFaction) {
-        String attackerLabel = normalizeFactionLabel(attackerFaction);
-        String defenderLabel = normalizeFactionLabel(defenderFaction);
-        if (attackerLabel == null || defenderLabel == null) {
-            return "combat-snapshot";
-        }
-        return attackerLabel + "-" + defenderLabel;
-    }
-
-    @Nullable
-    private String normalizeFactionLabel(@Nullable String faction) {
-        if (StringUtils.isBlank(faction)) return null;
-        String normalized = faction.trim().toLowerCase().replaceAll("[^a-z0-9_-]", "");
-        return normalized.isEmpty() ? null : normalized;
     }
 
     @SneakyThrows

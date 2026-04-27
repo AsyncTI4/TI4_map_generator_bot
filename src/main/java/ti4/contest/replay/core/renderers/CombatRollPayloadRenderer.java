@@ -12,6 +12,9 @@ import ti4.contest.replay.core.CombatRollPayload.UnitRoll;
 import ti4.service.emoji.DiceEmojis;
 import ti4.service.emoji.MiscEmojis;
 
+/**
+ * Converts structured combat roll payloads into the Discord markdown shown during replay.
+ */
 @UtilityClass
 public class CombatRollPayloadRenderer {
 
@@ -146,9 +149,11 @@ public class CombatRollPayloadRenderer {
     }
 
     private String renderDice(UnitRoll unitRoll) {
-        return unitRoll.dice().stream()
-                .map(die -> renderDie(unitRoll.unitId(), die))
-                .reduce("", String::concat);
+        StringBuilder dice = new StringBuilder();
+        for (var die : unitRoll.dice()) {
+            dice.append(renderDie(unitRoll.unitId(), die));
+        }
+        return dice.toString();
     }
 
     private String renderDie(String unitId, DieRoll die) {

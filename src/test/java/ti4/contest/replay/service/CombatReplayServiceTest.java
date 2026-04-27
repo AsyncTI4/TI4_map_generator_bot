@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.contest.replay.core.CombatContestSettings;
+import ti4.contest.replay.core.CombatReplaySelection;
 import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.entities.CombatObservationEntity;
 import ti4.contest.replay.repository.CombatCandidateEventRepository;
@@ -86,7 +87,7 @@ class CombatReplayServiceTest {
                 .thenReturn(List.of(first, second, third));
 
         service.refreshSelectionSnapshot();
-        CombatReplayService.SelectionDebugView view = service.getSelectionDebugView();
+        CombatReplaySelection.SelectionDebugView view = service.getSelectionDebugView();
 
         assertEquals(3, view.windowSize());
         assertEquals(0.80, view.averageFairnessRatio(), 0.0001);
@@ -94,14 +95,14 @@ class CombatReplayServiceTest {
         assertEquals(1.0 / 9.0, view.jointScoreCutoff(), 0.0001);
         assertEquals(3, view.observations().size());
 
-        CombatReplayService.SelectionObservationDebugView firstObservation =
+        CombatReplaySelection.SelectionObservationDebugView firstObservation =
                 view.observations().getFirst();
         assertEquals(3L, firstObservation.observation().getId());
         assertTrue(firstObservation.eligibleAsCandidate());
         assertEquals("pbd102", firstObservation.observation().getGameName());
         assertEquals(1.0 / 9.0, firstObservation.jointScore(), 0.0001);
 
-        CombatReplayService.SelectionObservationDebugView lastObservation =
+        CombatReplaySelection.SelectionObservationDebugView lastObservation =
                 view.observations().get(2);
         assertEquals(1L, lastObservation.observation().getId());
         assertEquals("pbd100", lastObservation.observation().getGameName());

@@ -61,6 +61,10 @@ public class CombatReplayDebugButtonHandler {
     private static void setCommanderLock(
             ButtonInteractionEvent event, Game game, Player pressingPlayer, String commanderId, boolean locked) {
         Player target = debugPlayer(game, pressingPlayer);
+        if (target == null) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not find a player for this debug action.");
+            return;
+        }
         Leader commander = target.getLeader(commanderId).orElse(null);
         if (commander == null) {
             target.addLeader(commanderId);
@@ -74,6 +78,10 @@ public class CombatReplayDebugButtonHandler {
     }
 
     private static void startMecatolRexFight(ButtonInteractionEvent event, Game game, Player pressingPlayer) {
+        if (game == null) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not find a game for this debug action.");
+            return;
+        }
         Tile mecatolRex = game.getMecatolTile();
         if (mecatolRex == null) {
             MessageHelper.sendMessageToEventChannel(event, "Could not find Mecatol Rex in this game.");
@@ -81,8 +89,12 @@ public class CombatReplayDebugButtonHandler {
         }
 
         Player player = debugPlayer(game, pressingPlayer);
-        Player opponent =
-                game.getRealPlayersExcludingThis(player).stream().findFirst().orElse(null);
+        if (player == null) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not find a player for this debug action.");
+            return;
+        }
+        List<Player> possibleOpponents = game.getRealPlayersExcludingThis(player);
+        Player opponent = possibleOpponents.isEmpty() ? null : possibleOpponents.getFirst();
         if (opponent == null) {
             MessageHelper.sendMessageToEventChannel(event, "Could not find another real player for the test fight.");
             return;
@@ -101,9 +113,12 @@ public class CombatReplayDebugButtonHandler {
     }
 
     private static Player debugPlayer(Game game, Player pressingPlayer) {
-        return game.getRealPlayers().stream()
-                .filter(player -> "memephilosopher".equalsIgnoreCase(player.getFaction()))
-                .findFirst()
-                .orElse(pressingPlayer);
+        if (game == null) return pressingPlayer;
+        for (Player player : game.getRealPlayers()) {
+            if ("memephilosopher".equalsIgnoreCase(player.getFaction())) {
+                return player;
+            }
+        }
+        return pressingPlayer;
     }
 }

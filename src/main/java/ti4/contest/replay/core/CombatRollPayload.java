@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 import ti4.service.combat.CombatRollType;
 
+/**
+ * Structured combat roll snapshot used to replay roll messages without depending on live Discord text.
+ */
 public record CombatRollPayload(
         RollHeader header,
         List<CombatRollNote> notes,

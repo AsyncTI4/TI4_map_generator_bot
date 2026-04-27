@@ -16,8 +16,8 @@ class ReplayDispatchPayloadTest extends BaseTi4Test {
         ReplayDispatchPayload payload =
                 serializer.read("{\"kind\":\"DISCORD_MESSAGE\",\"message\":{\"content\":\"old\",\"embeds\":[]}}");
 
-        ReplayDispatchPayload.DiscordMessageDispatch message =
-                assertInstanceOf(ReplayDispatchPayload.DiscordMessageDispatch.class, payload);
+        ReplayDispatchPayload.GenericMessageDispatch message =
+                assertInstanceOf(ReplayDispatchPayload.GenericMessageDispatch.class, payload);
         assertEquals("old", message.message().content());
     }
 
@@ -39,5 +39,9 @@ class ReplayDispatchPayloadTest extends BaseTi4Test {
         assertTrue(serializer.write(ReplayDispatchPayload.techPlayed("asc")).contains("\"kind\":\"TECH_PLAYED\""));
         assertTrue(
                 serializer.write(ReplayDispatchPayload.techExhausted("gls")).contains("\"kind\":\"TECH_EXHAUSTED\""));
+        assertTrue(serializer.write(ReplayDispatchPayload.retreatDeclared()).contains("\"kind\":\"RETREAT_DECLARED\""));
+        assertTrue(serializer
+                .write(ReplayDispatchPayload.retreatResolved("A1"))
+                .contains("\"kind\":\"RETREAT_RESOLVED\""));
     }
 }
