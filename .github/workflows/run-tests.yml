@@ -17,9 +17,9 @@ jobs:
       - name: Detect changed files
         id: diff
         run: |
-          git fetch --depth=1 origin ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}
+          git fetch --depth=1 origin ${{ github.event.pull_request.base.sha }}
           BASE=${{ github.event.pull_request.base.sha }}
-          HEAD=${{ github.event.pull_request.head.sha }}
+          HEAD=${{ github.sha }}
           CHANGED_JSON=$(git diff --name-only "$BASE" "$HEAD" | grep -E '\.json$' || true)
           if [ -n "$CHANGED_JSON" ]; then
             echo "has_json=true" >> "$GITHUB_OUTPUT"
