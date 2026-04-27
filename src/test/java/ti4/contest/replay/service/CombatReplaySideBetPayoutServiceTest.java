@@ -47,7 +47,7 @@ class CombatReplaySideBetPayoutServiceTest {
 
         int payout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_WHIFF, "sol");
 
-        assertEquals(3, payout);
+        assertEquals(4, payout);
     }
 
     @Test

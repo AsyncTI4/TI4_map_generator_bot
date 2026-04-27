@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.*;
+import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
 import ti4.contest.replay.entities.*;
 import ti4.contest.replay.repository.*;
 import ti4.discord.JdaService;
@@ -100,6 +101,9 @@ public class CombatReplayContestLifecycleService {
                     CombatCandidateStatus.RESOLVED,
                     CombatCandidatePromotionStatus.PENDING,
                     now.minusHours(lookbackHours));
+            candidates = candidates.stream()
+                    .filter(this::usesCurrentReplaySnapshotFormat)
+                    .toList();
             if (!candidates.isEmpty()) {
                 return candidates;
             }
@@ -119,6 +123,9 @@ public class CombatReplayContestLifecycleService {
         }
         if (candidate.getPromotionStatus() != CombatCandidatePromotionStatus.PENDING) {
             return ForcePromoteResult.rejected("Candidate is not eligible for promotion");
+        }
+        if (!usesCurrentReplaySnapshotFormat(candidate)) {
+            return ForcePromoteResult.rejected("Candidate uses the old replay snapshot format");
         }
 
         CombatReplayContestEntity existingContest =
@@ -346,6 +353,10 @@ public class CombatReplayContestLifecycleService {
 
     private double getPromotionScore(CombatCandidateEntity candidate) {
         return candidate.getPromotionScore() == null ? 0.0 : candidate.getPromotionScore();
+    }
+
+    private boolean usesCurrentReplaySnapshotFormat(CombatCandidateEntity candidate) {
+        return candidate != null && CombatReplayTileRenderer.canRender(candidate.getInitialRenderSnapshotJson());
     }
 
     private CombatCandidateEntity selectPromotionWinner(List<CombatCandidateEntity> candidates) {

@@ -31,11 +31,11 @@ public class ReplayDispatchSerializer {
     @SneakyThrows
     public ReplayDispatchPayload read(String payloadJson) {
         if (payloadJson == null || payloadJson.isBlank()) return null;
-        ReplayDispatchPayload payload = JsonMapperManager.basic().readValue(payloadJson, ReplayDispatchPayload.class);
-        if (payload instanceof ReplayDispatchPayload.DiscordMessageDispatch legacyMessage) {
-            return new ReplayDispatchPayload.GenericMessageDispatch(legacyMessage.message());
-        }
-        return payload;
+        return JsonMapperManager.basic().readValue(normalizeLegacyKind(payloadJson), ReplayDispatchPayload.class);
+    }
+
+    private String normalizeLegacyKind(String payloadJson) {
+        return payloadJson.replace("\"kind\":\"DISCORD_MESSAGE\"", "\"kind\":\"GENERIC_MESSAGE\"");
     }
 
     public static ReplayDispatchPayload.DiscordEmbed fromMessageEmbed(MessageEmbed embed) {

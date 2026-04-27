@@ -7,12 +7,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nullable;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
+import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -60,23 +60,17 @@ public class CombatReplayTileRenderer {
         return write(captureUnitState(tilePosition, tile));
     }
 
-    private boolean isInitialSnapshot(String payloadJson) {
+    public boolean canRender(String payloadJson) {
         if (payloadJson == null || payloadJson.isBlank()) return false;
         return readPayload(payloadJson).getContext() != null;
     }
 
     public Game render(String initialContextJson, String unitStateJson) {
-        return render(initialContextJson, unitStateJson, null);
-    }
-
-    public Game render(String initialContextJson, String unitStateJson, @Nullable Game sourceGame) {
-        if (!isInitialSnapshot(initialContextJson)) {
-            return LegacyCombatReplayTileRenderer.restoreGame(unitStateJson, sourceGame);
-        }
+        if (!canRender(initialContextJson)) return null;
         return renderNew(initialContextJson, unitStateJson);
     }
 
-    public String buildReplaySnapshotName(@Nullable String attackerFaction, @Nullable String defenderFaction) {
+    public String buildReplaySnapshotName(String attackerFaction, String defenderFaction) {
         String attackerLabel = normalizeFactionLabel(attackerFaction);
         String defenderLabel = normalizeFactionLabel(defenderFaction);
         if (attackerLabel == null || defenderLabel == null) {
@@ -137,6 +131,7 @@ public class CombatReplayTileRenderer {
         snapshot.setNpc(player.isNpc());
         snapshot.setUnitsOwned(new ArrayList<>(player.getUnitsOwned()));
         snapshot.setExhaustedPlanets(new ArrayList<>(player.getExhaustedPlanets()));
+        snapshot.setLeaders(new ArrayList<>(player.getLeaders()));
         return snapshot;
     }
 
@@ -201,6 +196,7 @@ public class CombatReplayTileRenderer {
         player.setNpc(playerSnapshot.isNpc());
         player.setUnitsOwned(new HashSet<>(playerSnapshot.getUnitsOwned()));
         player.getExhaustedPlanets().addAll(playerSnapshot.getExhaustedPlanets());
+        player.setLeaders(new ArrayList<>(playerSnapshot.getLeaders()));
         return player;
     }
 
@@ -246,8 +242,7 @@ public class CombatReplayTileRenderer {
         return TILE_PAYLOAD_MAPPER.readValue(TILE_PAYLOAD_MAPPER.writeValueAsString(tile), Tile.class);
     }
 
-    @Nullable
-    private String normalizeFactionLabel(@Nullable String faction) {
+    private String normalizeFactionLabel(String faction) {
         if (StringUtils.isBlank(faction)) return null;
         String normalized = faction.trim().toLowerCase().replaceAll("[^a-z0-9_-]", "");
         return normalized.isEmpty() ? null : normalized;
@@ -331,5 +326,6 @@ public class CombatReplayTileRenderer {
         private boolean npc;
         private List<String> unitsOwned = new ArrayList<>();
         private List<String> exhaustedPlanets = new ArrayList<>();
+        private List<Leader> leaders = new ArrayList<>();
     }
 }

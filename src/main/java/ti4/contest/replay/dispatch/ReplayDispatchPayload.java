@@ -8,7 +8,6 @@ import ti4.contest.replay.core.CombatRollPayload;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "kind")
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = ReplayDispatchPayload.DiscordMessageDispatch.class, name = "DISCORD_MESSAGE"),
     @JsonSubTypes.Type(value = ReplayDispatchPayload.GenericMessageDispatch.class, name = "GENERIC_MESSAGE"),
     @JsonSubTypes.Type(value = ReplayDispatchPayload.LeaderPlayedDispatch.class, name = "LEADER_PLAYED"),
     @JsonSubTypes.Type(value = ReplayDispatchPayload.ActionCardPlayedDispatch.class, name = "ACTION_CARD_PLAYED"),
@@ -86,8 +85,6 @@ public interface ReplayDispatchPayload {
     static ReplayDispatchPayload combatRoll(String content, CombatRollPayload payload) {
         return new CombatRollDispatch(new DiscordMessage(content, List.of()), payload);
     }
-
-    record DiscordMessageDispatch(DiscordMessage message) implements ReplayDispatchPayload {}
 
     record GenericMessageDispatch(DiscordMessage message) implements ReplayDispatchPayload {}
 

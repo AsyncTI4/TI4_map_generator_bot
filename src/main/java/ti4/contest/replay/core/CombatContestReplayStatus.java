@@ -4,8 +4,10 @@ package ti4.contest.replay.core;
  * Lifecycle state for a promoted contest as its recorded events are replayed to Discord.
  */
 public enum CombatContestReplayStatus {
+    /** Contest has been posted but replay ticks have not started. */
     PENDING,
+    /** Replay events are actively being posted or retried. */
     REPLAYING,
-    COMPLETED,
-    FAILED
+    /** Replay and leaderboard posting are complete. */
+    COMPLETED
 }

@@ -25,6 +25,7 @@ public class CombatReplayDebugButtonHandler {
     private static final String DISABLE_JOLNAR = PREFIX + "disable_jolnar_commander";
     private static final String DISABLE_WINNU = PREFIX + "disable_winnu_commander";
     private static final String START_MR_FIGHT = PREFIX + "start_mecatol_rex_fight";
+    private static final String WIPE_MR_SPACE = PREFIX + "wipe_mecatol_rex_space";
     private static final String DEBUG_FLEET = "carrier, dreadnought, cruiser, destroyer, 3 fighter";
 
     public static List<Button> buttons() {
@@ -33,7 +34,8 @@ public class CombatReplayDebugButtonHandler {
                 Buttons.green(ENABLE_WINNU, "Enable Winnu Commander"),
                 Buttons.red(DISABLE_JOLNAR, "Disable Jol-Nar Commander"),
                 Buttons.red(DISABLE_WINNU, "Disable Winnu Commander"),
-                Buttons.blue(START_MR_FIGHT, "Start a Fight at Mecatol Rex"));
+                Buttons.blue(START_MR_FIGHT, "Start a Fight at Mecatol Rex"),
+                Buttons.red(WIPE_MR_SPACE, "Wipe Space Army on Rex"));
     }
 
     @ButtonHandler(PREFIX)
@@ -50,6 +52,7 @@ public class CombatReplayDebugButtonHandler {
             case DISABLE_JOLNAR -> setCommanderLock(event, game, player, "jolnarcommander", true);
             case DISABLE_WINNU -> setCommanderLock(event, game, player, "winnucommander", true);
             case START_MR_FIGHT -> startMecatolRexFight(event, game, player);
+            case WIPE_MR_SPACE -> wipeMecatolRexSpace(event, game);
             default -> MessageHelper.sendEphemeralMessageToEventChannel(event, "Unknown combat replay debug action.");
         }
     }
@@ -93,10 +96,10 @@ public class CombatReplayDebugButtonHandler {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not find a player for this debug action.");
             return;
         }
-        List<Player> possibleOpponents = game.getRealPlayersExcludingThis(player);
-        Player opponent = possibleOpponents.isEmpty() ? null : possibleOpponents.getFirst();
+        Player opponent = debugOpponent(game, player);
         if (opponent == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Could not find another real player for the test fight.");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Could not find a non-allied real player for the test fight.");
             return;
         }
 
@@ -112,6 +115,21 @@ public class CombatReplayDebugButtonHandler {
         StartCombatService.combatCheck(game, event, mecatolRex);
     }
 
+    private static void wipeMecatolRexSpace(ButtonInteractionEvent event, Game game) {
+        if (game == null) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not find a game for this debug action.");
+            return;
+        }
+        Tile mecatolRex = game.getMecatolTile();
+        if (mecatolRex == null) {
+            MessageHelper.sendMessageToEventChannel(event, "Could not find Mecatol Rex in this game.");
+            return;
+        }
+
+        mecatolRex.getSpaceUnitHolder().getUnitsByState().clear();
+        MessageHelper.sendMessageToEventChannel(event, "Removed all space units from Mecatol Rex.");
+    }
+
     private static Player debugPlayer(Game game, Player pressingPlayer) {
         if (game == null) return pressingPlayer;
         for (Player player : game.getRealPlayers()) {
@@ -120,5 +138,14 @@ public class CombatReplayDebugButtonHandler {
             }
         }
         return pressingPlayer;
+    }
+
+    private static Player debugOpponent(Game game, Player player) {
+        for (Player opponent : game.getRealPlayersExcludingThis(player)) {
+            if (!player.isPlayerMemberOfAlliance(opponent) && !opponent.isPlayerMemberOfAlliance(player)) {
+                return opponent;
+            }
+        }
+        return null;
     }
 }

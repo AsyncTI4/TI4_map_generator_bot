@@ -41,7 +41,7 @@ public class ReplayPayloadRenderer {
     public Game restoreReplayGame(
             String snapshotJson, Game game, CombatCandidateEntity candidate, String tilePosition) {
         String initialContextJson = candidate == null ? snapshotJson : candidate.getInitialRenderSnapshotJson();
-        Game snapshotGame = CombatReplayTileRenderer.render(initialContextJson, snapshotJson, game);
+        Game snapshotGame = CombatReplayTileRenderer.render(initialContextJson, snapshotJson);
         if (snapshotGame == null || candidate == null) return snapshotGame;
         CombatReplayDecoys.applyToTile(snapshotGame, tilePosition, readReplayAbilities(candidate));
         removeReplayCommandCounters(snapshotGame, tilePosition);
@@ -221,6 +221,7 @@ public class ReplayPayloadRenderer {
     private MessageResult message(String content, List<MessageEmbed> embeds) {
         return new MessageResult(content, embeds);
     }
+
     private TileRenderResult tileRender(
             String content, List<MessageEmbed> embeds, String tilePosition, String snapshotJson) {
         return new TileRenderResult(content, embeds, tilePosition, snapshotJson);
