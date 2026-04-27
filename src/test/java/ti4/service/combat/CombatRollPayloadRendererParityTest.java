@@ -24,6 +24,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import ti4.contest.replay.core.CombatRollPayload;
 import ti4.contest.replay.core.renderers.CombatRollPayloadRenderer;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -48,7 +49,6 @@ import ti4.service.player.PlayerColorService;
 import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.unit.DestroyUnitService;
 import ti4.spring.context.SpringContext;
-import ti4.spring.service.contest.CombatContestService;
 import ti4.testUtils.BaseTi4Test;
 
 class CombatRollPayloadRendererParityTest extends BaseTi4Test {
@@ -222,14 +222,14 @@ class CombatRollPayloadRendererParityTest extends BaseTi4Test {
         harness.add(tile, mentak, UnitType.Carrier, 1);
         GenericInteractionCreateEvent event = mock(GenericInteractionCreateEvent.class);
         when(event.getMessageChannel()).thenReturn(mock(MessageChannel.class));
-        CombatContestService contestService = mock(CombatContestService.class);
+        CombatReplayService replayService = mock(CombatReplayService.class);
 
         try (MockedStatic<DiceHelper> dice = mockDice(10);
                 MockedStatic<MessageHelper> ignoredMessages = mockStatic(MessageHelper.class);
                 MockedStatic<FOWCombatThreadMirroring> ignoredFow = mockStatic(FOWCombatThreadMirroring.class);
                 MockedStatic<RoundStatsTracker> ignoredRoundStats = mockStatic(RoundStatsTracker.class);
                 MockedStatic<SpringContext> spring = mockStatic(SpringContext.class)) {
-            spring.when(() -> SpringContext.getBean(CombatContestService.class)).thenReturn(contestService);
+            spring.when(() -> SpringContext.getBean(CombatReplayService.class)).thenReturn(replayService);
 
             CombatRollService.secondHalfOfCombatRoll(
                     sol, harness.game, event, tile, Constants.SPACE, CombatRollType.combatround, false);
@@ -237,7 +237,7 @@ class CombatRollPayloadRendererParityTest extends BaseTi4Test {
 
         ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<CombatRollPayload> payloadCaptor = ArgumentCaptor.forClass(CombatRollPayload.class);
-        verify(contestService)
+        verify(replayService)
                 .mirrorCombatRoll(
                         eq(harness.game),
                         eq(sol),

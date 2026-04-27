@@ -11,12 +11,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.contest.replay.core.CombatContestSettings;
+import ti4.contest.replay.core.CombatContestType;
 import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.entities.CombatObservationEntity;
 import ti4.contest.replay.repository.CombatCandidateEventRepository;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatObservationRepository;
-import ti4.spring.service.contest.CombatContestType;
 
 class CombatReplayServiceTest {
 

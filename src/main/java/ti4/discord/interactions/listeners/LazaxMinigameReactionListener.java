@@ -6,10 +6,10 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import ti4.contest.replay.service.CombatReplayLeaderboardService;
 import ti4.discord.JdaService;
 import ti4.executors.ExecutorServiceManager;
 import ti4.logging.BotLogger;
-import ti4.spring.service.contest.CombatContestService;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
 class LazaxMinigameReactionListener extends ListenerAdapter {
@@ -44,14 +44,16 @@ class LazaxMinigameReactionListener extends ListenerAdapter {
 
     private void applyRoleUpdateIfSubscriptionPrompt(MessageReactionAddEvent event, Message message) {
         if (!message.getAuthor().isBot()) return;
-        if (!message.getContentRaw().contains(CombatContestService.LAZAX_MINIGAME_SUBSCRIPTION_MARKER)) return;
+        if (!message.getContentRaw().contains(CombatReplayLeaderboardService.LAZAX_MINIGAME_SUBSCRIPTION_MARKER))
+            return;
 
         String emoji = event.getEmoji().getName();
         if (!SUBSCRIBE_EMOJI.equals(emoji) && !UNSUBSCRIBE_EMOJI.equals(emoji)) return;
 
-        Role role = event.getGuild().getRolesByName(CombatContestService.LAZAX_MINIGAME_ROLE_NAME, true).stream()
-                .findFirst()
-                .orElse(null);
+        Role role =
+                event.getGuild().getRolesByName(CombatReplayLeaderboardService.LAZAX_MINIGAME_ROLE_NAME, true).stream()
+                        .findFirst()
+                        .orElse(null);
         if (role == null) {
             BotLogger.warning("Lazax Minigame role not found in guild: "
                     + event.getGuild().getId());

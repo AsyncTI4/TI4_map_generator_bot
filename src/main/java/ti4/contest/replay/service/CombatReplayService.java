@@ -24,7 +24,6 @@ import ti4.helpers.Constants;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.CombatUnitSelectionHelper;
 import ti4.spring.context.SpringContext;
-import ti4.spring.service.contest.CombatContestType;
 
 @Service
 @RequiredArgsConstructor

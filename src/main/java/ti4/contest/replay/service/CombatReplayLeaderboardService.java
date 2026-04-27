@@ -38,7 +38,6 @@ import ti4.helpers.ThreadGetter;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.spring.service.contest.CombatContestService;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +45,9 @@ import ti4.spring.service.contest.CombatContestService;
  * Manages replay-native prediction locking, scoring, and leaderboard posting.
  */
 public class CombatReplayLeaderboardService {
+
+    public static final String LAZAX_MINIGAME_SUBSCRIPTION_MARKER = "-# Lazax Minigame Subscription";
+    public static final String LAZAX_MINIGAME_ROLE_NAME = "Lazax Minigame";
 
     private static final int WRONG_PREDICTION_PENALTY = -4;
     private static final String SUBSCRIBE_EMOJI = "\uD83D\uDFE2";
@@ -369,7 +371,7 @@ public class CombatReplayLeaderboardService {
         String message = "Did you like this? React " + SUBSCRIBE_EMOJI
                 + " to subscribe to more, " + UNSUBSCRIBE_EMOJI
                 + " to opt out if already subscribed.\n"
-                + CombatContestService.LAZAX_MINIGAME_SUBSCRIPTION_MARKER;
+                + LAZAX_MINIGAME_SUBSCRIPTION_MARKER;
         MessageHelper.splitAndSentWithAction(message, threadOrChannel, postedMessage -> {
             postedMessage.addReaction(Emoji.fromUnicode(SUBSCRIBE_EMOJI)).queue(null, BotLogger::catchRestError);
             postedMessage.addReaction(Emoji.fromUnicode(UNSUBSCRIBE_EMOJI)).queue(null, BotLogger::catchRestError);

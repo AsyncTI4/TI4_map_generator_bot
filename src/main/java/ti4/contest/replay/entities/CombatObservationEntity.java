@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ti4.spring.service.contest.CombatContestType;
+import ti4.contest.replay.core.CombatContestType;
 
 @Data
 @NoArgsConstructor

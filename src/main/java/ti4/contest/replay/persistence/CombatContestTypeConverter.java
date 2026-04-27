@@ -2,7 +2,7 @@ package ti4.contest.replay.persistence;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import ti4.spring.service.contest.CombatContestType;
+import ti4.contest.replay.core.CombatContestType;
 
 @Converter(autoApply = true)
 public class CombatContestTypeConverter implements AttributeConverter<CombatContestType, String> {

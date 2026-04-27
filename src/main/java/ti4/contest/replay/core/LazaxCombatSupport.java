@@ -34,7 +34,6 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.UnitEmojis;
-import ti4.spring.service.contest.CombatContestType;
 
 @UtilityClass
 /**

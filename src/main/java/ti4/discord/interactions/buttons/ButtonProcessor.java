@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -39,7 +40,6 @@ import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
-import ti4.spring.service.contest.CombatContestService;
 
 @UtilityClass
 public class ButtonProcessor {
@@ -98,7 +98,7 @@ public class ButtonProcessor {
                 beforeTime = System.currentTimeMillis();
                 context.save();
                 if (context.getGame() != null) {
-                    SpringContext.getBean(CombatContestService.class)
+                    SpringContext.getBean(CombatReplayService.class)
                             .onButtonInteractionSettled(context.getGame(), context.getPlayer(), event);
                 }
                 saveRuntime = System.currentTimeMillis() - beforeTime;

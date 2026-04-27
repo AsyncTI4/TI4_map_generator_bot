@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -21,7 +22,6 @@ import ti4.message.MessageHelper;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.spring.context.SpringContext;
-import ti4.spring.service.contest.CombatContestService;
 
 @UtilityClass
 class CombatButtonHandler {
@@ -173,7 +173,7 @@ class CombatButtonHandler {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         }
         FOWCombatThreadMirroring.mirrorMessage(event, game, msg.replace("## ", ""));
-        SpringContext.getBean(CombatContestService.class)
+        SpringContext.getBean(CombatReplayService.class)
                 .mirrorRetreatDeclared(game, player, event.getChannel().getName());
 
         if (Helper.getCCCount(game, player.getColor()) > 15) {

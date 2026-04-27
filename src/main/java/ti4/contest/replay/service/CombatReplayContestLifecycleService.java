@@ -44,7 +44,6 @@ import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.LeaderModel;
 import ti4.model.TechnologyModel;
-import ti4.spring.service.contest.CombatContestService;
 
 @Service
 @RequiredArgsConstructor
@@ -529,9 +528,12 @@ public class CombatReplayContestLifecycleService {
 
     private String getLazaxRoleMention() {
         if (JdaService.guildPrimary == null) return "";
-        Role role = JdaService.guildPrimary.getRolesByName(CombatContestService.LAZAX_MINIGAME_ROLE_NAME, true).stream()
-                .findFirst()
-                .orElse(null);
+        Role role =
+                JdaService.guildPrimary
+                        .getRolesByName(CombatReplayLeaderboardService.LAZAX_MINIGAME_ROLE_NAME, true)
+                        .stream()
+                        .findFirst()
+                        .orElse(null);
         return role == null ? "" : role.getAsMention();
     }
 

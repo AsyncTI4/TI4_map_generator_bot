@@ -22,6 +22,7 @@ import ti4.contest.replay.core.CombatRollPayload.CombatRollNotePlacement;
 import ti4.contest.replay.core.CombatRollPayload.CombatRollNoteType;
 import ti4.contest.replay.core.CombatRollPayload.DieRollSource;
 import ti4.contest.replay.core.CombatRollPayload.RollSegmentType;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
@@ -63,7 +64,6 @@ import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.spring.context.SpringContext;
-import ti4.spring.service.contest.CombatContestService;
 
 @UtilityClass
 public class CombatRollService {
@@ -344,7 +344,7 @@ public class CombatRollService {
             message = message.substring(0, message.length() - 2);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        SpringContext.getBean(CombatContestService.class)
+        SpringContext.getBean(CombatReplayService.class)
                 .mirrorCombatRoll(
                         game,
                         player,

@@ -1,4 +1,4 @@
-package ti4.spring.service.contest;
+package ti4.contest.replay.core;
 
 public enum CombatContestType {
     SPACE
