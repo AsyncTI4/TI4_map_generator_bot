@@ -11,10 +11,10 @@ import ti4.game.persistence.ManagedGame;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
-class ReloadAllCorruptedSaves extends Subcommand {
+class ReloadCorruptedSaves extends Subcommand {
 
-    ReloadAllCorruptedSaves() {
-        super("run_against_all_games", "Runs this custom code against all games.");
+    ReloadCorruptedSaves() {
+        super("reload_corrupted_saves", "Runs this custom code against all games.");
     }
 
     @Override
