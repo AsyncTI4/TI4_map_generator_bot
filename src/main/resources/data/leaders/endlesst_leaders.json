@@ -50,7 +50,8 @@
         "type": "commander",
         "name": "Asaroenni Dzulmaran",
         "title": "Sophon Councilwoman",
-        "permanentEffect": "This card satisfies a Yellow technology requirement. Planets you control with tech specialties gain +1 to their Resource and Influence values.",
+        "abilityWindow": "Always",
+        "abilityText": "This card satisfies a Yellow technology requirement. Planets you control with tech specialties gain +1 to their Resource and Influence values.",
         "unlockCondition": "Have a technology with three or more prerequisites",
         "source": "endlesst"
     },
@@ -355,7 +356,8 @@
         "type": "commander",
         "name": "Lare Staccato",
         "title": "Freedom Refrain",
-        "permanentEffect": "At the end of space combat involving at least one of your ships, your opponent places a command token from their reinforcements into the active system if they don't have one there already.",
+        "abilityWindow": "At the end of space combat involving at least one of your ships:",
+        "abilityText": "Your opponent places a command token from their reinforcements into the active system if they don't have one there already.",
         "unlockCondition": "Win a combat against a player who has passed.",
         "source": "endlesst"
     },
@@ -388,7 +390,8 @@
         "type": "commander",
         "name": "Panako Nakatug",
         "title": "Minister of the Realm",
-        "permanentEffect": "Legendary planets you control gain the PRODUCTION 2 ability, and planets with attachments you control gain the PRODUCTION 1 ability. They may use these abilities as if they were units.",
+        "abilityWindow": "Always",
+        "abilityText": "Legendary planets you control gain the PRODUCTION 2 ability, and planets with attachments you control gain the PRODUCTION 1 ability. They may use these abilities as if they were units.",
         "unlockCondition": "Have a relic and a planet with an attachment.",
         "source": "endlesst"
     },

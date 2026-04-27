@@ -220,7 +220,7 @@
     {
         "id": "horatio_infantry",
         "baseType": "infantry",
-        "asyncId": "inf",
+        "asyncId": "gf",
         "name": "Horatio Warrior",
         "source": "endlesst",
         "faction": "horatio",

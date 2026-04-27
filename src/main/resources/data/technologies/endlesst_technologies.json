@@ -117,7 +117,7 @@
         "text": "This technology counts as a unit upgrade. Your Horatio Warriors apply +1 to their dice rolls and gain 'At the start of ground combat, if you control at least three infantry, destroy one ground force your opponent controls'."
     },
     {
-        "alias": "hwgreen",
+        "alias": "horatiord",
         "name": "Genetic Redistributors",
         "types": [
             "BIOTIC"
