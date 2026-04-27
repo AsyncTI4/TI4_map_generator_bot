@@ -163,7 +163,7 @@
     },
     {
         "id": "craver_spacedock",
-        "baseType": "sd",
+        "baseType": "spacedock",
         "asyncId": "sd",
         "name": "Craver Hive I",
         "upgradesToUnitId": "craver_spacedock2",
@@ -175,8 +175,9 @@
     },
     {
         "id": "craver_spacedock2",
-        "baseType": "sd",
+        "baseType": "spacedock",
         "asyncId": "sd",
+        "requiredTechId": "craversd",
         "name": "Craver Hive II",
         "source": "endlesst",
         "faction": "craver",

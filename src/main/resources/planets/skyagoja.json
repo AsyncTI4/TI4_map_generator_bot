@@ -1,9 +1,9 @@
 {
-    "id": "skygoja",
+    "id": "skagoja",
     "tileId": "et9",
-    "name": "Skygoja",
+    "name": "Skyagoja",
     "aliases": [
-        "skygoja"
+        "skyagoja"
     ],
     "positionInTile": {
         "x": 226.0,
@@ -18,7 +18,7 @@
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
     "unitPositions": {
-        "unitHolderName": "skygoja",
+        "unitHolderName": "skyagoja",
         "coordinateMap": {
             "control": [
                 {

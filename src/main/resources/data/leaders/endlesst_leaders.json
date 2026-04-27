@@ -320,7 +320,8 @@
         "type": "commander",
         "name": "Fusha Keencrest",
         "title": "Seeker of Battle",
-        "permanentEffect": "When you win a space combat, if you have no ground forces in the active system, remove all command tokens from that system.",
+        "abilityWindow": "When you win a space combat",
+        "abilityText": "If you have no ground forces in the active system, remove all command tokens from that system.",
         "unlockCondition": "Have seven or more Keii.",
         "source": "endlesst"
     },

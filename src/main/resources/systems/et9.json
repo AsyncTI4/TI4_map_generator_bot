@@ -1,10 +1,10 @@
 {
     "id": "et9",
-    "name": "Uchi/Skygoja - The Hissho Bushidan",
+    "name": "Uchi/Skyagoja - The Hissho Bushidan",
     "aliases": [
         "et9",
         "uchi",
-        "skygoja",
+        "skyagoja",
         "hissho"
     ],
     "imagePath": "et9.png",
@@ -30,7 +30,7 @@
     "wormholes": [],
     "planets": [
         "uchi",
-        "skygoja"
+        "skyagoja"
     ],
     "source": "endlesst",
     "tileBack": "green"
