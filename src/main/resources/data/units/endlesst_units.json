@@ -431,7 +431,7 @@
     {
         "id": "unfallen_pds",
         "baseType": "pds",
-        "asyncId": "pds",
+        "asyncId": "pd",
         "name": "Thorn I",
         "upgradesToUnitId": "unfallen_pds2",
         "source": "endlesst",
@@ -445,7 +445,7 @@
     {
         "id": "unfallen_pds2",
         "baseType": "pds",
-        "asyncId": "pds",
+        "asyncId": "pd",
         "name": "Thorn II",
         "source": "endlesst",
         "faction": "unfallen",

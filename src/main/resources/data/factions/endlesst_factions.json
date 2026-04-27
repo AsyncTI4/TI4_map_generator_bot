@@ -48,6 +48,8 @@
         "homeSystem": "et1",
         "startingFleet": "2 cv, 1 dd, 2 ff, 2 inf h, 2 inf i, sd h",
         "commodities": 3,
+        "startingTechOptions": [],
+        "startingTechAmount": 0,
         "factionTech": [
             "sophonomg",
             "sophonsg"
