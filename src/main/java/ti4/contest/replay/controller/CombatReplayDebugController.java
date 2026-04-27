@@ -151,7 +151,8 @@ public class CombatReplayDebugController {
                 settings.getRuntime().isDevMode(),
                 settings.getRuntime().isDiscordPostingEnabled(),
                 settings.getRuntime().isTrackAllCombatsAsCandidates(),
-                settings.getRuntime().isImmediatePromotionOnResolve());
+                settings.getRuntime().isImmediatePromotionOnResolve(),
+                settings.isDecoysEnabled());
     }
 
     private CandidateSummary toCandidateSummary(CombatCandidateEntity candidate) {
@@ -202,7 +203,8 @@ public class CombatReplayDebugController {
             boolean devMode,
             boolean discordPostingEnabled,
             boolean trackAllCombatsAsCandidates,
-            boolean immediatePromotionOnResolve) {}
+            boolean immediatePromotionOnResolve,
+            boolean decoysEnabled) {}
 
     private record CandidateListResponse(RuntimeStateResponse runtime, List<CandidateSummary> candidates) {}
 

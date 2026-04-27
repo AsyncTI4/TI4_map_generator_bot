@@ -25,6 +25,7 @@ public class CombatContestSettings {
     private Retention retention = new Retention();
     private Runtime runtime = new Runtime();
     private SideBets sideBets = new SideBets();
+    private boolean decoysEnabled = false;
 
     public CombatContestSettings() {
         applyEnvironmentDefaults();
