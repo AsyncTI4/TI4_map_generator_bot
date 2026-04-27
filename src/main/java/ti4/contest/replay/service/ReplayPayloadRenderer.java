@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.core.CombatRollPayload;
 import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
@@ -28,6 +29,7 @@ import ti4.model.TechnologyModel;
 @RequiredArgsConstructor
 public class ReplayPayloadRenderer {
 
+    private final CombatContestSettings settings;
     private final ReplayDispatchSerializer payloadSerializer;
 
     public RenderedReplayEvent render(Game game, CombatCandidateEntity candidate, CombatCandidateEventEntity event) {
@@ -51,7 +53,7 @@ public class ReplayPayloadRenderer {
     }
 
     public CombatReplayDecoys.Abilities readReplayAbilities(CombatCandidateEntity candidate) {
-        return candidate == null
+        return candidate == null || !settings.isDecoysEnabled()
                 ? new CombatReplayDecoys.Abilities(null)
                 : CombatReplayDecoys.read(candidate.getReplayAbilitiesJson());
     }

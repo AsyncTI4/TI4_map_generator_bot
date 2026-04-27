@@ -16,7 +16,6 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
-import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
@@ -33,7 +32,14 @@ public class CombatReplayDecoys {
     private static final Map<String, List<DecoyUnit>> DEBUG_DECOY_UNITS_BY_COMBAT = new ConcurrentHashMap<>();
 
     public String buildJson(Player attacker, Player defender, Tile tile) {
-        Abilities abilities = build(attacker, defender, tile, consumeDebugDecoyUnits(attacker, defender, tile));
+        return buildJson(attacker, defender, tile, false);
+    }
+
+    public String buildJson(Player attacker, Player defender, Tile tile, boolean decoysEnabled) {
+        List<DecoyUnit> debugDecoyUnits = consumeDebugDecoyUnits(attacker, defender, tile);
+        if (!decoysEnabled) return null;
+
+        Abilities abilities = build(debugDecoyUnits);
         return abilities.hasDecoys() ? write(abilities) : null;
     }
 
@@ -146,37 +152,9 @@ public class CombatReplayDecoys {
                 + "uneasy certainty that some of those ships were never truly there.";
     }
 
-    private Abilities build(Player attacker, Player defender, Tile tile, List<DecoyUnit> debugDecoyUnits) {
-        List<DecoyUnit> decoyUnits = new ArrayList<>();
-        if (debugDecoyUnits == null) {
-            addDecoyUnits(decoyUnits, attacker, tile);
-            addDecoyUnits(decoyUnits, defender, tile);
-        } else {
-            decoyUnits.addAll(debugDecoyUnits);
-        }
+    private Abilities build(List<DecoyUnit> debugDecoyUnits) {
+        List<DecoyUnit> decoyUnits = debugDecoyUnits == null ? List.of() : debugDecoyUnits;
         return new Abilities(decoyUnits.isEmpty() ? null : new Decoy(decoyUnits));
-    }
-
-    private void addDecoyUnits(List<DecoyUnit> decoyUnits, Player player, Tile tile) {
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
-        for (UnitKey unitKey : space.getUnitsByState().keySet()) {
-            if (!player.getColorID().equals(unitKey.getColorID())) continue;
-            if (!isShip(unitKey.getUnitType())) continue;
-            decoyUnits.add(new DecoyUnit(
-                    player.getFaction(),
-                    player.getFactionEmoji(),
-                    player.getColorID(),
-                    unitKey.getUnitType(),
-                    Constants.SPACE,
-                    1));
-        }
-    }
-
-    private boolean isShip(UnitType unitType) {
-        return switch (unitType) {
-            case Fighter, Destroyer, Cruiser, Carrier, Dreadnought, Flagship, Warsun, Lady, Celagrom, Cavalry -> true;
-            default -> false;
-        };
     }
 
     private List<DecoyUnit> consumeDebugDecoyUnits(Player attacker, Player defender, Tile tile) {

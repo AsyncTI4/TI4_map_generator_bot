@@ -442,7 +442,7 @@ public class CombatReplayService {
         return new CandidateInitialSnapshot(
                 LazaxCombatSupport.formatCombatTechSummary(tile, attacker, defender),
                 CombatReplayTileRenderer.captureInitialSnapshot(game, tile.getPosition()),
-                CombatReplayDecoys.buildJson(attacker, defender, tile),
+                CombatReplayDecoys.buildJson(attacker, defender, tile, settings.isDecoysEnabled()),
                 countDestroyersInCombat(tile, attacker),
                 countDestroyersInCombat(tile, defender),
                 hasAssaultCannon(attacker),
