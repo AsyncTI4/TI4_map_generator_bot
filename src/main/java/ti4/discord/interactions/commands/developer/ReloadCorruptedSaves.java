@@ -39,8 +39,8 @@ class ReloadCorruptedSaves extends Subcommand {
                 event.getChannel(),
                 "Finished reloading games."
                         + "\nSuccessfully loaded: " + successCount + " games"
-                        + "\nReloaded games: " + reloadedGames
-                        + "\nFailed reloaded games: " + failedReloadedGames);
+                        + "\nReloaded: " + reloadedGames
+                        + "\nFailed to reload: " + failedReloadedGames);
     }
 
     private boolean tryReload(String name) {
