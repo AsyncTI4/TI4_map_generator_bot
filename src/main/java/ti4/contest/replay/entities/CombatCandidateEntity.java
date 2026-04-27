@@ -100,6 +100,12 @@ public class CombatCandidateEntity {
     @Column(name = "defender_destroyer_count", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
     private Integer defenderDestroyerCount = 0;
 
+    @Column(name = "attacker_has_assault_cannon", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean attackerHasAssaultCannon = false;
+
+    @Column(name = "defender_has_assault_cannon", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean defenderHasAssaultCannon = false;
+
     @Column(name = "attacker_rolled_afb", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean attackerRolledAfb = false;
 
