@@ -110,6 +110,7 @@ public class CombatContestSettings {
     @Getter
     @Setter
     public static class Promotion {
+        private boolean enabled = false;
         private int intervalSeconds = 60;
         private int candidateLookbackHours = 12;
         private int maxPromotionsPerHour = 1;

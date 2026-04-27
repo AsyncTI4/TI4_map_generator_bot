@@ -145,6 +145,7 @@ public class CombatReplayDebugController {
 
     private RuntimeStateResponse runtimeState() {
         return new RuntimeStateResponse(
+                settings.getPromotion().isEnabled(),
                 settings.getRuntime().isDiscordPostingEnabled(),
                 settings.getRuntime().isTrackAllCombatsAsCandidates(),
                 settings.getRuntime().isImmediatePromotionOnResolve());
@@ -191,7 +192,10 @@ public class CombatReplayDebugController {
     }
 
     private record RuntimeStateResponse(
-            boolean discordPostingEnabled, boolean trackAllCombatsAsCandidates, boolean immediatePromotionOnResolve) {}
+            boolean promotionEnabled,
+            boolean discordPostingEnabled,
+            boolean trackAllCombatsAsCandidates,
+            boolean immediatePromotionOnResolve) {}
 
     private record CandidateListResponse(RuntimeStateResponse runtime, List<CandidateSummary> candidates) {}
 
