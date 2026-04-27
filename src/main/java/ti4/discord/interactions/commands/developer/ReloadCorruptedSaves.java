@@ -1,7 +1,6 @@
 package ti4.discord.interactions.commands.developer;
 
 import java.util.HashSet;
-import java.util.Set;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.Subcommand;
@@ -19,14 +18,17 @@ class ReloadCorruptedSaves extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Running custom command against all games.");
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+            "Reloading all corrupted saves. This will take a while.");
 
-        Set<String> reloadedGames = new HashSet<>();
-        Set<String> failedReloadedGames = new HashSet<>();
+        int successCount = 0;
+        var reloadedGames = new HashSet<String>();
+        var failedReloadedGames = new HashSet<String>();
         var managedGames = GameManager.getManagedGames();
         for (ManagedGame managedGame : managedGames) {
             try {
                 managedGame.getGame();
+                successCount++;
             } catch (Exception e) {
                 if (tryReload(managedGame.getName())) reloadedGames.add(managedGame.getName());
                 else failedReloadedGames.add(managedGame.getName());
@@ -36,6 +38,7 @@ class ReloadCorruptedSaves extends Subcommand {
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
                 "Finished reloading games."
+                        + "\nSuccessfully loaded: " + successCount + " games"
                         + "\nReloaded games: " + reloadedGames
                         + "\nFailed reloaded games: " + failedReloadedGames);
     }
