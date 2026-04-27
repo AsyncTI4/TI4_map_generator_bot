@@ -524,7 +524,7 @@
         "baseType": "warsun",
         "asyncId": "ws",
         "name": "Behemoth Core",
-        "upgradesToUnitId": "hissho_behemoth_citadel, hissho_behemoth_obliterator",
+        "upgradesToUnitId": "hissho_behemoth_citadel",
         "source": "endlesst",
         "faction": "hissho",
         "moveValue": 1,
