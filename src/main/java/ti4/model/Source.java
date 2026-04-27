@@ -48,6 +48,7 @@ public class Source {
         balacasi,
         viability_patch,
         beans,
+        endlesst,
 
         // async homebrew
         draft,

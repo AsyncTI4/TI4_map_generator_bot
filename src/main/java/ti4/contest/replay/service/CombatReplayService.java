@@ -498,6 +498,12 @@ public class CombatReplayService {
                 || trackedEvent == CombatReplayTrackedEvent.NONE) return;
         boolean moraleBoost = trackedEvent == CombatReplayTrackedEvent.MORALE_BOOST;
         boolean shieldsHolding = trackedEvent == CombatReplayTrackedEvent.SHIELDS_HOLDING;
+        boolean rout = trackedEvent == CombatReplayTrackedEvent.ROUT;
+        if (rout) {
+            candidate.setPromotionStatus(CombatCandidatePromotionStatus.EXPIRED);
+            candidate.setCancellationReason(firstNonBlank(
+                    candidate.getCancellationReason(), "Ineligible for promotion because Rout was played."));
+        }
         boolean attacker = player.getFaction().equalsIgnoreCase(candidate.getAttackerFaction());
         if (attacker) {
             candidate.setAttackerPlayedMoraleBoost(
@@ -673,7 +679,13 @@ public class CombatReplayService {
         candidate.setSideBetCompatible(true);
         candidate.setAttackerDestroyerCount(countDestroyersInCombat(tile, attacker));
         candidate.setDefenderDestroyerCount(countDestroyersInCombat(tile, defender));
+        candidate.setAttackerHasAssaultCannon(hasAssaultCannon(attacker));
+        candidate.setDefenderHasAssaultCannon(hasAssaultCannon(defender));
         return candidate;
+    }
+
+    private boolean hasAssaultCannon(Player player) {
+        return player != null && player.hasTech("asc");
     }
 
     private List<CombatCandidateEntity> getTrackingCandidates(Game game) {
@@ -781,6 +793,10 @@ public class CombatReplayService {
     private static double safeRatio(double weaker, double stronger) {
         if (stronger <= 0) return 0.0;
         return Math.max(0.0, Math.min(1.0, weaker / stronger));
+    }
+
+    private String firstNonBlank(String first, String fallback) {
+        return first == null || first.isBlank() ? fallback : first;
     }
 
     private record SelectionSnapshot(
