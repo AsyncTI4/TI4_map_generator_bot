@@ -153,11 +153,11 @@ public class GameManager {
     public static Game reload(String gameName) {
         waitFor(GAME_NAMES_LOADED_LATCH);
         Game game = GameLoadService.load(gameName);
-        handleMissingMatchingManagedGame(game);
         if (game == null) {
             game = GameUndoService.loadUndoForMissingGame(gameName);
             handleUndo(game);
         }
+        handleMissingMatchingManagedGame(game);
         return game;
     }
 
