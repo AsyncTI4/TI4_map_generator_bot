@@ -131,10 +131,10 @@ public class CombatReplayDecoys {
     public CombatRollPayload applyToRoll(CombatRollPayload payload, Abilities abilities) {
         if (!abilities.hasDecoys()) return payload;
 
-        List<DecoyUnit> availableDecoys = new ArrayList<>(abilities.decoy().units());
         List<CombatRollPayload.UnitRoll> unitRolls = new ArrayList<>();
         for (CombatRollPayload.UnitRoll unitRoll : payload.unitRolls()) {
-            DecoyUnit decoyUnit = takeDecoyForRoll(payload, unitRoll, availableDecoys);
+            DecoyUnit decoyUnit =
+                    findDecoyForRoll(payload, unitRoll, abilities.decoy().units());
             unitRolls.add(decoyUnit == null ? unitRoll : withDecoys(unitRoll, decoyUnit.count()));
         }
         return new CombatRollPayload(
@@ -185,11 +185,10 @@ public class CombatReplayDecoys {
         return vanished.toString();
     }
 
-    private DecoyUnit takeDecoyForRoll(
-            CombatRollPayload payload, CombatRollPayload.UnitRoll unitRoll, List<DecoyUnit> availableDecoys) {
-        for (DecoyUnit decoyUnit : List.copyOf(availableDecoys)) {
+    private DecoyUnit findDecoyForRoll(
+            CombatRollPayload payload, CombatRollPayload.UnitRoll unitRoll, List<DecoyUnit> decoyUnits) {
+        for (DecoyUnit decoyUnit : decoyUnits) {
             if (matches(decoyUnit, payload, unitRoll)) {
-                availableDecoys.remove(decoyUnit);
                 return decoyUnit;
             }
         }
