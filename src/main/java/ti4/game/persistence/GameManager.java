@@ -33,7 +33,7 @@ public class GameManager {
     private static final CountDownLatch GAME_NAMES_LOADED_LATCH = new CountDownLatch(1);
     private static final AtomicBoolean WARMUP_STARTED = new AtomicBoolean(false);
     private static final CountDownLatch WARMUP_FINISHED_LATCH = new CountDownLatch(1);
-    private static final int WAIT_FOR_WARMUP_TIMEOUT_SECONDS = 30;
+    private static final int WAIT_FOR_WARMUP_TIMEOUT_SECONDS = 40;
 
     public static void warmup() {
         if (!WARMUP_STARTED.compareAndSet(false, true)) {
