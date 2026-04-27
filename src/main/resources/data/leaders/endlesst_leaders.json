@@ -219,7 +219,8 @@
         "type": "commander",
         "name": "Jenhaestra Drev",
         "title": "The Fixer",
-        "permanentEffect": "Gain +1 to your maximum commodity value for each player that has your Alliance promissory note in their play area.",
+        "abilityWindow": "Always:",
+        "abilityText": "Gain +1 to your maximum commodity value for each player that has your Alliance promissory note in their play area.",
         "unlockCondition": "Use the primary or secondary ability of Trade.",
         "source": "endlesst"
     },

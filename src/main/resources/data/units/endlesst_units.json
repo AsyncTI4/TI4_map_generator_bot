@@ -133,7 +133,7 @@
     {
         "id": "craver_cruiser",
         "baseType": "cruiser",
-        "asyncId": "cr",
+        "asyncId": "ca",
         "name": "Scavenger I",
         "upgradesToUnitId": "craver_cruiser2",
         "source": "endlesst",
@@ -149,7 +149,7 @@
     {
         "id": "craver_cruiser2",
         "baseType": "cruiser",
-        "asyncId": "cr",
+        "asyncId": "ca",
         "name": "Scavenger II",
         "source": "endlesst",
         "faction": "craver",

@@ -283,7 +283,7 @@
         ],
         "requirements": "RRRY",
         "faction": "hissho",
-        "baseUpgrade": "ws2",
+        "baseUpgrade": "ws",
         "source": "endlesst",
         "text": "At the end of a combat round, if this unit produced at least one hit, you may destroy all other ships in the active system. BOMBARDMENT 3(9) Cost 12 Combat 9(3) Move 2 Capacity 4"
     },
