@@ -18,8 +18,8 @@ class ReloadCorruptedSaves extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        MessageHelper.sendMessageToChannel(event.getChannel(),
-            "Reloading all corrupted saves. This will take a while.");
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(), "Reloading all corrupted saves. This will take a while.");
 
         int successCount = 0;
         var reloadedGames = new HashSet<String>();
