@@ -1,0 +1,39 @@
+{
+    "id": "et5",
+    "name": "Chrism/Anchorite/Eschaton - The Church of the Vodyani",
+    "aliases": [
+        "et5",
+        "chrism",
+        "anchorite",
+        "eschaton",
+        "vodyani"
+    ],
+    "imagePath": "et5.png",
+    "shipPositionsType": "TYPE03",
+    "spaceTokenLocations": [
+        {
+            "x": 250.0,
+            "y": 90.0
+        },
+        {
+            "x": 80.0,
+            "y": 10.0
+        },
+        {
+            "x": 135.0,
+            "y": 105.0
+        },
+        {
+            "x": 80.0,
+            "y": 185.0
+        }
+    ],
+    "wormholes": [],
+    "planets": [
+        "chrism",
+        "anchorite",
+        "eschaton"
+    ],
+    "source": "endlesst",
+    "tileBack": "green"
+}

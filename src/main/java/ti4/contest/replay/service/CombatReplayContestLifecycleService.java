@@ -118,6 +118,9 @@ public class CombatReplayContestLifecycleService {
         if (candidate.getStatus() != CombatCandidateStatus.RESOLVED) {
             return ForcePromoteResult.rejected("Candidate must be RESOLVED before promotion");
         }
+        if (candidate.getPromotionStatus() != CombatCandidatePromotionStatus.PENDING) {
+            return ForcePromoteResult.rejected("Candidate is not eligible for promotion");
+        }
 
         CombatReplayContestEntity existingContest =
                 replayContestRepository.findByCandidateId(candidateId).orElse(null);

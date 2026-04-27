@@ -2333,6 +2333,10 @@ public class ActionCardHelper {
         if (actionCard == null || actionCard.getAlias() == null) return CombatReplayTrackedEvent.NONE;
         if (MORALE_BOOST_IDS.contains(actionCard.getAlias())) return CombatReplayTrackedEvent.MORALE_BOOST;
         if (SHIELDS_HOLDING_IDS.contains(actionCard.getAlias())) return CombatReplayTrackedEvent.SHIELDS_HOLDING;
+        if ("Rout".equalsIgnoreCase(actionCard.getName())
+                || actionCard.getAlias().startsWith("rout")) {
+            return CombatReplayTrackedEvent.ROUT;
+        }
         return CombatReplayTrackedEvent.NONE;
     }
 }

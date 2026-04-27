@@ -1,0 +1,346 @@
+[
+    {
+        "alias": "uempireii",
+        "name": "Imperial Industry",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "uempire",
+        "source": "balacasi",
+        "text": "When you use the PRODUCTION ability of any of your units, you may exhaust this card and a planet you control. If you do, reduce the total cost of units made by 1 and increase the PRODUCTION value of your units for this built by the Influence value of the exhausted planet."
+    },
+    {
+        "alias": "uempirecv",
+        "name": "Corvette II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "BB",
+        "faction": "uempire",
+        "baseUpgrade": "cv2",
+        "source": "endlesst",
+        "text": "ANTI-FIGHTER BARRAGE: 7** Cost 3 Combat 7 Move 3 Capacity 4"
+    },
+    {
+        "alias": "sophonomg",
+        "name": "Imperial Industry",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BBB",
+        "faction": "sophon",
+        "source": "endlesst",
+        "text": "During tactical actions, the number of ships you can have in a system is not limited by the number of command tokens in your fleet pool. After another player moves units as part of a tactical action into a system that contains your ships, you may move any number of ships you control from other systems that do not contain your command tokens into the active system."
+    },
+    {
+        "alias": "sophonosg",
+        "name": "Scienceganza",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "BBB",
+        "faction": "sophon",
+        "source": "endlesst",
+        "text": "For the purposes of checking prerequisites, this technology can count as a technology of any color. Whenever you research a technology, if no other player has that same technology, you may exhaust this card to gain a random technology."
+    },
+    {
+        "alias": "cravercr",
+        "name": "Scavenger II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GYR",
+        "faction": "craver",
+        "baseUpgrade": "cr2",
+        "source": "endlesst",
+        "text": "This unit can have hits assigned to it by Anti-Fighter Barrage as if it were a fighter. Cost 1 Combat 6 Move 3 Capacity 1"
+    },
+    {
+        "alias": "craversd",
+        "name": "Craver Hive II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "faction": "craver",
+        "baseUpgrade": "sd2",
+        "source": "endlesst",
+        "text": "This unit's PRODUCTION value is equal to 5 more than the resource value of this planet. Up to 3 fighters in this system do not count against your ships' capacity. When you take control of a planet, you may destroy four of your infantry or fighters in that planet's system to place a space dock there."
+    },
+    {
+        "alias": "hwgreen",
+        "name": "Redundant Replicators",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "isUpgrade": true,
+        "faction": "horatio",
+        "source": "endlesst",
+        "text": "This technology counts as a unit upgrade. Your Horatio Warriors apply +1 to their dice rolls and gain 'After this unit is destroyed, place the unit on this card. At the start of the Status Phase, place each unit that is on this card on a planet you control that contains one or more of your infantry'."
+    },
+    {
+        "alias": "hwyellow",
+        "name": "Genetic Recalibration Network",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "isUpgrade": true,
+        "faction": "horatio",
+        "source": "endlesst",
+        "text": "This technology counts as a unit upgrade. Your Horatio Warriors apply +1 to their dice rolls and gain 'After you produce one or more infantry as part of a tactical action, you may place an infantry from your reinforcements onto each planet you control in each system adjacent to the active system'."
+    },
+    {
+        "alias": "hwblue",
+        "name": "AI Targeting Reticules",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BB",
+        "isUpgrade": true,
+        "faction": "horatio",
+        "source": "endlesst",
+        "text": "This technology counts as a unit upgrade. Your Horatio Warriors apply +1 to their dice rolls and gain 'On a roll of 10, before modifiers, this unit produces an additional hit'."
+    },
+    {
+        "alias": "hwred",
+        "name": "Personal Assault Matrix",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "isUpgrade": true,
+        "faction": "horatio",
+        "source": "endlesst",
+        "text": "This technology counts as a unit upgrade. Your Horatio Warriors apply +1 to their dice rolls and gain 'At the start of ground combat, if you control at least three infantry, destroy one ground force your opponent controls'."
+    },
+    {
+        "alias": "horatiord",
+        "name": "Genetic Redistributors",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GGG",
+        "isUpgrade": true,
+        "faction": "horatio",
+        "source": "endlesst",
+        "text": "ACTION: For each unit upgrade you have, you may place an infantry from your reinforcements on any planet you control that contains one or more of your infantry. Then, exhaust this card."
+    },
+    {
+        "alias": "vaultermf",
+        "name": "Metafolding",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BBB",
+        "faction": "vaulter",
+        "source": "endlesst",
+        "text": "Systems containing your flagship or a planet you control are considered adjacent during your turn and when you are retreating."
+    },
+    {
+        "alias": "vaulteribp",
+        "name": "Intrepid Boarding Pods",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RRR",
+        "faction": "vaulter",
+        "source": "endlesst",
+        "text": "During Space Combat, you may choose to have your opponent assign hits to their ground forces in the space area of the active system instead of their ships. At the end of a space combat round, if your opponent controls no ground forces in the space area of the active system and you do: You may exhaust this technology to destroy all of your opponent's ships in the active system."
+    },
+    {
+        "alias": "vodyaniff",
+        "name": "Leecher II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GB",
+        "faction": "vodyani",
+        "baseUpgrade": "ff2",
+        "source": "endlesst",
+        "text": "When this unit produces a hit during a combat round, either gain 1 commodity or convert 1 of your commodities to a trade good. This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool. Cost 1** Combat 8 Move 2"
+    },
+    {
+        "alias": "vodyanica",
+        "name": "Consecrated Arks",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YYY",
+        "faction": "vodyani",
+        "source": "endlesst",
+        "text": "Planets in your home system gain Space Cannon 7. They can use this ability on ships adjacent to your home system. During Space Combat, planets you control in your home system gain Anti-Fighter Barrage 5(x2) and can use it as if they were ships. When you activate your home system, planets you control in your home system gain PRODUCTION 2 until the end of the tactical action."
+    },
+    {
+        "alias": "lumerisdn",
+        "name": "Omokar II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "BBY",
+        "faction": "lumeris",
+        "baseUpgrade": "dn2",
+        "source": "endlesst",
+        "text": "This unit cannot be destroyed by \"Direct Hit\" action cards. When producing this unit, its cost can only be paid with trade goods. When this unit is destroyed, you may produce a dreadnought at any one of your space docks. BOMBARDMENT 5** Cost 4 Combat 5 Move 2 Capacity 1"
+    },
+    {
+        "alias": "lumerisse",
+        "name": "Shrewd Extortion",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "G",
+        "faction": "lumeris",
+        "source": "endlesst",
+        "text": "After winning a combat, you may exhaust this technology to draw an action card. At the start of your turn, if you have no action cards on your faction sheet, you may ready this technology."
+    },
+    {
+        "alias": "unfallenht",
+        "name": "Harmonious Thrum",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "unfallen",
+        "source": "endlesst",
+        "text": "ACTION: Exhaust this card, then for each player you may choose one planet that player controls in an Entangled system. Ready any of the chosen planets. Whenever you gain control of a legendary planet, ready that planet and its legendary planet card."
+    },
+    {
+        "alias": "unfallenpds",
+        "name": "Thorn II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "RY",
+        "faction": "unfallen",
+        "baseUpgrade": "pds2",
+        "source": "endlesst",
+        "text": "This unit cannot lose Planetary Shield and may use its SPACE CANNON on ships that are adjacent to this unit's system. During your turn, you may use this unit's SPACE CANNON on ships in Entangled systems. SPACE CANNON 5"
+    },
+    {
+        "alias": "riftbornss",
+        "name": "Stasis Singularity",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "R",
+        "faction": "riftborn",
+        "source": "endlesst",
+        "text": "At the start of a combat round, you may exhaust this technology and choose a ship type. Ships of that type do not roll combat dice this combat round and cannot have hits assigned to them."
+    },
+    {
+        "alias": "riftbornfs",
+        "name": "Fold Singularity",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YYY",
+        "faction": "riftborn",
+        "source": "endlesst",
+        "text": "ACTION: Draw a relic and place it on this card. You may use the abilities and effects of any relics on this card. If another player were to gain control of a relic on this card, shuffle that relic into the relic deck instead. When this technology becomes readied, shuffle all relics on this card back into the relic deck."
+    },
+    {
+        "alias": "riftbornrs",
+        "name": "Rip Singularity",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BBB",
+        "faction": "riftborn",
+        "source": "endlesst",
+        "text": "After a player activates a system, you may exhaust this technology. At the end of that tactical action, return all ships in the active system to the system they were in at the start of the tactical action."
+    },
+    {
+        "alias": "riftborncs",
+        "name": "Compression Singularity",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BB",
+        "faction": "riftborn",
+        "source": "endlesst",
+        "text": "When you gain this technology, exhaust it and then place the Riftborn Compression token in a system that contains your units or a planet you control. ACTION: Exhaust this technology, then you may move the Compression token to any system that contains your units or a planet you control. While this technology is exhausted, units moving out of or through the system with the Compression token gain +1 movement."
+    },
+    {
+        "alias": "hissho_behemoth_citadel",
+        "name": "Behemoth Citadel",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "RRRY",
+        "faction": "hissho",
+        "baseUpgrade": "ws",
+        "source": "endlesst",
+        "text": "This unit's PRODUCTION ability is equal to three more than the combined Resource value of all planets in its system. ANTI-FIGHTER BARRAGE 3*** PRODUCTION X Cost 12 Combat 3*** Move 1 Capacity 8"
+    },
+    {
+        "alias": "hissho_behemoth_obliterator",
+        "name": "Behemoth Obliterator",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "RRRY",
+        "faction": "hissho",
+        "baseUpgrade": "ws",
+        "source": "endlesst",
+        "text": "At the end of a combat round, if this unit produced at least one hit, you may destroy all other ships in the active system. BOMBARDMENT 3(9) Cost 12 Combat 9(3) Move 2 Capacity 4"
+    },
+    {
+        "alias": "hisshodh",
+        "name": "Distinguished Hatcheries",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "riftborn",
+        "source": "endlesst",
+        "text": "You may have any number of structures on planets you control. Planets you control with structures on them cannot be the target of action cards or elected as part of agendas. You can produce ships at Space Docks even if they are blockaded. If you produce ships at a SPace Dock that is blockaded, immediately resolve space combat after production is done."
+    },
+    {
+        "alias": "uchoirad",
+        "name": "Accelerando Drive",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BB",
+        "faction": "uchoir",
+        "source": "endlesst",
+        "text": "Whenever you activate a system that contains another player's command token, up to one ship you control gets +1 move during this tactical action. Your ships cannot have hits assigned to them by Space Cannon during this tactical action."
+    },
+    {
+        "alias": "uchoirbl",
+        "name": "Biological Lockdown",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GGG",
+        "faction": "uchoir",
+        "source": "endlesst",
+        "text": "At the start of another player's turn, you may exhaust this card and choose tactical or component. That player cannot perform actions of the chosen type this turn."
+    },
+    {
+        "alias": "nakalimdd",
+        "name": "Seneschal II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "RR",
+        "faction": "nakalim",
+        "baseUpgrade": "dd2",
+        "source": "endlesst",
+        "text": "Whenever this unit produces a hit in space combat, you may immediately use its Anti-Fighter Barrage ability. ANTIFIGHTER BARRAGE 6(3) Cost 1 Combat 6 Move 3"
+    },
+    {
+        "alias": "nakalimpd",
+        "name": "Protogalactic Designs",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RRR",
+        "faction": "nakalim",
+        "source": "endlesst",
+        "text": "When you gain this technology, attach it to a non-fighter ship type on your faction sheet. Units of that type permanently gain the following: This unit rolls an additional die when rolling for unit abilities. This unit cannot be assigned hits from SPACE CANNON. +1 Cost +1 movement -2 combat."
+    }
+]

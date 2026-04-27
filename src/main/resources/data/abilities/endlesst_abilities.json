@@ -1,0 +1,241 @@
+[
+    {
+        "id": "industrious_populace",
+        "name": "Industrious Populace",
+        "faction": "uempire",
+        "permanentEffect": "When resolving the primary or secondary ability of Leadership, each exhausted planet you control before spending adds 1 influence.",
+        "source": "endlesst"
+    },
+    {
+        "id": "emperor_will",
+        "name": "The Emperor's Will",
+        "faction": "uempire",
+        "window": "When spending resources",
+        "windowEffect": "You may return any number of command tokens from your sheet to your reinforcements to gain 2 resources per token.",
+        "source": "endlesst"
+    },
+    {
+        "id": "dangerous_science",
+        "name": "Dangerous_Science",
+        "faction": "sophon",
+        "permanentEffect": "Whenever you gain a random technology, shuffle the technology deck and pick out one card at random. If you do not meet the prerequisites for the picked technology, remove a command token from your fleet pool. You may exhaust planets you control with tech specialties to help meet these requirements. Then, gain that technology.",
+        "source": "endlesst"
+    },
+    {
+        "id": "wild_curiosity",
+        "name": "Wild Curiosity",
+        "faction": "sophon",
+        "permanentEffect": "Whenever you gain a relic, gain a random technology as well.",
+        "source": "endlesst"
+    },
+    {
+        "id": "galactic_locusts",
+        "name": "Galactic Locusts",
+        "faction": "craver",
+        "window": "At the start of the Status Phase",
+        "windowEffect": "Choose a non-home, non-legendary planet you control in a system that contains no planets with a Locust token. Gain trade goods equal to the combined Resource and Influence value of the chosen planet, then place a Locust token on it.",
+        "source": "endlesst"
+    },
+    {
+        "id": "exploitation",
+        "name": "Exploitation",
+        "faction": "craver",
+        "permanentEffect": "When a planet gains one of your Locust tokens, exhaust it. Planets with Locust tokens on them cannot be readied. These tokens cannot be removed by any game effect or ability.",
+        "source": "endlesst"
+    },
+    {
+        "id": "craver_exodus",
+        "name": "Exodus of the Swarm",
+        "faction": "craver",
+        "permanentEffect": "You may score Public Objectives if you control all of the planets in any home system. When resolving the secondary ability of Warfare, you may produce at any one of your Space Docks.",
+        "source": "endlesst"
+    },
+    {
+        "id": "genetic_manipulation",
+        "name": "Genetic Manipulation",
+        "faction": "horatio",
+        "permanentEffect": "You have multiple infantry upgrades. Your infantry have all abilities of all of your researched infantry upgrades.",
+        "source": "endlesst"
+    },
+    {
+        "id": "technological_brilliance",
+        "name": "Technological Brilliance",
+        "faction": "horatio",
+        "window": "When you gain a unit upgrade technology",
+        "windowEffect": "Choose a color of technology in that upgrade's prerequisites. That upgrade technology is the chosen color for the rest of the game",
+        "source": "endlesst"
+    },
+    {
+        "id": "involuntary_nomads",
+        "name": "Involuntary Nomads",
+        "faction": "vaulter",
+        "window": "During Set-up",
+        "windowEffect": "Use a home system chosen at random from among unchosen factions as your home system. Shuffle the four \"Search for Auriga\" event cards into the corresponding exploration deck.",
+        "source": "endlesst"
+    },
+    {
+        "id": "homebound",
+        "name": "Involuntary Nomads",
+        "faction": "vaulter",
+        "window": "At the start of the Status Phase",
+        "windowEffect": "If you control both the Auriga planet and all the planets in your home system, gain 1 Victory Point. This ability can only be used once per game.",
+        "source": "endlesst"
+    },
+    {
+        "id": "argosky_ability",
+        "name": "The Argosky",
+        "faction": "vaulter",
+        "permanentEffect": "When you produce your flagship, gain the Argosky planet card and ready it. If another player captures your flagship, they gain control of the Argosky planet card and ready it. When your flagship is returned to your reinforcements, return the Argosky planet card to the supply.",
+        "source": "endlesst"
+    },
+    {
+        "id": "vodyani_crusade",
+        "name": "The Crusade",
+        "faction": "vodyani",
+        "window": "At the end of the Status Phase",
+        "windowEffect": "Choose a system tile that is adjacent to your home system. Swap those tiles and all units and components on them. Only count system tiles that are physically touching on the game board as adjacent for the purposes of this ability.",
+        "source": "endlesst"
+    },
+    {
+        "id": "great_armada",
+        "name": "The Great Armada",
+        "faction": "vodyani",
+        "permanentEffect": "Units you control in the space area of your home system do not count against your ships' capacity.",
+        "source": "endlesst"
+    },
+    {
+        "id": "shipbound",
+        "name": "Shipbound",
+        "faction": "vodyani",
+        "permanentEffect": "At the end of the Status Phase, move all of your infantry on planets into the space area of their system.",
+        "source": "endlesst"
+    },
+    {
+        "id": "wheelers_dealers",
+        "name": "Wheelers and Dealers",
+        "faction": "lumeris",
+        "permanentEffect": "You cannot play promissory notes or action cards that are placed on your faction sheet. During your turn, you may trade action cards, promissory notes, or captured units that are on your Faction Sheet as part of transactions.",
+        "source": "endlesst"
+    },
+    {
+        "id": "alternative_imports",
+        "name": "Alternative Imports",
+        "faction": "lumeris",
+        "window": "Whenever you draw one or more action cards",
+        "windowEffect": "Place the top card of the action card deck face-up on your faction sheet.",
+        "source": "endlesst"
+    },
+    {
+        "id": "ba_friends",
+        "name": "Back Alley Friends",
+        "faction": "lumeris",
+        "window": "During Set-up",
+        "windowEffect": "Take the two extra Lumeris Alliance promissory notes and add them to your hand.",
+        "source": "endlesst"
+    },
+    {
+        "id": "celestial_vines",
+        "name": "Celestial Vines",
+        "faction": "unfallen",
+        "permanentEffect": "During Set-up, place the Unfallen Vine Counter in your play area and set its initial value to 1. At the end of the Status Phase, incrememtn the Vine Counter by 1. Non-home systems that are X systems away from your home system or closer are considered Entangled, where X is the value of the Vine Counter. Your home system is always considered Entangled.",
+        "source": "endlesst"
+    },
+    {
+        "id": "budding_leaves",
+        "name": "Budding Leaves",
+        "faction": "unfallen",
+        "window": "At the start of the Status Phase",
+        "windowEffect": "Place an infantry from your reinforcements onto any planet in an Entangled System. If that planet has units owned by another player, your infantry enters coexisting.",
+        "source": "endlesst"
+    },
+    {
+        "id": "cautious_friends",
+        "name": "Cautious Friends",
+        "faction": "unfallen",
+        "permanentEffect": "You are neighbors with all players that have units or a planet they control in Entangled systems. You cannot be neighbors with players except through this ability.",
+        "source": "endlesst"
+    },
+    {
+        "id": "riftborn_strangers",
+        "name": "Strangers to Reality",
+        "faction": "riftborn",
+        "permanentEffect": "When spending influence to resolve the primary or secondary ability of Leadership, spend that many resources instead. When spending resources to research technology, spend that much influence instead.",
+        "source": "endlesst"
+    },
+    {
+        "id": "continuum_sculptors",
+        "name": "Cuntinuum Sculptors",
+        "faction": "riftborn",
+        "permanentEffect": "During Set-up, add the two extra Riftborn technologies to your technology deck.",
+        "source": "endlesst"
+    },
+    {
+        "id": "masters_tands",
+        "name": "Masters of Time and Space",
+        "faction": "riftborn",
+        "window": "At the start of your turn",
+        "windowEffect": "You may spend 3 influence to ready any of your technologies.",
+        "source": "endlesst"
+    },
+    {
+        "id": "hissho_honor",
+        "name": "Honor Bound",
+        "faction": "hissho",
+        "window": "During Set-up:",
+        "windowEffect": "Add the Keii tokens to the supply. Then, add the three Hissho Observance cards to your hand. You may place one of them face-up in your play area.",
+        "source": "endlesst"
+    },
+    {
+        "id": "behemoth_specialists",
+        "name": "Behemoth Specialists",
+        "faction": "hissho",
+        "window": "When you gain the War Sun unit upgrade:",
+        "windowEffect": "Choose one side of the technology to be face-up in your play area for the rest of the game.",
+        "source": "endlesst"
+    },
+    {
+        "id": "hissho_ritualistic",
+        "name": "Ritualistic",
+        "faction": "hissho",
+        "window": "At the end of the Agenda phase:",
+        "windowEffect": "gather all three Observance cards and place them near the agenda deck. Each player votes on one of the Observance cards as if it were an agenda, with you acting as Speaker for this vote. Place the Observance card with the most votes face-up in your play area.",
+        "source": "endlesst"
+    },
+    {
+        "id": "anomalous_existence",
+        "name": "Anomalous Existence",
+        "faction": "uchoir",
+        "permanentEffect": "Other players cannot commit ground forces to planets in your home system. During set-up, place a frontier token into your home system. Your home system is treated as a system with no planets.",
+        "source": "endlesst"
+    },
+    {
+        "id": "in_the_shadows",
+        "name": "In The Shadows",
+        "faction": "uchoir",
+        "permanentEffect": "At the end of the Strategy Phase, place the choir's 9 token on your Strategy card. You are last in initiative order.",
+        "source": "endlesst"
+    },
+    {
+        "id": "enigmatic_agenda",
+        "name": "Enigmatic Agenda",
+        "faction": "uchoir",
+        "window": "Whenever another player discards a secret objective:",
+        "windowEffect": "You look at that card before it is shuffled back into the deck. You may choose to keep that secret objective by discarding another unsocred secret objective from your hand.",
+        "source": "endlesst"
+    },
+    {
+        "id": "beliefs_breakthroughs",
+        "name": "Beliefs, not Breakthroughs",
+        "faction": "nakalim",
+        "permanentEffect": "Whenever you would research a technology, gain two command tokens instead.",
+        "source": "endlesst"
+    },
+    {
+        "id": "lost_lore",
+        "name": "Lost Lore",
+        "faction": "nakalim",
+        "window": "Whenever you score an Objective:",
+        "windowEffect": "You may gain any number of technologies, so long as the number of technologies you are gaining and their combined prerequisites are less than or equal to the number of relics you control plus the number of relic fragments you purge when you use this ability.",
+        "source": "endlesst"
+    }
+]

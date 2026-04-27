@@ -33,7 +33,7 @@ public class CombatReplaySideBetTriggerService {
         }
         if (rollType == CombatRollType.combatround
                 && round == 1
-                && CombatSideBetType.AFB_SKIPPED.isAvailable(destroyerCount)
+                && isAfbSkippedAvailable(candidate, player.getFaction())
                 && !hasRolledAfb(candidate, player.getFaction())) {
             announcements.add(announcement(player, "Skipped AFB!"));
         }
@@ -57,7 +57,7 @@ public class CombatReplaySideBetTriggerService {
         return switch (trackedEvent) {
             case MORALE_BOOST -> List.of(announcement(player, "Morale Boost!"));
             case SHIELDS_HOLDING -> List.of(announcement(player, "Shields Holding!"));
-            case NONE -> List.of();
+            case ROUT, NONE -> List.of();
         };
     }
 
@@ -85,6 +85,23 @@ public class CombatReplaySideBetTriggerService {
             return safeInt(candidate.getDefenderDestroyerCount());
         }
         return 0;
+    }
+
+    private boolean isAfbSkippedAvailable(CombatCandidateEntity candidate, String faction) {
+        if (faction == null || !CombatSideBetType.AFB_SKIPPED.isAvailable(destroyerCount(candidate, faction))) {
+            return false;
+        }
+        return !(destroyerCount(candidate, faction) == 1 && opponentHasAssaultCannon(candidate, faction));
+    }
+
+    private boolean opponentHasAssaultCannon(CombatCandidateEntity candidate, String faction) {
+        if (faction.equalsIgnoreCase(candidate.getAttackerFaction())) {
+            return Boolean.TRUE.equals(candidate.getDefenderHasAssaultCannon());
+        }
+        if (faction.equalsIgnoreCase(candidate.getDefenderFaction())) {
+            return Boolean.TRUE.equals(candidate.getAttackerHasAssaultCannon());
+        }
+        return false;
     }
 
     private boolean hasRolledAfb(CombatCandidateEntity candidate, String faction) {
