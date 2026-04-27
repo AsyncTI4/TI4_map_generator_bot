@@ -1,0 +1,17 @@
+{
+    "tileBack": "green",
+    "id": "et3",
+    "name": "Horatio Prime -- The Horatio Supremacy",
+    "aliases": [
+        "et3",
+        "horatioprime",
+        "horatio"
+    ],
+    "imagePath": "et3.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "horatioprime"
+    ],
+    "source": "endlesst"
+}

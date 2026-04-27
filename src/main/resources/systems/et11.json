@@ -1,0 +1,17 @@
+{
+    "tileBack": "green",
+    "id": "et11",
+    "name": "Sobra -- The Nakalim Progenitors",
+    "aliases": [
+        "et11",
+        "sobra",
+        "nakalim"
+    ],
+    "imagePath": "et11.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "sobra"
+    ],
+    "source": "endlesst"
+}

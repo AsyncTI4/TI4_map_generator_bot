@@ -1,0 +1,548 @@
+[
+    {
+        "alias": "uempire",
+        "factionName": "The United Empire",
+        "homeSystem": "et0",
+        "startingFleet": "1 dd, 1 cr, 1 cv, 2 ff, 4 inf l, sd l",
+        "commodities": 3,
+        "factionTech": [
+            "uempireii",
+            "uempirecv"
+        ],
+        "startingTech": [
+            "st"
+        ],
+        "homePlanets": [
+            "raia"
+        ],
+        "abilities": [
+            "industrious_populace",
+            "emperor_will"
+        ],
+        "leaders": [
+            "uempireagent",
+            "uempirecommander",
+            "uempirehero"
+        ],
+        "promissoryNotes": [
+            "uempirepn"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "uempire_carrier",
+            "dreadnought",
+            "uempire_flagship",
+            "infantry",
+            "uempire_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Low",
+        "source": "endlesst"
+    },
+    {
+        "alias": "sophon",
+        "factionName": "The Sophonity",
+        "homeSystem": "et1",
+        "startingFleet": "2 cv, 1 dd, 2 ff, 2 inf h, 2 inf i, sd h",
+        "commodities": 3,
+        "startingTechOptions": [],
+        "startingTechAmount": 0,
+        "factionTech": [
+            "sophonomg",
+            "sophonosg"
+        ],
+        "homePlanets": [
+            "hekim",
+            "illumination"
+        ],
+        "abilities": [
+            "dangerous_science",
+            "wild_curiosity"
+        ],
+        "leaders": [
+            "sophonagent",
+            "sophoncommander",
+            "sophonhero"
+        ],
+        "promissoryNotes": [
+            "sophonpn"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "sophon_flagship",
+            "infantry",
+            "sophon_mech",
+            "pds",
+            "spacedock",
+            "warsun"
+        ],
+        "complexity": "High",
+        "source": "endlesst"
+    },
+    {
+        "alias": "craver",
+        "factionName": "The Craver Swarm",
+        "homeSystem": "et2",
+        "startingFleet": "1 cr, 1 cv, 1 dn, 10 inf h",
+        "commodities": 2,
+        "factionTech": [
+            "cravercr",
+            "craversd"
+        ],
+        "startingTech": [
+            "sar",
+            "dxa"
+        ],
+        "homePlanets": [
+            "husk"
+        ],
+        "abilities": [
+            "galactic_locusts",
+            "exploitation",
+            "craver_exodus"
+        ],
+        "leaders": [
+            "craveragent",
+            "cravercommander",
+            "craverhero"
+        ],
+        "promissoryNotes": [
+            "craverpn"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "craver_cruiser",
+            "carrier",
+            "dreadnought",
+            "craver_flagship",
+            "infantry",
+            "craver_mech",
+            "pds",
+            "craver_spacedock"
+        ],
+        "complexity": "Moderate",
+        "source": "endlesst"
+    },
+    {
+        "alias": "horatio",
+        "factionName": "The Horatio Supremacy",
+        "homeSystem": "et3",
+        "startingFleet": "2 cv, 3 ff, 1 cr, 4 inf h, sd h",
+        "commodities": 3,
+        "factionTech": [
+            "hwgreen",
+            "hwred",
+            "hwyellow",
+            "hwblue",
+            "horatiord"
+        ],
+        "startingTechOptions": [
+            "aida",
+            "pa"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [
+            "horatioprime"
+        ],
+        "abilities": [
+            "genetic_manipulation",
+            "technological_brilliance"
+        ],
+        "leaders": [
+            "horatioagent",
+            "horatiocommander",
+            "horatiohero"
+        ],
+        "promissoryNotes": [
+            "horatiopn"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "horatio_flagship",
+            "horatio_infantry",
+            "horatio_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Low",
+        "source": "endlesst"
+    },
+    {
+        "alias": "vaulter",
+        "factionName": "The Vaulter Remnants",
+        "homeSystem": "d11",
+        "startingFleet": "1 dd, 2 cv, 3 ff, 3 inf, sd",
+        "commodities": 3,
+        "factionTech": [
+            "vaultermf",
+            "vaulteribp"
+        ],
+        "startingTech": [
+            "sdn",
+            "det"
+        ],
+        "homePlanets": [],
+        "abilities": [
+            "involuntary_nomads",
+            "homebound",
+            "argosky_ability"
+        ],
+        "leaders": [
+            "vaulteragent",
+            "vaultercommander",
+            "vaulterhero"
+        ],
+        "promissoryNotes": [
+            "vaulterpn"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "vaulter_flagship",
+            "infantry",
+            "vaulter_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Low",
+        "source": "endlesst"
+    },
+    {
+        "alias": "vodyani",
+        "factionName": "The Church of the Vodyani",
+        "homeSystem": "et5",
+        "startingFleet": "2 cv, 5 ff, 1 inf c, 1 inf a, 1 inf e, sd c",
+        "commodities": 2,
+        "factionTech": [
+            "vodyaniff",
+            "vodyanica"
+        ],
+        "startingTechOptions": [
+            "ps",
+            "amd",
+            "sdn"
+        ],
+        "startingTechAmount": 2,
+        "homePlanets": [
+            "chrism",
+            "anchorite",
+            "eschaton"
+        ],
+        "abilities": [
+            "vodyani_crusade",
+            "great_armada",
+            "shipbound"
+        ],
+        "leaders": [
+            "vodyaniagent",
+            "vodyanicommander",
+            "vodyanihero"
+        ],
+        "promissoryNotes": [
+            "vodyanipn"
+        ],
+        "units": [
+            "vodyani_fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "vodyani_flagship",
+            "infantry",
+            "vodyani_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "High",
+        "source": "endlesst"
+    },
+    {
+        "alias": "lumeris",
+        "factionName": "The Lumeris Families",
+        "homeSystem": "et6",
+        "startingFleet": "2 cv, 1 cr, 2 ff, 2 inf j, 2 inf m, sd j, pds m",
+        "commodities": 4,
+        "factionTech": [
+            "lumerisdn",
+            "lumerisse"
+        ],
+        "startingTech": [
+            "nm"
+        ],
+        "homePlanets": [
+            "jenes",
+            "meos"
+        ],
+        "abilities": [
+            "wheelers_dealers",
+            "alternative_imports",
+            "ba_friends"
+        ],
+        "leaders": [
+            "lumerisagent",
+            "lumeriscommander",
+            "lumerishero"
+        ],
+        "promissoryNotes": [
+            "lumerispn"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "lumeris_dreadnought",
+            "lumeris_flagship",
+            "infantry",
+            "lumeris_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Low",
+        "source": "endlesst"
+    },
+    {
+        "alias": "unfallen",
+        "factionName": "The Unfallen",
+        "homeSystem": "et7",
+        "startingFleet": "1 cr, 1 cv, 1 dd, 4 inf k, sd k, pds k",
+        "commodities": 4,
+        "factionTech": [
+            "unfallenpds",
+            "unfallenht"
+        ],
+        "startingTech": [
+            "st",
+            "pa"
+        ],
+        "homePlanets": [
+            "koyasil"
+        ],
+        "abilities": [
+            "celestial_vines",
+            "budding_leaves",
+            "cautious_friends"
+        ],
+        "leaders": [
+            "unfallenagent",
+            "unfallencommander",
+            "unfallenhero"
+        ],
+        "promissoryNotes": [
+            "unfallenpn"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "unfallen_flagship",
+            "infantry",
+            "unfallen_mech",
+            "unfallen_pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "endlesst"
+    },
+    {
+        "alias": "riftborn",
+        "factionName": "The Riftborn Expedition",
+        "homeSystem": "et8",
+        "startingFleet": "2 cv, 3 ff, 1 inf v, 1 inf d, sd v, pds d",
+        "commodities": 3,
+        "factionTech": [
+            "riftborncs",
+            "riftbornrs",
+            "riftbornfs",
+            "riftbornss"
+        ],
+        "startingTech": [
+            "td"
+        ],
+        "homePlanets": [
+            "vanguard",
+            "diametus"
+        ],
+        "abilities": [
+            "riftborn_strangers",
+            "continuum_sculptors",
+            "masters_tands"
+        ],
+        "leaders": [
+            "riftbornagent",
+            "riftborncommander",
+            "riftbornhero"
+        ],
+        "promissoryNotes": [
+            "riftbornpn"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "riftborn_flagship",
+            "infantry",
+            "riftborn_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "High",
+        "source": "endlesst"
+    },
+    {
+        "alias": "hissho",
+        "factionName": "The Hissho Bushidan",
+        "homeSystem": "et9",
+        "startingFleet": "2 cv, 3 ff, 3 inf s, 2 inf u, sd s",
+        "commodities": 3,
+        "factionTech": [
+            "hisshodh",
+            "hissho_behemoth_citadel",
+            "hissho_behemoth_obliterator"
+        ],
+        "startingTechOptions": [
+            "ps",
+            "det"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [
+            "skyagoja",
+            "uchi"
+        ],
+        "abilities": [
+            "hissho_honor",
+            "behemoth_specialists",
+            "hissho_ritualistic"
+        ],
+        "leaders": [
+            "hisshoagent",
+            "hisshocommander",
+            "hisshohero"
+        ],
+        "promissoryNotes": [
+            "hisshopn"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "hissho_war_sun",
+            "hissho_flagship",
+            "infantry",
+            "hissho_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "High",
+        "source": "endlesst"
+    },
+    {
+        "alias": "uchoir",
+        "factionName": "The Umbral Choir",
+        "homeSystem": "et10",
+        "startingFleet": "2 cv, 3 ff, 1 dd, 4 inf v, sd v",
+        "commodities": 4,
+        "factionTech": [
+            "uchoirad",
+            "uchoirbl"
+        ],
+        "startingTech": [],
+        "homePlanets": [
+            "vexa8minor"
+        ],
+        "abilities": [
+            "anomalous_existence",
+            "enigmatic_agenda",
+            "in_the_shadows"
+        ],
+        "leaders": [
+            "uchoiragent",
+            "uchoircommander",
+            "uchoirhero"
+        ],
+        "promissoryNotes": [
+            "uchoirpn"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "uchoir_flagship",
+            "infantry",
+            "uchoir_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "endlesst"
+    },
+    {
+        "alias": "nakalim",
+        "factionName": "The Nakalim Progenitors",
+        "homeSystem": "et11",
+        "startingFleet": "1 cv, 2 dn, 4 ff, 4 inf s, sd s, pds s",
+        "commodities": 4,
+        "factionTech": [
+            "nakalimdd",
+            "nakalimpd"
+        ],
+        "startingTech": [
+            "gd",
+            "bs",
+            "md",
+            "gls"
+        ],
+        "homePlanets": [
+            "sobra"
+        ],
+        "abilities": [
+            "beliefs_breakthroughs",
+            "lost_lore"
+        ],
+        "leaders": [
+            "nakalimagent",
+            "nakalimcommander",
+            "nakalimhero"
+        ],
+        "promissoryNotes": [
+            "nakalimpn"
+        ],
+        "units": [
+            "fighter",
+            "nakalim_destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "nakalim_flagship",
+            "infantry",
+            "nakalim_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "High",
+        "source": "endlesst"
+    }
+]
