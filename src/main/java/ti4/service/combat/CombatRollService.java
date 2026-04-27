@@ -1177,13 +1177,13 @@ public class CombatRollService {
                                 .append(" due to ")
                                 .append(misses == 1 ? "a Thalnos miss" : "Thalnos misses")
                                 .append(".");
-                    delayedAfterTotalNotes.add(new CombatRollPayload.CombatRollNote(
-                            CombatRollNoteType.UNIT_DESTROYED_FROM_ROLL,
-                            CombatRollNotePlacement.AFTER_TOTAL,
-                            "thalnos",
-                            unitModel.getId(),
-                            misses,
-                            Map.of("actorEmoji", player.getFactionEmoji(), "unitName", unitModel.getName())));
+                        delayedAfterTotalNotes.add(new CombatRollPayload.CombatRollNote(
+                                CombatRollNoteType.UNIT_DESTROYED_FROM_ROLL,
+                                CombatRollNotePlacement.AFTER_TOTAL,
+                                "thalnos",
+                                unitModel.getId(),
+                                misses,
+                                Map.of("actorEmoji", player.getFactionEmoji(), "unitName", unitModel.getName())));
                         thalnosUnits(event, game, player, misses, unitModel.getUnitType());
                     } else {
                         if (misses > 0) {

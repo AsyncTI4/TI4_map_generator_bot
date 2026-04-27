@@ -100,7 +100,7 @@ public class TfBlessResolver implements EdictResolver {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "You have already resolved this edict.");
             return;
         }
-        player.addStoredValue(buttonID, "y");
+        player.setStoredValue(buttonID, "y");
         CommandCounterButtonHandler.gainCC(event, player, game);
         afterResolve(event, game, player);
     }
