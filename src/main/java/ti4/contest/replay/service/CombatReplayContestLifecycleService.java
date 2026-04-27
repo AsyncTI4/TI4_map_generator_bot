@@ -48,6 +48,7 @@ public class CombatReplayContestLifecycleService {
     private static final String CONTEST_CHANNEL_NAME_V1 = "lazax-war-archives-dev";
     private static final String CONTEST_CHANNEL_NAME_V2 = "lazax-war-archives";
     private static final long SHADOW_DISCORD_ID = 0L;
+    private static final String PROMOTION_DISABLED_REASON = "Candidate-to-contest promotion is disabled.";
     private static final List<String> PREDICTION_LOCK_TITLES = List.of(
             "The Wagers Open",
             "The Archives Open",
@@ -79,6 +80,8 @@ public class CombatReplayContestLifecycleService {
     private final ReplayDispatchSerializer payloadSerializer;
 
     public void promoteBestCandidateIfDue() {
+        if (!settings.getPromotion().isEnabled()) return;
+
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
         int maxPromotionsPerHour = settings.getPromotion().getMaxPromotionsPerHour();
         if (maxPromotionsPerHour <= 0) return;
@@ -111,6 +114,7 @@ public class CombatReplayContestLifecycleService {
 
     public ForcePromoteResult forcePromoteCandidate(Long candidateId) {
         if (candidateId == null) return ForcePromoteResult.rejected("candidateId is required");
+        if (!settings.getPromotion().isEnabled()) return ForcePromoteResult.rejected(PROMOTION_DISABLED_REASON);
 
         CombatCandidateEntity candidate =
                 candidateRepository.findById(candidateId).orElse(null);
