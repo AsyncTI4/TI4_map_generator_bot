@@ -1,0 +1,17 @@
+{
+    "tileBack": "green",
+    "id": "et10",
+    "name": "Vexa 8 Minor -- The Umbral Choir",
+    "aliases": [
+        "et10",
+        "vexa8minor",
+        "uchoir"
+    ],
+    "imagePath": "et10.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "vexa8minor"
+    ],
+    "source": "endlesst"
+}

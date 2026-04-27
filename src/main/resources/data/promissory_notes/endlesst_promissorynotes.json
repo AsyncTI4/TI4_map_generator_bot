@@ -1,0 +1,122 @@
+[
+    {
+        "alias": "uempirepn",
+        "name": "The Emperor's Voice",
+        "faction": "uempire",
+        "color": "",
+        "playArea": true,
+        "playImmediately": true,
+        "source": "endlesst",
+        "text": "When you receive this promissory note, if it is the Agenda Phase, return this card to the United Empire player. Otherwise, place it face-up in your play area. During the Agenda phase, you always vote after the United Empire player. When you vote, you may add an additional vote for each Command Token on your faction sheet. If you vote for an outcome to an agenda that the United Empire player did not vote for or predict, return this card to the United Empire player."
+    },
+     {
+        "alias": "sophonpn",
+        "name": "Experimental Extravaganza",
+        "faction": "sophon",
+        "color": "",
+        "playArea": false,
+        "playImmediately": false,
+        "source": "endlesst",
+        "text": "At the start of the Status Phase, choose a non-faction technology the Sophon player owns. When you do, remove a command token from your fleet pool for each prerequisite you do not meet. Then gain that technology and return this card to the Sophon player."
+    },
+     {
+        "alias": "craverpn",
+        "name": "Craver Reparations",
+        "faction": "craver",
+        "color": "",
+        "playArea": false,
+        "playImmediately": false,
+        "source": "endlesst",
+        "text": "When the Craver player places a Locust token: You may return this card to the Craver player to gain a number of trade goods equal to either that planet's Influence or Resource value."
+    },
+     {
+        "alias": "horatiopn",
+        "name": "Borrowed Ingenuity",
+        "faction": "craver",
+        "color": "",
+        "playArea": false,
+        "playImmediately": false,
+        "source": "endlesst",
+        "text": "When researching a unit upgrade technology: You may return this card to the Horatio player to ignore one prerequisite."
+    },
+     {
+        "alias": "vaulterpn",
+        "name": "Vaulter Planetary Synchronization",
+        "faction": "vaulter",
+        "color": "",
+        "playArea": true,
+        "playImmediately": true,
+        "source": "endlesst",
+        "text": "When you receive this promissory note, if you are not the Vaulter player, place it face-up into your play area. This card has the text of all legendary planet cards you control while it is in your play area, except for A Song like Marrow. After you pass, if this card is exhausted, return it to the Vaulter player."
+    },
+     {
+        "alias": "vodyanipn",
+        "name": "Benevolent Conversion",
+        "faction": "vodyani",
+        "color": "",
+        "playArea": false,
+        "playImmediately": false,
+        "source": "endlesst",
+        "text": "ACTION: Remove all of your infantry from a planet that is in the same system or in a system adjacent to a planet the Vodyani player controls. For each unit returned to your reinforcements in this way, gain a trade good. Then, return this card to the Vodyani player."
+    },
+     {
+        "alias": "lumerispn",
+        "name": "Shadow Banking",
+        "faction": "Lumeris",
+        "color": "",
+        "playArea": false,
+        "playImmediately": false,
+        "source": "endlesst",
+        "text": "When the Lumeris player performs a strategic action: Play this card and give three trade goods to the Lumeris player to use the secondary ability of their strategy card without spending a command token. At the end of that strategic action, return this card to the Lumeris player."
+    },
+     {
+        "alias": "unfallenpn",
+        "name": "Organic Sentinels",
+        "faction": "unfallen",
+        "color": "",
+        "playArea": false,
+        "playImmediately": false,
+        "source": "endlesst",
+        "text": "ACTION: Remove a Command Token from your faction sheet to place a PDS on any planet you control in an Entangled system. Then, return this card to the Unfallen player."
+    },
+     {
+        "alias": "riftbornpn",
+        "name": "Student of the Expedition",
+        "faction": "riftborn",
+        "color": "",
+        "playArea": true,
+        "playImmediately": true,
+        "source": "endlesst",
+        "text": "When you receive this card, if you are not the Riftborn player, immediately place it into your play area. Whenever you activate a system that contains one of the Riftborn's units, return this card to the Riftborn player. Whenever the Riftborn uses their Masters of Space and Time ability, you may ready any one technology you control."
+    },
+     {
+        "alias": "hisshopn",
+        "name": "Toksoto Strike",
+        "faction": "hissho",
+        "color": "",
+        "playArea": false,
+        "playImmediately": false,
+        "source": "endlesst",
+        "text": "During the first round of space combat, you may play this card before combat dice are rolled to produce one hit against your opponent. They must assign it immediately. Then, return this card to the Hissho player. They gain one Keii."
+    },
+     {
+        "alias": "uchoirpn",
+        "name": "Euphonic Ensemble",
+        "faction": "uchoir",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "source": "endlesst",
+        "text": "ACTION: Gain a command token, then place this card face-up in your play area. Whenever the Umbral Choir player would place the 9 token on their Strategy Card while this card is in your play area, return this card to the Umbral Choir player and place the 9 token on your Strategy Card instead. You are last in initiative order."
+    },
+     {
+        "alias": "nakalimpn",
+        "name": "Tribute and Supplication",
+        "faction": "uchoir",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "source": "endlesst",
+        "text": "During your turn, you may give this card and a relic fragment to the Nakalim player to draw an action card."
+    }
+]
