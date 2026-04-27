@@ -13,10 +13,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
       - name: Detect changed files
         id: diff
         run: |
+          git fetch --depth=1 origin ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}
           BASE=${{ github.event.pull_request.base.sha }}
           HEAD=${{ github.event.pull_request.head.sha }}
           CHANGED_JSON=$(git diff --name-only "$BASE" "$HEAD" | grep -E '\.json$' || true)
