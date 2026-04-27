@@ -1,34 +1,29 @@
 package ti4.contest.replay.service;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ti4.contest.replay.core.CombatCandidateEventType;
 import ti4.contest.replay.core.CombatContestSettings;
-import ti4.contest.replay.core.CombatRollPayload;
-import ti4.contest.replay.core.CombatRollPayload.RollSegmentType;
 import ti4.contest.replay.core.CombatSideBetType;
+import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
-import ti4.contest.replay.dispatch.ReplayDispatchPayload;
-import ti4.contest.replay.dispatch.ReplayDispatchSerializer;
 import ti4.contest.replay.entities.CombatCandidateEntity;
-import ti4.contest.replay.entities.CombatCandidateEventEntity;
 import ti4.contest.replay.entities.CombatContestSideBetEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
-import ti4.contest.replay.repository.CombatCandidateEventRepository;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.CombatModHelper;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
+import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.CombatStatsService;
 import ti4.service.combat.CombatUnitSelectionHelper;
@@ -42,16 +37,7 @@ public class CombatReplaySideBetPayoutService {
 
     public static final String ODDS_V1 = "ODDS_V1";
 
-    private static final EnumSet<RollSegmentType> OPENING_ROLL_SEGMENTS = EnumSet.of(
-            RollSegmentType.PRIMARY,
-            RollSegmentType.SUPERCHARGE_SELECTED_UNIT,
-            RollSegmentType.SUPERCHARGE_REST,
-            RollSegmentType.GRAVLEASH_SELECTED_UNIT,
-            RollSegmentType.GRAVLEASH_REST);
-
     private final CombatContestSettings settings;
-    private final CombatCandidateEventRepository candidateEventRepository;
-    private final ReplayDispatchSerializer payloadSerializer;
 
     public int offeredPayout(
             CombatReplayContestEntity contest,
@@ -59,25 +45,30 @@ public class CombatReplaySideBetPayoutService {
             CombatSideBetType betType,
             String targetFaction) {
         if (!ODDS_V1.equalsIgnoreCase(contest.getSideBetPayoutModel())
-                || (betType != CombatSideBetType.ROUND_ONE_WHIFF
+                || (betType != CombatSideBetType.AFB_WHIFF
+                        && betType != CombatSideBetType.ROUND_ONE_WHIFF
                         && betType != CombatSideBetType.ROUND_ONE_SLAM
                         && betType != CombatSideBetType.WINNER_ONE_HP)) {
             return fixedPayout(betType);
         }
 
         if (betType == CombatSideBetType.WINNER_ONE_HP) {
-            return candidate.getAttackerHp() == null || candidate.getDefenderHp() == null
+            InitialSnapshotCombatContext context = initialSnapshotCombatContext(candidate, null);
+            return context == null
                     ? fixedPayout(betType)
-                    : hpPayout(candidate.getAttackerHp(), candidate.getDefenderHp());
+                    : hpPayout(
+                            context.snapshot().attackerHp(), context.snapshot().defenderHp());
+        }
+
+        if (betType == CombatSideBetType.AFB_WHIFF) {
+            Double probability = afbWhiffProbabilityFromInitialSnapshot(candidate, targetFaction);
+            if (probability == null) return fixedPayout(betType);
+            return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(probability);
         }
 
         boolean slam = betType == CombatSideBetType.ROUND_ONE_SLAM;
         Double probability = openingRoundProbabilityFromInitialSnapshot(candidate, targetFaction, slam);
-        if (probability == null) {
-            CombatRollPayload payload = roundOnePayload(candidate, targetFaction);
-            if (payload == null) return fixedPayout(betType);
-            probability = eventProbability(payload.unitRolls(), slam);
-        }
+        if (probability == null) return fixedPayout(betType);
 
         return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(probability);
     }
@@ -85,6 +76,12 @@ public class CombatReplaySideBetPayoutService {
     public int resolvedProfitPoints(CombatContestSideBetEntity sideBet) {
         Integer offeredProfitPoints = sideBet.getOfferedProfitPoints();
         return offeredProfitPoints == null ? sideBet.getBetType().profitPoints() : offeredProfitPoints;
+    }
+
+    public boolean hasAfbUnits(CombatCandidateEntity candidate, String targetFaction) {
+        InitialSnapshotCombatContext context = initialSnapshotCombatContext(candidate, targetFaction);
+        return context != null
+                && !collectAfbUnits(context.tile(), context.player()).isEmpty();
     }
 
     private int fixedPayout(CombatSideBetType betType) {
@@ -111,48 +108,140 @@ public class CombatReplaySideBetPayoutService {
         double x = Math.max(0.0, totalHp - 8.0) / 52.0;
         int profitPoints = (int) Math.round(3.0 + Math.pow(x, 1.35) * (64.0 + 8.0 * Math.sqrt(balance)));
         profitPoints = Math.max(3, profitPoints);
-        return Math.min(settings.getSideBets().getDynamicPayoutCap(), profitPoints);
+        return Math.min(settings.getSideBets().getDynamicPayoutCap(), profitPoints * 2);
     }
 
     private Double openingRoundProbabilityFromInitialSnapshot(
             CombatCandidateEntity candidate, String targetFaction, boolean slam) {
+        InitialSnapshotCombatContext context = initialSnapshotCombatContext(candidate, targetFaction);
+        if (context == null) return null;
+
+        Map<UnitModel, Integer> playerUnits =
+                CombatUnitSelectionHelper.collectCombatRoundUnits(context.tile(), context.space(), context.player());
+        Map<UnitModel, Integer> opponentUnits =
+                CombatUnitSelectionHelper.collectCombatRoundUnits(context.tile(), context.space(), context.opponent());
+        TileModel tileModel = TileHelper.getTileById(context.tile().getTileID());
+        List<NamedCombatModifierModel> hitModifiers = CombatModHelper.getModifiers(
+                context.player(),
+                context.opponent(),
+                playerUnits,
+                opponentUnits,
+                tileModel,
+                context.game(),
+                CombatRollType.combatround,
+                Constants.COMBAT_MODIFIERS);
+        List<NamedCombatModifierModel> extraRollModifiers = CombatModHelper.getModifiers(
+                context.player(),
+                context.opponent(),
+                playerUnits,
+                opponentUnits,
+                tileModel,
+                context.game(),
+                CombatRollType.combatround,
+                Constants.COMBAT_EXTRA_ROLLS);
+
+        return eventProbability(
+                playerUnits,
+                context.player(),
+                context.opponent(),
+                context.game(),
+                context.tile(),
+                context.space(),
+                hitModifiers,
+                extraRollModifiers,
+                CombatRollType.combatround,
+                slam);
+    }
+
+    private Double afbWhiffProbabilityFromInitialSnapshot(CombatCandidateEntity candidate, String targetFaction) {
+        InitialSnapshotCombatContext context = initialSnapshotCombatContext(candidate, targetFaction);
+        if (context == null) return null;
+
+        Map<UnitModel, Integer> playerUnits = collectAfbUnits(context.tile(), context.player());
+        if (playerUnits.isEmpty()) return null;
+        Map<UnitModel, Integer> opponentUnits =
+                CombatUnitSelectionHelper.collectCombatRoundUnits(context.tile(), context.space(), context.opponent());
+        TileModel tileModel = TileHelper.getTileById(context.tile().getTileID());
+        List<NamedCombatModifierModel> hitModifiers = CombatModHelper.getModifiers(
+                context.player(),
+                context.opponent(),
+                playerUnits,
+                opponentUnits,
+                tileModel,
+                context.game(),
+                CombatRollType.AFB,
+                Constants.COMBAT_MODIFIERS);
+        List<NamedCombatModifierModel> extraRollModifiers = CombatModHelper.getModifiers(
+                context.player(),
+                context.opponent(),
+                playerUnits,
+                opponentUnits,
+                tileModel,
+                context.game(),
+                CombatRollType.AFB,
+                Constants.COMBAT_EXTRA_ROLLS);
+
+        return eventProbability(
+                playerUnits,
+                context.player(),
+                context.opponent(),
+                context.game(),
+                context.tile(),
+                context.space(),
+                hitModifiers,
+                extraRollModifiers,
+                CombatRollType.AFB,
+                false);
+    }
+
+    private Map<UnitModel, Integer> collectAfbUnits(Tile tile, Player player) {
+        Map<String, Integer> unitsByAsyncId = new java.util.HashMap<>();
+        String colorId = Mapper.getColorID(player.getColor());
+        for (UnitHolder holder : tile.getUnitHolders().values()) {
+            for (Map.Entry<String, Integer> entry :
+                    holder.getUnitAsyncIdsOnHolder(colorId).entrySet()) {
+                unitsByAsyncId.merge(entry.getKey(), entry.getValue(), Integer::sum);
+            }
+        }
+
+        Map<UnitModel, Integer> afbUnits = new java.util.HashMap<>();
+        for (Map.Entry<String, Integer> entry : unitsByAsyncId.entrySet()) {
+            UnitModel unit = player.getPriorityUnitByAsyncID(entry.getKey(), null);
+            if (unit != null && unit.getAfbDieCount(player) > 0) {
+                afbUnits.put(unit, entry.getValue());
+            }
+        }
+        if (player.hasRelic("metalivoidarmaments")) {
+            afbUnits.put(CombatRollService.getMetaliAFBUnit(player), 1);
+        }
+        return afbUnits;
+    }
+
+    private InitialSnapshotCombatContext initialSnapshotCombatContext(
+            CombatCandidateEntity candidate, String targetFaction) {
         String snapshotJson = candidate.getInitialRenderSnapshotJson();
         if (snapshotJson == null || snapshotJson.isBlank()) return null;
 
         Game game = CombatReplayTileRenderer.render(snapshotJson, snapshotJson);
         if (game == null) return null;
         Tile tile = game.getTileByPosition(candidate.getTilePosition());
-        if (tile == null) tile = game.getTileByPosition(game.getActiveSystem());
-        Player player = game.getPlayerFromColorOrFaction(targetFaction);
-        Player opponent = opponentFor(game, candidate, targetFaction);
+        Player attacker = game.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
+        Player defender = game.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
+        Player player = targetFaction == null ? attacker : game.getPlayerFromColorOrFaction(targetFaction);
+        Player opponent = targetFaction == null ? defender : opponentFor(game, candidate, targetFaction);
         UnitHolder space = tile == null ? null : tile.getUnitHolders().get(Constants.SPACE);
-        if (tile == null || player == null || opponent == null || space == null) return null;
-
-        Map<UnitModel, Integer> playerUnits = CombatUnitSelectionHelper.collectCombatRoundUnits(tile, space, player);
-        Map<UnitModel, Integer> opponentUnits =
-                CombatUnitSelectionHelper.collectCombatRoundUnits(tile, space, opponent);
-        TileModel tileModel = TileHelper.getTileById(tile.getTileID());
-        List<NamedCombatModifierModel> hitModifiers = CombatModHelper.getModifiers(
-                player,
-                opponent,
-                playerUnits,
-                opponentUnits,
-                tileModel,
-                game,
-                CombatRollType.combatround,
-                Constants.COMBAT_MODIFIERS);
-        List<NamedCombatModifierModel> extraRollModifiers = CombatModHelper.getModifiers(
-                player,
-                opponent,
-                playerUnits,
-                opponentUnits,
-                tileModel,
-                game,
-                CombatRollType.combatround,
-                Constants.COMBAT_EXTRA_ROLLS);
-
-        return eventProbability(
-                playerUnits, player, opponent, game, tile, space, hitModifiers, extraRollModifiers, slam);
+        if (tile == null
+                || attacker == null
+                || defender == null
+                || player == null
+                || opponent == null
+                || space == null) {
+            return null;
+        }
+        LazaxCombatSupport.SpaceCombatSnapshot snapshot =
+                LazaxCombatSupport.buildSpaceCombatSnapshot(game, attacker, defender, tile);
+        if (snapshot == null) return null;
+        return new InitialSnapshotCombatContext(game, tile, space, player, opponent, snapshot);
     }
 
     private Player opponentFor(Game game, CombatCandidateEntity candidate, String targetFaction) {
@@ -171,6 +260,7 @@ public class CombatReplaySideBetPayoutService {
             UnitHolder space,
             List<NamedCombatModifierModel> hitModifiers,
             List<NamedCombatModifierModel> extraRollModifiers,
+            CombatRollType rollType,
             boolean slam) {
         double probability = 1.0;
         int dice = 0;
@@ -178,90 +268,40 @@ public class CombatReplaySideBetPayoutService {
         for (Map.Entry<UnitModel, Integer> entry : unitCounts.entrySet()) {
             UnitModel unit = entry.getKey();
             int quantity = entry.getValue();
-            CombatStatsService.CombatRoundProfile profile =
-                    CombatStatsService.getCombatRoundProfile(true, unit, player, tile, opponent, false);
-            int modifier = CombatModHelper.getCombinedModifierForUnit(
-                    unit,
-                    quantity,
-                    hitModifiers,
-                    player,
-                    opponent,
-                    game,
-                    playerUnitTypes,
-                    CombatRollType.combatround,
-                    tile,
-                    space);
-            int extraDice = CombatModHelper.getCombinedModifierForUnit(
-                    unit,
-                    quantity,
-                    extraRollModifiers,
-                    player,
-                    opponent,
-                    game,
-                    playerUnitTypes,
-                    CombatRollType.combatround,
-                    tile,
-                    space);
-            int diceCount = Math.max(0, quantity * profile.diceCount() + extraDice);
-            if (diceCount == 0) continue;
-            double hitChance = hitChance(profile.hitsOn() - modifier);
-            probability *= Math.pow(slam ? hitChance : 1.0 - hitChance, diceCount);
-            dice += diceCount;
-        }
-        return dice == 0 ? 0.0 : probability;
-    }
-
-    private CombatRollPayload roundOnePayload(CombatCandidateEntity candidate, String targetFaction) {
-        for (CombatCandidateEventEntity event :
-                candidateEventRepository.findByCandidateIdOrderBySequenceNumberAsc(candidate.getId())) {
-            if (event.getEventType() != CombatCandidateEventType.ROLL) continue;
-            if (!Integer.valueOf(1).equals(event.getRoundNumber())) continue;
-            if (!targetFaction.equalsIgnoreCase(event.getActorFaction())) continue;
-
-            CombatRollPayload payload = readCombatRollPayload(event);
-            if (isRoundOneCombatPayload(payload)) {
-                return payload;
+            int dicePerUnit;
+            int hitsOn;
+            if (rollType == CombatRollType.combatround) {
+                CombatStatsService.CombatRoundProfile profile =
+                        CombatStatsService.getCombatRoundProfile(true, unit, player, tile, opponent, false);
+                dicePerUnit = profile.diceCount();
+                hitsOn = profile.hitsOn();
+            } else {
+                dicePerUnit = unit.getCombatDieCountForAbility(rollType, player);
+                hitsOn = unit.getCombatDieHitsOnForAbility(rollType, player);
             }
-        }
-        return null;
-    }
-
-    private CombatRollPayload readCombatRollPayload(CombatCandidateEventEntity event) {
-        ReplayDispatchPayload payload = payloadSerializer.read(event);
-        if (payload instanceof ReplayDispatchPayload.CombatRollDispatch combatRoll) {
-            return combatRoll.payload();
-        }
-        return null;
-    }
-
-    private boolean isRoundOneCombatPayload(CombatRollPayload payload) {
-        if (payload == null) return false;
-        CombatRollPayload.RollHeader header = payload.header();
-        return header != null && header.rollType() == CombatRollType.combatround;
-    }
-
-    private double eventProbability(List<CombatRollPayload.UnitRoll> unitRolls, boolean slam) {
-        double probability = 1.0;
-        int dice = 0;
-        for (CombatRollPayload.UnitRoll unitRoll : unitRolls) {
-            int diceCount = openingDiceCount(unitRoll);
-            if (diceCount <= 0) continue;
-            double hitChance = hitChance(unitRoll.effectiveThreshold());
+            int modifier = CombatModHelper.getCombinedModifierForUnit(
+                    unit, quantity, hitModifiers, player, opponent, game, playerUnitTypes, rollType, tile, space);
+            int extraDice = CombatModHelper.getCombinedModifierForUnit(
+                    unit, quantity, extraRollModifiers, player, opponent, game, playerUnitTypes, rollType, tile, space);
+            int diceCount = Math.max(0, quantity * dicePerUnit + extraDice);
+            if (diceCount == 0) continue;
+            double hitChance = hitChance(hitsOn - modifier);
             probability *= Math.pow(slam ? hitChance : 1.0 - hitChance, diceCount);
             dice += diceCount;
         }
         return dice == 0 ? 0.0 : probability;
-    }
-
-    private int openingDiceCount(CombatRollPayload.UnitRoll unitRoll) {
-        if (!OPENING_ROLL_SEGMENTS.contains(unitRoll.segmentType())) return 0;
-        int recordedDice = unitRoll.dice().size();
-        if (recordedDice > 0) return recordedDice;
-        return Math.max(0, unitRoll.quantity() * unitRoll.dicePerUnit() + unitRoll.extraDice());
     }
 
     private double hitChance(int effectiveThreshold) {
         int boundedThreshold = Math.max(1, Math.min(11, effectiveThreshold));
         return Math.max(0.0, Math.min(1.0, (11 - boundedThreshold) / 10.0));
     }
+
+    private record InitialSnapshotCombatContext(
+            Game game,
+            Tile tile,
+            UnitHolder space,
+            Player player,
+            Player opponent,
+            LazaxCombatSupport.SpaceCombatSnapshot snapshot) {}
 }

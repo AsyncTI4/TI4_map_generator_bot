@@ -18,7 +18,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayChannels;
 import ti4.contest.replay.entities.CombatCandidateEntity;
@@ -101,10 +100,9 @@ public class CombatReplayLeaderboardService {
         replayPredictionRepository.save(lockedPrediction);
     }
 
-    @Transactional
     public void clearLockedPredictions(Long replayContestId) {
         if (replayContestId == null) return;
-        replayPredictionRepository.deleteByContestId(replayContestId);
+        replayPredictionRepository.findByContestId(replayContestId).ifPresent(replayPredictionRepository::delete);
     }
 
     public void finalizeReplayLeaderboardContest(
@@ -113,12 +111,7 @@ public class CombatReplayLeaderboardService {
         if (replayContest.getId() == null) return;
         if (replayContest.getLeaderboardPostedAt() != null) return;
 
-        CombatReplayPredictionEntity lockedPrediction = replayPredictionRepository
-                .findByContestId(replayContest.getId())
-                .orElse(null);
-        ScoredContestResult result = lockedPrediction == null
-                ? scoreSideBetOnlyContest(candidate, replayContest)
-                : scoreContest(candidate, replayContest, lockedPrediction);
+        ScoredContestResult result = scoreReplayContest(candidate, replayContest);
         MessageChannel threadOrChannel = getContestThreadOrChannel(replayContest);
         if (threadOrChannel != null) {
             postPredictionResultsSummary(game, threadOrChannel, candidate, result, () -> {
@@ -229,6 +222,16 @@ public class CombatReplayLeaderboardService {
             CombatCandidateEntity candidate, CombatReplayContestEntity replayContest) {
         SideBetResolution sideBetResolution = sideBetService.resolveSideBets(candidate, replayContest);
         return new ScoredContestResult(0, List.of(), sideBetResolution.resolvedSideBets());
+    }
+
+    private synchronized ScoredContestResult scoreReplayContest(
+            CombatCandidateEntity candidate, CombatReplayContestEntity replayContest) {
+        CombatReplayPredictionEntity lockedPrediction = replayPredictionRepository
+                .findByContestId(replayContest.getId())
+                .orElse(null);
+        return lockedPrediction == null
+                ? scoreSideBetOnlyContest(candidate, replayContest)
+                : scoreContest(candidate, replayContest, lockedPrediction);
     }
 
     private ScoredContestResult scoreContest(

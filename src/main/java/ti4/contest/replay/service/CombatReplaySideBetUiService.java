@@ -96,6 +96,7 @@ public class CombatReplaySideBetUiService {
     private boolean isAvailableForFaction(
             CombatSideBetType type, CombatCandidateEntity candidate, String faction, CombatSideState state) {
         if (!type.isAvailable(state.destroyerCount())) return false;
+        if (type == CombatSideBetType.AFB_WHIFF) return payoutService.hasAfbUnits(candidate, faction);
         if (type != CombatSideBetType.AFB_SKIPPED) return true;
         return !(state.destroyerCount() == 1 && opponentHasAssaultCannon(candidate, faction));
     }

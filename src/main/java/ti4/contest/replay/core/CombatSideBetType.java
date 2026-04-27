@@ -13,7 +13,7 @@ public enum CombatSideBetType {
     /** Current AFB side bet: player skips available anti-fighter barrage. */
     AFB_SKIPPED("Skips AFB", UnitEmojis.destroyer, 1, 6),
     /** Current AFB side bet: player rolls AFB and scores zero hits. */
-    AFB_WHIFF("AFB Whiff", UnitEmojis.destroyer, 2, 4),
+    AFB_WHIFF("AFB Whiff", UnitEmojis.destroyer, 0, 4),
     /** Current dynamic side bet: player scores zero hits in their first combat roll. */
     ROUND_ONE_WHIFF("R1 Whiff", DiceEmojis.d10red_1, 0, 10),
     /** Current dynamic side bet: every die in player's first combat roll hits. */

@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.listeners.context.SelectionMenuContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.SelectionHandler;
@@ -15,6 +16,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.logging.RollbarManager;
 import ti4.service.game.GameNameService;
+import ti4.spring.context.SpringContext;
 
 @UtilityClass
 public final class SelectionMenuProcessor {
@@ -50,8 +52,15 @@ public final class SelectionMenuProcessor {
             RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
 
             if (context.isValid()) {
-                resolveSelectionMenu(context);
-                context.save();
+                CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
+                combatReplayService.setPreInteractionSnapshot(
+                        combatReplayService.capturePreInteractionSnapshot(context.getGame()));
+                try {
+                    resolveSelectionMenu(context);
+                    context.save();
+                } finally {
+                    combatReplayService.clearPreInteractionSnapshot();
+                }
             }
         } catch (Exception e) {
             String message = "Selection Menu issue in event: " + event.getComponentId() + "\n> Channel: "
