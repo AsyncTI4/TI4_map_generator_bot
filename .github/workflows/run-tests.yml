@@ -13,12 +13,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
       - name: Detect changed files
         id: diff
         run: |
+          git fetch --depth=1 origin ${{ github.event.pull_request.base.sha }}
           BASE=${{ github.event.pull_request.base.sha }}
-          HEAD=${{ github.event.pull_request.head.sha }}
+          HEAD=${{ github.sha }}
           CHANGED_JSON=$(git diff --name-only "$BASE" "$HEAD" | grep -E '\.json$' || true)
           if [ -n "$CHANGED_JSON" ]; then
             echo "has_json=true" >> "$GITHUB_OUTPUT"
@@ -68,11 +69,11 @@ jobs:
       - name: Fetch master branch for spotless
         if: steps.diff.outputs.has_java == 'true' && (steps.validate-json.outcome == 'success' || steps.validate-json.outcome == 'skipped')
         run: git fetch --no-tags --depth=1 origin master
-      - name: Set up JDK 21 for x64
+      - name: Set up JDK 26 for x64
         if: steps.diff.outputs.has_java == 'true' && (steps.validate-json.outcome == 'success' || steps.validate-json.outcome == 'skipped')
         uses: actions/setup-java@v5
         with:
-          java-version: "21"
+          java-version: "26"
           distribution: "corretto"
           architecture: x64
       - name: Cache Maven local repository

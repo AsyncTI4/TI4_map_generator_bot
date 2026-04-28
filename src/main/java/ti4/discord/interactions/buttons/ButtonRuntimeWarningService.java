@@ -10,8 +10,11 @@ import ti4.service.statistics.SREStats;
 
 class ButtonRuntimeWarningService {
 
-    private static final int WARNING_THRESHOLD_MILLISECONDS = 1500;
-    private static final int RUNTIME_WARNING_COUNT_THRESHOLD = 20;
+    private static final int PREPROCESSING_WARNING_THRESHOLD_MILLISECONDS = 2500;
+    private static final int PROCESSING_WARNING_THRESHOLD_MILLISECONDS = 1000;
+    private static final int RUNTIME_WARNING_COUNT_THRESHOLD = 10;
+    private static final int RESET_WARNING_COUNT_AFTER_SECONDS = 300;
+    private static final int PAUSE_AFTER_WARNING_SECONDS = 300;
 
     private int runtimeWarningCount;
     private Instant pauseWarningsUntil = Instant.now();
@@ -50,12 +53,12 @@ class ButtonRuntimeWarningService {
         SREStats.recordButtonProcessingMillis(processingTimeMs);
 
         var now = Instant.now();
-        if (lastWarningTime.isBefore(now.minusSeconds(60))) {
+        if (lastWarningTime.isBefore(now.minusSeconds(RESET_WARNING_COUNT_AFTER_SECONDS))) {
             runtimeWarningCount = 0;
         }
 
-        boolean slowPreprocess = preprocessingTimeMs >= WARNING_THRESHOLD_MILLISECONDS;
-        boolean slowExecution = processingTimeMs >= WARNING_THRESHOLD_MILLISECONDS;
+        boolean slowPreprocess = preprocessingTimeMs >= PREPROCESSING_WARNING_THRESHOLD_MILLISECONDS;
+        boolean slowExecution = processingTimeMs >= PROCESSING_WARNING_THRESHOLD_MILLISECONDS;
 
         if (!slowPreprocess && !slowExecution) {
             return;
@@ -82,7 +85,7 @@ class ButtonRuntimeWarningService {
                 + ButtonHelper.getButtonRepresentation(event.getButton())
                 + " in: [" + event.getChannel().getName() + "]("
                 + event.getMessage().getJumpUrl() + ") "
-                + "\n> ⚠ **Slow Button Warning:** Took over " + WARNING_THRESHOLD_MILLISECONDS + "ms"
+                + "\n> ⚠ **Slow Button Warning:**"
                 + "\n> 🕒 Event start: `" + eventTime + "`"
                 + "\n> 🧩 Built context in: `" + contextTime + "`"
                 + "\n> 🛠 Executed in: `" + resolveTime + "`"
@@ -96,7 +99,7 @@ class ButtonRuntimeWarningService {
         runtimeWarningCount++;
 
         if (runtimeWarningCount > RUNTIME_WARNING_COUNT_THRESHOLD) {
-            pauseWarningsUntil = now.plusSeconds(300);
+            pauseWarningsUntil = now.plusSeconds(PAUSE_AFTER_WARNING_SECONDS);
             BotLogger.error("**Buttons are processing slowly. Pausing warnings for 5 minutes.**");
             runtimeWarningCount = 0;
         }
@@ -106,7 +109,7 @@ class ButtonRuntimeWarningService {
 
     private static String formatMillisecondsWithWarning(long runtimeMs) {
         String formattedRuntime = DateTimeHelper.getTimeRepresentationToMilliseconds(runtimeMs);
-        if (runtimeMs >= WARNING_THRESHOLD_MILLISECONDS) {
+        if (runtimeMs >= PROCESSING_WARNING_THRESHOLD_MILLISECONDS) {
             return formattedRuntime + " ❗";
         }
         return formattedRuntime;

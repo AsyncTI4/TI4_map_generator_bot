@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.commands.Command;
 import ti4.discord.interactions.commands.GameStateContainer;
 import ti4.discord.interactions.commands.ParentCommand;
@@ -19,6 +20,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.RollbarManager;
 import ti4.service.SusSlashCommandService;
 import ti4.service.game.GameNameService;
+import ti4.spring.context.SpringContext;
 
 class SlashCommandListener extends ListenerAdapter implements CommandListenerInterface {
 
@@ -67,9 +69,15 @@ class SlashCommandListener extends ListenerAdapter implements CommandListenerInt
         RollbarManager.put("game_name", GameNameService.getGameName(event));
 
         ParentCommand command = SlashCommandManager.getCommand(event.getName());
+        Command<SlashCommandInteractionEvent> resolvedCommand = getCommand(event);
+        CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
         try {
             if (command.accept(event)) {
                 command.preExecute(event);
+                if (resolvedCommand instanceof GameStateContainer gameStateContainer) {
+                    combatReplayService.setPreInteractionSnapshot(
+                            combatReplayService.capturePreInteractionSnapshot(gameStateContainer.getGame()));
+                }
                 logSlashCommand(event);
                 command.execute(event);
                 command.postExecute(event);
@@ -80,6 +88,7 @@ class SlashCommandListener extends ListenerAdapter implements CommandListenerInt
         } catch (Exception e) {
             command.onException(event, e);
         } finally {
+            combatReplayService.clearPreInteractionSnapshot();
             RollbarManager.clear();
         }
 

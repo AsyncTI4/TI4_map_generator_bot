@@ -42,7 +42,9 @@ class MessageListener extends ListenerAdapter {
     // The mention itself is 23 characters long
     private static final int BOTHELPER_MENTION_REMINDER_MESSAGE_LENGTH_THRESHOLD = 53;
     private static final String BOTHELPER_MENTION_REMINDER_TEXT = """
-        Friendly reminder in case you forgot, please include the specific reason for the ping (e.g. something is not working, there is a bug, or you're not sure how to do something) and any other relevant information. This will speed up the process by allowing the staff to know how they can help. Thanks!\n\nPlease do not ping bothelper again, the first ping is enough, just explain without a 2nd ping.
+        Friendly reminder in case you forgot, please include the specific reason for the ping (e.g. something is not working, there is a bug, or you're not sure how to do something) and any other relevant information. This will speed up the process by allowing the staff to know how they can help. Thanks!
+
+        Please do not ping bothelper again, the first ping is enough, just explain without a 2nd ping.
         """;
     private static final List<String> INTERESTING_MESSAGES = List.of("gaslight", "please stop");
 

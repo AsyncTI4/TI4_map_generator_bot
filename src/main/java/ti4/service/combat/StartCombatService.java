@@ -18,6 +18,8 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
+import ti4.contest.replay.core.CombatReplayDecoys;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.other.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.game.Game;
@@ -51,7 +53,6 @@ import ti4.service.tech.BastionTechService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.spring.context.SpringContext;
-import ti4.spring.service.contest.CombatContestService;
 
 @UtilityClass
 public class StartCombatService {
@@ -120,7 +121,7 @@ public class StartCombatService {
             GenericInteractionCreateEvent event,
             String specialCombatTitle) {
         RoundStatsTracker.incrementCombatsInitiated(game, player);
-        SpringContext.getBean(CombatContestService.class).onSpaceCombatStarted(game, player, player2, tile);
+        SpringContext.getBean(CombatReplayService.class).onSpaceCombatStarted(game, player, player2, tile);
         String threadName = combatThreadName(game, player, player2, tile, specialCombatTitle);
         if (!game.isFowMode()) {
             findOrCreateCombatThread(
@@ -357,8 +358,17 @@ public class StartCombatService {
         if (amount > 2 || tile.getNumberOfUnitsInSystem() > 2) {
             MessageHelper.sendMessageToChannel(
                     threadChannel,
-                    ButtonHelper.getCombatTileSummaryMessage(
-                            game, tile, player1, event, spaceOrGround, unitHolderName, List.of(player1, player2)));
+                    CombatReplayDecoys.appendDebugDecoySummary(
+                            ButtonHelper.getCombatTileSummaryMessage(
+                                    game,
+                                    tile,
+                                    player1,
+                                    event,
+                                    spaceOrGround,
+                                    unitHolderName,
+                                    List.of(player1, player2)),
+                            game,
+                            tile));
         }
 
         // Space Cannon Offense

@@ -48,6 +48,9 @@ public class CombatReplayContestEntity {
     @Column(name = "side_bet_summary_message_id")
     private Long sideBetSummaryMessageId;
 
+    @Column(name = "side_bet_payout_model")
+    private String sideBetPayoutModel;
+
     @Column(name = "replay_status", nullable = false)
     private CombatContestReplayStatus replayStatus;
 

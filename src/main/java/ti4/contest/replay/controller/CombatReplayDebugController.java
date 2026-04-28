@@ -1,5 +1,6 @@
 package ti4.contest.replay.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ti4.contest.replay.core.CombatContestSettings;
+import ti4.contest.replay.core.CombatReplaySelection;
 import ti4.contest.replay.dispatch.ReplayDispatchSerializer;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatCandidateEventEntity;
@@ -50,10 +52,11 @@ public class CombatReplayDebugController {
 
     @GetMapping(value = "/candidates", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getTopCandidates() {
-        List<CandidateSummary> candidates =
-                candidateRepository.findAll(PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "startedAt"))).stream()
-                        .map(this::toCandidateSummary)
-                        .toList();
+        List<CandidateSummary> candidates = new ArrayList<>();
+        for (CombatCandidateEntity candidate :
+                candidateRepository.findAll(PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "startedAt")))) {
+            candidates.add(toCandidateSummary(candidate));
+        }
         return ok(new CandidateListResponse(runtimeState(), candidates));
     }
 
@@ -103,12 +106,11 @@ public class CombatReplayDebugController {
 
     @GetMapping(value = "/contests", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getLatestContests() {
-        List<ContestSummary> contests =
-                replayContestRepository
-                        .findAll(PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "postedAt")))
-                        .stream()
-                        .map(this::toContestSummary)
-                        .toList();
+        List<ContestSummary> contests = new ArrayList<>();
+        for (CombatReplayContestEntity contest :
+                replayContestRepository.findAll(PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "postedAt")))) {
+            contests.add(toContestSummary(contest));
+        }
         return ok(new ContestListResponse(runtimeState(), contests));
     }
 
@@ -145,9 +147,12 @@ public class CombatReplayDebugController {
 
     private RuntimeStateResponse runtimeState() {
         return new RuntimeStateResponse(
+                settings.getPromotion().isEnabled(),
+                settings.getRuntime().isDevMode(),
                 settings.getRuntime().isDiscordPostingEnabled(),
                 settings.getRuntime().isTrackAllCombatsAsCandidates(),
-                settings.getRuntime().isImmediatePromotionOnResolve());
+                settings.getRuntime().isImmediatePromotionOnResolve(),
+                settings.isDecoysEnabled());
     }
 
     private CandidateSummary toCandidateSummary(CombatCandidateEntity candidate) {
@@ -175,9 +180,12 @@ public class CombatReplayDebugController {
     }
 
     private List<EventResponse> loadEvents(Long candidateId) {
-        return candidateEventRepository.findByCandidateIdOrderBySequenceNumberAsc(candidateId).stream()
-                .map(this::toEventResponse)
-                .toList();
+        List<EventResponse> events = new ArrayList<>();
+        for (CombatCandidateEventEntity event :
+                candidateEventRepository.findByCandidateIdOrderBySequenceNumberAsc(candidateId)) {
+            events.add(toEventResponse(event));
+        }
+        return events;
     }
 
     private long eventCount(Long candidateId) {
@@ -191,11 +199,17 @@ public class CombatReplayDebugController {
     }
 
     private record RuntimeStateResponse(
-            boolean discordPostingEnabled, boolean trackAllCombatsAsCandidates, boolean immediatePromotionOnResolve) {}
+            boolean promotionEnabled,
+            boolean devMode,
+            boolean discordPostingEnabled,
+            boolean trackAllCombatsAsCandidates,
+            boolean immediatePromotionOnResolve,
+            boolean decoysEnabled) {}
 
     private record CandidateListResponse(RuntimeStateResponse runtime, List<CandidateSummary> candidates) {}
 
-    private record SelectionResponse(RuntimeStateResponse runtime, CombatReplayService.SelectionDebugView selection) {}
+    private record SelectionResponse(
+            RuntimeStateResponse runtime, CombatReplaySelection.SelectionDebugView selection) {}
 
     private record CandidateSummary(
             CombatCandidateEntity candidate,

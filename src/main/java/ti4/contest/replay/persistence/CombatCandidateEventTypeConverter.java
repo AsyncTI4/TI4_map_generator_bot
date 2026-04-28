@@ -14,13 +14,6 @@ public class CombatCandidateEventTypeConverter implements AttributeConverter<Com
 
     @Override
     public CombatCandidateEventType convertToEntityAttribute(String dbData) {
-        if (dbData == null) {
-            return null;
-        }
-        return switch (dbData) {
-            case "CARD", "AGENT", "LEADER", "RETREAT", "TECH_USE", "ASSAULT", "GRAVITON" ->
-                CombatCandidateEventType.INFO;
-            default -> CombatCandidateEventType.valueOf(dbData);
-        };
+        return dbData == null ? null : CombatCandidateEventType.valueOf(dbData);
     }
 }

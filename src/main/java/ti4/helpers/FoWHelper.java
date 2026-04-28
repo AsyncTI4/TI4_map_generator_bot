@@ -496,10 +496,9 @@ public final class FoWHelper {
     public static boolean isTileInUpgradedExileRange(Game game, Tile tile, Player player) {
         if (player.hasUnit("crimson_destroyer2")) {
             List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Destroyer);
-            for (String adjPos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+            for (String adjPos : getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
                 for (Tile tile2 : destroyers) {
-                    if (FoWHelper.getAdjacentTiles(game, adjPos, player, false, true)
-                            .contains(tile2.getPosition())) {
+                    if (getAdjacentTiles(game, adjPos, player, false, true).contains(tile2.getPosition())) {
                         return true;
                     }
                 }

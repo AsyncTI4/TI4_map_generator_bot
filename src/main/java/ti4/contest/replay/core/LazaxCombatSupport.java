@@ -3,6 +3,7 @@ package ti4.contest.replay.core;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -10,7 +11,6 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.contest.replay.entities.CombatCandidateEntity;
-import ti4.contest.replay.entities.CombatObservationEntity;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -20,8 +20,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.json.JsonMapperManager;
 import ti4.model.LeaderModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -34,12 +34,11 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.UnitEmojis;
-import ti4.spring.service.contest.CombatContestType;
 
-@UtilityClass
 /**
  * Shared combat helper logic for replay candidate filtering, scoring inputs, and Lazax replay text generation.
  */
+@UtilityClass
 public class LazaxCombatSupport {
 
     private static final Set<String> COMBAT_SUMMARY_TECH_ALIASES = Set.of("da", "asc", "gls", "x89", "x89c4");
@@ -76,11 +75,13 @@ public class LazaxCombatSupport {
         if (attacker.isDummy() || defender.isDummy() || !attacker.isRealPlayer() || !defender.isRealPlayer()) {
             return false;
         }
-        List<Player> shipPlayers = ButtonHelper.getPlayersWithShipsInTheSystem(game, tile).stream()
-                .filter(Player::isRealPlayer)
-                .filter(player -> !player.isDummy())
-                .toList();
-        return shipPlayers.size() == 2;
+        int realShipPlayers = 0;
+        for (Player player : ButtonHelper.getPlayersWithShipsInTheSystem(game, tile)) {
+            if (player.isRealPlayer() && !player.isDummy()) {
+                realShipPlayers++;
+            }
+        }
+        return realShipPlayers == 2;
     }
 
     public boolean hasExcludedFlagship(Player attacker, Player defender) {
@@ -91,15 +92,17 @@ public class LazaxCombatSupport {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         if (space == null) return null;
 
-        FleetStrength attackerStrength = calculateFleetStrength(game, attacker, defender, tile, space);
-        FleetStrength defenderStrength = calculateFleetStrength(game, defender, attacker, tile, space);
-        String summary = extractSpaceOnlySummary(ButtonHelper.getCombatTileSummaryMessage(
-                game, tile, attacker, null, "space", Constants.SPACE, List.of(attacker, defender)));
+        FleetStrength attackerStrength = calculateFleetStrength(attacker, defender, tile, space);
+        FleetStrength defenderStrength = calculateFleetStrength(defender, attacker, tile, space);
+        String summary = CombatReplayDecoys.appendDebugDecoySummary(
+                extractSpaceOnlySummary(ButtonHelper.getCombatTileSummaryMessage(
+                        game, tile, attacker, null, "space", Constants.SPACE, List.of(attacker, defender))),
+                game,
+                tile);
         String activePlayerSummary = formatActivePlayerSummary(game);
         String openerText = formatReplayHeader(game, tile, attacker, defender, activePlayerSummary);
         String parentPostText = openerText + "\n\n" + summary;
         return new SpaceCombatSnapshot(
-                CombatContestType.SPACE,
                 parentPostText,
                 activePlayerSummary,
                 summary,
@@ -111,8 +114,7 @@ public class LazaxCombatSupport {
                 defenderStrength.expectedHits());
     }
 
-    public FleetStrength calculateFleetStrength(
-            Game game, Player player, Player opponent, Tile tile, UnitHolder space) {
+    public FleetStrength calculateFleetStrength(Player player, Player opponent, Tile tile, UnitHolder space) {
         double total = 0;
         double hp = 0;
         double expectedHits = 0;
@@ -156,14 +158,12 @@ public class LazaxCombatSupport {
         if (lawSection != null) {
             message.append("\n").append(lawSection);
         }
-        String effectSection = formatCombatEffectSection(attacker.getGame());
+        String effectSection = formatCombatEffectSection(tile, attacker.getGame());
         if (effectSection != null) {
             message.append("\n").append(effectSection);
         }
         String actionCardSection = formatActionCardSection(attacker, defender);
-        if (actionCardSection != null) {
-            message.append("\n").append(actionCardSection);
-        }
+        message.append("\n").append(actionCardSection);
         String leaderSection = formatCombatLeaderSection(tile, attacker, defender);
         if (leaderSection != null) {
             message.append("\n").append(leaderSection);
@@ -172,11 +172,7 @@ public class LazaxCombatSupport {
     }
 
     public String formatReplayAnnouncement(
-            Game game,
-            CombatObservationEntity observation,
-            CombatCandidateEntity candidate,
-            String roleMention,
-            String startSummaryText) {
+            Game game, CombatCandidateEntity candidate, String roleMention, String startSummaryText) {
         Player attacker = game.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
         Player defender = game.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
         Tile tile = game.getTileByPosition(candidate.getTilePosition());
@@ -230,17 +226,25 @@ public class LazaxCombatSupport {
     }
 
     private String formatCombatTechLine(Player player) {
-        String techSummary = player.getTechs().stream()
-                .map(Mapper::getTech)
-                .filter(Objects::nonNull)
-                .filter(tech -> !player.getPurgedTechs().contains(tech.getAlias()))
-                .filter(tech -> tech.isFactionTech()
-                        || tech.isUnitUpgrade()
-                        || COMBAT_SUMMARY_TECH_ALIASES.contains(tech.getAlias()))
-                .sorted(TECH_COMPARATOR)
-                .map(tech -> formatCombatTech(player, tech))
-                .reduce((left, right) -> left + ", " + right)
-                .orElse("No technologies");
+        List<TechnologyModel> combatTechs = new ArrayList<>();
+        for (String techId : player.getTechs()) {
+            TechnologyModel tech = Mapper.getTech(techId);
+            if (tech == null) continue;
+            if (player.getPurgedTechs().contains(tech.getAlias())) continue;
+            if (!tech.isFactionTech()
+                    && !tech.isUnitUpgrade()
+                    && !COMBAT_SUMMARY_TECH_ALIASES.contains(tech.getAlias())) {
+                continue;
+            }
+            combatTechs.add(tech);
+        }
+        combatTechs.sort(TECH_COMPARATOR);
+
+        List<String> techLines = new ArrayList<>(combatTechs.size());
+        for (TechnologyModel tech : combatTechs) {
+            techLines.add(formatCombatTech(player, tech));
+        }
+        String techSummary = techLines.isEmpty() ? "No technologies" : String.join(", ", techLines);
         return formatPlayerSummaryLine(player, techSummary);
     }
 
@@ -268,18 +272,20 @@ public class LazaxCombatSupport {
     }
 
     private String formatCombatRelicLine(Player player) {
-        String relicSummary = player.getRelics().stream()
-                .distinct()
-                .filter(COMBAT_SUMMARY_RELIC_ALIASES::contains)
-                .map(Mapper::getRelic)
-                .filter(Objects::nonNull)
-                .map(relic -> ExploreEmojis.Relic + " " + relic.getName())
-                .sorted(String::compareToIgnoreCase)
-                .reduce((left, right) -> left + ", " + right)
-                .orElse(null);
-        if (relicSummary == null) return null;
+        Set<String> seenRelics = new HashSet<>();
+        List<String> relics = new ArrayList<>();
+        for (String relicId : player.getRelics()) {
+            if (!seenRelics.add(relicId)) continue;
+            if (!COMBAT_SUMMARY_RELIC_ALIASES.contains(relicId)) continue;
+            var relic = Mapper.getRelic(relicId);
+            if (relic != null) {
+                relics.add(ExploreEmojis.Relic + " " + relic.getName());
+            }
+        }
+        if (relics.isEmpty()) return null;
 
-        return formatPlayerSummaryLine(player, relicSummary);
+        relics.sort(String::compareToIgnoreCase);
+        return formatPlayerSummaryLine(player, String.join(", ", relics));
     }
 
     private String formatCombatLawSection(Player attacker, Player defender) {
@@ -305,8 +311,8 @@ public class LazaxCombatSupport {
         return formatPlayerSummaryLine(player, CardEmojis.Agenda + " Prophecy of Ixth");
     }
 
-    private String formatCombatEffectSection(Game game) {
-        if (!isQuietusActive(game)) {
+    private String formatCombatEffectSection(Tile tile, Game game) {
+        if (!isQuietusActive(tile, game)) {
             return null;
         }
         return "## Combat Effects\n- " + FactionEmojis.Crimson + " " + UnitEmojis.flagship
@@ -342,27 +348,33 @@ public class LazaxCombatSupport {
     }
 
     private String formatOtherLeaderSection(Game game, Player attacker, Player defender) {
-        List<String> lines = game.getRealPlayers().stream()
-                .filter(player -> !player.equals(attacker) && !player.equals(defender))
-                .map(LazaxCombatSupport::formatOtherCombatLeaderLine)
-                .filter(Objects::nonNull)
-                .toList();
+        List<String> lines = new ArrayList<>();
+        for (Player player : game.getRealPlayers()) {
+            if (player.equals(attacker) || player.equals(defender)) continue;
+            String line = formatOtherCombatLeaderLine(player);
+            if (line != null) {
+                lines.add(line);
+            }
+        }
         if (lines.isEmpty()) return null;
         return "### Other Leaders\n" + String.join("\n", lines);
     }
 
     private String formatOtherCombatLeaderLine(Player player) {
-        List<String> leaders = player.getLeaders().stream()
-                .filter(leader -> SPACE_COMBAT_AGENT_IDS.contains(leader.getId()))
-                .map(LazaxCombatSupport::formatLeaderSummary)
-                .toList();
+        List<String> leaders = new ArrayList<>();
+        for (Leader leader : player.getLeaders()) {
+            if (SPACE_COMBAT_AGENT_IDS.contains(leader.getId())) {
+                leaders.add(formatLeaderSummary(leader));
+            }
+        }
         return leaders.isEmpty() ? null : formatPlayerLeaderBlock(player, leaders);
     }
 
     private String formatCombatParticipantLeaderLine(Player player) {
-        List<String> leaders = player.getLeaders().stream()
-                .map(LazaxCombatSupport::formatLeaderSummary)
-                .toList();
+        List<String> leaders = new ArrayList<>();
+        for (Leader leader : player.getLeaders()) {
+            leaders.add(formatLeaderSummary(leader));
+        }
         return leaders.isEmpty() ? null : formatPlayerLeaderBlock(player, leaders);
     }
 
@@ -397,14 +409,18 @@ public class LazaxCombatSupport {
         return builder.toString();
     }
 
-    private boolean isQuietusActive(Game game) {
-        if (game == null) return false;
+    private boolean isQuietusActive(Tile combatTile, Game game) {
+        if (combatTile == null || game == null) return false;
         Player quietusOwner = Helper.getPlayerFromUnit(game, "crimson_flagship");
         if (quietusOwner == null) return false;
-        return game.getTileMap().values().stream()
+        UnitHolder combatSpace = combatTile.getSpaceUnitHolder();
+        if (combatSpace == null || !combatSpace.getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE)) {
+            return false;
+        }
+        return ButtonHelper.getTilesOfPlayersSpecificUnits(game, quietusOwner, UnitType.Flagship).stream()
                 .map(Tile::getSpaceUnitHolder)
                 .filter(Objects::nonNull)
-                .anyMatch(holder -> holder.getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE));
+                .anyMatch(unitHolder -> unitHolder.getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE));
     }
 
     private String formatPlayerSummaryLine(Player player, String summary) {
@@ -413,7 +429,7 @@ public class LazaxCombatSupport {
 
     private String formatPlayerSummaryHeader(Player player) {
         String emoji = player.getFactionEmoji();
-        if (emoji == null || emoji.isBlank()) {
+        if (emoji.isBlank()) {
             return "- " + player.getFaction();
         }
         return "- " + emoji;
@@ -491,16 +507,6 @@ public class LazaxCombatSupport {
                 + player.getUserName();
     }
 
-    private String extractRecordedActivePlayerSummary(String summaryText) {
-        if (summaryText == null || summaryText.isBlank()) return null;
-        for (String line : summaryText.split("\n")) {
-            if (line.startsWith("**Active Player:**")) {
-                return line + "\n";
-            }
-        }
-        return null;
-    }
-
     private String extractRecordedBoardSummary(String summaryText) {
         if (summaryText == null || summaryText.isBlank()) return null;
         int separator = summaryText.indexOf("\n\n");
@@ -510,21 +516,12 @@ public class LazaxCombatSupport {
         return summaryText.substring(separator + 2).trim();
     }
 
-    public String toJson(Object value) {
-        try {
-            return JsonMapperManager.basic().writeValueAsString(value);
-        } catch (Exception e) {
-            return "{}";
-        }
-    }
-
     private double safeRatio(double weaker, double stronger) {
         if (stronger <= 0) return 0.0;
         return Math.max(0.0, Math.min(1.0, weaker / stronger));
     }
 
     public record SpaceCombatSnapshot(
-            CombatContestType combatType,
             String replaySummaryText,
             String activePlayerSummary,
             String boardSummary,

@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.other.zephyrion.ZephyrionBountyButtonHandler;
@@ -59,7 +60,6 @@ import ti4.service.unit.GalvanizeService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 import ti4.spring.context.SpringContext;
-import ti4.spring.service.contest.CombatContestService;
 
 public final class ButtonHelperAgents {
 
@@ -606,13 +606,11 @@ public final class ButtonHelperAgents {
         ExhaustLeaderService.exhaustLeader(game, player, playerLeader);
         LeaderModel agentModel = playerLeader.getLeaderModel().orElse(null);
         if (agentModel != null) {
-            SpringContext.getBean(CombatContestService.class)
-                    .mirrorCombatEvent(
+            SpringContext.getBean(CombatReplayService.class)
+                    .mirrorLeaderPlayed(
                             game,
                             player,
-                            "Agent",
-                            "used _" + agentModel.getName() + "_.",
-                            agentModel.getRepresentationEmbed(),
+                            agentModel.getAlias(),
                             player.getCorrectChannel().getName());
         }
 

@@ -30,6 +30,7 @@ jobs:
         username: ${{ secrets.HOSTINGER_SSH_USER }}
         password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
         port: ${{ secrets.HOSTINGER_SSH_PORT }}
+        command_timeout: 30m
         envs: AWS_KEY, AWS_SECRET, DISCORD_BOT_TOKEN, DISCORD_BOT_USERID, REPO_DISPATCH_TOKEN, TI4_ULTIMATE_STATISTICS_API_KEY, MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY, DISCORD_REDIRECT_URI, DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, ROLLBAR_ACCESS_TOKEN, ROLLBAR_ENVIRONMENT, ROLLBAR_CODE_VERSION
         script: |
           set -eu
@@ -44,14 +45,6 @@ jobs:
           export IMAGE_REPOSITORY="${{ env.IMAGE_REPOSITORY }}"
           export IMAGE_TAG="master"
           compose_file="docker-compose.production.yml"
-          rollout_plugin_path="$HOME/.docker/cli-plugins/docker-rollout"
-
-          if ! docker rollout --help >/dev/null 2>&1; then
-            mkdir -p "$(dirname "$rollout_plugin_path")"
-            curl -fsSL https://raw.githubusercontent.com/wowu/docker-rollout/v0.13/docker-rollout -o "$rollout_plugin_path"
-            chmod +x "$rollout_plugin_path"
-            docker rollout --help >/dev/null
-          fi
           
           echo "Pulling docker image..."
           docker version
@@ -59,14 +52,8 @@ jobs:
           
           docker compose -f "$compose_file" up -d traefik
 
-          existing_bot_containers="$(docker compose -f "$compose_file" ps -q tibot || true)"
-          if [ -n "$existing_bot_containers" ]; then
-            echo "Rolling out TIBot..."
-            docker rollout -f "$compose_file" --timeout 600 --wait-after-healthy 2 --pre-stop-hook 'wget -qO- --post-data="" http://127.0.0.1:8081/api/public/deploy/drain || true; for i in $(seq 1 15); do wget -q -O - http://127.0.0.1:8081/api/public/ready >/dev/null 2>&1 || break; sleep 1; done' tibot
-          else
-            echo "Starting initial container..."
-            docker compose -f "$compose_file" up -d tibot
-          fi
+          echo "Rolling out one new TIBot container..."
+          COMPOSE_FILE="$compose_file" ROLLOUT_TIMEOUT_SECONDS=540 bash scripts/deploy_tibot_single_instance.sh
           echo "Cleaning up docker stuff..."
           
           docker image prune --force --filter until=48h

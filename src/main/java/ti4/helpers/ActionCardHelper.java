@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import ti4.contest.replay.core.CombatReplayTrackedEvent;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
@@ -51,7 +52,6 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.spring.context.SpringContext;
-import ti4.spring.service.contest.CombatContestService;
 
 @UtilityClass
 public class ActionCardHelper {
@@ -828,13 +828,11 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithEmbed(bEvent.getChannel(), message, acEmbed);
             }
         }
-        SpringContext.getBean(CombatContestService.class)
-                .mirrorCombatEvent(
+        SpringContext.getBean(CombatReplayService.class)
+                .mirrorActionCardPlayed(
                         game,
                         player,
-                        "Action Card",
-                        "played _" + actionCard.getName() + "_.",
-                        actionCard.getRepresentationEmbed(false, true, game),
+                        actionCard.getAlias(),
                         player.getCorrectChannel().getName(),
                         getCombatReplayTrackedEvent(actionCard));
 
@@ -2333,6 +2331,10 @@ public class ActionCardHelper {
         if (actionCard == null || actionCard.getAlias() == null) return CombatReplayTrackedEvent.NONE;
         if (MORALE_BOOST_IDS.contains(actionCard.getAlias())) return CombatReplayTrackedEvent.MORALE_BOOST;
         if (SHIELDS_HOLDING_IDS.contains(actionCard.getAlias())) return CombatReplayTrackedEvent.SHIELDS_HOLDING;
+        if ("Rout".equalsIgnoreCase(actionCard.getName())
+                || actionCard.getAlias().startsWith("rout")) {
+            return CombatReplayTrackedEvent.ROUT;
+        }
         return CombatReplayTrackedEvent.NONE;
     }
 }

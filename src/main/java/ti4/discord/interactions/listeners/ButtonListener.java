@@ -13,7 +13,6 @@ import ti4.contest.replay.buttons.CombatSideBetButtonIds;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.ButtonProcessor;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.DateTimeHelper;
 import ti4.logging.BotLogger;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
@@ -75,8 +74,8 @@ class ButtonListener extends ListenerAdapter {
 
     private static final class EventLatencyChecker {
 
-        private static final long THRESHOLD_MS = 1000;
-        private static final Duration WARNING_COOLDOWN_WINDOW = Duration.ofMinutes(5);
+        private static final long THRESHOLD_MS = 2000;
+        private static final Duration WARNING_COOLDOWN_WINDOW = Duration.ofMinutes(2);
         private static final int EVENT_COUNT_THRESHOLD = 10;
 
         private static final ConcurrentLinkedDeque<Long> slowEvents = new ConcurrentLinkedDeque<>();
@@ -90,7 +89,7 @@ class ButtonListener extends ListenerAdapter {
                 return;
             }
 
-            long eventTimeMs = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());
+            long eventTimeMs = event.getTimeCreated().toInstant().toEpochMilli();
             long latencyMs = now - eventTimeMs;
 
             if (latencyMs <= THRESHOLD_MS) {
@@ -103,8 +102,8 @@ class ButtonListener extends ListenerAdapter {
             Long ts;
             long windowMs = WARNING_COOLDOWN_WINDOW.toMillis();
 
-            while ((ts = slowEvents.peekFirst()) != null && now - ts > windowMs) {
-                slowEvents.pollFirst();
+            while (!slowEvents.isEmpty() && now - slowEvents.getFirst() > windowMs) {
+                slowEvents.removeFirst();
             }
 
             if (slowEvents.size() < EVENT_COUNT_THRESHOLD) {
@@ -117,8 +116,12 @@ class ButtonListener extends ListenerAdapter {
 
             slowEvents.clear();
 
-            BotLogger.error("⚠ **High Discord/JDA latency detected: " + EVENT_COUNT_THRESHOLD
-                    + "+ slow events in the last " + WARNING_COOLDOWN_WINDOW.toMinutes() + "  minutes.**");
+            long gatewayPing = event.getJDA().getGatewayPing();
+            BotLogger.error("⚠ **High Discord/JDA latency detected: "
+                    + EVENT_COUNT_THRESHOLD
+                    + "+ slow events in the last "
+                    + WARNING_COOLDOWN_WINDOW.toMinutes() + "  minutes.**"
+                    + "\nGateway ping: " + gatewayPing);
         }
     }
 }
