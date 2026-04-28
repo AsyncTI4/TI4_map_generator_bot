@@ -2536,6 +2536,7 @@ public final class ButtonHelperAbilities {
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit + " " + planet);
         String opponent = "their opponent's";
         String colour = "";
+        Player indoctrinatedPlayer = null;
         for (Player p2 : game.getPlayers().values()) {
             if (p2.getColor() == null
                     || p2 == player
@@ -2548,6 +2549,7 @@ public final class ButtonHelperAbilities {
                 ButtonHelper.resolveInfantryRemoval(p2, 1, tile);
                 opponent = p2.getRepresentationNoPing();
                 colour = p2.getColor();
+                indoctrinatedPlayer = p2;
                 break;
             }
         }
@@ -2610,6 +2612,13 @@ public final class ButtonHelperAbilities {
                     event.getMessageChannel(),
                     player.getRepresentationNoPing() + " replaced 1 of " + opponent + " infantry with 1 " + unit
                             + " on " + Helper.getPlanetRepresentation(planet, game) + " using **Indoctrination**.");
+        }
+        if (game.isFowMode() && indoctrinatedPlayer != null) {
+            MessageHelper.sendPrivateMessageToPlayer(
+                    indoctrinatedPlayer,
+                    game,
+                    player.getFactionEmoji() + " replaced 1 of your infantry with 1 " + unit + " on "
+                            + Helper.getPlanetRepresentation(planet, game) + " using **Indoctrination**.");
         }
         options.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(

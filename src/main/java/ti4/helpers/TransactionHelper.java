@@ -50,6 +50,16 @@ import ti4.settings.users.UserSettingsManager;
 
 public final class TransactionHelper {
 
+    public static MessageChannel getTradeNotificationChannel(Player player, Game game) {
+        if (game.isFowMode()) {
+            MessageChannel cardsInfoThread = player.getCardsInfoThread();
+            if (cardsInfoThread != null) {
+                return cardsInfoThread;
+            }
+        }
+        return player.getCorrectChannel();
+    }
+
     private static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
         List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
         List<Player> players = new ArrayList<>();
@@ -1680,8 +1690,10 @@ public final class TransactionHelper {
                 String msg = p1.getRepresentation() + " sent "
                         + (RandomHelper.isOneInX(20) ? "||a secret objective||" : "a secret objective") + " to "
                         + p2.getRepresentation() + ".";
-                MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), msg);
-                if (game.isFowMode()) MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
+                MessageHelper.sendMessageToChannel(getTradeNotificationChannel(p1, game), msg);
+                if (game.isFowMode()) {
+                    MessageHelper.sendMessageToChannel(getTradeNotificationChannel(p2, game), msg);
+                }
             }
             case "Frags" -> {
                 String fragType = amountToTrans.substring(0, 3).toUpperCase();
@@ -1700,7 +1712,7 @@ public final class TransactionHelper {
             case "Technology" -> {
                 p2.addTech(amountToTrans);
                 MessageHelper.sendMessageToChannel(
-                        p2.getCorrectChannel(),
+                        getTradeNotificationChannel(p2, game),
                         p2.getRepresentation() + ", you have received the technology _" + Mapper.getTech(amountToTrans)
                                 + "_ from a transaction.");
             }
@@ -1715,7 +1727,8 @@ public final class TransactionHelper {
         if (game.isFowMode()) {
             if (!message2.isEmpty()) {
                 MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), message2);
-                MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), "**🤝 Transaction:** " + message2);
+                MessageHelper.sendMessageToChannel(
+                        getTradeNotificationChannel(p2, game), "**🤝 Transaction:** " + message2);
             }
         } else {
             TextChannel channel = game.getMainGameChannel();
@@ -1977,9 +1990,9 @@ public final class TransactionHelper {
             String message2 = p1.getRepresentation() + " returned _"
                     + Mapper.getPromissoryNote(id).getName() + "_ from their play area to " + p2.getRepresentation()
                     + ".";
-            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message2);
+            MessageHelper.sendMessageToChannel(getTradeNotificationChannel(p2, game), message2);
             if (game.isFowMode()) {
-                MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), message2);
+                MessageHelper.sendMessageToChannel(getTradeNotificationChannel(p1, game), message2);
             }
         }
         ButtonHelper.deleteMessage(event);

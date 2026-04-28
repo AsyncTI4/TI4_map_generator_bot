@@ -7,6 +7,7 @@ import ti4.game.Player;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.TransactionHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
@@ -101,10 +102,10 @@ public class SendPromissoryService {
         } else {
             reportMsg = String.format(reportMsgFmt, "a promissory note to the hand");
         }
-        MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), reportMsg);
+        MessageHelper.sendMessageToChannel(TransactionHelper.getTradeNotificationChannel(receiver, game), reportMsg);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
-                    sender.getCorrectChannel(),
+                    TransactionHelper.getTradeNotificationChannel(sender, game),
                     reportMsg.replace(receiver.getRepresentation(), receiver.getColorIfCanSeeStats(sender)));
             String extra = null;
             if (model.getAlias().endsWith("_sftt")) extra = "Scores changed.";
@@ -142,9 +143,9 @@ public class SendPromissoryService {
     private static void reportReturnedProm(Game game, Player sender, Player receiver, PromissoryNoteModel model) {
         String reportMsg = sender.getRepresentation() + " returned " + model.getNameRepresentation() + " to "
                 + receiver.getRepresentation() + ".";
-        MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), reportMsg);
+        MessageHelper.sendMessageToChannel(TransactionHelper.getTradeNotificationChannel(receiver, game), reportMsg);
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(sender.getCorrectChannel(), reportMsg);
+            MessageHelper.sendMessageToChannel(TransactionHelper.getTradeNotificationChannel(sender, game), reportMsg);
             String extra = null;
             if (model.getAlias().endsWith("_sftt")) extra = "Scores changed.";
             FoWHelper.pingPlayersTransaction(game, null, sender, receiver, CardEmojis.PN + model.getName(), extra);

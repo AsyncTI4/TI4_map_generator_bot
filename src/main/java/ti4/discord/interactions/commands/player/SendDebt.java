@@ -9,6 +9,7 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
+import ti4.helpers.TransactionHelper;
 import ti4.message.MessageHelper;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.transaction.SendDebtService;
@@ -52,9 +53,10 @@ class SendDebt extends GameStateSubcommand {
         String debtMsg = sendingPlayer.getRepresentation() + " sent " + debtCountToSend + " debt token"
                 + (debtCountToSend == 1 ? "" : "s") + " to " + receivingPlayer.getRepresentation() + ", for their \""
                 + pool + "\" pool.";
-        MessageHelper.sendMessageToChannel(sendingPlayer.getCorrectChannel(), debtMsg);
+        MessageHelper.sendMessageToChannel(TransactionHelper.getTradeNotificationChannel(sendingPlayer, game), debtMsg);
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(receivingPlayer.getPrivateChannel(), debtMsg);
+            MessageHelper.sendMessageToChannel(
+                    TransactionHelper.getTradeNotificationChannel(receivingPlayer, game), debtMsg);
         }
     }
 }

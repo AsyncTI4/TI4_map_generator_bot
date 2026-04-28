@@ -3279,6 +3279,11 @@ public final class ButtonHelperFactionSpecific {
         String planet = buttonID.split("_")[1];
         String unit = buttonID.split("_")[2];
         Tile tile = game.getTileFromPlanet(planet);
+        List<Player> playersToNotify = game.isFowMode()
+                ? game.getRealPlayersExcludingThis(player).stream()
+                        .filter(p2 -> FoWHelper.playerHasUnitsOnPlanet(p2, tile, planet))
+                        .toList()
+                : List.of();
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit + " " + planet);
         RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "1 infantry " + planet);
         List<Button> options = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
@@ -3286,6 +3291,13 @@ public final class ButtonHelperFactionSpecific {
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " replaced 1 of their infantry with 1 " + unit + " on "
                         + Helper.getPlanetRepresentation(planet, game) + " using the mech's DEPLOY ability.");
+        for (Player p2 : playersToNotify) {
+            MessageHelper.sendPrivateMessageToPlayer(
+                    p2,
+                    game,
+                    player.getFactionEmoji() + " replaced 1 infantry with 1 " + unit + " on "
+                            + Helper.getPlanetRepresentation(planet, game) + " using the mech's DEPLOY ability.");
+        }
         options.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
@@ -3934,6 +3946,7 @@ public final class ButtonHelperFactionSpecific {
         Tile tile = game.getTileFromPlanet(planet);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit + " " + planet);
         String opponent = "their opponent's";
+        Player greyfireTarget = null;
         for (Player p2 : game.getRealPlayersNNeutral()) {
             if (p2 == player) {
                 continue;
@@ -3941,6 +3954,7 @@ public final class ButtonHelperFactionSpecific {
             if (FoWHelper.playerHasInfantryOnPlanet(p2, tile, planet)) {
                 RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), "1 infantry " + planet);
                 opponent = p2.getRepresentationNoPing();
+                greyfireTarget = p2;
                 break;
             }
         }
@@ -3954,6 +3968,13 @@ public final class ButtonHelperFactionSpecific {
                     event.getMessageChannel(),
                     player.getRepresentationNoPing() + " replaced 1 of " + opponent + " infantry with 1 " + unit
                             + " on " + Helper.getPlanetRepresentation(planet, game) + " using _Greyfire Mutagen_.");
+        }
+        if (game.isFowMode() && greyfireTarget != null) {
+            MessageHelper.sendPrivateMessageToPlayer(
+                    greyfireTarget,
+                    game,
+                    player.getFactionEmoji() + " replaced 1 of your infantry with 1 " + unit + " on "
+                            + Helper.getPlanetRepresentation(planet, game) + " using _Greyfire Mutagen_.");
         }
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
