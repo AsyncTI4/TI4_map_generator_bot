@@ -10,7 +10,8 @@ import ti4.service.statistics.SREStats;
 
 class ButtonRuntimeWarningService {
 
-    private static final int WARNING_THRESHOLD_MILLISECONDS = 1500;
+    private static final int PREPROCESSING_WARNING_THRESHOLD_MILLISECONDS = 2000;
+    private static final int PROCESSING_WARNING_THRESHOLD_MILLISECONDS = 1000;
     private static final int RUNTIME_WARNING_COUNT_THRESHOLD = 20;
 
     private int runtimeWarningCount;
@@ -54,8 +55,8 @@ class ButtonRuntimeWarningService {
             runtimeWarningCount = 0;
         }
 
-        boolean slowPreprocess = preprocessingTimeMs >= WARNING_THRESHOLD_MILLISECONDS;
-        boolean slowExecution = processingTimeMs >= WARNING_THRESHOLD_MILLISECONDS;
+        boolean slowPreprocess = preprocessingTimeMs >= PREPROCESSING_WARNING_THRESHOLD_MILLISECONDS;
+        boolean slowExecution = processingTimeMs >= PROCESSING_WARNING_THRESHOLD_MILLISECONDS;
 
         if (!slowPreprocess && !slowExecution) {
             return;
@@ -82,7 +83,7 @@ class ButtonRuntimeWarningService {
                 + ButtonHelper.getButtonRepresentation(event.getButton())
                 + " in: [" + event.getChannel().getName() + "]("
                 + event.getMessage().getJumpUrl() + ") "
-                + "\n> ⚠ **Slow Button Warning:** Took over " + WARNING_THRESHOLD_MILLISECONDS + "ms"
+                + "\n> ⚠ **Slow Button Warning:**"
                 + "\n> 🕒 Event start: `" + eventTime + "`"
                 + "\n> 🧩 Built context in: `" + contextTime + "`"
                 + "\n> 🛠 Executed in: `" + resolveTime + "`"
@@ -106,7 +107,7 @@ class ButtonRuntimeWarningService {
 
     private static String formatMillisecondsWithWarning(long runtimeMs) {
         String formattedRuntime = DateTimeHelper.getTimeRepresentationToMilliseconds(runtimeMs);
-        if (runtimeMs >= WARNING_THRESHOLD_MILLISECONDS) {
+        if (runtimeMs >= PROCESSING_WARNING_THRESHOLD_MILLISECONDS) {
             return formattedRuntime + " ❗";
         }
         return formattedRuntime;
