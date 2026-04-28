@@ -52,6 +52,10 @@ public class Units {
             return unitType.plainName();
         }
 
+        public String unitTypeVal() {
+            return unitType.getValue();
+        }
+
         public String humanReadableName() {
             return unitType.humanReadableName();
         }
@@ -276,7 +280,7 @@ public class Units {
                 case none -> "";
                 case dmg -> "Damaged";
                 case glv -> "Galvanized";
-                case dmg_glv -> "Dmg+Glv";
+                case dmg_glv -> "Dmg+Galv";
             };
         }
 

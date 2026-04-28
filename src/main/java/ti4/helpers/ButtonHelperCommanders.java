@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -13,6 +11,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
@@ -44,6 +43,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.tactical.TacticalActionService;
+import ti4.service.tech.PlayerTechService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -467,12 +467,13 @@ public class ButtonHelperCommanders {
         AddUnitService.addUnits(event, tile, game, player.getColor(), "fighter");
         player.setGhostCommanderCounter(player.getGhostCommanderCounter() + 1);
         String factionEmoji = player.getFactionEmoji();
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                factionEmoji + " placed 1 fighter in " + tile.getRepresentation()
-                        + " using Sai Seravus, the Creuss commander.\n-# " + factionEmoji
-                        + " has placed a total of " + player.getGhostCommanderCounter()
-                        + " fighters over the course of this game.");
+
+        String method = game.isTwilightKart() ? "IFF Support Wing" : "Sai Seravus, the Creuss commander";
+        String msg = factionEmoji + " placed 1 fighter in " + tile.getRepresentation()
+                + " using " + method + ".\n-# " + factionEmoji
+                + " has placed a total of " + player.getGhostCommanderCounter()
+                + " fighters over the course of this game.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
 
     @ButtonHandler("placeKhraskCommanderInf_")
@@ -497,7 +498,7 @@ public class ButtonHelperCommanders {
         for (String planet : player.getExhaustedPlanets()) {
             Planet planetReal = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             if (planetReal != null
-                    && isNotBlank(planetReal.getOriginalPlanetType())
+                    && StringUtils.isNotBlank(planetReal.getOriginalPlanetType())
                     && player.getPlanetsAllianceMode().contains(planet)) {
                 List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
                 buttons.addAll(planetButtons);
@@ -731,6 +732,12 @@ public class ButtonHelperCommanders {
                         buttons2);
             }
         }
+        if (player.hasUnit("tk-sumerianrelay")) {
+            String msg = "Please choose the system in which you wish to produce a ship using ";
+            msg += Mapper.getUnit("tk-sumerianrelay").getNameRepresentation() + ".";
+            List<Button> buttons = PlayerTechService.getSlingRelayButtons(game, player);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+        }
     }
 
     @ButtonHandler("freeSystemsBT_")
@@ -870,10 +877,14 @@ public class ButtonHelperCommanders {
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         Tile tile = game.getTileFromPlanet(planet);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planet);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getFactionEmoji() + " placed 1 infantry on " + Helper.getPlanetRepresentation(planet, game)
-                        + " using Claire Gibson, the Sol Commander.");
+
+        String msg = player.getFactionEmoji() + " placed 1 infantry on " + Helper.getPlanetRepresentation(planet, game);
+        if (player.hasUnit("tk-genesiscorps")) {
+            msg += " using " + UnitEmojis.infantry + " " + FactionEmojis.Sol + " _Genesis Corps_.";
+        } else {
+            msg += " using Claire Gibson, the Sol Commander.";
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 
     @ButtonHandler("utilizeMykoBT_")

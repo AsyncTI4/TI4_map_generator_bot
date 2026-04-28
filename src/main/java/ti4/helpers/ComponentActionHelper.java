@@ -277,6 +277,14 @@ public class ComponentActionHelper {
             Button lButton = Buttons.gray(finChecker + "mahactCommander", "Use Mahact Commander", FactionEmojis.Mahact);
             compButtons.add(lButton);
         }
+        if (p1.hasUnit("tk-heartofdominium") && p1.getTacticalCC() > 0) {
+            List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship);
+            if (tiles.stream().anyMatch(t -> CommandCounterHelper.hasCC(p1, t))) {
+                Button lButton =
+                        Buttons.gray(finChecker + "mahactCommander", "Use Heart of Dominium", UnitEmojis.flagship);
+                compButtons.add(lButton);
+            }
+        }
 
         // Relics
         boolean enigmaticSeen = false;

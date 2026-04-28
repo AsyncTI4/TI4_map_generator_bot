@@ -465,6 +465,7 @@ public final class ButtonHelperModifyUnits {
                 hits > 0
                         && (player.hasUnit("naalu_flagship")
                                 || player.hasUnit("tf-morphwing")
+                                || player.hasUnit("tk-hierarch")
                                 || player.hasUnit("sigma_naalu_flagship_2")
                                 || player.hasUnit("belkosea_fighter")
                                 || player.hasUnit("belkosea_fighter2"))
@@ -1036,7 +1037,7 @@ public final class ButtonHelperModifyUnits {
             }
         }
         if (pdsAmount > 0) {
-            if (player.hasUnit("mirveda_pds") || player.hasUnit("mirveda_pds2")) {
+            if (player.hasAnyUnit("mirveda_pds", "mirveda_pds2")) {
                 AddUnitService.addUnits(
                         event, game.getTileFromPlanet(uH.getName()), game, player.getColor(), pdsAmount + " pds");
             } else {
@@ -1758,7 +1759,7 @@ public final class ButtonHelperModifyUnits {
                         replace);
             }
         } else if ("pds".equalsIgnoreCase(unitLong)) {
-            if (player.ownsUnit("mirveda_pds") || player.ownsUnit("mirveda_pds2")) {
+            if (player.hasAnyUnit("mirveda_pds", "mirveda_pds2")) {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitID);
                 successMessage = "Placed 1 space dock in the space area of the "
                         + Helper.getPlanetRepresentation(planetName, game) + " system.";
@@ -2461,6 +2462,12 @@ public final class ButtonHelperModifyUnits {
             msg = opponent.getRepresentationUnfogged()
                     + ", your opponent used the Ascendancy to produce a hit against your non-fighter ships. Please assign it with buttons.";
             buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "combat");
+        } else if (cause.contains("assEsc")) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), player.getRepresentation(false, false) + " used _Assault Escort_.");
+            msg = opponent.getRepresentationUnfogged()
+                    + ", your opponent used _Assault Escort_, forcing you to destroy a non-fighter ship. Please assign it with buttons.";
+            buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "assaultcannoncombat");
         } else {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), player.getRepresentation(false, false) + " used _Assault Cannon_.");

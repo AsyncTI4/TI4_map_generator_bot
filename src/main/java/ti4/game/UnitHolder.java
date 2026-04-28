@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.awt.Point;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Data;
 import lombok.Getter;
 import ti4.helpers.Constants;
@@ -262,6 +264,17 @@ public abstract class UnitHolder {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
+    /** Return the set unit keys that are actually on this unitholder (quantity > 0) */
+    @JsonIgnore
+    public Set<UnitKey> getUnitKeysForPlayer(Player p) {
+        return unitsByState.entrySet().stream()
+                .filter(e -> p.unitBelongsToPlayer(e.getKey()))
+                .filter(e -> getTotalUnitCount(e.getValue()) > 0)
+                .map(Entry::getKey)
+                .sorted(Comparator.comparing(uk -> uk.getUnitType()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
     @Deprecated
     @JsonIgnore
     public Map<UnitKey, Integer> getUnits() {
@@ -292,6 +305,13 @@ public abstract class UnitHolder {
     @JsonIgnore
     public List<Integer> getUnitStates(UnitKey key) {
         return unitsByState.getOrDefault(key, UnitState.emptyList());
+    }
+
+    @JsonIgnore
+    public List<UnitState> getNonZeroUnitStates(UnitKey key) {
+        return Stream.of(UnitState.values())
+                .filter(st -> getUnitCountForState(key, st) > 0)
+                .toList();
     }
 
     @JsonIgnore

@@ -30,6 +30,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.thundersedge.TeHelperActionCards;
+import ti4.helpers.twilight_kart.TkHelperActionCards;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
@@ -413,7 +414,8 @@ public class ActionCardHelper {
                 "revolution",
                 "deflection",
                 "summit",
-                "bounty_contracts");
+                "bounty_contracts",
+                "tk-compose");
         List<String> actionCards = new ArrayList<>(player.getActionCards().keySet());
         if (player.hasPlanet("garbozia")) {
             actionCards.addAll(getGarboziaActionCards(player.getGame()).keySet());
@@ -891,25 +893,7 @@ public class ActionCardHelper {
 
             MessageChannel channel2 = player.getCorrectChannel();
             if ("investments".equals(automationID)) {
-                List<Button> scButtons = new ArrayList<>();
-                for (int sc : game.getSCList()) {
-                    Button button;
-                    TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
-                    if (scEmoji != CardEmojis.SCBackBlank) {
-                        button = Buttons.gray(
-                                player.finChecker() + "increaseTGonSC_" + sc, Helper.getSCName(sc, game), scEmoji);
-                    } else {
-                        button = Buttons.gray(
-                                player.finChecker() + "increaseTGonSC_" + sc, sc + " " + Helper.getSCName(sc, game));
-                    }
-                    scButtons.add(button);
-                }
-                scButtons.add(Buttons.red("deleteButtons", "Done Adding Trade Goods"));
-                MessageHelper.sendMessageToChannelWithButtons(
-                        channel2,
-                        player.getRepresentation()
-                                + ", please use buttons to increase trade goods on strategy cards. Each button press adds 1 trade good.",
-                        scButtons);
+                serveManipulateInvestmentButtons(game, player);
             }
             if ("deflection".equals(automationID) || "tf-tartarus".equals(automationID)) {
                 List<Button> scButtons = new ArrayList<>();
@@ -1704,6 +1688,7 @@ public class ActionCardHelper {
                         channel2, String.format(targetMsg, "ground forces"), codedButtons);
             }
             TeHelperActionCards.resolveTeActionCard(actionCard, player, introMsg);
+            TkHelperActionCards.resolveTkActionCard(actionCard, player, introMsg);
 
             TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(
                     Constants.AC, actionCard.getAlias(), player.getNumberOfTurns());
@@ -1832,6 +1817,27 @@ public class ActionCardHelper {
 
     private static boolean isActionCardCancelable(ActionCardModel actionCard) {
         return !actionCard.getText().contains("cannot be canceled");
+    }
+
+    public static void serveManipulateInvestmentButtons(Game game, Player player) {
+        List<Button> scButtons = new ArrayList<>();
+        for (int sc : game.getSCList()) {
+            Button button;
+            TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
+
+            String id = player.finChecker() + "increaseTGonSC_" + sc;
+            if (scEmoji != CardEmojis.SCBackBlank) {
+                button = Buttons.gray(id, Helper.getSCName(sc, game), scEmoji);
+            } else {
+                button = Buttons.gray(id, sc + " " + Helper.getSCName(sc, game));
+            }
+            scButtons.add(button);
+        }
+        scButtons.add(Buttons.red("deleteButtons", "Done Adding Trade Goods"));
+
+        String msg = player.getRepresentation() + ", please use buttons to increase trade goods";
+        msg += " on strategy cards. Each button press adds 1 trade good.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, scButtons);
     }
 
     public static void serveReverseEngineerButtons(Game game, Player discardingPlayer, List<String> actionCards) {

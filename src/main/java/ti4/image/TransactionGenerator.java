@@ -236,6 +236,10 @@ public final class TransactionGenerator {
                         String txt = "In-game " + furtherDetail + " action";
                         y += drawStringMultiLine(g2, txt, x, y + 40, 250, hAlign);
                     }
+                    case "details" -> {
+                        String txt = furtherDetail.replace("fin777", " ");
+                        y += drawStringMultiLine(g2, txt, x, y + 40, 250, hAlign);
+                    }
                     default -> {
                         String txt = "\"" + item + "\"";
                         y += drawStringMultiLine(g2, txt, x, y + 40, 250, hAlign);

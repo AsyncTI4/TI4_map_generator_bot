@@ -99,7 +99,7 @@ class StatusPhaseButtonHandler {
                 EndGameService.secondHalfOfGameEnd(event, game, true, true, false);
             } else {
                 var speakerPlayer = game.getSpeaker();
-                ObjectiveHelper.secondHalfOfPeakStage1(game, speakerPlayer, 1, true);
+                ObjectiveHelper.secondHalfOfPeakStage1(game, speakerPlayer, 1);
                 TextChannel tableTalkChannel = game.getTableTalkChannel();
                 if (!game.isFowMode() && tableTalkChannel != null) {
                     MessageHelper.sendMessageToChannel(

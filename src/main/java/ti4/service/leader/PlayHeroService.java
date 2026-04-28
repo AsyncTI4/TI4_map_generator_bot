@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.edict.EdictPhaseHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -547,10 +548,7 @@ public class PlayHeroService {
                 }
             }
             case "voicehero" -> {
-                List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");
-                if (ButtonHelper.isLawInPlay(game, "tf-censure")) {
-                    edicts.removeIf("tf-censure"::equalsIgnoreCase);
-                }
+                List<String> edicts = EdictPhaseHandler.getEdictDeck(game);
                 List<Button> buttons = new ArrayList<>();
                 List<MessageEmbed> embeds = new ArrayList<>();
                 Player tyrant = player;

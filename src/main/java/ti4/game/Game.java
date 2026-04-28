@@ -42,9 +42,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.commands.planet.PlanetRemove;
+import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftCategory;
 import ti4.draft.FrankenDraft;
+import ti4.game.helper.StoredValueHelper;
+import ti4.game.helper.TwilightFallDeckFuncs;
 import ti4.game.manager.BorderAnomalyManager;
 import ti4.game.manager.StrategyCardManager;
 import ti4.game.persistence.GameManager;
@@ -76,18 +79,8 @@ import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.model.ActionCardModel;
-import ti4.model.BorderAnomalyHolder;
-import ti4.model.BorderAnomalyModel;
-import ti4.model.DeckModel;
-import ti4.model.ExploreModel;
-import ti4.model.FactionModel;
-import ti4.model.PublicObjectiveModel;
+import ti4.model.*;
 import ti4.model.Source.ComponentSource;
-import ti4.model.StrategyCardModel;
-import ti4.model.StrategyCardSetModel;
-import ti4.model.TechnologyModel;
-import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.draft.DraftLoadService;
@@ -101,7 +94,7 @@ import ti4.service.statistics.round.RoundStatsTracker;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
-public class Game extends GameProperties {
+public class Game extends GameProperties implements StoredValueHelper, TwilightFallDeckFuncs {
 
     private static final JsonMapper mapper = JsonMapperManager.basic();
 
@@ -121,7 +114,6 @@ public class Game extends GameProperties {
     @Getter
     private final Map<Integer, Boolean> scPlayed = new HashMap<>();
 
-    private final Map<String, String> checkingForAllReacts = new HashMap<>();
     private List<String> listOfTilePinged = new ArrayList<>();
 
     // TODO (Jazz): These should be easily added to GameProperties
@@ -384,6 +376,23 @@ public class Game extends GameProperties {
         return neutral;
     }
 
+    public Player setupNeutralPlayer() {
+        Player neutral = getPlayerFromColorOrFaction("neutral");
+        if (neutral != null) return neutral;
+        return setupNeutralPlayer(SetupNeutralPlayer.pickNeutralColor(this));
+    }
+
+    @NotNull
+    public Player getNeutral() {
+        if (getPlayerFromColorOrFaction("neutral") == null) return setupNeutralPlayer();
+        return getPlayerFromColorOrFaction("neutral");
+    }
+
+    @NotNull
+    public String getNeutralColor() {
+        return getNeutral().getColor();
+    }
+
     private int getNumberOfSOsInTheDeck() {
         return getSecretObjectives().size();
     }
@@ -600,18 +609,38 @@ public class Game extends GameProperties {
     public void setupTwilightsFallMode(GenericInteractionCreateEvent event) {
         setTwilightsFallMode(true);
         setThundersEdge(false);
-        validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_twilights_fall"));
-        validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
-        setStrategyCardSet("twilights_fall_sc");
-        removeSOFromGame("baf");
-        removeSOFromGame("dp");
-        removeSOFromGame("dtd");
-        removeSOFromGame("sb"); // get this stuff too
-        removeRelicFromGame("quantumcore");
-        removeRelicFromGame("mawofworlds");
-        removeRelicFromGame("prophetstears");
-        validateAndSetActionCardDeck(event, Mapper.getDeck("tf_action_deck"));
-        setTechnologyDeckID("techs_tf");
+
+        String agendaDeck = "agendas_twilights_fall";
+        String relicDeck = "relics_pok_te";
+        String stratCards = "twilights_fall_sc";
+        String acDeck = "tf_action_deck";
+        String techDeck = "techs_tf";
+
+        // Initialize splice decks
+        setAbilitySpliceDeckID("techs_tf");
+        setGenomeSpliceDeckID("tf_genome");
+        setParadigmSpliceDeckID("tf_paradigm");
+        setUnitSpliceDeckID("tf_units");
+
+        // Overrides for TK mode
+        if (isTwilightKart()) {
+            agendaDeck = "agendas_twilight_kart";
+            acDeck = "action_cards_twilight_kart";
+            setUnitSpliceDeckID("twilight_kart_units");
+        }
+
+        // Set other normal decks
+        validateAndSetAgendaDeck(event, Mapper.getDeck(agendaDeck));
+        validateAndSetRelicDeck(Mapper.getDeck(relicDeck));
+        setStrategyCardSet(stratCards);
+        validateAndSetActionCardDeck(event, Mapper.getDeck(acDeck));
+        setTechnologyDeckID(techDeck);
+
+        // Remove the secrets we have to remove
+        List.of("sb", "dtd", "dp", "baf").forEach(this::removeSOFromGame);
+
+        // Remove the Relics we have to remove
+        List.of("quantumcore", "mawofworlds", "prophetstears").forEach(this::removeRelicFromGame);
     }
 
     public void setPurgedPNs(List<String> purgedPN) {
@@ -1100,23 +1129,12 @@ public class Game extends GameProperties {
     }
 
     public void setCurrentReacts(String messageID, String factionsWhoReacted) {
-        checkingForAllReacts.put(messageID, factionsWhoReacted);
-    }
-
-    public Map<String, String> getMessagesThatICheckedForAllReacts() {
-        return checkingForAllReacts;
-    }
-
-    private String getFactionsThatReactedToThis(String messageID) {
-        if (checkingForAllReacts.get(messageID) != null) {
-            return checkingForAllReacts.get(messageID);
-        }
-        return "";
+        getStoredValueMap().put(messageID, factionsWhoReacted);
     }
 
     public void clearAllEmptyStoredValues() {
         // Remove the entry if the value is empty
-        checkingForAllReacts
+        getStoredValueMap()
                 .entrySet()
                 .removeIf(entry -> entry.getValue() == null || entry.getValue().isEmpty());
     }
@@ -1128,7 +1146,7 @@ public class Game extends GameProperties {
             return;
         }
         value = StringHelper.escape(value);
-        checkingForAllReacts.put(key, value);
+        getStoredValueMap().put(key, value);
     }
 
     public int changeCommsOnPlanet(int change, String planet) {
@@ -1147,12 +1165,12 @@ public class Game extends GameProperties {
     }
 
     public String getStoredValue(String key) {
-        String value = getFactionsThatReactedToThis(key);
+        String value = getStoredValueMap().getOrDefault(key, "");
         return StringHelper.unescape(value);
     }
 
     public String removeStoredValue(String key) {
-        return checkingForAllReacts.remove(key);
+        return getStoredValueMap().remove(key);
     }
 
     public void resetCurrentAgendaVotes() {
@@ -3242,6 +3260,7 @@ public class Game extends GameProperties {
         return null;
     }
 
+    /** List of Relics remaining in the deck */
     public List<String> getAllRelics() {
         return relics;
     }

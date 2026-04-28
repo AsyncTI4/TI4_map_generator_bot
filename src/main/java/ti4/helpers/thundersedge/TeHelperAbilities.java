@@ -223,6 +223,7 @@ public final class TeHelperAbilities {
                                 + Helper.getPlanetRepresentation(planet.getName(), game);
                         buttons.add(Buttons.red(id, label, UnitEmojis.pds));
                     }
+                    if (player.hasUnit("tk-keshnu") && !player.hasAbility("miniaturization")) continue;
                     for (int x = 1; x <= Math.min(1, docks); x++) {
                         String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "sd_"
                                 + planet.getName();
