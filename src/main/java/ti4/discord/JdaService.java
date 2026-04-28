@@ -107,8 +107,8 @@ public class JdaService {
     public static final List<Guild> fowServers = new ArrayList<>();
 
     private static final ExecutorService EVENT_EXECUTOR = Executors.newFixedThreadPool(
-        Runtime.getRuntime().availableProcessors(),
-        Thread.ofPlatform().name("ti4-jda-event-", 0).factory());
+            Runtime.getRuntime().availableProcessors(),
+            Thread.ofPlatform().name("ti4-jda-event-", 0).factory());
 
     public static void startJdaAndRegisterListeners(String[] args) {
         BotLogger.info("STARTING JDA");

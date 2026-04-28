@@ -14,7 +14,7 @@ public class ExecutorServiceManager {
 
     private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newThreadPerTaskExecutor(
-        Thread.ofVirtual().name("ti4-worker-", 0).factory());
+            Thread.ofVirtual().name("ti4-worker-", 0).factory());
 
     public static void runAsyncWithLock(
             String name, String gameName, MessageChannel messageChannel, Runnable runnable) {

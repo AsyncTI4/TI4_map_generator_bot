@@ -17,7 +17,7 @@ public class StatisticsPipeline {
     private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
     private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 10;
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor(
-        Thread.ofPlatform().name("ti4-statistics-gatherer-", 0).factory());
+            Thread.ofPlatform().name("ti4-statistics-gatherer-", 0).factory());
 
     public static void queue(SlashCommandInteractionEvent event, Runnable runnable) {
         if (CircuitBreaker.checkIsOpenAndPostWarningIfTrue(event.getMessageChannel())) {
