@@ -1,41 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" output="target/classes" path="src/main/java">
-		<attributes>
-			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry excluding="**" kind="src" output="target/classes" path="src/main/resources">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="optional" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
-		<attributes>
-			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="test" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry excluding="**" kind="src" output="target/test-classes" path="src/test/resources">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="test" value="true"/>
-			<attribute name="optional" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk-26.0.1"/>
 	<classpathentry kind="src" output="target/test-classes" path="target/generated-test-sources/test-annotations">
 		<attributes>
 			<attribute name="optional" value="true"/>
@@ -48,6 +13,2039 @@
 	<classpathentry kind="src" path="target/generated-sources/annotations">
 		<attributes>
 			<attribute name="optional" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/resources">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="optional" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="target/classes" path="src/main/resources">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="optional" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="target/classes" path="src/main/java">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-starter-web/4.1.0-RC1/spring-boot-starter-web-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-starter-web"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-starter-jackson/4.1.0-RC1/spring-boot-starter-jackson-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-starter-jackson"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-jackson/4.1.0-RC1/spring-boot-jackson-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-jackson"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat/4.1.0-RC1/spring-boot-starter-tomcat-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-starter-tomcat"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat-runtime/4.1.0-RC1/spring-boot-starter-tomcat-runtime-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-starter-tomcat-runtime"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-web-server/4.1.0-RC1/spring-boot-web-server-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-web-server"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/11.0.21/tomcat-embed-core-11.0.21.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="tomcat-embed-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="11.0.21"/>
+			<attribute name="maven.groupId" value="org.apache.tomcat.embed"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/apache/tomcat/embed/tomcat-embed-el/11.0.21/tomcat-embed-el-11.0.21.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="tomcat-embed-el"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="11.0.21"/>
+			<attribute name="maven.groupId" value="org.apache.tomcat.embed"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/apache/tomcat/embed/tomcat-embed-websocket/11.0.21/tomcat-embed-websocket-11.0.21.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="tomcat-embed-websocket"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="11.0.21"/>
+			<attribute name="maven.groupId" value="org.apache.tomcat.embed"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-tomcat/4.1.0-RC1/spring-boot-tomcat-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-tomcat"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-http-converter/4.1.0-RC1/spring-boot-http-converter-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-http-converter"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot/4.1.0-RC1/spring-boot-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/spring-context/7.0.7/spring-context-7.0.7.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-context"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.0.7"/>
+			<attribute name="maven.groupId" value="org.springframework"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/spring-web/7.0.7/spring-web-7.0.7.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-web"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.0.7"/>
+			<attribute name="maven.groupId" value="org.springframework"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-webmvc/4.1.0-RC1/spring-boot-webmvc-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-webmvc"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-servlet/4.1.0-RC1/spring-boot-servlet-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-servlet"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/spring-webmvc/7.0.7/spring-webmvc-7.0.7.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-webmvc"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.0.7"/>
+			<attribute name="maven.groupId" value="org.springframework"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/spring-expression/7.0.7/spring-expression-7.0.7.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-expression"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.0.7"/>
+			<attribute name="maven.groupId" value="org.springframework"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-starter-websocket/4.1.0-RC1/spring-boot-starter-websocket-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-starter-websocket"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-starter/4.1.0-RC1/spring-boot-starter-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-starter"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-starter-logging/4.1.0-RC1/spring-boot-starter-logging-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-starter-logging"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/ch/qos/logback/logback-classic/1.5.32/logback-classic-1.5.32.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="logback-classic"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.5.32"/>
+			<attribute name="maven.groupId" value="ch.qos.logback"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/ch/qos/logback/logback-core/1.5.32/logback-core-1.5.32.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="logback-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.5.32"/>
+			<attribute name="maven.groupId" value="ch.qos.logback"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/apache/logging/log4j/log4j-to-slf4j/2.25.4/log4j-to-slf4j-2.25.4.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="log4j-to-slf4j"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.25.4"/>
+			<attribute name="maven.groupId" value="org.apache.logging.log4j"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/apache/logging/log4j/log4j-api/2.25.4/log4j-api-2.25.4.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="log4j-api"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.25.4"/>
+			<attribute name="maven.groupId" value="org.apache.logging.log4j"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/slf4j/jul-to-slf4j/2.0.17/jul-to-slf4j-2.0.17.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jul-to-slf4j"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.0.17"/>
+			<attribute name="maven.groupId" value="org.slf4j"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/4.1.0-RC1/spring-boot-autoconfigure-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-autoconfigure"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/jakarta/annotation/jakarta.annotation-api/3.0.0/jakarta.annotation-api-3.0.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jakarta.annotation-api"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="3.0.0"/>
+			<attribute name="maven.groupId" value="jakarta.annotation"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/yaml/snakeyaml/2.6/snakeyaml-2.6.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="snakeyaml"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.6"/>
+			<attribute name="maven.groupId" value="org.yaml"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-starter-webmvc/4.1.0-RC1/spring-boot-starter-webmvc-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-starter-webmvc"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-websocket/4.1.0-RC1/spring-boot-websocket-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-websocket"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/spring-messaging/7.0.7/spring-messaging-7.0.7.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-messaging"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.0.7"/>
+			<attribute name="maven.groupId" value="org.springframework"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/spring-websocket/7.0.7/spring-websocket-7.0.7.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-websocket"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.0.7"/>
+			<attribute name="maven.groupId" value="org.springframework"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-starter-actuator/4.1.0-RC1/spring-boot-starter-actuator-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-starter-actuator"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-starter-micrometer-metrics/4.1.0-RC1/spring-boot-starter-micrometer-metrics-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-starter-micrometer-metrics"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-micrometer-metrics/4.1.0-RC1/spring-boot-micrometer-metrics-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-micrometer-metrics"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-micrometer-observation/4.1.0-RC1/spring-boot-micrometer-observation-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-micrometer-observation"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-actuator-autoconfigure/4.1.0-RC1/spring-boot-actuator-autoconfigure-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-actuator-autoconfigure"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-actuator/4.1.0-RC1/spring-boot-actuator-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-actuator"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-health/4.1.0-RC1/spring-boot-health-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-health"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/micrometer/micrometer-observation/1.17.0-RC1/micrometer-observation-1.17.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="micrometer-observation"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.17.0-RC1"/>
+			<attribute name="maven.groupId" value="io.micrometer"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/micrometer/micrometer-commons/1.17.0-RC1/micrometer-commons-1.17.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="micrometer-commons"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.17.0-RC1"/>
+			<attribute name="maven.groupId" value="io.micrometer"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/micrometer/micrometer-jakarta9/1.17.0-RC1/micrometer-jakarta9-1.17.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="micrometer-jakarta9"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.17.0-RC1"/>
+			<attribute name="maven.groupId" value="io.micrometer"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-starter-security/4.1.0-RC1/spring-boot-starter-security-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-starter-security"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-security/4.1.0-RC1/spring-boot-security-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-security"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/security/spring-security-config/7.1.0-RC1/spring-security-config-7.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-security-config"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.security"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/security/spring-security-core/7.1.0-RC1/spring-security-core-7.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-security-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.security"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/security/spring-security-crypto/7.1.0-RC1/spring-security-crypto-7.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-security-crypto"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.security"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/security/spring-security-web/7.1.0-RC1/spring-security-web-7.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-security-web"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.security"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/spring-aop/7.0.7/spring-aop-7.0.7.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-aop"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.0.7"/>
+			<attribute name="maven.groupId" value="org.springframework"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/spring-beans/7.0.7/spring-beans-7.0.7.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-beans"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.0.7"/>
+			<attribute name="maven.groupId" value="org.springframework"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-starter-oauth2-resource-server/4.1.0-RC1/spring-boot-starter-oauth2-resource-server-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-starter-oauth2-resource-server"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-security-oauth2-resource-server/4.1.0-RC1/spring-boot-security-oauth2-resource-server-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-security-oauth2-resource-server"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/security/spring-security-oauth2-jose/7.1.0-RC1/spring-security-oauth2-jose-7.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-security-oauth2-jose"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.security"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/security/spring-security-oauth2-core/7.1.0-RC1/spring-security-oauth2-core-7.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-security-oauth2-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.security"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/nimbusds/nimbus-jose-jwt/10.6/nimbus-jose-jwt-10.6.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="nimbus-jose-jwt"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="10.6"/>
+			<attribute name="maven.groupId" value="com.nimbusds"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/security/spring-security-oauth2-resource-server/7.1.0-RC1/spring-security-oauth2-resource-server-7.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-security-oauth2-resource-server"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.security"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-starter-data-jpa/4.1.0-RC1/spring-boot-starter-data-jpa-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-starter-data-jpa"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-starter-jdbc/4.1.0-RC1/spring-boot-starter-jdbc-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-starter-jdbc"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/zaxxer/HikariCP/7.0.2/HikariCP-7.0.2.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="HikariCP"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.0.2"/>
+			<attribute name="maven.groupId" value="com.zaxxer"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-data-jpa/4.1.0-RC1/spring-boot-data-jpa-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-data-jpa"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-data-commons/4.1.0-RC1/spring-boot-data-commons-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-data-commons"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-persistence/4.1.0-RC1/spring-boot-persistence-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-persistence"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/data/spring-data-commons/4.1.0-RC1/spring-data-commons-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-data-commons"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.data"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-hibernate/4.1.0-RC1/spring-boot-hibernate-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-hibernate"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-jpa/4.1.0-RC1/spring-boot-jpa-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-jpa"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/spring-orm/7.0.7/spring-orm-7.0.7.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-orm"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.0.7"/>
+			<attribute name="maven.groupId" value="org.springframework"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/data/spring-data-jpa/4.1.0-RC1/spring-data-jpa-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-data-jpa"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.data"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/spring-tx/7.0.7/spring-tx-7.0.7.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-tx"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.0.7"/>
+			<attribute name="maven.groupId" value="org.springframework"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/spring-aspects/7.0.7/spring-aspects-7.0.7.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-aspects"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.0.7"/>
+			<attribute name="maven.groupId" value="org.springframework"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/aspectj/aspectjweaver/1.9.25.1/aspectjweaver-1.9.25.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="aspectjweaver"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.9.25.1"/>
+			<attribute name="maven.groupId" value="org.aspectj"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-jdbc/4.1.0-RC1/spring-boot-jdbc-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-jdbc"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-sql/4.1.0-RC1/spring-boot-sql-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-sql"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-transaction/4.1.0-RC1/spring-boot-transaction-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-transaction"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/spring-jdbc/7.0.7/spring-jdbc-7.0.7.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-jdbc"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.0.7"/>
+			<attribute name="maven.groupId" value="org.springframework"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/xerial/sqlite-jdbc/3.53.0.0/sqlite-jdbc-3.53.0.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="sqlite-jdbc"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="3.53.0.0"/>
+			<attribute name="maven.groupId" value="org.xerial"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/hibernate/orm/hibernate-community-dialects/7.3.0.Final/hibernate-community-dialects-7.3.0.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="hibernate-community-dialects"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.3.0.Final"/>
+			<attribute name="maven.groupId" value="org.hibernate.orm"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/hibernate/orm/hibernate-core/7.2.12.Final/hibernate-core-7.2.12.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="hibernate-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.2.12.Final"/>
+			<attribute name="maven.groupId" value="org.hibernate.orm"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.2.0/jakarta.persistence-api-3.2.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jakarta.persistence-api"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="3.2.0"/>
+			<attribute name="maven.groupId" value="jakarta.persistence"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jakarta.transaction-api"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.0.1"/>
+			<attribute name="maven.groupId" value="jakarta.transaction"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/hibernate/models/hibernate-models/1.0.1/hibernate-models-1.0.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="hibernate-models"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="1.0.1"/>
+			<attribute name="maven.groupId" value="org.hibernate.models"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/fasterxml/classmate/1.7.3/classmate-1.7.3.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="classmate"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="1.7.3"/>
+			<attribute name="maven.groupId" value="com.fasterxml"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/net/bytebuddy/byte-buddy/1.18.8/byte-buddy-1.18.8.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="byte-buddy"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="1.18.8"/>
+			<attribute name="maven.groupId" value="net.bytebuddy"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.6/jaxb-runtime-4.0.6.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jaxb-runtime"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.0.6"/>
+			<attribute name="maven.groupId" value="org.glassfish.jaxb"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.6/jaxb-core-4.0.6.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jaxb-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.0.6"/>
+			<attribute name="maven.groupId" value="org.glassfish.jaxb"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/eclipse/angus/angus-activation/2.0.3/angus-activation-2.0.3.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="angus-activation"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="2.0.3"/>
+			<attribute name="maven.groupId" value="org.eclipse.angus"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/glassfish/jaxb/txw2/4.0.6/txw2-4.0.6.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="txw2"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.0.6"/>
+			<attribute name="maven.groupId" value="org.glassfish.jaxb"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.2/istack-commons-runtime-4.1.2.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="istack-commons-runtime"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.1.2"/>
+			<attribute name="maven.groupId" value="com.sun.istack"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jakarta.inject-api"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="2.0.1"/>
+			<attribute name="maven.groupId" value="jakarta.inject"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="antlr4-runtime"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.13.2"/>
+			<attribute name="maven.groupId" value="org.antlr"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/jboss/logging/jboss-logging/3.6.3.Final/jboss-logging-3.6.3.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jboss-logging"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="3.6.3.Final"/>
+			<attribute name="maven.groupId" value="org.jboss.logging"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/micrometer/micrometer-registry-prometheus/1.17.0-RC1/micrometer-registry-prometheus-1.17.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="micrometer-registry-prometheus"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.17.0-RC1"/>
+			<attribute name="maven.groupId" value="io.micrometer"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jspecify"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.0.0"/>
+			<attribute name="maven.groupId" value="org.jspecify"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/micrometer/micrometer-core/1.17.0-RC1/micrometer-core-1.17.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="micrometer-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.17.0-RC1"/>
+			<attribute name="maven.groupId" value="io.micrometer"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/hdrhistogram/HdrHistogram/2.2.2/HdrHistogram-2.2.2.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="HdrHistogram"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="2.2.2"/>
+			<attribute name="maven.groupId" value="org.hdrhistogram"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/prometheus/prometheus-metrics-core/1.5.1/prometheus-metrics-core-1.5.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="prometheus-metrics-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.5.1"/>
+			<attribute name="maven.groupId" value="io.prometheus"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/prometheus/prometheus-metrics-model/1.5.1/prometheus-metrics-model-1.5.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="prometheus-metrics-model"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.5.1"/>
+			<attribute name="maven.groupId" value="io.prometheus"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/prometheus/prometheus-metrics-config/1.5.1/prometheus-metrics-config-1.5.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="prometheus-metrics-config"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.5.1"/>
+			<attribute name="maven.groupId" value="io.prometheus"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/prometheus/prometheus-metrics-tracer-common/1.5.1/prometheus-metrics-tracer-common-1.5.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="prometheus-metrics-tracer-common"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.5.1"/>
+			<attribute name="maven.groupId" value="io.prometheus"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/prometheus/prometheus-metrics-exposition-formats/1.5.1/prometheus-metrics-exposition-formats-1.5.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="prometheus-metrics-exposition-formats"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="1.5.1"/>
+			<attribute name="maven.groupId" value="io.prometheus"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/prometheus/prometheus-metrics-exposition-textformats/1.5.1/prometheus-metrics-exposition-textformats-1.5.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="prometheus-metrics-exposition-textformats"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="1.5.1"/>
+			<attribute name="maven.groupId" value="io.prometheus"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/net/dv8tion/JDA/6.4.1/JDA-6.4.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="JDA"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="6.4.1"/>
+			<attribute name="maven.groupId" value="net.dv8tion"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="slf4j-api"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.0.17"/>
+			<attribute name="maven.groupId" value="org.slf4j"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/neovisionaries/nv-websocket-client/2.14/nv-websocket-client-2.14.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="nv-websocket-client"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.14"/>
+			<attribute name="maven.groupId" value="com.neovisionaries"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/squareup/okhttp3/okhttp-jvm/5.3.2/okhttp-jvm-5.3.2.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="okhttp-jvm"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="5.3.2"/>
+			<attribute name="maven.groupId" value="com.squareup.okhttp3"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/squareup/okio/okio-jvm/3.16.4/okio-jvm-3.16.4.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="okio-jvm"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="3.16.4"/>
+			<attribute name="maven.groupId" value="com.squareup.okio"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/apache/commons/commons-collections4/4.5.0/commons-collections4-4.5.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="commons-collections4"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.5.0"/>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/Finneganj/.m2/repository/org/apache/commons/commons-collections4/4.5.0/commons-collections4-4.5.0-javadoc.jar!/"/>
+			<attribute name="maven.groupId" value="org.apache.commons"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/net/sf/trove4j/core/3.1.0/core-3.1.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="3.1.0"/>
+			<attribute name="maven.groupId" value="net.sf.trove4j"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.21.2/jackson-core-2.21.2.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jackson-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="2.21.2"/>
+			<attribute name="maven.groupId" value="com.fasterxml.jackson.core"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.21.2/jackson-databind-2.21.2.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jackson-databind"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="2.21.2"/>
+			<attribute name="maven.groupId" value="com.fasterxml.jackson.core"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.21/jackson-annotations-2.21.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jackson-annotations"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.21"/>
+			<attribute name="maven.groupId" value="com.fasterxml.jackson.core"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/google/crypto/tink/tink/1.18.0/tink-1.18.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="tink"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="1.18.0"/>
+			<attribute name="maven.groupId" value="com.google.crypto.tink"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/google/code/gson/gson/2.13.2/gson-2.13.2.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="gson"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="2.13.2"/>
+			<attribute name="maven.groupId" value="com.google.code.gson"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/google/protobuf/protobuf-java/4.34.1/protobuf-java-4.34.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="protobuf-java"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.34.1"/>
+			<attribute name="maven.groupId" value="com.google.protobuf"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/s3/2.43.0/s3-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="s3"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/aws-xml-protocol/2.43.0/aws-xml-protocol-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="aws-xml-protocol"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/aws-query-protocol/2.43.0/aws-query-protocol-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="aws-query-protocol"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/protocol-core/2.43.0/protocol-core-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="protocol-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/arns/2.43.0/arns-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="arns"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/profiles/2.43.0/profiles-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="profiles"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/crt-core/2.43.0/crt-core-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="crt-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/http-auth/2.43.0/http-auth-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="http-auth"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/identity-spi/2.43.0/identity-spi-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="identity-spi"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/http-auth-spi/2.43.0/http-auth-spi-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="http-auth-spi"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="reactive-streams"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.0.4"/>
+			<attribute name="maven.groupId" value="org.reactivestreams"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/http-auth-aws/2.43.0/http-auth-aws-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="http-auth-aws"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/checksums/2.43.0/checksums-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="checksums"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/checksums-spi/2.43.0/checksums-spi-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="checksums-spi"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/retries-spi/2.43.0/retries-spi-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="retries-spi"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/sdk-core/2.43.0/sdk-core-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="sdk-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/retries/2.43.0/retries-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="retries"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/auth/2.43.0/auth-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="auth"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/http-auth-aws-eventstream/2.43.0/http-auth-aws-eventstream-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="http-auth-aws-eventstream"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/eventstream/eventstream/1.0.1/eventstream-1.0.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="eventstream"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.0.1"/>
+			<attribute name="maven.groupId" value="software.amazon.eventstream"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/http-client-spi/2.43.0/http-client-spi-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="http-client-spi"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/regions/2.43.0/regions-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="regions"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/annotations/2.43.0/annotations-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="annotations"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/utils/2.43.0/utils-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="utils"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/aws-core/2.43.0/aws-core-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="aws-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/utils-lite/2.43.0/utils-lite-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="utils-lite"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/metrics-spi/2.43.0/metrics-spi-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="metrics-spi"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/json-utils/2.43.0/json-utils-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="json-utils"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/third-party-jackson-core/2.43.0/third-party-jackson-core-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="third-party-jackson-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/endpoints-spi/2.43.0/endpoints-spi-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="endpoints-spi"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/apache-client/2.43.0/apache-client-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="apache-client"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/apache/httpcomponents/httpclient/4.5.13/httpclient-4.5.13.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="httpclient"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.5.13"/>
+			<attribute name="maven.groupId" value="org.apache.httpcomponents"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/apache/httpcomponents/httpcore/4.4.16/httpcore-4.4.16.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="httpcore"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.4.16"/>
+			<attribute name="maven.groupId" value="org.apache.httpcomponents"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/commons-codec/commons-codec/1.21.0/commons-codec-1.21.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="commons-codec"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="1.21.0"/>
+			<attribute name="maven.groupId" value="commons-codec"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/netty-nio-client/2.43.0/netty-nio-client-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-nio-client"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/netty/netty-codec-http/4.2.12.Final/netty-codec-http-4.2.12.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-codec-http"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.2.12.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/netty/netty-codec-base/4.2.12.Final/netty-codec-base-4.2.12.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-codec-base"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.2.12.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/netty/netty-codec-compression/4.2.12.Final/netty-codec-compression-4.2.12.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-codec-compression"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.2.12.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/netty/netty-codec-http2/4.2.12.Final/netty-codec-http2-4.2.12.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-codec-http2"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.2.12.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/netty/netty-codec/4.2.12.Final/netty-codec-4.2.12.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-codec"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.2.12.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/netty/netty-codec-protobuf/4.2.12.Final/netty-codec-protobuf-4.2.12.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-codec-protobuf"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.2.12.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/netty/netty-codec-marshalling/4.2.12.Final/netty-codec-marshalling-4.2.12.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-codec-marshalling"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.2.12.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/netty/netty-transport/4.2.12.Final/netty-transport-4.2.12.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-transport"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.2.12.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/netty/netty-common/4.2.12.Final/netty-common-4.2.12.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-common"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.2.12.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/netty/netty-buffer/4.2.12.Final/netty-buffer-4.2.12.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-buffer"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.2.12.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/netty/netty-handler/4.2.12.Final/netty-handler-4.2.12.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-handler"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.2.12.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/netty/netty-transport-native-unix-common/4.2.12.Final/netty-transport-native-unix-common-4.2.12.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-transport-native-unix-common"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.2.12.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/netty/netty-transport-classes-epoll/4.2.12.Final/netty-transport-classes-epoll-4.2.12.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-transport-classes-epoll"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.2.12.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/io/netty/netty-resolver/4.2.12.Final/netty-resolver-4.2.12.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-resolver"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.2.12.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/batch/2.43.0/batch-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="batch"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/software/amazon/awssdk/aws-json-protocol/2.43.0/aws-json-protocol-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="aws-json-protocol"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="software.amazon.awssdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/apache/commons/commons-lang3/3.20.0/commons-lang3-3.20.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="commons-lang3"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="3.20.0"/>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/Finneganj/.m2/repository/org/apache/commons/commons-lang3/3.20.0/commons-lang3-3.20.0-javadoc.jar!/"/>
+			<attribute name="maven.groupId" value="org.apache.commons"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="lombok"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="provided"/>
+			<attribute name="maven.version" value="1.18.46"/>
+			<attribute name="maven.groupId" value="org.projectlombok"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/github/ben-manes/caffeine/caffeine/3.2.3/caffeine-3.2.3.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="caffeine"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="3.2.3"/>
+			<attribute name="maven.groupId" value="com.github.ben-manes.caffeine"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/google/errorprone/error_prone_annotations/2.43.0/error_prone_annotations-2.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="error_prone_annotations"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.43.0"/>
+			<attribute name="maven.groupId" value="com.google.errorprone"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/reflections/reflections/0.10.2/reflections-0.10.2.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="reflections"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="0.10.2"/>
+			<attribute name="maven.groupId" value="org.reflections"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/javassist/javassist/3.28.0-GA/javassist-3.28.0-GA.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="javassist"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="3.28.0-GA"/>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/Finneganj/.m2/repository/org/javassist/javassist/3.28.0-GA/javassist-3.28.0-GA-javadoc.jar!/"/>
+			<attribute name="maven.groupId" value="org.javassist"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jsr305"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="3.0.2"/>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/Finneganj/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2-javadoc.jar!/"/>
+			<attribute name="maven.groupId" value="com.google.code.findbugs"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/de/gesundkrank/jskills/jskills/1.1/jskills-1.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jskills"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.1"/>
+			<attribute name="maven.groupId" value="de.gesundkrank.jskills"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/ejml/simple/0.30/simple-0.30.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="simple"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="0.30"/>
+			<attribute name="maven.groupId" value="org.ejml"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/ejml/core/0.30/core-0.30.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="0.30"/>
+			<attribute name="maven.groupId" value="org.ejml"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/ejml/dense64/0.30/dense64-0.30.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="dense64"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="0.30"/>
+			<attribute name="maven.groupId" value="org.ejml"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/github/usefulness/webp-imageio/0.10.2/webp-imageio-0.10.2.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="webp-imageio"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="0.10.2"/>
+			<attribute name="maven.groupId" value="com.github.usefulness"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib/2.3.20/kotlin-stdlib-2.3.20.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="kotlin-stdlib"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.3.20"/>
+			<attribute name="maven.groupId" value="org.jetbrains.kotlin"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/jetbrains/annotations/13.0/annotations-13.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="annotations"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="13.0"/>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/Finneganj/.m2/repository/org/jetbrains/annotations/13.0/annotations-13.0-javadoc.jar!/"/>
+			<attribute name="maven.groupId" value="org.jetbrains"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/net/fellbaum/jemoji/2.0.0/jemoji-2.0.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jemoji"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.0.0"/>
+			<attribute name="maven.groupId" value="net.fellbaum"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/tools/jackson/core/jackson-databind/3.1.2/jackson-databind-3.1.2.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jackson-databind"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="3.1.2"/>
+			<attribute name="maven.groupId" value="tools.jackson.core"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/tools/jackson/core/jackson-core/3.1.2/jackson-core-3.1.2.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jackson-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="3.1.2"/>
+			<attribute name="maven.groupId" value="tools.jackson.core"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/rollbar/rollbar-java/2.2.0/rollbar-java-2.2.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="rollbar-java"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.2.0"/>
+			<attribute name="maven.groupId" value="com.rollbar"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/rollbar/rollbar-api/2.2.0/rollbar-api-2.2.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="rollbar-api"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.2.0"/>
+			<attribute name="maven.groupId" value="com.rollbar"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/github/spotbugs/spotbugs-annotations/4.9.8/spotbugs-annotations-4.9.8.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spotbugs-annotations"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.9.8"/>
+			<attribute name="maven.optionaldependency" value="true"/>
+			<attribute name="maven.groupId" value="com.github.spotbugs"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-starter-test/4.1.0-RC1/spring-boot-starter-test-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-starter-test"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-test/4.1.0-RC1/spring-boot-test-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-test"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/boot/spring-boot-test-autoconfigure/4.1.0-RC1/spring-boot-test-autoconfigure-4.1.0-RC1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-boot-test-autoconfigure"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="4.1.0-RC1"/>
+			<attribute name="maven.groupId" value="org.springframework.boot"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/jayway/jsonpath/json-path/2.10.0/json-path-2.10.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="json-path"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="2.10.0"/>
+			<attribute name="maven.groupId" value="com.jayway.jsonpath"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.4/jakarta.xml.bind-api-4.0.4.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jakarta.xml.bind-api"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="4.0.4"/>
+			<attribute name="maven.groupId" value="jakarta.xml.bind"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.4/jakarta.activation-api-2.1.4.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jakarta.activation-api"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="runtime"/>
+			<attribute name="maven.version" value="2.1.4"/>
+			<attribute name="maven.groupId" value="jakarta.activation"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/net/minidev/json-smart/2.6.0/json-smart-2.6.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="json-smart"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="2.6.0"/>
+			<attribute name="maven.groupId" value="net.minidev"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/net/minidev/accessors-smart/2.6.0/accessors-smart-2.6.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="accessors-smart"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="2.6.0"/>
+			<attribute name="maven.groupId" value="net.minidev"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/ow2/asm/asm/9.7.1/asm-9.7.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="asm"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="9.7.1"/>
+			<attribute name="maven.groupId" value="org.ow2.asm"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/assertj/assertj-core/3.27.7/assertj-core-3.27.7.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="assertj-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="3.27.7"/>
+			<attribute name="maven.groupId" value="org.assertj"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/awaitility/awaitility/4.3.0/awaitility-4.3.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="awaitility"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="4.3.0"/>
+			<attribute name="maven.groupId" value="org.awaitility"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/hamcrest/hamcrest/3.0/hamcrest-3.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="hamcrest"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="3.0"/>
+			<attribute name="maven.groupId" value="org.hamcrest"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/junit/jupiter/junit-jupiter/6.0.3/junit-jupiter-6.0.3.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="junit-jupiter"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="6.0.3"/>
+			<attribute name="maven.groupId" value="org.junit.jupiter"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/junit/jupiter/junit-jupiter-api/6.0.3/junit-jupiter-api-6.0.3.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="junit-jupiter-api"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="6.0.3"/>
+			<attribute name="maven.groupId" value="org.junit.jupiter"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="opentest4j"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="1.3.0"/>
+			<attribute name="maven.groupId" value="org.opentest4j"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/junit/platform/junit-platform-commons/6.0.3/junit-platform-commons-6.0.3.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="junit-platform-commons"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="6.0.3"/>
+			<attribute name="maven.groupId" value="org.junit.platform"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="apiguardian-api"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="1.1.2"/>
+			<attribute name="maven.groupId" value="org.apiguardian"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/junit/jupiter/junit-jupiter-params/6.0.3/junit-jupiter-params-6.0.3.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="junit-jupiter-params"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="6.0.3"/>
+			<attribute name="maven.groupId" value="org.junit.jupiter"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/junit/jupiter/junit-jupiter-engine/6.0.3/junit-jupiter-engine-6.0.3.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="junit-jupiter-engine"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="6.0.3"/>
+			<attribute name="maven.groupId" value="org.junit.jupiter"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/junit/platform/junit-platform-engine/6.0.3/junit-platform-engine-6.0.3.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="junit-platform-engine"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="6.0.3"/>
+			<attribute name="maven.groupId" value="org.junit.platform"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/mockito/mockito-core/5.23.0/mockito-core-5.23.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="mockito-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="5.23.0"/>
+			<attribute name="maven.groupId" value="org.mockito"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/net/bytebuddy/byte-buddy-agent/1.18.8/byte-buddy-agent-1.18.8.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="byte-buddy-agent"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="1.18.8"/>
+			<attribute name="maven.groupId" value="net.bytebuddy"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="objenesis"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="3.3"/>
+			<attribute name="maven.groupId" value="org.objenesis"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/mockito/mockito-junit-jupiter/5.23.0/mockito-junit-jupiter-5.23.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="mockito-junit-jupiter"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="5.23.0"/>
+			<attribute name="maven.groupId" value="org.mockito"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/skyscreamer/jsonassert/1.5.3/jsonassert-1.5.3.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jsonassert"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="1.5.3"/>
+			<attribute name="maven.groupId" value="org.skyscreamer"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="android-json"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="0.0.20131108.vaadin1"/>
+			<attribute name="maven.groupId" value="com.vaadin.external.google"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/spring-core/7.0.7/spring-core-7.0.7.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.0.7"/>
+			<attribute name="maven.groupId" value="org.springframework"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/commons-logging/commons-logging/1.3.6/commons-logging-1.3.6.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="commons-logging"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.3.6"/>
+			<attribute name="maven.groupId" value="commons-logging"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/springframework/spring-test/7.0.7/spring-test-7.0.7.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="spring-test"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="7.0.7"/>
+			<attribute name="maven.groupId" value="org.springframework"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="c:/Users/Finneganj/.m2/repository/org/xmlunit/xmlunit-core/2.11.0/xmlunit-core-2.11.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="xmlunit-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="test"/>
+			<attribute name="maven.version" value="2.11.0"/>
+			<attribute name="maven.groupId" value="org.xmlunit"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>
