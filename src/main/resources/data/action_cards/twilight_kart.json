@@ -4,7 +4,7 @@
         "name": "Amalgamate",
         "phase": "Action",
         "window": "Action",
-        "text": "Draw 1 genome.",
+        "text": "Draw 2 genomes. Then, discard 1 of your genomes.",
         "source": "twilight_kart"
     },
     {
@@ -28,7 +28,7 @@
         "name": "Commission",
         "phase": "Action",
         "window": "Action",
-        "text": "Place 1 neutral mech on any non-home planet that contains no non-neutral units; if that planet was owned by another player, they return its planet card to the planet card deck.",
+        "text": "Place 1 neutral mech and 1 neutral PDS on any non-home planet that contains no non-neutral units; if that planet was owned by another player, they return its planet card to the planet card deck.",
         "source": "twilight_kart"
     },
     {
