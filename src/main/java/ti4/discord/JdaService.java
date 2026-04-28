@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.JDA;
@@ -104,9 +106,14 @@ public class JdaService {
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
     public static final List<Guild> fowServers = new ArrayList<>();
 
+    private static final ExecutorService EVENT_EXECUTOR = Executors.newFixedThreadPool(
+            Runtime.getRuntime().availableProcessors(),
+            Thread.ofPlatform().name("ti4-jda-event-", 0).factory());
+
     public static void startJdaAndRegisterListeners(String[] args) {
         BotLogger.info("STARTING JDA");
         jda = JDABuilder.createDefault(args[0])
+                .setEventPool(EVENT_EXECUTOR)
                 // This is a privileged gateway intent that is used to update user information and join/leaves
                 // (including kicks). This is required to cache all members of a guild (including chunking)
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
@@ -563,6 +570,11 @@ public class JdaService {
             BotLogger.info("SHUTDOWN PROCESS STARTED");
             ActiveLeaseService.setCurrentProcessReady(false);
             BotLogger.info("NO LONGER ACCEPTING COMMANDS");
+            if (shutdownEventExecutor()) { // will wait for up to an additional 20 seconds
+                BotLogger.info("FINISHED PROCESSING ASYNC THREADPOOL");
+            } else {
+                BotLogger.info("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
+            }
             if (ExecutorServiceManager.shutdown()) { // will wait for up to an additional 20 seconds
                 BotLogger.info("FINISHED PROCESSING ASYNC THREADPOOL");
             } else {
@@ -593,6 +605,17 @@ public class JdaService {
             jda.awaitShutdown(30, TimeUnit.SECONDS);
         } catch (Exception e) {
             BotLogger.error("Error encountered within shutdown process:\n> ", e);
+        }
+    }
+
+    private static boolean shutdownEventExecutor() {
+        EVENT_EXECUTOR.shutdownNow();
+        try {
+            return EVENT_EXECUTOR.awaitTermination(20, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            BotLogger.error("JdaService event thread pool shutdown interrupted.", e);
+            Thread.currentThread().interrupt();
+            return false;
         }
     }
 }
