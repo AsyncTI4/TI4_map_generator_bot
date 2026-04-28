@@ -20,6 +20,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
 import ti4.model.LeaderModel;
@@ -421,7 +422,13 @@ public class LazaxCombatSupport {
         Player quietusOwner = Helper.getPlayerFromUnit(game, "crimson_flagship");
         if (quietusOwner == null) return false;
         UnitHolder combatSpace = combatTile.getSpaceUnitHolder();
-        return combatSpace != null && combatSpace.getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
+        if (combatSpace == null || !combatSpace.getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE)) {
+            return false;
+        }
+        return ButtonHelper.getTilesOfPlayersSpecificUnits(game, quietusOwner, UnitType.Flagship).stream()
+                .map(Tile::getSpaceUnitHolder)
+                .filter(unitHolder -> unitHolder != null)
+                .anyMatch(unitHolder -> unitHolder.getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE));
     }
 
     private String formatPlayerSummaryLine(Player player, String summary) {
