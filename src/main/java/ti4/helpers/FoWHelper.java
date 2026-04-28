@@ -498,8 +498,7 @@ public final class FoWHelper {
             List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Destroyer);
             for (String adjPos : getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
                 for (Tile tile2 : destroyers) {
-                    if (getAdjacentTiles(game, adjPos, player, false, true)
-                            .contains(tile2.getPosition())) {
+                    if (getAdjacentTiles(game, adjPos, player, false, true).contains(tile2.getPosition())) {
                         return true;
                     }
                 }

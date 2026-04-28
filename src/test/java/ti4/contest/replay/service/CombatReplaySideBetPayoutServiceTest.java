@@ -71,7 +71,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
 
         int payout = service.offeredPayout(contest, candidate, CombatSideBetType.AFB_WHIFF, "sol");
 
-      assertTrue(service.hasAfbUnits(candidate, "sol"));
+        assertTrue(service.hasAfbUnits(candidate, "sol"));
         assertEquals(6, payout);
         verifyNoInteractions(eventRepository);
     }
@@ -83,7 +83,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
 
         int payout = service.offeredPayout(contest, candidate, CombatSideBetType.AFB_WHIFF, "sol");
 
-      assertFalse(service.hasAfbUnits(candidate, "sol"));
+        assertFalse(service.hasAfbUnits(candidate, "sol"));
         assertEquals(4, payout);
         verifyNoInteractions(eventRepository);
     }
