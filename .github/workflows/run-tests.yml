@@ -27,7 +27,7 @@ jobs:
           else
             echo "has_json=false" >> "$GITHUB_OUTPUT"
           fi
-          if git diff --name-only "$BASE" "$HEAD" | grep -qE '^(src/|pom\.xml$|.*\.json$)'; then
+          if git diff --name-only "$BASE" "$HEAD" | grep -qE '^(src/|pom\.xml$|.*\.json$|\.github/workflows/run-tests\.yml$)'; then
             echo "has_java=true" >> "$GITHUB_OUTPUT"
           else
             echo "has_java=false" >> "$GITHUB_OUTPUT"
