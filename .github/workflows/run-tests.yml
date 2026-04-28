@@ -69,11 +69,11 @@ jobs:
       - name: Fetch master branch for spotless
         if: steps.diff.outputs.has_java == 'true' && (steps.validate-json.outcome == 'success' || steps.validate-json.outcome == 'skipped')
         run: git fetch --no-tags --depth=1 origin master
-      - name: Set up JDK 21 for x64
+      - name: Set up JDK 26 for x64
         if: steps.diff.outputs.has_java == 'true' && (steps.validate-json.outcome == 'success' || steps.validate-json.outcome == 'skipped')
         uses: actions/setup-java@v5
         with:
-          java-version: "21"
+          java-version: "26"
           distribution: "corretto"
           architecture: x64
       - name: Cache Maven local repository

@@ -44,7 +44,7 @@ Download the latest JDK: https://adoptium.net/
 
 Setup vscode with the default extensions for java: https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack
 
-ctrl+shift+p: Java: Configure Java Runtime -> JavaSE-21
+ctrl+shift+p: Java: Configure Java Runtime -> JavaSE-26
 
 Create a discord server for testing
 Create a discord application: https://discord.com/developers/applications
