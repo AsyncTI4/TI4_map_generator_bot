@@ -2,6 +2,7 @@ package ti4.contest.replay.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -21,6 +22,11 @@ import ti4.service.combat.CombatRollType;
 import ti4.testUtils.BaseTi4Test;
 
 class CombatReplayDecoysTest extends BaseTi4Test {
+
+    @Test
+    void globalDecoysFlagDefaultsOff() {
+        assertFalse(new CombatContestSettings().isDecoysEnabled());
+    }
 
     @Test
     void addsDecoyUnitsToRenderedTileOnly() {
@@ -175,6 +181,33 @@ class CombatReplayDecoysTest extends BaseTi4Test {
     }
 
     @Test
+    void doesNotCaptureImplicitDecoysFromRealUnits() {
+        Game game = new Game();
+        Tile tile = new Tile("19", "000");
+        game.setTile(tile);
+        Player ghost = player(game, "ghost", "turquoise");
+        Player yin = player(game, "yin", "sunset");
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Cruiser, "tqs"), 1);
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Destroyer, "sns"), 1);
+        CombatReplayDecoys.clearDebugDecoys(game, tile);
+
+        assertNull(CombatReplayDecoys.buildJson(ghost, yin, tile, true));
+    }
+
+    @Test
+    void globalFlagSuppressesDebugDecoys() {
+        Game game = new Game();
+        Tile tile = new Tile("19", "000");
+        game.setTile(tile);
+        Player ghost = player(game, "ghost", "turquoise");
+        Player yin = player(game, "yin", "sunset");
+        CombatReplayDecoys.clearDebugDecoys(game, tile);
+        CombatReplayDecoys.addDebugDecoyUnit(game, tile, ghost, UnitType.Destroyer);
+
+        assertNull(CombatReplayDecoys.buildJson(ghost, yin, tile, false));
+    }
+
+    @Test
     void debugDecoyOverrideCapturesBuiltUnitMix() {
         Game game = new Game();
         Tile tile = new Tile("19", "000");
@@ -189,7 +222,7 @@ class CombatReplayDecoysTest extends BaseTi4Test {
         CombatReplayDecoys.addDebugDecoyUnit(game, tile, ghost, UnitType.Destroyer);
         CombatReplayDecoys.addDebugDecoyUnit(game, tile, ghost, UnitType.Fighter);
         CombatReplayDecoys.Abilities abilities =
-                CombatReplayDecoys.read(CombatReplayDecoys.buildJson(ghost, yin, tile));
+                CombatReplayDecoys.read(CombatReplayDecoys.buildJson(ghost, yin, tile, true));
 
         assertTrue(abilities.hasDecoys());
         assertEquals(2, abilities.decoy().units().size());
@@ -212,7 +245,7 @@ class CombatReplayDecoysTest extends BaseTi4Test {
 
         CombatReplayDecoys.setDebugDecoyUnits(game, tile, List.of());
 
-        assertEquals(null, CombatReplayDecoys.buildJson(ghost, yin, tile));
+        assertNull(CombatReplayDecoys.buildJson(ghost, yin, tile, true));
     }
 
     @Test

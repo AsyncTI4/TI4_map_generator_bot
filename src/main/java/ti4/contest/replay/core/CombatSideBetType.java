@@ -34,14 +34,14 @@ public enum CombatSideBetType {
     CombatSideBetType(String label, TI4Emoji emoji, int requiredDestroyers, int profitPoints) {
         this.label = label;
         this.emoji = emoji;
-        this.unicodeEmoji = null;
+        unicodeEmoji = null;
         this.requiredDestroyers = requiredDestroyers;
         this.profitPoints = profitPoints;
     }
 
     CombatSideBetType(String label, String unicodeEmoji, int requiredDestroyers, int profitPoints) {
         this.label = label;
-        this.emoji = null;
+        emoji = null;
         this.unicodeEmoji = unicodeEmoji;
         this.requiredDestroyers = requiredDestroyers;
         this.profitPoints = profitPoints;
@@ -71,6 +71,6 @@ public enum CombatSideBetType {
         if (key == null || key.isBlank()) {
             throw new IllegalArgumentException("Unknown side bet type: " + key);
         }
-        return CombatSideBetType.valueOf(key.trim().toUpperCase(Locale.ROOT));
+        return valueOf(key.trim().toUpperCase(Locale.ROOT));
     }
 }

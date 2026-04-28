@@ -25,6 +25,7 @@ public class CombatContestSettings {
     private Retention retention = new Retention();
     private Runtime runtime = new Runtime();
     private SideBets sideBets = new SideBets();
+    private boolean decoysEnabled;
 
     public CombatContestSettings() {
         applyEnvironmentDefaults();
@@ -138,11 +139,11 @@ public class CombatContestSettings {
     @Getter
     @Setter
     public static class Runtime {
-        private boolean devMode = false;
+        private boolean devMode;
         private boolean discordPostingEnabled = true;
         private String versionEnabled = "v2";
-        private boolean trackAllCombatsAsCandidates = false;
-        private boolean immediatePromotionOnResolve = false;
+        private boolean trackAllCombatsAsCandidates;
+        private boolean immediatePromotionOnResolve;
     }
 
     @Getter

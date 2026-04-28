@@ -226,13 +226,13 @@ final class HyperlaneTileGenerator {
         if (matrix != null) {
             // Use matrix hashCode as seed for determinism: same matrix always yields same background/transform
             long seed = matrix.hashCode();
-            int tileIndex = (int) Math.floorMod(seed, RANDOM_BACKGROUNDS.size());
+            int tileIndex = Math.floorMod(seed, RANDOM_BACKGROUNDS.size());
             String randomTile = RANDOM_BACKGROUNDS.get(tileIndex);
             String randomTilePath = ResourceHelper.getInstance().getTileFile(randomTile);
             if (randomTilePath != null) {
                 tilePath = randomTilePath;
             }
-            transform = (int) Math.floorMod(
+            transform = Math.floorMod(
                     seed * 6364136223846793005L + 1442695040888963407L,
                     4); // LCG step (Knuth MMIX constants) for independent transform selection; 0, 1, 2, or 3
         }

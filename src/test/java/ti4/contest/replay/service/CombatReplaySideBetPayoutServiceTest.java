@@ -1,6 +1,8 @@
 package ti4.contest.replay.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 
@@ -69,7 +71,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
 
         int payout = service.offeredPayout(contest, candidate, CombatSideBetType.AFB_WHIFF, "sol");
 
-        assertEquals(true, service.hasAfbUnits(candidate, "sol"));
+        assertTrue(service.hasAfbUnits(candidate, "sol"));
         assertEquals(6, payout);
         verifyNoInteractions(eventRepository);
     }
@@ -81,7 +83,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
 
         int payout = service.offeredPayout(contest, candidate, CombatSideBetType.AFB_WHIFF, "sol");
 
-        assertEquals(false, service.hasAfbUnits(candidate, "sol"));
+        assertFalse(service.hasAfbUnits(candidate, "sol"));
         assertEquals(4, payout);
         verifyNoInteractions(eventRepository);
     }

@@ -50,6 +50,7 @@ public class CombatReplayLeaderboardService {
     public static final String LAZAX_MINIGAME_SUBSCRIPTION_MARKER = "-# Lazax Minigame Subscription";
     public static final String LAZAX_MINIGAME_ROLE_NAME = "Lazax Minigame";
 
+    static final int STARTING_POINTS = 100;
     private static final int WRONG_PREDICTION_PENALTY = -4;
     private static final String SUBSCRIBE_EMOJI = "\uD83D\uDFE2";
     private static final String UNSUBSCRIBE_EMOJI = "\uD83D\uDD34";
@@ -138,7 +139,7 @@ public class CombatReplayLeaderboardService {
             CombatReplayLeaderboardEntryEntity entry = topEntries.get(index);
             int predictions = safeInt(entry.getPredictionCount());
             int correctPredictions = safeInt(entry.getCorrectPredictions());
-            int accuracy = predictions == 0 ? 0 : Math.round((100f * correctPredictions) / predictions);
+            int accuracy = predictions == 0 ? 0 : Math.round((100.0f * correctPredictions) / predictions);
             message.append('`')
                     .append(index + 1)
                     .append(".` ")
@@ -314,7 +315,7 @@ public class CombatReplayLeaderboardService {
         entry.setDiscordUserId(discordUserId);
         entry.setDiscordUserName(
                 discordUserName == null || discordUserName.isBlank() ? "Unknown User" : discordUserName);
-        entry.setTotalPoints(0);
+        entry.setTotalPoints(STARTING_POINTS);
         entry.setPredictionCount(0);
         entry.setCorrectPredictions(0);
         entry.setUpdatedAt(LocalDateTime.now());

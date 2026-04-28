@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.audit.TargetType;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.events.guild.GuildAuditLogEntryCreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import ti4.executors.ExecutorServiceManager;
 import ti4.logging.BotLogger;
 import ti4.service.async.BanCleanupService;
 import ti4.spring.service.deploy.ActiveLeaseService;
@@ -15,6 +16,10 @@ class BanListener extends ListenerAdapter {
     @Override
     public void onGuildAuditLogEntryCreate(@Nonnull GuildAuditLogEntryCreateEvent event) {
         if (!ActiveLeaseService.shouldHandleCurrentProcessInteraction()) return;
+        ExecutorServiceManager.runAsync("BanListener task", () -> process(event));
+    }
+
+    private void process(GuildAuditLogEntryCreateEvent event) {
         try {
             AuditLogEntry log = event.getEntry();
             UserSnowflake target = getTargetUser(log);

@@ -158,13 +158,13 @@ public class CombatRollPayloadRenderer {
 
     private String renderDie(String unitId, DieRoll die) {
         if (die.success()) {
-            String redDie = DiceEmojis.getRedDieEmoji(die.result()).toString();
+            String redDie = DiceEmojis.getRedDieEmoji(die.result());
             if ("jolnar_flagship".equals(unitId) && (die.result() == 9 || die.result() == 10)) {
                 return DiceEmojis.getDieEmoji("blue", die.result());
             }
             return redDie;
         }
-        return DiceEmojis.getGrayDieEmoji(die.result()).toString();
+        return DiceEmojis.getGrayDieEmoji(die.result());
     }
 
     private boolean isNice(List<DieRoll> dice) {

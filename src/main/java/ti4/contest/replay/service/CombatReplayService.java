@@ -12,11 +12,23 @@ import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.springframework.stereotype.Service;
-import ti4.contest.replay.core.*;
+import ti4.contest.replay.core.CombatCandidateEventType;
+import ti4.contest.replay.core.CombatCandidatePromotionStatus;
+import ti4.contest.replay.core.CombatCandidateStatus;
+import ti4.contest.replay.core.CombatContestSettings;
+import ti4.contest.replay.core.CombatReplayDecoys;
+import ti4.contest.replay.core.CombatReplaySelection;
+import ti4.contest.replay.core.CombatReplayTrackedEvent;
+import ti4.contest.replay.core.CombatRollPayload;
+import ti4.contest.replay.core.CombatSideState;
+import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
 import ti4.contest.replay.dispatch.ReplayDispatchPayload;
-import ti4.contest.replay.entities.*;
-import ti4.contest.replay.repository.*;
+import ti4.contest.replay.entities.CombatCandidateEntity;
+import ti4.contest.replay.entities.CombatObservationEntity;
+import ti4.contest.replay.repository.CombatCandidateEventRepository;
+import ti4.contest.replay.repository.CombatCandidateRepository;
+import ti4.contest.replay.repository.CombatObservationRepository;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -35,6 +47,7 @@ import ti4.spring.context.SpringContext;
 public class CombatReplayService {
 
     private static final Pattern SYSTEM_TILE_PATTERN = Pattern.compile("-system-([^-]+)-");
+    private static final ThreadLocal<PreInteractionSnapshot> preInteractionSnapshot = new ThreadLocal<>();
 
     private final CombatContestSettings settings;
     private final CombatObservationRepository observationRepository;
@@ -42,7 +55,6 @@ public class CombatReplayService {
     private final CombatCandidateEventRepository candidateEventRepository;
     private final CombatReplayEventAppender eventAppender;
     private final CombatReplaySideBetTriggerService sideBetTriggerService;
-    private final ThreadLocal<PreInteractionSnapshot> preInteractionSnapshot = new ThreadLocal<>();
     private CombatReplaySelection selection;
 
     @PostConstruct
@@ -442,7 +454,7 @@ public class CombatReplayService {
         return new CandidateInitialSnapshot(
                 LazaxCombatSupport.formatCombatTechSummary(tile, attacker, defender),
                 CombatReplayTileRenderer.captureInitialSnapshot(game, tile.getPosition()),
-                CombatReplayDecoys.buildJson(attacker, defender, tile),
+                CombatReplayDecoys.buildJson(attacker, defender, tile, settings.isDecoysEnabled()),
                 countDestroyersInCombat(tile, attacker),
                 countDestroyersInCombat(tile, defender),
                 hasAssaultCannon(attacker),
@@ -459,8 +471,8 @@ public class CombatReplayService {
             return null;
         }
         return new ResolutionState(
-                LazaxCombatSupport.calculateFleetStrength(game, attacker, defender, tile, space),
-                LazaxCombatSupport.calculateFleetStrength(game, defender, attacker, tile, space));
+                LazaxCombatSupport.calculateFleetStrength(attacker, defender, tile, space),
+                LazaxCombatSupport.calculateFleetStrength(defender, attacker, tile, space));
     }
 
     public void refreshSelectionSnapshot() {

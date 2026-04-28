@@ -70,7 +70,6 @@ class SlashCommandListener extends ListenerAdapter implements CommandListenerInt
 
         ParentCommand command = SlashCommandManager.getCommand(event.getName());
         Command<SlashCommandInteractionEvent> resolvedCommand = getCommand(event);
-        boolean combatReplaySnapshotBound = false;
         CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
         try {
             if (command.accept(event)) {
@@ -78,7 +77,6 @@ class SlashCommandListener extends ListenerAdapter implements CommandListenerInt
                 if (resolvedCommand instanceof GameStateContainer gameStateContainer) {
                     combatReplayService.setPreInteractionSnapshot(
                             combatReplayService.capturePreInteractionSnapshot(gameStateContainer.getGame()));
-                    combatReplaySnapshotBound = true;
                 }
                 logSlashCommand(event);
                 command.execute(event);
@@ -90,9 +88,7 @@ class SlashCommandListener extends ListenerAdapter implements CommandListenerInt
         } catch (Exception e) {
             command.onException(event, e);
         } finally {
-            if (combatReplaySnapshotBound) {
-                combatReplayService.clearPreInteractionSnapshot();
-            }
+            combatReplayService.clearPreInteractionSnapshot();
             RollbarManager.clear();
         }
 

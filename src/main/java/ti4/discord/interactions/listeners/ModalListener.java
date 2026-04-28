@@ -76,16 +76,15 @@ public final class ModalListener extends ListenerAdapter {
             RollbarManager.putInteractionMetadata("modal", event);
             RollbarManager.put("modal_id", event.getModalId());
             RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
-            if (context.isValid()) {
-                CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
-                combatReplayService.setPreInteractionSnapshot(
-                        combatReplayService.capturePreInteractionSnapshot(context.getGame()));
-                try {
-                    resolveModalInteractionEvent(context);
-                    context.save();
-                } finally {
-                    combatReplayService.clearPreInteractionSnapshot();
-                }
+
+            CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
+            combatReplayService.setPreInteractionSnapshot(
+                    combatReplayService.capturePreInteractionSnapshot(context.getGame()));
+            try {
+                resolveModalInteractionEvent(context);
+                context.save();
+            } finally {
+                combatReplayService.clearPreInteractionSnapshot();
             }
         } catch (Exception e) {
             String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: "
