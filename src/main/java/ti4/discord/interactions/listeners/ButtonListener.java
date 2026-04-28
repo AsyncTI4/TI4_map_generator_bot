@@ -103,14 +103,12 @@ class ButtonListener extends ListenerAdapter {
             slowEvents.addLast(now);
 
             // trim old entries outside 5-minute window
-            Long ts;
             long windowMs = WARNING_COOLDOWN_WINDOW.toMillis();
-
             while (!slowEvents.isEmpty() && now - slowEvents.getFirst() > windowMs) {
                 slowEvents.removeFirst();
             }
 
-            if (slowEvents.size() < EVENT_COUNT_THRESHOLD) {
+            if (slowEvents.size() <= EVENT_COUNT_THRESHOLD) {
                 return;
             }
 
@@ -125,7 +123,7 @@ class ButtonListener extends ListenerAdapter {
                     + EVENT_COUNT_THRESHOLD
                     + "+ slow events in the last "
                     + WARNING_COOLDOWN_WINDOW.toMinutes() + "  minutes.**"
-                    + "\nGateway ping: " + gatewayPing);
+                    + "\n**Gateway ping:** " + gatewayPing);
         }
     }
 }
