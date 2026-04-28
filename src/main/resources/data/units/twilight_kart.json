@@ -90,7 +90,7 @@
         "sustainDamage": true,
         "isUpgrade": true,
         "isShip": true,
-        "ability": "This unit cannot be destroyed by “Spark” action cards. After you win a space combat in this system, you may gain 1 trade good, or produce 1 ship in this system of any ship type that was destroyed during the combat.",
+        "ability": "This unit cannot be destroyed by “Spark” action cards. After a space combat in this system, you may gain 1 trade good; then you may also produce 1 ship in this system of any type destroyed during the combat.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-salvagebarge.png?raw=true",
         "source": "twilight_kart"
     },
@@ -286,7 +286,7 @@
         "combatDieCount": 1,
         "isUpgrade": true,
         "isShip": true,
-        "ability": "Other players must spend 1 influence to activate the system that contains this unit.",
+        "ability": "Other players must spend 2 influence to activate the system that contains this ship.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-publicani.png?raw=true",
         "source": "twilight_kart"
     },
