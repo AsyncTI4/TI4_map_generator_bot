@@ -533,8 +533,7 @@ public final class ButtonHelperTwilightsFall {
         }
         MessageHelper.sendMessageToChannel(
                 game.getMainGameChannel(),
-                "The splice order has been reversed. The new order is: "
-                        + getSpliceOrderString(participants));
+                "The splice order has been reversed. The new order is: " + getSpliceOrderString(participants));
 
         game.removeStoredValue("reverseSpliceOrder");
     }
