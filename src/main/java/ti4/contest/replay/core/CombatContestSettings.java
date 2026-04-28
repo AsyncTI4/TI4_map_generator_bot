@@ -25,7 +25,7 @@ public class CombatContestSettings {
     private Retention retention = new Retention();
     private Runtime runtime = new Runtime();
     private SideBets sideBets = new SideBets();
-    private boolean decoysEnabled = false;
+    private boolean decoysEnabled;
 
     public CombatContestSettings() {
         applyEnvironmentDefaults();
@@ -100,21 +100,21 @@ public class CombatContestSettings {
 
     @Getter
     @Setter
-    public static class CandidateSelection {
+    private static class CandidateSelection {
         private Window window = new Window();
         private int targetCandidatesPerHour = 4;
     }
 
     @Getter
     @Setter
-    public static class Window {
+    private static class Window {
         private int lookbackMinutes = 60;
         private int refreshCronIntervalSeconds = 300;
     }
 
     @Getter
     @Setter
-    public static class Promotion {
+    private static class Promotion {
         private boolean enabled = true;
         private int intervalSeconds = 60;
         private int candidateLookbackHours = 12;
@@ -123,7 +123,7 @@ public class CombatContestSettings {
 
     @Getter
     @Setter
-    public static class ReplayExecution {
+    private static class ReplayExecution {
         private int startDelayMinutes = 15;
         private int replayIntervalSeconds = 15;
         private int maxEventGapSeconds = 30;
@@ -138,17 +138,17 @@ public class CombatContestSettings {
 
     @Getter
     @Setter
-    public static class Runtime {
-        private boolean devMode = false;
+    private static class Runtime {
+        private boolean devMode;
         private boolean discordPostingEnabled = true;
         private String versionEnabled = "v2";
-        private boolean trackAllCombatsAsCandidates = false;
-        private boolean immediatePromotionOnResolve = false;
+        private boolean trackAllCombatsAsCandidates;
+        private boolean immediatePromotionOnResolve;
     }
 
     @Getter
     @Setter
-    public static class SideBets {
+    private static class SideBets {
         private boolean enableSideBets = true;
         private int maxBetsPerUser = 5;
         private int costPoints = 1;

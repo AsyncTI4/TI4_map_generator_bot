@@ -39,7 +39,7 @@ class RotateHyperlane extends GameStateSubcommand {
 
         int rotation = 60;
         if (event.getOptions().size() > 1 && event.getOptions().get(1).getType() == OptionType.INTEGER) {
-            rotation = (int) event.getOptions().get(1).getAsInt();
+            rotation = event.getOptions().get(1).getAsInt();
             if (rotation % 60 != 0) {
                 MessageHelper.replyToMessage(event, "Rotation must be a multiple of 60");
                 return;

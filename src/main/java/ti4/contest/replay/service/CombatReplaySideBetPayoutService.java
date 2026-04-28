@@ -55,14 +55,14 @@ public class CombatReplaySideBetPayoutService {
         if (betType == CombatSideBetType.WINNER_ONE_HP) {
             InitialSnapshotCombatContext context = initialSnapshotCombatContext(candidate, null);
             return context == null
-                    ? fixedPayout(betType)
+                    ? fixedPayout(CombatSideBetType.WINNER_ONE_HP)
                     : hpPayout(
                             context.snapshot().attackerHp(), context.snapshot().defenderHp());
         }
 
         if (betType == CombatSideBetType.AFB_WHIFF) {
             Double probability = afbWhiffProbabilityFromInitialSnapshot(candidate, targetFaction);
-            if (probability == null) return fixedPayout(betType);
+            if (probability == null) return fixedPayout(CombatSideBetType.AFB_WHIFF);
             return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(probability);
         }
 

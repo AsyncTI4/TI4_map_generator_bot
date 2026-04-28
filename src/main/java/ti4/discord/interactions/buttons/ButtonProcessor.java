@@ -1,11 +1,14 @@
 package ti4.discord.interactions.buttons;
 
 import java.text.DecimalFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.contest.replay.service.CombatReplayService;
@@ -34,6 +37,8 @@ import ti4.message.MessageHelper;
 import ti4.service.button.ReactionService;
 import ti4.service.game.GameNameService;
 import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.settings.users.UserSettings;
+import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
 
 @UtilityClass
@@ -74,7 +79,7 @@ public class ButtonProcessor {
         long resolveRuntime = 0;
         long saveRuntime = 0;
 
-        BotLogger.logButton(event);
+        log(event);
         try {
             CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
             CombatReplayService.PreInteractionSnapshot preInteractionSnapshot =
@@ -106,6 +111,20 @@ public class ButtonProcessor {
                 contextCreationRuntime,
                 resolveRuntime,
                 saveRuntime);
+    }
+
+    private static void log(ButtonInteractionEvent event) {
+        BotLogger.logButton(event);
+
+        RollbarManager.putInteractionMetadata("button", event);
+        RollbarManager.put("button_id", event.getButton().getCustomId());
+        RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
+
+        User user = event.getUser();
+        UserSettings userSettings = UserSettingsManager.get(user.getId());
+        int currentHourUTC = ZonedDateTime.now(ZoneId.of("UTC")).getHour();
+        userSettings.addActiveHour(currentHourUTC);
+        UserSettingsManager.save(userSettings);
     }
 
     private static boolean handleKnownButtons(ButtonContext context) {

@@ -37,7 +37,7 @@ public class MuaatHeroService {
         boolean frontier = space.getTokenList().contains(frontierFilename);
         Tile novaTile = new Tile(AliasHandler.resolveTile("81"), tile.getPosition(), space);
         if (muaat.getPlanets().contains("avernus")
-                && tile.getUnitHolders().keySet().contains("avernus")) {
+                && tile.getUnitHolders().containsKey("avernus")) {
             TokenPlanetService.moveTokenPlanet(game, muaat, novaTile, "avernus");
         }
         game.removeTile(tile.getPosition());
