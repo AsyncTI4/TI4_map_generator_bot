@@ -1,8 +1,10 @@
 package ti4.discord.interactions.buttons;
 
+import java.time.Duration;
 import java.time.Instant;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
 import ti4.logging.BotLogger;
@@ -13,8 +15,11 @@ class ButtonRuntimeWarningService {
     private static final int PREPROCESSING_WARNING_THRESHOLD_MILLISECONDS = 2500;
     private static final int PROCESSING_WARNING_THRESHOLD_MILLISECONDS = 1000;
     private static final int RUNTIME_WARNING_COUNT_THRESHOLD = 10;
-    private static final int RESET_WARNING_COUNT_AFTER_SECONDS = 300;
-    private static final int PAUSE_AFTER_WARNING_SECONDS = 300;
+    private static final long RESET_WARNING_COUNT_AFTER_SECONDS =
+            Duration.ofMinutes(2).toSeconds();
+    private static final long PAUSE_AFTER_WARNING_SECONDS =
+            Duration.ofMinutes(5).toSeconds();
+    private static final Duration TO_WAIT_BEFORE_CHECKS_START = Duration.ofMinutes(2);
 
     private int runtimeWarningCount;
     private Instant pauseWarningsUntil = Instant.now();
@@ -39,6 +44,7 @@ class ButtonRuntimeWarningService {
             long contextCreationRuntimeMs,
             long resolveRuntimeMs,
             long saveRuntimeMs) {
+        if (!AsyncTI4DiscordBot.durationHasPassedSinceStartup(TO_WAIT_BEFORE_CHECKS_START)) return;
 
         runtimeSubmissionCount++;
 

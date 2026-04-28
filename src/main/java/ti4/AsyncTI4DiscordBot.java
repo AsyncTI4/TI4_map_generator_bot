@@ -1,5 +1,6 @@
 package ti4;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
@@ -84,5 +85,9 @@ public class AsyncTI4DiscordBot {
 
     private static boolean isBlank(String value) {
         return value == null || value.isBlank();
+    }
+
+    public static boolean durationHasPassedSinceStartup(Duration duration) {
+        return System.currentTimeMillis() - START_TIME_MILLISECONDS <= duration.toMillis();
     }
 }
