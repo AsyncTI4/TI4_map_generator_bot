@@ -17,7 +17,7 @@ class ThreadCreateListener extends ListenerAdapter {
 
         // lock per guild so we don't run it more than once
         ExecutorServiceManager.runAsyncWithLock(
-                "ThreadCreateListener task on" + event.getGuild().getName(), () -> {
+                "ThreadCreateListener task on " + event.getGuild().getName(), () -> {
                     try {
                         ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
                     } catch (Exception e) {

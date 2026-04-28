@@ -10,9 +10,11 @@ import ti4.service.statistics.SREStats;
 
 class ButtonRuntimeWarningService {
 
-    private static final int PREPROCESSING_WARNING_THRESHOLD_MILLISECONDS = 2000;
+    private static final int PREPROCESSING_WARNING_THRESHOLD_MILLISECONDS = 2500;
     private static final int PROCESSING_WARNING_THRESHOLD_MILLISECONDS = 1000;
-    private static final int RUNTIME_WARNING_COUNT_THRESHOLD = 20;
+    private static final int RUNTIME_WARNING_COUNT_THRESHOLD = 10;
+    private static final int RESET_WARNING_COUNT_AFTER_SECONDS = 300;
+    private static final int PAUSE_AFTER_WARNING_SECONDS = 300;
 
     private int runtimeWarningCount;
     private Instant pauseWarningsUntil = Instant.now();
@@ -51,7 +53,7 @@ class ButtonRuntimeWarningService {
         SREStats.recordButtonProcessingMillis(processingTimeMs);
 
         var now = Instant.now();
-        if (lastWarningTime.isBefore(now.minusSeconds(60))) {
+        if (lastWarningTime.isBefore(now.minusSeconds(RESET_WARNING_COUNT_AFTER_SECONDS))) {
             runtimeWarningCount = 0;
         }
 
@@ -97,7 +99,7 @@ class ButtonRuntimeWarningService {
         runtimeWarningCount++;
 
         if (runtimeWarningCount > RUNTIME_WARNING_COUNT_THRESHOLD) {
-            pauseWarningsUntil = now.plusSeconds(300);
+            pauseWarningsUntil = now.plusSeconds(PAUSE_AFTER_WARNING_SECONDS);
             BotLogger.error("**Buttons are processing slowly. Pausing warnings for 5 minutes.**");
             runtimeWarningCount = 0;
         }
