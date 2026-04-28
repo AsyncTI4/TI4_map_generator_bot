@@ -570,7 +570,7 @@ public class JdaService {
             BotLogger.info("SHUTDOWN PROCESS STARTED");
             ActiveLeaseService.setCurrentProcessReady(false);
             BotLogger.info("NO LONGER ACCEPTING COMMANDS");
-            if (shutdownEventExecutor()) {
+            if (shutdownEventExecutor()) { // will wait for up to an additional 20 seconds
                 BotLogger.info("FINISHED PROCESSING ASYNC THREADPOOL");
             } else {
                 BotLogger.info("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
