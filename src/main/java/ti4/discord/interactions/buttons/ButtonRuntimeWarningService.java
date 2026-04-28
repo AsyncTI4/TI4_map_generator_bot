@@ -15,8 +15,10 @@ class ButtonRuntimeWarningService {
     private static final int PREPROCESSING_WARNING_THRESHOLD_MILLISECONDS = 2500;
     private static final int PROCESSING_WARNING_THRESHOLD_MILLISECONDS = 1000;
     private static final int RUNTIME_WARNING_COUNT_THRESHOLD = 10;
-    private static final long RESET_WARNING_COUNT_AFTER_SECONDS = Duration.ofMinutes(5).toSeconds();
-    private static final long PAUSE_AFTER_WARNING_SECONDS = Duration.ofMinutes(5).toSeconds();
+    private static final long RESET_WARNING_COUNT_AFTER_SECONDS =
+            Duration.ofMinutes(5).toSeconds();
+    private static final long PAUSE_AFTER_WARNING_SECONDS =
+            Duration.ofMinutes(5).toSeconds();
     private static final Duration TO_WAIT_BEFORE_CHECKS_START = Duration.ofMinutes(2);
 
     private int runtimeWarningCount;
