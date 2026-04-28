@@ -90,7 +90,10 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          mvn --batch-mode --no-transfer-progress verify -P ci-spotless \
+          mvn --batch-mode \
+            --no-transfer-progress verify \
+            --fail-at-end \
+            -P ci-spotless \
             -Dorg.slf4j.simpleLogger.showDateTime=true \
             -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss.SSS \
             2>&1 | tee /tmp/maven.log
