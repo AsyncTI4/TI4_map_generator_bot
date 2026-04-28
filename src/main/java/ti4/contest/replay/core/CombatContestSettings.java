@@ -100,21 +100,21 @@ public class CombatContestSettings {
 
     @Getter
     @Setter
-    private static class CandidateSelection {
+    public static class CandidateSelection {
         private Window window = new Window();
         private int targetCandidatesPerHour = 4;
     }
 
     @Getter
     @Setter
-    private static class Window {
+    public static class Window {
         private int lookbackMinutes = 60;
         private int refreshCronIntervalSeconds = 300;
     }
 
     @Getter
     @Setter
-    private static class Promotion {
+    public static class Promotion {
         private boolean enabled = true;
         private int intervalSeconds = 60;
         private int candidateLookbackHours = 12;
@@ -123,7 +123,7 @@ public class CombatContestSettings {
 
     @Getter
     @Setter
-    private static class ReplayExecution {
+    public static class ReplayExecution {
         private int startDelayMinutes = 15;
         private int replayIntervalSeconds = 15;
         private int maxEventGapSeconds = 30;
@@ -138,7 +138,7 @@ public class CombatContestSettings {
 
     @Getter
     @Setter
-    private static class Runtime {
+    public static class Runtime {
         private boolean devMode;
         private boolean discordPostingEnabled = true;
         private String versionEnabled = "v2";
@@ -148,7 +148,7 @@ public class CombatContestSettings {
 
     @Getter
     @Setter
-    private static class SideBets {
+    public static class SideBets {
         private boolean enableSideBets = true;
         private int maxBetsPerUser = 5;
         private int costPoints = 1;
