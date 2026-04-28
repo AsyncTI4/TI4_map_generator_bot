@@ -13,6 +13,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.edict.EdictPhaseHandler;
+import ti4.discord.interactions.buttons.handlers.faction.other.onyxxa.OnyxxaHeroButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -206,23 +207,7 @@ public class PlayHeroService {
                     ButtonHelperRelics.offerTitansHeroButtons(player, game, event);
                 }
             }
-            case "onyxxahero" -> {
-                List<Button> buttons = new ArrayList<>();
-                for (Tile tile : game.getTileMap().values()) {
-                    if (FoWHelper.playerHasActualShipsInSystem(player, tile)) {
-                        buttons.add(Buttons.green(
-                                "moveShipToAdjacentSystemStep2_" + tile.getPosition() + "_hero",
-                                tile.getRepresentationForButtons(game, player)));
-                    }
-                }
-
-                buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation()
-                                + ", please use buttons to resolve your _Titles Are Silly_ hero ability.",
-                        buttons);
-            }
+            case "onyxxahero" -> OnyxxaHeroButtonHandler.postInitialButtons(event, game, player);
             case "xanhero" -> {
                 int amount = 0;
                 for (Tile tile : game.getTileMap().values()) {

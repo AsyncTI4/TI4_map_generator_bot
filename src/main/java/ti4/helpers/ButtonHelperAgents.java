@@ -2441,6 +2441,7 @@ public final class ButtonHelperAgents {
         String ogTile = buttonID.split("_")[1];
         for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, ogTile, player, false)) {
             Tile tile = game.getTileByPosition(pos);
+            if (tile.getTileModel() != null && tile.getTileModel().isHyperlane()) continue;
 
             if ((tile.isAsteroidField()
                             && !player.getTechs().contains("amd")
@@ -2451,7 +2452,7 @@ public final class ButtonHelperAgents {
                             && !player.hasTech("mr")
                             && !player.getRelics().contains("circletofthevoid")
                             && !player.hasAbility("celestial_being"))
-                    || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+                    || (!buttonID.contains("combat") && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game))) {
                 continue;
             }
             String og = ogTile;
@@ -2463,7 +2464,7 @@ public final class ButtonHelperAgents {
                     "fogAllianceAgentStep3_" + tile.getPosition() + "_" + og,
                     tile.getRepresentationForButtons(game, player)));
         }
-        if (buttonID.contains("hero")) {
+        if (buttonID.contains("combat")) {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         } else {
             ButtonHelper.deleteMessage(event);
