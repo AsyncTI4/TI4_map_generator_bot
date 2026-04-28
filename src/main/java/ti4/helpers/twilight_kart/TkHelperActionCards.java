@@ -122,28 +122,26 @@ public class TkHelperActionCards {
         }
 
         List<MessageEmbed> embeds = genomes.stream()
-            .map(Mapper::getLeader)
-            .map(LeaderModel::getTfRepresentationEmbed)
-            .toList();
+                .map(Mapper::getLeader)
+                .map(LeaderModel::getTfRepresentationEmbed)
+                .toList();
         if (!game.isVeiledHeartMode()) {
             genomes.forEach(player::addLeader);
-            
+
         } else {
             String veilKey = "veiledCards" + player.getFaction();
             String veilCards = game.getStoredValue(veilKey) + String.join("_", genomes) + "_";
             game.setStoredValue(veilKey, veilCards);
-
         }
-
 
         for (String cardID : genomes) {
             if (!game.isVeiledHeartMode()) {
                 player.addLeader(cardID);
                 MessageHelper.sendMessageToChannelWithEmbed(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " has acquired the genome: "
-                    + Mapper.getLeader(cardID).getName(),
-                    Mapper.getLeader(cardID).getRepresentationEmbed(true));
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " has acquired the genome: "
+                                + Mapper.getLeader(cardID).getName(),
+                        Mapper.getLeader(cardID).getRepresentationEmbed(true));
             } else {
                 String key = "veiledCards" + player.getFaction();
                 String veiledCards = game.getStoredValue(key);
