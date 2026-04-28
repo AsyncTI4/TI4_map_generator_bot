@@ -91,11 +91,12 @@ jobs:
         run: |
           set -o pipefail
           mvn --batch-mode \
-            --no-transfer-progress verify \
+            --no-transfer-progress \
             --fail-at-end \
             -P ci-spotless \
             -Dorg.slf4j.simpleLogger.showDateTime=true \
             -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss.SSS \
+            verify \
             2>&1 | tee /tmp/maven.log
       - name: Parse Spotless violations
         if: always() && steps.maven.outcome == 'failure'
