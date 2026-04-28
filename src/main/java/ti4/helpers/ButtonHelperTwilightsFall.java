@@ -812,7 +812,7 @@ public final class ButtonHelperTwilightsFall {
                         MessageHelper.sendMessageToChannelWithEmbed(
                                 player.getCorrectChannel(),
                                 player.getRepresentation() + " has spliced in the "
-                                        + Mapper.getLeader(cardID).getTFNameIfAble() + " genome.",
+                                        + Mapper.getLeader(cardID).getTFNameIfAble() + ".",
                                 Mapper.getLeader(cardID).getRepresentationEmbed(false, true, false, false, true));
                     }
                     if ("units".equalsIgnoreCase(type)) {
