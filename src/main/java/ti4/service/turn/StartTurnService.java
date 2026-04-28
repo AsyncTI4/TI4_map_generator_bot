@@ -60,7 +60,7 @@ public class StartTurnService {
         game.removeStoredValue("currentActionSummary" + player.getFaction());
 
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
-        Map<String, String> maps = new HashMap<>(game.getMessagesThatICheckedForAllReacts());
+        Map<String, String> maps = new HashMap<>(game.getStoredValueMap());
         for (String id : maps.keySet()) {
             if (id.contains("combatRoundTracker")) {
                 game.removeStoredValue(id);

@@ -218,7 +218,7 @@ public class PlayerSetupService {
             }
         }
 
-        if (!"techs_tf".equals(game.getTechnologyDeckID())) {
+        if (!game.getTechnologyDeckID().equals(game.getAbilitySpliceDeckID())) {
             Map<String, TechnologyModel> techReplacements =
                     Mapper.getHomebrewTechReplaceMap(game.getTechnologyDeckID());
             List<String> playerTechs = new ArrayList<>(player.getTechs());

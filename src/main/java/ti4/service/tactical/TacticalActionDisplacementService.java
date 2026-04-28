@@ -244,8 +244,12 @@ public class TacticalActionDisplacementService {
             if (!canMoveUnit(player, allowedAllies, unitKey)) continue;
             if (unitHolder instanceof Planet && !movableFromPlanets.contains(unitKey.getUnitType())) continue;
 
+            List<Integer> existing = movement.getOrDefault(unitKey, UnitState.emptyList());
             List<Integer> states = unitHolder.removeUnit(unitKey, unitHolder.getUnitCount(unitKey));
-            movement.put(unitKey, states);
+            for (int i = 0; i < existing.size(); i++) {
+                existing.set(i, existing.get(i) + states.get(i));
+            }
+            movement.put(unitKey, existing);
         }
         displaced.put(uhKey, movement);
     }

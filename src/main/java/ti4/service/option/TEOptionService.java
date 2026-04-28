@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.container.Container;
+import net.dv8tion.jda.api.components.container.ContainerChildComponent;
+import net.dv8tion.jda.api.components.section.Section;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
@@ -11,7 +14,11 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.draft.TwilightsFallFrankenDraft;
 import ti4.game.Game;
 import ti4.helpers.ButtonHelper;
+import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.message.componentsV2.MessageV2Builder;
+import ti4.model.SourceModel;
+import ti4.service.emoji.SourceEmojis;
 import ti4.service.franken.FrankenDraftBagService;
 
 @UtilityClass
@@ -35,11 +42,12 @@ public class TEOptionService {
         buttons.add(Buttons.gray("startDraftSystem_andcatPresetMilty", "Start Milty Draft + Later Inaugural Splice"));
         buttons.add(
                 Buttons.gray("startDraftSystem_andcatPresetNucleus", "Start Nucleus Draft + Later Inaugural Splice"));
+        buttons.add(Buttons.red("editTFHomebrew", "Enable TF Homebrew options"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
     }
 
     @ButtonHandler("startTFDraft")
-    public static void startTFDraft(Game game, ButtonInteractionEvent event) {
+    public static void startTFDraft(ButtonInteractionEvent event, Game game) {
         game.setupTwilightsFallMode(event);
         FrankenDraftBagService.setUpFrankenFactions(game, event, true);
         FrankenDraftBagService.clearPlayerHands(game);
@@ -48,8 +56,44 @@ public class TEOptionService {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("editTFHomebrew")
+    private static void postTwilightFallHomebrewOptions(ButtonInteractionEvent event, Game game) {
+        String msg = "Use the buttons to enable or disable various homebrew options:";
+        List<ContainerChildComponent> sections = getTFHomebrewInfo(game);
+        MessageV2Builder builder = new MessageV2Builder(game.getMainGameChannel());
+        builder.append(msg);
+        builder.append(Container.of(sections));
+        builder.append(Buttons.DONE_DELETE_BUTTONS);
+        builder.send();
+
+        // MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, buttons);
+    }
+
+    private static List<ContainerChildComponent> getTFHomebrewInfo(Game game) {
+        String idPre = "toggleTFHomebrew_";
+        List<ContainerChildComponent> sections = new ArrayList<>();
+
+        SourceModel tk = Mapper.getSource("twilight_kart");
+        String tkId = idPre + "twilightkart";
+        Button button = Buttons.rgToggle(game.isTwilightKart(), tkId, "Twilight Kart", SourceEmojis.TwilightKart);
+        sections.add(Section.of(button, tk.getRepresentationTextDisplays()));
+        // sections.add(Separator.create(true, Spacing.LARGE));
+
+        return sections;
+    }
+
+    @ButtonHandler("toggleTFHomebrew")
+    private static void toggleTFHomebrew(ButtonInteractionEvent event, Game game, String buttonID) {
+        String homebrew = buttonID.split("_")[1];
+        switch (homebrew) {
+            case "twilightkart" -> game.setTwilightKart(!game.isTwilightKart());
+        }
+        postTwilightFallHomebrewOptions(event, game);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("chooseExp_")
-    public static void chooseExp(Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void chooseExp(ButtonInteractionEvent event, Game game, String buttonID) {
         String choice = buttonID.split("_")[1];
         switch (choice.toLowerCase()) {
             case "newpok" -> {

@@ -7,7 +7,7 @@
         "startingFleet": "2 inf, 2 cv, 2 ff, 1 ca, sd mollprimusk",
         "commodities": 2,
         "factionTech": [
-            "executiveorder",
+            "iihq",
             "asn"
         ],
         "startingTech": [],
@@ -61,7 +61,7 @@
         "startingFleet": "2 inf, 2 cv, 2 ff, 1 ca, sd archonrenk",
         "commodities": 2,
         "factionTech": [
-            "executiveorder",
+            "iihq",
             "asn"
         ],
         "startingTech": [],
@@ -115,7 +115,7 @@
         "startingFleet": "2 inf, 2 cv, 2 ff, 1 ca, sd valkk",
         "commodities": 2,
         "factionTech": [
-            "executiveorder",
+            "iihq",
             "asn"
         ],
         "startingTech": [],

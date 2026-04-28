@@ -20,7 +20,6 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.other.zephyrion.ZephyrionBountyButtonHandler;
-import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -363,8 +362,7 @@ public final class ButtonHelperAbilities {
                 }
             }
         }
-        AddUnitService.addUnits(
-                event, tile, game, game.getPlayerFromColorOrFaction("neutral").getColor(), asyncID);
+        AddUnitService.addUnits(event, tile, game, game.getNeutralColor(), asyncID);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " replaced the only ship owned by " + op.getRepresentation() + " in "
@@ -2204,33 +2202,27 @@ public final class ButtonHelperAbilities {
             }
         }
         if (game.isDangerousWildsMode()) {
-            Player neutral = game.getPlayerFromColorOrFaction("neutral");
-            if (neutral == null) {
-                String color = SetupNeutralPlayer.pickNeutralColor(game);
-                neutral = game.setupNeutralPlayer(color);
-            }
-            if (neutral != null) {
-                for (Tile tile : game.getTileMap().values()) {
-                    for (UnitHolder uH : tile.getPlanetUnitHolders()) {
-                        if (ButtonHelper.getTypeOfPlanet(game, uH.getName()).contains("hazardous")) {
-                            boolean owned = false;
-                            for (Player p2 : game.getRealPlayers()) {
-                                if (p2.getPlanets().contains(uH.getName())) {
-                                    owned = true;
-                                    break;
-                                }
+            Player neutral = game.getNeutral();
+            for (Tile tile : game.getTileMap().values()) {
+                for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                    if (ButtonHelper.getTypeOfPlanet(game, uH.getName()).contains("hazardous")) {
+                        boolean owned = false;
+                        for (Player p2 : game.getRealPlayers()) {
+                            if (p2.getPlanets().contains(uH.getName())) {
+                                owned = true;
+                                break;
                             }
-                            if (!owned) {
-                                int resource = Helper.getPlanetResources(uH.getName(), game);
-                                int neutralUnitsToAdd = resource - uH.getUnitCount(UnitType.Infantry, neutral);
-                                if (neutralUnitsToAdd > 0) {
-                                    AddUnitService.addUnits(
-                                            event,
-                                            tile,
-                                            game,
-                                            neutral.getColor(),
-                                            neutralUnitsToAdd + " infantry " + uH.getName());
-                                }
+                        }
+                        if (!owned) {
+                            int resource = Helper.getPlanetResources(uH.getName(), game);
+                            int neutralUnitsToAdd = resource - uH.getUnitCount(UnitType.Infantry, neutral);
+                            if (neutralUnitsToAdd > 0) {
+                                AddUnitService.addUnits(
+                                        event,
+                                        tile,
+                                        game,
+                                        neutral.getColor(),
+                                        neutralUnitsToAdd + " infantry " + uH.getName());
                             }
                         }
                     }
@@ -2348,6 +2340,7 @@ public final class ButtonHelperAbilities {
         switch (reason) {
             case "mitosis" -> reason = "**Mitosis**";
             case "refit" -> reason = "_Refit Troops_";
+            default -> reason = "_" + capitalize(reason) + "_";
         }
         String successMessage;
         if ("space".equalsIgnoreCase(uH)) {
@@ -2666,16 +2659,6 @@ public final class ButtonHelperAbilities {
             ObjectiveHelper.secondHalfOfPeakStage2(game, player, 1);
         }
         ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("foretellPeak_")
-    public static void foretellPeak(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
-            ObjectiveHelper.secondHalfOfPeakStage1(game, player, Integer.parseInt(buttonID.split("_")[2]));
-        } else {
-            ObjectiveHelper.secondHalfOfPeakStage2(game, player, Integer.parseInt(buttonID.split("_")[2]));
-        }
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler("initialPeak")

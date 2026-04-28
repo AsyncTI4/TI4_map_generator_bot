@@ -1,5 +1,6 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,8 @@ import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.TI4Emoji;
 
 @Data
 public class AgendaModel implements ModelInterface, EmbeddableModel {
@@ -57,7 +60,15 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        return CardEmojis.Agenda + " _" + name + "_ " + source.emoji();
+        return getEmoji() + " _" + name + "_ " + source.emoji();
+    }
+
+    @JsonIgnore
+    public TI4Emoji getEmoji() {
+        return switch (getCategory()) {
+            case "edict" -> FactionEmojis.Mahact;
+            default -> CardEmojis.Agenda;
+        };
     }
 
     private String getCategory() {
@@ -149,8 +160,11 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
         String name = this.name == null ? "" : this.name;
-        eb.setTitle(CardEmojis.Agenda + "__" + name + "__" + source.emoji(), null);
-        eb.setColor(Color.blue);
+        eb.setTitle(getEmoji() + "__" + name + "__" + source.emoji(), null);
+        switch (getCategory()) {
+            case "edict" -> eb.setColor(Color.yellow);
+            default -> eb.setColor(Color.blue);
+        }
 
         // DESCRIPTION
         StringBuilder text = new StringBuilder("**" + getType() + ":** *" + getTarget() + "*\n");
