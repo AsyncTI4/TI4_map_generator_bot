@@ -1738,10 +1738,10 @@ public class ButtonHelper {
                     || doesPlayerHaveFSHere("sigma_keleresa_flagship_2", nonActivePlayer, activeSystem)
                     || doesPlayerHaveUnitHere("tk-publicani", nonActivePlayer, activeSystem)) {
 
-                String infToPay = nonActivePlayer.hasUnit("sigma_keleresa_flagship_2") ? "4" : "2";
+                int infToPay = nonActivePlayer.hasUnit("sigma_keleresa_flagship_2") ? 4 : 2;
                 String unitName = "the Artemiris (the Keleres flagship)";
                 if (doesPlayerHaveUnitHere("tk-publicani", nonActivePlayer, activeSystem)) {
-                    infToPay = "" + activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Carrier, nonActivePlayer);
+                    infToPay = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Carrier, nonActivePlayer) * 2;
                     unitName = UnitEmojis.carrier.toString() + FactionEmojis.Keleres + " _Publicani_";
                 }
 

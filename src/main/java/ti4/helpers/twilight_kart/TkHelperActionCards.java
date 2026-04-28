@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
@@ -17,15 +18,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.helpers.ActionCardHelper;
-import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ButtonHelperAgents;
-import ti4.helpers.Helper;
-import ti4.helpers.NewStuffHelper;
-import ti4.helpers.RegexHelper;
-import ti4.helpers.StringHelper;
-import ti4.helpers.Units;
+import ti4.helpers.*;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
@@ -33,6 +26,7 @@ import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.LeaderModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
@@ -65,8 +59,7 @@ public class TkHelperActionCards {
         // tk-succor
 
         switch (card.getAutomationID()) {
-            case "tk-amalgamate" ->
-                buttons.add(Buttons.green(ffcc + "drawSingularNewSpliceCard_genome", "Draw 1 Genome (Agent)"));
+            case "tk-amalgamate" -> buttons.add(Buttons.green(ffcc + "resolveTkAmalgamate", resolve));
             case "tk-avenge" -> buttons.add(Buttons.green(ffcc + "courageousStarter", resolve));
             case "tk-bestow" -> buttons.addAll(getTkBestowButtons(player, resolve));
             case "tk-commission" -> buttons.add(Buttons.green(ffcc + "tkCommission_page0", resolve));
@@ -116,6 +109,51 @@ public class TkHelperActionCards {
             return true;
         }
         return false;
+    }
+
+    @ButtonHandler("resolveTkAmalgamate")
+    private static void resolveAmalgamate(ButtonInteractionEvent event, Game game, Player player) {
+        List<String> genomes = ButtonHelperTwilightsFall.getDeckForSplicing(game, "genome", 2);
+        if (genomes.isEmpty()) {
+            String messageText = "There are no more cards in the genome deck.";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), messageText);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            return;
+        }
+
+        List<MessageEmbed> embeds = genomes.stream()
+            .map(Mapper::getLeader)
+            .map(LeaderModel::getTfRepresentationEmbed)
+            .toList();
+        if (!game.isVeiledHeartMode()) {
+            genomes.forEach(player::addLeader);
+            
+        } else {
+            String veilKey = "veiledCards" + player.getFaction();
+            String veilCards = game.getStoredValue(veilKey) + String.join("_", genomes) + "_";
+            game.setStoredValue(veilKey, veilCards);
+
+        }
+
+
+        for (String cardID : genomes) {
+            if (!game.isVeiledHeartMode()) {
+                player.addLeader(cardID);
+                MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has acquired the genome: "
+                    + Mapper.getLeader(cardID).getName(),
+                    Mapper.getLeader(cardID).getRepresentationEmbed(true));
+            } else {
+                String key = "veiledCards" + player.getFaction();
+                String veiledCards = game.getStoredValue(key);
+                game.setStoredValue(key, veiledCards + cardID + "_");
+
+                String msg = player.getRepresentationNoPing() + " has taken a secret card. They ";
+                msg += "may put it into play with a button in their `#cards-info` thread.";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            }
+        }
     }
 
     private static List<Button> getTkBestowButtons(Player player, String resolve) {
@@ -174,7 +212,8 @@ public class TkHelperActionCards {
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String planet = matcher.group("planet");
             Tile tile = game.getTileFromPlanet(planet);
-            TeHelperActionCards.resolvePiratesGeneric(event, game, player, tile, "mech " + planet);
+            String units = "mech " + planet + ", pds " + planet;
+            TeHelperActionCards.resolvePiratesGeneric(event, game, player, tile, units);
             String message = player.getRepresentation() + " 'commissioned' some mercenaries to post up at "
                     + Helper.getPlanetRepresentation(planet, game) + ".";
             if (tile != null && tile.getPosition().contains("frac")) {
