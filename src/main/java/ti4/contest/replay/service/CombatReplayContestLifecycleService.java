@@ -1,5 +1,6 @@
 package ti4.contest.replay.service;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -46,6 +47,8 @@ public class CombatReplayContestLifecycleService {
 
     private static final long SHADOW_DISCORD_ID = 0L;
     private static final String PROMOTION_DISABLED_REASON = "Candidate-to-contest promotion is disabled.";
+    private static final Duration PUBLIC_PROMOTION_COOLDOWN = Duration.ofHours(2);
+    private static final Duration PUBLIC_PROMOTION_COOLDOWN_GRACE = Duration.ofMinutes(5);
     private static final List<String> PREDICTION_LOCK_TITLES = List.of(
             "The Wagers Open",
             "The Archives Open",
@@ -75,15 +78,16 @@ public class CombatReplayContestLifecycleService {
     private final CombatReplayLeaderboardService replayLeaderboardService;
     private final CombatReplaySideBetService replaySideBetService;
     private final ReplayPayloadRenderer replayPayloadRenderer;
+    private Clock clock = Clock.systemDefaultZone();
 
     public void promoteBestCandidateIfDue() {
         if (!settings.getPromotion().isEnabled()) return;
 
-        LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+        LocalDateTime now = LocalDateTime.now(clock).truncatedTo(ChronoUnit.MINUTES);
         if (now.getMinute() != 0) return;
         int maxPromotionsPerHour = settings.getPromotion().getMaxPromotionsPerHour();
         if (maxPromotionsPerHour <= 0) return;
-        if (replayContestRepository.countByPostedAtGreaterThanEqual(now.minusHours(2)) > 0) return;
+        if (replayContestRepository.countByPostedAtGreaterThanEqual(publicPromotionCooldownCutoff(now)) > 0) return;
         if (replayContestRepository.countByPostedAtGreaterThanEqual(now.truncatedTo(ChronoUnit.HOURS))
                 >= maxPromotionsPerHour) {
             return;
@@ -112,6 +116,14 @@ public class CombatReplayContestLifecycleService {
             }
         }
         return List.of();
+    }
+
+    void setClock(Clock clock) {
+        this.clock = clock == null ? Clock.systemDefaultZone() : clock;
+    }
+
+    static LocalDateTime publicPromotionCooldownCutoff(LocalDateTime now) {
+        return now.minus(PUBLIC_PROMOTION_COOLDOWN).plus(PUBLIC_PROMOTION_COOLDOWN_GRACE);
     }
 
     public ForcePromoteResult forcePromoteCandidate(Long candidateId) {
