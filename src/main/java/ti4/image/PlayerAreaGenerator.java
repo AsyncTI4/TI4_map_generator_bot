@@ -2560,9 +2560,6 @@ public class PlayerAreaGenerator {
 
     private int techInfo(Player player, int x, int y, Game game) {
         List<String> techs = player.getTechs();
-        List<String> exhaustedTechs = player.getExhaustedTechs();
-        List<String> purgedTechs = player.getPurgedTechs();
-
         Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : techs) {
             TechnologyModel techModel = Mapper.getTech(tech);
@@ -2589,12 +2586,13 @@ public class PlayerAreaGenerator {
             List<String> list = entry.getValue();
             list.sort(techComparator);
         }
-        purgedTechs.sort(techComparator);
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
 
         int deltaX = 0;
+
+        List<String> exhaustedTechs = player.getExhaustedTechs();
         if (game.isTwilightsFallMode()) {
             deltaX = techField(x, y, techsFiltered.get("generictf"), exhaustedTechs, deltaX, player);
         }
@@ -2615,7 +2613,10 @@ public class PlayerAreaGenerator {
                     graphics, x, y, VeiledHeartService.VeiledCardType.UNIT, deltaX, player);
         }
 
+        List<String> purgedTechs = player.getPurgedTechs();
         if (!purgedTechs.isEmpty()) {
+            purgedTechs = new ArrayList<>(purgedTechs);
+            purgedTechs.sort(techComparator);
             deltaX = techField(x, y, purgedTechs, Collections.emptyList(), deltaX, player);
         }
         return x + deltaX;
