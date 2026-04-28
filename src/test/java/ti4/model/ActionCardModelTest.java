@@ -26,7 +26,7 @@ class ActionCardModelTest extends BaseTi4Test {
     void testGetRepresentation() {
         Game game = new Game();
         ActionCardModel dhActionCardModel = Mapper.getActionCard("dh1");
-        String expectedString = "" + CardEmojis.getACEmoji(game)
+        String expectedString = CardEmojis.getACEmoji(game)
                 + "_Direct Hit_ - After another player's ship uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities: Destroy that ship.\n";
         assertEquals(expectedString, dhActionCardModel.getRepresentation(game));
     }
@@ -47,7 +47,7 @@ class ActionCardModelTest extends BaseTi4Test {
         Game game = new Game();
         game.setWildWildGalaxyMode(true);
         ActionCardModel dhActionCardModel = Mapper.getActionCard("reflective");
-        String expectedString = "" + CardEmojis.getACEmoji(game)
+        String expectedString = CardEmojis.getACEmoji(game)
                 + "_Reflective Shielding_ - When one of your ships uses SUSTAIN DAMAGE during combat: Produce 2 hits against your opponent's ships in the active system.\n";
         assertEquals(expectedString, dhActionCardModel.getRepresentation(game));
     }

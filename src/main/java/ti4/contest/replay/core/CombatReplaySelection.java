@@ -15,7 +15,7 @@ public class CombatReplaySelection {
 
     public CombatReplaySelection(CombatContestSettings settings) {
         this.settings = settings;
-        this.selectionSnapshot = emptySnapshot();
+        selectionSnapshot = emptySnapshot();
     }
 
     public void refresh(List<CombatObservationEntity> window) {

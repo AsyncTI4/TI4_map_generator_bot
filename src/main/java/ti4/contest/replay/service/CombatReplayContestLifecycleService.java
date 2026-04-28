@@ -23,10 +23,23 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import ti4.contest.replay.core.*;
+import ti4.contest.replay.core.CombatCandidateEventType;
+import ti4.contest.replay.core.CombatCandidatePromotionStatus;
+import ti4.contest.replay.core.CombatCandidateStatus;
+import ti4.contest.replay.core.CombatContestReplayStatus;
+import ti4.contest.replay.core.CombatContestSettings;
+import ti4.contest.replay.core.CombatReplayChannels;
+import ti4.contest.replay.core.CombatReplayDecoys;
+import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
-import ti4.contest.replay.entities.*;
-import ti4.contest.replay.repository.*;
+import ti4.contest.replay.entities.CombatCandidateEntity;
+import ti4.contest.replay.entities.CombatCandidateEventEntity;
+import ti4.contest.replay.entities.CombatObservationEntity;
+import ti4.contest.replay.entities.CombatReplayContestEntity;
+import ti4.contest.replay.repository.CombatCandidateEventRepository;
+import ti4.contest.replay.repository.CombatCandidateRepository;
+import ti4.contest.replay.repository.CombatObservationRepository;
+import ti4.contest.replay.repository.CombatReplayContestRepository;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -172,8 +185,8 @@ public class CombatReplayContestLifecycleService {
         if (game == null) return null;
 
         String startSummaryText = snapshotStartSummaryText(winner);
-        String message = LazaxCombatSupport.formatReplayAnnouncement(
-                game, observation, winner, getLazaxRoleMention(), startSummaryText);
+        String message =
+                LazaxCombatSupport.formatReplayAnnouncement(game, winner, getLazaxRoleMention(), startSummaryText);
         if (!settings.getRuntime().isDiscordPostingEnabled()) {
             return createShadowReplayContest(game, observation, winner, message, existingContest);
         }
@@ -373,7 +386,7 @@ public class CombatReplayContestLifecycleService {
     }
 
     private Comparator<CombatCandidateEntity> candidateComparator(Map<Long, Double> jointScoresByObservationId) {
-        return Comparator.<CombatCandidateEntity, Double>comparing(this::getPromotionScore)
+        return Comparator.comparing(this::getPromotionScore)
                 .thenComparing(candidate -> jointScoresByObservationId.getOrDefault(candidate.getObservationId(), 0.0))
                 .thenComparing(CombatCandidateEntity::getResolvedAt, Comparator.reverseOrder())
                 .thenComparing(CombatCandidateEntity::getId, Comparator.reverseOrder());
@@ -571,14 +584,19 @@ public class CombatReplayContestLifecycleService {
     private void postReplayEvent(
             MessageChannel channel, Game game, CombatCandidateEntity candidate, CombatCandidateEventEntity event) {
         ReplayPayloadRenderer.RenderedReplayEvent rendered = replayPayloadRenderer.render(game, candidate, event);
-        if (rendered instanceof ReplayPayloadRenderer.TileRenderResult tileRender) {
+        if (rendered
+                instanceof
+                ReplayPayloadRenderer.TileRenderResult(
+                        String content,
+                        List<MessageEmbed> embeds,
+                        String tilePosition,
+                        String snapshotJson)) {
             sendTileRenderMessage(
                     channel,
-                    tileRender.content(),
-                    tileRender.embeds(),
-                    replayPayloadRenderer.restoreReplayGame(
-                            tileRender.snapshotJson(), game, candidate, tileRender.tilePosition()),
-                    tileRender.tilePosition());
+                    content,
+                    embeds,
+                    replayPayloadRenderer.restoreReplayGame(snapshotJson, game, candidate, tilePosition),
+                    tilePosition);
             return;
         }
         ReplayPayloadRenderer.MessageResult message = (ReplayPayloadRenderer.MessageResult) rendered;

@@ -139,7 +139,7 @@ public class CombatReplayLeaderboardService {
             CombatReplayLeaderboardEntryEntity entry = topEntries.get(index);
             int predictions = safeInt(entry.getPredictionCount());
             int correctPredictions = safeInt(entry.getCorrectPredictions());
-            int accuracy = predictions == 0 ? 0 : Math.round((100f * correctPredictions) / predictions);
+            int accuracy = predictions == 0 ? 0 : Math.round((100.0f * correctPredictions) / predictions);
             message.append('`')
                     .append(index + 1)
                     .append(".` ")

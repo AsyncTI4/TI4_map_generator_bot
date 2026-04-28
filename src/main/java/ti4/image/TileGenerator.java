@@ -817,7 +817,7 @@ public class TileGenerator {
                     y += (isSpiral ? 43 : 0);
                     String breachFile = ResourceHelper.getInstance().getTokenFile("token_breachActive.png");
 
-                    BufferedImage bufferedImage = ImageHelper.readScaled(breachFile, 2f);
+                    BufferedImage bufferedImage = ImageHelper.readScaled(breachFile, 2.0f);
                     if (bufferedImage != null) {
                         x += (345 - bufferedImage.getWidth()) / 2;
                         y += (300 - bufferedImage.getHeight()) / 2;

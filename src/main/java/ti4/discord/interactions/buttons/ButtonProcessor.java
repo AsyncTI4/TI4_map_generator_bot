@@ -58,13 +58,6 @@ public class ButtonProcessor {
         var buttonContext = new ButtonContext(event);
         if (!buttonContext.isValid()) return;
 
-        BotLogger.logButton(event);
-        User user = event.getUser();
-        UserSettings userSettings = UserSettingsManager.get(user.getId());
-        int currentHourUTC = ZonedDateTime.now(ZoneId.of("UTC")).getHour();
-        userSettings.addActiveHour(currentHourUTC);
-        UserSettingsManager.save(userSettings);
-
         String gameName = GameNameService.getGameNameFromChannel(event);
         ExecutorServiceManager.runAsyncWithLock(
                 eventToString(event, gameName),
@@ -85,36 +78,29 @@ public class ButtonProcessor {
         long processStartTime = System.currentTimeMillis();
         long resolveRuntime = 0;
         long saveRuntime = 0;
+
+        log(event);
         try {
-            RollbarManager.putInteractionMetadata("button", event);
-            RollbarManager.put("button_id", event.getButton().getCustomId());
-            RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
-
-            if (context.isValid()) {
-                CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
-                CombatReplayService.PreInteractionSnapshot preInteractionSnapshot =
-                        combatReplayService.capturePreInteractionSnapshot(context.getGame());
-                combatReplayService.setPreInteractionSnapshot(preInteractionSnapshot);
+            CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
+            CombatReplayService.PreInteractionSnapshot preInteractionSnapshot =
+                    combatReplayService.capturePreInteractionSnapshot(context.getGame());
+            combatReplayService.setPreInteractionSnapshot(preInteractionSnapshot);
+            try {
                 long beforeTime = System.currentTimeMillis();
-                try {
-                    resolveButtonInteractionEvent(context);
-                    resolveRuntime = System.currentTimeMillis() - beforeTime;
+                resolveButtonInteractionEvent(context);
+                resolveRuntime = System.currentTimeMillis() - beforeTime;
 
-                    beforeTime = System.currentTimeMillis();
-                    context.save();
-                    if (context.getGame() != null) {
-                        combatReplayService.onButtonInteractionSettled(context.getGame(), context.getPlayer(), event);
-                    }
-                    saveRuntime = System.currentTimeMillis() - beforeTime;
-                } finally {
-                    combatReplayService.clearPreInteractionSnapshot();
+                beforeTime = System.currentTimeMillis();
+                context.save();
+                if (context.getGame() != null) {
+                    combatReplayService.onButtonInteractionSettled(context.getGame(), context.getPlayer(), event);
                 }
+                saveRuntime = System.currentTimeMillis() - beforeTime;
+            } finally {
+                combatReplayService.clearPreInteractionSnapshot();
             }
         } catch (Exception e) {
-            LogOrigin origin = new LogOrigin(event, context);
-            BotLogger.error(origin, "Something went wrong with button interaction", e);
-        } finally {
-            RollbarManager.clear();
+            BotLogger.error(new LogOrigin(event, context), "Something went wrong with button interaction", e);
         }
 
         long contextCreationRuntime = context.getCreationEndTime() - context.getCreationStartTime();
@@ -125,6 +111,20 @@ public class ButtonProcessor {
                 contextCreationRuntime,
                 resolveRuntime,
                 saveRuntime);
+    }
+
+    private static void log(ButtonInteractionEvent event) {
+        BotLogger.logButton(event);
+
+        RollbarManager.putInteractionMetadata("button", event);
+        RollbarManager.put("button_id", event.getButton().getCustomId());
+        RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
+
+        User user = event.getUser();
+        UserSettings userSettings = UserSettingsManager.get(user.getId());
+        int currentHourUTC = ZonedDateTime.now(ZoneId.of("UTC")).getHour();
+        userSettings.addActiveHour(currentHourUTC);
+        UserSettingsManager.save(userSettings);
     }
 
     private static boolean handleKnownButtons(ButtonContext context) {
