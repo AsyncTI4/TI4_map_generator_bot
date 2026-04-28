@@ -93,9 +93,9 @@ public class CombatReplayPromotionScoreBackfillCron {
                 || candidate.getWinnerFaction() == null) return false;
 
         LazaxCombatSupport.FleetStrength attackerRemainingStrength =
-                LazaxCombatSupport.calculateFleetStrength(snapshotGame, attacker, defender, tile, space);
+                LazaxCombatSupport.calculateFleetStrength(attacker, defender, tile, space);
         LazaxCombatSupport.FleetStrength defenderRemainingStrength =
-                LazaxCombatSupport.calculateFleetStrength(snapshotGame, defender, attacker, tile, space);
+                LazaxCombatSupport.calculateFleetStrength(defender, attacker, tile, space);
         int roundsObserved = SpringContext.getBean(CombatCandidateEventRepository.class)
                 .findMaxRoundNumberByCandidateId(candidate.getId())
                 .orElse(0);

@@ -3,6 +3,8 @@ package ti4.logging;
 import static ti4.helpers.discord.DiscordHelper.isDiscordServerError;
 import static ti4.helpers.discord.DiscordHelper.isIgnorableError;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -11,6 +13,7 @@ import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -26,9 +29,12 @@ import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.ThreadGetter;
 import ti4.message.MessageHelper;
+import ti4.service.game.GameNameService;
 import ti4.service.statistics.SREStats;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
+import ti4.settings.users.UserSettings;
+import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
@@ -411,6 +417,16 @@ public class BotLogger {
     }
 
     public static void logButton(ButtonInteractionEvent event) {
+        RollbarManager.putInteractionMetadata("button", event);
+        RollbarManager.put("button_id", event.getButton().getCustomId());
+        RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
+
+        User user = event.getUser();
+        UserSettings userSettings = UserSettingsManager.get(user.getId());
+        int currentHourUTC = ZonedDateTime.now(ZoneId.of("UTC")).getHour();
+        userSettings.addActiveHour(currentHourUTC);
+        UserSettingsManager.save(userSettings);
+
         LogBufferManager.addLogMessage(new ButtonInteractionEventLog(new LogOrigin(event)));
     }
 

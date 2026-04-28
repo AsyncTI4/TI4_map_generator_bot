@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.contest.replay.entities.CombatCandidateEntity;
-import ti4.contest.replay.entities.CombatObservationEntity;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -22,7 +22,6 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.json.JsonMapperManager;
 import ti4.model.LeaderModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -93,8 +92,8 @@ public class LazaxCombatSupport {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         if (space == null) return null;
 
-        FleetStrength attackerStrength = calculateFleetStrength(game, attacker, defender, tile, space);
-        FleetStrength defenderStrength = calculateFleetStrength(game, defender, attacker, tile, space);
+        FleetStrength attackerStrength = calculateFleetStrength(attacker, defender, tile, space);
+        FleetStrength defenderStrength = calculateFleetStrength(defender, attacker, tile, space);
         String summary = CombatReplayDecoys.appendDebugDecoySummary(
                 extractSpaceOnlySummary(ButtonHelper.getCombatTileSummaryMessage(
                         game, tile, attacker, null, "space", Constants.SPACE, List.of(attacker, defender))),
@@ -115,8 +114,7 @@ public class LazaxCombatSupport {
                 defenderStrength.expectedHits());
     }
 
-    public FleetStrength calculateFleetStrength(
-            Game game, Player player, Player opponent, Tile tile, UnitHolder space) {
+    public FleetStrength calculateFleetStrength(Player player, Player opponent, Tile tile, UnitHolder space) {
         double total = 0;
         double hp = 0;
         double expectedHits = 0;
@@ -165,9 +163,7 @@ public class LazaxCombatSupport {
             message.append("\n").append(effectSection);
         }
         String actionCardSection = formatActionCardSection(attacker, defender);
-        if (actionCardSection != null) {
-            message.append("\n").append(actionCardSection);
-        }
+        message.append("\n").append(actionCardSection);
         String leaderSection = formatCombatLeaderSection(tile, attacker, defender);
         if (leaderSection != null) {
             message.append("\n").append(leaderSection);
@@ -176,11 +172,7 @@ public class LazaxCombatSupport {
     }
 
     public String formatReplayAnnouncement(
-            Game game,
-            CombatObservationEntity observation,
-            CombatCandidateEntity candidate,
-            String roleMention,
-            String startSummaryText) {
+            Game game, CombatCandidateEntity candidate, String roleMention, String startSummaryText) {
         Player attacker = game.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
         Player defender = game.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
         Tile tile = game.getTileByPosition(candidate.getTilePosition());
@@ -427,7 +419,7 @@ public class LazaxCombatSupport {
         }
         return ButtonHelper.getTilesOfPlayersSpecificUnits(game, quietusOwner, UnitType.Flagship).stream()
                 .map(Tile::getSpaceUnitHolder)
-                .filter(unitHolder -> unitHolder != null)
+                .filter(Objects::nonNull)
                 .anyMatch(unitHolder -> unitHolder.getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE));
     }
 
@@ -437,7 +429,7 @@ public class LazaxCombatSupport {
 
     private String formatPlayerSummaryHeader(Player player) {
         String emoji = player.getFactionEmoji();
-        if (emoji == null || emoji.isBlank()) {
+        if (emoji.isBlank()) {
             return "- " + player.getFaction();
         }
         return "- " + emoji;
@@ -515,16 +507,6 @@ public class LazaxCombatSupport {
                 + player.getUserName();
     }
 
-    private String extractRecordedActivePlayerSummary(String summaryText) {
-        if (summaryText == null || summaryText.isBlank()) return null;
-        for (String line : summaryText.split("\n")) {
-            if (line.startsWith("**Active Player:**")) {
-                return line + "\n";
-            }
-        }
-        return null;
-    }
-
     private String extractRecordedBoardSummary(String summaryText) {
         if (summaryText == null || summaryText.isBlank()) return null;
         int separator = summaryText.indexOf("\n\n");
@@ -532,14 +514,6 @@ public class LazaxCombatSupport {
             return null;
         }
         return summaryText.substring(separator + 2).trim();
-    }
-
-    public String toJson(Object value) {
-        try {
-            return JsonMapperManager.basic().writeValueAsString(value);
-        } catch (Exception e) {
-            return "{}";
-        }
     }
 
     private double safeRatio(double weaker, double stronger) {

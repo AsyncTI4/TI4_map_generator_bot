@@ -102,8 +102,8 @@ class ButtonListener extends ListenerAdapter {
             Long ts;
             long windowMs = WARNING_COOLDOWN_WINDOW.toMillis();
 
-            while ((ts = slowEvents.peekFirst()) != null && now - ts > windowMs) {
-                slowEvents.pollFirst();
+            while (!slowEvents.isEmpty() && now - slowEvents.getFirst() > windowMs) {
+                slowEvents.removeFirst();
             }
 
             if (slowEvents.size() < EVENT_COUNT_THRESHOLD) {
