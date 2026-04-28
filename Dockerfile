@@ -1,5 +1,5 @@
 # ---- Build stage ----
-FROM maven:3.9.9-eclipse-temurin-26-alpine AS build
+FROM maven:3.9.15-eclipse-temurin-26-alpine AS build
 WORKDIR /opt/app
 
 # cache dependencies
