@@ -81,6 +81,7 @@ public enum MiscEmojis implements TI4Emoji {
     NoAfters, //
     Winemaking,
     BortWindow,
+    BongoMahact,
     SpoonAbides,
     AsyncTI4Logo,
     TIGL,

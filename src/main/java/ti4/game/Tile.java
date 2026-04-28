@@ -734,6 +734,11 @@ public class Tile {
     }
 
     @JsonIgnore
+    public boolean hasPlayerNonFighterShips(Player p) {
+        return containsPlayersUnitsWithModelCondition(p, UnitModel::isNonFighterShip);
+    }
+
+    @JsonIgnore
     public int getNumberOfUnitsInSystem() {
 
         int amount = 0;

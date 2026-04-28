@@ -261,7 +261,7 @@ class GameSaveService {
         writer.write(Constants.AGENDA_VOTE_INFO + " " + sb2);
         writer.write(System.lineSeparator());
 
-        Map<String, String> currentCheckingForAllReacts = game.getMessagesThatICheckedForAllReacts();
+        Map<String, String> currentCheckingForAllReacts = game.getStoredValueMap();
         sb2 = new StringBuilder();
         for (Map.Entry<String, String> entry : currentCheckingForAllReacts.entrySet()) {
             sb2.append(entry.getKey())
@@ -648,6 +648,12 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.EXPLORATION_DECK_ID + " " + game.getExplorationDeckID());
         writer.write(System.lineSeparator());
+
+        writeStrLine(writer, Constants.ABILITY_DECK_ID, game.getAbilitySpliceDeckID());
+        writeStrLine(writer, Constants.GENOME_DECK_ID, game.getGenomeSpliceDeckID());
+        writeStrLine(writer, Constants.PARADIGM_DECK_ID, game.getParadigmSpliceDeckID());
+        writeStrLine(writer, Constants.UNITUPGRADE_DECK_ID, game.getUnitSpliceDeckID());
+        writeBoolLine(writer, Constants.TWILIGHT_KART, game.isTwilightKart());
 
         writer.write(Constants.BAG_DRAFT + " "
                 + (game.getActiveBagDraft() == null
@@ -1123,8 +1129,7 @@ class GameSaveService {
     }
 
     private static void writeStrLine(Writer writer, String field, String str) throws IOException {
-        String output = StringHelper.escape(str != null ? str : "");
-        writer.write(field + " " + output);
+        writer.write(field + " " + str);
         writer.write(System.lineSeparator());
     }
 

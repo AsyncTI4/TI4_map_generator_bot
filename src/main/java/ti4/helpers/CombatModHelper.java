@@ -723,33 +723,33 @@ public class CombatModHelper {
                         scalingCount = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player);
                     }
                 }
-                case "damaged_units_same_type" -> {
+                case "damaged_units_max_2" -> {
+                    UnitKey key = Units.getUnitKey(origUnit.getUnitType(), player.getColor());
                     UnitHolder space = activeSystem.getUnitHolders().get("space");
                     if (origUnit.getIsGroundForce()
                             && !activeSystem.getPlanetUnitHolders().isEmpty()) {
                         for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
-                            if (planet.getUnitCount(
-                                            Mapper.getUnitKey(
-                                                            AliasHandler.resolveUnit(origUnit.getBaseType()),
-                                                            player.getColorID())
-                                                    .getUnitType(),
-                                            player)
-                                    > 0) {
+                            if (planet.getUnitCount(key) > 0) {
                                 space = planet;
                             }
                         }
                     }
-                    int count = 0;
-                    if (space.getUnitDamage()
-                                    .get(Mapper.getUnitKey(
-                                            AliasHandler.resolveUnit(origUnit.getBaseType()), player.getColorID()))
-                            != null) {
-                        count = space.getUnitDamage()
-                                .get(Mapper.getUnitKey(
-                                        AliasHandler.resolveUnit(origUnit.getBaseType()), player.getColorID()));
-                    }
+                    int count = space.getDamagedUnitCount(key);
                     scalingCount += count;
-                    scalingCount = Math.min(scalingCount, 2);
+                }
+                case "damaged_units" -> {
+                    UnitKey key = Units.getUnitKey(origUnit.getUnitType(), player.getColor());
+                    UnitHolder space = activeSystem.getUnitHolders().get("space");
+                    if (origUnit.getIsGroundForce()
+                            && !activeSystem.getPlanetUnitHolders().isEmpty()) {
+                        for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
+                            if (planet.getUnitCount(key) > 0) {
+                                space = planet;
+                            }
+                        }
+                    }
+                    int count = space.getDamagedUnitCount(key);
+                    scalingCount += count;
                 }
                 case "opponent_sftt" -> scalingCount = getOpponentSfttCount(opponent);
                 case "nonhome_system_with_planet" -> scalingCount = getSystemsWithControlledPlanets(game, player);

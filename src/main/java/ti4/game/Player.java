@@ -53,6 +53,7 @@ import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
+import ti4.game.helper.StoredValueHelper;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -106,7 +107,7 @@ import ti4.service.user.AFKService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 
-public class Player extends PlayerProperties {
+public class Player extends PlayerProperties implements StoredValueHelper {
 
     private static final int EMBED_FIELD_VALUE_LIMIT = 1024;
 
@@ -497,7 +498,7 @@ public class Player extends PlayerProperties {
 
     @Nullable
     public BreakthroughModel getBreakthroughModel(String bt) {
-        if (!hasBreakthrough(bt)) return null;
+        if (bt == null || !hasBreakthrough(bt)) return null;
         return Mapper.getBreakthrough(bt);
     }
 
@@ -605,13 +606,7 @@ public class Player extends PlayerProperties {
         return "dummyPlayerSpoof" + getFaction() + "_";
     }
 
-    public boolean hasPDS2Tech() {
-        return getTechs().contains("ht2")
-                || getTechs().contains("pds2")
-                || getTechs().contains("dsgledpds")
-                || getTechs().contains("dsmirvpds");
-    }
-
+    /** AKA: Has Infantry Revival Ability */
     public boolean hasInf2Tech() { // "dszeliinf"
         return getTechs().contains("cl2")
                 || getTechs().contains("so2")
@@ -630,33 +625,11 @@ public class Player extends PlayerProperties {
 
     public boolean hasWarsunTech() {
         return getUnitByBaseType("warsun") != null;
-        // return getTechs().contains("pws2")
-        //         || getTechs().contains("dsrohdws")
-        //         || getTechs().contains("ws")
-        //         || hasUnit("tf_warsun")
-        //         || hasUnit("tf-universitywarsun")
-        //         || hasUnit("tf-pws")
-        //         || getTechs().contains("absol_ws")
-        //         || getTechs().contains("baxanws")
-        //         || getTechs().contains("absol_pws2")
-        //         || hasUnit("muaat_warsun")
-        //         || hasUnit("rohdhna_warsun");
     }
 
     public boolean hasFF2Tech() {
-        return getTechs().contains("ff2")
-                || getTechs().contains("hcf2")
-                || getTechs().contains("dsflorff")
-                || getTechs().contains("dslizhff")
-                || getTechs().contains("dsbelkff")
-                || getTechs().contains("absol_ff2")
-                || getTechs().contains("absol_hcf2")
-                || ownsUnit("tf-hcf")
-                || ownsUnit("tf-triune")
-                || ownsUnit("tf-morphwing")
-                || ownsUnit("florzen_fighter")
-                || ownsUnit("eidolon_fighter")
-                || ownsUnit("eidolon_fighter2");
+        UnitModel ff = getUnitByType(UnitType.Fighter);
+        return ff.getIsUpgrade() || ownsUnit("florzen_fighter") || ownsUnit("eidolon_fighter");
     }
 
     public boolean hasUpgradedUnit(String baseUpgradeID) {
@@ -1028,6 +1001,15 @@ public class Player extends PlayerProperties {
                 .collect(Collectors.toSet());
     }
 
+    public boolean hasAnyUnit(String... unitIDs) {
+        for (String unitID : unitIDs) {
+            if (hasUnit(unitID)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean hasUnit(String unitID) {
         if (unitID.contains("flagship") && hasUnlockedBreakthrough("nekrobt")) {
             return ValefarZService.hasFlagshipAbility(game, this, unitID);
@@ -1117,7 +1099,7 @@ public class Player extends PlayerProperties {
                 && ((Constants.SPACE.equals(unitHolder.getName()) && Boolean.TRUE.equals(unit.getIsShip()))
                         || (!Constants.SPACE.equals(unitHolder.getName()) && !Boolean.TRUE.equals(unit.getIsShip()))))
             score++;
-        if (unit.getID().contains("tf-")
+        if ((unit.getID().contains("tf-") || unit.getID().contains("tk-"))
                 && (unit.getUnitType() == UnitType.Flagship || unit.getUnitType() == UnitType.Mech)) {
             score = 0;
         }
@@ -1739,9 +1721,10 @@ public class Player extends PlayerProperties {
 
         StringBuilder sb = new StringBuilder(userById.getAsMention());
         switch (getUserID()) {
-            case Constants.bortId -> sb.append(MiscEmojis.BortWindow); // mysonisalsonamedbort
-            case Constants.tspId -> sb.append(MiscEmojis.SpoonAbides); // tispoon
-            case Constants.jazzId -> sb.append(MiscEmojis.Scout); // Jazzx
+            case Constants.bortId -> sb.append(" ").append(MiscEmojis.BortWindow);
+            case Constants.tspId -> sb.append(" ").append(MiscEmojis.SpoonAbides);
+            case Constants.jazzId -> sb.append(" ").append(MiscEmojis.Scout);
+            case Constants.andcatId -> sb.append(" ").append(MiscEmojis.BongoMahact);
         }
         return sb.toString();
     }
@@ -2354,6 +2337,9 @@ public class Player extends PlayerProperties {
             if (getTechs().contains("absol_" + techID)) {
                 return true;
             }
+        }
+        if ("scc".equalsIgnoreCase(techID) && getTechs().contains("tf-ahl")) {
+            return true;
         }
         if ("ah".equalsIgnoreCase(techID) && getTechs().contains("tf-ahl")) {
             return true;
@@ -3359,7 +3345,12 @@ public class Player extends PlayerProperties {
     }
 
     @JsonIgnore
-    public void addStoredValue(String key, String val) {
+    public boolean isElected(String law) {
+        return IsPlayerElectedService.isPlayerElected(game, this, law);
+    }
+
+    @JsonIgnore
+    public void setStoredValue(String key, String val) {
         String safeKey = StringHelper.escape(key);
         getStoredValueMap().put(safeKey, StringHelper.escape(val));
     }

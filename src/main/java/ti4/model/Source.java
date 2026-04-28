@@ -35,6 +35,7 @@ public class Source {
         uncharted_space,
         monuments,
         blue_reverie,
+        twilight_kart,
 
         // lil homebrew
         lazax,
@@ -143,6 +144,13 @@ public class Source {
             };
         }
 
+        public boolean isTwilightFallish() {
+            return switch (this) {
+                case twilights_fall, twilight_kart -> true;
+                default -> false;
+            };
+        }
+
         public boolean isHiddenFromSearch() {
             return switch (this) {
                 case deprecated, miltymod, lazax, little_omega, admins, dane_leaks -> true;
@@ -175,6 +183,7 @@ public class Source {
                         case lazax -> FactionEmojis.Lazax;
                         case salliance -> SourceEmojis.StrategicAlliance;
                         case monuments -> SourceEmojis.Monuments;
+                        case twilight_kart -> SourceEmojis.TwilightKart;
                         default -> null;
                     };
             return emoji == null ? "" : emoji.toString();

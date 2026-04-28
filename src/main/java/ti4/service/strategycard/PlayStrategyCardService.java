@@ -367,6 +367,14 @@ public class PlayStrategyCardService {
                 if (player3 == player) {
                     continue;
                 }
+                if (IsPlayerElectedService.isPlayerElected(game, player3, "tk-endorse")) {
+                    MessageHelper.sendMessageToChannel(
+                            player3.getCardsInfoThread(),
+                            player3.getRepresentationUnfogged() + ", you may follow **" + stratCardName
+                                    + "** without spending a token because of _Endorse_.");
+                    continue;
+                }
+
                 MindsieveService.serveMindsieveButtons(game, player3, scToPlay);
                 List<Button> empNMahButtons = new ArrayList<>();
                 Button deleteB = Buttons.red("deleteButtons", "Delete These Buttons");

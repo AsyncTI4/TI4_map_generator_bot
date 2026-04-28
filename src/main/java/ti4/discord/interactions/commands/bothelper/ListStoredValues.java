@@ -38,7 +38,7 @@ class ListStoredValues extends GameStateSubcommand {
             }
         }
 
-        Map<String, String> storedMap = game.getMessagesThatICheckedForAllReacts();
+        Map<String, String> storedMap = game.getStoredValueMap();
         String message;
         if (keys.isEmpty()) {
             message = "No keys specified. Listing all the game's stored key-value-pairs:\n"

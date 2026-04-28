@@ -100,11 +100,16 @@ public class TacticalActionOutputService {
 
     private String buildMessageForSingleSystem(
             Game game, Player player, Tile tile, boolean condensed, boolean inclSummary) {
-        String linePrefix = "> " + player.getFactionEmoji();
+        String linePrefix = "> ";
         int distance = CheckDistanceHelper.getDistanceBetweenTwoTiles(
                 game, player, tile.getPosition(), game.getActiveSystem(), true);
         int riftDistance = CheckDistanceHelper.getDistanceBetweenTwoTiles(
                 game, player, tile.getPosition(), game.getActiveSystem(), false);
+
+        Tile activeTile = game.getTileByPosition(game.getActiveSystem());
+        if (player.hasTech("scc") && tile.containsPlayersUnits(player) && activeTile.containsPlayersUnits(player)) {
+            distance = riftDistance = 1;
+        }
 
         var displaced = game.getTacticalActionDisplacement();
         Set<UnitKey> movingUnitsFromTile = displaced.entrySet().stream()
@@ -166,7 +171,7 @@ public class TacticalActionOutputService {
                     int amt = states.get(state.ordinal());
                     if (amt == 0) continue;
 
-                    String stateStr = (state == UnitState.none) ? "" : " " + state.humanDescr();
+                    String stateStr = (state == UnitState.none) ? "" : " " + state.stateEmoji();
                     String unitMoveStr = linePrefix + " moved " + amt + color + stateStr + " " + key.unitEmoji();
 
                     String unitHolderStr =
@@ -236,6 +241,19 @@ public class TacticalActionOutputService {
                 output += ", used _Gravity Drive_)";
             } else {
                 output += ", __does not have _Gravity Drive___)";
+            }
+            if (player.hasUnit("tk-voidcarver")) {
+                maxBonus++;
+                output += " (has _Voidcarver_ for +1 movement for one other ship moving from the same system)";
+            }
+            if (player.hasUnit("tk-dissident") && unit.getUnitType().equals(UnitType.Dreadnought)) {
+                for (Player p2 : game.getRealPlayers()) {
+                    if (!tile.containsPlayersUnits(p2)) continue;
+                    if (player.getTotalVictoryPoints() < p2.getTotalVictoryPoints()) {
+                        maxBonus++;
+                        output += " (_Dissident_ has +1 movement to this system)";
+                    }
+                }
             }
             if (player.hasUnlockedBreakthrough("winnubt")
                     && game.getTileByPosition(game.getActiveSystem()).hasLegendary()) {

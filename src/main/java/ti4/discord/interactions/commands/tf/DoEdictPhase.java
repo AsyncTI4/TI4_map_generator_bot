@@ -1,7 +1,7 @@
 package ti4.discord.interactions.commands.tf;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.discord.interactions.buttons.handlers.agenda.EdictPhaseHandler;
+import ti4.discord.interactions.buttons.handlers.edict.EdictPhaseHandler;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 

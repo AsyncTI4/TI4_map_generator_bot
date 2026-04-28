@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -17,6 +18,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.collections4.IterableUtils;
 import ti4.contest.replay.core.CombatRollPayload;
 import ti4.contest.replay.core.CombatRollPayload.CombatRollNotePlacement;
 import ti4.contest.replay.core.CombatRollPayload.CombatRollNoteType;
@@ -41,6 +43,7 @@ import ti4.helpers.CombatModHelper;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper;
+import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -63,6 +66,7 @@ import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
+import ti4.service.unit.HacanFlagshipService;
 import ti4.spring.context.SpringContext;
 
 @UtilityClass
@@ -695,6 +699,37 @@ public class CombatRollService {
         return h;
     }
 
+    public static void sendSpaceAssignHitsButtons(
+            GenericInteractionCreateEvent event, Game game, Player opponent, Tile tile, int hits) {
+        List<Button> buttons = new ArrayList<>();
+
+        String plural = "hit" + (hits == 1 ? "" : "s");
+        if (opponent.isDummy() || opponent.isNpc()) {
+            String id = opponent.dummyPlayerSpoof() + "autoAssignSpaceHits_" + tile.getPosition() + "_" + hits;
+            buttons.add(Buttons.green(id, "Auto-assign " + plural + " for Dummy"));
+
+        } else {
+            String assignID = opponent.finChecker() + "autoAssignSpaceHits_" + tile.getPosition() + "_" + hits;
+            buttons.add(Buttons.green(assignID, "Auto-assign " + plural));
+
+            String manualID = "getDamageButtons_" + tile.getPosition() + "deleteThis_spacecombat";
+            buttons.add(Buttons.red(manualID, "Manually Assign " + plural));
+
+            String cancelID = opponent.finChecker() + "cancelSpaceHits_" + tile.getPosition() + "_" + hits;
+            buttons.add(Buttons.gray(cancelID, "Cancel a Hit"));
+        }
+
+        String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign ";
+        msg2 += (hits == 1 ? "the hit" : "hits") + ". ";
+        msg2 += ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, hits, event, true);
+        if (opponent.hasRelic("metalivoidshielding")) {
+            RelicModel relicModel = Mapper.getRelic("metalivoidshielding");
+            msg2 += "\nReminder: You have the _" + relicModel.getName() + "_ relic,";
+            msg2 += " you may SUSTAIN DAMAGE on one of your none-fighter ships instead of taking a hit.";
+        }
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
+    }
+
     // This roll was made from fow private channel and not from a combat thread
     private static boolean isFoWPrivateChannelRoll(Player player, GenericInteractionCreateEvent event) {
         return event.getMessageChannel().equals(player.getPrivateChannel());
@@ -764,6 +799,15 @@ public class CombatRollService {
         int maximumHits = 0;
 
         List<UnitModel> playerUnitsList = new ArrayList<>(playerUnits.keySet());
+        List<UnitType> playerUnitTypes =
+                playerUnitsList.stream().map(UnitModel::getUnitType).toList();
+        boolean hacanFlagship = player.hasUnit("hacan_flagship") && playerUnitTypes.contains(UnitType.Flagship);
+        boolean tkHacanWarsun = player.hasUnit("tk-fallofkenara") && playerUnitTypes.contains(UnitType.Warsun);
+        List<Button> hacanFsButtons = new ArrayList<>();
+        List<UnitType> hacanFsThalnosDestroyTypes = new ArrayList<>();
+        int nearMisses = 0;
+        boolean isThalnosReroll = "true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"));
+
         int totalMisses = 0;
         UnitHolder space = activeSystem.getUnitHolders().get("space");
         StringBuilder extra = new StringBuilder();
@@ -862,6 +906,7 @@ public class CombatRollService {
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
             UnitModel unitModel = entry.getKey();
             int numOfUnit = entry.getValue();
+            UnitType unitType = unitModel.getUnitType();
 
             int toHit = unitModel.getCombatDieHitsOnForAbility(rollType, player);
             int modifierToHit = CombatModHelper.getCombinedModifierForUnit(
@@ -894,8 +939,7 @@ public class CombatRollService {
                 numRollsPerUnit = combatRoundProfile.diceCount();
             }
             boolean extraRollsCount = false;
-            if ((numRollsPerUnit > 1 || extraRollsForUnit > 0)
-                    && "true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"))) {
+            if ((numRollsPerUnit > 1 || extraRollsForUnit > 0) && isThalnosReroll) {
                 extraRollsCount = true;
                 numRollsPerUnit = 1;
                 extraRollsForUnit = 0;
@@ -923,7 +967,7 @@ public class CombatRollService {
             }
             List<String> singleUnitUse = new ArrayList<>(List.of("no"));
             if (rollType == CombatRollType.combatround
-                    && !"true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"))
+                    && !isThalnosReroll
                     && (player.hasTech("tf-supercharge")
                             || (player.hasUnlockedBreakthrough("letnevbt")
                                     && "space".equalsIgnoreCase(unitHolder.getName())))) {
@@ -962,7 +1006,7 @@ public class CombatRollService {
                             default -> RollSegmentType.PRIMARY;
                         };
                 RoundStatsTracker.recordDiceRolled(game, player, numRolls);
-                List<DiceHelper.Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
+                List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
                 int mult = 1;
 
                 player.setExpectedHitsTimes10(
@@ -977,11 +1021,20 @@ public class CombatRollService {
                 if (unitModel.getUnitType() == UnitType.Flagship
                         && ValefarZService.hasFlagshipAbility(game, player, "jolnar_flagship")) {
                     chanceOfAllHits *= Math.pow(2.0 / (11 - toHit + modifierToHit), numRolls * mult);
-                    for (DiceHelper.Die die : resultRolls) {
+                    for (Die die : resultRolls) {
                         if (die.getResult() >= 9) {
                             hitRolls += 2;
                         }
                         maximumHits += 2;
+                    }
+                }
+                if (unitModel.getUnitType() == UnitType.Infantry && player.hasUnit("tk-tekklarelite")) {
+                    chanceOfAllHits *= Math.pow(2.0 / (11 - toHit + modifierToHit), numRolls * mult);
+                    for (Die die : resultRolls) {
+                        if (die.isSuccess()) {
+                            hitRolls += 1;
+                        }
+                        maximumHits += 1;
                     }
                 }
                 if (rollType == CombatRollType.bombardment && "tf-dragonfreed".equalsIgnoreCase(unitModel.getId())) {
@@ -1042,8 +1095,7 @@ public class CombatRollService {
                     int additionalDice = hitRolls;
                     while (hitRolls < 100 && additionalDice > 0) {
                         RoundStatsTracker.recordDiceRolled(game, player, additionalDice);
-                        List<DiceHelper.Die> additionalResultRolls =
-                                DiceHelper.rollDice(toHit - modifierToHit, additionalDice);
+                        List<Die> additionalResultRolls = DiceHelper.rollDice(toHit - modifierToHit, additionalDice);
                         additionalDice = DiceHelper.countSuccesses(additionalResultRolls);
                         hitRolls += additionalDice;
                         resultRolls.addAll(additionalResultRolls);
@@ -1055,7 +1107,7 @@ public class CombatRollService {
                         && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
                     ButtonHelperAbilities.readyBannerHalls(game);
                     chanceOfAllHits *= Math.pow(1.0 / (11 - toHit + modifierToHit), numRolls * mult);
-                    for (DiceHelper.Die die : resultRolls) {
+                    for (Die die : resultRolls) {
                         if (die.getResult() >= 10) {
                             hitRolls += 1;
                             MessageHelper.sendMessageToChannel(
@@ -1067,7 +1119,7 @@ public class CombatRollService {
                     }
                 }
                 if ("vaden_flagship".equalsIgnoreCase(unitModel.getId()) && rollType == CombatRollType.bombardment) {
-                    for (DiceHelper.Die die : resultRolls) {
+                    for (Die die : resultRolls) {
                         if (die.getResult() > 4) {
                             player.setTg(player.getTg() + 1);
                             ButtonHelperAbilities.pillageCheck(player, game);
@@ -1093,48 +1145,54 @@ public class CombatRollService {
                 int misses = numRolls - hitRolls;
                 totalMisses += misses;
 
-                if (misses > 0 && !extraRollsCount && "true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"))) {
-                    extra.append(player.getFactionEmoji())
-                            .append(" destroyed ")
-                            .append(misses)
-                            .append(" of their own ")
-                            .append(unitModel.getName())
-                            .append(misses == 1 ? "" : "s")
-                            .append(" due to ")
-                            .append(misses == 1 ? "a Thalnos miss" : "Thalnos misses")
-                            .append(".");
-                    delayedAfterTotalNotes.add(new CombatRollPayload.CombatRollNote(
-                            CombatRollNoteType.UNIT_DESTROYED_FROM_ROLL,
-                            CombatRollNotePlacement.AFTER_TOTAL,
-                            "thalnos",
-                            unitModel.getId(),
-                            misses,
-                            Map.of("actorEmoji", player.getFactionEmoji(), "unitName", unitModel.getName())));
-                    for (String thalnosUnit : game.getThalnosUnits().keySet()) {
-                        String pos = thalnosUnit.split("_")[0];
-                        String unitHolderName = thalnosUnit.split("_")[1];
-                        Tile tile = game.getTileByPosition(pos);
-                        String unitName = unitModel.getBaseType();
-                        thalnosUnit = thalnosUnit.split("_")[2].replace("damaged", "");
-                        if (thalnosUnit.equals(unitName)) {
-                            DestroyUnitService.destroyUnits(
-                                    event,
-                                    tile,
-                                    game,
-                                    player.getColor(),
-                                    misses + " " + unitName + " " + unitHolderName,
-                                    true);
-                            break;
+                // Handle Thalnos Reroll things here
+                if (isThalnosReroll) {
+                    if (hacanFlagship) {
+                        misses -= resultRolls.stream()
+                                .filter(Die::eligibleForHeartPlus)
+                                .toList()
+                                .size();
+                        hacanFsButtons.add(buildHacanFlagshipThalnosButton(game, player, unitType, resultRolls));
+                        if (!extraRollsCount) {
+                            // later we will build one destroy button to rule them all
+                            hacanFsThalnosDestroyTypes.add(unitType);
                         }
+                    } else if (tkHacanWarsun) {
+                        // do not immediately destroy anything here
+                        misses = 0;
+                        hacanFsButtons.add(buildTkHacanWSThalnosButton(game, player, unitType, resultRolls));
+                    }
+                    if ((hacanFlagship || tkHacanWarsun) && !extraRollsCount) {
+                        // later we will build one destroy button to rule them all
+                        hacanFsThalnosDestroyTypes.add(unitType);
                     }
 
-                } else {
-                    if (misses > 0 && "true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"))) {
-                        MessageHelper.sendMessageToChannel(
-                                event.getMessageChannel(),
-                                player.getFactionEmoji() + " had " + misses + " " + unitModel.getName()
-                                        + (misses == 1 ? "" : "s") + " miss" + (misses == 1 ? "" : "es")
-                                        + " on a Thalnos roll, but no units were removed due to extra rolls being unaccounted for.");
+                    if (misses > 0 && !extraRollsCount) {
+                        extra.append(player.getFactionEmoji())
+                                .append(" destroyed ")
+                                .append(misses)
+                                .append(" of their own ")
+                                .append(unitModel.getName())
+                                .append(misses == 1 ? "" : "s")
+                                .append(" due to ")
+                                .append(misses == 1 ? "a Thalnos miss" : "Thalnos misses")
+                                .append(".");
+                        delayedAfterTotalNotes.add(new CombatRollPayload.CombatRollNote(
+                                CombatRollNoteType.UNIT_DESTROYED_FROM_ROLL,
+                                CombatRollNotePlacement.AFTER_TOTAL,
+                                "thalnos",
+                                unitModel.getId(),
+                                misses,
+                                Map.of("actorEmoji", player.getFactionEmoji(), "unitName", unitModel.getName())));
+                        thalnosUnits(event, game, player, misses, unitModel.getUnitType());
+                    } else {
+                        if (misses > 0) {
+                            MessageHelper.sendMessageToChannel(
+                                    event.getMessageChannel(),
+                                    player.getFactionEmoji() + " had " + misses + " " + unitModel.getName()
+                                            + (misses == 1 ? "" : "s") + " miss" + (misses == 1 ? "" : "es")
+                                            + " on a Thalnos roll, but no units were removed due to extra rolls being unaccounted for.");
+                        }
                     }
                 }
 
@@ -1174,6 +1232,8 @@ public class CombatRollService {
                         if (hitRolls > 0) {
                             RoundStatsTracker.recordDiceRolled(game, player, hitRolls);
                             resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, hitRolls);
+                            // Very important to remove the rerolled dice from the original dice pool
+                            resultRolls.removeIf(Die::isSuccess);
                             player.setExpectedHitsTimes10(
                                     player.getExpectedHitsTimes10() + (hitRolls * (11 - toHit + modifierToHit)));
                             int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
@@ -1211,6 +1271,8 @@ public class CombatRollService {
                         if (numMisses > 0) {
                             RoundStatsTracker.recordDiceRolled(game, player, numMisses);
                             resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numMisses);
+                            // Very important to remove the rerolled dice from the original dice pool
+                            resultRolls.removeIf(Predicate.not(Die::isSuccess));
                             player.setExpectedHitsTimes10(
                                     player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));
                             chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numMisses);
@@ -1350,9 +1412,13 @@ public class CombatRollService {
 
                 if (game.getStoredValue("munitionsReserves").equalsIgnoreCase(player.getFaction())
                         && rollType == CombatRollType.combatround
-                        && numMisses > 0) {
+                        && numMisses > 0
+                        && !isThalnosReroll) { // do not munitions after thalnos
                     RoundStatsTracker.recordDiceRolled(game, player, numMisses);
                     resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numMisses);
+                    // Very important to remove the rerolled dice from the original dice pool
+                    resultRolls.removeIf(Predicate.not(Die::isSuccess));
+
                     player.setExpectedHitsTimes10(
                             player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));
                     chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numMisses);
@@ -1392,6 +1458,45 @@ public class CombatRollService {
                             .append(numMisses == 1 ? "" : "es")
                             .append(": ")
                             .append(unitRoll2);
+                    // these dice are eligible for further rerolls
+                    resultRolls.addAll(resultRolls2);
+                    resultRolls2.clear();
+                }
+
+                if (game.playerHasLeaderUnlockedOrAlliance(player, "kaltrimcommander")) {
+                    int num1s = 0;
+                    for (DiceHelper.Die die : resultRolls) {
+                        if (die.getResult() == 1) {
+                            num1s++;
+                        }
+                    }
+                    // Very important to remove the rerolled dice from the original dice pool
+                    resultRolls.removeIf(d -> d.getResult() == 1);
+
+                    if (num1s > 0) {
+                        RoundStatsTracker.recordDiceRolled(game, player, num1s);
+                        resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, num1s);
+                        player.setExpectedHitsTimes10(
+                                player.getExpectedHitsTimes10() + (num1s * (11 - toHit + modifierToHit)));
+                        int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
+                        totalHits += hitRolls2;
+                        String unitRoll2 = CombatMessageHelper.displayUnitRoll(
+                                unitModel,
+                                toHit,
+                                modifierToHit,
+                                numOfUnit,
+                                numRollsPerUnit,
+                                0,
+                                resultRolls2,
+                                hitRolls2);
+                        resultBuilder
+                                .append("Rerolling ")
+                                .append(num1s)
+                                .append(" roll")
+                                .append(num1s == 1 ? "" : "s")
+                                .append(" of 1 due to the Kaltrim Commander:\n ")
+                                .append(unitRoll2);
+                    }
                 }
 
                 int argentInfKills = 0;
@@ -1427,6 +1532,10 @@ public class CombatRollService {
                     UnitKey inf = Units.getUnitKey(UnitType.Infantry, opponent.getColorID());
                     DestroyUnitService.destroyUnit(event, activeSystem, game, inf, argentInfKills, space, true);
                 }
+
+                // Accumulate all the near misses so we can send a hacan flagship button at the very end of rolling
+                nearMisses += IterableUtils.countMatches(resultRolls, Die::eligibleForHeartPlus);
+                nearMisses += IterableUtils.countMatches(resultRolls2, Die::eligibleForHeartPlus);
             }
         }
         result = resultBuilder.toString();
@@ -1447,11 +1556,15 @@ public class CombatRollService {
         if (game.isConventionsOfWarAbandonedMode() && rollType == CombatRollType.bombardment) {
             totalHits *= 3;
         }
-        boolean x89applies = usesX89c4;
-        if (totalHits < 1) {
-            x89applies = false;
+        boolean useDoubleBoomEmoji = usesX89c4;
+        if (player.hasStoredValue("RazeFaction") && rollType == CombatRollType.bombardment) {
+            useDoubleBoomEmoji = true;
+            totalHits *= 2;
         }
-        result += CombatMessageHelper.displayHitResults(totalHits, x89applies);
+        if (totalHits < 1) {
+            useDoubleBoomEmoji = false;
+        }
+        result += CombatMessageHelper.displayHitResults(totalHits, useDoubleBoomEmoji);
 
         if (totalHits > 0 && usesX89c4) {
             result += "\n" + player.getFactionEmoji() + " produced " + (totalHits / 2) + " additional hit"
@@ -1459,10 +1572,13 @@ public class CombatRollService {
                     + Mapper.getTech("x89c4").getNameRepresentation() + ".";
         }
 
+        if ((hacanFlagship || tkHacanWarsun) && nearMisses > 0 && !isThalnosReroll) {
+            HacanFlagshipService.startHacanFlagshipNormal(event, game, player, activeSystem, nearMisses);
+        }
         if (player.hasRelic("thalnos")
                 && rollType == CombatRollType.combatround
                 && totalMisses > 0
-                && !"true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"))) {
+                && !isThalnosReroll) {
             result += "\n" + player.getFactionEmoji() + " You have _The Crown of Thalnos_ and may reroll "
                     + (totalMisses == 1 ? "the miss" : "misses")
                     + ", adding +1, at the risk of your " + (totalMisses == 1 ? "troop's life" : "troops' lives") + ".";
@@ -1488,6 +1604,43 @@ public class CombatRollService {
         }
         CombatRollPayload payload = payloadBuilder.build(totalHits, totalMisses, maximumHits);
         return new CombatRollResult(result, totalHits, whiff, slam, payload);
+    }
+
+    // FFCC_tkHacanWs_X,X,X,X,X,X,X,X,X,X
+    private void sendTkHacanWsButtons(Game game, Player player, List<Die> misses) {}
+
+    /** Builds a button with ID {@code FFCC_hacanFlagshipThalnos_<unittype>_X} where {@code X} is the number of units that can score a hit given a +1 */
+    private Button buildHacanFlagshipThalnosButton(Game game, Player player, UnitType type, List<Die> results) {
+        int amt = results.stream().filter(Die::eligibleForHeartPlus).toList().size();
+
+        String id = player.finChecker() + "hacanFlagship_" + type.getValue() + "_" + amt;
+        String label = " (" + amt + ")";
+        return Buttons.green(id, label, type.getUnitTypeEmoji());
+    }
+
+    /** Builds a button with ID {@code FFCC_tkHacanWsThalnos_<unittype>_X,X,X,X,X,X,X,X,X,X} where _X\u1D62_ is the number of units that can rolled a result of _i_*/
+    private Button buildTkHacanWSThalnosButton(Game game, Player player, UnitType type, List<Die> results) {
+        for (Die d : results) {
+            if (d.isSuccess()) continue;
+        }
+
+        return null;
+    }
+
+    private void thalnosUnits(
+            GenericInteractionCreateEvent event, Game game, Player player, int misses, UnitType type) {
+        for (String thalnosUnit : game.getThalnosUnits().keySet()) {
+            String pos = thalnosUnit.split("_")[0];
+            String unitHolderName = thalnosUnit.split("_")[1];
+            Tile tile = game.getTileByPosition(pos);
+            String unitName = type.plainName();
+            thalnosUnit = thalnosUnit.split("_")[2].replace("damaged", "");
+            if (thalnosUnit.equals(unitName)) {
+                DestroyUnitService.destroyUnits(
+                        event, tile, game, player.getColor(), misses + " " + unitName + " " + unitHolderName, true);
+                break;
+            }
+        }
     }
 
     private CombatRollPayload.RollHeader buildRollHeader(

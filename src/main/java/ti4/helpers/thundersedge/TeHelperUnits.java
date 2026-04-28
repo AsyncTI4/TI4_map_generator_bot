@@ -56,10 +56,12 @@ public final class TeHelperUnits {
     @ButtonHandler("revenantDeploy_")
     private static void revenantDeploy(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         String regex = "revenantDeploy_" + RegexHelper.unitHolderRegex(game, "planet");
-        if (!game.getTileByPosition(game.getActiveSystem())
-                .getSpaceUnitHolder()
-                .getTokenList()
-                .contains(Constants.TOKEN_BREACH_ACTIVE)) {
+
+        Tile tile = game.getTileByPosition(game.getActiveSystem());
+        UnitHolder space = tile.getSpaceUnitHolder();
+        boolean hasBreach = space.getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
+        boolean hasShips = tile.containsPlayersUnitsWithModelCondition(player, UnitModel::isNonFighterShip);
+        if (!hasBreach && !(game.isTwilightKart() && hasShips)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), "The system must have an active Breach in it to deploy a Revenant.");
             return;
@@ -69,9 +71,8 @@ public final class TeHelperUnits {
             AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "1 mech " + planet);
             String planetRep = Helper.getPlanetRepresentation(planet, game);
             String boringMsg = player.getRepresentation(true, false) + " deployed a Revenant on " + planetRep + ".";
-            String flavorMsg =
-                    "Out of the cold depths of the active Breach, a Rebellion Revenant has emerged, landing on "
-                            + planetRep + ".";
+            String flavorMsg = "Out of the cold depths of " + (game.isTwilightKart() ? "space" : "the active breach");
+            flavorMsg += ", a Rebellion _Revenant_ has emerged, landing on " + planetRep + ".";
 
             String msg = RandomHelper.isOneInX(20) ? flavorMsg : boringMsg;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
