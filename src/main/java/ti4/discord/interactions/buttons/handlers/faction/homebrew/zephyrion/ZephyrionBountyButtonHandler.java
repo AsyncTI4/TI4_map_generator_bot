@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.other.zephyrion;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.zephyrion;
 
 import java.util.ArrayList;
 import java.util.List;

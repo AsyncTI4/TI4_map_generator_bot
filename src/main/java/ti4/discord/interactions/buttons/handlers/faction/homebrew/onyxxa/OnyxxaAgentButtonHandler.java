@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.other.onyxxa;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.onyxxa;
 
 import java.util.ArrayList;
 import java.util.List;

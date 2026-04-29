@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.other.zephyrion;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.zephyrion;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
 

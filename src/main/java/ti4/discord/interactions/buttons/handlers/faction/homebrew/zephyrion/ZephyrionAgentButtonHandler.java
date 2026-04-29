@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.other.zephyrion;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.zephyrion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -16,7 +17,31 @@ import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 
 @UtilityClass
-class ZephyrionAgentButtonHandler {
+public class ZephyrionAgentButtonHandler {
+
+    public static void postInitialButtons(Game game, Player player) {
+        List<String> bounties = ZephyrionBountyButtonHandler.getBountiesForPlayer(game);
+        List<Button> buttons = new ArrayList<>();
+        for (Player otherPlayer : game.getRealPlayersExcludingThis(player)) {
+            for (String bounty : bounties) {
+                String faction = bounty.split(" ")[0];
+                String ship = bounty.split(" ")[1];
+                if ("flagship".equalsIgnoreCase(ship) || "warsun".equalsIgnoreCase(ship)) {
+                    continue;
+                }
+                if (otherPlayer.getFaction().equalsIgnoreCase(faction)) {
+                    buttons.add(Buttons.gray(
+                            "zephAgentRes_" + faction + "_" + ship,
+                            StringUtils.capitalize(ship),
+                            otherPlayer.getFactionEmojiOrColor()));
+                }
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " you may use the buttons to select the ship you want to kill.",
+                buttons);
+    }
 
     @ButtonHandler("zephAgentRes_")
     public static void zephAgentRes(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
