@@ -14,6 +14,7 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.edict.EdictPhaseHandler;
 import ti4.discord.interactions.buttons.handlers.faction.other.onyxxa.OnyxxaHeroButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.other.xan.XanHeroButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -34,8 +35,6 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
-import ti4.helpers.Units.UnitKey;
-import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.Mapper;
@@ -207,30 +206,8 @@ public class PlayHeroService {
                     ButtonHelperRelics.offerTitansHeroButtons(player, game, event);
                 }
             }
-            case "onyxxahero" -> OnyxxaHeroButtonHandler.postInitialButtons(event, game, player);
-            case "xanhero" -> {
-                int amount = 0;
-                for (Tile tile : game.getTileMap().values()) {
-                    for (UnitHolder uh : tile.getUnitHolders().values()) {
-                        for (UnitKey uk : uh.getUnitKeys()) {
-                            amount += uh.getUnitCountForState(uk, UnitState.dmg);
-                        }
-                    }
-                }
-                game.getTileMap().values().stream()
-                        .flatMap(t -> t.getUnitHolders().values().stream())
-                        .forEach(uh -> uh.removeAllUnitDamage(player.getColorID()));
-                String gainedTg = player.gainTG(amount, true);
-                String message = player.getRepresentation() + " repaired all " + amount
-                        + " of their damaged units, and consequently gained " + amount + " trade good"
-                        + (amount == 1 ? "" : "s") + " " + gainedTg + ".";
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                ButtonHelperAgents.resolveArtunoCheck(player, amount);
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation()
-                                + " can now repair other players' units near their space docks (not automated, use `/remove_all_sustain_damage`).");
-            }
+            case "onyxxahero" -> OnyxxaHeroButtonHandler.postInitialButtons(game, player);
+            case "xanhero" -> XanHeroButtonHandler.postInitialButtons(game, player);
             case "mirvedahero" -> {
                 List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, "pds", "placeOneNDone_skipbuild");
                 String message = "Please choose a planet to place a PDS";
