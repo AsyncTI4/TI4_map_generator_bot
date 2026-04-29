@@ -12,7 +12,9 @@ public record CombatSideState(
         boolean roundOneWhiff,
         boolean roundOneSlam,
         boolean playedMoraleBoost,
-        boolean playedShieldsHolding) {
+        boolean playedShieldsHolding,
+        boolean playedDirectHit,
+        boolean playedFighterPrototype) {
 
     public static CombatSideState forFaction(CombatCandidateEntity candidate, String faction) {
         if (candidate == null || faction == null) return null;
@@ -21,21 +23,20 @@ public record CombatSideState(
         return null;
     }
 
-    public static boolean markRollFlags(
+    public static void markRollFlags(
             CombatCandidateEntity candidate,
             String faction,
             boolean rolledAfb,
             boolean afbWhiff,
             boolean roundOneWhiff,
             boolean roundOneSlam) {
-        if (candidate == null || faction == null) return false;
         if (faction.equalsIgnoreCase(candidate.getAttackerFaction())) {
             candidate.setAttackerRolledAfb(Boolean.TRUE.equals(candidate.getAttackerRolledAfb()) || rolledAfb);
             candidate.setAttackerAfbWhiff(Boolean.TRUE.equals(candidate.getAttackerAfbWhiff()) || afbWhiff);
             candidate.setAttackerRoundOneWhiff(
                     Boolean.TRUE.equals(candidate.getAttackerRoundOneWhiff()) || roundOneWhiff);
             candidate.setAttackerRoundOneSlam(Boolean.TRUE.equals(candidate.getAttackerRoundOneSlam()) || roundOneSlam);
-            return true;
+            return;
         }
         if (faction.equalsIgnoreCase(candidate.getDefenderFaction())) {
             candidate.setDefenderRolledAfb(Boolean.TRUE.equals(candidate.getDefenderRolledAfb()) || rolledAfb);
@@ -43,29 +44,32 @@ public record CombatSideState(
             candidate.setDefenderRoundOneWhiff(
                     Boolean.TRUE.equals(candidate.getDefenderRoundOneWhiff()) || roundOneWhiff);
             candidate.setDefenderRoundOneSlam(Boolean.TRUE.equals(candidate.getDefenderRoundOneSlam()) || roundOneSlam);
-            return true;
         }
-        return false;
     }
 
-    public static boolean markEventFlags(
-            CombatCandidateEntity candidate, String faction, boolean moraleBoost, boolean shieldsHolding) {
-        if (candidate == null || faction == null) return false;
-        if (faction.equalsIgnoreCase(candidate.getAttackerFaction())) {
-            candidate.setAttackerPlayedMoraleBoost(
-                    Boolean.TRUE.equals(candidate.getAttackerPlayedMoraleBoost()) || moraleBoost);
-            candidate.setAttackerPlayedShieldsHolding(
-                    Boolean.TRUE.equals(candidate.getAttackerPlayedShieldsHolding()) || shieldsHolding);
-            return true;
+    public static void markEventFlag(
+            CombatCandidateEntity candidate, String faction, CombatReplayTrackedEvent trackedEvent) {
+        boolean attacker = faction.equalsIgnoreCase(candidate.getAttackerFaction());
+        if (!attacker && !faction.equalsIgnoreCase(candidate.getDefenderFaction())) return;
+        switch (trackedEvent) {
+            case MORALE_BOOST -> {
+                if (attacker) candidate.setAttackerPlayedMoraleBoost(true);
+                else candidate.setDefenderPlayedMoraleBoost(true);
+            }
+            case SHIELDS_HOLDING -> {
+                if (attacker) candidate.setAttackerPlayedShieldsHolding(true);
+                else candidate.setDefenderPlayedShieldsHolding(true);
+            }
+            case DIRECT_HIT -> {
+                if (attacker) candidate.setAttackerPlayedDirectHit(true);
+                else candidate.setDefenderPlayedDirectHit(true);
+            }
+            case FIGHTER_PROTOTYPE -> {
+                if (attacker) candidate.setAttackerPlayedFighterPrototype(true);
+                else candidate.setDefenderPlayedFighterPrototype(true);
+            }
+            case ROUT, NONE -> {}
         }
-        if (faction.equalsIgnoreCase(candidate.getDefenderFaction())) {
-            candidate.setDefenderPlayedMoraleBoost(
-                    Boolean.TRUE.equals(candidate.getDefenderPlayedMoraleBoost()) || moraleBoost);
-            candidate.setDefenderPlayedShieldsHolding(
-                    Boolean.TRUE.equals(candidate.getDefenderPlayedShieldsHolding()) || shieldsHolding);
-            return true;
-        }
-        return false;
     }
 
     private static CombatSideState attacker(CombatCandidateEntity candidate) {
@@ -76,7 +80,9 @@ public record CombatSideState(
                 Boolean.TRUE.equals(candidate.getAttackerRoundOneWhiff()),
                 Boolean.TRUE.equals(candidate.getAttackerRoundOneSlam()),
                 Boolean.TRUE.equals(candidate.getAttackerPlayedMoraleBoost()),
-                Boolean.TRUE.equals(candidate.getAttackerPlayedShieldsHolding()));
+                Boolean.TRUE.equals(candidate.getAttackerPlayedShieldsHolding()),
+                Boolean.TRUE.equals(candidate.getAttackerPlayedDirectHit()),
+                Boolean.TRUE.equals(candidate.getAttackerPlayedFighterPrototype()));
     }
 
     private static CombatSideState defender(CombatCandidateEntity candidate) {
@@ -87,7 +93,9 @@ public record CombatSideState(
                 Boolean.TRUE.equals(candidate.getDefenderRoundOneWhiff()),
                 Boolean.TRUE.equals(candidate.getDefenderRoundOneSlam()),
                 Boolean.TRUE.equals(candidate.getDefenderPlayedMoraleBoost()),
-                Boolean.TRUE.equals(candidate.getDefenderPlayedShieldsHolding()));
+                Boolean.TRUE.equals(candidate.getDefenderPlayedShieldsHolding()),
+                Boolean.TRUE.equals(candidate.getDefenderPlayedDirectHit()),
+                Boolean.TRUE.equals(candidate.getDefenderPlayedFighterPrototype()));
     }
 
     private static int safeInt(Integer value) {

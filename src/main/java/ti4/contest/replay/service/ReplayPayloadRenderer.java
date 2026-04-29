@@ -1,6 +1,9 @@
 package ti4.contest.replay.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
@@ -14,9 +17,15 @@ import ti4.contest.replay.dispatch.ReplayDispatchPayload;
 import ti4.contest.replay.dispatch.ReplayDispatchSerializer;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatCandidateEventEntity;
+import ti4.contest.replay.repository.CombatCandidateEventRepository;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitState;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.model.ActionCardModel;
 import ti4.model.LeaderModel;
@@ -31,6 +40,7 @@ public class ReplayPayloadRenderer {
 
     private final CombatContestSettings settings;
     private final ReplayDispatchSerializer payloadSerializer;
+    private final CombatCandidateEventRepository candidateEventRepository;
 
     public RenderedReplayEvent render(Game game, CombatCandidateEntity candidate, CombatCandidateEventEntity event) {
         ReplayDispatchPayload payload = payloadSerializer.read(event);
@@ -94,8 +104,9 @@ public class ReplayPayloadRenderer {
 
     private RenderedReplayEvent renderHitAssign(
             RenderContext context, ReplayDispatchPayload.HitAssignDispatch payload) {
-        return tileRender(
-                context.event().getSummaryText(), List.of(), payload.tilePosition(), payload.combatStateSnapshotJson());
+        String content = firstNonBlank(
+                renderHitAssignSummary(context, payload), context.event().getSummaryText());
+        return tileRender(content, List.of(), payload.tilePosition(), payload.combatStateSnapshotJson());
     }
 
     private RenderedReplayEvent renderTileRenderMessage(
@@ -235,6 +246,129 @@ public class ReplayPayloadRenderer {
 
     private String firstNonBlank(String value, String fallback) {
         return value != null && !value.isBlank() ? value : fallback;
+    }
+
+    private String renderHitAssignSummary(RenderContext context, ReplayDispatchPayload.HitAssignDispatch payload) {
+        String previousSnapshotJson = previousTileSnapshotJson(context, payload.tilePosition());
+        if (StringUtils.isBlank(previousSnapshotJson)) return null;
+
+        Game previous =
+                restoreReplayGame(previousSnapshotJson, context.game(), context.candidate(), payload.tilePosition());
+        Game current = restoreReplayGame(
+                payload.combatStateSnapshotJson(), context.game(), context.candidate(), payload.tilePosition());
+        if (previous == null || current == null) return null;
+
+        List<String> changes = hitAssignmentChanges(previous, current, payload.tilePosition());
+        if (changes.isEmpty()) return null;
+        return context.event().getSummaryText() + "\n" + String.join("\n", changes);
+    }
+
+    private String previousTileSnapshotJson(RenderContext context, String tilePosition) {
+        CombatCandidateEntity candidate = context.candidate();
+        if (candidate == null || candidate.getId() == null) return null;
+
+        String previousSnapshotJson = candidate.getInitialRenderSnapshotJson();
+        for (CombatCandidateEventEntity event :
+                candidateEventRepository.findByCandidateIdOrderBySequenceNumberAsc(candidate.getId())) {
+            if (event.getSequenceNumber() == null
+                    || context.event().getSequenceNumber() == null
+                    || event.getSequenceNumber() >= context.event().getSequenceNumber()) {
+                break;
+            }
+            ReplayDispatchPayload eventPayload = payloadSerializer.read(event);
+            if (eventPayload instanceof ReplayDispatchPayload.HitAssignDispatch hitAssign
+                    && tilePosition.equals(hitAssign.tilePosition())) {
+                previousSnapshotJson = hitAssign.combatStateSnapshotJson();
+            } else if (eventPayload instanceof ReplayDispatchPayload.TileRenderMessageDispatch tileRender
+                    && tilePosition.equals(tileRender.tilePosition())) {
+                previousSnapshotJson = tileRender.combatStateSnapshotJson();
+            }
+        }
+        return previousSnapshotJson;
+    }
+
+    private List<String> hitAssignmentChanges(Game previous, Game current, String tilePosition) {
+        Map<UnitKey, Counts> before = unitCounts(previous, tilePosition);
+        Map<UnitKey, Counts> after = unitCounts(current, tilePosition);
+        List<String> changes = new ArrayList<>();
+
+        for (UnitKey key : before.keySet()) {
+            Counts previousCounts = before.get(key);
+            Counts currentCounts = after.getOrDefault(key, Counts.empty());
+            int sustained = previousCounts.sustainedBy(currentCounts);
+            int destroyed = previousCounts.total() - currentCounts.total();
+            if (sustained > 0) {
+                changes.add("- " + unitOwner(current, key.getColorID()) + " sustained "
+                        + unitPhrase(key.getUnitType(), sustained) + ".");
+            }
+            if (destroyed > 0) {
+                changes.add("- " + unitOwner(current, key.getColorID()) + " destroyed "
+                        + unitPhrase(key.getUnitType(), destroyed) + ".");
+            }
+        }
+        return changes;
+    }
+
+    private Map<UnitKey, Counts> unitCounts(Game game, String tilePosition) {
+        Tile tile = game.getTileByPosition(tilePosition);
+        if (tile == null) return Map.of();
+
+        Map<UnitKey, Counts> counts = new HashMap<>();
+        for (UnitHolder holder : tile.getUnitHolders().values()) {
+            for (UnitKey unitKey : holder.getUnitKeys()) {
+                counts.merge(unitKey, Counts.from(holder, unitKey), Counts::plus);
+            }
+        }
+        return counts;
+    }
+
+    private String unitOwner(Game game, String colorId) {
+        Player player = game.getPlayerFromColorOrFaction(colorId);
+        if (player == null) return colorId;
+        return player.getFactionEmoji();
+    }
+
+    private String unitPhrase(UnitType unitType, int count) {
+        String name = unitType.humanReadableName().toLowerCase();
+        if (count == 1 || unitType == UnitType.Infantry || unitType == UnitType.Pds) {
+            return count + " " + name;
+        }
+        return count + " " + name + "s";
+    }
+
+    private record Counts(int none, int damaged, int galvanized, int damagedGalvanized) {
+
+        private static Counts empty() {
+            return new Counts(0, 0, 0, 0);
+        }
+
+        private static Counts from(UnitHolder holder, UnitKey key) {
+            return new Counts(
+                    holder.getUnitCountForState(key, UnitState.none),
+                    holder.getUnitCountForState(key, UnitState.dmg),
+                    holder.getUnitCountForState(key, UnitState.glv),
+                    holder.getUnitCountForState(key, UnitState.dmg_glv));
+        }
+
+        private Counts plus(Counts other) {
+            return new Counts(
+                    none + other.none,
+                    damaged + other.damaged,
+                    galvanized + other.galvanized,
+                    damagedGalvanized + other.damagedGalvanized);
+        }
+
+        private int total() {
+            return none + damaged + galvanized + damagedGalvanized;
+        }
+
+        private int sustainedBy(Counts current) {
+            int standardSustains = Math.min(Math.max(0, none - current.none), Math.max(0, current.damaged - damaged));
+            int galvanizedSustains = Math.min(
+                    Math.max(0, galvanized - current.galvanized),
+                    Math.max(0, current.damagedGalvanized - damagedGalvanized));
+            return standardSustains + galvanizedSustains;
+        }
     }
 
     public sealed interface RenderedReplayEvent permits MessageResult, TileRenderResult {}

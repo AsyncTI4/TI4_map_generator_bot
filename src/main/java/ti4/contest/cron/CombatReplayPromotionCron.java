@@ -26,7 +26,8 @@ public class CombatReplayPromotionCron {
     private static void promoteBestCandidate() {
         if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         CombatContestSettings settings = SpringContext.getBean(CombatContestSettings.class);
-        if (!shouldRun(settings.getPromotion().getIntervalSeconds())) return;
+        if (!settings.getRuntime().isImmediatePromotionOnResolve()
+                && !shouldRun(settings.getPromotion().getIntervalSeconds())) return;
         BotLogger.logCron("Running CombatReplayPromotionCron.");
         try {
             SpringContext.getBean(CombatReplayContestLifecycleService.class).promoteBestCandidateIfDue();

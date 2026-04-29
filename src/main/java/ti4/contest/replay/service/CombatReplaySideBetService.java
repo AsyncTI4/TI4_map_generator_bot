@@ -230,6 +230,8 @@ public class CombatReplaySideBetService {
             case ROUND_ONE_SLAM -> state.roundOneSlam();
             case MORALE_BOOST -> state.playedMoraleBoost();
             case SHIELDS_HOLDING -> state.playedShieldsHolding();
+            case DIRECT_HIT -> state.playedDirectHit();
+            case FIGHTER_PROTOTYPE -> state.playedFighterPrototype();
             case WINNER_ONE_HP ->
                 Boolean.TRUE.equals(candidate.getWinnerOneHpRemaining())
                         && sideBet.getTargetFaction() != null

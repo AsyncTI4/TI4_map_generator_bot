@@ -33,9 +33,12 @@ public class CombatReplayEventAppender {
         CombatCandidateEntity freshCandidate =
                 candidateRepository.findById(candidate.getId()).orElse(null);
         if (freshCandidate == null) return;
-        if (freshCandidate.getStatus() != CombatCandidateStatus.TRACKING
-                && eventType != CombatCandidateEventType.RESOLVED
-                && eventType != CombatCandidateEventType.CANCELLED) return;
+        CombatCandidateStatus status = freshCandidate.getStatus();
+        boolean pendingHitAssignment =
+                status == CombatCandidateStatus.PENDING_RESOLUTION && eventType == CombatCandidateEventType.HIT_ASSIGN;
+        boolean terminalEvent =
+                eventType == CombatCandidateEventType.RESOLVED || eventType == CombatCandidateEventType.CANCELLED;
+        if (status != CombatCandidateStatus.TRACKING && !pendingHitAssignment && !terminalEvent) return;
 
         int sequenceNumber = nextSequenceNumber(freshCandidate);
         CombatCandidateEventEntity event = new CombatCandidateEventEntity();
