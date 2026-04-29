@@ -22,9 +22,7 @@ class CardsInfoButtonHandler {
         if (!game.isFowMode()) {
             ThreadChannel channel = player.getCardsInfoThread();
             // archiving it to combat a common bug that is solved via archiving
-            channel.getManager()
-                    .setArchived(true)
-                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            channel.getManager().setArchived(true).queue(Consumers.nop(), BotLogger::catchRestError);
         }
         CardsInfoService.sendCardsInfo(game, player, event);
         EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);

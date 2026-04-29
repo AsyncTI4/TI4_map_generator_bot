@@ -192,7 +192,9 @@ public class ReactionService {
             return;
         }
 
-        var message = game.getMainGameChannel().retrieveMessageById(gameMessage.messageId()).complete();
+        var message = game.getMainGameChannel()
+                .retrieveMessageById(gameMessage.messageId())
+                .complete();
         if (gameMessage.type() == GameMessageType.AGENDA_AFTER) {
             handleAllPlayersReactingNoAfters(message, game);
         } else if (gameMessage.type() == GameMessageType.AGENDA_WHEN) {
