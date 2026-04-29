@@ -21,7 +21,11 @@ public interface TwilightFallDeckFuncs {
     String getUnitSpliceDeckID();
 
     default List<String> getAbilitySpliceDeck(boolean includeVeiledCards) {
-        List<String> allCards = Mapper.getDeck(getAbilitySpliceDeckID()).getNewShuffledDeck();
+        String deckID = getAbilitySpliceDeckID();
+        if (deckID == null || deckID.isEmpty()) {
+            deckID = "techs_tf";
+        }
+        List<String> allCards = Mapper.getDeck(deckID).getNewShuffledDeck();
         for (Player p : getRealPlayersNNeutral()) {
             for (String tech : p.getTechs()) {
                 allCards.remove(tech);
@@ -43,7 +47,11 @@ public interface TwilightFallDeckFuncs {
     }
 
     default List<String> getGenomeSpliceDeck(boolean includeVeiledCards) {
-        List<String> allCards = Mapper.getDeck(getGenomeSpliceDeckID()).getNewShuffledDeck();
+        String deckID = getGenomeSpliceDeckID();
+        if (deckID == null || deckID.isEmpty()) {
+            deckID = "tf_genome";
+        }
+        List<String> allCards = Mapper.getDeck(deckID).getNewShuffledDeck();
         for (Player p : getRealPlayersNNeutral()) {
             for (String genome : p.getLeaderIDs()) {
                 allCards.remove(genome);
@@ -56,7 +64,11 @@ public interface TwilightFallDeckFuncs {
     }
 
     default List<String> getUnitSpliceDeck(boolean includeVeiledCards) {
-        List<String> allCards = Mapper.getDeck(getUnitSpliceDeckID()).getNewShuffledDeck();
+        String deckID = getUnitSpliceDeckID();
+        if (deckID == null || deckID.isEmpty()) {
+            deckID = "tf_units";
+        }
+        List<String> allCards = Mapper.getDeck(deckID).getNewShuffledDeck();
         for (Player p : getRealPlayersNNeutral()) {
             for (String unit : p.getUnitsOwned()) {
                 allCards.remove(unit);
@@ -69,7 +81,11 @@ public interface TwilightFallDeckFuncs {
     }
 
     default List<String> getParadigmSpliceDeck(boolean includeVeiledCards) {
-        List<String> allCards = Mapper.getDeck(getParadigmSpliceDeckID()).getNewShuffledDeck();
+        String deckID = getParadigmSpliceDeckID();
+        if (deckID == null || deckID.isEmpty()) {
+            deckID = "tf_paradigm";
+        }
+        List<String> allCards = Mapper.getDeck(deckID).getNewShuffledDeck();
         List<String> alreadyDrawn = List.of(getStoredValue("savedParadigms").split("_"));
         for (String card : alreadyDrawn) {
             // savedParadigms includes veiled paradigms, which should only be removed if includeVeiledCards is false

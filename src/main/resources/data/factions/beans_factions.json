@@ -3,26 +3,18 @@
         "alias": "dream",
         "factionName": "The Dreaming Throne",
         "homeSystem": "be1",
-        "startingFleet": "2 cv, 1 dd, 3 ff, 2 inf x, 1 inf k, 1 pds k, sd x",
+        "startingFleet": "1 cv, 2 dd, 2 ff, 2 inf x, 2 inf k, 1 pds k, sd x",
         "commodities": 3,
         "factionTech": [
-            "bedreamdo",
+            "bedreamdd",
             "bedreamneg"
         ],
-        "startingTechOptions": [
-            "amd",
-            "det",
-            "nm",
-            "pa",
-            "gd",
-            "sr",
-            "bs",
-            "dxa"
+        "startingTech": [
+            "gd"
         ],
-        "startingTechAmount": 1,
         "homePlanets": [
-            "xylath",
-            "kathulun"
+            "xyl'ath",
+            "kath'ulun"
         ],
         "abilities": [
             "dream_nexus",
@@ -39,7 +31,7 @@
         ],
         "units": [
             "fighter",
-            "destroyer",
+            "dream_destroyer",
             "cruiser",
             "carrier",
             "dreadnought",
@@ -47,19 +39,19 @@
             "infantry",
             "dream_mech",
             "pds",
-            "spacedock"
+            "space_dock"
         ],
         "complexity": "Low",
         "source": "beans"
     },
     {
         "alias": "crystellum",
-        "factionName": "The Crystellum Collective",
+        "factionName": "The Crystellum",
         "homeSystem": "be2",
-        "startingFleet": "1 cv, 1 dn, 1 dd, 3 ff, 2 inf p, 1 inf s, sd p",
+        "startingFleet": "1 cv, 1 dn, 1 cv, 2 ff, 2 inf p, 2 inf s, sd p",
         "commodities": 2,
         "factionTech": [
-            "becrystda",
+            "becrystrd",
             "becrystmb"
         ],
         "startingTechOptions": [
@@ -70,11 +62,11 @@
             "st",
             "sdn",
             "ps",
-            "aida"
+            "aidev"
         ],
         "startingTechAmount": 1,
         "homePlanets": [
-            "prismbe",
+            "prisma",
             "spire"
         ],
         "abilities": [
@@ -99,7 +91,7 @@
             "infantry",
             "crystellum_mech",
             "pds",
-            "spacedock"
+            "space_dock"
         ],
         "complexity": "Medium",
         "source": "beans"
@@ -108,7 +100,7 @@
         "alias": "ashen",
         "factionName": "The Ashen Legion",
         "homeSystem": "be3",
-        "startingFleet": "1 dn, 1 cv, 1 dd, 3 ff, 3 inf p, 1 pds p, sd p",
+        "startingFleet": "2 dn, 1 cv, 1 ff, 4 inf p, sd p",
         "commodities": 2,
         "factionTech": [
             "beasheninf",
@@ -142,7 +134,7 @@
             "ashen_infantry",
             "ashen_mech",
             "pds",
-            "spacedock"
+            "space_dock"
         ],
         "complexity": "Medium",
         "source": "beans"
@@ -186,7 +178,7 @@
             "infantry",
             "iron_mech",
             "pds",
-            "spacedock"
+            "space_dock"
         ],
         "complexity": "Medium",
         "source": "beans"
@@ -195,7 +187,7 @@
         "alias": "ta",
         "factionName": "The Architects of Ta",
         "homeSystem": "be5",
-        "startingFleet": "1 cv, 1 cr, 1 dd, 2 ff, 3 inf t, 1 pds t, sd t",
+        "startingFleet": "1 cv, 2 cr, 2 ff, 3 inf t, 1 pds t, sd t",
         "commodities": 3,
         "factionTech": [
             "betaqr",
@@ -232,7 +224,7 @@
             "infantry",
             "ta_mech",
             "pds",
-            "spacedock"
+            "space_dock"
         ],
         "complexity": "High",
         "source": "beans"
@@ -241,14 +233,14 @@
         "alias": "netrunners",
         "factionName": "The Kha'Zyrr Net-Runners",
         "homeSystem": "be6",
-        "startingFleet": "2 cv, 1 dd, 2 ff, 2 inf k, 2 inf z, sd k",
+        "startingFleet": "2 cv, 1 dd, 2 ff, 5 inf k, pds k, sd k",
         "commodities": 3,
         "factionTech": [
             "benetrunnersdm",
             "benetrunnerssd"
         ],
         "startingTech": [
-            "aida"
+            "aidev"
         ],
         "homePlanets": [
             "kha"
@@ -278,7 +270,57 @@
             "pds",
             "netrunners_spacedock"
         ],
-        "complexity": "Medium",
+        "complexity": "High",
+        "source": "beans"
+    },
+    {
+        "alias": "natau",
+        "factionName": "The Natau Priesthood",
+        "homeSystem": "be7",
+        "startingFleet": "1 cv, 1 dd, 1 dn, 2 ff, 1 inf decay, 1 inf demise, 2 inf disorder, sd disorder",
+        "commodities": 3,
+        "factionTech": [
+            "benataudo",
+            "benataure"
+        ],
+        "startingTechOptions": [
+            "aidev",
+            "ps",
+            "amd",
+            "det"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [
+            "decay",
+            "demise",
+            "disorder"
+        ],
+        "abilities": [
+            "doctrine",
+            "paradigm",
+            "decree"
+        ],
+        "leaders": [
+            "natauagent",
+            "nataucommander",
+            "natauhero"
+        ],
+        "promissoryNotes": [
+            "bepnnatau"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "natau_flagship",
+            "infantry",
+            "natau_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "High",
         "source": "beans"
     }
 ]

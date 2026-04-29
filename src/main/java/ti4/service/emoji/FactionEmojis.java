@@ -121,6 +121,7 @@ public enum FactionEmojis implements TI4Emoji {
     crystellum,
     dream,
     ashen,
+    natau,
 
     // nomadfalcon
     erock,
@@ -393,6 +394,7 @@ public enum FactionEmojis implements TI4Emoji {
             case "ta" -> ta;
             case "netrunners" -> netrunners;
             case "crystellum" -> crystellum;
+            case "natau" -> natau;
 
             case "netharii" -> netharii;
             case "drahn" -> Drahn;

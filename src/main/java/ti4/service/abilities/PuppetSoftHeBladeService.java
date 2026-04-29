@@ -152,7 +152,7 @@ public class PuppetSoftHeBladeService {
     private static String flipFirmamentHomeSystem(Player player) {
         Tile oldHome = player.getHomeSystemTile();
         if (!"96a".equals(oldHome.getTileID())) return null;
-
+        Game game = player.getGame();
         // Replace the home system
         Tile newHome = new Tile("96b", oldHome.getPosition(), oldHome.getSpaceUnitHolder());
         newHome.inheritFogData(oldHome);
@@ -171,6 +171,9 @@ public class PuppetSoftHeBladeService {
         player.removePlanet("tallin");
         player.addPlanet("cronoshollow");
         player.addPlanet("tallinhollow");
+        game.removeTile(oldHome.getPosition());
+        game.setTile(newHome);
+        player.setHomeSystemPosition(newHome.getPosition());
 
         return "Sucessfully replaced home system tile.";
     }
@@ -218,11 +221,11 @@ public class PuppetSoftHeBladeService {
         });
         player.getLeaderByID("firmamenthero").ifPresent(oldLeader -> {
             player.removeLeader(oldLeader);
-            Leader newLeader = new Leader("obsidianhero");
-            player.addLeader(newLeader);
-            HeroUnlockCheckService.checkIfHeroUnlocked(player.getGame(), player);
-            output.add(String.format(fmt, oldLeader.getName(), newLeader.getName()));
         });
+        Leader newLeader = new Leader("obsidianhero");
+        player.addLeader(newLeader);
+        HeroUnlockCheckService.checkIfHeroUnlocked(player.getGame(), player);
+        output.add(String.format(fmt, Mapper.getLeader("firmamenthero").getName(), newLeader.getName()));
         return output;
     }
 

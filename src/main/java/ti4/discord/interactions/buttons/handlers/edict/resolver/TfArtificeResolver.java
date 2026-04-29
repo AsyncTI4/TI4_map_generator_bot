@@ -82,6 +82,9 @@ public class TfArtificeResolver implements EdictResolver {
                 ButtonHelperTwilightsFall.drawParadigm(game, player, event, false);
             }
             for (String paradigm : game.getStoredValue("artificeParadigms").split("_")) {
+                if (Mapper.getLeader(paradigm) == null) {
+                    continue;
+                }
                 buttons.add(Buttons.green(
                         "keepArtificeParadigm_" + paradigm,
                         "Keep " + Mapper.getLeader(paradigm).getName()));

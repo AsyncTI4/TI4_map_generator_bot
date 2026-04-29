@@ -131,5 +131,8 @@ public class YinHeroButtonHandler {
                             + ", reminder that Dannel of the Tenth, the Yin hero, skips the space cannon defense step.");
         }
         ButtonHelper.deleteMessage(event);
+        if (!game.isFowMode()) {
+            ButtonHelper.updateMap(game, event, "Yin hero landing on " + Helper.getPlanetRepresentation(planet, game));
+        }
     }
 }
