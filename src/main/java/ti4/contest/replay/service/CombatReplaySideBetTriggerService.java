@@ -63,6 +63,8 @@ public class CombatReplaySideBetTriggerService {
         return switch (trackedEvent) {
             case MORALE_BOOST -> List.of(announcement(player, "Morale Boost!"));
             case SHIELDS_HOLDING -> List.of(announcement(player, "Shields Holding!"));
+            case DIRECT_HIT -> List.of(announcement(player, "Direct Hit!"));
+            case FIGHTER_PROTOTYPE -> List.of(announcement(player, "Fighter Prototype!"));
             case ROUT, NONE -> List.of();
         };
     }

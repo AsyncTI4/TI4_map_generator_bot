@@ -14,8 +14,13 @@ public class CombatReplayPredictionScorer {
     static ScoredPredictions score(
             List<LockedPrediction> attackerPredictions,
             List<LockedPrediction> defenderPredictions,
-            boolean attackerWon) {
-        List<LockedPrediction> winningPredictions = attackerWon ? attackerPredictions : defenderPredictions;
+            String winnerFaction,
+            String attackerFaction) {
+        List<LockedPrediction> winningPredictions = List.of();
+        if (winnerFaction != null) {
+            winningPredictions =
+                    winnerFaction.equalsIgnoreCase(attackerFaction) ? attackerPredictions : defenderPredictions;
+        }
         List<LockedPrediction> allPredictions =
                 new ArrayList<>(attackerPredictions.size() + defenderPredictions.size());
         allPredictions.addAll(attackerPredictions);

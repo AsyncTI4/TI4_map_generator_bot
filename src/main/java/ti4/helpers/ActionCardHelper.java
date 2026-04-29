@@ -2335,10 +2335,13 @@ public class ActionCardHelper {
 
     private CombatReplayTrackedEvent getCombatReplayTrackedEvent(ActionCardModel actionCard) {
         if (actionCard == null || actionCard.getAlias() == null) return CombatReplayTrackedEvent.NONE;
-        if (MORALE_BOOST_IDS.contains(actionCard.getAlias())) return CombatReplayTrackedEvent.MORALE_BOOST;
-        if (SHIELDS_HOLDING_IDS.contains(actionCard.getAlias())) return CombatReplayTrackedEvent.SHIELDS_HOLDING;
-        if ("Rout".equalsIgnoreCase(actionCard.getName())
-                || actionCard.getAlias().startsWith("rout")) {
+        String alias = actionCard.getAlias();
+        String automationId = actionCard.getAutomationID();
+        if (MORALE_BOOST_IDS.contains(alias)) return CombatReplayTrackedEvent.MORALE_BOOST;
+        if (SHIELDS_HOLDING_IDS.contains(alias)) return CombatReplayTrackedEvent.SHIELDS_HOLDING;
+        if ("direct_hit".equalsIgnoreCase(automationId)) return CombatReplayTrackedEvent.DIRECT_HIT;
+        if ("f_prototype".equalsIgnoreCase(automationId)) return CombatReplayTrackedEvent.FIGHTER_PROTOTYPE;
+        if ("Rout".equalsIgnoreCase(actionCard.getName()) || alias.startsWith("rout")) {
             return CombatReplayTrackedEvent.ROUT;
         }
         return CombatReplayTrackedEvent.NONE;

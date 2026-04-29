@@ -96,14 +96,17 @@ public class CombatReplayContestLifecycleService {
     public void promoteBestCandidateIfDue() {
         if (!settings.getPromotion().isEnabled()) return;
 
+        boolean immediatePromotion = settings.getRuntime().isImmediatePromotionOnResolve();
         LocalDateTime now = LocalDateTime.now(clock).truncatedTo(ChronoUnit.MINUTES);
-        if (now.getMinute() != 0) return;
-        int maxPromotionsPerHour = settings.getPromotion().getMaxPromotionsPerHour();
-        if (maxPromotionsPerHour <= 0) return;
-        if (replayContestRepository.countByPostedAtGreaterThanEqual(publicPromotionCooldownCutoff(now)) > 0) return;
-        if (replayContestRepository.countByPostedAtGreaterThanEqual(now.truncatedTo(ChronoUnit.HOURS))
-                >= maxPromotionsPerHour) {
-            return;
+        if (!immediatePromotion) {
+            if (now.getMinute() != 0) return;
+            int maxPromotionsPerHour = settings.getPromotion().getMaxPromotionsPerHour();
+            if (maxPromotionsPerHour <= 0) return;
+            if (replayContestRepository.countByPostedAtGreaterThanEqual(publicPromotionCooldownCutoff(now)) > 0) return;
+            if (replayContestRepository.countByPostedAtGreaterThanEqual(now.truncatedTo(ChronoUnit.HOURS))
+                    >= maxPromotionsPerHour) {
+                return;
+            }
         }
 
         List<CombatCandidateEntity> candidates = findPromotionCandidates(now);

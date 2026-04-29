@@ -22,6 +22,10 @@ public enum CombatSideBetType {
     MORALE_BOOST("Plays Morale Boost", CardEmojis.ActionCard, 0, 8),
     /** Current tracked interaction side bet. */
     SHIELDS_HOLDING("Plays Shields Holding", CardEmojis.ActionCard, 0, 8),
+    /** Current tracked interaction side bet. */
+    DIRECT_HIT("Plays Direct Hit", CardEmojis.ActionCard, 0, 8),
+    /** Current tracked interaction side bet. */
+    FIGHTER_PROTOTYPE("Plays Fighter Prototype", CardEmojis.ActionCard, 0, 24),
     /** Current dynamic resolution side bet. */
     WINNER_ONE_HP("Wins On 1\uFE0F\u20E3 HP", "1\uFE0F\u20E3", 0, 35);
 
