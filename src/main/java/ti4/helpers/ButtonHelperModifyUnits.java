@@ -2317,6 +2317,11 @@ public final class ButtonHelperModifyUnits {
                 }
             }
         } else {
+            if (skipbuild.contains("component")) {
+                String message = "Use buttons to end turn or do another action.";
+                List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
+            }
             if (orbitalDrop) {
                 List<Button> orbFollowUp = new ArrayList<>();
                 if (player.hasUnit("sol_mech")

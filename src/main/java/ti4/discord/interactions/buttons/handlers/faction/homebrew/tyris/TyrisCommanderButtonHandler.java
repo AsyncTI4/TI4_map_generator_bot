@@ -33,7 +33,7 @@ public class TyrisCommanderButtonHandler {
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
         List<Button> buttons =
-                new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
+                new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuildcomponent"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 "Please choose the planet you wish to place 1 " + UnitEmojis.mech + " mech on.",
