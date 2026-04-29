@@ -271,7 +271,17 @@ public final class ButtonHelperTacticalAction {
         }
         EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
         if (unitsWereMoved) {
-            CommanderUnlockCheckService.checkPlayer(player, "nivyn", "ghoti", "zelian", "gledge", "mortheus");
+            CommanderUnlockCheckService.checkPlayer(
+                    player,
+                    "nivyn",
+                    "ghoti",
+                    "zelian",
+                    "gledge",
+                    "mortheus",
+                    "tyris",
+                    "lunarium",
+                    "zephyrion",
+                    "vyserix");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "cabal");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "naalu");
