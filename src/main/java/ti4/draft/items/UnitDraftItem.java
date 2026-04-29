@@ -75,6 +75,13 @@ public class UnitDraftItem extends DraftItem {
                     .append(unit.getSpaceCannonDieCount())
                     .append(' ');
         }
+        if (unit.getBombardDieCount() > 0) {
+            sb.append("BOMBARDMENT ")
+                    .append(unit.getBombardHitsOn())
+                    .append("x")
+                    .append(unit.getBombardDieCount())
+                    .append(' ');
+        }
         if (unit.getProductionValue() > 0) {
             sb.append("PRODUCTION ");
             sb.append(unit.getProductionValue());
