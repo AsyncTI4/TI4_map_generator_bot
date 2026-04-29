@@ -40,7 +40,7 @@
             "PROPULSION"
         ],
         "requirements": "B",
-        "faction": "cryst",
+        "faction": "crystellum",
         "source": "beans",
         "text": "During movement, apply +1 to the move value of your ships that are transporting a number of units equal to their capacity value."
     },
@@ -51,7 +51,7 @@
             "CYBERNETIC"
         ],
         "requirements": "Y",
-        "faction": "cryst",
+        "faction": "crystellum",
         "source": "beans",
         "text": "At the start of your turn, you may replace 1 of your fighters on the game board with 1 destroyer from your reinforcements, or 2 infantry on any planet you control with 1 mech from your reinforcements."
     },

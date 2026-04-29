@@ -1,7 +1,7 @@
 [
   {
     "id": "dreamagent",
-    "faction": "dreaming",
+    "faction": "dream",
     "type": "agent",
     "name": "Xal'thuun",
     "title": "Dream-Seeker",
@@ -12,7 +12,7 @@
   },
   {
     "id": "dreamcommander",
-    "faction": "dreaming",
+    "faction": "dream",
     "type": "commander",
     "name": "Thul'morah",
     "title": "The Awakened One",
@@ -23,7 +23,7 @@
   },
   {
     "id": "dreamhero",
-    "faction": "dreaming",
+    "faction": "dream",
     "type": "hero",
     "name": "Shuulgoroth",
     "title": "The Nightmare Made Flesh",

@@ -25,7 +25,7 @@
     {
         "id": "refraction",
         "name": "Refraction",
-        "faction": "cryst",
+        "faction": "crystellum",
         "window": "After another player produces 1 or more hits against your units during space combat:",
         "windowEffect": "You may assign 1 of those hits to 1 of your non-fighter ships in an adjacent system.",
         "source": "beans"
@@ -33,7 +33,7 @@
     {
         "id": "fragmentation",
         "name": "Fragmentation",
-        "faction": "cryst",
+        "faction": "crystellum",
         "window": "After one of your non-fighter ships in the active system is destroyed during combat:",
         "windowEffect": "You may place 1 fighter from your reinforcements in that system.",
         "source": "beans"
