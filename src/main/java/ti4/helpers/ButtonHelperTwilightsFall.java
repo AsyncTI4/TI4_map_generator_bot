@@ -446,19 +446,7 @@ public final class ButtonHelperTwilightsFall {
             // Cleans up any dirty values left over from e.g. playing Engineer without finishing the splice
             game.removeStoredValue("engineerACSplice");
         }
-        for (Player player2 : game.getRealPlayers()) {
-            if (game.getStoredValue("Reverse Splice") != null
-                    && game.getStoredValue("Reverse Splice").contains(player2.getFaction())
-                    && player2.getPlayableActionCards().contains("tf-reverse")) {
-                ActionCardHelper.playAC(event, game, player2, "tf-reverse", game.getMainGameChannel());
-            }
-            if (game.getStoredValue("Manipulate Splice") != null
-                    && game.getStoredValue("Manipulate Splice").contains(player2.getFaction())
-                    && player2.getPlayableActionCards().contains("tf-manipulate")
-                    && !participants.contains(player2)) {
-                ActionCardHelper.playAC(event, game, player2, "tf-manipulate", game.getMainGameChannel());
-            }
-        }
+
         if (!game.getStoredValue("paid6ForSplice").isEmpty()) {
             participants.add(startPlayer);
             game.removeStoredValue("paid6ForSplice");
@@ -505,6 +493,19 @@ public final class ButtonHelperTwilightsFall {
                     player2.getCardsInfoThread(),
                     getQueueSpliceMessage(game, player2),
                     getQueueSplicePickButtons(game, player2));
+        }
+        for (Player player2 : game.getRealPlayers()) {
+            if (game.getStoredValue("Reverse Splice") != null
+                    && game.getStoredValue("Reverse Splice").contains(player2.getFaction())
+                    && player2.getPlayableActionCards().contains("tf-reverse")) {
+                ActionCardHelper.playAC(event, game, player2, "tf-reverse", game.getMainGameChannel());
+            }
+            if (game.getStoredValue("Manipulate Splice") != null
+                    && game.getStoredValue("Manipulate Splice").contains(player2.getFaction())
+                    && player2.getPlayableActionCards().contains("tf-manipulate")
+                    && !participants.contains(player2)) {
+                ActionCardHelper.playAC(event, game, player2, "tf-manipulate", game.getMainGameChannel());
+            }
         }
     }
 
@@ -810,7 +811,7 @@ public final class ButtonHelperTwilightsFall {
                         MessageHelper.sendMessageToChannelWithEmbed(
                                 player.getCorrectChannel(),
                                 player.getRepresentation() + " has spliced in the "
-                                        + Mapper.getLeader(cardID).getTFNameIfAble() + " genome.",
+                                        + Mapper.getLeader(cardID).getTFNameIfAble() + ".",
                                 Mapper.getLeader(cardID).getRepresentationEmbed(false, true, false, false, true));
                     }
                     if ("units".equalsIgnoreCase(type)) {

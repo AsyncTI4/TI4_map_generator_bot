@@ -1,16 +1,16 @@
 {
-    "id": "prismbe",
-    "tileId": "be2old",
-    "name": "Prism",
+    "id": "prisma",
+    "tileId": "be2",
+    "name": "Prisma",
     "aliases": [
-        "prismbe"
+        "prisma"
     ],
     "positionInTile": {
         "x": 134.0,
         "y": 86.0
     },
     "resources": 4,
-    "influence": 0,
+    "influence": 1,
     "factionHomeworld": "crystellum",
     "planetType": "FACTION",
     "cardImagePath": null,
@@ -18,7 +18,7 @@
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
     "unitPositions": {
-        "unitHolderName": "prismbe",
+        "unitHolderName": "prisma",
         "coordinateMap": {
             "control": [
                 {

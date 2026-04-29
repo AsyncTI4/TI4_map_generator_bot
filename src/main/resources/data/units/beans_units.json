@@ -10,12 +10,12 @@
     "capacityValue": 3,
     "capacityUsed": 1,
     "cost": 8,
-    "combatHitsOn": 7,
+    "combatHitsOn": 5,
     "combatDieCount": 2,
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "This unit is a nexus token. If you choose to remove this unit using your Incomprehensible Form ability, produce and assign 1 hit to 1 of your opponent's ships."
+    "ability": "This unit is also a nexus token. If it is removed using INCOMPREHENSIBLE FORM, produce 1 hit and assign it to 1 of your opponents' ships."
   },
   {
     "id": "dream_mech",
@@ -30,7 +30,47 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "When this unit is destroyed, you may spend 1 influence to place it on another planet in a system that contains 1 of your nexus tokens or your flagship."
+    "ability": "When this unit would be destroyed, you may spend 1 influence to place it on another planet in a system that contains 1 of your nexus tokens or your flagship."
+  },
+  {
+    "id": "dream_destroyer",
+    "baseType": "destroyer",
+    "asyncId": "dd",
+    "name": "Liturgy I",
+    "upgradesToUnitId": "dream_destroyer2",
+    "faction": "dream",
+    "source": "beans",
+    "moveValue": 2,
+    "capacityValue": 1,
+    "capacityUsed": 1,
+    "cost": 1,
+    "combatHitsOn": 9,
+    "combatDieCount": 1,
+    "afbHitsOn": 9,
+    "afbDieCount": 2,
+    "sustainDamage": false,
+    "isShip": true,
+    "ability": "At the end of a tactical action in this unit's system, you may place or move 1 nexus token into this system."
+  },
+  {
+    "id": "dream_destroyer2",
+    "baseType": "destroyer",
+    "asyncId": "dd",
+    "name": "Liturgy II",
+    "upgradesFromUnitId": "dream_destroyer",
+    "faction": "dream",
+    "source": "beans",
+    "moveValue": 3,
+    "capacityValue": 1,
+    "capacityUsed": 1,
+    "cost": 1,
+    "combatHitsOn": 8,
+    "combatDieCount": 1,
+    "afbHitsOn": 6,
+    "afbDieCount": 3,
+    "sustainDamage": false,
+    "isShip": true,
+    "ability": "At the end of a tactical action in this unit's system, you may place or move 1 nexus token into any system that contains your units."
   },
   {
     "id": "crystellum_flagship",
@@ -48,7 +88,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "When this unit is destroyed, place fighters in its system up to its capacity."
+    "ability": "After this unit is destroyed, place fighters in its system up to its capacity value."
   },
   {
     "id": "crystellum_mech",
@@ -63,7 +103,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "During ground combat, before assigning hits; you may choose to assign 1 of those hits to 1 of your fighters in the active system instead."
+    "ability": "After another player produces 1 or more hits against you during ground combat, you may choose to assign 1 of those hits to 1 of your fighters in the active system instead."
   },
   {
     "id": "ashen_flagship",
@@ -76,10 +116,10 @@
     "capacityValue": 3,
     "capacityUsed": 1,
     "cost": 8,
-    "combatHitsOn": 7,
+    "combatHitsOn": 5,
     "combatDieCount": 2,
-    "bombardHitsOn": 5,
-    "bombardDieCount": 2,
+    "bombardmentHitsOn": 5,
+    "bombardmentDieCount": 2,
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
@@ -98,7 +138,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "When this unit is destroyed, place it on this card. At the start of your next turn place each unit on this card on planets you control in your home system."
+    "ability": "When this unit would be destroyed, place it on this card. At the start of your next turn place each unit on this card on planets you control in your home system."
   },
   {
     "id": "ashen_dreadnought",
@@ -114,11 +154,11 @@
     "cost": 4,
     "combatHitsOn": 5,
     "combatDieCount": 1,
-    "bombardHitsOn": 5,
-    "bombardDieCount": 1,
+    "bombardmentHitsOn": 5,
+    "bombardmentDieCount": 1,
     "sustainDamage": true,
     "isShip": true,
-    "ability": "When this unit is destroyed, you may use its BOMBARDMENT ability against a planet in its system."
+    "ability": "During combat, when this unit would be destroyed, you may use its BOMBARDMENT ability against a planet in its system."
   },
   {
     "id": "ashen_dreadnought2",
@@ -135,12 +175,12 @@
     "cost": 4,
     "combatHitsOn": 4,
     "combatDieCount": 1,
-    "bombardHitsOn": 4,
-    "bombardDieCount": 1,
+    "bombardmentHitsOn": 4,
+    "bombardmentDieCount": 1,
     "sustainDamage": true,
     "canBeDirectHit": false,
     "isShip": true,
-    "ability": "This unit may not be destroyed by \"Direct Hit\" action cards.\n\nWhen this unit is destroyed or uses its SUSTAIN DAMAGE ability, you may use its BOMBARDMENT ability against a planet in its system."
+    "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.\n\nDuring combat, when this unit would be destroyed or uses its SUSTAIN DAMAGE ability, you may use its BOMBARDMENT ability against a planet in its system."
   },
   {
     "id": "ashen_infantry",
@@ -155,7 +195,7 @@
     "combatHitsOn": 8,
     "combatDieCount": 1,
     "isGroundForce": true,
-    "ability": "When this unit is destroyed, roll 1 die. If the result is 9 or greater, you may produce 1 hit. Then, place it on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system."
+    "ability": "When this unit would be destroyed, roll 1 die. On a 9 or higher, you may produce 1 hit. If you do, place that unit on this card. At the start of your next turn, place each unit on this card on planets you control in your home system."
   },
   {
     "id": "ashen_infantry2",
@@ -171,7 +211,7 @@
     "combatHitsOn": 7,
     "combatDieCount": 1,
     "isGroundForce": true,
-    "ability": "When this unit is destroyed, roll 1 die. If the result is 6 or greater, you may produce 1 hit. Then, place it on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system."
+    "ability": "When this unit would be destroyed, roll 1 die. On a 6 or higher, you may produce 1 hit. If you do, place that unit on this card. At the start of your next turn, place each unit on this card on planets you control in your home system."
   },
   {
     "id": "iron_flagship",
@@ -184,10 +224,10 @@
     "capacityValue": 3,
     "capacityUsed": 1,
     "cost": 8,
-    "combatHitsOn": 7,
+    "combatHitsOn": 5,
     "combatDieCount": 2,
     "afbHitsOn": 7,
-    "afbDieCount": 1,
+    "afbDieCount": 2,
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
@@ -206,6 +246,7 @@
     "combatHitsOn": 5,
     "combatDieCount": 1,
     "sustainDamage": true,
+    "isShip": true,
     "isGroundForce": true,
     "ability": "When this unit is destroyed, place 1 infantry from your reinforcements on its planet. If it was in the space area, place 1 fighter instead."
   },
@@ -226,7 +267,7 @@
     "sustainDamage": true,
     "isShip": true,
     "isGroundForce": true,
-    "ability": "When this unit is destroyed, place 1 infantry from your reinforcements on its planet. If it was in the space area, place 1 fighter instead. This unit may move without being transported. mechs in excess of capacity count against your fleet limit."
+    "ability": "When this unit is destroyed, place 1 infantry from your reinforcements on its planet. If it was in the space area, place 1 fighter instead. This unit may move without being transported. Mechs in excess of capacity count against your fleet limit."
   },
   {
     "id": "ta_flagship",
@@ -244,7 +285,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "Any 1 planet of your choice that you control in this unit's system gain +1 resource and +1 influence. Any 1 planet of oyur choice in this unit's system that is controlled by another player has -1 resource and -1 influence."
+    "ability": "1 planet in this system you control has its resource and influence values increased by 1, and 1 planet in this system controlled by another player has its resource and influence values reduced by 1."
   },
   {
     "id": "ta_mech",
@@ -259,7 +300,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "DEPLOY: When you attach a Design to a planet, you may spend 1 resource to place a mech on that planet."
+    "ability": "DEPLOY: When you attach a design to a planet, you may spend 1 resource to place a mech on that planet."
   },
   {
     "id": "netrunners_flagship",
@@ -272,12 +313,12 @@
     "capacityValue": 4,
     "capacityUsed": 1,
     "cost": 8,
-    "combatHitsOn": 5,
+    "combatHitsOn": 7,
     "combatDieCount": 2,
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "Apply an additional -1 to ability rolls made by compromised PDS in this system. Compromised space docks in this system gain +1 to their PRODUCTION value."
+    "ability": "SPACE CANNON cannot be used against your units in this system. Space Docks being blockaded by this unit lose their PRODUCTION ability."
   },
   {
     "id": "netrunners_mech",
@@ -292,7 +333,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "DEPLOY: When you place a structure, you may pay 1 resource to place a mech with that structure."
+    "ability": "DEPLOY: When you place a structure, you may spend 1 resource to place a mech with that structure."
   },
   {
     "id": "netrunners_spacedock",
@@ -303,10 +344,10 @@
     "source": "beans",
     "faction": "netrunners",
     "productionValue": "+2",
-    "basicProduction": "res",
+    "basicProduciton": "res",
     "capacityValue": 3,
     "isStructure": true,
-    "ability": "When using this unit's PRODUCTION ability, discount the combined cost of the units produced by the number of compromised space docks on the game board. Up to 3 fighters in this system do not count against capacity."
+    "ability": "This unit's PRODUCTION value is equal to 2 more than this planet's resource value. \n\nUp to 3 fighters in this system do not count against capacity."
   },
   {
     "id": "netrunners_spacedock2",
@@ -321,6 +362,39 @@
     "basicProduction": "res",
     "capacityValue": 3,
     "isStructure": true,
-    "ability": "When using this unit's PRODUCTION ability, discount the combined cost of the units produced by the number of compromised structures on the game board. Up to 3 fighters in this system do not count against capacity."
+    "ability": "This unit's PRODUCTION value is equal to 4 more than this planet's resource value. \n\nWhen using this unit's PRODUCTION ability, discount the combined cost of the units produced by 1 for every 2 other player's control tokens on your faction sheet. \n\nUp to 3 fighters in this system do not count against capacity."
+  },
+  {
+    "id": "natau_flagship",
+    "baseType": "flagship",
+    "asyncId": "fs",
+    "name": "The Chained",
+    "source": "beans",
+    "faction": "natau",
+    "moveValue": 1,
+    "capacityValue": 3,
+    "capacityUsed": 1,
+    "cost": 8,
+    "combatHitsOn": 7,
+    "combatDieCount": 2,
+    "sustainDamage": true,
+    "canBeDirectHit": true,
+    "isShip": true,
+    "ability": "Other player's units in this system lose their unit abilities while this unit is not damaged."
+  },
+  {
+    "id": "natau_mech",
+    "baseType": "mech",
+    "asyncId": "mf",
+    "name": "Penitent",
+    "source": "beans",
+    "faction": "natau",
+    "capacityUsed": 1,
+    "cost": 2,
+    "combatHitsOn": 6,
+    "combatDieCount": 1,
+    "sustainDamage": true,
+    "isGroundForce": true,
+    "ability": "This unit gains +1 to its combat rolls for each exhausted doctrine in your play area."
   }
 ]

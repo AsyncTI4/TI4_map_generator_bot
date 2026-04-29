@@ -1,11 +1,9 @@
 {
-    "id": "be2",
+    "id": "be2old",
     "name": "Prism/Spire - Chystellum",
     "aliases": [
-        "be2",
-        "prisma",
-        "spire",
-        "chystellum"
+        "be2old",
+        "prismbe"
     ],
     "imagePath": "be2_crystellumhs.png",
     "shipPositionsType": "TYPE02",
@@ -29,8 +27,7 @@
     ],
     "wormholes": [],
     "planets": [
-        "prisma",
-        "spire"
+        "prismbe"
     ],
     "source": "beans",
     "tileBack": "green"
