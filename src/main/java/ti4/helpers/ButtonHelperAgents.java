@@ -20,6 +20,7 @@ import ti4.ResourceHelper;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.other.onyxxa.OnyxxaAgentButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.other.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -965,17 +966,7 @@ public final class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String faction = rest.replace("onyxxaagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
-            String msg =
-                    p2.getRepresentationUnfogged() + ", please choose the system that you wish to move a ship from.";
-            List<Button> buttons = new ArrayList<>();
-            for (Tile tile : game.getTileMap().values()) {
-                if (FoWHelper.playerHasShipsInSystem(p2, tile)) {
-                    buttons.add(Buttons.green(
-                            "moveShipToAdjacentSystemStep2_" + tile.getPosition() + "_agent",
-                            tile.getRepresentationForButtons(game, p2)));
-                }
-            }
-            MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons);
+            OnyxxaAgentButtonHandler.postInitialButtons(game, p2);
         }
 
         if ("redcreussagent".equalsIgnoreCase(agent) || "crimsonagent".equalsIgnoreCase(agent)) {

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -19,7 +18,7 @@ import ti4.service.combat.StartCombatService;
 @UtilityClass
 public class OnyxxaHeroButtonHandler {
 
-    public static void postInitialButtons(GenericInteractionCreateEvent event, Game game, Player player) {
+    public static void postInitialButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.playerHasActualShipsInSystem(player, tile)) {
