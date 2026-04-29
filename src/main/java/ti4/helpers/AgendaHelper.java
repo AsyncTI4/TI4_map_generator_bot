@@ -1874,7 +1874,6 @@ public final class AgendaHelper {
             return;
         }
         if (game.getCurrentAgendaInfo() != null) {
-
             Player nextInLine = null;
             try {
                 nextInLine = getNextInLine(null, getVotingOrder(game), game);

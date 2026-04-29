@@ -1,6 +1,7 @@
 package ti4.service.button;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -191,15 +192,14 @@ public class ReactionService {
             return;
         }
 
-        game.getMainGameChannel().retrieveMessageById(gameMessage.messageId()).queue(message -> {
-            if (gameMessage.type() == GameMessageType.AGENDA_AFTER) {
-                handleAllPlayersReactingNoAfters(message, game);
-            } else if (gameMessage.type() == GameMessageType.AGENDA_WHEN) {
-                handleAllPlayersReactingNoWhens(message, game);
-            } else {
-                handleAllPlayersReactingNoSabotage(message, game, gameMessage);
-            }
-        });
+        var message = game.getMainGameChannel().retrieveMessageById(gameMessage.messageId()).complete();
+        if (gameMessage.type() == GameMessageType.AGENDA_AFTER) {
+            handleAllPlayersReactingNoAfters(message, game);
+        } else if (gameMessage.type() == GameMessageType.AGENDA_WHEN) {
+            handleAllPlayersReactingNoWhens(message, game);
+        } else {
+            handleAllPlayersReactingNoSabotage(message, game, gameMessage);
+        }
     }
 
     public static void handleAllPlayersReactingNoAfters(Message message, Game game) {
