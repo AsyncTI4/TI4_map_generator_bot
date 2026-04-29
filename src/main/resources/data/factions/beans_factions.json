@@ -13,8 +13,8 @@
             "gd"
         ],
         "homePlanets": [
-            "xyl'ath",
-            "kath'ulun"
+            "xylath",
+            "kathulun"
         ],
         "abilities": [
             "dream_nexus",
@@ -178,7 +178,7 @@
             "infantry",
             "iron_mech",
             "pds",
-            "space_dock"
+            "spacedock"
         ],
         "complexity": "Medium",
         "source": "beans"
