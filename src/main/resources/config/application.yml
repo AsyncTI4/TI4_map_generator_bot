@@ -12,8 +12,8 @@ spring:
     url: "jdbc:sqlite:${DB_PATH:./}/tibot.db"
     driver-class-name: org.sqlite.JDBC
     hikari:
-      # WAL allows for 1 writer at a time, but readers can go ahead
-      maximum-pool-size: 4
+      # SQLite permits only one writer at a time; extra pooled connections increase lock contention.
+      maximum-pool-size: 1
       connection-init-sql: |
         PRAGMA journal_mode=WAL;
         PRAGMA busy_timeout=30000;
