@@ -21,7 +21,7 @@ import ti4.ResourceHelper;
 import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.other.zephyrion.ZephyrionBountyButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;

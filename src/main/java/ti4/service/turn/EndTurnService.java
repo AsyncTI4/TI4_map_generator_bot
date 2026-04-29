@@ -12,10 +12,10 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.PhantomEnergyHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
-import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -69,19 +69,8 @@ public class EndTurnService {
     }
 
     private static void resetStoredValuesEndOfTurn(Game game, Player player) {
-        if (player.hasAbility("phantom_energy")
-                && !game.getStoredValue("phantomEnergy").isEmpty()) {
-            for (Tile tile : game.getTileMap().values()) {
-                if (tile.hasPlayerCC(player)) {
-                    for (String asyncID : tile.getSpaceUnitHolder()
-                            .getUnitAsyncIdsOnHolder(player.getColorID())
-                            .keySet()) {
-                        game.setStoredValue(
-                                "phantomEnergy",
-                                game.getStoredValue("phantomEnergy").replace(asyncID, ""));
-                    }
-                }
-            }
+        if (player.hasAbility("phantom_energy")) {
+            PhantomEnergyHandler.cleanupEndOfTurn(game, player);
         }
         game.removeStoredValue("fortuneSeekers");
         game.setStoredValue("lawsDisabled", "no");

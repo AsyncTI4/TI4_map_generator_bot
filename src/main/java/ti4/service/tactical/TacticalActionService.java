@@ -166,7 +166,18 @@ public class TacticalActionService {
 
         // Post-core triggers
         CommanderUnlockCheckService.checkPlayer(player, "naaz", "empyrean", "ghost");
-        CommanderUnlockCheckService.checkPlayer(player, "nivyn", "ghoti", "zelian", "gledge", "mortheus", "hacan");
+        CommanderUnlockCheckService.checkPlayer(
+                player,
+                "nivyn",
+                "ghoti",
+                "zelian",
+                "gledge",
+                "mortheus",
+                "hacan",
+                "tyris",
+                "lunarium",
+                "zephyrion",
+                "vyserix");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
 
         if (tile.getPosition().startsWith("frac")) {
@@ -334,7 +345,7 @@ public class TacticalActionService {
             boolean hasUnits = hasUnitsOrAlliedUnitsWithoutCC(player, game, event, tile);
             boolean canSelect = (movedFrom || hasUnits)
                     && (!CommandCounterHelper.hasCC(event, player.getColor(), tile)
-                            || ButtonHelper.nomadHeroAndDomOrbCheck(player, game)
+                            || ButtonHelper.canMoveOutOfLockedSystems(player, game)
                             || tile.getPosition().equalsIgnoreCase(game.getActiveSystem()));
             if (canSelect) {
                 out.add(Buttons.green(

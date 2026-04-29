@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.other.xan;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.xan;
 
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;

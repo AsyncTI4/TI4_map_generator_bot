@@ -20,8 +20,8 @@ import ti4.ResourceHelper;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.other.onyxxa.OnyxxaAgentButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.other.zephyrion.ZephyrionBountyButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.onyxxa.OnyxxaAgentButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.zephyrion.ZephyrionAgentButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -760,28 +760,19 @@ public final class ButtonHelperAgents {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
                     + "Rhino the Adventurer, the Zephyrion" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
-
-            String msg = player.getRepresentationUnfogged()
-                    + " you may use the buttons to select the ship you want to kill.";
-            List<String> bounties = ZephyrionBountyButtonHandler.getBountiesForPlayer(game);
-            List<Button> buttons = new ArrayList<>();
-            for (Player otherPlayer : game.getRealPlayersExcludingThis(player)) {
-                for (String bounty : bounties) {
-                    String faction = bounty.split(" ")[0];
-                    String ship = bounty.split(" ")[1];
-                    if ("flagship".equalsIgnoreCase(ship) || "warsun".equalsIgnoreCase(ship)) {
-                        continue;
-                    }
-                    if (otherPlayer.getFaction().equalsIgnoreCase(faction)) {
-                        Button bountyButton = Buttons.gray(
-                                "zephAgentRes_" + faction + "_" + ship,
-                                StringUtils.capitalize(ship),
-                                otherPlayer.getFactionEmojiOrColor());
-                        buttons.add(bountyButton);
-                    }
-                }
-            }
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+            ZephyrionAgentButtonHandler.postInitialButtons(game, player);
+        }
+        if ("tyrisagent".equalsIgnoreCase(agent)) {
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
+                    + "Echo-Weaver Tzara, the Tyris" + ssruuSlash + " agent.";
+            MessageHelper.sendMessageToChannel(channel, exhaustText);
+            List<Button> buttons = new ArrayList<>(ButtonHelper.getEchoAvailableSystems(game, player));
+            buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + " use buttons to place a frontier token in a system with no planets.",
+                    buttons);
         }
         if ("jolnaragent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
