@@ -136,6 +136,7 @@
         "id": "decree",
         "name": "Decree",
         "faction": "natau",
-        "permanentEffect": "You gain the text abilities of a doctrine while it is in your play area."
+        "permanentEffect": "You gain the text abilities of a doctrine while it is in your play area.",
+        "source": "beans"
     }
 ]
