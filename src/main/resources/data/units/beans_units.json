@@ -355,7 +355,7 @@
     "asyncId": "sd",
     "name": "Siphon II",
     "upgradesFromUnitId": "netrunners_spacedock",
-    "requiredTechId": "benetrunnersd",
+    "requiredTechId": "benetrunnerssd",
     "source": "beans",
     "faction": "netrunners",
     "productionValue": "+4",

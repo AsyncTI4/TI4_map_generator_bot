@@ -39,7 +39,7 @@
             "infantry",
             "dream_mech",
             "pds",
-            "space_dock"
+            "spacedock"
         ],
         "complexity": "Low",
         "source": "beans"
@@ -91,7 +91,7 @@
             "infantry",
             "crystellum_mech",
             "pds",
-            "space_dock"
+            "spacedock"
         ],
         "complexity": "Medium",
         "source": "beans"
@@ -134,7 +134,7 @@
             "ashen_infantry",
             "ashen_mech",
             "pds",
-            "space_dock"
+            "spacedock"
         ],
         "complexity": "Medium",
         "source": "beans"
@@ -224,7 +224,7 @@
             "infantry",
             "ta_mech",
             "pds",
-            "space_dock"
+            "spacedock"
         ],
         "complexity": "High",
         "source": "beans"
