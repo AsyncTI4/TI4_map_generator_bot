@@ -67,7 +67,7 @@ public class CreateGameButtonHandler {
             return;
         }
 
-        createGameChannels(event);
+        createGameAndChannels(event);
     }
 
     @ModalHandler("signupModal")
@@ -279,7 +279,7 @@ public class CreateGameButtonHandler {
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " left the game.");
     }
 
-    private static void createGameChannels(ButtonInteractionEvent event) {
+    private static void createGameAndChannels(ButtonInteractionEvent event) {
         String userName = event.getUser().getEffectiveName();
         List<Member> members = fetchMembersFromMessage(event);
         MessageHelper.sendMessageToEventChannel(event, userName + " pressed the [Create Game] button");

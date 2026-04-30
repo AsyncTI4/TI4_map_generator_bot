@@ -431,8 +431,8 @@ public class CreateGameService {
         return inviteUsersToServer(guild, members, channel, null);
     }
 
-    public static List<Member> inviteUsersToServer(
-            Guild guild, List<Member> members, MessageChannel channel, String gameName) {
+    private static List<Member> inviteUsersToServer(
+        Guild guild, List<Member> members, MessageChannel channel, String gameName) {
         List<String> guildMemberIDs =
                 guild.getMembers().stream().map(ISnowflake::getId).toList();
         List<Member> missingMembers = new ArrayList<>();
