@@ -20,7 +20,7 @@ import ti4.service.game.CreateGameService;
 
 class CreateGameButton extends Subcommand {
 
-    public CreateGameButton() {
+    CreateGameButton() {
         super(Constants.CREATE_GAME_BUTTON, "Create Game Creation Button");
         addOptions(new OptionData(
                         OptionType.STRING,

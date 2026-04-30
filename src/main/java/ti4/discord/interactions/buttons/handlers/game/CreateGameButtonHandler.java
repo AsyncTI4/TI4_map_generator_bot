@@ -350,10 +350,8 @@ public class CreateGameButtonHandler {
                 && !CommandHelper.hasRole(event, JdaService.bothelperRoles)
                 && !CommandHelper.hasRole(event, JdaService.developerRoles)) return;
 
-        if (event != null
-                && !members.contains(event.getMember())
-                && !CommandHelper.hasRole(event, JdaService.bothelperRoles)
-                && !CommandHelper.hasRole(event, JdaService.developerRoles)) {
+        if (!members.contains(event.getMember()) && !CommandHelper.hasRole(event, JdaService.bothelperRoles) &&
+            !CommandHelper.hasRole(event, JdaService.developerRoles)) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(), "You must be a bothelper or a member of the game to launch the game.");
             return;

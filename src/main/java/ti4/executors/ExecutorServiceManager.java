@@ -22,8 +22,8 @@ public class ExecutorServiceManager {
     }
 
     public static void runAsyncWithLock(
-            String name,
-            String gameName,
+            String taskName,
+            String lockName,
             MessageChannel messageChannel,
             Runnable runnable,
             ExecutionLockType lockType) {
@@ -31,11 +31,11 @@ public class ExecutorServiceManager {
             return;
         }
 
-        if (isNotBlank(gameName)) {
-            runnable = ExecutionLockManager.wrapWithTryLockAndRelease(gameName, lockType, runnable, messageChannel);
+        if (isNotBlank(lockName)) {
+            runnable = ExecutionLockManager.wrapWithTryLockAndRelease(lockName, lockType, runnable, messageChannel);
         }
 
-        var timedRunnable = new TimedRunnable(name, runnable);
+        var timedRunnable = new TimedRunnable(taskName, runnable);
         runAsync(timedRunnable);
     }
 

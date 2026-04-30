@@ -28,10 +28,6 @@ class ContextInteractionListener extends ListenerAdapter implements CommandListe
     private void onContextInteraction(GenericContextInteractionEvent<?> event) {
         if (!canReceiveCommands(event)) return;
         event.getInteraction().deferReply(true).queue(Consumers.nop(), BotLogger::catchRestError);
-        queue(event);
-    }
-
-    private void queue(GenericContextInteractionEvent<?> event) {
         ExecutorServiceManager.runAsync(eventToString(event), () -> process(event));
     }
 
