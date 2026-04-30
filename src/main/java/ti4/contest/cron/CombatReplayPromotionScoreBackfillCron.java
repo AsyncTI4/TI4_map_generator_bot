@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.experimental.UtilityClass;
+import ti4.contest.replay.core.CombatCandidateEventType;
 import ti4.contest.replay.core.CombatCandidateStatus;
 import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
@@ -26,6 +27,8 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class CombatReplayPromotionScoreBackfillCron {
+
+    private static final String SKIPPED_AFB_SUMMARY_TEXT = "Skipped AFB";
 
     private static final AtomicBoolean HAS_RUN = new AtomicBoolean(false);
 
@@ -55,6 +58,7 @@ public class CombatReplayPromotionScoreBackfillCron {
         }
 
         CombatCandidateRepository candidateRepository = SpringContext.getBean(CombatCandidateRepository.class);
+        int skippedAfbBackfilled = backfillSkippedAfbFlags(candidateRepository);
         int updated = 0;
         int skipped = 0;
         for (CombatCandidateEntity candidate : candidateRepository.findByStatus(CombatCandidateStatus.RESOLVED)) {
@@ -66,6 +70,39 @@ public class CombatReplayPromotionScoreBackfillCron {
         }
 
         BotLogger.info("Combat replay promotion-score backfill completed. Updated=" + updated + ", skipped=" + skipped);
+        BotLogger.info("Combat replay skipped-AFB backfill completed. Updated=" + skippedAfbBackfilled);
+    }
+
+    private static int backfillSkippedAfbFlags(CombatCandidateRepository candidateRepository) {
+        CombatCandidateEventRepository eventRepository = SpringContext.getBean(CombatCandidateEventRepository.class);
+        int updated = 0;
+        for (CombatCandidateEventEntity event : eventRepository.findByEventTypeAndSummaryTextContainingIgnoreCase(
+                CombatCandidateEventType.INFO, SKIPPED_AFB_SUMMARY_TEXT)) {
+            if (event.getActorFaction() == null) continue;
+            if (event.getCandidateId() == null) continue;
+            CombatCandidateEntity candidate =
+                    candidateRepository.findById(event.getCandidateId()).orElse(null);
+            if (candidate == null) continue;
+            if (markSkippedAfb(candidate, event.getActorFaction())) {
+                candidateRepository.save(candidate);
+                updated++;
+            }
+        }
+        return updated;
+    }
+
+    private static boolean markSkippedAfb(CombatCandidateEntity candidate, String faction) {
+        if (faction.equalsIgnoreCase(candidate.getAttackerFaction())
+                && !Boolean.TRUE.equals(candidate.getAttackerSkippedAfb())) {
+            candidate.setAttackerSkippedAfb(true);
+            return true;
+        }
+        if (faction.equalsIgnoreCase(candidate.getDefenderFaction())
+                && !Boolean.TRUE.equals(candidate.getDefenderSkippedAfb())) {
+            candidate.setDefenderSkippedAfb(true);
+            return true;
+        }
+        return false;
     }
 
     private static boolean recomputePromotionScore(CombatCandidateEntity candidate) {

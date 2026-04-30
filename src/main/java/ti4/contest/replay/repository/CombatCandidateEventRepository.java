@@ -17,8 +17,8 @@ public interface CombatCandidateEventRepository extends JpaRepository<CombatCand
     boolean existsByCandidateIdAndEventTypeAndActorFactionAndRoundNumber(
             Long candidateId, CombatCandidateEventType eventType, String actorFaction, Integer roundNumber);
 
-    boolean existsByCandidateIdAndEventTypeAndActorFactionAndSummaryTextContainingIgnoreCase(
-            Long candidateId, CombatCandidateEventType eventType, String actorFaction, String summaryText);
+    List<CombatCandidateEventEntity> findByEventTypeAndSummaryTextContainingIgnoreCase(
+            CombatCandidateEventType eventType, String summaryText);
 
     List<CombatCandidateEventEntity> findByCandidateIdOrderBySequenceNumberAsc(Long candidateId);
 
