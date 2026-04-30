@@ -40,7 +40,7 @@ public class CombatReplaySideBetTriggerService {
                 && round == 1
                 && isAfbSkippedAvailable(candidate, player.getFaction())
                 && state != null
-                && !state.rolledAfb()) {
+                && state.skippedAfb()) {
             announcements.add(announcement(player, "Skipped AFB!"));
         }
         if (rollType == CombatRollType.combatround && round == 1 && whiff) {

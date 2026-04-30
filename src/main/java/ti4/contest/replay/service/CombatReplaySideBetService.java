@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.springframework.stereotype.Service;
+import ti4.contest.replay.core.CombatCandidateEventType;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatSideBetType;
 import ti4.contest.replay.core.CombatSideState;
@@ -18,6 +19,7 @@ import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatContestSideBetEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
 import ti4.contest.replay.entities.CombatReplayLeaderboardEntryEntity;
+import ti4.contest.replay.repository.CombatCandidateEventRepository;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatContestSideBetRepository;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
@@ -31,9 +33,12 @@ import ti4.game.Game;
 @RequiredArgsConstructor
 public class CombatReplaySideBetService {
 
+    private static final String SKIPPED_AFB_SUMMARY_TEXT = "Skipped AFB";
+
     private final CombatContestSettings settings;
     private final CombatReplayContestRepository replayContestRepository;
     private final CombatCandidateRepository candidateRepository;
+    private final CombatCandidateEventRepository candidateEventRepository;
     private final CombatContestSideBetRepository sideBetRepository;
     private final CombatReplayLeaderboardEntryRepository leaderboardEntryRepository;
     private final CombatReplaySideBetPayoutService payoutService;
@@ -224,7 +229,9 @@ public class CombatReplaySideBetService {
         if (state == null) return false;
         CombatSideBetType betType = sideBet.getBetType();
         return switch (betType) {
-            case AFB_SKIPPED -> isAfbSkippedAvailable(candidate, sideBet.getTargetFaction()) && !state.rolledAfb();
+            case AFB_SKIPPED ->
+                isAfbSkippedAvailable(candidate, sideBet.getTargetFaction())
+                        && hasSkippedAfb(candidate, sideBet.getTargetFaction(), state);
             case AFB_WHIFF -> betType.isAvailable(state.destroyerCount()) && state.afbWhiff();
             case ROUND_ONE_WHIFF -> state.roundOneWhiff();
             case ROUND_ONE_SLAM -> state.roundOneSlam();
@@ -244,6 +251,32 @@ public class CombatReplaySideBetService {
         CombatSideState state = CombatSideState.forFaction(candidate, targetFaction);
         if (state == null || !CombatSideBetType.AFB_SKIPPED.isAvailable(state.destroyerCount())) return false;
         return !(state.destroyerCount() == 1 && opponentHasAssaultCannon(candidate, targetFaction));
+    }
+
+    private boolean hasSkippedAfb(CombatCandidateEntity candidate, String targetFaction, CombatSideState state) {
+        if (state.skippedAfb()) return true;
+        if (candidate.getId() == null || targetFaction == null) return false;
+        boolean recordedSkip =
+                candidateEventRepository
+                        .existsByCandidateIdAndEventTypeAndActorFactionAndSummaryTextContainingIgnoreCase(
+                                candidate.getId(),
+                                CombatCandidateEventType.INFO,
+                                targetFaction,
+                                SKIPPED_AFB_SUMMARY_TEXT);
+        if (recordedSkip) {
+            markSkippedAfb(candidate, targetFaction);
+        }
+        return recordedSkip;
+    }
+
+    private void markSkippedAfb(CombatCandidateEntity candidate, String targetFaction) {
+        if (targetFaction.equalsIgnoreCase(candidate.getAttackerFaction())) {
+            candidate.setAttackerSkippedAfb(true);
+            candidateRepository.save(candidate);
+        } else if (targetFaction.equalsIgnoreCase(candidate.getDefenderFaction())) {
+            candidate.setDefenderSkippedAfb(true);
+            candidateRepository.save(candidate);
+        }
     }
 
     private boolean opponentHasAssaultCannon(CombatCandidateEntity candidate, String targetFaction) {

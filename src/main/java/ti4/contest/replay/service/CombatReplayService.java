@@ -22,6 +22,7 @@ import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.core.CombatReplaySelection;
 import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.core.CombatRollPayload;
+import ti4.contest.replay.core.CombatSideBetType;
 import ti4.contest.replay.core.CombatSideState;
 import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
@@ -713,14 +714,37 @@ public class CombatReplayService {
         boolean rolledAfb = rollType == CombatRollType.AFB;
         boolean roundOneCombatRoll = rollType == CombatRollType.combatround && round == 1;
         if (!rolledAfb && !roundOneCombatRoll) return;
+        CombatSideState state = CombatSideState.forFaction(candidate, player.getFaction());
+        boolean skippedAfb = roundOneCombatRoll
+                && state != null
+                && !state.rolledAfb()
+                && isAfbSkippedAvailable(candidate, player.getFaction());
         CombatSideState.markRollFlags(
                 candidate,
                 player.getFaction(),
                 rolledAfb,
                 rolledAfb && whiff,
+                skippedAfb,
                 roundOneCombatRoll && whiff,
                 roundOneCombatRoll && slam);
         candidateRepository.save(candidate);
+    }
+
+    private boolean isAfbSkippedAvailable(CombatCandidateEntity candidate, String targetFaction) {
+        if (candidate == null || targetFaction == null) return false;
+        CombatSideState state = CombatSideState.forFaction(candidate, targetFaction);
+        if (state == null || !CombatSideBetType.AFB_SKIPPED.isAvailable(state.destroyerCount())) return false;
+        return !(state.destroyerCount() == 1 && opponentHasAssaultCannon(candidate, targetFaction));
+    }
+
+    private boolean opponentHasAssaultCannon(CombatCandidateEntity candidate, String targetFaction) {
+        if (targetFaction.equalsIgnoreCase(candidate.getAttackerFaction())) {
+            return Boolean.TRUE.equals(candidate.getDefenderHasAssaultCannon());
+        }
+        if (targetFaction.equalsIgnoreCase(candidate.getDefenderFaction())) {
+            return Boolean.TRUE.equals(candidate.getAttackerHasAssaultCannon());
+        }
+        return false;
     }
 
     private void appendSideBetTriggerEvents(
