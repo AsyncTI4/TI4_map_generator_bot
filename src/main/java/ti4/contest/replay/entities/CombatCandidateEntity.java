@@ -117,6 +117,12 @@ public class CombatCandidateEntity {
     @Column(name = "defender_hp")
     private Double defenderHp;
 
+    @Column(name = "attacker_strength")
+    private Double attackerStrength;
+
+    @Column(name = "defender_strength")
+    private Double defenderStrength;
+
     @Column(name = "attacker_rolled_afb", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean attackerRolledAfb = false;
 

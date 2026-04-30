@@ -11,10 +11,8 @@ import ti4.contest.replay.dispatch.ReplayDispatchPayload;
 import ti4.contest.replay.dispatch.ReplayDispatchSerializer;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatCandidateEventEntity;
-import ti4.contest.replay.entities.CombatObservationEntity;
 import ti4.contest.replay.repository.CombatCandidateEventRepository;
 import ti4.contest.replay.repository.CombatCandidateRepository;
-import ti4.contest.replay.repository.CombatObservationRepository;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.cron.CronManager;
 import ti4.game.Game;
@@ -71,10 +69,8 @@ public class CombatReplayPromotionScoreBackfillCron {
     }
 
     private static boolean recomputePromotionScore(CombatCandidateEntity candidate) {
-        CombatObservationEntity observation = SpringContext.getBean(CombatObservationRepository.class)
-                .findById(candidate.getObservationId())
-                .orElse(null);
-        if (observation == null) return false;
+        CombatReplayService.InitialCombatStats initialStats = CombatReplayService.initialCombatStats(candidate);
+        if (initialStats == null) return false;
 
         String snapshotJson = extractLatestSnapshotJson(candidate.getId());
         if (snapshotJson == null || snapshotJson.isBlank()) return false;
@@ -100,11 +96,16 @@ public class CombatReplayPromotionScoreBackfillCron {
                 .findMaxRoundNumberByCandidateId(candidate.getId())
                 .orElse(0);
         candidate.setPromotionScore(CombatReplayService.computePromotionScore(
-                observation,
+                candidate,
+                initialStats,
                 attackerRemainingStrength,
                 defenderRemainingStrength,
                 candidate.getWinnerFaction(),
                 roundsObserved));
+        candidate.setAttackerStrength(initialStats.attackerStrength());
+        candidate.setDefenderStrength(initialStats.defenderStrength());
+        candidate.setAttackerHp(initialStats.attackerHp());
+        candidate.setDefenderHp(initialStats.defenderHp());
         SpringContext.getBean(CombatCandidateRepository.class).save(candidate);
         return true;
     }

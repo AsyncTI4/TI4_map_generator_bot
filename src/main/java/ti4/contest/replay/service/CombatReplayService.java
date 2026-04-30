@@ -407,9 +407,13 @@ public class CombatReplayService {
 
     private void resolveCandidate(
             Game game, CombatCandidateEntity candidate, Tile tile, Player winner, String loserFaction) {
-        CombatObservationEntity observation =
-                observationRepository.findById(candidate.getObservationId()).orElse(null);
-        if (observation == null) return;
+        InitialCombatStats initialStats = initialCombatStats(candidate);
+        if (initialStats == null) {
+            cancelCandidate(
+                    game, candidate, "The tracked space combat initial snapshot could not be resolved cleanly.");
+            return;
+        }
+        applyInitialCombatStats(candidate, initialStats);
         ResolutionState resolution = buildResolutionState(game, candidate, tile);
         if (resolution == null) {
             cancelCandidate(game, candidate, "The tracked space combat could not be resolved cleanly.");
@@ -425,7 +429,8 @@ public class CombatReplayService {
         candidate.setResolutionReason("Winner determined from remaining fleets.");
         candidate.setWinnerOneHpRemaining(hasExactlyOneHpRemaining(resolution, candidate, winner.getFaction()));
         candidate.setPromotionScore(computePromotionScore(
-                observation,
+                candidate,
+                initialStats,
                 resolution.attackerRemainingStrength(),
                 resolution.defenderRemainingStrength(),
                 winner.getFaction(),
@@ -452,8 +457,7 @@ public class CombatReplayService {
         int roundsObserved = candidateEventRepository
                 .findMaxRoundNumberByCandidateId(candidate.getId())
                 .orElse(0);
-        CombatObservationEntity observation =
-                observationRepository.findById(candidate.getObservationId()).orElse(null);
+        InitialCombatStats initialStats = initialCombatStats(candidate);
 
         candidate.setStatus(CombatCandidateStatus.RESOLVED);
         candidate.setResolvedAt(LocalDateTime.now());
@@ -461,8 +465,9 @@ public class CombatReplayService {
         candidate.setLoserFaction(null);
         candidate.setResolutionReason("Combat ended in a draw after pending hit assignment.");
         candidate.setWinnerOneHpRemaining(false);
-        if (observation != null) {
-            candidate.setPromotionScore(computeDrawPromotionScore(observation, roundsObserved));
+        if (initialStats != null) {
+            applyInitialCombatStats(candidate, initialStats);
+            candidate.setPromotionScore(computeDrawPromotionScore(initialStats, roundsObserved));
         }
         candidateRepository.save(candidate);
 
@@ -543,6 +548,8 @@ public class CombatReplayService {
         candidate.setDefenderHasAssaultCannon(snapshot.defenderHasAssaultCannon());
         candidate.setAttackerHp(snapshot.attackerHp());
         candidate.setDefenderHp(snapshot.defenderHp());
+        candidate.setAttackerStrength(snapshot.attackerStrength());
+        candidate.setDefenderStrength(snapshot.defenderStrength());
         candidateRepository.save(candidate);
     }
 
@@ -569,6 +576,8 @@ public class CombatReplayService {
                 countDestroyersInCombat(tile, defender),
                 hasAssaultCannon(attacker),
                 hasAssaultCannon(defender),
+                combatSnapshot.attackerStrength(),
+                combatSnapshot.defenderStrength(),
                 combatSnapshot.attackerHp(),
                 combatSnapshot.defenderHp());
     }
@@ -593,39 +602,78 @@ public class CombatReplayService {
     }
 
     public static double computePromotionScore(
-            CombatObservationEntity observation,
+            CombatCandidateEntity candidate,
+            InitialCombatStats initialStats,
             LazaxCombatSupport.FleetStrength attackerRemainingStrength,
             LazaxCombatSupport.FleetStrength defenderRemainingStrength,
             String winnerFaction,
             int roundsObserved) {
-        double weakerHp = Math.min(observation.getAttackerHp(), observation.getDefenderHp());
-        double weakerStrength = Math.min(observation.getAttackerStrength(), observation.getDefenderStrength());
-        double strongerStrength = Math.max(observation.getAttackerStrength(), observation.getDefenderStrength());
-        double winnerRemainingHp = winnerFaction.equalsIgnoreCase(observation.getAttackerFaction())
+        double weakerHp = Math.min(initialStats.attackerHp(), initialStats.defenderHp());
+        double weakerStrength = Math.min(initialStats.attackerStrength(), initialStats.defenderStrength());
+        double strongerStrength = Math.max(initialStats.attackerStrength(), initialStats.defenderStrength());
+        double winnerRemainingHp = winnerFaction.equalsIgnoreCase(candidate.getAttackerFaction())
                 ? attackerRemainingStrength.hp()
                 : defenderRemainingStrength.hp();
-        double winnerInitialHp = winnerFaction.equalsIgnoreCase(observation.getAttackerFaction())
-                ? observation.getAttackerHp()
-                : observation.getDefenderHp();
+        double winnerInitialHp = winnerFaction.equalsIgnoreCase(candidate.getAttackerFaction())
+                ? initialStats.attackerHp()
+                : initialStats.defenderHp();
         double sizeFactor = Math.min(1.0, weakerHp / 8.0);
         double strengthRatio = safeRatio(weakerStrength, strongerStrength);
         double winnerSurvivalRatio = safeRatio(winnerRemainingHp, winnerInitialHp);
         double roundScore = Math.sqrt(Math.max(0, roundsObserved)) * sizeFactor;
         double openingBalanceScore = 0.9 * Math.pow(strengthRatio, 3.0);
         double endingTensionScore = winnerRemainingHp <= 0 ? 0.0 : 5.0 * Math.exp(-6.0 * winnerSurvivalRatio);
-        double defenderWinBonus = winnerFaction.equalsIgnoreCase(observation.getDefenderFaction()) ? 0.5 : 0.0;
+        double defenderWinBonus = winnerFaction.equalsIgnoreCase(candidate.getDefenderFaction()) ? 0.5 : 0.0;
         return roundScore + openingBalanceScore + endingTensionScore + defenderWinBonus;
     }
 
-    private static double computeDrawPromotionScore(CombatObservationEntity observation, int roundsObserved) {
-        double weakerHp = Math.min(observation.getAttackerHp(), observation.getDefenderHp());
-        double weakerStrength = Math.min(observation.getAttackerStrength(), observation.getDefenderStrength());
-        double strongerStrength = Math.max(observation.getAttackerStrength(), observation.getDefenderStrength());
+    private static double computeDrawPromotionScore(InitialCombatStats initialStats, int roundsObserved) {
+        double weakerHp = Math.min(initialStats.attackerHp(), initialStats.defenderHp());
+        double weakerStrength = Math.min(initialStats.attackerStrength(), initialStats.defenderStrength());
+        double strongerStrength = Math.max(initialStats.attackerStrength(), initialStats.defenderStrength());
         double sizeFactor = Math.min(1.0, weakerHp / 8.0);
         double strengthRatio = safeRatio(weakerStrength, strongerStrength);
         double roundScore = Math.sqrt(Math.max(0, roundsObserved)) * sizeFactor;
         double openingBalanceScore = 0.9 * Math.pow(strengthRatio, 3.0);
         return roundScore + openingBalanceScore + 5.0;
+    }
+
+    public static InitialCombatStats initialCombatStats(CombatCandidateEntity candidate) {
+        if (candidate == null) return null;
+        if (candidate.getAttackerStrength() != null
+                && candidate.getDefenderStrength() != null
+                && candidate.getAttackerHp() != null
+                && candidate.getDefenderHp() != null) {
+            return new InitialCombatStats(
+                    candidate.getAttackerStrength(),
+                    candidate.getDefenderStrength(),
+                    candidate.getAttackerHp(),
+                    candidate.getDefenderHp());
+        }
+        if (!CombatReplayTileRenderer.canRender(candidate.getInitialRenderSnapshotJson())) return null;
+
+        Game snapshotGame = CombatReplayTileRenderer.render(
+                candidate.getInitialRenderSnapshotJson(), candidate.getInitialRenderSnapshotJson());
+        if (snapshotGame == null) return null;
+        Tile tile = snapshotGame.getTileByPosition(candidate.getTilePosition());
+        Player attacker = snapshotGame.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
+        Player defender = snapshotGame.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
+        UnitHolder space = tile == null ? null : tile.getUnitHolders().get(Constants.SPACE);
+        if (tile == null || attacker == null || defender == null || space == null) return null;
+
+        LazaxCombatSupport.FleetStrength attackerStrength =
+                LazaxCombatSupport.calculateFleetStrength(attacker, defender, tile, space);
+        LazaxCombatSupport.FleetStrength defenderStrength =
+                LazaxCombatSupport.calculateFleetStrength(defender, attacker, tile, space);
+        return new InitialCombatStats(
+                attackerStrength.value(), defenderStrength.value(), attackerStrength.hp(), defenderStrength.hp());
+    }
+
+    private void applyInitialCombatStats(CombatCandidateEntity candidate, InitialCombatStats initialStats) {
+        candidate.setAttackerStrength(initialStats.attackerStrength());
+        candidate.setDefenderStrength(initialStats.defenderStrength());
+        candidate.setAttackerHp(initialStats.attackerHp());
+        candidate.setDefenderHp(initialStats.defenderHp());
     }
 
     public CombatReplaySelection.SelectionDebugView getSelectionDebugView() {
@@ -970,8 +1018,13 @@ public class CombatReplayService {
             int defenderDestroyerCount,
             boolean attackerHasAssaultCannon,
             boolean defenderHasAssaultCannon,
+            double attackerStrength,
+            double defenderStrength,
             double attackerHp,
             double defenderHp) {}
+
+    public record InitialCombatStats(
+            double attackerStrength, double defenderStrength, double attackerHp, double defenderHp) {}
 
     private record SelectionSnapshot(
             int windowSize,
