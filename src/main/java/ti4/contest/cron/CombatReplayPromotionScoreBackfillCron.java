@@ -83,22 +83,30 @@ public class CombatReplayPromotionScoreBackfillCron {
             CombatCandidateEntity candidate =
                     candidateRepository.findById(event.getCandidateId()).orElse(null);
             if (candidate == null) continue;
-            if (markSkippedAfb(candidate, event.getActorFaction())) {
-                candidateRepository.save(candidate);
-                updated++;
-            }
+            if (hasSkippedAfbFlag(candidate, event.getActorFaction())) continue;
+            if (!markSkippedAfb(candidate, event.getActorFaction())) continue;
+            candidateRepository.save(candidate);
+            updated++;
         }
         return updated;
     }
 
+    private static boolean hasSkippedAfbFlag(CombatCandidateEntity candidate, String faction) {
+        if (faction.equalsIgnoreCase(candidate.getAttackerFaction())) {
+            return Boolean.TRUE.equals(candidate.getAttackerSkippedAfb());
+        }
+        if (faction.equalsIgnoreCase(candidate.getDefenderFaction())) {
+            return Boolean.TRUE.equals(candidate.getDefenderSkippedAfb());
+        }
+        return false;
+    }
+
     private static boolean markSkippedAfb(CombatCandidateEntity candidate, String faction) {
-        if (faction.equalsIgnoreCase(candidate.getAttackerFaction())
-                && !Boolean.TRUE.equals(candidate.getAttackerSkippedAfb())) {
+        if (faction.equalsIgnoreCase(candidate.getAttackerFaction())) {
             candidate.setAttackerSkippedAfb(true);
             return true;
         }
-        if (faction.equalsIgnoreCase(candidate.getDefenderFaction())
-                && !Boolean.TRUE.equals(candidate.getDefenderSkippedAfb())) {
+        if (faction.equalsIgnoreCase(candidate.getDefenderFaction())) {
             candidate.setDefenderSkippedAfb(true);
             return true;
         }
