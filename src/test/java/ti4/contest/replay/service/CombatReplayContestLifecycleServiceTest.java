@@ -83,12 +83,12 @@ class CombatReplayContestLifecycleServiceTest {
     }
 
     @Test
-    void promoteBestCandidateIfDueRunsDuringTopOfHourPostingWindow() {
+    void promoteBestCandidateIfDueRunsWhenCronIsLateForThePromotionSlot() {
         CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
         CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
         CombatContestSettings settings = new CombatContestSettings();
         CombatReplayContestLifecycleService service = service(settings, candidateRepository, replayContestRepository);
-        service.setClock(fixedClock("2026-04-27T12:04:00"));
+        service.setClock(fixedClock("2026-04-27T12:45:00"));
         LocalDateTime recentContestCutoff = LocalDateTime.parse("2026-04-27T11:00:00");
 
         when(replayContestRepository.countByPostedAtGreaterThanEqual(recentContestCutoff))
@@ -98,7 +98,7 @@ class CombatReplayContestLifecycleServiceTest {
         when(candidateRepository.findResolvedPromotionCandidates(
                         CombatCandidateStatus.RESOLVED,
                         CombatCandidatePromotionStatus.PENDING,
-                        LocalDateTime.parse("2026-04-27T00:04:00")))
+                        LocalDateTime.parse("2026-04-27T00:45:00")))
                 .thenReturn(List.of());
 
         service.promoteBestCandidateIfDue();
@@ -108,20 +108,7 @@ class CombatReplayContestLifecycleServiceTest {
                 .findResolvedPromotionCandidates(
                         CombatCandidateStatus.RESOLVED,
                         CombatCandidatePromotionStatus.PENDING,
-                        LocalDateTime.parse("2026-04-27T00:04:00"));
-    }
-
-    @Test
-    void promoteBestCandidateIfDueDoesNothingOutsideTopOfHourPostingWindow() {
-        CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
-        CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
-        CombatContestSettings settings = new CombatContestSettings();
-        CombatReplayContestLifecycleService service = service(settings, candidateRepository, replayContestRepository);
-        service.setClock(fixedClock("2026-04-27T12:06:00"));
-
-        service.promoteBestCandidateIfDue();
-
-        verifyNoInteractions(candidateRepository, replayContestRepository);
+                        LocalDateTime.parse("2026-04-27T00:45:00"));
     }
 
     @Test
