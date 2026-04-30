@@ -4100,10 +4100,10 @@ public class ButtonHelper {
                         fleetCap += 2;
                     } else if (player.ownsUnit("xan_spacedock")) {
                         fightersIgnored += 3;
-                        fleetCap += 1;
+                        fleetCap += 2;
                     } else if (player.ownsUnit("xan_spacedock2")) {
                         fightersIgnored += 3;
-                        fleetCap += 3;
+                        fleetCap += 6;
                     } else if (!player.hasUnit("mykomentori_spacedock") && !player.hasUnit("mykomentori_spacedock2")) {
                         fightersIgnored += 3;
                     }

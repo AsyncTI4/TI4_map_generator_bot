@@ -2466,7 +2466,7 @@ public final class AgendaHelper {
             }
         }
         if (highestVoter != null) {
-            CommanderUnlockCheckService.checkPlayer(highestVoter, "atokera");
+            CommanderUnlockCheckService.checkPlayer(highestVoter, "atokera", "xan");
         }
     }
 
