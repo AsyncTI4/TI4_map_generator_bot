@@ -49,6 +49,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.ArvaxiAgentButtonHandler;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -1784,6 +1785,7 @@ public class ActionCardHelper {
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
                 }
             }
+            ArvaxiAgentButtonHandler.postInitialButtons(game, player, acID);
         }
 
         // Fog of war ping
@@ -2171,12 +2173,7 @@ public class ActionCardHelper {
 
     public static void getActionCardFromDiscard(
             GenericInteractionCreateEvent event, Game game, Player player, int acIndex) {
-        String acId = null;
-        for (Map.Entry<String, Integer> ac : game.getDiscardActionCards().entrySet()) {
-            if (ac.getValue().equals(acIndex)) {
-                acId = ac.getKey();
-            }
-        }
+        String acId = getDiscardedAcID(game, acIndex);
 
         if (acId == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Card ID found, please retry");
@@ -2194,6 +2191,14 @@ public class ActionCardHelper {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
 
         sendActionCardInfo(game, player);
+    }
+
+    public static String getDiscardedAcID(Game game, int acIndex) {
+        return game.getDiscardActionCards().entrySet().stream()
+                .filter(e -> e.getValue().equals(acIndex))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
     }
 
     private static boolean isDiscardActionCardPickable(Game game, String acId) {

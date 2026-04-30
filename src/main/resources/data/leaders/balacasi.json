@@ -119,7 +119,7 @@
         "name": "Syphrydon Umbas",
         "title": "The Judicial",
         "abilityWindow": "After you score a secret objective:",
-        "abilityText": "You may draw 1 secret objective.",
+        "abilityText": "Draw 1 secret objective.",
         "unlockCondition": "Have 4 carriers on the game board",
         "source": "balacasi"
     },

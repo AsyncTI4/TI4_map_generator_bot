@@ -563,6 +563,19 @@ public class StartPhaseService {
                         player2.getCardsInfoThread(),
                         player2.getRepresentationUnfogged() + ", reminder that this is the window to play _Summit_.");
             }
+            if (player2.hasAbility("underhanded_maneuver")
+                    && !player2.getNeighbouringPlayers(true).isEmpty()) {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.gray(
+                        player2.getFinsFactionCheckerPrefix() + "underhandedManeuverPickNeighbor",
+                        "Use Underhanded Maneuver",
+                        FactionEmojis.arvaxi));
+                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player2.getCardsInfoThread(),
+                        player2.getRepresentationUnfogged() + ", use buttons to resolve _Underhanded Maneuver_.",
+                        buttons);
+            }
             for (String pn : player2.getPromissoryNotes().keySet()) {
                 if (!player2.ownsPromissoryNote("scepter") && "scepter".equalsIgnoreCase(pn)) {
                     PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pn);
