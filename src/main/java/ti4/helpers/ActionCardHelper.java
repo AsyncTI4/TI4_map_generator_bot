@@ -23,6 +23,7 @@ import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.ArvaxiAgentButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -1784,6 +1785,7 @@ public class ActionCardHelper {
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
                 }
             }
+            ArvaxiAgentButtonHandler.postInitialButtons(game, player, acID);
         }
 
         // Fog of war ping
@@ -2171,12 +2173,7 @@ public class ActionCardHelper {
 
     public static void getActionCardFromDiscard(
             GenericInteractionCreateEvent event, Game game, Player player, int acIndex) {
-        String acId = null;
-        for (Map.Entry<String, Integer> ac : game.getDiscardActionCards().entrySet()) {
-            if (ac.getValue().equals(acIndex)) {
-                acId = ac.getKey();
-            }
-        }
+        String acId = getDiscardedAcID(game, acIndex);
 
         if (acId == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Card ID found, please retry");
@@ -2194,6 +2191,14 @@ public class ActionCardHelper {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
 
         sendActionCardInfo(game, player);
+    }
+
+    public static String getDiscardedAcID(Game game, int acIndex) {
+        return game.getDiscardActionCards().entrySet().stream()
+                .filter(e -> e.getValue().equals(acIndex))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
     }
 
     private static boolean isDiscardActionCardPickable(Game game, String acId) {
