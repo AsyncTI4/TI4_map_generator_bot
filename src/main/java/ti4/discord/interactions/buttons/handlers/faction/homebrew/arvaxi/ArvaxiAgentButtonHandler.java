@@ -61,7 +61,8 @@ public class ArvaxiAgentButtonHandler {
             if (target.getFaction().equals(discarderFaction)) continue;
             buttons.add(Buttons.green(
                     "FFCC_" + player.getFaction() + "_arvaxiAgentPickTarget_" + acIndex + "_" + target.getFaction(),
-                    target.getFactionNameOrColor(), target.fogSafeEmoji()));
+                    target.getFactionNameOrColor(),
+                    target.fogSafeEmoji()));
         }
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "No eligible players found.");
@@ -76,8 +77,7 @@ public class ArvaxiAgentButtonHandler {
     }
 
     @ButtonHandler("arvaxiAgentPickTarget_")
-    public static void arvaxiAgentPickTarget(
-            ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+    public static void arvaxiAgentPickTarget(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String stripped = buttonID.replace("arvaxiAgentPickTarget_", "");
         int acIndex = Integer.parseInt(stripped.split("_")[0]);
         String targetFaction = stripped.split("_")[1];

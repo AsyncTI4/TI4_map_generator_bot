@@ -59,7 +59,8 @@ public class ArvaxiCommanderHandler {
                 "Ravok, the Judicial has demanded an action card. Please choose which card to hand over.");
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                "Sent " + opponent.getColor() + " the buttons for resolving Ravok, the Judicial, the Arvaxi commander.");
+                "Sent " + opponent.getColor()
+                        + " the buttons for resolving Ravok, the Judicial, the Arvaxi commander.");
         ButtonHelper.deleteMessage(event);
     }
 

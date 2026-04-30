@@ -22,7 +22,8 @@ public class ArvaxiAbilityButtonHandler {
         for (Player neighbor : player.getNeighbouringPlayers(true)) {
             buttons.add(Buttons.green(
                     "FFCC_" + player.getFaction() + "_underhandedManeuverTarget_" + neighbor.getFaction(),
-                    neighbor.getFactionNameOrColor(), neighbor.fogSafeEmoji()));
+                    neighbor.getFactionNameOrColor(),
+                    neighbor.fogSafeEmoji()));
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
