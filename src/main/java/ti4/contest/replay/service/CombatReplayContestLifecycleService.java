@@ -61,7 +61,8 @@ public class CombatReplayContestLifecycleService {
     private static final long SHADOW_DISCORD_ID = 0L;
     private static final String PROMOTION_DISABLED_REASON = "Candidate-to-contest promotion is disabled.";
     private static final Duration PUBLIC_PROMOTION_COOLDOWN = Duration.ofHours(2);
-    private static final Duration PUBLIC_PROMOTION_COOLDOWN_GRACE = Duration.ofMinutes(5);
+    private static final Duration PUBLIC_PROMOTION_POSTING_WINDOW = Duration.ofMinutes(5);
+    private static final Duration PUBLIC_PROMOTION_SLOT_WIDTH = Duration.ofHours(1);
     private static final List<String> PREDICTION_LOCK_TITLES = List.of(
             "The Wagers Open",
             "The Archives Open",
@@ -99,7 +100,7 @@ public class CombatReplayContestLifecycleService {
         boolean immediatePromotion = settings.getRuntime().isImmediatePromotionOnResolve();
         LocalDateTime now = LocalDateTime.now(clock).truncatedTo(ChronoUnit.MINUTES);
         if (!immediatePromotion) {
-            if (now.getMinute() != 0) return;
+            if (!isInsidePublicPromotionWindow(now)) return;
             int maxPromotionsPerHour = settings.getPromotion().getMaxPromotionsPerHour();
             if (maxPromotionsPerHour <= 0) return;
             if (replayContestRepository.countByPostedAtGreaterThanEqual(publicPromotionCooldownCutoff(now)) > 0) return;
@@ -139,7 +140,16 @@ public class CombatReplayContestLifecycleService {
     }
 
     static LocalDateTime publicPromotionCooldownCutoff(LocalDateTime now) {
-        return now.minus(PUBLIC_PROMOTION_COOLDOWN).plus(PUBLIC_PROMOTION_COOLDOWN_GRACE);
+        // Public cadence is slot-based: a late 10:00-slot post should not block the 12:00-slot post.
+        return publicPromotionSlot(now).minus(PUBLIC_PROMOTION_COOLDOWN).plus(PUBLIC_PROMOTION_SLOT_WIDTH);
+    }
+
+    private static LocalDateTime publicPromotionSlot(LocalDateTime now) {
+        return now.truncatedTo(ChronoUnit.HOURS);
+    }
+
+    private static boolean isInsidePublicPromotionWindow(LocalDateTime now) {
+        return Duration.between(publicPromotionSlot(now), now).compareTo(PUBLIC_PROMOTION_POSTING_WINDOW) <= 0;
     }
 
     public ForcePromoteResult forcePromoteCandidate(Long candidateId) {
