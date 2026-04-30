@@ -107,13 +107,13 @@ public class CombatContestSettings {
     @Setter
     public static class CandidateSelection {
         private Window window = new Window();
-        private int targetCandidatesPerHour = 4;
+        private int targetCandidatesPerHour = 16;
     }
 
     @Getter
     @Setter
     public static class Window {
-        private int lookbackMinutes = 60;
+        private int lookbackMinutes = 1440;
         private int refreshCronIntervalSeconds = 300;
     }
 
