@@ -6,6 +6,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.Subcommand;
+import ti4.executors.ExecutionLockManager;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.migration.DataMigrationManager;
@@ -33,31 +35,32 @@ class RunManualDataMigration extends Subcommand {
             return;
         }
 
-        Game game = GameManager.getManagedGame(gameName).getGame();
-        try {
-            Class<?>[] paramTypes = {Game.class};
-            Method method = DataMigrationManager.class.getMethod(migrationName, paramTypes);
-            method.setAccessible(true);
-            Boolean changesMade = (Boolean) method.invoke(null, game);
-            if (changesMade) {
-                game.addMigration(migrationName);
-                GameManager.save(
-                        game, "Migration ran: " + migrationName); // TODO: We should be locking since we're saving
-                MessageHelper.sendMessageToChannel(
-                        event.getChannel(),
-                        "Successfully ran migration " + migrationName + " for map " + game.getName());
-            } else {
-                MessageHelper.sendMessageToChannel(
-                        event.getChannel(),
-                        "Successfully ran migration " + migrationName + " for map " + game.getName()
-                                + " but no changes were required.");
+        ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
+            Game game = GameManager.getManagedGame(gameName).getGame();
+            try {
+                Class<?>[] paramTypes = {Game.class};
+                Method method = DataMigrationManager.class.getMethod(migrationName, paramTypes);
+                method.setAccessible(true);
+                Boolean changesMade = (Boolean) method.invoke(null, game);
+                if (changesMade) {
+                    game.addMigration(migrationName);
+                    GameManager.save(game, "Migration ran: " + migrationName);
+                    MessageHelper.sendMessageToChannel(
+                            event.getChannel(),
+                            "Successfully ran migration " + migrationName + " for map " + game.getName());
+                } else {
+                    MessageHelper.sendMessageToChannel(
+                            event.getChannel(),
+                            "Successfully ran migration " + migrationName + " for map " + game.getName()
+                                    + " but no changes were required.");
+                }
+            } catch (IllegalAccessException
+                    | IllegalArgumentException
+                    | InvocationTargetException
+                    | NoSuchMethodException
+                    | SecurityException e) {
+                BotLogger.error(new LogOrigin(event), "failed to run data migration", e);
             }
-        } catch (IllegalAccessException
-                | IllegalArgumentException
-                | InvocationTargetException
-                | NoSuchMethodException
-                | SecurityException e) {
-            BotLogger.error(new LogOrigin(event), "failed to run data migration", e);
-        }
+        });
     }
 }

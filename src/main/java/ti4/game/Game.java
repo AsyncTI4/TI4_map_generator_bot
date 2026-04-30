@@ -1,7 +1,7 @@
 package ti4.game;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -50,7 +50,6 @@ import ti4.game.helper.StoredValueHelper;
 import ti4.game.helper.TwilightFallDeckFuncs;
 import ti4.game.manager.BorderAnomalyManager;
 import ti4.game.manager.StrategyCardManager;
-import ti4.game.persistence.GameManager;
 import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -79,8 +78,18 @@ import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.model.*;
+import ti4.model.ActionCardModel;
+import ti4.model.BorderAnomalyHolder;
+import ti4.model.BorderAnomalyModel;
+import ti4.model.DeckModel;
+import ti4.model.ExploreModel;
+import ti4.model.FactionModel;
+import ti4.model.PublicObjectiveModel;
 import ti4.model.Source.ComponentSource;
+import ti4.model.StrategyCardModel;
+import ti4.model.StrategyCardSetModel;
+import ti4.model.TechnologyModel;
+import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.draft.DraftLoadService;
@@ -3998,7 +4007,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             for (Player player : players.values()) {
                 PromissoryNoteHelper.checkAndAddPNs(this, player);
             }
-            GameManager.save(this, "Added missing promissory notes to players' hands: " + missingPromissoryNotes);
         }
     }
 

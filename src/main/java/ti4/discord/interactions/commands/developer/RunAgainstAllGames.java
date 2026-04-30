@@ -29,6 +29,7 @@ class RunAgainstAllGames extends Subcommand {
             boolean changed = makeChanges(game, event);
             if (changed) {
                 changedGames.add(game.getName());
+                // TODO: Need to figure out how to lock here. Maybe add a "consumeAllGamesWithLock"
                 GameManager.save(game, "Developer ran custom command against this game, probably migration related.");
             }
         });

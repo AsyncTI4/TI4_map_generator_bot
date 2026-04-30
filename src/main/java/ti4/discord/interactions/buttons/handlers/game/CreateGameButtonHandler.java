@@ -350,8 +350,9 @@ public class CreateGameButtonHandler {
                 && !CommandHelper.hasRole(event, JdaService.bothelperRoles)
                 && !CommandHelper.hasRole(event, JdaService.developerRoles)) return;
 
-        if (!members.contains(event.getMember()) && !CommandHelper.hasRole(event, JdaService.bothelperRoles) &&
-            !CommandHelper.hasRole(event, JdaService.developerRoles)) {
+        if (!members.contains(event.getMember())
+                && !CommandHelper.hasRole(event, JdaService.bothelperRoles)
+                && !CommandHelper.hasRole(event, JdaService.developerRoles)) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(), "You must be a bothelper or a member of the game to launch the game.");
             return;
@@ -380,7 +381,7 @@ public class CreateGameButtonHandler {
                 members, event, gameSillyName, gameName, gameOwner, categoryChannel);
         if (game != null) {
             MessageHelper.sendMessageToEventChannel(event, "Message for posterity:\n\n" + buttonMsg);
-            // TODO: We should be locking since we're saving? Maybe not here
+            // TODO: We should be locking since we're saving? Maybe fine here since it's the first save.
             GameManager.save(game, "Created game channels");
         } else {
             MessageHelper.sendMessageToEventChannel(event, "Something went wrong...");
