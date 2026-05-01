@@ -406,20 +406,24 @@ public class CombatModHelper {
                 }
             }
             case Constants.MOD_NEBULA_DEFENDER -> {
+                Player activePlayer = game.getActivePlayer();
                 if (onTile != null
                         && (onTile.isNebula() || tile.isNebula(game))
-                        && !game.getActivePlayerID().equals(player.getUserID())
-                        && !game.getActivePlayer().getAllianceMembers().contains(player.getFaction())
+                        && activePlayer != null
+                        && !activePlayer.getUserID().equals(player.getUserID())
+                        && !activePlayer.getAllianceMembers().contains(player.getFaction())
                         && !game.getStoredValue("mahactHeroTarget").equalsIgnoreCase(player.getFaction())) {
                     meetsCondition = true;
                 }
             }
             case "nebula_cosmic_defender" -> {
+                Player activePlayer = game.getActivePlayer();
                 if (game.isCosmicPhenomenaeMode()
                         && onTile != null
                         && (onTile.isNebula() || tile.isNebula(game))
-                        && !game.getActivePlayerID().equals(player.getUserID())
-                        && !game.getActivePlayer().getAllianceMembers().contains(player.getFaction())
+                        && activePlayer != null
+                        && !activePlayer.getUserID().equals(player.getUserID())
+                        && !activePlayer.getAllianceMembers().contains(player.getFaction())
                         && !game.getStoredValue("mahactHeroTarget").equalsIgnoreCase(player.getFaction())) {
                     meetsCondition = true;
                 }

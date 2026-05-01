@@ -1,6 +1,7 @@
 package ti4.contest.replay.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -9,6 +10,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import ti4.contest.replay.core.CombatCandidateStatus;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplaySelection;
 import ti4.contest.replay.core.LazaxCombatSupport;
@@ -17,6 +19,10 @@ import ti4.contest.replay.entities.CombatObservationEntity;
 import ti4.contest.replay.repository.CombatCandidateEventRepository;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatObservationRepository;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.service.combat.CombatRollType;
 
 class CombatReplayServiceTest {
 
@@ -144,6 +150,57 @@ class CombatReplayServiceTest {
         assertTrue(lastObservation.eligibleAsCandidate());
     }
 
+    @Test
+    void identifiesTrackedCandidateRollForMatchingSpaceCombatParticipants() {
+        CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
+        CombatReplayService service = service(candidateRepository);
+        Game game = game("pbd-tracked-roll");
+        Tile tile = new Tile("18", "305");
+        Player attacker = player(game, "sol");
+        Player defender = player(game, "yin");
+        CombatCandidateEntity candidate = candidate("sol", "yin");
+        candidate.setStatus(CombatCandidateStatus.TRACKING);
+        candidate.setGameName(game.getName());
+        candidate.setTilePosition(tile.getPosition());
+        when(candidateRepository.findFirstByGameNameAndTilePositionAndStatus(
+                        game.getName(), tile.getPosition(), CombatCandidateStatus.TRACKING))
+                .thenReturn(candidate);
+
+        assertTrue(service.isTrackedCandidateRoll(game, attacker, defender, tile, CombatRollType.combatround));
+        assertTrue(service.isTrackedCandidateRoll(game, defender, attacker, tile, CombatRollType.AFB));
+    }
+
+    @Test
+    void rejectsTrackedCandidateRollForNonReplayRollsAndUnmatchedParticipants() {
+        CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
+        CombatReplayService service = service(candidateRepository);
+        Game game = game("pbd-untracked-roll");
+        Tile tile = new Tile("18", "305");
+        Player attacker = player(game, "sol");
+        Player defender = player(game, "yin");
+        Player outsider = player(game, "hacan");
+        CombatCandidateEntity candidate = candidate("sol", "yin");
+        candidate.setStatus(CombatCandidateStatus.TRACKING);
+        candidate.setGameName(game.getName());
+        candidate.setTilePosition(tile.getPosition());
+        when(candidateRepository.findFirstByGameNameAndTilePositionAndStatus(
+                        game.getName(), tile.getPosition(), CombatCandidateStatus.TRACKING))
+                .thenReturn(candidate);
+
+        assertFalse(service.isTrackedCandidateRoll(game, attacker, defender, tile, CombatRollType.bombardment));
+        assertFalse(service.isTrackedCandidateRoll(game, attacker, outsider, tile, CombatRollType.combatround));
+    }
+
+    private CombatReplayService service(CombatCandidateRepository candidateRepository) {
+        return new CombatReplayService(
+                new CombatContestSettings(),
+                mock(CombatObservationRepository.class),
+                candidateRepository,
+                mock(CombatCandidateEventRepository.class),
+                mock(CombatReplayEventAppender.class),
+                mock(CombatReplaySideBetTriggerService.class));
+    }
+
     private CombatObservationEntity observation(
             Long id,
             LocalDateTime startedAt,
@@ -179,6 +236,18 @@ class CombatReplayServiceTest {
         candidate.setAttackerFaction(attackerFaction);
         candidate.setDefenderFaction(defenderFaction);
         return candidate;
+    }
+
+    private Game game(String name) {
+        Game game = new Game();
+        game.setName(name);
+        return game;
+    }
+
+    private Player player(Game game, String faction) {
+        Player player = new Player(faction + "-user", faction, game);
+        player.setFaction(faction);
+        return player;
     }
 
     private CombatReplayService.InitialCombatStats initialStats(
