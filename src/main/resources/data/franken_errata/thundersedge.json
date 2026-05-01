@@ -92,12 +92,6 @@
         "source": "thunders_edge"
     },
     {
-        "itemCategory": "FLAGSHIP",
-        "itemId": "deepwrought_flagship",
-        "undraftable": true,
-        "source": "thunders_edge"
-    },
-    {
         "itemCategory": "AGENT",
         "itemId": "deepwroughtagent",
         "undraftable": true,
