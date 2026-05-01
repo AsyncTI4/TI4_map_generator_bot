@@ -348,17 +348,11 @@ public class CombatRollService {
             message = message.substring(0, message.length() - 2);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        SpringContext.getBean(CombatReplayService.class)
-                .mirrorCombatRoll(
-                        game,
-                        player,
-                        opponent,
-                        tile,
-                        message,
-                        rollType,
-                        rollResult.whiff(),
-                        rollResult.slam(),
-                        payload);
+        CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
+        boolean trackedCandidateRoll =
+                combatReplayService.isTrackedCandidateRoll(game, player, opponent, tile, rollType);
+        combatReplayService.mirrorCombatRoll(
+                game, player, opponent, tile, message, rollType, rollResult.whiff(), rollResult.slam(), payload);
         if (message.contains("adding +1, at the risk of your")) {
             Button thalnosButton = Buttons.green(
                     "startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos", ExploreEmojis.Relic);
@@ -370,7 +364,7 @@ public class CombatRollService {
         }
 
         if (!game.isFowMode()) {
-            if (!"none".equals(game.getStoredValue("surprisingDiceRoll"))) {
+            if (!trackedCandidateRoll && !"none".equals(game.getStoredValue("surprisingDiceRoll"))) {
                 StringBuilder disaster;
                 if ("hits".equals(game.getStoredValue("surprisingDiceRoll"))) {
                     disaster = new StringBuilder(player.getRepresentation() + " has rolled grievously against "

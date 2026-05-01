@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayContestLifecycleService;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.cron.CronManager;
 import ti4.logging.BotLogger;
 import ti4.spring.context.SpringContext;
@@ -24,6 +25,7 @@ public class CombatReplayCron {
         CombatContestSettings settings = SpringContext.getBean(CombatContestSettings.class);
         if (!shouldRun(settings.getReplayExecution().getReplayIntervalSeconds())) return;
         try {
+            SpringContext.getBean(CombatReplayService.class).finalizeExpiredPendingResolutionCandidates();
             SpringContext.getBean(CombatReplayContestLifecycleService.class).runReplayTick();
         } catch (Exception e) {
             BotLogger.error("**CombatReplayCron failed.**", e);

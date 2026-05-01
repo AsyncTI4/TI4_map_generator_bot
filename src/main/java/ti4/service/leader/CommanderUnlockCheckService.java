@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -196,7 +197,8 @@ public class CommanderUnlockCheckService {
                 shouldBeUnlocked = (ButtonHelperAbilities.getNumberOfDifferentAxisOrdersBought(player, game) >= 4);
             case "bentor" -> shouldBeUnlocked = (player.getNumberOfBluePrints() >= 3);
             case "celdauri" ->
-                shouldBeUnlocked = (ButtonHelper.getNumberOfSpacedocksNotInOrAdjacentHS(player, game) >= 1);
+                shouldBeUnlocked =
+                        (ButtonHelper.getNumberOfUnitsNotInOrAdjacentToHS(player, game, UnitType.Spacedock) >= 1);
             case "cheiran" ->
                 shouldBeUnlocked = (ButtonHelper.getNumberOfStructuresOnNonHomePlanets(player, game) >= 4);
             case "cymiae" ->
@@ -249,6 +251,27 @@ public class CommanderUnlockCheckService {
 
             // BR
             case "atokera", "belkosea", "pharadn", "qhet", "toldar", "uydai", "kaltrim" -> shouldBeUnlocked = true;
+
+            // Balacasi
+            case "arvaxi" -> shouldBeUnlocked = true;
+            case "lunarium" ->
+                shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "carrier", false) >= 4);
+            case "tyris" ->
+                shouldBeUnlocked =
+                        (ButtonHelper.getNumberOfUnitsNotInOrAdjacentToHS(player, game, UnitType.Infantry) >= 5);
+            case "vyserix" -> {
+                int num = 0;
+                for (String planetID : player.getPlanets()) {
+                    Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetID, game);
+                    if (planet != null && !planet.getTechSpecialities().isEmpty()) num++;
+                }
+                shouldBeUnlocked = (num >= 3);
+            }
+            case "zephyrion" -> {
+                int num = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false)
+                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser", false);
+                shouldBeUnlocked = (num >= 7);
+            }
         }
         if (shouldBeUnlocked) {
             UnlockLeaderService.unlockLeader(faction + "commander", game, player);

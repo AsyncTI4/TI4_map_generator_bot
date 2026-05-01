@@ -13,7 +13,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.RollbarManager;
 import ti4.service.game.GameNameService;
 
-class ContextInteractionListener extends ListenerAdapter implements CommandListenerInterface {
+class ContextInteractionListener extends ListenerAdapter implements CommandListener {
 
     @Override
     public void onMessageContextInteraction(MessageContextInteractionEvent event) {
@@ -28,10 +28,6 @@ class ContextInteractionListener extends ListenerAdapter implements CommandListe
     private void onContextInteraction(GenericContextInteractionEvent<?> event) {
         if (!canReceiveCommands(event)) return;
         event.getInteraction().deferReply(true).queue(Consumers.nop(), BotLogger::catchRestError);
-        queue(event);
-    }
-
-    private void queue(GenericContextInteractionEvent<?> event) {
         ExecutorServiceManager.runAsync(eventToString(event), () -> process(event));
     }
 

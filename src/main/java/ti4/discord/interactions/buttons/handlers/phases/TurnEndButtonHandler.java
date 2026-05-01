@@ -35,7 +35,18 @@ public class TurnEndButtonHandler {
             return;
         }
         CommanderUnlockCheckService.checkPlayer(player, "naaz", "empyrean", "ghost", "obsidian", "firmament");
-        CommanderUnlockCheckService.checkPlayer(player, "nivyn", "ghoti", "zelian", "gledge", "mortheus", "hacan");
+        CommanderUnlockCheckService.checkPlayer(
+                player,
+                "nivyn",
+                "ghoti",
+                "zelian",
+                "gledge",
+                "mortheus",
+                "hacan",
+                "tyris",
+                "lunarium",
+                "zephyrion",
+                "vyserix");
         EndTurnService.endTurnAndUpdateMap(event, game, player);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }

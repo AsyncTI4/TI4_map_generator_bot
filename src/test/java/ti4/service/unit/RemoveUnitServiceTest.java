@@ -15,8 +15,6 @@ class RemoveUnitServiceTest extends BaseTi4Test {
 
     @Test
     void removeUnits() {
-        beforeAll();
-
         var unitKey = new Units.UnitKey(Units.UnitType.Mech, "black");
         Tile tile = createTile("ixth", unitKey, 4);
         Game game = createGame(tile);

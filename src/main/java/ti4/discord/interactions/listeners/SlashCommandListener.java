@@ -22,7 +22,7 @@ import ti4.service.SusSlashCommandService;
 import ti4.service.game.GameNameService;
 import ti4.spring.context.SpringContext;
 
-class SlashCommandListener extends ListenerAdapter implements CommandListenerInterface {
+class SlashCommandListener extends ListenerAdapter implements CommandListener {
 
     private static final List<String> SLASHCOMMANDS_WITH_MODALS = Arrays.asList(
             Constants.ADD_TILE_LIST,

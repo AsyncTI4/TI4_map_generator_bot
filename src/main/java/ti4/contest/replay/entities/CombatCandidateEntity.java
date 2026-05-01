@@ -22,6 +22,9 @@ import ti4.contest.replay.core.CombatCandidateStatus;
             @Index(name = "idx_combat_candidate_status_started_at", columnList = "status, started_at"),
             @Index(name = "idx_combat_candidate_promotion_resolved_at", columnList = "promotion_status, resolved_at"),
             @Index(name = "idx_combat_candidate_game_tile_status", columnList = "game_name, tile_position, status"),
+            @Index(
+                    name = "idx_combat_candidate_status_pending_resolution",
+                    columnList = "status, pending_resolution_started_at"),
             @Index(name = "idx_combat_candidate_promoted_at", columnList = "promoted_at")
         })
 /**
@@ -50,6 +53,9 @@ public class CombatCandidateEntity {
 
     @Column(name = "resolved_at")
     private LocalDateTime resolvedAt;
+
+    @Column(name = "pending_resolution_started_at")
+    private LocalDateTime pendingResolutionStartedAt;
 
     @Column(name = "promoted_at")
     private LocalDateTime promotedAt;
@@ -111,6 +117,12 @@ public class CombatCandidateEntity {
     @Column(name = "defender_hp")
     private Double defenderHp;
 
+    @Column(name = "attacker_strength")
+    private Double attackerStrength;
+
+    @Column(name = "defender_strength")
+    private Double defenderStrength;
+
     @Column(name = "attacker_rolled_afb", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean attackerRolledAfb = false;
 
@@ -122,6 +134,12 @@ public class CombatCandidateEntity {
 
     @Column(name = "defender_afb_whiff", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean defenderAfbWhiff = false;
+
+    @Column(name = "attacker_skipped_afb", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean attackerSkippedAfb = false;
+
+    @Column(name = "defender_skipped_afb", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean defenderSkippedAfb = false;
 
     @Column(name = "attacker_round_one_whiff", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean attackerRoundOneWhiff = false;
@@ -146,6 +164,18 @@ public class CombatCandidateEntity {
 
     @Column(name = "defender_played_shields_holding", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean defenderPlayedShieldsHolding = false;
+
+    @Column(name = "attacker_played_direct_hit", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean attackerPlayedDirectHit = false;
+
+    @Column(name = "defender_played_direct_hit", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean defenderPlayedDirectHit = false;
+
+    @Column(name = "attacker_played_fighter_prototype", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean attackerPlayedFighterPrototype = false;
+
+    @Column(name = "defender_played_fighter_prototype", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean defenderPlayedFighterPrototype = false;
 
     @Column(name = "winner_one_hp_remaining", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean winnerOneHpRemaining = false;

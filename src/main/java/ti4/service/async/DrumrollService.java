@@ -56,7 +56,7 @@ public class DrumrollService {
             for (Message bonus : bonusMessages) {
                 bonus.delete().queue(null, null);
             }
-
+            // TODO: This save is spooky.
             Game reloadedGame = GameManager.getManagedGame(gameName).getGame();
             if (resolve.test(reloadedGame)) GameManager.save(reloadedGame, "Post-Drumroll");
         };

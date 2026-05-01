@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.experimental.UtilityClass;
+import ti4.contest.replay.core.CombatCandidateEventType;
 import ti4.contest.replay.core.CombatCandidateStatus;
 import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
@@ -11,10 +12,8 @@ import ti4.contest.replay.dispatch.ReplayDispatchPayload;
 import ti4.contest.replay.dispatch.ReplayDispatchSerializer;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatCandidateEventEntity;
-import ti4.contest.replay.entities.CombatObservationEntity;
 import ti4.contest.replay.repository.CombatCandidateEventRepository;
 import ti4.contest.replay.repository.CombatCandidateRepository;
-import ti4.contest.replay.repository.CombatObservationRepository;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.cron.CronManager;
 import ti4.game.Game;
@@ -28,6 +27,8 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class CombatReplayPromotionScoreBackfillCron {
+
+    private static final String SKIPPED_AFB_SUMMARY_TEXT = "Skipped AFB";
 
     private static final AtomicBoolean HAS_RUN = new AtomicBoolean(false);
 
@@ -57,6 +58,7 @@ public class CombatReplayPromotionScoreBackfillCron {
         }
 
         CombatCandidateRepository candidateRepository = SpringContext.getBean(CombatCandidateRepository.class);
+        int skippedAfbBackfilled = backfillSkippedAfbFlags(candidateRepository);
         int updated = 0;
         int skipped = 0;
         for (CombatCandidateEntity candidate : candidateRepository.findByStatus(CombatCandidateStatus.RESOLVED)) {
@@ -68,13 +70,52 @@ public class CombatReplayPromotionScoreBackfillCron {
         }
 
         BotLogger.info("Combat replay promotion-score backfill completed. Updated=" + updated + ", skipped=" + skipped);
+        BotLogger.info("Combat replay skipped-AFB backfill completed. Updated=" + skippedAfbBackfilled);
+    }
+
+    private static int backfillSkippedAfbFlags(CombatCandidateRepository candidateRepository) {
+        CombatCandidateEventRepository eventRepository = SpringContext.getBean(CombatCandidateEventRepository.class);
+        int updated = 0;
+        for (CombatCandidateEventEntity event : eventRepository.findByEventTypeAndSummaryTextContainingIgnoreCase(
+                CombatCandidateEventType.INFO, SKIPPED_AFB_SUMMARY_TEXT)) {
+            if (event.getActorFaction() == null) continue;
+            if (event.getCandidateId() == null) continue;
+            CombatCandidateEntity candidate =
+                    candidateRepository.findById(event.getCandidateId()).orElse(null);
+            if (candidate == null) continue;
+            if (hasSkippedAfbFlag(candidate, event.getActorFaction())) continue;
+            if (!markSkippedAfb(candidate, event.getActorFaction())) continue;
+            candidateRepository.save(candidate);
+            updated++;
+        }
+        return updated;
+    }
+
+    private static boolean hasSkippedAfbFlag(CombatCandidateEntity candidate, String faction) {
+        if (faction.equalsIgnoreCase(candidate.getAttackerFaction())) {
+            return Boolean.TRUE.equals(candidate.getAttackerSkippedAfb());
+        }
+        if (faction.equalsIgnoreCase(candidate.getDefenderFaction())) {
+            return Boolean.TRUE.equals(candidate.getDefenderSkippedAfb());
+        }
+        return false;
+    }
+
+    private static boolean markSkippedAfb(CombatCandidateEntity candidate, String faction) {
+        if (faction.equalsIgnoreCase(candidate.getAttackerFaction())) {
+            candidate.setAttackerSkippedAfb(true);
+            return true;
+        }
+        if (faction.equalsIgnoreCase(candidate.getDefenderFaction())) {
+            candidate.setDefenderSkippedAfb(true);
+            return true;
+        }
+        return false;
     }
 
     private static boolean recomputePromotionScore(CombatCandidateEntity candidate) {
-        CombatObservationEntity observation = SpringContext.getBean(CombatObservationRepository.class)
-                .findById(candidate.getObservationId())
-                .orElse(null);
-        if (observation == null) return false;
+        CombatReplayService.InitialCombatStats initialStats = CombatReplayService.initialCombatStats(candidate);
+        if (initialStats == null) return false;
 
         String snapshotJson = extractLatestSnapshotJson(candidate.getId());
         if (snapshotJson == null || snapshotJson.isBlank()) return false;
@@ -100,11 +141,16 @@ public class CombatReplayPromotionScoreBackfillCron {
                 .findMaxRoundNumberByCandidateId(candidate.getId())
                 .orElse(0);
         candidate.setPromotionScore(CombatReplayService.computePromotionScore(
-                observation,
+                candidate,
+                initialStats,
                 attackerRemainingStrength,
                 defenderRemainingStrength,
                 candidate.getWinnerFaction(),
                 roundsObserved));
+        candidate.setAttackerStrength(initialStats.attackerStrength());
+        candidate.setDefenderStrength(initialStats.defenderStrength());
+        candidate.setAttackerHp(initialStats.attackerHp());
+        candidate.setDefenderHp(initialStats.defenderHp());
         SpringContext.getBean(CombatCandidateRepository.class).save(candidate);
         return true;
     }

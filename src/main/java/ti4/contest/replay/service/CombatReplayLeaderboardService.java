@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayChannels;
+import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
 import ti4.contest.replay.entities.CombatReplayLeaderboardEntryEntity;
@@ -79,6 +80,14 @@ public class CombatReplayLeaderboardService {
                 .retrieveMessageById(replayContest.getPublicMessageId())
                 .complete();
         replayPredictionRepository.save(buildLockedPredictionSnapshot(game, replayContest, candidate, message));
+        revealPlayerNamesOnContestPost(message, game, candidate);
+    }
+
+    private void revealPlayerNamesOnContestPost(Message message, Game game, CombatCandidateEntity candidate) {
+        String revealedMessage =
+                LazaxCombatSupport.revealReplayAnnouncementPlayerNames(message.getContentRaw(), game, candidate);
+        if (revealedMessage == null || revealedMessage.equals(message.getContentRaw())) return;
+        message.editMessage(revealedMessage).queue(null, BotLogger::catchRestError);
     }
 
     public void announceLockedPredictionsIfNeeded(
@@ -243,11 +252,8 @@ public class CombatReplayLeaderboardService {
                 readLockedPredictions(lockedPrediction.getAttackerPredictionsJson());
         List<LockedPrediction> defenderPredictions =
                 readLockedPredictions(lockedPrediction.getDefenderPredictionsJson());
-        boolean attackerWon = candidate.getWinnerFaction() != null
-                && candidate.getWinnerFaction().equalsIgnoreCase(candidate.getAttackerFaction());
-
-        ScoredPredictions scoredPredictions =
-                CombatReplayPredictionScorer.score(attackerPredictions, defenderPredictions, attackerWon);
+        ScoredPredictions scoredPredictions = CombatReplayPredictionScorer.score(
+                attackerPredictions, defenderPredictions, candidate.getWinnerFaction(), candidate.getAttackerFaction());
 
         List<String> userIds = new ArrayList<>();
         for (LockedPrediction prediction : scoredPredictions.allPredictions()) {
@@ -328,10 +334,11 @@ public class CombatReplayLeaderboardService {
             CombatCandidateEntity candidate,
             ScoredContestResult result,
             Runnable afterPost) {
+        String resultLabel = candidate.getWinnerFaction() == null ? "Result" : "Winner";
         String winnerDisplay = getWinnerDisplay(game, candidate);
         List<WinningPredictionSummary> winningPredictions = result.winningPredictions();
         String message = "## Prediction Results\n"
-                + "Winner: " + winnerDisplay + "\n"
+                + resultLabel + ": " + winnerDisplay + "\n"
                 + "Predictions locked: **" + result.totalPredictions() + "**\n"
                 + "Correct predictions: **" + winningPredictions.size() + "**";
         if (result.totalPredictions() == 0) {
@@ -379,13 +386,14 @@ public class CombatReplayLeaderboardService {
     }
 
     private String getWinnerDisplay(Game game, CombatCandidateEntity candidate) {
-        if (game != null && candidate.getWinnerFaction() != null) {
+        if (candidate.getWinnerFaction() == null) return "**Draw**";
+        if (game != null) {
             Player winner = game.getPlayerFromColorOrFaction(candidate.getWinnerFaction());
             if (winner != null) {
                 return winner.getFactionEmoji() + " **" + getSafeLeaderboardName(winner.getUserName()) + "**";
             }
         }
-        return "**" + (candidate.getWinnerFaction() == null ? "Unknown" : candidate.getWinnerFaction()) + "**";
+        return "**" + candidate.getWinnerFaction() + "**";
     }
 
     private void postParticipantFollowup(Game game, CombatCandidateEntity candidate, MessageChannel threadOrChannel) {

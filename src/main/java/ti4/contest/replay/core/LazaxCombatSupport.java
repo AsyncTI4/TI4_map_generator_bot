@@ -22,6 +22,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
+import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -177,8 +178,8 @@ public class LazaxCombatSupport {
         Player defender = game.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
         Tile tile = game.getTileByPosition(candidate.getTilePosition());
         String tileRepresentation = tile == null ? candidate.getTilePosition() : tile.getRepresentationForButtons();
-        String attackerLine = formatReplayLegendLine(attacker, candidate.getAttackerFaction());
-        String defenderLine = formatReplayLegendLine(defender, candidate.getDefenderFaction());
+        String attackerLine = formatReplayLegendLine(attacker, candidate.getAttackerFaction(), false);
+        String defenderLine = formatReplayLegendLine(defender, candidate.getDefenderFaction(), false);
 
         String openerText = "## A New Combat Contest Has Emerged!\n"
                 + roleMention
@@ -194,6 +195,21 @@ public class LazaxCombatSupport {
             return openerText;
         }
         return openerText + "\n\n" + boardSummary;
+    }
+
+    public String revealReplayAnnouncementPlayerNames(
+            String announcementText, Game game, CombatCandidateEntity candidate) {
+        if (announcementText == null || announcementText.isBlank()) return announcementText;
+
+        Player attacker = game.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
+        Player defender = game.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
+        return announcementText
+                .replace(
+                        formatReplayLegendLine(attacker, candidate.getAttackerFaction(), false),
+                        formatReplayLegendLine(attacker, candidate.getAttackerFaction(), true))
+                .replace(
+                        formatReplayLegendLine(defender, candidate.getDefenderFaction(), false),
+                        formatReplayLegendLine(defender, candidate.getDefenderFaction(), true));
     }
 
     public double computeFairnessRatio(
@@ -499,12 +515,22 @@ public class LazaxCombatSupport {
         };
     }
 
-    private String formatReplayLegendLine(Player player, String fallbackFaction) {
+    private String formatReplayLegendLine(Player player, String fallbackFaction, boolean revealPlayerName) {
         if (player == null) {
             return "- `" + fallbackFaction + "`";
         }
-        return "- " + ColorEmojis.getColorEmoji(player.getColor()) + " " + player.getFactionEmoji() + " = "
-                + player.getUserName();
+        String label = revealPlayerName ? player.getUserName() : getFactionDisplayName(player, fallbackFaction);
+        return "- " + ColorEmojis.getColorEmoji(player.getColor()) + " " + player.getFactionEmoji() + " = " + label;
+    }
+
+    private String getFactionDisplayName(Player player, String fallbackFaction) {
+        FactionModel factionModel = player.getFactionModel();
+        if (factionModel == null
+                || factionModel.getFactionName() == null
+                || factionModel.getFactionName().isBlank()) {
+            return fallbackFaction;
+        }
+        return factionModel.getFactionName();
     }
 
     private String extractRecordedBoardSummary(String summaryText) {

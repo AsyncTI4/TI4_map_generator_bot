@@ -61,7 +61,7 @@ public class CombatReplayContestLifecycleService {
     private static final long SHADOW_DISCORD_ID = 0L;
     private static final String PROMOTION_DISABLED_REASON = "Candidate-to-contest promotion is disabled.";
     private static final Duration PUBLIC_PROMOTION_COOLDOWN = Duration.ofHours(2);
-    private static final Duration PUBLIC_PROMOTION_COOLDOWN_GRACE = Duration.ofMinutes(5);
+    private static final Duration PUBLIC_PROMOTION_SLOT_WIDTH = Duration.ofHours(1);
     private static final List<String> PREDICTION_LOCK_TITLES = List.of(
             "The Wagers Open",
             "The Archives Open",
@@ -96,20 +96,26 @@ public class CombatReplayContestLifecycleService {
     public void promoteBestCandidateIfDue() {
         if (!settings.getPromotion().isEnabled()) return;
 
+        boolean immediatePromotion = settings.getRuntime().isImmediatePromotionOnResolve();
         LocalDateTime now = LocalDateTime.now(clock).truncatedTo(ChronoUnit.MINUTES);
-        if (now.getMinute() != 0) return;
-        int maxPromotionsPerHour = settings.getPromotion().getMaxPromotionsPerHour();
-        if (maxPromotionsPerHour <= 0) return;
-        if (replayContestRepository.countByPostedAtGreaterThanEqual(publicPromotionCooldownCutoff(now)) > 0) return;
-        if (replayContestRepository.countByPostedAtGreaterThanEqual(now.truncatedTo(ChronoUnit.HOURS))
-                >= maxPromotionsPerHour) {
-            return;
+        if (!immediatePromotion) {
+            int maxPromotionsPerHour = settings.getPromotion().getMaxPromotionsPerHour();
+            if (maxPromotionsPerHour <= 0) return;
+            if (replayContestRepository.countByPostedAtGreaterThanEqual(publicPromotionCooldownCutoff(now)) > 0) return;
+            if (replayContestRepository.countByPostedAtGreaterThanEqual(now.truncatedTo(ChronoUnit.HOURS))
+                    >= maxPromotionsPerHour) {
+                return;
+            }
         }
 
         List<CombatCandidateEntity> candidates = findPromotionCandidates(now);
-        CombatCandidateEntity winner = selectPromotionWinner(candidates);
-        if (winner == null) return;
-        promoteCandidate(winner);
+        for (CombatCandidateEntity candidate : rankPromotionCandidates(candidates)) {
+            if (promoteCandidate(candidate) != null) {
+                return;
+            }
+            BotLogger.error("Replay contest promotion skipped because promotion returned no contest. "
+                    + promotionCandidateLogContext(candidate));
+        }
     }
 
     private List<CombatCandidateEntity> findPromotionCandidates(LocalDateTime now) {
@@ -136,7 +142,12 @@ public class CombatReplayContestLifecycleService {
     }
 
     static LocalDateTime publicPromotionCooldownCutoff(LocalDateTime now) {
-        return now.minus(PUBLIC_PROMOTION_COOLDOWN).plus(PUBLIC_PROMOTION_COOLDOWN_GRACE);
+        // Public cadence is slot-based: a late 10:00-slot post should not block the 12:00-slot post.
+        return publicPromotionSlot(now).minus(PUBLIC_PROMOTION_COOLDOWN).plus(PUBLIC_PROMOTION_SLOT_WIDTH);
+    }
+
+    private static LocalDateTime publicPromotionSlot(LocalDateTime now) {
+        return now.truncatedTo(ChronoUnit.HOURS);
     }
 
     public ForcePromoteResult forcePromoteCandidate(Long candidateId) {
@@ -169,7 +180,7 @@ public class CombatReplayContestLifecycleService {
         return ForcePromoteResult.promoted(contest);
     }
 
-    private CombatReplayContestEntity promoteCandidate(CombatCandidateEntity winner) {
+    CombatReplayContestEntity promoteCandidate(CombatCandidateEntity winner) {
         return promoteCandidate(
                 winner,
                 replayContestRepository.findByCandidateId(winner.getId()).orElse(null));
@@ -179,10 +190,18 @@ public class CombatReplayContestLifecycleService {
             CombatCandidateEntity winner, CombatReplayContestEntity existingContest) {
         CombatObservationEntity observation =
                 observationRepository.findById(winner.getObservationId()).orElse(null);
-        if (observation == null) return null;
+        if (observation == null) {
+            BotLogger.error("Replay contest promotion failed because observation was not found. "
+                    + promotionCandidateLogContext(winner));
+            return null;
+        }
 
         Game game = loadGame(winner.getGameName());
-        if (game == null) return null;
+        if (game == null) {
+            BotLogger.error("Replay contest promotion failed because game could not be loaded. "
+                    + promotionCandidateLogContext(winner));
+            return null;
+        }
 
         String startSummaryText = snapshotStartSummaryText(winner);
         String message =
@@ -192,7 +211,11 @@ public class CombatReplayContestLifecycleService {
         }
 
         TextChannel contestChannel = getContestChannel();
-        if (contestChannel == null) return null;
+        if (contestChannel == null) {
+            BotLogger.error("Replay contest promotion failed because contest channel was not found. channelName="
+                    + CombatReplayChannels.contestChannelName(settings) + " " + promotionCandidateLogContext(winner));
+            return null;
+        }
 
         try {
             LocalDateTime promotedAt = LocalDateTime.now();
@@ -204,9 +227,23 @@ public class CombatReplayContestLifecycleService {
             postPromotionContext(thread != null ? thread : contestChannel, contest, winner);
             return contest;
         } catch (Exception e) {
-            BotLogger.error("Replay contest promotion failed.", e);
+            BotLogger.error("Replay contest promotion failed. " + promotionCandidateLogContext(winner), e);
             return null;
         }
+    }
+
+    private String promotionCandidateLogContext(CombatCandidateEntity candidate) {
+        if (candidate == null) return "candidate=null";
+        return "candidateId=" + candidate.getId()
+                + ", observationId=" + candidate.getObservationId()
+                + ", game=" + candidate.getGameName()
+                + ", tile=" + candidate.getTilePosition()
+                + ", attacker=" + candidate.getAttackerFaction()
+                + ", defender=" + candidate.getDefenderFaction()
+                + ", status=" + candidate.getStatus()
+                + ", promotionStatus=" + candidate.getPromotionStatus()
+                + ", resolvedAt=" + candidate.getResolvedAt()
+                + ", promotionScore=" + candidate.getPromotionScore();
     }
 
     String snapshotStartSummaryText(CombatCandidateEntity candidate) {
@@ -400,17 +437,13 @@ public class CombatReplayContestLifecycleService {
         return candidate != null && CombatReplayTileRenderer.canRender(candidate.getInitialRenderSnapshotJson());
     }
 
-    private CombatCandidateEntity selectPromotionWinner(List<CombatCandidateEntity> candidates) {
+    private List<CombatCandidateEntity> rankPromotionCandidates(List<CombatCandidateEntity> candidates) {
         Map<Long, Double> jointScoresByObservationId = loadJointScores(candidates);
-        CombatCandidateEntity winner = null;
         Comparator<CombatCandidateEntity> comparator = candidateComparator(jointScoresByObservationId);
-        for (CombatCandidateEntity candidate : candidates) {
-            if (candidate.getResolvedAt() == null) continue;
-            if (winner == null || comparator.compare(candidate, winner) > 0) {
-                winner = candidate;
-            }
-        }
-        return winner;
+        return candidates.stream()
+                .filter(candidate -> candidate.getResolvedAt() != null)
+                .sorted(comparator.reversed())
+                .toList();
     }
 
     private Map<Long, Double> loadJointScores(List<CombatCandidateEntity> candidates) {

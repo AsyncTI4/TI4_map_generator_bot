@@ -3,9 +3,11 @@ package ti4.contest.replay.service;
 import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.core.CombatReplaySelection;
 import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.core.CombatRollPayload;
+import ti4.contest.replay.core.CombatSideBetType;
 import ti4.contest.replay.core.CombatSideState;
 import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
@@ -33,11 +36,11 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.CombatUnitSelectionHelper;
-import ti4.spring.context.SpringContext;
 
 /**
  * Observes live combats, scores them against the current replay thresholds, and records replay candidates/events.
@@ -47,6 +50,8 @@ import ti4.spring.context.SpringContext;
 public class CombatReplayService {
 
     private static final Pattern SYSTEM_TILE_PATTERN = Pattern.compile("-system-([^-]+)-");
+    private static final Set<CombatCandidateStatus> OPEN_CANDIDATE_STATUSES =
+            EnumSet.of(CombatCandidateStatus.TRACKING, CombatCandidateStatus.PENDING_RESOLUTION);
     private static final ThreadLocal<PreInteractionSnapshot> preInteractionSnapshot = new ThreadLocal<>();
 
     private final CombatContestSettings settings;
@@ -67,7 +72,7 @@ public class CombatReplayService {
         if (game == null) return PreInteractionSnapshot.empty();
 
         Map<Long, CandidateInitialSnapshot> snapshots = new HashMap<>();
-        for (CombatCandidateEntity candidate : getTrackingCandidates(game)) {
+        for (CombatCandidateEntity candidate : getOpenCandidates(game)) {
             if (isInitialSnapshotCaptured(candidate)) continue;
             CandidateInitialSnapshot snapshot = captureCandidateInitialSnapshot(game, candidate);
             if (snapshot != null) {
@@ -109,9 +114,32 @@ public class CombatReplayService {
     }
 
     public void onButtonInteractionSettled(Game game, Player player, ButtonInteractionEvent event) {
-        for (CombatCandidateEntity candidate : getTrackingCandidates(game)) {
-            trackHitAssignments(game, player, event, candidate);
-            evaluateCandidateCompletion(game, candidate);
+        for (CombatCandidateEntity candidate : getOpenCandidates(game)) {
+            if (candidate.getStatus() == CombatCandidateStatus.PENDING_RESOLUTION
+                    && !candidate
+                            .getPendingResolutionStartedAt()
+                            .plusSeconds(settings.getReplayExecution().getPendingResolutionWindowSeconds())
+                            .isAfter(LocalDateTime.now())) {
+                finalizePendingResolutionCandidate(game, candidate);
+                continue;
+            }
+
+            boolean trackedHitAssignment = trackHitAssignments(game, player, event, candidate);
+            if (candidate.getStatus() == CombatCandidateStatus.TRACKING) {
+                evaluateCandidateCompletion(game, candidate);
+            } else if (trackedHitAssignment) {
+                cancelPendingResolutionIfDrawn(game, candidate);
+            }
+        }
+    }
+
+    public void finalizeExpiredPendingResolutionCandidates() {
+        LocalDateTime cutoff =
+                LocalDateTime.now().minusSeconds(settings.getReplayExecution().getPendingResolutionWindowSeconds());
+        for (CombatCandidateEntity candidate : candidateRepository.findByStatusAndPendingResolutionStartedAtBefore(
+                CombatCandidateStatus.PENDING_RESOLUTION, cutoff)) {
+            Game game = loadGame(candidate.getGameName());
+            finalizePendingResolutionCandidate(game, candidate);
         }
     }
 
@@ -126,8 +154,8 @@ public class CombatReplayService {
             boolean slam,
             CombatRollPayload payload) {
         CombatCandidateEntity candidate = getTrackingCandidate(game, tile.getPosition());
-        if (candidate == null || !matchesParticipants(candidate, player, opponent)) return;
-        if (!isSpaceCombatRoll(rollType)) return;
+        if (candidate == null || !isReplayRoll(rollType)) return;
+        if (rollType != CombatRollType.SpaceCannonOffence && !matchesParticipants(candidate, player, opponent)) return;
 
         ensureInitialSnapshot(candidate, game);
         int round = getCurrentRound(game, candidate);
@@ -143,8 +171,20 @@ public class CombatReplayService {
                 candidate, sideBetTriggerService.fromRoll(candidate, player, rollType, whiff, slam, round));
     }
 
-    private boolean isSpaceCombatRoll(CombatRollType rollType) {
-        return rollType == CombatRollType.combatround || rollType == CombatRollType.AFB;
+    public boolean isTrackedCandidateRoll(
+            Game game, Player player, Player opponent, Tile tile, CombatRollType rollType) {
+        if (game == null || player == null || opponent == null || tile == null || !isReplayRoll(rollType)) {
+            return false;
+        }
+        CombatCandidateEntity candidate = getTrackingCandidate(game, tile.getPosition());
+        if (candidate == null) return false;
+        return rollType == CombatRollType.SpaceCannonOffence || matchesParticipants(candidate, player, opponent);
+    }
+
+    private boolean isReplayRoll(CombatRollType rollType) {
+        return rollType == CombatRollType.combatround
+                || rollType == CombatRollType.AFB
+                || rollType == CombatRollType.SpaceCannonOffence;
     }
 
     public void mirrorCombatEvent(
@@ -265,12 +305,7 @@ public class CombatReplayService {
         Tile tile = game.getTileByPosition(candidate.getTilePosition());
         if (tile == null) return false;
 
-        List<Player> remainingShipPlayers = new ArrayList<>();
-        for (Player player : ButtonHelper.getPlayersWithShipsInTheSystem(game, tile)) {
-            if (player.isRealPlayer() && !player.isDummy()) {
-                remainingShipPlayers.add(player);
-            }
-        }
+        List<Player> remainingShipPlayers = remainingShipPlayers(game, tile);
         boolean hasRecordedRoll = hasRecordedRoll(candidate);
         return switch (remainingShipPlayers.size()) {
             case 0 -> {
@@ -287,8 +322,7 @@ public class CombatReplayService {
                     cancelCandidate(game, candidate, "The tracked space combat ended before any dice were rolled.");
                     yield true;
                 }
-                Player winner = remainingShipPlayers.getFirst();
-                resolveCandidate(game, candidate, tile, winner, loserFaction(candidate, winner));
+                markCandidatePendingResolution(candidate);
                 yield true;
             }
             case 2 -> {
@@ -304,6 +338,64 @@ public class CombatReplayService {
                 yield true;
             }
         };
+    }
+
+    private void markCandidatePendingResolution(CombatCandidateEntity candidate) {
+        candidate.setStatus(CombatCandidateStatus.PENDING_RESOLUTION);
+        candidate.setPendingResolutionStartedAt(LocalDateTime.now());
+        candidate.setResolutionReason("Combat pending final hit assignment.");
+        candidateRepository.save(candidate);
+    }
+
+    private void cancelPendingResolutionIfDrawn(Game game, CombatCandidateEntity candidate) {
+        Tile tile = game.getTileByPosition(candidate.getTilePosition());
+        if (tile != null && remainingShipPlayers(game, tile).isEmpty()) {
+            resolveDrawCandidate(game, candidate, tile);
+        }
+    }
+
+    private void finalizePendingResolutionCandidate(Game game, CombatCandidateEntity candidate) {
+        if (game == null) {
+            cancelCandidate(null, candidate, "The tracked space combat could not be loaded for resolution.");
+            return;
+        }
+
+        Tile tile = game.getTileByPosition(candidate.getTilePosition());
+        if (tile == null) {
+            cancelCandidate(game, candidate, "The tracked space combat tile could not be found.");
+            return;
+        }
+
+        List<Player> remainingShipPlayers = remainingShipPlayers(game, tile);
+        switch (remainingShipPlayers.size()) {
+            case 0 -> resolveDrawCandidate(game, candidate, tile);
+            case 1 -> {
+                Player winner = remainingShipPlayers.getFirst();
+                resolveCandidate(game, candidate, tile, winner, loserFaction(candidate, winner));
+            }
+            case 2 -> {
+                if (containsOnlyOriginalParticipants(candidate, remainingShipPlayers)) {
+                    cancelCandidate(
+                            game,
+                            candidate,
+                            "The tracked space combat was still unresolved after the pending-resolution window.");
+                } else {
+                    cancelCandidate(
+                            game, candidate, "The tracked space combat drifted away from the original participants.");
+                }
+            }
+            default -> cancelCandidate(game, candidate, "The tracked space combat no longer has exactly two sides.");
+        }
+    }
+
+    private List<Player> remainingShipPlayers(Game game, Tile tile) {
+        List<Player> remainingShipPlayers = new ArrayList<>();
+        for (Player player : ButtonHelper.getPlayersWithShipsInTheSystem(game, tile)) {
+            if (player.isRealPlayer() && !player.isDummy()) {
+                remainingShipPlayers.add(player);
+            }
+        }
+        return remainingShipPlayers;
     }
 
     private boolean containsOnlyOriginalParticipants(
@@ -326,9 +418,13 @@ public class CombatReplayService {
 
     private void resolveCandidate(
             Game game, CombatCandidateEntity candidate, Tile tile, Player winner, String loserFaction) {
-        CombatObservationEntity observation =
-                observationRepository.findById(candidate.getObservationId()).orElse(null);
-        if (observation == null) return;
+        InitialCombatStats initialStats = initialCombatStats(candidate);
+        if (initialStats == null) {
+            cancelCandidate(
+                    game, candidate, "The tracked space combat initial snapshot could not be resolved cleanly.");
+            return;
+        }
+        applyInitialCombatStats(candidate, initialStats);
         ResolutionState resolution = buildResolutionState(game, candidate, tile);
         if (resolution == null) {
             cancelCandidate(game, candidate, "The tracked space combat could not be resolved cleanly.");
@@ -344,7 +440,8 @@ public class CombatReplayService {
         candidate.setResolutionReason("Winner determined from remaining fleets.");
         candidate.setWinnerOneHpRemaining(hasExactlyOneHpRemaining(resolution, candidate, winner.getFaction()));
         candidate.setPromotionScore(computePromotionScore(
-                observation,
+                candidate,
+                initialStats,
                 resolution.attackerRemainingStrength(),
                 resolution.defenderRemainingStrength(),
                 winner.getFaction(),
@@ -365,10 +462,37 @@ public class CombatReplayService {
                         + ")");
         appendSideBetTriggerEvents(
                 candidate, CombatCandidateEventType.RESOLVED, sideBetTriggerService.fromResolution(candidate, winner));
+    }
 
-        if (settings.getRuntime().isImmediatePromotionOnResolve()) {
-            SpringContext.getBean(CombatReplayContestLifecycleService.class).forcePromoteCandidate(candidate.getId());
+    private void resolveDrawCandidate(Game game, CombatCandidateEntity candidate, Tile tile) {
+        int roundsObserved = candidateEventRepository
+                .findMaxRoundNumberByCandidateId(candidate.getId())
+                .orElse(0);
+        InitialCombatStats initialStats = initialCombatStats(candidate);
+
+        candidate.setStatus(CombatCandidateStatus.RESOLVED);
+        candidate.setResolvedAt(LocalDateTime.now());
+        candidate.setWinnerFaction(null);
+        candidate.setLoserFaction(null);
+        candidate.setResolutionReason("Combat ended in a draw after pending hit assignment.");
+        candidate.setWinnerOneHpRemaining(false);
+        if (initialStats != null) {
+            applyInitialCombatStats(candidate, initialStats);
+            candidate.setPromotionScore(computeDrawPromotionScore(initialStats, roundsObserved));
         }
+        candidateRepository.save(candidate);
+
+        appendTileRenderEvent(
+                candidate,
+                CombatCandidateEventType.RESOLVED,
+                roundsObserved,
+                null,
+                tile.getPosition(),
+                CombatReplayTileRenderer.captureUnitStateSnapshot(game, tile.getPosition()),
+                "## Contest Result\nThe space combat in " + tile.getRepresentationForButtons()
+                        + " ended in a draw with no ships remaining.\n"
+                        + "Game " + game.getName() + ": [Open Game](https://asyncti4.com/game/" + game.getName()
+                        + ")");
     }
 
     private void cancelCandidate(Game game, CombatCandidateEntity candidate, String reason) {
@@ -381,19 +505,20 @@ public class CombatReplayService {
         appendDiscordEvent(candidate, CombatCandidateEventType.CANCELLED, null, null, "## Contest Closed\n" + reason);
     }
 
-    private void trackHitAssignments(
+    private boolean trackHitAssignments(
             Game game, Player player, ButtonInteractionEvent event, CombatCandidateEntity candidate) {
-        if (player == null || !isSpaceCombatHitAssignment(game, player, event)) return;
+        if (player == null || !isSpaceCombatHitAssignment(game, player, event)) return false;
         if (!candidate
                 .getTilePosition()
-                .equals(getTilePosition(event.getButton().getCustomId()))) return;
-        if (!matchesParticipant(candidate, player)) return;
+                .equals(getTilePosition(event.getButton().getCustomId()))) return false;
+        if (!matchesParticipant(candidate, player)) return false;
 
         ensureInitialSnapshot(candidate, game);
         int round = getCurrentRound(game, candidate);
-        if (candidateEventRepository.existsByCandidateIdAndEventTypeAndActorFactionAndRoundNumber(
-                candidate.getId(), CombatCandidateEventType.HIT_ASSIGN, player.getFaction(), round)) {
-            return;
+        if (candidate.getStatus() == CombatCandidateStatus.TRACKING
+                && candidateEventRepository.existsByCandidateIdAndEventTypeAndActorFactionAndRoundNumber(
+                        candidate.getId(), CombatCandidateEventType.HIT_ASSIGN, player.getFaction(), round)) {
+            return true;
         }
 
         String roundLabel = round > 0 ? "round #" + round : "the current exchange";
@@ -409,6 +534,7 @@ public class CombatReplayService {
                 ReplayDispatchPayload.hitAssign(
                         candidate.getTilePosition(),
                         CombatReplayTileRenderer.captureUnitStateSnapshot(game, candidate.getTilePosition())));
+        return true;
     }
 
     private void ensureInitialSnapshot(CombatCandidateEntity candidate, Game fallbackGame) {
@@ -433,6 +559,8 @@ public class CombatReplayService {
         candidate.setDefenderHasAssaultCannon(snapshot.defenderHasAssaultCannon());
         candidate.setAttackerHp(snapshot.attackerHp());
         candidate.setDefenderHp(snapshot.defenderHp());
+        candidate.setAttackerStrength(snapshot.attackerStrength());
+        candidate.setDefenderStrength(snapshot.defenderStrength());
         candidateRepository.save(candidate);
     }
 
@@ -459,6 +587,8 @@ public class CombatReplayService {
                 countDestroyersInCombat(tile, defender),
                 hasAssaultCannon(attacker),
                 hasAssaultCannon(defender),
+                combatSnapshot.attackerStrength(),
+                combatSnapshot.defenderStrength(),
                 combatSnapshot.attackerHp(),
                 combatSnapshot.defenderHp());
     }
@@ -483,28 +613,78 @@ public class CombatReplayService {
     }
 
     public static double computePromotionScore(
-            CombatObservationEntity observation,
+            CombatCandidateEntity candidate,
+            InitialCombatStats initialStats,
             LazaxCombatSupport.FleetStrength attackerRemainingStrength,
             LazaxCombatSupport.FleetStrength defenderRemainingStrength,
             String winnerFaction,
             int roundsObserved) {
-        double weakerHp = Math.min(observation.getAttackerHp(), observation.getDefenderHp());
-        double weakerStrength = Math.min(observation.getAttackerStrength(), observation.getDefenderStrength());
-        double strongerStrength = Math.max(observation.getAttackerStrength(), observation.getDefenderStrength());
-        double winnerRemainingHp = winnerFaction.equalsIgnoreCase(observation.getAttackerFaction())
+        double weakerHp = Math.min(initialStats.attackerHp(), initialStats.defenderHp());
+        double weakerStrength = Math.min(initialStats.attackerStrength(), initialStats.defenderStrength());
+        double strongerStrength = Math.max(initialStats.attackerStrength(), initialStats.defenderStrength());
+        double winnerRemainingHp = winnerFaction.equalsIgnoreCase(candidate.getAttackerFaction())
                 ? attackerRemainingStrength.hp()
                 : defenderRemainingStrength.hp();
-        double winnerInitialHp = winnerFaction.equalsIgnoreCase(observation.getAttackerFaction())
-                ? observation.getAttackerHp()
-                : observation.getDefenderHp();
+        double winnerInitialHp = winnerFaction.equalsIgnoreCase(candidate.getAttackerFaction())
+                ? initialStats.attackerHp()
+                : initialStats.defenderHp();
         double sizeFactor = Math.min(1.0, weakerHp / 8.0);
         double strengthRatio = safeRatio(weakerStrength, strongerStrength);
         double winnerSurvivalRatio = safeRatio(winnerRemainingHp, winnerInitialHp);
         double roundScore = Math.sqrt(Math.max(0, roundsObserved)) * sizeFactor;
         double openingBalanceScore = 0.9 * Math.pow(strengthRatio, 3.0);
         double endingTensionScore = winnerRemainingHp <= 0 ? 0.0 : 5.0 * Math.exp(-6.0 * winnerSurvivalRatio);
-        double defenderWinBonus = winnerFaction.equalsIgnoreCase(observation.getDefenderFaction()) ? 0.5 : 0.0;
+        double defenderWinBonus = winnerFaction.equalsIgnoreCase(candidate.getDefenderFaction()) ? 0.5 : 0.0;
         return roundScore + openingBalanceScore + endingTensionScore + defenderWinBonus;
+    }
+
+    private static double computeDrawPromotionScore(InitialCombatStats initialStats, int roundsObserved) {
+        double weakerHp = Math.min(initialStats.attackerHp(), initialStats.defenderHp());
+        double weakerStrength = Math.min(initialStats.attackerStrength(), initialStats.defenderStrength());
+        double strongerStrength = Math.max(initialStats.attackerStrength(), initialStats.defenderStrength());
+        double sizeFactor = Math.min(1.0, weakerHp / 8.0);
+        double strengthRatio = safeRatio(weakerStrength, strongerStrength);
+        double roundScore = Math.sqrt(Math.max(0, roundsObserved)) * sizeFactor;
+        double openingBalanceScore = 0.9 * Math.pow(strengthRatio, 3.0);
+        return roundScore + openingBalanceScore + 5.0;
+    }
+
+    public static InitialCombatStats initialCombatStats(CombatCandidateEntity candidate) {
+        if (candidate == null) return null;
+        if (candidate.getAttackerStrength() != null
+                && candidate.getDefenderStrength() != null
+                && candidate.getAttackerHp() != null
+                && candidate.getDefenderHp() != null) {
+            return new InitialCombatStats(
+                    candidate.getAttackerStrength(),
+                    candidate.getDefenderStrength(),
+                    candidate.getAttackerHp(),
+                    candidate.getDefenderHp());
+        }
+        if (!CombatReplayTileRenderer.canRender(candidate.getInitialRenderSnapshotJson())) return null;
+
+        Game snapshotGame = CombatReplayTileRenderer.render(
+                candidate.getInitialRenderSnapshotJson(), candidate.getInitialRenderSnapshotJson());
+        if (snapshotGame == null) return null;
+        Tile tile = snapshotGame.getTileByPosition(candidate.getTilePosition());
+        Player attacker = snapshotGame.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
+        Player defender = snapshotGame.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
+        UnitHolder space = tile == null ? null : tile.getUnitHolders().get(Constants.SPACE);
+        if (tile == null || attacker == null || defender == null || space == null) return null;
+
+        LazaxCombatSupport.FleetStrength attackerStrength =
+                LazaxCombatSupport.calculateFleetStrength(attacker, defender, tile, space);
+        LazaxCombatSupport.FleetStrength defenderStrength =
+                LazaxCombatSupport.calculateFleetStrength(defender, attacker, tile, space);
+        return new InitialCombatStats(
+                attackerStrength.value(), defenderStrength.value(), attackerStrength.hp(), defenderStrength.hp());
+    }
+
+    private void applyInitialCombatStats(CombatCandidateEntity candidate, InitialCombatStats initialStats) {
+        candidate.setAttackerStrength(initialStats.attackerStrength());
+        candidate.setDefenderStrength(initialStats.defenderStrength());
+        candidate.setAttackerHp(initialStats.attackerHp());
+        candidate.setDefenderHp(initialStats.defenderHp());
     }
 
     public CombatReplaySelection.SelectionDebugView getSelectionDebugView() {
@@ -542,13 +722,39 @@ public class CombatReplayService {
             int round) {
         if (candidate == null || player == null) return;
         boolean rolledAfb = rollType == CombatRollType.AFB;
-        boolean afbWhiff = rolledAfb && whiff;
         boolean roundOneCombatRoll = rollType == CombatRollType.combatround && round == 1;
-        boolean roundOneWhiff = roundOneCombatRoll && whiff;
-        boolean roundOneSlam = roundOneCombatRoll && slam;
-        if (!rolledAfb && !afbWhiff && !roundOneWhiff && !roundOneSlam) return;
-        CombatSideState.markRollFlags(candidate, player.getFaction(), rolledAfb, afbWhiff, roundOneWhiff, roundOneSlam);
+        if (!rolledAfb && !roundOneCombatRoll) return;
+        CombatSideState state = CombatSideState.forFaction(candidate, player.getFaction());
+        boolean skippedAfb = roundOneCombatRoll
+                && state != null
+                && !state.rolledAfb()
+                && isAfbSkippedAvailable(candidate, player.getFaction());
+        CombatSideState.markRollFlags(
+                candidate,
+                player.getFaction(),
+                rolledAfb,
+                rolledAfb && whiff,
+                skippedAfb,
+                roundOneCombatRoll && whiff,
+                roundOneCombatRoll && slam);
         candidateRepository.save(candidate);
+    }
+
+    private boolean isAfbSkippedAvailable(CombatCandidateEntity candidate, String targetFaction) {
+        if (candidate == null || targetFaction == null) return false;
+        CombatSideState state = CombatSideState.forFaction(candidate, targetFaction);
+        if (state == null || !CombatSideBetType.AFB_SKIPPED.isAvailable(state.destroyerCount())) return false;
+        return !(state.destroyerCount() == 1 && opponentHasAssaultCannon(candidate, targetFaction));
+    }
+
+    private boolean opponentHasAssaultCannon(CombatCandidateEntity candidate, String targetFaction) {
+        if (targetFaction.equalsIgnoreCase(candidate.getAttackerFaction())) {
+            return Boolean.TRUE.equals(candidate.getDefenderHasAssaultCannon());
+        }
+        if (targetFaction.equalsIgnoreCase(candidate.getDefenderFaction())) {
+            return Boolean.TRUE.equals(candidate.getAttackerHasAssaultCannon());
+        }
+        return false;
     }
 
     private void appendSideBetTriggerEvents(
@@ -572,15 +778,12 @@ public class CombatReplayService {
                 || player == null
                 || trackedEvent == null
                 || trackedEvent == CombatReplayTrackedEvent.NONE) return;
-        boolean moraleBoost = trackedEvent == CombatReplayTrackedEvent.MORALE_BOOST;
-        boolean shieldsHolding = trackedEvent == CombatReplayTrackedEvent.SHIELDS_HOLDING;
-        boolean rout = trackedEvent == CombatReplayTrackedEvent.ROUT;
-        if (rout) {
+        if (trackedEvent == CombatReplayTrackedEvent.ROUT) {
             candidate.setPromotionStatus(CombatCandidatePromotionStatus.EXPIRED);
             candidate.setCancellationReason(firstNonBlank(
                     candidate.getCancellationReason(), "Ineligible for promotion because Rout was played."));
         }
-        CombatSideState.markEventFlags(candidate, player.getFaction(), moraleBoost, shieldsHolding);
+        CombatSideState.markEventFlag(candidate, player.getFaction(), trackedEvent);
         candidateRepository.save(candidate);
     }
 
@@ -635,11 +838,11 @@ public class CombatReplayService {
     private boolean isEligibleCandidate(
             Game game, Player attacker, Player defender, Tile tile, CombatReplaySelection.Evaluation evaluation) {
         if (settings.getRuntime().isTrackAllCombatsAsCandidates()) {
-            return getTrackingCandidate(game, tile.getPosition()) == null;
+            return getOpenCandidate(game, tile.getPosition()) == null;
         }
         return evaluation.eligible()
                 && !LazaxCombatSupport.hasExcludedFlagship(attacker, defender)
-                && getTrackingCandidate(game, tile.getPosition()) == null;
+                && getOpenCandidate(game, tile.getPosition()) == null;
     }
 
     private CombatReplaySelection selection() {
@@ -675,13 +878,18 @@ public class CombatReplayService {
         return player != null && player.hasTech("asc");
     }
 
-    private List<CombatCandidateEntity> getTrackingCandidates(Game game) {
-        return candidateRepository.findByGameNameAndStatus(game.getName(), CombatCandidateStatus.TRACKING);
+    private List<CombatCandidateEntity> getOpenCandidates(Game game) {
+        return candidateRepository.findByGameNameAndStatusIn(game.getName(), OPEN_CANDIDATE_STATUSES);
     }
 
     private CombatCandidateEntity getTrackingCandidate(Game game, String tilePosition) {
         return candidateRepository.findFirstByGameNameAndTilePositionAndStatus(
                 game.getName(), tilePosition, CombatCandidateStatus.TRACKING);
+    }
+
+    private CombatCandidateEntity getOpenCandidate(Game game, String tilePosition) {
+        return candidateRepository.findFirstByGameNameAndTilePositionAndStatusIn(
+                game.getName(), tilePosition, OPEN_CANDIDATE_STATUSES);
     }
 
     private boolean hasRecordedRoll(CombatCandidateEntity candidate) {
@@ -767,12 +975,16 @@ public class CombatReplayService {
         String tilePosition = extractTilePosition(sourceChannelName);
         if (tilePosition != null) {
             CombatCandidateEntity candidate = getTrackingCandidate(game, tilePosition);
-            if (candidate != null && matchesParticipant(candidate, player)) return candidate;
+            if (candidate != null) return candidate;
         }
 
         List<CombatCandidateEntity> candidates = candidateRepository.findTrackingCandidatesForFaction(
                 game.getName(), CombatCandidateStatus.TRACKING, player.getFaction());
-        return candidates.size() == 1 ? candidates.getFirst() : null;
+        if (candidates.size() == 1) return candidates.getFirst();
+
+        List<CombatCandidateEntity> activeCandidates =
+                candidateRepository.findByGameNameAndStatus(game.getName(), CombatCandidateStatus.TRACKING);
+        return activeCandidates.size() == 1 ? activeCandidates.getFirst() : null;
     }
 
     private String extractTilePosition(String sourceChannelName) {
@@ -812,6 +1024,11 @@ public class CombatReplayService {
         return first == null || first.isBlank() ? fallback : first;
     }
 
+    private Game loadGame(String gameName) {
+        var managedGame = GameManager.getManagedGame(gameName);
+        return managedGame == null ? null : managedGame.getGame();
+    }
+
     public record PreInteractionSnapshot(Map<Long, CandidateInitialSnapshot> snapshotsByCandidateId) {
 
         public PreInteractionSnapshot {
@@ -835,8 +1052,13 @@ public class CombatReplayService {
             int defenderDestroyerCount,
             boolean attackerHasAssaultCannon,
             boolean defenderHasAssaultCannon,
+            double attackerStrength,
+            double defenderStrength,
             double attackerHp,
             double defenderHp) {}
+
+    public record InitialCombatStats(
+            double attackerStrength, double defenderStrength, double attackerHp, double defenderHp) {}
 
     private record SelectionSnapshot(
             int windowSize,

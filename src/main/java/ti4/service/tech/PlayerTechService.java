@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.other.zephyrion.ZephyrionBountyButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;

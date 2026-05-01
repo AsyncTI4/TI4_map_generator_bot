@@ -56,6 +56,7 @@ import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.PhantomEnergyHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.selections.selectmenus.SelectFaction;
@@ -2405,7 +2406,7 @@ public class ButtonHelper {
         }
     }
 
-    public static boolean nomadHeroAndDomOrbCheck(Player player, Game game) {
+    public static boolean canMoveOutOfLockedSystems(Player player, Game game) {
         if (game.isDominusOrb()
                 || game.isL1Hero()
                 || !game.getStoredValue("phantomEnergy").isEmpty()) {
@@ -2911,24 +2912,15 @@ public class ButtonHelper {
         return planets;
     }
 
-    public static int getNumberOfSpacedocksNotInOrAdjacentHS(Player player, Game game) {
+    public static int getNumberOfUnitsNotInOrAdjacentToHS(Player player, Game game, UnitType unitType) {
         int count = 0;
         Tile hs = player.getHomeSystemTile();
-        for (String planet : player.getPlanetsAllianceMode()) {
-            if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
-                continue;
-            }
-
-            Tile tile = game.getTileFromPlanet(planet);
-            if (tile == null
-                    || tile == hs
-                    || FoWHelper.getAdjacentTiles(game, hs.getPosition(), player, false)
-                            .contains(tile.getPosition())) {
-                continue;
-            }
-            Planet p = getUnitHolderFromPlanetName(planet, game);
-            if (p != null && p.getUnitCount(UnitType.Spacedock, player.getColor()) > 0) {
-                count++;
+        if (hs == null) return 0;
+        var adjacentToHS = FoWHelper.getAdjacentTiles(game, hs.getPosition(), player, false);
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile == hs || adjacentToHS.contains(tile.getPosition())) continue;
+            for (UnitHolder uh : tile.getUnitHolders().values()) {
+                count += uh.getUnitCount(unitType, player.getColor());
             }
         }
         return count;
@@ -4105,10 +4097,10 @@ public class ButtonHelper {
                         fleetCap += 2;
                     } else if (player.ownsUnit("xan_spacedock")) {
                         fightersIgnored += 3;
-                        fleetCap += 1;
+                        fleetCap += 2;
                     } else if (player.ownsUnit("xan_spacedock2")) {
                         fightersIgnored += 3;
-                        fleetCap += 3;
+                        fleetCap += 6;
                     } else if (!player.hasUnit("mykomentori_spacedock") && !player.hasUnit("mykomentori_spacedock2")) {
                         fightersIgnored += 3;
                     }
@@ -4440,7 +4432,8 @@ public class ButtonHelper {
     public static List<Button> getEchoAvailableSystems(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (tile.getPlanetUnitHolders().isEmpty()) {
+            if (tile.getPlanetUnitHolders().isEmpty()
+                    && !tile.getTilePath().toLowerCase().contains("hyperlane")) {
                 buttons.add(Buttons.green(
                         "echoPlaceFrontier_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
             }
@@ -5557,29 +5550,9 @@ public class ButtonHelper {
                 && tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
             resolveFullFrontierExplore(game, player, tile, event);
             if (player.hasAbility("phantom_energy")) {
-                List<Button> buttons = new ArrayList<>();
-                for (String asyncID : tile.getSpaceUnitHolder()
-                        .getUnitAsyncIdsOnHolder(player.getColorID())
-                        .keySet()) {
-                    buttons.add(Buttons.green(
-                            "resolvePhantomEnergy_" + asyncID,
-                            StringUtils.capitalize(Mapper.getUnitBaseTypeFromAsyncID(asyncID))));
-                }
-                String msg = player.getRepresentation() + " choose the ship type to use **Phantom Energy** on.";
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+                PhantomEnergyHandler.postInitialButtons(game, player, tile);
             }
         }
-    }
-
-    @ButtonHandler("resolvePhantomEnergy_")
-    public static void resolvePhantomEnergy(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
-        String asyncID = buttonID.split("_")[1];
-        game.setStoredValue("phantomEnergy", game.getStoredValue("phantomEnergy") + asyncID);
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentation() + " has used **Phantom Energy** on the "
-                        + Mapper.getUnitBaseTypeFromAsyncID(asyncID) + " ship type.");
-        deleteMessage(event);
     }
 
     public static void resolveFullFrontierExplore(

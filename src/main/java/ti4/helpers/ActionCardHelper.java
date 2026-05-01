@@ -23,6 +23,7 @@ import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.ArvaxiAgentButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -1784,6 +1785,7 @@ public class ActionCardHelper {
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
                 }
             }
+            ArvaxiAgentButtonHandler.postInitialButtons(game, player, acID);
         }
 
         // Fog of war ping
@@ -2171,12 +2173,7 @@ public class ActionCardHelper {
 
     public static void getActionCardFromDiscard(
             GenericInteractionCreateEvent event, Game game, Player player, int acIndex) {
-        String acId = null;
-        for (Map.Entry<String, Integer> ac : game.getDiscardActionCards().entrySet()) {
-            if (ac.getValue().equals(acIndex)) {
-                acId = ac.getKey();
-            }
-        }
+        String acId = getDiscardedAcID(game, acIndex);
 
         if (acId == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Card ID found, please retry");
@@ -2194,6 +2191,14 @@ public class ActionCardHelper {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
 
         sendActionCardInfo(game, player);
+    }
+
+    public static String getDiscardedAcID(Game game, int acIndex) {
+        return game.getDiscardActionCards().entrySet().stream()
+                .filter(e -> e.getValue().equals(acIndex))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
     }
 
     private static boolean isDiscardActionCardPickable(Game game, String acId) {
@@ -2335,10 +2340,13 @@ public class ActionCardHelper {
 
     private CombatReplayTrackedEvent getCombatReplayTrackedEvent(ActionCardModel actionCard) {
         if (actionCard == null || actionCard.getAlias() == null) return CombatReplayTrackedEvent.NONE;
-        if (MORALE_BOOST_IDS.contains(actionCard.getAlias())) return CombatReplayTrackedEvent.MORALE_BOOST;
-        if (SHIELDS_HOLDING_IDS.contains(actionCard.getAlias())) return CombatReplayTrackedEvent.SHIELDS_HOLDING;
-        if ("Rout".equalsIgnoreCase(actionCard.getName())
-                || actionCard.getAlias().startsWith("rout")) {
+        String alias = actionCard.getAlias();
+        String automationId = actionCard.getAutomationID();
+        if (MORALE_BOOST_IDS.contains(alias)) return CombatReplayTrackedEvent.MORALE_BOOST;
+        if (SHIELDS_HOLDING_IDS.contains(alias)) return CombatReplayTrackedEvent.SHIELDS_HOLDING;
+        if ("direct_hit".equalsIgnoreCase(automationId)) return CombatReplayTrackedEvent.DIRECT_HIT;
+        if ("f_prototype".equalsIgnoreCase(automationId)) return CombatReplayTrackedEvent.FIGHTER_PROTOTYPE;
+        if ("Rout".equalsIgnoreCase(actionCard.getName()) || alias.startsWith("rout")) {
             return CombatReplayTrackedEvent.ROUT;
         }
         return CombatReplayTrackedEvent.NONE;

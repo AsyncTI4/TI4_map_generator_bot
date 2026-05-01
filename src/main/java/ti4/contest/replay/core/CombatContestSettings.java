@@ -55,6 +55,9 @@ public class CombatContestSettings {
         require(replayExecution.startDelayMinutes >= 0, "replayExecution.startDelayMinutes must be >= 0.");
         require(replayExecution.replayIntervalSeconds > 0, "replayExecution.replayIntervalSeconds must be > 0.");
         require(replayExecution.maxEventGapSeconds >= 0, "replayExecution.maxEventGapSeconds must be >= 0.");
+        require(
+                replayExecution.pendingResolutionWindowSeconds > 0,
+                "replayExecution.pendingResolutionWindowSeconds must be > 0.");
         require(retention.observationRetentionDays > 0, "retention.observationRetentionDays must be > 0.");
         require(retention.eventRetentionDays > 0, "retention.eventRetentionDays must be > 0.");
         require(runtime.versionEnabled != null, "runtime.versionEnabled is required.");
@@ -83,6 +86,7 @@ public class CombatContestSettings {
             replayExecution.setStartDelayMinutes(15);
             replayExecution.setReplayIntervalSeconds(15);
             replayExecution.setMaxEventGapSeconds(30);
+            replayExecution.setPendingResolutionWindowSeconds(900);
             runtime.setDevMode(false);
             runtime.setTrackAllCombatsAsCandidates(false);
             runtime.setImmediatePromotionOnResolve(false);
@@ -91,6 +95,7 @@ public class CombatContestSettings {
             replayExecution.setStartDelayMinutes(0);
             replayExecution.setReplayIntervalSeconds(1);
             replayExecution.setMaxEventGapSeconds(1);
+            replayExecution.setPendingResolutionWindowSeconds(30);
             runtime.setDevMode(true);
             runtime.setTrackAllCombatsAsCandidates(true);
             runtime.setImmediatePromotionOnResolve(true);
@@ -102,13 +107,13 @@ public class CombatContestSettings {
     @Setter
     public static class CandidateSelection {
         private Window window = new Window();
-        private int targetCandidatesPerHour = 4;
+        private int targetCandidatesPerHour = 16;
     }
 
     @Getter
     @Setter
     public static class Window {
-        private int lookbackMinutes = 60;
+        private int lookbackMinutes = 1440;
         private int refreshCronIntervalSeconds = 300;
     }
 
@@ -127,6 +132,7 @@ public class CombatContestSettings {
         private int startDelayMinutes = 15;
         private int replayIntervalSeconds = 15;
         private int maxEventGapSeconds = 30;
+        private int pendingResolutionWindowSeconds = 900;
     }
 
     @Getter

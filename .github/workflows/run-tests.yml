@@ -27,7 +27,7 @@ jobs:
           else
             echo "has_json=false" >> "$GITHUB_OUTPUT"
           fi
-          if git diff --name-only "$BASE" "$HEAD" | grep -qE '^(src/|pom\.xml$|.*\.json$)'; then
+          if git diff --name-only "$BASE" "$HEAD" | grep -qE '^(src/|pom\.xml$|.*\.json$|\.github/workflows/run-tests\.yml$)'; then
             echo "has_java=true" >> "$GITHUB_OUTPUT"
           else
             echo "has_java=false" >> "$GITHUB_OUTPUT"
@@ -90,9 +90,13 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          mvn --batch-mode --no-transfer-progress verify -P ci-spotless \
+          mvn --batch-mode \
+            --no-transfer-progress \
+            --fail-at-end \
+            -P ci-spotless \
             -Dorg.slf4j.simpleLogger.showDateTime=true \
             -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss.SSS \
+            verify \
             2>&1 | tee /tmp/maven.log
       - name: Parse Spotless violations
         if: always() && steps.maven.outcome == 'failure'

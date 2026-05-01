@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.AsyncTI4DiscordBot;
 import ti4.contest.replay.buttons.CombatSideBetButtonIds;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.ButtonProcessor;
@@ -74,6 +75,7 @@ class ButtonListener extends ListenerAdapter {
 
     private static final class EventLatencyChecker {
 
+        private static final Duration TO_WAIT_BEFORE_CHECKS_START = Duration.ofMinutes(2);
         private static final long THRESHOLD_MS = 2000;
         private static final Duration WARNING_COOLDOWN_WINDOW = Duration.ofMinutes(2);
         private static final int EVENT_COUNT_THRESHOLD = 10;
@@ -82,6 +84,8 @@ class ButtonListener extends ListenerAdapter {
         private static final AtomicLong lastWarningTimeMs = new AtomicLong(0);
 
         static void check(GenericInteractionCreateEvent event) {
+            if (!AsyncTI4DiscordBot.durationHasPassedSinceStartup(TO_WAIT_BEFORE_CHECKS_START)) return;
+
             long now = System.currentTimeMillis();
             long lastWarning = lastWarningTimeMs.get();
 
@@ -99,14 +103,12 @@ class ButtonListener extends ListenerAdapter {
             slowEvents.addLast(now);
 
             // trim old entries outside 5-minute window
-            Long ts;
             long windowMs = WARNING_COOLDOWN_WINDOW.toMillis();
-
             while (!slowEvents.isEmpty() && now - slowEvents.getFirst() > windowMs) {
                 slowEvents.removeFirst();
             }
 
-            if (slowEvents.size() < EVENT_COUNT_THRESHOLD) {
+            if (slowEvents.size() <= EVENT_COUNT_THRESHOLD) {
                 return;
             }
 
@@ -121,7 +123,7 @@ class ButtonListener extends ListenerAdapter {
                     + EVENT_COUNT_THRESHOLD
                     + "+ slow events in the last "
                     + WARNING_COOLDOWN_WINDOW.toMinutes() + "  minutes.**"
-                    + "\nGateway ping: " + gatewayPing);
+                    + "\n**Gateway ping:** " + gatewayPing);
         }
     }
 }
