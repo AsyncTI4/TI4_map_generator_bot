@@ -65,9 +65,8 @@ public class DrumrollService {
         }
         if (!JdaService.isReadyToReceiveCommands()) return;
         var managed = GameManager.getManagedGame(gameName);
-        if (managed == null) return;
-        Game game = managed.getGame();
-        if (game != null) resolve.accept(game);
+        if (managed == null || managed.getGame() == null) return;
+        resolve.accept(managed.getGame());
     }
 
     public void doDrumroll(MessageChannel main, String msg, int sec, String gameName, Consumer<Game> resolve) {
