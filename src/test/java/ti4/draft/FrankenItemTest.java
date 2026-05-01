@@ -12,13 +12,11 @@ import ti4.testUtils.BaseTi4Test;
 class FrankenItemTest extends BaseTi4Test {
     @Test
     void testAllCardsGenerateSuccessfully() {
-        beforeAll();
         assertDoesNotThrow(DraftItem::generateAllDraftableCards);
     }
 
     @Test
     void testAllCardsHaveValidShortNames() {
-        beforeAll();
         List<DraftItem> cards = DraftItem.generateAllDraftableCards();
         for (DraftItem card : cards) {
             assert !card.getShortDescription().isEmpty() : card.getAlias();
@@ -27,7 +25,6 @@ class FrankenItemTest extends BaseTi4Test {
 
     @Test
     void testAllCardsHaveValidLongNames() {
-        beforeAll();
         List<DraftItem> cards = DraftItem.generateAllDraftableCards();
         for (DraftItem card : cards) {
             try {
@@ -40,7 +37,6 @@ class FrankenItemTest extends BaseTi4Test {
 
     @Test
     void testAllCardsHaveValidEmoji() {
-        beforeAll();
         List<DraftItem> cards = DraftItem.generateAllDraftableCards();
         for (DraftItem card : cards) {
             assert card.getItemEmoji() != null : card.getAlias();
@@ -49,7 +45,6 @@ class FrankenItemTest extends BaseTi4Test {
 
     @Test
     void errataFileSanityTest() {
-        beforeAll();
         Set<String> unexpectedAliases = Set.of(
                 // PoK
                 "ABILITY:mitosis",

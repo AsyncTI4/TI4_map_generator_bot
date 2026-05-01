@@ -177,7 +177,8 @@ public class MiltyService {
                         }
                     }
                     game.setPhaseOfGame("miltydraft");
-                    GameManager.save(game, "Milty"); // TODO: We should be locking since we're saving
+                    // TODO: We should be locking since we're saving
+                    GameManager.save(game, "Milty");
                     if (game.isThundersEdge()) {
                         ThundersEdgeRulesService.alertTabletalkWithRulesAtStartOfDraft(game);
                     }

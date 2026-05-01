@@ -31,7 +31,6 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
     @Test
     void testStandard6p() {
-        beforeAll();
         Game game = createTestGame(6);
 
         testSuccessfulNucleusForGame(game);
@@ -39,7 +38,6 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
     @Test
     void testStandard5p() {
-        beforeAll();
         Game game = createTestGame(5);
 
         testSuccessfulNucleusForGame(game);
@@ -47,7 +45,6 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
     @Test
     void testStandard4p() {
-        beforeAll();
         Game game = createTestGame(4);
 
         testSuccessfulNucleusForGame(game);
@@ -55,7 +52,6 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
     @Test
     void testStandard3p() {
-        beforeAll();
         Game game = createTestGame(3);
 
         testSuccessfulNucleusForGame(game);
@@ -63,7 +59,6 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
     @Test
     void testStandard7p() {
-        beforeAll();
         Game game = createTestGame(7);
 
         testSuccessfulNucleusForGame(game);
@@ -71,7 +66,6 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
     @Test
     void testStandard8p() {
-        beforeAll();
         Game game = createTestGame(8);
 
         testSuccessfulNucleusForGame(game);
@@ -79,7 +73,6 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
     @Test
     void testAllSources6p() {
-        beforeAll();
 
         Game game = createTestGame(6);
         game.setUnchartedSpaceStuff(true);
@@ -102,7 +95,6 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
     @Test
     void testAllSources3p() {
-        beforeAll();
 
         Game game = createTestGame(3);
         game.setUnchartedSpaceStuff(true);
@@ -125,7 +117,6 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
     @Test
     void testAllSources8p() {
-        beforeAll();
 
         Game game = createTestGame(8);
         game.setUnchartedSpaceStuff(true);

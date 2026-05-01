@@ -21,7 +21,7 @@ import ti4.service.game.CreateGameService;
 
 class CreateGameChannels extends Subcommand {
 
-    public CreateGameChannels() {
+    CreateGameChannels() {
         super(Constants.CREATE_GAME_CHANNELS, "Create Role and Game Channels for a New Game");
         addOptions(new OptionData(
                         OptionType.STRING,
@@ -51,13 +51,12 @@ class CreateGameChannels extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        // GAME NAME
         OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
         String gameName;
         if (gameNameOption != null) {
             gameName = gameNameOption.getAsString();
         } else {
-            gameName = CreateGameService.getNextGameName();
+            gameName = CreateGameService.getNextPbdGameName();
         }
         if (CreateGameService.gameOrRoleAlreadyExists(gameName)) {
             MessageHelper.sendMessageToEventChannel(

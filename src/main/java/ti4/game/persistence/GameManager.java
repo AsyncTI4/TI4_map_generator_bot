@@ -12,10 +12,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.JdaService;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
@@ -29,6 +31,7 @@ public class GameManager {
     private static final Set<String> gameNames = ConcurrentHashMap.newKeySet();
     private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, ManagedPlayer> userIdToManagedPlayer = new ConcurrentHashMap<>();
+    private static final AtomicInteger latestPbdNumber = new AtomicInteger();
 
     private static final CountDownLatch GAME_NAMES_LOADED_LATCH = new CountDownLatch(1);
     private static final AtomicBoolean WARMUP_STARTED = new AtomicBoolean(false);
@@ -42,6 +45,7 @@ public class GameManager {
 
         try {
             gameNames.addAll(GameLoadService.loadGameNames());
+            resetLatestPbdNumberFrom(0);
             GAME_NAMES_LOADED_LATCH.countDown();
             BotLogger.info("LOADED " + gameNames.size() + " GAME NAMES");
         } catch (Exception e) {
@@ -229,5 +233,26 @@ public class GameManager {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Failed to wait for warmup.", e);
         }
+    }
+
+    public static int getLatestPbdNumber() {
+        waitFor(GAME_NAMES_LOADED_LATCH);
+        return latestPbdNumber.get();
+    }
+
+    public static int getAndIncrementLatestPbdNumber() {
+        waitFor(GAME_NAMES_LOADED_LATCH);
+        return latestPbdNumber.incrementAndGet();
+    }
+
+    public static void resetLatestPbdNumberFrom(int toResetFrom) {
+        int maxNumber = gameNames.stream()
+                .filter(gameName -> gameName.startsWith("pbd"))
+                .map(gameName -> gameName.replace("pbd", ""))
+                .filter(StringUtils::isNumeric)
+                .map(Integer::parseInt)
+                .max(Integer::compare)
+                .orElse(0);
+        latestPbdNumber.compareAndSet(toResetFrom, maxNumber);
     }
 }

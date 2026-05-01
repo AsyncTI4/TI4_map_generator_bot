@@ -90,11 +90,9 @@ public class IxthianArtifactService {
         }
     }
 
-    private static String techs = TechEmojis.Propulsion3.toString()
-            + TechEmojis.Biotic3.toString()
-            + TechEmojis.Cybernetic3.toString()
-            + TechEmojis.Warfare3.toString();
-    private static String booms = MiscEmojis.DoubleBoom.toString().repeat(4);
+    private static final String techs =
+            TechEmojis.Propulsion3.toString() + TechEmojis.Biotic3 + TechEmojis.Cybernetic3 + TechEmojis.Warfare3;
+    private static final String booms = MiscEmojis.DoubleBoom.toString().repeat(4);
 
     private String resultMessage(Game game, Die result, boolean heartUsed) {
         String msg = "## Rolled a " + result.getGreenDieIfSuccessOrRedDieIfFailure() + " for ";
@@ -168,7 +166,7 @@ public class IxthianArtifactService {
     }
 
     @ButtonHandler("resolveIxthian")
-    private void resolveIxthian(ButtonInteractionEvent event, Game game, String buttonID) {
+    private void resolveIxthian(Game game, String buttonID) {
         boolean publish = buttonID.contains("_publish");
         boolean heart = buttonID.endsWith("_heart");
         int result = Integer.parseInt(buttonID.split("_")[1]);

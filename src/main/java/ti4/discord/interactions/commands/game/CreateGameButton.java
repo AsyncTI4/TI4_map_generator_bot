@@ -18,9 +18,11 @@ import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
 
+// TODO the way this gets game name seems bad? What is stopping a game from sniping that name before the button
+// is pressed?
 class CreateGameButton extends Subcommand {
 
-    public CreateGameButton() {
+    CreateGameButton() {
         super(Constants.CREATE_GAME_BUTTON, "Create Game Creation Button");
         addOptions(new OptionData(
                         OptionType.STRING,
@@ -40,7 +42,7 @@ class CreateGameButton extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         // GAME NAME
-        String gameName = CreateGameService.getNextGameName();
+        String gameName = CreateGameService.getNextPbdGameName();
 
         // CHECK IF GIVEN CATEGORY IS VALID
         String categoryChannelName = CreateGameService.getCategoryNameForGame(gameName);

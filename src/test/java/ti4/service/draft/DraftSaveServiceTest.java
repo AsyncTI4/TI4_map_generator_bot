@@ -15,7 +15,6 @@ import ti4.testUtils.BaseTi4Test;
 class DraftSaveServiceTest extends BaseTi4Test {
     @Test
     void testSaveAndLoad() {
-        beforeAll();
         Game game = createTestGame(6);
         DraftManager draftManager = new DraftManager(game);
         draftManager.setPlayers(game.getPlayerIDs().stream().toList());
@@ -99,7 +98,6 @@ class DraftSaveServiceTest extends BaseTi4Test {
 
     @Test
     void testSaveFormatUnchanged() {
-        beforeAll();
         String draftSave = TestData.getTestFile(TestData.FINISHED_6P_DRAFT_FILE);
         assertNotNull(draftSave, "Test data for finished 6p draft is missing or empty");
         Game game = createTestGame(6);
