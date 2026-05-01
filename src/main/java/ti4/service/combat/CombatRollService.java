@@ -1613,10 +1613,6 @@ public class CombatRollService {
 
     /** Builds a button with ID {@code FFCC_tkHacanWsThalnos_<unittype>_X,X,X,X,X,X,X,X,X,X} where _Xᵢ_ is the number of units that can rolled a result of _i_*/
     private Button buildTkHacanWSThalnosButton(List<Die> results) {
-        for (Die d : results) {
-            if (d.isSuccess()) {}
-        }
-
         return null;
     }
 
