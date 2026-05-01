@@ -79,7 +79,7 @@ public class DataMigrationManager {
                         migrationCutoffDate,
                         migrateEndedGames);
                 migrationNamesToAppliedGameNames
-                        .computeIfAbsent(entry.getKey(), k -> new ArrayList<>())
+                        .computeIfAbsent(entry.getKey(), _ -> new ArrayList<>())
                         .addAll(migratedGames);
             }
         } catch (Exception e) {

@@ -276,9 +276,11 @@ public class ReplayPayloadRenderer {
                 break;
             }
             ReplayDispatchPayload eventPayload = payloadSerializer.read(event);
-            if (eventPayload instanceof ReplayDispatchPayload.HitAssignDispatch hitAssign
-                    && tilePosition.equals(hitAssign.tilePosition())) {
-                previousSnapshotJson = hitAssign.combatStateSnapshotJson();
+            if (eventPayload
+                            instanceof
+                            ReplayDispatchPayload.HitAssignDispatch(String position, String combatStateSnapshotJson)
+                    && tilePosition.equals(position)) {
+                previousSnapshotJson = combatStateSnapshotJson;
             } else if (eventPayload instanceof ReplayDispatchPayload.TileRenderMessageDispatch tileRender
                     && tilePosition.equals(tileRender.tilePosition())) {
                 previousSnapshotJson = tileRender.combatStateSnapshotJson();

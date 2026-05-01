@@ -218,8 +218,8 @@ class UnitRenderGenerator {
                 String factionKey = player.getFaction();
                 String unitId = unitKey.asyncID();
                 unitCoordinatesByFaction
-                        .computeIfAbsent(factionKey, k -> new HashMap<>())
-                        .computeIfAbsent(unitId, k -> new ArrayList<>())
+                        .computeIfAbsent(factionKey, _ -> new HashMap<>())
+                        .computeIfAbsent(unitId, _ -> new ArrayList<>())
                         .add(new Point(imageX, imageY));
 
                 if (unitKey.getUnitType() == UnitType.Spacedock

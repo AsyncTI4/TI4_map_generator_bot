@@ -58,7 +58,7 @@ public class ExecutionLockManager {
     }
 
     private static ReentrantReadWriteLock getLock(String lockName) {
-        return locks.get(lockName, k -> new ReentrantReadWriteLock());
+        return locks.get(lockName, _ -> new ReentrantReadWriteLock());
     }
 
     public static Runnable wrapWithTryLockAndRelease(String lockName, ExecutionLockType lockType, Runnable task) {

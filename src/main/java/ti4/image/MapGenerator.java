@@ -2578,8 +2578,8 @@ public class MapGenerator implements AutoCloseable {
                             .toList();
 
                     globalUnitCoordinatesByFaction
-                            .computeIfAbsent(faction, k -> new HashMap<>())
-                            .computeIfAbsent(unitId, k -> new ArrayList<>())
+                            .computeIfAbsent(faction, _ -> new HashMap<>())
+                            .computeIfAbsent(unitId, _ -> new ArrayList<>())
                             .addAll(globalCoordinates);
                 }
             }

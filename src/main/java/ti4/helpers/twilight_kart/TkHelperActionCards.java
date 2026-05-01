@@ -18,7 +18,16 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.helpers.*;
+import ti4.helpers.ActionCardHelper;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperTwilightsFall;
+import ti4.helpers.Helper;
+import ti4.helpers.NewStuffHelper;
+import ti4.helpers.RegexHelper;
+import ti4.helpers.StringHelper;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
@@ -274,7 +283,7 @@ public class TkHelperActionCards {
             unitDescrs.add(amt + "x " + model.getUnitEmoji() + " "
                     + model.getUnitType().humanReadableName());
 
-            if (model.getIsShip() && !key.getUnitType().equals(UnitType.Fighter)) {
+            if (model.getIsShip() && key.getUnitType() != UnitType.Fighter) {
                 cost += amt * model.getCost();
             }
         }
@@ -305,7 +314,7 @@ public class TkHelperActionCards {
             for (UnitState state : UnitState.values()) {
                 if (space.getUnitCountForState(key, state) == 0) continue;
                 String unitStateStr = key.getUnitType().getValue() + "_" + state.name();
-                String stateStr = state.humanDescr() + (state.equals(UnitState.none) ? "" : " ");
+                String stateStr = state.humanDescr() + (state == UnitState.none ? "" : " ");
 
                 String id = player.finChecker() + "incubateUnit_" + pos + "_" + unitStateStr;
                 String label = "Replace 1 " + stateStr + key.getUnitType().humanReadableName();
@@ -331,7 +340,7 @@ public class TkHelperActionCards {
             RemoveUnitService.removeUnit(event, tile, game, player, space, type, 1, state);
             AddUnitService.addUnits(event, tile, game, player.getColor(), "dn");
 
-            String stateMsg = state.humanDescr() + (state.equals(UnitState.none) ? "" : " ");
+            String stateMsg = state.humanDescr() + (state == UnitState.none ? "" : " ");
             String message =
                     player.getRepresentationUnfogged() + " replaced 1 " + stateMsg + type.humanReadableName() + " on ";
             message +=

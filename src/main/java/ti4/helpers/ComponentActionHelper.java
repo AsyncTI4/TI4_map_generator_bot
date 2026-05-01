@@ -1188,7 +1188,7 @@ public class ComponentActionHelper {
                 // handled above
             }
             case "bookoflatvinia" -> BookOfLatviniaService.purgeBookOfLatvinia(event, game, player);
-            case "thesilverflame" -> SilverFlameService.rollSilverFlame(event, game, player);
+            case "thesilverflame" -> SilverFlameService.rollSilverFlame(game, player);
             default ->
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(), "This relic is not tied to any automation. Please resolve manually.");

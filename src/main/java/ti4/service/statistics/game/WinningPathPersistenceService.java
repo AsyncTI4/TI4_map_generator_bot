@@ -29,7 +29,7 @@ public class WinningPathPersistenceService {
     private static void computeWinPath(Game game, Map<String, Map<String, Integer>> data) {
         game.getWinner().ifPresent(winner -> {
             String key = key(game.getRealAndEliminatedPlayers().size(), game.getVp());
-            Map<String, Integer> map = data.computeIfAbsent(key, k -> new HashMap<>());
+            Map<String, Integer> map = data.computeIfAbsent(key, _ -> new HashMap<>());
             String path = WinningPathHelper.buildWinningPath(game, winner);
             map.put(path, map.getOrDefault(path, 0) + 1);
         });

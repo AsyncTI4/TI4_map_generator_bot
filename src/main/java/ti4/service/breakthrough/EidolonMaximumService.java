@@ -124,6 +124,6 @@ public class EidolonMaximumService {
         if (index >= QUOTES.size()) return;
 
         channel.sendMessage(QUOTES.get(index))
-                .queueAfter(2, TimeUnit.SECONDS, success -> sendTimedQuoteSequence(channel, index + 1));
+                .queueAfter(2, TimeUnit.SECONDS, _ -> sendTimedQuoteSequence(channel, index + 1));
     }
 }

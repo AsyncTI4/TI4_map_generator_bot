@@ -43,7 +43,7 @@ public class SilverFlameService {
         return Mapper.getRelic("thesilverflame").getSimpleRepresentation(false);
     }
 
-    public void rollSilverFlame(ButtonInteractionEvent event, Game game, Player player) {
+    public void rollSilverFlame(Game game, Player player) {
         silverFlameDrumroll(game, player, 10);
     }
 

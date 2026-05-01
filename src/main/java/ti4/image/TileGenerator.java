@@ -171,8 +171,8 @@ public class TileGenerator {
                     List<Point> coordinates = unitEntry.getValue();
 
                     unitCoordinatesByFaction
-                            .computeIfAbsent(faction, k -> new HashMap<>())
-                            .computeIfAbsent(unitId, k -> new ArrayList<>())
+                            .computeIfAbsent(faction, _ -> new HashMap<>())
+                            .computeIfAbsent(unitId, _ -> new ArrayList<>())
                             .addAll(coordinates);
                 }
             }

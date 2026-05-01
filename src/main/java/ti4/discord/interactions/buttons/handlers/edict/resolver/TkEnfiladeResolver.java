@@ -135,7 +135,7 @@ public class TkEnfiladeResolver implements EdictResolver {
 
                     for (UnitState state : UnitState.values()) {
                         if (uh.getUnitCountForState(key, state) == 0) continue;
-                        String stateDescr = state.humanDescr() + (state.equals(UnitState.none) ? "" : " ");
+                        String stateDescr = state.humanDescr() + (state == UnitState.none ? "" : " ");
 
                         String id = partialID + key.getUnitType().getValue() + "_" + state.name();
                         String label = "Destroy " + stateDescr + key.humanReadableName();

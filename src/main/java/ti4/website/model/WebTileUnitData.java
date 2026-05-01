@@ -94,7 +94,7 @@ public final class WebTileUnitData {
             } else {
                 // For planets and space stations
                 if (unitHolder instanceof Planet planet) {
-                    WebTilePlanet planetData = tileData.planets.computeIfAbsent(holderName, k -> new WebTilePlanet());
+                    WebTilePlanet planetData = tileData.planets.computeIfAbsent(holderName, _ -> new WebTilePlanet());
 
                     // Extract units, tokens, and action cards
                     extractUnits(game, unitHolder, planetData.getEntities());
@@ -228,14 +228,14 @@ public final class WebTileUnitData {
             // Get unit state counts: [healthy, damaged, galvanized, damaged+galvanized]
             List<Integer> unitStates = unitHolder.getUnitStates(unitKey);
             WebEntityData entityData = new WebEntityData(unitId, "unit", unitCount, sustainedDamage, unitStates);
-            factionEntities.computeIfAbsent(faction, k -> new ArrayList<>()).add(entityData);
+            factionEntities.computeIfAbsent(faction, _ -> new ArrayList<>()).add(entityData);
         }
 
         if (!factionEntities.isEmpty()) {
             // Add units to target entities
             for (Map.Entry<String, List<WebEntityData>> factionEntry : factionEntities.entrySet()) {
                 targetEntities
-                        .computeIfAbsent(factionEntry.getKey(), k -> new ArrayList<>())
+                        .computeIfAbsent(factionEntry.getKey(), _ -> new ArrayList<>())
                         .addAll(factionEntry.getValue());
             }
         }
@@ -273,13 +273,13 @@ public final class WebTileUnitData {
 
             // For now, we'll treat all tokens as non-faction specific
             WebEntityData tokenData = new WebEntityData(ti4.image.Mapper.getTokenIDFromTokenPath(token), entityType, 1);
-            factionTokens.computeIfAbsent("neutral", k -> new ArrayList<>()).add(tokenData);
+            factionTokens.computeIfAbsent("neutral", _ -> new ArrayList<>()).add(tokenData);
         }
 
         // Merge token data with existing data
         for (Map.Entry<String, List<WebEntityData>> factionEntry : factionTokens.entrySet()) {
             targetEntities
-                    .computeIfAbsent(factionEntry.getKey(), k -> new ArrayList<>())
+                    .computeIfAbsent(factionEntry.getKey(), _ -> new ArrayList<>())
                     .addAll(factionEntry.getValue());
         }
     }
@@ -298,7 +298,7 @@ public final class WebTileUnitData {
 
         for (String cardId : ActionCardHelper.getGarboziaActionCards(game).keySet()) {
             WebEntityData cardData = new WebEntityData(cardId, "actioncard", 1);
-            targetEntities.computeIfAbsent("neutral", k -> new ArrayList<>()).add(cardData);
+            targetEntities.computeIfAbsent("neutral", _ -> new ArrayList<>()).add(cardData);
         }
     }
 

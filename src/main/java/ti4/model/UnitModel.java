@@ -594,7 +594,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public boolean isNonFighterShip() {
-        return getIsShip() && !getUnitType().equals(UnitType.Fighter);
+        return getIsShip() && getUnitType() != UnitType.Fighter;
     }
 
     public boolean getIsSpaceOnly() {

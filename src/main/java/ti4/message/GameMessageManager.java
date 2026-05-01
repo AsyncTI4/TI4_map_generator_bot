@@ -27,7 +27,7 @@ public class GameMessageManager {
         }
 
         List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
         if (messages.stream().anyMatch(message -> message.messageId.equals(messageId))) {
             return;
         }
@@ -45,7 +45,7 @@ public class GameMessageManager {
         }
 
         List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
 
         String replacedMessageId = null;
         if (!messages.isEmpty()) {
@@ -146,7 +146,7 @@ public class GameMessageManager {
         }
 
         List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
         return messages.stream().filter(filter).findFirst();
     }
 
@@ -157,7 +157,7 @@ public class GameMessageManager {
         }
 
         List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
         return messages.stream().filter(m -> m.type == type).toList();
     }
 
