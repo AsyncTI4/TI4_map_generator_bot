@@ -50,7 +50,7 @@ public class DrumrollService {
                         TimeUnit.SECONDS,
                         success -> {
                             for (Message bonus : bonusMessages) {
-                                bonus.editMessage(drumroll).queue(null, null);
+                                bonus.editMessage(drumroll).queue(Consumers.nop(), BotLogger::catchRestError);
                             }
                             drumrollStep(msg, bonusMessages, message, gameName, resolve, iteration + 1, endTime);
                         },
@@ -59,9 +59,9 @@ public class DrumrollService {
 
     private static void finishDrumroll(
             Message msg, List<Message> bonusMessages, String gameName, Consumer<Game> resolve) {
-        msg.delete().queue(null, null);
+        msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
         for (Message bonus : bonusMessages) {
-            bonus.delete().queue(null, null);
+            bonus.delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
         if (!JdaService.isReadyToReceiveCommands()) return;
         var managed = GameManager.getManagedGame(gameName);
