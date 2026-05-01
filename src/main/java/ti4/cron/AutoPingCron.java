@@ -294,8 +294,7 @@ public class AutoPingCron {
                     if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(
                                 player.getCorrectChannel(),
-                                player.getRepresentationUnfogged()
-                                        + ", please draw action cards and allocate command tokens.");
+                                player.getRepresentationUnfogged() + ", please allocate command tokens.");
                     }
                     msg.append(player.getRepresentation()).append(", ");
                 } else if (game.isFowMode()
@@ -308,8 +307,7 @@ public class AutoPingCron {
                 }
             }
             if (!game.isFowMode() && !msg.isEmpty()) {
-                MessageHelper.sendMessageToChannel(
-                        game.getActionsChannel(), msg + "please draw action cards and allocate command tokens.\n");
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), msg + "please allocate command tokens.\n");
             }
             AutoPingMetadataManager.addPing(game.getName());
         }

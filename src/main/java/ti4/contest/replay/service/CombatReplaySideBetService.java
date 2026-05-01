@@ -224,7 +224,7 @@ public class CombatReplaySideBetService {
         if (state == null) return false;
         CombatSideBetType betType = sideBet.getBetType();
         return switch (betType) {
-            case AFB_SKIPPED -> isAfbSkippedAvailable(candidate, sideBet.getTargetFaction()) && !state.rolledAfb();
+            case AFB_SKIPPED -> isAfbSkippedAvailable(candidate, sideBet.getTargetFaction()) && state.skippedAfb();
             case AFB_WHIFF -> betType.isAvailable(state.destroyerCount()) && state.afbWhiff();
             case ROUND_ONE_WHIFF -> state.roundOneWhiff();
             case ROUND_ONE_SLAM -> state.roundOneSlam();

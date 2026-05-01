@@ -912,6 +912,16 @@ public final class ButtonHelperFactionSpecific {
                 UnitType.Carrier,
                 UnitType.Flagship,
                 UnitType.Cruiser));
+        if (player.ownsUnit("nekro_flagship")) {
+            units = new ArrayList<>(List.of(
+                    UnitType.Cavalry,
+                    UnitType.Warsun,
+                    UnitType.Dreadnought,
+                    UnitType.Carrier,
+                    UnitType.Flagship,
+                    UnitType.Mech,
+                    UnitType.Cruiser));
+        }
         for (Player p2 : ButtonHelper.getPlayersWithShipsInTheSystem(game, tile)) {
             for (UnitType unit : units) {
                 if (space.getDamagedUnitCount(unit, p2.getColorID()) > 0) {
