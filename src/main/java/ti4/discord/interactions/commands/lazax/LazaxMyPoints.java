@@ -18,4 +18,9 @@ class LazaxMyPoints extends Subcommand {
                 .buildUserPointsMessage(event.getUser().getId());
         LazaxReplyHelper.replyEphemeral(event, message);
     }
+
+    @Override
+    public boolean isEphemeral(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }
