@@ -1,6 +1,5 @@
 package ti4.discord.interactions.commands.developer;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -54,12 +53,8 @@ class RunManualDataMigration extends Subcommand {
                             "Successfully ran migration " + migrationName + " for map " + game.getName()
                                     + " but no changes were required.");
                 }
-            } catch (IllegalAccessException
-                    | IllegalArgumentException
-                    | InvocationTargetException
-                    | NoSuchMethodException
-                    | SecurityException e) {
-                BotLogger.error(new LogOrigin(event), "failed to run data migration", e);
+            } catch (Exception e) {
+                BotLogger.error(new LogOrigin(event), "Failed to run data migration", e);
             }
         });
     }

@@ -282,14 +282,14 @@ public class CreateGameButtonHandler {
         if (!CreateGameService.isGameCreationAllowed()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                "Admins have temporarily turned off game creation, most likely to contain a bug. Please be patient.");
+                    "Admins have temporarily turned off game creation, most likely to contain a bug. Please be patient.");
             return;
         }
 
         if (CreateGameService.isLockedFromCreatingGames(event)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                "You created a game within the last 10 minutes. Please wait or have someone else create it.");
+                    "You created a game within the last 10 minutes. Please wait or have someone else create it.");
             return;
         }
 
@@ -310,8 +310,7 @@ public class CreateGameButtonHandler {
 
         if (!isStaff && !members.contains(event.getMember())) {
             MessageHelper.sendMessageToChannel(
-                event.getChannel(),
-                "You must be a staff member or a member of the game to launch the game.");
+                    event.getChannel(), "You must be a staff member or a member of the game to launch the game.");
             return;
         }
 
@@ -367,16 +366,16 @@ public class CreateGameButtonHandler {
         if (categoryChannel == null) categoryChannel = CreateGameService.createNewGameCategory(categoryChannelName);
         if (categoryChannel == null) {
             MessageHelper.sendMessageToEventChannel(
-                event,
-                "Could not automatically find a category that begins with **" + categoryChannelName
-                    + "** - Please create this category.\n# Warning, this may mean all servers are at capacity.");
+                    event,
+                    "Could not automatically find a category that begins with **" + categoryChannelName
+                            + "** - Please create this category.\n# Warning, this may mean all servers are at capacity.");
         }
         return categoryChannel;
     }
 
     private static boolean isStaff(ButtonInteractionEvent event) {
         return CommandHelper.hasRole(event, JdaService.bothelperRoles)
-            || CommandHelper.hasRole(event, JdaService.developerRoles);
+                || CommandHelper.hasRole(event, JdaService.developerRoles);
     }
 
     private static boolean validateMembersCanJoin(ButtonInteractionEvent event, List<Member> members) {

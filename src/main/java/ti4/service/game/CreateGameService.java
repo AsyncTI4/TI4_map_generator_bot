@@ -751,10 +751,10 @@ public class CreateGameService {
         // spotless:on
 
         return ThreadLocalRandom.current()
-            .ints(0, words.size())
-            .distinct()
-            .limit(3)
-            .mapToObj(words::get)
-            .collect(Collectors.joining("-"));
+                .ints(0, words.size())
+                .distinct()
+                .limit(3)
+                .mapToObj(words::get)
+                .collect(Collectors.joining("-"));
     }
 }

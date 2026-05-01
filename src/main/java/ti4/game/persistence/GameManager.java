@@ -247,12 +247,12 @@ public class GameManager {
 
     public static void resetLatestPbdNumberFrom(int toResetFrom) {
         int maxNumber = getGameNames().stream()
-            .filter(gameName -> gameName.startsWith("pbd"))
-            .map(gameName -> gameName.replace("pbd", ""))
-            .filter(StringUtils::isNumeric)
-            .map(Integer::parseInt)
-            .max(Integer::compare)
-            .orElse(0);
+                .filter(gameName -> gameName.startsWith("pbd"))
+                .map(gameName -> gameName.replace("pbd", ""))
+                .filter(StringUtils::isNumeric)
+                .map(Integer::parseInt)
+                .max(Integer::compare)
+                .orElse(0);
         latestPbdNumber.compareAndSet(toResetFrom, maxNumber);
     }
 }
