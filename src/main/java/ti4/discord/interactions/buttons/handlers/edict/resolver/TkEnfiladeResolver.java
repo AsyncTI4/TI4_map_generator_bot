@@ -97,7 +97,7 @@ public class TkEnfiladeResolver implements EdictResolver {
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 int amt = t.getUnitHolders().values().stream()
                         .map(uh -> uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure))
-                        .mapToInt(i -> i)
+                        .mapToInt(Integer::intValue)
                         .sum();
                 visibleTargets.put(p2.getFaction(), amt);
             }

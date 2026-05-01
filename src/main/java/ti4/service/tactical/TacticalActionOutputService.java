@@ -157,7 +157,7 @@ public class TacticalActionOutputService {
 
                 List<Integer> states = unitMap.get(key);
                 if (condensed) {
-                    int amt = states.stream().mapToInt(i -> i).sum();
+                    int amt = states.stream().mapToInt(Integer::intValue).sum();
                     String unitStr = key.unitEmoji().emojiString().repeat(amt);
                     if (amt > 2) unitStr = amt + "x " + key.unitEmoji();
                     lines.add(unitStr);
