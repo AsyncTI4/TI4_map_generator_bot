@@ -48,7 +48,6 @@ public class GameImageService {
         if (isBlank(gameName) || message == null) return;
         Guild guild = message.getGuild();
         MessageChannel channel = message.getChannel();
-        if (guild == null || channel == null) return;
         saveDiscordMessageId(gameName, message.getIdLong(), guild.getIdLong(), channel.getIdLong());
     }
 

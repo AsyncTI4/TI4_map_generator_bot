@@ -199,7 +199,7 @@ class CombatReplayContestLifecycleServiceTest {
                 ZoneId.systemDefault());
     }
 
-    private static class FallbackPromotionService extends CombatReplayContestLifecycleService {
+    private static final class FallbackPromotionService extends CombatReplayContestLifecycleService {
         private final List<Long> promotedCandidateIds = new ArrayList<>();
 
         private FallbackPromotionService(

@@ -472,7 +472,7 @@ public class PlayerAreaGenerator {
             }
 
             if (member != null) return member.getEffectiveName() + afk;
-            if (user != null) return user.getEffectiveName() + afk;
+            return user.getEffectiveName() + afk;
         } catch (Exception e) {
         }
         return player.getUserName() + afk;
@@ -2121,13 +2121,9 @@ public class PlayerAreaGenerator {
             int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, game);
             int totalPlayerResources = Helper.getPlayerResourcesTotal(player, game);
             int availablePlayerResourcesOptimal = Helper.getPlayerOptimalResourcesAvailable(player, game);
-            // int totalPlayerResourcesOptimal =
-            // Helper.getPlayerOptimalResourcesTotal(player, map);
             int availablePlayerInfluence = Helper.getPlayerInfluenceAvailable(player, game);
             int totalPlayerInfluence = Helper.getPlayerInfluenceTotal(player, game);
             int availablePlayerInfluenceOptimal = Helper.getPlayerOptimalInfluenceAvailable(player, game);
-            // int totalPlayerInfluenceOptimal =
-            // Helper.getPlayerOptimalInfluenceTotal(player, map);
             int availablePlayerFlex = Helper.getPlayerFlexResourcesInfluenceAvailable(player, game);
             // int totalPlayerFlex = Helper.getPlayerFlexResourcesInfluenceTotal(player,
             // map);
@@ -2185,9 +2181,6 @@ public class PlayerAreaGenerator {
                     String.valueOf(availablePlayerFlex),
                     new Rectangle(x + deltaX, y + 115, 150, 20),
                     Storage.getFont18());
-            // DrawingUtil.drawCenteredString(graphics, String.valueOf(totalPlayerFlex), new Rectangle(x
-            // + deltaX + 185, y + 109, 32, 32), Storage.getFont32());
-
         }
 
         deltaX += 156;

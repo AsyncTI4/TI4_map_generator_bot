@@ -323,7 +323,7 @@ public class ExploreService {
         }
 
         if (kolleccbt) {
-            player.setBreakthroughExhausted("kolleccbt", kolleccbt);
+            player.setBreakthroughExhausted("kolleccbt", true);
             MessageHelper.sendMessageToChannel(
                     (MessageChannel) event.getChannel(),
                     player.getRepresentation()
@@ -815,15 +815,6 @@ public class ExploreService {
                                     + " mech here.\n-# Do not do this prior to exploring; it is an \"after\", while exploring is a \"when\".",
                             saarButton);
                 }
-
-                // if (IsPlayerElectedService.isPlayerElected(game, player, "minister_exploration")) {
-                //     String fac = player.getFactionEmoji();
-                //     message = fac + " gained 1 trade good from _Minister of Exploration_ " + player.gainTG(1)
-                //             + ". You do have this trade good prior to exploring.";
-                //     MessageHelper.sendMessageToEventChannel(event, message);
-                //     ButtonHelperAbilities.pillageCheck(player, game);
-                //     ButtonHelperAgents.resolveArtunoCheck(player, 1);
-                // }
 
                 String exploredMessage = player.getRepresentation() + " explored the planet " + ExploreEmojis.Cultural
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(mirageID, game)

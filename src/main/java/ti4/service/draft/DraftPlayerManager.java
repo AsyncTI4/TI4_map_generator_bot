@@ -128,10 +128,5 @@ public class DraftPlayerManager {
      * Check that all required fields are set and that all shared state is
      * consistent.
      */
-    public void validateState() {
-
-        if (playerStates == null) {
-            throw new IllegalStateException("Player states not set");
-        }
-    }
+    public void validateState() {}
 }

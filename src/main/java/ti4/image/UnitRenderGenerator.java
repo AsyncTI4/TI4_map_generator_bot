@@ -1,6 +1,6 @@
 package ti4.image;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -302,7 +302,7 @@ class UnitRenderGenerator {
             }
 
             int galvAmt = unitHolder.getGalvanizedUnitCount(unitKey);
-            if (galvAmt > 0 && unitKey.getUnitType() != UnitType.Mech && position != null && imagePos != null) {
+            if (galvAmt > 0 && unitKey.getUnitType() != UnitType.Mech && position != null) {
                 drawGalvanizeTag(position, imagePos, unitImage, galvTag, galvSingle, unitKey.getUnitType(), galvAmt);
             }
 

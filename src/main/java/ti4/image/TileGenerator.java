@@ -1648,7 +1648,7 @@ public class TileGenerator {
     }
 
     public static Point offsetTokenPositionForTokenPlanets(Point position, UnitHolder planet, Tile tile) {
-        if (position == null) return position;
+        if (position == null) return null;
         if (Constants.TOKEN_PLANETS.contains(planet.getName())) {
             Point centerPosition = planet.getHolderCenterPosition(tile);
             int radius = 55;

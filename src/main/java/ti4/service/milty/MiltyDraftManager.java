@@ -416,7 +416,7 @@ public class MiltyDraftManager {
                     MiltyDraftDisplayService.pingCurrentDraftPlayer(this, game, false);
                 }
             }
-            if (getQueueButtons(player, game).size() > 0
+            if (!getQueueButtons(player, game).isEmpty()
                     && getQueuedPick(player, game) == null
                     && player != nextDrafter) {
                 MessageHelper.sendMessageToChannel(

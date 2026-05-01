@@ -28,7 +28,7 @@ import ti4.service.unit.RemoveUnitService;
 public class TkSpoilResolver implements EdictResolver {
 
     @Getter
-    public String edict = "tk-spoil";
+    public final String edict = "tk-spoil";
 
     private List<Button> buttons() {
         return List.of(Buttons.red("beginSpoil", "Remove 1 Ship"));
@@ -47,8 +47,7 @@ public class TkSpoilResolver implements EdictResolver {
     }
 
     private static boolean alreadyResolved(Player player) {
-        boolean resolved = player.hasStoredValue("tk-spoil");
-        return resolved;
+        return player.hasStoredValue("tk-spoil");
     }
 
     private static void afterResolve(ButtonInteractionEvent event, Game game, Player player) {

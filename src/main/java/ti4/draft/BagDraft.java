@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
@@ -140,10 +141,9 @@ public abstract class BagDraft {
     }
 
     private List<DraftItem> draftableItemsInBag(Player player) {
-        ArrayList<DraftItem> draftableItems = new ArrayList<>(player.getCurrentDraftBag().Contents.stream()
+        return new ArrayList<>(player.getCurrentDraftBag().Contents.stream()
                 .filter(draftItem -> draftItem.isDraftable(player))
                 .toList());
-        return draftableItems;
     }
 
     public void setPlayerReadyToPass(Player player, boolean ready) {
@@ -211,7 +211,7 @@ public abstract class BagDraft {
         if (owner.getName().contains("pbd100") || owner.getName().contains("pbd500")) {
             isPrivateChannel = true;
         }
-        ThreadChannelAction threadAction = ((TextChannel) player.getCorrectChannel())
+        ThreadChannelAction threadAction = ((IThreadContainer) player.getCorrectChannel())
                 .createThreadChannel(getBagChannelThreadName(player), isPrivateChannel)
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
         if (isPrivateChannel) {

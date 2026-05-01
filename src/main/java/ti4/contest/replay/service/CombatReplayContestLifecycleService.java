@@ -657,7 +657,7 @@ public class CombatReplayContestLifecycleService {
             }
             MessageCreateBuilder builder = new MessageCreateBuilder().addFiles(fileUpload);
             if (!messageParts.isEmpty()) {
-                builder.addContent(messageParts.get(messageParts.size() - 1));
+                builder.addContent(messageParts.getLast());
             }
             if (!embeds.isEmpty()) builder.addEmbeds(embeds);
             return channel.sendMessage(builder.build()).complete();

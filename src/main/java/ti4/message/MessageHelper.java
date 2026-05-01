@@ -70,7 +70,7 @@ import ti4.service.game.GameUndoNameService;
 public class MessageHelper {
 
     public static Consumer<Message> pin() {
-        return msg -> msg.pin().queue(null, error -> {
+        return msg -> msg.pin().queue(Consumers.nop(), error -> {
             String err = getRestActionFailureMessage(msg.getChannel(), "Failed to pin message", null, error);
             BotLogger.error(err, error);
         });

@@ -133,7 +133,7 @@ public class CombatReplayLeaderboardService {
         markLeaderboardPostedIfPublished(replayContest);
     }
 
-    public boolean postLeaderboard() {
+    private boolean postLeaderboard() {
         if (!settings.getRuntime().isDiscordPostingEnabled()) return false;
         List<CombatReplayLeaderboardEntryEntity> topEntries =
                 leaderboardEntryRepository

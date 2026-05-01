@@ -294,8 +294,9 @@ public class ReplayPayloadRenderer {
         Map<UnitKey, Counts> after = unitCounts(current, tilePosition);
         List<String> changes = new ArrayList<>();
 
-        for (UnitKey key : before.keySet()) {
-            Counts previousCounts = before.get(key);
+        for (Map.Entry<UnitKey, Counts> entry : before.entrySet()) {
+            UnitKey key = entry.getKey();
+            Counts previousCounts = entry.getValue();
             Counts currentCounts = after.getOrDefault(key, Counts.empty());
             int sustained = previousCounts.sustainedBy(currentCounts);
             int destroyed = previousCounts.total() - currentCounts.total();

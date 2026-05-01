@@ -220,7 +220,7 @@ public class TacticalActionService {
                         && tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE));
 
         if (unitsWereMoved) {
-            ButtonHelperTacticalAction.resolveAfterMovementEffects(event, game, player, updatedTile, unitsWereMoved);
+            ButtonHelperTacticalAction.resolveAfterMovementEffects(event, game, player, updatedTile, true);
             game.setStoredValue(
                     "currentActionSummary" + player.getFaction(),
                     game.getStoredValue("currentActionSummary" + player.getFaction()) + " Moved ships there.");

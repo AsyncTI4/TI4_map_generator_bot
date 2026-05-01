@@ -2632,7 +2632,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     @NotNull
-    public Map<String, Integer> drawActionCard(Player player) {
+    private Map<String, Integer> drawActionCard(Player player) {
         if (!getActionCards().isEmpty()) {
             String id = getActionCards().getFirst();
             if (player.hasAbility("deceive")) {

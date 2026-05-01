@@ -33,7 +33,7 @@ import ti4.message.MessageHelper;
  */
 @Service
 @RequiredArgsConstructor
-public class CombatReplaySideBetUiService {
+class CombatReplaySideBetUiService {
 
     private final CombatContestSettings settings;
     private final CombatReplayContestRepository replayContestRepository;
@@ -248,7 +248,7 @@ public class CombatReplaySideBetUiService {
     private String factionSectionTitle(Game game, String faction) {
         String emoji = getFactionEmoji(game, faction);
         String label = buttonFactionDisplayName(game, faction);
-        if (emoji == null || emoji.isBlank()) return "### " + label;
+        if (emoji.isBlank()) return "### " + label;
         return "### " + emoji + " " + label;
     }
 

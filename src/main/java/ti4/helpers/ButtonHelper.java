@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -209,7 +212,7 @@ public class ButtonHelper {
                 return tile;
             }
         }
-        return tileC;
+        return null;
     }
 
     public static boolean isCoatlHealed(Game game) {
@@ -229,7 +232,7 @@ public class ButtonHelper {
                 return p2;
             }
         }
-        return controller;
+        return null;
     }
 
     public static void resolveInfantryRemoval(Player player, int totalAmount, Tile tile) {
@@ -249,17 +252,6 @@ public class ButtonHelper {
                 if (p2.ownsUnit("tf-vortexer")) {
                     for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p2, false, true)) {
                         if (game.getTileByPosition(pos).getSpaceUnitHolder().getUnitCount(UnitType.Carrier, p2) > 0) {
-                            // MessageHelper.sendMessageToChannel(
-                            //         player.getCorrectChannel(),
-                            //         (totalAmount <= 10
-                            //                         ? UnitEmojis.infantry
-                            //                                 .toString()
-                            //                                 .repeat(totalAmount)
-                            //                         : UnitEmojis.infantry + "×" + totalAmount)
-                            //                 + " died and were captured by a "
-                            //                 + p2.getFactionEmoji()
-                            //                 + p2.getFaction()
-                            //                 + " Vortexer.");
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, game, p2, totalAmount, "infantry", null);
                             break;
                         }
@@ -1260,9 +1252,7 @@ public class ButtonHelper {
         buttons.add(Buttons.gray("showDeck_relic", "Relics", ExploreEmojis.Relic));
         buttons.add(Buttons.gray("showDeck_unscoredSO", "Unscored Secret Objectives", CardEmojis.SecretObjective));
         buttons.add(Buttons.gray("showObjInfo_both", "All Revealed Objectives in Game", CardEmojis.Public1));
-        if (true) {
-            buttons.add(Buttons.gray("showDeck_tiles", "Remaining Tiles", TileEmojis.TileBlueBack));
-        }
+        buttons.add(Buttons.gray("showDeck_tiles", "Remaining Tiles", TileEmojis.TileBlueBack));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Pick a deck to show:", buttons);
     }
 
@@ -2172,7 +2162,7 @@ public class ButtonHelper {
         String msg = "Please choose a planet or technology to ready.";
         if (!absol) {
             for (String planet : player.getExhaustedPlanets()) {
-                if (absol || checkForTechSkips(game, planet)) {
+                if (checkForTechSkips(game, planet)) {
                     buttons.add(Buttons.green(
                             "biostimsReady_planet_" + planet, "Ready " + Helper.getPlanetRepresentation(planet, game)));
                 }
@@ -3649,13 +3639,7 @@ public class ButtonHelper {
     }
 
     @ButtonHandler("editMessage_") // editMessage_{Optional String to edit the message to}
-    public static void editMessage(GenericInteractionCreateEvent event) {
-        // if (event instanceof ButtonInteractionEvent bevent) {
-        // // bevent.getMessage();
-        // // bevent.getButton();
-        // // String message = bevent.getButton().getId().replace("editMessage_", "");
-        // }
-    }
+    public static void editMessage(GenericInteractionCreateEvent event) {}
 
     public static void deleteAllButtons(ButtonInteractionEvent event) {
         if (event == null) return;
@@ -4843,8 +4827,6 @@ public class ButtonHelper {
                 "d122",
                 "d123"));
 
-        // if (includeAllTiles) tilesToPullFrom = TileHelper.getAllTiles().values().stream().filter(tile ->
-        // !tile.isAnomaly() && !tile.isHomeSystem() && !tile.isHyperlane()).map(TileModel::getId).toList();
         redTilesToPullFrom.removeAll(
                 game.getTileMap().values().stream().map(Tile::getTileID).toList());
         if (!game.isDiscordantStarsMode() && !game.isUnchartedSpaceStuff()) {

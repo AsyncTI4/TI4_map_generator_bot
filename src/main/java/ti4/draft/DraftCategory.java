@@ -84,9 +84,6 @@ public enum DraftCategory {
     }
 
     public boolean showDescrByDefault() {
-        return switch (this) {
-            case STARTINGTECH, STARTINGFLEET -> true;
-            default -> true;
-        };
+        return true;
     }
 }

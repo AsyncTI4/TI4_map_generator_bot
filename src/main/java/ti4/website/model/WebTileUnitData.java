@@ -57,7 +57,7 @@ public final class WebTileUnitData {
 
         // Add virtual "special" tile for off-tile planets (custodiavigilia, oceans, etc.)
         WebTileUnitData specialTileData = extractOffTilePlanetsData(game);
-        if (specialTileData != null && !specialTileData.planets.isEmpty()) {
+        if (!specialTileData.planets.isEmpty()) {
             tileUnitData.put(Constants.SPECIAL, specialTileData);
         }
 

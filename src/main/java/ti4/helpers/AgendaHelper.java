@@ -391,9 +391,6 @@ public final class AgendaHelper {
         if (player.hasTechReady("dsedyng")) {
             names.add("Unity Algorithm");
         }
-        // if (IsPlayerElectedService.isPlayerElected(player.getGame(), player, "committee")) {
-        //     names.add("Committee Formation (technically resolves after all afters)");
-        // }
         return names;
     }
 
@@ -447,9 +444,6 @@ public final class AgendaHelper {
         if (player.hasTechReady("dsedyng")) {
             buttons.add(Buttons.red("queueAfter_tech_dsedyng", "Unity Algorithm"));
         }
-        // if (IsPlayerElectedService.isPlayerElected(player.getGame(), player, "committee")) {
-        //     buttons.add(Buttons.red("queueAfter_agenda_committee", "Committee Formation"));
-        // }
         CryypterHelper.addVotCRiderQueueButtons(player, buttons);
 
         return buttons;
@@ -3181,9 +3175,10 @@ public final class AgendaHelper {
         } else {
             StringBuilder summaryBuilder =
                     new StringBuilder("# _" + agendaName + "_\nCurrent status of votes and outcomes is: \n");
-            for (String outcome : outcomes.keySet()) {
+            for (Entry<String, String> entry : outcomes.entrySet()) {
+                String outcome = entry.getKey();
                 int totalVotes = 0;
-                StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
+                StringTokenizer vote_info = new StringTokenizer(entry.getValue(), ";");
                 String outcomeSummary;
                 String outcomeName = getAgendaOutcomeName(game, outcome, capitalize);
                 StringBuilder outcomeSummaryBuilder = new StringBuilder();
@@ -3446,12 +3441,11 @@ public final class AgendaHelper {
 
         boolean executive = player.getFaction().equalsIgnoreCase(game.getStoredValue("executiveOrder"));
         if (player.hasUnlockedBreakthrough("xxchabt") || executive) {
-            int baseMixedCount = planets.stream()
+            voteCount = planets.stream()
                     .map(planetsInfo::get)
                     .filter(Objects::nonNull)
                     .mapToInt(Planet::getHigherofInfluenceOrResource)
                     .sum();
-            voteCount = baseMixedCount;
         }
 
         if (executive) {
@@ -3835,9 +3829,6 @@ public final class AgendaHelper {
                     }
                 }
             }
-            // MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel,
-            // "Please indicate \"No Afters\" again.", game, afterButtons,
-            // GameMessageType.AGENDA_AFTER);
         }
         // "dspnedyn"
         ButtonHelper.deleteMessage(event);

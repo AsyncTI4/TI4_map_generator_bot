@@ -17,7 +17,7 @@ import ti4.service.planet.IndustrexService;
 import ti4.service.regex.RegexService;
 
 @UtilityClass
-public class IndustrexButtonHandler {
+class IndustrexButtonHandler {
 
     @ButtonHandler("industrexPickType_")
     public static void pickUnitType(ButtonInteractionEvent event, Game game, Player player, String buttonID) {

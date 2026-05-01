@@ -335,7 +335,7 @@ public final class RiftSetModeService {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "A " + ident + msg);
                     }
 
-                    totalTGsGained += sacrificedUnits * unitModel.getCost();
+                    totalTGsGained += (int) (sacrificedUnits * unitModel.getCost());
                 }
             }
         }

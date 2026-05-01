@@ -484,10 +484,6 @@ public class ComponentActionHelper {
         if (!IsPlayerElectedService.isPlayerElected(game, p1, "censure")
                 && !IsPlayerElectedService.isPlayerElected(game, p1, "absol_censure")) {
             List<Button> acButtons = ActionCardHelper.getActionPlayActionCardButtons(p1);
-            // Button acButton = Buttons.gray(
-            //         finChecker + prefix + "actionCards_",
-            //         "Play an Action Card with Component Action (" + acButtons.size() + ")");
-            // compButtons.add(acButton);
             compButtons.addAll(acButtons);
         }
 

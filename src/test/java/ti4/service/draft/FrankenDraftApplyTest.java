@@ -13,7 +13,6 @@ import ti4.testUtils.BaseTi4Test;
 public class FrankenDraftApplyTest extends BaseTi4Test {
 
     private static Game game;
-    private static Player p1, p2, p3;
 
     @BeforeAll
     public static void setupGame() {
@@ -23,9 +22,9 @@ public class FrankenDraftApplyTest extends BaseTi4Test {
         game.setName("Test Franken Draft Application");
         game.setCcNPlasticLimit(false);
 
-        p1 = setupFrankenPlayer("franken12");
-        p2 = setupFrankenPlayer("franken13");
-        p3 = setupFrankenPlayer("franken14");
+        Player p1 = setupFrankenPlayer("franken12");
+        Player p2 = setupFrankenPlayer("franken13");
+        Player p3 = setupFrankenPlayer("franken14");
     }
 
     private static Player setupFrankenPlayer(String faction) {

@@ -416,9 +416,8 @@ public class AddPlanetService {
         }
 
         if ((game.getPhaseOfGame().contains("agenda")
-                        || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
+                        || game.getActivePlayerID() != null && !"".equalsIgnoreCase(game.getActivePlayerID()))
                 && player.hasUnlockedBreakthrough("zealotsbt")
-                && unitHolder != null
                 && tile != null
                 && (tile.getPosition().contains("frac") || unitHolder.isLegendary())
                 && !doubleCheck

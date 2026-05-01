@@ -30,7 +30,7 @@ class ListStoredValues extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
 
-        List<String> keys = new LinkedList<String>();
+        List<String> keys = new LinkedList<>();
         for (int i = 1; i <= NUM_OF_KEY_OPTIONS; i++) {
             String key = event.getOption("stored_key_" + i, "", OptionMapping::getAsString);
             if (!key.isBlank()) {

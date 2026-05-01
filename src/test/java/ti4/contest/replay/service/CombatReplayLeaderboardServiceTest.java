@@ -44,12 +44,11 @@ class CombatReplayLeaderboardServiceTest {
 
         String message = service.buildUserPointsMessage("2");
 
-        assertEquals(
-                "## Your Lazax War Archives Points\n"
-                        + "Rank: **#2**\n"
-                        + "Points: **120**\n"
-                        + "Correct predictions: `3/5` (60%)",
-                message);
+        assertEquals("""
+                ## Your Lazax War Archives Points
+                Rank: **#2**
+                Points: **120**
+                Correct predictions: `3/5` (60%)""", message);
     }
 
     @Test

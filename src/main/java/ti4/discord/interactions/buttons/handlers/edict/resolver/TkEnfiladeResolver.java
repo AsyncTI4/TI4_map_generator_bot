@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -36,8 +35,7 @@ public class TkEnfiladeResolver implements EdictResolver {
 
     private static List<Button> tyrantButtons(Player player) {
         String id = player.finChecker() + "enfilade_";
-        List<Button> buttons = new ArrayList<>();
-        buttons.addAll(placeButtons(player));
+        List<Button> buttons = new ArrayList<>(placeButtons(player));
         buttons.add(Buttons.red(id + "destroy", "Destroy 1 Structure", "💥"));
         return buttons;
     }
@@ -99,7 +97,8 @@ public class TkEnfiladeResolver implements EdictResolver {
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 int amt = t.getUnitHolders().values().stream()
                         .map(uh -> uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure))
-                        .collect(Collectors.summingInt(i -> i));
+                        .mapToInt(i -> i)
+                        .sum();
                 visibleTargets.put(p2.getFaction(), amt);
             }
         }

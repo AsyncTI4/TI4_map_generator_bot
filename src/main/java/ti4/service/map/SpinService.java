@@ -172,8 +172,6 @@ public class SpinService {
         // status phase
         @Override
         public String toString() {
-            // sb.append(OPTION_SEPARATOR);
-            // sb.append(toSpin.toString());
             return ring.stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR))
                     + OPTION_SEPARATOR
                     + direction.toString()

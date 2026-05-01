@@ -33,7 +33,7 @@ import ti4.service.combat.CombatUnitSelectionHelper;
  */
 @Service
 @RequiredArgsConstructor
-public class CombatReplaySideBetPayoutService {
+class CombatReplaySideBetPayoutService {
 
     public static final String ODDS_V1 = "ODDS_V1";
 

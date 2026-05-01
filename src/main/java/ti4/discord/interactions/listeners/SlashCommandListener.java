@@ -44,7 +44,7 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
         queue(event);
     }
 
-    public void queue(SlashCommandInteractionEvent event) {
+    private void queue(SlashCommandInteractionEvent event) {
         Command<SlashCommandInteractionEvent> command = getCommand(event);
         ExecutionLockType lockType = getLockType(command);
         String eventString = eventToString(event);

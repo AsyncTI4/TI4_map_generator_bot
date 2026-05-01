@@ -15,7 +15,7 @@ import ti4.helpers.CommandCounterHelper;
 import ti4.message.MessageHelper;
 
 @UtilityClass
-public class RalNelButtonHandler {
+class RalNelButtonHandler {
 
     @ButtonHandler("ralnelCStep3_")
     public static void ralnelCStep3(ButtonInteractionEvent event, Player player, String buttonID, Game game) {

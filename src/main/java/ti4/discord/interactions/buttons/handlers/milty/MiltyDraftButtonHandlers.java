@@ -52,7 +52,7 @@ class MiltyDraftButtonHandlers {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
-    public static String getMiltyQueueMessage(Game game, Player player) {
+    private static String getMiltyQueueMessage(Game game, Player player) {
         String alreadyQueued = game.getStoredValue(player.getUserID() + "queuedMiltyPick");
         int numQueued = alreadyQueued.split("_").length;
         if (alreadyQueued.isEmpty()) {

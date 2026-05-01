@@ -9,6 +9,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -526,8 +527,7 @@ public class PlayerTechService {
     }
 
     public static List<Button> getSlingRelayButtons(Game game, Player player) {
-        Set<Tile> tiles = new HashSet<>();
-        tiles.addAll(
+        Set<Tile> tiles = new HashSet<>(
                 ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock, UnitType.PlenaryOrbital));
         if (player.hasUnit("ghoti_flagship")) {
             tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Flagship));
@@ -578,7 +578,7 @@ public class PlayerTechService {
 
     private static void deleteIfButtonEvent(GenericInteractionCreateEvent event) {
         if (event instanceof ButtonInteractionEvent) {
-            ((ButtonInteractionEvent) event).getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            ((ComponentInteraction) event).getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 

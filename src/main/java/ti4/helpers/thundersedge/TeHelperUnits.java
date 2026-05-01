@@ -270,8 +270,7 @@ public final class TeHelperUnits {
 
                 // moved all of this unit already from this unit holder
                 String unitStr = uk.asyncID() + " " + uh.getName();
-                if (movedUnits != null
-                        && movedUnits.stream().filter(s -> s.equals(unitStr)).count() >= uh.getUnitCount(uk)) continue;
+                if (movedUnits.stream().filter(s -> s.equals(unitStr)).count() >= uh.getUnitCount(uk)) continue;
 
                 String id = player.finChecker() + "moveForerunner_" + destination.getPosition() + "_"
                         + source.getPosition() + "_" + uk.asyncID() + "_" + uh.getName();
@@ -280,18 +279,16 @@ public final class TeHelperUnits {
             }
         }
         // Get buttons to UNDO moving units from this system
-        if (movedUnits != null) {
-            Set<String> uniqueUnits = new HashSet<>(movedUnits);
-            for (String unit : uniqueUnits) {
-                String[] data = unit.split(" ");
-                UnitType type = Units.findUnitType(data[0]);
-                String uhName = Helper.getPlanetRepresentation(data[1], game);
-                if (type != null) {
-                    String id = player.finChecker() + "undoForerunner_" + destination.getPosition() + "_"
-                            + source.getPosition() + "_" + type + "_" + data[1];
-                    String label = "Return " + type.humanReadableName() + " to " + uhName;
-                    buttons.add(Buttons.red(id, label, type.getUnitTypeEmoji()));
-                }
+        Set<String> uniqueUnits = new HashSet<>(movedUnits);
+        for (String unit : uniqueUnits) {
+            String[] data = unit.split(" ");
+            UnitType type = Units.findUnitType(data[0]);
+            String uhName = Helper.getPlanetRepresentation(data[1], game);
+            if (type != null) {
+                String id = player.finChecker() + "undoForerunner_" + destination.getPosition() + "_"
+                        + source.getPosition() + "_" + type + "_" + data[1];
+                String label = "Return " + type.humanReadableName() + " to " + uhName;
+                buttons.add(Buttons.red(id, label, type.getUnitTypeEmoji()));
             }
         }
         // Choose another system button

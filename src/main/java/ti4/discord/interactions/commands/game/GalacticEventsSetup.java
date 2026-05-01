@@ -62,9 +62,6 @@ class GalacticEventsSetup extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
 
-        // Boolean betaTestMode = event.getOption(Constants.BETA_TEST_MODE, null, OptionMapping::getAsBoolean);
-        // if (betaTestMode != null) game.setTestBetaFeaturesMode(betaTestMode);
-
         Boolean explorationMode = event.getOption(Constants.AGE_OF_EXPLORATION_MODE, null, OptionMapping::getAsBoolean);
         if (explorationMode != null) game.setAgeOfExplorationMode(explorationMode);
 

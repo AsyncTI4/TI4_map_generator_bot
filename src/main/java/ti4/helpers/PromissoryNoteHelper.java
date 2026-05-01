@@ -554,9 +554,6 @@ public class PromissoryNoteHelper {
                     game,
                     player,
                     riderButtons);
-            // MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(),
-            //    "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
-
         }
         if ("dspnedyn".equalsIgnoreCase(id)) {
             String riderName = "Edyn Rider";
@@ -570,8 +567,6 @@ public class PromissoryNoteHelper {
                     game,
                     player,
                     riderButtons);
-            // MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(),
-            //    "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
         }
         if ("dspnkyro".equalsIgnoreCase(id)) {
             String riderName = "Kyro Rider";
@@ -585,8 +580,6 @@ public class PromissoryNoteHelper {
                     game,
                     player,
                     riderButtons);
-            // MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(),
-            //    "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
         }
         if ("spynet".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerSpyNetOptions(player);

@@ -21,7 +21,7 @@ import ti4.service.emoji.CardEmojis;
 public class TfBlessResolver implements EdictResolver {
 
     @Getter
-    final String edict = "tf-bless";
+    static final String edict = "tf-bless";
 
     private static final List<Button> blessButtons = Arrays.asList(
             Buttons.green("blessBoonTg", "Gain 3 Trade Goods"),

@@ -73,10 +73,6 @@ public final class CryypterHelper {
 
     // Envoys
     public static void checkEnvoyUnlocks(Game game) {
-        // if (!game.isVotcMode())
-        // {
-        //    return;
-        // }
         for (Player player : game.getRealPlayers()) {
             Leader envoy = player.getLeaderByType("envoy").orElse(null);
             if (envoy != null && envoy.isLocked()) {
@@ -702,8 +698,4 @@ public final class CryypterHelper {
     }
 
     // AgendaHelper.getWinningRiders(), currently line 1832
-    // public static void handleVotCRiders()
-    // {
-    //
-    // }
 }

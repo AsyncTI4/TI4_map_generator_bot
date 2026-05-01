@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -203,13 +204,11 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             case combatround -> getCombatDieCount();
             case AFB -> getAfbDieCount(player);
             case bombardment -> getBombardDieCount(player);
-            case SpaceCannonOffence -> getSpaceCannonDieCount(player);
-            case SpaceCannonDefence -> getSpaceCannonDieCount(player);
+            case SpaceCannonOffence, SpaceCannonDefence -> getSpaceCannonDieCount(player);
         };
     }
 
     public int getAfbDieCount(Player player) {
-        // if (player.hasRelic("metalivoidarmaments") && afbDieCount == 0) return 3;
         if (capacityValue > 0
                 && player.getFaction().equalsIgnoreCase(player.getGame().getStoredValue("ShrapnelTurretsFaction"))
                 && getExpectedAfbHits(player) < 0.6) {
@@ -224,7 +223,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             UnitModel dd = player.getUnitByType(UnitType.Destroyer);
             UnitModel ca = player.getUnitByType(UnitType.Cruiser);
             UnitModel dn = player.getUnitByType(UnitType.Dreadnought);
-            return List.of(dd, ca, dn).stream()
+            return Stream.of(dd, ca, dn)
                     .filter(UnitModel::getIsUpgrade)
                     .max(Comparator.comparing(m -> m.getExpectedAfbHits(player)))
                     .map(m -> m.getAfbDieCount(player))
@@ -302,7 +301,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             UnitModel dd = player.getUnitByType(UnitType.Destroyer);
             UnitModel ca = player.getUnitByType(UnitType.Cruiser);
             UnitModel dn = player.getUnitByType(UnitType.Dreadnought);
-            return List.of(dd, ca, dn).stream()
+            return Stream.of(dd, ca, dn)
                     .filter(UnitModel::getIsUpgrade)
                     .max(Comparator.comparing(m -> m.getExpectedAfbHits(player)))
                     .map(model -> model.getAfbHitsOn(player))
@@ -316,7 +315,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             UnitModel dd = player.getUnitByType(UnitType.Destroyer);
             UnitModel ca = player.getUnitByType(UnitType.Cruiser);
             UnitModel dn = player.getUnitByType(UnitType.Dreadnought);
-            return List.of(dd, ca, dn).stream()
+            return Stream.of(dd, ca, dn)
                     .filter(UnitModel::getIsUpgrade)
                     .max(Comparator.comparing(m -> m.getExpectedBombardHits(player)))
                     .map(m -> m.getBombardDieCount(player))
@@ -343,7 +342,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             UnitModel dd = player.getUnitByType(UnitType.Destroyer);
             UnitModel ca = player.getUnitByType(UnitType.Cruiser);
             UnitModel dn = player.getUnitByType(UnitType.Dreadnought);
-            return List.of(dd, ca, dn).stream()
+            return Stream.of(dd, ca, dn)
                     .filter(UnitModel::getIsUpgrade)
                     .max(Comparator.comparing(m -> m.getExpectedBombardHits(player)))
                     .map(m -> m.getBombardHitsOn(player))
@@ -379,8 +378,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             case combatround -> getCombatHitsOn();
             case AFB -> getAfbHitsOn(player);
             case bombardment -> getBombardHitsOn(player);
-            case SpaceCannonOffence -> getSpaceCannonHitsOn(player);
-            case SpaceCannonDefence -> getSpaceCannonHitsOn(player);
+            case SpaceCannonOffence, SpaceCannonDefence -> getSpaceCannonHitsOn(player);
         };
     }
 
@@ -389,8 +387,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             case combatround -> getCombatHitsOn();
             case AFB -> getAfbHitsOn(player);
             case bombardment -> getBombardHitsOn(player);
-            case SpaceCannonOffence -> getSpaceCannonHitsOn(player);
-            case SpaceCannonDefence -> getSpaceCannonHitsOn(player);
+            case SpaceCannonOffence, SpaceCannonDefence -> getSpaceCannonHitsOn(player);
         };
     }
 

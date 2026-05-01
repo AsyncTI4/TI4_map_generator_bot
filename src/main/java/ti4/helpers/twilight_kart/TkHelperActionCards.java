@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -102,18 +103,14 @@ public class TkHelperActionCards {
             }
             case "tk-raze" -> buttons.add(Buttons.green(ffcc + "resolveRaze_" + game.getActiveSystem(), resolve));
             case "tk-riposte" -> nop(); // Button is automatically served upon being activated
-            case "tk-spite" -> {
-                // TODO
+            case "tk-spite" -> // TODO
                 nop();
-            }
-            case "tk-succor" -> {
-                // TODO
+            case "tk-succor" -> // TODO
                 nop();
-            }
             case "tk-thwart" -> buttons.add(Buttons.green(ffcc + "startThwart", "Start Thwart"));
         }
 
-        if (buttons != null && !buttons.isEmpty()) {
+        if (!buttons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), introMsg, buttons);
             return true;
         }
@@ -165,9 +162,9 @@ public class TkHelperActionCards {
 
     private static List<Button> getTkBestowButtons(Player player, String resolve) {
         String id = player.finChecker() + "resolveTkBestow_";
-        List<Button> buttons = List.of(1, 2, 3, 4).stream()
+        List<Button> buttons = Stream.of(1, 2, 3, 4)
                 .map(n -> Buttons.green(id + n, "Resolve " + StringHelper.ordinal(n) + " Bestow"))
-                .collect(Collectors.toCollection(() -> new ArrayList<>()));
+                .collect(Collectors.toCollection(ArrayList::new));
         buttons.add(Buttons.DONE_DELETE_BUTTONS);
         return buttons;
     }
@@ -284,7 +281,7 @@ public class TkHelperActionCards {
                     + model.getUnitType().humanReadableName());
 
             if (model.getIsShip() && key.getUnitType() != UnitType.Fighter) {
-                cost += amt * model.getCost();
+                cost += (int) (amt * model.getCost());
             }
         }
 

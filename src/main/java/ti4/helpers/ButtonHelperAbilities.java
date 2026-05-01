@@ -1208,7 +1208,7 @@ public final class ButtonHelperAbilities {
                 }
             }
         }
-        return tile;
+        return null;
     }
 
     @ButtonHandler("exhaustSuperweapon_")
@@ -1718,8 +1718,7 @@ public final class ButtonHelperAbilities {
         if (!player.isHasUsedEnvironmentPlunderAbility()
                 && player.hasAbility("policy_the_environment_plunder")
                 && ButtonHelper.getTypeOfPlanet(game, planet).contains("hazardous")) {
-            Planet planetUnit = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-            Planet planetReal = planetUnit;
+            Planet planetReal = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             List<Button> buttons = new ArrayList<>();
             if (planetReal != null
                     && isNotBlank(planetReal.getOriginalPlanetType())

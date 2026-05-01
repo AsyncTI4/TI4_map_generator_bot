@@ -50,8 +50,10 @@ public class CombatReplaySideBetService {
 
     public PlacementResult placeSideBet(
             ButtonInteractionEvent event, Long contestId, CombatSideBetType betType, String targetFaction) {
-        if (contestId == null || event == null || event.getUser() == null) {
+        if (contestId == null || event == null) {
             return PlacementResult.rejected("Side bet context is incomplete.");
+        } else {
+            event.getUser();
         }
 
         String userId = event.getUser().getId();

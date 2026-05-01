@@ -147,16 +147,7 @@ public class TEOptionService {
         // msg =
         //         "Thunder's Edge contains two new strategy cards, Construction and Warfare. You can use them in this
         // game by pressing the button below.";
-        // buttons = new ArrayList<>();
-        // buttons.add(Buttons.green("addNewSCs", "Use New Strategy Cards"));
-        // buttons.add(Buttons.red("deleteButtons", "Decline"));
-        // MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
 
-        // msg = "Thunder's Edge contains 7 new relics. You can use them in this game by pressing the button below.";
-        // buttons = new ArrayList<>();
-        // buttons.add(Buttons.green("addNewRelics", "Use New Relics"));
-        // buttons.add(Buttons.red("deleteButtons", "Decline"));
-        // MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
     }
 
     public static List<Button> getGalacticEventButtons(Game game) {

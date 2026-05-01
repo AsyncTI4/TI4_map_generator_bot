@@ -23,7 +23,7 @@ import ti4.service.planet.FlipTileService;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
-public class YinHeroButtonHandler {
+class YinHeroButtonHandler {
 
     @ButtonHandler("yinHeroStart")
     public static void yinHeroStart(ButtonInteractionEvent event, Game game) {

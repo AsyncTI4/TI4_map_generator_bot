@@ -107,7 +107,7 @@ class SearchSources extends Subcommand {
      * @param compSource
      * @return
      */
-    private HashMap<String, Integer> getOccurrencesByCompType(ComponentSource compSource) {
+    private Map<String, Integer> getOccurrencesByCompType(ComponentSource compSource) {
         HashMap<String, Integer> occurrences = new HashMap<>();
         occurrences.put("Abilities", Mapper.getAbilitiesSources(compSource).size());
         occurrences.put("Action Cards", Mapper.getActionCardsSources(compSource).size());

@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -680,7 +681,7 @@ public class StartCombatService {
 
         MessageChannel channel = player.getPrivateChannel();
         channel.sendMessage("Spectate Combat in this thread:").queue(m -> {
-            ThreadChannelAction threadChannel = ((TextChannel) channel).createThreadChannel(threadName, m.getId());
+            ThreadChannelAction threadChannel = ((IThreadContainer) channel).createThreadChannel(threadName, m.getId());
             threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
             threadChannel.queue(
                     tc -> initializeSpectatorThread(tc, game, player, tile, event, systemWithContext, spaceOrGround));
@@ -1141,13 +1142,6 @@ public class StartCombatService {
             Game game,
             List<Player> combatPlayers,
             Tile tile) {
-        // boolean thereAreAFBUnits = false;
-        // for (Player player : combatPlayers) {
-        //     if (!CombatRollService.getUnitsInAFB(tile, player, event).isEmpty())
-        //         thereAreAFBUnits = true;
-        // }
-        // if (!thereAreAFBUnits)
-        //     return;
 
         if (tile.isScar(game)) {
             MessageHelper.sendMessageToChannel(

@@ -51,15 +51,13 @@ public class SilverFlameService {
         String ffcc = player.finChecker();
         Button good = Buttons.green(ffcc + "resolveSilverFlamePoint", "Gain 1 Victory Point", CardEmojis.Public1alt);
         Button bad = Buttons.red(ffcc + "resolveSilverFlamePurge", "Purge your Home System", TileEmojis.TileRedBack);
-        List<Button> resolveButtons =
-                new ArrayList<>(HeartOfIxthService.makeHeartOfIxthButtons(game, player, good, bad, resultDie));
 
         // TODO: other mykomentori related buttons
         // if (player.getPromissoryNotesInPlayArea().contains("dspnmyko") &&
         // game.getStoredValue("usedGiftInsight").isBlank())
         //     resolveButtons.add(Buttons.blue("rerollSilverFlame", "Reroll with Gift of Insight", CardEmojis.PN));
 
-        return resolveButtons;
+        return new ArrayList<>(HeartOfIxthService.makeHeartOfIxthButtons(game, player, good, bad, resultDie));
     }
 
     private void silverFlameDrumroll(Game game, Player flamePlayer, int target) {
