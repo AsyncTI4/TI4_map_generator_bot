@@ -10,8 +10,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.discord.JdaService;
-import ti4.executors.ExecutionLockManager;
-import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.message.MessageHelper;
@@ -58,10 +56,9 @@ public class DrumrollService {
             for (Message bonus : bonusMessages) {
                 bonus.delete().queue(null, null);
             }
-            ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
-                Game reloadedGame = GameManager.getManagedGame(gameName).getGame();
-                if (resolve.test(reloadedGame)) GameManager.save(reloadedGame, "Post-Drumroll");
-            });
+            // TODO: This save is spooky.
+            Game reloadedGame = GameManager.getManagedGame(gameName).getGame();
+            if (resolve.test(reloadedGame)) GameManager.save(reloadedGame, "Post-Drumroll");
         };
     }
 
