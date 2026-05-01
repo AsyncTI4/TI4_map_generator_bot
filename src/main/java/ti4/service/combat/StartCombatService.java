@@ -1470,7 +1470,7 @@ public class StartCombatService {
                 buttons.add(Buttons.gray(
                         finChecker + "empyreanFlagshipAbilityStep1_" + pos,
                         "Use Empyrean Flagship Ability",
-                        FactionEmojis.Empyrean));
+                        agentHolder.getFactionEmojiOrColor()));
             }
 
             if ((!game.isFowMode() || agentHolder == p1)

@@ -210,7 +210,7 @@ public final class RiftSetModeService {
                     player.getCorrectChannel(),
                     "## While trying to explore the planet, you find something dark and dangerous..." + "\n-# "
                             + getGMs(game));
-            StellarConverterService.secondHalfOfStellar(game, planetName, event);
+            StellarConverterService.secondHalfOfStellar(game, planetName, event, player);
             Tile tile = game.getTileFromPlanet(planetName);
             UnitHolder unitHolder = tile.getUnitHolderFromPlanet(planetName);
             unitHolder.removeAllTokens();

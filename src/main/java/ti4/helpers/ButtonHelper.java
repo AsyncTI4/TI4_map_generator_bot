@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -7516,6 +7513,9 @@ public class ButtonHelper {
             Tile tile = game.getTileByPosition(pos);
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder instanceof Planet planet) {
+                    if (planet.isSpaceStation()) {
+                        continue;
+                    }
                     if ((!player.getPlanetsAllianceMode().contains(planet.getName())
                                     && !isPlanetLegendaryOrHome(unitHolder.getName(), game, false, player)
                                     && !game.mecatols().contains(planet.getName()))

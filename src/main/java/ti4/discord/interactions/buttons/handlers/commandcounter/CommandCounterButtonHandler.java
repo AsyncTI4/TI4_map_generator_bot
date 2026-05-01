@@ -141,6 +141,7 @@ public class CommandCounterButtonHandler {
 
         if (!game.isFowMode() && "statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
             ReactionService.addReaction(event, game, player);
+            game.setStoredValue("statusHomeworkReactionFor" + player.getFaction() + "Round" + game.getRound(), "added");
             for (Player p2 : game.getRealPlayers()) {
                 if (p2.isNpc()
                         && game.getStoredValue(

@@ -26,6 +26,6 @@ class StellarConverter extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "Planet not found in map.");
             return;
         }
-        StellarConverterService.secondHalfOfStellar(game, planetName, event);
+        StellarConverterService.secondHalfOfStellar(game, planetName, event, null);
     }
 }
