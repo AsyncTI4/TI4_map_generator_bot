@@ -465,10 +465,10 @@ public class CreateGameService {
     }
 
     public static String getNextPbdGameName() {
-        String nextGameName = "pbd" + GameManager.getAndIncrementLatestPbdNumber();
-        if (ReserveGameNumberService.isGameNumReserved("pbd" + nextGameName)) {
+        String nextGameName;
+        do {
             nextGameName = "pbd" + GameManager.getAndIncrementLatestPbdNumber();
-        }
+        } while (ReserveGameNumberService.isGameNumReserved(nextGameName));
         return nextGameName;
     }
 

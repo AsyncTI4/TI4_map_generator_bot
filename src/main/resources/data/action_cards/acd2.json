@@ -906,7 +906,7 @@
         "name": "Ubiquity",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Spend 4 resources to gain 1 technology with less prerequisites than the number of players that own it.",
+        "text": "Spend 3 resources to gain 1 technology with less prerequisites than the number of players that own it.",
         "flavorText": "Once an enigmatic device plucked from the void, it had become nothing more than schematics: patented and traded to the rim of the galaxy.",
         "source": "action_deck_2"
     },
