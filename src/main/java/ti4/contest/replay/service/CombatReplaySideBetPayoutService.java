@@ -238,6 +238,7 @@ public class CombatReplaySideBetPayoutService {
                 || space == null) {
             return null;
         }
+        game.setActivePlayerID(attacker.getUserID());
         LazaxCombatSupport.SpaceCombatSnapshot snapshot =
                 LazaxCombatSupport.buildSpaceCombatSnapshot(game, attacker, defender, tile);
         if (snapshot == null) return null;
