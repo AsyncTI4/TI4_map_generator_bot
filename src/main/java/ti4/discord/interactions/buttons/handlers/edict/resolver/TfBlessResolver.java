@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons.handlers.edict.resolver;
 
 import java.util.Arrays;
 import java.util.List;
+
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -101,7 +102,7 @@ public class TfBlessResolver implements EdictResolver {
             return;
         }
         player.setStoredValue(buttonID, "y");
-        CommandCounterButtonHandler.gainCC(event, player, game);
+        CommandCounterButtonHandler.gainCCNoDelete(event, player, game);
         afterResolve(event, game, player);
     }
 
