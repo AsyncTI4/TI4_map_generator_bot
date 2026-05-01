@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -17,6 +16,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -75,13 +75,12 @@ public class SilverFlameService {
         }
         DisasterWatchHelper.postTileInFlameWatch(game, null, flamePlayer.getHomeSystemTile(), 0, watchPartyMsg);
 
-        Predicate<Game> resolve = g2 -> {
-            Player player = g2.getPlayer(flamePlayer.getUserID());
-            resolveSilverFlameRoll(g2, player, target);
-            return false;
+        Runnable onCompletion = () -> {
+            Game silverFlameGame = GameManager.getManagedGame(gameName).getGame();
+            resolveSilverFlameRoll(silverFlameGame, silverFlameGame.getPlayer(flamePlayer.getUserID()), target);
         };
         String drumrollMessage = flamePlayer.getRepresentation() + " is rolling for " + rep() + "!";
-        DrumrollService.doDrumroll(flamePlayer.getCorrectChannel(), drumrollMessage, 5, gameName, resolve);
+        DrumrollService.doDrumroll(flamePlayer.getCorrectChannel(), drumrollMessage, 5, onCompletion);
     }
 
     private void resolveSilverFlameRoll(Game game, Player flamePlayer, int target) {
