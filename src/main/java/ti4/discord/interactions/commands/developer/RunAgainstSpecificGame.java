@@ -29,7 +29,7 @@ class RunAgainstSpecificGame extends Subcommand {
             return;
         }
 
-        ExecutionLockManager.wrapWithLockAndRelease("", ExecutionLockType.WRITE, () -> {
+        ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Running custom command against " + gameName + ".");
 
             Game game = GameManager.getManagedGame(gameName).getGame();
