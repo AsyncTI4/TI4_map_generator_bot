@@ -2,7 +2,7 @@ package ti4.service.agenda;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -77,10 +77,7 @@ public class IxthianArtifactService {
         MessageChannel partyChan = watchPartyChannel(game);
         String watchMsg = watchPartyPing(game);
 
-        Predicate<Game> resolve = futureGame -> {
-            resolveIxthianRoll(futureGame, publish && partyChan != null);
-            return false;
-        };
+        Consumer<Game> resolve = futureGame -> resolveIxthianRoll(futureGame, publish && partyChan != null);
 
         int sec = drumrollSeconds();
         if (publish && !game.isFowMode()) {

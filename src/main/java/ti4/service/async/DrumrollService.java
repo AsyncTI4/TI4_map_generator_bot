@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -18,13 +17,6 @@ import ti4.service.emoji.MiscEmojis;
 @UtilityClass
 public class DrumrollService {
 
-    private static void sleepForTwoSeconds() {
-        try {
-            TimeUnit.SECONDS.sleep(2);
-        } catch (Exception ignored) {
-        }
-    }
-
     private static String drumrollString(String message, int iteration) {
         StringBuilder sb = new StringBuilder();
         if (message != null) sb.append(message).append('\n');
@@ -33,36 +25,52 @@ public class DrumrollService {
         return sb.toString();
     }
 
-    private Consumer<Message> drumrollFunction(
-            List<Message> bonusMessages, int seconds, String message, String gameName, Predicate<Game> resolve) {
-        long startTime = System.currentTimeMillis();
-        long endTime = startTime + seconds * 1000L;
-
-        return msg -> {
-            int iteration = 1;
-            sleepForTwoSeconds();
-            while (System.currentTimeMillis() < endTime) {
-                String drumroll = drumrollString(message, iteration);
-                msg.editMessage(drumroll).queue(null, null);
-                for (Message bonus : bonusMessages) {
-                    bonus.editMessage(drumroll).queue(null, null);
-                }
-                iteration++;
-                sleepForTwoSeconds();
-                if (!JdaService.isReadyToReceiveCommands())
-                    break; // if the bot needs to shut down, cancel all drumrolls
-            }
-            msg.delete().queue(null, null);
-            for (Message bonus : bonusMessages) {
-                bonus.delete().queue(null, null);
-            }
-            // TODO: This save is spooky.
-            Game reloadedGame = GameManager.getManagedGame(gameName).getGame();
-            if (resolve.test(reloadedGame)) GameManager.save(reloadedGame, "Post-Drumroll");
-        };
+    private static Consumer<Message> drumrollFunction(
+            List<Message> bonusMessages, int seconds, String message, String gameName, Consumer<Game> resolve) {
+        long endTime = System.currentTimeMillis() + seconds * 1000L;
+        return msg -> drumrollStep(msg, bonusMessages, message, gameName, resolve, 1, endTime);
     }
 
-    public void doDrumroll(MessageChannel main, String msg, int sec, String gameName, Predicate<Game> resolve) {
+    private static void drumrollStep(
+            Message msg,
+            List<Message> bonusMessages,
+            String message,
+            String gameName,
+            Consumer<Game> resolve,
+            int iteration,
+            long endTime) {
+        if (!JdaService.isReadyToReceiveCommands() || System.currentTimeMillis() >= endTime) {
+            finishDrumroll(msg, bonusMessages, gameName, resolve);
+            return;
+        }
+        String drumroll = drumrollString(message, iteration);
+        msg.editMessage(drumroll)
+                .queueAfter(
+                        2,
+                        TimeUnit.SECONDS,
+                        success -> {
+                            for (Message bonus : bonusMessages) {
+                                bonus.editMessage(drumroll).queue(null, null);
+                            }
+                            drumrollStep(msg, bonusMessages, message, gameName, resolve, iteration + 1, endTime);
+                        },
+                        failure -> finishDrumroll(msg, bonusMessages, gameName, resolve));
+    }
+
+    private static void finishDrumroll(
+            Message msg, List<Message> bonusMessages, String gameName, Consumer<Game> resolve) {
+        msg.delete().queue(null, null);
+        for (Message bonus : bonusMessages) {
+            bonus.delete().queue(null, null);
+        }
+        if (!JdaService.isReadyToReceiveCommands()) return;
+        var managed = GameManager.getManagedGame(gameName);
+        if (managed == null) return;
+        Game game = managed.getGame();
+        if (game != null) resolve.accept(game);
+    }
+
+    public void doDrumroll(MessageChannel main, String msg, int sec, String gameName, Consumer<Game> resolve) {
         doDrumrollMultiChannel(main, msg, sec, gameName, resolve, null, null);
     }
 
@@ -71,7 +79,7 @@ public class DrumrollService {
             String msg,
             int sec,
             String gameName,
-            Predicate<Game> resolve,
+            Consumer<Game> resolve,
             MessageChannel channel2,
             String msg2) {
         List<MessageChannel> chans = channel2 == null ? Collections.emptyList() : List.of(channel2);
@@ -84,7 +92,7 @@ public class DrumrollService {
             String msg,
             int sec,
             String gameName,
-            Predicate<Game> resolve,
+            Consumer<Game> resolve,
             List<MessageChannel> bonusChannels,
             List<String> altMessages) {
         List<Message> bonusMessages = new ArrayList<>();

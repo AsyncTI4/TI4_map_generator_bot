@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Predicate;
+import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -77,10 +77,9 @@ public class SilverFlameService {
         }
         DisasterWatchHelper.postTileInFlameWatch(game, null, flamePlayer.getHomeSystemTile(), 0, watchPartyMsg);
 
-        Predicate<Game> resolve = g2 -> {
+        Consumer<Game> resolve = g2 -> {
             Player player = g2.getPlayer(flamePlayer.getUserID());
             resolveSilverFlameRoll(g2, player, target);
-            return false;
         };
         String drumrollMessage = flamePlayer.getRepresentation() + " is rolling for " + rep() + "!";
         DrumrollService.doDrumroll(flamePlayer.getCorrectChannel(), drumrollMessage, 5, gameName, resolve);
