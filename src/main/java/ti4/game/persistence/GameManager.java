@@ -246,7 +246,7 @@ public class GameManager {
     }
 
     public static void resetLatestPbdNumberFrom(int toResetFrom) {
-        int maxNumber = getGameNames().stream()
+        int maxNumber = gameNames.stream()
                 .filter(gameName -> gameName.startsWith("pbd"))
                 .map(gameName -> gameName.replace("pbd", ""))
                 .filter(StringUtils::isNumeric)
