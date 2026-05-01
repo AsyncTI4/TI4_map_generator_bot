@@ -10,6 +10,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
+import ti4.helpers.discord.DiscordHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.GameMessageManager;
@@ -66,9 +67,19 @@ public class SabotageAutoReactCron {
             }
 
             for (var acMessage : acMessages) {
-                if (!ReactionService.checkForSpecificPlayerReact(acMessage.messageId(), player, game)) {
-                    String message = game.isFowMode() ? "No Sabotage" : null;
+                if (ReactionService.checkForSpecificPlayerReact(acMessage.messageId(), player, game)) {
+                    continue;
+                }
+
+                String message = game.isFowMode() ? "No Sabotage" : null;
+                try {
                     ReactionService.addReaction(player, false, message, null, acMessage.messageId(), game);
+                } catch (Exception e) {
+                    if (DiscordHelper.isUnknownMessageError(e)) {
+                        GameMessageManager.remove(game.getName(), acMessage.messageId());
+                        continue;
+                    }
+                    throw e;
                 }
             }
         }
