@@ -27,7 +27,7 @@
     <spotless.version>3.4.0</spotless.version>
     <spotless.skip>false</spotless.skip>
     <spotbugs.version>4.9.8</spotbugs.version>
-    <spotbugs-maven-plugin.version>4.9.8.2</spotbugs-maven-plugin.version>
+    <spotbugs-maven-plugin.version>4.9.8.3</spotbugs-maven-plugin.version>
     <findsecbugs.version>1.14.0</findsecbugs.version>
     <sb-contrib.version>7.7.4</sb-contrib.version>
   </properties>
