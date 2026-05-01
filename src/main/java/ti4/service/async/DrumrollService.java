@@ -8,9 +8,9 @@ import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
-import ti4.game.Game;
-import ti4.game.persistence.GameManager;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.MiscEmojis;
 
@@ -26,21 +26,20 @@ public class DrumrollService {
     }
 
     private static Consumer<Message> drumrollFunction(
-            List<Message> bonusMessages, int seconds, String message, String gameName, Consumer<Game> resolve) {
+            List<Message> bonusMessages, int seconds, String message, Runnable onCompletion) {
         long endTime = System.currentTimeMillis() + seconds * 1000L;
-        return msg -> drumrollStep(msg, bonusMessages, message, gameName, resolve, 1, endTime);
+        return msg -> drumrollStep(msg, bonusMessages, message, onCompletion, 1, endTime);
     }
 
     private static void drumrollStep(
             Message msg,
             List<Message> bonusMessages,
             String message,
-            String gameName,
-            Consumer<Game> resolve,
+            Runnable onCompletion,
             int iteration,
             long endTime) {
         if (!JdaService.isReadyToReceiveCommands() || System.currentTimeMillis() >= endTime) {
-            finishDrumroll(msg, bonusMessages, gameName, resolve);
+            finishDrumroll(msg, bonusMessages, onCompletion);
             return;
         }
         String drumroll = drumrollString(message, iteration);
@@ -52,46 +51,36 @@ public class DrumrollService {
                             for (Message bonus : bonusMessages) {
                                 bonus.editMessage(drumroll).queue(Consumers.nop(), BotLogger::catchRestError);
                             }
-                            drumrollStep(msg, bonusMessages, message, gameName, resolve, iteration + 1, endTime);
+                            drumrollStep(msg, bonusMessages, message, onCompletion, iteration + 1, endTime);
                         },
-                        failure -> finishDrumroll(msg, bonusMessages, gameName, resolve));
+                        failure -> finishDrumroll(msg, bonusMessages, onCompletion));
     }
 
-    private static void finishDrumroll(
-            Message msg, List<Message> bonusMessages, String gameName, Consumer<Game> resolve) {
+    private static void finishDrumroll(Message msg, List<Message> bonusMessages, Runnable onCompletion) {
         msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
         for (Message bonus : bonusMessages) {
             bonus.delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
         if (!JdaService.isReadyToReceiveCommands()) return;
-        var managed = GameManager.getManagedGame(gameName);
-        if (managed == null || managed.getGame() == null) return;
-        resolve.accept(managed.getGame());
+        onCompletion.run();
     }
 
-    public void doDrumroll(MessageChannel main, String msg, int sec, String gameName, Consumer<Game> resolve) {
-        doDrumrollMultiChannel(main, msg, sec, gameName, resolve, null, null);
+    public void doDrumroll(MessageChannel main, String msg, int sec, Runnable onCompletion) {
+        doDrumrollMultiChannel(main, msg, sec, onCompletion, null, null);
     }
 
     public void doDrumrollMirrored(
-            MessageChannel main,
-            String msg,
-            int sec,
-            String gameName,
-            Consumer<Game> resolve,
-            MessageChannel channel2,
-            String msg2) {
+            MessageChannel main, String msg, int sec, Runnable onCompletion, MessageChannel channel2, String msg2) {
         List<MessageChannel> chans = channel2 == null ? Collections.emptyList() : List.of(channel2);
         List<String> msgs = msg2 == null ? Collections.emptyList() : List.of(msg2);
-        doDrumrollMultiChannel(main, msg, sec, gameName, resolve, chans, msgs);
+        doDrumrollMultiChannel(main, msg, sec, onCompletion, chans, msgs);
     }
 
     private void doDrumrollMultiChannel(
             MessageChannel main,
             String msg,
             int sec,
-            String gameName,
-            Consumer<Game> resolve,
+            Runnable onCompletion,
             List<MessageChannel> bonusChannels,
             List<String> altMessages) {
         List<Message> bonusMessages = new ArrayList<>();
@@ -108,7 +97,7 @@ public class DrumrollService {
         }
 
         String initialDrumroll = drumrollString(msg, 0);
-        Consumer<Message> function = drumrollFunction(bonusMessages, sec, msg, gameName, resolve);
+        Consumer<Message> function = drumrollFunction(bonusMessages, sec, msg, onCompletion);
         MessageHelper.splitAndSentWithAction(initialDrumroll, main, function);
     }
 }
