@@ -29,4 +29,9 @@ class LazaxTop100 extends Subcommand {
         }
         LazaxReplyHelper.replyEphemeral(event, message);
     }
+
+    @Override
+    public boolean isEphemeral(SlashCommandInteractionEvent event) {
+        return !event.getOption(Constants.PUBLIC, Boolean.FALSE, OptionMapping::getAsBoolean);
+    }
 }

@@ -10,7 +10,13 @@ final class LazaxReplyHelper {
     private LazaxReplyHelper() {}
 
     static void replyEphemeral(SlashCommandInteractionEvent event, String message) {
+        boolean firstChunk = true;
         for (String chunk : splitByLine(message)) {
+            if (firstChunk) {
+                event.getHook().editOriginal(chunk).queue(null, BotLogger::catchRestError);
+                firstChunk = false;
+                continue;
+            }
             event.getHook().sendMessage(chunk).setEphemeral(true).queue(null, BotLogger::catchRestError);
         }
     }

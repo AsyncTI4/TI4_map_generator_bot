@@ -58,6 +58,12 @@ public interface ParentCommand extends Command<SlashCommandInteractionEvent> {
         return subcommand != null && subcommand.isSuspicious(event);
     }
 
+    @Override
+    default boolean isEphemeral(SlashCommandInteractionEvent event) {
+        Command<SlashCommandInteractionEvent> subcommand = getSubcommand(event);
+        return subcommand != null && subcommand.isEphemeral(event);
+    }
+
     default void register(CommandListUpdateAction commands) {
         var command = Commands.slash(getName(), getDescription())
                 .addSubcommands(getSubcommands().values())
