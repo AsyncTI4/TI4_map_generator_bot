@@ -54,6 +54,17 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void pricesRoundOneSideBetInNebulaSnapshotWithoutActivePlayer() {
+        CombatReplayContestEntity contest = oddsContest();
+        CombatCandidateEntity candidate = snapshotCandidate("92", 1, 1);
+
+        int payout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_WHIFF, "yin");
+
+        assertEquals(4, payout);
+        verifyNoInteractions(eventRepository);
+    }
+
+    @Test
     void capsVeryLowOddsRoundOneSlamFromInitialSnapshotAtMaxPayout() {
         CombatReplayContestEntity contest = oddsContest();
         CombatCandidateEntity candidate = snapshotCandidate(4, 1);
@@ -139,12 +150,16 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
     }
 
     private CombatCandidateEntity snapshotCandidate(int solCarriers, int yinCarriers) {
+        return snapshotCandidate("18", solCarriers, yinCarriers);
+    }
+
+    private CombatCandidateEntity snapshotCandidate(String tileId, int solCarriers, int yinCarriers) {
         Game game = new Game();
         game.newGameSetup();
         game.setName("pbd-side-bet-snapshot");
         Player sol = player(game, "sol");
         Player yin = player(game, "yin");
-        Tile tile = tile(game, "18");
+        Tile tile = tile(game, tileId);
         tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, sol.getColorID()), solCarriers);
         tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, yin.getColorID()), yinCarriers);
 

@@ -143,6 +143,46 @@ public class CombatReplayLeaderboardService {
         TextChannel contestChannel = getContestPublicChannelByName();
         if (contestChannel == null) return false;
 
+        MessageHelper.sendMessageToChannel(contestChannel, buildLeaderboardMessage(topEntries));
+        return true;
+    }
+
+    public String buildTop100LeaderboardMessage() {
+        List<CombatReplayLeaderboardEntryEntity> topEntries =
+                leaderboardEntryRepository
+                        .findTop100ByOrderByTotalPointsDescCorrectPredictionsDescPredictionCountDescDiscordUserNameAsc();
+        if (topEntries.isEmpty()) return "No Lazax War Archives leaderboard entries have been recorded yet.";
+        return buildLeaderboardMessage(topEntries);
+    }
+
+    public String buildUserPointsMessage(String discordUserId) {
+        CombatReplayLeaderboardEntryEntity userEntry =
+                leaderboardEntryRepository.findByDiscordUserId(discordUserId).orElse(null);
+        if (userEntry == null) {
+            return "You do not have any Lazax War Archives points yet.";
+        }
+
+        List<CombatReplayLeaderboardEntryEntity> entries =
+                leaderboardEntryRepository
+                        .findAllByOrderByTotalPointsDescCorrectPredictionsDescPredictionCountDescDiscordUserNameAsc();
+        int rank = 0;
+        for (int index = 0; index < entries.size(); index++) {
+            if (discordUserId.equals(entries.get(index).getDiscordUserId())) {
+                rank = index + 1;
+                break;
+            }
+        }
+
+        int predictions = safeInt(userEntry.getPredictionCount());
+        int correctPredictions = safeInt(userEntry.getCorrectPredictions());
+        int accuracy = predictions == 0 ? 0 : Math.round((100.0f * correctPredictions) / predictions);
+        return "## Your Lazax War Archives Points\n"
+                + "Rank: **" + (rank == 0 ? "Unranked" : "#" + rank) + "**\n"
+                + "Points: **" + safeInt(userEntry.getTotalPoints()) + "**\n"
+                + "Correct predictions: `" + correctPredictions + "/" + predictions + "` (" + accuracy + "%)";
+    }
+
+    private String buildLeaderboardMessage(List<CombatReplayLeaderboardEntryEntity> topEntries) {
         StringBuilder message = new StringBuilder("## Lazax War Archives Leaderboard\n");
         for (int index = 0; index < topEntries.size(); index++) {
             CombatReplayLeaderboardEntryEntity entry = topEntries.get(index);
@@ -166,8 +206,7 @@ public class CombatReplayLeaderboardService {
                 message.append("\n");
             }
         }
-        MessageHelper.sendMessageToChannel(contestChannel, message.toString());
-        return true;
+        return message.toString();
     }
 
     private CombatReplayPredictionEntity buildLockedPredictionSnapshot(

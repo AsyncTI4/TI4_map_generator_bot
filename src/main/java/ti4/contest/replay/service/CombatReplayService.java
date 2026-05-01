@@ -171,6 +171,16 @@ public class CombatReplayService {
                 candidate, sideBetTriggerService.fromRoll(candidate, player, rollType, whiff, slam, round));
     }
 
+    public boolean isTrackedCandidateRoll(
+            Game game, Player player, Player opponent, Tile tile, CombatRollType rollType) {
+        if (game == null || player == null || opponent == null || tile == null || !isReplayRoll(rollType)) {
+            return false;
+        }
+        CombatCandidateEntity candidate = getTrackingCandidate(game, tile.getPosition());
+        if (candidate == null) return false;
+        return rollType == CombatRollType.SpaceCannonOffence || matchesParticipants(candidate, player, opponent);
+    }
+
     private boolean isReplayRoll(CombatRollType rollType) {
         return rollType == CombatRollType.combatround
                 || rollType == CombatRollType.AFB

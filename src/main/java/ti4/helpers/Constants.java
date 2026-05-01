@@ -1541,6 +1541,10 @@ public final class Constants {
     public static final String TIGL_CHANGE_NICKNAME = "change_nickname";
     public static final String TIGL_NICKNAME = "nickname";
     public static final String TIGL_FRACTURED_TAG = "TIGL Fractured";
+    public static final String LAZAX = "lazax";
+    public static final String LAZAX_MY_POINTS = "my_points";
+    public static final String LAZAX_TOP_100 = "top_100";
+    public static final String PUBLIC = "public";
     public static final String IS_FRACTURED = "is_fractured";
     public static final String SHOW_GAME_IDS = "show_game_ids";
     public static final String SEARCH_NAMES = "search_names";

@@ -35,7 +35,10 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
         if (!canReceiveCommands(event)) return;
 
         if (!isModalCommand(event)) {
-            event.getInteraction().deferReply().queue(Consumers.nop(), BotLogger::catchRestError);
+            Command<SlashCommandInteractionEvent> command = getCommand(event);
+            event.getInteraction()
+                    .deferReply(command.isEphemeral(event))
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         queue(event);
@@ -81,7 +84,7 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
                 logSlashCommand(event);
                 command.execute(event);
                 command.postExecute(event);
-                if (!isModalCommand(event)) {
+                if (!isModalCommand(event) && !resolvedCommand.isEphemeral(event)) {
                     event.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             }
