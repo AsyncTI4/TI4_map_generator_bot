@@ -94,11 +94,7 @@ public class DataSkimmerService {
     }
 
     private static void pickCardFromDiscard(Game game, Player ralnel, int acNum) {
-        String acID = game.getDiscardActionCards().entrySet().stream()
-                .filter(entry -> entry.getValue() == acNum)
-                .map(Map.Entry::getKey)
-                .findFirst()
-                .orElse(null);
+        String acID = ActionCardHelper.getDiscardedAcID(game, acNum);
 
         if (game.pickActionCard(ralnel.getUserID(), acNum)) {
             ActionCardModel acModel = Mapper.getActionCard(acID);

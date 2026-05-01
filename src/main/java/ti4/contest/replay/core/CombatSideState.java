@@ -9,6 +9,7 @@ public record CombatSideState(
         int destroyerCount,
         boolean rolledAfb,
         boolean afbWhiff,
+        boolean skippedAfb,
         boolean roundOneWhiff,
         boolean roundOneSlam,
         boolean playedMoraleBoost,
@@ -28,11 +29,13 @@ public record CombatSideState(
             String faction,
             boolean rolledAfb,
             boolean afbWhiff,
+            boolean skippedAfb,
             boolean roundOneWhiff,
             boolean roundOneSlam) {
         if (faction.equalsIgnoreCase(candidate.getAttackerFaction())) {
             candidate.setAttackerRolledAfb(Boolean.TRUE.equals(candidate.getAttackerRolledAfb()) || rolledAfb);
             candidate.setAttackerAfbWhiff(Boolean.TRUE.equals(candidate.getAttackerAfbWhiff()) || afbWhiff);
+            candidate.setAttackerSkippedAfb(Boolean.TRUE.equals(candidate.getAttackerSkippedAfb()) || skippedAfb);
             candidate.setAttackerRoundOneWhiff(
                     Boolean.TRUE.equals(candidate.getAttackerRoundOneWhiff()) || roundOneWhiff);
             candidate.setAttackerRoundOneSlam(Boolean.TRUE.equals(candidate.getAttackerRoundOneSlam()) || roundOneSlam);
@@ -41,6 +44,7 @@ public record CombatSideState(
         if (faction.equalsIgnoreCase(candidate.getDefenderFaction())) {
             candidate.setDefenderRolledAfb(Boolean.TRUE.equals(candidate.getDefenderRolledAfb()) || rolledAfb);
             candidate.setDefenderAfbWhiff(Boolean.TRUE.equals(candidate.getDefenderAfbWhiff()) || afbWhiff);
+            candidate.setDefenderSkippedAfb(Boolean.TRUE.equals(candidate.getDefenderSkippedAfb()) || skippedAfb);
             candidate.setDefenderRoundOneWhiff(
                     Boolean.TRUE.equals(candidate.getDefenderRoundOneWhiff()) || roundOneWhiff);
             candidate.setDefenderRoundOneSlam(Boolean.TRUE.equals(candidate.getDefenderRoundOneSlam()) || roundOneSlam);
@@ -77,6 +81,7 @@ public record CombatSideState(
                 safeInt(candidate.getAttackerDestroyerCount()),
                 Boolean.TRUE.equals(candidate.getAttackerRolledAfb()),
                 Boolean.TRUE.equals(candidate.getAttackerAfbWhiff()),
+                Boolean.TRUE.equals(candidate.getAttackerSkippedAfb()),
                 Boolean.TRUE.equals(candidate.getAttackerRoundOneWhiff()),
                 Boolean.TRUE.equals(candidate.getAttackerRoundOneSlam()),
                 Boolean.TRUE.equals(candidate.getAttackerPlayedMoraleBoost()),
@@ -90,6 +95,7 @@ public record CombatSideState(
                 safeInt(candidate.getDefenderDestroyerCount()),
                 Boolean.TRUE.equals(candidate.getDefenderRolledAfb()),
                 Boolean.TRUE.equals(candidate.getDefenderAfbWhiff()),
+                Boolean.TRUE.equals(candidate.getDefenderSkippedAfb()),
                 Boolean.TRUE.equals(candidate.getDefenderRoundOneWhiff()),
                 Boolean.TRUE.equals(candidate.getDefenderRoundOneSlam()),
                 Boolean.TRUE.equals(candidate.getDefenderPlayedMoraleBoost()),

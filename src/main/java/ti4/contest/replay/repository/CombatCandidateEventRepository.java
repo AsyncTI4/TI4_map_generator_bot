@@ -17,6 +17,9 @@ public interface CombatCandidateEventRepository extends JpaRepository<CombatCand
     boolean existsByCandidateIdAndEventTypeAndActorFactionAndRoundNumber(
             Long candidateId, CombatCandidateEventType eventType, String actorFaction, Integer roundNumber);
 
+    List<CombatCandidateEventEntity> findByEventTypeAndSummaryTextContainingIgnoreCase(
+            CombatCandidateEventType eventType, String summaryText);
+
     List<CombatCandidateEventEntity> findByCandidateIdOrderBySequenceNumberAsc(Long candidateId);
 
     @Query("select max(e.roundNumber) from CombatCandidateEventEntity e where e.candidateId = :candidateId")

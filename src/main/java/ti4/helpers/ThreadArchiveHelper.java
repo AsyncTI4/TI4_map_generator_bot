@@ -77,6 +77,7 @@ public class ThreadArchiveHelper {
         // 1 = normal threads (neither bot-suffix nor cards-info), 2 = cards-info, 3 = bot-suffix
         if (name.endsWith(Constants.BOT_CHANNEL_SUFFIX)) return 3;
         if (name.startsWith(Constants.CARDS_INFO_THREAD_PREFIX)) return 2;
+        if (name.toLowerCase().contains("admin")) return 2;
         return 1; // Archive first
     }
 

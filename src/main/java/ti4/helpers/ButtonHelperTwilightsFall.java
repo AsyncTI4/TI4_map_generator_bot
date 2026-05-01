@@ -519,7 +519,10 @@ public final class ButtonHelperTwilightsFall {
             Collections.rotate(participants, -2);
         }
         Collections.reverse(participants);
-        if (participants.getFirst() != participants.getLast()) {
+        if (participants.getFirst() != participants.getLast()
+                || (participants.size() > 2
+                        && participants.get(2) != participants.get(0)
+                        && participants.get(1) == participants.get(0))) {
             Collections.rotate(participants, 1);
         }
         game.removeStoredValue("savedParticipants");

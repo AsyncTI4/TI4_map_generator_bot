@@ -21,6 +21,7 @@ import ti4.ResourceHelper;
 import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.ArvaxiCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -883,6 +884,11 @@ public class StartCombatService {
                                 + ", a reminder that if you win this combat, you may resolve _N'orr Supremacy_ for a unit upgrade technology or a command token.",
                         buttons);
             }
+            if ("space".equalsIgnoreCase(type)
+                    && (player.getLeaderIDs().contains("arvaxicommander")
+                            || game.playerHasLeaderUnlockedOrAlliance(player, "arvaxicommander"))) {
+                ArvaxiCommanderHandler.sendCombatButtons(player, otherPlayer, game, msg);
+            }
             if (player.hasTechReady("dskortg") && CommandCounterHelper.hasCC(player, tile)) {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(
@@ -1470,7 +1476,7 @@ public class StartCombatService {
                 buttons.add(Buttons.gray(
                         finChecker + "empyreanFlagshipAbilityStep1_" + pos,
                         "Use Empyrean Flagship Ability",
-                        FactionEmojis.Empyrean));
+                        agentHolder.getFactionEmojiOrColor()));
             }
 
             if ((!game.isFowMode() || agentHolder == p1)
