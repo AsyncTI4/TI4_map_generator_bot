@@ -14,4 +14,10 @@ public interface CombatReplayLeaderboardEntryRepository
 
     List<CombatReplayLeaderboardEntryEntity>
             findTop10ByOrderByTotalPointsDescCorrectPredictionsDescPredictionCountDescDiscordUserNameAsc();
+
+    List<CombatReplayLeaderboardEntryEntity>
+            findTop100ByOrderByTotalPointsDescCorrectPredictionsDescPredictionCountDescDiscordUserNameAsc();
+
+    List<CombatReplayLeaderboardEntryEntity>
+            findAllByOrderByTotalPointsDescCorrectPredictionsDescPredictionCountDescDiscordUserNameAsc();
 }
