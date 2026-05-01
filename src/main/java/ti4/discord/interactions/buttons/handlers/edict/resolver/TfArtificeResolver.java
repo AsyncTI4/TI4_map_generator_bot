@@ -29,14 +29,14 @@ public class TfArtificeResolver implements EdictResolver {
         MessageChannel channel = player.getCorrectChannel();
         if (vpDifference < 1) {
             RelicHelper.drawRelicAndNotify(player, event, game);
-            ButtonHelperTwilightsFall.drawParadigm(game, player, event, false);
+            ButtonHelperTwilightsFall.drawParadigm(game, player, event, false, false);
             game.removeStoredValue("artificeParadigms");
             MessageHelper.sendMessageToChannel(
                     channel,
                     "No player has more victory points than " + player.getRepresentationNoPing()
                             + ", so they were not able to draw any additional relics or paradigms.");
         } else {
-            ButtonHelperTwilightsFall.drawParadigm(game, player, event, false);
+            ButtonHelperTwilightsFall.drawParadigm(game, player, event, false, true);
             String relic = game.getAllRelics().getFirst();
             RelicModel mod = Mapper.getRelic(relic);
             MessageHelper.sendMessageToChannelWithEmbed(
@@ -79,7 +79,7 @@ public class TfArtificeResolver implements EdictResolver {
         if (paradigms > 0) {
             List<Button> buttons = new ArrayList<>();
             for (int x = 0; x < paradigms; x++) {
-                ButtonHelperTwilightsFall.drawParadigm(game, player, event, false);
+                ButtonHelperTwilightsFall.drawParadigm(game, player, event, false, true);
             }
             for (String paradigm : game.getStoredValue("artificeParadigms").split("_")) {
                 if (Mapper.getLeader(paradigm) == null) {

@@ -1520,7 +1520,7 @@ public class ActionCardHelper {
             }
 
             if ("tf-reverse".equals(automationID)) {
-                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveReverseTF", buttonLabel));
+                codedButtons.add(Buttons.green("resolveReverseTF", buttonLabel + " (Anyone can press this)"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
