@@ -140,39 +140,37 @@ public class ReactionService {
 
     public static void addReaction(
             Player player, boolean sendPublic, String message, String additionalMessage, String messageID, Game game) {
-        game.getMainGameChannel()
+        Message mainMessage = game.getMainGameChannel()
                 .retrieveMessageById(messageID)
-                .queue(
-                        mainMessage -> {
-                            Emoji emojiToUse = Helper.getPlayerReactionEmoji(game, player, mainMessage);
-                            String messageId = mainMessage.getId();
+                .complete();
 
-                            game.getMainGameChannel()
-                                    .addReactionById(messageId, emojiToUse)
-                                    .queue(Consumers.nop(), BotLogger::catchRestError);
-                            GameMessageManager.addReaction(game.getName(), player.getFaction(), messageId);
-                            progressGameIfAllPlayersHaveReacted(messageId, game);
+        Emoji emojiToUse = Helper.getPlayerReactionEmoji(game, player, mainMessage);
+        String messageId = mainMessage.getId();
 
-                            if (message == null || message.isEmpty()) {
-                                return;
-                            }
+        game.getMainGameChannel()
+            .addReactionById(messageId, emojiToUse)
+            .queue(Consumers.nop(), BotLogger::catchRestError);
+        GameMessageManager.addReaction(game.getName(), player.getFaction(), messageId);
+        progressGameIfAllPlayersHaveReacted(messageId, game);
 
-                            String text = player.getRepresentation() + " " + message;
-                            if (game.isFowMode() && sendPublic) {
-                                text = message;
-                            } else if (game.isFowMode()) {
-                                text = "(You) " + emojiToUse.getFormatted() + " " + message;
-                            }
+        if (message == null || message.isEmpty()) {
+            return;
+        }
 
-                            if (additionalMessage != null && !additionalMessage.isEmpty()) {
-                                text += game.getPing() + " " + additionalMessage;
-                            }
+        String text = player.getRepresentation() + " " + message;
+        if (game.isFowMode() && sendPublic) {
+            text = message;
+        } else if (game.isFowMode()) {
+            text = "(You) " + emojiToUse.getFormatted() + " " + message;
+        }
 
-                            if (game.isFowMode() && !sendPublic) {
-                                MessageHelper.sendPrivateMessageToPlayer(player, game, text);
-                            }
-                        },
-                        BotLogger::catchRestError);
+        if (additionalMessage != null && !additionalMessage.isEmpty()) {
+            text += game.getPing() + " " + additionalMessage;
+        }
+
+        if (game.isFowMode() && !sendPublic) {
+            MessageHelper.sendPrivateMessageToPlayer(player, game, text);
+        }
     }
 
     public static void progressGameIfAllPlayersHaveReacted(String messageId, Game game) {
