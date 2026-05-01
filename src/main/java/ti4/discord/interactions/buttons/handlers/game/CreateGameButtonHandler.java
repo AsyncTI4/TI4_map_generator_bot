@@ -39,7 +39,6 @@ import ti4.spring.service.statistics.AverageTurnTimeService;
 @UtilityClass
 public class CreateGameButtonHandler {
 
-    @ButtonHandler("createGameChannels")
     @ButtonHandler("launchGame")
     public static void createGameChannelsButton(ButtonInteractionEvent event) {
         List<Member> members = new ArrayList<>();
