@@ -140,16 +140,15 @@ public class ReactionService {
 
     public static void addReaction(
             Player player, boolean sendPublic, String message, String additionalMessage, String messageID, Game game) {
-        Message mainMessage = game.getMainGameChannel()
-                .retrieveMessageById(messageID)
-                .complete();
+        Message mainMessage =
+                game.getMainGameChannel().retrieveMessageById(messageID).complete();
 
         Emoji emojiToUse = Helper.getPlayerReactionEmoji(game, player, mainMessage);
         String messageId = mainMessage.getId();
 
         game.getMainGameChannel()
-            .addReactionById(messageId, emojiToUse)
-            .queue(Consumers.nop(), BotLogger::catchRestError);
+                .addReactionById(messageId, emojiToUse)
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         GameMessageManager.addReaction(game.getName(), player.getFaction(), messageId);
         progressGameIfAllPlayersHaveReacted(messageId, game);
 
