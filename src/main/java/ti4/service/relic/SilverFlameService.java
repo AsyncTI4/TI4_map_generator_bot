@@ -77,9 +77,9 @@ public class SilverFlameService {
         }
         DisasterWatchHelper.postTileInFlameWatch(game, null, flamePlayer.getHomeSystemTile(), 0, watchPartyMsg);
 
-        Consumer<Game> resolve = g2 -> {
-            Player player = g2.getPlayer(flamePlayer.getUserID());
-            resolveSilverFlameRoll(g2, player, target);
+        Consumer<Game> resolve = silverFlameGame -> {
+            Player player = silverFlameGame.getPlayer(flamePlayer.getUserID());
+            resolveSilverFlameRoll(silverFlameGame, player, target);
         };
         String drumrollMessage = flamePlayer.getRepresentation() + " is rolling for " + rep() + "!";
         DrumrollService.doDrumroll(flamePlayer.getCorrectChannel(), drumrollMessage, 5, gameName, resolve);
