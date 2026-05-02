@@ -601,17 +601,20 @@ public final class AgendaHelper {
                                         listVoteCount(game, game.getMainGameChannel());
                                     }
                                 } else {
+                                    String ability = "Galactic Threat";
                                     if ("galactic_threat".equalsIgnoreCase(after)) {
                                         game.setStoredValue("galacticThreatUsed", "Yes");
                                         riderButtons = getAgendaButtons(
                                                 "Galactic Threat Rider", game, player.getFinsFactionCheckerPrefix());
                                     } else {
+                                        ability = "Radiance";
                                         riderButtons = getAgendaButtons(
                                                 "Radiance", game, player.getFinsFactionCheckerPrefix());
                                     }
                                     MessageHelper.sendMessageToChannelWithFactionReact(
                                             player.getCorrectChannel(),
-                                            player.getRepresentation() + ", please choose your target.",
+                                            player.getRepresentation() + ", please choose your target for the "
+                                                    + ability + " ability.",
                                             game,
                                             player,
                                             riderButtons);

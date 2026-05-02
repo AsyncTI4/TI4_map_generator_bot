@@ -98,7 +98,7 @@ public class TfBlessResolver implements EdictResolver {
             return;
         }
         player.setStoredValue(buttonID, "y");
-        CommandCounterButtonHandler.gainCC(event, player, game);
+        CommandCounterButtonHandler.gainCCNoDelete(event, player, game);
         afterResolve(event, game, player);
     }
 

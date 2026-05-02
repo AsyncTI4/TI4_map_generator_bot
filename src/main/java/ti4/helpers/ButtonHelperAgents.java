@@ -937,15 +937,14 @@ public final class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String faction = rest.replace("xxchaagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
-            message = p2.getRepresentationUnfogged()
-                    + ", please choose the planet you wish to ready. Removing the infantry from planets is not automatically done but is an option for you to do.";
+            message = player.getRepresentationUnfogged() + ", please choose the planet you wish to ready. ";
             List<Button> buttons = new ArrayList<>();
             for (String planet : p2.getExhaustedPlanets()) {
                 buttons.add(Buttons.gray(
                         "khraskHeroStep4Ready_" + p2.getFaction() + "_" + planet,
                         Helper.getPlanetRepresentation(planet, game)));
             }
-            MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
         if ("onyxxaagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Onyxxa"
