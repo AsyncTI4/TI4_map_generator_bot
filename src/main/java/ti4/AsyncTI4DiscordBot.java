@@ -31,7 +31,7 @@ public class AsyncTI4DiscordBot {
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
     private static final Duration WARMUP_DURATION = Duration.ofMinutes(2);
 
-    private static volatile boolean shuttingDown = false;
+    private static volatile boolean shuttingDown;
 
     static void main(String[] args) {
         GlobalSettings.loadSettings();
@@ -95,10 +95,10 @@ public class AsyncTI4DiscordBot {
     }
 
     public static boolean isUnstable() {
-        return shuttingDown || durationHasPassedSinceStartup(WARMUP_DURATION);
+        return shuttingDown || isWithinStartupDuration();
     }
 
-    private static boolean durationHasPassedSinceStartup(Duration duration) {
-        return System.currentTimeMillis() - START_TIME_MILLISECONDS <= duration.toMillis();
+    private static boolean isWithinStartupDuration() {
+        return System.currentTimeMillis() - START_TIME_MILLISECONDS <= WARMUP_DURATION.toMillis();
     }
 }
