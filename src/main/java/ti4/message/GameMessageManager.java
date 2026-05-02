@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
@@ -175,6 +177,41 @@ public class GameMessageManager {
             }
         }
         return Collections.unmodifiableMap(result);
+    }
+
+    public static synchronized Map<String, List<GameMessage>> getAll() {
+        GameMessages allGameMessages = readFile();
+        if (allGameMessages == null) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, List<GameMessage>> result = new HashMap<>();
+        for (var entry : allGameMessages.gameNameToMessages.entrySet()) {
+            result.put(entry.getKey(), List.copyOf(entry.getValue()));
+        }
+        return Collections.unmodifiableMap(result);
+    }
+
+    public static synchronized void removeGameNamesAndMessages(
+            Collection<String> gameNamesToRemove, Map<String, ? extends Collection<String>> messageIdsByGame) {
+        if (gameNamesToRemove.isEmpty() && messageIdsByGame.isEmpty()) return;
+
+        GameMessages allGameMessages = readFile();
+        if (allGameMessages == null) {
+            return;
+        }
+
+        gameNamesToRemove.forEach(allGameMessages.gameNameToMessages::remove);
+
+        for (var entry : messageIdsByGame.entrySet()) {
+            List<GameMessage> messages = allGameMessages.gameNameToMessages.get(entry.getKey());
+            if (messages != null) {
+                Set<String> idsToRemove = new HashSet<>(entry.getValue());
+                messages.removeIf(msg -> idsToRemove.contains(msg.messageId()));
+            }
+        }
+
+        persistFile(allGameMessages);
     }
 
     public static synchronized List<GameMessage> getAll(String gameName, GameMessageType type) {
