@@ -161,9 +161,16 @@ public class GameMessageManager {
 
         Map<String, List<GameMessage>> result = new HashMap<>();
         for (var entry : allGameMessages.gameNameToMessages.entrySet()) {
-            List<GameMessage> filtered =
-                    entry.getValue().stream().filter(m -> m.type == type).toList();
-            if (!filtered.isEmpty()) {
+            List<GameMessage> filtered = null;
+            for (GameMessage message : entry.getValue()) {
+                if (message.type == type) {
+                    if (filtered == null) {
+                        filtered = new ArrayList<>();
+                    }
+                    filtered.add(message);
+                }
+            }
+            if (filtered != null) {
                 result.put(entry.getKey(), filtered);
             }
         }
