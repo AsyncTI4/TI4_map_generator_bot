@@ -187,14 +187,14 @@ public class GameMessageManager {
 
         Map<String, List<GameMessage>> result = new HashMap<>();
         for (var entry : allGameMessages.gameNameToMessages.entrySet()) {
-            result.put(entry.getKey(), List.copyOf(entry.getValue()));
+            result.put(entry.getKey(), entry.getValue());
         }
         return Collections.unmodifiableMap(result);
     }
 
     public static synchronized void removeGameNamesAndMessages(
-            Collection<String> gameNamesToRemove, Map<String, ? extends Collection<String>> messageIdsByGame) {
-        if (gameNamesToRemove.isEmpty() && messageIdsByGame.isEmpty()) return;
+            Collection<String> gameNamesToRemove, Map<String, ? extends Collection<String>> messagesToRemoveByGame) {
+        if (gameNamesToRemove.isEmpty() && messagesToRemoveByGame.isEmpty()) return;
 
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
@@ -203,16 +203,89 @@ public class GameMessageManager {
 
         gameNamesToRemove.forEach(allGameMessages.gameNameToMessages::remove);
 
-        for (var entry : messageIdsByGame.entrySet()) {
+        for (var entry : messagesToRemoveByGame.entrySet()) {
             List<GameMessage> messages = allGameMessages.gameNameToMessages.get(entry.getKey());
             if (messages != null) {
                 Set<String> idsToRemove = new HashSet<>(entry.getValue());
                 messages.removeIf(msg -> idsToRemove.contains(msg.messageId()));
+                if (messages.isEmpty()) {
+                    allGameMessages.gameNameToMessages.remove(entry.getKey());
+                }
             }
         }
 
         persistFile(allGameMessages);
     }
+
+    /**
+     * Atomically reads, evaluates, and writes the game messages file to remove stale entries.
+     *
+     * <p>Removes an entire game entry when:
+     * <ul>
+     *   <li>the game name is absent from {@code realPlayerCountByActiveGame} (ended or unknown), or
+     *   <li>the message list is empty, or
+     *   <li>all individual messages are removed, leaving an empty list.
+     * </ul>
+     *
+     * <p>Removes an individual message when:
+     * <ul>
+     *   <li>all real players have reacted (factionsThatReacted &ge; realPlayerCount), or
+     *   <li>the message's {@code gameSaveTime} is older than {@code staleBeforeMs}.
+     * </ul>
+     *
+     * @param realPlayerCountByActiveGame map of game name to real player count for games that are
+     *     still active; game names absent from this map will have their entries fully removed
+     * @param staleBeforeMs epoch-millisecond threshold; messages with a gameSaveTime before this
+     *     value are considered stale and will be removed
+     * @return a {@link CleanupStats} record describing how many game entries and messages were removed
+     */
+    public static synchronized CleanupStats cleanupStaleEntries(
+            Map<String, Integer> realPlayerCountByActiveGame, long staleBeforeMs) {
+        GameMessages allGameMessages = readFile();
+        if (allGameMessages == null) {
+            return new CleanupStats(0, 0);
+        }
+
+        int removedGames = 0;
+        int removedMessages = 0;
+
+        var iterator = allGameMessages.gameNameToMessages.entrySet().iterator();
+        while (iterator.hasNext()) {
+            var entry = iterator.next();
+            String gameName = entry.getKey();
+            List<GameMessage> messages = entry.getValue();
+
+            Integer realPlayerCount = realPlayerCountByActiveGame.get(gameName);
+
+            // Remove the entire entry if the game is ended/unknown or the list is already empty
+            if (realPlayerCount == null || messages.isEmpty()) {
+                iterator.remove();
+                removedGames++;
+                continue;
+            }
+
+            // Remove individual stale messages
+            int before = messages.size();
+            int count = realPlayerCount;
+            messages.removeIf(msg ->
+                    (count > 0 && msg.factionsThatReacted().size() >= count) || msg.gameSaveTime() < staleBeforeMs);
+            removedMessages += before - messages.size();
+
+            // If all messages were removed, clean up the game entry too
+            if (messages.isEmpty()) {
+                iterator.remove();
+                removedGames++;
+            }
+        }
+
+        if (removedGames > 0 || removedMessages > 0) {
+            persistFile(allGameMessages);
+        }
+
+        return new CleanupStats(removedGames, removedMessages);
+    }
+
+    public record CleanupStats(int removedGameEntries, int removedMessages) {}
 
     public static synchronized List<GameMessage> getAll(String gameName, GameMessageType type) {
         GameMessages allGameMessages = readFile();
