@@ -85,7 +85,7 @@ public class GameManager {
         gameNames.remove(gameName);
         var managedGame = gameNameToManagedGame.remove(gameName);
         if (managedGame != null) {
-            managedGame.getPlayers().forEach(player -> player.removeGame(managedGame));
+            managedGame.getPlayers().forEach(player -> player.removeGame(gameName));
         }
     }
 
