@@ -149,7 +149,6 @@ public class CombatReplayDebugController {
         return new RuntimeStateResponse(
                 settings.getPromotion().isEnabled(),
                 settings.getRuntime().isDevMode(),
-                settings.getRuntime().isDiscordPostingEnabled(),
                 settings.getRuntime().isTrackAllCombatsAsCandidates(),
                 settings.getRuntime().isImmediatePromotionOnResolve(),
                 settings.isDecoysEnabled());
@@ -201,7 +200,6 @@ public class CombatReplayDebugController {
     private record RuntimeStateResponse(
             boolean promotionEnabled,
             boolean devMode,
-            boolean discordPostingEnabled,
             boolean trackAllCombatsAsCandidates,
             boolean immediatePromotionOnResolve,
             boolean decoysEnabled) {}

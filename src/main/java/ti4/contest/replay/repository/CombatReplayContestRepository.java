@@ -11,8 +11,21 @@ import ti4.contest.replay.entities.CombatReplayContestEntity;
 public interface CombatReplayContestRepository extends JpaRepository<CombatReplayContestEntity, Long> {
     Optional<CombatReplayContestEntity> findByCandidateId(Long candidateId);
 
+    Optional<CombatReplayContestEntity> findByPublicMessageId(Long publicMessageId);
+
+    Optional<CombatReplayContestEntity> findByPublicMessageIdOrPublicThreadId(
+            Long publicMessageId, Long publicThreadId);
+
+    Optional<CombatReplayContestEntity> findFirstByIdLessThanOrderByIdDesc(Long id);
+
+    boolean existsByIdGreaterThan(Long id);
+
     List<CombatReplayContestEntity> findByReplayStatusInAndNextReplayAtLessThanEqualOrderByNextReplayAtAsc(
             Collection<CombatContestReplayStatus> replayStatuses, LocalDateTime nextReplayAt);
+
+    List<CombatReplayContestEntity>
+            findByReplayStatusAndSideBetMarketPostedAtIsNullAndPostedAtLessThanEqualOrderByPostedAtAsc(
+                    CombatContestReplayStatus replayStatus, LocalDateTime postedAt);
 
     boolean existsByPostedAtGreaterThanEqual(LocalDateTime postedAt);
 

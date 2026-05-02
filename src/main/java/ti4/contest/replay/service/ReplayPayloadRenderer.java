@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import ti4.contest.replay.core.CombatContestSettings;
+import ti4.contest.replay.core.CombatCandidateEventType;
 import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.core.CombatRollPayload;
 import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
@@ -38,7 +38,6 @@ import ti4.model.TechnologyModel;
 @RequiredArgsConstructor
 public class ReplayPayloadRenderer {
 
-    private final CombatContestSettings settings;
     private final ReplayDispatchSerializer payloadSerializer;
     private final CombatCandidateEventRepository candidateEventRepository;
 
@@ -52,10 +51,21 @@ public class ReplayPayloadRenderer {
 
     public Game restoreReplayGame(
             String snapshotJson, Game game, CombatCandidateEntity candidate, String tilePosition) {
+        return restoreReplayGame(snapshotJson, game, candidate, tilePosition, true);
+    }
+
+    public Game restoreReplayGame(
+            String snapshotJson,
+            Game game,
+            CombatCandidateEntity candidate,
+            String tilePosition,
+            boolean applyReplayDecoys) {
         String initialContextJson = candidate == null ? snapshotJson : candidate.getInitialRenderSnapshotJson();
         Game snapshotGame = CombatReplayTileRenderer.render(initialContextJson, snapshotJson);
         if (snapshotGame == null || candidate == null) return snapshotGame;
-        CombatReplayDecoys.applyToTile(snapshotGame, tilePosition, readReplayAbilities(candidate));
+        if (applyReplayDecoys) {
+            CombatReplayDecoys.applyToTile(snapshotGame, tilePosition, readReplayAbilities(candidate));
+        }
         removeReplayCommandCounters(snapshotGame, tilePosition);
         snapshotGame.setName(CombatReplayTileRenderer.buildReplaySnapshotName(
                 candidate.getAttackerFaction(), candidate.getDefenderFaction()));
@@ -63,7 +73,7 @@ public class ReplayPayloadRenderer {
     }
 
     public CombatReplayDecoys.Abilities readReplayAbilities(CombatCandidateEntity candidate) {
-        return candidate == null || !settings.isDecoysEnabled()
+        return candidate == null
                 ? new CombatReplayDecoys.Abilities(null)
                 : CombatReplayDecoys.read(candidate.getReplayAbilitiesJson());
     }
@@ -117,7 +127,12 @@ public class ReplayPayloadRenderer {
                 : firstNonBlank(replayMessage.content(), context.event().getSummaryText());
         List<MessageEmbed> embeds =
                 replayMessage == null ? List.of() : ReplayDispatchSerializer.toMessageEmbeds(replayMessage.embeds());
-        return tileRender(content, embeds, payload.tilePosition(), payload.combatStateSnapshotJson());
+        return tileRender(
+                content,
+                embeds,
+                payload.tilePosition(),
+                payload.combatStateSnapshotJson(),
+                context.event().getEventType() != CombatCandidateEventType.RESOLVED);
     }
 
     private RenderedReplayEvent renderGenericMessage(
@@ -237,7 +252,16 @@ public class ReplayPayloadRenderer {
 
     private TileRenderResult tileRender(
             String content, List<MessageEmbed> embeds, String tilePosition, String snapshotJson) {
-        return new TileRenderResult(content, embeds, tilePosition, snapshotJson);
+        return tileRender(content, embeds, tilePosition, snapshotJson, true);
+    }
+
+    private TileRenderResult tileRender(
+            String content,
+            List<MessageEmbed> embeds,
+            String tilePosition,
+            String snapshotJson,
+            boolean applyReplayDecoys) {
+        return new TileRenderResult(content, embeds, tilePosition, snapshotJson, applyReplayDecoys);
     }
 
     private void removeReplayCommandCounters(Game snapshotGame, String tilePosition) {
@@ -375,7 +399,12 @@ public class ReplayPayloadRenderer {
 
     public record MessageResult(String content, List<MessageEmbed> embeds) implements RenderedReplayEvent {}
 
-    public record TileRenderResult(String content, List<MessageEmbed> embeds, String tilePosition, String snapshotJson)
+    public record TileRenderResult(
+            String content,
+            List<MessageEmbed> embeds,
+            String tilePosition,
+            String snapshotJson,
+            boolean applyReplayDecoys)
             implements RenderedReplayEvent {}
 
     private record RenderContext(Game game, CombatCandidateEntity candidate, CombatCandidateEventEntity event) {}

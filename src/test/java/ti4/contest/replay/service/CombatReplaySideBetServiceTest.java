@@ -9,9 +9,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.junit.jupiter.api.Test;
 import ti4.contest.replay.core.CombatContestSettings;
+import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.core.CombatSideBetType;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatContestSideBetEntity;
@@ -24,14 +28,24 @@ import ti4.contest.replay.repository.CombatReplayLeaderboardEntryRepository;
 
 class CombatReplaySideBetServiceTest {
 
+    private final CombatContestSettings settings = new CombatContestSettings();
+    private final CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
+    private final CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
+    private final CombatContestSideBetRepository sideBetRepository = mock(CombatContestSideBetRepository.class);
+    private final CombatReplayLeaderboardEntryRepository leaderboardEntryRepository =
+            mock(CombatReplayLeaderboardEntryRepository.class);
+    private final CombatReplaySideBetPayoutService payoutService = mock(CombatReplaySideBetPayoutService.class);
+    private final CombatReplaySideBetUiService sideBetUiService = mock(CombatReplaySideBetUiService.class);
+    private final CombatReplayHouseService houseService = mock(CombatReplayHouseService.class);
     private final CombatReplaySideBetService service = new CombatReplaySideBetService(
-            new CombatContestSettings(),
-            mock(CombatReplayContestRepository.class),
-            mock(CombatCandidateRepository.class),
-            mock(CombatContestSideBetRepository.class),
-            mock(CombatReplayLeaderboardEntryRepository.class),
-            mock(CombatReplaySideBetPayoutService.class),
-            mock(CombatReplaySideBetUiService.class));
+            settings,
+            replayContestRepository,
+            candidateRepository,
+            sideBetRepository,
+            leaderboardEntryRepository,
+            payoutService,
+            sideBetUiService,
+            houseService);
 
     @Test
     void afbSkippedAvailableForSideWithDestroyerUnlessSingleDestroyerIsFacingAssaultCannon() {
@@ -50,47 +64,70 @@ class CombatReplaySideBetServiceTest {
     }
 
     @Test
-    void afbSkippedBetWinsEvenIfAfbIsRolledLater() {
-        CombatContestSideBetRepository sideBetRepository = mock(CombatContestSideBetRepository.class);
-        CombatReplayLeaderboardEntryRepository leaderboardEntryRepository =
-                mock(CombatReplayLeaderboardEntryRepository.class);
-        CombatReplaySideBetPayoutService payoutService = mock(CombatReplaySideBetPayoutService.class);
-        CombatReplaySideBetService resolvingService = new CombatReplaySideBetService(
-                new CombatContestSettings(),
-                mock(CombatReplayContestRepository.class),
-                mock(CombatCandidateRepository.class),
-                sideBetRepository,
-                leaderboardEntryRepository,
-                payoutService,
-                mock(CombatReplaySideBetUiService.class));
-        CombatCandidateEntity candidate = candidate(0, 2, false, false);
-        candidate.setDefenderRolledAfb(true);
-        candidate.setDefenderSkippedAfb(true);
-        CombatReplayContestEntity contest = new CombatReplayContestEntity();
-        contest.setId(126L);
-        CombatContestSideBetEntity sideBet = new CombatContestSideBetEntity();
-        sideBet.setContestId(126L);
-        sideBet.setDiscordUserId("user");
-        sideBet.setDiscordUserName("User");
-        sideBet.setBetType(CombatSideBetType.AFB_SKIPPED);
-        sideBet.setTargetFaction("yin");
-        sideBet.setPlacedAt(LocalDateTime.now());
-        CombatReplayLeaderboardEntryEntity entry = new CombatReplayLeaderboardEntryEntity();
-        entry.setDiscordUserId("user");
-        entry.setDiscordUserName("User");
-        entry.setTotalPoints(10);
+    void hacanUserWithZeroPointsCanStillPlaceSideBetAndStaysAtZero() {
+        ButtonInteractionEvent event = mock(ButtonInteractionEvent.class);
+        User user = mock(User.class);
+        MessageChannel channel = mock(MessageChannel.class);
+        CombatReplayContestEntity contest = contest();
+        CombatCandidateEntity candidate = candidate(0, 0, false, false);
+        candidate.setId(7L);
+        candidate.setSideBetCompatible(true);
+        CombatReplayLeaderboardEntryEntity entry = leaderboardEntry("user-id", "Hacan Player", 0);
 
-        when(sideBetRepository.findByContestId(126L)).thenReturn(List.of(sideBet));
-        when(leaderboardEntryRepository.findByDiscordUserIdIn(any())).thenReturn(List.of(entry));
-        when(payoutService.resolvedProfitPoints(sideBet)).thenReturn(6);
+        when(event.getUser()).thenReturn(user);
+        when(event.getMessageChannel()).thenReturn(channel);
+        when(user.getId()).thenReturn("user-id");
+        when(user.getEffectiveName()).thenReturn("Hacan Player");
+        when(replayContestRepository.findById(1L)).thenReturn(Optional.of(contest));
+        when(candidateRepository.findById(7L)).thenReturn(Optional.of(candidate));
+        when(leaderboardEntryRepository.findByDiscordUserId("user-id")).thenReturn(Optional.of(entry));
+        when(houseService.houseForUser("user-id")).thenReturn(CombatReplayHouse.HACAN);
+        when(sideBetRepository.countByContestIdAndDiscordUserId(1L, "user-id")).thenReturn(0);
+        when(payoutService.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_WHIFF, "sol"))
+                .thenReturn(10);
+        when(sideBetUiService.renderUserSummary(contest, candidate, "user-id", 0))
+                .thenReturn("summary");
 
-        CombatReplaySideBetService.SideBetResolution resolution = resolvingService.resolveSideBets(candidate, contest);
+        CombatReplaySideBetService.PlacementResult result =
+                service.placeSideBet(event, 1L, CombatSideBetType.ROUND_ONE_WHIFF, "sol");
 
-        assertEquals(16, entry.getTotalPoints());
-        assertEquals(1, resolution.resolvedSideBets().size());
-        assertEquals("Skips AFB", resolution.resolvedSideBets().getFirst().label());
-        verify(sideBetRepository).saveAll(List.of(sideBet));
-        verify(leaderboardEntryRepository).saveAll(any());
+        assertTrue(result.accepted());
+        assertEquals(0, result.totalPoints());
+        assertEquals(0, entry.getTotalPoints());
+        verify(sideBetRepository).save(any(CombatContestSideBetEntity.class));
+    }
+
+    @Test
+    void hacanUserWithoutLeaderboardEntryCanStillPlaceSideBetAtZero() {
+        ButtonInteractionEvent event = mock(ButtonInteractionEvent.class);
+        User user = mock(User.class);
+        MessageChannel channel = mock(MessageChannel.class);
+        CombatReplayContestEntity contest = contest();
+        CombatCandidateEntity candidate = candidate(0, 0, false, false);
+        candidate.setId(7L);
+        candidate.setSideBetCompatible(true);
+
+        when(event.getUser()).thenReturn(user);
+        when(event.getMessageChannel()).thenReturn(channel);
+        when(user.getId()).thenReturn("user-id");
+        when(user.getEffectiveName()).thenReturn("Hacan Player");
+        when(replayContestRepository.findById(1L)).thenReturn(Optional.of(contest));
+        when(candidateRepository.findById(7L)).thenReturn(Optional.of(candidate));
+        when(leaderboardEntryRepository.findByDiscordUserId("user-id")).thenReturn(Optional.empty());
+        when(houseService.houseForUser("user-id")).thenReturn(CombatReplayHouse.HACAN);
+        when(sideBetRepository.countByContestIdAndDiscordUserId(1L, "user-id")).thenReturn(0);
+        when(payoutService.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_WHIFF, "sol"))
+                .thenReturn(10);
+        when(sideBetUiService.renderUserSummary(contest, candidate, "user-id", 0))
+                .thenReturn("summary");
+
+        CombatReplaySideBetService.PlacementResult result =
+                service.placeSideBet(event, 1L, CombatSideBetType.ROUND_ONE_WHIFF, "sol");
+
+        assertTrue(result.accepted());
+        assertEquals(0, result.totalPoints());
+        verify(leaderboardEntryRepository).save(any(CombatReplayLeaderboardEntryEntity.class));
+        verify(sideBetRepository).save(any(CombatContestSideBetEntity.class));
     }
 
     private CombatCandidateEntity candidate(
@@ -106,5 +143,25 @@ class CombatReplaySideBetServiceTest {
         candidate.setAttackerHasAssaultCannon(attackerHasAssaultCannon);
         candidate.setDefenderHasAssaultCannon(defenderHasAssaultCannon);
         return candidate;
+    }
+
+    private CombatReplayContestEntity contest() {
+        CombatReplayContestEntity contest = new CombatReplayContestEntity();
+        contest.setId(1L);
+        contest.setCandidateId(7L);
+        contest.setReplayStartAt(LocalDateTime.now().plusMinutes(1));
+        contest.setSideBetMarketPostedAt(LocalDateTime.now());
+        return contest;
+    }
+
+    private CombatReplayLeaderboardEntryEntity leaderboardEntry(String userId, String userName, int points) {
+        CombatReplayLeaderboardEntryEntity entry = new CombatReplayLeaderboardEntryEntity();
+        entry.setDiscordUserId(userId);
+        entry.setDiscordUserName(userName);
+        entry.setTotalPoints(points);
+        entry.setPredictionCount(0);
+        entry.setCorrectPredictions(0);
+        entry.setUpdatedAt(LocalDateTime.now());
+        return entry;
     }
 }
