@@ -8,16 +8,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
@@ -943,8 +941,7 @@ public final class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String faction = rest.replace("xxchaagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
-            message = player.getRepresentationUnfogged()
-                    + ", please choose the planet you wish to ready. ";
+            message = player.getRepresentationUnfogged() + ", please choose the planet you wish to ready. ";
             List<Button> buttons = new ArrayList<>();
             for (String planet : p2.getExhaustedPlanets()) {
                 buttons.add(Buttons.gray(

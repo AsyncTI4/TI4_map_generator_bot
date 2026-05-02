@@ -30,7 +30,7 @@ public class IndustrexService {
         }
         if (game.isTwilightsFallMode()) {
             for (String unit : player.getUnitsOwned()) {
-                if (unit.contains("tf-")) {
+                if (unit.contains("tf-") || unit.contains("tk-")) {
                     UnitModel unitModel = Mapper.getUnit(unit);
                     if (unitModel != null && unitModel.getIsShip()) {
                         typesAvailable.add(unitModel.getUnitType());

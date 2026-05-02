@@ -2,7 +2,6 @@ package ti4.discord.interactions.buttons.handlers.edict.resolver;
 
 import java.util.Arrays;
 import java.util.List;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;

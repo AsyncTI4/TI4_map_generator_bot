@@ -46,7 +46,7 @@ class MessageListener extends ListenerAdapter {
 
         Please do not ping bothelper again, the first ping is enough, just explain without a 2nd ping.
         """;
-    private static final List<String> INTERESTING_MESSAGES = List.of("gaslight", "please stop");
+    private static final List<String> INTERESTING_MESSAGES = List.of("please stop", "retard");
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {

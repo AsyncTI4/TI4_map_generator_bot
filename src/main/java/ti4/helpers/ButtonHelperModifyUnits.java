@@ -2192,6 +2192,11 @@ public final class ButtonHelperModifyUnits {
                     }
                 }
             } else {
+                if ("1ff".equalsIgnoreCase(unitLong)) {
+                    AddUnitService.addUnits(event, game.getTileByPosition(planetName), game, player.getColor(), "1 ff");
+                    successMessage = producedOrPlaced + " 1 " + UnitEmojis.fighter + " in tile "
+                            + tile.getRepresentationForButtons(game, player) + ".";
+                }
                 if ("2ff".equalsIgnoreCase(unitLong)) {
                     AddUnitService.addUnits(event, game.getTileByPosition(planetName), game, player.getColor(), "2 ff");
                     successMessage = producedOrPlaced + " 2 " + UnitEmojis.fighter + " in tile "

@@ -2605,8 +2605,22 @@ public class ButtonHelper {
                 count += space.getUnitCount(unit);
             } else if ("mech".equalsIgnoreCase(removedUnit.getBaseType())
                     && player.hasUnit("naaz_mech_space")
+                    && !player.hasUnit("naaz_voltron")
                     && "action".equalsIgnoreCase(player.getGame().getPhaseOfGame())) {
                 count += space.getUnitCount(unit);
+            }
+        }
+        for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+            for (UnitKey unit : uH.getUnitKeys()) {
+                if (!player.unitBelongsToPlayer(unit)) continue;
+
+                List<UnitModel> unitModels = player.getUnitsByAsyncID(unit.asyncID());
+                if (unitModels.isEmpty()) continue;
+
+                UnitModel removedUnit = unitModels.getFirst();
+                if (removedUnit.getIsShip() && !removedUnit.getAsyncId().contains("ff")) {
+                    count += uH.getUnitCount(unit);
+                }
             }
         }
         return count;
@@ -5273,7 +5287,7 @@ public class ButtonHelper {
             }
         }
         for (String unitID : player.getUnitsOwned()) {
-            if (unitID.contains("tf-")) {
+            if (unitID.contains("tf-") || unitID.contains("tk-")) {
                 count++;
             }
         }

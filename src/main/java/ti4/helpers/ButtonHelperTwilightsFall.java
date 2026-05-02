@@ -1286,7 +1286,7 @@ public final class ButtonHelperTwilightsFall {
         }
         if ("units".equalsIgnoreCase(type)) {
             for (String unit : player.getUnitsOwned()) {
-                if (unit.contains("tf_") || !unit.contains("tf-")) {
+                if (unit.contains("tf_") || (!unit.contains("tf-") && !unit.contains("tk-"))) {
                     continue;
                 }
                 buttons.add(Buttons.red(
@@ -1427,7 +1427,7 @@ public final class ButtonHelperTwilightsFall {
                                     || unit.getUpgradesFromUnitId().isEmpty())
                             .toList();
                     for (UnitModel u : unitsToRemove) {
-                        if (u.getAlias().contains("tf-")) {
+                        if (u.getAlias().contains("tf-") || u.getAlias().contains("tk-")) {
                             List<Button> buttons = new ArrayList<>();
                             buttons.add(Buttons.green("keepUnit_" + u.getAlias(), "Keep " + u.getName()));
                             buttons.add(Buttons.red("deleteButtons", "Keep the New Unit"));

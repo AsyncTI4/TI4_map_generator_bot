@@ -267,6 +267,7 @@ public class CommandCounterButtonHandler {
         ReactionService.addReaction(event, game, player, message);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
+
     @ButtonHandler("gainCCNoDelete")
     public static void gainCCNoDelete(ButtonInteractionEvent event, Player player, Game game) {
         String message = "";
