@@ -161,11 +161,9 @@ public class GameMessageManager {
         }
 
         return allGameMessages.gameNameToMessages.entrySet().stream()
-                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, entry -> entry.getValue().stream()
-                        .filter(m -> m.type == type)
-                        .toList()))
-                .entrySet()
-                .stream()
+                .map(entry -> Map.entry(
+                        entry.getKey(),
+                        entry.getValue().stream().filter(m -> m.type == type).toList()))
                 .filter(entry -> !entry.getValue().isEmpty())
                 .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
