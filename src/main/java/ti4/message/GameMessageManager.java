@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -148,6 +149,22 @@ public class GameMessageManager {
         List<GameMessage> messages =
                 allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
         return messages.stream().filter(filter).findFirst();
+    }
+
+    public static synchronized Map<String, List<GameMessage>> getAllByGame(GameMessageType type) {
+        GameMessages allGameMessages = readFile();
+        if (allGameMessages == null) {
+            return Collections.emptyMap();
+        }
+
+        return allGameMessages.gameNameToMessages.entrySet().stream()
+                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, entry -> entry.getValue().stream()
+                        .filter(m -> m.type == type)
+                        .toList()))
+                .entrySet()
+                .stream()
+                .filter(entry -> !entry.getValue().isEmpty())
+                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public static synchronized List<GameMessage> getAll(String gameName, GameMessageType type) {

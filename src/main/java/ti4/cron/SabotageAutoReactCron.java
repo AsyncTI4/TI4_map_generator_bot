@@ -1,8 +1,7 @@
 package ti4.cron;
 
-import static java.util.function.Predicate.not;
-
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
@@ -38,29 +37,34 @@ public class SabotageAutoReactCron {
         if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running SabotageAutoReactCron.");
 
-        GameManager.getManagedGames().stream()
-                .filter(not(ManagedGame::isHasEnded))
-                .map(ManagedGame::getGame)
-                .forEach(SabotageAutoReactCron::autoReact);
+        Map<String, List<GameMessageManager.GameMessage>> acMessagesByGame =
+                GameMessageManager.getAllByGame(GameMessageType.ACTION_CARD);
+
+        for (Map.Entry<String, List<GameMessageManager.GameMessage>> entry : acMessagesByGame.entrySet()) {
+            String gameName = entry.getKey();
+            List<GameMessageManager.GameMessage> acMessages = entry.getValue();
+
+            ManagedGame managedGame = GameManager.getManagedGame(gameName);
+            if (managedGame == null || managedGame.isHasEnded()) {
+                acMessages.forEach(acMessage -> GameMessageManager.remove(gameName, acMessage.messageId()));
+                continue;
+            }
+
+            Game game = managedGame.getGame();
+            if (game == null) continue;
+
+            try {
+                automaticallyReactToSabotageWindows(game, acMessages);
+            } catch (Exception e) {
+                BotLogger.error(new LogOrigin(game), "SabotageAutoReactCron failed for game: " + game.getName(), e);
+            }
+        }
 
         BotLogger.logCron("Finished SabotageAutoReactCron.");
     }
 
-    private static void autoReact(Game game) {
-        try {
-            automaticallyReactToSabotageWindows(game);
-        } catch (Exception e) {
-            BotLogger.error(new LogOrigin(game), "SabotageAutoReactCron failed for game: " + game.getName(), e);
-        }
-    }
-
-    private static void automaticallyReactToSabotageWindows(Game game) {
-        List<GameMessageManager.GameMessage> acMessages =
-                GameMessageManager.getAll(game.getName(), GameMessageType.ACTION_CARD);
-        if (acMessages.isEmpty()) {
-            return;
-        }
-
+    private static void automaticallyReactToSabotageWindows(
+            Game game, List<GameMessageManager.GameMessage> acMessages) {
         for (Player player : game.getRealPlayers()) {
             if (!playerShouldRandomlyReact(player, game)) {
                 continue;
