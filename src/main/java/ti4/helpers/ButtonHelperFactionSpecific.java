@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -145,7 +148,7 @@ public final class ButtonHelperFactionSpecific {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static List<Button> getIntrigueCardButtons(Player player, String faction, Game game) {
+    private static List<Button> getIntrigueCardButtons(Player player, String faction, Game game) {
         List<Button> buttons = new ArrayList<>();
         if (player.getSteelbalanceCounter() > 1
                 && game.getStoredValue("intrigueLevy").isEmpty()) {
@@ -2207,9 +2210,10 @@ public final class ButtonHelperFactionSpecific {
         boolean hasInf = false;
         for (UnitHolder unitHolder : player.getNomboxTile().getUnitHolders().values()) {
             Map<UnitKey, Integer> units = unitHolder.getUnits();
-            for (UnitKey unitKey : units.keySet()) {
-                if (unitKey.getUnitType() == UnitType.Infantry && units.get(unitKey) > 0) {
+            for (Map.Entry<UnitKey, Integer> entry : units.entrySet()) {
+                if (entry.getKey().getUnitType() == UnitType.Infantry && entry.getValue() > 0) {
                     hasInf = true;
+                    break;
                 }
             }
         }
@@ -2689,9 +2693,9 @@ public final class ButtonHelperFactionSpecific {
 
         CombatTempModHelper.ensureValidTempMods(p1, tile.getTileModel(), planet);
         CombatTempModHelper.initializeNewTempMods(p1, tile.getTileModel(), planet);
-        List<NamedCombatModifierModel> tempMods = new ArrayList<>();
-        tempMods.addAll(CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
-                p1, tile.getTileModel(), planet, false, CombatRollType.combatround));
+        List<NamedCombatModifierModel> tempMods =
+                new ArrayList<>(CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
+                        p1, tile.getTileModel(), planet, false, CombatRollType.combatround));
 
         String message = CombatMessageHelper.displayCombatSummary(p1, tile, planet, CombatRollType.combatround);
         message += CombatRollService.rollForUnits(
@@ -3899,8 +3903,8 @@ public final class ButtonHelperFactionSpecific {
     @ButtonHandler("creussTFCruiserStep1_")
     public static void creussTFCruiserStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        Set<Tile> tiles = new HashSet<>();
-        tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Cruiser));
+        Set<Tile> tiles = new HashSet<>(
+                CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Cruiser));
         if (player.hasUnit("pinktf_flagship")) {
             tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Flagship));
         }
@@ -4003,20 +4007,6 @@ public final class ButtonHelperFactionSpecific {
         String msg;
         if (game.isFowMode() && !isTileCreussIFFSuitable(game, player, tile)) {
             msg = pos + " was not suitable for the _Creuss IFF_.";
-            /*if (player.getTg() > 0) {
-                player.setTg(player.getTg() - 1);
-                msg += " You lost 1 trade good.";
-            } else {
-                if (player.getTacticalCC() > 0) {
-                    player.setTacticalCC(player.getTacticalCC() - 1);
-                    msg += " You lost 1 command token from your tactic pool.";
-                } else {
-                    if (player.getFleetCC() > 0) {
-                        player.setFleetCC(player.getFleetCC() - 1);
-                        msg += " You lost 1 command token from your fleet pool.";
-                    }
-                }
-            }*/
         } else {
             StringBuilder sb = new StringBuilder(player.getRepresentation());
             tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);

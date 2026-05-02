@@ -14,7 +14,7 @@ import ti4.service.milty.MiltyDraftTile;
 
 class SliceDraftableAddSlice extends GameStateSubcommand {
 
-    protected SliceDraftableAddSlice() {
+    SliceDraftableAddSlice() {
         super(Constants.DRAFT_SLICE_ADD_SLICE, "Add a new slice with the specified tiles", true, false);
         addOption(OptionType.STRING, Constants.DRAFT_NEW_SLICE_OPTION, "The name of the new slice to add", true);
         addOption(

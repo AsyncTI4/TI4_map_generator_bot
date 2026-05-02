@@ -484,10 +484,6 @@ public class ComponentActionHelper {
         if (!IsPlayerElectedService.isPlayerElected(game, p1, "censure")
                 && !IsPlayerElectedService.isPlayerElected(game, p1, "absol_censure")) {
             List<Button> acButtons = ActionCardHelper.getActionPlayActionCardButtons(p1);
-            // Button acButton = Buttons.gray(
-            //         finChecker + prefix + "actionCards_",
-            //         "Play an Action Card with Component Action (" + acButtons.size() + ")");
-            // compButtons.add(acButton);
             compButtons.addAll(acButtons);
         }
 
@@ -1188,7 +1184,7 @@ public class ComponentActionHelper {
                 // handled above
             }
             case "bookoflatvinia" -> BookOfLatviniaService.purgeBookOfLatvinia(event, game, player);
-            case "thesilverflame" -> SilverFlameService.rollSilverFlame(event, game, player);
+            case "thesilverflame" -> SilverFlameService.rollSilverFlame(game, player);
             default ->
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(), "This relic is not tied to any automation. Please resolve manually.");

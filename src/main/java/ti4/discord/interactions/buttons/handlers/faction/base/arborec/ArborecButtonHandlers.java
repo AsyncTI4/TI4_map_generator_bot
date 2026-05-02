@@ -17,7 +17,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
-public class ArborecButtonHandlers {
+class ArborecButtonHandlers {
 
     @ButtonHandler("arboAgentOn_")
     public static void arboAgentOn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {

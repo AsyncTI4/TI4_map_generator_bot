@@ -186,7 +186,7 @@ public class GameManager {
     public static ManagedGame getManagedGame(String gameName) {
         if (!isValid(gameName)) return null;
         waitFor(GAME_NAMES_LOADED_LATCH);
-        return gameNameToManagedGame.computeIfAbsent(gameName, k -> {
+        return gameNameToManagedGame.computeIfAbsent(gameName, _ -> {
             Game game = GameLoadService.load(gameName);
             if (game == null) {
                 BotLogger.error("Failed to load ManagedGame for " + gameName + ".");

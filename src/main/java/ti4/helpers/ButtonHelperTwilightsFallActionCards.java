@@ -359,7 +359,7 @@ public final class ButtonHelperTwilightsFallActionCards {
     }
 
     @ButtonHandler("coerceStep2")
-    public static void coerceStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+    private static void coerceStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         for (String ability : p2.getTechs()) {
@@ -527,7 +527,7 @@ public final class ButtonHelperTwilightsFallActionCards {
         }
     }
 
-    public static List<Button> getTransferSingularityButtons(Game game, Player target, Player recipient) {
+    private static List<Button> getTransferSingularityButtons(Game game, Player target, Player recipient) {
         List<Button> buttons = new ArrayList<>();
         for (String ability : target.getTechs()) {
             TechnologyModel tech = Mapper.getTech(ability);

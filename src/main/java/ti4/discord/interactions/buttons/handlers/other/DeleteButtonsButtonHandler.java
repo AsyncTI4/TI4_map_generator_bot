@@ -318,9 +318,6 @@ class DeleteButtonsButtonHandler {
                                 "ghostbt" + (tile.getWormholes(game).size() - adjust));
                     }
                 }
-                // ButtonHelper.updateMap(game, event,
-                // "Result of build on turn " + player.getInRoundTurnCount() + " for " +
-                // player.getFactionEmoji());
                 buttons.add(doneExhausting);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
                 if (tile != null

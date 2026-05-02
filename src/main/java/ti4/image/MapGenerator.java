@@ -654,7 +654,7 @@ public class MapGenerator implements AutoCloseable {
                 .mapToInt(Player::getTotalVictoryPoints)
                 .max()
                 .orElse(0);
-        if (game.getVp() > 14 || pinkLimit > 14 || greyLimit > 14) {
+        if (game.getVp() > 14 || greyLimit > 14) {
             boxWidth = 2250 / (1 + Math.max(game.getVp(), Math.max(pinkLimit, greyLimit)));
         }
 
@@ -1906,8 +1906,6 @@ public class MapGenerator implements AutoCloseable {
 
         String playerStatsAnchor = player.getPlayerStatsAnchorPosition();
         if (playerStatsAnchor != null) {
-            // String anchorProjectedOnOutsideRing =
-            // PositionMapper.getEquivalentPositionAtRing(ringCount, playerStatsAnchor);
             Point anchorProjectedPoint = PositionMapper.getTilePosition(playerStatsAnchor);
             if (anchorProjectedPoint != null) {
                 Point playerStatsAnchorPoint = PositionMapper.getScaledTilePosition(
@@ -2578,8 +2576,8 @@ public class MapGenerator implements AutoCloseable {
                             .toList();
 
                     globalUnitCoordinatesByFaction
-                            .computeIfAbsent(faction, k -> new HashMap<>())
-                            .computeIfAbsent(unitId, k -> new ArrayList<>())
+                            .computeIfAbsent(faction, _ -> new HashMap<>())
+                            .computeIfAbsent(unitId, _ -> new ArrayList<>())
                             .addAll(globalCoordinates);
                 }
             }

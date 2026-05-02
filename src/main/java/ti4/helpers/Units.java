@@ -353,8 +353,8 @@ public class Units {
         if (type == null || colorID == null) {
             return null;
         }
-        var map = keys.computeIfAbsent(type, k -> new ConcurrentHashMap<>());
-        return map.computeIfAbsent(colorID, k -> new UnitKey(type, colorID));
+        var map = keys.computeIfAbsent(type, _ -> new ConcurrentHashMap<>());
+        return map.computeIfAbsent(colorID, _ -> new UnitKey(type, colorID));
     }
 
     @Nullable

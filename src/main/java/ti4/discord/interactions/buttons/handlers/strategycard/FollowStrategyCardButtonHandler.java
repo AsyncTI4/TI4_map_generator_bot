@@ -8,7 +8,7 @@ import ti4.game.Game;
 import ti4.logging.BotLogger;
 
 @UtilityClass
-public class FollowStrategyCardButtonHandler {
+class FollowStrategyCardButtonHandler {
 
     @ButtonHandler("requestAllFollow_")
     public static void requestAllFollow(ButtonInteractionEvent event, Game game) {

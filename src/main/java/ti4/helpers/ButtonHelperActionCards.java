@@ -60,8 +60,6 @@ public final class ButtonHelperActionCards {
                 buttons.add(validTile);
             }
         }
-        // Button validTile2 = Buttons.red(finChecker + "deleteButtons", "Decline");
-        // buttons.add(validTile2);
         return buttons;
     }
 

@@ -30,7 +30,7 @@ public class TeHelperBreakthroughs {
                 String output = player.getRepresentation()
                         + ", please choose a secret objective to discard - the bot will automatically draw a replacement:";
                 List<Button> buttons =
-                        new ArrayList<Button>(SecretObjectiveHelper.getSODiscardButtonsWithSuffix(player, "redraw"));
+                        new ArrayList<>(SecretObjectiveHelper.getSODiscardButtonsWithSuffix(player, "redraw"));
                 MessageHelper.sendMessageToChannelWithButtons(channel, output, buttons);
             }
             case "crimsonbt" -> ResonanceGeneratorService.postInitialButtons(event, game, player);

@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
-public class DacxiveButtonHandler {
+class DacxiveButtonHandler {
 
     @ButtonHandler("dacxive_")
     public static void daxcive(ButtonInteractionEvent event, Player player, String buttonID, Game game) {

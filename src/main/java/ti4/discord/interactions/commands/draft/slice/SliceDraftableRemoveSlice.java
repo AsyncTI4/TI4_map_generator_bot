@@ -10,7 +10,7 @@ import ti4.service.milty.MiltyDraftSlice;
 
 class SliceDraftableRemoveSlice extends GameStateSubcommand {
 
-    protected SliceDraftableRemoveSlice() {
+    SliceDraftableRemoveSlice() {
         super(Constants.DRAFT_SLICE_REMOVE_SLICE, "Remove an existing slice by name", true, false);
         addOption(OptionType.STRING, Constants.DRAFT_SLICE_OPTION, "The name of the slice to remove", true, true);
     }

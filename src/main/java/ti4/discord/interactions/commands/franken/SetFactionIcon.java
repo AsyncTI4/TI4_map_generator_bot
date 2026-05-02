@@ -48,14 +48,6 @@ class SetFactionIcon extends GameStateSubcommand {
             player.setFactionEmoji(null);
             return;
         }
-        if (factionEmoji instanceof UnicodeEmoji) {
-            MessageHelper.sendMessageToEventChannel(
-                    event,
-                    player.getRepresentationUnfogged() + " is setting their faction icon to " + factionEmojiString
-                            + ".");
-            player.setFactionEmoji(factionEmojiString);
-            return;
-        }
         MessageHelper.sendMessageToEventChannel(
                 event,
                 player.getRepresentationUnfogged() + " is setting their faction icon to " + factionEmojiString + ".");

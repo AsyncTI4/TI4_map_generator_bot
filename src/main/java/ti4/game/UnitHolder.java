@@ -271,7 +271,7 @@ public abstract class UnitHolder {
                 .filter(e -> p.unitBelongsToPlayer(e.getKey()))
                 .filter(e -> getTotalUnitCount(e.getValue()) > 0)
                 .map(Entry::getKey)
-                .sorted(Comparator.comparing(uk -> uk.getUnitType()))
+                .sorted(Comparator.comparing(UnitKey::getUnitType))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 

@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.listeners.context.SelectionMenuContext;
 import ti4.discord.interactions.selections.Selection;
@@ -92,10 +93,7 @@ public class BigSelectDemo implements Selection {
         menuBuilder.setMaxValues(4);
 
         if (event instanceof StringSelectInteractionEvent) {
-            ((StringSelectInteractionEvent) event)
-                    .getMessage()
-                    .delete()
-                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            ((ComponentInteraction) event).getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         event.getMessageChannel()

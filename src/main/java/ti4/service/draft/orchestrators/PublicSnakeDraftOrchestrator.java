@@ -169,7 +169,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         // Persist the choice in Player State.
         Map<DraftableType, List<DraftChoice>> playerChoices =
                 draftManager.getPlayerStates().get(playerUserId).getPicks();
-        playerChoices.computeIfAbsent(choice.getType(), k -> new ArrayList<>()).add(choice);
+        playerChoices.computeIfAbsent(choice.getType(), _ -> new ArrayList<>()).add(choice);
 
         // Send announcement of pick
         Player player = draftManager.getGame().getPlayer(playerUserId);

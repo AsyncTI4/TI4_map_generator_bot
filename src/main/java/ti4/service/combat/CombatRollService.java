@@ -1,6 +1,8 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1146,7 +1148,7 @@ public class CombatRollService {
                                 .filter(Die::eligibleForHeartPlus)
                                 .toList()
                                 .size();
-                        hacanFsButtons.add(buildHacanFlagshipThalnosButton(game, player, unitType, resultRolls));
+                        hacanFsButtons.add(buildHacanFlagshipThalnosButton(player, unitType, resultRolls));
                         if (!extraRollsCount) {
                             // later we will build one destroy button to rule them all
                             hacanFsThalnosDestroyTypes.add(unitType);
@@ -1154,7 +1156,7 @@ public class CombatRollService {
                     } else if (tkHacanWarsun) {
                         // do not immediately destroy anything here
                         misses = 0;
-                        hacanFsButtons.add(buildTkHacanWSThalnosButton(game, player, unitType, resultRolls));
+                        hacanFsButtons.add(buildTkHacanWSThalnosButton(resultRolls));
                     }
                     if ((hacanFlagship || tkHacanWarsun) && !extraRollsCount) {
                         // later we will build one destroy button to rule them all
@@ -1528,8 +1530,8 @@ public class CombatRollService {
                 }
 
                 // Accumulate all the near misses so we can send a hacan flagship button at the very end of rolling
-                nearMisses += IterableUtils.countMatches(resultRolls, Die::eligibleForHeartPlus);
-                nearMisses += IterableUtils.countMatches(resultRolls2, Die::eligibleForHeartPlus);
+                nearMisses += (int) IterableUtils.countMatches(resultRolls, Die::eligibleForHeartPlus);
+                nearMisses += (int) IterableUtils.countMatches(resultRolls2, Die::eligibleForHeartPlus);
             }
         }
         result = resultBuilder.toString();
@@ -1600,11 +1602,8 @@ public class CombatRollService {
         return new CombatRollResult(result, totalHits, whiff, slam, payload);
     }
 
-    // FFCC_tkHacanWs_X,X,X,X,X,X,X,X,X,X
-    private void sendTkHacanWsButtons(Game game, Player player, List<Die> misses) {}
-
     /** Builds a button with ID {@code FFCC_hacanFlagshipThalnos_<unittype>_X} where {@code X} is the number of units that can score a hit given a +1 */
-    private Button buildHacanFlagshipThalnosButton(Game game, Player player, UnitType type, List<Die> results) {
+    private Button buildHacanFlagshipThalnosButton(Player player, UnitType type, List<Die> results) {
         int amt = results.stream().filter(Die::eligibleForHeartPlus).toList().size();
 
         String id = player.finChecker() + "hacanFlagship_" + type.getValue() + "_" + amt;
@@ -1612,12 +1611,8 @@ public class CombatRollService {
         return Buttons.green(id, label, type.getUnitTypeEmoji());
     }
 
-    /** Builds a button with ID {@code FFCC_tkHacanWsThalnos_<unittype>_X,X,X,X,X,X,X,X,X,X} where _X\u1D62_ is the number of units that can rolled a result of _i_*/
-    private Button buildTkHacanWSThalnosButton(Game game, Player player, UnitType type, List<Die> results) {
-        for (Die d : results) {
-            if (d.isSuccess()) continue;
-        }
-
+    /** Builds a button with ID {@code FFCC_tkHacanWsThalnos_<unittype>_X,X,X,X,X,X,X,X,X,X} where _Xᵢ_ is the number of units that can rolled a result of _i_*/
+    private Button buildTkHacanWSThalnosButton(List<Die> results) {
         return null;
     }
 
@@ -1864,7 +1859,7 @@ public class CombatRollService {
         };
     }
 
-    public static Map<UnitModel, Integer> getCombatRoundUnits(
+    private static Map<UnitModel, Integer> getCombatRoundUnits(
             Tile tile, UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
         Map<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);

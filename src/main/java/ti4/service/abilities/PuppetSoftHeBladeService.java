@@ -121,8 +121,7 @@ public class PuppetSoftHeBladeService {
     }
 
     private static void flipFactionToObsidian(Game game, Player player) {
-        List<String> outputStrings = new ArrayList<>();
-        outputStrings.addAll(flipFirmamentComponentsToObsidianComponents(game, player));
+        List<String> outputStrings = new ArrayList<>(flipFirmamentComponentsToObsidianComponents(game, player));
         String msg = "### " + player.getRepresentationUnfogged();
         msg += " the following components have been updated:\n> ";
         msg += String.join("\n> ", outputStrings);
@@ -219,9 +218,7 @@ public class PuppetSoftHeBladeService {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
             output.add(String.format(fmt, oldLeader.getName(), newLeader.getName()));
         });
-        player.getLeaderByID("firmamenthero").ifPresent(oldLeader -> {
-            player.removeLeader(oldLeader);
-        });
+        player.getLeaderByID("firmamenthero").ifPresent(player::removeLeader);
         Leader newLeader = new Leader("obsidianhero");
         player.addLeader(newLeader);
         HeroUnlockCheckService.checkIfHeroUnlocked(player.getGame(), player);

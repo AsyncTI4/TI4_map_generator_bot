@@ -82,7 +82,7 @@ public final class TileHelper {
                 PlanetModel planet = JsonMapperManager.basic().readValue(fileInputStream, PlanetModel.class);
                 planetIdsToPlanetModels.put(planet.getId(), planet);
                 tileIdsToPlanetModels
-                        .computeIfAbsent(planet.getTileId(), k -> new ArrayList<>())
+                        .computeIfAbsent(planet.getTileId(), _ -> new ArrayList<>())
                         .add(planet);
                 if (!planet.isValid()) {
                     badObjects.add(planet.getAlias());

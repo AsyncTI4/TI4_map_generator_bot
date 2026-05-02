@@ -37,7 +37,7 @@ public class AbsolConstitutionAgendaResolver implements ForAgainstAgendaResolver
                 for (String id3 : discardedAgendas) {
                     game.putAgendaBackIntoDeckOnTop(id3);
                 }
-                if (discardedAgendas.size() > 0) {
+                if (!discardedAgendas.isEmpty()) {
                     MessageHelper.sendMessageToChannel(
                             game.getMainGameChannel(),
                             "Shuffled the following non-law agendas back in: " + String.join(", ", discardedAgendas));

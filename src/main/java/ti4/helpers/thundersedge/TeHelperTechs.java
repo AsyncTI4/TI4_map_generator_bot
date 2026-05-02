@@ -151,10 +151,9 @@ public final class TeHelperTechs {
                         && tilesAdjToObsInf.stream().anyMatch(t -> t.containsPlayersUnitsWithKeyCondition(p, isInf)))
                 .toList();
         String prefixID = player.getFinsFactionCheckerPrefix() + "neuralParasiteS2_";
-        List<Button> buttons = playersWithInfAdj.stream()
+        return playersWithInfAdj.stream()
                 .map(p -> Buttons.gray(prefixID + p.getFaction(), null, p.fogSafeEmoji()))
                 .toList();
-        return buttons;
     }
 
     @ButtonHandler("startNeuralParasite")
@@ -265,10 +264,6 @@ public final class TeHelperTechs {
         List<Button> buttons = getPlanesplitterStep1Buttons(game, player);
 
         String message = "Please choose a system to move an Ingress token into.";
-        // if (NewStuffHelper.checkAndHandlePaginationChange(
-        //         event, player.getCorrectChannel(), buttons, message, buttonPrefix, buttonID)) {
-        //     return;
-        // }
         if (event == null) {
             if (game.isTwilightsFallMode()) {
                 message = "Please choose a system to add an Ingress token into.";

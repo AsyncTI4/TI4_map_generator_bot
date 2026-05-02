@@ -61,10 +61,7 @@ public class TfBlessResolver implements EdictResolver {
         boolean resolvedCC = player.hasStoredValue("blessBoonCC");
         if (!isTyrant && (resolvedAC || resolvedCC || resolvedTG)) {
             return true;
-        } else if (isTyrant && resolvedAC && resolvedCC && resolvedTG) {
-            return true;
-        }
-        return false;
+        } else return isTyrant && resolvedAC && resolvedCC && resolvedTG;
     }
 
     @ButtonHandler("blessBoonTg")

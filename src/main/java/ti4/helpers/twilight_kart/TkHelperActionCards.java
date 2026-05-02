@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -18,7 +19,16 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.helpers.*;
+import ti4.helpers.ActionCardHelper;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperTwilightsFall;
+import ti4.helpers.Helper;
+import ti4.helpers.NewStuffHelper;
+import ti4.helpers.RegexHelper;
+import ti4.helpers.StringHelper;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
@@ -93,18 +103,14 @@ public class TkHelperActionCards {
             }
             case "tk-raze" -> buttons.add(Buttons.green(ffcc + "resolveRaze_" + game.getActiveSystem(), resolve));
             case "tk-riposte" -> nop(); // Button is automatically served upon being activated
-            case "tk-spite" -> {
-                // TODO
+            case "tk-spite" -> // TODO
                 nop();
-            }
-            case "tk-succor" -> {
-                // TODO
+            case "tk-succor" -> // TODO
                 nop();
-            }
             case "tk-thwart" -> buttons.add(Buttons.green(ffcc + "startThwart", "Start Thwart"));
         }
 
-        if (buttons != null && !buttons.isEmpty()) {
+        if (!buttons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), introMsg, buttons);
             return true;
         }
@@ -156,9 +162,9 @@ public class TkHelperActionCards {
 
     private static List<Button> getTkBestowButtons(Player player, String resolve) {
         String id = player.finChecker() + "resolveTkBestow_";
-        List<Button> buttons = List.of(1, 2, 3, 4).stream()
+        List<Button> buttons = Stream.of(1, 2, 3, 4)
                 .map(n -> Buttons.green(id + n, "Resolve " + StringHelper.ordinal(n) + " Bestow"))
-                .collect(Collectors.toCollection(() -> new ArrayList<>()));
+                .collect(Collectors.toCollection(ArrayList::new));
         buttons.add(Buttons.DONE_DELETE_BUTTONS);
         return buttons;
     }
@@ -274,8 +280,8 @@ public class TkHelperActionCards {
             unitDescrs.add(amt + "x " + model.getUnitEmoji() + " "
                     + model.getUnitType().humanReadableName());
 
-            if (model.getIsShip() && !key.getUnitType().equals(UnitType.Fighter)) {
-                cost += amt * model.getCost();
+            if (model.getIsShip() && key.getUnitType() != UnitType.Fighter) {
+                cost += (int) (amt * model.getCost());
             }
         }
 
@@ -305,7 +311,7 @@ public class TkHelperActionCards {
             for (UnitState state : UnitState.values()) {
                 if (space.getUnitCountForState(key, state) == 0) continue;
                 String unitStateStr = key.getUnitType().getValue() + "_" + state.name();
-                String stateStr = state.humanDescr() + (state.equals(UnitState.none) ? "" : " ");
+                String stateStr = state.humanDescr() + (state == UnitState.none ? "" : " ");
 
                 String id = player.finChecker() + "incubateUnit_" + pos + "_" + unitStateStr;
                 String label = "Replace 1 " + stateStr + key.getUnitType().humanReadableName();
@@ -331,7 +337,7 @@ public class TkHelperActionCards {
             RemoveUnitService.removeUnit(event, tile, game, player, space, type, 1, state);
             AddUnitService.addUnits(event, tile, game, player.getColor(), "dn");
 
-            String stateMsg = state.humanDescr() + (state.equals(UnitState.none) ? "" : " ");
+            String stateMsg = state.humanDescr() + (state == UnitState.none ? "" : " ");
             String message =
                     player.getRepresentationUnfogged() + " replaced 1 " + stateMsg + type.humanReadableName() + " on ";
             message +=

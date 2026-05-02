@@ -17,7 +17,7 @@ import ti4.contest.replay.repository.CombatCandidateRepository;
  */
 @Service
 @RequiredArgsConstructor
-public class CombatReplayEventAppender {
+class CombatReplayEventAppender {
 
     private final CombatCandidateRepository candidateRepository;
     private final CombatCandidateEventRepository candidateEventRepository;

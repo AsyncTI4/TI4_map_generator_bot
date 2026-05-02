@@ -116,7 +116,6 @@ public class ListTechService {
             StrategyCardModel scModel =
                     game.getStrategyCardModelByName("technology").orElse(null);
             if (!used
-                    && !dwsBt
                     && scModel != null
                     && scModel.usesAutomationForSCID("pok7technology")
                     && !player.getFollowedSCs().contains(scModel.getInitiative())) {

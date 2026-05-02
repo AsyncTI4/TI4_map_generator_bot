@@ -185,7 +185,7 @@ public class RemoveUnitService {
             List<Integer> unitsRemovedCount =
                     unitHolder.removeUnit(parsedUnit.getUnitKey(), toRemoveCount, preferredState);
 
-            int tot = unitsRemovedCount.stream().mapToInt(i -> i).sum();
+            int tot = unitsRemovedCount.stream().mapToInt(Integer::intValue).sum();
             if (tot > 0) {
                 allUnitsRemoved.add(new RemovedUnit(parsedUnit.getUnitKey(), tile, unitHolder, unitsRemovedCount));
                 toRemoveCount -= tot;

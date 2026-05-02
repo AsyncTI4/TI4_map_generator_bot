@@ -16,7 +16,7 @@ import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 
 @UtilityClass
-public class YinSpinnerButtonHandler {
+class YinSpinnerButtonHandler {
 
     @ButtonHandler("startYinSpinner")
     public static void startYinSpinner(ButtonInteractionEvent event, Player player, Game game) {

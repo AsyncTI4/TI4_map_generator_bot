@@ -311,8 +311,6 @@ public final class TIGLHelper {
             JdaService.guildPrimary
                     .addRoleToMember(user, toRank.getRole())
                     .queue(Consumers.nop(), BotLogger::catchRestError);
-            // JdaService.guildPrimary.removeRoleFromMember(user, currentRank.getRole()).queueAfter(5,
-            // TimeUnit.SECONDS);
         }
         String message = user.getAsMention() + " has been promoted to **"
                 + toRank.getRole().getName() + "**!";

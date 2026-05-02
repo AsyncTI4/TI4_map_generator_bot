@@ -519,7 +519,7 @@ public class WebPlayerArea {
                     String unitFaction = unitOwner.getFaction();
                     int count = nombox.getUnitCount(unitKey);
 
-                    unitsByFaction.computeIfAbsent(unitFaction, k -> new HashMap<>());
+                    unitsByFaction.computeIfAbsent(unitFaction, _ -> new HashMap<>());
                     Map<String, Integer> unitCounts = unitsByFaction.get(unitFaction);
                     unitCounts.put(unitId, unitCounts.getOrDefault(unitId, 0) + count);
                 }

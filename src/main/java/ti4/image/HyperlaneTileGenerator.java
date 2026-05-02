@@ -149,7 +149,7 @@ final class HyperlaneTileGenerator {
         // Use canonical matrix as cache key
         String cacheKey = canonical.matrix == null ? "null" : canonical.matrix;
 
-        BufferedImage overlay = HYPERLANE_CACHE.computeIfAbsent(cacheKey, k -> {
+        BufferedImage overlay = HYPERLANE_CACHE.computeIfAbsent(cacheKey, _ -> {
             BufferedImage img = new BufferedImage(TILE_WIDTH, TILE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = img.createGraphics();
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

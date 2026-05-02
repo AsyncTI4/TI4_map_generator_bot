@@ -1,6 +1,6 @@
 package ti4.image;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -218,8 +218,8 @@ class UnitRenderGenerator {
                 String factionKey = player.getFaction();
                 String unitId = unitKey.asyncID();
                 unitCoordinatesByFaction
-                        .computeIfAbsent(factionKey, k -> new HashMap<>())
-                        .computeIfAbsent(unitId, k -> new ArrayList<>())
+                        .computeIfAbsent(factionKey, _ -> new HashMap<>())
+                        .computeIfAbsent(unitId, _ -> new ArrayList<>())
                         .add(new Point(imageX, imageY));
 
                 if (unitKey.getUnitType() == UnitType.Spacedock
@@ -302,7 +302,7 @@ class UnitRenderGenerator {
             }
 
             int galvAmt = unitHolder.getGalvanizedUnitCount(unitKey);
-            if (galvAmt > 0 && unitKey.getUnitType() != UnitType.Mech && position != null && imagePos != null) {
+            if (galvAmt > 0 && unitKey.getUnitType() != UnitType.Mech && position != null) {
                 drawGalvanizeTag(position, imagePos, unitImage, galvTag, galvSingle, unitKey.getUnitType(), galvAmt);
             }
 

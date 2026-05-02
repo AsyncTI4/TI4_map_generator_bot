@@ -39,7 +39,7 @@ public class ImageHelper {
         if (filePath == null) {
             return null;
         }
-        return ImageCache.getOrLoadStaticImage(filePath, k -> readImage(filePath));
+        return ImageCache.getOrLoadStaticImage(filePath, _ -> readImage(filePath));
     }
 
     @Nullable
@@ -47,7 +47,7 @@ public class ImageHelper {
         if (filePath == null) {
             return null;
         }
-        return ImageCache.getOrLoadStaticImage(percent + filePath, k -> {
+        return ImageCache.getOrLoadStaticImage(percent + filePath, _ -> {
             BufferedImage image = readImage(filePath);
             if (image == null) {
                 return null;
@@ -61,7 +61,7 @@ public class ImageHelper {
         if (filePath == null) {
             return null;
         }
-        return ImageCache.getOrLoadStaticImage(width + "x" + height + filePath, k -> {
+        return ImageCache.getOrLoadStaticImage(width + "x" + height + filePath, _ -> {
             BufferedImage image = readImage(filePath);
             if (image == null) {
                 return null;
@@ -90,7 +90,7 @@ public class ImageHelper {
         if (imageURL == null) {
             return null;
         }
-        return ImageCache.getOrLoadExpiringImage(width + "x" + height + imageURL, k -> {
+        return ImageCache.getOrLoadExpiringImage(width + "x" + height + imageURL, _ -> {
             BufferedImage image = readImageURL(imageURL);
             if (image == null) {
                 return null;

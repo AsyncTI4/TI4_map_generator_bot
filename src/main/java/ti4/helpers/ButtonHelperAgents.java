@@ -37,7 +37,6 @@ import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
-import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
@@ -605,15 +604,12 @@ public final class ButtonHelperAgents {
         }
 
         ExhaustLeaderService.exhaustLeader(game, player, playerLeader);
-        LeaderModel agentModel = playerLeader.getLeaderModel().orElse(null);
-        if (agentModel != null) {
-            SpringContext.getBean(CombatReplayService.class)
-                    .mirrorLeaderPlayed(
-                            game,
-                            player,
-                            agentModel.getAlias(),
-                            player.getCorrectChannel().getName());
-        }
+        playerLeader.getLeaderModel().ifPresent(agentModel -> SpringContext.getBean(CombatReplayService.class)
+                .mirrorLeaderPlayed(
+                        game,
+                        player,
+                        agentModel.getAlias(),
+                        player.getCorrectChannel().getName()));
 
         MessageChannel channel = player.getCorrectChannel();
         String message;

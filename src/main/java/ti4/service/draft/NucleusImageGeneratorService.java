@@ -221,9 +221,7 @@ public class NucleusImageGeneratorService {
                 FactionModel faction = FactionDraftable.getFactionByChoice(factionChoice);
                 if (faction.getAlias().contains("keleres")) {
                     TI4Emoji keleresEmoji = FactionEmojis.getFactionIcon(faction.getAlias());
-                    if (keleresEmoji != null) {
-                        summaryEmojis.add(keleresEmoji);
-                    }
+                    summaryEmojis.add(keleresEmoji);
                 }
             }
         }

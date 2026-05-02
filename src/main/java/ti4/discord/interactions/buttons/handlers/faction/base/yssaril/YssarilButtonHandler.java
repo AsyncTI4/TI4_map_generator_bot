@@ -17,7 +17,7 @@ import ti4.model.ActionCardModel;
 import ti4.service.emoji.CardEmojis;
 
 @UtilityClass
-public class YssarilButtonHandler {
+class YssarilButtonHandler {
 
     @ButtonHandler("yssarilHeroInitialOffering_")
     public static void yssarilHeroInitialOffering(

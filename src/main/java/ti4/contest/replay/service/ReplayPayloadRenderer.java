@@ -300,9 +300,11 @@ public class ReplayPayloadRenderer {
                 break;
             }
             ReplayDispatchPayload eventPayload = payloadSerializer.read(event);
-            if (eventPayload instanceof ReplayDispatchPayload.HitAssignDispatch hitAssign
-                    && tilePosition.equals(hitAssign.tilePosition())) {
-                previousSnapshotJson = hitAssign.combatStateSnapshotJson();
+            if (eventPayload
+                            instanceof
+                            ReplayDispatchPayload.HitAssignDispatch(String position, String combatStateSnapshotJson)
+                    && tilePosition.equals(position)) {
+                previousSnapshotJson = combatStateSnapshotJson;
             } else if (eventPayload instanceof ReplayDispatchPayload.TileRenderMessageDispatch tileRender
                     && tilePosition.equals(tileRender.tilePosition())) {
                 previousSnapshotJson = tileRender.combatStateSnapshotJson();
@@ -316,8 +318,9 @@ public class ReplayPayloadRenderer {
         Map<UnitKey, Counts> after = unitCounts(current, tilePosition);
         List<String> changes = new ArrayList<>();
 
-        for (UnitKey key : before.keySet()) {
-            Counts previousCounts = before.get(key);
+        for (Map.Entry<UnitKey, Counts> entry : before.entrySet()) {
+            UnitKey key = entry.getKey();
+            Counts previousCounts = entry.getValue();
             Counts currentCounts = after.getOrDefault(key, Counts.empty());
             int sustained = previousCounts.sustainedBy(currentCounts);
             int destroyed = previousCounts.total() - currentCounts.total();

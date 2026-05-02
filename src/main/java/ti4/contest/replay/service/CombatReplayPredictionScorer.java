@@ -9,7 +9,7 @@ import ti4.contest.replay.entities.CombatReplayLeaderboardEntryEntity;
 /**
  * Pure scoring helper for prediction payouts and winner result summaries.
  */
-public class CombatReplayPredictionScorer {
+final class CombatReplayPredictionScorer {
 
     static ScoredPredictions score(
             List<LockedPrediction> attackerPredictions,

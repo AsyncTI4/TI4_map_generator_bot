@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
@@ -311,10 +312,10 @@ public class PublicDraftInfoService {
             List<String> clearMessageHeaders,
             List<String> clearAttachments) {
         boolean removePings = clearFirstPing;
-        HashSet<String> removeHeaders = new HashSet<>(clearMessageHeaders != null ? clearMessageHeaders : List.of());
-        HashSet<String> removeAttachments = new HashSet<>(clearAttachments != null ? clearAttachments : List.of());
-        HashSet<String> seenHeader = new HashSet<>();
-        HashSet<String> seenAttachment = new HashSet<>();
+        Iterable<String> removeHeaders = new HashSet<>(clearMessageHeaders != null ? clearMessageHeaders : List.of());
+        Iterable<String> removeAttachments = new HashSet<>(clearAttachments != null ? clearAttachments : List.of());
+        Set<String> seenHeader = new HashSet<>();
+        Set<String> seenAttachment = new HashSet<>();
         for (Message msg : hist.getRetrievedHistory()) {
             String msgTxt = msg.getContentRaw();
             if (msgTxt.contains("is up to draft")) {

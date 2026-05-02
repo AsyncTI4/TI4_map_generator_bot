@@ -11,7 +11,7 @@ final class GameFileLockManager {
     private static final ConcurrentHashMap<String, ReentrantReadWriteLock> locks = new ConcurrentHashMap<>();
 
     private static ReentrantReadWriteLock getLock(String gameName) {
-        return locks.computeIfAbsent(gameName, k -> new ReentrantReadWriteLock());
+        return locks.computeIfAbsent(gameName, _ -> new ReentrantReadWriteLock());
     }
 
     public static void wrapWithWriteLock(String gameName, Runnable runnable) {
