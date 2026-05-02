@@ -1,7 +1,5 @@
 package ti4.game.persistence;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -87,7 +85,7 @@ public class GameManager {
         gameNames.remove(gameName);
         var managedGame = gameNameToManagedGame.remove(gameName);
         if (managedGame != null) {
-            managedGame.getPlayers().forEach(player -> player.getGames().remove(managedGame));
+            managedGame.getPlayers().forEach(player -> player.removeGame(gameName));
         }
     }
 
@@ -167,7 +165,7 @@ public class GameManager {
 
     public static List<String> getGameNames() {
         waitFor(GAME_NAMES_LOADED_LATCH);
-        return new ArrayList<>(gameNames);
+        return List.copyOf(gameNames);
     }
 
     public static int getGameCount() {
@@ -198,7 +196,7 @@ public class GameManager {
 
     public static List<ManagedGame> getManagedGames() {
         waitFor(WARMUP_FINISHED_LATCH);
-        return new ArrayList<>(gameNameToManagedGame.values());
+        return List.copyOf(gameNameToManagedGame.values());
     }
 
     public static ManagedPlayer getManagedPlayer(String playerId) {
@@ -208,11 +206,11 @@ public class GameManager {
 
     public static Set<ManagedPlayer> getManagedPlayers() {
         waitFor(WARMUP_FINISHED_LATCH);
-        return new HashSet<>(userIdToManagedPlayer.values());
+        return Set.copyOf(userIdToManagedPlayer.values());
     }
 
     static ManagedPlayer addOrMergePlayer(ManagedGame game, Player player) {
-        return userIdToManagedPlayer.compute(player.getUserID(), (id, existing) -> {
+        return userIdToManagedPlayer.compute(player.getUserID(), (_, existing) -> {
             if (existing == null) {
                 return new ManagedPlayer(game, player);
             }
