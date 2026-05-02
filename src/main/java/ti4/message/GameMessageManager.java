@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -160,14 +159,15 @@ public class GameMessageManager {
             return Collections.emptyMap();
         }
 
-        return allGameMessages.gameNameToMessages.entrySet().stream()
-                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, entry -> entry.getValue().stream()
-                        .filter(m -> m.type == type)
-                        .toList()))
-                .entrySet()
-                .stream()
-                .filter(entry -> !entry.getValue().isEmpty())
-                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+        Map<String, List<GameMessage>> result = new HashMap<>();
+        for (var entry : allGameMessages.gameNameToMessages.entrySet()) {
+            List<GameMessage> filtered =
+                    entry.getValue().stream().filter(m -> m.type == type).toList();
+            if (!filtered.isEmpty()) {
+                result.put(entry.getKey(), filtered);
+            }
+        }
+        return Collections.unmodifiableMap(result);
     }
 
     public static synchronized List<GameMessage> getAll(String gameName, GameMessageType type) {

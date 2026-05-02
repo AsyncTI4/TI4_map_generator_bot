@@ -79,13 +79,14 @@ public class SabotageAutoReactCron {
             }
 
             for (var acMessage : acMessages) {
-                if (ReactionService.checkForSpecificPlayerReact(acMessage.messageId(), player, game)) {
+                if (acMessage.factionsThatReacted().contains(player.getFaction())) {
                     continue;
                 }
 
                 String message = game.isFowMode() ? "No Sabotage" : null;
                 try {
                     ReactionService.addReaction(player, false, message, null, acMessage.messageId(), game);
+                    acMessage.factionsThatReacted().add(player.getFaction());
                 } catch (Exception e) {
                     if (DiscordHelper.isUnknownMessageError(e)) {
                         GameMessageManager.remove(game.getName(), acMessage.messageId());
