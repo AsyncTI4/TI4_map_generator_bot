@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -17,6 +16,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -43,7 +43,7 @@ public class SilverFlameService {
         return Mapper.getRelic("thesilverflame").getSimpleRepresentation(false);
     }
 
-    public void rollSilverFlame(ButtonInteractionEvent event, Game game, Player player) {
+    public void rollSilverFlame(Game game, Player player) {
         silverFlameDrumroll(game, player, 10);
     }
 
@@ -51,15 +51,13 @@ public class SilverFlameService {
         String ffcc = player.finChecker();
         Button good = Buttons.green(ffcc + "resolveSilverFlamePoint", "Gain 1 Victory Point", CardEmojis.Public1alt);
         Button bad = Buttons.red(ffcc + "resolveSilverFlamePurge", "Purge your Home System", TileEmojis.TileRedBack);
-        List<Button> resolveButtons =
-                new ArrayList<>(HeartOfIxthService.makeHeartOfIxthButtons(game, player, good, bad, resultDie));
 
         // TODO: other mykomentori related buttons
         // if (player.getPromissoryNotesInPlayArea().contains("dspnmyko") &&
         // game.getStoredValue("usedGiftInsight").isBlank())
         //     resolveButtons.add(Buttons.blue("rerollSilverFlame", "Reroll with Gift of Insight", CardEmojis.PN));
 
-        return resolveButtons;
+        return new ArrayList<>(HeartOfIxthService.makeHeartOfIxthButtons(game, player, good, bad, resultDie));
     }
 
     private void silverFlameDrumroll(Game game, Player flamePlayer, int target) {
@@ -77,13 +75,12 @@ public class SilverFlameService {
         }
         DisasterWatchHelper.postTileInFlameWatch(game, null, flamePlayer.getHomeSystemTile(), 0, watchPartyMsg);
 
-        Predicate<Game> resolve = g2 -> {
-            Player player = g2.getPlayer(flamePlayer.getUserID());
-            resolveSilverFlameRoll(g2, player, target);
-            return false;
+        Runnable onCompletion = () -> {
+            Game silverFlameGame = GameManager.getManagedGame(gameName).getGame();
+            resolveSilverFlameRoll(silverFlameGame, silverFlameGame.getPlayer(flamePlayer.getUserID()), target);
         };
         String drumrollMessage = flamePlayer.getRepresentation() + " is rolling for " + rep() + "!";
-        DrumrollService.doDrumroll(flamePlayer.getCorrectChannel(), drumrollMessage, 5, gameName, resolve);
+        DrumrollService.doDrumroll(flamePlayer.getCorrectChannel(), drumrollMessage, 5, onCompletion);
     }
 
     private void resolveSilverFlameRoll(Game game, Player flamePlayer, int target) {
@@ -161,7 +158,7 @@ public class SilverFlameService {
         List<UnitType> singles = List.of(UnitType.Infantry, UnitType.Fighter);
         for (UnitHolder uh : homeSystem.getUnitHolders().values()) {
             for (UnitKey key : uh.getUnitsByState().keySet()) {
-                int uhAmt = singles.contains(key.getUnitType()) ? 1 : uh.getUnitCount(key);
+                int uhAmt = singles.contains(key.unitType()) ? 1 : uh.getUnitCount(key);
                 allUnitsCount.put(key, allUnitsCount.getOrDefault(key, 0) + uhAmt);
             }
         }
@@ -170,7 +167,7 @@ public class SilverFlameService {
         StringBuilder purgedUnitList = new StringBuilder("Also purged the following units from the game:");
         for (Entry<UnitKey, Integer> entry : allUnitsCount.entrySet()) {
             UnitKey key = entry.getKey();
-            Player owner = game.getPlayerFromColorOrFaction(key.getColorID());
+            Player owner = game.getPlayerFromColorOrFaction(key.colorID());
             if (owner == null) continue;
 
             int quantity = entry.getValue();

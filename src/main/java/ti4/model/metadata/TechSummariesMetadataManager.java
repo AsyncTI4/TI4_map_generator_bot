@@ -30,7 +30,7 @@ public class TechSummariesMetadataManager {
         }
 
         RoundTechSummaries roundTechSummaries = techSummaries.gameNameToTechSummary.computeIfAbsent(
-                game.getName(), k -> new RoundTechSummaries(game.getRound(), new ArrayList<>()));
+                game.getName(), _ -> new RoundTechSummaries(game.getRound(), new ArrayList<>()));
         if (roundTechSummaries.round != game.getRound()) {
             roundTechSummaries = new RoundTechSummaries(game.getRound(), new ArrayList<>());
             techSummaries.gameNameToTechSummary.put(game.getName(), roundTechSummaries);

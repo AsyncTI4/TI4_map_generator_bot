@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.callbacks.IDeferrableCallback;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -84,7 +85,7 @@ public class CustomHyperlaneService {
                     .setComponents(buttons)
                     .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
-            ((ButtonInteractionEvent) event)
+            ((IDeferrableCallback) event)
                     .getHook()
                     .editOriginalComponents(buttons)
                     .queue(Consumers.nop(), BotLogger::catchRestError);

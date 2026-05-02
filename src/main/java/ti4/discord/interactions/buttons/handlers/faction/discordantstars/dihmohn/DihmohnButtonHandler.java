@@ -17,7 +17,7 @@ import ti4.message.MessageHelper;
 import ti4.service.leader.PurgeHeroService;
 
 @UtilityClass
-public class DihmohnButtonHandler {
+class DihmohnButtonHandler {
 
     @ButtonHandler("dsdihmy_")
     public static void dihmohnYellowTech(ButtonInteractionEvent event, Player player, String buttonID, Game game) {

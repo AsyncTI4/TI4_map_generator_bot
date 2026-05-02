@@ -16,7 +16,7 @@ import ti4.model.TechnologyModel;
 import ti4.service.tech.ListTechService;
 
 @UtilityClass
-public class JolnarButtonHandler {
+class JolnarButtonHandler {
 
     @ButtonHandler("jnHeroSwapOut_")
     public static void resolveAJolNarSwapStep1(

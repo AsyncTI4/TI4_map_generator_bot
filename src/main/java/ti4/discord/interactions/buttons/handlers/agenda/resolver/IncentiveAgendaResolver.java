@@ -6,7 +6,7 @@ import ti4.service.objectives.RevealPublicObjectiveService;
 
 public class IncentiveAgendaResolver implements ForAgainstAgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "incentive";
     }
 

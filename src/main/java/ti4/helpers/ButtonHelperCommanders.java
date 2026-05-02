@@ -140,8 +140,6 @@ public class ButtonHelperCommanders {
                     player.getRepresentation() + " the system does not have your command token in it.");
             return;
         }
-        // player.setTg(player.getTg() - 2);
-        // player.setStrategicCC(player.getStrategicCC() - 1);
         RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
@@ -337,7 +335,7 @@ public class ButtonHelperCommanders {
                         .filter(uk -> !player.getUnitFromUnitKey(uk).getIsStructure())
                         .map(uk -> Buttons.gray(
                                 prefix + uk.asyncID(),
-                                uk.getUnitType().humanReadableName() + " " + planetName,
+                                uk.unitType().humanReadableName() + " " + planetName,
                                 uk.unitEmoji()))
                         .forEach(newButtons::add);
             }

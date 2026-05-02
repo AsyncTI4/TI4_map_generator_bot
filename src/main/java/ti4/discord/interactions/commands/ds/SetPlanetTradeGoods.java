@@ -30,14 +30,10 @@ class SetPlanetTradeGoods extends GameStateSubcommand {
         int old;
         if ("uikos".equalsIgnoreCase(planet)) {
             old = getPlayer().getHarvestCounter();
-            if (count > -1) {
-                getPlayer().setHarvestCounter(count);
-            }
+            getPlayer().setHarvestCounter(count);
         } else {
             old = getGame().changeCommsOnPlanet(0, planet);
-            if (count > -1) {
-                getGame().changeCommsOnPlanet(count - old, planet);
-            }
+            getGame().changeCommsOnPlanet(count - old, planet);
         }
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),

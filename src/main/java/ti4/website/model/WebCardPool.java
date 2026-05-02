@@ -66,40 +66,40 @@ public class WebCardPool {
                     .filter(so -> !scoredSecrets.contains(so))
                     .collect(Collectors.toList());
         }
-        cardPool.setSecretObjectiveDeck(shuffledCopy(unscoredSecrets));
-        cardPool.setSecretObjectiveFullDeckSize(game.getSecretObjectiveFullDeckSize());
+        cardPool.secretObjectiveDeck = shuffledCopy(unscoredSecrets);
+        cardPool.secretObjectiveFullDeckSize = game.getSecretObjectiveFullDeckSize();
 
         // Action Cards
-        cardPool.setActionCardDeck(new ArrayList<>());
-        cardPool.setActionCardDiscard(
-                new ArrayList<>(game.getDiscardActionCards().keySet()));
-        cardPool.setActionCardFullDeckSize(game.getActionCardFullDeckSize());
+        cardPool.actionCardDeck = new ArrayList<>();
+        cardPool.actionCardDiscard =
+                new ArrayList<>(game.getDiscardActionCards().keySet());
+        cardPool.actionCardFullDeckSize = game.getActionCardFullDeckSize();
 
         // Exploration Cards
-        cardPool.setCulturalExploreDeck(shuffledCopy(game.getExploreDeck(Constants.CULTURAL)));
-        cardPool.setCulturalExploreDiscard(new ArrayList<>(game.getExploreDiscard(Constants.CULTURAL)));
-        cardPool.setCulturalExploreFullDeckSize(game.getCulturalExploreFullDeckSize());
+        cardPool.culturalExploreDeck = shuffledCopy(game.getExploreDeck(Constants.CULTURAL));
+        cardPool.culturalExploreDiscard = new ArrayList<>(game.getExploreDiscard(Constants.CULTURAL));
+        cardPool.culturalExploreFullDeckSize = game.getCulturalExploreFullDeckSize();
 
-        cardPool.setIndustrialExploreDeck(shuffledCopy(game.getExploreDeck(Constants.INDUSTRIAL)));
-        cardPool.setIndustrialExploreDiscard(new ArrayList<>(game.getExploreDiscard(Constants.INDUSTRIAL)));
-        cardPool.setIndustrialExploreFullDeckSize(game.getIndustrialExploreFullDeckSize());
+        cardPool.industrialExploreDeck = shuffledCopy(game.getExploreDeck(Constants.INDUSTRIAL));
+        cardPool.industrialExploreDiscard = new ArrayList<>(game.getExploreDiscard(Constants.INDUSTRIAL));
+        cardPool.industrialExploreFullDeckSize = game.getIndustrialExploreFullDeckSize();
 
-        cardPool.setHazardousExploreDeck(shuffledCopy(game.getExploreDeck(Constants.HAZARDOUS)));
-        cardPool.setHazardousExploreDiscard(new ArrayList<>(game.getExploreDiscard(Constants.HAZARDOUS)));
-        cardPool.setHazardousExploreFullDeckSize(game.getHazardousExploreFullDeckSize());
+        cardPool.hazardousExploreDeck = shuffledCopy(game.getExploreDeck(Constants.HAZARDOUS));
+        cardPool.hazardousExploreDiscard = new ArrayList<>(game.getExploreDiscard(Constants.HAZARDOUS));
+        cardPool.hazardousExploreFullDeckSize = game.getHazardousExploreFullDeckSize();
 
-        cardPool.setFrontierExploreDeck(shuffledCopy(game.getExploreDeck(Constants.FRONTIER)));
-        cardPool.setFrontierExploreDiscard(new ArrayList<>(game.getExploreDiscard(Constants.FRONTIER)));
-        cardPool.setFrontierExploreFullDeckSize(game.getFrontierExploreFullDeckSize());
+        cardPool.frontierExploreDeck = shuffledCopy(game.getExploreDeck(Constants.FRONTIER));
+        cardPool.frontierExploreDiscard = new ArrayList<>(game.getExploreDiscard(Constants.FRONTIER));
+        cardPool.frontierExploreFullDeckSize = game.getFrontierExploreFullDeckSize();
 
         // Relics
-        cardPool.setRelicDeck(shuffledCopy(game.getAllRelics()));
-        cardPool.setRelicFullDeckSize(game.getRelicFullDeckSize());
+        cardPool.relicDeck = shuffledCopy(game.getAllRelics());
+        cardPool.relicFullDeckSize = game.getRelicFullDeckSize();
 
         // Agendas
-        cardPool.setAgendaDeck(shuffledCopy(game.getAgendas()));
-        cardPool.setAgendaDiscard(new ArrayList<>(game.getDiscardAgendas().keySet()));
-        cardPool.setAgendaFullDeckSize(game.getAgendaFullDeckSize());
+        cardPool.agendaDeck = shuffledCopy(game.getAgendas());
+        cardPool.agendaDiscard = new ArrayList<>(game.getDiscardAgendas().keySet());
+        cardPool.agendaFullDeckSize = game.getAgendaFullDeckSize();
 
         return cardPool;
     }

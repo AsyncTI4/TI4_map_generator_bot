@@ -651,7 +651,7 @@ public final class TransactionHelper {
         transaction(null, player, game, "");
     }
 
-    @ButtonHandler(value = "transaction_BMD", save = true)
+    @ButtonHandler("transaction_BMD")
     @ButtonHandler(value = "transaction", save = false)
     private static void transaction(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         if (buttonID.endsWith("_BMD")) {
@@ -1485,7 +1485,7 @@ public final class TransactionHelper {
         String factionToTrans = buttonID.substring(0, buttonID.indexOf('_'));
         String amountToTrans = buttonID.substring(buttonID.indexOf('_') + 1);
         Player p2 = game.getPlayerFromColorOrFaction(factionToTrans);
-        if (p1 == null || p2 == null) return;
+        if (p2 == null) return;
 
         String message2 = "";
         String ident = p1.getRepresentation();
@@ -1745,9 +1745,6 @@ public final class TransactionHelper {
     }
 
     private static boolean canTheseTwoTransact(Game game, Player player, Player player2) {
-        // if(game.getRealPlayers().size() > 26){
-        //     return true;
-        // }
         if (IsPlayerElectedService.isPlayerElected(game, player2, "tf-censure")
                 || IsPlayerElectedService.isPlayerElected(game, player, "tf-censure")) {
             return false;
@@ -1801,7 +1798,7 @@ public final class TransactionHelper {
                     continue;
                 }
                 String faction = player.getFaction();
-                if (faction != null && Mapper.isValidFaction(faction)) {
+                if (Mapper.isValidFaction(faction)) {
                     Button button;
                     if (!game.isFowMode()) {
                         String label = player.getUserName();

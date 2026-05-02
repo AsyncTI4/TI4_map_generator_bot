@@ -121,7 +121,6 @@ public final class TransactionGenerator {
         return img;
     }
 
-    /** See also {@link TransactionHelper.buildTransactionOffer} */
     public static BufferedImage drawTradeOfferMeme(Game game, Player p1, Player p2) {
         BufferedImage meme = ImageHelper.read(ResourceHelper.getInstance().getExtraFile("trade_offer_base.png"));
         if (meme == null) return null;
@@ -216,11 +215,7 @@ public final class TransactionGenerator {
                         String txt = "Clear " + amountToTransact + " debt";
                         y += drawStringMultiLine(g2, txt, x, y + 40, 250, hAlign);
                     }
-                    case "shipOrders" -> {
-                        String txt = Mapper.getRelic(furtherDetail).getName();
-                        y += drawStringMultiLine(g2, txt, x, y + 40, 250, hAlign);
-                    }
-                    case "starCharts" -> {
+                    case "shipOrders", "starCharts" -> {
                         String txt = Mapper.getRelic(furtherDetail).getName();
                         y += drawStringMultiLine(g2, txt, x, y + 40, 250, hAlign);
                     }

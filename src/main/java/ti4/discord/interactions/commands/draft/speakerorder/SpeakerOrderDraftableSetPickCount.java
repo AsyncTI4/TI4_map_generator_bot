@@ -10,7 +10,7 @@ import ti4.service.draft.draftables.SpeakerOrderDraftable;
 
 class SpeakerOrderDraftableSetPickCount extends GameStateSubcommand {
 
-    protected SpeakerOrderDraftableSetPickCount() {
+    SpeakerOrderDraftableSetPickCount() {
         super(Constants.DRAFT_SPEAKER_ORDER_SET_PICK_COUNT, "Set the number of pick orders in the draft", true, false);
         addOption(
                 OptionType.INTEGER,

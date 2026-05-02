@@ -141,10 +141,6 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "2ff", "placeOneNDone_skipbuild"));
             }
             // Homebrew
-            // case "mr" -> {
-            //     output = "Use buttons to destroy a ground force on a legendary or a planet adjacent to Mecatol Rex.";
-            //     buttons.addAll(ButtonHelper.customRexLegendary(player, game));
-            // }
             case "avernus" -> {
                 output = "Please choose the system where you wish to resolve **Star Forge** in.";
                 List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Warsun);

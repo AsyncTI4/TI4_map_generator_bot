@@ -239,7 +239,7 @@ final class DashboardBadgeEngine {
         }
         String tier = longHaulFinishes >= GALACTIC_ENDURANCE_LEGENDARY_GAMES
                 ? "LEGENDARY"
-                : longHaulFinishes >= GALACTIC_ENDURANCE_GOLD_GAMES ? "GOLD" : "SILVER";
+                : longHaulFinishes == GALACTIC_ENDURANCE_GOLD_GAMES ? "GOLD" : "SILVER";
         badges.add(new PlayerDashboardResponse.BadgeAward(
                 "galactic_endurance",
                 "Galactic Endurance",

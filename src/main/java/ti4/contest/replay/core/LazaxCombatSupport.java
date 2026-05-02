@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -145,12 +146,17 @@ public class LazaxCombatSupport {
     }
 
     public String formatCombatTechSummary(Tile tile, Player attacker, Player defender) {
+        return formatCombatTechSummary(tile, attacker, defender, new CombatReplayDecoys.Abilities(null));
+    }
+
+    public String formatCombatTechSummary(
+            Tile tile, Player attacker, Player defender, CombatReplayDecoys.Abilities abilities) {
         if (attacker == null || defender == null) return null;
 
         StringBuilder message = new StringBuilder("## Combat Technologies\n")
-                .append(formatCombatTechLine(attacker))
+                .append(formatCombatTechLine(attacker, abilities))
                 .append("\n")
-                .append(formatCombatTechLine(defender));
+                .append(formatCombatTechLine(defender, abilities));
         String relicSection = formatCombatRelicSection(attacker, defender);
         if (relicSection != null) {
             message.append("\n").append(relicSection);
@@ -232,7 +238,7 @@ public class LazaxCombatSupport {
         Map<String, Integer> damagedCountsByAsyncId = new HashMap<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             for (UnitKey unitKey : unitHolder.getUnitKeys()) {
-                if (!unitKey.getColorID().equalsIgnoreCase(player.getColorID())) continue;
+                if (!unitKey.colorID().equalsIgnoreCase(player.getColorID())) continue;
                 int damagedUnits = unitHolder.getDamagedUnitCount(unitKey);
                 if (damagedUnits <= 0) continue;
                 damagedCountsByAsyncId.merge(unitKey.asyncID(), damagedUnits, Integer::sum);
@@ -241,9 +247,13 @@ public class LazaxCombatSupport {
         return damagedCountsByAsyncId;
     }
 
-    private String formatCombatTechLine(Player player) {
+    private String formatCombatTechLine(Player player, CombatReplayDecoys.Abilities abilities) {
         List<TechnologyModel> combatTechs = new ArrayList<>();
-        for (String techId : player.getTechs()) {
+        Set<String> techIds = new LinkedHashSet<>(player.getTechs());
+        if (CombatReplayDecoys.hasWarSunDecoyForPlayer(abilities, player)) {
+            techIds.add("ws");
+        }
+        for (String techId : techIds) {
             TechnologyModel tech = Mapper.getTech(techId);
             if (tech == null) continue;
             if (player.getPurgedTechs().contains(tech.getAlias())) continue;

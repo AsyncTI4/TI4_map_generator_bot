@@ -191,19 +191,8 @@ public class TacticalActionService {
         ButtonHelper.deleteAllButtons(event);
     }
 
-    private static final class FinishMovementContext {
-        final Tile tile;
-        final boolean unitsWereMoved;
-        final boolean hasGfsInRange;
-        final List<Player> playersWithPds2;
-
-        FinishMovementContext(Tile tile, boolean unitsWereMoved, boolean hasGfsInRange, List<Player> playersWithPds2) {
-            this.tile = tile;
-            this.unitsWereMoved = unitsWereMoved;
-            this.hasGfsInRange = hasGfsInRange;
-            this.playersWithPds2 = playersWithPds2;
-        }
-    }
+    private record FinishMovementContext(
+            Tile tile, boolean unitsWereMoved, boolean hasGfsInRange, List<Player> playersWithPds2) {}
 
     private FinishMovementContext executeCoreFinishMovement(
             ButtonInteractionEvent event, Game game, Player player, Tile tile) {
@@ -220,7 +209,7 @@ public class TacticalActionService {
                         && tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE));
 
         if (unitsWereMoved) {
-            ButtonHelperTacticalAction.resolveAfterMovementEffects(event, game, player, updatedTile, unitsWereMoved);
+            ButtonHelperTacticalAction.resolveAfterMovementEffects(event, game, player, updatedTile, true);
             game.setStoredValue(
                     "currentActionSummary" + player.getFaction(),
                     game.getStoredValue("currentActionSummary" + player.getFaction()) + " Moved ships there.");

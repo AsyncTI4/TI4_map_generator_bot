@@ -1,31 +1,43 @@
 package ti4.game.persistence;
 
-import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
 import ti4.game.Player;
 
-@Getter
 public class ManagedPlayer {
 
+    @Getter
     private final String id;
+
+    @Getter
     private final String name;
-    private final Set<ManagedGame> games;
+
+    // We have to use a map for the "replace" logic to work, a set won't provide an atomic replace
+    private final Map<String, ManagedGame> games;
 
     public ManagedPlayer(ManagedGame game, Player player) {
         id = player.getUserID();
         name = player.getUserName();
-        games = new HashSet<>();
-        games.add(game);
+        games = new ConcurrentHashMap<>();
+        games.put(game.getName(), game);
     }
 
-    synchronized void addOrReplaceGame(ManagedGame game, Player player) {
+    void removeGame(String gameName) {
+        games.remove(gameName);
+    }
+
+    void addOrReplaceGame(ManagedGame game, Player player) {
         if (!player.getUserID().equals(id)) {
             throw new IllegalArgumentException("Player " + player.getUserID() + " attempted merge with " + id);
         }
-        games.remove(game);
-        games.add(game);
+        games.put(game.getName(), game);
+    }
+
+    public Set<ManagedGame> getGames() {
+        return Set.copyOf(games.values());
     }
 
     @Override

@@ -97,7 +97,7 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
     @Override
     public List<Button> specialButtons() {
         String idPrefix = menuAction + "_" + navId() + "_";
-        ArrayList<Button> buttons = new ArrayList<>(super.specialButtons());
+        List<Button> buttons = new ArrayList<>(super.specialButtons());
         buttons.add(Buttons.blue(idPrefix + "presetPackages~MDL", "Use preset packages"));
         return buttons;
     }
@@ -220,7 +220,7 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
         return "Unknown Event";
     }
 
-    public String setPresetPackages(String packagesString) {
+    private String setPresetPackages(String packagesString) {
         if (packagesString == null || packagesString.isEmpty()) {
             return null;
         }

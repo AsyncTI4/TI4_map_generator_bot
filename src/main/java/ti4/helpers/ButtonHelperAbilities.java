@@ -325,7 +325,7 @@ public final class ButtonHelperAbilities {
                 for (Map.Entry<UnitKey, Integer> entry : units.entrySet()) {
                     UnitKey unitKey = entry.getKey();
                     if (unitKey != null
-                            && unitKey.getColorID().equals(colorID)
+                            && unitKey.colorID().equals(colorID)
                             && p2.getUnitFromAsyncID(unitKey.asyncID()) != null
                             && p2.getUnitFromAsyncID(unitKey.asyncID()).getIsShip()) {
                         ships += entry.getValue();
@@ -354,7 +354,7 @@ public final class ButtonHelperAbilities {
 
             for (UnitKey unitKey : units.keySet()) {
                 if (unitKey != null
-                        && unitKey.getColorID().equals(colorID)
+                        && unitKey.colorID().equals(colorID)
                         && p2.getUnitFromAsyncID(unitKey.asyncID()) != null
                         && p2.getUnitFromAsyncID(unitKey.asyncID()).getIsShip()) {
                     asyncID = unitKey.asyncID();
@@ -1208,7 +1208,7 @@ public final class ButtonHelperAbilities {
                 }
             }
         }
-        return tile;
+        return null;
     }
 
     @ButtonHandler("exhaustSuperweapon_")
@@ -1718,8 +1718,7 @@ public final class ButtonHelperAbilities {
         if (!player.isHasUsedEnvironmentPlunderAbility()
                 && player.hasAbility("policy_the_environment_plunder")
                 && ButtonHelper.getTypeOfPlanet(game, planet).contains("hazardous")) {
-            Planet planetUnit = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-            Planet planetReal = planetUnit;
+            Planet planetReal = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             List<Button> buttons = new ArrayList<>();
             if (planetReal != null
                     && isNotBlank(planetReal.getOriginalPlanetType())

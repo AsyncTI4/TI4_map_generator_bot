@@ -63,7 +63,7 @@ public class LogBufferManager {
         try {
             LogTarget target = new LogTarget(eventLog.getChannelName(), eventLog.getThreadName());
             messageBuilders
-                    .computeIfAbsent(target, k -> new StringBuilder(INITIAL_STRING_BUFFER_SIZE))
+                    .computeIfAbsent(target, _ -> new StringBuilder(INITIAL_STRING_BUFFER_SIZE))
                     .append(eventLog.getLogString());
         } catch (Exception e) {
             BotLogger.error("Error draining message buffer for single event log.", e);

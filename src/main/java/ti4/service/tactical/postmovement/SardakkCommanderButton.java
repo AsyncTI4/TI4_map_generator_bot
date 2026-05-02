@@ -8,10 +8,10 @@ import ti4.service.tactical.PostMovementButtonContext;
 
 public final class SardakkCommanderButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return ctx.game.playerHasLeaderUnlockedOrAlliance(ctx.player, "sardakkcommander");
+        return ctx.game().playerHasLeaderUnlockedOrAlliance(ctx.player(), "sardakkcommander");
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
-        return ButtonHelperCommanders.getSardakkCommanderButtons(ctx.game, ctx.player, null);
+        return ButtonHelperCommanders.getSardakkCommanderButtons(ctx.game(), ctx.player(), null);
     }
 }

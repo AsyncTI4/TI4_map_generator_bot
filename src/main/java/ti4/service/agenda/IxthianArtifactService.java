@@ -2,7 +2,6 @@ package ti4.service.agenda;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -16,6 +15,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTwilightsFallActionCards;
 import ti4.helpers.DiceHelper;
@@ -77,16 +77,14 @@ public class IxthianArtifactService {
         MessageChannel partyChan = watchPartyChannel(game);
         String watchMsg = watchPartyPing(game);
 
-        Predicate<Game> resolve = futureGame -> {
-            resolveIxthianRoll(futureGame, publish && partyChan != null);
-            return false;
-        };
+        Runnable onCompletion =
+                () -> resolveIxthianRoll(GameManager.getManagedGame(gameName).getGame(), publish && partyChan != null);
 
         int sec = drumrollSeconds();
         if (publish && !game.isFowMode()) {
-            DrumrollService.doDrumrollMirrored(chan, gameMsg, sec, gameName, resolve, partyChan, watchMsg);
+            DrumrollService.doDrumrollMirrored(chan, gameMsg, sec, onCompletion, partyChan, watchMsg);
         } else {
-            DrumrollService.doDrumroll(chan, gameMsg, sec, gameName, resolve);
+            DrumrollService.doDrumroll(chan, gameMsg, sec, onCompletion);
         }
     }
 

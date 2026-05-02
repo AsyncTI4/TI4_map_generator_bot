@@ -270,28 +270,25 @@ public final class TeHelperUnits {
 
                 // moved all of this unit already from this unit holder
                 String unitStr = uk.asyncID() + " " + uh.getName();
-                if (movedUnits != null
-                        && movedUnits.stream().filter(s -> s.equals(unitStr)).count() >= uh.getUnitCount(uk)) continue;
+                if (movedUnits.stream().filter(s -> s.equals(unitStr)).count() >= uh.getUnitCount(uk)) continue;
 
                 String id = player.finChecker() + "moveForerunner_" + destination.getPosition() + "_"
                         + source.getPosition() + "_" + uk.asyncID() + "_" + uh.getName();
-                String label = uk.getUnitType().humanReadableName() + " from " + uhName;
+                String label = uk.unitType().humanReadableName() + " from " + uhName;
                 buttons.add(Buttons.green(id, label, uk.unitEmoji()));
             }
         }
         // Get buttons to UNDO moving units from this system
-        if (movedUnits != null) {
-            Set<String> uniqueUnits = new HashSet<>(movedUnits);
-            for (String unit : uniqueUnits) {
-                String[] data = unit.split(" ");
-                UnitType type = Units.findUnitType(data[0]);
-                String uhName = Helper.getPlanetRepresentation(data[1], game);
-                if (type != null) {
-                    String id = player.finChecker() + "undoForerunner_" + destination.getPosition() + "_"
-                            + source.getPosition() + "_" + type + "_" + data[1];
-                    String label = "Return " + type.humanReadableName() + " to " + uhName;
-                    buttons.add(Buttons.red(id, label, type.getUnitTypeEmoji()));
-                }
+        Set<String> uniqueUnits = new HashSet<>(movedUnits);
+        for (String unit : uniqueUnits) {
+            String[] data = unit.split(" ");
+            UnitType type = Units.findUnitType(data[0]);
+            String uhName = Helper.getPlanetRepresentation(data[1], game);
+            if (type != null) {
+                String id = player.finChecker() + "undoForerunner_" + destination.getPosition() + "_"
+                        + source.getPosition() + "_" + type + "_" + data[1];
+                String label = "Return " + type.humanReadableName() + " to " + uhName;
+                buttons.add(Buttons.red(id, label, type.getUnitTypeEmoji()));
             }
         }
         // Choose another system button
@@ -309,14 +306,13 @@ public final class TeHelperUnits {
         for (UnitKey uk : tile.getSpaceUnitHolder().getUnitsByState().keySet()) {
             if (player.unitBelongsToPlayer(uk)) continue;
 
-            Player p2 = game.getPlayerFromColorOrFaction(uk.getColorID());
+            Player p2 = game.getPlayerFromColorOrFaction(uk.colorID());
             if (p2 == null) continue;
 
             UnitModel model = p2.getUnitFromUnitKey(uk);
             if (!model.getSustainDamage()) {
                 String id = prefixID + p2.getFaction() + "_" + uk.asyncID();
-                String label =
-                        "Destroy " + p2.getColor() + " " + uk.getUnitType().humanReadableName();
+                String label = "Destroy " + p2.getColor() + " " + uk.unitType().humanReadableName();
                 destroyable.add(Buttons.red(id, label, uk.unitEmoji()));
             }
         }

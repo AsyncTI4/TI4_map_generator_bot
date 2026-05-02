@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -102,7 +103,7 @@ public final class TeHelperAbilities {
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- RalNel Consortium -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
     /* ---------------------------------------------------------------------------|--------------------------------------------------------------------------- */
     // Helpers for all of RalNel's broken movement abilities
-    public static String unitSummary(Game game, Player player, HashMap<String, List<String>> moveMap) {
+    public static String unitSummary(Game game, Player player, Map<String, List<String>> moveMap) {
         if (moveMap.isEmpty()) return "\n> No units are being moved yet.";
         StringBuilder sb = new StringBuilder();
         for (Entry<String, List<String>> system : moveMap.entrySet()) {
@@ -120,7 +121,7 @@ public final class TeHelperAbilities {
         return sb.toString();
     }
 
-    public static void removeUnits(Game game, Player player, HashMap<String, List<String>> moveMap) {
+    public static void removeUnits(Game game, Player player, Map<String, List<String>> moveMap) {
         for (Entry<String, List<String>> system : moveMap.entrySet()) {
             Tile systemFrom = game.getTileByPosition(system.getKey());
 
@@ -147,7 +148,7 @@ public final class TeHelperAbilities {
         return moveMap;
     }
 
-    public static String storeMovementMap(HashMap<String, List<String>> moveMap) {
+    public static String storeMovementMap(Map<String, List<String>> moveMap) {
         StringBuilder sb = new StringBuilder();
         for (Entry<String, List<String>> system : moveMap.entrySet()) {
             if (!sb.isEmpty()) sb.append("|");
@@ -168,7 +169,7 @@ public final class TeHelperAbilities {
             String planet = matcher.group("planet");
             int count = Integer.parseInt(matcher.group("count"));
 
-            String unitName = uk.getUnitType().humanReadableName();
+            String unitName = uk.unitType().humanReadableName();
             String planetName = Helper.getPlanetRepresentation(planet, game);
             String message = player.getRepresentation(false, false) + " landed " + count + " " + unitName + " on "
                     + planetName + ".";
@@ -345,7 +346,7 @@ public final class TeHelperAbilities {
     }
 
     public static List<Button> getSurvivalInstinctSystemButtons(
-            Game game, Player player, Tile tile, HashMap<String, List<String>> survivalMap) {
+            Game game, Player player, Tile tile, Map<String, List<String>> survivalMap) {
         // Get the tiles that are valid sources for Survival Instinct
         if (survivalMap == null) survivalMap = new HashMap<>();
         List<Button> buttons = new ArrayList<>();
@@ -373,9 +374,9 @@ public final class TeHelperAbilities {
                 if (!player.unitBelongsToPlayer(uk)) continue;
 
                 // franken compat
-                if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.getUnitType())
+                if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.unitType())
                         && !player.hasAbility("miniaturization")) continue;
-                if (uk.getUnitType() == UnitType.PlenaryOrbital) continue;
+                if (uk.unitType() == UnitType.PlenaryOrbital) continue;
 
                 // moved all of this unit already from this unit holder
                 String unitStr = uk.asyncID() + " " + uh.getName();
@@ -386,7 +387,7 @@ public final class TeHelperAbilities {
                 // otherwise, add the button
                 String id = player.finChecker() + "moveSurvival_" + destination.getPosition() + "_"
                         + source.getPosition() + "_" + uk.asyncID() + "_" + uh.getName();
-                String label = uk.getUnitType().humanReadableName() + " from " + uhName;
+                String label = uk.unitType().humanReadableName() + " from " + uhName;
                 buttons.add(Buttons.green(id, label, uk.unitEmoji()));
             }
         }

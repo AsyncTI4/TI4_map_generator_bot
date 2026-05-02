@@ -183,9 +183,6 @@ class ActionCardDeck2ButtonHandler {
         //            buttons.add(Buttons.red("getDamageButtons_" + game.getActiveSystem() + "_" + "combat", "Assign
         // Hit" + (hits == 1 ? "" : "s")));
         //        }
-        //        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg + "\n " +
-        // player.getRepresentation() +
-        //            " your opponent needs to assign " + hits + " hit" + (hits == 1 ? "" : "s"), buttons);
     }
 
     @ButtonHandler("resolveFlawlessStrategy")

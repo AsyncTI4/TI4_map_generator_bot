@@ -6,10 +6,12 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import ti4.contest.replay.service.CombatReplayHouseService;
 import ti4.contest.replay.service.CombatReplayLeaderboardService;
 import ti4.discord.JdaService;
 import ti4.executors.ExecutorServiceManager;
 import ti4.logging.BotLogger;
+import ti4.spring.context.SpringContext;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
 class LazaxMinigameReactionListener extends ListenerAdapter {
@@ -36,14 +38,23 @@ class LazaxMinigameReactionListener extends ListenerAdapter {
     private void handleReactionAdd(MessageReactionAddEvent event) {
         try {
             event.retrieveMessage()
-                    .queue(message -> applyRoleUpdateIfSubscriptionPrompt(event, message), BotLogger::catchRestError);
+                    .queue(message -> handleLazaxMinigameReaction(event, message), BotLogger::catchRestError);
         } catch (Exception e) {
             BotLogger.error("Error in `LazaxMinigameReactionListener.handleReactionAdd`", e);
         }
     }
 
-    private void applyRoleUpdateIfSubscriptionPrompt(MessageReactionAddEvent event, Message message) {
+    private void handleLazaxMinigameReaction(MessageReactionAddEvent event, Message message) {
         if (!message.getAuthor().isBot()) return;
+        applyHouseAssignmentIfPredictionReaction(event, message);
+        applyRoleUpdateIfSubscriptionPrompt(event, message);
+    }
+
+    private void applyHouseAssignmentIfPredictionReaction(MessageReactionAddEvent event, Message message) {
+        SpringContext.getBean(CombatReplayHouseService.class).assignHouseForPredictionReaction(event, message);
+    }
+
+    private void applyRoleUpdateIfSubscriptionPrompt(MessageReactionAddEvent event, Message message) {
         if (!message.getContentRaw().contains(CombatReplayLeaderboardService.LAZAX_MINIGAME_SUBSCRIPTION_MARKER))
             return;
 

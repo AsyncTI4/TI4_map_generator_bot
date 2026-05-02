@@ -644,9 +644,7 @@ public class CombatModHelper {
                         scalingCount += 1;
                         if (player.getDishonorCounter() < 4) {
                             scalingCount += 1;
-                            if (player.getDishonorCounter() < 7) {
-                                scalingCount += 1;
-                            }
+                            scalingCount += 1;
                         }
                     }
                 }
@@ -824,19 +822,6 @@ public class CombatModHelper {
         }
         return count;
     }
-
-    // public static int getGalvanizedUnitCount(Game game, Tile activeSystem, UnitModel origUnit, Player player) {
-    //     UnitKey uk = Units.getUnitKey(origUnit.getUnitType(), player.getColorID());
-    //     UnitHolder space = activeSystem.getSpaceUnitHolder();
-    //     if (origUnit.getIsGroundForce() && !activeSystem.getPlanetUnitHolders().isEmpty()) {
-    //         for (Planet planet : activeSystem.getPlanetUnitHolders()) {
-    //             if (planet.getUnitCount(uk) > 0) {
-    //                 space = planet;
-    //             }
-    //         }
-    //     }
-    //     return space.getGalvanizedUnitCount(uk);
-    // }
 
     private static int getGalvanizedUnitCount(Game game, UnitHolder uH, UnitModel origUnit, Player player) {
         UnitKey uk = Units.getUnitKey(origUnit.getUnitType(), player.getColorID());

@@ -8,7 +8,7 @@ import ti4.game.Player;
 import ti4.service.commodities.CommodityConversionService;
 
 @UtilityClass
-public class ConvertCommoditiesButtonHandler {
+class ConvertCommoditiesButtonHandler {
 
     @ButtonHandler("convertAllComms")
     public static void convertAllComm(ButtonInteractionEvent event, Player player, Game game) {

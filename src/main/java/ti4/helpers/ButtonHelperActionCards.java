@@ -60,8 +60,6 @@ public final class ButtonHelperActionCards {
                 buttons.add(validTile);
             }
         }
-        // Button validTile2 = Buttons.red(finChecker + "deleteButtons", "Decline");
-        // buttons.add(validTile2);
         return buttons;
     }
 
@@ -113,12 +111,12 @@ public final class ButtonHelperActionCards {
                 UnitKey unitKey = unitEntry.getKey();
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
 
-                if (!allowedUnits.contains(unitKey.getUnitType())) {
+                if (!allowedUnits.contains(unitKey.unitType())) {
                     continue;
                 }
 
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                String prettyName = unitModel == null ? unitKey.getUnitType().humanReadableName() : unitModel.getName();
+                String prettyName = unitModel == null ? unitKey.unitType().humanReadableName() : unitModel.getName();
                 String unitName = unitKey.unitName();
                 int totalUnits = unitEntry.getValue();
                 int damagedUnits = 0;
@@ -161,7 +159,7 @@ public final class ButtonHelperActionCards {
                 UnitKey unitKey = unitEntry.getKey();
                 if (player.unitBelongsToPlayer(unitKey)) continue;
 
-                if (!allowedUnits.contains(unitKey.getUnitType())) {
+                if (!allowedUnits.contains(unitKey.unitType())) {
                     continue;
                 }
                 Player p2 = game.getPlayerFromColorOrFaction(unitKey.getColor());
@@ -170,7 +168,7 @@ public final class ButtonHelperActionCards {
                 }
 
                 UnitModel unitModel = p2.getUnitFromUnitKey(unitKey);
-                String prettyName = unitModel == null ? unitKey.getUnitType().humanReadableName() : unitModel.getName();
+                String prettyName = unitModel == null ? unitKey.unitType().humanReadableName() : unitModel.getName();
                 String unitName = unitKey.unitName();
                 int totalUnits = unitEntry.getValue();
                 int damagedUnits = 0;
@@ -645,7 +643,7 @@ public final class ButtonHelperActionCards {
                             .append("Rolling against ")
                             .append(numOfUnit)
                             .append(' ')
-                            .append(key.getUnitType().getUnitTypeEmoji())
+                            .append(key.unitType().getUnitTypeEmoji())
                             .append(" owned by ")
                             .append(key.getColor())
                             .append(".\n");
@@ -677,7 +675,7 @@ public final class ButtonHelperActionCards {
                                 .computeIfAbsent(uH, ignored -> new HashMap<>())
                                 .put(key, hitRolls);
                         totalDamageDealt += hitRolls;
-                        if (key.getUnitType() == UnitType.Mech && player_.hasActiveBreakthrough("naazbt")) {
+                        if (key.unitType() == UnitType.Mech && player_.hasActiveBreakthrough("naazbt")) {
                             BreakthroughCommandHelper.deactivateBreakthrough(player_, "naazbt");
                         }
                     }

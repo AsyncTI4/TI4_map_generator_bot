@@ -37,10 +37,7 @@ public class FealtyUplinkService {
     public boolean canUseFealty(Game game, Player player, Tile tile) {
         if (tile == null) return false;
         if (player.hasUnlockedBreakthrough("l1z1xbt")) return true;
-        if (player.hasUnit("tk-fealtycore") && tile.getSpaceUnitHolder().getUnitCount(UnitType.Warsun, player) > 0) {
-            return true;
-        }
-        return false;
+        return player.hasUnit("tk-fealtycore") && tile.getSpaceUnitHolder().getUnitCount(UnitType.Warsun, player) > 0;
     }
 
     public void postInitialButtons(Game game, Player player, String planetName) {

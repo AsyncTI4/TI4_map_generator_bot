@@ -304,8 +304,6 @@ public class FrankenDraftBagService {
         List<Button> buttons = new ArrayList<>();
         boolean draftable = DraftItem.isDraftable(player, cat);
         if (!items.isEmpty()) {
-            // String descrButtonID = ACTION_NAME + "showDescr_" + cat.ordinal();
-            // buttons.add(Buttons.blue(descrButtonID, "Show " + cat + " Descriptions"));
             for (DraftItem item : items) {
                 String buttonID = player.finChecker() + ACTION_NAME + item.getAlias();
                 Button b = Buttons.green(buttonID, item.getShortDescription(), item.getItemEmoji());

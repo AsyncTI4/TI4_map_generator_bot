@@ -5,6 +5,7 @@ import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.buttons.Buttons;
@@ -37,7 +38,7 @@ class CreateGameButton extends Subcommand {
     public void execute(SlashCommandInteractionEvent event) {
         List<Member> members = new ArrayList<>();
         for (int i = 1; i <= 8; i++) {
-            Member member = event.getOption("player" + i, null, option -> option.getAsMember());
+            Member member = event.getOption("player" + i, null, OptionMapping::getAsMember);
             if (member == null) {
                 continue;
             }

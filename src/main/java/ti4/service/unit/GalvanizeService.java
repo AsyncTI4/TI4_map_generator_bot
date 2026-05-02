@@ -120,7 +120,7 @@ public class GalvanizeService {
         if (add) uh.addGalvanizedUnit(unit, 1);
         if (!add) uh.removeGalvanizedUnit(unit, 1);
         refreshGalvanizeButtons(event, game, player, tile);
-        String descr = unit.getUnitType().humanReadableName() + grammar + uhName;
+        String descr = unit.unitType().humanReadableName() + grammar + uhName;
         String addRemove = add ? " galvanized " : " removed galvanize from ";
         String msg = player.getRepresentation() + addRemove + descr + " in tile "
                 + tile.getRepresentationForButtons(game, player);

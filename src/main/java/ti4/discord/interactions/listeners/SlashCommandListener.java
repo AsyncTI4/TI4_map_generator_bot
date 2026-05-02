@@ -35,13 +35,16 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
         if (!canReceiveCommands(event)) return;
 
         if (!isModalCommand(event)) {
-            event.getInteraction().deferReply().queue(Consumers.nop(), BotLogger::catchRestError);
+            Command<SlashCommandInteractionEvent> command = getCommand(event);
+            event.getInteraction()
+                    .deferReply(command.isEphemeral(event))
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         queue(event);
     }
 
-    public void queue(SlashCommandInteractionEvent event) {
+    private void queue(SlashCommandInteractionEvent event) {
         Command<SlashCommandInteractionEvent> command = getCommand(event);
         ExecutionLockType lockType = getLockType(command);
         String eventString = eventToString(event);
@@ -81,7 +84,7 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
                 logSlashCommand(event);
                 command.execute(event);
                 command.postExecute(event);
-                if (!isModalCommand(event)) {
+                if (!isModalCommand(event) && !resolvedCommand.isEphemeral(event)) {
                     event.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             }

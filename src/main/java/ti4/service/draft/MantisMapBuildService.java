@@ -61,16 +61,14 @@ public class MantisMapBuildService {
         }
         String[] actionParts = action.split("_", 2);
         String actionType = actionParts[0];
-        String outcome =
-                switch (actionType) {
-                    case "place" -> handlePlaceTile(event, mapBuildContext, actionParts[1]);
-                    case "mulligan" -> handleMulliganTile(event, mapBuildContext, actionParts[1]);
-                    case "repost" -> handleRepost(mapBuildContext);
-                    case "discard" -> handleDiscardTile(event, mapBuildContext, actionParts[1]);
-                    default -> "Error: Unknown map build action type: " + actionType;
-                };
 
-        return outcome;
+        return switch (actionType) {
+            case "place" -> handlePlaceTile(event, mapBuildContext, actionParts[1]);
+            case "mulligan" -> handleMulliganTile(event, mapBuildContext, actionParts[1]);
+            case "repost" -> handleRepost(mapBuildContext);
+            case "discard" -> handleDiscardTile(event, mapBuildContext, actionParts[1]);
+            default -> "Error: Unknown map build action type: " + actionType;
+        };
     }
 
     private String handlePlaceTile(

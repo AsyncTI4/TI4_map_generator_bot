@@ -17,7 +17,7 @@ import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 
 @UtilityClass
-public class WarfareStrategyCardButtonHandler {
+class WarfareStrategyCardButtonHandler {
 
     @ButtonHandler("primaryOfWarfare")
     public static void primaryOfWarfare(ButtonInteractionEvent event, Player player, Game game) {

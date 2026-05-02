@@ -2,6 +2,7 @@ package ti4.message;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -27,7 +28,7 @@ public class GameMessageManager {
         }
 
         List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
         if (messages.stream().anyMatch(message -> message.messageId.equals(messageId))) {
             return;
         }
@@ -45,7 +46,7 @@ public class GameMessageManager {
         }
 
         List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
 
         String replacedMessageId = null;
         if (!messages.isEmpty()) {
@@ -64,7 +65,9 @@ public class GameMessageManager {
         return replacedMessageId;
     }
 
-    public static synchronized void remove(List<String> gameNames) {
+    public static synchronized void remove(Collection<String> gameNames) {
+        if (gameNames.isEmpty()) return;
+
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             return;
@@ -146,8 +149,32 @@ public class GameMessageManager {
         }
 
         List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
         return messages.stream().filter(filter).findFirst();
+    }
+
+    public static synchronized Map<String, List<GameMessage>> getAllByGame(GameMessageType type) {
+        GameMessages allGameMessages = readFile();
+        if (allGameMessages == null) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, List<GameMessage>> result = new HashMap<>();
+        for (var entry : allGameMessages.gameNameToMessages.entrySet()) {
+            List<GameMessage> filtered = null;
+            for (GameMessage message : entry.getValue()) {
+                if (message.type == type) {
+                    if (filtered == null) {
+                        filtered = new ArrayList<>();
+                    }
+                    filtered.add(message);
+                }
+            }
+            if (filtered != null) {
+                result.put(entry.getKey(), filtered);
+            }
+        }
+        return Collections.unmodifiableMap(result);
     }
 
     public static synchronized List<GameMessage> getAll(String gameName, GameMessageType type) {
@@ -157,7 +184,7 @@ public class GameMessageManager {
         }
 
         List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
         return messages.stream().filter(m -> m.type == type).toList();
     }
 

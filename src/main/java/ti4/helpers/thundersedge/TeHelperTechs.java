@@ -131,7 +131,7 @@ public final class TeHelperTechs {
     }
 
     private static List<Tile> tilesAdjToPlayersInf(Game game, Player player) {
-        Predicate<UnitKey> isInf = uk -> uk.getUnitType() == UnitType.Infantry;
+        Predicate<UnitKey> isInf = uk -> uk.unitType() == UnitType.Infantry;
         List<Tile> tilesWithInf = game.getTileMap().values().stream()
                 .filter(t -> t.containsPlayersUnitsWithKeyCondition(player, isInf))
                 .toList();
@@ -144,17 +144,16 @@ public final class TeHelperTechs {
     }
 
     public static List<Button> neuralParasiteButtons(Game game, Player player) {
-        Predicate<UnitKey> isInf = uk -> uk.getUnitType() == UnitType.Infantry;
+        Predicate<UnitKey> isInf = uk -> uk.unitType() == UnitType.Infantry;
         List<Tile> tilesAdjToObsInf = tilesAdjToPlayersInf(game, player);
         List<Player> playersWithInfAdj = game.getRealPlayersNNeutral().stream()
                 .filter(p -> p != player
                         && tilesAdjToObsInf.stream().anyMatch(t -> t.containsPlayersUnitsWithKeyCondition(p, isInf)))
                 .toList();
         String prefixID = player.getFinsFactionCheckerPrefix() + "neuralParasiteS2_";
-        List<Button> buttons = playersWithInfAdj.stream()
+        return playersWithInfAdj.stream()
                 .map(p -> Buttons.gray(prefixID + p.getFaction(), null, p.fogSafeEmoji()))
                 .toList();
-        return buttons;
     }
 
     @ButtonHandler("startNeuralParasite")
@@ -265,10 +264,6 @@ public final class TeHelperTechs {
         List<Button> buttons = getPlanesplitterStep1Buttons(game, player);
 
         String message = "Please choose a system to move an Ingress token into.";
-        // if (NewStuffHelper.checkAndHandlePaginationChange(
-        //         event, player.getCorrectChannel(), buttons, message, buttonPrefix, buttonID)) {
-        //     return;
-        // }
         if (event == null) {
             if (game.isTwilightsFallMode()) {
                 message = "Please choose a system to add an Ingress token into.";

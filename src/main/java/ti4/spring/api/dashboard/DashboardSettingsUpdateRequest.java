@@ -2,7 +2,7 @@ package ti4.spring.api.dashboard;
 
 import java.util.List;
 
-public record DashboardSettingsUpdateRequest(
+record DashboardSettingsUpdateRequest(
         List<String> preferredColors,
         Integer personalPingInterval,
         Boolean prefersDistanceBasedTacticalActions,

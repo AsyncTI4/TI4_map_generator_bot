@@ -55,10 +55,9 @@ public class TeHelperActionCards {
                 buttons.add(Buttons.green(ffcc + "transaction_BMD", "Start Black Market Transaction"));
             case "brilliance" -> buttons.add(Buttons.green(ffcc + "brilliance", resolve));
             case "crashlanding" -> buttons.add(Buttons.green(ffcc + "crashLandingStart", "Start Crash Landing"));
-            case "crisis" -> nop(); // preset
+            case "crisis", "extremeduress" -> nop(); // preset
             case "exchangeprogram" ->
                 buttons.add(Buttons.green(ffcc + "exchangeProgramStart", "Start Exchange Program"));
-            case "extremeduress" -> nop(); // preset
             case "lieinwait" -> buttons.add(Buttons.green(ffcc + "lieInWait", resolve));
             case "mercenarycontract" -> buttons.add(Buttons.green(ffcc + "teMercenaryContract_page0", resolve));
             case "piratecontract" -> buttons.add(Buttons.green(ffcc + "pirateContract", resolve));
@@ -69,7 +68,7 @@ public class TeHelperActionCards {
             case "strategize" -> buttons.add(Buttons.green(ffcc + "strategize", resolve));
         }
 
-        if (buttons != null && !buttons.isEmpty()) {
+        if (!buttons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), introMsg, buttons);
             return true;
         }

@@ -13,8 +13,7 @@ public final class Stickers {
         return switch (planet.toLowerCase()) {
             case "hopesend" -> HopesEnd;
             case "mallice", "lockedmallice" -> Mallice;
-            case "mr" -> Mecatol;
-            case "mrte" -> Mecatol;
+            case "mr", "mrte" -> Mecatol;
             case "mirage" -> Mirage;
             case "primor" -> Primor;
             case "semlore" -> SemLore;

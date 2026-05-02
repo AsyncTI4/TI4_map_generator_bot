@@ -10,7 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
-import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import ti4.discord.JdaService;
@@ -33,11 +32,7 @@ public class Units {
      * It is being used as a key in some major hashmaps which causes issues when we attempt to save/restore from JSON as JSON map keys have to be strings, not JSON objects. This forces us to use custom mappers to resolve.
      * </p>
      */
-    @Data
-    public static class UnitKey {
-
-        private final UnitType unitType;
-        private final String colorID;
+    public record UnitKey(UnitType unitType, String colorID) {
 
         @JsonIgnore
         public String getColor() {
@@ -66,7 +61,9 @@ public class Units {
 
         @JsonIgnore
         public String getFileName() {
-            if (JdaService.testingMode) return getFileName(false);
+            if (JdaService.testingMode) {
+                return getFileName(false);
+            }
             return getFileName(RandomHelper.isOneInX(Constants.EYE_CHANCE));
         }
 
@@ -353,8 +350,8 @@ public class Units {
         if (type == null || colorID == null) {
             return null;
         }
-        var map = keys.computeIfAbsent(type, k -> new ConcurrentHashMap<>());
-        return map.computeIfAbsent(colorID, k -> new UnitKey(type, colorID));
+        var map = keys.computeIfAbsent(type, _ -> new ConcurrentHashMap<>());
+        return map.computeIfAbsent(colorID, _ -> new UnitKey(type, colorID));
     }
 
     @Nullable

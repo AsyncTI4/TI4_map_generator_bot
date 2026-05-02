@@ -97,7 +97,7 @@ public class DrawingUtil {
         int width = g.getFontMetrics().stringWidth(txt);
         if (horizontalAlignment != null) {
             switch (horizontalAlignment) {
-                case Center -> x -= width / 2.0;
+                case Center -> x -= (int) (width / 2.0);
                 case Right -> x -= width;
                 case Left -> {}
             }

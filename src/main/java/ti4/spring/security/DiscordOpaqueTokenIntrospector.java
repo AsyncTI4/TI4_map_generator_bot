@@ -32,7 +32,6 @@ public class DiscordOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
 
     @Override
     public OAuth2AuthenticatedPrincipal introspect(String token) {
-        if (token == null) throw new OAuth2AuthenticationException("No token provided");
 
         try {
             return authenticate(token);

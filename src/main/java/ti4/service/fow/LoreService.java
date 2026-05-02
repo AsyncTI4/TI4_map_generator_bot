@@ -24,6 +24,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.interactions.callbacks.IDeferrableCallback;
+import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
 import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
@@ -220,7 +222,7 @@ public final class LoreService {
                     .setComponents(buttons)
                     .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
-            ((ButtonInteractionEvent) event)
+            ((IDeferrableCallback) event)
                     .getHook()
                     .editOriginalComponents(buttons)
                     .queue(Consumers.nop(), BotLogger::catchRestError);
@@ -314,12 +316,9 @@ public final class LoreService {
                 .addComponents(List.of(ActionRow.of(menu)))
                 .queue(Consumers.nop(), BotLogger::catchRestError);
         if (event instanceof ButtonInteractionEvent) {
-            ((ButtonInteractionEvent) event).getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            ((ComponentInteraction) event).getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         } else if (event instanceof StringSelectInteractionEvent) {
-            ((StringSelectInteractionEvent) event)
-                    .getMessage()
-                    .delete()
-                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            ((ComponentInteraction) event).getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 

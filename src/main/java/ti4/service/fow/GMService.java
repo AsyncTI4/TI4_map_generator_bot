@@ -260,10 +260,10 @@ public final class GMService {
                     pns.append("__")
                             .append(player.getRepresentationUnfoggedNoPing())
                             .append("__\n");
-                    player.getPromissoryNotes().entrySet().forEach(entry -> pns.append("> ")
-                            .append(Mapper.getPromissoryNote(entry.getKey()).getNameRepresentation())
+                    player.getPromissoryNotes().forEach((key, value) -> pns.append("> ")
+                            .append(Mapper.getPromissoryNote(key).getNameRepresentation())
                             .append(" (")
-                            .append(entry.getValue())
+                            .append(value)
                             .append(")\n"));
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), pns.toString());

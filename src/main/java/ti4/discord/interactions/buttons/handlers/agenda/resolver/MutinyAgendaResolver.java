@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 public class MutinyAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "mutiny";
     }
 

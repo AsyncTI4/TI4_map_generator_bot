@@ -42,3 +42,6 @@ ti4:
     lease-key: discord-bot
     lease-duration-seconds: 30
     heartbeat-interval-seconds: 1
+
+combat-contest:
+  is-dev: ${COMBAT_CONTEST_IS_DEV:false}

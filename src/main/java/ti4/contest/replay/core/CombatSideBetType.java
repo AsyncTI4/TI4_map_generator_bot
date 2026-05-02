@@ -27,7 +27,7 @@ public enum CombatSideBetType {
     /** Current tracked interaction side bet. */
     FIGHTER_PROTOTYPE("Plays Fighter Prototype", CardEmojis.ActionCard, 0, 24),
     /** Current dynamic resolution side bet. */
-    WINNER_ONE_HP("Wins On 1\uFE0F\u20E3 HP", "1\uFE0F\u20E3", 0, 35);
+    WINNER_ONE_HP("Wins On 1️⃣ HP", "1️⃣", 0, 35);
 
     private final String label;
     private final TI4Emoji emoji;

@@ -1081,8 +1081,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         int score = 0;
 
         if ("naaz_voltron".equals(unit.getAlias())) score += 99; // ALWAYS use voltron, if available
-        // if ("mentak_cruiser3".equals(unit.getAlias())) // Always, ALWAYS use corsair, if available
-        // score += 99;
 
         if (unit.getAlias().contains("3")) {
             score += 99;
@@ -1096,9 +1094,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (StringUtils.isNotBlank(unit.getFaction().orElse(""))) score += 3;
         if (StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse(""))) score += 2;
         if (unitHolder != null
-                && ((Constants.SPACE.equals(unitHolder.getName()) && Boolean.TRUE.equals(unit.getIsShip()))
-                        || (!Constants.SPACE.equals(unitHolder.getName()) && !Boolean.TRUE.equals(unit.getIsShip()))))
-            score++;
+                && ((Constants.SPACE.equals(unitHolder.getName()) && unit.getIsShip())
+                        || (!Constants.SPACE.equals(unitHolder.getName()) && !unit.getIsShip()))) score++;
         if ((unit.getID().contains("tf-") || unit.getID().contains("tk-"))
                 && (unit.getUnitType() == UnitType.Flagship || unit.getUnitType() == UnitType.Mech)) {
             score = 0;
@@ -1852,12 +1849,12 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public List<Leader> getLeadersIncludingPurged() {
-        ArrayList<Leader> originalLeaders = new ArrayList<>();
+        List<Leader> originalLeaders = new ArrayList<>();
         for (String leaderID : getFactionStartingLeaders()) {
             originalLeaders.add(new Leader(leaderID));
         }
         for (String leaderID : getLeaderIDs()) {
-            if (!originalLeaders.stream().anyMatch(l -> l.getId().equals(leaderID))) {
+            if (originalLeaders.stream().noneMatch(l -> l.getId().equals(leaderID))) {
                 originalLeaders.add(new Leader(leaderID));
             }
         }
@@ -3021,7 +3018,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (unit == null) {
             return false;
         }
-        return getColor().equals(AliasHandler.resolveColor(unit.getColorID()));
+        return getColor().equals(AliasHandler.resolveColor(unit.colorID()));
     }
 
     public boolean removeTempMod(TemporaryCombatModifierModel tempMod) {

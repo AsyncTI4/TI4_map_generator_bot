@@ -34,6 +34,10 @@ public interface Command<T extends GenericInteractionCreateEvent> {
         return false;
     }
 
+    default boolean isEphemeral(T event) {
+        return false;
+    }
+
     default void register(CommandListUpdateAction update) {}
 
     default void registerSearchCommands(CommandListUpdateAction update) {}

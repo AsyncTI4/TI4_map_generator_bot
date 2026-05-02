@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -145,7 +148,7 @@ public final class ButtonHelperFactionSpecific {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static List<Button> getIntrigueCardButtons(Player player, String faction, Game game) {
+    private static List<Button> getIntrigueCardButtons(Player player, String faction, Game game) {
         List<Button> buttons = new ArrayList<>();
         if (player.getSteelbalanceCounter() > 1
                 && game.getStoredValue("intrigueLevy").isEmpty()) {
@@ -2207,9 +2210,10 @@ public final class ButtonHelperFactionSpecific {
         boolean hasInf = false;
         for (UnitHolder unitHolder : player.getNomboxTile().getUnitHolders().values()) {
             Map<UnitKey, Integer> units = unitHolder.getUnits();
-            for (UnitKey unitKey : units.keySet()) {
-                if (unitKey.getUnitType() == UnitType.Infantry && units.get(unitKey) > 0) {
+            for (Map.Entry<UnitKey, Integer> entry : units.entrySet()) {
+                if (entry.getKey().unitType() == UnitType.Infantry && entry.getValue() > 0) {
                     hasInf = true;
+                    break;
                 }
             }
         }
@@ -2231,10 +2235,10 @@ public final class ButtonHelperFactionSpecific {
             Map<UnitKey, Integer> units = unitHolder.getUnits();
             for (Map.Entry<UnitKey, Integer> entry : units.entrySet()) {
                 UnitKey unitKey = entry.getKey();
-                if (unitKey.getUnitType() == UnitType.Infantry && entry.getValue() > 0) {
+                if (unitKey.unitType() == UnitType.Infantry && entry.getValue() > 0) {
                     hasInf = true;
                 }
-                if (unitKey.getUnitType() == UnitType.Fighter && entry.getValue() > 0) {
+                if (unitKey.unitType() == UnitType.Fighter && entry.getValue() > 0) {
                     hasFF = true;
                 }
             }
@@ -2689,9 +2693,9 @@ public final class ButtonHelperFactionSpecific {
 
         CombatTempModHelper.ensureValidTempMods(p1, tile.getTileModel(), planet);
         CombatTempModHelper.initializeNewTempMods(p1, tile.getTileModel(), planet);
-        List<NamedCombatModifierModel> tempMods = new ArrayList<>();
-        tempMods.addAll(CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
-                p1, tile.getTileModel(), planet, false, CombatRollType.combatround));
+        List<NamedCombatModifierModel> tempMods =
+                new ArrayList<>(CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
+                        p1, tile.getTileModel(), planet, false, CombatRollType.combatround));
 
         String message = CombatMessageHelper.displayCombatSummary(p1, tile, planet, CombatRollType.combatround);
         message += CombatRollService.rollForUnits(
@@ -3362,8 +3366,8 @@ public final class ButtonHelperFactionSpecific {
                 .flatMap(uh -> uh.getUnits().entrySet().stream()
                         .filter(e -> e.getValue() > 0)
                         .map(Map.Entry::getKey))
-                .filter(unitKey -> !colorsBlockading.contains(unitKey.getColorID())
-                        && !player.getColorID().equalsIgnoreCase(unitKey.getColorID()))
+                .filter(unitKey -> !colorsBlockading.contains(unitKey.colorID())
+                        && !player.getColorID().equalsIgnoreCase(unitKey.colorID()))
                 .collect(Collectors.toSet());
         return availableUnits.stream()
                 .filter(unitKey -> vortexButtonAvailable(game, unitKey))
@@ -3373,7 +3377,7 @@ public final class ButtonHelperFactionSpecific {
 
     public static boolean vortexButtonAvailable(Game game, UnitKey unitKey) {
         int baseUnitCap =
-                switch (unitKey.getUnitType()) {
+                switch (unitKey.unitType()) {
                     case Infantry, Fighter -> 10_000;
                     case Destroyer, Cruiser -> 8;
                     case Dreadnought -> 5;
@@ -3382,18 +3386,18 @@ public final class ButtonHelperFactionSpecific {
                     case Flagship -> 1;
                     default -> 0; // everything else that can't be captured
                 };
-        int unitCap = game.getPlayerByColorID(unitKey.getColorID())
+        int unitCap = game.getPlayerByColorID(unitKey.colorID())
                 .filter(p -> p.getUnitCap(unitKey.asyncID()) != 0)
                 .map(p -> p.getUnitCap(unitKey.asyncID()))
                 .orElse(baseUnitCap);
         return (ButtonHelper.getNumberOfUnitsOnTheBoard(game, unitKey) < unitCap
-                && unitKey.getUnitType() != UnitType.Spacedock
-                && unitKey.getUnitType() != UnitType.Pds);
+                && unitKey.unitType() != UnitType.Spacedock
+                && unitKey.unitType() != UnitType.Pds);
     }
 
     public static int remainingUnitsOfType(Game game, UnitKey unitKey) {
         int baseUnitCap =
-                switch (unitKey.getUnitType()) {
+                switch (unitKey.unitType()) {
                     case Infantry, Fighter -> 10_000;
                     case Destroyer, Cruiser -> 8;
                     case Dreadnought -> 5;
@@ -3402,7 +3406,7 @@ public final class ButtonHelperFactionSpecific {
                     case Flagship -> 1;
                     default -> 0; // everything else that can't be captured
                 };
-        int unitCap = game.getPlayerByColorID(unitKey.getColorID())
+        int unitCap = game.getPlayerByColorID(unitKey.colorID())
                 .filter(p -> p.getUnitCap(unitKey.asyncID()) != 0)
                 .map(p -> p.getUnitCap(unitKey.asyncID()))
                 .orElse(baseUnitCap);
@@ -3410,12 +3414,12 @@ public final class ButtonHelperFactionSpecific {
     }
 
     private static Button buildVortexButton(Game game, UnitKey unitKey) {
-        String faction = game.getPlayerByColorID(unitKey.getColorID())
+        String faction = game.getPlayerByColorID(unitKey.colorID())
                 .map(Player::getFaction)
                 .get();
         String buttonID = "cabalVortextCapture_" + unitKey.unitName() + "_" + faction;
         String buttonText = String.format(
-                "Capture %s %s", unitKey.getColor(), unitKey.getUnitType().humanReadableName());
+                "Capture %s %s", unitKey.getColor(), unitKey.unitType().humanReadableName());
         return Buttons.red(buttonID, buttonText, unitKey.unitEmoji());
     }
 
@@ -3899,8 +3903,8 @@ public final class ButtonHelperFactionSpecific {
     @ButtonHandler("creussTFCruiserStep1_")
     public static void creussTFCruiserStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        Set<Tile> tiles = new HashSet<>();
-        tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Cruiser));
+        Set<Tile> tiles = new HashSet<>(
+                CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Cruiser));
         if (player.hasUnit("pinktf_flagship")) {
             tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Flagship));
         }
@@ -4003,20 +4007,6 @@ public final class ButtonHelperFactionSpecific {
         String msg;
         if (game.isFowMode() && !isTileCreussIFFSuitable(game, player, tile)) {
             msg = pos + " was not suitable for the _Creuss IFF_.";
-            /*if (player.getTg() > 0) {
-                player.setTg(player.getTg() - 1);
-                msg += " You lost 1 trade good.";
-            } else {
-                if (player.getTacticalCC() > 0) {
-                    player.setTacticalCC(player.getTacticalCC() - 1);
-                    msg += " You lost 1 command token from your tactic pool.";
-                } else {
-                    if (player.getFleetCC() > 0) {
-                        player.setFleetCC(player.getFleetCC() - 1);
-                        msg += " You lost 1 command token from your fleet pool.";
-                    }
-                }
-            }*/
         } else {
             StringBuilder sb = new StringBuilder(player.getRepresentation());
             tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
@@ -4424,9 +4414,9 @@ public final class ButtonHelperFactionSpecific {
         Map<UnitKey, Integer> units = tile.getUnitHolders().get("space").getUnits();
         for (UnitKey unit : units.keySet()) {
             if (Objects.equals(unit.getColor(), player.getColor())
-                    && (unit.getUnitType() == UnitType.Cruiser
-                            || unit.getUnitType() == UnitType.Carrier
-                            || unit.getUnitType() == UnitType.Dreadnought)) {
+                    && (unit.unitType() == UnitType.Cruiser
+                            || unit.unitType() == UnitType.Carrier
+                            || unit.unitType() == UnitType.Dreadnought)) {
                 // if unit is not in the list, add it
                 if (!availableUnits.contains(unit)) {
                     availableUnits.add(unit);
@@ -4437,7 +4427,7 @@ public final class ButtonHelperFactionSpecific {
         for (UnitKey unit : availableUnits) {
             buttons.add(Buttons.green(
                     "FFCC_" + player.getFaction() + "_rohdhnaRecycle_" + unit.unitName(),
-                    unit.getUnitType().humanReadableName(),
+                    unit.unitType().humanReadableName(),
                     unit.unitEmoji()));
         }
 

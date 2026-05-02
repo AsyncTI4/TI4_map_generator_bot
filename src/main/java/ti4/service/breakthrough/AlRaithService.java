@@ -44,10 +44,5 @@ public final class AlRaithService {
         TeHelperTechs.initializePlanesplitterStep1(game, player);
         TeHelperTechs.initializePlanesplitterStep1(game, player);
         ButtonHelper.deleteMessage(event);
-
-        // List<Button> buttons = new ArrayList<>();
-        // for (int i = 0; i < Math.min(3, totalIngress); i++) {
-
-        // }
     }
 }

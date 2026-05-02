@@ -206,11 +206,6 @@ public final class ButtonHelperSCs {
         List<Button> buttons = Helper.getPlanetRefreshButtons(player, game);
         Button doneRefreshing = Buttons.red("deleteButtons_diplomacy", "Done Readying Planets"); // spitItOut
         buttons.add(doneRefreshing);
-        // if (!game.isFowMode()) {
-        //     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
-        // } else {
-        //     MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
-        // }
         MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
         if (player.hasAbility("peace_accords") && !game.isTwilightsFallMode()) {
             List<Button> buttons2 = ButtonHelperAbilities.getXxchaPeaceAccordsButtons(
@@ -1029,11 +1024,6 @@ public final class ButtonHelperSCs {
                 MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
             }
         }
-        // List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(message, buttons);
-        // for (MessageCreateData messageD : messageList) {
-        //     event.getHook().setEphemeral(true).sendMessage(messageD).queue(Consumers.nop(),
-        // BotLogger::catchRestError);
-        // }
     }
 
     @ButtonHandler("placeAgesMonument_")

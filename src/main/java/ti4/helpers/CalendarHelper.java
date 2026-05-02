@@ -47,8 +47,6 @@ public final class CalendarHelper {
         Calendar endDate = Calendar.getInstance();
         endDate.set(endYear, endMonth, endDay);
 
-        // BotLogger.info("Checking Dates:\n" + startDate.getTime() + "\n" + checkDate.getTime() + "\n" +
-        // endDate.getTime());
         return checkDate.after(startDate) && checkDate.before(endDate);
     }
 

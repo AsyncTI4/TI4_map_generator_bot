@@ -15,7 +15,7 @@ import ti4.service.strategycard.PlayStrategyCardService;
 
 public class CrisisAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "crisis";
     }
 
