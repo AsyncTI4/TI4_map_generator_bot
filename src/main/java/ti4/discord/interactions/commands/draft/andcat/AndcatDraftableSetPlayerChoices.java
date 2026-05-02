@@ -69,7 +69,7 @@ class AndcatDraftableSetPlayerChoices extends GameStateSubcommand {
             return;
         }
         ReferenceCardPackage refPackage =
-                draftable.getPackageByChoiceKey(picks.getFirst().getChoiceKey());
+                draftable.getPackageByChoiceKey(picks.getFirst().choiceKey());
         if (refPackage == null) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),

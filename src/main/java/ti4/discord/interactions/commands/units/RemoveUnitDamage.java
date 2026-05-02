@@ -57,7 +57,7 @@ public class RemoveUnitDamage extends GameStateCommand {
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString();
         ParseUnitService.getParsedUnits(event, color, tile, unitList)
                 .forEach(parsedUnit -> tile.removeUnitDamage(
-                        parsedUnit.getLocation(), parsedUnit.getUnitKey(), parsedUnit.getCount()));
+                        parsedUnit.location(), parsedUnit.unitKey(), parsedUnit.count()));
 
         UnitCommandHelper.handleGenerateMapOption(event, game);
     }

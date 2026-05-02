@@ -18,17 +18,12 @@ import ti4.contest.replay.persistence.CombatSideBetTypeConverter;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(
-        name = "combat_replay_hacan_subsidy_vote",
-        indexes = {
-            @Index(name = "idx_hacan_subsidy_vote_contest", columnList = "contest_id"),
-            @Index(name = "idx_hacan_subsidy_vote_user", columnList = "contest_id, discord_user_id")
-        },
-        uniqueConstraints = {
-            @UniqueConstraint(
-                    name = "uk_hacan_subsidy_vote_user_bet",
-                    columnNames = {"contest_id", "discord_user_id", "bet_type", "target_faction"})
-        })
+@Table(name = "combat_replay_hacan_subsidy_vote", indexes = {
+    @Index(name = "idx_hacan_subsidy_vote_contest", columnList = "contest_id"),
+    @Index(name = "idx_hacan_subsidy_vote_user", columnList = "contest_id, discord_user_id")
+}, uniqueConstraints = @UniqueConstraint(
+    name = "uk_hacan_subsidy_vote_user_bet",
+    columnNames = {"contest_id", "discord_user_id", "bet_type", "target_faction"}))
 public class CombatReplayHacanSubsidyVoteEntity {
 
     @Id

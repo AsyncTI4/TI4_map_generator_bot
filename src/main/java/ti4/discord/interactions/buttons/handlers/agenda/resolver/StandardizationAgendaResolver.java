@@ -8,7 +8,7 @@ import ti4.message.MessageHelper;
 
 public class StandardizationAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "standardization";
     }
 

@@ -133,7 +133,7 @@ class TwilightsFallSpliceWinRateStatisticsService {
     private static Map<String, WinRateCount> initializeUnitUpgrades() {
         return Mapper.getUnits().values().stream()
                 .filter(unit -> unit.getSource() == ComponentSource.twilights_fall)
-                .filter(unit -> Boolean.TRUE.equals(unit.getIsUpgrade()))
+                .filter(unit -> unit.getIsUpgrade())
                 .collect(LinkedHashMap::new, (map, unit) -> map.put(unit.getId(), new WinRateCount()), Map::putAll);
     }
 

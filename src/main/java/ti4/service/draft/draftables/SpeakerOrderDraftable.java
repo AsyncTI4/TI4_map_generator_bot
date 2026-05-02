@@ -143,7 +143,7 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
             throw new IllegalStateException("Player " + playerUserId + " has not picked a speaker order");
         }
 
-        String speakerOrder = pState.getPicks().get(TYPE).getFirst().getChoiceKey();
+        String speakerOrder = pState.getPicks().get(TYPE).getFirst().choiceKey();
         Integer speakerNum = getSpeakerOrderFromChoiceKey(speakerOrder);
         if (speakerNum == null) {
             throw new IllegalStateException(

@@ -28,8 +28,8 @@ public class AddPlanetToPlayAreaService {
         Set<UnitKey> allUnitsOnPlanet = planet.getUnitKeys();
         Set<String> unitColors = new HashSet<>();
         for (UnitKey unit_ : allUnitsOnPlanet) {
-            String unitColor = unit_.getColorID();
-            if (unit_.getUnitType() != UnitType.Fighter) {
+            String unitColor = unit_.colorID();
+            if (unit_.unitType() != UnitType.Fighter) {
                 unitColors.add(unitColor);
             }
         }

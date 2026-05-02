@@ -238,7 +238,7 @@ public class LazaxCombatSupport {
         Map<String, Integer> damagedCountsByAsyncId = new HashMap<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             for (UnitKey unitKey : unitHolder.getUnitKeys()) {
-                if (!unitKey.getColorID().equalsIgnoreCase(player.getColorID())) continue;
+                if (!unitKey.colorID().equalsIgnoreCase(player.getColorID())) continue;
                 int damagedUnits = unitHolder.getDamagedUnitCount(unitKey);
                 if (damagedUnits <= 0) continue;
                 damagedCountsByAsyncId.merge(unitKey.asyncID(), damagedUnits, Integer::sum);

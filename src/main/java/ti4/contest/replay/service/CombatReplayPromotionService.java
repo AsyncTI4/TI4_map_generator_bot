@@ -294,7 +294,7 @@ public class CombatReplayPromotionService {
     }
 
     private Comparator<CombatCandidateEntity> candidateComparator(Map<Long, Double> jointScoresByObservationId) {
-        return Comparator.<CombatCandidateEntity, Double>comparing(this::getPromotionScore)
+        return Comparator.comparing(this::getPromotionScore)
                 .thenComparing(candidate -> jointScoresByObservationId.getOrDefault(candidate.getObservationId(), 0.0))
                 .thenComparing(CombatCandidateEntity::getResolvedAt, Comparator.reverseOrder())
                 .thenComparing(CombatCandidateEntity::getId, Comparator.reverseOrder());

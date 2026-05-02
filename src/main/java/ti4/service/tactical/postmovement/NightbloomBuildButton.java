@@ -11,13 +11,13 @@ import ti4.service.unit.CheckUnitContainmentService;
 
 public final class NightbloomBuildButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return ctx.player.ownsUnit("greentf_flagship")
-                && CheckUnitContainmentService.getTilesContainingPlayersUnits(ctx.game, ctx.player, UnitType.Flagship)
-                        .contains(ctx.tile);
+        return ctx.player().ownsUnit("greentf_flagship")
+                && CheckUnitContainmentService.getTilesContainingPlayersUnits(ctx.game(), ctx.player(), UnitType.Flagship)
+                        .contains(ctx.tile());
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.blue(
-                ctx.player.finChecker() + "nightbloomBuild", "Do Nightbloom (Flagship) Build", FactionEmojis.greentf));
+                ctx.player().finChecker() + "nightbloomBuild", "Do Nightbloom (Flagship) Build", FactionEmojis.greentf));
     }
 }

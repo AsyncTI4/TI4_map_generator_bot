@@ -169,11 +169,11 @@ class CabalButtonHandler {
                         }
 
                         Units.UnitKey key = unitEntry.getKey();
-                        if (key.getUnitType() == Units.UnitType.Infantry
-                                || key.getUnitType() == Units.UnitType.Mech
-                                || key.getUnitType() == Units.UnitType.Fighter
-                                || key.getUnitType() == Units.UnitType.Spacedock
-                                || key.getUnitType() == Units.UnitType.Pds) {
+                        if (key.unitType() == Units.UnitType.Infantry
+                                || key.unitType() == Units.UnitType.Mech
+                                || key.unitType() == Units.UnitType.Fighter
+                                || key.unitType() == Units.UnitType.Spacedock
+                                || key.unitType() == Units.UnitType.Pds) {
                             continue;
                         }
 
@@ -197,7 +197,7 @@ class CabalButtonHandler {
                                 message.append(dice.getGreenDieIfSuccessOrRedDieIfFailure());
                                 if (!dice.isSuccess()) {
                                     RemoveUnitService.removeUnit(
-                                            event, tile, game, p2, unitHolder, key.getUnitType(), 1, true);
+                                            event, tile, game, p2, unitHolder, key.unitType(), 1, true);
                                     if (!tf) {
                                         AddUnitService.addUnits(
                                                 event,
@@ -226,7 +226,7 @@ class CabalButtonHandler {
                                 message.append(dice.getGreenDieIfSuccessOrRedDieIfFailure());
                                 if (!dice.isSuccess()) {
                                     RemoveUnitService.removeUnit(
-                                            event, tile, game, p2, unitHolder, key.getUnitType(), 1, false);
+                                            event, tile, game, p2, unitHolder, key.unitType(), 1, false);
                                     if (!tf) {
                                         AddUnitService.addUnits(
                                                 event,
@@ -501,24 +501,24 @@ class CabalButtonHandler {
                     }
 
                     Units.UnitKey key = unitEntry.getKey();
-                    if (key.getUnitType() == Units.UnitType.Spacedock) {
+                    if (key.unitType() == Units.UnitType.Spacedock) {
                         continue;
                     }
                     if (!tf
-                            && (key.getUnitType() == Units.UnitType.Infantry
-                                    || key.getUnitType() == Units.UnitType.Mech
-                                    || key.getUnitType() == Units.UnitType.Fighter)) {
+                            && (key.unitType() == Units.UnitType.Infantry
+                                    || key.unitType() == Units.UnitType.Mech
+                                    || key.unitType() == Units.UnitType.Fighter)) {
                         buttons.add(Buttons.red(
                                 "removeNCaptureThisTypeOfUnit_"
-                                        + key.getUnitType().humanReadableName() + "_" + tile.getPosition() + "_"
+                                        + key.unitType().humanReadableName() + "_" + tile.getPosition() + "_"
                                         + unitHolder.getName() + "_" + player.getColor(),
-                                key.getUnitType().humanReadableName() + " from " + tile.getRepresentation()
+                                key.unitType().humanReadableName() + " from " + tile.getRepresentation()
                                         + " in Space"));
                     } else {
                         buttons.add(Buttons.blue(
-                                "removeThisTypeOfUnit_" + key.getUnitType().humanReadableName() + "_"
+                                "removeThisTypeOfUnit_" + key.unitType().humanReadableName() + "_"
                                         + tile.getPosition() + "_" + unitHolder.getName(),
-                                key.getUnitType().humanReadableName() + " from " + tile.getRepresentation()
+                                key.unitType().humanReadableName() + " from " + tile.getRepresentation()
                                         + " in Space"));
                     }
                 }
@@ -557,21 +557,21 @@ class CabalButtonHandler {
                     }
 
                     Units.UnitKey key = unitEntry.getKey();
-                    if (key.getUnitType() == Units.UnitType.Infantry
-                            || key.getUnitType() == Units.UnitType.Mech
-                            || key.getUnitType() == Units.UnitType.Fighter) {
+                    if (key.unitType() == Units.UnitType.Infantry
+                            || key.unitType() == Units.UnitType.Mech
+                            || key.unitType() == Units.UnitType.Fighter) {
                         if (tf) {
                             buttons.add(Buttons.blue(
-                                    "removeThisTypeOfUnit_" + key.getUnitType().humanReadableName() + "_"
+                                    "removeThisTypeOfUnit_" + key.unitType().humanReadableName() + "_"
                                             + tile.getPosition() + "_" + unitHolder.getName(),
-                                    key.getUnitType().humanReadableName() + " from " + tile.getRepresentation()
+                                    key.unitType().humanReadableName() + " from " + tile.getRepresentation()
                                             + " in Space"));
                         } else {
                             buttons.add(Buttons.red(
                                     "removeNCaptureThisTypeOfUnit_"
-                                            + key.getUnitType().humanReadableName() + "_" + tile.getPosition() + "_"
+                                            + key.unitType().humanReadableName() + "_" + tile.getPosition() + "_"
                                             + unitHolder.getName() + "_" + player.getColor(),
-                                    key.getUnitType().humanReadableName() + " from " + tile.getRepresentation()
+                                    key.unitType().humanReadableName() + " from " + tile.getRepresentation()
                                             + " in Space"));
                         }
                     }

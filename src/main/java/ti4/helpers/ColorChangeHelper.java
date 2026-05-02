@@ -121,8 +121,8 @@ public class ColorChangeHelper {
         String newColorSuffix = "_" + newColorID + ".";
 
         for (UnitKey unitKey : unitHolder.getUnitKeys()) {
-            if (unitKey.getColorID().equals(oldColorID)) {
-                UnitKey replacedKey = Units.getUnitKey(unitKey.getUnitType(), newColorID);
+            if (unitKey.colorID().equals(oldColorID)) {
+                UnitKey replacedKey = Units.getUnitKey(unitKey.unitType(), newColorID);
                 List<Integer> states = unitHolder.removeUnit(unitKey, unitHolder.getUnitCount(unitKey));
                 unitHolder.addUnitsWithStates(replacedKey, states);
             }

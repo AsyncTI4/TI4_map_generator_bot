@@ -74,8 +74,8 @@ class DraftSaveServiceTest extends BaseTi4Test {
                 List<DraftChoice> loadedDraftable =
                         loadedManager.getDraftable(draftable.getType()).getAllDraftChoices();
                 assertArrayEquals(
-                        originalChoices.stream().map(DraftChoice::getChoiceKey).toArray(),
-                        loadedDraftable.stream().map(DraftChoice::getChoiceKey).toArray(),
+                        originalChoices.stream().map(DraftChoice::choiceKey).toArray(),
+                        loadedDraftable.stream().map(DraftChoice::choiceKey).toArray(),
                         "Mismatch in choice keys for draftable type: "
                                 + draftable.getClass().getSimpleName());
 
@@ -84,10 +84,10 @@ class DraftSaveServiceTest extends BaseTi4Test {
                     List<DraftChoice> loadedPlayerChoices = loadedManager.getPlayerPicks(userId, draftable.getType());
                     assertArrayEquals(
                             originalPlayerChoices.stream()
-                                    .map(DraftChoice::getChoiceKey)
+                                    .map(DraftChoice::choiceKey)
                                     .toArray(),
                             loadedPlayerChoices.stream()
-                                    .map(DraftChoice::getChoiceKey)
+                                    .map(DraftChoice::choiceKey)
                                     .toArray(),
                             "Mismatch in player " + userId + " choice keys for draftable type: "
                                     + draftable.getClass().getSimpleName());

@@ -195,10 +195,10 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
         List<String> lines = new ArrayList<>();
         for (CombatCandidateEventEntity event : orderedEvents(candidate)) {
             ReplayDispatchPayload payload = payloadSerializer.read(event);
-            if (!(payload instanceof ReplayDispatchPayload.ActionCardPlayedDispatch actionCardPlayed)) continue;
+            if (!(payload instanceof ReplayDispatchPayload.ActionCardPlayedDispatch(String actionCardId))) continue;
 
-            ActionCardModel actionCard = Mapper.getActionCard(actionCardPlayed.actionCardId());
-            String cardName = actionCard == null ? actionCardPlayed.actionCardId() : actionCard.getName();
+            ActionCardModel actionCard = Mapper.getActionCard(actionCardId);
+            String cardName = actionCard == null ? actionCardId : actionCard.getName();
             lines.add("- " + actor(game, event.getActorFaction()) + ": _" + cardName + "_");
         }
 

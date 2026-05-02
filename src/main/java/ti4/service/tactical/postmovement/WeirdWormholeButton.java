@@ -9,12 +9,12 @@ import ti4.service.tactical.PostMovementButtonContext;
 
 public final class WeirdWormholeButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return ctx.game.isWeirdWormholesMode();
+        return ctx.game().isWeirdWormholesMode();
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.green(
-                ctx.player.finChecker() + "getWeirdWormholeButtons_" + ctx.tile.getPosition(),
+                ctx.player().finChecker() + "getWeirdWormholeButtons_" + ctx.tile().getPosition(),
                 "Units Travelled Through Weird Wormhole",
                 MiscEmojis.WHalpha));
     }

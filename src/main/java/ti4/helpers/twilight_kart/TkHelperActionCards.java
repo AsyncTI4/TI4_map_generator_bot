@@ -273,14 +273,14 @@ public class TkHelperActionCards {
         List<String> unitStrs = new ArrayList<>();
         List<String> unitDescrs = new ArrayList<>();
         for (UnitKey key : space.getUnitKeysForPlayer(player)) {
-            UnitModel model = player.getUnitByType(key.getUnitType());
+            UnitModel model = player.getUnitByType(key.unitType());
 
             int amt = space.getUnitCount(key);
-            unitStrs.add(amt + " " + key.getUnitType().getValue());
+            unitStrs.add(amt + " " + key.unitType().getValue());
             unitDescrs.add(amt + "x " + model.getUnitEmoji() + " "
                     + model.getUnitType().humanReadableName());
 
-            if (model.getIsShip() && key.getUnitType() != UnitType.Fighter) {
+            if (model.getIsShip() && key.unitType() != UnitType.Fighter) {
                 cost += (int) (amt * model.getCost());
             }
         }
@@ -310,11 +310,11 @@ public class TkHelperActionCards {
 
             for (UnitState state : UnitState.values()) {
                 if (space.getUnitCountForState(key, state) == 0) continue;
-                String unitStateStr = key.getUnitType().getValue() + "_" + state.name();
+                String unitStateStr = key.unitType().getValue() + "_" + state.name();
                 String stateStr = state.humanDescr() + (state == UnitState.none ? "" : " ");
 
                 String id = player.finChecker() + "incubateUnit_" + pos + "_" + unitStateStr;
-                String label = "Replace 1 " + stateStr + key.getUnitType().humanReadableName();
+                String label = "Replace 1 " + stateStr + key.unitType().humanReadableName();
                 buttons.add(Buttons.blue(id, label, model.getUnitEmoji()));
             }
         }

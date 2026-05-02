@@ -121,12 +121,12 @@ public class PublicDraftInfoService {
         for (DraftChoice choice : allDraftChoices) {
             // Skip this choice if someone already has it.
             if (!draftManager
-                    .getPlayersWithChoiceKey(draftable.getType(), choice.getChoiceKey())
+                    .getPlayersWithChoiceKey(draftable.getType(), choice.choiceKey())
                     .isEmpty()) {
                 continue;
             }
 
-            buttons.add(choice.getButton());
+            buttons.add(choice.button());
         }
 
         // Append custom buttons
@@ -164,16 +164,16 @@ public class PublicDraftInfoService {
                 if (picks.getPicks().containsKey(draftable.getType())) {
                     List<DraftChoice> draftablePicks = picks.getPicks().get(draftable.getType());
                     for (DraftChoice choice : draftablePicks) {
-                        if (choice.getIdentifyingEmoji() != null) {
-                            sb.append(choice.getIdentifyingEmoji());
+                        if (choice.identifyingEmoji() != null) {
+                            sb.append(choice.identifyingEmoji());
                         } else {
-                            longChoiceNames.add(choice.getFormattedName());
+                            longChoiceNames.add(choice.formattedName());
                         }
                     }
                 } else if (defaultChoices.containsKey(draftable.getType())) {
                     DraftChoice noChoice = defaultChoices.get(draftable.getType());
-                    if (noChoice.getIdentifyingEmoji() != null) {
-                        sb.append(noChoice.getIdentifyingEmoji());
+                    if (noChoice.identifyingEmoji() != null) {
+                        sb.append(noChoice.identifyingEmoji());
                     }
                     // Skip adding anything if no default emoji
                 }

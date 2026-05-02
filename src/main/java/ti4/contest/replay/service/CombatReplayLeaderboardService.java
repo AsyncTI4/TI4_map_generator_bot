@@ -194,7 +194,7 @@ public class CombatReplayLeaderboardService {
             CombatReplayLeaderboardEntryEntity entry = topEntries.get(index);
             int predictions = safeInt(entry.getPredictionCount());
             int correctPredictions = safeInt(entry.getCorrectPredictions());
-            int accuracy = predictions == 0 ? 0 : Math.round((100f * correctPredictions) / predictions);
+            int accuracy = predictions == 0 ? 0 : Math.round((100.0f * correctPredictions) / predictions);
             message.append('`')
                     .append(index + 1)
                     .append(".` ")
@@ -236,7 +236,7 @@ public class CombatReplayLeaderboardService {
             HouseLeaderboardSummary summary = summaries.get(index);
             int accuracy = summary.predictionCount() == 0
                     ? 0
-                    : Math.round((100f * summary.correctPredictions()) / summary.predictionCount());
+                    : Math.round((100.0f * summary.correctPredictions()) / summary.predictionCount());
             message.append('`')
                     .append(index + 1)
                     .append(".` ")
@@ -498,10 +498,9 @@ public class CombatReplayLeaderboardService {
 
     private String appendHousePredictionResults(String message, List<HousePredictionSummary> houseSummaries) {
         if (!settings.isHousesEnabled() || houseSummaries == null || houseSummaries.isEmpty()) return message;
-        return new StringBuilder(message)
-                .append("\n\n")
-                .append(formatHousePredictionResults(houseSummaries))
-                .toString();
+        return message +
+            "\n\n" +
+            formatHousePredictionResults(houseSummaries);
     }
 
     private String formatHousePredictionResults(List<HousePredictionSummary> houseSummaries) {

@@ -12,18 +12,7 @@ import ti4.message.MessageHelper;
 import ti4.service.agenda.IxthianArtifactService;
 import ti4.service.emoji.PlanetEmojis;
 
-public class ArtifactAgendaResolver implements ForAgainstAgendaResolver {
-
-    private final String agendaId;
-
-    public ArtifactAgendaResolver(String agendaId) {
-        this.agendaId = agendaId;
-    }
-
-    @Override
-    public String getAgendaId() {
-        return agendaId;
-    }
+public record ArtifactAgendaResolver(String agendaId) implements ForAgainstAgendaResolver {
 
     @Override
     public void handleFor(Game game, ButtonInteractionEvent event, int agendaNumericId) {
@@ -33,10 +22,10 @@ public class ArtifactAgendaResolver implements ForAgainstAgendaResolver {
             Tile tile = game.getMecatolTile();
             if (tile != null) {
                 FileUpload systemWithContext =
-                        new TileGenerator(game, event, null, 1, tile.getPosition()).createFileUpload();
+                    new TileGenerator(game, event, null, 1, tile.getPosition()).createFileUpload();
                 String message = "# _Ixthian Artifact_ has resolved! " + watchPartyPing + "\n"
-                        + AgendaHelper.getSummaryOfVotes(game, true).replace("# _Ixthian Artifact_\n", "")
-                        + "\nSurrounding Mecatol Rex in " + game.getName() + ".";
+                    + AgendaHelper.getSummaryOfVotes(game, true).replace("# _Ixthian Artifact_\n", "")
+                    + "\nSurrounding Mecatol Rex in " + game.getName() + ".";
                 MessageHelper.sendMessageWithFile(watchParty, systemWithContext, message, false);
             }
         }

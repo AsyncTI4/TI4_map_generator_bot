@@ -351,14 +351,9 @@ final class HyperlaneTileGenerator {
         }
     }
 
-    // Helper class to hold canonical matrix and rotation
-    private static class MatrixRotationResult {
-        final String matrix;
-        final int rotation; // in degrees, 0, 60, ..., 300
-
-        MatrixRotationResult(String matrix, int rotation) {
-            this.matrix = matrix;
-            this.rotation = rotation;
-        }
+    /**
+     * @param rotation in degrees, 0, 60, ..., 300
+     */ // Helper class to hold canonical matrix and rotation
+        private record MatrixRotationResult(String matrix, int rotation) {
     }
 }

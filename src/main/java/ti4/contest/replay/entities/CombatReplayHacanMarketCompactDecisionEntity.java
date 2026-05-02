@@ -15,12 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(
-        name = "combat_replay_hacan_market_compact_decision",
-        indexes = {@Index(name = "idx_hacan_market_compact_decision_contest", columnList = "contest_id")},
-        uniqueConstraints = {
-            @UniqueConstraint(name = "uk_hacan_market_compact_decision_contest", columnNames = "contest_id")
-        })
+@Table(name = "combat_replay_hacan_market_compact_decision", indexes = @Index(name = "idx_hacan_market_compact_decision_contest", columnList = "contest_id"), uniqueConstraints = @UniqueConstraint(name = "uk_hacan_market_compact_decision_contest", columnNames = "contest_id"))
 public class CombatReplayHacanMarketCompactDecisionEntity {
 
     @Id

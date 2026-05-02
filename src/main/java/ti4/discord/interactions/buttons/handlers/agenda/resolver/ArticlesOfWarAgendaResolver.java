@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 
 public class ArticlesOfWarAgendaResolver implements ForAgainstAgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "articles_war";
     }
 

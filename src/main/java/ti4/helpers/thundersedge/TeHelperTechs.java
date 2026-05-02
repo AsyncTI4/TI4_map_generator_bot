@@ -131,7 +131,7 @@ public final class TeHelperTechs {
     }
 
     private static List<Tile> tilesAdjToPlayersInf(Game game, Player player) {
-        Predicate<UnitKey> isInf = uk -> uk.getUnitType() == UnitType.Infantry;
+        Predicate<UnitKey> isInf = uk -> uk.unitType() == UnitType.Infantry;
         List<Tile> tilesWithInf = game.getTileMap().values().stream()
                 .filter(t -> t.containsPlayersUnitsWithKeyCondition(player, isInf))
                 .toList();
@@ -144,7 +144,7 @@ public final class TeHelperTechs {
     }
 
     public static List<Button> neuralParasiteButtons(Game game, Player player) {
-        Predicate<UnitKey> isInf = uk -> uk.getUnitType() == UnitType.Infantry;
+        Predicate<UnitKey> isInf = uk -> uk.unitType() == UnitType.Infantry;
         List<Tile> tilesAdjToObsInf = tilesAdjToPlayersInf(game, player);
         List<Player> playersWithInfAdj = game.getRealPlayersNNeutral().stream()
                 .filter(p -> p != player

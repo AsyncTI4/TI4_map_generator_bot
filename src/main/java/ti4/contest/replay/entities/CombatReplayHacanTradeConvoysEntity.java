@@ -18,14 +18,7 @@ import ti4.contest.replay.core.CombatReplayHouse;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(
-        name = "combat_replay_hacan_trade_convoys",
-        indexes = {@Index(name = "idx_hacan_trade_convoys_contest", columnList = "contest_id")},
-        uniqueConstraints = {
-            @UniqueConstraint(
-                    name = "uk_hacan_trade_convoys_contest",
-                    columnNames = {"contest_id"})
-        })
+@Table(name = "combat_replay_hacan_trade_convoys", indexes = @Index(name = "idx_hacan_trade_convoys_contest", columnList = "contest_id"), uniqueConstraints = @UniqueConstraint(name = "uk_hacan_trade_convoys_contest", columnNames = "contest_id"))
 public class CombatReplayHacanTradeConvoysEntity {
 
     @Id

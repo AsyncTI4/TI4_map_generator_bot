@@ -18,17 +18,12 @@ import ti4.contest.replay.core.CombatReplayHouse;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(
-        name = "combat_replay_hacan_trade_convoys_vote",
-        indexes = {
-            @Index(name = "idx_hacan_trade_convoys_vote_contest", columnList = "contest_id"),
-            @Index(name = "idx_hacan_trade_convoys_vote_user", columnList = "contest_id, discord_user_id")
-        },
-        uniqueConstraints = {
-            @UniqueConstraint(
-                    name = "uk_hacan_trade_convoys_vote_contest_user",
-                    columnNames = {"contest_id", "discord_user_id"})
-        })
+@Table(name = "combat_replay_hacan_trade_convoys_vote", indexes = {
+    @Index(name = "idx_hacan_trade_convoys_vote_contest", columnList = "contest_id"),
+    @Index(name = "idx_hacan_trade_convoys_vote_user", columnList = "contest_id, discord_user_id")
+}, uniqueConstraints = @UniqueConstraint(
+    name = "uk_hacan_trade_convoys_vote_contest_user",
+    columnNames = {"contest_id", "discord_user_id"}))
 public class CombatReplayHacanTradeConvoysVoteEntity {
 
     @Id

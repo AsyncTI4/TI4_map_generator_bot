@@ -9,13 +9,13 @@ import ti4.service.tactical.PostMovementButtonContext;
 
 public final class GhostCommanderButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return ctx.game.playerHasLeaderUnlockedOrAlliance(ctx.player, "ghostcommander")
-                || ctx.player.hasUnit("tk-iffsupportwing");
+        return ctx.game().playerHasLeaderUnlockedOrAlliance(ctx.player(), "ghostcommander")
+                || ctx.player().hasUnit("tk-iffsupportwing");
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.blue(
-                ctx.player.finChecker() + "placeGhostCommanderFF_" + ctx.tile.getPosition(),
+                ctx.player().finChecker() + "placeGhostCommanderFF_" + ctx.tile().getPosition(),
                 "Place Fighter with Creuss Commander",
                 FactionEmojis.Ghost));
     }

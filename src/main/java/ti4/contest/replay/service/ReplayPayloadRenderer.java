@@ -325,12 +325,12 @@ public class ReplayPayloadRenderer {
             int sustained = previousCounts.sustainedBy(currentCounts);
             int destroyed = previousCounts.total() - currentCounts.total();
             if (sustained > 0) {
-                changes.add("- " + unitOwner(current, key.getColorID()) + " sustained "
-                        + unitPhrase(key.getUnitType(), sustained) + ".");
+                changes.add("- " + unitOwner(current, key.colorID()) + " sustained "
+                        + unitPhrase(key.unitType(), sustained) + ".");
             }
             if (destroyed > 0) {
-                changes.add("- " + unitOwner(current, key.getColorID()) + " destroyed "
-                        + unitPhrase(key.getUnitType(), destroyed) + ".");
+                changes.add("- " + unitOwner(current, key.colorID()) + " destroyed "
+                        + unitPhrase(key.unitType(), destroyed) + ".");
             }
         }
         return changes;

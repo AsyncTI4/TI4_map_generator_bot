@@ -157,7 +157,7 @@ public final class TeHelperAgents {
                     .collect(Collectors.toSet());
             keys.stream()
                     .map(uk ->
-                            Buttons.blue(prefix + uk.asyncID(), uk.getUnitType().humanReadableName(), uk.unitEmoji()))
+                            Buttons.blue(prefix + uk.asyncID(), uk.unitType().humanReadableName(), uk.unitEmoji()))
                     .forEach(newButtons::add);
 
         } else if ((matcher = Pattern.compile(part3).matcher(buttonID)).matches()) {
@@ -187,7 +187,7 @@ public final class TeHelperAgents {
                     .collect(Collectors.toSet());
             keys.stream()
                     .map(uk ->
-                            Buttons.blue(prefix + uk.asyncID(), uk.getUnitType().humanReadableName(), uk.unitEmoji()))
+                            Buttons.blue(prefix + uk.asyncID(), uk.unitType().humanReadableName(), uk.unitEmoji()))
                     .forEach(newButtons::add);
 
         } else if ((matcher = Pattern.compile(part5).matcher(buttonID)).matches()) {

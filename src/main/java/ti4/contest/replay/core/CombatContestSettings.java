@@ -24,7 +24,7 @@ public class CombatContestSettings {
     public static final int PROMOTION_LOOKBACK_FALLBACK_MAX_HOURS = 8;
 
     @Setter(AccessLevel.NONE)
-    private boolean isProd = false;
+    private boolean isProd;
 
     private CandidateSelection candidateSelection = new CandidateSelection();
     private Promotion promotion = new Promotion();
@@ -43,8 +43,8 @@ public class CombatContestSettings {
 
     @Autowired
     public CombatContestSettings(@Value("${combat-contest.is-dev:false}") boolean isDev) {
-        this.isProd = !isDev;
-        loadEnvironmentDefaults(this.isProd);
+        isProd = !isDev;
+        loadEnvironmentDefaults(isProd);
         validate();
     }
 
@@ -192,7 +192,7 @@ public class CombatContestSettings {
     @Getter
     @Setter
     public static class Promotion {
-        private boolean enabled = false;
+        private boolean enabled;
         private int intervalSeconds = 60;
         private int candidateLookbackHours = 12;
         private int maxPromotionsPerHour = 1;
@@ -243,8 +243,8 @@ public class CombatContestSettings {
         private int baseCombatFavorGain = 10;
         private int initialHousePoints = 1000;
         private int catchupFavorPointsPerBonus = 100;
-        private int catchupFavorBonusStep = 0;
-        private int maxCatchupFavorBonus = 0;
+        private int catchupFavorBonusStep;
+        private int maxCatchupFavorBonus;
     }
 
     @Getter

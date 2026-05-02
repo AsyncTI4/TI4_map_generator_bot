@@ -10,7 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
-import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import ti4.discord.JdaService;
@@ -33,76 +32,74 @@ public class Units {
      * It is being used as a key in some major hashmaps which causes issues when we attempt to save/restore from JSON as JSON map keys have to be strings, not JSON objects. This forces us to use custom mappers to resolve.
      * </p>
      */
-    @Data
-    public static class UnitKey {
+        public record UnitKey(UnitType unitType, String colorID) {
 
-        private final UnitType unitType;
-        private final String colorID;
-
-        @JsonIgnore
-        public String getColor() {
-            return AliasHandler.resolveColor(colorID);
-        }
-
-        public String asyncID() {
-            return unitType.toString();
-        }
-
-        public String unitName() {
-            return unitType.plainName();
-        }
-
-        public String unitTypeVal() {
-            return unitType.getValue();
-        }
-
-        public String humanReadableName() {
-            return unitType.humanReadableName();
-        }
-
-        public TI4Emoji unitEmoji() {
-            return unitType.getUnitTypeEmoji();
-        }
-
-        @JsonIgnore
-        public String getFileName() {
-            if (JdaService.testingMode) return getFileName(false);
-            return getFileName(RandomHelper.isOneInX(Constants.EYE_CHANCE));
-        }
-
-        public String getFileName(boolean eyes) {
-            if (unitType == UnitType.Destroyer && eyes) {
-                return String.format("%s_dd_eyes.png", colorID);
-            }
-            if (unitType == UnitType.Celagrom || unitType == UnitType.Lady || unitType == UnitType.Cavalry) {
-                return String.format("%s_%s.png", colorID, "fs");
-            }
-            if (unitType == UnitType.TyrantsLament) {
-                return "TyrantsLament.png";
-            }
-            if (unitType == UnitType.PlenaryOrbital) {
-                return "PlenaryOrbital.png";
-            }
-            if (unitType == UnitType.Monument) {
-                return getColor() + "_monument.png";
+            @JsonIgnore
+            public String getColor() {
+                return AliasHandler.resolveColor(colorID);
             }
 
-            return String.format("%s_%s.png", colorID, asyncID());
-        }
+            public String asyncID() {
+                return unitType.toString();
+            }
 
-        public String toString() {
-            return String.format("%s—%s", colorID, unitType.humanReadableName());
-        }
+            public String unitName() {
+                return unitType.plainName();
+            }
 
-        public String outputForSave() {
-            return String.format("%s%s%s", colorID, EMDASH, asyncID());
-        }
+            public String unitTypeVal() {
+                return unitType.getValue();
+            }
 
-        public UnitKey(@JsonProperty("unitType") UnitType unitType, @JsonProperty("colorID") String colorID) {
-            this.unitType = unitType;
-            this.colorID = colorID;
+            public String humanReadableName() {
+                return unitType.humanReadableName();
+            }
+
+            public TI4Emoji unitEmoji() {
+                return unitType.getUnitTypeEmoji();
+            }
+
+            @JsonIgnore
+            public String getFileName() {
+                if (JdaService.testingMode) {
+                    return getFileName(false);
+                }
+                return getFileName(RandomHelper.isOneInX(Constants.EYE_CHANCE));
+            }
+
+            public String getFileName(boolean eyes) {
+                if (unitType == UnitType.Destroyer && eyes) {
+                    return String.format("%s_dd_eyes.png", colorID);
+                }
+                if (unitType == UnitType.Celagrom || unitType == UnitType.Lady || unitType == UnitType.Cavalry) {
+                    return String.format("%s_%s.png", colorID, "fs");
+                }
+                if (unitType == UnitType.TyrantsLament) {
+                    return "TyrantsLament.png";
+                }
+                if (unitType == UnitType.PlenaryOrbital) {
+                    return "PlenaryOrbital.png";
+                }
+                if (unitType == UnitType.Monument) {
+                    return getColor() + "_monument.png";
+                }
+
+                return String.format("%s_%s.png", colorID, asyncID());
+            }
+
+            public String toString() {
+                return String.format("%s—%s", colorID, unitType.humanReadableName());
+            }
+
+            public String outputForSave() {
+                return String.format("%s%s%s", colorID, EMDASH, asyncID());
+            }
+
+            public UnitKey(@JsonProperty("unitType") UnitType unitType, @JsonProperty("colorID") String colorID) {
+                this.unitType = unitType;
+                this.colorID = colorID;
+            }
         }
-    }
 
     @Getter
     public enum UnitType {
