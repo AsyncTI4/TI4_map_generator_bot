@@ -162,7 +162,7 @@ public class GameMessageManager {
         Map<String, List<GameMessage>> result = new HashMap<>();
         for (var entry : allGameMessages.gameNameToMessages.entrySet()) {
             List<GameMessage> filtered =
-                entry.getValue().stream().filter(m -> m.type == type).toList();
+                    entry.getValue().stream().filter(m -> m.type == type).toList();
             if (!filtered.isEmpty()) {
                 result.put(entry.getKey(), filtered);
             }
