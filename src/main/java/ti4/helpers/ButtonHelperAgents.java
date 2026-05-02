@@ -1186,6 +1186,9 @@ public final class ButtonHelperAgents {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "T'ro An, the N'orr"
                     + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
+            if (!rest.contains("_")) {
+                return;
+            }
             String posNPlanet = rest.replace("sardakkagent_", "");
             String pos = posNPlanet.split("_")[0];
             String planetName = posNPlanet.split("_")[1];
