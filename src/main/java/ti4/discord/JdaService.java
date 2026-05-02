@@ -566,6 +566,7 @@ public class JdaService {
 
     public static void shutdown() {
         try {
+            AsyncTI4DiscordBot.markShuttingDown();
             jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
             BotLogger.info("SHUTDOWN PROCESS STARTED");
             ActiveLeaseService.setCurrentProcessReady(false);

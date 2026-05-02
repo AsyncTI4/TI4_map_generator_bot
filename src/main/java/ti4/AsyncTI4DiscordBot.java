@@ -29,6 +29,9 @@ public class AsyncTI4DiscordBot {
     public static final String INSTANCE_ID = UUID.randomUUID().toString();
     public static final String SHORT_INSTANCE_ID = INSTANCE_ID.substring(0, 8);
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
+    private static final Duration WARMUP_DURATION = Duration.ofMinutes(2);
+
+    private static volatile boolean shuttingDown = false;
 
     static void main(String[] args) {
         GlobalSettings.loadSettings();
@@ -87,7 +90,15 @@ public class AsyncTI4DiscordBot {
         return value == null || value.isBlank();
     }
 
-    public static boolean durationHasPassedSinceStartup(Duration duration) {
+    public static void markShuttingDown() {
+        shuttingDown = true;
+    }
+
+    public static boolean isUnstable() {
+        return shuttingDown || durationHasPassedSinceStartup(WARMUP_DURATION);
+    }
+
+    private static boolean durationHasPassedSinceStartup(Duration duration) {
         return System.currentTimeMillis() - START_TIME_MILLISECONDS <= duration.toMillis();
     }
 }
