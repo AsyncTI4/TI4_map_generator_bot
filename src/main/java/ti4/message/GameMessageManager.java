@@ -68,7 +68,7 @@ public class GameMessageManager {
 
     public static synchronized void remove(Collection<String> gameNames) {
         if (gameNames.isEmpty()) return;
-        
+
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             return;

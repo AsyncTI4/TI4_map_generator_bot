@@ -47,21 +47,23 @@ public class SabotageAutoReactCron {
         for (Map.Entry<String, List<GameMessageManager.GameMessage>> entry : acMessagesByGame.entrySet()) {
             String gameName = entry.getKey();
 
-            ExecutionLockManager.wrapWithTryLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
-                ManagedGame managedGame = GameManager.getManagedGame(gameName);
-                if (managedGame == null || managedGame.isHasEnded()) {
-                    gamesToRemove.add(gameName);
-                    return;
-                }
+            ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
+                        ManagedGame managedGame = GameManager.getManagedGame(gameName);
+                        if (managedGame == null || managedGame.isHasEnded()) {
+                            gamesToRemove.add(gameName);
+                            return;
+                        }
 
-                Game game = managedGame.getGame();
-                List<GameMessageManager.GameMessage> acMessages = entry.getValue();
-                try {
-                    automaticallyReactToSabotageWindows(game, acMessages);
-                } catch (Exception e) {
-                    BotLogger.error(new LogOrigin(game), "SabotageAutoReactCron failed for game: " + game.getName(), e);
-                }
-            });
+                        Game game = managedGame.getGame();
+                        List<GameMessageManager.GameMessage> acMessages = entry.getValue();
+                        try {
+                            automaticallyReactToSabotageWindows(game, acMessages);
+                        } catch (Exception e) {
+                            BotLogger.error(
+                                    new LogOrigin(game), "SabotageAutoReactCron failed for game: " + game.getName(), e);
+                        }
+                    })
+                    .run();
         }
 
         GameMessageManager.remove(gamesToRemove);
