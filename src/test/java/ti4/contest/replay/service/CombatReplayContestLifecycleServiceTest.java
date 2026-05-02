@@ -31,7 +31,6 @@ class CombatReplayContestLifecycleServiceTest {
         CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
         CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
         CombatContestSettings settings = new CombatContestSettings();
-        settings.getPromotion().setEnabled(false);
         CombatReplayContestLifecycleService service = service(settings, candidateRepository, replayContestRepository);
 
         service.promoteBestCandidateIfDue();
@@ -43,7 +42,7 @@ class CombatReplayContestLifecycleServiceTest {
     void promoteBestCandidateIfDueAllowsPreviousPromotionSlotEvenWhenPostWasLate() {
         CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
         CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
-        CombatContestSettings settings = new CombatContestSettings();
+        CombatContestSettings settings = settingsWithPromotionEnabled();
         CombatReplayContestLifecycleService service = service(settings, candidateRepository, replayContestRepository);
         service.setClock(fixedClock("2026-04-27T12:00:00"));
         LocalDateTime recentContestCutoff = LocalDateTime.parse("2026-04-27T11:00:00");
@@ -72,7 +71,7 @@ class CombatReplayContestLifecycleServiceTest {
     void promoteBestCandidateIfDueBlocksWhenContestExistsInPreviousPromotionSlot() {
         CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
         CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
-        CombatContestSettings settings = new CombatContestSettings();
+        CombatContestSettings settings = settingsWithPromotionEnabled();
         CombatReplayContestLifecycleService service = service(settings, candidateRepository, replayContestRepository);
         service.setClock(fixedClock("2026-04-27T12:00:00"));
         LocalDateTime recentContestCutoff = LocalDateTime.parse("2026-04-27T11:00:00");
@@ -90,7 +89,7 @@ class CombatReplayContestLifecycleServiceTest {
     void promoteBestCandidateIfDueRunsWhenCronIsLateForThePromotionSlot() {
         CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
         CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
-        CombatContestSettings settings = new CombatContestSettings();
+        CombatContestSettings settings = settingsWithPromotionEnabled();
         CombatReplayContestLifecycleService service = service(settings, candidateRepository, replayContestRepository);
         service.setClock(fixedClock("2026-04-27T12:45:00"));
         LocalDateTime recentContestCutoff = LocalDateTime.parse("2026-04-27T11:00:00");
@@ -120,7 +119,7 @@ class CombatReplayContestLifecycleServiceTest {
         CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
         CombatObservationRepository observationRepository = mock(CombatObservationRepository.class);
         CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
-        CombatContestSettings settings = new CombatContestSettings();
+        CombatContestSettings settings = settingsWithPromotionEnabled();
         FallbackPromotionService service = new FallbackPromotionService(
                 settings, candidateRepository, observationRepository, replayContestRepository);
         service.setClock(fixedClock("2026-04-27T12:00:00"));
@@ -148,7 +147,6 @@ class CombatReplayContestLifecycleServiceTest {
         CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
         CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
         CombatContestSettings settings = new CombatContestSettings();
-        settings.getPromotion().setEnabled(false);
         CombatReplayContestLifecycleService service = service(settings, candidateRepository, replayContestRepository);
 
         CombatReplayContestLifecycleService.ForcePromoteResult result = service.forcePromoteCandidate(1L);
@@ -163,6 +161,12 @@ class CombatReplayContestLifecycleServiceTest {
             CombatCandidateRepository candidateRepository,
             CombatReplayContestRepository replayContestRepository) {
         return service(settings, candidateRepository, mock(CombatObservationRepository.class), replayContestRepository);
+    }
+
+    private CombatContestSettings settingsWithPromotionEnabled() {
+        CombatContestSettings settings = new CombatContestSettings();
+        settings.getPromotion().setEnabled(true);
+        return settings;
     }
 
     private CombatReplayContestLifecycleService service(
