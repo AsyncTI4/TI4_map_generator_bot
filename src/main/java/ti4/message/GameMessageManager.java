@@ -2,6 +2,7 @@ package ti4.message;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -65,7 +66,9 @@ public class GameMessageManager {
         return replacedMessageId;
     }
 
-    public static synchronized void remove(Iterable<String> gameNames) {
+    public static synchronized void remove(Collection<String> gameNames) {
+        if (gameNames.isEmpty()) return;
+        
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             return;
