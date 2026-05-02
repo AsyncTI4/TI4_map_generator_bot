@@ -1,0 +1,64 @@
+candidateSelection:
+  window:
+    lookbackMinutes: 60
+    refreshCronIntervalSeconds: 300
+  targetCandidatesPerHour: 4
+
+promotion:
+  enabled: false
+  intervalSeconds: 60
+  candidateLookbackHours: 12
+  maxPromotionsPerHour: 1
+
+replayExecution:
+  startDelaySeconds: 900
+  discussionWindowSeconds: 900
+  sideBetWindowSeconds: 600
+  replayIntervalSeconds: 15
+  maxEventGapSeconds: 30
+  pendingResolutionWindowSeconds: 900
+
+retention:
+  observationRetentionDays: 2
+  eventRetentionDays: 2
+
+runtime:
+  devMode: false
+  trackAllCombatsAsCandidates: false
+  immediatePromotionOnResolve: false
+
+sideBets:
+  enableSideBets: true
+  maxBetsPerUser: 3
+  costPoints: 1
+  dynamicPayoutCap: 100
+
+decoysEnabled: false
+housesEnabled: true
+
+houseAbilities:
+  minimumAbilityVotesToResolve: 3
+  baseCombatFavorGain: 10
+  initialHousePoints: 1000
+  catchupFavorPointsPerBonus: 100
+  catchupFavorBonusStep: 0
+  maxCatchupFavorBonus: 0
+  naalu:
+    actionCardPeekFavorCost: 30
+    roundOneRollPeekFavorCost: 50
+  mentak:
+    previewLeadSeconds: 900
+    destroyerDecoyFavorCost: 30
+    cruiserDecoyFavorCost: 40
+    dreadnoughtDecoyFavorCost: 60
+    warSunDecoyFavorCost: 80
+  hacan:
+    maxSubsidiesPerContest: 2
+    subsidyFavorOnHit: 10
+    marketMakerPointsPerBet: 1
+    lowTradeConvoysFavorCost: 10
+    lowTradeConvoysPredictionBonus: 5
+    mediumTradeConvoysFavorCost: 20
+    mediumTradeConvoysPredictionBonus: 10
+    highTradeConvoysFavorCost: 30
+    highTradeConvoysPredictionBonus: 15

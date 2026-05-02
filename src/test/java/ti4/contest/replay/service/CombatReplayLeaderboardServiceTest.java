@@ -1,25 +1,36 @@
 package ti4.contest.replay.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import ti4.contest.replay.core.CombatContestSettings;
+import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.entities.CombatReplayLeaderboardEntryEntity;
+import ti4.contest.replay.house.hacan.CombatReplayHacanTradeConvoysService;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
 import ti4.contest.replay.repository.CombatReplayLeaderboardEntryRepository;
 import ti4.contest.replay.repository.CombatReplayPredictionRepository;
+import ti4.contest.replay.service.CombatReplayHouseLedgerService.HouseFavorSummary;
+import ti4.contest.replay.service.CombatReplayHouseLedgerService.HousePredictionSummary;
 
 class CombatReplayLeaderboardServiceTest {
 
     @Test
     void newLeaderboardEntriesStartWithInitialPoints() throws Exception {
-        CombatReplayLeaderboardService service = newService(mock(CombatReplayLeaderboardEntryRepository.class));
+        CombatReplayLeaderboardService service = new CombatReplayLeaderboardService(
+                new CombatContestSettings(),
+                mock(CombatReplayContestRepository.class),
+                mock(CombatReplayPredictionRepository.class),
+                mock(CombatReplayLeaderboardEntryRepository.class),
+                mock(CombatReplaySideBetService.class),
+                mock(CombatReplayHouseService.class),
+                mock(CombatReplayHouseLedgerService.class),
+                mock(CombatReplayHouseFavorService.class),
+                mock(CombatReplayHacanTradeConvoysService.class));
         Method method = CombatReplayLeaderboardService.class.getDeclaredMethod(
                 "newLeaderboardEntry", String.class, String.class);
         method.setAccessible(true);
@@ -27,61 +38,45 @@ class CombatReplayLeaderboardServiceTest {
         CombatReplayLeaderboardEntryEntity entry =
                 (CombatReplayLeaderboardEntryEntity) method.invoke(service, "123", "Player");
 
-        assertEquals(CombatReplayLeaderboardService.STARTING_POINTS, entry.getTotalPoints());
+        assertEquals(0, entry.getTotalPoints());
         assertEquals(0, entry.getPredictionCount());
         assertEquals(0, entry.getCorrectPredictions());
     }
 
     @Test
-    void userPointsMessageIncludesRankPointsAndAccuracy() {
-        CombatReplayLeaderboardEntryRepository repository = mock(CombatReplayLeaderboardEntryRepository.class);
-        CombatReplayLeaderboardEntryEntity first = leaderboardEntry("1", "First", 140, 10, 7);
-        CombatReplayLeaderboardEntryEntity user = leaderboardEntry("2", "Player", 120, 5, 3);
-        when(repository.findByDiscordUserId("2")).thenReturn(Optional.of(user));
-        when(repository.findAllByOrderByTotalPointsDescCorrectPredictionsDescPredictionCountDescDiscordUserNameAsc())
-                .thenReturn(List.of(first, user));
-        CombatReplayLeaderboardService service = newService(repository);
-
-        String message = service.buildUserPointsMessage("2");
-
-        assertEquals("""
-                ## Your Lazax War Archives Points
-                Rank: **#2**
-                Points: **120**
-                Correct predictions: `3/5` (60%)""", message);
-    }
-
-    @Test
-    void top100MessageUsesLeaderboardFormatting() {
-        CombatReplayLeaderboardEntryRepository repository = mock(CombatReplayLeaderboardEntryRepository.class);
-        when(repository.findTop100ByOrderByTotalPointsDescCorrectPredictionsDescPredictionCountDescDiscordUserNameAsc())
-                .thenReturn(List.of(leaderboardEntry("1", "Player", 120, 5, 3)));
-        CombatReplayLeaderboardService service = newService(repository);
-
-        String message = service.buildTop100LeaderboardMessage();
-
-        assertEquals(
-                "## Lazax War Archives Leaderboard\n" + "`1.` Player - **120** points (`3/5` correct, 60%)", message);
-    }
-
-    private static CombatReplayLeaderboardService newService(CombatReplayLeaderboardEntryRepository repository) {
-        return new CombatReplayLeaderboardService(
+    void hacanFavorAwardMessageBreaksOutMarketCompactFavor() throws Exception {
+        CombatReplayLeaderboardService service = new CombatReplayLeaderboardService(
                 new CombatContestSettings(),
                 mock(CombatReplayContestRepository.class),
                 mock(CombatReplayPredictionRepository.class),
-                repository,
-                mock(CombatReplaySideBetService.class));
-    }
+                mock(CombatReplayLeaderboardEntryRepository.class),
+                mock(CombatReplaySideBetService.class),
+                mock(CombatReplayHouseService.class),
+                mock(CombatReplayHouseLedgerService.class),
+                mock(CombatReplayHouseFavorService.class),
+                mock(CombatReplayHacanTradeConvoysService.class));
+        Method method = CombatReplayLeaderboardService.class.getDeclaredMethod(
+                "favorAwardMessage", HousePredictionSummary.class);
+        method.setAccessible(true);
 
-    private static CombatReplayLeaderboardEntryEntity leaderboardEntry(
-            String userId, String userName, int totalPoints, int predictionCount, int correctPredictions) {
-        CombatReplayLeaderboardEntryEntity entry = new CombatReplayLeaderboardEntryEntity();
-        entry.setDiscordUserId(userId);
-        entry.setDiscordUserName(userName);
-        entry.setTotalPoints(totalPoints);
-        entry.setPredictionCount(predictionCount);
-        entry.setCorrectPredictions(correctPredictions);
-        entry.setUpdatedAt(LocalDateTime.now());
-        return entry;
+        HousePredictionSummary summary = new HousePredictionSummary(
+                CombatReplayHouse.HACAN,
+                0,
+                0,
+                0,
+                13,
+                0,
+                0,
+                List.of(),
+                List.of(
+                        new HouseFavorSummary("the Custodians sealing this combat's ledger", 10),
+                        new HouseFavorSummary("Market Compact hits", 3)));
+
+        String message = (String) method.invoke(service, summary);
+
+        assertTrue(message.contains("receives `+13` Favor"));
+        assertTrue(message.contains("- `+10` from the Custodians sealing this combat's ledger."));
+        assertTrue(message.contains("- `+3` from Market Compact hits."));
+        assertTrue(message.contains("- **Total Favor:** `0`"));
     }
 }

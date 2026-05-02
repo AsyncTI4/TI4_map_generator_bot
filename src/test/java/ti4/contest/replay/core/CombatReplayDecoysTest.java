@@ -43,6 +43,39 @@ class CombatReplayDecoysTest extends BaseTi4Test {
     }
 
     @Test
+    void warSunDecoyGrantsReplayOnlyWarSunTechForRenderedTile() {
+        Game game = new Game();
+        Tile tile = new Tile("19", "000");
+        game.setTile(tile);
+        Player letnev = player(game, "letnev", "blue");
+        game.getPlayers().put(letnev.getUserID(), letnev);
+        CombatReplayDecoys.Abilities abilities =
+                abilities(new DecoyUnit("letnev", "<letnev>", "blu", UnitType.Warsun, "space", 1));
+
+        CombatReplayDecoys.applyToTile(game, "000", abilities);
+
+        assertTrue(letnev.hasWarsunTech());
+        assertTrue(letnev.hasTech("ws"));
+        assertEquals(1, tile.getSpaceUnitHolder().getUnitCount(Units.getUnitKey(UnitType.Warsun, "blu")));
+    }
+
+    @Test
+    void warSunDecoyWithFullColorNameRendersOnTile() {
+        Game game = new Game();
+        Tile tile = new Tile("19", "000");
+        game.setTile(tile);
+        Player yin = player(game, "yin", "sunset");
+        game.getPlayers().put(yin.getUserID(), yin);
+        CombatReplayDecoys.Abilities abilities =
+                abilities(new DecoyUnit("yin", "<yin>", "sunset", UnitType.Warsun, "space", 1));
+
+        CombatReplayDecoys.applyToTile(game, "000", abilities);
+
+        assertTrue(yin.hasWarsunTech());
+        assertEquals(1, tile.getSpaceUnitHolder().getUnitCount(Units.getUnitKey(UnitType.Warsun, yin.getColorID())));
+    }
+
+    @Test
     void addsForcedMissDiceToMatchingRollWithoutChangingTotals() {
         CombatRollPayload payload = new CombatRollPayload(
                 new CombatRollPayload.RollHeader(
@@ -94,6 +127,60 @@ class CombatReplayDecoysTest extends BaseTi4Test {
         assertEquals(DieRollSource.DECOY, decoyDie.source());
         assertFalse(decoyDie.success());
         assertTrue(decoyDie.result() < 4);
+    }
+
+    @Test
+    void addsSyntheticForcedMissRollWhenDecoyUnitHasNoOriginalRoll() {
+        CombatRollPayload.RollTotal total = new CombatRollPayload.RollTotal(1, 0, 1, 1);
+        CombatRollPayload payload = new CombatRollPayload(
+                new CombatRollPayload.RollHeader(
+                        "yin",
+                        "sunset",
+                        "<yin>",
+                        "letnev",
+                        "blue",
+                        "000",
+                        "18",
+                        "space",
+                        "space combat",
+                        CombatRollType.combatround,
+                        1,
+                        false,
+                        false),
+                List.of(),
+                List.of(),
+                List.of(new CombatRollPayload.UnitRoll(
+                        "yin_destroyer",
+                        "dd",
+                        "destroyer",
+                        "Destroyer I",
+                        "Destroyer I",
+                        "<destroyer>",
+                        1,
+                        1,
+                        0,
+                        9,
+                        0,
+                        9,
+                        RollSegmentType.PRIMARY,
+                        List.of(new CombatRollPayload.DieRoll(2, 9, false, DieRollSource.PRIMARY)),
+                        0)),
+                total);
+        CombatReplayDecoys.Abilities abilities =
+                abilities(new DecoyUnit("yin", "<yin>", "sunset", UnitType.Warsun, "space", 1));
+
+        CombatRollPayload transformed = CombatReplayDecoys.applyToRoll(payload, abilities);
+        CombatRollPayload.UnitRoll warSunRoll = transformed.unitRolls().get(1);
+
+        assertEquals(2, transformed.unitRolls().size());
+        assertSame(total, transformed.total());
+        assertEquals("ws", warSunRoll.asyncId());
+        assertEquals("warsun", warSunRoll.baseType());
+        assertEquals(1, warSunRoll.quantity());
+        assertEquals(3, warSunRoll.dice().size());
+        assertEquals(0, warSunRoll.hits());
+        assertTrue(warSunRoll.dice().stream().allMatch(die -> die.source() == DieRollSource.DECOY));
+        assertTrue(warSunRoll.dice().stream().noneMatch(CombatRollPayload.DieRoll::success));
     }
 
     @Test
@@ -175,7 +262,7 @@ class CombatReplayDecoysTest extends BaseTi4Test {
 
         String message = CombatReplayDecoys.renderDisappearanceMessage(abilities);
 
-        assertTrue(message.contains("## Sensor Echoes Fade"));
+        assertTrue(message.contains("## False Colors Revealed"));
         assertTrue(message.contains("<ghost> 2 cruisers"));
         assertTrue(message.contains("<yin> 1 destroyer"));
     }
@@ -233,6 +320,21 @@ class CombatReplayDecoysTest extends BaseTi4Test {
     }
 
     @Test
+    void persistedDecoyChoiceMergesIntoReplayAbilities() {
+        String abilitiesJson = CombatReplayDecoys.addDecoy(
+                null, new DecoyUnit("mentak", "<mentak>", "blu", UnitType.Destroyer, Constants.SPACE, 1));
+        abilitiesJson = CombatReplayDecoys.addDecoy(
+                abilitiesJson, new DecoyUnit("mentak", "<mentak>", "blu", UnitType.Destroyer, Constants.SPACE, 1));
+
+        CombatReplayDecoys.Abilities abilities = CombatReplayDecoys.read(abilitiesJson);
+
+        assertTrue(abilities.hasDecoys());
+        assertEquals(1, abilities.decoy().units().size());
+        assertEquals(UnitType.Destroyer, abilities.decoy().units().getFirst().unitType());
+        assertEquals(2, abilities.decoy().units().getFirst().count());
+    }
+
+    @Test
     void debugDecoyOverrideCanSuppressDecoys() {
         Game game = new Game();
         Tile tile = new Tile("19", "000");
@@ -246,6 +348,19 @@ class CombatReplayDecoysTest extends BaseTi4Test {
         CombatReplayDecoys.setDebugDecoyUnits(game, tile, List.of());
 
         assertNull(CombatReplayDecoys.buildJson(ghost, yin, tile, true));
+    }
+
+    @Test
+    void rendersNoDebugDecoysForEmptyOverride() {
+        Game game = new Game();
+        Tile tile = new Tile("19", "000");
+        game.setTile(tile);
+        CombatReplayDecoys.clearDebugDecoys(game, tile);
+
+        CombatReplayDecoys.setDebugDecoyUnits(game, tile, List.of());
+
+        assertEquals("No decoys selected.", CombatReplayDecoys.renderDebugDecoySummary(game, tile));
+        assertEquals("Space\n", CombatReplayDecoys.appendDebugDecoySummary("Space\n", game, tile));
     }
 
     @Test

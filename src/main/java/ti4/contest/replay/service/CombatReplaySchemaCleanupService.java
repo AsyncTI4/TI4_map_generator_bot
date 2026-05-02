@@ -34,6 +34,11 @@ public class CombatReplaySchemaCleanupService {
             dropColumns(connection, "combat_candidate", "combat_type");
             dropColumns(
                     connection, "combat_contest_side_bets", "candidate_id", "points_spent", "won", "profit_awarded");
+            dropColumns(connection, "combat_replay_house_ability_use", "contest_id", "ability_key");
+            dropColumns(connection, "combat_replay_house_ability_vote", "contest_id", "ability_key");
+            dropColumns(connection, "combat_replay_hacan_trade_convoys", "candidate_id");
+            dropColumns(connection, "combat_replay_hacan_trade_convoys_vote", "candidate_id");
+            dropColumns(connection, "combat_replay_hacan_market_compact_decision", "decision_type", "vote_count");
         } catch (SQLException e) {
             BotLogger.error("Failed to clean obsolete combat replay schema columns.", e);
         }

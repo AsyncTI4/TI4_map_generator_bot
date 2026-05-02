@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.CombatContestSettings;
+import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.core.CombatSideBetType;
 import ti4.contest.replay.core.CombatSideState;
 import ti4.contest.replay.entities.CombatCandidateEntity;
@@ -38,6 +39,7 @@ public class CombatReplaySideBetService {
     private final CombatReplayLeaderboardEntryRepository leaderboardEntryRepository;
     private final CombatReplaySideBetPayoutService payoutService;
     private final CombatReplaySideBetUiService sideBetUiService;
+    private final CombatReplayHouseService houseService;
 
     public boolean shouldShowButtons(CombatCandidateEntity candidate) {
         return sideBetUiService.shouldShowButtons(candidate);
@@ -83,6 +85,9 @@ public class CombatReplaySideBetService {
         if (contest.getReplayStartAt() == null || !LocalDateTime.now().isBefore(contest.getReplayStartAt())) {
             return PlacementPersistenceResult.rejected("The side-bet window is closed.");
         }
+        if (settings.isHousesEnabled() && contest.getSideBetMarketPostedAt() == null) {
+            return PlacementPersistenceResult.rejected("The side-bet market is not open yet.");
+        }
 
         CombatCandidateEntity candidate =
                 candidateRepository.findById(contest.getCandidateId()).orElse(null);
@@ -93,8 +98,12 @@ public class CombatReplaySideBetService {
             return PlacementPersistenceResult.rejected("That side bet is not available for this combat.");
         }
 
+        boolean hacanProtected = hasHacanSideBetProtection(userId);
         CombatReplayLeaderboardEntryEntity entry =
                 leaderboardEntryRepository.findByDiscordUserId(userId).orElse(null);
+        if (entry == null && hacanProtected) {
+            entry = newLeaderboardEntry(userId, userName);
+        }
         if (entry == null) {
             return PlacementPersistenceResult.rejected("You do not have any points to bet.");
         }
@@ -107,15 +116,15 @@ public class CombatReplaySideBetService {
 
         int costPoints = settings.getSideBets().getCostPoints();
         int currentPoints = safeInt(entry.getTotalPoints());
-        if (currentPoints <= 0) {
+        if (currentPoints <= 0 && !hacanProtected) {
             return PlacementPersistenceResult.rejected("You do not have any points to bet.");
         }
-        if (currentPoints < costPoints) {
+        if (currentPoints < costPoints && !hacanProtected) {
             return PlacementPersistenceResult.rejected("You do not have enough points to place that side bet.");
         }
 
         entry.setDiscordUserName(userName);
-        entry.setTotalPoints(currentPoints - costPoints);
+        entry.setTotalPoints(Math.max(0, currentPoints - costPoints));
         entry.setUpdatedAt(LocalDateTime.now());
         leaderboardEntryRepository.save(entry);
 
@@ -158,10 +167,12 @@ public class CombatReplaySideBetService {
                 entry.setUpdatedAt(now);
             }
 
-            if (entry != null && won && firstResolution) {
+            if (entry != null && won) {
                 resolved.add(new ResolvedSideBet(
                         sideBet.getDiscordUserId(),
                         sideBet.getDiscordUserName(),
+                        sideBet.getBetType(),
+                        sideBet.getTargetFaction(),
                         sideBet.getBetType().label(),
                         profitPoints));
             }
@@ -198,7 +209,13 @@ public class CombatReplaySideBetService {
         }
     }
 
-    public record ResolvedSideBet(String discordUserId, String discordUserName, String label, int profitPoints) {}
+    public record ResolvedSideBet(
+            String discordUserId,
+            String discordUserName,
+            CombatSideBetType betType,
+            String targetFaction,
+            String label,
+            int profitPoints) {}
 
     private record PlacementPersistenceResult(
             PlacementResult result, CombatReplayContestEntity contest, CombatCandidateEntity candidate) {
@@ -239,6 +256,21 @@ public class CombatReplaySideBetService {
                         && sideBet.getTargetFaction() != null
                         && sideBet.getTargetFaction().equalsIgnoreCase(candidate.getWinnerFaction());
         };
+    }
+
+    private boolean hasHacanSideBetProtection(String userId) {
+        return settings.isHousesEnabled() && houseService.houseForUser(userId) == CombatReplayHouse.HACAN;
+    }
+
+    private CombatReplayLeaderboardEntryEntity newLeaderboardEntry(String userId, String userName) {
+        CombatReplayLeaderboardEntryEntity entry = new CombatReplayLeaderboardEntryEntity();
+        entry.setDiscordUserId(userId);
+        entry.setDiscordUserName(userName);
+        entry.setTotalPoints(0);
+        entry.setPredictionCount(0);
+        entry.setCorrectPredictions(0);
+        entry.setUpdatedAt(LocalDateTime.now());
+        return entry;
     }
 
     public boolean isAfbSkippedAvailable(CombatCandidateEntity candidate, String targetFaction) {

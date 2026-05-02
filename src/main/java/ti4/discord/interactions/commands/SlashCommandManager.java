@@ -57,6 +57,7 @@ import ti4.discord.interactions.commands.tokens.RemoveTokenCommand;
 import ti4.discord.interactions.commands.transaction.TransactionCommand;
 import ti4.discord.interactions.commands.uncategorized.AllInfoCommand;
 import ti4.discord.interactions.commands.uncategorized.CardsInfoCommand;
+import ti4.discord.interactions.commands.uncategorized.PostLazaxSeason1PublicCommand;
 import ti4.discord.interactions.commands.uncategorized.SelectionBoxDemoCommand;
 import ti4.discord.interactions.commands.uncategorized.ShowDistancesCommand;
 import ti4.discord.interactions.commands.uncategorized.ShowGameCommand;
@@ -134,6 +135,7 @@ public class SlashCommandManager {
                     new BreakthroughCommand(),
                     new PlanetCommand(),
                     new SelectionBoxDemoCommand(),
+                    new PostLazaxSeason1PublicCommand(),
                     new UserCommand(),
                     new LazaxCommand(),
                     new TiglCommand(),

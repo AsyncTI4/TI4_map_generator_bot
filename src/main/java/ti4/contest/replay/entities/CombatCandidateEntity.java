@@ -60,6 +60,9 @@ public class CombatCandidateEntity {
     @Column(name = "promoted_at")
     private LocalDateTime promotedAt;
 
+    @Column(name = "mentak_preview_posted_at")
+    private LocalDateTime mentakPreviewPostedAt;
+
     @Column(name = "game_name", nullable = false)
     private String gameName;
 
@@ -179,4 +182,7 @@ public class CombatCandidateEntity {
 
     @Column(name = "winner_one_hp_remaining", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean winnerOneHpRemaining = false;
+
+    @Column(name = "winner_remaining_hp")
+    private Double winnerRemainingHp;
 }

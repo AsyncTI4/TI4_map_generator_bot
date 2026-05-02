@@ -439,6 +439,7 @@ public class CombatReplayService {
         candidate.setLoserFaction(loserFaction);
         candidate.setResolutionReason("Winner determined from remaining fleets.");
         candidate.setWinnerOneHpRemaining(hasExactlyOneHpRemaining(resolution, candidate, winner.getFaction()));
+        candidate.setWinnerRemainingHp(winnerRemainingHp(resolution, candidate, winner.getFaction()));
         candidate.setPromotionScore(computePromotionScore(
                 candidate,
                 initialStats,
@@ -448,6 +449,7 @@ public class CombatReplayService {
                 roundsObserved));
         candidateRepository.save(candidate);
 
+        appendFalseColorsRevealedEvent(candidate, roundsObserved);
         appendTileRenderEvent(
                 candidate,
                 CombatCandidateEventType.RESOLVED,
@@ -482,6 +484,7 @@ public class CombatReplayService {
         }
         candidateRepository.save(candidate);
 
+        appendFalseColorsRevealedEvent(candidate, roundsObserved);
         appendTileRenderEvent(
                 candidate,
                 CombatCandidateEventType.RESOLVED,
@@ -503,6 +506,14 @@ public class CombatReplayService {
         candidateRepository.save(candidate);
 
         appendDiscordEvent(candidate, CombatCandidateEventType.CANCELLED, null, null, "## Contest Closed\n" + reason);
+    }
+
+    private void appendFalseColorsRevealedEvent(CombatCandidateEntity candidate, int roundsObserved) {
+        String message = CombatReplayDecoys.renderDisappearanceMessage(
+                CombatReplayDecoys.read(candidate.getReplayAbilitiesJson()));
+        if (message == null || message.isBlank()) return;
+
+        appendDiscordEvent(candidate, CombatCandidateEventType.RESOLVED, roundsObserved, null, message);
     }
 
     private boolean trackHitAssignments(
@@ -579,10 +590,12 @@ public class CombatReplayService {
         LazaxCombatSupport.SpaceCombatSnapshot combatSnapshot =
                 LazaxCombatSupport.buildSpaceCombatSnapshot(game, attacker, defender, tile);
         if (combatSnapshot == null) return null;
+        String replayAbilitiesJson = CombatReplayDecoys.buildJson(attacker, defender, tile, settings.isDecoysEnabled());
         return new CandidateInitialSnapshot(
-                LazaxCombatSupport.formatCombatTechSummary(tile, attacker, defender),
+                LazaxCombatSupport.formatCombatTechSummary(
+                        tile, attacker, defender, CombatReplayDecoys.read(replayAbilitiesJson)),
                 CombatReplayTileRenderer.captureInitialSnapshot(game, tile.getPosition()),
-                CombatReplayDecoys.buildJson(attacker, defender, tile, settings.isDecoysEnabled()),
+                replayAbilitiesJson,
                 countDestroyersInCombat(tile, attacker),
                 countDestroyersInCombat(tile, defender),
                 hasAssaultCannon(attacker),
@@ -790,10 +803,16 @@ public class CombatReplayService {
     private boolean hasExactlyOneHpRemaining(
             ResolutionState resolution, CombatCandidateEntity candidate, String winnerFaction) {
         if (winnerFaction == null || resolution == null) return false;
-        double hp = winnerFaction.equalsIgnoreCase(candidate.getAttackerFaction())
+        double hp = winnerRemainingHp(resolution, candidate, winnerFaction);
+        return Math.abs(hp - 1.0) < 0.0001;
+    }
+
+    private double winnerRemainingHp(
+            ResolutionState resolution, CombatCandidateEntity candidate, String winnerFaction) {
+        if (winnerFaction == null || resolution == null) return 0.0;
+        return winnerFaction.equalsIgnoreCase(candidate.getAttackerFaction())
                 ? resolution.attackerRemainingStrength().hp()
                 : resolution.defenderRemainingStrength().hp();
-        return Math.abs(hp - 1.0) < 0.0001;
     }
 
     private int countDestroyersInCombat(Tile tile, Player player) {
