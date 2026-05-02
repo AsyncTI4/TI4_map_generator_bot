@@ -34,6 +34,7 @@
         "window": "At the start of another player's turn, if they have a readied strategy card",
         "text": "If that player's next action is not a strategic action, they discard all of their action cards, give you all of their trade goods, and show you all of their secret objectives.",
         "flavorText": "Kan Kip Rel tugged nervously at his collar, fingering the explosive device he knew was there.",
+        "notes": "If combined with Coup d'Etat, the player will face the same decision on their next available action.",
         "source": "thunders_edge"
     },
     {
