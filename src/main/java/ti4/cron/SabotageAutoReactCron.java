@@ -1,5 +1,6 @@
 package ti4.cron;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -40,25 +41,27 @@ public class SabotageAutoReactCron {
         Map<String, List<GameMessageManager.GameMessage>> acMessagesByGame =
                 GameMessageManager.getAllByGame(GameMessageType.ACTION_CARD);
 
+        var gamesToRemove = new HashSet<String>();
         for (Map.Entry<String, List<GameMessageManager.GameMessage>> entry : acMessagesByGame.entrySet()) {
             String gameName = entry.getKey();
-            List<GameMessageManager.GameMessage> acMessages = entry.getValue();
-
             ManagedGame managedGame = GameManager.getManagedGame(gameName);
             if (managedGame == null || managedGame.isHasEnded()) {
-                acMessages.forEach(acMessage -> GameMessageManager.remove(gameName, acMessage.messageId()));
+                gamesToRemove.add(gameName);
                 continue;
             }
 
             Game game = managedGame.getGame();
             if (game == null) continue;
 
+            List<GameMessageManager.GameMessage> acMessages = entry.getValue();
             try {
                 automaticallyReactToSabotageWindows(game, acMessages);
             } catch (Exception e) {
                 BotLogger.error(new LogOrigin(game), "SabotageAutoReactCron failed for game: " + game.getName(), e);
             }
         }
+
+        GameMessageManager.remove(gamesToRemove);
 
         BotLogger.logCron("Finished SabotageAutoReactCron.");
     }

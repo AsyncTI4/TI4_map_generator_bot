@@ -65,7 +65,7 @@ public class GameMessageManager {
         return replacedMessageId;
     }
 
-    public static synchronized void remove(List<String> gameNames) {
+    public static synchronized void remove(Iterable<String> gameNames) {
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             return;
