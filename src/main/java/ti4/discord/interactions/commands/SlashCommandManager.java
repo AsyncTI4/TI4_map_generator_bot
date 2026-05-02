@@ -142,8 +142,7 @@ public class SlashCommandManager {
                     new AsyncCommand(),
                     new OmegaPhaseCommand(),
                     new DraftCommand(),
-                    new SpinCommand(),
-                    new LazaxCommand())
+                    new SpinCommand())
             .collect(Collectors.toMap(ParentCommand::getName, command -> command));
 
     public static ParentCommand getCommand(String name) {
