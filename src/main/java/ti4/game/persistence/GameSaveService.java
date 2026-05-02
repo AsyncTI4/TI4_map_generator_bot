@@ -1139,7 +1139,7 @@ class GameSaveService {
     }
 
     private static void writeBoolLine(Writer writer, String field, boolean bool) throws IOException {
-        String output = bool ? "true" : "false";
+        String output = Boolean.toString(bool);
         writer.write(field + " " + output);
         writer.write(System.lineSeparator());
     }
@@ -1163,7 +1163,7 @@ class GameSaveService {
 
     private static void writeStrBoolMap(Writer writer, String field, Map<String, Boolean> map) throws IOException {
         List<String> entries = map.entrySet().stream()
-                .map(e -> e.getKey() + "," + (e.getValue() ? "true" : "false"))
+                .map(e -> e.getKey() + "," + (e.getValue().toString()))
                 .toList();
         writer.write(field + " " + String.join(";", entries));
         writer.write(System.lineSeparator());

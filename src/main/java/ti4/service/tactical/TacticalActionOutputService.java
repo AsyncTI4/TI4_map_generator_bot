@@ -250,7 +250,7 @@ public class TacticalActionOutputService {
                 maxBonus++;
                 output.append(" (has _Voidcarver_ for +1 movement for one other ship moving from the same system)");
             }
-            if (player.hasUnit("tk-dissident") && unit.getUnitType() == UnitType.Dreadnought) {
+            if (player.hasUnit("tk-dissident") && unit.unitType() == UnitType.Dreadnought) {
                 for (Player p2 : game.getRealPlayers()) {
                     if (!tile.containsPlayersUnits(p2)) continue;
                     if (player.getTotalVictoryPoints() < p2.getTotalVictoryPoints()) {

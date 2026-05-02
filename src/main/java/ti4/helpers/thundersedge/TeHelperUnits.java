@@ -274,7 +274,7 @@ public final class TeHelperUnits {
 
                 String id = player.finChecker() + "moveForerunner_" + destination.getPosition() + "_"
                         + source.getPosition() + "_" + uk.asyncID() + "_" + uh.getName();
-                String label = uk.getUnitType().humanReadableName() + " from " + uhName;
+                String label = uk.unitType().humanReadableName() + " from " + uhName;
                 buttons.add(Buttons.green(id, label, uk.unitEmoji()));
             }
         }
@@ -306,14 +306,13 @@ public final class TeHelperUnits {
         for (UnitKey uk : tile.getSpaceUnitHolder().getUnitsByState().keySet()) {
             if (player.unitBelongsToPlayer(uk)) continue;
 
-            Player p2 = game.getPlayerFromColorOrFaction(uk.getColorID());
+            Player p2 = game.getPlayerFromColorOrFaction(uk.colorID());
             if (p2 == null) continue;
 
             UnitModel model = p2.getUnitFromUnitKey(uk);
             if (!model.getSustainDamage()) {
                 String id = prefixID + p2.getFaction() + "_" + uk.asyncID();
-                String label =
-                        "Destroy " + p2.getColor() + " " + uk.getUnitType().humanReadableName();
+                String label = "Destroy " + p2.getColor() + " " + uk.unitType().humanReadableName();
                 destroyable.add(Buttons.red(id, label, uk.unitEmoji()));
             }
         }

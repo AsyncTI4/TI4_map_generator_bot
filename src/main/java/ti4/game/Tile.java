@@ -158,7 +158,7 @@ public class Tile {
     }
 
     public static Predicate<Tile> tileHasPlayersInfAndCC(Player player) {
-        Predicate<UnitKey> isInf = unit -> unit.getUnitType() == UnitType.Infantry;
+        Predicate<UnitKey> isInf = unit -> unit.unitType() == UnitType.Infantry;
         return tile -> tile.containsPlayersUnitsWithKeyCondition(player, isInf)
                 && CommandCounterHelper.hasCC(null, player.getColor(), tile);
     }
@@ -655,7 +655,7 @@ public class Tile {
         if (hasAnyToken("token_gravityrift.png", "token_ds_wound.png", "token_vortex.png")) return true;
         for (UnitHolder unitHolder : unitHolders.values()) {
             for (UnitKey unit : unitHolder.getUnitKeys()) {
-                if (unit.getUnitType() == UnitType.Spacedock && game != null) {
+                if (unit.unitType() == UnitType.Spacedock && game != null) {
                     Player player = game.getPlayerFromColorOrFaction(unit.getColor());
                     if (player != null) {
                         UnitModel model = player.getUnitFromUnitKey(unit);

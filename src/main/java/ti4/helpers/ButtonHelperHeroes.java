@@ -849,11 +849,11 @@ public class ButtonHelperHeroes {
             for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {
                 UnitKey unitKey = unitEntry.getKey();
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
-                if (!allowedUnits.contains(unitKey.getUnitType())) {
+                if (!allowedUnits.contains(unitKey.unitType())) {
                     continue;
                 }
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                String prettyName = unitModel == null ? unitKey.getUnitType().humanReadableName() : unitModel.getName();
+                String prettyName = unitModel == null ? unitKey.unitType().humanReadableName() : unitModel.getName();
                 String unitName = unitKey.unitName();
                 Button validTile2 = Buttons.red(
                         finChecker + "glimmersHeroOn_" + tile.getPosition() + "_" + unitName,
@@ -1827,7 +1827,7 @@ public class ButtonHelperHeroes {
 
                 UnitKey unitKey = unitEntry.getKey();
                 int totalUnits = unitEntry.getValue();
-                if (unitKey.getUnitType() != UnitType.Infantry && unitKey.getUnitType() != UnitType.Mech) {
+                if (unitKey.unitType() != UnitType.Infantry && unitKey.unitType() != UnitType.Mech) {
                     var parsedUnit = new ParsedUnit(unitKey, totalUnits, Constants.SPACE);
                     RemoveUnitService.removeUnit(event, tile1, game, parsedUnit);
                 }

@@ -257,7 +257,7 @@ public class DraftSystemSettings extends SettingsMenu {
                 SpeakerOrderDraftable.class.getSimpleName()));
         draftOrchestrator.setChosenKey(PublicSnakeDraftOrchestrator.class.getSimpleName());
         sliceSettings.getMapGenerationMode().setChosenKey("Nucleus");
-        setPreset("Nucleus Draft");
+        preset = "Nucleus Draft";
     }
 
     public void setupAndcatMiltyTwilightsFallPreset() {
@@ -268,7 +268,7 @@ public class DraftSystemSettings extends SettingsMenu {
         draftOrchestrator.setChosenKey(PublicSnakeDraftOrchestrator.class.getSimpleName());
         sliceSettings.getMapGenerationMode().setChosenKey("Milty");
         sourceSettings.getTeDemo().setVal(true);
-        setPreset("Twilights Fall (Andcat Draft)");
+        preset = "Twilights Fall (Andcat Draft)";
     }
 
     public void setupAndcatNucleusTwilightsFallPreset() {
@@ -280,6 +280,6 @@ public class DraftSystemSettings extends SettingsMenu {
         draftOrchestrator.setChosenKey(PublicSnakeDraftOrchestrator.class.getSimpleName());
         sliceSettings.getMapGenerationMode().setChosenKey("Nucleus");
         sourceSettings.getTeDemo().setVal(true);
-        setPreset("Twilights Fall (Andcat Draft)");
+        preset = "Twilights Fall (Andcat Draft)";
     }
 }

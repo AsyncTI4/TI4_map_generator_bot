@@ -25,7 +25,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -159,7 +158,7 @@ public class ButtonHelper {
         Collections.addAll(unitTypes, type);
 
         return game.getTileMap().values().stream()
-                .filter(t -> t.containsPlayersUnitsWithKeyCondition(p1, unit -> unitTypes.contains(unit.getUnitType())))
+                .filter(t -> t.containsPlayersUnitsWithKeyCondition(p1, unit -> unitTypes.contains(unit.unitType())))
                 .toList();
     }
 
@@ -3423,8 +3422,8 @@ public class ButtonHelper {
             for (String playerColor : unitHolder.getUnitColorsOnHolder()) {
                 for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                     UnitKey unitKey = unitEntry.getKey();
-                    String color = AliasHandler.resolveColor(unitKey.getColorID());
-                    if (color == null || !unitKey.getColorID().equalsIgnoreCase(playerColor)) continue;
+                    String color = AliasHandler.resolveColor(unitKey.colorID());
+                    if (color == null || !unitKey.colorID().equalsIgnoreCase(playerColor)) continue;
                     Player player = game.getPlayerFromColorOrFaction(color);
                     if (player == null) continue;
                     UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
@@ -5403,7 +5402,7 @@ public class ButtonHelper {
                     if (nokar.unitBelongsToPlayer(key)
                             && nokar.getUnitFromUnitKey(key).getIsShip()) {
                         int amt = space.getUnitCount(key);
-                        RemoveUnitService.removeUnit(event, tile, game, nokar, space, key.getUnitType(), amt);
+                        RemoveUnitService.removeUnit(event, tile, game, nokar, space, key.unitType(), amt);
                         AddUnitService.addUnits(event, tile, game, player.getColor(), amt + " " + key.asyncID());
                     }
                 }
@@ -6504,7 +6503,7 @@ public class ButtonHelper {
         // label parts
         String labelStart = labelAction;
         String stateStr = state != UnitState.none ? state.humanDescr() + " " : "";
-        String unitName = key.getUnitType().humanReadableName();
+        String unitName = key.unitType().humanReadableName();
         String planetName = (uh instanceof Planet p)
                 ? " from " + Helper.getPlanetRepresentationNoResInf(p.getName(), player.getGame())
                 : "";
@@ -6584,12 +6583,12 @@ public class ButtonHelper {
                 }
                 if ("assaultcannoncombat".equalsIgnoreCase(type)
                         && List.of(UnitType.Fighter, UnitType.Spacedock, UnitType.Mech, UnitType.Infantry)
-                                .contains(unitKey.getUnitType())) {
+                                .contains(unitKey.unitType())) {
                     continue;
                 }
                 if ("courageouscombat".equalsIgnoreCase(type)
                         && List.of(UnitType.Spacedock, UnitType.Mech, UnitType.Infantry)
-                                .contains(unitKey.getUnitType())) {
+                                .contains(unitKey.unitType())) {
                     continue;
                 }
 
@@ -7362,18 +7361,7 @@ public class ButtonHelper {
      * solutions if any have too low of a luminance variation
      */
     public static void resolveSetupColorChecker(Game game) {
-        @Data
-        class Collision {
-            final Player p1;
-            final Player p2;
-            final double contrast;
-
-            Collision(Player p1, Player p2, double contrast) {
-                this.p1 = p1;
-                this.p2 = p2;
-                this.contrast = contrast;
-            }
-        }
+        record Collision(Player p1, Player p2, double contrast) {}
 
         List<Player> players = game.getRealPlayers();
         List<Collision> issues = new ArrayList<>();
@@ -7595,7 +7583,7 @@ public class ButtonHelper {
 
                     UnitKey unitKey = unitEntry.getKey();
                     Player owningPlayer =
-                            game.getPlayerByColorID(unitKey.getColorID()).orElse(null);
+                            game.getPlayerByColorID(unitKey.colorID()).orElse(null);
                     if (owningPlayer == null
                             || playersWithPds2.contains(owningPlayer)
                             || !FoWHelper.getAdjacentTiles(game, tilePos, owningPlayer, false, true)
@@ -7660,7 +7648,7 @@ public class ButtonHelper {
 
                     UnitKey unitKey = unitEntry.getKey();
                     Player owningPlayer =
-                            game.getPlayerByColorID(unitKey.getColorID()).orElse(null);
+                            game.getPlayerByColorID(unitKey.colorID()).orElse(null);
                     if (owningPlayer == null || owningPlayer == player) {
                         continue;
                     }

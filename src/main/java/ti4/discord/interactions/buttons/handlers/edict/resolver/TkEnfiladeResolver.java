@@ -136,7 +136,7 @@ public class TkEnfiladeResolver implements EdictResolver {
                         if (uh.getUnitCountForState(key, state) == 0) continue;
                         String stateDescr = state.humanDescr() + (state == UnitState.none ? "" : " ");
 
-                        String id = partialID + key.getUnitType().getValue() + "_" + state.name();
+                        String id = partialID + key.unitType().getValue() + "_" + state.name();
                         String label = "Destroy " + stateDescr + key.humanReadableName();
                         if (uh instanceof Space) {
                             label += " in tile " + t.getPosition();

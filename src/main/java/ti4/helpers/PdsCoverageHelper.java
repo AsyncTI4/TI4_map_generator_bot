@@ -74,7 +74,7 @@ public final class PdsCoverageHelper {
                         }
 
                         Units.UnitKey unitKey = unitEntry.getKey();
-                        if (game.getPlayerByColorID(unitKey.getColorID()).orElse(null) != player) {
+                        if (game.getPlayerByColorID(unitKey.colorID()).orElse(null) != player) {
                             continue;
                         }
 

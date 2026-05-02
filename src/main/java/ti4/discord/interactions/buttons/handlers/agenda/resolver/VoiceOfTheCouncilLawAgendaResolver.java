@@ -8,7 +8,7 @@ import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
 
 public class VoiceOfTheCouncilLawAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return Constants.VOICE_OF_THE_COUNCIL_ID;
     }
 

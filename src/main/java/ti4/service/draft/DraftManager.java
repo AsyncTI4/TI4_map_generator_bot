@@ -102,7 +102,7 @@ public class DraftManager extends DraftPlayerManager {
     }
 
     public boolean hasBeenPicked(DraftableType type, String choiceKey) {
-        return getAllPicksOfType(type).stream().anyMatch(c -> c.getChoiceKey().equals(choiceKey));
+        return getAllPicksOfType(type).stream().anyMatch(c -> c.choiceKey().equals(choiceKey));
     }
 
     // Interaction handling
@@ -114,7 +114,7 @@ public class DraftManager extends DraftPlayerManager {
             if (command.startsWith(commandPrefix)) {
                 String innerCommand = command.substring(commandPrefix.length());
                 for (DraftChoice choice : d.getAllDraftChoices()) {
-                    if (innerCommand.equals(choice.getChoiceKey())) {
+                    if (innerCommand.equals(choice.choiceKey())) {
                         if (whatsStoppingDraftEnd() == null) {
                             return "Cannot make draft picks after the draft has ended.";
                         }

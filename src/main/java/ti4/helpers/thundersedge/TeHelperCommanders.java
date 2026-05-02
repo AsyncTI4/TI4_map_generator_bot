@@ -196,9 +196,9 @@ public class TeHelperCommanders {
             String uhName = "space".equals(uh.getName()) ? "Space" : Helper.getPlanetRepresentation(uh.getName(), game);
             for (UnitKey uk : uh.getUnitsByState().keySet()) {
                 // franken compat
-                if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.getUnitType())
+                if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.unitType())
                         && !player.hasAbility("miniaturization")) continue;
-                if (uk.getUnitType() == UnitType.PlenaryOrbital) continue;
+                if (uk.unitType() == UnitType.PlenaryOrbital) continue;
 
                 // moved all of this unit already from this unit holder
                 String unitStr = uk.asyncID() + " " + uh.getName();
@@ -209,7 +209,7 @@ public class TeHelperCommanders {
                 // otherwise, add the button
                 String id = player.finChecker() + "moveOjzRetreatS1_" + source.getPosition() + "_" + uk.asyncID() + "_"
                         + uh.getName();
-                String label = uk.getUnitType().humanReadableName() + " From " + uhName;
+                String label = uk.unitType().humanReadableName() + " From " + uhName;
                 buttons.add(Buttons.green(id, label, uk.unitEmoji()));
             }
         }

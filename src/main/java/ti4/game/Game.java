@@ -869,7 +869,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     private void clearTIGLSetupState() {
         TIGLHelper.removeFracturedTag(this);
-        setMinimumTIGLRankAtGameStart(null);
+        minimumTIGLRankAtGameStart = null;
         for (Player player : players.values()) {
             if (player != null) {
                 player.setPlayerTIGLRankAtGameStart(null);
@@ -4327,7 +4327,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public Optional<Player> getPlayerByUnitKey(UnitKey unit) {
         return getRealPlayersNDummies().stream()
-                .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(unit.getColorID()))
+                .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(unit.colorID()))
                 .findFirst();
     }
 
@@ -4480,7 +4480,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public UnitModel getUnitFromUnitKey(UnitKey unitKey) {
-        Player player = getPlayerFromColorOrFaction(unitKey.getColorID());
+        Player player = getPlayerFromColorOrFaction(unitKey.colorID());
         if (player == null) return null;
         return player.getUnitFromUnitKey(unitKey);
     }

@@ -132,7 +132,7 @@ public class SeatDraftable extends SinglePickDraftable {
             throw new IllegalStateException("Player " + playerUserId + " has not picked a seat");
         }
 
-        String seat = pState.getPicks().get(TYPE).getFirst().getChoiceKey();
+        String seat = pState.getPicks().get(TYPE).getFirst().choiceKey();
         Integer seatNum = getSeatNumberFromChoiceKey(seat);
         if (seatNum == null) {
             throw new IllegalStateException("Player " + playerUserId + " has an invalid seat choice key: " + seat);

@@ -10,12 +10,13 @@ import ti4.service.tactical.PostMovementButtonContext;
 
 public final class NokarAgentButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return ctx.player.hasUnexhaustedLeader("nokaragent") && FoWHelper.playerHasShipsInSystem(ctx.player, ctx.tile);
+        return ctx.player().hasUnexhaustedLeader("nokaragent")
+                && FoWHelper.playerHasShipsInSystem(ctx.player(), ctx.tile());
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.gray(
-                "exhaustAgent_nokaragent_" + ctx.player.getFaction(),
+                "exhaustAgent_nokaragent_" + ctx.player().getFaction(),
                 "Use Nokar Agent to Place 1 Destroyer",
                 FactionEmojis.nokar));
     }

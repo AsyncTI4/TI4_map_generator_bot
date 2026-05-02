@@ -11,7 +11,7 @@ import ti4.model.AgendaModel;
 
 public class AbsolConstitutionAgendaResolver implements ForAgainstAgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "absol_constitution";
     }
 

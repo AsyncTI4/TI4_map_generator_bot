@@ -68,7 +68,7 @@ public final class WebTileUnitData {
         WebTileUnitData tileData = new WebTileUnitData();
 
         // Set anomaly status
-        tileData.setAnomaly(tile.isAnomaly(game));
+        tileData.isAnomaly = tile.isAnomaly(game);
 
         // Extract command tokens from space
         UnitHolder spaceHolder = tile.getUnitHolders().get(Constants.SPACE);
@@ -135,7 +135,7 @@ public final class WebTileUnitData {
                 ti4.helpers.PdsCoverage detailed = entry.getValue();
                 pdsCoverage.put(entry.getKey(), new WebPdsCoverage(detailed.getCount(), detailed.getExpected()));
             }
-            tileData.setPds(pdsCoverage);
+            tileData.pds = pdsCoverage;
         }
 
         return tileData;
@@ -208,7 +208,7 @@ public final class WebTileUnitData {
         for (UnitKey unitKey : unitHolder.getUnitKeys()) {
             Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
             int unitCount = unitHolder.getUnitCount(unitKey);
-            String unitId = getUnitIdFromType(unitKey.getUnitType());
+            String unitId = getUnitIdFromType(unitKey.unitType());
 
             if (player == null || unitId == null || unitCount <= 0) {
                 continue;

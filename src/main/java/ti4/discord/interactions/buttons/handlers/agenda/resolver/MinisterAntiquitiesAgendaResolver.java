@@ -8,7 +8,7 @@ import ti4.message.MessageHelper;
 
 public class MinisterAntiquitiesAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "minister_antiquities";
     }
 

@@ -10,7 +10,7 @@ import ti4.service.unit.CheckUnitContainmentService;
 
 public class DefenseActAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "defense_act";
     }
 

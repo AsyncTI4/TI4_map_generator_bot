@@ -10,14 +10,15 @@ import ti4.service.tactical.PostMovementButtonContext;
 
 public final class ZelianHeroButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return ctx.player.hasLeaderUnlocked("zelianhero")
-                && !ctx.tile.isMecatol(ctx.game)
-                && ButtonHelper.getTilesOfUnitsWithBombard(ctx.player, ctx.game).contains(ctx.tile);
+        return ctx.player().hasLeaderUnlocked("zelianhero")
+                && !ctx.tile().isMecatol(ctx.game())
+                && ButtonHelper.getTilesOfUnitsWithBombard(ctx.player(), ctx.game())
+                        .contains(ctx.tile());
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.blue(
-                ctx.player.finChecker() + "celestialImpact_" + ctx.tile.getPosition(),
+                ctx.player().finChecker() + "celestialImpact_" + ctx.tile().getPosition(),
                 "Celestial Impact This Tile",
                 FactionEmojis.zelian));
     }

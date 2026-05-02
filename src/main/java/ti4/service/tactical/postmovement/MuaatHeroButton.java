@@ -11,16 +11,16 @@ import ti4.service.unit.CheckUnitContainmentService;
 
 public final class MuaatHeroButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return ctx.player.hasLeaderUnlocked("muaathero")
-                && ((!ctx.tile.isMecatol(ctx.game) && !ctx.tile.isHomeSystem(ctx.game))
-                        || ctx.game.isWildWildGalaxyMode())
-                && CheckUnitContainmentService.getTilesContainingPlayersUnits(ctx.game, ctx.player, UnitType.Warsun)
-                        .contains(ctx.tile);
+        return ctx.player().hasLeaderUnlocked("muaathero")
+                && ((!ctx.tile().isMecatol(ctx.game()) && !ctx.tile().isHomeSystem(ctx.game()))
+                        || ctx.game().isWildWildGalaxyMode())
+                && CheckUnitContainmentService.getTilesContainingPlayersUnits(ctx.game(), ctx.player(), UnitType.Warsun)
+                        .contains(ctx.tile());
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.blue(
-                ctx.player.finChecker() + "novaSeed_" + ctx.tile.getPosition(),
+                ctx.player().finChecker() + "novaSeed_" + ctx.tile().getPosition(),
                 "Nova Seed This Tile",
                 FactionEmojis.Muaat));
     }

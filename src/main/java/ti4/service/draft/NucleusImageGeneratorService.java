@@ -153,7 +153,7 @@ public class NucleusImageGeneratorService {
                     return null;
                 }
                 DraftChoice seatChoice = seatChoices.getFirst();
-                Integer seatNum = SeatDraftable.getSeatNumberFromChoiceKey(seatChoice.getChoiceKey());
+                Integer seatNum = SeatDraftable.getSeatNumberFromChoiceKey(seatChoice.choiceKey());
                 return seatNum;
             };
         } else if (draftManager.getDraftable(SpeakerOrderDraftable.TYPE) != null) {
@@ -163,7 +163,7 @@ public class NucleusImageGeneratorService {
                     return null;
                 }
                 DraftChoice speakerChoice = speakerChoices.getFirst();
-                Integer seatNum = SpeakerOrderDraftable.getSpeakerOrderFromChoiceKey(speakerChoice.getChoiceKey());
+                Integer seatNum = SpeakerOrderDraftable.getSpeakerOrderFromChoiceKey(speakerChoice.choiceKey());
                 return seatNum;
             };
         }
@@ -205,7 +205,7 @@ public class NucleusImageGeneratorService {
             List<DraftChoice> speakerChoices = draftManager.getPlayerPicks(playerUserId, SpeakerOrderDraftable.TYPE);
             if (speakerChoices != null && !speakerChoices.isEmpty()) {
                 DraftChoice speakerChoice = speakerChoices.getFirst();
-                Integer speakerOrder = SpeakerOrderDraftable.getSpeakerOrderFromChoiceKey(speakerChoice.getChoiceKey());
+                Integer speakerOrder = SpeakerOrderDraftable.getSpeakerOrderFromChoiceKey(speakerChoice.choiceKey());
                 TI4Emoji speakerEmoji = MiltyDraftEmojis.getSpeakerPickEmoji(speakerOrder);
                 if (speakerEmoji != null) {
                     summaryEmojis.add(speakerEmoji);

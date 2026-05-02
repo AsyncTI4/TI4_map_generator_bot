@@ -9,7 +9,7 @@ import ti4.message.MessageHelper;
 
 public class SharedResearchAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "shared_research";
     }
 
