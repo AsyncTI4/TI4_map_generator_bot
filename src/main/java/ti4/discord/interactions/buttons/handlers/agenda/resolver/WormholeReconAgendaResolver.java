@@ -10,7 +10,7 @@ import ti4.helpers.FoWHelper;
 
 public class WormholeReconAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "wormhole_recon";
     }
 

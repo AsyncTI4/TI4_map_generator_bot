@@ -20,12 +20,11 @@ import ti4.contest.replay.core.CombatReplayHouse;
 @Entity
 @Table(
         name = "combat_replay_house_ability_use",
-        indexes = {@Index(name = "idx_replay_house_ability_use_house", columnList = "house")},
-        uniqueConstraints = {
-            @UniqueConstraint(
-                    name = "uk_replay_house_ability_use_candidate_house",
-                    columnNames = {"candidate_id", "house"})
-        })
+        indexes = @Index(name = "idx_replay_house_ability_use_house", columnList = "house"),
+        uniqueConstraints =
+                @UniqueConstraint(
+                        name = "uk_replay_house_ability_use_candidate_house",
+                        columnNames = {"candidate_id", "house"}))
 /** Records the single house ability use allowed for one replay candidate. */
 public class CombatReplayHouseAbilityUseEntity {
 

@@ -1198,7 +1198,7 @@ public class StartCombatService {
         boolean hasDestroyer = false;
         for (UnitKey unit : tile.getSpaceUnitHolder().getUnitKeysForPlayer(player)) {
             UnitModel model = player.getUnitFromUnitKey(unit);
-            if (unit.getUnitType() == UnitType.Destroyer) {
+            if (unit.unitType() == UnitType.Destroyer) {
                 hasDestroyer = true;
             }
             if (model.isNonFighterShip()) {

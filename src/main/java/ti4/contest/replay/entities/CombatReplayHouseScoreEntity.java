@@ -20,12 +20,11 @@ import ti4.contest.replay.core.CombatReplayHouse;
 @Entity
 @Table(
         name = "combat_replay_house_score",
-        indexes = {@Index(name = "idx_replay_house_score_house", columnList = "house")},
-        uniqueConstraints = {
-            @UniqueConstraint(
-                    name = "uk_replay_house_score_contest_house",
-                    columnNames = {"contest_id", "house"})
-        })
+        indexes = @Index(name = "idx_replay_house_score_house", columnList = "house"),
+        uniqueConstraints =
+                @UniqueConstraint(
+                        name = "uk_replay_house_score_contest_house",
+                        columnNames = {"contest_id", "house"}))
 /**
  * Stores per-contest house-only scoring, including house ability bonuses that do not affect individual players.
  */

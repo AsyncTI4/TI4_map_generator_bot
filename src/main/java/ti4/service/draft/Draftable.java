@@ -30,7 +30,7 @@ public abstract class Draftable extends DraftLifecycleHooks {
     public final DraftChoice getDraftChoice(String choiceKey) {
         List<DraftChoice> allChoices = getAllDraftChoices();
         for (DraftChoice choice : allChoices) {
-            if (choice.getChoiceKey().equals(choiceKey)) {
+            if (choice.choiceKey().equals(choiceKey)) {
                 return choice;
             }
         }
@@ -43,7 +43,7 @@ public abstract class Draftable extends DraftLifecycleHooks {
      */
     private Set<String> getAllDraftChoiceKeys() {
         List<DraftChoice> allChoices = getAllDraftChoices();
-        return allChoices.stream().map(DraftChoice::getChoiceKey).collect(Collectors.toSet());
+        return allChoices.stream().map(DraftChoice::choiceKey).collect(Collectors.toSet());
     }
 
     // Interaction info
@@ -116,8 +116,8 @@ public abstract class Draftable extends DraftLifecycleHooks {
      */
     public String isValidDraftChoice(DraftManager draftManager, String playerUserId, DraftChoice choice) {
         Set<String> allChoiceKeys = getAllDraftChoiceKeys();
-        if (!allChoiceKeys.contains(choice.getChoiceKey())) {
-            return "The choiceKey " + choice.getChoiceKey() + " is not valid for draftable type " + getType();
+        if (!allChoiceKeys.contains(choice.choiceKey())) {
+            return "The choiceKey " + choice.choiceKey() + " is not valid for draftable type " + getType();
         }
         return null;
     }

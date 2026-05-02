@@ -13,7 +13,7 @@ import ti4.service.emoji.MiscEmojis;
 
 public class EconomicEqualityAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "economic_equality";
     }
 

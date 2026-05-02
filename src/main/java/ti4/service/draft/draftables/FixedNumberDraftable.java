@@ -58,10 +58,10 @@ public abstract class FixedNumberDraftable extends Draftable {
         List<DraftChoice> picks = draftManager.getAllPicksOfType(getType());
         Set<String> pickSet = new HashSet<>();
         for (DraftChoice choice : picks) {
-            if (pickSet.contains(choice.getChoiceKey())) {
-                return "Multiple players have chosen " + choice.getChoiceKey() + " from draftable " + getType();
+            if (pickSet.contains(choice.choiceKey())) {
+                return "Multiple players have chosen " + choice.choiceKey() + " from draftable " + getType();
             }
-            pickSet.add(choice.getChoiceKey());
+            pickSet.add(choice.choiceKey());
         }
 
         return null;

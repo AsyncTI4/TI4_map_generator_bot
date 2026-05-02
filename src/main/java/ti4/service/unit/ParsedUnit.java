@@ -1,21 +1,13 @@
 package ti4.service.unit;
 
-import lombok.Getter;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 
-@Getter
-public class ParsedUnit {
-
-    private final Units.UnitKey unitKey;
-    private final int count;
-    private final String location;
+public record ParsedUnit(Units.UnitKey unitKey, int count, String location) {
 
     public ParsedUnit(Units.UnitKey unitKey) {
-        this.unitKey = unitKey;
-        count = 1;
-        location = Constants.SPACE;
+        this(unitKey, 1, Constants.SPACE);
     }
 
     public ParsedUnit(Units.UnitKey unitKey, int count, String location) {

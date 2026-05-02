@@ -101,7 +101,7 @@ public class DraftPlayerManager {
         for (String userId : playerStates.keySet()) {
             List<DraftChoice> choices = getPlayerPicks(userId, type);
             for (DraftChoice choice : choices) {
-                if (choice.getChoiceKey().equals(choiceKey)) {
+                if (choice.choiceKey().equals(choiceKey)) {
                     playersWithChoice.add(userId);
                     break;
                 }

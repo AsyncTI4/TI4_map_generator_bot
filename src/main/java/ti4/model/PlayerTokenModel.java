@@ -40,10 +40,10 @@ public class PlayerTokenModel implements TokenModelInterface, ColorableModelInte
     @Override
     public PlayerTokenModel duplicateAndSetColor(ColorModel newColor) {
         PlayerTokenModel cc = new PlayerTokenModel();
-        cc.setAlias(alias.replace(color, newColor.getAlias()));
-        cc.setName(name.replace(color, newColor.getDisplayName()));
-        cc.setImagePath(imagePath.replace(color, newColor.getAlias()));
-        cc.setColor(newColor.getAlias());
+        cc.alias = alias.replace(color, newColor.getAlias());
+        cc.name = name.replace(color, newColor.getDisplayName());
+        cc.imagePath = imagePath.replace(color, newColor.getAlias());
+        cc.color = newColor.getAlias();
         return cc;
     }
 

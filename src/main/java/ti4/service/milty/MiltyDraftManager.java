@@ -636,7 +636,7 @@ public class MiltyDraftManager {
         List<String> draftOrder = new ArrayList<>(players);
         draftOrder.addAll(playersReversed);
         draftOrder.addAll(players);
-        setDraftOrder(draftOrder);
+        this.draftOrder = draftOrder;
         setPlayers(players);
 
         // Picks
@@ -660,7 +660,7 @@ public class MiltyDraftManager {
 
         // Map Template
         String savedTemplate = bigTokenizer.nextToken();
-        setMapTemplate(savedTemplate);
+        mapTemplate = savedTemplate;
     }
 
     public void loadSlicesFromString(String str) throws Exception {

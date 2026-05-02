@@ -158,7 +158,7 @@ public class SilverFlameService {
         List<UnitType> singles = List.of(UnitType.Infantry, UnitType.Fighter);
         for (UnitHolder uh : homeSystem.getUnitHolders().values()) {
             for (UnitKey key : uh.getUnitsByState().keySet()) {
-                int uhAmt = singles.contains(key.getUnitType()) ? 1 : uh.getUnitCount(key);
+                int uhAmt = singles.contains(key.unitType()) ? 1 : uh.getUnitCount(key);
                 allUnitsCount.put(key, allUnitsCount.getOrDefault(key, 0) + uhAmt);
             }
         }
@@ -167,7 +167,7 @@ public class SilverFlameService {
         StringBuilder purgedUnitList = new StringBuilder("Also purged the following units from the game:");
         for (Entry<UnitKey, Integer> entry : allUnitsCount.entrySet()) {
             UnitKey key = entry.getKey();
-            Player owner = game.getPlayerFromColorOrFaction(key.getColorID());
+            Player owner = game.getPlayerFromColorOrFaction(key.colorID());
             if (owner == null) continue;
 
             int quantity = entry.getValue();

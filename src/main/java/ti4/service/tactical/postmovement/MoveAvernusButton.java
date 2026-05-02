@@ -11,15 +11,15 @@ import ti4.service.unit.CheckUnitContainmentService;
 
 public final class MoveAvernusButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return ctx.player.hasUnlockedBreakthrough("muaatbt")
-                && CheckUnitContainmentService.getTilesContainingPlayersUnits(ctx.game, ctx.player, UnitType.Warsun)
-                        .contains(ctx.tile)
-                && !ctx.tile.isHomeSystem(ctx.game);
+        return ctx.player().hasUnlockedBreakthrough("muaatbt")
+                && CheckUnitContainmentService.getTilesContainingPlayersUnits(ctx.game(), ctx.player(), UnitType.Warsun)
+                        .contains(ctx.tile())
+                && !ctx.tile().isHomeSystem(ctx.game());
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.blue(
-                ctx.player.finChecker() + "moveAvernus_" + ctx.game.getActiveSystem(),
+                ctx.player().finChecker() + "moveAvernus_" + ctx.game().getActiveSystem(),
                 "Move Avernus Into This System",
                 FactionEmojis.Muaat));
     }

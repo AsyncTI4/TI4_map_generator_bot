@@ -16,7 +16,7 @@ import ti4.service.emoji.PlanetEmojis;
 
 public class AbsolArtifactAgendaResolver implements ForAgainstAgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "absol_artifact";
     }
 

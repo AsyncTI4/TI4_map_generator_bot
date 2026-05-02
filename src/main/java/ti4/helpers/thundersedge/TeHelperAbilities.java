@@ -169,7 +169,7 @@ public final class TeHelperAbilities {
             String planet = matcher.group("planet");
             int count = Integer.parseInt(matcher.group("count"));
 
-            String unitName = uk.getUnitType().humanReadableName();
+            String unitName = uk.unitType().humanReadableName();
             String planetName = Helper.getPlanetRepresentation(planet, game);
             String message = player.getRepresentation(false, false) + " landed " + count + " " + unitName + " on "
                     + planetName + ".";
@@ -374,9 +374,9 @@ public final class TeHelperAbilities {
                 if (!player.unitBelongsToPlayer(uk)) continue;
 
                 // franken compat
-                if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.getUnitType())
+                if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.unitType())
                         && !player.hasAbility("miniaturization")) continue;
-                if (uk.getUnitType() == UnitType.PlenaryOrbital) continue;
+                if (uk.unitType() == UnitType.PlenaryOrbital) continue;
 
                 // moved all of this unit already from this unit holder
                 String unitStr = uk.asyncID() + " " + uh.getName();
@@ -387,7 +387,7 @@ public final class TeHelperAbilities {
                 // otherwise, add the button
                 String id = player.finChecker() + "moveSurvival_" + destination.getPosition() + "_"
                         + source.getPosition() + "_" + uk.asyncID() + "_" + uh.getName();
-                String label = uk.getUnitType().humanReadableName() + " from " + uhName;
+                String label = uk.unitType().humanReadableName() + " from " + uhName;
                 buttons.add(Buttons.green(id, label, uk.unitEmoji()));
             }
         }

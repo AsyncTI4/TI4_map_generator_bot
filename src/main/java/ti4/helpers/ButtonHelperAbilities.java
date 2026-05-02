@@ -325,7 +325,7 @@ public final class ButtonHelperAbilities {
                 for (Map.Entry<UnitKey, Integer> entry : units.entrySet()) {
                     UnitKey unitKey = entry.getKey();
                     if (unitKey != null
-                            && unitKey.getColorID().equals(colorID)
+                            && unitKey.colorID().equals(colorID)
                             && p2.getUnitFromAsyncID(unitKey.asyncID()) != null
                             && p2.getUnitFromAsyncID(unitKey.asyncID()).getIsShip()) {
                         ships += entry.getValue();
@@ -354,7 +354,7 @@ public final class ButtonHelperAbilities {
 
             for (UnitKey unitKey : units.keySet()) {
                 if (unitKey != null
-                        && unitKey.getColorID().equals(colorID)
+                        && unitKey.colorID().equals(colorID)
                         && p2.getUnitFromAsyncID(unitKey.asyncID()) != null
                         && p2.getUnitFromAsyncID(unitKey.asyncID()).getIsShip()) {
                     asyncID = unitKey.asyncID();

@@ -1708,11 +1708,11 @@ public final class Helper {
         }
         for (UnitKey unit : uH.getUnits().keySet()) {
             if (unit.getColor().equalsIgnoreCase(player.getColor())) {
-                if (unit.getUnitType() == UnitType.TyrantsLament
+                if (unit.unitType() == UnitType.TyrantsLament
                         && player.getUnitsByAsyncID(unit.asyncID()).isEmpty()) {
                     player.addOwnedUnitByID("tyrantslament");
                 }
-                if (unit.getUnitType() == UnitType.PlenaryOrbital
+                if (unit.unitType() == UnitType.PlenaryOrbital
                         && player.getUnitsByAsyncID(unit.asyncID()).isEmpty()) {
                     player.addOwnedUnitByID("plenaryorbital");
                 }

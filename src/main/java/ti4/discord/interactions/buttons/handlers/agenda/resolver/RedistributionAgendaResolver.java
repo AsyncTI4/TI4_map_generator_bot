@@ -18,7 +18,7 @@ import ti4.service.unit.DestroyUnitService;
 
 public class RedistributionAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "redistribution";
     }
 
