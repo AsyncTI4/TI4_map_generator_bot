@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
+import ti4.executors.ExecutionLockManager;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
@@ -44,21 +46,22 @@ public class SabotageAutoReactCron {
         var gamesToRemove = new HashSet<String>();
         for (Map.Entry<String, List<GameMessageManager.GameMessage>> entry : acMessagesByGame.entrySet()) {
             String gameName = entry.getKey();
-            ManagedGame managedGame = GameManager.getManagedGame(gameName);
-            if (managedGame == null || managedGame.isHasEnded()) {
-                gamesToRemove.add(gameName);
-                continue;
-            }
 
-            Game game = managedGame.getGame();
-            if (game == null) continue;
+            ExecutionLockManager.wrapWithTryLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
+                ManagedGame managedGame = GameManager.getManagedGame(gameName);
+                if (managedGame == null || managedGame.isHasEnded()) {
+                    gamesToRemove.add(gameName);
+                    return;
+                }
 
-            List<GameMessageManager.GameMessage> acMessages = entry.getValue();
-            try {
-                automaticallyReactToSabotageWindows(game, acMessages);
-            } catch (Exception e) {
-                BotLogger.error(new LogOrigin(game), "SabotageAutoReactCron failed for game: " + game.getName(), e);
-            }
+                Game game = managedGame.getGame();
+                List<GameMessageManager.GameMessage> acMessages = entry.getValue();
+                try {
+                    automaticallyReactToSabotageWindows(game, acMessages);
+                } catch (Exception e) {
+                    BotLogger.error(new LogOrigin(game), "SabotageAutoReactCron failed for game: " + game.getName(), e);
+                }
+            });
         }
 
         GameMessageManager.remove(gamesToRemove);
