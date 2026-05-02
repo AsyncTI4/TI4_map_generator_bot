@@ -208,8 +208,8 @@ class UnitRenderGenerator {
                 }
                 prevState = stateToRender;
 
-                position = calculateUnitPosition(
-                        posCtx, unitKey, unitRenderCt + unitTypeCounts.get(unitKey.unitType()));
+                position =
+                        calculateUnitPosition(posCtx, unitKey, unitRenderCt + unitTypeCounts.get(unitKey.unitType()));
                 imagePos = calculateImagePosition(posCtx, position);
                 int imageX = imagePos.x();
                 int imageY = imagePos.y();
@@ -801,9 +801,7 @@ class UnitRenderGenerator {
         for (UnitType type : typeOrder) {
             for (String colorID : playerOrder) {
                 for (UnitKey id : tempUnits) {
-                    if (id != null
-                            && id.unitType() == type
-                            && id.colorID().equals(colorID)) {
+                    if (id != null && id.unitType() == type && id.colorID().equals(colorID)) {
                         sortedUnits.add(id);
                     }
                 }

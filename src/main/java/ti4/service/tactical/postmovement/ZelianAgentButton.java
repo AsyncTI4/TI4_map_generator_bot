@@ -11,7 +11,11 @@ import ti4.service.tactical.PostMovementButtonContext;
 public final class ZelianAgentButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
         return ctx.player().hasUnexhaustedLeader("zelianagent")
-                && ctx.tile().getUnitHolders().get("space").getUnitCount(UnitType.Infantry, ctx.player().getColor()) > 0;
+                && ctx.tile()
+                                .getUnitHolders()
+                                .get("space")
+                                .getUnitCount(UnitType.Infantry, ctx.player().getColor())
+                        > 0;
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {

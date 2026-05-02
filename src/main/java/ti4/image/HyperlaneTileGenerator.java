@@ -353,7 +353,7 @@ final class HyperlaneTileGenerator {
 
     /**
      * @param rotation in degrees, 0, 60, ..., 300
-     */ // Helper class to hold canonical matrix and rotation
-        private record MatrixRotationResult(String matrix, int rotation) {
-    }
+     */
+    // Helper class to hold canonical matrix and rotation
+    private record MatrixRotationResult(String matrix, int rotation) {}
 }

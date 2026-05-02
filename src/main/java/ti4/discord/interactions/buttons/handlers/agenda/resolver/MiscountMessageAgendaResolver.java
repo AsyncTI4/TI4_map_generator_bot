@@ -14,9 +14,8 @@ public record MiscountMessageAgendaResolver(String agendaId) implements AgendaRe
     @Override
     public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         MessageHelper.sendMessageToChannel(
-            game.getMainGameChannel(),
-            "# Repealed the _" + Mapper.getAgendaTitleNoCap(winner)
-                +
-                "_ law.\nIt will will now be revealed for the purposes of revoting.\n-# It is technically still in effect during the revote, if relevant.");
+                game.getMainGameChannel(),
+                "# Repealed the _" + Mapper.getAgendaTitleNoCap(winner)
+                        + "_ law.\nIt will will now be revealed for the purposes of revoting.\n-# It is technically still in effect during the revote, if relevant.");
     }
 }

@@ -7361,8 +7361,7 @@ public class ButtonHelper {
      * solutions if any have too low of a luminance variation
      */
     public static void resolveSetupColorChecker(Game game) {
-        record Collision(Player p1, Player p2, double contrast) {
-        }
+        record Collision(Player p1, Player p2, double contrast) {}
 
         List<Player> players = game.getRealPlayers();
         List<Collision> issues = new ArrayList<>();

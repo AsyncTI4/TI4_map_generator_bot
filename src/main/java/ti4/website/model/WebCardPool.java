@@ -71,7 +71,8 @@ public class WebCardPool {
 
         // Action Cards
         cardPool.actionCardDeck = new ArrayList<>();
-        cardPool.actionCardDiscard = new ArrayList<>(game.getDiscardActionCards().keySet());
+        cardPool.actionCardDiscard =
+                new ArrayList<>(game.getDiscardActionCards().keySet());
         cardPool.actionCardFullDeckSize = game.getActionCardFullDeckSize();
 
         // Exploration Cards

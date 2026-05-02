@@ -175,10 +175,7 @@ public class CombatReplayHacanMarketCompactService {
             return VoteResult.accepted(renderUserVoteSummary(contestId, userId, "Withdrew Do Not Use."));
         }
 
-        for (CombatReplayHacanSubsidyVoteEntity vote :
-                voteRepository.findByContestIdAndDiscordUserId(contestId, userId)) {
-            voteRepository.delete(vote);
-        }
+        voteRepository.deleteAll(voteRepository.findByContestIdAndDiscordUserId(contestId, userId));
         CombatReplayHacanSubsidyVoteEntity vote = new CombatReplayHacanSubsidyVoteEntity();
         vote.setContestId(contestId);
         vote.setDiscordUserId(userId);

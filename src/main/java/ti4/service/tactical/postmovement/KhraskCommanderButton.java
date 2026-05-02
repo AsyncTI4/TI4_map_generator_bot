@@ -15,7 +15,8 @@ public final class KhraskCommanderButton implements PostMovementAbilityButton {
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.blue(
-                ctx.player().finChecker() + "placeKhraskCommanderInf_" + ctx.tile().getPosition(),
+                ctx.player().finChecker() + "placeKhraskCommanderInf_"
+                        + ctx.tile().getPosition(),
                 "Place Infantry with Khrask Commander",
                 FactionEmojis.khrask));
     }

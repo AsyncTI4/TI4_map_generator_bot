@@ -29,17 +29,14 @@ public class WebPlayerArea {
         IMAGE // Local image converted to WebP URL
     }
 
-    private record UnitCountInfo(int unitCap, int deployedCount) {
-    }
+    private record UnitCountInfo(int unitCap, int deployedCount) {}
 
     /**
      * @param tradeGoodsStored TODO: MemePhilosopher uncomment this private final boolean active;
      */
-    public record BreakthroughInfo(String breakthroughId, boolean unlocked, boolean exhausted, int tradeGoodsStored) {
-    }
+    public record BreakthroughInfo(String breakthroughId, boolean unlocked, boolean exhausted, int tradeGoodsStored) {}
 
-    public record PlotCardInfo(String plotAlias, Integer identifier, List<String> factions) {
-    }
+    public record PlotCardInfo(String plotAlias, Integer identifier, List<String> factions) {}
 
     // Basic properties
     private String userName;
@@ -315,8 +312,8 @@ public class WebPlayerArea {
         webPlayerArea.isSpeaker = player.isSpeaker();
         webPlayerArea.isTyrant = player.isTyrant();
         webPlayerArea.neighbors = player.getNeighbouringPlayers(false).stream()
-            .map(Player::getColor)
-            .toList();
+                .map(Player::getColor)
+                .toList();
 
         // Army values
         webPlayerArea.spaceArmyRes = player.getTotalResourceValueOfUnits("space");
@@ -580,8 +577,7 @@ public class WebPlayerArea {
     /**
      * Result class for faction image path and type
      */
-        private record FactionImageResult(String path, FactionImageType type) {
-    }
+    private record FactionImageResult(String path, FactionImageType type) {}
 
     /**
      * Gets the appropriate faction image path and type for web interface.

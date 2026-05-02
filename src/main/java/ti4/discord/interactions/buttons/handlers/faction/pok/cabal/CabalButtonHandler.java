@@ -516,8 +516,8 @@ class CabalButtonHandler {
                                         + " in Space"));
                     } else {
                         buttons.add(Buttons.blue(
-                                "removeThisTypeOfUnit_" + key.unitType().humanReadableName() + "_"
-                                        + tile.getPosition() + "_" + unitHolder.getName(),
+                                "removeThisTypeOfUnit_" + key.unitType().humanReadableName() + "_" + tile.getPosition()
+                                        + "_" + unitHolder.getName(),
                                 key.unitType().humanReadableName() + " from " + tile.getRepresentation()
                                         + " in Space"));
                     }

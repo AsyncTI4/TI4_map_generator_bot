@@ -18,7 +18,10 @@ import ti4.contest.replay.core.CombatReplayHouse;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "combat_replay_house", indexes = @Index(name = "idx_replay_house_house", columnList = "house"), uniqueConstraints = @UniqueConstraint(name = "uk_replay_house_user", columnNames = "discord_user_id"))
+@Table(
+        name = "combat_replay_house",
+        indexes = @Index(name = "idx_replay_house_house", columnList = "house"),
+        uniqueConstraints = @UniqueConstraint(name = "uk_replay_house_user", columnNames = "discord_user_id"))
 /**
  * Stores the Lazax house assigned to each Discord user participating in replay predictions.
  */

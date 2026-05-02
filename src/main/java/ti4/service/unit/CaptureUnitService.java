@@ -59,8 +59,7 @@ public class CaptureUnitService {
         List<Player> cabalsWithFs = new ArrayList<>();
         for (Player p : cabals) {
             // Flagship cannot capture itself
-            if (p.unitBelongsToPlayer(removed.unitKey()) && removed.unitKey().unitType() == UnitType.Flagship)
-                continue;
+            if (p.unitBelongsToPlayer(removed.unitKey()) && removed.unitKey().unitType() == UnitType.Flagship) continue;
 
             // If the flagship was not destroyed
             if (tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, p) > 0) {

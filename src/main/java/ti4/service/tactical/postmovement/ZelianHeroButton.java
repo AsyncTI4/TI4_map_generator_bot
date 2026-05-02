@@ -12,7 +12,8 @@ public final class ZelianHeroButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
         return ctx.player().hasLeaderUnlocked("zelianhero")
                 && !ctx.tile().isMecatol(ctx.game())
-                && ButtonHelper.getTilesOfUnitsWithBombard(ctx.player(), ctx.game()).contains(ctx.tile());
+                && ButtonHelper.getTilesOfUnitsWithBombard(ctx.player(), ctx.game())
+                        .contains(ctx.tile());
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {

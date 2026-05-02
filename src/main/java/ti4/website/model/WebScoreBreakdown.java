@@ -774,7 +774,6 @@ public class WebScoreBreakdown {
     }
 
     // Helper class for public objective candidates with state information
-        private record PublicObjectiveCandidate(String key, EntryType type, int pointValue, EntryState state, int progress,
-                                                int threshold) {
-    }
+    private record PublicObjectiveCandidate(
+            String key, EntryType type, int pointValue, EntryState state, int progress, int threshold) {}
 }

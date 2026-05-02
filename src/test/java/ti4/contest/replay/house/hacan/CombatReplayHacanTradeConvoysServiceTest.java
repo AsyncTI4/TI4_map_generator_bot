@@ -75,7 +75,7 @@ class CombatReplayHacanTradeConvoysServiceTest {
 
         contest.setReplayCompletedAt(LocalDateTime.now());
 
-      assertTrue(service.shouldOfferVoting(contest, candidate));
+        assertTrue(service.shouldOfferVoting(contest, candidate));
 
         when(contestRepository.existsByIdGreaterThan(contest.getId())).thenReturn(true);
 

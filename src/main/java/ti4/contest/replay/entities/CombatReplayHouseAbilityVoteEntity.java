@@ -18,9 +18,13 @@ import ti4.contest.replay.core.CombatReplayHouse;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "combat_replay_house_ability_vote", indexes = @Index(name = "idx_house_ability_vote_candidate_house", columnList = "candidate_id, house"), uniqueConstraints = @UniqueConstraint(
-    name = "uk_house_ability_vote_candidate_house_user",
-    columnNames = {"candidate_id", "house", "discord_user_id"}))
+@Table(
+        name = "combat_replay_house_ability_vote",
+        indexes = @Index(name = "idx_house_ability_vote_candidate_house", columnList = "candidate_id, house"),
+        uniqueConstraints =
+                @UniqueConstraint(
+                        name = "uk_house_ability_vote_candidate_house_user",
+                        columnNames = {"candidate_id", "house", "discord_user_id"}))
 public class CombatReplayHouseAbilityVoteEntity {
 
     @Id

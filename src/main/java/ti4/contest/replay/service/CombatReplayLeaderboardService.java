@@ -498,9 +498,7 @@ public class CombatReplayLeaderboardService {
 
     private String appendHousePredictionResults(String message, List<HousePredictionSummary> houseSummaries) {
         if (!settings.isHousesEnabled() || houseSummaries == null || houseSummaries.isEmpty()) return message;
-        return message +
-            "\n\n" +
-            formatHousePredictionResults(houseSummaries);
+        return message + "\n\n" + formatHousePredictionResults(houseSummaries);
     }
 
     private String formatHousePredictionResults(List<HousePredictionSummary> houseSummaries) {

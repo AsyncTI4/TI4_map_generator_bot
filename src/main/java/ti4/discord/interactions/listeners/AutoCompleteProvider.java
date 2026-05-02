@@ -1305,9 +1305,8 @@ class AutoCompleteProvider {
 
                 List<DraftChoice> allPicks = draftManager.getAllPicksOfType(draftableType);
                 event.replyChoices(allPicks.stream()
-                                .filter(option -> option.unformattedName()
-                                        .toLowerCase()
-                                        .contains(enteredValue))
+                                .filter(option ->
+                                        option.unformattedName().toLowerCase().contains(enteredValue))
                                 .limit(25)
                                 .map(option -> new Command.Choice(option.unformattedName(), option.choiceKey()))
                                 .collect(Collectors.toList()))

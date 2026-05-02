@@ -191,9 +191,8 @@ public class TacticalActionService {
         ButtonHelper.deleteAllButtons(event);
     }
 
-    private record FinishMovementContext(Tile tile, boolean unitsWereMoved, boolean hasGfsInRange,
-                                         List<Player> playersWithPds2) {
-    }
+    private record FinishMovementContext(
+            Tile tile, boolean unitsWereMoved, boolean hasGfsInRange, List<Player> playersWithPds2) {}
 
     private FinishMovementContext executeCoreFinishMovement(
             ButtonInteractionEvent event, Game game, Player player, Tile tile) {

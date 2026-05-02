@@ -46,21 +46,21 @@ public class CombatReplayDiscordPostService {
     public void postReplayEvent(
             MessageChannel channel, Game game, CombatCandidateEntity candidate, CombatCandidateEventEntity event) {
         ReplayPayloadRenderer.RenderedReplayEvent rendered = replayPayloadRenderer.render(game, candidate, event);
-        if (rendered instanceof ReplayPayloadRenderer.TileRenderResult(
-            String content, List<MessageEmbed> embeds, String tilePosition, String snapshotJson,
-            boolean applyReplayDecoys
-        )) {
+        if (rendered
+                instanceof
+                ReplayPayloadRenderer.TileRenderResult(
+                        String content,
+                        List<MessageEmbed> embeds,
+                        String tilePosition,
+                        String snapshotJson,
+                        boolean applyReplayDecoys)) {
             sendTileRenderMessage(
                     channel,
-                content,
-                embeds,
+                    content,
+                    embeds,
                     replayPayloadRenderer.restoreReplayGame(
-                        snapshotJson,
-                            game,
-                            candidate,
-                        tilePosition,
-                        applyReplayDecoys),
-                tilePosition);
+                            snapshotJson, game, candidate, tilePosition, applyReplayDecoys),
+                    tilePosition);
             return;
         }
         ReplayPayloadRenderer.MessageResult message = (ReplayPayloadRenderer.MessageResult) rendered;

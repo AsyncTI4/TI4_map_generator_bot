@@ -15,6 +15,10 @@ import net.dv8tion.jda.api.components.buttons.Button;
  *                         Ex. "Titans of Ul" can use the faction symbol.
  *                         Ex. franken's "Terragenesis" doesn't have a unique emoji, since there are other faction abilities.
  */
-public record DraftChoice(DraftableType type, String choiceKey, Button button, String formattedName,
-                          String unformattedName, String identifyingEmoji) {
-}
+public record DraftChoice(
+        DraftableType type,
+        String choiceKey,
+        Button button,
+        String formattedName,
+        String unformattedName,
+        String identifyingEmoji) {}

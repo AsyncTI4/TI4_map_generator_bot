@@ -49,15 +49,15 @@ public class SpinRingsHelper {
     private record Hex(int q, int r) {
 
         @Override
-            public boolean equals(Object o) {
-                if (this == o) {
-                    return true;
-                }
-                if (!(o instanceof Hex h)) {
-                    return false;
-                }
-                return q == h.q && r == h.r;
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
             }
+            if (!(o instanceof Hex(int q1, int r1))) {
+                return false;
+            }
+            return q == q1 && r == r1;
+        }
     }
 
     private static void generateBoard(int maxRing) {

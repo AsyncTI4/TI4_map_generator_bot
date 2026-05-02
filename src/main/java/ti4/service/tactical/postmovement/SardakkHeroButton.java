@@ -14,7 +14,7 @@ public final class SardakkHeroButton implements PostMovementAbilityButton {
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
-        return List.of(
-                Buttons.blue(ctx.player().finChecker() + "purgeSardakkHero", "Use Sardakk Hero", FactionEmojis.Sardakk));
+        return List.of(Buttons.blue(
+                ctx.player().finChecker() + "purgeSardakkHero", "Use Sardakk Hero", FactionEmojis.Sardakk));
     }
 }

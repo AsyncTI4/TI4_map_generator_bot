@@ -312,8 +312,7 @@ public final class TeHelperUnits {
             UnitModel model = p2.getUnitFromUnitKey(uk);
             if (!model.getSustainDamage()) {
                 String id = prefixID + p2.getFaction() + "_" + uk.asyncID();
-                String label =
-                        "Destroy " + p2.getColor() + " " + uk.unitType().humanReadableName();
+                String label = "Destroy " + p2.getColor() + " " + uk.unitType().humanReadableName();
                 destroyable.add(Buttons.red(id, label, uk.unitEmoji()));
             }
         }

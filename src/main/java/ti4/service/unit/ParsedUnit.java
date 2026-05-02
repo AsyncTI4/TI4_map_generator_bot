@@ -14,7 +14,7 @@ public record ParsedUnit(Units.UnitKey unitKey, int count, String location) {
         this.unitKey = unitKey;
         this.count = count;
         this.location = Constants.SPACE.equalsIgnoreCase(location)
-            ? Constants.SPACE
-            : AliasHandler.resolvePlanet(location.toLowerCase());
+                ? Constants.SPACE
+                : AliasHandler.resolvePlanet(location.toLowerCase());
     }
 }

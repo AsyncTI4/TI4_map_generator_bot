@@ -48,8 +48,7 @@ class AddCaptureUnits extends GameStateSubcommand {
             if (parsedUnit.unitKey().unitType() == Units.UnitType.Fighter
                     || parsedUnit.unitKey().unitType() == Units.UnitType.Infantry) {
                 Units.UnitKey unitKey = Mapper.getUnitKey(
-                        parsedUnit.unitKey().unitType().toString(),
-                        getPlayer().getColor());
+                        parsedUnit.unitKey().unitType().toString(), getPlayer().getColor());
                 parsedUnit = new ParsedUnit(unitKey, parsedUnit.count(), "space");
             }
             tile.addUnit("space", parsedUnit.unitKey(), parsedUnit.count());

@@ -226,8 +226,8 @@ public class MantisTileDraftable extends Draftable {
 
         DraftCategory choiceCategory = getItemCategory(choice.choiceKey());
         if (choiceCategory == null) {
-            return "Error: Could not find category for choice: " + choice.unformattedName() + " ("
-                    + choice.choiceKey() + ").";
+            return "Error: Could not find category for choice: " + choice.unformattedName() + " (" + choice.choiceKey()
+                    + ").";
         }
         if (choiceCategory == DraftCategory.BLUETILE) {
             if (bluePicked >= bpp) {

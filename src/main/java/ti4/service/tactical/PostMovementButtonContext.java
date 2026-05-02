@@ -4,5 +4,4 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 
-public record PostMovementButtonContext(Game game, Player player, Tile tile) {
-}
+public record PostMovementButtonContext(Game game, Player player, Tile tile) {}
