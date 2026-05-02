@@ -101,6 +101,8 @@ public class ButtonProcessor {
             }
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(event, context), "Something went wrong with button interaction", e);
+        } finally {
+            RollbarManager.clear();
         }
 
         long contextCreationRuntime = context.getCreationEndTime() - context.getCreationStartTime();

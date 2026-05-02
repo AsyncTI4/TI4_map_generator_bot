@@ -49,10 +49,19 @@ public class CombatReplaySideBetUiService {
     public void postSideBetButtonsIfNeeded(
             MessageChannel channel, Game game, CombatReplayContestEntity contest, CombatCandidateEntity candidate) {
         if (channel == null || game == null || contest == null || !shouldShowButtons(candidate)) return;
-        MessageHelper.sendMessageToChannel(channel, "## Side Bets\nPlace up to 5 side bets before the replay begins.");
+        MessageHelper.sendMessageToChannel(channel, sideBetPrompt());
         ensureSummaryMessage(channel, game, contest);
         postFactionButtons(channel, game, contest, candidate, candidate.getAttackerFaction());
         postFactionButtons(channel, game, contest, candidate, candidate.getDefenderFaction());
+    }
+
+    private String sideBetPrompt() {
+        int maxBets = settings.getSideBets().getMaxBetsPerUser();
+        if (!settings.isHousesEnabled()) {
+            return "## Side Bets\nPlace up to " + maxBets + " side bets before the replay begins.";
+        }
+        return "## Side-Bet Market\nThe battle market is open. Place up to " + maxBets
+                + " side bets before the replay begins.";
     }
 
     public void refreshSummaryMessage(
@@ -79,7 +88,6 @@ public class CombatReplaySideBetUiService {
     private List<Button> buttonsForFaction(
             Game game, CombatReplayContestEntity contest, CombatCandidateEntity candidate, String faction) {
         List<Button> buttons = new ArrayList<>();
-        String factionLabel = buttonFactionIdLabel(game, faction);
         CombatSideState state = CombatSideState.forFaction(candidate, faction);
         if (state == null) return buttons;
         for (CombatSideBetType type : CombatSideBetType.values()) {
@@ -87,7 +95,7 @@ public class CombatReplaySideBetUiService {
             int profitPoints = payoutService.offeredPayout(contest, candidate, type, faction);
             buttons.add(Buttons.gray(
                     CombatSideBetButtonIds.format(contest.getId(), type, faction),
-                    buttonLabel(type, factionLabel, profitPoints),
+                    buttonLabel(type, profitPoints),
                     type.emoji()));
         }
         return buttons;
@@ -112,8 +120,8 @@ public class CombatReplaySideBetUiService {
         return false;
     }
 
-    private String buttonLabel(CombatSideBetType type, String factionLabel, int profitPoints) {
-        return "[" + factionLabel + "] " + type.label() + " +" + profitPoints + " pts";
+    private String buttonLabel(CombatSideBetType type, int profitPoints) {
+        return type.label() + " +" + profitPoints + " pts";
     }
 
     private void ensureSummaryMessage(MessageChannel channel, Game game, CombatReplayContestEntity contest) {

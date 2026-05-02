@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.contest.replay.service.CombatReplayHouseService;
 import ti4.discord.JdaService;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
@@ -31,6 +32,7 @@ import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.WhisperService;
 import ti4.service.game.CreateGameService;
 import ti4.service.game.GameNameService;
+import ti4.spring.context.SpringContext;
 import ti4.spring.service.deploy.ActiveLeaseService;
 import ti4.spring.service.messagecache.SavedBotMessagesService;
 
@@ -86,6 +88,7 @@ class MessageListener extends ListenerAdapter {
                 if (respondToBotHelperPing(message)) return;
                 if (checkForFogOfWarInvitePrompt(message)) return;
                 if (copyLFGPingsToLFGPingsChannel(event, message)) return;
+                addHouseEmojiReactionToLazaxMessages(event);
                 String messageRaw = message.getContentRaw().toLowerCase();
                 for (String phrase : INTERESTING_MESSAGES) {
                     if (messageRaw.contains(phrase)) {
@@ -109,6 +112,10 @@ class MessageListener extends ListenerAdapter {
                             + event.getMessage().getJumpUrl(),
                     e);
         }
+    }
+
+    private static void addHouseEmojiReactionToLazaxMessages(MessageReceivedEvent event) {
+        SpringContext.getBean(CombatReplayHouseService.class).addHouseEmojiReactionIfNeeded(event);
     }
 
     private static boolean respondToBotHelperPing(Message message) {

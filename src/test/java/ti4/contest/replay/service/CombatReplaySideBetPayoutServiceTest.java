@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import java.util.HashSet;
 import org.junit.jupiter.api.Test;
 import ti4.contest.replay.core.CombatContestSettings;
+import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.core.CombatSideBetType;
 import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
 import ti4.contest.replay.entities.CombatCandidateEntity;
@@ -54,11 +55,13 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void pricesRoundOneSideBetInNebulaSnapshotWithoutActivePlayer() {
+    void roundOneOddsIgnoreReplayOnlyWarSunDecoy() {
         CombatReplayContestEntity contest = oddsContest();
-        CombatCandidateEntity candidate = snapshotCandidate("92", 1, 1);
+        CombatCandidateEntity candidate = snapshotCandidate(1, 1);
+        candidate.setReplayAbilitiesJson(CombatReplayDecoys.addDecoy(
+                null, new CombatReplayDecoys.DecoyUnit("sol", "<sol>", "blu", UnitType.Warsun, Constants.SPACE, 1)));
 
-        int payout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_WHIFF, "yin");
+        int payout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_WHIFF, "sol");
 
         assertEquals(4, payout);
         verifyNoInteractions(eventRepository);
@@ -76,6 +79,46 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void pricesRoundOneSlamAfterOpponentAfbCanRemoveTargetFighters() {
+        CombatReplayContestEntity contest = oddsContest();
+        CombatCandidateEntity candidate = slamAfbSnapshotCandidate();
+
+        int yinPayout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_SLAM, "yin");
+        int solPayout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_SLAM, "sol");
+
+        assertEquals(75, yinPayout);
+        assertEquals(100, solPayout);
+        verifyNoInteractions(eventRepository);
+    }
+
+    @Test
+    void pricesRoundOneSlamFromOpponentNonDestroyerAfbUnits() {
+        CombatReplayContestEntity contest = oddsContest();
+        CombatCandidateEntity candidate = zelianDreadnoughtAfbSnapshotCandidate();
+
+        int payout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_SLAM, "yin");
+
+        assertEquals(6, payout);
+        verifyNoInteractions(eventRepository);
+    }
+
+    @Test
+    void pricesRoundOneSlamWithJolNarCommanderAfbRerollMisses() {
+        CombatReplayContestEntity contest = oddsContest();
+        CombatCandidateEntity lockedCommanderCandidate = jolNarAfbRerollSnapshotCandidate(false);
+        CombatCandidateEntity unlockedCommanderCandidate = jolNarAfbRerollSnapshotCandidate(true);
+
+        int lockedPayout =
+                service.offeredPayout(contest, lockedCommanderCandidate, CombatSideBetType.ROUND_ONE_SLAM, "yin");
+        int unlockedPayout =
+                service.offeredPayout(contest, unlockedCommanderCandidate, CombatSideBetType.ROUND_ONE_SLAM, "yin");
+
+        assertEquals(10, lockedPayout);
+        assertEquals(6, unlockedPayout);
+        verifyNoInteractions(eventRepository);
+    }
+
+    @Test
     void pricesAfbWhiffFromInitialSnapshotAfbUnitsOnly() {
         CombatReplayContestEntity contest = oddsContest();
         CombatCandidateEntity candidate = afbSnapshotCandidate();
@@ -84,6 +127,20 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
 
         assertTrue(service.hasAfbUnits(candidate, "sol"));
         assertEquals(6, payout);
+        verifyNoInteractions(eventRepository);
+    }
+
+    @Test
+    void afbAvailabilityIgnoresReplayOnlyDestroyerDecoy() {
+        CombatReplayContestEntity contest = oddsContest();
+        CombatCandidateEntity candidate = snapshotCandidate(1, 1);
+        candidate.setReplayAbilitiesJson(CombatReplayDecoys.addDecoy(
+                null, new CombatReplayDecoys.DecoyUnit("sol", "<sol>", "blu", UnitType.Destroyer, Constants.SPACE, 1)));
+
+        int payout = service.offeredPayout(contest, candidate, CombatSideBetType.AFB_WHIFF, "sol");
+
+        assertFalse(service.hasAfbUnits(candidate, "sol"));
+        assertEquals(4, payout);
         verifyNoInteractions(eventRepository);
     }
 
@@ -123,6 +180,18 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void oneHpPayoutIgnoresReplayOnlyWarSunDecoy() {
+        CombatCandidateEntity candidate = snapshotCandidate(1, 1);
+        candidate.setReplayAbilitiesJson(CombatReplayDecoys.addDecoy(
+                null, new CombatReplayDecoys.DecoyUnit("sol", "<sol>", "blu", UnitType.Warsun, Constants.SPACE, 1)));
+
+        int payout = service.offeredPayout(oddsContest(), candidate, CombatSideBetType.WINNER_ONE_HP, "sol");
+
+        assertEquals(6, payout);
+        verifyNoInteractions(eventRepository);
+    }
+
+    @Test
     void resolvesOldRowsWithLegacyFixedPayoutAndNewRowsWithLockedSnapshot() {
         CombatContestSideBetEntity legacy = new CombatContestSideBetEntity();
         legacy.setBetType(CombatSideBetType.ROUND_ONE_WHIFF);
@@ -150,20 +219,79 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
     }
 
     private CombatCandidateEntity snapshotCandidate(int solCarriers, int yinCarriers) {
-        return snapshotCandidate("18", solCarriers, yinCarriers);
-    }
-
-    private CombatCandidateEntity snapshotCandidate(String tileId, int solCarriers, int yinCarriers) {
         Game game = new Game();
         game.newGameSetup();
         game.setName("pbd-side-bet-snapshot");
         Player sol = player(game, "sol");
         Player yin = player(game, "yin");
-        Tile tile = tile(game, tileId);
+        Tile tile = tile(game, "18");
         tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, sol.getColorID()), solCarriers);
         tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, yin.getColorID()), yinCarriers);
 
         CombatCandidateEntity candidate = candidate(null, null);
+        candidate.setTilePosition(tile.getPosition());
+        candidate.setInitialRenderSnapshotJson(
+                CombatReplayTileRenderer.captureInitialSnapshot(game, tile.getPosition()));
+        return candidate;
+    }
+
+    private CombatCandidateEntity slamAfbSnapshotCandidate() {
+        Game game = new Game();
+        game.newGameSetup();
+        game.setName("pbd-side-bet-slam-afb-snapshot");
+        Player sol = player(game, "sol");
+        sol.removeOwnedUnitByID("destroyer");
+        sol.addOwnedUnitByID("destroyer2");
+        Player yin = player(game, "yin");
+        Tile tile = tile(game, "18");
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Destroyer, sol.getColorID()), 1);
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, sol.getColorID()), 1);
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Fighter, sol.getColorID()), 4);
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, yin.getColorID()), 1);
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Fighter, yin.getColorID()), 4);
+
+        CombatCandidateEntity candidate = candidate(null, null);
+        candidate.setTilePosition(tile.getPosition());
+        candidate.setInitialRenderSnapshotJson(
+                CombatReplayTileRenderer.captureInitialSnapshot(game, tile.getPosition()));
+        return candidate;
+    }
+
+    private CombatCandidateEntity zelianDreadnoughtAfbSnapshotCandidate() {
+        Game game = new Game();
+        game.newGameSetup();
+        game.setName("pbd-side-bet-zelian-afb-snapshot");
+        Player sol = player(game, "sol");
+        unlockLeader(sol, "zeliancommander");
+        Player yin = player(game, "yin");
+        Tile tile = tile(game, "18");
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Dreadnought, sol.getColorID()), 1);
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, yin.getColorID()), 1);
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Fighter, yin.getColorID()), 1);
+
+        CombatCandidateEntity candidate = candidate(null, null);
+        candidate.setTilePosition(tile.getPosition());
+        candidate.setInitialRenderSnapshotJson(
+                CombatReplayTileRenderer.captureInitialSnapshot(game, tile.getPosition()));
+        return candidate;
+    }
+
+    private CombatCandidateEntity jolNarAfbRerollSnapshotCandidate(boolean commanderUnlocked) {
+        Game game = new Game();
+        game.newGameSetup();
+        game.setName("pbd-side-bet-jolnar-afb-reroll-snapshot");
+        Player jolnar = player(game, "jolnar");
+        if (commanderUnlocked) {
+            unlockLeader(jolnar, "jolnarcommander");
+        }
+        Player yin = player(game, "yin");
+        Tile tile = tile(game, "18");
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Destroyer, jolnar.getColorID()), 1);
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, yin.getColorID()), 1);
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Fighter, yin.getColorID()), 1);
+
+        CombatCandidateEntity candidate = candidate(null, null);
+        candidate.setAttackerFaction("jolnar");
         candidate.setTilePosition(tile.getPosition());
         candidate.setInitialRenderSnapshotJson(
                 CombatReplayTileRenderer.captureInitialSnapshot(game, tile.getPosition()));
@@ -206,6 +334,11 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
         player.setCommoditiesBase(model.getCommodities());
         player.setFactionTechs(model.getFactionTech());
         return player;
+    }
+
+    private void unlockLeader(Player player, String leaderId) {
+        player.addLeader(leaderId);
+        player.unsafeGetLeader(leaderId).setLocked(false);
     }
 
     private Tile tile(Game game, String tileId) {

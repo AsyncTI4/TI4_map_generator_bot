@@ -18,6 +18,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.CombatModHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.model.NamedCombatModifierModel;
@@ -55,19 +56,20 @@ public class CombatReplaySideBetPayoutService {
         if (betType == CombatSideBetType.WINNER_ONE_HP) {
             InitialSnapshotCombatContext context = initialSnapshotCombatContext(candidate, null);
             return context == null
-                    ? fixedPayout(CombatSideBetType.WINNER_ONE_HP)
+                    ? fixedPayout(betType)
                     : hpPayout(
                             context.snapshot().attackerHp(), context.snapshot().defenderHp());
         }
 
         if (betType == CombatSideBetType.AFB_WHIFF) {
             Double probability = afbWhiffProbabilityFromInitialSnapshot(candidate, targetFaction);
-            if (probability == null) return fixedPayout(CombatSideBetType.AFB_WHIFF);
+            if (probability == null) return fixedPayout(betType);
             return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(probability);
         }
 
-        boolean slam = betType == CombatSideBetType.ROUND_ONE_SLAM;
-        Double probability = openingRoundProbabilityFromInitialSnapshot(candidate, targetFaction, slam);
+        Double probability = betType == CombatSideBetType.ROUND_ONE_SLAM
+                ? openingRoundSlamProbabilityFromInitialSnapshot(candidate, targetFaction)
+                : openingRoundProbabilityFromInitialSnapshot(candidate, targetFaction, false);
         if (probability == null) return fixedPayout(betType);
 
         return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(probability);
@@ -111,6 +113,27 @@ public class CombatReplaySideBetPayoutService {
         return Math.min(settings.getSideBets().getDynamicPayoutCap(), profitPoints * 2);
     }
 
+    private Double openingRoundSlamProbabilityFromInitialSnapshot(
+            CombatCandidateEntity candidate, String targetFaction) {
+        InitialSnapshotCombatContext context = initialSnapshotCombatContext(candidate, targetFaction);
+        if (context == null) return null;
+
+        Map<UnitModel, Integer> playerUnits =
+                CombatUnitSelectionHelper.collectCombatRoundUnits(context.tile(), context.space(), context.player());
+        int fighterCount = fighterCount(playerUnits);
+        if (fighterCount == 0) {
+            return openingRoundEventProbability(context, playerUnits, true);
+        }
+
+        double probability = 0.0;
+        Map<Integer, Double> fighterLossDistribution = opponentAfbFighterLossDistribution(context, fighterCount);
+        for (Map.Entry<Integer, Double> entry : fighterLossDistribution.entrySet()) {
+            Map<UnitModel, Integer> survivingUnits = removeFighters(playerUnits, entry.getKey());
+            probability += entry.getValue() * openingRoundEventProbability(context, survivingUnits, true);
+        }
+        return probability;
+    }
+
     private Double openingRoundProbabilityFromInitialSnapshot(
             CombatCandidateEntity candidate, String targetFaction, boolean slam) {
         InitialSnapshotCombatContext context = initialSnapshotCombatContext(candidate, targetFaction);
@@ -118,6 +141,11 @@ public class CombatReplaySideBetPayoutService {
 
         Map<UnitModel, Integer> playerUnits =
                 CombatUnitSelectionHelper.collectCombatRoundUnits(context.tile(), context.space(), context.player());
+        return openingRoundEventProbability(context, playerUnits, slam);
+    }
+
+    private double openingRoundEventProbability(
+            InitialSnapshotCombatContext context, Map<UnitModel, Integer> playerUnits, boolean slam) {
         Map<UnitModel, Integer> opponentUnits =
                 CombatUnitSelectionHelper.collectCombatRoundUnits(context.tile(), context.space(), context.opponent());
         TileModel tileModel = TileHelper.getTileById(context.tile().getTileID());
@@ -151,6 +179,51 @@ public class CombatReplaySideBetPayoutService {
                 extraRollModifiers,
                 CombatRollType.combatround,
                 slam);
+    }
+
+    private Map<Integer, Double> opponentAfbFighterLossDistribution(
+            InitialSnapshotCombatContext context, int targetFighterCount) {
+        Map<UnitModel, Integer> afbUnits = collectAfbUnits(context.tile(), context.opponent());
+        if (targetFighterCount <= 0 || afbUnits.isEmpty()) return Map.of(0, 1.0);
+
+        Map<UnitModel, Integer> targetUnits =
+                CombatUnitSelectionHelper.collectCombatRoundUnits(context.tile(), context.space(), context.player());
+        TileModel tileModel = TileHelper.getTileById(context.tile().getTileID());
+        List<NamedCombatModifierModel> hitModifiers = CombatModHelper.getModifiers(
+                context.opponent(),
+                context.player(),
+                afbUnits,
+                targetUnits,
+                tileModel,
+                context.game(),
+                CombatRollType.AFB,
+                Constants.COMBAT_MODIFIERS);
+        List<NamedCombatModifierModel> extraRollModifiers = CombatModHelper.getModifiers(
+                context.opponent(),
+                context.player(),
+                afbUnits,
+                targetUnits,
+                tileModel,
+                context.game(),
+                CombatRollType.AFB,
+                Constants.COMBAT_EXTRA_ROLLS);
+
+        Map<Integer, Double> hitDistribution = hitCountDistribution(
+                afbUnits,
+                context.opponent(),
+                context.player(),
+                context.game(),
+                context.tile(),
+                context.space(),
+                hitModifiers,
+                extraRollModifiers,
+                CombatRollType.AFB);
+        Map<Integer, Double> lossDistribution = new java.util.HashMap<>();
+        for (Map.Entry<Integer, Double> entry : hitDistribution.entrySet()) {
+            int fighterLosses = Math.min(targetFighterCount, entry.getKey());
+            lossDistribution.merge(fighterLosses, entry.getValue(), Double::sum);
+        }
+        return lossDistribution;
     }
 
     private Double afbWhiffProbabilityFromInitialSnapshot(CombatCandidateEntity candidate, String targetFaction) {
@@ -286,16 +359,113 @@ public class CombatReplaySideBetPayoutService {
                     unit, quantity, extraRollModifiers, player, opponent, game, playerUnitTypes, rollType, tile, space);
             int diceCount = Math.max(0, quantity * dicePerUnit + extraDice);
             if (diceCount == 0) continue;
-            double hitChance = hitChance(hitsOn - modifier);
+            double hitChance = hitChanceForRoll(player, game, rollType, hitsOn - modifier);
             probability *= Math.pow(slam ? hitChance : 1.0 - hitChance, diceCount);
             dice += diceCount;
         }
         return dice == 0 ? 0.0 : probability;
     }
 
+    private Map<Integer, Double> hitCountDistribution(
+            Map<UnitModel, Integer> unitCounts,
+            Player player,
+            Player opponent,
+            Game game,
+            Tile tile,
+            UnitHolder space,
+            List<NamedCombatModifierModel> hitModifiers,
+            List<NamedCombatModifierModel> extraRollModifiers,
+            CombatRollType rollType) {
+        Map<Integer, Double> distribution = new java.util.HashMap<>();
+        distribution.put(0, 1.0);
+
+        List<UnitModel> playerUnitTypes = new ArrayList<>(unitCounts.keySet());
+        for (Map.Entry<UnitModel, Integer> entry : unitCounts.entrySet()) {
+            UnitModel unit = entry.getKey();
+            int quantity = entry.getValue();
+            int dicePerUnit;
+            int hitsOn;
+            if (rollType == CombatRollType.combatround) {
+                CombatStatsService.CombatRoundProfile profile =
+                        CombatStatsService.getCombatRoundProfile(true, unit, player, tile, opponent, false);
+                dicePerUnit = profile.diceCount();
+                hitsOn = profile.hitsOn();
+            } else {
+                dicePerUnit = unit.getCombatDieCountForAbility(rollType, player);
+                hitsOn = unit.getCombatDieHitsOnForAbility(rollType, player);
+            }
+            int modifier = CombatModHelper.getCombinedModifierForUnit(
+                    unit, quantity, hitModifiers, player, opponent, game, playerUnitTypes, rollType, tile, space);
+            int extraDice = CombatModHelper.getCombinedModifierForUnit(
+                    unit, quantity, extraRollModifiers, player, opponent, game, playerUnitTypes, rollType, tile, space);
+            int diceCount = Math.max(0, quantity * dicePerUnit + extraDice);
+            if (diceCount == 0) continue;
+            distribution =
+                    addDice(distribution, diceCount, hitChanceForRoll(player, game, rollType, hitsOn - modifier));
+        }
+        return distribution;
+    }
+
+    private Map<Integer, Double> addDice(Map<Integer, Double> distribution, int diceCount, double hitChance) {
+        Map<Integer, Double> updated = distribution;
+        for (int die = 0; die < diceCount; die++) {
+            Map<Integer, Double> next = new java.util.HashMap<>();
+            for (Map.Entry<Integer, Double> entry : updated.entrySet()) {
+                next.merge(entry.getKey(), entry.getValue() * (1.0 - hitChance), Double::sum);
+                next.merge(entry.getKey() + 1, entry.getValue() * hitChance, Double::sum);
+            }
+            updated = next;
+        }
+        return updated;
+    }
+
+    private int fighterCount(Map<UnitModel, Integer> unitCounts) {
+        int count = 0;
+        for (Map.Entry<UnitModel, Integer> entry : unitCounts.entrySet()) {
+            if (isFighter(entry.getKey())) count += entry.getValue();
+        }
+        return count;
+    }
+
+    private Map<UnitModel, Integer> removeFighters(Map<UnitModel, Integer> unitCounts, int fighterLosses) {
+        if (fighterLosses <= 0) return new java.util.HashMap<>(unitCounts);
+        Map<UnitModel, Integer> survivingUnits = new java.util.HashMap<>();
+        int remainingLosses = fighterLosses;
+        for (Map.Entry<UnitModel, Integer> entry : unitCounts.entrySet()) {
+            UnitModel unit = entry.getKey();
+            int quantity = entry.getValue();
+            if (isFighter(unit) && remainingLosses > 0) {
+                int removed = Math.min(quantity, remainingLosses);
+                quantity -= removed;
+                remainingLosses -= removed;
+            }
+            if (quantity > 0) survivingUnits.put(unit, quantity);
+        }
+        return survivingUnits;
+    }
+
+    private boolean isFighter(UnitModel unit) {
+        return unit != null
+                && (unit.getUnitType() == UnitType.Fighter || "fighter".equalsIgnoreCase(unit.getBaseType()));
+    }
+
     private double hitChance(int effectiveThreshold) {
         int boundedThreshold = Math.max(1, Math.min(11, effectiveThreshold));
         return Math.max(0.0, Math.min(1.0, (11 - boundedThreshold) / 10.0));
+    }
+
+    private double hitChanceForRoll(Player player, Game game, CombatRollType rollType, int effectiveThreshold) {
+        double baseHitChance = hitChance(effectiveThreshold);
+        if (rollType == CombatRollType.combatround || !rerollsMisses(player, game)) {
+            return baseHitChance;
+        }
+        double missChance = 1.0 - baseHitChance;
+        return 1.0 - missChance * missChance;
+    }
+
+    private boolean rerollsMisses(Player player, Game game) {
+        return game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")
+                || player.hasTech("tf-tacticalbrilliance");
     }
 
     private record InitialSnapshotCombatContext(
