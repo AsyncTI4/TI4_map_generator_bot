@@ -17,7 +17,7 @@
     <java.version>26</java.version>
     <lombok.version>1.18.46</lombok.version>
     <jda.version>6.4.1</jda.version>
-    <aws.sdk.version>2.43.0</aws.sdk.version>
+    <aws.sdk.version>2.44.0</aws.sdk.version>
     <hibernate-dialects.version>7.3.2.Final</hibernate-dialects.version>
     <reflections.version>0.10.2</reflections.version>
     <jskills.version>1.1</jskills.version>
