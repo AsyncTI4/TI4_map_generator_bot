@@ -35,27 +35,28 @@ class RunManualDataMigration extends Subcommand {
         }
 
         ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
-            Game game = GameManager.getManagedGame(gameName).getGame();
-            try {
-                Class<?>[] paramTypes = {Game.class};
-                Method method = DataMigrationManager.class.getMethod(migrationName, paramTypes);
-                method.setAccessible(true);
-                Boolean changesMade = (Boolean) method.invoke(null, game);
-                if (changesMade) {
-                    game.addMigration(migrationName);
-                    GameManager.save(game, "Migration ran: " + migrationName);
-                    MessageHelper.sendMessageToChannel(
-                            event.getChannel(),
-                            "Successfully ran migration " + migrationName + " for map " + game.getName());
-                } else {
-                    MessageHelper.sendMessageToChannel(
-                            event.getChannel(),
-                            "Successfully ran migration " + migrationName + " for map " + game.getName()
-                                    + " but no changes were required.");
-                }
-            } catch (Exception e) {
-                BotLogger.error(new LogOrigin(event), "Failed to run data migration", e);
-            }
-        });
+                    Game game = GameManager.getManagedGame(gameName).getGame();
+                    try {
+                        Class<?>[] paramTypes = {Game.class};
+                        Method method = DataMigrationManager.class.getMethod(migrationName, paramTypes);
+                        method.setAccessible(true);
+                        Boolean changesMade = (Boolean) method.invoke(null, game);
+                        if (changesMade) {
+                            game.addMigration(migrationName);
+                            GameManager.save(game, "Migration ran: " + migrationName);
+                            MessageHelper.sendMessageToChannel(
+                                    event.getChannel(),
+                                    "Successfully ran migration " + migrationName + " for map " + game.getName());
+                        } else {
+                            MessageHelper.sendMessageToChannel(
+                                    event.getChannel(),
+                                    "Successfully ran migration " + migrationName + " for map " + game.getName()
+                                            + " but no changes were required.");
+                        }
+                    } catch (Exception e) {
+                        BotLogger.error(new LogOrigin(event), "Failed to run data migration", e);
+                    }
+                })
+                .run();
     }
 }
