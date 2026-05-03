@@ -56,7 +56,6 @@ public class AddTileListService {
         }
 
         MessageHelper.sendMessageToEventChannel(event, "Map String set to: ```\n" + game.getMapString() + "\n```");
-        ShowGameService.simpleShowGame(game, event, DisplayType.map);
 
         if (!badTiles.isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -65,6 +64,7 @@ public class AddTileListService {
         }
 
         finishSetup(game, event);
+        ShowGameService.simpleShowGame(game, event, DisplayType.map);
     }
 
     public static List<String> addTileMapToGame(Game game, Map<String, String> tileMap) throws Exception {
