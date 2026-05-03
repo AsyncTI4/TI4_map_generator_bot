@@ -52,6 +52,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.lunarium.LunariumAbilityButtonHandler;
+import ti4.discord.utility.DiscordChannelUtility;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.game.helper.StoredValueHelper;
@@ -651,154 +652,87 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     @Nullable
     private ThreadChannel getCardsInfoThread(boolean createIfMissing) {
-        if (isNpc() || isDummy()) {
+        if (isNpc() || isDummy()) return null;
+
+        TextChannel actionsChannel = resolveActionsChannel();
+        if (actionsChannel == null) {
+            logMissingChannel();
             return null;
         }
 
-        TextChannel actionsChannel = game.getMainGameChannel();
-        if (game.isFowMode() || game.isCommunityMode()) {
-            actionsChannel = (TextChannel) getPrivateChannel();
-
-            if (!isRealPlayer() && isGM()) {
-                List<TextChannel> channels = game.getGuild().getTextChannelsByName(game.getName() + "-gm-room", true);
-                actionsChannel = channels.isEmpty() ? null : channels.getFirst();
-            }
-        }
-        if (actionsChannel == null) {
-            actionsChannel = game.getMainGameChannel();
-        }
-        if (actionsChannel == null) {
-            if (!game.isHasEnded()) {
-                BotLogger.warning(
-                        new LogOrigin(this),
-                        "`Player.getCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: "
-                                + game.getName());
-            }
-            return null;
-        }
         String userName = getUserName().replace("/", "");
-        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + game.getName() + "-" + userName;
-        if (game.isFowMode()) {
-            threadName = game.getName() + "-cards-info-" + userName + "-private";
+        String threadName = game.isFowMode()
+                ? String.format("%s-cards-info-%s-private", game.getName(), userName)
+                : String.format("%s%s-%s", Constants.CARDS_INFO_THREAD_PREFIX, game.getName(), userName);
+
+        ThreadChannel foundThread = findCardsInfoThreadByIdOrName(actionsChannel, threadName);
+
+        if (foundThread != null) {
+            setCardsInfoThreadID(foundThread.getId());
+            return foundThread;
         }
 
-        List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-        List<ThreadChannel> hiddenThreadChannels = new ArrayList<>();
-        List<ThreadChannel> allActiveChannels = new ArrayList<>();
+        return createIfMissing ? createNewThread(actionsChannel, threadName) : null;
+    }
 
-        // ATTEMPT TO FIND BY ID
+    private TextChannel resolveActionsChannel() {
+        if (!game.isFowMode() && !game.isCommunityMode()) {
+            return game.getMainGameChannel();
+        }
+
+        TextChannel channel = (TextChannel) getPrivateChannel();
+
+        // Check for specific GM room if the player is a GM
+        if (!isRealPlayer() && isGM()) {
+            channel = game.getGuild().getTextChannelsByName(game.getName() + "-gm-room", true).stream()
+                    .findFirst()
+                    .orElse(channel);
+        }
+
+        return channel != null ? channel : game.getMainGameChannel();
+    }
+
+    @Nullable
+    private ThreadChannel findCardsInfoThreadByIdOrName(TextChannel actionsChannel, String name) {
+        String idStr = getCardsInfoThreadID();
+
+        if (StringUtils.isNotBlank(idStr) && !"null".equals(idStr)) {
+            try {
+                long id = Long.parseLong(idStr);
+                ThreadChannel thread = DiscordChannelUtility.retrieveThreadChannelById(actionsChannel.getGuild(), id).complete();
+                if (thread != null) return thread;
+            } catch (Exception ignored) {
+                // ignore and try to search by name
+            }
+        }
+
         try {
-            String cardsInfoThreadID = getCardsInfoThreadID();
-            if (cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !"null".equals(cardsInfoThreadID)) {
-                ThreadChannel threadChannel = actionsChannel.getGuild().getThreadChannelById(cardsInfoThreadID);
-                if (threadChannel != null) {
-                    setCardsInfoThreadID(threadChannel.getId());
-                    return threadChannel;
-                }
-
-                // SEARCH FOR EXISTING OPEN THREAD IN CACHE
-                for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getId().equalsIgnoreCase(cardsInfoThreadID)) {
-                        setCardsInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
-                }
-
-                // SEARCH FOR EXISTING ACTIVE THREAD
-                allActiveChannels =
-                        actionsChannel.getGuild().retrieveActiveThreads().complete();
-                for (ThreadChannel threadChannel_ : allActiveChannels) {
-                    if (threadChannel_.getId().equalsIgnoreCase(cardsInfoThreadID)) {
-                        setCardsInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
-                }
-
-                // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                hiddenThreadChannels =
-                        actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
-                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                    if (threadChannel_.getId().equalsIgnoreCase(cardsInfoThreadID)) {
-                        setCardsInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
-                }
-            }
+            return DiscordChannelUtility.retrieveFirstThreadChannelByNameIgnoringCase(actionsChannel, name).complete();
         } catch (Exception e) {
-            logCardsInfoThreadLookupFailure(
-                    "`Player.getCardsInfoThread`: Could not find existing #cards-info thread using ID: "
-                            + getCardsInfoThreadID() + " for potential thread name: " + threadName,
-                    e,
-                    createIfMissing);
-        }
-
-        // ATTEMPT TO FIND BY NAME
-        try {
-            // FIND DIRECTLY BY NAME
-            List<ThreadChannel> threadChannelsByName =
-                    actionsChannel.getGuild().getThreadChannelsByName(threadName, true);
-            if (!threadChannelsByName.isEmpty()) {
-                ThreadChannel threadChannel = threadChannelsByName.getFirst();
-                setCardsInfoThreadID(threadChannel.getId());
-                return threadChannel;
-            }
-
-            // SEARCH FOR EXISTING OPEN THREAD IN CACHE
-            for (ThreadChannel threadChannel_ : threadChannels) {
-                if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
-                    setCardsInfoThreadID(threadChannel_.getId());
-                    return threadChannel_;
-                }
-            }
-
-            // SEARCH FOR EXISTING ACTIVE THREAD
-            if (allActiveChannels.isEmpty()) {
-                allActiveChannels =
-                        actionsChannel.getGuild().retrieveActiveThreads().complete();
-            }
-            for (ThreadChannel threadChannel_ : allActiveChannels) {
-                if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
-                    setCardsInfoThreadID(threadChannel_.getId());
-                    return threadChannel_;
-                }
-            }
-
-            // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-            if (hiddenThreadChannels.isEmpty()) {
-                hiddenThreadChannels =
-                        actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
-            }
-            for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
-                    setCardsInfoThreadID(threadChannel_.getId());
-                    return threadChannel_;
-                }
-            }
-        } catch (Exception e) {
-            logCardsInfoThreadLookupFailure(
-                    "`Player.getCardsInfoThread`: Could not find existing #cards-info thread using name: " + threadName,
-                    e,
-                    createIfMissing);
-        }
-
-        if (!createIfMissing) {
             return null;
         }
+    }
 
-        // CREATE NEW THREAD
-        // Make card info thread a public thread in community mode
-        boolean isPrivateChannel = !game.isFowMode();
-        ThreadChannelAction threadAction = actionsChannel
-                .createThreadChannel(threadName, isPrivateChannel)
+    private ThreadChannel createNewThread(TextChannel actionsChannel, String threadName) {
+        boolean isPrivate = !game.isFowMode();
+        ThreadChannelAction action = actionsChannel
+                .createThreadChannel(threadName, isPrivate)
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK);
-        if (isPrivateChannel) {
-            threadAction = threadAction.setInvitable(false);
+
+        if (isPrivate) action = action.setInvitable(false);
+
+        ThreadChannel thread = action.complete();
+        MessageHelper.sendMessageToChannel(thread, "Hello " + getPing() + "! This is your private channel.");
+        setCardsInfoThreadID(thread.getId());
+        return thread;
+    }
+
+    private void logMissingChannel() {
+        if (!game.isHasEnded()) {
+            BotLogger.warning(
+                    new LogOrigin(this),
+                    "`Player.getCardsInfoThread`: actionsChannel is null for game: " + game.getName());
         }
-        ThreadChannel threadChannel = threadAction.complete();
-        String message = "Hello " + getPing() + "! This is your private channel.";
-        MessageHelper.sendMessageToChannel(threadChannel, message);
-        setCardsInfoThreadID(threadChannel.getId());
-        return threadChannel;
     }
 
     public String getCardsInfoThreadJumpLink() {

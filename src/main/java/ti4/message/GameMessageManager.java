@@ -204,7 +204,8 @@ public class GameMessageManager {
             int playerCount = game.getRealPlayers().size();
             long twoWeeksAgo = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(14);
             boolean removed = messages.removeIf(
-                    msg -> (msg.factionsThatReacted().size() >= playerCount) || msg.gameSaveTime() <= twoWeeksAgo);
+                    msg -> (playerCount > 0 && msg.factionsThatReacted().size() >= playerCount)
+                            || msg.gameSaveTime() <= twoWeeksAgo);
             if (removed) {
                 removedMessages = true;
                 BotLogger.info("GameMessageCleanupCron removed GameMessages for " + gameName);
