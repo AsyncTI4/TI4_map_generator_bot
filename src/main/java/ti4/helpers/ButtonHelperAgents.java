@@ -64,7 +64,7 @@ import ti4.spring.context.SpringContext;
 public final class ButtonHelperAgents {
 
     private static List<Button> getTilesToArboAgent(Player player, Game game) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
             if (FoWHelper.playerHasShipsInSystem(player, tileEntry.getValue())) {
@@ -237,7 +237,7 @@ public final class ButtonHelperAgents {
     }
 
     public static List<Button> getUnitsToArboAgent(Player player, Tile tile) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         Set<UnitType> allowedUnits = Set.of(
                 UnitType.Destroyer,
                 UnitType.Cruiser,
@@ -293,7 +293,7 @@ public final class ButtonHelperAgents {
 
     public static List<Button> getArboAgentReplacementOptions(
             Player player, Game game, GenericInteractionCreateEvent event, Tile tile, String unit) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
 
         boolean damaged = false;
@@ -1424,8 +1424,7 @@ public final class ButtonHelperAgents {
             if (p2 == null) return;
             channel = p2.getCorrectChannel();
             List<Button> redistributeButton = new ArrayList<>();
-            Button deleButton =
-                    Buttons.red("FFCC_" + player.getFaction() + "_" + "deleteButtons", "Delete These Buttons");
+            Button deleButton = Buttons.red(player.factionButtonChecker() + "deleteButtons", "Delete These Buttons");
             redistributeButton.add(Buttons.REDISTRIBUTE_CCs);
             redistributeButton.add(deleButton);
             MessageHelper.sendMessageToChannelWithButtons(
@@ -2634,14 +2633,12 @@ public final class ButtonHelperAgents {
         String placePrefix = "placeOneNDone_skipbuild";
         String tp = tile.getPosition();
         Button ff2Button = Buttons.green(
-                "FFCC_" + player.getFaction() + "_" + placePrefix + "_2ff_" + tp,
-                "Place 2 Fighters",
-                UnitEmojis.fighter);
+                player.factionButtonChecker() + placePrefix + "_2ff_" + tp, "Place 2 Fighters", UnitEmojis.fighter);
         buttons.add(ff2Button);
         for (Planet planet : tile.getPlanetUnitHolders()) {
             String pp = planet.getName();
             Button inf2Button = Buttons.green(
-                    "FFCC_" + player.getFaction() + "_" + placePrefix + "_2gf_" + pp,
+                    player.factionButtonChecker() + placePrefix + "_2gf_" + pp,
                     "Place 2 Infantry on " + Helper.getPlanetRepresentation(pp, game),
                     UnitEmojis.infantry);
             buttons.add(inf2Button);

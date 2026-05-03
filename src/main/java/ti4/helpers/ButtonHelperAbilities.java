@@ -903,7 +903,7 @@ public final class ButtonHelperAbilities {
             if (player.hasUnexhaustedLeader("mentakagent")) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green(
-                        "FFCC_" + player.getFaction() + "_" + "exhaustAgent_mentakagent_" + pillaged.getFaction(),
+                        player.factionButtonChecker() + "exhaustAgent_mentakagent_" + pillaged.getFaction(),
                         "Use Mentak Agent",
                         FactionEmojis.Mentak));
                 buttons.add(Buttons.red("deleteButtons", "Done"));

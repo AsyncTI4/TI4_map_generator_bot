@@ -206,7 +206,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
     }
 
     private static List<Button> getNewPrismLoseTechOptions(Player player) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);

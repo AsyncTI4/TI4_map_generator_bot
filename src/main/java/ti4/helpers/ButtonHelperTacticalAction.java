@@ -847,7 +847,7 @@ public final class ButtonHelperTacticalAction {
     }
 
     public static List<Button> getButtonsForAllUnitsInSystem(Player player, Game game, Tile tile, String moveOrRemove) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         List<UnitType> movableFromPlanets = new ArrayList<>(List.of(UnitType.Infantry, UnitType.Mech));
         if (player.hasTech("ffac2") || player.hasUnit("tf-floatingfactory") || player.hasUnit("saar_spacedock")) {

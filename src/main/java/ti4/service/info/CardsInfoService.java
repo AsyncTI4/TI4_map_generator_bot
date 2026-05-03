@@ -78,7 +78,7 @@ public class CardsInfoService {
             buttons.add(Buttons.blue("startIntrigueCard", "Pay For Intrigue Card", FactionEmojis.xin));
         }
         if (player.hasRelicReady("superweaponavailyn")) {
-            String factionChecker = "FFCC_" + player.getFaction() + "_";
+            String factionChecker = player.factionButtonChecker();
             buttons.add(Buttons.gray(
                     factionChecker + "exhaustSuperweapon_availyn",
                     "Produce 3 Fighters With Availyn",
