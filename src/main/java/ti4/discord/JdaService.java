@@ -31,11 +31,13 @@ import ti4.contest.cron.CombatReplayPromotionCron;
 import ti4.contest.cron.CombatReplayPromotionScoreBackfillCron;
 import ti4.contest.cron.CombatReplaySelectionCron;
 import ti4.cron.AutoPingCron;
+import ti4.cron.BothelperDashboardCron;
 import ti4.cron.CategoryCleanupCron;
 import ti4.cron.CloseLaunchThreadsCron;
 import ti4.cron.CronManager;
 import ti4.cron.EndOldGamesCron;
 import ti4.cron.FastScFollowCron;
+import ti4.cron.GameMessageCleanupCron;
 import ti4.cron.InteractionLogCron;
 import ti4.cron.LogButtonRuntimeStatisticsCron;
 import ti4.cron.LogCacheStatsCron;
@@ -301,6 +303,7 @@ public class JdaService {
         UploadRecentStatsCron.register();
         OldUndoFileCleanupCron.register();
         EndOldGamesCron.register();
+        GameMessageCleanupCron.register();
         LogButtonRuntimeStatisticsCron.register();
         TechSummaryCron.register();
         SabotageAutoReactCron.register();
@@ -314,6 +317,7 @@ public class JdaService {
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
         CategoryCleanupCron.register();
+        BothelperDashboardCron.register();
     }
 
     public static void markProcessReady() {
