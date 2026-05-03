@@ -156,9 +156,9 @@ public class VoteButtonHandler {
         List<Button> voteButtons = new ArrayList<>();
         Button buttonFor;
         Button buttonAgainst;
-        String finChecker = "";
+        String factionChecker = "";
         if (player != null) {
-            finChecker = player.getFinsFactionCheckerPrefix();
+            factionChecker = player.factionButtonChecker();
         }
         Map<String, Integer> discardAgendas = game.getDiscardAgendas();
         Integer agendaInt = null;
@@ -195,11 +195,11 @@ public class VoteButtonHandler {
             }
         }
         if (rider == null) {
-            buttonFor = Buttons.green(finChecker + prefix + "_for", "For");
-            buttonAgainst = Buttons.red(finChecker + prefix + "_against", "Against");
+            buttonFor = Buttons.green(factionChecker + prefix + "_for", "For");
+            buttonAgainst = Buttons.red(factionChecker + prefix + "_against", "Against");
         } else {
-            buttonFor = Buttons.green(finChecker + prefix + "rider_fa;for_" + rider, "For");
-            buttonAgainst = Buttons.red(finChecker + prefix + "rider_fa;against_" + rider, "Against");
+            buttonFor = Buttons.green(factionChecker + prefix + "rider_fa;for_" + rider, "For");
+            buttonAgainst = Buttons.red(factionChecker + prefix + "rider_fa;against_" + rider, "Against");
         }
 
         buttonFor = buttonFor.withEmoji(Emoji.fromFormatted(forEmojiString));

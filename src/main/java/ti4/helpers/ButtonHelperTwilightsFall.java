@@ -592,7 +592,7 @@ public final class ButtonHelperTwilightsFall {
                 selectASpliceCard(
                         game,
                         player,
-                        buttons.getFirst().getCustomId().replace(player.getFinsFactionCheckerPrefix(), ""),
+                        buttons.getFirst().getCustomId().replace(player.factionButtonChecker(), ""),
                         null);
             } else {
                 if (game.isVeiledHeartMode()) {
@@ -1106,7 +1106,7 @@ public final class ButtonHelperTwilightsFall {
                 for (String card : cards) {
                     String name = Mapper.getTech(card).getName();
                     buttons.add(Buttons.green(
-                            player.getFinsFactionCheckerPrefix() + prefix + card,
+                            player.factionButtonChecker() + prefix + card,
                             name,
                             Mapper.getTech(card).getSingleTechEmoji()));
                 }
@@ -1120,9 +1120,7 @@ public final class ButtonHelperTwilightsFall {
                     }
                     FactionModel factionModel = Mapper.getFaction(faction);
                     buttons.add(Buttons.green(
-                            player.getFinsFactionCheckerPrefix() + prefix + card,
-                            name,
-                            factionModel.getFactionEmoji()));
+                            player.factionButtonChecker() + prefix + card, name, factionModel.getFactionEmoji()));
                 }
             }
             if ("units".equalsIgnoreCase(type)) {
@@ -1130,7 +1128,7 @@ public final class ButtonHelperTwilightsFall {
                     if (Mapper.getUnit(card) != null) {
                         String name = Mapper.getUnit(card).getName();
                         buttons.add(Buttons.green(
-                                player.getFinsFactionCheckerPrefix() + prefix + card,
+                                player.factionButtonChecker() + prefix + card,
                                 name,
                                 Mapper.getUnit(card).getUnitEmoji()));
                     } else {
@@ -1144,15 +1142,11 @@ public final class ButtonHelperTwilightsFall {
         if (!game.getStoredValue("engineerACSplice").startsWith("remove") && !prefix.contains("manipulate")) {
             if (!player.hasTech("wavelength")) {
                 buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + prefix + "wavelength",
-                        "Wavelength",
-                        TechEmojis.GenericTF));
+                        player.factionButtonChecker() + prefix + "wavelength", "Wavelength", TechEmojis.GenericTF));
             }
             if (!player.hasTech("antimatter")) {
                 buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + prefix + "antimatter",
-                        "Antimatter",
-                        TechEmojis.GenericTF));
+                        player.factionButtonChecker() + prefix + "antimatter", "Antimatter", TechEmojis.GenericTF));
             }
         }
         return buttons;

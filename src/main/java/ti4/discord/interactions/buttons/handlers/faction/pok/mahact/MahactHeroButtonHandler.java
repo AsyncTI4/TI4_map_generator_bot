@@ -130,7 +130,7 @@ class MahactHeroButtonHandler {
     }
 
     private static List<Button> getBenediction2ndTileOptions(Player player, Game game, String pos1) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         Player origPlayer = player;
         Tile tile1 = game.getTileByPosition(pos1);
@@ -145,12 +145,12 @@ class MahactHeroButtonHandler {
             Tile tile2 = game.getTileByPosition(pos2);
             if (FoWHelper.otherPlayersHaveShipsInSystem(player, tile2, game)) {
                 buttons.add(Buttons.gray(
-                        finChecker + "mahactBenedictionFrom_" + pos1 + "_" + pos2,
+                        factionChecker + "mahactBenedictionFrom_" + pos1 + "_" + pos2,
                         tile2.getRepresentationForButtons(game, origPlayer)));
             }
         }
         BlindSelectionService.filterForBlindPositionSelection(
-                game, origPlayer, buttons, finChecker + "mahactBenedictionFrom_" + pos1);
+                game, origPlayer, buttons, factionChecker + "mahactBenedictionFrom_" + pos1);
         return buttons;
     }
 }

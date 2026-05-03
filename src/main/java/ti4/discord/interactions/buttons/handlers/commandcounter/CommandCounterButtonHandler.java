@@ -118,15 +118,15 @@ public class CommandCounterButtonHandler {
                 + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
 
-        String finChecker = player.finChecker();
-        Button getTactic = Buttons.green(finChecker + "increase_tactic_cc", "Gain 1 Tactic Token");
-        Button getFleet = Buttons.green(finChecker + "increase_fleet_cc", "Gain 1 Fleet Token");
-        Button getStrat = Buttons.green(finChecker + "increase_strategy_cc", "Gain 1 Strategy Token");
-        Button loseTactic = Buttons.red(finChecker + "decrease_tactic_cc", "Lose 1 Tactic Token");
-        Button loseFleet = Buttons.red(finChecker + "decrease_fleet_cc", "Lose 1 Fleet Token");
-        Button loseStrat = Buttons.red(finChecker + "decrease_strategy_cc", "Lose 1 Strategy Token");
-        Button doneGainingCC = Buttons.blue(finChecker + "deleteButtons", "Done Redistributing Command Tokens");
-        Button resetCC = Buttons.gray(finChecker + "resetCCs", "Reset Command Tokens");
+        String factionChecker = player.factionButtonChecker();
+        Button getTactic = Buttons.green(factionChecker + "increase_tactic_cc", "Gain 1 Tactic Token");
+        Button getFleet = Buttons.green(factionChecker + "increase_fleet_cc", "Gain 1 Fleet Token");
+        Button getStrat = Buttons.green(factionChecker + "increase_strategy_cc", "Gain 1 Strategy Token");
+        Button loseTactic = Buttons.red(factionChecker + "decrease_tactic_cc", "Lose 1 Tactic Token");
+        Button loseFleet = Buttons.red(factionChecker + "decrease_fleet_cc", "Lose 1 Fleet Token");
+        Button loseStrat = Buttons.red(factionChecker + "decrease_strategy_cc", "Lose 1 Strategy Token");
+        Button doneGainingCC = Buttons.blue(factionChecker + "deleteButtons", "Done Redistributing Command Tokens");
+        Button resetCC = Buttons.gray(factionChecker + "resetCCs", "Reset Command Tokens");
 
         List<Button> buttons =
                 Arrays.asList(getTactic, getFleet, getStrat, loseTactic, loseFleet, loseStrat, doneGainingCC, resetCC);

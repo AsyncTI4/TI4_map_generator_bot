@@ -261,7 +261,7 @@ public final class BreakthroughCommandHelper {
     }
 
     private static void serveRollFractureButtons(Player player, String btID) {
-        String id = player.finChecker() + "rollFracture_" + btID;
+        String id = player.factionButtonChecker() + "rollFracture_" + btID;
         Button rollFracture = Buttons.green(id, "Roll For The Fracture", MiscEmojis.RollDice);
         String message = "It looks like The Fracture isn't in play yet. Use the button to roll for The Fracture!"
                 + "\n If you roll a " + DiceEmojis.d10blue_1 + " or a"

@@ -15,7 +15,7 @@ public class TfExecuteResolver implements EdictResolver {
     public String edict = "tf-execute";
 
     private static List<Button> buttons(Player player) {
-        String id = player.finChecker() + "resolvePlagueStep";
+        String id = player.factionButtonChecker() + "resolvePlagueStep";
         return List.of(
                 Buttons.green(id + "11", "Resolve Execute"),
                 Buttons.green(id + "12", "Resolve Execute"),

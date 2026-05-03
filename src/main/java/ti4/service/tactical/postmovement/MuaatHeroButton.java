@@ -20,7 +20,7 @@ public final class MuaatHeroButton implements PostMovementAbilityButton {
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.blue(
-                ctx.player().finChecker() + "novaSeed_" + ctx.tile().getPosition(),
+                ctx.player().factionButtonChecker() + "novaSeed_" + ctx.tile().getPosition(),
                 "Nova Seed This Tile",
                 FactionEmojis.Muaat));
     }

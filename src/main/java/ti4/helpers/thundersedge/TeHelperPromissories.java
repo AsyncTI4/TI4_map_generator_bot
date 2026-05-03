@@ -110,7 +110,7 @@ public final class TeHelperPromissories {
 
     public static List<Button> getCourierTransportButtons(Game game, Player player, String destination) {
         List<Button> buttons = new ArrayList<>();
-        String prefixID = player.finChecker() + "courierTransport_" + destination + "_";
+        String prefixID = player.factionButtonChecker() + "courierTransport_" + destination + "_";
         Tile dest = game.getTileByPosition(destination);
         if (dest == null) return buttons;
 

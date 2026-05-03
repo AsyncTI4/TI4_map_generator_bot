@@ -33,7 +33,7 @@ public class ThundersParadoxService {
     private void startThundersParadox(ButtonInteractionEvent event, Game game, Player player) {
         if (player.hasUnlockedBreakthrough("nomadbt")) {
             List<Button> buttons = new ArrayList<>();
-            String buttonPrefix = player.finChecker() + "useThundersParadox_step2_";
+            String buttonPrefix = player.factionButtonChecker() + "useThundersParadox_step2_";
             for (Leader leader : player.getLeaders()) {
                 if (leader.isExhausted() || !"agent".equals(leader.getType())) continue;
 
@@ -89,7 +89,7 @@ public class ThundersParadoxService {
 
             String msg2 = player.getRepresentation() + ". please choose a player to ready one of their agents.";
             List<Button> buttons = new ArrayList<>();
-            String buttonPrefix = player.finChecker() + "useThundersParadox_step3_";
+            String buttonPrefix = player.factionButtonChecker() + "useThundersParadox_step3_";
             for (Player p : game.getRealPlayers()) {
                 boolean found = false;
                 for (Leader l : p.getLeaders()) {
@@ -118,7 +118,8 @@ public class ThundersParadoxService {
                         + p2.getRepresentation(false, false) + ".";
 
                 List<Button> buttons = new ArrayList<>();
-                String buttonPrefix = player.finChecker() + "useThundersParadox_step4_" + p2.getFaction() + "_";
+                String buttonPrefix =
+                        player.factionButtonChecker() + "useThundersParadox_step4_" + p2.getFaction() + "_";
                 for (Leader leader : p2.getLeaders()) {
                     if (!leader.isExhausted() || !"agent".equals(leader.getType())) continue;
 

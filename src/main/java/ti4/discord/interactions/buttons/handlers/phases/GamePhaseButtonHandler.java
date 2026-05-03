@@ -61,7 +61,7 @@ class GamePhaseButtonHandler {
         List<Button> buttons = ButtonHelper.getEndOfTurnAbilities(player, game);
         ButtonHelper.deleteMessage(event);
         if (!buttons.isEmpty()) {
-            buttons.addFirst(Buttons.red(player.finChecker() + "turnEnd", "End Turn"));
+            buttons.addFirst(Buttons.red(player.factionButtonChecker() + "turnEnd", "End Turn"));
             MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(event.getMessageChannel(), msg, buttons);
         } else {
             TurnEndButtonHandler.turnEnd(event, game, player);
@@ -72,7 +72,7 @@ class GamePhaseButtonHandler {
     private static void passingAbilities(ButtonInteractionEvent event, Player player, Game game) {
         String msg = "Use these buttons to do an ability when you pass.";
         List<Button> buttons = ButtonHelper.getPassingAbilities(player, game);
-        buttons.addFirst(Buttons.red(player.finChecker() + "passForRound", "Pass"));
+        buttons.addFirst(Buttons.red(player.factionButtonChecker() + "passForRound", "Pass"));
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(event.getMessageChannel(), msg, buttons);
     }
 

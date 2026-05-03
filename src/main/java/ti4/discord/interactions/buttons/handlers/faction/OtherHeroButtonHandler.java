@@ -62,13 +62,13 @@ class OtherHeroButtonHandler {
                 event, player, game, "pharadnhero", "Pharad'n the Immortal, the Pharad'n hero");
         String planet = buttonID.split("_")[1];
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.red(
-                player.getFinsFactionCheckerPrefix() + "pharadnHeroDestroy_" + planet, "Destroy All Infantry"));
+        buttons.add(
+                Buttons.red(player.factionButtonChecker() + "pharadnHeroDestroy_" + planet, "Destroy All Infantry"));
         for (int x = 1;
                 x < player.getNomboxTile().getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player) + 1;
                 x++) {
             buttons.add(Buttons.green(
-                    player.getFinsFactionCheckerPrefix() + "pharadnHeroCommit_" + planet + "_" + x,
+                    player.factionButtonChecker() + "pharadnHeroCommit_" + planet + "_" + x,
                     "Commit " + x + " Infantry"));
         }
         MessageHelper.sendMessageToChannelWithButtons(

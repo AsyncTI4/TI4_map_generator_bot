@@ -59,7 +59,7 @@ public class PsychosporeService {
             List<Button> bonusInfantry = new ArrayList<>();
             for (String planetOrSpace : tile.getUnitHolders().keySet()) {
                 String place = planetOrSpace + ("space".equals(planetOrSpace) ? tile.getPosition() : "");
-                String id = player.finChecker() + "placeOneNDone_skipbuild_gf_" + place;
+                String id = player.factionButtonChecker() + "placeOneNDone_skipbuild_gf_" + place;
                 String label = Helper.getUnitHolderRepresentation(tile, planetOrSpace, game, player);
                 bonusInfantry.add(Buttons.green(id, label, PlanetEmojis.getPlanetEmoji(planetOrSpace)));
             }

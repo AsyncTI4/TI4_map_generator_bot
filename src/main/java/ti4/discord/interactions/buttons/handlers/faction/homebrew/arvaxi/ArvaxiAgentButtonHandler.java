@@ -29,7 +29,7 @@ public class ArvaxiAgentButtonHandler {
             if (!p.hasUnexhaustedLeader("arvaxiagent")) continue;
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.gray(
-                    p.getFinsFactionCheckerPrefix() + "arvaxiAgentOffer_" + acIndex + "_" + discarder.getFaction(),
+                    p.factionButtonChecker() + "arvaxiAgentOffer_" + acIndex + "_" + discarder.getFaction(),
                     "Use Arvaxi Agent on " + acName,
                     CardEmojis.getACEmoji(game)));
             buttons.add(Buttons.red("deleteButtons", "Decline"));

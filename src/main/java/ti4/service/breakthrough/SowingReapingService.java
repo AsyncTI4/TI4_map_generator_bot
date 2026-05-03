@@ -39,7 +39,7 @@ public class SowingReapingService {
         List<Button> buttons = new ArrayList<>();
         for (int i = 1; i <= Math.min(3, firmament.getTg()); i++) {
             buttons.add(Buttons.green(
-                    firmament.finChecker() + "theSowingAddTg_" + i,
+                    firmament.factionButtonChecker() + "theSowingAddTg_" + i,
                     i + " Trade Good" + (i == 1 ? "" : "s"),
                     MiscEmojis.getTGorNomadCoinEmoji(game)));
         }

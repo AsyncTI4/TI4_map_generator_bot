@@ -117,7 +117,7 @@ public class MoveUnits extends GameStateCommand {
             if (doesTileHaveFloatingGF) {
                 List<Button> buttons = TacticalActionService.getLandingUnitsButtons(game, getPlayer(), tileTo);
                 Button concludeMove =
-                        Buttons.red(getPlayer().getFinsFactionCheckerPrefix() + "deleteButtons", "Done Landing Troops");
+                        Buttons.red(getPlayer().factionButtonChecker() + "deleteButtons", "Done Landing Troops");
                 buttons.add(concludeMove);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getChannel(),

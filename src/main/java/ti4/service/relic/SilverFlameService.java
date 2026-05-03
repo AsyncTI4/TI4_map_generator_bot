@@ -48,7 +48,7 @@ public class SilverFlameService {
     }
 
     private List<Button> silverFlameResolveButtons(Game game, Player player, Die resultDie) {
-        String ffcc = player.finChecker();
+        String ffcc = player.factionButtonChecker();
         Button good = Buttons.green(ffcc + "resolveSilverFlamePoint", "Gain 1 Victory Point", CardEmojis.Public1alt);
         Button bad = Buttons.red(ffcc + "resolveSilverFlamePurge", "Purge your Home System", TileEmojis.TileRedBack);
 
@@ -214,7 +214,7 @@ public class SilverFlameService {
 
         if (controlsAPlanet && player.getSecretsUnscored().containsKey("bam")) {
             List<Button> scoreButtons = new ArrayList<>();
-            String ffcc = player.finChecker();
+            String ffcc = player.factionButtonChecker();
             scoreButtons.add(Buttons.green(
                     ffcc + "scoreSilverFlameBAM", "Score Become A Martyr", CardEmojis.SecretObjectiveAlt));
             scoreButtons.add(Buttons.red("deleteButtons", "Decline"));

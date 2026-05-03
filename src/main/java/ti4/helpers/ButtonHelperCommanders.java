@@ -329,7 +329,7 @@ public class ButtonHelperCommanders {
                         .filter(unit -> uh.getUnits().get(unit) > 0)
                         .filter(player::unitBelongsToPlayer)
                         .collect(Collectors.toSet());
-                String prefix = player.getFinsFactionCheckerPrefix() + "ravenMigration_" + from.getPosition() + "_"
+                String prefix = player.factionButtonChecker() + "ravenMigration_" + from.getPosition() + "_"
                         + uh.getName() + "_";
                 keys.stream()
                         .filter(uk -> !player.getUnitFromUnitKey(uk).getIsStructure())
@@ -348,7 +348,7 @@ public class ButtonHelperCommanders {
             UnitType unitType = Units.findUnitType(matcher.group("unittype"));
             boolean ship = player.getUnitFromAsyncID(unitType.getValue()).getIsShip();
 
-            String prefix = player.getFinsFactionCheckerPrefix() + "ravenMigration_" + from.getPosition() + "_"
+            String prefix = player.factionButtonChecker() + "ravenMigration_" + from.getPosition() + "_"
                     + unitHolderFrom + "_" + unitType.value + "_";
             String suffix = ship ? "_space" : "";
 
@@ -371,7 +371,7 @@ public class ButtonHelperCommanders {
             UnitType unitType = Units.findUnitType(matcher.group("unittype"));
             Tile to = game.getTileByPosition(matcher.group("posto"));
 
-            String prefix = player.getFinsFactionCheckerPrefix() + "ravenMigration_" + from.getPosition() + "_"
+            String prefix = player.factionButtonChecker() + "ravenMigration_" + from.getPosition() + "_"
                     + unitHolderFrom + "_" + unitType.value + "_" + to.getPosition() + "_";
 
             newMessage = player.getRepresentation() + " You are migrating a " + unitType.humanReadableName() + " from "
@@ -512,35 +512,31 @@ public class ButtonHelperCommanders {
             abletobot = "_yes";
         }
         buttons.add(Buttons.green(
-                player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_industrial" + abletobot,
+                player.factionButtonChecker() + "uydaiCommanderLook_industrial" + abletobot,
                 "Industrial",
                 ExploreEmojis.Industrial));
         buttons.add(Buttons.red(
-                player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_hazardous" + abletobot,
+                player.factionButtonChecker() + "uydaiCommanderLook_hazardous" + abletobot,
                 "Hazardous",
                 ExploreEmojis.Hazardous));
         buttons.add(Buttons.blue(
-                player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_cultural" + abletobot,
+                player.factionButtonChecker() + "uydaiCommanderLook_cultural" + abletobot,
                 "Cultural",
                 ExploreEmojis.Cultural));
         buttons.add(Buttons.gray(
-                player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_frontier" + abletobot,
+                player.factionButtonChecker() + "uydaiCommanderLook_frontier" + abletobot,
                 "Frontier",
                 ExploreEmojis.Frontier));
         buttons.add(Buttons.green(
-                player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_relics" + abletobot,
-                "Relic",
-                ExploreEmojis.Relic));
+                player.factionButtonChecker() + "uydaiCommanderLook_relics" + abletobot, "Relic", ExploreEmojis.Relic));
         buttons.add(Buttons.red(
-                player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_secrets" + abletobot,
+                player.factionButtonChecker() + "uydaiCommanderLook_secrets" + abletobot,
                 "Secret",
                 CardEmojis.SecretObjective));
         buttons.add(Buttons.blue(
-                player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_agenda" + abletobot,
-                "Agenda",
-                CardEmojis.Agenda));
+                player.factionButtonChecker() + "uydaiCommanderLook_agenda" + abletobot, "Agenda", CardEmojis.Agenda));
         buttons.add(Buttons.gray(
-                player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_acs" + abletobot,
+                player.factionButtonChecker() + "uydaiCommanderLook_acs" + abletobot,
                 "Action Card",
                 CardEmojis.ActionCard));
         return buttons;
@@ -608,9 +604,8 @@ public class ButtonHelperCommanders {
         }
         if ("yes".equalsIgnoreCase(ableToBot)) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(
-                    Buttons.red(player.getFinsFactionCheckerPrefix() + "uydaiCommanderBottom_" + target, "Bottom It"));
-            buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Leave It On Top"));
+            buttons.add(Buttons.red(player.factionButtonChecker() + "uydaiCommanderBottom_" + target, "Bottom It"));
+            buttons.add(Buttons.gray(player.factionButtonChecker() + "deleteButtons", "Leave It On Top"));
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
                     player.getRepresentation() + ", would you like to bottom the card or leave it on top?",
@@ -722,7 +717,7 @@ public class ButtonHelperCommanders {
         }
         if (player.hasTech("tf-peaceaccords")) {
             List<Button> buttons2 = ButtonHelperAbilities.getXxchaPeaceAccordsButtons(
-                    game, player, event, player.getFinsFactionCheckerPrefix());
+                    game, player, event, player.factionButtonChecker());
             if (!buttons2.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
@@ -756,7 +751,7 @@ public class ButtonHelperCommanders {
                                     game, game.getUnitHolderFromPlanet(planet), player, false, true)
                             .isEmpty()) {
                 buttons.add(Buttons.gray(
-                        player.getFinsFactionCheckerPrefix() + "exchangeProgramPart3_" + planet,
+                        player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
                         Helper.getPlanetRepresentation(planet, game)));
             }
         }

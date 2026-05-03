@@ -80,9 +80,9 @@ public class VoidTetherService {
 
     public List<Button> getRemoveVoidTetherButtons(Game game, Player player, String pos) {
         List<Button> buttons = new ArrayList<>();
-        String prefixRemove = player.finChecker() + "moveVoidTether_" + pos;
+        String prefixRemove = player.factionButtonChecker() + "moveVoidTether_" + pos;
         if (pos == null) {
-            prefixRemove = player.finChecker() + "removeVoidTether";
+            prefixRemove = player.factionButtonChecker() + "removeVoidTether";
         }
         for (BorderAnomalyHolder border : getTethersOnMap(game)) {
             String dir = "(" + directionStr(border.getDirection()) + ")";
@@ -96,7 +96,7 @@ public class VoidTetherService {
         List<Button> buttons = getRemoveVoidTetherButtons(game, player, pos);
         // If there are Tethers left in reinforcements...
         if (buttons.size() < 2) {
-            String prefixNew = player.finChecker() + "newVoidTether_" + pos;
+            String prefixNew = player.factionButtonChecker() + "newVoidTether_" + pos;
             buttons.add(Buttons.green(prefixNew, "Use New Token"));
         }
         buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No Thanks"));
@@ -105,10 +105,10 @@ public class VoidTetherService {
 
     public void fixVoidTether(Game game, Player empyrean) {
         if (!empyrean.hasUnlockedBreakthrough("empyreanbt")) return;
-        String finChecker = empyrean.finChecker();
+        String factionChecker = empyrean.factionButtonChecker();
 
         List<Button> buttons = new ArrayList<>(getRemoveVoidTetherButtons(game, empyrean, null));
-        buttons.add(Buttons.blue(finChecker + "addVoidTetherStep1", "Add Void Tether", FactionEmojis.Empyrean));
+        buttons.add(Buttons.blue(factionChecker + "addVoidTetherStep1", "Add Void Tether", FactionEmojis.Empyrean));
         buttons.add(Buttons.DONE_DELETE_BUTTONS);
 
         String message = "Use the buttons to interact with your Void Tether tokens.";
@@ -117,7 +117,7 @@ public class VoidTetherService {
 
     private List<Button> getPlaceVoidTetherButtons(Game game, Player player, String pos) {
         List<Button> buttons = new ArrayList<>();
-        String prefix = player.finChecker() + "placeVoidTether_" + pos + "_";
+        String prefix = player.factionButtonChecker() + "placeVoidTether_" + pos + "_";
 
         List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(pos);
         if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6) {

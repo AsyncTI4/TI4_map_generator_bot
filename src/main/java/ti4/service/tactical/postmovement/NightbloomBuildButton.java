@@ -19,7 +19,7 @@ public final class NightbloomBuildButton implements PostMovementAbilityButton {
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.blue(
-                ctx.player().finChecker() + "nightbloomBuild",
+                ctx.player().factionButtonChecker() + "nightbloomBuild",
                 "Do Nightbloom (Flagship) Build",
                 FactionEmojis.greentf));
     }

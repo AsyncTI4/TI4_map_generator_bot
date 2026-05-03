@@ -34,14 +34,14 @@ public class TkEnfiladeResolver implements EdictResolver {
     public String edict = "tk-enfilade";
 
     private static List<Button> tyrantButtons(Player player) {
-        String id = player.finChecker() + "enfilade_";
+        String id = player.factionButtonChecker() + "enfilade_";
         List<Button> buttons = new ArrayList<>(placeButtons(player));
         buttons.add(Buttons.red(id + "destroy", "Destroy 1 Structure", "💥"));
         return buttons;
     }
 
     private static List<Button> placeButtons(Player player) {
-        String id = (player != null ? player.finChecker() : "") + "enfilade_";
+        String id = (player != null ? player.factionButtonChecker() : "") + "enfilade_";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(id + "sd", "Place 1 Space Dock", UnitEmojis.spacedock));
         buttons.add(Buttons.green(id + "pds", "Place 1 PDS", UnitEmojis.pds));
@@ -108,7 +108,7 @@ public class TkEnfiladeResolver implements EdictResolver {
             int targets = visibleTargets.get(p2.getFaction());
             if (targets == 0) continue;
 
-            String id = player.finChecker() + "enfiladeTarget_" + p2.getFaction();
+            String id = player.factionButtonChecker() + "enfiladeTarget_" + p2.getFaction();
             String label = "Target " + targets + " " + p2.getFactionNameOrColor() + " structures";
             buttons.add(Buttons.red(id, label, p2.fogSafeEmoji()));
         }
@@ -125,7 +125,7 @@ public class TkEnfiladeResolver implements EdictResolver {
             if (t.hasFog(player) || t.isHomeSystem(game)) continue;
 
             for (UnitHolder uh : t.getUnitHolders().values()) {
-                String partialID = player.finChecker() + "enfiladeDestroy_" + victim.getFaction();
+                String partialID = player.factionButtonChecker() + "enfiladeDestroy_" + victim.getFaction();
                 partialID += "_" + t.getPosition() + "_" + uh.getName() + "_";
 
                 for (UnitKey key : uh.getUnitKeysForPlayer(victim)) {

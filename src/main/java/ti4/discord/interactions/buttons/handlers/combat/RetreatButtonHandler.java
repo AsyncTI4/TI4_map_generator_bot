@@ -76,9 +76,7 @@ class RetreatButtonHandler {
                 && !player.hasRelic("circletofthevoid")
                 && !player.hasTech("tf-crucible")) {
             Button rift = Buttons.green(
-                    player.getFinsFactionCheckerPrefix() + "getRiftButtons_" + pos,
-                    "Rift Units",
-                    MiscEmojis.GravityRift);
+                    player.factionButtonChecker() + "getRiftButtons_" + pos, "Rift Units", MiscEmojis.GravityRift);
             List<Button> buttons = new ArrayList<>();
             buttons.add(rift);
             String message2 = "## " + player.getRepresentationUnfogged()
@@ -121,8 +119,8 @@ class RetreatButtonHandler {
                 && game.getTileByPosition(pos1) == oldTile) {
 
             List<Button> breakthroughButtons = new ArrayList<>();
-            breakthroughButtons.add(
-                    Buttons.blue(player.finChecker() + "moveAvernus_" + pos2, "Retreat Avernus", FactionEmojis.Muaat));
+            breakthroughButtons.add(Buttons.blue(
+                    player.factionButtonChecker() + "moveAvernus_" + pos2, "Retreat Avernus", FactionEmojis.Muaat));
             breakthroughButtons.add(Buttons.red("deleteButtons", "Decline"));
             String breakthroughMessage = player.getRepresentationUnfogged() + ", you may move Avernus into "
                     + game.getTileByPosition(pos2).getRepresentationForButtons(game, player) + ".";
@@ -136,7 +134,7 @@ class RetreatButtonHandler {
                 && Helper.getProductionValue(player, game, game.getTileByPosition(pos1), false) > 0) {
             List<Button> flagButtons = new ArrayList<>();
             flagButtons.add(Buttons.blue(
-                    player.finChecker() + "anarchy7Build_" + pos1, "Build in " + pos1, FactionEmojis.Muaat));
+                    player.factionButtonChecker() + "anarchy7Build_" + pos1, "Build in " + pos1, FactionEmojis.Muaat));
             flagButtons.add(Buttons.red("deleteButtons", "Decline"));
             String flagMessage = player.getRepresentationUnfogged()
                     + ", you may build in the system your flagship is retreating from.";

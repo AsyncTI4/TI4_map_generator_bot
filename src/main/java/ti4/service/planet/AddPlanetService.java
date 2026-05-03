@@ -373,7 +373,7 @@ public class AddPlanetService {
         if (unitHolder.getTokenList().contains("token_relictoken.png") && player.isRealPlayer()) {
             unitHolder.removeToken("token_relictoken.png");
             if (!alreadyOwned) {
-                Button draw = Buttons.green(player.getFinsFactionCheckerPrefix() + "drawRelic", "Draw A Relic");
+                Button draw = Buttons.green(player.factionButtonChecker() + "drawRelic", "Draw A Relic");
                 String message = player.getRepresentation()
                         + " has gained control of a planet which allows them to draw a relic!\nUse the button __after__ you have resolved __all__ ground combats.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, draw);
@@ -485,7 +485,7 @@ public class AddPlanetService {
             String planetStr = unitHolder.getName();
             String planetName = Mapper.getPlanet(planetStr).getName();
             liberateButtons.add(Buttons.green(
-                    player.getFinsFactionCheckerPrefix() + "liberate_" + planetStr,
+                    player.factionButtonChecker() + "liberate_" + planetStr,
                     "Liberate " + planetName,
                     FactionEmojis.Bastion));
             MessageHelper.sendMessageToChannelWithButtons(

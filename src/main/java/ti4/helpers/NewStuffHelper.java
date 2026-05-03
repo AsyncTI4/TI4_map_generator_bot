@@ -127,7 +127,7 @@ public final class NewStuffHelper {
     @ButtonHandler("garbozia_")
     public static void resolveGarboziaTE(
             GenericInteractionCreateEvent event, Game game, Player player, String buttonID) {
-        String buttonPrefix = player.getFinsFactionCheckerPrefix() + "garbozia_";
+        String buttonPrefix = player.factionButtonChecker() + "garbozia_";
         String message =
                 "Use buttons to pick an action card from the discard and put it on _Doc 'N Pic's Salvage Yard_.";
         List<Button> buttons = garboziaButtons(game, player);
@@ -156,7 +156,7 @@ public final class NewStuffHelper {
     public static List<Button> garboziaButtons(Game game, Player player) {
         List<Button> allButtons = new ArrayList<>();
         Map<String, ACStatus> status = game.getDiscardACStatus();
-        String pre = player.finChecker() + "garbozia_pick";
+        String pre = player.factionButtonChecker() + "garbozia_pick";
 
         // Right now, only a 'null' status allows the card to be picked up. Add more to this list if it changes in the
         // future

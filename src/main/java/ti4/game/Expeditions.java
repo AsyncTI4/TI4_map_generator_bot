@@ -167,7 +167,7 @@ public class Expeditions {
     }
 
     public List<Button> getRemainingExpeditionButtons(Player player) {
-        String prefix = player.getFinsFactionCheckerPrefix();
+        String prefix = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         for (Entry<String, String> exp : expeditionFactions.entrySet()) {
             if (exp.getValue() != null) continue;
@@ -280,8 +280,8 @@ public class Expeditions {
                         + " has completed the last expedition! They can now place the Thunder's Edge planet on the board:";
                 message +=
                         "\n-# Thunder's Edge must be placed on a tile that does not have any planets or printed wormholes, and cannot be placed in a supernova or The Fracture.";
-                Button button = Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "placeThundersEdge", "Place Thunder's Edge");
+                Button button =
+                        Buttons.green(player.factionButtonChecker() + "placeThundersEdge", "Place Thunder's Edge");
                 MessageHelper.sendMessageToChannel(channel, message);
                 MessageHelper.sendMessageToChannelWithButton(
                         channel, "Use the button to begin placing Thunder's Edge:", button);

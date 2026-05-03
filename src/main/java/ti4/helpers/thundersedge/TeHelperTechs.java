@@ -91,7 +91,7 @@ public final class TeHelperTechs {
         // ACTION: Exhaust this card to place 1 PDS on a planet you control.
         // ACTION: Exhaust this card to repair all of your damaged units.
         // ACTION: Exhaust this card and discard an action card to draw 1 action card.
-        String prefix = player.getFinsFactionCheckerPrefix() + "nanomachines_";
+        String prefix = player.factionButtonChecker() + "nanomachines_";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red(prefix + "pds", "Place a PDS", UnitEmojis.pds));
         buttons.add(Buttons.red(prefix + "actionCard", "Discard/Draw 1 Action Card", CardEmojis.getACEmoji(player)));
@@ -150,7 +150,7 @@ public final class TeHelperTechs {
                 .filter(p -> p != player
                         && tilesAdjToObsInf.stream().anyMatch(t -> t.containsPlayersUnitsWithKeyCondition(p, isInf)))
                 .toList();
-        String prefixID = player.getFinsFactionCheckerPrefix() + "neuralParasiteS2_";
+        String prefixID = player.factionButtonChecker() + "neuralParasiteS2_";
         return playersWithInfAdj.stream()
                 .map(p -> Buttons.gray(prefixID + p.getFaction(), null, p.fogSafeEmoji()))
                 .toList();
@@ -260,7 +260,7 @@ public final class TeHelperTechs {
             Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         // When you perform a strategic action, you may move an ingress token into a system that contains or is adjacent
         // to your units.\nThis technology cannot be researched.
-        String buttonPrefix = player.getFinsFactionCheckerPrefix() + "planesplitterStep1_";
+        String buttonPrefix = player.factionButtonChecker() + "planesplitterStep1_";
         List<Button> buttons = getPlanesplitterStep1Buttons(game, player);
 
         String message = "Please choose a system to move an Ingress token into.";
@@ -290,7 +290,7 @@ public final class TeHelperTechs {
     private static List<Button> getPlanesplitterStep1Buttons(Game game, Player player) {
         // ACTION: Exhaust this card to place or move an ingress token into a system that contains or is adjacent to
         // your ships.
-        String prefix = player.getFinsFactionCheckerPrefix() + "planesplitterStep1_";
+        String prefix = player.factionButtonChecker() + "planesplitterStep1_";
         List<Button> buttons = new ArrayList<>();
         if (player.hasUnlockedBreakthrough("cabalbt")) {
             for (Tile tile : game.getTileMap().values()) {
@@ -329,7 +329,7 @@ public final class TeHelperTechs {
     private static void handlePlanesplitterStep2(
             Game game, Player player, ButtonInteractionEvent event, String buttonID) {
 
-        String buttonPrefix = player.getFinsFactionCheckerPrefix() + "planesplitterStep2_";
+        String buttonPrefix = player.factionButtonChecker() + "planesplitterStep2_";
         List<Button> buttons = getPlanesplitterStep2Buttons(game, player);
 
         String message = "Please choose the system to move the ingress token from.";
@@ -362,7 +362,7 @@ public final class TeHelperTechs {
     private static List<Button> getPlanesplitterStep2Buttons(Game game, Player player) {
         // ACTION: Exhaust this card to place or move an ingress token into a system that contains or is adjacent to
         // your ships.
-        String prefix = player.getFinsFactionCheckerPrefix() + "planesplitterStep2_";
+        String prefix = player.factionButtonChecker() + "planesplitterStep2_";
         List<Button> buttons = new ArrayList<>();
 
         game.getTileMap().values().forEach(tile -> {
@@ -376,8 +376,9 @@ public final class TeHelperTechs {
     public static void postExecutiveOrderButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         ButtonHelper.deleteMessage(event);
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green(player.finChecker() + "useExecutiveOrder_top", "Reveal Agenda From Top"));
-        buttons.add(Buttons.green(player.finChecker() + "useExecutiveOrder_bottom", "Reveal Agenda From Bottom"));
+        buttons.add(Buttons.green(player.factionButtonChecker() + "useExecutiveOrder_top", "Reveal Agenda From Top"));
+        buttons.add(
+                Buttons.green(player.factionButtonChecker() + "useExecutiveOrder_bottom", "Reveal Agenda From Bottom"));
         String msg = player.getPing()
                 + ", please choose if you wish to reveal the agenda from the top or from the bottom of the agenda deck.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
