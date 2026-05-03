@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -26,6 +27,7 @@ import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.SelectionHandler;
 import ti4.logging.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
 
 @UtilityClass
@@ -35,6 +37,7 @@ public class BothelperDashboardService {
     private static final String BUTTON_ID = "bothelperDashboard_manageRoles";
     private static final String SELECTION_ID = "bothelperManageRoles";
     private static final String BOTHELPER_ROLE_NAME = "Bothelper";
+    private static final int MAX_SELECT_OPTIONS = 25;
 
     // ---------------------------------------------------------------------------
     // Dashboard content builder
@@ -87,19 +90,18 @@ public class BothelperDashboardService {
         String content = buildDashboardContent();
         var manageRolesButton = Buttons.blue(BUTTON_ID, "Manage Roles");
 
+        // Delete all existing messages then send a fresh one (handles >2k content via split)
         channel.getHistory()
-                .retrievePast(1)
+                .retrievePast(100)
                 .queue(
                         messages -> {
-                            if (messages.isEmpty()) {
-                                channel.sendMessage(content)
-                                        .addComponents(ActionRow.of(manageRolesButton))
-                                        .queue(Consumers.nop(), BotLogger::catchRestError);
+                            if (!messages.isEmpty()) {
+                                List<CompletableFuture<Void>> futures = channel.purgeMessages(messages);
+                                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                                        .thenRun(() -> MessageHelper.sendMessageToChannelWithButton(
+                                                channel, content, manageRolesButton));
                             } else {
-                                messages.getFirst()
-                                        .editMessage(content)
-                                        .setComponents(ActionRow.of(manageRolesButton))
-                                        .queue(Consumers.nop(), BotLogger::catchRestError);
+                                MessageHelper.sendMessageToChannelWithButton(channel, content, manageRolesButton);
                             }
                         },
                         BotLogger::catchRestError);
@@ -142,11 +144,21 @@ public class BothelperDashboardService {
 
         StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(SELECTION_ID);
         menuBuilder.setMinValues(0);
-        menuBuilder.setMaxValues(servers.size());
+        menuBuilder.setMaxValues(Math.min(servers.size(), MAX_SELECT_OPTIONS));
         menuBuilder.setPlaceholder("Select servers to have the Bothelper role on");
 
+        if (servers.size() > MAX_SELECT_OPTIONS) {
+            BotLogger.warning("BothelperDashboardService: "
+                    + servers.size()
+                    + " overflow servers configured but StringSelectMenu supports at most "
+                    + MAX_SELECT_OPTIONS
+                    + ". Only the first "
+                    + MAX_SELECT_OPTIONS
+                    + " will be shown.");
+        }
+
         List<String> preselected = new ArrayList<>();
-        for (Guild guild : servers) {
+        for (Guild guild : servers.stream().limit(MAX_SELECT_OPTIONS).toList()) {
             SelectOption option = SelectOption.of(guild.getName(), guild.getId());
             Role bothelperRole = CreateGameService.getRole(BOTHELPER_ROLE_NAME, guild);
             if (bothelperRole != null) {
