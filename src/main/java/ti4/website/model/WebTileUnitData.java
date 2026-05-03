@@ -42,7 +42,7 @@ public final class WebTileUnitData {
     public static Map<String, WebTileUnitData> fromGame(Game game) {
         Map<String, WebTileUnitData> tileUnitData = new HashMap<>();
 
-        for (Map.Entry<String, Tile> entry : new HashMap<>(game.getTileMap()).entrySet()) {
+        for (Map.Entry<String, Tile> entry : new ArrayList<>(game.getTileMap().entrySet())) {
             String position = entry.getKey();
             Tile tile = entry.getValue();
 
