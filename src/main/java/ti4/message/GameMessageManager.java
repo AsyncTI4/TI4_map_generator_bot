@@ -5,14 +5,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
 import ti4.json.PersistenceManager;
 import ti4.logging.BotLogger;
 
@@ -175,6 +179,48 @@ public class GameMessageManager {
             }
         }
         return Collections.unmodifiableMap(result);
+    }
+
+    public static synchronized void cleanupStaleEntries() {
+        GameMessages allGameMessages = readFile();
+        if (allGameMessages == null) {
+            return;
+        }
+
+        var removedGames = new HashSet<>();
+        boolean removedMessages = false;
+        var iterator = allGameMessages.gameNameToMessages.entrySet().iterator();
+        while (iterator.hasNext()) {
+            var entry = iterator.next();
+            String gameName = entry.getKey();
+            List<GameMessage> messages = entry.getValue();
+            ManagedGame game = GameManager.getManagedGame(gameName);
+            if (game == null || game.isHasEnded() || messages.isEmpty()) {
+                iterator.remove();
+                removedGames.add(gameName);
+                continue;
+            }
+
+            int playerCount = game.getRealPlayers().size();
+            long twoWeeksAgo = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(14);
+            boolean removed = messages.removeIf(
+                    msg -> (msg.factionsThatReacted().size() >= playerCount) || msg.gameSaveTime() <= twoWeeksAgo);
+            if (removed) {
+                removedMessages = true;
+                BotLogger.info("GameMessageCleanupCron removed GameMessages for " + gameName);
+            }
+
+            if (messages.isEmpty()) {
+                iterator.remove();
+                removedGames.add(gameName);
+            }
+        }
+
+        if (!removedGames.isEmpty() || removedMessages) {
+            if (!removedGames.isEmpty())
+                BotLogger.info("GameMessageCleanupCron removed the following games " + removedGames);
+            persistFile(allGameMessages);
+        }
     }
 
     public static synchronized List<GameMessage> getAll(String gameName, GameMessageType type) {
