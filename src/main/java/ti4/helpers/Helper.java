@@ -3026,20 +3026,11 @@ public final class Helper {
     }
 
     public static GuildMessageChannel getThreadChannelIfExists(ButtonInteractionEvent event) {
-        String messageID = event.getInteraction().getMessage().getId();
         MessageChannel messageChannel = event.getMessageChannel();
-        List<ThreadChannel> threadChannels = event.getGuild().getThreadChannels();
-        try {
-            for (ThreadChannel threadChannel : threadChannels) {
-                if (threadChannel.getId().equals(messageID)) {
-                    return threadChannel;
-                }
-            }
-            return (GuildMessageChannel) messageChannel;
-        } catch (Exception e) {
-            BotLogger.error(new LogOrigin(event), "Something went wrong getting thread channels.", e);
-            return null;
+        if (messageChannel instanceof ThreadChannel threadChannel) {
+            return threadChannel;
         }
+        return (GuildMessageChannel) messageChannel;
     }
 
     /**
