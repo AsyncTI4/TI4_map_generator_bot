@@ -26,7 +26,6 @@ import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.SelectionHandler;
 import ti4.logging.BotLogger;
-import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
 
 @UtilityClass
@@ -216,9 +215,11 @@ public class BothelperDashboardService {
             summary.append("⚠️ Skipped: ").append(String.join(", ", skipped)).append("\n");
         }
 
-        // Delete the select menu and send the summary as an ephemeral follow-up
-        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        MessageHelper.sendEphemeralMessageToEventChannel(event, summary.toString());
+        // Replace the select menu with the summary in place (works for both ephemeral and non-ephemeral)
+        event.getHook()
+                .editOriginal(summary.toString())
+                .setComponents()
+                .queue(Consumers.nop(), BotLogger::catchRestError);
 
         // Refresh the dashboard after a short delay to allow role changes to propagate
         CronManager.scheduleOnce(
