@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -263,7 +264,7 @@ public class DestroyUnitService {
                                 .contains(player.getHomeSystemTile())) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green(
-                            player.getFinsFactionCheckerPrefix() + "useNekroNullRef",
+                            player.factionButtonChecker() + "useNekroNullRef",
                             "Use Null Reference (Upon Each Destroy)",
                             FactionEmojis.Nekro));
                     buttons.add(Buttons.red("deleteButtons", "Decline", FactionEmojis.Nekro));
@@ -327,6 +328,19 @@ public class DestroyUnitService {
                                 + " You now have a total of " + player.getUnitCap(unitID)
                                 + " available to you  (on the game board or in your reinforcements)."
                                 + "\n-# If this was a mistake, readjust the limit with `/game set_unit_cap`.");
+            }
+        }
+        if (player != null) {
+            String unitTypeString =
+                    unit.unitKey().unitType().humanReadableName().toLowerCase();
+            Player activePlayer = game.getActivePlayer();
+            if (!game.getStoredValue("bounties" + player.getFaction() + unitTypeString)
+                            .isEmpty()
+                    && activePlayer != null
+                    && activePlayer.hasAbility("marked_prey")
+                    && !activePlayer.equals(player)) {
+                ZephyrionBountyButtonHandler.claimBounty(
+                        game, activePlayer, player, unit.unitKey().unitType(), combat);
             }
         }
     }

@@ -19,8 +19,14 @@ public enum LeaderRemovalReason {
         return switch (leaderId) {
             case "titanshero", "kyrohero", "toldarhero", "freesystemshero" -> ATTACHED;
 
-            case "letnevhero", "nomadhero", "zealotshero", "nokarhero", "kolumehero", "qhethero", "nivynhero" ->
-                STATUS_CLEANUP;
+            case "letnevhero",
+                    "nomadhero",
+                    "zealotshero",
+                    "nokarhero",
+                    "kolumehero",
+                    "qhethero",
+                    "nivynhero",
+                    "lunariumhero" -> STATUS_CLEANUP;
 
             case "arborechero",
                     "argenthero",

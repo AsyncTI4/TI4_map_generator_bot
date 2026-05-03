@@ -15,7 +15,7 @@ public final class AlRaithService {
     // Cabal Breakthrough
     public static void serveBeginCabalBreakthroughButtons(ButtonInteractionEvent event, Game game, Player player) {
         Button startCabalBreakthrough =
-                Buttons.red(player.finChecker() + "beginCabalBreakthroughMove", "Move Ingress Tokens");
+                Buttons.red(player.factionButtonChecker() + "beginCabalBreakthroughMove", "Move Ingress Tokens");
         String message =
                 "After you finish setting the ingress tokens on the map, click this button to move up to 2 of them into systems that contain gravity rifts.";
         MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, startCabalBreakthrough);

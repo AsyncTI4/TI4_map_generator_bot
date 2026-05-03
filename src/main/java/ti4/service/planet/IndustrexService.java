@@ -41,7 +41,7 @@ public class IndustrexService {
 
         List<Button> buttons = new ArrayList<>();
         for (UnitType type : typesAvailable) {
-            String id = player.finChecker() + "industrexPickType_" + type.getValue();
+            String id = player.factionButtonChecker() + "industrexPickType_" + type.getValue();
             String label = "Place " + type.humanReadableName();
             buttons.add(Buttons.green(id, label, type.getUnitTypeEmoji()));
         }

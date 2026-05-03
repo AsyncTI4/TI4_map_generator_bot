@@ -45,8 +45,8 @@ public class EdictPhaseHandler {
         }
         for (int x = 0; x < 3; x++) {
             AgendaModel edict = Mapper.getAgenda(edicts.get(x));
-            buttons.add(Buttons.green(
-                    tyrant.getFinsFactionCheckerPrefix() + "resolveEdict_" + edicts.get(x), edict.getName()));
+            buttons.add(
+                    Buttons.green(tyrant.factionButtonChecker() + "resolveEdict_" + edicts.get(x), edict.getName()));
             embeds.add(edict.getRepresentationEmbed());
         }
         String msg = tyrant.getRepresentation()

@@ -997,7 +997,7 @@ public final class Helper {
                     || game.getUnitHolderFromPlanet(planet).isSpaceStation()) {
                 continue;
             }
-            String id = player.finChecker() + prefix + "_" + unit + "_" + planet;
+            String id = player.factionButtonChecker() + prefix + "_" + unit + "_" + planet;
             planetButtons.add(Buttons.red(id, getPlanetRepresentation(planet, game), unitKey.unitEmoji()));
         }
         return planetButtons;
@@ -1007,7 +1007,7 @@ public final class Helper {
         List<Button> planetButtons = new ArrayList<>();
         List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, game);
         for (Tile tile : tiles) {
-            String id = player.finChecker() + prefix + "_" + unit + "_" + tile.getPosition();
+            String id = player.factionButtonChecker() + prefix + "_" + unit + "_" + tile.getPosition();
             planetButtons.add(
                     Buttons.red(id, tile.getRepresentationForButtons(game, player), UnitEmojis.getUnitEmoji(unit)));
         }
@@ -1019,7 +1019,7 @@ public final class Helper {
         List<Tile> tiles = ButtonHelper.getTilesWithTrapsInTheSystem(game);
         for (Tile tile : tiles) {
             if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
-                String id = player.finChecker() + prefix + "_" + unit + "_" + tile.getPosition();
+                String id = player.factionButtonChecker() + prefix + "_" + unit + "_" + tile.getPosition();
                 planetButtons.add(
                         Buttons.red(id, tile.getRepresentationForButtons(game, player), UnitEmojis.getUnitEmoji(unit)));
             }
@@ -1033,7 +1033,7 @@ public final class Helper {
         List<Tile> tiles = ButtonHelper.getTilesForCheiranHero(player, game);
         for (Tile tile : tiles) {
             if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
-                String id = player.finChecker() + prefix + "_" + unit + "_" + tile.getPosition();
+                String id = player.factionButtonChecker() + prefix + "_" + unit + "_" + tile.getPosition();
                 planetButtons.add(
                         Buttons.red(id, tile.getRepresentationForButtons(game, player), UnitEmojis.getUnitEmoji(unit)));
             }
@@ -1047,7 +1047,7 @@ public final class Helper {
         List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, game);
         for (Tile tile : tiles) {
             if (CommandCounterHelper.hasCC(event, player.getColor(), tile)) {
-                String id = player.finChecker() + prefix + "_" + unit + "_" + tile.getPosition();
+                String id = player.factionButtonChecker() + prefix + "_" + unit + "_" + tile.getPosition();
                 planetButtons.add(
                         Buttons.red(id, tile.getRepresentationForButtons(game, player), UnitEmojis.getUnitEmoji(unit)));
             }
@@ -2500,11 +2500,10 @@ public final class Helper {
         }
         if ("place".equalsIgnoreCase(placePrefix)) {
             Button DoneProducingUnits = Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "deleteButtons_" + warfareNOtherstuff + "_"
-                            + tile.getPosition(),
+                    player.factionButtonChecker() + "deleteButtons_" + warfareNOtherstuff + "_" + tile.getPosition(),
                     "Done Producing Units");
             unitButtons.add(DoneProducingUnits);
-            unitButtons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "resetProducedThings", "Reset Build"));
+            unitButtons.add(Buttons.gray(player.factionButtonChecker() + "resetProducedThings", "Reset Build"));
         }
         if (player.hasTech("yso")) {
             if ("sling".equalsIgnoreCase(warfareNOtherstuff)

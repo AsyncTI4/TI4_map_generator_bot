@@ -567,7 +567,7 @@ public class StartPhaseService {
                     && !player2.getNeighbouringPlayers(true).isEmpty()) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(
-                        player2.getFinsFactionCheckerPrefix() + "underhandedManeuverPickNeighbor",
+                        player2.factionButtonChecker() + "underhandedManeuverPickNeighbor",
                         "Use Underhanded Maneuver",
                         FactionEmojis.arvaxi));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
@@ -843,7 +843,7 @@ public class StartPhaseService {
             if (IsPlayerElectedService.isPlayerElected(game, player, "minister_policy")
                     && player.hasAbility("scheming")) {
                 yssarilPolicy = Buttons.gray(
-                        player.getFinsFactionCheckerPrefix() + "yssarilMinisterOfPolicy",
+                        player.factionButtonChecker() + "yssarilMinisterOfPolicy",
                         "Draw Minister of Policy Action Card",
                         FactionEmojis.Yssaril);
             }
@@ -851,7 +851,7 @@ public class StartPhaseService {
                     && IsPlayerElectedService.isPlayerElected(game, player, "absol_minspolicy")) {
                 List<Button> absButtons = new ArrayList<>();
                 absButtons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "cymiaeHeroStep1_"
+                        player.factionButtonChecker() + "cymiaeHeroStep1_"
                                 + (game.getRealPlayers().size() + 1),
                         "Resolve Absol Minister Of Policy"));
                 MessageHelper.sendMessageToChannelWithButtons(

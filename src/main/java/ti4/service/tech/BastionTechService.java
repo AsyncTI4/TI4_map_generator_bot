@@ -185,9 +185,9 @@ public class BastionTechService {
                 String msg = p2.getRepresentationUnfogged() + ", you may auto-assign " + h + " hit"
                         + (h == 1 ? "" : "s") + ".";
                 List<Button> buttons = new ArrayList<>();
-                String finChecker = "FFCC_" + p2.getFaction() + "_";
+                String factionChecker = "FFCC_" + p2.getFaction() + "_";
                 buttons.add(Buttons.green(
-                        finChecker + "autoAssignGroundHits_" + planetN + "_" + h,
+                        factionChecker + "autoAssignGroundHits_" + planetN + "_" + h,
                         "Auto-Assign Hit" + (h == 1 ? "" : "s")));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
@@ -218,9 +218,9 @@ public class BastionTechService {
                 String msg = p1.getRepresentationUnfogged() + ", you may autoassign " + h + " hit" + (h == 1 ? "" : "s")
                         + ".";
                 List<Button> buttons = new ArrayList<>();
-                String finChecker = "FFCC_" + p1.getFaction() + "_";
+                String factionChecker = "FFCC_" + p1.getFaction() + "_";
                 buttons.add(Buttons.green(
-                        finChecker + "autoAssignGroundHits_" + planetN + "_" + h,
+                        factionChecker + "autoAssignGroundHits_" + planetN + "_" + h,
                         "Auto-Assign Hit" + (h == 1 ? "" : "s")));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);

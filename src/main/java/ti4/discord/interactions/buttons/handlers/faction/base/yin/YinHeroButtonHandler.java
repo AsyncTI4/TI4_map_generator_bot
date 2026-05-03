@@ -52,7 +52,7 @@ class YinHeroButtonHandler {
                     continue;
                 }
                 buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "yinHeroPlanet_" + planet,
+                        player.factionButtonChecker() + "yinHeroPlanet_" + planet,
                         Helper.getPlanetRepresentation(planet, game)));
             }
             MessageHelper.sendMessageToChannelWithButtons(
@@ -74,7 +74,7 @@ class YinHeroButtonHandler {
                         }
                         if (!owned) {
                             buttons.add(Buttons.green(
-                                    player.getFinsFactionCheckerPrefix() + "yinHeroPlanet_" + planet.getName(),
+                                    player.factionButtonChecker() + "yinHeroPlanet_" + planet.getName(),
                                     Helper.getPlanetRepresentation(planet.getName(), game)));
                         }
                     }
@@ -102,7 +102,7 @@ class YinHeroButtonHandler {
         List<Button> buttons = new ArrayList<>();
         for (int x = 1; x < 4; x++) {
             buttons.add(Buttons.green(
-                    player.getFinsFactionCheckerPrefix() + "yinHeroInfantry_" + planet + "_" + x,
+                    player.factionButtonChecker() + "yinHeroInfantry_" + planet + "_" + x,
                     "Land " + x + " infantry",
                     UnitEmojis.infantry));
         }

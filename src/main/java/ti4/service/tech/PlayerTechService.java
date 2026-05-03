@@ -306,9 +306,7 @@ public class PlayerTechService {
             case "absol_nm" -> { // Absol's Neural Motivator
                 ButtonHelper.deleteTheOneButton(event);
                 Button draw2ACButton = Buttons.gray(
-                        player.getFinsFactionCheckerPrefix() + "draw2 AC",
-                        "Draw 2 Action Cards",
-                        CardEmojis.getACEmoji(game));
+                        player.factionButtonChecker() + "draw2 AC", "Draw 2 Action Cards", CardEmojis.getACEmoji(game));
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", draw2ACButton);
                 // sendNextActionButtonsIfButtonEvent(event, game, player);
             }
@@ -331,7 +329,7 @@ public class PlayerTechService {
                 ButtonHelper.resolveTransitDiodesStep1(game, player);
             case "miltymod_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
                 Button gainCC = Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "gain_CCdeletethismessage", "Gain Command Tokens");
+                        player.factionButtonChecker() + "gain_CCdeletethismessage", "Gain Command Tokens");
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getFactionEmojiOrColor() + " use button to gain 1 command token.",
@@ -340,7 +338,7 @@ public class PlayerTechService {
             case "absol_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "gain_CCdeletethismessage", "Gain Command Tokens"));
+                        player.factionButtonChecker() + "gain_CCdeletethismessage", "Gain Command Tokens"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getFactionEmojiOrColor() + " use button to gain 1 command token.",
@@ -551,7 +549,7 @@ public class PlayerTechService {
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player || p2.getAcCount() == 0) continue;
 
-            String id = player.finChecker() + "getACFrom_" + p2.getFaction();
+            String id = player.factionButtonChecker() + "getACFrom_" + p2.getFaction();
             String label = p2.getFactionModel().getShortName();
             String emoji = p2.getFactionEmoji();
 

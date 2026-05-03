@@ -151,7 +151,7 @@ public final class FOWPlusService {
 
     @ModalHandler("blindActivation_")
     public static void doBlindActivation(ModalInteractionEvent event, Player player, Game game) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = "FFCC_" + player.getFaction() + "_";
         String origMessageId = event.getModalId().replace("blindActivation_", "");
         String position = event.getValue(Constants.POSITION).getAsString().trim();
 
@@ -168,7 +168,7 @@ public final class FOWPlusService {
 
         List<Button> chooseTileButtons = new ArrayList<>();
         chooseTileButtons.add(Buttons.green(
-                finChecker + "ringTile_" + targetPosition, tile.getRepresentationForButtons(game, player)));
+                factionChecker + "ringTile_" + targetPosition, tile.getRepresentationForButtons(game, player)));
         chooseTileButtons.add(Buttons.red("ChooseDifferentDestination", "Get a Different Ring"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Please choose the system that you wish to activate.", chooseTileButtons);
@@ -319,7 +319,8 @@ public final class FOWPlusService {
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged() + ", use the button to gain one command token.",
                         Buttons.green(
-                                player.finChecker() + "redistributeCCButtons_deleteThisMessage", "Gain Command Token"));
+                                player.factionButtonChecker() + "redistributeCCButtons_deleteThisMessage",
+                                "Gain Command Token"));
                 break;
 
             case FOWPLUS_EXPLORE_FRACTURE:

@@ -34,11 +34,11 @@ public class ExperimentalMechanismsService {
         List<Button> buttons = new ArrayList<>();
         for (Player target : game.getRealPlayers()) {
             buttons.add(Buttons.gray(
-                    player.finChecker() + "arvaxiEnginePlayer_" + target.getFaction(),
+                    player.factionButtonChecker() + "arvaxiEnginePlayer_" + target.getFaction(),
                     StringUtils.capitalize(target.getFaction()),
                     target.getFactionEmojiOrColor()));
         }
-        buttons.add(Buttons.red(player.finChecker() + "deleteButtons", "Delete these buttons"));
+        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Delete these buttons"));
 
         String msg = player.getRepresentation() + " use " + btRep()
                 + " to choose which player's unit upgrade to attach the Mobilization Engine to.";
@@ -70,7 +70,8 @@ public class ExperimentalMechanismsService {
             UnitModel unit = Mapper.getUnitModelByTechUpgrade(techID);
             if (unit == null || !unit.getIsShip() || "fighter".equalsIgnoreCase(unit.getBaseType())) continue;
             buttons.add(Buttons.gray(
-                    player.finChecker() + "arvaxiEngineTech_" + targetFaction + "_" + techID, tech.getName()));
+                    player.factionButtonChecker() + "arvaxiEngineTech_" + targetFaction + "_" + techID,
+                    tech.getName()));
         }
 
         if (buttons.isEmpty()) {
@@ -79,7 +80,7 @@ public class ExperimentalMechanismsService {
                     target.getRepresentationNoPing() + " has no valid non-fighter ship unit upgrade technologies.");
             return;
         }
-        buttons.add(Buttons.red(player.finChecker() + "deleteButtons", "Delete these buttons"));
+        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Delete these buttons"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 "Choose which of " + target.getRepresentationNoPing()
@@ -100,10 +101,12 @@ public class ExperimentalMechanismsService {
 
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
-                player.finChecker() + "arvaxiEngineAttach_" + targetFaction + "_" + techID + "_boon", "Boon side"));
+                player.factionButtonChecker() + "arvaxiEngineAttach_" + targetFaction + "_" + techID + "_boon",
+                "Boon side"));
         buttons.add(Buttons.blue(
-                player.finChecker() + "arvaxiEngineAttach_" + targetFaction + "_" + techID + "_curse", "Curse side"));
-        buttons.add(Buttons.red(player.finChecker() + "deleteButtons", "Cancel"));
+                player.factionButtonChecker() + "arvaxiEngineAttach_" + targetFaction + "_" + techID + "_curse",
+                "Curse side"));
+        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Cancel"));
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

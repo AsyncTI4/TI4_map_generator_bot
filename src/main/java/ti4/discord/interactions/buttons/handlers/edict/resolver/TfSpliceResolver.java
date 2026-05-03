@@ -18,7 +18,7 @@ public class TfSpliceResolver implements EdictResolver {
     String edict = "tf-splice";
 
     private static List<Button> buttons(Player player) {
-        String id = player.finChecker() + "startSplice_";
+        String id = player.factionButtonChecker() + "startSplice_";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(id + "7_all", "Initiate Ability Splice", MiscEmojis.tf_ability));
         buttons.add(Buttons.gray(id + "2_all", "Initiate Genome Splice", MiscEmojis.tf_genome));

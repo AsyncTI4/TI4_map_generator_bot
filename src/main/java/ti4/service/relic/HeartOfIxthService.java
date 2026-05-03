@@ -67,13 +67,15 @@ public class HeartOfIxthService {
             if (result.eligibleForHeartMinus()) buttons.add(badHeart);
 
             if (!rollingPlayer.is(heart)) {
-                String idPre = heart.finChecker() + "exhaustHeartOfIxth_";
+                String idPre = heart.factionButtonChecker() + "exhaustHeartOfIxth_";
                 if (result.eligibleForHeartPlus())
                     buttons.add(Buttons.blue(idPre + "plus", "Exhaust Heart of Ixth", ExploreEmojis.Relic));
                 if (result.eligibleForHeartMinus())
                     buttons.add(Buttons.blue(idPre + "minus", "Exhaust Heart of Ixth", ExploreEmojis.Relic));
                 buttons.add(Buttons.gray(
-                        heart.finChecker() + "declineHeartOfIxth", "Decline Heart of Ixth", ExploreEmojis.Relic));
+                        heart.factionButtonChecker() + "declineHeartOfIxth",
+                        "Decline Heart of Ixth",
+                        ExploreEmojis.Relic));
 
                 if (game.getStoredValue("heartWarnedThisTurn").isBlank()) {
                     String warning = "### ATTENTION " + rollingPlayer.getRepresentation() + ":\n";

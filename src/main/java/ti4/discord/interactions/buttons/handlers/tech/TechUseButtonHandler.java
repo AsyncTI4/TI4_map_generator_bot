@@ -129,7 +129,7 @@ class TechUseButtonHandler {
     @ButtonHandler("acquireAFreeTech") // Buttons.GET_A_FREE_TECH
     public static void acquireAFreeTech(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
-        String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
+        String finsFactionCheckerPrefix = player.factionButtonChecker();
         game.setComponentAction(true);
         buttons.add(Buttons.blue(
                 finsFactionCheckerPrefix + "getAllTechOfType_propulsion_noPay",

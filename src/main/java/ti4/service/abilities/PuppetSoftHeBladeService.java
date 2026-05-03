@@ -98,7 +98,7 @@ public class PuppetSoftHeBladeService {
 
     private static void revealPlotSeethe(Player obsidian, List<Player> puppets) {
         List<Button> seetheButtons = new ArrayList<>();
-        String prefix = obsidian.finChecker() + "revealSeethe_";
+        String prefix = obsidian.factionButtonChecker() + "revealSeethe_";
         for (Player p : puppets) {
             if (p == null) continue;
             String label = p.getFactionNameOrColor();
@@ -110,7 +110,7 @@ public class PuppetSoftHeBladeService {
 
     private static void revealPlotExtract(Player obsidian, List<Player> puppets) {
         List<Button> extractButtons = new ArrayList<>();
-        String prefix = obsidian.finChecker() + "revealExtract_";
+        String prefix = obsidian.factionButtonChecker() + "revealExtract_";
         for (Player p : puppets) {
             if (p == null) continue;
             String label = p.getFactionNameOrColor();

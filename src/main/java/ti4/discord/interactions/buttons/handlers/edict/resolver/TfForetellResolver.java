@@ -21,12 +21,12 @@ public class TfForetellResolver implements EdictResolver {
     private static List<Button> buttons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (int loc = 1; loc <= game.getPublicObjectives1Peekable().size(); loc++) {
-            String id = player.finChecker() + "foretellPeak_1_" + loc;
+            String id = player.factionButtonChecker() + "foretellPeak_1_" + loc;
             String label = "Stage 1, Position " + loc;
             buttons.add(Buttons.green(id, label, CardEmojis.Public1alt));
         }
         for (int loc = 1; loc <= game.getPublicObjectives2Peekable().size(); loc++) {
-            String id = player.finChecker() + "foretellPeak_2_" + loc;
+            String id = player.factionButtonChecker() + "foretellPeak_2_" + loc;
             String label = "Stage 2, Position " + loc;
             buttons.add(Buttons.blue(id, label, CardEmojis.Public2alt));
         }

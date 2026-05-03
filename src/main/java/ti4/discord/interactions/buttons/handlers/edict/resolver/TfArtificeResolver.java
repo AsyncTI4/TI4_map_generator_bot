@@ -53,7 +53,7 @@ public class TfArtificeResolver implements EdictResolver {
                 int relics = x;
                 int paradigms = vpDifference - x;
 
-                String id = player.finChecker() + "artificeStep2_" + relics + "_" + paradigms;
+                String id = player.factionButtonChecker() + "artificeStep2_" + relics + "_" + paradigms;
                 String label = relics + " Relic" + (relics == 1 ? "s" : "") + " & ";
                 label += paradigms + " Paradigm" + (paradigms == 1 ? "s" : "");
                 buttons.add(Buttons.green(id, label));

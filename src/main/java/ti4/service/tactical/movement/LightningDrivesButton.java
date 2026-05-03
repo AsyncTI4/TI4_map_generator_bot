@@ -14,6 +14,8 @@ public final class LightningDrivesButton implements MoveAbilityButton {
 
     public List<Button> build(MoveContext ctx) {
         return List.of(Buttons.green(
-                ctx.player.finChecker() + "declareUse_Lightning", "Declare Lightning Drives", FactionEmojis.gledge));
+                ctx.player.factionButtonChecker() + "declareUse_Lightning",
+                "Declare Lightning Drives",
+                FactionEmojis.gledge));
     }
 }

@@ -46,7 +46,7 @@ public class GalvanizeService {
     }
 
     public static List<Button> getToggleGalvanizeButtons(Player player, Game game, Tile tile) {
-        String finChecker = player.getFinsFactionCheckerPrefix();
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         String pos = tile.getPosition() + "_";
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
@@ -68,12 +68,12 @@ public class GalvanizeService {
                 String unitIdPart = pos + unit.asyncID() + "_" + uhName;
                 if (ungalvanized > 0)
                     buttons.add(Buttons.green(
-                            finChecker + "galvanize_" + unitIdPart,
+                            factionChecker + "galvanize_" + unitIdPart,
                             "Galvanize 1 " + unit.unitName() + uhRepresentation,
                             unit.unitEmoji()));
                 if (galvanized > 0)
                     buttons.add(Buttons.red(
-                            finChecker + "ungalvanize_" + unitIdPart,
+                            factionChecker + "ungalvanize_" + unitIdPart,
                             "Ungalvanize 1 " + unit.unitName() + uhRepresentation,
                             unit.unitEmoji()));
             }

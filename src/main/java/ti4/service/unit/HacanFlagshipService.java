@@ -37,7 +37,7 @@ public class HacanFlagshipService {
     }
 
     private static Button hacanFSButton(Player player, String pos, int misses, int hits, int added) {
-        String id = player.finChecker() + "hacanFlagship_" + pos + "_" + misses + "_" + hits;
+        String id = player.factionButtonChecker() + "hacanFlagship_" + pos + "_" + misses + "_" + hits;
         String label = "Add " + added + " hit" + (added > 1 ? "s" : "") + " with Wrath of Kenara";
         return Buttons.green(id, label, UnitEmojis.flagship);
     }

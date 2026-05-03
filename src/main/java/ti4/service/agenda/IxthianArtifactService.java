@@ -141,7 +141,7 @@ public class IxthianArtifactService {
             }
         } else {
             Player heartPlayer = HeartOfIxthService.getHeartOfIxthPlayer(game, true);
-            String buttonID = heartPlayer.finChecker() + "resolveIxthian_" + result.getResult();
+            String buttonID = heartPlayer.factionButtonChecker() + "resolveIxthian_" + result.getResult();
             buttonID += publish ? "_publish" : "";
             Button good = Buttons.green(buttonID, "Get Technology", TechEmojis.PropulsionTech);
             Button bad = Buttons.red(buttonID, "Explode", MiscEmojis.DoubleBoom);

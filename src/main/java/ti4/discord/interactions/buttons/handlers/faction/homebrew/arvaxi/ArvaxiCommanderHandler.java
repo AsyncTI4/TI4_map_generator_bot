@@ -22,7 +22,7 @@ public class ArvaxiCommanderHandler {
         List<Button> buttons = new ArrayList<>();
         if (!game.playerHasLeaderUnlockedOrAlliance(player, "arvaxicommander")) {
             buttons.add(Buttons.gray(
-                    player.getFinsFactionCheckerPrefix() + "arvaxiCommanderOfferUnlock",
+                    player.factionButtonChecker() + "arvaxiCommanderOfferUnlock",
                     "Discard AC to Unlock Commander (Upon Win)",
                     FactionEmojis.arvaxi));
             MessageHelper.sendMessageToChannelWithButtons(
@@ -32,7 +32,7 @@ public class ArvaxiCommanderHandler {
                     buttons);
         } else {
             buttons.add(Buttons.gray(
-                    player.getFinsFactionCheckerPrefix() + "arvaxiCommanderStealAC_" + opponent.getFaction(),
+                    player.factionButtonChecker() + "arvaxiCommanderStealAC_" + opponent.getFaction(),
                     "Force Opponent to Give 1 AC (Upon Win)",
                     FactionEmojis.arvaxi));
             MessageHelper.sendMessageToChannelWithButtons(
