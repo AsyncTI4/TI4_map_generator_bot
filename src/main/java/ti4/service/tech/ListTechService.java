@@ -106,7 +106,7 @@ public class ListTechService {
             List<TechnologyType> techTypes,
             boolean first) {
         game.setComponentAction(!sc);
-        String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
+        String finsFactionCheckerPrefix = player.factionButtonChecker();
         game.setComponentAction(!sc);
         String techPrefix = finsFactionCheckerPrefix + "getAllTechOfType_";
         String techSuffix = dwsBt ? "_dwsbt" : "";
@@ -370,7 +370,7 @@ public class ListTechService {
 
         techs.sort(TechnologyModel.sortByTechRequirements);
 
-        String idPrefix = player.finChecker()
+        String idPrefix = player.factionButtonChecker()
                 + switch (buttonPrefixType.toLowerCase()) {
                     case "normal", "res", "nekro", "nopay", "free", "inf", "shareknowledge", "dwsbt" -> "getTech_";
                     default -> "swapTechs__" + buttonPrefixType + "__";

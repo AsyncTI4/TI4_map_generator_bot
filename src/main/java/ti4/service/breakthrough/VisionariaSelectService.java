@@ -55,9 +55,13 @@ public class VisionariaSelectService {
         buttons.add(Buttons.green("giveVisionariaPN", "Give Promissory Note", CardEmojis.PN));
         buttons.add(Buttons.red("declineVisionaria", "Decline"));
         buttons.add(Buttons.gray(
-                player.finChecker() + "fleetLogAfterVisionaria", "Wait Until All Have Reacted", factionEmoji));
+                player.factionButtonChecker() + "fleetLogAfterVisionaria",
+                "Wait Until All Have Reacted",
+                factionEmoji));
         buttons.add(Buttons.gray(
-                player.finChecker() + "endTurnAfterVisionaria", "End Turn After All Have Reacted", factionEmoji));
+                player.factionButtonChecker() + "endTurnAfterVisionaria",
+                "End Turn After All Have Reacted",
+                factionEmoji));
         MessageHelper.sendMessageToChannelWithFactionReact(game.getMainGameChannel(), message, game, player, buttons);
         for (Player player_ : game.getRealPlayers()) {
             if (!player_.equals(player)) {
@@ -115,7 +119,7 @@ public class VisionariaSelectService {
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             String message = player.getRepresentationUnfogged() + ", your current command tokens are "
                     + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
-            Button resetCC = Buttons.gray(player.getFinsFactionCheckerPrefix() + "resetCCs", "Reset Command Tokens");
+            Button resetCC = Buttons.gray(player.factionButtonChecker() + "resetCCs", "Reset Command Tokens");
             List<Button> buttons = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
             if (player.getTg() > 2) {

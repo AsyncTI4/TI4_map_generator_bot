@@ -14,6 +14,8 @@ public final class MirvedaCommanderButton implements PostMovementAbilityButton {
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.blue(
-                ctx.player().finChecker() + "offerMirvedaCommander", "Use Mirveda Commander", FactionEmojis.mirveda));
+                ctx.player().factionButtonChecker() + "offerMirvedaCommander",
+                "Use Mirveda Commander",
+                FactionEmojis.mirveda));
     }
 }

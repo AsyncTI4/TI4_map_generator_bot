@@ -91,7 +91,7 @@ public final class ButtonHelperFactionSpecific {
         // ACTION: Exhaust this card to place 1 PDS on a planet you control.
         // ACTION: Exhaust this card to repair all of your damaged units.
         // ACTION: Exhaust this card and discard an action card to draw 1 action card.
-        String prefix = player.getFinsFactionCheckerPrefix() + "c4redtech_";
+        String prefix = player.factionButtonChecker() + "c4redtech_";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red(prefix + "pds", "Place a PDS", UnitEmojis.pds));
         buttons.add(Buttons.red(prefix + "actionCard", "Discard/Draw 1 Action Card", CardEmojis.getACEmoji(player)));
@@ -128,7 +128,7 @@ public final class ButtonHelperFactionSpecific {
                         && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)
                         && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(planet))) {
                     buttons2.add(Buttons.gray(
-                            player.getFinsFactionCheckerPrefix() + "exchangeProgramPart3_" + planet,
+                            player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
                             Helper.getPlanetRepresentation(planet, game)));
                 }
             }
@@ -153,62 +153,61 @@ public final class ButtonHelperFactionSpecific {
         if (player.getSteelbalanceCounter() > 1
                 && game.getStoredValue("intrigueLevy").isEmpty()) {
             buttons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "intrigueCardResolve_" + faction + "_Levy",
-                    "Levy (PRODUCTION)"));
+                    player.factionButtonChecker() + "intrigueCardResolve_" + faction + "_Levy", "Levy (PRODUCTION)"));
         }
         if (player.getSteelbalanceCounter() > 2
                 && game.getStoredValue("intrigueIntervention").isEmpty()) {
             buttons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "intrigueCardResolve_" + faction + "_Intervention",
+                    player.factionButtonChecker() + "intrigueCardResolve_" + faction + "_Intervention",
                     "Logistical Intervention (Token lift)"));
         }
         if (player.getSteelbalanceCounter() > 3
                 && game.getStoredValue("intrigueOmen").isEmpty()) {
             buttons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "intrigueCardResolve_" + faction + "_Omen", "Omen (3 AC)"));
+                    player.factionButtonChecker() + "intrigueCardResolve_" + faction + "_Omen", "Omen (3 AC)"));
         }
         if (player.getSteelbalanceCounter() > 4
                 && game.getStoredValue("intrigueRecruit").isEmpty()) {
             buttons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "intrigueCardResolve_" + faction + "_Recruit",
+                    player.factionButtonChecker() + "intrigueCardResolve_" + faction + "_Recruit",
                     "Recruit Spies (3 Coexistence)"));
         }
         if (player.getSteelbalanceCounter() > 3
                 && player.getStarbalanceCounter() > 2
                 && game.getStoredValue("intrigueGambit").isEmpty()) {
             buttons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "intrigueCardResolve_" + faction + "_Gambit",
+                    player.factionButtonChecker() + "intrigueCardResolve_" + faction + "_Gambit",
                     "Gambit (Warfare Primary)"));
         }
         if (player.getStarbalanceCounter() > 1
                 && game.getStoredValue("intrigueCommission").isEmpty()) {
             buttons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "intrigueCardResolve_" + faction + "_Commission",
+                    player.factionButtonChecker() + "intrigueCardResolve_" + faction + "_Commission",
                     "Commission (2tg and Comms)"));
         }
         if (player.getStarbalanceCounter() > 2
                 && game.getStoredValue("intrigueLegislation").isEmpty()) {
             buttons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "intrigueCardResolve_" + faction + "_Legislation",
+                    player.factionButtonChecker() + "intrigueCardResolve_" + faction + "_Legislation",
                     "Legislation (3 agendas)"));
         }
         if (player.getStarbalanceCounter() > 3
                 && game.getStoredValue("intrigueCosmos").isEmpty()) {
             buttons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "intrigueCardResolve_" + faction + "_Cosmos",
+                    player.factionButtonChecker() + "intrigueCardResolve_" + faction + "_Cosmos",
                     "Call of the Cosmos (1 Tech)"));
         }
         if (player.getStarbalanceCounter() > 4
                 && game.getStoredValue("intrigueSecure").isEmpty()) {
             buttons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "intrigueCardResolve_" + faction + "_Secure",
+                    player.factionButtonChecker() + "intrigueCardResolve_" + faction + "_Secure",
                     "Secure Favor (2 PNs from 3 Neighbors)"));
         }
         if (player.getStarbalanceCounter() > 3
                 && player.getSteelbalanceCounter() > 2
                 && game.getStoredValue("intrigueMandate").isEmpty()) {
             buttons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "intrigueCardResolve_" + faction + "_Mandate",
+                    player.factionButtonChecker() + "intrigueCardResolve_" + faction + "_Mandate",
                     "Mandate (1 relic or SO)"));
         }
         return buttons;
@@ -248,7 +247,8 @@ public final class ButtonHelperFactionSpecific {
                 for (Tile tile1 : game.getTileMap().values()) {
                     if (Helper.getProductionValue(p2, game, tile1, false) > 0) {
                         String pos1 = tile1.getPosition();
-                        buildButtons.add(Buttons.blue(p2.finChecker() + "anarchy7Build_" + pos1, "Build in " + pos1));
+                        buildButtons.add(
+                                Buttons.blue(p2.factionButtonChecker() + "anarchy7Build_" + pos1, "Build in " + pos1));
                     }
                 }
                 String buildMessage = p2.getRepresentationUnfogged()
@@ -1151,7 +1151,7 @@ public final class ButtonHelperFactionSpecific {
         if (player.hasUnlockedBreakthrough("nekrobt")
                 && !game.playerHasLeaderUnlockedOrAlliance(p2, "bastioncommander")) {
             if (!game.getStoredValue("valefarZ").contains(p2.getFaction())) {
-                String vfzID = player.finChecker() + "valefarZ_" + p2.getFaction();
+                String vfzID = player.factionButtonChecker() + "valefarZ_" + p2.getFaction();
                 buttons.add(Buttons.blue(vfzID, "Copy Flagship", p2.getFactionEmoji()));
             }
         }
@@ -1350,7 +1350,7 @@ public final class ButtonHelperFactionSpecific {
                     .orElse("")
                     .isEmpty()) {
                 techs.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "getTech_"
+                        player.factionButtonChecker() + "getTech_"
                                 + Mapper.getTech(tech).getAlias() + "__noPay",
                         Mapper.getTech(tech).getName()));
             }
@@ -1381,7 +1381,7 @@ public final class ButtonHelperFactionSpecific {
                     .orElse("")
                     .isEmpty()) {
                 techs.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "getTech_"
+                        player.factionButtonChecker() + "getTech_"
                                 + Mapper.getTech(tech).getAlias() + "__noPay",
                         Mapper.getTech(tech).getName()));
             }
@@ -1413,7 +1413,7 @@ public final class ButtonHelperFactionSpecific {
         for (String tech : techToGain) {
             if (!player.getTechs().contains(tech)) {
                 techs.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "getTech_"
+                        player.factionButtonChecker() + "getTech_"
                                 + Mapper.getTech(tech).getAlias() + "__noPay",
                         Mapper.getTech(tech).getName()));
             }
@@ -2221,8 +2221,8 @@ public final class ButtonHelperFactionSpecific {
             return buttons;
         }
         for (String planet : player.getPlanetsAllianceMode()) {
-            buttons.add(
-                    Buttons.green(player.finChecker() + "pharadnInf2Revive_" + planet, Helper.getPlanetName(planet)));
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "pharadnInf2Revive_" + planet, Helper.getPlanetName(planet)));
         }
         return buttons;
     }
@@ -2254,7 +2254,7 @@ public final class ButtonHelperFactionSpecific {
                 if (uH instanceof Planet) {
                     if (hasInf) {
                         buttons.add(Buttons.green(
-                                player.finChecker() + "vortexRevive_" + tile.getPosition() + "_infantry_"
+                                player.factionButtonChecker() + "vortexRevive_" + tile.getPosition() + "_infantry_"
                                         + uH.getName(),
                                 "Release Infantry On " + Helper.getPlanetRepresentation(uH.getName(), game),
                                 UnitEmojis.infantry));
@@ -2263,13 +2263,14 @@ public final class ButtonHelperFactionSpecific {
                 } else {
                     if (hasFF) {
                         buttons.add(Buttons.blue(
-                                player.finChecker() + "vortexRevive_" + tile.getPosition() + "_fighter_" + uH.getName(),
+                                player.factionButtonChecker() + "vortexRevive_" + tile.getPosition() + "_fighter_"
+                                        + uH.getName(),
                                 "Release Fighter In " + tile.getRepresentationForButtons(),
                                 UnitEmojis.fighter));
                     }
                     if (hasInf) {
                         buttons.add(Buttons.green(
-                                player.finChecker() + "vortexRevive_" + tile.getPosition() + "_infantry_"
+                                player.factionButtonChecker() + "vortexRevive_" + tile.getPosition() + "_infantry_"
                                         + uH.getName(),
                                 "Release Infantry " + tile.getRepresentationForButtons() + " Space Area",
                                 UnitEmojis.infantry));
@@ -2277,7 +2278,7 @@ public final class ButtonHelperFactionSpecific {
                 }
             }
         }
-        buttons.add(Buttons.red(player.finChecker() + "deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done Resolving"));
         return buttons;
     }
 
@@ -2377,7 +2378,7 @@ public final class ButtonHelperFactionSpecific {
                         msg = voter.getRepresentation(false, true) + " has the option to remove 1 command token";
                         msg += " from their fleet pool to ignore the effect of _Genetic Recombination_.";
 
-                        String prefix = voter.finChecker() + "geneticRecombination_" + p2.getUserID() + "_";
+                        String prefix = voter.factionButtonChecker() + "geneticRecombination_" + p2.getUserID() + "_";
                         List<Button> buttons = new ArrayList<>();
                         buttons.add(Buttons.blue(prefix + "accept", "Vote For Chosen Outcome"));
                         buttons.add(Buttons.red(prefix + "decline", "Remove Fleet Token"));
@@ -2594,7 +2595,7 @@ public final class ButtonHelperFactionSpecific {
 
     public static List<Button> gainOrConvertCommButtons(Player player, boolean deleteAfter) {
         List<Button> buttons = new ArrayList<>();
-        String ffcc = player.getFinsFactionCheckerPrefix();
+        String ffcc = player.factionButtonChecker();
         if (deleteAfter) {
             buttons.add(Buttons.green(ffcc + "convertComms_1", "Convert 1 Commodity to Trade Good", MiscEmojis.Wash));
             buttons.add(Buttons.blue(ffcc + "gainComms_1", "Gain 1 Commodity", MiscEmojis.comm));
@@ -3029,7 +3030,7 @@ public final class ButtonHelperFactionSpecific {
                     .equalsIgnoreCase(deck.getFirst())) {
                 msg2 += " (same as last time)";
             }
-            Button transact1 = Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveExp_Look_industrial", msg2);
+            Button transact1 = Buttons.green(player.factionButtonChecker() + "resolveExp_Look_industrial", msg2);
             deckType = "hazardous";
             deck = game.getExploreDeck(deckType);
             msg2 = capitalize(deckType);
@@ -3037,7 +3038,7 @@ public final class ButtonHelperFactionSpecific {
                     .equalsIgnoreCase(deck.getFirst())) {
                 msg2 += " (same as last time)";
             }
-            Button transact2 = Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveExp_Look_hazardous", msg2);
+            Button transact2 = Buttons.green(player.factionButtonChecker() + "resolveExp_Look_hazardous", msg2);
             deckType = "cultural";
             deck = game.getExploreDeck(deckType);
             msg2 = capitalize(deckType);
@@ -3045,7 +3046,7 @@ public final class ButtonHelperFactionSpecific {
                     .equalsIgnoreCase(deck.getFirst())) {
                 msg2 += " (same as last time)";
             }
-            Button transact3 = Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveExp_Look_cultural", msg2);
+            Button transact3 = Buttons.green(player.factionButtonChecker() + "resolveExp_Look_cultural", msg2);
             List<Button> buttons1 = new ArrayList<>();
             buttons1.add(transact1);
             buttons1.add(transact2);
@@ -3054,7 +3055,7 @@ public final class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons1);
 
             Button transact =
-                    Buttons.green(player.getFinsFactionCheckerPrefix() + "relic_look_top", "Look at top of Relic Deck");
+                    Buttons.green(player.factionButtonChecker() + "relic_look_top", "Look at top of Relic Deck");
             msg2 = player.getRepresentation() + ", you may also look at the top card of the relic deck.";
             List<Button> buttons2 = new ArrayList<>();
             buttons2.add(transact);
@@ -4223,7 +4224,7 @@ public final class ButtonHelperFactionSpecific {
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 == null) return;
 
-        String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
+        String finsFactionCheckerPrefix = player.factionButtonChecker();
         Button loseTactic = Buttons.red(finsFactionCheckerPrefix + "decrease_tactic_cc", "Lose 1 Tactic Token");
         Button loseFleet = Buttons.red(finsFactionCheckerPrefix + "decrease_fleet_cc", "Lose 1 Fleet Token");
         Button loseStrat = Buttons.red(finsFactionCheckerPrefix + "decrease_strategy_cc", "Lose 1 Strategy Token");

@@ -18,7 +18,8 @@ public final class ZelianHeroButton implements PostMovementAbilityButton {
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.blue(
-                ctx.player().finChecker() + "celestialImpact_" + ctx.tile().getPosition(),
+                ctx.player().factionButtonChecker() + "celestialImpact_"
+                        + ctx.tile().getPosition(),
                 "Celestial Impact This Tile",
                 FactionEmojis.zelian));
     }

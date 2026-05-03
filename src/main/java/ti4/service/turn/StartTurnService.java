@@ -220,11 +220,11 @@ public class StartTurnService {
                         && player.getNeighbouringPlayers(true).contains(p2)) {
                     List<Button> buttonsRedCreuss = new ArrayList<>();
                     buttonsRedCreuss.add(Buttons.green(
-                            player.getFinsFactionCheckerPrefix() + "redCreussWashFull_" + p2.getUserID(),
+                            player.factionButtonChecker() + "redCreussWashFull_" + p2.getUserID(),
                             "Full Wash",
                             MiscEmojis.Wash));
                     buttonsRedCreuss.add(Buttons.blue(
-                            player.getFinsFactionCheckerPrefix() + "redCreussWashPartial_" + p2.getUserID(),
+                            player.factionButtonChecker() + "redCreussWashPartial_" + p2.getUserID(),
                             "Partial Wash",
                             MiscEmojis.Wash));
                     buttonsRedCreuss.add(Buttons.red("deleteButtons", "Decline"));
@@ -246,7 +246,7 @@ public class StartTurnService {
                     ActionCardHelper.playAC(event, game, p2, "extremeduress", game.getMainGameChannel());
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.red(
-                            player.getFinsFactionCheckerPrefix() + "concedeToED_" + p2.getFaction(),
+                            player.factionButtonChecker() + "concedeToED_" + p2.getFaction(),
                             "Lose Action Cards, Give Trade Goods, And Show Secrets"));
                     buttons2.add(
                             Buttons.green("deleteButtons", "Give In And Play Strategy Card (or Sabo Extreme Duress)"));
@@ -263,7 +263,7 @@ public class StartTurnService {
                     game.removeStoredValue("Crisis Target");
                     ActionCardHelper.playAC(event, game, p2, "crisis", game.getMainGameChannel());
                     List<Button> buttons2 = new ArrayList<>();
-                    buttons2.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn"));
+                    buttons2.add(Buttons.red(player.factionButtonChecker() + "turnEnd", "End Turn"));
                     buttons2.add(Buttons.green("deleteButtons", "Delete These (If Crisis Was Sabo'd)"));
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
@@ -327,8 +327,8 @@ public class StartTurnService {
             String msg = player.getRepresentation() + " use buttons to either accept or refuse the path";
             List<Button> buttons = new ArrayList<>();
             game.removeStoredValue("pathOf" + player.getFaction());
-            buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "acceptPath", "Accept Path"));
-            buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "declinePath", "Refuse Path"));
+            buttons.add(Buttons.green(player.factionButtonChecker() + "acceptPath", "Accept Path"));
+            buttons.add(Buttons.red(player.factionButtonChecker() + "declinePath", "Refuse Path"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
     }
@@ -427,7 +427,7 @@ public class StartTurnService {
                 }
             }
         }
-        String finChecker = player.getFinsFactionCheckerPrefix();
+        String finChecker = player.factionButtonChecker();
         game.setDominusOrb(false);
         List<Button> startButtons = new ArrayList<>();
         boolean hadAnyUnplayedSCs = false;
@@ -667,9 +667,7 @@ public class StartTurnService {
             }
             if (player.hasAbility("laws_order") && !game.getLaws().isEmpty()) {
                 startButtons.add(Buttons.gray(
-                        player.getFinsFactionCheckerPrefix() + "useLawsOrder",
-                        "Pay To Ignore Laws",
-                        FactionEmojis.Keleres));
+                        player.factionButtonChecker() + "useLawsOrder", "Pay To Ignore Laws", FactionEmojis.Keleres));
             }
             if ((player.hasTech("td") && !player.getExhaustedTechs().contains("td"))
                     || (player.hasTech("absol_td")

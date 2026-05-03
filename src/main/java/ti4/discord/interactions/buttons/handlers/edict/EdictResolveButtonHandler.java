@@ -93,7 +93,7 @@ public class EdictResolveButtonHandler {
 
                     String orangeEdict = edicts.getFirst();
                     AgendaModel edictModel = Mapper.getAgenda(orangeEdict);
-                    String id = aur.finChecker() + "resolveEdict_" + orangeEdict + "_orangetf";
+                    String id = aur.factionButtonChecker() + "resolveEdict_" + orangeEdict + "_orangetf";
                     Button resolve = Buttons.green(id, "Resolve 1 Edict");
 
                     MessageHelper.sendMessageToChannelWithButton(aur.getCorrectChannel(), msg, resolve);

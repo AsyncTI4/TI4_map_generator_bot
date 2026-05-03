@@ -14,7 +14,7 @@ public final class WeirdWormholeButton implements PostMovementAbilityButton {
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.green(
-                ctx.player().finChecker() + "getWeirdWormholeButtons_"
+                ctx.player().factionButtonChecker() + "getWeirdWormholeButtons_"
                         + ctx.tile().getPosition(),
                 "Units Travelled Through Weird Wormhole",
                 MiscEmojis.WHalpha));

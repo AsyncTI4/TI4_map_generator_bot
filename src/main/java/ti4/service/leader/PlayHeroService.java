@@ -153,7 +153,7 @@ public class PlayHeroService {
                 // You may choose to no longer be passed; if you do, gain 2 command tokens, draw 1 action card, and
                 // purge this card
                 player.setPassed(false);
-                String prefix = player.getFinsFactionCheckerPrefix();
+                String prefix = player.factionButtonChecker();
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green(prefix + "gain_CC", "Gain 2 Command Tokens"));
                 buttons.add(Buttons.green(prefix + "drawActionCards_1", "Draw 1 Action Card"));
@@ -208,6 +208,8 @@ public class PlayHeroService {
             }
             case "onyxxahero" -> OnyxxaHeroButtonHandler.postInitialButtons(game, player);
             case "xanhero" -> XanHeroButtonHandler.postInitialButtons(game, player);
+            case "tyrishero" ->
+                game.setStoredValue("tyrisHeroRound" + game.getRound() + "_" + player.getFaction(), "true");
             case "mirvedahero" -> {
                 List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, "pds", "placeOneNDone_skipbuild");
                 String message = "Please choose a planet to place a PDS";
@@ -517,7 +519,7 @@ public class PlayHeroService {
                 for (int x = 0; x < 3; x++) {
                     AgendaModel edict = Mapper.getAgenda(edicts.get(x));
                     buttons.add(Buttons.green(
-                            tyrant.getFinsFactionCheckerPrefix() + "resolveEdict_" + edicts.get(x), edict.getName()));
+                            tyrant.factionButtonChecker() + "resolveEdict_" + edicts.get(x), edict.getName()));
                     embeds.add(edict.getRepresentationEmbed());
                 }
                 String msg = tyrant.getRepresentation()
@@ -593,8 +595,8 @@ public class PlayHeroService {
             }
             case "yinhero" -> {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.blue(
-                        player.getFinsFactionCheckerPrefix() + "yinHeroStart", "Invade A Planet With Yin Hero"));
+                buttons.add(
+                        Buttons.blue(player.factionButtonChecker() + "yinHeroStart", "Invade A Planet With Yin Hero"));
                 buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
@@ -639,11 +641,9 @@ public class PlayHeroService {
             case "augershero" -> {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.blue(
-                        player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 1,
-                        "Resolve Ilyxum Hero on Stage 1 Deck"));
+                        player.factionButtonChecker() + "augersHeroStart_" + 1, "Resolve Ilyxum Hero on Stage 1 Deck"));
                 buttons.add(Buttons.blue(
-                        player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 2,
-                        "Resolve Ilyxum Hero on Stage 2 Deck"));
+                        player.factionButtonChecker() + "augersHeroStart_" + 2, "Resolve Ilyxum Hero on Stage 2 Deck"));
                 buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),

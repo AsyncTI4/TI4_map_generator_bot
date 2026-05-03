@@ -1174,7 +1174,7 @@ public class ExploreService {
             }
             case "suspiciouswreckage" -> {
                 Button button = Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "resolveDiplomaticPressureStep1",
+                        player.factionButtonChecker() + "resolveDiplomaticPressureStep1",
                         "Resolve Suspicious Wreckage");
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", button);
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", button);

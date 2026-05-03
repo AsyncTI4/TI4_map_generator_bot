@@ -49,13 +49,13 @@ import ti4.service.unit.RemoveUnitService;
 public final class ButtonHelperActionCards {
 
     private static List<Button> getTilesToScuttle(Player player, Game game, int tgAlready) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
             if (FoWHelper.playerHasShipsInSystem(player, tileEntry.getValue())) {
                 Tile tile = tileEntry.getValue();
                 Button validTile = Buttons.green(
-                        finChecker + "scuttleIn_" + tileEntry.getKey() + "_" + tgAlready,
+                        factionChecker + "scuttleIn_" + tileEntry.getKey() + "_" + tgAlready,
                         tile.getRepresentationForButtons(game, player));
                 buttons.add(validTile);
             }
@@ -64,7 +64,7 @@ public final class ButtonHelperActionCards {
     }
 
     private static List<Button> getTilesToLuckyShot(Player player, Game game) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
             if (FoWHelper.otherPlayersHaveShipsInSystem(player, tileEntry.getValue(), game)
@@ -81,7 +81,7 @@ public final class ButtonHelperActionCards {
                 }
                 if (rightKindPresent) {
                     Button validTile = Buttons.green(
-                            finChecker + "luckyShotIn_" + tileEntry.getKey(),
+                            factionChecker + "luckyShotIn_" + tileEntry.getKey(),
                             tile.getRepresentationForButtons(game, player));
                     buttons.add(validTile);
                 }
@@ -91,7 +91,7 @@ public final class ButtonHelperActionCards {
     }
 
     private static List<Button> getUnitsToScuttle(Player player, Tile tile, int tgAlready) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = "FFCC_" + player.getFaction() + "_";
         Set<UnitType> allowedUnits = Set.of(
                 UnitType.Destroyer,
                 UnitType.Cruiser,
@@ -126,15 +126,15 @@ public final class ButtonHelperActionCards {
                 }
 
                 for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
-                    String buttonID = finChecker + "scuttleOn_" + tile.getPosition() + "_" + unitName + "damaged" + "_"
-                            + tgAlready;
+                    String buttonID = factionChecker + "scuttleOn_" + tile.getPosition() + "_" + unitName + "damaged"
+                            + "_" + tgAlready;
                     Button validTile2 = Buttons.red(buttonID, "Remove A Damaged " + prettyName, unitKey.unitEmoji());
                     buttons.add(validTile2);
                 }
                 totalUnits -= damagedUnits;
                 for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
                     Button validTile2 = Buttons.red(
-                            finChecker + "scuttleOn_" + tile.getPosition() + "_" + unitName + "_" + tgAlready,
+                            factionChecker + "scuttleOn_" + tile.getPosition() + "_" + unitName + "_" + tgAlready,
                             "Remove " + x + " " + prettyName,
                             unitKey.unitEmoji());
                     buttons.add(validTile2);
@@ -145,7 +145,7 @@ public final class ButtonHelperActionCards {
     }
 
     private static List<Button> getUnitsToLuckyShot(Player player, Game game, Tile tile) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = "FFCC_" + player.getFaction() + "_";
         Set<UnitType> allowedUnits = Set.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Dreadnought);
 
         List<Button> buttons = new ArrayList<>();
@@ -178,7 +178,7 @@ public final class ButtonHelperActionCards {
                 }
 
                 for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
-                    String buttonID = finChecker + "luckyShotOn_" + tile.getPosition() + "_" + unitName + "damaged"
+                    String buttonID = factionChecker + "luckyShotOn_" + tile.getPosition() + "_" + unitName + "damaged"
                             + "_" + unitKey.getColor();
                     Button validTile2 = Buttons.red(buttonID, "Destroy A Damaged " + prettyName, unitKey.unitEmoji());
                     buttons.add(validTile2);
@@ -186,7 +186,7 @@ public final class ButtonHelperActionCards {
                 totalUnits -= damagedUnits;
                 for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
                     Button validTile2 = Buttons.red(
-                            finChecker + "luckyShotOn_" + tile.getPosition() + "_" + unitName + "_"
+                            factionChecker + "luckyShotOn_" + tile.getPosition() + "_" + unitName + "_"
                                     + unitKey.getColor(),
                             "Destroy " + x + " " + prettyName,
                             unitKey.unitEmoji());
@@ -488,14 +488,14 @@ public final class ButtonHelperActionCards {
     }
 
     private static List<Button> getDivertFundingLoseTechOptions(Player player, Game game) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
             if (!techM.isUnitUpgrade()
                     && (techM.getFaction().isEmpty()
                             || techM.getFaction().orElse("").isEmpty())) {
-                buttons.add(Buttons.gray(finChecker + "divertFunding@" + tech, techM.getName()));
+                buttons.add(Buttons.gray(factionChecker + "divertFunding@" + tech, techM.getName()));
             }
         }
         return buttons;
@@ -705,7 +705,7 @@ public final class ButtonHelperActionCards {
     }
 
     public static List<Button> getCourageousOptions(Player player, Game game, boolean nekro, String type) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = "FFCC_" + player.getFaction() + "_";
         nekro |= game.isTwilightKart() && game.isTwilightsFallMode();
         List<Button> buttons = new ArrayList<>();
 
@@ -737,7 +737,7 @@ public final class ButtonHelperActionCards {
         for (String asyncID : allowedUnits) {
             UnitModel ownedUnit = player.getUnitFromAsyncID(asyncID);
             if (ownedUnit != null) {
-                String buttonID = finChecker + "courageousFire_" + ownedUnit.getBaseType() + "_"
+                String buttonID = factionChecker + "courageousFire_" + ownedUnit.getBaseType() + "_"
                         + ownedUnit.getCombatHitsOn() + "_" + type;
                 String buttonText = "Choose " + ownedUnit.getName() + " (Hits On " + ownedUnit.getCombatHitsOn() + ")";
                 buttons.add(Buttons.gray(buttonID, buttonText, ownedUnit.getUnitEmoji()));
@@ -815,7 +815,7 @@ public final class ButtonHelperActionCards {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             buttons.add(Buttons.gray(
-                    player.getFinsFactionCheckerPrefix() + "resolveParleyStep2_" + planet,
+                    player.factionButtonChecker() + "resolveParleyStep2_" + planet,
                     Helper.getPlanetRepresentation(planet, game)));
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);

@@ -15,7 +15,7 @@ public final class GhostCommanderButton implements PostMovementAbilityButton {
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.blue(
-                ctx.player().finChecker() + "placeGhostCommanderFF_"
+                ctx.player().factionButtonChecker() + "placeGhostCommanderFF_"
                         + ctx.tile().getPosition(),
                 "Place Fighter with Creuss Commander",
                 FactionEmojis.Ghost));

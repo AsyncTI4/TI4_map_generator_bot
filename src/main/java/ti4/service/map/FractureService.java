@@ -147,7 +147,8 @@ public class FractureService {
 
             List<Button> buttons = new ArrayList<>(tilesWithSkip.stream()
                     .map(tile -> {
-                        String id = player.finChecker() + "addIngressToken_" + tile.getPosition() + "_" + countPer;
+                        String id = player.factionButtonChecker() + "addIngressToken_" + tile.getPosition() + "_"
+                                + countPer;
                         String label = "Add Ingress To " + tile.getRepresentationForButtons(game, player);
                         return Buttons.red(id, label, type.emoji());
                     })

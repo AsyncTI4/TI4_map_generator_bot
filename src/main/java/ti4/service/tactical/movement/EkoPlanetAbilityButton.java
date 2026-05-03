@@ -14,6 +14,7 @@ public final class EkoPlanetAbilityButton implements MoveAbilityButton {
 
     public List<Button> build(MoveContext ctx) {
         return List.of(Buttons.gray(
-                ctx.player.finChecker() + "planetAbilityExhaust_" + "eko", "Use Eko's Ability To Ignore Anomalies"));
+                ctx.player.factionButtonChecker() + "planetAbilityExhaust_" + "eko",
+                "Use Eko's Ability To Ignore Anomalies"));
     }
 }

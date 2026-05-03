@@ -15,6 +15,6 @@ public final class AtokeraHeroButton implements PostMovementAbilityButton {
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.blue(
-                ctx.player().finChecker() + "purgeAtokeraHero", "Use Atokera Hero", FactionEmojis.atokera));
+                ctx.player().factionButtonChecker() + "purgeAtokeraHero", "Use Atokera Hero", FactionEmojis.atokera));
     }
 }

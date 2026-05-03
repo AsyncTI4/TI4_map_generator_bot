@@ -28,12 +28,12 @@ public class TkCatalyzeResolver implements EdictResolver {
 
     private static List<Button> buttons(Player player) {
         List<Button> buttons = new ArrayList<>();
-        String draw = player.finChecker() + "drawSingularNewSpliceCard_";
+        String draw = player.factionButtonChecker() + "drawSingularNewSpliceCard_";
         buttons.add(Buttons.green(draw + "ability", "Draw 1 Ability", MiscEmojis.tf_ability));
         buttons.add(Buttons.green(draw + "units", "Draw 1 Unit Upgrade", TechEmojis.UnitUpgradeTech));
         buttons.add(Buttons.green(draw + "genome", "Draw 1 Genome", MiscEmojis.tf_genome));
 
-        buttons.add(Buttons.red(player.finChecker() + "rollCatalyze", "Roll for Catalyze"));
+        buttons.add(Buttons.red(player.factionButtonChecker() + "rollCatalyze", "Roll for Catalyze"));
         buttons.add(Buttons.DONE_DELETE_BUTTONS);
         return buttons;
     }

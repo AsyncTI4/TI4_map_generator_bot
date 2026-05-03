@@ -61,12 +61,12 @@ public class SpeakerService {
                     Button button;
                     if (!game.isFowMode()) {
                         button = Buttons.gray(
-                                politicsHolder.getFinsFactionCheckerPrefix() + "assignTyrant_" + faction,
+                                politicsHolder.factionButtonChecker() + "assignTyrant_" + faction,
                                 " ",
                                 player.getFactionEmoji());
                     } else {
                         button = Buttons.gray(
-                                politicsHolder.getFinsFactionCheckerPrefix() + "assignTyrant_" + faction,
+                                politicsHolder.factionButtonChecker() + "assignTyrant_" + faction,
                                 player.getColor(),
                                 ColorEmojis.getColorEmoji(player.getColor()));
                     }

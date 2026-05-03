@@ -308,7 +308,7 @@ public final class RiftUnitsHelper {
     }
 
     private static List<Button> getButtonsForRiftingUnitsInSystem(Player player, Game game, Tile tile) {
-        String finChecker = player.getFinsFactionCheckerPrefix();
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
 
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
@@ -341,7 +341,7 @@ public final class RiftUnitsHelper {
                     }
                     for (int x = 1; x < damagedUnits + 1 && x <= 2; x++) {
                         Button validTile2 = Buttons.red(
-                                finChecker + "riftUnit_" + tile.getPosition() + "_" + x + unitName + "damaged",
+                                factionChecker + "riftUnit_" + tile.getPosition() + "_" + x + unitName + "damaged",
                                 "Rift " + x + " Damaged " + unitModel.getBaseType(),
                                 unitModel.getUnitEmoji());
                         buttons.add(validTile2);
@@ -349,7 +349,7 @@ public final class RiftUnitsHelper {
                     totalUnits -= damagedUnits;
                     for (int x = 1; x < totalUnits + 1 && x <= 2; x++) {
                         Button validTile2 = Buttons.red(
-                                finChecker + "riftUnit_" + tile.getPosition() + "_" + x + unitName,
+                                factionChecker + "riftUnit_" + tile.getPosition() + "_" + x + unitName,
                                 "Rift " + x + " " + unitModel.getBaseType(),
                                 unitModel.getUnitEmoji());
                         buttons.add(validTile2);
@@ -357,7 +357,7 @@ public final class RiftUnitsHelper {
                 }
             }
         }
-        buttons.add(Buttons.gray(finChecker + "riftAllUnits_" + tile.getPosition(), "Rift All Units"));
+        buttons.add(Buttons.gray(factionChecker + "riftAllUnits_" + tile.getPosition(), "Rift All Units"));
         buttons.add(Buttons.blue("getDamageButtons_" + tile.getPosition() + "_remove", "Remove Transported Units"));
         buttons.add(Buttons.red("doneRifting", "Done Rifting Units and Removing Transported Units"));
 
@@ -365,7 +365,7 @@ public final class RiftUnitsHelper {
     }
 
     private static List<Button> getButtonsForWormholingUnitsInSystem(Player player, Game game, Tile tile) {
-        String finChecker = player.getFinsFactionCheckerPrefix();
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
 
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
@@ -397,7 +397,7 @@ public final class RiftUnitsHelper {
                     }
                     for (int x = 1; x < damagedUnits + 1 && x <= 2; x++) {
                         Button validTile2 = Buttons.red(
-                                finChecker + "wormholeUnit_" + tile.getPosition() + "_" + x + unitName + "damaged",
+                                factionChecker + "wormholeUnit_" + tile.getPosition() + "_" + x + unitName + "damaged",
                                 "Wormhole " + x + " Damaged " + unitModel.getBaseType(),
                                 unitModel.getUnitEmoji());
                         buttons.add(validTile2);
@@ -405,7 +405,7 @@ public final class RiftUnitsHelper {
                     totalUnits -= damagedUnits;
                     for (int x = 1; x < totalUnits + 1 && x <= 2; x++) {
                         Button validTile2 = Buttons.red(
-                                finChecker + "wormholeUnit_" + tile.getPosition() + "_" + x + unitName,
+                                factionChecker + "wormholeUnit_" + tile.getPosition() + "_" + x + unitName,
                                 "Wormhole " + x + " " + unitModel.getBaseType(),
                                 unitModel.getUnitEmoji());
                         buttons.add(validTile2);
@@ -413,7 +413,7 @@ public final class RiftUnitsHelper {
                 }
             }
         }
-        buttons.add(Buttons.gray(finChecker + "wormholeAllShips_" + tile.getPosition(), "Wormhole All Ships"));
+        buttons.add(Buttons.gray(factionChecker + "wormholeAllShips_" + tile.getPosition(), "Wormhole All Ships"));
         buttons.add(
                 Buttons.blue("getDamageButtons_" + tile.getPosition() + "_remove", "Remove Excess Transported Units"));
         buttons.add(Buttons.red("doneRifting", "Done Wormholing Ships"));

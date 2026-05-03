@@ -211,30 +211,30 @@ public final class TeHelperAbilities {
                         continue;
                     }
                     for (int x = 1; x <= Math.min(2, pds); x++) {
-                        String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "pd_"
-                                + planet.getName();
+                        String id = player.factionButtonChecker() + "miniLanding_" + activeSystem.getPosition() + "_"
+                                + x + "pd_" + planet.getName();
                         String label =
                                 "Land " + x + " PDS On " + Helper.getPlanetRepresentation(planet.getName(), game);
                         buttons.add(Buttons.red(id, label, UnitEmojis.pds));
                     }
                     for (int x = 1; x <= Math.min(2, dmgPds); x++) {
-                        String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "pd_"
-                                + planet.getName();
+                        String id = player.factionButtonChecker() + "miniLanding_" + activeSystem.getPosition() + "_"
+                                + x + "pd_" + planet.getName();
                         String label = "Land " + x + " Damaged PDS On "
                                 + Helper.getPlanetRepresentation(planet.getName(), game);
                         buttons.add(Buttons.red(id, label, UnitEmojis.pds));
                     }
                     if (player.hasUnit("tk-keshnu") && !player.hasAbility("miniaturization")) continue;
                     for (int x = 1; x <= Math.min(1, docks); x++) {
-                        String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "sd_"
-                                + planet.getName();
+                        String id = player.factionButtonChecker() + "miniLanding_" + activeSystem.getPosition() + "_"
+                                + x + "sd_" + planet.getName();
                         String label = "Land " + x + " Space Dock On "
                                 + Helper.getPlanetRepresentation(planet.getName(), game);
                         buttons.add(Buttons.red(id, label, UnitEmojis.spacedock));
                     }
                     for (int x = 1; x <= Math.min(1, dmgDocks); x++) {
-                        String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "sd_"
-                                + planet.getName();
+                        String id = player.factionButtonChecker() + "miniLanding_" + activeSystem.getPosition() + "_"
+                                + x + "sd_" + planet.getName();
                         String label = "Land " + x + " Damaged Space Dock On "
                                 + Helper.getPlanetRepresentation(planet.getName(), game);
                         buttons.add(Buttons.red(id, label, UnitEmojis.spacedock));
@@ -354,13 +354,14 @@ public final class TeHelperAbilities {
             Tile t = game.getTileByPosition(adj);
             if (t != null && !t.hasPlayerCC(player)) {
                 if (FoWHelper.playerHasShipsInSystem(player, t) || survivalMap.containsKey(adj)) {
-                    String id = player.finChecker() + "startSurvival_" + tile.getPosition() + "_" + t.getPosition();
+                    String id = player.factionButtonChecker() + "startSurvival_" + tile.getPosition() + "_"
+                            + t.getPosition();
                     String label = t.getRepresentationForButtons(game, player);
                     buttons.add(Buttons.green(id, label));
                 }
             }
         }
-        buttons.add(Buttons.red(player.finChecker() + "finishSurvival_" + tile.getPosition(), "Done Moving"));
+        buttons.add(Buttons.red(player.factionButtonChecker() + "finishSurvival_" + tile.getPosition(), "Done Moving"));
         return buttons;
     }
 
@@ -385,7 +386,7 @@ public final class TeHelperAbilities {
                                 >= uh.getUnits().get(uk)) continue;
 
                 // otherwise, add the button
-                String id = player.finChecker() + "moveSurvival_" + destination.getPosition() + "_"
+                String id = player.factionButtonChecker() + "moveSurvival_" + destination.getPosition() + "_"
                         + source.getPosition() + "_" + uk.asyncID() + "_" + uh.getName();
                 String label = uk.unitType().humanReadableName() + " from " + uhName;
                 buttons.add(Buttons.green(id, label, uk.unitEmoji()));
@@ -399,7 +400,7 @@ public final class TeHelperAbilities {
                 UnitType type = Units.findUnitType(data[0]);
                 String uhName = "space".equals(data[1]) ? "Space" : Helper.getPlanetRepresentation(data[1], game);
                 if (type != null) {
-                    String id = player.finChecker() + "undoSurvival_" + destination.getPosition() + "_"
+                    String id = player.factionButtonChecker() + "undoSurvival_" + destination.getPosition() + "_"
                             + source.getPosition() + "_" + type + "_" + data[1];
                     String label = "Return " + type.humanReadableName() + " to " + uhName;
                     buttons.add(Buttons.red(id, label, type.getUnitTypeEmoji()));
@@ -408,7 +409,7 @@ public final class TeHelperAbilities {
         }
         // Choose another system button
         buttons.add(Buttons.gray(
-                player.finChecker() + "startSurvival_" + destination.getPosition(), "Done With This System"));
+                player.factionButtonChecker() + "startSurvival_" + destination.getPosition(), "Done With This System"));
         return buttons;
     }
 }

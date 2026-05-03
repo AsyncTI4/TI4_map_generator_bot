@@ -44,7 +44,7 @@ public class FealtyUplinkService {
         String prettyPlanet = Helper.getPlanetRepresentationNoResInf(planetName, game);
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
-                player.finChecker() + "fealtyUplink_" + planetName,
+                player.factionButtonChecker() + "fealtyUplink_" + planetName,
                 "Use " + name(game) + " on " + prettyPlanet,
                 FactionEmojis.L1Z1X));
         String message = "When you gain control of a planet, you may use " + rep(game);

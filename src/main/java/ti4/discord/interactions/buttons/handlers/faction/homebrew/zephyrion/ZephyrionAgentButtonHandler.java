@@ -49,30 +49,27 @@ public class ZephyrionAgentButtonHandler {
         String colorPlayer = buttonID.split("_")[0];
         String unitTypeString = buttonID.split("_")[1].toLowerCase();
         Player p2 = game.getPlayerFromColorOrFaction(colorPlayer);
-        UnitModel unit = p2.getUnitByBaseType(unitTypeString);
-        game.removeStoredValue("bounties" + p2.getFaction() + unitTypeString);
-        player.gainTG(3, true);
-        ButtonHelperAgents.resolveArtunoCheck(player, 3);
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentation()
-                        + " claimed a bounty and so gained 3 trade goods. The bounty claimed was on a "
-                        + StringUtils.capitalize(unitTypeString) + " belonging to "
-                        + p2.getRepresentationNoPing() + ".");
-        if (unit != null) {
-            String message = p2.getRepresentation() + ", please destroy one of your ships of that type.";
-            List<Button> removeButtons = new ArrayList<>(
-                    ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(p2, game, unitTypeString, true));
-            if (!removeButtons.isEmpty()) {
-                p2.gainTG((int) unit.getCost(), true);
-                ButtonHelperAgents.resolveArtunoCheck(p2, (int) unit.getCost());
-                MessageHelper.sendMessageToChannel(
-                        p2.getCorrectChannel(),
-                        p2.getRepresentationNoPing() + " received trade goods equal to the ship's cost.");
-                message += ".";
-                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, removeButtons);
-            }
+        if (p2 == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not find player, please resolve manually.");
+            return;
         }
+        UnitModel unit = p2.getUnitByBaseType(unitTypeString);
+        if (unit != null) {
+            p2.gainTG((int) unit.getCost(), true);
+            ButtonHelperAgents.resolveArtunoCheck(p2, (int) unit.getCost());
+            MessageHelper.sendMessageToChannel(
+                    p2.getCorrectChannel(),
+                    p2.getRepresentationNoPing() + " received trade goods equal to the ship's cost.");
+        }
+        List<Button> removeButtons = new ArrayList<>();
+        for (Button b : ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(p2, game, unitTypeString, true, true)) {
+            removeButtons.add(b.withCustomId(p2.factionButtonChecker() + b.getCustomId()));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                game.getMainGameChannel(),
+                p2.getRepresentation() + ", please destroy one of your ships of that type.",
+                removeButtons);
         ButtonHelper.deleteMessage(event);
     }
 }
