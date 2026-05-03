@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.lunarium.LunariumAbilityButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -217,6 +218,9 @@ public class CommandCounterButtonHandler {
                                 + ButtonHelper.checkFleetInEveryTile(player, game)
                                 + ". That's how many command tokens you'll need to retain in your fleet pool to avoid removing ships.");
             }
+        }
+        if (player.hasAbility("multitasking")) {
+            LunariumAbilityButtonHandler.offerFactionSheetCCButtons(game, player);
         }
     }
 

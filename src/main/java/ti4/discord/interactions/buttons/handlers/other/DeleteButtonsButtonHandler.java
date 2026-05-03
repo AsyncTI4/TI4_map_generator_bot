@@ -247,6 +247,14 @@ class DeleteButtonsButtonHandler {
                         && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red("exhaustAgent_winnuagent", "Use Winnu Agent", FactionEmojis.Winnu));
                 }
+                if (player.hasUnexhaustedLeader("lunariumagent")
+                        && !"muaatagent".equalsIgnoreCase(buttonID)
+                        && !"solBtBuild".equalsIgnoreCase(buttonID)
+                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                        && !buttonID.contains("integrated")) {
+                    buttons.add(
+                            Buttons.red("exhaustAgent_lunariumagent", "Use Lunarium Agent", FactionEmojis.lunarium));
+                }
                 if (player.hasUnexhaustedLeader("gledgeagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)

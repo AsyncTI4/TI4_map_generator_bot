@@ -1453,6 +1453,9 @@ public final class Helper {
                 } else if (thing.contains("winnuagent")) {
                     msg.append("> Used Winnu agent for 2 resources").append('\n');
                     res += 2;
+                } else if (thing.contains("lunariumagent")) {
+                    msg.append("> Used Lunarium agent for 1 resource").append('\n');
+                    res += 1;
                 } else if (thing.contains("Zealots Agent")) {
                     msg.append("> ")
                             .append(thing)
