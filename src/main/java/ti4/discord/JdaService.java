@@ -31,6 +31,7 @@ import ti4.contest.cron.CombatReplayPromotionCron;
 import ti4.contest.cron.CombatReplayPromotionScoreBackfillCron;
 import ti4.contest.cron.CombatReplaySelectionCron;
 import ti4.cron.AutoPingCron;
+import ti4.cron.BothelperDashboardCron;
 import ti4.cron.CategoryCleanupCron;
 import ti4.cron.CloseLaunchThreadsCron;
 import ti4.cron.CronManager;
@@ -316,6 +317,7 @@ public class JdaService {
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
         CategoryCleanupCron.register();
+        BothelperDashboardCron.register();
     }
 
     public static void markProcessReady() {
