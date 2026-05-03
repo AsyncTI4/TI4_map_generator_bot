@@ -61,7 +61,6 @@ public class BothelperDashboardService {
                     .append(")\n");
             for (Member member : members) {
                 uniqueUserIds.add(member.getId());
-                //serverBlocks.append("- ").append(member.getEffectiveName()).append("\n");
             }
         }
 
@@ -84,7 +83,7 @@ public class BothelperDashboardService {
         }
         TextChannel channel = channels.getFirst();
         String content = buildDashboardContent();
-        var manageRolesButton = Buttons.blue(BUTTON_ID, "Pick Servers to Bothelper");
+        var manageRolesButton = Buttons.blue(BUTTON_ID, "Manage My Bothelper Role");
 
         // Delete all existing messages then send a fresh one
         channel.getHistory()
@@ -194,7 +193,7 @@ public class BothelperDashboardService {
             Member member = guild.getMember(event.getUser());
             if (member == null) {
                 skipped.add(guild.getName() + " (you are not in this server)");
-                // TODO: add a server invite link 
+                // TODO: add a server invite link
                 continue;
             }
             boolean userWantsRole = selectedGuildIds.contains(guild.getId());
