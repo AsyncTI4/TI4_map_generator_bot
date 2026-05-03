@@ -151,7 +151,7 @@ public final class FOWPlusService {
 
     @ModalHandler("blindActivation_")
     public static void doBlindActivation(ModalInteractionEvent event, Player player, Game game) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         String origMessageId = event.getModalId().replace("blindActivation_", "");
         String position = event.getValue(Constants.POSITION).getAsString().trim();
 

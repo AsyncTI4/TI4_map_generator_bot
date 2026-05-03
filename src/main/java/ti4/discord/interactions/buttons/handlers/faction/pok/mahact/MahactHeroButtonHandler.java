@@ -130,7 +130,7 @@ class MahactHeroButtonHandler {
     }
 
     private static List<Button> getBenediction2ndTileOptions(Player player, Game game, String pos1) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         Player origPlayer = player;
         Tile tile1 = game.getTileByPosition(pos1);

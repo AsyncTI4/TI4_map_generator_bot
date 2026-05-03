@@ -49,7 +49,7 @@ import ti4.service.unit.RemoveUnitService;
 public final class ButtonHelperActionCards {
 
     private static List<Button> getTilesToScuttle(Player player, Game game, int tgAlready) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
             if (FoWHelper.playerHasShipsInSystem(player, tileEntry.getValue())) {
@@ -64,7 +64,7 @@ public final class ButtonHelperActionCards {
     }
 
     private static List<Button> getTilesToLuckyShot(Player player, Game game) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
             if (FoWHelper.otherPlayersHaveShipsInSystem(player, tileEntry.getValue(), game)
@@ -91,7 +91,7 @@ public final class ButtonHelperActionCards {
     }
 
     private static List<Button> getUnitsToScuttle(Player player, Tile tile, int tgAlready) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         Set<UnitType> allowedUnits = Set.of(
                 UnitType.Destroyer,
                 UnitType.Cruiser,
@@ -145,7 +145,7 @@ public final class ButtonHelperActionCards {
     }
 
     private static List<Button> getUnitsToLuckyShot(Player player, Game game, Tile tile) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         Set<UnitType> allowedUnits = Set.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Dreadnought);
 
         List<Button> buttons = new ArrayList<>();
@@ -488,7 +488,7 @@ public final class ButtonHelperActionCards {
     }
 
     private static List<Button> getDivertFundingLoseTechOptions(Player player, Game game) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
@@ -705,7 +705,7 @@ public final class ButtonHelperActionCards {
     }
 
     public static List<Button> getCourageousOptions(Player player, Game game, boolean nekro, String type) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         nekro |= game.isTwilightKart() && game.isTwilightsFallMode();
         List<Button> buttons = new ArrayList<>();
 
