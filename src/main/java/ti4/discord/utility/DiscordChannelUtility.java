@@ -20,7 +20,7 @@ import net.dv8tion.jda.internal.requests.RestActionImpl;
 public class DiscordChannelUtility {
 
     public CacheRestAction<ThreadChannel> retrieveThreadChannelById(Guild guild, long id) {
-        retrieveThreadChannelById(guild, Long.toString(id));
+        return retrieveThreadChannelById(guild, Long.toString(id));
     }
 
     public CacheRestAction<ThreadChannel> retrieveThreadChannelById(Guild guild, String id) {
