@@ -694,25 +694,20 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     @Nullable
     private ThreadChannel findCardsInfoThreadByIdOrName(TextChannel actionsChannel, String name) {
-        String idStr = getCardsInfoThreadID();
-
-        if (StringUtils.isNotBlank(idStr) && !"null".equals(idStr)) {
-            try {
-                long id = Long.parseLong(idStr);
-                ThreadChannel thread = DiscordChannelUtility.retrieveThreadChannelById(actionsChannel.getGuild(), id)
-                        .complete();
-                if (thread != null) return thread;
-            } catch (Exception ignored) {
-                // ignore and try to search by name
-            }
-        }
-
-        try {
-            return DiscordChannelUtility.retrieveFirstThreadChannelByNameIgnoringCase(actionsChannel, name)
+        Long id = getCardsInfoThreadIdLong();
+        if (id != null) {
+            ThreadChannel thread = DiscordChannelUtility.retrieveThreadChannelById(actionsChannel.getGuild(), id)
                     .complete();
-        } catch (Exception e) {
-            return null;
+            if (thread != null) return thread;
         }
+        return DiscordChannelUtility.retrieveFirstThreadChannelByNameIgnoringCase(actionsChannel, name)
+                .complete();
+    }
+
+    private Long getCardsInfoThreadIdLong() {
+        String idStr = getCardsInfoThreadID();
+        if (StringUtils.isBlank(idStr) || !"null".equals(idStr)) return null;
+        return Long.valueOf(getCardsInfoThreadID());
     }
 
     private ThreadChannel createNewThread(TextChannel actionsChannel, String threadName) {
