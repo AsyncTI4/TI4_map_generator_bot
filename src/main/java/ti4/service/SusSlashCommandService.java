@@ -80,8 +80,25 @@ public class SusSlashCommandService {
                         .findFirst()
                         .orElse(null);
         if (moderationLogChannel == null) return;
-        String message = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + jumpUrl;
-        MessageHelper.sendMessageToChannel(moderationLogChannel, message);
+        StringBuilder message = new StringBuilder();
+        message.append(event.getUser().getEffectiveName())
+                .append(" `")
+                .append(event.getCommandString())
+                .append("` ")
+                .append(jumpUrl);
+        String gameName = GameNameService.getGameName(event);
+        ManagedGame managedGame = GameManager.getManagedGame(gameName);
+        if (managedGame != null) {
+            TextChannel actionsChannel = managedGame.getActionsChannel();
+            TextChannel tableTalkChannel = managedGame.getTableTalkChannel();
+            if (actionsChannel != null) {
+                message.append("\nActions: ").append(actionsChannel.getAsMention());
+            }
+            if (tableTalkChannel != null) {
+                message.append("\nTabletalk: ").append(tableTalkChannel.getAsMention());
+            }
+        }
+        MessageHelper.sendMessageToChannel(moderationLogChannel, message.toString());
     }
 
     private static void reportToSusSlashCommandLog(
