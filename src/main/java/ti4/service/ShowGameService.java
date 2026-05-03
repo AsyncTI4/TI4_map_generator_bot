@@ -96,7 +96,7 @@ public class ShowGameService {
         Consumer<Message> persistMessageId = shouldPersistFullMapMessageId
                 ? msg -> SpringContext.getBean(GameImageService.class)
                         .saveDiscordMessageId(
-                                game,
+                                game.getName(),
                                 msg.getIdLong(),
                                 msg.getGuild().getIdLong(),
                                 msg.getChannel().getIdLong())

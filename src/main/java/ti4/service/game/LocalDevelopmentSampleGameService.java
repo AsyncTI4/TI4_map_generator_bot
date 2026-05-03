@@ -75,9 +75,7 @@ public class LocalDevelopmentSampleGameService {
         }
         Member developer = developerUserId == null ? null : guild.getMemberById(developerUserId);
         RecreateGameService.RecreateGameResult result = RecreateGameService.recreateGameResult(game, guild, developer);
-        if (!GameManager.save(game, "Recreated local development test game resources")) {
-            result.addNote("Game save failed after recreation.");
-        }
+        GameManager.save(game, "Recreated local development test game resources");
         return result.getSummary();
     }
 
@@ -152,10 +150,7 @@ public class LocalDevelopmentSampleGameService {
             return null;
         }
         prepareClonedGame(game, targetGameName);
-        if (!GameManager.save(game, "Created local development test game from " + sourceGameName)) {
-            BotLogger.warning("LocalDevelopmentSampleGameService: failed to save cloned test game: " + targetGameName);
-            return null;
-        }
+        GameManager.save(game, "Created local development test game from " + sourceGameName);
         return GameManager.reload(targetGameName);
     }
 
