@@ -46,7 +46,7 @@ public class BothelperDashboardService {
     public static String buildDashboardContent() {
         List<Guild> servers = JdaService.serversToCreateNewGamesOn;
         Set<String> uniqueUserIds = new HashSet<>();
-        StringBuilder sb = new StringBuilder("# Bothelper Dashboard\n");
+        StringBuilder sb = new StringBuilder("# __Bothelper Dashboard__\n");
 
         StringBuilder serverBlocks = new StringBuilder();
         for (Guild guild : servers) {
@@ -54,14 +54,14 @@ public class BothelperDashboardService {
             if (bothelperRole == null) continue;
             List<Member> members = guild.getMembersWithRoles(bothelperRole);
             serverBlocks
-                    .append("## ")
+                    .append("- ")
                     .append(guild.getName())
                     .append(" (")
                     .append(members.size())
                     .append(")\n");
             for (Member member : members) {
                 uniqueUserIds.add(member.getId());
-                serverBlocks.append("- ").append(member.getEffectiveName()).append("\n");
+                //serverBlocks.append("- ").append(member.getEffectiveName()).append("\n");
             }
         }
 
@@ -84,7 +84,7 @@ public class BothelperDashboardService {
         }
         TextChannel channel = channels.getFirst();
         String content = buildDashboardContent();
-        var manageRolesButton = Buttons.blue(BUTTON_ID, "Manage Roles");
+        var manageRolesButton = Buttons.blue(BUTTON_ID, "Pick Servers to Bothelper");
 
         // Delete all existing messages then send a fresh one
         channel.getHistory()
@@ -193,7 +193,8 @@ public class BothelperDashboardService {
             }
             Member member = guild.getMember(event.getUser());
             if (member == null) {
-                // User is not in this server; skip silently
+                skipped.add(guild.getName() + " (you are not in this server)");
+                // TODO: add a server invite link 
                 continue;
             }
             boolean userWantsRole = selectedGuildIds.contains(guild.getId());
