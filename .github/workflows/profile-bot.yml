@@ -1,0 +1,89 @@
+on:
+  workflow_dispatch:
+    inputs:
+      duration:
+        description: "Profile duration in seconds"
+        required: false
+        default: "30"
+      event:
+        description: "Profiling event type"
+        required: false
+        default: "cpu"
+        type: choice
+        options:
+          - cpu
+          - alloc
+          - wall
+      format:
+        description: "Output format"
+        required: false
+        default: "flamegraph"
+        type: choice
+        options:
+          - flamegraph
+          - jfr
+name: ProfileBot
+concurrency:
+  group: "ProfileBot"
+jobs:
+  profile:
+    name: ProfileBot
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run async-profiler inside container
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOSTINGER_SSH_HOST }}
+          username: ${{ secrets.HOSTINGER_SSH_USER }}
+          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+          port: ${{ secrets.HOSTINGER_SSH_PORT }}
+          script: |
+            set -eu
+
+            DURATION="${{ github.event.inputs.duration }}"
+            EVENT="${{ github.event.inputs.event }}"
+            FORMAT="${{ github.event.inputs.format }}"
+            PROFILES_DIR="${{ vars.HOST_TI4_SAVES_DIR }}/profiles"
+            TIMESTAMP=$(date +%Y%m%d%H%M%S)
+
+            # Determine file extension
+            if [ "$FORMAT" = "jfr" ]; then
+              EXT="jfr"
+            else
+              EXT="html"
+            fi
+
+            OUTPUT_FILE="/opt/profiles/profile_${EVENT}_${TIMESTAMP}.${EXT}"
+            HOST_OUTPUT_FILE="${PROFILES_DIR}/profile_${EVENT}_${TIMESTAMP}.${EXT}"
+
+            echo "Ensuring profiles output directory exists..."
+            mkdir -p "$PROFILES_DIR"
+
+            echo "Finding running tibot container..."
+            CONTAINER_ID=$(docker ps -q --filter "label=com.docker.compose.service=tibot" | head -n 1)
+            if [ -z "$CONTAINER_ID" ]; then
+              echo "No running tibot container found. Exiting."
+              exit 1
+            fi
+            echo "Container: $CONTAINER_ID"
+
+            echo "Finding Java process PID inside container..."
+            JAVA_PID=$(docker exec "$CONTAINER_ID" sh -c \
+              'for p in /proc/[0-9]*; do grep -q "^java$" "$p/comm" 2>/dev/null && echo "${p##*/}" && break; done')
+            if [ -z "$JAVA_PID" ]; then
+              echo "No Java process found inside container. Exiting."
+              exit 1
+            fi
+            echo "Java PID inside container: $JAVA_PID"
+
+            echo "Starting async-profiler: event=$EVENT duration=${DURATION}s format=$FORMAT output=$OUTPUT_FILE"
+            docker exec "$CONTAINER_ID" \
+              /opt/async-profiler/bin/asprof \
+                -e "$EVENT" \
+                -d "$DURATION" \
+                -f "$OUTPUT_FILE" \
+                "$JAVA_PID"
+
+            echo "Profile written to (inside container): $OUTPUT_FILE"
+            echo "Profile written to (host):             $HOST_OUTPUT_FILE"
+            echo "Profile completed successfully."
