@@ -46,7 +46,7 @@ public class BothelperDashboardService {
     public static String buildDashboardContent() {
         List<Guild> servers = JdaService.serversToCreateNewGamesOn;
         Set<String> uniqueUserIds = new HashSet<>();
-        StringBuilder sb = new StringBuilder("# @Bothelper Dashboard\n");
+        StringBuilder sb = new StringBuilder("# Bothelper Dashboard\n");
 
         StringBuilder serverBlocks = new StringBuilder();
         for (Guild guild : servers) {
@@ -76,10 +76,6 @@ public class BothelperDashboardService {
 
     public static void refreshDashboardMessage() {
         Guild hub = JdaService.guildPrimary;
-        if (hub == null) {
-            BotLogger.warning("BothelperDashboardService: guildPrimary is null, cannot refresh dashboard.");
-            return;
-        }
         List<TextChannel> channels = hub.getTextChannelsByName(DASHBOARD_CHANNEL_NAME, true);
         if (channels.isEmpty()) {
             BotLogger.warning(
@@ -90,7 +86,7 @@ public class BothelperDashboardService {
         String content = buildDashboardContent();
         var manageRolesButton = Buttons.blue(BUTTON_ID, "Manage Roles");
 
-        // Delete all existing messages then send a fresh one (handles >2k content via split)
+        // Delete all existing messages then send a fresh one
         channel.getHistory()
                 .retrievePast(100)
                 .queue(
