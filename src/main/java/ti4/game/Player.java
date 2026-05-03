@@ -699,7 +699,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (StringUtils.isNotBlank(idStr) && !"null".equals(idStr)) {
             try {
                 long id = Long.parseLong(idStr);
-                ThreadChannel thread = DiscordChannelUtility.retrieveThreadChannelById(actionsChannel.getGuild(), id).complete();
+                ThreadChannel thread = DiscordChannelUtility.retrieveThreadChannelById(actionsChannel.getGuild(), id)
+                        .complete();
                 if (thread != null) return thread;
             } catch (Exception ignored) {
                 // ignore and try to search by name
@@ -707,7 +708,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
 
         try {
-            return DiscordChannelUtility.retrieveFirstThreadChannelByNameIgnoringCase(actionsChannel, name).complete();
+            return DiscordChannelUtility.retrieveFirstThreadChannelByNameIgnoringCase(actionsChannel, name)
+                    .complete();
         } catch (Exception e) {
             return null;
         }
