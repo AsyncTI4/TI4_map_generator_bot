@@ -179,9 +179,9 @@ public class EndTurnService {
             }
             CommanderUnlockCheckService.checkPlayer(mainPlayer, "ralnel");
             if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, mainPlayer, event)) {
-                EndPhaseService.EndActionPhase(event, game, gameChannel);
                 game.updateActivePlayer(null);
                 ButtonHelperAgents.checkForEdynAgentActive(game, event);
+                EndPhaseService.EndActionPhase(event, game, gameChannel);
             }
 
             return;

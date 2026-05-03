@@ -41,7 +41,6 @@ class ChecksAndBalancesButtonHandler {
         List<Button> buttons = PickStrategyCardButtonHandler.getPlayerOptionsForChecksNBalances(player, game, scPicked);
         if (buttons.isEmpty()) {
             StartPhaseService.startActionPhase(event, game);
-            game.setStoredValue("willRevolution", "");
         } else {
             boolean foundPlayer = false;
             Player privatePlayer = null;

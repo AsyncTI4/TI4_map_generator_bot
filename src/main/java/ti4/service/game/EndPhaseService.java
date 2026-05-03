@@ -10,11 +10,11 @@ import ti4.helpers.StatusHelper;
 public class EndPhaseService {
     public static void EndActionPhase(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
         StatusHelper.AnnounceStatusPhase(game);
+        StatusHelper.HandleStatusPhaseMiddle(event, game, gameChannel);
         if (!game.isOmegaPhaseMode()) {
             StatusHelper.beginScoring(event, game, gameChannel);
         } else {
             StartPhaseService.startStatusHomework(event, game);
         }
-        StatusHelper.HandleStatusPhaseMiddle(event, game, gameChannel);
     }
 }

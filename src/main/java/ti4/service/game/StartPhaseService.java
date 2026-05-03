@@ -107,9 +107,9 @@ public class StartPhaseService {
             }
             case "statusScoring" -> {
                 StatusHelper.AnnounceStatusPhase(game);
-                StatusHelper.beginScoring(event, game, event.getMessageChannel());
                 StatusHelper.HandleStatusPhaseMiddle(event, game, event.getMessageChannel());
                 game.updateActivePlayer(null);
+                StatusHelper.beginScoring(event, game, event.getMessageChannel());
             }
             case "endOfGameSummary" -> {
                 StringBuilder endOfGameSummary = new StringBuilder();
