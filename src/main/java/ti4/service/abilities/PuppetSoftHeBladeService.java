@@ -57,7 +57,7 @@ public class PuppetSoftHeBladeService {
         flipFactionToObsidian(game, player);
 
         // Announce Plots
-        String factionName = player.getDisplayName();
+        String factionName = player.getRepresentationNoPing();
         StringBuilder plotInfo = new StringBuilder("## __" + factionName + " plots are now revealed:__");
         for (String plotID : player.getPlotCards().keySet()) {
             GenericCardModel plot = Mapper.getPlot(plotID);
@@ -310,6 +310,13 @@ public class PuppetSoftHeBladeService {
         player.setFaction("obsidian");
         player.setFactionEmoji(null);
         player.setCommoditiesBase(obsidian.getCommodities());
+        FactionModel firmament = Mapper.getFaction("firmament");
+        for (String ability : firmament.getAbilities()) {
+            player.removeAbility(ability);
+        }
+        for (String ability : obsidian.getAbilities()) {
+            player.addAbility(ability);
+        }
         outputs.add("Successfully updated faction sheet to _Obsidian_.");
 
         // Replace laws and stuff

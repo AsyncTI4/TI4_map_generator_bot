@@ -700,7 +700,11 @@ public final class ButtonHelperTacticalAction {
 
             for (Player remnant : game.getRealPlayers()) {
                 if (!remnant.ownsUnit("tk-saturnremnant")) continue;
-
+                if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, remnant, UnitType.Pds)
+                                .contains(activeSystem)
+                        || FoWHelper.otherPlayersHaveShipsInSystem(remnant, activeSystem, game)) {
+                    continue;
+                }
                 UnitKey key = Units.getUnitKey(UnitType.Cruiser, remnant.getColor());
                 if (ButtonHelperFactionSpecific.vortexButtonAvailable(game, key)) {
                     String id = remnant.finChecker() + "placeOneNDone_skipbuild_cruiser_" + activeSystem.getPosition();

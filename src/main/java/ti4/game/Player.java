@@ -1904,6 +1904,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (hasLeader(leaderId)) {
             return !getLeaderByID(leaderId).map(Leader::isExhausted).orElse(true);
         } else {
+            if (leaderId.contains("keleresagent")
+                    && getGame().getStoredValue("keleresAgentTarget").equalsIgnoreCase(getFaction())) {
+                return true;
+            }
             return hasExternalAccessToLeader(leaderId)
                     && !getLeaderByID("yssarilagent").map(Leader::isExhausted).orElse(true);
         }

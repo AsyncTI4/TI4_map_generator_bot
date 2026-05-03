@@ -14,6 +14,7 @@ public final class MuaatHeroButton implements PostMovementAbilityButton {
         return ctx.player().hasLeaderUnlocked("muaathero")
                 && ((!ctx.tile().isMecatol(ctx.game()) && !ctx.tile().isHomeSystem(ctx.game()))
                         || ctx.game().isWildWildGalaxyMode())
+                && !ctx.tile().getPosition().contains("frac")
                 && CheckUnitContainmentService.getTilesContainingPlayersUnits(ctx.game(), ctx.player(), UnitType.Warsun)
                         .contains(ctx.tile());
     }

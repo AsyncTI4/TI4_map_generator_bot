@@ -364,7 +364,7 @@ public class TeHelperActionCards {
                     + Helper.getPlanetRepresentation(planet, game) + ".";
             if (tile != null && tile.getPosition().contains("frac")) {
                 Planet uh = game.getUnitHolderFromPlanet(planet);
-                if (uh != null) {
+                if (uh != null && !"mirage".equalsIgnoreCase(planet)) {
                     uh.addToken("token_relictoken.png");
                 }
             }
