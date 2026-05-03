@@ -114,8 +114,7 @@ public class BothelperDashboardService {
     public static void handleManageRolesButton(ButtonInteractionEvent event) {
         if (!CommandHelper.hasRole(event, JdaService.bothelperRoles)) {
             event.getHook()
-                    .setEphemeral(true)
-                    .sendMessage("You must have the Bothelper role to use this.")
+                    .editOriginal("You must have the Bothelper role to use this.")
                     .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
@@ -137,8 +136,7 @@ public class BothelperDashboardService {
     private static void sendManageRolesMenu(User user, InteractionHook hook) {
         List<Guild> servers = JdaService.serversToCreateNewGamesOn;
         if (servers.isEmpty()) {
-            hook.setEphemeral(true)
-                    .sendMessage("No overflow servers are currently configured.")
+            hook.editOriginal("No overflow servers are currently configured.")
                     .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
@@ -162,9 +160,8 @@ public class BothelperDashboardService {
         }
         menuBuilder.setDefaultValues(preselected);
 
-        hook.setEphemeral(true)
-                .sendMessage("Select which servers you want the Bothelper role on:")
-                .addComponents(ActionRow.of(menuBuilder.build()))
+        hook.editOriginal("Select which servers you want the Bothelper role on:")
+                .setComponents(ActionRow.of(menuBuilder.build()))
                 .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
@@ -195,7 +192,7 @@ public class BothelperDashboardService {
             boolean userWantsRole = selectedGuildIds.contains(guild.getId());
             boolean userHasRole = member.getRoles().contains(bothelperRole);
             if (userWantsRole && !userHasRole) {
-                guild.addRoleToMember(event.getUser(), bothelperRole).queue(Consumers.nop(), BotLogger::catchRestError);
+                guild.addRoleToMember(member, bothelperRole).queue(Consumers.nop(), BotLogger::catchRestError);
                 added.add(guild.getName());
             } else if (!userWantsRole && userHasRole) {
                 guild.removeRoleFromMember(member, bothelperRole).queue(Consumers.nop(), BotLogger::catchRestError);
