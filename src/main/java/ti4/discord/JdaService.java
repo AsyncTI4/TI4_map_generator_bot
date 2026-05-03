@@ -37,6 +37,7 @@ import ti4.cron.CloseLaunchThreadsCron;
 import ti4.cron.CronManager;
 import ti4.cron.EndOldGamesCron;
 import ti4.cron.FastScFollowCron;
+import ti4.cron.GameMessageCleanupCron;
 import ti4.cron.InteractionLogCron;
 import ti4.cron.LogButtonRuntimeStatisticsCron;
 import ti4.cron.LogCacheStatsCron;
@@ -302,6 +303,7 @@ public class JdaService {
         UploadRecentStatsCron.register();
         OldUndoFileCleanupCron.register();
         EndOldGamesCron.register();
+        GameMessageCleanupCron.register();
         LogButtonRuntimeStatisticsCron.register();
         TechSummaryCron.register();
         SabotageAutoReactCron.register();
