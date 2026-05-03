@@ -17,6 +17,9 @@ services:
     image: ${IMAGE_REPOSITORY:-ghcr.io/asyncti4/ti4-map-generator-bot}:${IMAGE_TAG:-master}
     restart: unless-stopped
     mem_limit: 7g
+    # SYS_ADMIN capability and disabled seccomp are required for async-profiler to
+    # access kernel perf events for CPU profiling. Without these, only JVMTI-based
+    # sampling (--no-kernel) would be available, which gives less accurate results.
     cap_add:
       - SYS_ADMIN
     security_opt:

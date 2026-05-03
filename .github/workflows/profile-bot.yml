@@ -23,6 +23,7 @@ on:
           - flamegraph
           - jfr
 name: ProfileBot
+permissions: {}
 concurrency:
   group: "ProfileBot"
 jobs:
@@ -43,6 +44,12 @@ jobs:
             DURATION="${{ github.event.inputs.duration }}"
             EVENT="${{ github.event.inputs.event }}"
             FORMAT="${{ github.event.inputs.format }}"
+
+            # Validate duration is a positive integer
+            if ! echo "$DURATION" | grep -qE '^[1-9][0-9]*$'; then
+              echo "Invalid duration '$DURATION': must be a positive integer. Exiting."
+              exit 1
+            fi
             PROFILES_DIR="${{ vars.HOST_TI4_SAVES_DIR }}/profiles"
             TIMESTAMP=$(date +%Y%m%d%H%M%S)
 
