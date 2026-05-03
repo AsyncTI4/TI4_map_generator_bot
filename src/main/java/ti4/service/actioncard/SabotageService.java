@@ -158,6 +158,15 @@ public class SabotageService {
             return playerName + " has " + FactionEmojis.Yssaril
                     + " _Transparasteel Plating_, and all other players have passed.";
         }
+        if (player.hasTech("tf-crafty")
+                && game.getActivePlayerID() != null
+                && game.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2 == player) continue;
+                if (!p2.isPassed()) return null;
+            }
+            return playerName + " has " + FactionEmojis.Yssaril + " _Crafty_, and all other players have passed.";
+        }
         if (player.hasTech("baarvag")) {
             return playerName + " has _Unyielding Will_ and, thus their action cards cannot be cancelled.";
         }

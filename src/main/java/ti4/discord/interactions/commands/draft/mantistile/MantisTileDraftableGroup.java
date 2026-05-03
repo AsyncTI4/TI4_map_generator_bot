@@ -29,9 +29,6 @@ public class MantisTileDraftableGroup extends SubcommandGroup {
 
     public static MantisTileDraftable getDraftable(Game game) {
         DraftManager draftManager = game.getDraftManager();
-        if (draftManager == null) {
-            return null;
-        }
         return (MantisTileDraftable) draftManager.getDraftable(MantisTileDraftable.TYPE);
     }
 }

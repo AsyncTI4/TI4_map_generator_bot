@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.3</version>
+    <version>4.1.0-RC1</version>
   </parent>
 
   <groupId>me.terterro</groupId>
@@ -14,18 +14,20 @@
   <version>1.0-SNAPSHOT</version>
 
   <properties>
-    <java.version>21</java.version>
+    <java.version>26</java.version>
+    <lombok.version>1.18.46</lombok.version>
     <jda.version>6.4.1</jda.version>
-    <aws.sdk.version>2.42.26</aws.sdk.version>
-    <hibernate-dialects.version>7.3.0.Final</hibernate-dialects.version>
+    <aws.sdk.version>2.44.0</aws.sdk.version>
+    <hibernate-dialects.version>7.3.2.Final</hibernate-dialects.version>
     <reflections.version>0.10.2</reflections.version>
     <jskills.version>1.1</jskills.version>
     <webp-imageio.version>0.10.2</webp-imageio.version>
-    <jemoji.version>1.7.6</jemoji.version>
+    <jemoji.version>2.0.0</jemoji.version>
+    <rollbar.version>2.2.0</rollbar.version>
     <spotless.version>3.4.0</spotless.version>
     <spotless.skip>false</spotless.skip>
     <spotbugs.version>4.9.8</spotbugs.version>
-    <spotbugs-maven-plugin.version>4.9.8.2</spotbugs-maven-plugin.version>
+    <spotbugs-maven-plugin.version>4.9.8.3</spotbugs-maven-plugin.version>
     <findsecbugs.version>1.14.0</findsecbugs.version>
     <sb-contrib.version>7.7.4</sb-contrib.version>
   </properties>
@@ -111,6 +113,7 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -140,7 +143,7 @@
     <dependency>
       <groupId>com.rollbar</groupId>
       <artifactId>rollbar-java</artifactId>
-      <version>2.0.0</version>
+      <version>${rollbar.version}</version>
     </dependency>
 
     <dependency>
@@ -160,15 +163,16 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <excludes>
-            <exclude>
+          <annotationProcessorPaths>
+            <path>
               <groupId>org.projectlombok</groupId>
               <artifactId>lombok</artifactId>
-            </exclude>
-          </excludes>
+              <version>${lombok.version}</version>
+            </path>
+          </annotationProcessorPaths>
         </configuration>
       </plugin>
 
@@ -180,6 +184,19 @@
             <DB_PATH>./src/test/resources</DB_PATH>
             <RESOURCE_PATH>./src/main/resources</RESOURCE_PATH>
           </environmentVariables>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+            </exclude>
+          </excludes>
         </configuration>
       </plugin>
 
@@ -229,6 +246,8 @@
           <htmlOutput>true</htmlOutput>
           <sarifOutput>true</sarifOutput>
           <excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
+          <!-- Give the SpotBugs fork more heap to reduce GC pressure and speed up analysis -->
+          <jvmArgs>-Xmx2048m</jvmArgs>
           <plugins>
             <plugin>
               <groupId>com.h3xstream.findsecbugs</groupId>
@@ -254,4 +273,21 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>ci-spotless</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.diffplug.spotless</groupId>
+            <artifactId>spotless-maven-plugin</artifactId>
+            <configuration>
+              <ratchetFrom>origin/master</ratchetFrom>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

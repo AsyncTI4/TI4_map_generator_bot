@@ -1,0 +1,17 @@
+{
+    "tileBack": "green",
+    "id": "et0",
+    "name": "Raia -- The United Empire",
+    "aliases": [
+        "et0",
+        "raia",
+        "uempire"
+    ],
+    "imagePath": "et0.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "raia"
+    ],
+    "source": "endlesst"
+}

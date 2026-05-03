@@ -496,10 +496,9 @@ public final class FoWHelper {
     public static boolean isTileInUpgradedExileRange(Game game, Tile tile, Player player) {
         if (player.hasUnit("crimson_destroyer2")) {
             List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Destroyer);
-            for (String adjPos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+            for (String adjPos : getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
                 for (Tile tile2 : destroyers) {
-                    if (FoWHelper.getAdjacentTiles(game, adjPos, player, false, true)
-                            .contains(tile2.getPosition())) {
+                    if (getAdjacentTiles(game, adjPos, player, false, true).contains(tile2.getPosition())) {
                         return true;
                     }
                 }
@@ -917,7 +916,7 @@ public final class FoWHelper {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
-            if (unitKey != null && unitKey.getColorID().equals(colorID)) {
+            if (unitKey != null && unitKey.colorID().equals(colorID)) {
                 return true;
             }
         }
@@ -933,7 +932,7 @@ public final class FoWHelper {
 
         for (UnitKey unitKey : units.keySet()) {
             if (unitKey != null
-                    && unitKey.getColorID().equals(colorID)
+                    && unitKey.colorID().equals(colorID)
                     && player.getUnitFromAsyncID(unitKey.asyncID()) != null
                     && player.getUnitFromAsyncID(unitKey.asyncID()).getIsShip()) {
                 return true;
@@ -997,7 +996,7 @@ public final class FoWHelper {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
-            if (unitKey != null && unitKey.getColorID().equals(colorID) && unitKey.getUnitType() == UnitType.Fighter) {
+            if (unitKey != null && unitKey.colorID().equals(colorID) && unitKey.unitType() == UnitType.Fighter) {
                 return true;
             }
         }
@@ -1042,7 +1041,7 @@ public final class FoWHelper {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
-            if (unitKey != null && unitKey.getColorID().equals(colorID)) {
+            if (unitKey != null && unitKey.colorID().equals(colorID)) {
                 return true;
             }
         }
@@ -1058,7 +1057,7 @@ public final class FoWHelper {
             Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
             for (UnitKey unitKey : units.keySet()) {
-                if (unitKey != null && unitKey.getColorID().equals(colorID)) {
+                if (unitKey != null && unitKey.colorID().equals(colorID)) {
                     return true;
                 }
             }
@@ -1074,7 +1073,7 @@ public final class FoWHelper {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
-            if (unitKey != null && unitKey.getColorID().equals(colorID) && unitKey.getUnitType() == UnitType.Infantry) {
+            if (unitKey != null && unitKey.colorID().equals(colorID) && unitKey.unitType() == UnitType.Infantry) {
                 return true;
             }
         }

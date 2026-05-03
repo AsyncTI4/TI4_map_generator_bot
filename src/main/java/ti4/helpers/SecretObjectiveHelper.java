@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.lunarium.LunariumCommanderHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -144,26 +145,29 @@ public final class SecretObjectiveHelper {
                     message2.append(" relic fragments.");
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2.toString());
                 } else {
-                    String finChecker = player.getFinsFactionCheckerPrefix();
+                    String factionChecker = player.factionButtonChecker();
                     List<Button> purgeFragButtons = new ArrayList<>();
                     if (player.getCrf() > 0) {
-                        Button transact = Buttons.blue(finChecker + "purge_Frags_CRF_1", "Purge 1 Cultural Fragment");
+                        Button transact =
+                                Buttons.blue(factionChecker + "purge_Frags_CRF_1", "Purge 1 Cultural Fragment");
                         purgeFragButtons.add(transact);
                     }
                     if (player.getIrf() > 0) {
                         Button transact =
-                                Buttons.green(finChecker + "purge_Frags_IRF_1", "Purge 1 Industrial Fragment");
+                                Buttons.green(factionChecker + "purge_Frags_IRF_1", "Purge 1 Industrial Fragment");
                         purgeFragButtons.add(transact);
                     }
                     if (player.getHrf() > 0) {
-                        Button transact = Buttons.red(finChecker + "purge_Frags_HRF_1", "Purge 1 Hazardous Fragment");
+                        Button transact =
+                                Buttons.red(factionChecker + "purge_Frags_HRF_1", "Purge 1 Hazardous Fragment");
                         purgeFragButtons.add(transact);
                     }
                     if (player.getUrf() > 0) {
-                        Button transact = Buttons.gray(finChecker + "purge_Frags_URF_1", "Purge 1 Frontier Fragment");
+                        Button transact =
+                                Buttons.gray(factionChecker + "purge_Frags_URF_1", "Purge 1 Frontier Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    Button transact2 = Buttons.green(finChecker + "deleteButtons", "Done Purging");
+                    Button transact2 = Buttons.green(factionChecker + "deleteButtons", "Done Purging");
                     purgeFragButtons.add(transact2);
 
                     MessageHelper.sendMessageToChannelWithButtons(
@@ -217,6 +221,9 @@ public final class SecretObjectiveHelper {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
         CommanderUnlockCheckService.checkPlayer(player, "nomad");
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "lunariumcommander")) {
+            LunariumCommanderHandler.drawSO(event, game, player);
+        }
         return Helper.checkEndGame(game, player);
     }
 

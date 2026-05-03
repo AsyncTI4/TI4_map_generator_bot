@@ -34,7 +34,8 @@ public class BothelperCommand implements ParentCommand {
                     new EditStoredValue(),
                     new ListSlashCommandsUsed(),
                     new ReserveGame(),
-                    new DeleteFOWCommThreads())
+                    new DeleteFOWCommThreads(),
+                    new ManageRoles())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

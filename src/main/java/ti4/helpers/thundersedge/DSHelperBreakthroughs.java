@@ -47,13 +47,14 @@ public final class DSHelperBreakthroughs {
 
     public static void cheiranBTExhaust(Game game, Player p1) {
         String message = p1.getRepresentation() + ", please choose which system the ship you wish to replace is in.";
-        String finChecker = "FFCC_" + p1.getFaction() + "_";
+        String factionChecker = "FFCC_" + p1.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
             if (FoWHelper.playerHasShipsInSystem(p1, tileEntry.getValue())) {
                 Tile tile = tileEntry.getValue();
                 Button validTile = Buttons.green(
-                        finChecker + "cheiranBTIn_" + tileEntry.getKey(), tile.getRepresentationForButtons(game, p1));
+                        factionChecker + "cheiranBTIn_" + tileEntry.getKey(),
+                        tile.getRepresentationForButtons(game, p1));
                 buttons.add(validTile);
             }
         }
@@ -76,7 +77,7 @@ public final class DSHelperBreakthroughs {
     public static void cheiranBTIn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.substring(buttonID.indexOf('_') + 1);
         Tile tile = game.getTileByPosition(pos);
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = "FFCC_" + player.getFaction() + "_";
         Set<UnitType> allowedUnits = Set.of(
                 UnitType.Destroyer,
                 UnitType.Cruiser,
@@ -96,12 +97,12 @@ public final class DSHelperBreakthroughs {
                 UnitKey unitKey = unitEntry.getKey();
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
 
-                if (!allowedUnits.contains(unitKey.getUnitType())) {
+                if (!allowedUnits.contains(unitKey.unitType())) {
                     continue;
                 }
 
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                String prettyName = unitModel == null ? unitKey.getUnitType().humanReadableName() : unitModel.getName();
+                String prettyName = unitModel == null ? unitKey.unitType().humanReadableName() : unitModel.getName();
                 String unitName = unitKey.unitName();
                 int totalUnits = unitEntry.getValue();
                 int damagedUnits = 0;
@@ -111,14 +112,15 @@ public final class DSHelperBreakthroughs {
                 }
 
                 for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
-                    String buttonID2 = finChecker + "cheiranBTOn_" + tile.getPosition() + "_" + unitName + "damaged";
+                    String buttonID2 =
+                            factionChecker + "cheiranBTOn_" + tile.getPosition() + "_" + unitName + "damaged";
                     Button validTile2 = Buttons.red(buttonID2, "Remove A Damaged " + prettyName, unitKey.unitEmoji());
                     buttons.add(validTile2);
                 }
                 totalUnits -= damagedUnits;
                 for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
                     Button validTile2 = Buttons.red(
-                            finChecker + "cheiranBTOn_" + tile.getPosition() + "_" + unitName,
+                            factionChecker + "cheiranBTOn_" + tile.getPosition() + "_" + unitName,
                             "Remove " + x + " " + prettyName,
                             unitKey.unitEmoji());
                     buttons.add(validTile2);
@@ -234,7 +236,7 @@ public final class DSHelperBreakthroughs {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayersExcludingThis(p1)) {
             buttons.add(Buttons.blue(
-                    p1.getFinsFactionCheckerPrefix() + "edynbtSelect_" + p2.getFaction(),
+                    p1.factionButtonChecker() + "edynbtSelect_" + p2.getFaction(),
                     p2.getFactionNameOrColor(),
                     p2.getFactionEmojiOrColor()));
         }
@@ -306,7 +308,7 @@ public final class DSHelperBreakthroughs {
                 continue;
             }
             buttons.add(Buttons.gray(
-                    p1.getFinsFactionCheckerPrefix() + "axisBTStep2_" + tile.getPosition(),
+                    p1.factionButtonChecker() + "axisBTStep2_" + tile.getPosition(),
                     tile.getRepresentationForButtons()));
         }
         MessageHelper.sendMessageToChannelWithButtons(
@@ -328,7 +330,7 @@ public final class DSHelperBreakthroughs {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayersExcludingThis(p1)) {
             buttons.add(Buttons.gray(
-                    p1.getFinsFactionCheckerPrefix() + "florzenBTStep2_" + p2.getFaction(),
+                    p1.factionButtonChecker() + "florzenBTStep2_" + p2.getFaction(),
                     p2.getFactionNameOrColor(),
                     p2.getFactionEmojiOrColor()));
         }
@@ -345,8 +347,8 @@ public final class DSHelperBreakthroughs {
         String message = ", please choose the amount of trade goods you wish to spend.";
         List<Button> buttons = new ArrayList<>();
         for (int x = 0; x < 3 && x <= p1.getTg(); x++) {
-            buttons.add(Buttons.gray(
-                    p1.getFinsFactionCheckerPrefix() + "florzenBTStep3_" + p2.getFaction() + "_" + x, x + " tg"));
+            buttons.add(
+                    Buttons.gray(p1.factionButtonChecker() + "florzenBTStep3_" + p2.getFaction() + "_" + x, x + " tg"));
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 p1.getCardsInfoThread(), p1.getRepresentationUnfogged() + message, buttons);
@@ -365,8 +367,7 @@ public final class DSHelperBreakthroughs {
         List<Button> buttons = new ArrayList<>();
         for (int x = 0; x < 3 && x <= p2.getTg(); x++) {
             buttons.add(Buttons.gray(
-                    p2.getFinsFactionCheckerPrefix() + "florzenBTStep4_" + p1.getFaction() + "_" + originalBid + "_"
-                            + x,
+                    p2.factionButtonChecker() + "florzenBTStep4_" + p1.getFaction() + "_" + originalBid + "_" + x,
                     x + " tg"));
         }
         MessageHelper.sendMessageToChannelWithButtons(
@@ -469,7 +470,7 @@ public final class DSHelperBreakthroughs {
                 continue;
             }
             buttons.add(Buttons.gray(
-                    player.getFinsFactionCheckerPrefix() + "redcreussAgentPart2_" + pos + "_" + tile.getPosition(),
+                    player.factionButtonChecker() + "redcreussAgentPart2_" + pos + "_" + tile.getPosition(),
                     tile.getRepresentationForButtons()));
         }
         MessageHelper.sendMessageToChannelWithButtons(
@@ -485,7 +486,7 @@ public final class DSHelperBreakthroughs {
         if (!secretsUnscored.isEmpty()) {
             for (String soID : secretsUnscored.keySet()) {
                 buttons.add(Buttons.blue(
-                        p1.getFinsFactionCheckerPrefix() + "edynbtTarget_" + p2.getFaction() + "_" + soID,
+                        p1.factionButtonChecker() + "edynbtTarget_" + p2.getFaction() + "_" + soID,
                         Mapper.getSecretObjective(soID).getName()));
             }
             MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
@@ -561,7 +562,7 @@ public final class DSHelperBreakthroughs {
                 if (game.getUnitHolderFromPlanet(planet) != null
                         && game.getUnitHolderFromPlanet(planet).hasGroundForces(target)) {
                     buttons.add(Buttons.gray(
-                            player.getFinsFactionCheckerPrefix() + "exchangeProgramPart3_" + planet,
+                            player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
                             Helper.getPlanetRepresentation(planet, game)));
                 }
             }

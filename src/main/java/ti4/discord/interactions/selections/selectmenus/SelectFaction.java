@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.discord.interactions.context.SelectionMenuContext;
+import ti4.discord.interactions.listeners.context.SelectionMenuContext;
 import ti4.discord.interactions.selections.Selection;
 import ti4.game.Game;
 import ti4.helpers.ButtonHelper;

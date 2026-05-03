@@ -18,12 +18,13 @@ import ti4.service.unit.DestroyUnitService;
 @UtilityClass
 public class StellarConverterService {
 
-    public static void resolveStellar(Game game, ButtonInteractionEvent event, String buttonID) {
-        secondHalfOfStellar(game, buttonID.split("_")[1], event);
+    public static void resolveStellar(Game game, ButtonInteractionEvent event, String buttonID, Player player) {
+        secondHalfOfStellar(game, buttonID.split("_")[1], event, player);
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void secondHalfOfStellar(Game game, String planetName, GenericInteractionCreateEvent event) {
+    public static void secondHalfOfStellar(
+            Game game, String planetName, GenericInteractionCreateEvent event, Player player) {
         Tile tile = game.getTileFromPlanet(planetName);
         if (tile == null) {
             MessageHelper.replyToMessage(event, "System not found that contains planet.");
@@ -62,7 +63,10 @@ public class StellarConverterService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message2 + ".");
 
         message2.append(" by ");
-        message2.append(game.getPlayer(event.getUser().getId()).getRepresentation());
+        if (player == null) {
+            player = game.getPlayer(event.getUser().getId());
+        }
+        message2.append(player.getRepresentation());
         DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 0, message2 + ".");
         if (game.isConventionsOfWarAbandonedMode()
                 && tile.isHomeSystem(game)

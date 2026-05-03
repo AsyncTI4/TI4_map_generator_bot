@@ -246,6 +246,7 @@ public class SliceDraftable extends SinglePickDraftable {
             }
             initialize(outcome.slices());
             game.getDraftManager().tryStartDraft();
+            // TODO: We should be locking since we're saving
             GameManager.save(game, "Nucleus generation");
         });
 
@@ -304,6 +305,7 @@ public class SliceDraftable extends SinglePickDraftable {
         SliceGenerationPipeline.queue(event, this, game.getDraftTileManager(), specs, (Boolean success) -> {
             if (success) {
                 game.getDraftManager().tryStartDraft();
+                // TODO: We should be locking since we're saving
                 GameManager.save(game, "Milty generation");
             } else {
                 MessageHelper.sendMessageToChannel(

@@ -20,7 +20,7 @@ import ti4.model.TechnologyModel;
 import ti4.service.tech.ListTechService;
 
 @UtilityClass
-public class NekroHeroButtonHandler {
+class NekroHeroButtonHandler {
 
     @ButtonHandler("nekroHeroStep2_")
     public static void resolveNekroHeroStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {

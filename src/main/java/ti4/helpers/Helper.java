@@ -997,7 +997,7 @@ public final class Helper {
                     || game.getUnitHolderFromPlanet(planet).isSpaceStation()) {
                 continue;
             }
-            String id = player.finChecker() + prefix + "_" + unit + "_" + planet;
+            String id = player.factionButtonChecker() + prefix + "_" + unit + "_" + planet;
             planetButtons.add(Buttons.red(id, getPlanetRepresentation(planet, game), unitKey.unitEmoji()));
         }
         return planetButtons;
@@ -1007,7 +1007,7 @@ public final class Helper {
         List<Button> planetButtons = new ArrayList<>();
         List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, game);
         for (Tile tile : tiles) {
-            String id = player.finChecker() + prefix + "_" + unit + "_" + tile.getPosition();
+            String id = player.factionButtonChecker() + prefix + "_" + unit + "_" + tile.getPosition();
             planetButtons.add(
                     Buttons.red(id, tile.getRepresentationForButtons(game, player), UnitEmojis.getUnitEmoji(unit)));
         }
@@ -1019,7 +1019,7 @@ public final class Helper {
         List<Tile> tiles = ButtonHelper.getTilesWithTrapsInTheSystem(game);
         for (Tile tile : tiles) {
             if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
-                String id = player.finChecker() + prefix + "_" + unit + "_" + tile.getPosition();
+                String id = player.factionButtonChecker() + prefix + "_" + unit + "_" + tile.getPosition();
                 planetButtons.add(
                         Buttons.red(id, tile.getRepresentationForButtons(game, player), UnitEmojis.getUnitEmoji(unit)));
             }
@@ -1033,7 +1033,7 @@ public final class Helper {
         List<Tile> tiles = ButtonHelper.getTilesForCheiranHero(player, game);
         for (Tile tile : tiles) {
             if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
-                String id = player.finChecker() + prefix + "_" + unit + "_" + tile.getPosition();
+                String id = player.factionButtonChecker() + prefix + "_" + unit + "_" + tile.getPosition();
                 planetButtons.add(
                         Buttons.red(id, tile.getRepresentationForButtons(game, player), UnitEmojis.getUnitEmoji(unit)));
             }
@@ -1047,7 +1047,7 @@ public final class Helper {
         List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, game);
         for (Tile tile : tiles) {
             if (CommandCounterHelper.hasCC(event, player.getColor(), tile)) {
-                String id = player.finChecker() + prefix + "_" + unit + "_" + tile.getPosition();
+                String id = player.factionButtonChecker() + prefix + "_" + unit + "_" + tile.getPosition();
                 planetButtons.add(
                         Buttons.red(id, tile.getRepresentationForButtons(game, player), UnitEmojis.getUnitEmoji(unit)));
             }
@@ -1453,6 +1453,9 @@ public final class Helper {
                 } else if (thing.contains("winnuagent")) {
                     msg.append("> Used Winnu agent for 2 resources").append('\n');
                     res += 2;
+                } else if (thing.contains("lunariumagent")) {
+                    msg.append("> Used Lunarium agent for 1 resource").append('\n');
+                    res += 1;
                 } else if (thing.contains("Zealots Agent")) {
                     msg.append("> ")
                             .append(thing)
@@ -1708,11 +1711,11 @@ public final class Helper {
         }
         for (UnitKey unit : uH.getUnits().keySet()) {
             if (unit.getColor().equalsIgnoreCase(player.getColor())) {
-                if (unit.getUnitType() == UnitType.TyrantsLament
+                if (unit.unitType() == UnitType.TyrantsLament
                         && player.getUnitsByAsyncID(unit.asyncID()).isEmpty()) {
                     player.addOwnedUnitByID("tyrantslament");
                 }
-                if (unit.getUnitType() == UnitType.PlenaryOrbital
+                if (unit.unitType() == UnitType.PlenaryOrbital
                         && player.getUnitsByAsyncID(unit.asyncID()).isEmpty()) {
                     player.addOwnedUnitByID("plenaryorbital");
                 }
@@ -2500,11 +2503,10 @@ public final class Helper {
         }
         if ("place".equalsIgnoreCase(placePrefix)) {
             Button DoneProducingUnits = Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "deleteButtons_" + warfareNOtherstuff + "_"
-                            + tile.getPosition(),
+                    player.factionButtonChecker() + "deleteButtons_" + warfareNOtherstuff + "_" + tile.getPosition(),
                     "Done Producing Units");
             unitButtons.add(DoneProducingUnits);
-            unitButtons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "resetProducedThings", "Reset Build"));
+            unitButtons.add(Buttons.gray(player.factionButtonChecker() + "resetProducedThings", "Reset Build"));
         }
         if (player.hasTech("yso")) {
             if ("sling".equalsIgnoreCase(warfareNOtherstuff)
@@ -2518,6 +2520,21 @@ public final class Helper {
                         unitButtons2);
             } else {
                 unitButtons.add(Buttons.gray("startYinSpinner", "Yin Spin 2 Duders", FactionEmojis.Yin));
+            }
+        }
+        if (player.hasUnit("tk-moyinschosen")) {
+            if ("sling".equalsIgnoreCase(warfareNOtherstuff)
+                    || "freelancers".equalsIgnoreCase(warfareNOtherstuff)
+                    || "chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
+                List<Button> unitButtons2 = new ArrayList<>();
+                unitButtons2.add(Buttons.gray("startMoyinsChosen", "Use Moyin's Chosen", FactionEmojis.Yin));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged()
+                                + " if you made a destroyer, you may use this to place 1 fighter using the _Moyin's Chosen_ ability.",
+                        unitButtons2);
+            } else {
+                unitButtons.add(Buttons.gray("startMoyinsChosen", "Use Moyin's Chosen", FactionEmojis.Yin));
             }
         }
 

@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -21,7 +22,9 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.LoreService;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.unit.CheckUnitContainmentService;
+import ti4.spring.context.SpringContext;
 
 @UtilityClass
 class RetreatButtonHandler {
@@ -73,9 +76,7 @@ class RetreatButtonHandler {
                 && !player.hasRelic("circletofthevoid")
                 && !player.hasTech("tf-crucible")) {
             Button rift = Buttons.green(
-                    player.getFinsFactionCheckerPrefix() + "getRiftButtons_" + pos,
-                    "Rift Units",
-                    MiscEmojis.GravityRift);
+                    player.factionButtonChecker() + "getRiftButtons_" + pos, "Rift Units", MiscEmojis.GravityRift);
             List<Button> buttons = new ArrayList<>();
             buttons.add(rift);
             String message2 = "## " + player.getRepresentationUnfogged()
@@ -94,7 +95,14 @@ class RetreatButtonHandler {
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " retreated all units in space to "
                         + game.getTileByPosition(pos2).getRepresentationForButtons(game, player) + ".");
+        SpringContext.getBean(CombatReplayService.class)
+                .mirrorRetreatResolved(
+                        game,
+                        player,
+                        game.getTileByPosition(pos2).getRepresentationForButtons(game, player),
+                        event.getChannel().getName());
         LoreService.showSystemLore(player, game, pos2, LoreService.TRIGGER.CONTROLLED);
+        CommanderUnlockCheckService.checkPlayer(player, "kalora");
         FOWCombatThreadMirroring.mirrorMessage(
                 event, game, player.getRepresentationNoPing() + " retreated all units in space.");
         String message =
@@ -111,8 +119,8 @@ class RetreatButtonHandler {
                 && game.getTileByPosition(pos1) == oldTile) {
 
             List<Button> breakthroughButtons = new ArrayList<>();
-            breakthroughButtons.add(
-                    Buttons.blue(player.finChecker() + "moveAvernus_" + pos2, "Retreat Avernus", FactionEmojis.Muaat));
+            breakthroughButtons.add(Buttons.blue(
+                    player.factionButtonChecker() + "moveAvernus_" + pos2, "Retreat Avernus", FactionEmojis.Muaat));
             breakthroughButtons.add(Buttons.red("deleteButtons", "Decline"));
             String breakthroughMessage = player.getRepresentationUnfogged() + ", you may move Avernus into "
                     + game.getTileByPosition(pos2).getRepresentationForButtons(game, player) + ".";
@@ -126,7 +134,7 @@ class RetreatButtonHandler {
                 && Helper.getProductionValue(player, game, game.getTileByPosition(pos1), false) > 0) {
             List<Button> flagButtons = new ArrayList<>();
             flagButtons.add(Buttons.blue(
-                    player.finChecker() + "anarchy7Build_" + pos1, "Build in " + pos1, FactionEmojis.Muaat));
+                    player.factionButtonChecker() + "anarchy7Build_" + pos1, "Build in " + pos1, FactionEmojis.Muaat));
             flagButtons.add(Buttons.red("deleteButtons", "Decline"));
             String flagMessage = player.getRepresentationUnfogged()
                     + ", you may build in the system your flagship is retreating from.";

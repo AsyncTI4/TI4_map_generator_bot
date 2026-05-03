@@ -73,6 +73,7 @@ jobs:
             username: ${{ secrets.HOSTINGER_SSH_USER }}
             password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
             port: ${{ secrets.HOSTINGER_SSH_PORT }}
+            command_timeout: 30m
             envs: AWS_KEY, AWS_SECRET, DISCORD_BOT_TOKEN, DISCORD_BOT_USERID, REPO_DISPATCH_TOKEN, TI4_ULTIMATE_STATISTICS_API_KEY, MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY, DISCORD_WEBHOOK_URL, DISCORD_REDIRECT_URI, DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, ROLLBAR_ACCESS_TOKEN, ROLLBAR_ENVIRONMENT, ROLLBAR_CODE_VERSION
             script: |
               set -eu
@@ -89,14 +90,6 @@ jobs:
               export IMAGE_REPOSITORY="${{ env.IMAGE_REPOSITORY }}"
               export IMAGE_TAG="${{ needs.buildImage.outputs.image_tag }}"
               compose_file="docker-compose.production.yml"
-              rollout_plugin_path="$HOME/.docker/cli-plugins/docker-rollout"
-
-              if ! docker rollout --help >/dev/null 2>&1; then
-                mkdir -p "$(dirname "$rollout_plugin_path")"
-                curl -fsSL https://raw.githubusercontent.com/wowu/docker-rollout/v0.13/docker-rollout -o "$rollout_plugin_path"
-                chmod +x "$rollout_plugin_path"
-                docker rollout --help >/dev/null
-              fi
 
               timestamp=$(date "+%F %T.%3N")
               curl -X POST -H 'Content-Type: application/json' -d "{\"content\":\"\`$timestamp\`PULLING DOCKER IMAGE ${IMAGE_TAG}\"}" $DISCORD_WEBHOOK_URL
@@ -108,13 +101,34 @@ jobs:
               docker compose -f "$compose_file" up -d traefik
 
               timestamp=$(date "+%F %T.%3N")
-              existing_bot_containers="$(docker compose -f "$compose_file" ps -q tibot || true)"
-              if [ -n "$existing_bot_containers" ]; then
-                curl -X POST -H 'Content-Type: application/json' -d "{\"content\":\"\`$timestamp\`ROLLING OUT NEW TIBOT CONTAINER\"}" $DISCORD_WEBHOOK_URL
-                docker rollout -f "$compose_file" --timeout 600 --wait-after-healthy 2 --pre-stop-hook 'wget -qO- --post-data="" http://127.0.0.1:8081/api/public/deploy/drain || true; for i in $(seq 1 15); do wget -q -O - http://127.0.0.1:8081/api/public/ready >/dev/null 2>&1 || break; sleep 1; done' tibot
-              else
-                curl -X POST -H 'Content-Type: application/json' -d "{\"content\":\"\`$timestamp\`STARTING INITIAL TIBOT CONTAINER\"}" $DISCORD_WEBHOOK_URL
-                docker compose -f "$compose_file" up -d tibot
+              curl -X POST -H 'Content-Type: application/json' -d "{\"content\":\"\`$timestamp\`ROLLING OUT ONE NEW TIBOT CONTAINER\"}" $DISCORD_WEBHOOK_URL
+              COMPOSE_FILE="$compose_file" ROLLOUT_TIMEOUT_SECONDS=540 bash scripts/deploy_tibot_single_instance.sh
+
+              timestamp=$(date "+%F %T.%3N")
+              curl -X POST -H 'Content-Type: application/json' -d "{\"content\":\"\`$timestamp\`VERIFYING SINGLE TIBOT CONTAINER\"}" $DISCORD_WEBHOOK_URL
+              running_tibot_containers="$(docker ps -q --filter "label=com.docker.compose.project=${COMPOSE_PROJECT_NAME}" --filter "label=com.docker.compose.service=tibot" || true)"
+              running_tibot_count="$(printf '%s\n' "$running_tibot_containers" | sed '/^$/d' | wc -l | tr -d ' ')"
+              if [ "$running_tibot_count" -gt 1 ]; then
+                desired_tibot_container="$(docker ps -q --filter "label=com.docker.compose.project=${COMPOSE_PROJECT_NAME}" --filter "label=com.docker.compose.service=tibot" --filter "ancestor=${IMAGE_REPOSITORY}:${IMAGE_TAG}" | head -n 1 || true)"
+                if [ -z "$desired_tibot_container" ]; then
+                  desired_tibot_container="$(printf '%s\n' "$running_tibot_containers" | sed '/^$/d' | head -n 1)"
+                fi
+
+                echo "Found $running_tibot_count running tibot containers. Keeping $desired_tibot_container and removing extras..."
+                for container in $running_tibot_containers; do
+                  if [ "$container" != "$desired_tibot_container" ]; then
+                    docker stop --time 600 "$container"
+                    docker rm "$container"
+                  fi
+                done
+              fi
+
+              running_tibot_containers="$(docker ps -q --filter "label=com.docker.compose.project=${COMPOSE_PROJECT_NAME}" --filter "label=com.docker.compose.service=tibot" || true)"
+              running_tibot_count="$(printf '%s\n' "$running_tibot_containers" | sed '/^$/d' | wc -l | tr -d ' ')"
+              if [ "$running_tibot_count" -ne 1 ]; then
+                echo "Expected exactly one running tibot container, found $running_tibot_count" >&2
+                docker ps --filter "label=com.docker.compose.project=${COMPOSE_PROJECT_NAME}" --filter "label=com.docker.compose.service=tibot"
+                exit 1
               fi
               
               timestamp=$(date "+%F %T.%3N")

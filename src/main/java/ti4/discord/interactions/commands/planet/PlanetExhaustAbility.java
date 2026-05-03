@@ -141,10 +141,6 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "2ff", "placeOneNDone_skipbuild"));
             }
             // Homebrew
-            // case "mr" -> {
-            //     output = "Use buttons to destroy a ground force on a legendary or a planet adjacent to Mecatol Rex.";
-            //     buttons.addAll(ButtonHelper.customRexLegendary(player, game));
-            // }
             case "avernus" -> {
                 output = "Please choose the system where you wish to resolve **Star Forge** in.";
                 List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Warsun);
@@ -167,7 +163,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             case "tarrock" -> {
                 String riderName = "Tarrock Ability";
                 List<Button> riderButtons =
-                        AgendaHelper.getAgendaButtons(riderName, game, player.getFinsFactionCheckerPrefix());
+                        AgendaHelper.getAgendaButtons(riderName, game, player.factionButtonChecker());
                 // List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
                 MessageHelper.sendMessageToChannelWithFactionReact(
                         player.getCorrectChannel(),
@@ -210,14 +206,14 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
     }
 
     private static List<Button> getNewPrismLoseTechOptions(Player player) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
             if (!techM.isUnitUpgrade()
                     && (techM.getFaction().isEmpty()
                             || techM.getFaction().orElse("").isEmpty())) {
-                buttons.add(Buttons.gray(finChecker + "newPrism@" + tech, techM.getName()));
+                buttons.add(Buttons.gray(factionChecker + "newPrism@" + tech, techM.getName()));
             }
         }
         return buttons;

@@ -156,8 +156,7 @@ public final class TeHelperAgents {
                     .filter(uk -> player.getUnitFromUnitKey(uk).getIsShip())
                     .collect(Collectors.toSet());
             keys.stream()
-                    .map(uk ->
-                            Buttons.blue(prefix + uk.asyncID(), uk.getUnitType().humanReadableName(), uk.unitEmoji()))
+                    .map(uk -> Buttons.blue(prefix + uk.asyncID(), uk.unitType().humanReadableName(), uk.unitEmoji()))
                     .forEach(newButtons::add);
 
         } else if ((matcher = Pattern.compile(part3).matcher(buttonID)).matches()) {
@@ -186,8 +185,7 @@ public final class TeHelperAgents {
                     .filter(uk -> player.getUnitFromUnitKey(uk).getIsShip())
                     .collect(Collectors.toSet());
             keys.stream()
-                    .map(uk ->
-                            Buttons.blue(prefix + uk.asyncID(), uk.getUnitType().humanReadableName(), uk.unitEmoji()))
+                    .map(uk -> Buttons.blue(prefix + uk.asyncID(), uk.unitType().humanReadableName(), uk.unitEmoji()))
                     .forEach(newButtons::add);
 
         } else if ((matcher = Pattern.compile(part5).matcher(buttonID)).matches()) {
@@ -272,16 +270,16 @@ public final class TeHelperAgents {
                     String msg;
                     if (game.isTwilightsFallMode()) {
                         buttons2.add(Buttons.green(
-                                p2.getFinsFactionCheckerPrefix() + "useTCS_naaluagent-te_" + player.getFaction(),
+                                p2.factionButtonChecker() + "useTCS_naaluagent-te_" + player.getFaction(),
                                 "Spend A Command Token To Ready Limit Genome"));
-                        buttons2.add(Buttons.red(p2.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
+                        buttons2.add(Buttons.red(p2.factionButtonChecker() + "deleteButtons", "Decline"));
                         msg = p2.getRepresentationUnfogged()
                                 + " you have the opportunity to spend a command token via _Temporal Command Suite_ to ready _Limit Genome_, and potentially resolve a transaction.";
                     } else {
                         buttons2.add(Buttons.green(
-                                p2.getFinsFactionCheckerPrefix() + "exhaustTCS_naaluagent-te_" + player.getFaction(),
+                                p2.factionButtonChecker() + "exhaustTCS_naaluagent-te_" + player.getFaction(),
                                 "Exhaust Temporal Command Suite to Ready Naalu Agent"));
-                        buttons2.add(Buttons.red(p2.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
+                        buttons2.add(Buttons.red(p2.factionButtonChecker() + "deleteButtons", "Decline"));
                         msg = p2.getRepresentationUnfogged()
                                 + ", you have the opportunity to exhaust _Temporal Command Suite_ to ready Z'eu ΩΩ, and potentially resolve a transaction.";
                     }

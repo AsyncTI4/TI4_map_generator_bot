@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.attribute.IMemberContainer;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
@@ -44,7 +44,7 @@ class CheckChannels extends GameStateSubcommand {
                 output.append("No private channel");
             } else {
                 output.append(channel.getAsMention());
-                if (!((TextChannel) channel).getMembers().contains(player.getMember())) {
+                if (!((IMemberContainer) channel).getMembers().contains(player.getMember())) {
                     output.append(" - No access");
                 }
             }

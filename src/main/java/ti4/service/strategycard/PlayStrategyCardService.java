@@ -174,7 +174,7 @@ public class PlayStrategyCardService {
                                 || "sc_trade_follow".equals(id)
                                 || id.startsWith("sc_no_follow_"));
             });
-            String ffcc = player.getFinsFactionCheckerPrefix();
+            String ffcc = player.factionButtonChecker();
             scButtons.replaceAll(button -> {
                 String id = button.getCustomId();
                 if (id != null && !id.startsWith(ffcc)) {
@@ -187,7 +187,7 @@ public class PlayStrategyCardService {
             if (propagationPlayer != null) {
                 boolean shouldAddNekroTechButton = scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode();
                 if (shouldAddNekroTechButton) {
-                    String ffcc = propagationPlayer.getFinsFactionCheckerPrefix();
+                    String ffcc = propagationPlayer.factionButtonChecker();
                     scButtons.add(Buttons.gray(ffcc + "nekroFollowTech", "Get Command Tokens", FactionEmojis.Nekro));
                 }
             }
@@ -199,7 +199,7 @@ public class PlayStrategyCardService {
                         && !game.isFowMode()
                         && !ButtonHelper.isLawInPlay(game, "articles_war");
                 if (shouldAddTitansMechDeployButton) {
-                    String ffcc = titansMechPlayer.getFinsFactionCheckerPrefix();
+                    String ffcc = titansMechPlayer.factionButtonChecker();
                     scButtons.add(Buttons.gray(
                             ffcc + "titansConstructionMechDeployStep1",
                             "Deploy Titan Mech + Infantry",
@@ -263,8 +263,8 @@ public class PlayStrategyCardService {
         if (scModel.usesAutomationForSCID("pok3politics") || scModel.usesAutomationForSCID("cryypter_3")) {
             String drawAgendasMessage = player.getRepresentation()
                     + " __after__ assigning speaker, use this button to look at the top agendas, which will be shown to you in your `#cards-info` thread.";
-            Button draw2Agenda = Buttons.green(
-                    player.getFinsFactionCheckerPrefix() + "drawAgenda_2", "Draw 2 Agendas", CardEmojis.Agenda);
+            Button draw2Agenda =
+                    Buttons.green(player.factionButtonChecker() + "drawAgenda_2", "Draw 2 Agendas", CardEmojis.Agenda);
             if (!game.isTwilightsFallMode()) {
                 MessageHelper.sendMessageToChannelWithButton(
                         player.getCorrectChannel(), drawAgendasMessage, draw2Agenda);
@@ -276,7 +276,7 @@ public class PlayStrategyCardService {
             String lookAtTopMessage = player.getRepresentation()
                     + " after placing the drawn agendas on top/bottom, you must look a the top two cards of the agenda deck.";
             Button draw2Agenda = Buttons.green(
-                    player.getFinsFactionCheckerPrefix() + "agendaLookAt[count:2][lookAtBottom:false]",
+                    player.factionButtonChecker() + "agendaLookAt[count:2][lookAtBottom:false]",
                     "Look at top 2 Agendas",
                     CardEmojis.Agenda);
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), lookAtTopMessage, draw2Agenda);
@@ -367,6 +367,14 @@ public class PlayStrategyCardService {
                 if (player3 == player) {
                     continue;
                 }
+                if (IsPlayerElectedService.isPlayerElected(game, player3, "tk-endorse")) {
+                    MessageHelper.sendMessageToChannel(
+                            player3.getCardsInfoThread(),
+                            player3.getRepresentationUnfogged() + ", you may follow **" + stratCardName
+                                    + "** without spending a token because of _Endorse_.");
+                    continue;
+                }
+
                 MindsieveService.serveMindsieveButtons(game, player3, scToPlay);
                 List<Button> empNMahButtons = new ArrayList<>();
                 Button deleteB = Buttons.red("deleteButtons", "Delete These Buttons");
@@ -402,20 +410,18 @@ public class PlayStrategyCardService {
 
         List<Button> conclusionButtons = new ArrayList<>();
         conclusionButtons.add(ButtonHelper.getEndTurnButton(game, player));
-        conclusionButtons.add(
-                Buttons.red(player.getFinsFactionCheckerPrefix() + "doAnotherAction", "Do Another Action"));
+        conclusionButtons.add(Buttons.red(player.factionButtonChecker() + "doAnotherAction", "Do Another Action"));
 
         if (game.isTwilightsFallMode() && (scToPlay == 2 || scToPlay == 6 || scToPlay == 7)) {
             conclusionButtons.add(Buttons.blue(
-                    player.getFinsFactionCheckerPrefix() + "endTurnWhenSpliceEnds_" + scToPlay,
-                    "End Turn When Splice Ends"));
+                    player.factionButtonChecker() + "endTurnWhenSpliceEnds_" + scToPlay, "End Turn When Splice Ends"));
         } else {
             conclusionButtons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "endTurnWhenAllReactedTo_" + scToPlay,
+                    player.factionButtonChecker() + "endTurnWhenAllReactedTo_" + scToPlay,
                     "End Turn When All Have Reacted"));
             if (player.hasTech("fl")) {
                 conclusionButtons.add(Buttons.red(
-                        player.getFinsFactionCheckerPrefix() + "fleetLogWhenAllReactedTo_" + scToPlay,
+                        player.factionButtonChecker() + "fleetLogWhenAllReactedTo_" + scToPlay,
                         "Use Fleet Logistics When All Have Reacted"));
             }
         }
@@ -426,8 +432,8 @@ public class PlayStrategyCardService {
                 && !player.getExhaustedAbilities().contains("grace")
                 && ButtonHelperAbilities.getGraceButtons(game, player, scToPlay).size() > 2) {
             List<Button> graceButtons = new ArrayList<>();
-            graceButtons.add(Buttons.green(
-                    player.getFinsFactionCheckerPrefix() + "resolveGrace_" + scToPlay, "Resolve Grace Ability"));
+            graceButtons.add(
+                    Buttons.green(player.factionButtonChecker() + "resolveGrace_" + scToPlay, "Resolve Grace Ability"));
             graceButtons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
@@ -871,7 +877,7 @@ public class PlayStrategyCardService {
 
     private static List<Button> getDiplomacyButtons(int sc, Player player) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
-        Button diploSystemButton = Buttons.blue(player.getFinsFactionCheckerPrefix() + "diploSystem", "Diplo A System");
+        Button diploSystemButton = Buttons.blue(player.factionButtonChecker() + "diploSystem", "Diplo A System");
         Button refreshButton = Buttons.green("diploRefresh2", "Ready 2 Planets");
 
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
@@ -879,8 +885,8 @@ public class PlayStrategyCardService {
     }
 
     private static List<Button> getTF2Buttons(int sc, Player player) {
-        Button start = Buttons.red(player.getFinsFactionCheckerPrefix() + "startSplice_2", "Start Splice");
-        Button refreshButton = Buttons.green(player.getFinsFactionCheckerPrefix() + "diploRefresh2", "Ready 2 Planets");
+        Button start = Buttons.red(player.factionButtonChecker() + "startSplice_2", "Start Splice");
+        Button refreshButton = Buttons.green(player.factionButtonChecker() + "diploRefresh2", "Ready 2 Planets");
         Button participate = Buttons.blue("participateInSplice_2", "Participate In Splice");
 
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
@@ -888,9 +894,9 @@ public class PlayStrategyCardService {
     }
 
     private static List<Button> getTF6Buttons(int sc, Player player) {
-        Button start = Buttons.red(player.getFinsFactionCheckerPrefix() + "startSplice_6", "Start Splice");
-        Button refreshButton = Buttons.green(
-                player.getFinsFactionCheckerPrefix() + "primaryOfAnarchy7", "Resolve PRODUCTION In A System");
+        Button start = Buttons.red(player.factionButtonChecker() + "startSplice_6", "Start Splice");
+        Button refreshButton =
+                Buttons.green(player.factionButtonChecker() + "primaryOfAnarchy7", "Resolve PRODUCTION In A System");
         Button participate = Buttons.blue("participateInSplice_6", "Participate In Splice");
         Button homeBuild = Buttons.green("warfareTeBuild", "Build At Home");
 
@@ -899,9 +905,9 @@ public class PlayStrategyCardService {
     }
 
     private static List<Button> getTF7Buttons(int sc, Player player) {
-        Button start = Buttons.red(player.getFinsFactionCheckerPrefix() + "startSplice_7", "Start Splice");
+        Button start = Buttons.red(player.factionButtonChecker() + "startSplice_7", "Start Splice");
         Button refreshButton = Buttons.green(
-                player.getFinsFactionCheckerPrefix() + "addMagusSpliceCard", "Spend 3R And 3I To Add A Splice Card");
+                player.factionButtonChecker() + "addMagusSpliceCard", "Spend 3R And 3I To Add A Splice Card");
         Button participate = Buttons.blue("participateInSplice_7", "Participate In Splice");
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
         return List.of(start, refreshButton, participate, noFollowButton);
@@ -927,7 +933,7 @@ public class PlayStrategyCardService {
 
     private static List<Button> getAnarchy3Buttons(int sc, Player player) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
-        Button diploSystemButton = Buttons.blue(player.getFinsFactionCheckerPrefix() + "diploSystem", "Diplo A System");
+        Button diploSystemButton = Buttons.blue(player.factionButtonChecker() + "diploSystem", "Diplo A System");
         Button refreshButton = Buttons.gray("anarchy3secondary", "Perform Unchosen Or Exhausted Secondary");
 
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
@@ -936,7 +942,7 @@ public class PlayStrategyCardService {
 
     private static List<Button> getLuminous2Buttons(int sc, Player player) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
-        Button diploSystemButton = Buttons.blue(player.getFinsFactionCheckerPrefix() + "diploSystem", "Diplo A System");
+        Button diploSystemButton = Buttons.blue(player.factionButtonChecker() + "diploSystem", "Diplo A System");
         Button draw1AC = Buttons.gray("lumiACdraw", "Draw 1 Action Card", CardEmojis.getACEmoji(player));
         Button refreshButton = Buttons.gray("exploreAPlanet", "Explore a planet");
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
@@ -945,8 +951,8 @@ public class PlayStrategyCardService {
 
     private static List<Button> getLuminous9Buttons(int sc, Player player) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
-        Button scoreAnObjective = Buttons.gray(
-                player.getFinsFactionCheckerPrefix() + "scoreAnObjective", "Score A Public", CardEmojis.Public1);
+        Button scoreAnObjective =
+                Buttons.gray(player.factionButtonChecker() + "scoreAnObjective", "Score A Public", CardEmojis.Public1);
         Button refreshButton = Buttons.gray("anarchy3secondary", "Perform Exhausted Secondary");
 
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
@@ -971,7 +977,7 @@ public class PlayStrategyCardService {
                 String faction = player.getFaction();
                 if (Mapper.isValidFaction(faction)) {
                     Button button = Buttons.gray(
-                            politicsHolder.getFinsFactionCheckerPrefix()
+                            politicsHolder.factionButtonChecker()
                                     + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX
                                     + faction,
                             player.getFactionNameOrColor(),
@@ -1066,10 +1072,10 @@ public class PlayStrategyCardService {
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         Button drawSo = Buttons.gray("sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective);
         Button drawP = Buttons.gray("drawParadigm", "Draw Paradigm");
-        Button scoreImperial = Buttons.gray(
-                player.getFinsFactionCheckerPrefix() + "score_imperial", "Score Imperial", PlanetEmojis.Mecatol);
-        Button scoreAnObjective = Buttons.gray(
-                player.getFinsFactionCheckerPrefix() + "scoreAnObjective", "Score A Public", CardEmojis.Public1);
+        Button scoreImperial =
+                Buttons.gray(player.factionButtonChecker() + "score_imperial", "Score Imperial", PlanetEmojis.Mecatol);
+        Button scoreAnObjective =
+                Buttons.gray(player.factionButtonChecker() + "scoreAnObjective", "Score A Public", CardEmojis.Public1);
         return List.of(followButton, noFollowButton, drawSo, drawP, scoreImperial, scoreAnObjective);
     }
 

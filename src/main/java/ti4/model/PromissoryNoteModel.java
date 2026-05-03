@@ -48,21 +48,21 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     @Override
     public PromissoryNoteModel duplicateAndSetColor(ColorModel newColor) {
         PromissoryNoteModel pn = new PromissoryNoteModel();
-        pn.setAlias(alias.replace("<color>", newColor.getName()));
-        pn.setName(name);
-        pn.setShortName(shortName);
-        pn.setShrinkName(shrinkName);
-        pn.setFaction(faction);
-        pn.setColor(newColor.getName());
-        pn.setPlayArea(playArea);
-        pn.setPlayImmediately(playImmediately);
-        pn.setAttachment(attachment);
-        pn.setSource(source);
+        pn.alias = alias.replace("<color>", newColor.getName());
+        pn.name = name;
+        pn.shortName = shortName;
+        pn.shrinkName = shrinkName;
+        pn.faction = faction;
+        pn.color = newColor.getName();
+        pn.playArea = playArea;
+        pn.playImmediately = playImmediately;
+        pn.attachment = attachment;
+        pn.source = source;
         String newText = text.replace("<color>", "<" + newColor.getName() + ">");
-        pn.setText(newText);
-        pn.setHomebrewReplacesID(homebrewReplacesID);
-        pn.setSearchTags(new ArrayList<>(searchTags));
-        pn.setSourcePNModel(this);
+        pn.text = newText;
+        pn.homebrewReplacesID = homebrewReplacesID;
+        pn.searchTags = new ArrayList<>(searchTags);
+        pn.sourcePNModel = this;
         return pn;
     }
 

@@ -2,16 +2,21 @@ package ti4.message;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
 import ti4.json.PersistenceManager;
 import ti4.logging.BotLogger;
 
@@ -27,7 +32,7 @@ public class GameMessageManager {
         }
 
         List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
         if (messages.stream().anyMatch(message -> message.messageId.equals(messageId))) {
             return;
         }
@@ -45,7 +50,7 @@ public class GameMessageManager {
         }
 
         List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
 
         String replacedMessageId = null;
         if (!messages.isEmpty()) {
@@ -64,7 +69,9 @@ public class GameMessageManager {
         return replacedMessageId;
     }
 
-    public static synchronized void remove(List<String> gameNames) {
+    public static synchronized void remove(Collection<String> gameNames) {
+        if (gameNames.isEmpty()) return;
+
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             return;
@@ -146,8 +153,75 @@ public class GameMessageManager {
         }
 
         List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
         return messages.stream().filter(filter).findFirst();
+    }
+
+    public static synchronized Map<String, List<GameMessage>> getAllByGame(GameMessageType type) {
+        GameMessages allGameMessages = readFile();
+        if (allGameMessages == null) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, List<GameMessage>> result = new HashMap<>();
+        for (var entry : allGameMessages.gameNameToMessages.entrySet()) {
+            List<GameMessage> filtered = null;
+            for (GameMessage message : entry.getValue()) {
+                if (message.type == type) {
+                    if (filtered == null) {
+                        filtered = new ArrayList<>();
+                    }
+                    filtered.add(message);
+                }
+            }
+            if (filtered != null) {
+                result.put(entry.getKey(), filtered);
+            }
+        }
+        return Collections.unmodifiableMap(result);
+    }
+
+    public static synchronized void cleanupStaleEntries() {
+        GameMessages allGameMessages = readFile();
+        if (allGameMessages == null) {
+            return;
+        }
+
+        var removedGames = new HashSet<>();
+        boolean removedMessages = false;
+        var iterator = allGameMessages.gameNameToMessages.entrySet().iterator();
+        while (iterator.hasNext()) {
+            var entry = iterator.next();
+            String gameName = entry.getKey();
+            List<GameMessage> messages = entry.getValue();
+            ManagedGame game = GameManager.getManagedGame(gameName);
+            if (game == null || game.isHasEnded() || messages.isEmpty()) {
+                iterator.remove();
+                removedGames.add(gameName);
+                continue;
+            }
+
+            int playerCount = game.getRealPlayers().size();
+            long twoWeeksAgo = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(14);
+            boolean removed = messages.removeIf(
+                    msg -> (playerCount > 0 && msg.factionsThatReacted().size() >= playerCount)
+                            || msg.gameSaveTime() <= twoWeeksAgo);
+            if (removed) {
+                removedMessages = true;
+                BotLogger.info("GameMessageCleanupCron removed GameMessages for " + gameName);
+            }
+
+            if (messages.isEmpty()) {
+                iterator.remove();
+                removedGames.add(gameName);
+            }
+        }
+
+        if (!removedGames.isEmpty() || removedMessages) {
+            if (!removedGames.isEmpty())
+                BotLogger.info("GameMessageCleanupCron removed the following games " + removedGames);
+            persistFile(allGameMessages);
+        }
     }
 
     public static synchronized List<GameMessage> getAll(String gameName, GameMessageType type) {
@@ -157,7 +231,7 @@ public class GameMessageManager {
         }
 
         List<GameMessage> messages =
-                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, k -> new ArrayList<>());
+                allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
         return messages.stream().filter(m -> m.type == type).toList();
     }
 

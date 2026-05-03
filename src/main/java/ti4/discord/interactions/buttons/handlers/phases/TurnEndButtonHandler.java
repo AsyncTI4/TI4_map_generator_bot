@@ -13,7 +13,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.EndTurnService;
 
 @UtilityClass
-public class TurnEndButtonHandler {
+class TurnEndButtonHandler {
 
     @ButtonHandler("turnEnd")
     public static void turnEnd(ButtonInteractionEvent event, Game game, Player player) {
@@ -35,7 +35,18 @@ public class TurnEndButtonHandler {
             return;
         }
         CommanderUnlockCheckService.checkPlayer(player, "naaz", "empyrean", "ghost", "obsidian", "firmament");
-        CommanderUnlockCheckService.checkPlayer(player, "nivyn", "ghoti", "zelian", "gledge", "mortheus", "hacan");
+        CommanderUnlockCheckService.checkPlayer(
+                player,
+                "nivyn",
+                "ghoti",
+                "zelian",
+                "gledge",
+                "mortheus",
+                "hacan",
+                "tyris",
+                "lunarium",
+                "zephyrion",
+                "vyserix");
         EndTurnService.endTurnAndUpdateMap(event, game, player);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }

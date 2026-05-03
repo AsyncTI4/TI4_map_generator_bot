@@ -30,7 +30,7 @@ public class WebTilePositions {
         }
 
         tilePositions.sort(String::compareTo);
-        webTilePositions.setTilePositions(tilePositions);
+        webTilePositions.tilePositions = tilePositions;
         return webTilePositions;
     }
 }

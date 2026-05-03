@@ -44,7 +44,7 @@ public class FaunusService {
             // skip space stations
             if (p.isSpaceStation()) continue;
 
-            String id = player.finChecker() + "faunusTake_" + p.getName();
+            String id = player.factionButtonChecker() + "faunusTake_" + p.getName();
             String label = Helper.getPlanetRepresentation(p.getName(), game);
 
             Player owner = game.getPlayerThatControlsPlanet(p.getName());

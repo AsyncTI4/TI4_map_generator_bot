@@ -47,7 +47,7 @@ public class CreateFoWGameService {
             Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
     @ButtonHandler("createFoWGameChannels")
-    public static void createFoWGameChannels(ButtonInteractionEvent event) {
+    public static synchronized void createFoWGameChannels(ButtonInteractionEvent event) {
         MessageHelper.sendMessageToEventChannel(
                 event, event.getUser().getEffectiveName() + " pressed the [Create FoW Game] button.");
 

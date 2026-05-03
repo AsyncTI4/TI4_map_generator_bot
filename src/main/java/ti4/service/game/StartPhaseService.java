@@ -286,6 +286,11 @@ public class StartPhaseService {
                     && player2.getPlayableActionCards().contains("tf-tartarus")) {
                 ActionCardHelper.playAC(event, game, player2, "tf-tartarus", game.getMainGameChannel());
             }
+            if (game.getStoredValue("Compose") != null
+                    && game.getStoredValue("Compose").contains(player2.getFaction())
+                    && player2.getPlayableActionCards().contains("tk-compose")) {
+                ActionCardHelper.playAC(event, game, player2, "tk-compose", game.getMainGameChannel());
+            }
             if (player2.hasLeader("zealotshero")
                     && player2.getLeader("zealotshero").get().isActive()
                     && !game.getStoredValue("zealotsHeroTechs").isEmpty()) {
@@ -548,15 +553,25 @@ public class StartPhaseService {
                     Helper.getRemainingSCButtons(game, firstSCPicker));
         }
 
-        if (!game.isFowMode()) {
-            ButtonHelper.updateMap(game, event, "Start of the Strategy Phase for round #" + game.getRound() + ".");
-        }
         for (Player player2 : game.getRealPlayers()) {
             if (player2.getActionCards() != null
                     && player2.getPlayableActionCards().contains("summit")) {
                 MessageHelper.sendMessageToChannel(
                         player2.getCardsInfoThread(),
                         player2.getRepresentationUnfogged() + ", reminder that this is the window to play _Summit_.");
+            }
+            if (player2.hasAbility("underhanded_maneuver")
+                    && !player2.getNeighbouringPlayers(true).isEmpty()) {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.gray(
+                        player2.factionButtonChecker() + "underhandedManeuverPickNeighbor",
+                        "Use Underhanded Maneuver",
+                        FactionEmojis.arvaxi));
+                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player2.getCardsInfoThread(),
+                        player2.getRepresentationUnfogged() + ", use buttons to resolve _Underhanded Maneuver_.",
+                        buttons);
             }
             for (String pn : player2.getPromissoryNotes().keySet()) {
                 if (!player2.ownsPromissoryNote("scepter") && "scepter".equalsIgnoreCase(pn)) {
@@ -597,6 +612,9 @@ public class StartPhaseService {
 
         if (game.isAcd2() && game.getRound() > 1) {
             handleStartOfStrategyForAcd2(game);
+        }
+        if (!game.isFowMode()) {
+            ButtonHelper.updateMap(game, event, "Start of the Strategy Phase for round #" + game.getRound() + ".");
         }
     }
 
@@ -669,9 +687,9 @@ public class StartPhaseService {
                             + ", a reminder this is the window to play The Oracle, the Naalu Hero. You may use the buttons to start the process.",
                     buttons);
         }
+        playerLeader = player.getLeader("poisonhero").orElse(null);
         if (player.hasLeader("poisonhero")
                 && player.getLeaderByID("poisonhero").isPresent()
-                && playerLeader != null
                 && !playerLeader.isLocked()) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("poisonHeroInitiation", "Play Poison Hero", LeaderEmojis.NaaluHero));
@@ -804,6 +822,7 @@ public class StartPhaseService {
         if (playersWithSCs > 0) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "### " + game.getPing() + " **Status Cleanup Run!**");
+            StatusCleanupService.runStatusCleanup(game);
             if (!game.isFowMode()) {
                 MapRenderPipeline.queue(
                         game,
@@ -811,7 +830,6 @@ public class StartPhaseService {
                         DisplayType.map,
                         fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
             }
-            StatusCleanupService.runStatusCleanup(game);
         }
         for (Player player : game.getRealPlayers()) {
             sendStatusReminders(event, game, player);
@@ -825,7 +843,7 @@ public class StartPhaseService {
             if (IsPlayerElectedService.isPlayerElected(game, player, "minister_policy")
                     && player.hasAbility("scheming")) {
                 yssarilPolicy = Buttons.gray(
-                        player.getFinsFactionCheckerPrefix() + "yssarilMinisterOfPolicy",
+                        player.factionButtonChecker() + "yssarilMinisterOfPolicy",
                         "Draw Minister of Policy Action Card",
                         FactionEmojis.Yssaril);
             }
@@ -833,7 +851,7 @@ public class StartPhaseService {
                     && IsPlayerElectedService.isPlayerElected(game, player, "absol_minspolicy")) {
                 List<Button> absButtons = new ArrayList<>();
                 absButtons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "cymiaeHeroStep1_"
+                        player.factionButtonChecker() + "cymiaeHeroStep1_"
                                 + (game.getRealPlayers().size() + 1),
                         "Resolve Absol Minister Of Policy"));
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -909,11 +927,11 @@ public class StartPhaseService {
         }
         GMService.createFOWStatusSummary(game);
         GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, false);
-        if (!game.isFowMode()) {
-            ButtonHelper.updateMap(game, event, "Status Homework for round #" + game.getRound() + ".");
-        }
         if (game.isCivilizedSocietyMode()) {
             Helper.checkEndGameCivilizedSociety(game);
+        }
+        if (!game.isFowMode()) {
+            ButtonHelper.updateMap(game, event, "Status Homework for round #" + game.getRound() + ".");
         }
     }
 
@@ -1083,10 +1101,6 @@ public class StartPhaseService {
         if (nextPlayer == null) {
             return;
         }
-        // game.updateActivePlayer(nextPlayer);
-        // if (game.isFowMode()) {
-        //     FoWHelper.pingAllPlayersWithFullStats(game, event, nextPlayer, "started turn");
-        // }
         Set<Integer> scPickedList = new HashSet<>();
         for (Player player_ : game.getRealPlayers()) {
             scPickedList.addAll(player_.getSCs());
@@ -1099,10 +1113,6 @@ public class StartPhaseService {
                 game.setScTradeGood(sc, 0);
             }
         }
-        // ButtonHelperFactionSpecific.resolveMilitarySupportCheck(nextPlayer, game);
-        // if (nextPlayer.getInRoundTurnCount() == 0) {
-        //     nextPlayer.setInRoundTurnCount(1);
-        // }
         if (isFowPrivateGame) {
             for (Player p2 : Helper.getSpeakerOrFullPriorityOrder(game)) {
                 if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {

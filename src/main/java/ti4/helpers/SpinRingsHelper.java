@@ -46,25 +46,17 @@ public class SpinRingsHelper {
         {1, -1} // NE
     };
 
-    private static class Hex {
-        final int q;
-        final int r;
-
-        Hex(int q, int r) {
-            this.q = q;
-            this.r = r;
-        }
+    private record Hex(int q, int r) {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Hex h)) return false;
-            return q == h.q && r == h.r;
-        }
-
-        @Override
-        public int hashCode() {
-            return 31 * q + r;
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof Hex(int q1, int r1))) {
+                return false;
+            }
+            return q == q1 && r == r1;
         }
     }
 

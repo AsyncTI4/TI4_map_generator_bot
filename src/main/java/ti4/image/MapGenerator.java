@@ -37,7 +37,6 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
@@ -669,7 +668,7 @@ public class MapGenerator implements AutoCloseable {
                 .mapToInt(Player::getTotalVictoryPoints)
                 .max()
                 .orElse(0);
-        if (game.getVp() > 14 || pinkLimit > 14 || greyLimit > 14) {
+        if (game.getVp() > 14 || greyLimit > 14) {
             boxWidth = 2250 / (1 + Math.max(game.getVp(), Math.max(pinkLimit, greyLimit)));
         }
 
@@ -1095,9 +1094,8 @@ public class MapGenerator implements AutoCloseable {
         if (game.isTwilightsFallMode()) {
             int cardCount, fullDeck;
 
-            cardCount = ButtonHelperTwilightsFall.getDeckForSplicing(game, "ability", 100, true)
-                    .size();
-            fullDeck = Mapper.getDeck("techs_tf").getNewShuffledDeck().size();
+            cardCount = game.getAbilitySpliceDeck(true).size();
+            fullDeck = Mapper.getDeck(game.getAbilitySpliceDeckID()).getCardCount();
             drawPAImageScaled(x, y, "cardback_tf_ability.jpg", cardWidth, cardHeight);
             DrawingUtil.superDrawString(
                     graphics,
@@ -1113,9 +1111,8 @@ public class MapGenerator implements AutoCloseable {
             addWebsiteOverlay("Ability Splice Deck", overlayText, x, y, cardWidth, cardHeight);
             x += horSpacing;
 
-            cardCount = ButtonHelperTwilightsFall.getDeckForSplicing(game, "units", 100, true)
-                    .size();
-            fullDeck = Mapper.getUnits().size();
+            cardCount = game.getUnitSpliceDeck(true).size();
+            fullDeck = Mapper.getDeck(game.getUnitSpliceDeckID()).getCardCount();
             drawPAImageScaled(x, y, "cardback_unit_upgrade.jpg", cardWidth, cardHeight);
             DrawingUtil.superDrawString(
                     graphics,
@@ -1131,9 +1128,8 @@ public class MapGenerator implements AutoCloseable {
             addWebsiteOverlay("Unit Upgrade Splice Deck", overlayText, x, y, cardWidth, cardHeight);
             x += horSpacing;
 
-            cardCount = ButtonHelperTwilightsFall.getDeckForSplicing(game, "genome", 100, true)
-                    .size();
-            fullDeck = Mapper.getDeck("tf_genome").getNewShuffledDeck().size();
+            cardCount = game.getGenomeSpliceDeck(true).size();
+            fullDeck = Mapper.getDeck(game.getGenomeSpliceDeckID()).getCardCount();
             drawPAImageScaled(x, y, "cardback_genome.jpg", cardWidth, cardHeight);
             DrawingUtil.superDrawString(
                     graphics,
@@ -1149,9 +1145,8 @@ public class MapGenerator implements AutoCloseable {
             addWebsiteOverlay("Genome Splice Deck", overlayText, x, y, cardWidth, cardHeight);
             x += horSpacing;
 
-            cardCount = ButtonHelperTwilightsFall.getDeckForSplicing(game, "paradigm", 100, true)
-                    .size();
-            fullDeck = Mapper.getDeck("tf_paradigm").getNewShuffledDeck().size();
+            cardCount = game.getParadigmSpliceDeck(true).size();
+            fullDeck = Mapper.getDeck(game.getParadigmSpliceDeckID()).getCardCount();
             drawPAImageScaled(x, y, "cardback_paradigm.jpg", cardWidth, cardHeight);
             DrawingUtil.superDrawString(
                     graphics,
@@ -1925,8 +1920,6 @@ public class MapGenerator implements AutoCloseable {
 
         String playerStatsAnchor = player.getPlayerStatsAnchorPosition();
         if (playerStatsAnchor != null) {
-            // String anchorProjectedOnOutsideRing =
-            // PositionMapper.getEquivalentPositionAtRing(ringCount, playerStatsAnchor);
             Point anchorProjectedPoint = PositionMapper.getTilePosition(playerStatsAnchor);
             if (anchorProjectedPoint != null) {
                 Point playerStatsAnchorPoint = PositionMapper.getScaledTilePosition(
@@ -2597,8 +2590,8 @@ public class MapGenerator implements AutoCloseable {
                             .toList();
 
                     globalUnitCoordinatesByFaction
-                            .computeIfAbsent(faction, k -> new HashMap<>())
-                            .computeIfAbsent(unitId, k -> new ArrayList<>())
+                            .computeIfAbsent(faction, _ -> new HashMap<>())
+                            .computeIfAbsent(unitId, _ -> new ArrayList<>())
                             .addAll(globalCoordinates);
                 }
             }

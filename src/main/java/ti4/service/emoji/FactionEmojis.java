@@ -121,11 +121,26 @@ public enum FactionEmojis implements TI4Emoji {
     crystellum,
     dream,
     ashen,
+    natau,
 
     // nomadfalcon
     erock,
     explanetary,
     councilors,
+
+    // endlesst
+    Unfallen,
+    Sophon,
+    Uempire,
+    Riftborn,
+    Hissho,
+    Uchoir,
+    Nakalim,
+    Horatio,
+    Craver,
+    Vaulter,
+    Vodyani,
+    Lumeris,
 
     // Franken
     Franken1,
@@ -356,6 +371,19 @@ public enum FactionEmojis implements TI4Emoji {
             case "syndicate" -> syndicate;
             case "terminator" -> terminator;
 
+            case "vaulter" -> Vaulter;
+            case "sophon" -> Sophon;
+            case "uempire" -> Uempire;
+            case "riftborn" -> Riftborn;
+            case "hissho" -> Hissho;
+            case "uchoir" -> Uchoir;
+            case "nakalim" -> Nakalim;
+            case "horatio" -> Horatio;
+            case "craver" -> Craver;
+            case "vodyani" -> Vodyani;
+            case "lumeris" -> Lumeris;
+            case "unfallen" -> Unfallen;
+
             case "councilors" -> councilors;
             case "erock" -> erock;
             case "explanetary" -> explanetary;
@@ -366,6 +394,7 @@ public enum FactionEmojis implements TI4Emoji {
             case "ta" -> ta;
             case "netrunners" -> netrunners;
             case "crystellum" -> crystellum;
+            case "natau" -> natau;
 
             case "netharii" -> netharii;
             case "drahn" -> Drahn;

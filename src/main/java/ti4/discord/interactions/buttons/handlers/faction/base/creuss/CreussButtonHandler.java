@@ -15,7 +15,7 @@ import ti4.helpers.FoWHelper;
 import ti4.message.MessageHelper;
 
 @UtilityClass
-public class CreussButtonHandler {
+class CreussButtonHandler {
 
     @ButtonHandler("creussHeroStep2_")
     public static void resolveGhostHeroStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {

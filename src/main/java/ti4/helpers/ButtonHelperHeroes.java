@@ -103,14 +103,14 @@ public class ButtonHelperHeroes {
     public static List<Button> argentBreakthroughStep1(Game game, Player player, Tile activeSystem) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
-                player.getFinsFactionCheckerPrefix() + "argentHeroStep2_" + activeSystem.getPosition(),
+                player.factionButtonChecker() + "argentHeroStep2_" + activeSystem.getPosition(),
                 activeSystem.getRepresentationForButtons(game, player)));
         for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, activeSystem.getPosition(), player, false)) {
             Tile tile = game.getTileByPosition(pos);
             if (CommandCounterHelper.hasCC(player, tile)
                     && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
                 buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "argentHeroStep2_" + tile.getPosition(),
+                        player.factionButtonChecker() + "argentHeroStep2_" + tile.getPosition(),
                         tile.getRepresentationForButtons(game, player)));
             }
         }
@@ -236,24 +236,13 @@ public class ButtonHelperHeroes {
             unitName = unitName.replace("damaged", "");
         }
         destination = FlipTileService.flipTileIfNeeded(event, destination, game);
-        RemoveUnitService.removeUnits(event, origin, game, player.getColor(), unitName + " " + unitHolderName);
-        AddUnitService.addUnits(event, destination, game, player.getColor(), unitName);
+        var removed = RemoveUnitService.removeUnits(
+                event, origin, game, player.getColor(), unitName + " " + unitHolderName, damaged);
+        AddUnitService.addUnits(event, destination, game, player.getColor(), unitName, removed);
         List<Button> buttons = getArgentHeroStep3Buttons(game, player, buttonID);
         String msg2 = player.getFactionEmoji() + " moved 1 " + unitName + " from "
                 + origin.getRepresentationForButtons(game, player) + " to "
                 + destination.getRepresentationForButtons(game, player);
-        if (damaged) {
-            origin.getUnitHolders()
-                    .get(unitHolderName)
-                    .removeDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unitName), player.getColorID()), 1);
-            destination
-                    .getUnitHolders()
-                    .get("space")
-                    .addDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unitName), player.getColorID()), 1);
-            msg2 = player.getFactionEmoji() + " moved 1 damaged " + unitName + " from "
-                    + origin.getRepresentationForButtons(game, player) + " to "
-                    + destination.getRepresentationForButtons(game, player);
-        }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
         String msg =
@@ -823,24 +812,24 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getTilesToGhotiHeroIn(Player player, Game game) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
             if (FoWHelper.playerHasShipsInSystem(player, tileEntry.getValue())) {
                 Tile tile = tileEntry.getValue();
                 Button validTile = Buttons.green(
-                        finChecker + "ghotiHeroIn_" + tileEntry.getKey(),
+                        factionChecker + "ghotiHeroIn_" + tileEntry.getKey(),
                         tile.getRepresentationForButtons(game, player));
                 buttons.add(validTile);
             }
         }
-        Button validTile2 = Buttons.red(finChecker + "deleteButtons", "Done");
+        Button validTile2 = Buttons.red(factionChecker + "deleteButtons", "Done");
         buttons.add(validTile2);
         return buttons;
     }
 
     public static List<Button> getUnitsToGlimmersHero(Player player, Tile tile) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = "FFCC_" + player.getFaction() + "_";
         Set<UnitType> allowedUnits = Set.of(
                 UnitType.Destroyer,
                 UnitType.Cruiser,
@@ -860,37 +849,37 @@ public class ButtonHelperHeroes {
             for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {
                 UnitKey unitKey = unitEntry.getKey();
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
-                if (!allowedUnits.contains(unitKey.getUnitType())) {
+                if (!allowedUnits.contains(unitKey.unitType())) {
                     continue;
                 }
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                String prettyName = unitModel == null ? unitKey.getUnitType().humanReadableName() : unitModel.getName();
+                String prettyName = unitModel == null ? unitKey.unitType().humanReadableName() : unitModel.getName();
                 String unitName = unitKey.unitName();
                 Button validTile2 = Buttons.red(
-                        finChecker + "glimmersHeroOn_" + tile.getPosition() + "_" + unitName,
+                        factionChecker + "glimmersHeroOn_" + tile.getPosition() + "_" + unitName,
                         "Duplicate " + prettyName,
                         unitKey.unitEmoji());
                 buttons.add(validTile2);
             }
         }
-        Button validTile2 = Buttons.red(finChecker + "deleteButtons", "Decline");
+        Button validTile2 = Buttons.red(factionChecker + "deleteButtons", "Decline");
         buttons.add(validTile2);
         return buttons;
     }
 
     public static List<Button> getTilesToGlimmersHeroIn(Player player, Game game) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
             if (FoWHelper.playerHasShipsInSystem(player, tileEntry.getValue())) {
                 Tile tile = tileEntry.getValue();
                 Button validTile = Buttons.green(
-                        finChecker + "glimmersHeroIn_" + tileEntry.getKey(),
+                        factionChecker + "glimmersHeroIn_" + tileEntry.getKey(),
                         tile.getRepresentationForButtons(game, player));
                 buttons.add(validTile);
             }
         }
-        Button validTile2 = Buttons.red(finChecker + "deleteButtons", "Done");
+        Button validTile2 = Buttons.red(factionChecker + "deleteButtons", "Done");
         buttons.add(validTile2);
         return buttons;
     }
@@ -927,7 +916,7 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getButtonsForGheminaLadyHero(Player player, Game game) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         List<Tile> tilesWithBombard = CheckUnitContainmentService.getTilesContainingPlayersUnits(
                 game, player, UnitType.Lady, UnitType.Flagship);
@@ -944,7 +933,7 @@ public class ButtonHelperHeroes {
                             && !tile.isHomeSystem(game)
                             && !planet.getName().toLowerCase().contains("rex")) {
                         buttons.add(Buttons.green(
-                                finChecker + "gheminaLadyHero_" + planet.getName(),
+                                factionChecker + "gheminaLadyHero_" + planet.getName(),
                                 Helper.getPlanetRepresentation(planet.getName(), game)));
                     }
                 }
@@ -954,7 +943,7 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getButtonsForGheminaLordHero(Player player, Game game) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         List<Tile> tilesWithBombard = CheckUnitContainmentService.getTilesContainingPlayersUnits(
                 game, player, UnitType.Lady, UnitType.Flagship);
@@ -973,7 +962,7 @@ public class ButtonHelperHeroes {
                             && !planet.getName().toLowerCase().contains("rex")
                             && (units == null || units.isEmpty())) {
                         buttons.add(Buttons.green(
-                                finChecker + "gheminaLordHero_" + planet.getName(),
+                                factionChecker + "gheminaLordHero_" + planet.getName(),
                                 Helper.getPlanetRepresentation(planet.getName(), game)));
                     }
                 }
@@ -1293,7 +1282,7 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getCabalHeroButtons(Player player, Game game) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> empties = new ArrayList<>();
 
         List<Tile> tiles = new ArrayList<>();
@@ -1335,25 +1324,25 @@ public class ButtonHelperHeroes {
 
         for (Tile tile : adjTiles) {
             empties.add(Buttons.blue(
-                    finChecker + "cabalHeroTile_" + tile.getPosition(),
+                    factionChecker + "cabalHeroTile_" + tile.getPosition(),
                     "Roll For Units In " + tile.getRepresentationForButtons(game, player)));
         }
         empties.add(Buttons.red(
-                finChecker + "cabalHeroAll",
+                factionChecker + "cabalHeroAll",
                 "Resolve " + (game.isTwilightsFallMode() ? "Paradigm" : "Hero") + " For All Tiles [Experimental]"));
         SortHelper.sortButtonsByTitle(empties);
         return empties;
     }
 
     public static List<Button> getEmpyHeroButtons(Player player, Game game) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = "FFCC_" + player.getFaction() + "_";
         var frontierTokenId = Mapper.getTokenID(Constants.FRONTIER);
         return game.getTileMap().values().stream()
                 .filter(tile -> FoWHelper.playerHasShipsInSystem(player, tile))
                 .filter(tile ->
                         tile.getUnitHolders().get("space").getTokenList().contains(frontierTokenId))
                 .map(tile -> Buttons.blue(
-                        finChecker + "exploreFront_" + tile.getPosition(),
+                        factionChecker + "exploreFront_" + tile.getPosition(),
                         "Explore " + tile.getRepresentationForButtons(game, player)))
                 .toList();
     }
@@ -1685,12 +1674,12 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getJolNarHeroSwapOutOptions(Player player) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
             if (!techM.isUnitUpgrade()) {
-                buttons.add(Buttons.gray(finChecker + "jnHeroSwapOut_" + tech, techM.getName()));
+                buttons.add(Buttons.gray(factionChecker + "jnHeroSwapOut_" + tech, techM.getName()));
             }
         }
         buttons.add(Buttons.red("deleteButtons", "Done resolving"));
@@ -1698,7 +1687,7 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getBenediction1stTileOptions(Player player, Game game) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (Tile tile1 : game.getTileMap().values()) {
             String pos1 = tile1.getPosition();
@@ -1716,14 +1705,15 @@ public class ButtonHelperHeroes {
                     }
                     if (adjacentPeeps) {
                         buttons.add(Buttons.gray(
-                                finChecker + "benedictionStep1_" + pos1,
+                                factionChecker + "benedictionStep1_" + pos1,
                                 tile1.getRepresentationForButtons(game, player)));
                     }
                     break;
                 }
             }
         }
-        BlindSelectionService.filterForBlindPositionSelection(game, player, buttons, finChecker + "benedictionStep1");
+        BlindSelectionService.filterForBlindPositionSelection(
+                game, player, buttons, factionChecker + "benedictionStep1");
         return buttons;
     }
 
@@ -1838,7 +1828,7 @@ public class ButtonHelperHeroes {
 
                 UnitKey unitKey = unitEntry.getKey();
                 int totalUnits = unitEntry.getValue();
-                if (unitKey.getUnitType() != UnitType.Infantry && unitKey.getUnitType() != UnitType.Mech) {
+                if (unitKey.unitType() != UnitType.Infantry && unitKey.unitType() != UnitType.Mech) {
                     var parsedUnit = new ParsedUnit(unitKey, totalUnits, Constants.SPACE);
                     RemoveUnitService.removeUnit(event, tile1, game, parsedUnit);
                 }
@@ -1903,7 +1893,7 @@ public class ButtonHelperHeroes {
         for (String obj : game.getRevealedPublicObjectives().keySet()) {
             if (Mapper.getPublicObjective(obj) != null) {
                 buttons.add(Buttons.gray(
-                        player.getFinsFactionCheckerPrefix() + "toldarHero_"
+                        player.factionButtonChecker() + "toldarHero_"
                                 + Mapper.getPublicObjective(obj).getName(),
                         Mapper.getPublicObjective(obj).getName()));
             }

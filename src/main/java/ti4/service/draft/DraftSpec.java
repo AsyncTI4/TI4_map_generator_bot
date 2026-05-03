@@ -68,7 +68,7 @@ public class DraftSpec {
             template = Mapper.getDefaultMapTemplateForPlayerCount(specs.playerIDs.size());
             game.setMapTemplateID(template.getID());
         }
-        specs.setTemplate(template);
+        specs.template = template;
 
         // Load Slice Generation Specifications
         SliceGenerationSettings sliceSettings = settings.getSliceSettings();
@@ -87,7 +87,7 @@ public class DraftSpec {
 
         specs.priorityFactions.addAll(pfSettings.getPriFactions().getKeys());
         specs.priorityFactions.removeAll(specs.bannedFactions);
-        specs.setPlayerIDs(new ArrayList<>(pfSettings.getGamePlayers().getKeys()));
+        specs.playerIDs = new ArrayList<>(pfSettings.getGamePlayers().getKeys());
         if (pfSettings.getPresetDraftOrder().isVal()) {
             specs.playerDraftOrder = new ArrayList<>(game.getPlayers().keySet());
         }
@@ -95,8 +95,8 @@ public class DraftSpec {
         // Load Sources Specifications
         // TODO: These should be derived from game settings.
         SourceSettings sources = settings.getSourceSettings();
-        specs.setTileSources(sources.getTileSources());
-        specs.setFactionSources(sources.getFactionSources());
+        specs.tileSources = sources.getTileSources();
+        specs.factionSources = sources.getFactionSources();
 
         if (sliceSettings.getParsedSlices() != null) {
             specs.presetSlices = sliceSettings.getParsedSlices();
@@ -115,7 +115,7 @@ public class DraftSpec {
             template = Mapper.getDefaultMapTemplateForPlayerCount(specs.playerIDs.size());
             game.setMapTemplateID(template.getID());
         }
-        specs.setTemplate(template);
+        specs.template = template;
 
         // Load Slice Generation Specifications
         MiltySliceDraftableSettings sliceSettings = settings.getSliceSettings().getMiltySettings();
@@ -133,12 +133,12 @@ public class DraftSpec {
         specs.maxLegend = sliceSettings.getNumLegends().getValHigh();
         specs.minTot = sliceSettings.getTotalValue().getValLow();
         specs.maxTot = sliceSettings.getTotalValue().getValHigh();
-        specs.setPlayerIDs(new ArrayList<>(settings.getPlayerUserIds()));
+        specs.playerIDs = new ArrayList<>(settings.getPlayerUserIds());
 
         // Load Sources Specifications
         SourceSettings sources = settings.getSourceSettings();
-        specs.setTileSources(sources.getTileSources());
-        specs.setFactionSources(sources.getFactionSources());
+        specs.tileSources = sources.getTileSources();
+        specs.factionSources = sources.getFactionSources();
 
         if (settings.getSliceSettings().getParsedSlices() != null) {
             specs.presetSlices = settings.getSliceSettings().getParsedSlices();

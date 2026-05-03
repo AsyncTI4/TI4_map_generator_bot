@@ -10,7 +10,7 @@ import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 
 class ShowGameAsPlayer extends GameStateSubcommand {
 
-    public ShowGameAsPlayer() {
+    ShowGameAsPlayer() {
         super(Constants.SHOW_GAME_AS_PLAYER, "Shows map as the specified player sees it.", false, true);
         addOptions(new OptionData(
                 OptionType.STRING,

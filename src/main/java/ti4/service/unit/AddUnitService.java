@@ -36,7 +36,7 @@ public class AddUnitService {
             AddPlanetToPlayAreaService.addPlanetToPlayArea(
                     event, tile, unit.uh().getName(), game);
 
-            String color = unit.unitKey().getColorID();
+            String color = unit.unitKey().colorID();
             handleFogOfWar(tile, color, game, unit.unitKey() + " " + unit.getTotalRemoved());
             checkFleetCapacity(tile, color, game);
         }
@@ -52,9 +52,9 @@ public class AddUnitService {
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit parsedUnit : parsedUnits) {
             List<Integer> states = pickStatesForAddedUnit(parsedUnit, removed);
-            tile.getUnitHolders().get(parsedUnit.getLocation()).addUnitsWithStates(parsedUnit.getUnitKey(), states);
+            tile.getUnitHolders().get(parsedUnit.location()).addUnitsWithStates(parsedUnit.unitKey(), states);
             tile = FlipTileService.flipTileIfNeeded(tile, game);
-            AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.getLocation(), game);
+            AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.location(), game);
         }
 
         handleFogOfWar(tile, color, game, unitList);
@@ -65,9 +65,9 @@ public class AddUnitService {
             GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList) {
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit parsedUnit : parsedUnits) {
-            tile.addUnit(parsedUnit.getLocation(), parsedUnit.getUnitKey(), parsedUnit.getCount());
+            tile.addUnit(parsedUnit.location(), parsedUnit.unitKey(), parsedUnit.count());
             tile = FlipTileService.flipTileIfNeeded(tile, game);
-            AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.getLocation(), game);
+            AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.location(), game);
         }
 
         handleFogOfWar(tile, color, game, unitList);
@@ -139,18 +139,18 @@ public class AddUnitService {
         StringBuilder unitListBuilder = new StringBuilder();
         boolean first = true;
         for (ParsedUnit parsedUnit : assignedUnits) {
-            tile.addUnit(parsedUnit.getLocation(), parsedUnit.getUnitKey(), parsedUnit.getCount());
+            tile.addUnit(parsedUnit.location(), parsedUnit.unitKey(), parsedUnit.count());
             tile = FlipTileService.flipTileIfNeeded(tile, game);
-            AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.getLocation(), game);
+            AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.location(), game);
             if (!first) {
                 unitListBuilder.append(", ");
             }
             unitListBuilder
-                    .append(parsedUnit.getCount())
+                    .append(parsedUnit.count())
                     .append(' ')
-                    .append(parsedUnit.getUnitKey().asyncID())
+                    .append(parsedUnit.unitKey().asyncID())
                     .append(' ')
-                    .append(parsedUnit.getLocation());
+                    .append(parsedUnit.location());
             first = false;
         }
 
@@ -187,11 +187,11 @@ public class AddUnitService {
     }
 
     private static List<Integer> pickStatesForAddedUnit(ParsedUnit unit, List<RemovedUnit> removed) {
-        int amtRemaining = unit.getCount();
+        int amtRemaining = unit.count();
         List<Integer> states = UnitState.emptyList();
         for (UnitState state : UnitState.defaultAddStatusOrder()) {
             for (RemovedUnit rm : removed) {
-                if (!rm.unitKey().equals(unit.getUnitKey())) continue;
+                if (!rm.unitKey().equals(unit.unitKey())) continue;
                 if (rm.getTotalRemoved() == 0) continue; // depleted
 
                 int amtRemoved = rm.states().get(state.ordinal());

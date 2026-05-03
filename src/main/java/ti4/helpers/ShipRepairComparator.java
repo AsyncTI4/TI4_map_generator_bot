@@ -12,7 +12,7 @@ class ShipRepairComparator implements Comparator<UnitKey>, Serializable {
     }
 
     private int getAssignedValue(UnitKey ship) {
-        return switch (ship.getUnitType()) {
+        return switch (ship.unitType()) {
             case Cruiser -> 4; // SE2 can have sustained damage
             case Dreadnought -> 3;
             case Flagship -> 2;

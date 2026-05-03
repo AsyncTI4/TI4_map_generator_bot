@@ -235,7 +235,7 @@
     {
         "alias": "jolnar_bonus_hits_9_10",
         "type": "bonus_hits",
-        "value": "+1",
+        "value": "+2",
         "valueScalingType": "raw_rolls_gt_8",
         "persistenceType": "ALWAYS",
         "scope": "fs",
@@ -375,7 +375,7 @@
         "alias": "nivyn_commander",
         "type": "extrarolls",
         "value": "+1",
-        "valueScalingType": "damaged_units_same_type",
+        "valueScalingType": "damaged_units_max_2",
         "persistenceType": "CONDITIONAL",
         "condition": "nivyn_commander_damaged",
         "scope": "",

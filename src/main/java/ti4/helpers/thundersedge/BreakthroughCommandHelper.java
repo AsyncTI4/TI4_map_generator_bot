@@ -21,6 +21,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.BreakthroughHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -220,6 +221,15 @@ public final class BreakthroughCommandHelper {
                     player.removeOwnedUnitByID("dreadnought2");
                 }
             }
+            if ("veldyrbt".equalsIgnoreCase(bt.getID())) {
+                Tile tile = player.getHomeSystemTile();
+                if (tile != null) {
+                    tile.addToken("token_nebula_async.png", "space");
+                }
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " Made your home system into a nebula.");
+            }
 
             if ("cabalbt".equalsIgnoreCase(bt.getID())) {
                 if (btIDs.size() == 1) {
@@ -251,7 +261,7 @@ public final class BreakthroughCommandHelper {
     }
 
     private static void serveRollFractureButtons(Player player, String btID) {
-        String id = player.finChecker() + "rollFracture_" + btID;
+        String id = player.factionButtonChecker() + "rollFracture_" + btID;
         Button rollFracture = Buttons.green(id, "Roll For The Fracture", MiscEmojis.RollDice);
         String message = "It looks like The Fracture isn't in play yet. Use the button to roll for The Fracture!"
                 + "\n If you roll a " + DiceEmojis.d10blue_1 + " or a"

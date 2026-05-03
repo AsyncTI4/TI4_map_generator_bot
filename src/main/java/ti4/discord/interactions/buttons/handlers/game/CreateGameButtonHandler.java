@@ -31,7 +31,6 @@ import ti4.game.persistence.ManagedPlayer;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.SearchGameHelper;
 import ti4.logging.BotLogger;
-import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
 import ti4.settings.users.UserSettingsManager;
@@ -40,7 +39,6 @@ import ti4.spring.service.statistics.AverageTurnTimeService;
 @UtilityClass
 public class CreateGameButtonHandler {
 
-    @ButtonHandler("createGameChannels")
     @ButtonHandler("launchGame")
     public static void createGameChannelsButton(ButtonInteractionEvent event) {
         List<Member> members = new ArrayList<>();
@@ -67,7 +65,7 @@ public class CreateGameButtonHandler {
             return;
         }
 
-        createGameChannels(event);
+        createGameAndChannels(event);
     }
 
     @ModalHandler("signupModal")
@@ -249,9 +247,6 @@ public class CreateGameButtonHandler {
 
                 activityList.append('\n').append(playerNumber).append(". ").append(activeHoursSummary);
             }
-            // } else {
-            //     memberList.append("\n  - Insufficient data for active hours.");
-            // }
             playerNumber++;
         }
         return memberList.toString() + activityList;
@@ -279,87 +274,85 @@ public class CreateGameButtonHandler {
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " left the game.");
     }
 
-    private static void createGameChannels(ButtonInteractionEvent event) {
+    private static synchronized void createGameAndChannels(ButtonInteractionEvent event) {
         String userName = event.getUser().getEffectiveName();
-        List<Member> members = fetchMembersFromMessage(event);
         MessageHelper.sendMessageToEventChannel(event, userName + " pressed the [Create Game] button");
 
         if (!CreateGameService.isGameCreationAllowed()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "Admins have temporarily turned off game creation, "
-                            + "most likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
+                    "Admins have temporarily turned off game creation, most likely to contain a bug. Please be patient.");
             return;
         }
 
         if (CreateGameService.isLockedFromCreatingGames(event)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "You created a game within the last 10 minutes and thus are being stopped from creating more until some time "
-                            + "has passed. You can have someone else in the game press the button instead.");
+                    "You created a game within the last 10 minutes. Please wait or have someone else create it.");
             return;
         }
 
-        String buttonMsg = event.getMessage().getContentRaw();
-        String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
+        String buttonMessage = event.getMessage().getContentRaw();
+
+        List<Member> members = resolveMembers(event, buttonMessage);
+        if (members.isEmpty()) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No valid members found.");
+            return;
+        }
+
+        if (!validateMembersCanJoin(event, members)) {
+            return;
+        }
+
+        Member gameOwner = members.isEmpty() ? null : members.getFirst();
+        boolean isStaff = isStaff(event);
+
+        if (!isStaff && !members.contains(event.getMember())) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "You must be a staff member or a member of the game to launch the game.");
+            return;
+        }
+
+        if (!isStaff && isLikelyDoublePressedButton(members, event)) return;
+
+        String gameName = CreateGameService.getNextPbdGameName();
+        Category categoryChannel = resolveOrCreateCategory(gameName, event);
+        if (categoryChannel == null) {
+            resetPbdNumber(gameName);
+            return;
+        }
+
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+
+        String gameSillyName = parseOrGenerateSillyName(buttonMessage);
+
+        Game game = CreateGameService.createGameChannels(
+                members, event, gameSillyName, gameName, gameOwner, categoryChannel);
+
+        if (game == null) {
+            resetPbdNumber(gameName);
+            MessageHelper.sendMessageToEventChannel(event, "Something went wrong...");
+            return;
+        }
+
+        MessageHelper.sendMessageToEventChannel(event, "Message for posterity:\n\n" + buttonMessage);
+        GameManager.save(game, "Created game channels");
+    }
+
+    private static void resetPbdNumber(String gameName) {
+        int pbdNumber = Integer.parseInt(gameName.replace("pbd", ""));
+        GameManager.resetLatestPbdNumberFrom(pbdNumber);
+    }
+
+    private static String parseOrGenerateSillyName(String buttonMessage) {
+        String gameSillyName = StringUtils.substringBetween(buttonMessage, "Game Fun Name: ", "\n");
         if (gameSillyName == null || gameSillyName.isEmpty()) {
             gameSillyName = CreateGameService.autoGenerateGameName();
         }
-        String gameName = CreateGameService.getNextGameName();
-        String lastGameName = CreateGameService.getLastGameName();
+        return gameSillyName;
+    }
 
-        if (!GameManager.isValid(lastGameName)) {
-            BotLogger.error(
-                    new LogOrigin(event),
-                    "**Unable to create new games because the last game `" + lastGameName + "` cannot be found."
-                            + " Was it deleted but the roles still exist?**");
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "@Bothelper check if the supposed latest PBD game `" + lastGameName
-                            + "` exists using `/game info game_name:pbd#`."
-                            + " If not, you will need to create this game with"
-                            + " `/bothelper create_game_channels game_fun_name:<whatever-name> game_name:<missing"
-                            + " pbd# + 1> player1:.......`");
-            return;
-        }
-
-        Member gameOwner = null;
-        if (!members.isEmpty()) {
-            for (Member member : members) {
-                if (!userCanJoinGame(event, member)) {
-                    return;
-                }
-                if (gameOwner == null) gameOwner = member;
-            }
-        } else {
-            for (int i = 3; i < StringUtils.countMatches(buttonMsg, ":"); i++) {
-                String user = buttonMsg.split(":")[i];
-                user = StringUtils.substringBefore(user, ".");
-                Member member = event.getGuild().getMemberById(user);
-                if (member != null) {
-                    members.add(member);
-                    if (!userCanJoinGame(event, member)) {
-                        return;
-                    }
-                }
-                if (gameOwner == null) gameOwner = member;
-            }
-        }
-
-        if (isLikelyDoublePressedButton(gameName, members, lastGameName, event)
-                && !CommandHelper.hasRole(event, JdaService.bothelperRoles)
-                && !CommandHelper.hasRole(event, JdaService.developerRoles)) return;
-
-        if (event != null
-                && !members.contains(event.getMember())
-                && !CommandHelper.hasRole(event, JdaService.bothelperRoles)
-                && !CommandHelper.hasRole(event, JdaService.developerRoles)) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "You must be a bothelper or a member of the game to launch the game.");
-            return;
-        }
-
-        // CHECK IF GIVEN CATEGORY IS VALID
+    private static Category resolveOrCreateCategory(String gameName, ButtonInteractionEvent event) {
         String categoryChannelName = CreateGameService.getCategoryNameForGame(gameName);
         Category categoryChannel = null;
         List<Category> categories = CreateGameService.getAllAvailablePBDCategories();
@@ -375,18 +368,44 @@ public class CreateGameButtonHandler {
                     event,
                     "Could not automatically find a category that begins with **" + categoryChannelName
                             + "** - Please create this category.\n# Warning, this may mean all servers are at capacity.");
-            return;
         }
-        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        Game game = CreateGameService.createGameChannels(
-                members, event, gameSillyName, gameName, gameOwner, categoryChannel);
-        if (game != null) {
-            MessageHelper.sendMessageToEventChannel(event, "Message for posterity:\n\n" + buttonMsg);
-            // TODO: We should be locking since we're saving? Maybe not here
-            GameManager.save(game, "Created game channels");
-        } else {
-            MessageHelper.sendMessageToEventChannel(event, "Something went wrong...");
+        return categoryChannel;
+    }
+
+    private static boolean isStaff(ButtonInteractionEvent event) {
+        return CommandHelper.hasRole(event, JdaService.bothelperRoles)
+                || CommandHelper.hasRole(event, JdaService.developerRoles);
+    }
+
+    private static boolean validateMembersCanJoin(ButtonInteractionEvent event, List<Member> members) {
+        for (Member member : members) {
+            if (!userCanJoinGame(event, member)) {
+                return false;
+            }
         }
+        return true;
+    }
+
+    private static List<Member> resolveMembers(ButtonInteractionEvent event, String buttonMessage) {
+        List<Member> members = fetchMembersFromMessage(event);
+        if (!members.isEmpty()) {
+            return members;
+        }
+        return parseMembersFromButtonMessage(event, buttonMessage);
+    }
+
+    private static List<Member> parseMembersFromButtonMessage(ButtonInteractionEvent event, String buttonMsg) {
+        List<Member> members = new ArrayList<>();
+        String[] parts = buttonMsg.split(":");
+
+        for (int i = 3; i < parts.length; i++) {
+            String userId = StringUtils.substringBefore(parts[i], ".");
+            Member member = event.getGuild().getMemberById(userId);
+            if (member != null) {
+                members.add(member);
+            }
+        }
+        return members;
     }
 
     private static boolean userCanJoinGame(ButtonInteractionEvent event, Member member) {
@@ -451,9 +470,9 @@ public class CreateGameButtonHandler {
         };
     }
 
-    private static boolean isLikelyDoublePressedButton(
-            String gameName, List<Member> members, String lastGameName, ButtonInteractionEvent event) {
-        if ("pbd1".equalsIgnoreCase(gameName)) return false;
+    private static boolean isLikelyDoublePressedButton(List<Member> members, ButtonInteractionEvent event) {
+        String lastGameName = CreateGameService.getLastPbdGameName();
+        if (lastGameName == null) return false;
 
         Game lastGame = GameManager.getManagedGame(lastGameName).getGame();
         for (Member member : members) {

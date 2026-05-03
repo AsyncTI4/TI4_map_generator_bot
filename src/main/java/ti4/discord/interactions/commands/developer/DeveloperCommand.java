@@ -19,13 +19,14 @@ public class DeveloperCommand implements ParentCommand {
                     new ButtonProcessingStatistics(),
                     new CacheStatistics(),
                     new RestoreGame(),
+                    new ReloadCorruptedSaves(),
                     new RunCron(),
                     new RunAgainstAllGames(),
                     new CustomCommand(),
                     new RunAgainstSpecificGame(),
                     new ProduceNucleusGenStats(),
-                    new RunSql(),
-                    new LocalDevelopment())
+                    new LocalDevelopment(),
+                    new RunSql())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

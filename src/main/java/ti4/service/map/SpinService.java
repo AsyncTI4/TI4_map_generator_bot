@@ -1,6 +1,7 @@
 package ti4.service.map;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -171,7 +172,7 @@ public class SpinService {
         // status phase
         @Override
         public String toString() {
-            String sb = ring.stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR))
+            return ring.stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR))
                     + OPTION_SEPARATOR
                     + direction.toString()
                     + OPTION_SEPARATOR
@@ -180,9 +181,6 @@ public class SpinService {
                     + center
                     + OPTION_SEPARATOR
                     + trigger.toString();
-            // sb.append(OPTION_SEPARATOR);
-            // sb.append(toSpin.toString());
-            return sb;
         }
 
         public String getRepresentation(boolean forExecution) {
@@ -283,7 +281,7 @@ public class SpinService {
             sb.append("-# ring 3 CW three steps (except 6p map HS positions)");
 
         } else {
-            List<String> overTheBoundsWarning = new ArrayList<>();
+            var overTheBoundsWarning = new ArrayList<String>();
             for (SpinSetting setting : getSpinSettings(game)) {
                 sb.append(setting.getRepresentation(false)).append('\n');
                 if (setting.maxRing() > 9) {
@@ -308,7 +306,7 @@ public class SpinService {
         game.setSpinMode(currentSettings + (currentSettings.isEmpty() ? "" : SETTING_SEPARATOR) + toAdd.toString());
     }
 
-    public static void setSpinSettings(Game game, List<SpinSetting> settings) {
+    public static void setSpinSettings(Game game, Collection<SpinSetting> settings) {
         if (settings.isEmpty()) {
             game.setSpinMode("OFF");
         } else {

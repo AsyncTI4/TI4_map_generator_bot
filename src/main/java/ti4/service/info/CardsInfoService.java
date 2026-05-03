@@ -78,9 +78,9 @@ public class CardsInfoService {
             buttons.add(Buttons.blue("startIntrigueCard", "Pay For Intrigue Card", FactionEmojis.xin));
         }
         if (player.hasRelicReady("superweaponavailyn")) {
-            String finChecker = "FFCC_" + player.getFaction() + "_";
+            String factionChecker = "FFCC_" + player.getFaction() + "_";
             buttons.add(Buttons.gray(
-                    finChecker + "exhaustSuperweapon_availyn",
+                    factionChecker + "exhaustSuperweapon_availyn",
                     "Produce 3 Fighters With Availyn",
                     FactionEmojis.belkosea));
         }
@@ -202,9 +202,7 @@ public class CardsInfoService {
         }
         if (player.hasAbility("laws_order") && !game.getLaws().isEmpty()) {
             buttons.add(Buttons.gray(
-                    player.getFinsFactionCheckerPrefix() + "useLawsOrder",
-                    "Pay To Ignore Laws",
-                    FactionEmojis.Keleres));
+                    player.factionButtonChecker() + "useLawsOrder", "Pay To Ignore Laws", FactionEmojis.Keleres));
         }
         if (game.isVeiledHeartMode()) {
             buttons.add(Buttons.green("revealVeiledCards", "Reveal Veiled Cards"));

@@ -25,7 +25,8 @@ public class MapRenderPipeline {
 
     private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
     private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 10;
-    private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(
+            2, Thread.ofPlatform().name("ti4-map-renderer-", 0).factory());
 
     private static void render(RenderEvent renderEvent) {
         if (CircuitBreaker.isOpen()) {

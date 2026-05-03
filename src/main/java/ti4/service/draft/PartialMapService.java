@@ -160,7 +160,7 @@ public class PartialMapService {
         if (seatDraftable != null) {
             if (pState.getPickCount(seatDraftable.getType()) > 0) {
                 String seatChoiceKey =
-                        pState.getPicks(seatDraftable.getType()).getFirst().getChoiceKey();
+                        pState.getPicks(seatDraftable.getType()).getFirst().choiceKey();
                 return SeatDraftable.getSeatNumberFromChoiceKey(seatChoiceKey);
             }
             // If Seat Draftables are excluded from the draft, the Speaker Order is used instead
@@ -168,13 +168,13 @@ public class PartialMapService {
             if (pState.getPickCount(speakerOrderDraftable.getType()) > 0) {
                 String pickChoiceKey = pState.getPicks(speakerOrderDraftable.getType())
                         .getFirst()
-                        .getChoiceKey();
+                        .choiceKey();
                 return SpeakerOrderDraftable.getSpeakerOrderFromChoiceKey(pickChoiceKey);
             }
         } else if (andcatDraftable != null) {
             if (pState.getPickCount(andcatDraftable.getType()) > 0) {
                 String pickChoiceKey =
-                        pState.getPicks(andcatDraftable.getType()).getFirst().getChoiceKey();
+                        pState.getPicks(andcatDraftable.getType()).getFirst().choiceKey();
                 ReferenceCardPackage refPackage = andcatDraftable.getPackageByChoiceKey(pickChoiceKey);
                 List<String> speakerOrder = andcatDraftable.getSpeakerOrder(draftManager);
                 if (speakerOrder != null && refPackage.speakerOrderFaction() != null) {
@@ -189,13 +189,13 @@ public class PartialMapService {
 
     private FactionModel getPlayerHsFactionModel(DraftManager draftManager, PlayerDraftState pState) {
         if (pState.getPickCount(FactionDraftable.TYPE) > 0) {
-            String factionId = pState.getPicks(FactionDraftable.TYPE).getFirst().getChoiceKey();
+            String factionId = pState.getPicks(FactionDraftable.TYPE).getFirst().choiceKey();
             return Mapper.getFaction(factionId);
         }
         if (pState.getPickCount(AndcatReferenceCardsDraftable.TYPE) > 0) {
             String choiceKey = pState.getPicks(AndcatReferenceCardsDraftable.TYPE)
                     .getFirst()
-                    .getChoiceKey();
+                    .choiceKey();
             AndcatReferenceCardsDraftable arcDraftable =
                     (AndcatReferenceCardsDraftable) draftManager.getDraftable(AndcatReferenceCardsDraftable.TYPE);
             ReferenceCardPackage refPackage = arcDraftable.getPackageByChoiceKey(choiceKey);
@@ -211,7 +211,7 @@ public class PartialMapService {
 
     private MiltyDraftSlice getPlayerSlice(PlayerDraftState pState, SliceDraftable sliceDraftable) {
         if (pState.getPickCount(SliceDraftable.TYPE) > 0) {
-            String sliceName = pState.getPicks(SliceDraftable.TYPE).getFirst().getChoiceKey();
+            String sliceName = pState.getPicks(SliceDraftable.TYPE).getFirst().choiceKey();
             return sliceDraftable.getSliceByName(sliceName);
         }
         return null;

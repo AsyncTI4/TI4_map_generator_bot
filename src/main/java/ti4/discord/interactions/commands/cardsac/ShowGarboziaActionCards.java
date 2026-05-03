@@ -1,5 +1,6 @@
 package ti4.discord.interactions.commands.cardsac;
 
+import java.util.Objects;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -22,10 +23,7 @@ class ShowGarboziaActionCards extends GameStateSubcommand {
         Game game = getGame();
         boolean showFullText = event.getOption(Constants.SHOW_FULL_TEXT, false, OptionMapping::getAsBoolean);
         String garboziaText = ShowActionCardsService.getGarboziaDiscardText(game, showFullText);
-        if (garboziaText == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No Action Cards on Garbozia.");
-        } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), garboziaText);
-        }
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(), Objects.requireNonNullElse(garboziaText, "No Action Cards on Garbozia."));
     }
 }

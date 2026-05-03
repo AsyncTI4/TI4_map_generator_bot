@@ -5,25 +5,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
-import ti4.game.Game;
-import ti4.game.persistence.GameManager;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.MiscEmojis;
 
 @UtilityClass
 public class DrumrollService {
-
-    private static void sleepForTwoSeconds() {
-        try {
-            TimeUnit.SECONDS.sleep(2);
-        } catch (Exception ignored) {
-        }
-    }
 
     private static String drumrollString(String message, int iteration) {
         StringBuilder sb = new StringBuilder();
@@ -33,58 +25,62 @@ public class DrumrollService {
         return sb.toString();
     }
 
-    private Consumer<Message> drumrollFunction(
-            List<Message> bonusMessages, int seconds, String message, String gameName, Predicate<Game> resolve) {
-        long startTime = System.currentTimeMillis();
-        long endTime = startTime + seconds * 1000L;
-
-        return msg -> {
-            int iteration = 1;
-            sleepForTwoSeconds();
-            while (System.currentTimeMillis() < endTime) {
-                String drumroll = drumrollString(message, iteration);
-                msg.editMessage(drumroll).queue(null, null);
-                for (Message bonus : bonusMessages) {
-                    bonus.editMessage(drumroll).queue(null, null);
-                }
-                iteration++;
-                sleepForTwoSeconds();
-                if (!JdaService.isReadyToReceiveCommands())
-                    break; // if the bot needs to shut down, cancel all drumrolls
-            }
-            msg.delete().queue(null, null);
-            for (Message bonus : bonusMessages) {
-                bonus.delete().queue(null, null);
-            }
-
-            Game reloadedGame = GameManager.getManagedGame(gameName).getGame();
-            if (resolve.test(reloadedGame)) GameManager.save(reloadedGame, "Post-Drumroll");
-        };
+    private static Consumer<Message> drumrollFunction(
+            List<Message> bonusMessages, int seconds, String message, Runnable onCompletion) {
+        long endTime = System.currentTimeMillis() + seconds * 1000L;
+        return msg -> drumrollStep(msg, bonusMessages, message, onCompletion, 1, endTime);
     }
 
-    public void doDrumroll(MessageChannel main, String msg, int sec, String gameName, Predicate<Game> resolve) {
-        doDrumrollMultiChannel(main, msg, sec, gameName, resolve, null, null);
+    private static void drumrollStep(
+            Message msg,
+            List<Message> bonusMessages,
+            String message,
+            Runnable onCompletion,
+            int iteration,
+            long endTime) {
+        if (!JdaService.isReadyToReceiveCommands() || System.currentTimeMillis() >= endTime) {
+            finishDrumroll(msg, bonusMessages, onCompletion);
+            return;
+        }
+        String drumroll = drumrollString(message, iteration);
+        msg.editMessage(drumroll)
+                .queueAfter(
+                        2,
+                        TimeUnit.SECONDS,
+                        success -> {
+                            for (Message bonus : bonusMessages) {
+                                bonus.editMessage(drumroll).queue(Consumers.nop(), BotLogger::catchRestError);
+                            }
+                            drumrollStep(msg, bonusMessages, message, onCompletion, iteration + 1, endTime);
+                        },
+                        failure -> finishDrumroll(msg, bonusMessages, onCompletion));
+    }
+
+    private static void finishDrumroll(Message msg, List<Message> bonusMessages, Runnable onCompletion) {
+        msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        for (Message bonus : bonusMessages) {
+            bonus.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+        if (!JdaService.isReadyToReceiveCommands()) return;
+        onCompletion.run();
+    }
+
+    public void doDrumroll(MessageChannel main, String msg, int sec, Runnable onCompletion) {
+        doDrumrollMultiChannel(main, msg, sec, onCompletion, null, null);
     }
 
     public void doDrumrollMirrored(
-            MessageChannel main,
-            String msg,
-            int sec,
-            String gameName,
-            Predicate<Game> resolve,
-            MessageChannel channel2,
-            String msg2) {
+            MessageChannel main, String msg, int sec, Runnable onCompletion, MessageChannel channel2, String msg2) {
         List<MessageChannel> chans = channel2 == null ? Collections.emptyList() : List.of(channel2);
         List<String> msgs = msg2 == null ? Collections.emptyList() : List.of(msg2);
-        doDrumrollMultiChannel(main, msg, sec, gameName, resolve, chans, msgs);
+        doDrumrollMultiChannel(main, msg, sec, onCompletion, chans, msgs);
     }
 
     private void doDrumrollMultiChannel(
             MessageChannel main,
             String msg,
             int sec,
-            String gameName,
-            Predicate<Game> resolve,
+            Runnable onCompletion,
             List<MessageChannel> bonusChannels,
             List<String> altMessages) {
         List<Message> bonusMessages = new ArrayList<>();
@@ -101,7 +97,7 @@ public class DrumrollService {
         }
 
         String initialDrumroll = drumrollString(msg, 0);
-        Consumer<Message> function = drumrollFunction(bonusMessages, sec, msg, gameName, resolve);
+        Consumer<Message> function = drumrollFunction(bonusMessages, sec, msg, onCompletion);
         MessageHelper.splitAndSentWithAction(initialDrumroll, main, function);
     }
 }

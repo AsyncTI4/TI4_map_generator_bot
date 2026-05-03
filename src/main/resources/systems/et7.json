@@ -1,0 +1,17 @@
+{
+    "tileBack": "green",
+    "id": "et7",
+    "name": "Koyasil -- The Unfallen",
+    "aliases": [
+        "et7",
+        "koyasil",
+        "unfallen"
+    ],
+    "imagePath": "et7.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "koyasil"
+    ],
+    "source": "endlesst"
+}

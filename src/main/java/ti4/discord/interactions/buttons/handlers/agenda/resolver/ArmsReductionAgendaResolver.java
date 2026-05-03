@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 
 public class ArmsReductionAgendaResolver implements ForAgainstAgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "arms_reduction";
     }
 

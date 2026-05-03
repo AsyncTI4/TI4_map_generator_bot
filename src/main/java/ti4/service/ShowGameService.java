@@ -5,7 +5,6 @@ import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -162,7 +161,7 @@ public class ShowGameService {
                     && !channel.equals(privateChannel)) {
                 channel = privateChannel;
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), "Map Image sent to " + ((TextChannel) privateChannel).getJumpUrl());
+                        event.getMessageChannel(), "Map Image sent to " + privateChannel.getJumpUrl());
             }
         }
         return channel;

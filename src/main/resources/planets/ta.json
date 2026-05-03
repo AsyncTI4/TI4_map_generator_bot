@@ -10,7 +10,7 @@
         "y": 128.0
     },
     "resources": 3,
-    "influence": 2,
+    "influence": 3,
     "factionHomeworld": "ta",
     "planetType": "FACTION",
     "cardImagePath": null,

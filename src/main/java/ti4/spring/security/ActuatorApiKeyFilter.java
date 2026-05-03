@@ -24,7 +24,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *  - Otherwise, if header "X-API-KEY" matches the configured key, sets an authenticated principal with ROLE_ACTUATOR.
  *  - If missing or mismatched, does not short-circuit; downstream authorization will return 401/403 as appropriate.
  */
-public class ActuatorApiKeyFilter extends OncePerRequestFilter {
+class ActuatorApiKeyFilter extends OncePerRequestFilter {
 
     private static final String ACTUATOR_PATH = "/actuator/";
     private static final String API_KEY_HEADER = "X-API-KEY";
@@ -62,7 +62,8 @@ public class ActuatorApiKeyFilter extends OncePerRequestFilter {
             Object principal = current != null ? current.getPrincipal() : "actuator";
             Object credentials = current != null ? current.getCredentials() : "N/A";
             List<GrantedAuthority> merged = new ArrayList<>();
-            if (current != null && current.getAuthorities() != null) {
+            if (current != null) {
+                current.getAuthorities();
                 merged.addAll(current.getAuthorities());
             }
             merged.add(new SimpleGrantedAuthority("ROLE_ACTUATOR"));

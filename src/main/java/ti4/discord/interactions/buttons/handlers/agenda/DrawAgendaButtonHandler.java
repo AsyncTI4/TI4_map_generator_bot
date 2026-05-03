@@ -10,7 +10,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.message.MessageHelper;
 
 @UtilityClass
-public class DrawAgendaButtonHandler {
+class DrawAgendaButtonHandler {
 
     @ButtonHandler("drawAgenda_2")
     public static void drawAgenda2(ButtonInteractionEvent event, Game game, Player player) {

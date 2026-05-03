@@ -5,6 +5,7 @@ import static java.util.function.Predicate.not;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import ti4.executors.ExecutionLockManager;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
@@ -37,7 +38,7 @@ public class FastScFollowCron {
                 .filter(ManagedGame::isFastScFollowMode)
                 .map(ManagedGame::getName)
                 .forEach(gameName -> ExecutionLockManager.wrapWithLockAndRelease(
-                                gameName, ExecutionLockManager.LockType.WRITE, () -> handleFastScFollow(gameName))
+                                gameName, ExecutionLockType.WRITE, () -> handleFastScFollow(gameName))
                         .run());
 
         BotLogger.logCron("Finished FastScFollowCron");

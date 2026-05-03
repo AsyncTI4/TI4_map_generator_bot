@@ -35,7 +35,7 @@ class MantisTileDraftableSetTiles extends GameStateSubcommand {
             return;
         }
         String commaSeparatedTiles = event.getOption("tiles").getAsString();
-        if (commaSeparatedTiles == null || commaSeparatedTiles.trim().isEmpty()) {
+        if (commaSeparatedTiles.trim().isEmpty()) {
             return;
         }
 

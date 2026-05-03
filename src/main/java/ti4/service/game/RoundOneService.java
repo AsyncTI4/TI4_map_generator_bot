@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.lunarium.LunariumAbilityButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -68,17 +68,14 @@ public class RoundOneService {
             game.removeRelicFromGame("thesilverflame");
         }
         if (game.isThundersEdge() && !game.isTwilightsFallMode()) {
-            Player neutral = game.getPlayerFromColorOrFaction("neutral");
-            if (neutral == null) {
-                String color = SetupNeutralPlayer.pickNeutralColor(game);
-                game.setupNeutralPlayer(color);
-            }
+            game.setupNeutralPlayer();
             game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
             game.validateAndSetActionCardDeck(event, Mapper.getDeck(getTeActionCardDeckAlias(game)));
             game.setStrategyCardSet("te");
         }
         if (game.isTwilightsFallMode()) {
             ButtonHelperTwilightsFall.fixMahactColors(game, event);
+            game.setupNeutralPlayer();
             game.setupTwilightsFallMode(event);
         }
         if (game.isThundersEdge() || game.getStoredValue("useOldPok").isEmpty() || game.isTwilightsFallMode()) {
@@ -139,6 +136,10 @@ public class RoundOneService {
                     || player.hasAbility("collateralized_loans")
                     || player.hasAbility("binding_debts")) {
                 game.setDebtPoolIcon(Constants.VADEN_DEBT_POOL, MiscEmojis.SharkLoan.toString());
+            }
+
+            if (player.hasAbility("initiation")) {
+                LunariumAbilityButtonHandler.setFactionSheetCCs(game, player, 1);
             }
 
             if (player.hasAbility("questing_prince")) {

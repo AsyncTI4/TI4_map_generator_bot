@@ -13,6 +13,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 import ti4.executors.ExecutionLockManager;
+import ti4.executors.ExecutionLockType;
 import ti4.game.persistence.GameManager;
 import ti4.logging.BotLogger;
 import ti4.spring.service.deploy.ActiveLeaseService;
@@ -90,9 +91,7 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
     }
 
     private static void lockGame(String gameName) {
-        var lockType = RequestContext.shouldSaveGame()
-                ? ExecutionLockManager.LockType.WRITE
-                : ExecutionLockManager.LockType.READ;
+        var lockType = RequestContext.shouldSaveGame() ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutionLockManager.lock(gameName, lockType);
     }
 
@@ -124,9 +123,7 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
     }
 
     private static void unlockGame(String gameName) {
-        var lockType = RequestContext.shouldSaveGame()
-                ? ExecutionLockManager.LockType.WRITE
-                : ExecutionLockManager.LockType.READ;
+        var lockType = RequestContext.shouldSaveGame() ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutionLockManager.unlock(gameName, lockType);
     }
 }

@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.JDA;
@@ -22,13 +24,20 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.AsyncTI4DiscordBot;
+import ti4.contest.cron.CombatContestJanitorCron;
+import ti4.contest.cron.CombatReplayCron;
+import ti4.contest.cron.CombatReplayPromotionCron;
+import ti4.contest.cron.CombatReplayPromotionScoreBackfillCron;
+import ti4.contest.cron.CombatReplaySelectionCron;
 import ti4.cron.AutoPingCron;
+import ti4.cron.BothelperDashboardCron;
 import ti4.cron.CategoryCleanupCron;
 import ti4.cron.CloseLaunchThreadsCron;
-import ti4.cron.CombatContestLeaderboardCron;
 import ti4.cron.CronManager;
 import ti4.cron.EndOldGamesCron;
 import ti4.cron.FastScFollowCron;
+import ti4.cron.GameMessageCleanupCron;
 import ti4.cron.InteractionLogCron;
 import ti4.cron.LogButtonRuntimeStatisticsCron;
 import ti4.cron.LogCacheStatsCron;
@@ -42,12 +51,11 @@ import ti4.cron.UploadRecentStatsCron;
 import ti4.cron.UploadStatsCron;
 import ti4.cron.WinningPathCron;
 import ti4.discord.interactions.commands.SlashCommandManager;
-import ti4.discord.interactions.commands.context.ContextCommandManager;
+import ti4.discord.interactions.context.ContextCommandManager;
 import ti4.discord.interactions.listeners.ListenerManager;
 import ti4.discord.interactions.selections.SelectionManager;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.persistence.GameManager;
-import ti4.game.persistence.migration.DataMigrationManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -60,7 +68,6 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogBufferManager;
 import ti4.service.draft.SliceGenerationPipeline;
 import ti4.service.emoji.ApplicationEmojiService;
-import ti4.service.game.LocalDevelopmentSampleGameService;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
 import ti4.spring.context.SpringContext;
@@ -102,9 +109,14 @@ public class JdaService {
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
     public static final List<Guild> fowServers = new ArrayList<>();
 
-    public static void initialize(String[] args) {
+    private static final ExecutorService EVENT_EXECUTOR = Executors.newFixedThreadPool(
+            Runtime.getRuntime().availableProcessors(),
+            Thread.ofPlatform().name("ti4-jda-event-", 0).factory());
+
+    public static void startJdaAndRegisterListeners(String[] args) {
         BotLogger.info("STARTING JDA");
         jda = JDABuilder.createDefault(args[0])
+                .setEventPool(EVENT_EXECUTOR)
                 // This is a privileged gateway intent that is used to update user information and join/leaves
                 // (including kicks). This is required to cache all members of a guild (including chunking)
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
@@ -124,13 +136,15 @@ public class JdaService {
 
         BotLogger.info("INITIALIZING LISTENERS");
         ListenerManager.registerListeners(jda);
+    }
 
+    public static boolean waitForJdaReadyAndInitializeGuilds(String[] args) {
         BotLogger.info("AWAITING JDA READY");
         try {
             jda.awaitReady();
         } catch (Throwable t) {
             BotLogger.critical("Error waiting for bot to get ready", t);
-            return;
+            return false;
         }
 
         jda.getPresence()
@@ -144,7 +158,7 @@ public class JdaService {
 
         if (guildPrimary == null) {
             BotLogger.critical("Failed to start the bot on the primary guild. Aborting.");
-            return;
+            return false;
         }
 
         // Community Plays TI
@@ -256,8 +270,10 @@ public class JdaService {
                     "BOT-LOG WEBHOOK NOT FOUND for Primary GuildID:" + guildPrimaryID
                             + "\nPlease set a valid bot-log Webhook URL using `/developer setting setting_name:bot_log_webhook_url setting_type:string setting_value:<url>`");
         }
+        return true;
+    }
 
-        // LOAD DATA
+    public static void loadStaticDataAndResources() {
         BotLogger.info("LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
         ApplicationEmojiService.uploadNewEmojis();
@@ -275,24 +291,9 @@ public class JdaService {
         SelectionManager.init();
         initializeWhitelistedRoles();
         TIGLHelper.validateTIGLness();
+    }
 
-        jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Indexing Game Names"));
-
-        BotLogger.info("INDEXING GAME NAMES");
-        GameManager.initialize();
-
-        BotLogger.info("FINISHED INDEXING GAME NAMES");
-        if (GameManager.startManagedGamesWarmupIfNeeded()) {
-            BotLogger.info("STARTED BACKGROUND MANAGED GAME WARMUP");
-        } else {
-            BotLogger.info("DEFERRED BACKGROUND MANAGED GAME WARMUP UNTIL THIS PROCESS BECOMES ACTIVE");
-        }
-
-        if (DataMigrationManager.runMigrations()) {
-            BotLogger.info("FINISHED RUNNING MIGRATIONS");
-        }
-
-        // START CRONS
+    public static void registerAndStartCronJobs() {
         AutoPingCron.register();
         ReuploadStaleEmojisCron.register();
         LogCacheStatsCron.register();
@@ -302,30 +303,26 @@ public class JdaService {
         UploadRecentStatsCron.register();
         OldUndoFileCleanupCron.register();
         EndOldGamesCron.register();
+        GameMessageCleanupCron.register();
         LogButtonRuntimeStatisticsCron.register();
         TechSummaryCron.register();
         SabotageAutoReactCron.register();
         FastScFollowCron.register();
         CloseLaunchThreadsCron.register();
-        CombatContestLeaderboardCron.register();
+        CombatReplaySelectionCron.register();
+        CombatReplayPromotionCron.register();
+        CombatReplayPromotionScoreBackfillCron.register();
+        CombatReplayCron.register();
+        CombatContestJanitorCron.register();
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
         CategoryCleanupCron.register();
+        BothelperDashboardCron.register();
+    }
 
-        // BOT IS READY
+    public static void markProcessReady() {
         ActiveLeaseService.setCurrentProcessReady(true);
         BotLogger.info("BOT IS READY TO RECEIVE COMMANDS");
-        if (GameManager.isManagedGamesWarmupComplete()) {
-            updatePresence();
-        } else {
-            jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.customStatus("Warming game index"));
-        }
-
-        if (LocalDevelopmentSampleGameService.isLocalDevelopmentStartup()) {
-            String localUserId = args[1];
-            String sourceGameName = LocalDevelopmentSampleGameService.getStartupSourceGameName();
-            LocalDevelopmentSampleGameService.createAndRecreateTestGame(guildPrimary, localUserId, sourceGameName);
-        }
     }
 
     private static Guild tryToInitGuild(String guildID, boolean addToNewGameServerList) {
@@ -574,10 +571,16 @@ public class JdaService {
 
     public static void shutdown() {
         try {
+            AsyncTI4DiscordBot.markShuttingDown();
             jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
             BotLogger.info("SHUTDOWN PROCESS STARTED");
             ActiveLeaseService.setCurrentProcessReady(false);
             BotLogger.info("NO LONGER ACCEPTING COMMANDS");
+            if (shutdownEventExecutor()) { // will wait for up to an additional 20 seconds
+                BotLogger.info("FINISHED PROCESSING ASYNC THREADPOOL");
+            } else {
+                BotLogger.info("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
+            }
             if (ExecutorServiceManager.shutdown()) { // will wait for up to an additional 20 seconds
                 BotLogger.info("FINISHED PROCESSING ASYNC THREADPOOL");
             } else {
@@ -608,6 +611,17 @@ public class JdaService {
             jda.awaitShutdown(30, TimeUnit.SECONDS);
         } catch (Exception e) {
             BotLogger.error("Error encountered within shutdown process:\n> ", e);
+        }
+    }
+
+    private static boolean shutdownEventExecutor() {
+        EVENT_EXECUTOR.shutdownNow();
+        try {
+            return EVENT_EXECUTOR.awaitTermination(20, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            BotLogger.error("JdaService event thread pool shutdown interrupted.", e);
+            Thread.currentThread().interrupt();
+            return false;
         }
     }
 }

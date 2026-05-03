@@ -17,7 +17,7 @@ public class CheckUnitContainmentService {
         Collections.addAll(unitTypes, type);
 
         return game.getTileMap().values().stream()
-                .filter(t -> t.containsPlayersUnitsWithKeyCondition(p1, unit -> unitTypes.contains(unit.getUnitType())))
+                .filter(t -> t.containsPlayersUnitsWithKeyCondition(p1, unit -> unitTypes.contains(unit.unitType())))
                 .toList();
     }
 }

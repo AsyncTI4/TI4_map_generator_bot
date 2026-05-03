@@ -130,7 +130,7 @@ public class TeHelperCommanders {
             List<Tile> tiles = ojzDestinations(game, player, pos);
             for (Tile t : tiles) {
                 buttons.add(Buttons.green(
-                        player.finChecker() + "ojzRetreatS3_" + t.getPosition(),
+                        player.factionButtonChecker() + "ojzRetreatS3_" + t.getPosition(),
                         "Retreat To " + t.getRepresentationForButtons(game, player)));
             }
 
@@ -196,9 +196,9 @@ public class TeHelperCommanders {
             String uhName = "space".equals(uh.getName()) ? "Space" : Helper.getPlanetRepresentation(uh.getName(), game);
             for (UnitKey uk : uh.getUnitsByState().keySet()) {
                 // franken compat
-                if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.getUnitType())
+                if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.unitType())
                         && !player.hasAbility("miniaturization")) continue;
-                if (uk.getUnitType() == UnitType.PlenaryOrbital) continue;
+                if (uk.unitType() == UnitType.PlenaryOrbital) continue;
 
                 // moved all of this unit already from this unit holder
                 String unitStr = uk.asyncID() + " " + uh.getName();
@@ -207,9 +207,9 @@ public class TeHelperCommanders {
                                 >= uh.getUnits().get(uk)) continue;
 
                 // otherwise, add the button
-                String id = player.finChecker() + "moveOjzRetreatS1_" + source.getPosition() + "_" + uk.asyncID() + "_"
-                        + uh.getName();
-                String label = uk.getUnitType().humanReadableName() + " From " + uhName;
+                String id = player.factionButtonChecker() + "moveOjzRetreatS1_" + source.getPosition() + "_"
+                        + uk.asyncID() + "_" + uh.getName();
+                String label = uk.unitType().humanReadableName() + " From " + uhName;
                 buttons.add(Buttons.green(id, label, uk.unitEmoji()));
             }
         }
@@ -222,8 +222,8 @@ public class TeHelperCommanders {
                 UnitType type = Units.findUnitType(data[0]);
                 String uhName = "space".equals(data[1]) ? "Space" : Helper.getPlanetRepresentation(data[1], game);
                 if (type != null) {
-                    String id = player.finChecker() + "undoOjzRetreatS1_" + source.getPosition() + "_" + type + "_"
-                            + data[1];
+                    String id = player.factionButtonChecker() + "undoOjzRetreatS1_" + source.getPosition() + "_" + type
+                            + "_" + data[1];
                     String label = "Return " + type.humanReadableName() + " to " + uhName;
                     buttons.add(Buttons.red(id, label, type.getUnitTypeEmoji()));
                 }
@@ -231,7 +231,8 @@ public class TeHelperCommanders {
         }
 
         // Choose another system button
-        buttons.add(Buttons.gray(player.finChecker() + "ojzRetreatS2_" + source.getPosition(), "Pick A Destination"));
+        buttons.add(Buttons.gray(
+                player.factionButtonChecker() + "ojzRetreatS2_" + source.getPosition(), "Pick A Destination"));
         return buttons;
     }
 }

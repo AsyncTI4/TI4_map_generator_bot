@@ -4,6 +4,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.Subcommand;
+import ti4.executors.ExecutionLockManager;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
@@ -27,18 +29,24 @@ class RunAgainstSpecificGame extends Subcommand {
             return;
         }
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Running custom command against " + gameName + ".");
+        ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
+                    MessageHelper.sendMessageToChannel(
+                            event.getChannel(), "Running custom command against " + gameName + ".");
 
-        Game game = GameManager.getManagedGame(gameName).getGame();
-        boolean changed = makeChanges(game);
-        if (changed) {
-            BotLogger.info("Changes made to " + game.getName() + ".");
-            GameManager.save(game, "Developer ran custom command against this game, probably migration related.");
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Finished custom command against " + game.getName() + ".");
-        } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No changes required for " + game.getName() + ".");
-        }
+                    Game game = GameManager.getManagedGame(gameName).getGame();
+                    boolean changed = makeChanges(game);
+                    if (changed) {
+                        BotLogger.info("Changes made to " + game.getName() + ".");
+                        GameManager.save(
+                                game, "Developer ran custom command against this game, probably migration related.");
+                        MessageHelper.sendMessageToChannel(
+                                event.getChannel(), "Finished custom command against " + game.getName() + ".");
+                    } else {
+                        MessageHelper.sendMessageToChannel(
+                                event.getChannel(), "No changes required for " + game.getName() + ".");
+                    }
+                })
+                .run();
     }
 
     private static boolean makeChanges(Game game) {

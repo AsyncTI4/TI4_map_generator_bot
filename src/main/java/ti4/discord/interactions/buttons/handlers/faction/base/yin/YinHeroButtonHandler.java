@@ -23,7 +23,7 @@ import ti4.service.planet.FlipTileService;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
-public class YinHeroButtonHandler {
+class YinHeroButtonHandler {
 
     @ButtonHandler("yinHeroStart")
     public static void yinHeroStart(ButtonInteractionEvent event, Game game) {
@@ -52,7 +52,7 @@ public class YinHeroButtonHandler {
                     continue;
                 }
                 buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "yinHeroPlanet_" + planet,
+                        player.factionButtonChecker() + "yinHeroPlanet_" + planet,
                         Helper.getPlanetRepresentation(planet, game)));
             }
             MessageHelper.sendMessageToChannelWithButtons(
@@ -74,7 +74,7 @@ public class YinHeroButtonHandler {
                         }
                         if (!owned) {
                             buttons.add(Buttons.green(
-                                    player.getFinsFactionCheckerPrefix() + "yinHeroPlanet_" + planet.getName(),
+                                    player.factionButtonChecker() + "yinHeroPlanet_" + planet.getName(),
                                     Helper.getPlanetRepresentation(planet.getName(), game)));
                         }
                     }
@@ -102,7 +102,7 @@ public class YinHeroButtonHandler {
         List<Button> buttons = new ArrayList<>();
         for (int x = 1; x < 4; x++) {
             buttons.add(Buttons.green(
-                    player.getFinsFactionCheckerPrefix() + "yinHeroInfantry_" + planet + "_" + x,
+                    player.factionButtonChecker() + "yinHeroInfantry_" + planet + "_" + x,
                     "Land " + x + " infantry",
                     UnitEmojis.infantry));
         }
@@ -131,5 +131,8 @@ public class YinHeroButtonHandler {
                             + ", reminder that Dannel of the Tenth, the Yin hero, skips the space cannon defense step.");
         }
         ButtonHelper.deleteMessage(event);
+        if (!game.isFowMode()) {
+            ButtonHelper.updateMap(game, event, "Yin hero landing on " + Helper.getPlanetRepresentation(planet, game));
+        }
     }
 }

@@ -34,9 +34,6 @@ public class SliceDraftableGroup extends SubcommandGroup {
 
     public static SliceDraftable getDraftable(Game game) {
         DraftManager draftManager = game.getDraftManager();
-        if (draftManager == null) {
-            return null;
-        }
         return (SliceDraftable) draftManager.getDraftable(SliceDraftable.TYPE);
     }
 

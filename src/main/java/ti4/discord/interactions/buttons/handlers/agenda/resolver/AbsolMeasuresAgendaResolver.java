@@ -9,7 +9,7 @@ import ti4.message.MessageHelper;
 
 public class AbsolMeasuresAgendaResolver implements ForAgainstAgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "absol_measures";
     }
 

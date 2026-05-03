@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -19,6 +18,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.RandomHelper;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
 import ti4.model.TechnologyModel.TechnologyType;
@@ -58,7 +58,7 @@ public class FractureService {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 spawnFracture(event, game);
                 spawnIngressTokens(event, game, player, bt);
-            } else if (result == 6) {
+            } else if (result == 6 && RandomHelper.isOneInX(10)) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         "> \"Thunder rolled...\n> It rolled a " + DiceEmojis.getGrayDieEmoji(6)
@@ -78,11 +78,7 @@ public class FractureService {
                 "fracture1", "fracture2", "fracture3", "fracture4", "fracture5", "fracture6", "fracture7");
         List<String> positions = Arrays.asList("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7");
 
-        Player neutral = game.getPlayerFromColorOrFaction("neutral");
-        if (neutral == null) {
-            String color = SetupNeutralPlayer.pickNeutralColor(game);
-            neutral = game.setupNeutralPlayer(color);
-        }
+        Player neutral = game.getNeutral();
         String neutralColorID = neutral.getColorID();
         List<String> units =
                 Arrays.asList("2 ca, 2 inf c", "", "", "2 dn, 1 dd, 3 inf s", "", "", "1 cv, 4 ff, 1 inf l, 1 inf p");
@@ -151,7 +147,8 @@ public class FractureService {
 
             List<Button> buttons = new ArrayList<>(tilesWithSkip.stream()
                     .map(tile -> {
-                        String id = player.finChecker() + "addIngressToken_" + tile.getPosition() + "_" + countPer;
+                        String id = player.factionButtonChecker() + "addIngressToken_" + tile.getPosition() + "_"
+                                + countPer;
                         String label = "Add Ingress To " + tile.getRepresentationForButtons(game, player);
                         return Buttons.red(id, label, type.emoji());
                     })

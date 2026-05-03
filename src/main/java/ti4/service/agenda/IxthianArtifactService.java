@@ -2,7 +2,6 @@ package ti4.service.agenda;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -16,6 +15,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTwilightsFallActionCards;
 import ti4.helpers.DiceHelper;
@@ -77,41 +77,42 @@ public class IxthianArtifactService {
         MessageChannel partyChan = watchPartyChannel(game);
         String watchMsg = watchPartyPing(game);
 
-        Predicate<Game> resolve = futureGame -> {
-            resolveIxthianRoll(futureGame, publish && partyChan != null);
-            return false;
-        };
+        Runnable onCompletion =
+                () -> resolveIxthianRoll(GameManager.getManagedGame(gameName).getGame(), publish && partyChan != null);
 
         int sec = drumrollSeconds();
         if (publish && !game.isFowMode()) {
-            DrumrollService.doDrumrollMirrored(chan, gameMsg, sec, gameName, resolve, partyChan, watchMsg);
+            DrumrollService.doDrumrollMirrored(chan, gameMsg, sec, onCompletion, partyChan, watchMsg);
         } else {
-            DrumrollService.doDrumroll(chan, gameMsg, sec, gameName, resolve);
+            DrumrollService.doDrumroll(chan, gameMsg, sec, onCompletion);
         }
     }
 
-    private String resultMessage(Die result, boolean heartUsed) {
-        String msg = "## Rolled a " + result.getGreenDieIfSuccessOrRedDieIfFailure() + " for _Ixthian Artifact_";
+    private static final String techs =
+            TechEmojis.Propulsion3.toString() + TechEmojis.Biotic3 + TechEmojis.Cybernetic3 + TechEmojis.Warfare3;
+    private static final String booms = MiscEmojis.DoubleBoom.toString().repeat(4);
+
+    private String resultMessage(Game game, Die result, boolean heartUsed) {
+        String msg = "## Rolled a " + result.getGreenDieIfSuccessOrRedDieIfFailure() + " for ";
+        if (game.isTwilightsFallMode()) {
+            msg += "_Legacy of Ixth_";
+        } else {
+            msg += "_Ixthian Artifact_";
+        }
 
         if (!heartUsed) {
             msg += "!";
             if (result.isSuccess()) {
-                msg += TechEmojis.Propulsion3.toString();
-                msg += TechEmojis.Biotic3.toString();
-                msg += TechEmojis.Cybernetic3.toString();
-                msg += TechEmojis.Warfare3.toString();
+                msg += techs;
             } else {
-                msg += "💥💥💥💥";
+                msg += booms;
             }
         } else {
             msg += "............\n# But the _Heart of Ixth_ has changed the outcome!";
             if (result.isSuccess()) {
-                msg += "💥💥💥💥";
+                msg += booms;
             } else {
-                msg += TechEmojis.Propulsion3.toString();
-                msg += TechEmojis.Biotic3.toString();
-                msg += TechEmojis.Cybernetic3.toString();
-                msg += TechEmojis.Warfare3.toString();
+                msg += techs;
             }
         }
         return msg;
@@ -119,7 +120,7 @@ public class IxthianArtifactService {
 
     private String watchPartyMessage(Game game, Die result, boolean heartUsed) {
         String message = game.getName() + " has finished rolling:\n";
-        message += resultMessage(result, heartUsed);
+        message += resultMessage(game, result, heartUsed);
         return message;
     }
 
@@ -140,13 +141,13 @@ public class IxthianArtifactService {
             }
         } else {
             Player heartPlayer = HeartOfIxthService.getHeartOfIxthPlayer(game, true);
-            String buttonID = heartPlayer.finChecker() + "resolveIxthian_" + result.getResult();
+            String buttonID = heartPlayer.factionButtonChecker() + "resolveIxthian_" + result.getResult();
             buttonID += publish ? "_publish" : "";
             Button good = Buttons.green(buttonID, "Get Technology", TechEmojis.PropulsionTech);
             Button bad = Buttons.red(buttonID, "Explode", MiscEmojis.DoubleBoom);
 
             List<Button> buttons = HeartOfIxthService.makeHeartOfIxthButtons(game, heartPlayer, good, bad, result);
-            String msg = resultMessage(result, false).replaceFirst("## ", "");
+            String msg = resultMessage(game, result, false).replaceFirst("## ", "");
             msg += "\nHOWEVER, " + heartPlayer.getRepresentation() + " you can use the _Heart of Ixth_";
             msg += " to modify the outcome of _Ixthian Artifact_.";
             MessageHelper.sendMessageToChannelWithButtons(heartPlayer.getCorrectChannel(), msg, buttons);
@@ -163,7 +164,7 @@ public class IxthianArtifactService {
     }
 
     @ButtonHandler("resolveIxthian")
-    private void resolveIxthian(ButtonInteractionEvent event, Game game, String buttonID) {
+    private void resolveIxthian(Game game, String buttonID) {
         boolean publish = buttonID.contains("_publish");
         boolean heart = buttonID.endsWith("_heart");
         int result = Integer.parseInt(buttonID.split("_")[1]);
@@ -227,13 +228,13 @@ public class IxthianArtifactService {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
     }
 
-    private void informGameAndWatchPartyAndExhaustHeart(Game game, Die result, boolean usedHeart, boolean publish) {
+    public void informGameAndWatchPartyAndExhaustHeart(Game game, Die result, boolean usedHeart, boolean publish) {
         if (usedHeart) {
             Player heartPlayer = HeartOfIxthService.getHeartOfIxthPlayer(game, true);
             HeartOfIxthService.exhaustHeartOfIxth(game, heartPlayer, !result.isSuccess());
         }
 
-        String resultMsg = resultMessage(result, usedHeart);
+        String resultMsg = resultMessage(game, result, usedHeart);
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), resultMsg);
         TextChannel watchParty = watchPartyChannel(game);
         if (watchParty != null && !game.isFowMode() && publish) {

@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 public class SeedEmpireAgendaResolver implements ForAgainstAgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "seed_empire";
     }
 

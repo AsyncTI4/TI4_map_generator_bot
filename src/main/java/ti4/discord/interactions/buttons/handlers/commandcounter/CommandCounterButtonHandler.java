@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.lunarium.LunariumAbilityButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -118,15 +119,15 @@ public class CommandCounterButtonHandler {
                 + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
 
-        String finChecker = player.finChecker();
-        Button getTactic = Buttons.green(finChecker + "increase_tactic_cc", "Gain 1 Tactic Token");
-        Button getFleet = Buttons.green(finChecker + "increase_fleet_cc", "Gain 1 Fleet Token");
-        Button getStrat = Buttons.green(finChecker + "increase_strategy_cc", "Gain 1 Strategy Token");
-        Button loseTactic = Buttons.red(finChecker + "decrease_tactic_cc", "Lose 1 Tactic Token");
-        Button loseFleet = Buttons.red(finChecker + "decrease_fleet_cc", "Lose 1 Fleet Token");
-        Button loseStrat = Buttons.red(finChecker + "decrease_strategy_cc", "Lose 1 Strategy Token");
-        Button doneGainingCC = Buttons.blue(finChecker + "deleteButtons", "Done Redistributing Command Tokens");
-        Button resetCC = Buttons.gray(finChecker + "resetCCs", "Reset Command Tokens");
+        String factionChecker = player.factionButtonChecker();
+        Button getTactic = Buttons.green(factionChecker + "increase_tactic_cc", "Gain 1 Tactic Token");
+        Button getFleet = Buttons.green(factionChecker + "increase_fleet_cc", "Gain 1 Fleet Token");
+        Button getStrat = Buttons.green(factionChecker + "increase_strategy_cc", "Gain 1 Strategy Token");
+        Button loseTactic = Buttons.red(factionChecker + "decrease_tactic_cc", "Lose 1 Tactic Token");
+        Button loseFleet = Buttons.red(factionChecker + "decrease_fleet_cc", "Lose 1 Fleet Token");
+        Button loseStrat = Buttons.red(factionChecker + "decrease_strategy_cc", "Lose 1 Strategy Token");
+        Button doneGainingCC = Buttons.blue(factionChecker + "deleteButtons", "Done Redistributing Command Tokens");
+        Button resetCC = Buttons.gray(factionChecker + "resetCCs", "Reset Command Tokens");
 
         List<Button> buttons =
                 Arrays.asList(getTactic, getFleet, getStrat, loseTactic, loseFleet, loseStrat, doneGainingCC, resetCC);
@@ -141,6 +142,7 @@ public class CommandCounterButtonHandler {
 
         if (!game.isFowMode() && "statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
             ReactionService.addReaction(event, game, player);
+            game.setStoredValue("statusHomeworkReactionFor" + player.getFaction() + "Round" + game.getRound(), "added");
             for (Player p2 : game.getRealPlayers()) {
                 if (p2.isNpc()
                         && game.getStoredValue(
@@ -217,6 +219,9 @@ public class CommandCounterButtonHandler {
                                 + ". That's how many command tokens you'll need to retain in your fleet pool to avoid removing ships.");
             }
         }
+        if (player.hasAbility("multitasking")) {
+            LunariumAbilityButtonHandler.offerFactionSheetCCButtons(game, player);
+        }
     }
 
     @ButtonHandler("spendAStratCC")
@@ -265,6 +270,19 @@ public class CommandCounterButtonHandler {
 
         ReactionService.addReaction(event, game, player, message);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+    }
+
+    @ButtonHandler("gainCCNoDelete")
+    public static void gainCCNoDelete(ButtonInteractionEvent event, Player player, Game game) {
+        String message = "";
+
+        String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
+                + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
+        game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+        List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+
+        ReactionService.addReaction(event, game, player, message);
     }
 
     @ButtonHandler("confirm_cc")

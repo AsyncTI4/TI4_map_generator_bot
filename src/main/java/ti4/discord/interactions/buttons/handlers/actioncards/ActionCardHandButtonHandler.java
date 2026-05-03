@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.ArvaxiAgentButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -23,6 +24,7 @@ import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
 
 @UtilityClass
@@ -52,6 +54,34 @@ class ActionCardHandButtonHandler {
         }
     }
 
+    // Used by ForceGiveActionCardService (Arvaxi commander, etc.)
+    @ButtonHandler("forceGiveAC_")
+    static void forceGiveAC(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String stripped = buttonID.replace("forceGiveAC_", "");
+        int acIndex = Integer.parseInt(stripped.split("_")[0]);
+        String receiverFaction = stripped.split("_")[1];
+        Player receiver = game.getPlayerFromColorOrFaction(receiverFaction);
+        if (receiver == null || !player.getActionCards().containsValue(acIndex)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "Could not resolve, please resolve manually.");
+            return;
+        }
+        String acID = null;
+        for (var entry : player.getActionCards().entrySet()) {
+            if (entry.getValue().equals(acIndex)) acID = entry.getKey();
+        }
+        player.removeActionCard(acIndex);
+        receiver.setActionCard(acID);
+        MessageHelper.sendMessageToChannel(
+                game.getMainGameChannel(),
+                player.getRepresentationNoPing() + " gave _"
+                        + Mapper.getActionCard(acID).getName() + "_ to " + receiver.getRepresentationNoPing() + ".");
+        ActionCardHelper.sendActionCardInfo(game, player);
+        ActionCardHelper.sendActionCardInfo(game, receiver);
+        ButtonHelper.checkACLimit(game, receiver);
+        ButtonHelper.deleteMessage(event);
+    }
+
     // TODO: bake this into /ac discard
     @ButtonHandler("ac_discard_from_hand_")
     static void acDiscardFromHand(
@@ -71,6 +101,11 @@ class ActionCardHandButtonHandler {
         if (acIndex.endsWith("retain")) {
             acIndex = acIndex.replace("retain", "");
             retainButtons = true;
+        }
+        boolean arvaxiCommander = false;
+        if (acIndex.endsWith("arvaxicommander")) {
+            acIndex = acIndex.replace("arvaxicommander", "");
+            arvaxiCommander = true;
         }
 
         MessageChannel channel = game.getMainGameChannel() != null ? game.getMainGameChannel() : actionsChannel;
@@ -101,6 +136,9 @@ class ActionCardHandButtonHandler {
             MessageChannel channel2 = game.isFowMode() ? player.getPrivateChannel() : game.getMainGameChannel();
             MessageHelper.sendMessageToChannel(channel2, sb);
             ActionCardHelper.sendActionCardInfo(game, player);
+            if (arvaxiCommander) {
+                CommanderUnlockCheckService.checkPlayer(player, "arvaxi");
+            }
             String message = "Use buttons to end turn or do another action.";
             if (stalling) {
                 if (player.hasUnit("yssaril_mech")
@@ -140,6 +178,7 @@ class ActionCardHandButtonHandler {
                         buttons2);
             }
             ActionCardHelper.serveReverseEngineerButtons(game, player, List.of(acID));
+            ArvaxiAgentButtonHandler.postInitialButtons(game, player, acID);
             if (player.hasAbility("scrap_metal")) {
                 String message2 =
                         player.getRepresentationUnfogged() + ", please **Scrap Metal** by using these buttons.";
@@ -166,34 +205,50 @@ class ActionCardHandButtonHandler {
         if (acID.contains("reverse_")) {
             String actionCardTitle = acID.split("_")[2];
             acID = acID.split("_")[0];
-            List<Button> scButtons = new ArrayList<>();
-            scButtons.add(Buttons.green(
-                    "resolveReverse_" + actionCardTitle, "Pick Up " + actionCardTitle + " From The Discard"));
-            MessageHelper.sendMessageToChannelWithButtons(
+            Button button = Buttons.green(
+                    "resolveReverse_" + actionCardTitle, "Pick Up " + actionCardTitle + " From The Discard");
+            MessageHelper.sendMessageToChannelWithButton(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + ", after checking for Sabos, use buttons to resolve _Reverse Engineer_.",
-                    scButtons);
+                            + ", after checking for Sabos, use the button to resolve _Reverse Engineer_.",
+                    button);
         }
         if (acID.contains("twinning_")) {
             String actionCardTitle = acID.split("_")[2];
             acID = acID.split("_")[0];
-            List<Button> scButtons = new ArrayList<>();
-            scButtons.add(Buttons.green("resolveTwin_" + actionCardTitle, "Play " + actionCardTitle + " Immediately"));
-            MessageHelper.sendMessageToChannelWithButtons(
+            Button button = Buttons.green("resolveTwin_" + actionCardTitle, "Play " + actionCardTitle + " Immediately");
+            MessageHelper.sendMessageToChannelWithButton(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", after checking for Sabos, use buttons to resolve _Twinning_.",
-                    scButtons);
+                    player.getRepresentation() + ", after checking for Sabos, use the button to resolve _Twinning_.",
+                    button);
         }
         if (acID.contains("counterstroke_")) {
             String tilePos = acID.split("_")[2];
             acID = acID.split("_")[0];
-            List<Button> scButtons = new ArrayList<>();
-            scButtons.add(Buttons.green("resolveCounterStroke_" + tilePos, "Counterstroke in " + tilePos));
-            MessageHelper.sendMessageToChannelWithButtons(
+            Button button = Buttons.green("resolveCounterStroke_" + tilePos, "Counterstroke in " + tilePos);
+            MessageHelper.sendMessageToChannelWithButton(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", after checking for Sabos, use buttons to resolve _Counterstroke_.",
-                    scButtons);
+                    player.getRepresentation()
+                            + ", after checking for Sabos, use the button to resolve _Counterstroke_.",
+                    button);
+        }
+        if (acID.contains("riposte_")) {
+            String tilePos = acID.split("_")[2];
+            acID = acID.split("_")[0];
+            Button button = Buttons.green("resolveRiposte_" + tilePos, "Riposte in " + tilePos);
+            MessageHelper.sendMessageToChannelWithButton(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", after checking for Sabos, use the button to resolve _Riposte_.",
+                    button);
+        }
+        if (acID.contains("incubate_")) {
+            String tilePos = acID.split("_")[2];
+            acID = acID.split("_")[0];
+            Button button = Buttons.green("resolveIncubate_" + tilePos, "Incubate in " + tilePos);
+            MessageHelper.sendMessageToChannelWithButton(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", after checking for Sabos, use the button to resolve _Incubate_.",
+                    button);
         }
         if (channel == null) {
             event.getChannel()

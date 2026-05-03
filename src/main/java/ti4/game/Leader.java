@@ -63,6 +63,18 @@ public class Leader {
     }
 
     @JsonIgnore
+    public String getName() {
+        return getLeaderModel().map(LeaderModel::getName).orElse(id);
+    }
+
+    @JsonIgnore
+    public String getName(Game game) {
+        if (game.isTwilightsFallMode())
+            return getLeaderModel().map(LeaderModel::getTFNameIfAble).orElse(id);
+        return getLeaderModel().map(LeaderModel::getName).orElse(id);
+    }
+
+    @JsonIgnore
     public Optional<LeaderModel> getLeaderModel() {
         return Optional.ofNullable(Mapper.getLeader(id));
     }

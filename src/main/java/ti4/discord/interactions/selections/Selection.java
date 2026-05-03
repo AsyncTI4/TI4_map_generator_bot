@@ -1,7 +1,7 @@
 package ti4.discord.interactions.selections;
 
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import ti4.discord.interactions.context.SelectionMenuContext;
+import ti4.discord.interactions.listeners.context.SelectionMenuContext;
 
 public interface Selection {
 

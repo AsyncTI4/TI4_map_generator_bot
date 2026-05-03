@@ -32,8 +32,7 @@ public class ReadOnlyTextSetting extends SettingInterface {
     }
 
     protected String longValue() {
-        String val = shortValue();
-        return val;
+        return shortValue();
     }
 
     protected List<Button> buttons(String idPrefix) {

@@ -71,7 +71,7 @@ public class DeorbitBarrageService {
         Player player2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String target = Mapper.getColorID(matcher.group("faction"));
-            String prefixID = player.finChecker() + "deorbitBarragePlanet_";
+            String prefixID = player.factionButtonChecker() + "deorbitBarragePlanet_";
             List<Button> buttons = getAllPlanetsInRange(game, player).stream()
                     .filter(planet -> planet.getUnitCount(player2.getColorID()) > 0)
                     .map(pl -> Buttons.gray(prefixID + pl.getName(), "Target " + pl.getName()))

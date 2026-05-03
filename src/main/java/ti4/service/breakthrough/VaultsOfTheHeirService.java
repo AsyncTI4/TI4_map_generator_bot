@@ -31,7 +31,7 @@ public class VaultsOfTheHeirService {
         for (String tech : player.getTechs()) {
             TechnologyModel model = Mapper.getTech(tech);
             buttons.add(Buttons.red(
-                    player.finChecker() + "purgeTechVaults_" + tech,
+                    player.factionButtonChecker() + "purgeTechVaults_" + tech,
                     model.getName(),
                     model.getCondensedReqsEmojis(true)));
         }

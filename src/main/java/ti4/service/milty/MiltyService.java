@@ -167,9 +167,7 @@ public class MiltyService {
                     for (String player : draftManager.getPlayers()) {
                         Player p = game.getPlayer(player);
                         game.setStoredValue(p.getUserID() + "queuedMiltyPick", "");
-                        if (p != null
-                                && p != draftManager.getCurrentDraftPlayer(game)
-                                && p.getCardsInfoThread() != null) {
+                        if (p != draftManager.getCurrentDraftPlayer(game) && p.getCardsInfoThread() != null) {
                             MessageHelper.sendMessageToChannel(
                                     p.getCardsInfoThread(),
                                     p.getRepresentation() + " You can queue your choices with these buttons",
@@ -177,7 +175,8 @@ public class MiltyService {
                         }
                     }
                     game.setPhaseOfGame("miltydraft");
-                    GameManager.save(game, "Milty"); // TODO: We should be locking since we're saving
+                    // TODO: We should be locking since we're saving
+                    GameManager.save(game, "Milty");
                     if (game.isThundersEdge()) {
                         ThundersEdgeRulesService.alertTabletalkWithRulesAtStartOfDraft(game);
                     }

@@ -51,7 +51,7 @@ class DraftManagerUnpick extends GameStateSubcommand {
                     .getPlayerStates()
                     .get(playerUserId)
                     .getPicks(draftableType)
-                    .removeIf(choice -> choice.getChoiceKey().equals(choiceKey));
+                    .removeIf(choice -> choice.choiceKey().equals(choiceKey));
         }
 
         List<String> players = playerIds.stream()

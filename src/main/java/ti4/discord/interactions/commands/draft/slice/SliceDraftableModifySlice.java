@@ -14,7 +14,7 @@ import ti4.service.milty.MiltyDraftTile;
 
 class SliceDraftableModifySlice extends GameStateSubcommand {
 
-    protected SliceDraftableModifySlice() {
+    SliceDraftableModifySlice() {
         super(
                 Constants.DRAFT_SLICE_MODIFY_SLICE,
                 "Set the tiles for a slice, listing their tile IDs in order",

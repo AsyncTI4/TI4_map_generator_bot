@@ -149,7 +149,7 @@ final class HyperlaneTileGenerator {
         // Use canonical matrix as cache key
         String cacheKey = canonical.matrix == null ? "null" : canonical.matrix;
 
-        BufferedImage overlay = HYPERLANE_CACHE.computeIfAbsent(cacheKey, k -> {
+        BufferedImage overlay = HYPERLANE_CACHE.computeIfAbsent(cacheKey, _ -> {
             BufferedImage img = new BufferedImage(TILE_WIDTH, TILE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = img.createGraphics();
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -226,13 +226,13 @@ final class HyperlaneTileGenerator {
         if (matrix != null) {
             // Use matrix hashCode as seed for determinism: same matrix always yields same background/transform
             long seed = matrix.hashCode();
-            int tileIndex = (int) Math.floorMod(seed, RANDOM_BACKGROUNDS.size());
+            int tileIndex = Math.floorMod(seed, RANDOM_BACKGROUNDS.size());
             String randomTile = RANDOM_BACKGROUNDS.get(tileIndex);
             String randomTilePath = ResourceHelper.getInstance().getTileFile(randomTile);
             if (randomTilePath != null) {
                 tilePath = randomTilePath;
             }
-            transform = (int) Math.floorMod(
+            transform = Math.floorMod(
                     seed * 6364136223846793005L + 1442695040888963407L,
                     4); // LCG step (Knuth MMIX constants) for independent transform selection; 0, 1, 2, or 3
         }
@@ -351,14 +351,9 @@ final class HyperlaneTileGenerator {
         }
     }
 
+    /**
+     * @param rotation in degrees, 0, 60, ..., 300
+     */
     // Helper class to hold canonical matrix and rotation
-    private static class MatrixRotationResult {
-        final String matrix;
-        final int rotation; // in degrees, 0, 60, ..., 300
-
-        MatrixRotationResult(String matrix, int rotation) {
-            this.matrix = matrix;
-            this.rotation = rotation;
-        }
-    }
+    private record MatrixRotationResult(String matrix, int rotation) {}
 }

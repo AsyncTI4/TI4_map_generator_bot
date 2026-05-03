@@ -62,7 +62,7 @@ public class ResonanceGeneratorService {
                 .map(button -> button.withLabel("Flip in " + button.getLabel()))
                 .map(button -> button.withStyle(ButtonStyle.PRIMARY))
                 .forEach(buttons::add);
-        buttons.add(Buttons.red(player.finChecker() + "deleteButtons", "Delete these buttons"));
+        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Delete these buttons"));
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), "Choose a tile to place or flip a breach.", buttons);
@@ -117,11 +117,11 @@ public class ResonanceGeneratorService {
             if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_INACTIVE)) {
                 String pos = tile.getPosition();
                 buttons.add(Buttons.red(
-                        player.finChecker() + "removeBreach_" + pos,
+                        player.factionButtonChecker() + "removeBreach_" + pos,
                         "Remove from " + tile.getRepresentationForButtons(game, player)));
             }
         }
-        buttons.add(Buttons.red(player.finChecker() + "deleteButtons", "Delete these buttons"));
+        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Delete these buttons"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), "Please select an inactive breach to remove.", buttons);
     }

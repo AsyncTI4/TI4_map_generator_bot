@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -40,7 +41,7 @@ public class FactionTopColorsStatisticsService {
         String message = Mapper.getFactionsValues().stream()
                 .map(factionModel ->
                         formatFactionLine(factionModel.getAlias(), factionModel.getFactionName(), colorCountsByFaction))
-                .filter(line -> line != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.joining("\n"));
 
         if (message.isBlank()) {

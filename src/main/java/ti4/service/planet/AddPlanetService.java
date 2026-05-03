@@ -373,7 +373,7 @@ public class AddPlanetService {
         if (unitHolder.getTokenList().contains("token_relictoken.png") && player.isRealPlayer()) {
             unitHolder.removeToken("token_relictoken.png");
             if (!alreadyOwned) {
-                Button draw = Buttons.green(player.getFinsFactionCheckerPrefix() + "drawRelic", "Draw A Relic");
+                Button draw = Buttons.green(player.factionButtonChecker() + "drawRelic", "Draw A Relic");
                 String message = player.getRepresentation()
                         + " has gained control of a planet which allows them to draw a relic!\nUse the button __after__ you have resolved __all__ ground combats.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, draw);
@@ -416,9 +416,8 @@ public class AddPlanetService {
         }
 
         if ((game.getPhaseOfGame().contains("agenda")
-                        || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
+                        || game.getActivePlayerID() != null && !"".equalsIgnoreCase(game.getActivePlayerID()))
                 && player.hasUnlockedBreakthrough("zealotsbt")
-                && unitHolder != null
                 && tile != null
                 && (tile.getPosition().contains("frac") || unitHolder.isLegendary())
                 && !doubleCheck
@@ -486,7 +485,7 @@ public class AddPlanetService {
             String planetStr = unitHolder.getName();
             String planetName = Mapper.getPlanet(planetStr).getName();
             liberateButtons.add(Buttons.green(
-                    player.getFinsFactionCheckerPrefix() + "liberate_" + planetStr,
+                    player.factionButtonChecker() + "liberate_" + planetStr,
                     "Liberate " + planetName,
                     FactionEmojis.Bastion));
             MessageHelper.sendMessageToChannelWithButtons(
@@ -611,7 +610,7 @@ public class AddPlanetService {
             }
         }
 
-        if (player.hasUnlockedBreakthrough("l1z1xbt") && tile != null && !setup) {
+        if (!setup && tile != null && FealtyUplinkService.canUseFealty(game, player, tile)) {
             Planet p = tile.getUnitHolderFromPlanet(planet);
             if (p != null && !alreadyOwned) {
                 FealtyUplinkService.postInitialButtons(game, player, planet);

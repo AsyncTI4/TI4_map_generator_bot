@@ -7,7 +7,7 @@ import ti4.message.MessageHelper;
 
 public class AbolishmentAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "abolishment";
     }
 

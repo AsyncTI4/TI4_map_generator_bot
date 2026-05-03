@@ -1,6 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.tech;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +34,7 @@ class TechUseButtonHandler {
         TechnologyModel techModel = Mapper.getTech(tech);
         if (!"st".equalsIgnoreCase(tech)) {
             String useMessage =
-                    player.getRepresentation() + " used the _" + techModel.getRepresentation(false) + "_ technology.";
+                    player.getRepresentation() + " used the " + techModel.getRepresentation(false) + " technology.";
             if (game.isShowFullComponentTextEmbeds()) {
                 MessageHelper.sendMessageToChannelWithEmbed(
                         event.getMessageChannel(), useMessage, techModel.getRepresentationEmbed());
@@ -129,7 +129,7 @@ class TechUseButtonHandler {
     @ButtonHandler("acquireAFreeTech") // Buttons.GET_A_FREE_TECH
     public static void acquireAFreeTech(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
-        String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
+        String finsFactionCheckerPrefix = player.factionButtonChecker();
         game.setComponentAction(true);
         buttons.add(Buttons.blue(
                 finsFactionCheckerPrefix + "getAllTechOfType_propulsion_noPay",

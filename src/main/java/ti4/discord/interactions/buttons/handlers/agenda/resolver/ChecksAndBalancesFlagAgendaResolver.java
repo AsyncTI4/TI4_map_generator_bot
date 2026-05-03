@@ -5,7 +5,7 @@ import ti4.game.Game;
 
 public class ChecksAndBalancesFlagAgendaResolver implements ForAgainstAgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "checks";
     }
 

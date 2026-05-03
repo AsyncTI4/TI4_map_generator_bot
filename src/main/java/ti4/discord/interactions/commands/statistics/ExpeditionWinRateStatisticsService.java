@@ -133,7 +133,7 @@ class ExpeditionWinRateStatisticsService {
         Consumer<Map<String, WinRateCount>> mergeIntoCombined = (sourceMap) -> {
             if (sourceMap == null) return;
             sourceMap.forEach((expedition, stats) -> {
-                WinRateCount combinedStats = combined.computeIfAbsent(expedition, k -> new WinRateCount());
+                WinRateCount combinedStats = combined.computeIfAbsent(expedition, _ -> new WinRateCount());
                 combinedStats.wins += stats.wins;
                 combinedStats.total += stats.total;
             });
@@ -214,17 +214,17 @@ class ExpeditionWinRateStatisticsService {
             }
 
             Map<String, WinRateCount> expeditionWinRates =
-                    factionExpeditionStats.computeIfAbsent(faction, k -> new LinkedHashMap<>());
+                    factionExpeditionStats.computeIfAbsent(faction, _ -> new LinkedHashMap<>());
             if (completedExpeditions.isEmpty()) {
                 WinRateCount noExpeditionsCount =
-                        expeditionWinRates.computeIfAbsent(NO_EXPEDITIONS, k -> new WinRateCount());
+                        expeditionWinRates.computeIfAbsent(NO_EXPEDITIONS, _ -> new WinRateCount());
                 noExpeditionsCount.total++;
                 if (isWinner) {
                     noExpeditionsCount.wins++;
                 }
             } else {
                 WinRateCount anyExpeditionsCount =
-                        expeditionWinRates.computeIfAbsent(ANY_EXPEDITIONS, k -> new WinRateCount());
+                        expeditionWinRates.computeIfAbsent(ANY_EXPEDITIONS, _ -> new WinRateCount());
                 anyExpeditionsCount.total++;
                 if (isWinner) {
                     anyExpeditionsCount.wins++;
@@ -232,7 +232,7 @@ class ExpeditionWinRateStatisticsService {
 
                 completedExpeditions.forEach(expedition -> {
                     WinRateCount count2 =
-                            expeditionWinRates.computeIfAbsent(toExpeditionLabel(expedition), k -> new WinRateCount());
+                            expeditionWinRates.computeIfAbsent(toExpeditionLabel(expedition), _ -> new WinRateCount());
                     count2.total++;
                     if (isWinner) {
                         count2.wins++;
