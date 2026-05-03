@@ -553,9 +553,6 @@ public class StartPhaseService {
                     Helper.getRemainingSCButtons(game, firstSCPicker));
         }
 
-        if (!game.isFowMode()) {
-            ButtonHelper.updateMap(game, event, "Start of the Strategy Phase for round #" + game.getRound() + ".");
-        }
         for (Player player2 : game.getRealPlayers()) {
             if (player2.getActionCards() != null
                     && player2.getPlayableActionCards().contains("summit")) {
@@ -615,6 +612,9 @@ public class StartPhaseService {
 
         if (game.isAcd2() && game.getRound() > 1) {
             handleStartOfStrategyForAcd2(game);
+        }
+        if (!game.isFowMode()) {
+            ButtonHelper.updateMap(game, event, "Start of the Strategy Phase for round #" + game.getRound() + ".");
         }
     }
 
@@ -822,6 +822,7 @@ public class StartPhaseService {
         if (playersWithSCs > 0) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "### " + game.getPing() + " **Status Cleanup Run!**");
+            StatusCleanupService.runStatusCleanup(game);
             if (!game.isFowMode()) {
                 MapRenderPipeline.queue(
                         game,
@@ -829,7 +830,6 @@ public class StartPhaseService {
                         DisplayType.map,
                         fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
             }
-            StatusCleanupService.runStatusCleanup(game);
         }
         for (Player player : game.getRealPlayers()) {
             sendStatusReminders(event, game, player);
@@ -927,11 +927,11 @@ public class StartPhaseService {
         }
         GMService.createFOWStatusSummary(game);
         GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, false);
-        if (!game.isFowMode()) {
-            ButtonHelper.updateMap(game, event, "Status Homework for round #" + game.getRound() + ".");
-        }
         if (game.isCivilizedSocietyMode()) {
             Helper.checkEndGameCivilizedSociety(game);
+        }
+        if (!game.isFowMode()) {
+            ButtonHelper.updateMap(game, event, "Status Homework for round #" + game.getRound() + ".");
         }
     }
 

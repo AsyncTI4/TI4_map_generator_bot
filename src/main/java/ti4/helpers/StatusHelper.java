@@ -150,11 +150,6 @@ public final class StatusHelper {
     }
 
     public static void beginScoring(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
-        if (game.isOmegaPhaseMode()) {
-            // Show the effects of the Agendas while scoring
-            ButtonHelper.updateMap(game, event, "After Agendas, Round " + game.getRound() + ".");
-        }
-
         game.setPhaseOfGame("statusScoring");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", System.currentTimeMillis() + "");
         GMService.logActivity(game, "**StatusScoring** Phase for Round " + game.getRound() + " started.", true);
@@ -451,6 +446,10 @@ public final class StatusHelper {
         }
         if (allReacted) {
             ReactionCheckService.respondAllHaveScored(game);
+        }
+        if (game.isOmegaPhaseMode()) {
+            // Show the effects of the Agendas while scoring
+            ButtonHelper.updateMap(game, event, "After Agendas, Round " + game.getRound() + ".");
         }
     }
 
