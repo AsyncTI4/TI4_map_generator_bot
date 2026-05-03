@@ -4156,9 +4156,9 @@ public final class AgendaHelper {
             }
         }
         if (!game.isFowMode() && !action) {
-            ButtonHelper.updateMap(game, event, "Start of agenda #" + aCount + " _" + agendaName + "_ .");
             game.setStoredValue(
                     "startTimeOfRound" + game.getRound() + "Agenda" + aCount, System.currentTimeMillis() + "");
+            ButtonHelper.updateMap(game, event, "Start of agenda #" + aCount + " _" + agendaName + "_ .");
         }
         if (game.getCurrentAgendaInfo().contains("Secret")) {
             StringBuilder summary = new StringBuilder("## Scored Secret Objectives:\n");
