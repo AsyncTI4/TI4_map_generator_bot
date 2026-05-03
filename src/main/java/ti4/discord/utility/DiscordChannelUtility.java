@@ -20,12 +20,16 @@ import net.dv8tion.jda.internal.requests.RestActionImpl;
 public class DiscordChannelUtility {
 
     public CacheRestAction<ThreadChannel> retrieveThreadChannelById(Guild guild, long id) {
+        retrieveThreadChannelById(guild, Long.toString(id));
+    }
+
+    public CacheRestAction<ThreadChannel> retrieveThreadChannelById(Guild guild, String id) {
         JDA jda = guild.getJDA();
         return new DeferredRestAction<>(
                 jda,
                 ThreadChannel.class,
                 () -> guild.getThreadChannelById(id),
-                () -> new RestActionImpl<>(jda, Route.Channels.GET_CHANNEL.compile(Long.toString(id)), (res, _) -> {
+                () -> new RestActionImpl<>(jda, Route.Channels.GET_CHANNEL.compile(id), (res, _) -> {
                     DataObject dataObject = res.getObject();
                     ChannelType channelType = ChannelType.fromId(dataObject.getInt("type"));
                     if (!channelType.isThread()) {
