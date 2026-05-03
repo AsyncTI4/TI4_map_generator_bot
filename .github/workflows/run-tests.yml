@@ -32,6 +32,18 @@ jobs:
           else
             echo "has_java=false" >> "$GITHUB_OUTPUT"
           fi
+          CHANGED_JAVA_SRCS=$(git diff --name-only "$BASE" "$HEAD" | grep -E '^src/main/java/.*\.java$' || true)
+          if [ -n "$CHANGED_JAVA_SRCS" ]; then
+            SPOTBUGS_FILTER=$(echo "$CHANGED_JAVA_SRCS" \
+              | sed 's|^src/main/java/||; s|/[^/]*\.java$||; s|/|.|g' \
+              | sort -u \
+              | sed 's/$/-/' \
+              | tr '\n' ',' \
+              | sed 's/,$//')
+            echo "spotbugs_only_analyze=$SPOTBUGS_FILTER" >> "$GITHUB_OUTPUT"
+          else
+            echo "spotbugs_only_analyze=" >> "$GITHUB_OUTPUT"
+          fi
       - name: Validate changed JSON files
         if: steps.diff.outputs.has_json == 'true'
         id: validate-json
@@ -87,15 +99,22 @@ jobs:
       - name: Run the Maven verify phase
         if: steps.diff.outputs.has_java == 'true' && (steps.validate-json.outcome == 'success' || steps.validate-json.outcome == 'skipped')
         id: maven
+        env:
+          SPOTBUGS_ONLY_ANALYZE: ${{ steps.diff.outputs.spotbugs_only_analyze }}
         shell: bash
         run: |
           set -o pipefail
+          SPOTBUGS_OPTS=""
+          if [ -n "$SPOTBUGS_ONLY_ANALYZE" ]; then
+            SPOTBUGS_OPTS="-Dspotbugs.onlyAnalyze=$SPOTBUGS_ONLY_ANALYZE"
+          fi
           mvn --batch-mode \
             --no-transfer-progress \
             --fail-at-end \
             -P ci-spotless \
             -Dorg.slf4j.simpleLogger.showDateTime=true \
             -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss.SSS \
+            $SPOTBUGS_OPTS \
             verify \
             2>&1 | tee /tmp/maven.log
       - name: Parse Spotless violations
