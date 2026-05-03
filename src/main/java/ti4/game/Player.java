@@ -706,8 +706,12 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     private Long getCardsInfoThreadIdLong() {
         String idStr = getCardsInfoThreadID();
-        if (StringUtils.isBlank(idStr) || !"null".equals(idStr)) return null;
-        return Long.valueOf(getCardsInfoThreadID());
+        if (StringUtils.isBlank(idStr) || "null".equals(idStr)) return null;
+        try {
+            return Long.valueOf(idStr);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private ThreadChannel createNewThread(TextChannel actionsChannel, String threadName) {
