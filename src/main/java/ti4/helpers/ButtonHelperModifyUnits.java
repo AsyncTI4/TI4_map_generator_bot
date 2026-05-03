@@ -1093,7 +1093,7 @@ public final class ButtonHelperModifyUnits {
     }
 
     public static List<Button> getRalnelCommanderButtons(Player player, Game game, String pos1) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         for (String pos2 : FoWHelper.getAdjacentTiles(game, pos1, player, false, false)) {
             Tile targetTile = game.getTileByPosition(pos2);
@@ -1109,7 +1109,7 @@ public final class ButtonHelperModifyUnits {
 
     public static List<Button> getRetreatSystemButtons(
             Player player, Game game, String pos1, boolean skilled, boolean feint) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         String skilledS = "";
         if (skilled) {
@@ -1168,7 +1168,7 @@ public final class ButtonHelperModifyUnits {
     }
 
     public static List<Button> getRetreatingGroundTroopsButtons(Player player, Game game, String pos1, String pos2) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         Tile tile = game.getTileByPosition(pos1);
@@ -1340,7 +1340,7 @@ public final class ButtonHelperModifyUnits {
 
     private static List<Button> getUnitsToDevote(
             Player player, Game game, GenericInteractionCreateEvent event, Tile tile, String devoteOrNo) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         Set<UnitType> allowedUnits = Set.of(UnitType.Destroyer, UnitType.Cruiser);
 
         List<Button> buttons = new ArrayList<>();
