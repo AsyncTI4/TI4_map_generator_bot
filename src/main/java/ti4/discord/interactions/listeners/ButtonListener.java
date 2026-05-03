@@ -19,7 +19,7 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 
 class ButtonListener extends ListenerAdapter {
 
-    private static final Set<String> BUTTONS_TO_THINK_ABOUT = Set.of("showGameAgain");
+    private static final Set<String> BUTTONS_TO_THINK_ABOUT = Set.of("showGameAgain", "bothelperDashboard_manageRoles");
 
     private static ButtonListener instance;
 
