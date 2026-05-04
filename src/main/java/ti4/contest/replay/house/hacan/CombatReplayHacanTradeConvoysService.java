@@ -238,6 +238,7 @@ public class CombatReplayHacanTradeConvoysService {
         tradeConvoys.setVoteCount(winning.voteCount());
         tradeConvoys.setSelectedAt(LocalDateTime.now());
         tradeConvoysRepository.save(tradeConvoys);
+        applyLockedTradeConvoysFavorGrant(tradeConvoys);
         postLockedTradeConvoysSummary(tradeConvoys);
         return toTradeConvoys(tradeConvoys);
     }
@@ -414,6 +415,19 @@ public class CombatReplayHacanTradeConvoysService {
         return TradeConvoys.none();
     }
 
+    private void applyLockedTradeConvoysFavorGrant(CombatReplayHacanTradeConvoysEntity tradeConvoys) {
+        if (tradeConvoys.getContestId() == null
+                || tradeConvoys.getTargetHouse() == null
+                || safeInt(tradeConvoys.getFavorCost()) <= 0) return;
+        List<CombatReplayHouseScoreEntity> scores = houseScoreRepository.findByContestId(tradeConvoys.getContestId());
+        for (CombatReplayHouseScoreEntity score : scores) {
+            if (score.getHouse() != tradeConvoys.getTargetHouse()) continue;
+            score.setFavorPoints(safeInt(score.getFavorPoints()) + safeInt(tradeConvoys.getFavorCost()));
+            houseScoreRepository.saveAndFlush(score);
+            return;
+        }
+    }
+
     private boolean claimHacanTradeConvoysUse(
             long candidateId, int favorCost, String discordUserId, String discordUserName) {
         if (abilityUseRepository.existsByCandidateIdAndHouse(candidateId, CombatReplayHouse.HACAN)) return false;
@@ -450,28 +464,32 @@ public class CombatReplayHacanTradeConvoysService {
     }
 
     private void postLockedTradeConvoysSummary(CombatReplayHacanTradeConvoysEntity tradeConvoys) {
-        TextChannel channel = houseChannel();
-        if (channel == null) return;
         if (tradeConvoys.getTargetHouse() == null || safeInt(tradeConvoys.getPredictionBonus()) <= 0) {
+            TextChannel channel = houseChannel(CombatReplayHouse.HACAN);
+            if (channel == null) return;
             MessageHelper.sendMessageToChannel(
                     channel,
                     FactionEmojis.getFactionIcon(CombatReplayHouse.HACAN.displayName())
                             + " Hacan Delegation brokered no Trade Convoys for this combat.");
             return;
         }
-        MessageHelper.sendMessageToChannel(
-                channel,
-                "## "
-                        + FactionEmojis.getFactionIcon(CombatReplayHouse.HACAN.displayName())
-                        + " Hacan Delegation Trade Convoys Locked\n"
-                        + FactionEmojis.getFactionIcon(
-                                tradeConvoys.getTargetHouse().displayName())
-                        + " Hacan sends `"
-                        + safeInt(tradeConvoys.getFavorCost())
-                        + " Favor` to " + tradeConvoys.getTargetHouse().displayName()
-                        + " Delegation and will gain `"
-                        + safeInt(tradeConvoys.getPredictionBonus())
-                        + "%` of that Delegation's earned points in the next combat.");
+        String message = "## "
+                + FactionEmojis.getFactionIcon(CombatReplayHouse.HACAN.displayName())
+                + " Hacan Delegation Trade Convoys Locked\n"
+                + FactionEmojis.getFactionIcon(tradeConvoys.getTargetHouse().displayName())
+                + " Hacan sends `"
+                + safeInt(tradeConvoys.getFavorCost())
+                + " Favor` to " + tradeConvoys.getTargetHouse().displayName()
+                + " Delegation and will gain `"
+                + safeInt(tradeConvoys.getPredictionBonus())
+                + "%` of that Delegation's earned points in the next combat.";
+        sendTradeConvoysLockedMessage(CombatReplayHouse.HACAN, message);
+        sendTradeConvoysLockedMessage(tradeConvoys.getTargetHouse(), message);
+    }
+
+    private void sendTradeConvoysLockedMessage(CombatReplayHouse house, String message) {
+        TextChannel channel = houseChannel(house);
+        if (channel != null) MessageHelper.sendMessageToChannel(channel, message);
     }
 
     private TradeConvoys toTradeConvoys(CombatReplayHacanTradeConvoysEntity entity) {
@@ -503,13 +521,17 @@ public class CombatReplayHacanTradeConvoysService {
     }
 
     private TextChannel houseChannel() {
+        return houseChannel(CombatReplayHouse.HACAN);
+    }
+
+    private TextChannel houseChannel(CombatReplayHouse house) {
         Guild guild = JdaService.guildPrimary;
-        if (guild == null) return null;
-        TextChannel channel = guild.getTextChannelsByName(CombatReplayHouse.HACAN.channelName(), true).stream()
+        if (guild == null || house == null) return null;
+        TextChannel channel = guild.getTextChannelsByName(house.channelName(), true).stream()
                 .findFirst()
                 .orElse(null);
         if (channel == null) {
-            BotLogger.warning("Lazax house channel not found: " + CombatReplayHouse.HACAN.channelName());
+            BotLogger.warning("Lazax house channel not found: " + house.channelName());
         }
         return channel;
     }
