@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import lombok.experimental.UtilityClass;
@@ -23,6 +24,8 @@ import ti4.service.statistics.StatisticsPipeline;
 
 @UtilityClass
 class TwilightsFallSpliceWinRateStatisticsService {
+
+    private static final Set<String> BASIC_ABILITY_IDS = Set.of("wavelength", "antimatter");
 
     void queueReply(SlashCommandInteractionEvent event) {
         StatisticsPipeline.queue(event, () -> showWinRates(event));
@@ -55,10 +58,38 @@ class TwilightsFallSpliceWinRateStatisticsService {
         StringBuilder sb = new StringBuilder("## __**Twilight's Fall Splice Win Rates**__\n");
         sb.append("Games analyzed: ").append(gameCount).append('\n');
 
-        appendSection(sb, "Abilities", stats.abilities, TwilightsFallSpliceWinRateStatisticsService::getAbilityName);
         appendSection(
-                sb, "Unit Upgrades", stats.unitUpgrades, TwilightsFallSpliceWinRateStatisticsService::getUnitName);
-        appendSection(sb, "Genomes", stats.genomes, TwilightsFallSpliceWinRateStatisticsService::getGenomeName);
+                sb,
+                "Basic Abilities (when picked)",
+                stats.basicAbilities,
+                TwilightsFallSpliceWinRateStatisticsService::getAbilityName);
+        appendSection(
+                sb,
+                "Abilities (when picked)",
+                stats.abilities,
+                TwilightsFallSpliceWinRateStatisticsService::getAbilityName);
+        appendSection(
+                sb,
+                "Unit Upgrades (when picked)",
+                stats.unitUpgrades,
+                TwilightsFallSpliceWinRateStatisticsService::getUnitName);
+        appendSection(
+                sb, "Genomes (when picked)", stats.genomes, TwilightsFallSpliceWinRateStatisticsService::getGenomeName);
+        appendSectionEstimated(
+                sb,
+                "Abilities (when available, estimated)",
+                stats.abilities,
+                TwilightsFallSpliceWinRateStatisticsService::getAbilityName);
+        appendSectionEstimated(
+                sb,
+                "Unit Upgrades (when available, estimated)",
+                stats.unitUpgrades,
+                TwilightsFallSpliceWinRateStatisticsService::getUnitName);
+        appendSectionEstimated(
+                sb,
+                "Genomes (when available, estimated)",
+                stats.genomes,
+                TwilightsFallSpliceWinRateStatisticsService::getGenomeName);
         return sb.toString();
     }
 
@@ -70,6 +101,24 @@ class TwilightsFallSpliceWinRateStatisticsService {
                 .append(": ")
                 .append(entry.getValue())
                 .append('\n'));
+    }
+
+    private static void appendSectionEstimated(
+            StringBuilder sb, String title, Map<String, WinRateCount> stats, Function<String, String> displayName) {
+        int maxTotal = stats.values().stream().mapToInt(c -> c.total).max().orElse(0);
+        sb.append("\n**").append(title).append("**\n");
+        if (maxTotal == 0) {
+            return;
+        }
+        stats.entrySet().stream()
+                .sorted(Comparator.<Entry<String, WinRateCount>, Integer>comparing(
+                                entry -> entry.getValue().wins, Comparator.reverseOrder())
+                        .thenComparing(entry -> displayName.apply(entry.getKey())))
+                .forEach(entry -> sb.append("- ")
+                        .append(displayName.apply(entry.getKey()))
+                        .append(": ")
+                        .append(entry.getValue().toEstimatedString(maxTotal))
+                        .append('\n'));
     }
 
     private static Comparator<Entry<String, WinRateCount>> getWinRateComparator(Function<String, String> displayName) {
@@ -84,9 +133,23 @@ class TwilightsFallSpliceWinRateStatisticsService {
         List<Player> winners = game.getWinners();
         for (Player player : game.getRealAndEliminatedPlayers()) {
             boolean isWinner = winners.contains(player);
-            accumulateItems(player.getTechs(), stats.abilities, isWinner);
+            for (String tech : player.getTechs()) {
+                accumulateSingleItem(tech, stats.basicAbilities, isWinner);
+                accumulateSingleItem(tech, stats.abilities, isWinner);
+            }
             accumulateItems(player.getUnitsOwned(), stats.unitUpgrades, isWinner);
             accumulateItems(player.getLeaderIDs(), stats.genomes, isWinner);
+        }
+    }
+
+    private static void accumulateSingleItem(String item, Map<String, WinRateCount> stats, boolean isWinner) {
+        WinRateCount count = stats.get(item);
+        if (count == null) {
+            return;
+        }
+        count.total++;
+        if (isWinner) {
+            count.wins++;
         }
     }
 
@@ -119,14 +182,23 @@ class TwilightsFallSpliceWinRateStatisticsService {
     }
 
     private static class TwilightsFallSpliceWinRateStats {
+        private final Map<String, WinRateCount> basicAbilities = initializeBasicAbilities();
         private final Map<String, WinRateCount> abilities = initializeAbilities();
         private final Map<String, WinRateCount> unitUpgrades = initializeUnitUpgrades();
         private final Map<String, WinRateCount> genomes = initializeGenomes();
     }
 
+    private static Map<String, WinRateCount> initializeBasicAbilities() {
+        return Mapper.getTechs().values().stream()
+                .filter(tech -> tech.getSource() == ComponentSource.twilights_fall)
+                .filter(tech -> BASIC_ABILITY_IDS.contains(tech.getAlias()))
+                .collect(LinkedHashMap::new, (map, tech) -> map.put(tech.getAlias(), new WinRateCount()), Map::putAll);
+    }
+
     private static Map<String, WinRateCount> initializeAbilities() {
         return Mapper.getTechs().values().stream()
                 .filter(tech -> tech.getSource() == ComponentSource.twilights_fall)
+                .filter(tech -> !BASIC_ABILITY_IDS.contains(tech.getAlias()))
                 .collect(LinkedHashMap::new, (map, tech) -> map.put(tech.getAlias(), new WinRateCount()), Map::putAll);
     }
 
@@ -156,6 +228,10 @@ class TwilightsFallSpliceWinRateStatisticsService {
                 return "0/0 (0%)";
             }
             return wins + "/" + total + " (" + Math.round(wins * 100.0 / total) + "%)";
+        }
+
+        private String toEstimatedString(int denominator) {
+            return wins + "/" + denominator + " (" + Math.round(wins * 100.0 / denominator) + "%)";
         }
     }
 }
