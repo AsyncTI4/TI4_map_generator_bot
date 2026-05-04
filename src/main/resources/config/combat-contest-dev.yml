@@ -51,19 +51,19 @@ houseAbilities:
   maxCatchupFavorBonus: 0
   naalu:
     # actionCardPeekFavorCost: 0
-    actionCardPeekFavorCost: 30
+    actionCardPeekFavorCost: 20
     # roundOneRollPeekFavorCost: 0
-    roundOneRollPeekFavorCost: 50
+    roundOneRollPeekFavorCost: 40
   mentak:
     previewLeadSeconds: 15
     # destroyerDecoyFavorCost: 0
-    destroyerDecoyFavorCost: 30
+    destroyerDecoyFavorCost: 20
     # cruiserDecoyFavorCost: 0
-    cruiserDecoyFavorCost: 40
+    cruiserDecoyFavorCost: 30
     # dreadnoughtDecoyFavorCost: 0
-    dreadnoughtDecoyFavorCost: 60
+    dreadnoughtDecoyFavorCost: 40
     # warSunDecoyFavorCost: 0
-    warSunDecoyFavorCost: 80
+    warSunDecoyFavorCost: 70
   hacan:
     maxSubsidiesPerContest: 2
     subsidyFavorOnHit: 10

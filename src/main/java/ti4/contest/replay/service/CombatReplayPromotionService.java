@@ -79,9 +79,6 @@ public class CombatReplayPromotionService {
             }
 
             postProductionMentakPreviewIfDue(now);
-            LocalDateTime publicPromotionWindow = now.truncatedTo(ChronoUnit.MINUTES);
-            if (publicPromotionWindow.getMinute() != 0) return;
-            if (!canPublicPromoteAt(publicPromotionWindow)) return;
             promoteMentakPreviewedCandidateIfDue(now);
             return;
         }
@@ -128,11 +125,37 @@ public class CombatReplayPromotionService {
                     "Candidate already has an active replay contest", existingContest);
         }
 
+        if (usesMentakPreviewFlow()) {
+            if (isMentakPreviewReadyForPublicPromotion(candidate, LocalDateTime.now(clock))) {
+                CombatReplayContestEntity contest = promoteCandidate(candidate, existingContest);
+                if (contest == null) {
+                    return CombatReplayContestLifecycleService.ForcePromoteResult.rejected("Promotion failed");
+                }
+                return CombatReplayContestLifecycleService.ForcePromoteResult.promoted(contest);
+            }
+            return forceMentakPreviewCandidate(candidate, existingContest);
+        }
+
         CombatReplayContestEntity contest = promoteCandidate(candidate, existingContest);
         if (contest == null) {
             return CombatReplayContestLifecycleService.ForcePromoteResult.rejected("Promotion failed");
         }
         return CombatReplayContestLifecycleService.ForcePromoteResult.promoted(contest);
+    }
+
+    private CombatReplayContestLifecycleService.ForcePromoteResult forceMentakPreviewCandidate(
+            CombatCandidateEntity candidate, CombatReplayContestEntity existingContest) {
+        if (candidate.getMentakPreviewPostedAt() != null) {
+            return CombatReplayContestLifecycleService.ForcePromoteResult.rejected(
+                    "Mentak preview window is still open.", existingContest);
+        }
+
+        CombatReplayContestEntity contest = postMentakPreview(candidate);
+        if (contest == null) {
+            return CombatReplayContestLifecycleService.ForcePromoteResult.rejected("Mentak preview failed.");
+        }
+        return CombatReplayContestLifecycleService.ForcePromoteResult.rejected(
+                "Mentak preview posted. Public promotion will be available after the preview window.", contest);
     }
 
     private List<CombatCandidateEntity> findPromotionCandidates(LocalDateTime now) {
@@ -215,6 +238,7 @@ public class CombatReplayPromotionService {
     }
 
     private void promoteMentakPreviewedCandidateIfDue(LocalDateTime now) {
+        if (!canPublicPromoteAt(now.truncatedTo(ChronoUnit.MINUTES))) return;
         CombatCandidateEntity winner = selectPromotionWinner(findPromotionCandidates(now).stream()
                 .filter(candidate -> isMentakPreviewReadyForPublicPromotion(candidate, now))
                 .toList());
@@ -249,12 +273,12 @@ public class CombatReplayPromotionService {
                 .isAfter(now);
     }
 
-    private void postMentakPreview(CombatCandidateEntity candidate) {
+    private CombatReplayContestEntity postMentakPreview(CombatCandidateEntity candidate) {
         CombatObservationEntity observation =
                 observationRepository.findById(candidate.getObservationId()).orElse(null);
         Game game = loadGame(candidate.getGameName());
         TextChannel channel = discordPostService.houseChannel(CombatReplayHouse.MENTAK);
-        if (observation == null || game == null || channel == null) return;
+        if (observation == null || game == null || channel == null) return null;
 
         CombatReplayContestEntity previewContest = createPreviewContest(candidate);
         lockPreviousContestTradeConvoys(previewContest);
@@ -267,8 +291,10 @@ public class CombatReplayPromotionService {
             mentakAbilityService.postDecoyButtons(channel, candidate);
             candidate.setMentakPreviewPostedAt(LocalDateTime.now(clock));
             candidateRepository.save(candidate);
+            return previewContest;
         } catch (Exception e) {
             BotLogger.error("Failed to post Mentak combat replay preview.", e);
+            return null;
         }
     }
 
