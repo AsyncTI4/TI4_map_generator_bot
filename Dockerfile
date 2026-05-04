@@ -23,14 +23,6 @@ WORKDIR /app
 # needed to handle fonts
 RUN apk add --no-cache fontconfig ttf-dejavu
 
-# async-profiler: enables remote CPU/allocation profiling via IntelliJ Profiler
-ARG ASYNC_PROFILER_VERSION=3.0
-RUN wget -q "https://github.com/async-profiler/async-profiler/releases/download/v${ASYNC_PROFILER_VERSION}/async-profiler-${ASYNC_PROFILER_VERSION}-linux-musl-x64.tar.gz" \
-        -O /tmp/async-profiler.tar.gz \
-    && mkdir -p /app/async-profiler \
-    && tar -xzf /tmp/async-profiler.tar.gz -C /app/async-profiler --strip-components=1 \
-    && rm /tmp/async-profiler.tar.gz
-
 COPY --from=build /opt/app/target/TI4_map_generator_discord_bot-1.0-SNAPSHOT.jar tibot.jar
 
 ENV DB_PATH=/opt/STORAGE

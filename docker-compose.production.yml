@@ -20,9 +20,6 @@ services:
     volumes:
       - ${HOST_TI4_SAVES_DIR}:/opt/STORAGE
       - ${HOST_TI4_REPO_DIR}/src/main/resources:/opt/resources:ro
-    ports:
-      # async-profiler socket — bound to loopback only; reach via SSH tunnel
-      - "127.0.0.1:8849:8849"
     environment:
       AWS_ACCESS_KEY_ID: ${AWS_KEY}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET}
@@ -33,7 +30,6 @@ services:
       DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET}
       DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI}
       GUILDID_LIST: ${GUILDID_LIST}
-      JAVA_TOOL_OPTIONS: "-agentpath=/app/async-profiler/lib/libasyncProfiler.so=port=8849"
       MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY: ${MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY}
       REPO_DISPATCH_TOKEN: ${REPO_DISPATCH_TOKEN}
       RESOURCE_PATH: /opt/resources
