@@ -464,7 +464,7 @@ public class CombatReplayHouseService {
         }
 
         MessageHelper.sendMessageToChannel(
-                channel, houseRoleMention(guild, house) + " welcomes <@" + discordUserId + ">.");
+                channel, "**" + house.displayName() + " Delegation** welcomes <@" + discordUserId + ">.");
     }
 
     private Role findRole(Guild guild, CombatReplayHouse house) {
