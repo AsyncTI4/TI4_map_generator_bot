@@ -3,7 +3,6 @@ package ti4.contest.replay.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -186,7 +185,7 @@ class CombatReplayContestLifecycleServiceTest {
     }
 
     @Test
-    void promoteBestCandidateIfDueWaitsForNextHourlySlotWhenPreviewBecomesReadyMidHour() {
+    void promoteBestCandidateIfDueUsesActualTimeWhenPreviewBecomesReadyMidHour() {
         CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
         CombatObservationRepository observationRepository = mock(CombatObservationRepository.class);
         CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
@@ -205,7 +204,7 @@ class CombatReplayContestLifecycleServiceTest {
                         CombatCandidatePromotionStatus.PENDING,
                         LocalDateTime.parse("2026-04-27T00:25:00")))
                 .thenReturn(List.of(candidate));
-        when(observationRepository.findAllById(List.of())).thenReturn(List.of());
+        when(observationRepository.findAllById(List.of(1L))).thenReturn(List.of());
 
         service.promoteBestCandidateIfDue();
 
@@ -214,7 +213,7 @@ class CombatReplayContestLifecycleServiceTest {
                         CombatCandidateStatus.RESOLVED,
                         CombatCandidatePromotionStatus.PENDING,
                         LocalDateTime.parse("2026-04-27T00:25:00"));
-        verify(observationRepository, never()).findById(1L);
+        verify(observationRepository).findById(1L);
     }
 
     @Test
