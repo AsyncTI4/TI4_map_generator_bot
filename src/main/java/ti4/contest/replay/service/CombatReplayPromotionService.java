@@ -194,7 +194,7 @@ public class CombatReplayPromotionService {
 
         String startSummaryText = snapshotStartSummaryText(winner);
         String message = LazaxCombatSupport.formatReplayAnnouncement(
-                game, winner, discordPostService.getLazaxRoleMention(), startSummaryText);
+                game, winner, discordPostService.getHouseRoleMentions(), startSummaryText);
 
         TextChannel contestChannel = discordPostService.getContestChannel();
         if (contestChannel == null) return null;

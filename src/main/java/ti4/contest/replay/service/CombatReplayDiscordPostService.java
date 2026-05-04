@@ -127,19 +127,19 @@ public class CombatReplayDiscordPostService {
         return channels.isEmpty() ? null : channels.getFirst();
     }
 
-    public String getLazaxRoleMention() {
-        if (JdaService.guildPrimary == null) return "";
-        List<Role> roles =
-                JdaService.guildPrimary.getRolesByName(CombatReplayLeaderboardService.LAZAX_MINIGAME_ROLE_NAME, true);
-        Role role = roles.isEmpty() ? null : roles.getFirst();
-        return role == null ? "" : role.getAsMention();
-    }
-
     public String getHouseRoleMention(CombatReplayHouse house) {
         if (JdaService.guildPrimary == null || house == null) return "";
         List<Role> roles = JdaService.guildPrimary.getRolesByName(house.roleName(), true);
         Role role = roles.isEmpty() ? null : roles.getFirst();
         return role == null ? "" : role.getAsMention();
+    }
+
+    public String getHouseRoleMentions() {
+        if (JdaService.guildPrimary == null) return "";
+        return CombatReplayHouse.assignmentOrder().stream()
+                .map(this::getHouseRoleMention)
+                .filter(mention -> !mention.isBlank())
+                .collect(java.util.stream.Collectors.joining(" "));
     }
 
     private String buildReplayThreadName(CombatCandidateEntity candidate) {
