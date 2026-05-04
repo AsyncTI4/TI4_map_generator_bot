@@ -16,12 +16,15 @@ import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
 import ti4.contest.replay.entities.CombatReplayHacanTradeConvoysEntity;
 import ti4.contest.replay.entities.CombatReplayHouseScoreEntity;
+import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
 import ti4.contest.replay.repository.CombatReplayHacanTradeConvoysRepository;
 import ti4.contest.replay.repository.CombatReplayHacanTradeConvoysVoteRepository;
 import ti4.contest.replay.repository.CombatReplayHouseAbilityUseRepository;
 import ti4.contest.replay.repository.CombatReplayHouseScoreRepository;
+import ti4.contest.replay.service.CombatReplayHouseAbilityVoteService;
 import ti4.contest.replay.service.CombatReplayHouseFavorService;
+import ti4.contest.replay.service.CombatReplayHousePhaseService;
 import ti4.contest.replay.service.CombatReplayHouseService;
 
 class CombatReplayHacanTradeConvoysServiceTest {
@@ -31,10 +34,14 @@ class CombatReplayHacanTradeConvoysServiceTest {
     private final CombatReplayContestRepository contestRepository = mock(CombatReplayContestRepository.class);
     private final CombatReplayHouseScoreRepository houseScoreRepository = mock(CombatReplayHouseScoreRepository.class);
     private final CombatReplayHouseFavorService houseFavorService = mock(CombatReplayHouseFavorService.class);
+    private final CombatContestSettings settings = new CombatContestSettings();
     private final CombatReplayHacanTradeConvoysService service = new CombatReplayHacanTradeConvoysService(
-            new CombatContestSettings(),
+            settings,
             mock(CombatReplayHouseService.class),
+            new CombatReplayHousePhaseService(settings, contestRepository),
+            mock(CombatReplayHouseAbilityVoteService.class),
             houseFavorService,
+            mock(CombatCandidateRepository.class),
             contestRepository,
             mock(CombatReplayHouseAbilityUseRepository.class),
             tradeConvoysRepository,
@@ -86,9 +93,8 @@ class CombatReplayHacanTradeConvoysServiceTest {
     void tradeConvoysButtonsStayVisibleButDisableUnaffordableFavorCosts() {
         CombatReplayContestEntity contest = new CombatReplayContestEntity();
         contest.setId(3L);
-        when(houseFavorService.canAfford(CombatReplayHouse.HACAN, 10)).thenReturn(true);
-        when(houseFavorService.canAfford(CombatReplayHouse.HACAN, 20)).thenReturn(false);
-        when(houseFavorService.canAfford(CombatReplayHouse.HACAN, 30)).thenReturn(false);
+        when(houseFavorService.ledger(CombatReplayHouse.HACAN))
+                .thenReturn(new CombatReplayHouseFavorService.FavorLedger(10, 0, 10));
 
         List<net.dv8tion.jda.api.components.buttons.Button> buttons =
                 service.tradeConvoysButtonsForHouse(contest, CombatReplayHouse.NAALU);
@@ -97,6 +103,20 @@ class CombatReplayHacanTradeConvoysServiceTest {
         assertFalse(buttons.get(0).isDisabled());
         assertTrue(buttons.get(1).isDisabled());
         assertTrue(buttons.get(2).isDisabled());
+    }
+
+    @Test
+    void tradeConvoysLockedTargetMessageDoesNotRevealHacanPayout() {
+        CombatReplayHacanTradeConvoysEntity convoy = convoy(1L, CombatReplayHouse.NAALU, 30, 15);
+
+        String hacanMessage = service.hacanLockedTradeConvoysMessage(convoy);
+        String targetMessage = service.targetLockedTradeConvoysMessage(convoy);
+
+        assertTrue(hacanMessage.contains("will gain `15%`"));
+        assertTrue(targetMessage.contains("Hacan sends `30 Favor` to Naalu Delegation"));
+        assertFalse(targetMessage.contains("15%"));
+        assertFalse(targetMessage.contains("earned points"));
+        assertFalse(targetMessage.contains("will gain"));
     }
 
     private CombatReplayHacanTradeConvoysEntity convoy(

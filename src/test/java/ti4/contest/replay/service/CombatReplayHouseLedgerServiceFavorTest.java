@@ -23,13 +23,17 @@ class CombatReplayHouseLedgerServiceFavorTest {
     private final CombatContestSettings settings = new CombatContestSettings();
     private final CombatReplayHouseScoreRepository houseScoreRepository = mock(CombatReplayHouseScoreRepository.class);
     private final CombatReplayHouseService houseService = mock(CombatReplayHouseService.class);
+    private final CombatReplayCustodianFavorScoringRule custodianFavorScoringRule =
+            new CombatReplayCustodianFavorScoringRule(settings, houseScoreRepository);
     private final CombatReplayHouseLedgerService service = new CombatReplayHouseLedgerService(
             settings,
             mock(CombatContestSideBetRepository.class),
             houseScoreRepository,
             houseService,
             mock(CombatReplayHacanMarketCompactService.class),
-            mock(CombatReplayHacanTradeConvoysService.class));
+            mock(CombatReplayHacanTradeConvoysService.class),
+            custodianFavorScoringRule,
+            List.of(custodianFavorScoringRule));
 
     @Test
     void defaultCombatFavorGainDoesNotApplyCatchupBonus() {
@@ -55,7 +59,7 @@ class CombatReplayHouseLedgerServiceFavorTest {
         service.ensureSeasonOpeningBalances();
 
         ArgumentCaptor<List<CombatReplayHouseScoreEntity>> captor = ArgumentCaptor.forClass(List.class);
-        verify(houseScoreRepository).saveAll(captor.capture());
+        verify(houseScoreRepository).saveAllAndFlush(captor.capture());
         List<CombatReplayHouseScoreEntity> scores = captor.getValue();
 
         assertEquals(3, scores.size());

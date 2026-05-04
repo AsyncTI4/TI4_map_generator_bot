@@ -29,8 +29,11 @@ class CombatReplayHacanMarketCompactServiceTest {
             mock(CombatReplayHacanSubsidyVoteRepository.class),
             marketRepository,
             mock(CombatReplayHacanMarketCompactDecisionRepository.class),
+            mock(CombatReplayHouseAbilityVoteService.class),
             houseService,
-            mock(CombatReplaySideBetPayoutService.class));
+            mock(CombatReplayHousePhaseService.class),
+            mock(CombatReplaySideBetPayoutService.class),
+            mock(CombatSideBetAvailabilityService.class));
 
     @Test
     void marketMakerPointsCountEachNonHacanMarkedSideBetTaken() {
