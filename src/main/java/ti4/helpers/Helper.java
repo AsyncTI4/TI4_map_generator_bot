@@ -75,6 +75,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.TokenModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.ExperimentalMechanismsService;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -2095,6 +2096,10 @@ public final class Helper {
                         || (!game.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")
                                 && !player.hasTech("tf-quantumdrive"))) {
                     cost += (int) removedUnit.getCost() * entry.getValue();
+                    if (ExperimentalMechanismsService.hasEngineAttached(game)) {
+                        cost += ExperimentalMechanismsService.getEngineCostMod(game, player, removedUnit)
+                                * entry.getValue();
+                    }
                 }
                 totalUnits += entry.getValue();
                 if ((player.hasUnit("arvaxi_mech") || player.hasUnit("tf-valefarprime"))

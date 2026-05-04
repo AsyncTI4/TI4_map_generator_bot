@@ -104,6 +104,7 @@ import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.ExperimentalMechanismsService;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
@@ -4077,6 +4078,10 @@ public class ButtonHelper {
                 UnitModel unit = entry.getKey();
                 if ("space".equalsIgnoreCase(capChecker.getName())) {
                     capacity += unit.getCapacityValue() * entry.getValue();
+                    if (ExperimentalMechanismsService.hasEngineAttached(game)) {
+                        capacity += ExperimentalMechanismsService.getEngineCapacityMod(game, player, unit)
+                                * entry.getValue();
+                    }
                     if (unit.getUnitType() == UnitType.Carrier
                             && (player.hasUnit("lunarium_carrier") || player.hasUnit("lunarium_carrier2"))) {
                         capacity += player.getSoScored() * entry.getValue();

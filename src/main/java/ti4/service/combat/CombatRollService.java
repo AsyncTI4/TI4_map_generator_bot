@@ -61,6 +61,7 @@ import ti4.model.PlanetModel;
 import ti4.model.RelicModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
+import ti4.service.breakthrough.ExperimentalMechanismsService;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -927,6 +928,9 @@ public class CombatRollService {
                     rollType,
                     activeSystem,
                     unitHolder);
+            if (rollType == CombatRollType.combatround && ExperimentalMechanismsService.hasEngineAttached(game)) {
+                modifierToHit += ExperimentalMechanismsService.getEngineCombatMod(game, player, unitModel);
+            }
             int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player);
             if (rollType == CombatRollType.combatround) {
                 CombatStatsService.CombatRoundProfile combatRoundProfile = CombatStatsService.getCombatRoundProfile(

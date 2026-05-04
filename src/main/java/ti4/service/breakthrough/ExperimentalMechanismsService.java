@@ -20,7 +20,48 @@ import ti4.model.UnitModel;
 @UtilityClass
 public class ExperimentalMechanismsService {
 
-    private static final String STORED_KEY = "arvaxiMobilizationEngine";
+    public static final String STORED_KEY = "arvaxiMobilizationEngine";
+
+    public static boolean hasEngineAttached(Game game) {
+        return !game.getStoredValue(STORED_KEY).isEmpty();
+    }
+
+    private static boolean isEngineAttachedToUnit(Game game, Player player, UnitModel unit) {
+        String stored = game.getStoredValue(STORED_KEY);
+        if (stored.isEmpty()) return false;
+        int firstSep = stored.indexOf('_');
+        int lastSep = stored.lastIndexOf('_');
+        if (firstSep < 0 || firstSep == lastSep) return false;
+        if (!player.getFaction().equals(stored.substring(0, firstSep))) return false;
+        String techID = stored.substring(firstSep + 1, lastSep);
+        UnitModel engineUnit = Mapper.getUnitModelByTechUpgrade(techID);
+        return engineUnit != null && engineUnit.getAsyncId().equals(unit.getAsyncId());
+    }
+
+    private static boolean isEngineBoon(Game game) {
+        return game.getStoredValue(STORED_KEY).endsWith("_boon");
+    }
+
+    public static int getEngineCombatMod(Game game, Player player, UnitModel unit) {
+        if (!isEngineAttachedToUnit(game, player, unit)) return 0;
+        return isEngineBoon(game) ? 1 : -1;
+    }
+
+    public static int getEngineMoveMod(Game game, Player player, UnitModel unit) {
+        if (!isEngineAttachedToUnit(game, player, unit)) return 0;
+        return isEngineBoon(game) ? 1 : -1;
+    }
+
+    public static int getEngineCostMod(Game game, Player player, UnitModel unit) {
+        if (!isEngineAttachedToUnit(game, player, unit)) return 0;
+        return isEngineBoon(game) ? -1 : 1;
+    }
+
+    public static int getEngineCapacityMod(Game game, Player player, UnitModel unit) {
+        if (!isEngineAttachedToUnit(game, player, unit)) return 0;
+        return isEngineBoon(game) ? 1 : -1;
+    }
+
     private static final String BOON_TEXT =
             "The printed values of this unit have been adjusted: Cost -1, Combat -1, Move +1, Capacity +1.";
     private static final String CURSE_TEXT =
