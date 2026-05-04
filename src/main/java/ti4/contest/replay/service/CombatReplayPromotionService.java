@@ -238,12 +238,22 @@ public class CombatReplayPromotionService {
     }
 
     private void promoteMentakPreviewedCandidateIfDue(LocalDateTime now) {
-        if (!canPublicPromoteAt(now.truncatedTo(ChronoUnit.MINUTES))) return;
-        CombatCandidateEntity winner = selectPromotionWinner(findPromotionCandidates(now).stream()
-                .filter(candidate -> isMentakPreviewReadyForPublicPromotion(candidate, now))
+        LocalDateTime publicPromotionWindow = mentakPublicPromotionWindow(now);
+        if (!canPublicPromoteAt(publicPromotionWindow)) return;
+        List<CombatCandidateEntity> candidates = rankPromotionCandidates(findPromotionCandidates(now).stream()
+                .filter(candidate -> isMentakPreviewReadyForPublicPromotion(candidate, publicPromotionWindow))
                 .toList());
-        if (winner == null) return;
-        promoteCandidate(winner);
+        for (CombatCandidateEntity candidate : candidates) {
+            if (promoteCandidate(candidate) != null) return;
+            BotLogger.error("Mentak preview promotion skipped for candidate " + candidate.getId()
+                    + " because public promotion failed.");
+        }
+    }
+
+    private LocalDateTime mentakPublicPromotionWindow(LocalDateTime now) {
+        LocalDateTime truncatedNow = now.truncatedTo(ChronoUnit.MINUTES);
+        if (settings.getRuntime().isDevMode()) return truncatedNow;
+        return truncatedNow.truncatedTo(ChronoUnit.HOURS);
     }
 
     private boolean usesMentakPreviewFlow() {
@@ -340,18 +350,21 @@ public class CombatReplayPromotionService {
     }
 
     private CombatCandidateEntity selectPromotionWinner(List<CombatCandidateEntity> candidates) {
+        List<CombatCandidateEntity> rankedCandidates = rankPromotionCandidates(candidates);
+        return rankedCandidates.isEmpty() ? null : rankedCandidates.getFirst();
+    }
+
+    private List<CombatCandidateEntity> rankPromotionCandidates(List<CombatCandidateEntity> candidates) {
         Map<Long, Double> jointScoresByObservationId = loadJointScores(candidates);
-        CombatCandidateEntity winner = null;
         Comparator<CombatCandidateEntity> comparator = candidateComparator(jointScoresByObservationId);
         List<CombatCandidateEntity> previewedCandidates = candidates.stream()
                 .filter(candidate -> candidate.getMentakPreviewPostedAt() != null)
                 .toList();
         if (!previewedCandidates.isEmpty()) candidates = previewedCandidates;
-        for (CombatCandidateEntity candidate : candidates) {
-            if (candidate.getResolvedAt() == null) continue;
-            if (winner == null || comparator.compare(candidate, winner) > 0) winner = candidate;
-        }
-        return winner;
+        return candidates.stream()
+                .filter(candidate -> candidate.getResolvedAt() != null)
+                .sorted(comparator.reversed())
+                .toList();
     }
 
     private Map<Long, Double> loadJointScores(List<CombatCandidateEntity> candidates) {
