@@ -30,6 +30,6 @@ ENV RESOURCE_PATH=/opt/resources
 
 ENTRYPOINT ["java", \
             "-XX:MaxRAMPercentage=70.0", \
-            "-XX:InitialRAMPercentage=20.0", \
+            "-XX:InitialRAMPercentage=10.0", \
             "-XX:+UseStringDeduplication", \
             "-jar", "tibot.jar"]

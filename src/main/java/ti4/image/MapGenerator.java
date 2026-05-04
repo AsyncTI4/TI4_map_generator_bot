@@ -2466,7 +2466,7 @@ public class MapGenerator implements AutoCloseable {
      * @return between 3 and 8 (bounds based on constants)
      */
     private static int getRingCount(Game game) {
-        return Math.max(Math.min(game.getRingCount(), RING_MAX_COUNT), RING_MIN_COUNT);
+        return Math.clamp(game.getRingCount(), RING_MIN_COUNT, RING_MAX_COUNT);
     }
 
     /**
