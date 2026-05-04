@@ -24,8 +24,8 @@ WORKDIR /app
 RUN apk add --no-cache fontconfig ttf-dejavu
 
 # async-profiler: enables remote CPU/allocation profiling via IntelliJ Profiler
-ARG ASYNC_PROFILER_VERSION=3.0
-RUN wget -q "https://github.com/async-profiler/async-profiler/releases/download/v${ASYNC_PROFILER_VERSION}/async-profiler-${ASYNC_PROFILER_VERSION}-linux-musl-x64.tar.gz" \
+ARG ASYNC_PROFILER_VERSION=4.4
+RUN wget -q "https://github.com/async-profiler/async-profiler/releases/download/v${ASYNC_PROFILER_VERSION}/async-profiler-${ASYNC_PROFILER_VERSION}-linux-x64-debug.tar.gz" \
         -O /tmp/async-profiler.tar.gz \
     && mkdir -p /app/async-profiler \
     && tar -xzf /tmp/async-profiler.tar.gz -C /app/async-profiler --strip-components=1 \
