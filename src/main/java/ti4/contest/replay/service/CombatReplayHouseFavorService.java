@@ -35,6 +35,23 @@ public class CombatReplayHouseFavorService {
         return new FavorLedger(earned, spent, Math.max(0, earned - spent));
     }
 
+    public FavorLedger ledgerWithContestFavor(CombatReplayHouse house, Long contestId, int contestFavor) {
+        if (house == null) return new FavorLedger(0, 0, 0);
+
+        int earned = Math.max(0, contestFavor);
+        for (CombatReplayHouseScoreEntity score : houseScoreRepository.findByHouse(house)) {
+            if (contestId != null && contestId.equals(score.getContestId())) continue;
+            earned += safeInt(score.getFavorPoints());
+        }
+
+        int spent = 0;
+        for (CombatReplayHouseAbilityUseEntity use : houseAbilityUseRepository.findByHouse(house)) {
+            spent += safeInt(use.getFavorCost());
+        }
+
+        return new FavorLedger(earned, spent, Math.max(0, earned - spent));
+    }
+
     public boolean canAfford(CombatReplayHouse house, int favorCost) {
         return Math.max(0, favorCost) <= balance(house);
     }

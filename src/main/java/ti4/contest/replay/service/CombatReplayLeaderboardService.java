@@ -128,7 +128,8 @@ public class CombatReplayLeaderboardService {
                     postSideBetResultsSummary(threadOrChannel, result);
                 }
                 postDelegationFavorAwards(result.housePredictionSummaries());
-                hacanTradeConvoysService.postPostCombatTradeConvoysButtonsIfNeeded(replayContest, candidate);
+                hacanTradeConvoysService.postPostCombatTradeConvoysButtonsIfNeeded(
+                        replayContest, candidate, result.housePredictionSummaries());
                 postParticipantFollowup(game, candidate, threadOrChannel);
                 postSubscriptionPrompt(threadOrChannel);
             });

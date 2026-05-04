@@ -91,9 +91,8 @@ class CombatReplayHacanTradeConvoysServiceTest {
     void tradeConvoysButtonsStayVisibleButDisableUnaffordableFavorCosts() {
         CombatReplayContestEntity contest = new CombatReplayContestEntity();
         contest.setId(3L);
-        when(houseFavorService.canAfford(CombatReplayHouse.HACAN, 10)).thenReturn(true);
-        when(houseFavorService.canAfford(CombatReplayHouse.HACAN, 20)).thenReturn(false);
-        when(houseFavorService.canAfford(CombatReplayHouse.HACAN, 30)).thenReturn(false);
+        when(houseFavorService.ledger(CombatReplayHouse.HACAN))
+                .thenReturn(new CombatReplayHouseFavorService.FavorLedger(10, 0, 10));
 
         List<net.dv8tion.jda.api.components.buttons.Button> buttons =
                 service.tradeConvoysButtonsForHouse(contest, CombatReplayHouse.NAALU);

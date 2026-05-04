@@ -31,6 +31,7 @@ import ti4.contest.replay.repository.CombatReplayHouseScoreRepository;
 import ti4.contest.replay.service.CombatReplayAbilityWindowText;
 import ti4.contest.replay.service.CombatReplayHouseAbilityVoteService;
 import ti4.contest.replay.service.CombatReplayHouseFavorService;
+import ti4.contest.replay.service.CombatReplayHouseLedgerService.HousePredictionSummary;
 import ti4.contest.replay.service.CombatReplayHousePhaseService;
 import ti4.contest.replay.service.CombatReplayHouseService;
 import ti4.contest.replay.service.CombatReplayInteractionResult;
@@ -67,11 +68,23 @@ public class CombatReplayHacanTradeConvoysService {
 
     public void postPostCombatTradeConvoysButtonsIfNeeded(
             CombatReplayContestEntity contest, CombatCandidateEntity candidate) {
+        postPostCombatTradeConvoysButtonsIfNeeded(contest, candidate, List.of());
+    }
+
+    public void postPostCombatTradeConvoysButtonsIfNeeded(
+            CombatReplayContestEntity contest,
+            CombatCandidateEntity candidate,
+            List<HousePredictionSummary> currentCombatSummaries) {
         if (!canOfferTradeConvoys(contest, candidate)) return;
-        postTradeConvoysVotingButtons(contest);
+        postTradeConvoysVotingButtons(contest, hacanFavorLedger(contest, currentCombatSummaries));
     }
 
     private void postTradeConvoysVotingButtons(CombatReplayContestEntity contest) {
+        postTradeConvoysVotingButtons(contest, houseFavorService.ledger(CombatReplayHouse.HACAN));
+    }
+
+    private void postTradeConvoysVotingButtons(
+            CombatReplayContestEntity contest, CombatReplayHouseFavorService.FavorLedger favorLedger) {
 
         TextChannel channel = houseChannel();
         if (channel == null) return;
@@ -82,13 +95,13 @@ public class CombatReplayHacanTradeConvoysService {
                         + " Hacan Delegation Trade Convoys\n"
                         + CombatReplayAbilityWindowText.votesLockWhenNextContestPostsLine()
                         + "\n"
-                        + favorBalanceLine()
+                        + favorBalanceLine(favorLedger)
                         + "\n"
                         + tradeConvoysSummaryLine(),
                 List.of(Buttons.red(
                         formatButtonId(contest.getId(), CombatReplayHouse.HACAN, 0, 0), "Do Not Use Trade Convoys")));
-        postTradeConvoysButtonsForHouse(channel, contest, CombatReplayHouse.NAALU);
-        postTradeConvoysButtonsForHouse(channel, contest, CombatReplayHouse.MENTAK);
+        postTradeConvoysButtonsForHouse(channel, contest, CombatReplayHouse.NAALU, favorLedger);
+        postTradeConvoysButtonsForHouse(channel, contest, CombatReplayHouse.MENTAK, favorLedger);
     }
 
     public boolean shouldOfferVoting(CombatReplayContestEntity contest, CombatCandidateEntity candidate) {
@@ -108,8 +121,10 @@ public class CombatReplayHacanTradeConvoysService {
         return "-# Trade Convoys: send Favor to one rival Delegation. Hacan gains the listed share of that Delegation's earned points in the next combat.";
     }
 
-    private String favorBalanceLine() {
-        return "-# Total Favor: `" + houseFavorService.balance(CombatReplayHouse.HACAN) + "`";
+    private String favorBalanceLine(CombatReplayHouseFavorService.FavorLedger favorLedger) {
+        CombatReplayHouseFavorService.FavorLedger ledger =
+                favorLedger == null ? houseFavorService.ledger(CombatReplayHouse.HACAN) : favorLedger;
+        return "-# Total Favor: `" + ledger.balance() + "`";
     }
 
     public void sendEphemeralVotingControls(
@@ -122,7 +137,7 @@ public class CombatReplayHacanTradeConvoysService {
                         + " Hacan Delegation Trade Convoys\n"
                         + CombatReplayAbilityWindowText.votesLockWhenNextContestPostsLine()
                         + "\n"
-                        + favorBalanceLine()
+                        + favorBalanceLine(null)
                         + "\n"
                         + voteSummary(contest.getId()),
                 List.of(Buttons.red(
@@ -265,8 +280,11 @@ public class CombatReplayHacanTradeConvoysService {
     }
 
     private void postTradeConvoysButtonsForHouse(
-            TextChannel channel, CombatReplayContestEntity contest, CombatReplayHouse target) {
-        List<Button> buttons = tradeConvoysButtonsForHouse(contest, target);
+            TextChannel channel,
+            CombatReplayContestEntity contest,
+            CombatReplayHouse target,
+            CombatReplayHouseFavorService.FavorLedger favorLedger) {
+        List<Button> buttons = tradeConvoysButtonsForHouse(contest, target, favorLedger);
         MessageHelper.sendMessageToChannelWithButtons(
                 channel,
                 "### " + FactionEmojis.getFactionIcon(target.displayName()) + " " + target.displayName()
@@ -285,18 +303,37 @@ public class CombatReplayHacanTradeConvoysService {
     }
 
     List<Button> tradeConvoysButtonsForHouse(CombatReplayContestEntity contest, CombatReplayHouse target) {
+        return tradeConvoysButtonsForHouse(contest, target, houseFavorService.ledger(CombatReplayHouse.HACAN));
+    }
+
+    private List<Button> tradeConvoysButtonsForHouse(
+            CombatReplayContestEntity contest,
+            CombatReplayHouse target,
+            CombatReplayHouseFavorService.FavorLedger favorLedger) {
         List<Button> buttons = new ArrayList<>();
+        int availableFavor =
+                favorLedger == null ? houseFavorService.balance(CombatReplayHouse.HACAN) : favorLedger.balance();
         for (TradeConvoysTier tier : tradeConvoysTiers()) {
             Button button = Buttons.green(
                     formatButtonId(contest.getId(), target, tier.favorCost(), tier.bonusPercent()),
                     tier.favorCost() + " Favor: " + tier.bonusPercent() + "% next combat",
                     FactionEmojis.getFactionIcon(target.displayName()).toString());
-            buttons.add(
-                    houseFavorService.canAfford(CombatReplayHouse.HACAN, tier.favorCost())
-                            ? button
-                            : button.asDisabled());
+            buttons.add(tier.favorCost() <= availableFavor ? button : button.asDisabled());
         }
         return buttons;
+    }
+
+    private CombatReplayHouseFavorService.FavorLedger hacanFavorLedger(
+            CombatReplayContestEntity contest, List<HousePredictionSummary> currentCombatSummaries) {
+        HousePredictionSummary hacanSummary = currentCombatSummaries == null
+                ? null
+                : currentCombatSummaries.stream()
+                        .filter(summary -> summary.house() == CombatReplayHouse.HACAN)
+                        .findFirst()
+                        .orElse(null);
+        if (hacanSummary == null) return houseFavorService.ledger(CombatReplayHouse.HACAN);
+        return houseFavorService.ledgerWithContestFavor(
+                CombatReplayHouse.HACAN, contest == null ? null : contest.getId(), hacanSummary.favorPoints());
     }
 
     private CombatReplayContestEntity tradeConvoysContest(Long contestId) {
