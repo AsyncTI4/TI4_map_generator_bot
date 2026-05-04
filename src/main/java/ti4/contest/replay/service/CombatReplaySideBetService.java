@@ -40,6 +40,7 @@ public class CombatReplaySideBetService {
     private final CombatReplaySideBetPayoutService payoutService;
     private final CombatReplaySideBetUiService sideBetUiService;
     private final CombatReplayHouseService houseService;
+    private final CombatSideBetAvailabilityService availabilityService;
 
     public boolean shouldShowButtons(CombatCandidateEntity candidate) {
         return sideBetUiService.shouldShowButtons(candidate);
@@ -94,7 +95,7 @@ public class CombatReplaySideBetService {
         if (candidate == null || !Boolean.TRUE.equals(candidate.getSideBetCompatible())) {
             return PlacementPersistenceResult.rejected("This combat does not support side bets.");
         }
-        if (!isValidBet(candidate, betType, targetFaction)) {
+        if (!availabilityService.isAvailable(candidate, betType, targetFaction)) {
             return PlacementPersistenceResult.rejected("That side bet is not available for this combat.");
         }
 
@@ -231,19 +232,13 @@ public class CombatReplaySideBetService {
         }
     }
 
-    private boolean isValidBet(CombatCandidateEntity candidate, CombatSideBetType betType, String targetFaction) {
-        CombatSideState state = CombatSideState.forFaction(candidate, targetFaction);
-        if (state == null || !betType.isAvailable(state.destroyerCount())) return false;
-        if (betType == CombatSideBetType.AFB_WHIFF) return payoutService.hasAfbUnits(candidate, targetFaction);
-        return betType != CombatSideBetType.AFB_SKIPPED || isAfbSkippedAvailable(candidate, targetFaction);
-    }
-
     private boolean isWinningBet(CombatCandidateEntity candidate, CombatContestSideBetEntity sideBet) {
         CombatSideState state = CombatSideState.forFaction(candidate, sideBet.getTargetFaction());
         if (state == null) return false;
         CombatSideBetType betType = sideBet.getBetType();
         return switch (betType) {
-            case AFB_SKIPPED -> isAfbSkippedAvailable(candidate, sideBet.getTargetFaction()) && state.skippedAfb();
+            case AFB_SKIPPED ->
+                availabilityService.isAfbSkippedAvailable(candidate, sideBet.getTargetFaction()) && state.skippedAfb();
             case AFB_WHIFF -> betType.isAvailable(state.destroyerCount()) && state.afbWhiff();
             case ROUND_ONE_WHIFF -> state.roundOneWhiff();
             case ROUND_ONE_SLAM -> state.roundOneSlam();
@@ -271,23 +266,6 @@ public class CombatReplaySideBetService {
         entry.setCorrectPredictions(0);
         entry.setUpdatedAt(LocalDateTime.now());
         return entry;
-    }
-
-    public boolean isAfbSkippedAvailable(CombatCandidateEntity candidate, String targetFaction) {
-        if (candidate == null || targetFaction == null) return false;
-        CombatSideState state = CombatSideState.forFaction(candidate, targetFaction);
-        if (state == null || !CombatSideBetType.AFB_SKIPPED.isAvailable(state.destroyerCount())) return false;
-        return !(state.destroyerCount() == 1 && opponentHasAssaultCannon(candidate, targetFaction));
-    }
-
-    private boolean opponentHasAssaultCannon(CombatCandidateEntity candidate, String targetFaction) {
-        if (targetFaction.equalsIgnoreCase(candidate.getAttackerFaction())) {
-            return Boolean.TRUE.equals(candidate.getDefenderHasAssaultCannon());
-        }
-        if (targetFaction.equalsIgnoreCase(candidate.getDefenderFaction())) {
-            return Boolean.TRUE.equals(candidate.getAttackerHasAssaultCannon());
-        }
-        return false;
     }
 
     private int safeInt(Integer value) {

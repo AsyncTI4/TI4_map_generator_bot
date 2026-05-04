@@ -96,6 +96,13 @@ public class CombatContestSettings {
         require(sideBets.maxBetsPerUser >= 0, "sideBets.maxBetsPerUser must be >= 0.");
         require(sideBets.costPoints >= 0, "sideBets.costPoints must be >= 0.");
         require(sideBets.dynamicPayoutCap >= 1, "sideBets.dynamicPayoutCap must be >= 1.");
+        require(sideBets.afbWhiffSelectionBias >= 0.0, "sideBets.afbWhiffSelectionBias must be >= 0.");
+        require(sideBets.roundOneWhiffSelectionBias >= 0.0, "sideBets.roundOneWhiffSelectionBias must be >= 0.");
+        require(sideBets.roundOneSlamSelectionBias >= 0.0, "sideBets.roundOneSlamSelectionBias must be >= 0.");
+        require(sideBets.winnerOneHpPayoutMultiplier >= 0.0, "sideBets.winnerOneHpPayoutMultiplier must be >= 0.");
+        require(
+                sideBets.dynamicPayoutTiers != null && !sideBets.dynamicPayoutTiers.isBlank(),
+                "sideBets.dynamicPayoutTiers is required.");
         require(
                 houseAbilities.naalu.actionCardPeekFavorCost >= 0,
                 "houseAbilities.naalu.actionCardPeekFavorCost must be >= 0.");
@@ -232,6 +239,11 @@ public class CombatContestSettings {
         private int maxBetsPerUser = 3;
         private int costPoints = 1;
         private int dynamicPayoutCap = 50;
+        private double afbWhiffSelectionBias = 2.0;
+        private double roundOneWhiffSelectionBias = 3.0;
+        private double roundOneSlamSelectionBias = 3.0;
+        private double winnerOneHpPayoutMultiplier = 0.75;
+        private String dynamicPayoutTiers = "0.20:4,0.10:5,0.05:8,0.025:12,0.01:20,0.005:30";
     }
 
     @Getter

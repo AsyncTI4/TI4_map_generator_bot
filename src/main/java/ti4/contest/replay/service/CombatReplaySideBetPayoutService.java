@@ -1,6 +1,7 @@
 package ti4.contest.replay.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -37,19 +38,6 @@ import ti4.service.combat.CombatUnitSelectionHelper;
 public class CombatReplaySideBetPayoutService {
 
     public static final String ODDS_V1 = "ODDS_V1";
-
-    // Economy tuning knobs. Raw combat odds stay separate; these values account for bettor/recommender selection bias.
-    private static final double AFB_WHIFF_SELECTION_BIAS = 2.0;
-    private static final double ROUND_ONE_WHIFF_SELECTION_BIAS = 3.0;
-    private static final double ROUND_ONE_SLAM_SELECTION_BIAS = 3.0;
-    private static final double WINNER_ONE_HP_PAYOUT_MULTIPLIER = 0.75;
-    private static final List<PayoutTier> DEFAULT_DYNAMIC_PAYOUT_TIERS = List.of(
-            new PayoutTier(0.20, 4),
-            new PayoutTier(0.10, 5),
-            new PayoutTier(0.05, 8),
-            new PayoutTier(0.025, 12),
-            new PayoutTier(0.01, 20),
-            new PayoutTier(0.005, 30));
 
     private final CombatContestSettings settings;
 
@@ -105,7 +93,7 @@ public class CombatReplaySideBetPayoutService {
 
     private int dynamicPayout(CombatSideBetType betType, double probability) {
         double adjustedProbability = Math.min(1.0, probability * selectionBiasMultiplier(betType));
-        for (PayoutTier tier : DEFAULT_DYNAMIC_PAYOUT_TIERS) {
+        for (PayoutTier tier : dynamicPayoutTiers()) {
             if (adjustedProbability >= tier.minimumProbability()) return Math.min(tier.payout(), maxDynamicPayout());
         }
         return maxDynamicPayout();
@@ -113,11 +101,25 @@ public class CombatReplaySideBetPayoutService {
 
     private double selectionBiasMultiplier(CombatSideBetType betType) {
         return switch (betType) {
-            case AFB_WHIFF -> AFB_WHIFF_SELECTION_BIAS;
-            case ROUND_ONE_WHIFF -> ROUND_ONE_WHIFF_SELECTION_BIAS;
-            case ROUND_ONE_SLAM -> ROUND_ONE_SLAM_SELECTION_BIAS;
+            case AFB_WHIFF -> settings.getSideBets().getAfbWhiffSelectionBias();
+            case ROUND_ONE_WHIFF -> settings.getSideBets().getRoundOneWhiffSelectionBias();
+            case ROUND_ONE_SLAM -> settings.getSideBets().getRoundOneSlamSelectionBias();
             default -> 1.0;
         };
+    }
+
+    private List<PayoutTier> dynamicPayoutTiers() {
+        List<PayoutTier> tiers = new ArrayList<>();
+        String configuredTiers = settings.getSideBets().getDynamicPayoutTiers();
+        for (String rawTier : configuredTiers.split(",")) {
+            String[] parts = rawTier.trim().split(":", 2);
+            if (parts.length != 2) {
+                throw new IllegalStateException("Invalid dynamic payout tier: " + rawTier);
+            }
+            tiers.add(new PayoutTier(Double.parseDouble(parts[0]), Integer.parseInt(parts[1])));
+        }
+        tiers.sort(Comparator.comparingDouble(PayoutTier::minimumProbability).reversed());
+        return tiers;
     }
 
     private int maxDynamicPayout() {
@@ -130,7 +132,8 @@ public class CombatReplaySideBetPayoutService {
         double x = Math.max(0.0, totalHp - 8.0) / 52.0;
         int profitPoints = (int) Math.round(3.0 + Math.pow(x, 1.35) * (64.0 + 8.0 * Math.sqrt(balance)));
         profitPoints = Math.max(3, profitPoints);
-        int tunedPayout = (int) Math.round(profitPoints * 2 * WINNER_ONE_HP_PAYOUT_MULTIPLIER);
+        int tunedPayout =
+                (int) Math.round(profitPoints * 2 * settings.getSideBets().getWinnerOneHpPayoutMultiplier());
         return Math.min(maxDynamicPayout(), Math.max(1, tunedPayout));
     }
 

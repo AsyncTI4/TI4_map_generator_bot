@@ -14,7 +14,7 @@ import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatReplayHouseAbilityUseRepository;
-import ti4.contest.replay.repository.CombatReplayHouseAbilityVoteRepository;
+import ti4.contest.replay.service.CombatReplayHouseAbilityVoteService;
 import ti4.contest.replay.service.CombatReplayHouseFavorService;
 import ti4.contest.replay.service.CombatReplayHouseService;
 import ti4.helpers.Units.UnitType;
@@ -27,8 +27,8 @@ class CombatReplayMentakAbilityServiceButtonTest {
             settings,
             mock(CombatCandidateRepository.class),
             mock(CombatReplayHouseAbilityUseRepository.class),
-            mock(CombatReplayHouseAbilityVoteRepository.class),
             houseFavorService,
+            mock(CombatReplayHouseAbilityVoteService.class),
             mock(CombatReplayHouseService.class));
 
     @Test

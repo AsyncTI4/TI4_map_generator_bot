@@ -25,7 +25,6 @@ import ti4.contest.replay.repository.CombatCandidateEventRepository;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
 import ti4.contest.replay.repository.CombatReplayHouseAbilityUseRepository;
-import ti4.contest.replay.repository.CombatReplayHouseAbilityVoteRepository;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
 import ti4.json.JsonMapperManager;
@@ -38,8 +37,6 @@ class CombatReplayNaaluAbilityServiceTest {
     private final CombatCandidateEventRepository eventRepository = mock(CombatCandidateEventRepository.class);
     private final CombatReplayHouseAbilityUseRepository abilityUseRepository =
             mock(CombatReplayHouseAbilityUseRepository.class);
-    private final CombatReplayHouseAbilityVoteRepository abilityVoteRepository =
-            mock(CombatReplayHouseAbilityVoteRepository.class);
     private final ReplayDispatchSerializer serializer = new ReplayDispatchSerializer();
     private final CombatReplayNaaluAbilityService service = new CombatReplayNaaluAbilityService(
             new CombatContestSettings(),
@@ -47,8 +44,8 @@ class CombatReplayNaaluAbilityServiceTest {
             candidateRepository,
             eventRepository,
             abilityUseRepository,
-            abilityVoteRepository,
             mock(CombatReplayHouseFavorService.class),
+            mock(CombatReplayHouseAbilityVoteService.class),
             mock(CombatReplayHouseService.class),
             serializer);
 
