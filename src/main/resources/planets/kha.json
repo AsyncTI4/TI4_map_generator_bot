@@ -11,7 +11,7 @@
         "y": 128.0
     },
     "resources": 3,
-    "influence": 2,
+    "influence": 4,
     "factionHomeworld": "netrunners",
     "planetType": "FACTION",
     "cardImagePath": null,

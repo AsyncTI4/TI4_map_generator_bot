@@ -106,7 +106,7 @@ public class ListTechService {
             List<TechnologyType> techTypes,
             boolean first) {
         game.setComponentAction(!sc);
-        String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
+        String finsFactionCheckerPrefix = player.factionButtonChecker();
         game.setComponentAction(!sc);
         String techPrefix = finsFactionCheckerPrefix + "getAllTechOfType_";
         String techSuffix = dwsBt ? "_dwsbt" : "";
@@ -116,7 +116,6 @@ public class ListTechService {
             StrategyCardModel scModel =
                     game.getStrategyCardModelByName("technology").orElse(null);
             if (!used
-                    && !dwsBt
                     && scModel != null
                     && scModel.usesAutomationForSCID("pok7technology")
                     && !player.getFollowedSCs().contains(scModel.getInitiative())) {
@@ -234,7 +233,7 @@ public class ListTechService {
             for (UnitKey uk :
                     player.getNomboxTile().getSpaceUnitHolder().getUnits().keySet()) {
                 if (player.getNomboxTile().getSpaceUnitHolder().getUnitCount(uk) <= 0) continue;
-                if (unit.startsWith(uk.getUnitType().getValue())) return true;
+                if (unit.startsWith(uk.unitType().getValue())) return true;
             }
         }
         Set<TechnologyType> synergies = player.getSynergies();
@@ -371,7 +370,7 @@ public class ListTechService {
 
         techs.sort(TechnologyModel.sortByTechRequirements);
 
-        String idPrefix = player.finChecker()
+        String idPrefix = player.factionButtonChecker()
                 + switch (buttonPrefixType.toLowerCase()) {
                     case "normal", "res", "nekro", "nopay", "free", "inf", "shareknowledge", "dwsbt" -> "getTech_";
                     default -> "swapTechs__" + buttonPrefixType + "__";

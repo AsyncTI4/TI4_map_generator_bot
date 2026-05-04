@@ -10,10 +10,10 @@ import ti4.game.Player;
 @Data
 public class WebExpeditions {
 
-    @Data
-    public static class ExpeditionInfo {
-        private final String completedBy; // Player color (null if incomplete)
-    }
+    /**
+     * @param completedBy Player color (null if incomplete)
+     */
+    public record ExpeditionInfo(String completedBy) {}
 
     private Map<String, ExpeditionInfo> expeditions;
 

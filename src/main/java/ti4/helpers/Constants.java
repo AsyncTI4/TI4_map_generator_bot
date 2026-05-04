@@ -18,6 +18,7 @@ public final class Constants {
     public static final List<String> honoraryJazz = List.of("1153503280706625606", tspId);
     public static final String jabberwockyId = "455013002953883651";
     public static final String solaxId = "380689512621277185";
+    public static final String andcatId = "238933125072158720";
 
     // Server IDs
     public static final String ASYNCTI4_HUB_SERVER_ID = "943410040369479690";
@@ -338,6 +339,8 @@ public final class Constants {
     public static final String REMOVE_CUSTOM_ADJACENT_TILES = "remove_custom_adjacent_tiles";
     public static final String REMOVE_ALL_CUSTOM_ADJACENT_TILES = "remove_all_custom_adjacent_tiles";
     public static final String ADD_TILE = "add_tile";
+    public static final String ROTATE_HYPERLANE = "rotate_hyperlane";
+    public static final String ROTATION = "rotation";
     public static final String ADD_TILE_RANDOM = "add_tile_random";
     public static final String RANDOM_TYPE = "random_type";
     public static final String INCLUDE_ERONOUS_TILES = "eronous_tiles";
@@ -365,6 +368,7 @@ public final class Constants {
     public static final String ADD_TILE_LIST = "add_tile_list";
     public static final String ADD_FRONTIER_TOKENS = "add_frontier_tokens";
     public static final String ADD_UNITS = "add_units";
+    public static final String LAND_UNITS = "land_units";
     public static final String ADD_UNIT_DAMAGE = "add_sustain_damage";
     public static final String MOVE_UNITS = "move_units";
     public static final String NO_MAPGEN = "no_mapgen";
@@ -866,7 +870,7 @@ public final class Constants {
     public static final String SO_LIST_SCORED = "list_scored";
 
     public static final String TURN_ORDER = "turn_order";
-    public static final String TURN_STATS = "turn_stats";
+    public static final String AVERAGE_TURN_STATS = "average_turn_stats";
     public static final String VOTE_COUNT = "vote_count";
     public static final String SC_TRADE_GOODS = "sc_trade_goods";
     public static final String SC_COUNT = "sc_count";
@@ -1337,7 +1341,7 @@ public final class Constants {
     public static final String RUN_DATA_MIGRATIONS = "run_data_migrations";
     public static final String ENDED_DATE = "ended_date";
     public static final String REPLACEMENT_MADE = "replacement_made";
-    public static final String AVERAGE_TURN_TIME = "average_turn_time";
+    public static final String GLOBAL_AVERAGE_TURN_TIME = "global_average_turn_time";
     public static final String DICE_LUCK = "dice_luck";
     public static final String HITS_PER_TURN = "hits_per_turn";
     public static final String LIFETIME_RECORD = "lifetime_record";
@@ -1537,6 +1541,10 @@ public final class Constants {
     public static final String TIGL_CHANGE_NICKNAME = "change_nickname";
     public static final String TIGL_NICKNAME = "nickname";
     public static final String TIGL_FRACTURED_TAG = "TIGL Fractured";
+    public static final String LAZAX = "lazax";
+    public static final String LAZAX_MY_POINTS = "my_points";
+    public static final String LAZAX_TOP_100 = "top_100";
+    public static final String PUBLIC = "public";
     public static final String IS_FRACTURED = "is_fractured";
     public static final String SHOW_GAME_IDS = "show_game_ids";
     public static final String SEARCH_NAMES = "search_names";
@@ -1556,4 +1564,10 @@ public final class Constants {
     public static final String TRANSACTION_START = "transaction_start";
     public static final String ALL = "ALL";
     public static final String COEXIST = "coexist";
+
+    public static final String TWILIGHT_KART = "twilight_kart";
+    public static final String ABILITY_DECK_ID = "ability_deck_id";
+    public static final String GENOME_DECK_ID = "genome_deck_id";
+    public static final String PARADIGM_DECK_ID = "paradigm_deck_id";
+    public static final String UNITUPGRADE_DECK_ID = "unitupgrade_deck_id";
 }

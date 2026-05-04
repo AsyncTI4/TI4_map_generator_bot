@@ -85,9 +85,13 @@ public final class ButtonHelperTacticalAction {
                                 + " agent to place 1 space dock for 2 trade goods or 2 commodities",
                         buttons);
             }
-            if (player.hasAbility("miniaturization")) {
+            if (player.hasAbility("miniaturization") || player.hasUnit("tk-keshnu")) {
                 String msg = player.getRepresentation()
-                        + ", you may use **Miniaturization** to land any of your structures in the space area onto planets you control in this system.";
+                        + ", you may use _Miniaturization_ to land any of your structures in the space area onto planets you control in this system.";
+                if (player.hasUnit("tk-keshnu")) {
+                    msg = player.getRepresentation() + ", you may land any of your " + UnitEmojis.pds + " "
+                            + FactionEmojis.Ralnel + " _Kesh Nu_ units onto planets you control in this system.";
+                }
                 List<Button> buttons = TeHelperAbilities.miniLandingButtons(game, player);
                 if (!buttons.isEmpty()) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
@@ -116,7 +120,8 @@ public final class ButtonHelperTacticalAction {
             }
             if (game.isWarfareAction()) {
                 Button redistro = Buttons.blue(
-                        player.finChecker() + "redistributeCCButtons_deleteThisButton", "Redistribute Command Tokens");
+                        player.factionButtonChecker() + "redistributeCCButtons_deleteThisButton",
+                        "Redistribute Command Tokens");
                 String warfareDone = player.getRepresentationUnfogged()
                         + ", your **Warfare** action is finished, you may redistribute your command tokens again.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), warfareDone, redistro);
@@ -223,7 +228,7 @@ public final class ButtonHelperTacticalAction {
                 if (FoWHelper.playerHasUnitsInSystem(p2, tile)) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green(
-                            player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(),
+                            player.factionButtonChecker() + "getACFrom_" + p2.getFaction(),
                             "Take AC from " + p2.getColor()));
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
@@ -267,7 +272,17 @@ public final class ButtonHelperTacticalAction {
         }
         EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
         if (unitsWereMoved) {
-            CommanderUnlockCheckService.checkPlayer(player, "nivyn", "ghoti", "zelian", "gledge", "mortheus");
+            CommanderUnlockCheckService.checkPlayer(
+                    player,
+                    "nivyn",
+                    "ghoti",
+                    "zelian",
+                    "gledge",
+                    "mortheus",
+                    "tyris",
+                    "lunarium",
+                    "zephyrion",
+                    "vyserix");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "cabal");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "naalu");
@@ -649,11 +664,74 @@ public final class ButtonHelperTacticalAction {
                 }
                 if (!has || !magenPlayer.hasTech("md")) continue;
 
-                String id = magenPlayer.finChecker() + "useMagenDefense_" + activeSystem.getPosition();
+                String id = magenPlayer.factionButtonChecker() + "useMagenDefense_" + activeSystem.getPosition();
                 Button useMagen = Buttons.red(id, "Use Magen Defense Grid", TechEmojis.WarfareTech);
                 String magenMsg = magenPlayer.getRepresentation()
                         + " you can, and must, use _Magen Defense Grid_ to place an infantry with each of your structures in the active system.";
                 MessageHelper.sendMessageToChannelWithButton(magenPlayer.getCorrectChannel(), magenMsg, useMagen);
+            }
+
+            for (Player btb : game.getRealPlayers()) {
+                if (!btb.ownsUnit("tk-blacktrenchbulwark")) continue;
+                if (!activeSystem.containsPlayersUnitsWithModelCondition(btb, UnitModel::getIsStructure)) continue;
+
+                String id = btb.factionButtonChecker() + "useMagenDefense_" + activeSystem.getPosition();
+                Button use = Buttons.red(id, "Use Black Trench Bulwark", UnitEmojis.pds);
+                String msg = btb.getRepresentation()
+                        + " you can, and must, use _Black Trench Bulwark_ to place an infantry with each of your pds in the active system.";
+                MessageHelper.sendMessageToChannelWithButton(btb.getCorrectChannel(), msg, use);
+            }
+
+            for (Player archive : game.getRealPlayers()) {
+                if (!archive.ownsUnit("tk-visionariaarchive")) continue;
+                if (activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Spacedock, archive) == 0) continue;
+
+                String id = player.factionButtonChecker() + "useVisionariaArchive_" + archive.getColor();
+                Button use = Buttons.red(id, "Use Visionaria Archive", MiscEmojis.tf_ability);
+                String msg = player.getRepresentation()
+                        + " you can use _Visionaria Archive_ and spend 3 trade goods to draw 1 ability.";
+                if (player != archive) {
+                    msg += " If you do, " + archive.getRepresentationNoPing() + " will also draw 1 ability.";
+                }
+                msg += "-# You currently have " + player.getTg() + " trade goods.";
+
+                List<Button> buttons = List.of(use, Buttons.DONE_DELETE_BUTTONS.withLabel("Decline"));
+                MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(archive.getCorrectChannel(), msg, buttons);
+            }
+
+            for (Player remnant : game.getRealPlayers()) {
+                if (!remnant.ownsUnit("tk-saturnremnant")) continue;
+                if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, remnant, UnitType.Pds)
+                                .contains(activeSystem)
+                        || FoWHelper.otherPlayersHaveShipsInSystem(remnant, activeSystem, game)) {
+                    continue;
+                }
+                UnitKey key = Units.getUnitKey(UnitType.Cruiser, remnant.getColor());
+                if (ButtonHelperFactionSpecific.vortexButtonAvailable(game, key)) {
+                    String id = remnant.factionButtonChecker() + "placeOneNDone_skipbuild_cruiser_"
+                            + activeSystem.getPosition();
+                    String label = "Deploy Saturn Remnant";
+                    Button deploy = Buttons.green(id, label, FactionEmojis.Titans);
+                    String msg = remnant.getRepresentationUnfogged()
+                            + ", you can deploy a Saturn Remnant in the active system:";
+                    List<Button> buttons = List.of(deploy, Buttons.DONE_DELETE_BUTTONS.withLabel("Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(remnant.getCorrectChannel(), msg, buttons);
+                }
+            }
+
+            for (Player flaah : game.getRealPlayers()) {
+                if (ButtonHelper.doesPlayerHaveUnitHere("tk-flaahhyphae", flaah, activeSystem)) {
+                    List<Button> buttons = new ArrayList<>();
+                    String buildID = flaah.factionButtonChecker() + "umbatTile_" + activeSystem.getPosition();
+                    int amt = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Carrier, flaah) * 2;
+                    buttons.add(
+                            Buttons.green(buildID, "Build " + amt + " units with Flaah Hyphae", FactionEmojis.Arborec));
+                    buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            flaah.getCorrectChannel(),
+                            flaah.getRepresentation() + " use buttons to resolve a build for Flaah Hyphae.",
+                            buttons);
+                }
             }
 
             Set<String> tokens = activeSystem.getSpaceUnitHolder().getTokenList();
@@ -662,8 +740,8 @@ public final class ButtonHelperTacticalAction {
                             || tokens.contains(Constants.TOKEN_BREACH_INACTIVE))) {
                 String label = tokens.contains(Constants.TOKEN_BREACH_ACTIVE) ? "inactive" : "active";
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "flipBreach_" + pos, "Flip breach to " + label));
+                buttons.add(
+                        Buttons.green(player.factionButtonChecker() + "flipBreach_" + pos, "Flip breach to " + label));
                 buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No Thanks"));
                 String msg = player.getRepresentation()
                         + ", you may use the buttons to flip the Breach in the active system.";
@@ -773,10 +851,10 @@ public final class ButtonHelperTacticalAction {
     }
 
     public static List<Button> getButtonsForAllUnitsInSystem(Player player, Game game, Tile tile, String moveOrRemove) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         List<UnitType> movableFromPlanets = new ArrayList<>(List.of(UnitType.Infantry, UnitType.Mech));
-        if (player.hasTech("ffac2") || player.hasUnit("tf-floatingfactory")) {
+        if (player.hasTech("ffac2") || player.hasUnit("tf-floatingfactory") || player.hasUnit("saar_spacedock")) {
             movableFromPlanets.add(UnitType.Spacedock);
         }
         if (player.hasAbility("miniaturization")) {
@@ -796,7 +874,7 @@ public final class ButtonHelperTacticalAction {
             for (UnitKey unitKey : unitHolder.getUnitKeys()) {
                 if (!player.unitBelongsToPlayer(unitKey)) {
                     boolean belongsToUnlockedAlly = false;
-                    UnitType uT = unitKey.getUnitType();
+                    UnitType uT = unitKey.unitType();
                     if (uT == UnitType.Infantry || uT == UnitType.Fighter || uT == UnitType.Mech) {
                         for (Player p2 : game.getRealPlayers()) {
                             if (p2.unitBelongsToPlayer(unitKey)
@@ -810,7 +888,7 @@ public final class ButtonHelperTacticalAction {
                         continue;
                     }
                 }
-                if (unitHolder instanceof Planet && !(movableFromPlanets.contains(unitKey.getUnitType()))) continue;
+                if (unitHolder instanceof Planet && !(movableFromPlanets.contains(unitKey.unitType()))) continue;
 
                 List<Integer> states = unitHolder.getUnitsByState().get(unitKey);
                 for (UnitState state : UnitState.values()) {
@@ -826,10 +904,11 @@ public final class ButtonHelperTacticalAction {
 
         if ("Remove".equalsIgnoreCase(moveOrRemove)) {
             buttons.add(Buttons.gray(
-                    finChecker + "unitTacticalRemove_" + tile.getPosition() + "_removeAllShips", "Remove All Ships"));
+                    factionChecker + "unitTacticalRemove_" + tile.getPosition() + "_removeAllShips",
+                    "Remove All Ships"));
             buttons.add(Buttons.gray(
-                    finChecker + "unitTacticalRemove_" + tile.getPosition() + "_removeAll", "Remove All Units"));
-            buttons.add(Buttons.blue(finChecker + "doneRemoving", "Done removing units"));
+                    factionChecker + "unitTacticalRemove_" + tile.getPosition() + "_removeAll", "Remove All Units"));
+            buttons.add(Buttons.blue(factionChecker + "doneRemoving", "Done removing units"));
             return buttons;
         } else {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "tneliscommander")
@@ -839,10 +918,10 @@ public final class ButtonHelperTacticalAction {
                         "Use Tnelis Commander",
                         FactionEmojis.tnelis));
 
-            buttons.add(
-                    Buttons.gray(finChecker + "unitTacticalMove_" + tile.getPosition() + "_moveAll", "Move All Units"));
+            buttons.add(Buttons.gray(
+                    factionChecker + "unitTacticalMove_" + tile.getPosition() + "_moveAll", "Move All Units"));
             buttons.add(Buttons.blue(
-                    finChecker + "doneWithOneSystem_" + tile.getPosition(), "Done Moving Units From This System"));
+                    factionChecker + "doneWithOneSystem_" + tile.getPosition(), "Done Moving Units From This System"));
         }
 
         Map<String, Map<UnitKey, List<Integer>>> displacedUnits = game.getTacticalActionDisplacement();
@@ -864,8 +943,8 @@ public final class ButtonHelperTacticalAction {
             }
         }
         if (!displacedUnits.isEmpty()) {
-            Button validTile2 =
-                    Buttons.green(finChecker + "unitTacticalMove_" + tile.getPosition() + "_reverseAll", "Undo All");
+            Button validTile2 = Buttons.green(
+                    factionChecker + "unitTacticalMove_" + tile.getPosition() + "_reverseAll", "Undo All");
             buttons.add(validTile2);
         }
         return buttons;

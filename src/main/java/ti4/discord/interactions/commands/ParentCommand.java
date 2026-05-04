@@ -43,7 +43,7 @@ public interface ParentCommand extends Command<SlashCommandInteractionEvent> {
         if (subcommand != null) subcommand.onException(event, throwable);
     }
 
-    private Command<SlashCommandInteractionEvent> getSubcommand(SlashCommandInteractionEvent event) {
+    default Command<SlashCommandInteractionEvent> getSubcommand(SlashCommandInteractionEvent event) {
         String subcommandGroupName = event.getInteraction().getSubcommandGroup();
         if (subcommandGroupName != null) {
             return getSubcommandGroups().get(subcommandGroupName);
@@ -56,6 +56,12 @@ public interface ParentCommand extends Command<SlashCommandInteractionEvent> {
     default boolean isSuspicious(SlashCommandInteractionEvent event) {
         Command<SlashCommandInteractionEvent> subcommand = getSubcommand(event);
         return subcommand != null && subcommand.isSuspicious(event);
+    }
+
+    @Override
+    default boolean isEphemeral(SlashCommandInteractionEvent event) {
+        Command<SlashCommandInteractionEvent> subcommand = getSubcommand(event);
+        return subcommand != null && subcommand.isEphemeral(event);
     }
 
     default void register(CommandListUpdateAction commands) {

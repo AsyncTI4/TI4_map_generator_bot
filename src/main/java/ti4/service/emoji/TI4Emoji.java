@@ -15,6 +15,7 @@ import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
 import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
 
+@FunctionalInterface
 public interface TI4Emoji {
 
     default Emoji asEmoji() {

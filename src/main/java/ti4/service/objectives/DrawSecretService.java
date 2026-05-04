@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.lunarium.LunariumAbilityButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.SecretObjectiveHelper;
@@ -43,6 +44,9 @@ public class DrawSecretService {
             MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + output);
         }
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
+        if (player.hasAbility("multitasking")) {
+            LunariumAbilityButtonHandler.offerFactionSheetCCButtons(game, player);
+        }
         if (useTnelis && player.hasAbility("plausible_deniability")) {
             SecretObjectiveHelper.sendSODiscardButtons(player);
         }

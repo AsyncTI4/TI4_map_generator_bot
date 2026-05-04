@@ -55,9 +55,8 @@ public class MantisBuildImageGeneratorService {
         if (mapImage == null) {
             return null;
         }
-        FileUpload fileUpload = FileUploadService.createFileUpload(mapImage, uniqueKey);
 
-        return fileUpload;
+        return FileUploadService.createFileUpload(mapImage, uniqueKey);
     }
 
     private BufferedImage generateImage(
@@ -216,7 +215,6 @@ public class MantisBuildImageGeneratorService {
     private int getMapWidth(Game game) {
         float ringCount = getRingCount(game);
         ringCount += ringCount == RING_MIN_COUNT ? 1.5f : 1;
-        int mapWidth = (int) (ringCount * 520 + EXTRA_X * 2);
-        return mapWidth;
+        return (int) (ringCount * 520 + EXTRA_X * 2);
     }
 }

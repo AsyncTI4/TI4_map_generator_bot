@@ -188,7 +188,7 @@ public class AndcatReferenceCardsMessageHelper {
             }
 
             ReferenceCardPackage refPackage =
-                    draftable.getPackageByChoiceKey(playerPicks.getFirst().getChoiceKey());
+                    draftable.getPackageByChoiceKey(playerPicks.getFirst().choiceKey());
             if (refPackage == null) {
                 messageBuilder.append(playerRepresentation).append(" has an invalid package pick.");
                 continue;
@@ -387,7 +387,7 @@ public class AndcatReferenceCardsMessageHelper {
                     continue;
                 }
                 ReferenceCardPackage otherRefPackage = draftable.getPackageByChoiceKey(
-                        otherPlayerPicks.getFirst().getChoiceKey());
+                        otherPlayerPicks.getFirst().choiceKey());
                 if (otherRefPackage == null) {
                     continue;
                 }
@@ -400,7 +400,7 @@ public class AndcatReferenceCardsMessageHelper {
         }
 
         String playerChoiceKey = draftManager.getPlayerPicks(playerUserId, draftable.getType()).stream()
-                .map(DraftChoice::getChoiceKey)
+                .map(DraftChoice::choiceKey)
                 .findFirst()
                 .orElse(null);
         if (playerChoiceKey == null) {
@@ -578,7 +578,7 @@ public class AndcatReferenceCardsMessageHelper {
             StringBuilder pickSummary = new StringBuilder(
                     playerName + "'s reference card picks: " + System.lineSeparator() + System.lineSeparator());
             ReferenceCardPackage refPackage =
-                    draftable.getPackageByChoiceKey(picks.getFirst().getChoiceKey());
+                    draftable.getPackageByChoiceKey(picks.getFirst().choiceKey());
             if (refPackage.homeSystemFaction() != null) {
                 FactionModel homeSystemFaction = Mapper.getFaction(refPackage.homeSystemFaction());
                 pickSummary.append(TwilightsFallInfoHelper.getFactionSetupInfo(homeSystemFaction, false, true, false));
@@ -617,7 +617,7 @@ public class AndcatReferenceCardsMessageHelper {
             }
 
             ReferenceCardPackage refPackage =
-                    draftable.getPackageByChoiceKey(picks.getFirst().getChoiceKey());
+                    draftable.getPackageByChoiceKey(picks.getFirst().choiceKey());
 
             if (refPackage.speakerOrderFaction() == null) {
                 unorderedPlayers.add(playerUserId);

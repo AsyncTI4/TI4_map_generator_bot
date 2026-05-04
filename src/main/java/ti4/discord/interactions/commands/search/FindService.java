@@ -43,7 +43,7 @@ public class FindService {
                 ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
 
         List<FindItem> items = filteredItems(typeKey, query, source);
-        if (!allQuery) {
+        if (!allQuery && !allTypes) {
             FindItem exactMatch = findExactMatch(items, query);
             if (exactMatch == null) {
                 exactMatch = findExactMatch(getItems(typeKey, source), query);
@@ -172,11 +172,31 @@ public class FindService {
         if (normalizedText.equals(query)) return exactScore;
         if (normalizedText.startsWith(query)) return containsScore + 50 - normalizedText.length();
         if (normalizedText.contains(query)) return containsScore - normalizedText.indexOf(query);
-        return 0;
+        return scoreWords(query, text, containsScore - 100);
+    }
+
+    private static int scoreWords(String query, String text, int allWordsScore) {
+        List<String> queryWords = words(query);
+        List<String> textWords = words(text);
+        if (queryWords.isEmpty() || textWords.isEmpty()) return 0;
+
+        long matchedWords = queryWords.stream()
+                .filter(queryWord -> textWords.stream().anyMatch(textWord -> textWord.contains(queryWord)))
+                .count();
+        if (matchedWords != queryWords.size()) return 0;
+
+        return allWordsScore - textWords.size();
     }
 
     private static boolean contains(String value, String search) {
         return normalize(value).contains(search);
+    }
+
+    private static List<String> words(String value) {
+        if (value == null) return List.of();
+        return Stream.of(value.toLowerCase().split("[^a-z0-9]+"))
+                .filter(StringUtils::isNotBlank)
+                .toList();
     }
 
     private static String normalize(String value) {

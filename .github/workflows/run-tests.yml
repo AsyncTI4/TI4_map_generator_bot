@@ -3,62 +3,296 @@ on:
   pull_request:
     branches: ["master"]
 jobs:
-  changes:
-    name: Detect changed files
-    runs-on: ubuntu-latest
-    outputs:
-      json: ${{ steps.filter.outputs.json }}
-      java: ${{ steps.filter.outputs.java }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Detect changed file types
-        id: filter
-        run: |
-          BASE=${{ github.event.pull_request.base.sha }}
-          HEAD=${{ github.event.pull_request.head.sha }}
-          CHANGED_FILES="$(git diff --name-only "$BASE" "$HEAD")"
-          if printf '%s\n' "$CHANGED_FILES" | grep -qE '\.json$'; then
-            echo "json=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "json=false" >> "$GITHUB_OUTPUT"
-          fi
-          if printf '%s\n' "$CHANGED_FILES" | grep -qE '^(src/|pom\.xml$)'; then
-            echo "java=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "java=false" >> "$GITHUB_OUTPUT"
-          fi
-
-  validate-json:
-    name: check for invalid json files
-    runs-on: ubuntu-latest
-    needs: changes
-    if: needs.changes.outputs.json == 'true'
-    steps:
-      - uses: actions/checkout@v4
-      - name: check for invalid json files
-        run: |
-          find . -name "*.json" -print0 | while IFS= read -r -d $'\0' file; do
-            if ! python -mjson.tool "$file" > /dev/null; then
-              echo "INVALID $file" >&2
-              exit 1
-            fi
-          done
-
   ci:
     name: Run Tests On Pull Request
     runs-on: ubuntu-latest
-    needs: [changes, validate-json]
-    if: always() && needs.changes.outputs.java == 'true' && (needs.validate-json.result == 'success' || needs.validate-json.result == 'skipped')
+    permissions:
+      checks: write
+      pull-requests: write
+      security-events: write
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 21 for x64
+        with:
+          fetch-depth: 1
+      - name: Detect changed files
+        id: diff
+        run: |
+          git fetch --depth=1 origin ${{ github.event.pull_request.base.sha }}
+          BASE=${{ github.event.pull_request.base.sha }}
+          HEAD=${{ github.sha }}
+          CHANGED_JSON=$(git diff --name-only "$BASE" "$HEAD" | grep -E '\.json$' || true)
+          if [ -n "$CHANGED_JSON" ]; then
+            echo "has_json=true" >> "$GITHUB_OUTPUT"
+            printf '%s\n' "$CHANGED_JSON" > /tmp/changed_json_files.txt
+          else
+            echo "has_json=false" >> "$GITHUB_OUTPUT"
+          fi
+          if git diff --name-only "$BASE" "$HEAD" | grep -qE '^(src/|pom\.xml$|.*\.json$|\.github/workflows/run-tests\.yml$)'; then
+            echo "has_java=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_java=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Validate changed JSON files
+        if: steps.diff.outputs.has_json == 'true'
+        id: validate-json
+        run: |
+          python3 - << 'PYEOF'
+          import sys, json, os
+
+          with open('/tmp/changed_json_files.txt') as f:
+              files = [line.strip() for line in f if line.strip()]
+
+          errors = []
+          for filepath in files:
+              if not os.path.isfile(filepath):
+                  continue
+              try:
+                  with open(filepath, encoding='utf-8') as fh:
+                      json.load(fh)
+              except json.JSONDecodeError as e:
+                  errors.append({'file': filepath, 'line': e.lineno, 'col': e.colno, 'msg': e.msg})
+                  print(f"::error file={filepath},line={e.lineno},col={e.colno}::{e.msg}", flush=True)
+
+          if errors:
+              summary_path = os.environ['GITHUB_STEP_SUMMARY']
+              with open(summary_path, 'a') as fh:
+                  fh.write('## ❌ Invalid JSON Files\n\n')
+                  fh.write('| File | Line | Column | Error |\n')
+                  fh.write('|------|------|--------|-------|\n')
+                  for e in errors:
+                      fh.write(f"| `{e['file']}` | {e['line']} | {e['col']} | {e['msg']} |\n")
+              import json as _json
+              with open('/tmp/json_errors.json', 'w') as fh:
+                  _json.dump(errors, fh)
+              sys.exit(1)
+          PYEOF
+      - name: Fetch master branch for spotless
+        if: steps.diff.outputs.has_java == 'true' && (steps.validate-json.outcome == 'success' || steps.validate-json.outcome == 'skipped')
+        run: git fetch --no-tags --depth=1 origin master
+      - name: Set up JDK 26 for x64
+        if: steps.diff.outputs.has_java == 'true' && (steps.validate-json.outcome == 'success' || steps.validate-json.outcome == 'skipped')
         uses: actions/setup-java@v5
         with:
-          java-version: "21"
+          java-version: "26"
           distribution: "corretto"
           architecture: x64
-          cache: maven
+      - name: Cache Maven local repository
+        if: steps.diff.outputs.has_java == 'true' && (steps.validate-json.outcome == 'success' || steps.validate-json.outcome == 'skipped')
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
       - name: Run the Maven verify phase
-        run: mvn --batch-mode --no-transfer-progress verify
+        if: steps.diff.outputs.has_java == 'true' && (steps.validate-json.outcome == 'success' || steps.validate-json.outcome == 'skipped')
+        id: maven
+        shell: bash
+        run: |
+          set -o pipefail
+          mvn --batch-mode \
+            --no-transfer-progress \
+            --fail-at-end \
+            -P ci-spotless \
+            -Dorg.slf4j.simpleLogger.showDateTime=true \
+            -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss.SSS \
+            verify \
+            2>&1 | tee /tmp/maven.log
+      - name: Parse Spotless violations
+        if: always() && steps.maven.outcome == 'failure'
+        run: |
+          python3 << 'PYEOF'
+          import json, re
+          violations = []
+          try:
+              with open('/tmp/maven.log') as f:
+                  in_section = False
+                  for line in f:
+                      line = line.rstrip()
+                      if 'had format violations' in line:
+                          in_section = True
+                          continue
+                      if in_section:
+                          # Maven+SLF4J lines are: "HH:MM:SS.SSS [ERROR]     path/to/File.java"
+                          # File names have 5 spaces after "[ERROR]"; diff lines have 9+ spaces.
+                          m = re.search(r'\[ERROR\]     ([^ ].*)', line)
+                          if m:
+                              candidate = m.group(1).strip()
+                              # skip diff markers and the "Run mvn spotless:apply" line
+                              if candidate and not candidate.startswith(('@', '+', '-', ' ', 'R')):
+                                  violations.append(candidate)
+                          elif re.search(r'spotless:apply|-> \[Help', line):
+                              break
+          except FileNotFoundError:
+              pass
+          with open('/tmp/spotless_violations.json', 'w') as f:
+              json.dump(violations, f)
+          PYEOF
+      - name: Publish JUnit Report
+        if: always() && steps.diff.outputs.has_java == 'true' && github.event.pull_request.head.repo.full_name == github.repository
+        uses: mikepenz/action-junit-report@v6
+        with:
+          report_paths: "**/target/surefire-reports/TEST-*.xml"
+          fail_on_failure: true
+      - name: Add JUnit Annotations (forked repos)
+        if: failure() && steps.diff.outputs.has_java == 'true' && github.event.pull_request.head.repo.full_name != github.repository
+        uses: mikepenz/action-junit-report@v6
+        with:
+          report_paths: "**/target/surefire-reports/TEST-*.xml"
+          annotate_only: true
+      - name: Post Combined Test Results Comment
+        if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { execSync } = require('child_process');
+            const fs = require('fs');
+            const MARKER = '<!-- ci-report -->';
+
+            // ── JSON Validation section ──────────────────────────────────────
+            const jsonOutcome = '${{ steps.validate-json.outcome }}';
+            let jsonSection;
+            if (jsonOutcome === 'failure') {
+              let errors = [];
+              try {
+                errors = JSON.parse(fs.readFileSync('/tmp/json_errors.json', 'utf8'));
+              } catch (e) {
+                core.warning('Could not read JSON errors file: ' + e.message);
+              }
+              const bullets = errors.map(e => `- \`${e.file}\` (line ${e.line}, col ${e.col}): ${e.msg}`).join('\n');
+              jsonSection = `### ❌ JSON Validation Failed\n\n${bullets}\n\n`
+                + `> **Tip:** Open the file in a text editor that highlights JSON errors (e.g. VS Code) `
+                + `or paste the contents into [jsonlint.com](https://jsonlint.com) to find and fix the problem.`;
+            } else if (jsonOutcome === 'success') {
+              jsonSection = '### ✅ JSON Validation Passed\n\nAll changed JSON files are valid.';
+            } else {
+              jsonSection = '### ✅ JSON Validation\n\nNo JSON files changed.';
+            }
+
+            // ── Formatting Checks section ────────────────────────────────────
+            const mavenOutcome = '${{ steps.maven.outcome }}';
+            let formatSection;
+            if (mavenOutcome === 'failure') {
+              let violations = [];
+              try {
+                violations = JSON.parse(fs.readFileSync('/tmp/spotless_violations.json', 'utf8'));
+              } catch (e) { /* file absent = no violations detected */ }
+              if (violations.length > 0) {
+                const bullets = violations.map(f => `- \`${f}\``).join('\n');
+                formatSection = `### ❌ Formatting Checks Failed\n\n`
+                  + `The following files have Spotless formatting violations:\n\n${bullets}\n\n`
+                  + `> **Fix:** run \`mvn spotless:apply\` locally and commit the result.`;
+              } else {
+                formatSection = null; // maven failed for another reason — handled in JUnit section
+              }
+            } else if (mavenOutcome === 'success') {
+              formatSection = '### ✅ Formatting Checks Passed\n\nAll files pass Spotless formatting.';
+            } else {
+              formatSection = null; // maven skipped — omit section entirely
+            }
+
+            // ── JUnit Test Results section ───────────────────────────────────
+            let junitSection;
+            if (mavenOutcome === 'success' || mavenOutcome === 'failure') {
+              // If the build failed because of Spotless, tests never ran — say so instead of "Build Failed"
+              if (mavenOutcome === 'failure' && formatSection !== null) {
+                junitSection = '### ⏭️ JUnit Tests\n\nSkipped — build failed at formatting checks (see above).';
+              } else {
+                const pythonLines = [
+                  'import glob, xml.etree.ElementTree as ET, json',
+                  'failures = []',
+                  'for f in glob.glob("**/target/surefire-reports/TEST-*.xml", recursive=True):',
+                  '    try:',
+                  '        root = ET.parse(f).getroot()',
+                  '        for tc in root.findall("testcase"):',
+                  '            for e in list(tc.findall("failure")) + list(tc.findall("error")):',
+                  '                cls = tc.get("classname", "").split(".")[-1]',
+                  '                name = tc.get("name", "")',
+                  '                msg = (e.get("message") or e.text or "").split("\\n")[0][:100]',
+                  '                entry = cls + "#" + name + (": " + msg if msg else "")',
+                  '                failures.append(entry)',
+                  '    except Exception:',
+                  '        pass',
+                  'print(json.dumps(failures))',
+                ];
+                fs.writeFileSync('/tmp/parse_surefire.py', pythonLines.join('\n'));
+                let failures = [];
+                try {
+                  const output = execSync('python3 /tmp/parse_surefire.py', { encoding: 'utf8' });
+                  failures = JSON.parse(output.trim());
+                } catch (e) {
+                  core.warning('Could not parse surefire reports: ' + e.message);
+                }
+                if (failures.length === 0) {
+                  if (mavenOutcome === 'failure') {
+                    const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+                    junitSection = `### ❌ Build Failed\n\nMaven build failed with no test-failure details captured — see the [Actions run](${runUrl}) for the full log.`;
+                  } else {
+                    junitSection = '### ✅ JUnit Tests Passed\n\nAll tests passed successfully.';
+                  }
+                } else {
+                  const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+                  if (failures.length > 5) {
+                    junitSection = `### ❌ JUnit Test Failures (${failures.length})\n\nToo many failures to list — see the [Actions run](${runUrl}) for details.`;
+                  } else {
+                    const bullets = failures.map(f => `- \`${f}\``).join('\n');
+                    junitSection = `### ❌ JUnit Test Failures\n\n${bullets}\n\nSee the [Actions run](${runUrl}) for more details.`;
+                  }
+                }
+              }
+            } else if (jsonOutcome === 'failure') {
+              junitSection = '### ⏭️ JUnit Tests\n\nSkipped — tests did not run because JSON validation failed (see above).';
+            } else {
+              junitSection = '### ✅ JUnit Tests\n\nNo Java or JSON files changed — tests skipped.';
+            }
+
+            // ── Build and post/update the combined comment ───────────────────
+            const sections = [jsonSection];
+            if (formatSection !== null) sections.push(formatSection);
+            sections.push(junitSection);
+            const body = `${MARKER}\n## 🔬 Test Results\n\n${sections.join('\n\n---\n\n')}`;
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100,
+            });
+            const existing = comments.find(c => c.body && c.body.includes(MARKER));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+      - name: Upload Surefire Report
+        if: always() && steps.diff.outputs.has_java == 'true' && steps.maven.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports/
+      - name: Upload SpotBugs Reports
+        if: always() && steps.diff.outputs.has_java == 'true' && steps.maven.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotbugs-reports
+          path: |
+            target/spotbugsXml.xml
+            target/site/spotbugs.html
+            target/spotbugsSarif.json
+      - name: Upload SpotBugs SARIF to GitHub Code Scanning
+        if: always() && steps.diff.outputs.has_java == 'true' && steps.maven.outcome != 'skipped' && github.event.pull_request.head.repo.full_name == github.repository && hashFiles('target/spotbugsSarif.json') != ''
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: target/spotbugsSarif.json
+          category: spotbugs

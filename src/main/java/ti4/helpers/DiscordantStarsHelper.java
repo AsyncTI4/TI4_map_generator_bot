@@ -238,8 +238,7 @@ public final class DiscordantStarsHelper {
                 || !player.hasOlradinPolicies()) return;
         PlanetModel planetModel = Mapper.getPlanet(planet);
         if (planetModel == null) return;
-        Planet unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-        Planet planetHolder = unitHolder;
+        Planet planetHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         if (planetHolder == null) return;
 
         boolean hasAbility = planetHolder.isLegendary();
@@ -361,8 +360,6 @@ public final class DiscordantStarsHelper {
                 "d122",
                 "d123"));
 
-        // if (includeAllTiles) tilesToPullFrom = TileHelper.getAllTiles().values().stream().filter(tile ->
-        // !tile.isAnomaly() && !tile.isHomeSystem() && !tile.isHyperlane()).map(TileModel::getId).toList();
         tilesToPullFrom.removeAll(
                 game.getTileMap().values().stream().map(Tile::getTileID).toList());
         if (!game.isDiscordantStarsMode()) {

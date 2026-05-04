@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -20,6 +21,7 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.fow.FOWCombatThreadMirroring;
+import ti4.spring.context.SpringContext;
 
 @UtilityClass
 class CombatButtonHandler {
@@ -48,8 +50,8 @@ class CombatButtonHandler {
             ButtonHelperModifyUnits.automateGroundCombat(p1, p2, planet, game, event);
         } else if (p1 != null && p2 != null) {
             Button automate = Buttons.green(
-                    opponent.getFinsFactionCheckerPrefix() + "automateGroundCombat_" + p1.getFaction() + "_"
-                            + p2.getFaction() + "_" + planet + "_confirmed",
+                    opponent.factionButtonChecker() + "automateGroundCombat_" + p1.getFaction() + "_" + p2.getFaction()
+                            + "_" + planet + "_confirmed",
                     "Automate Combat");
             MessageHelper.sendMessageToChannelWithButton(
                     event.getMessageChannel(),
@@ -171,6 +173,8 @@ class CombatButtonHandler {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         }
         FOWCombatThreadMirroring.mirrorMessage(event, game, msg.replace("## ", ""));
+        SpringContext.getBean(CombatReplayService.class)
+                .mirrorRetreatDeclared(game, player, event.getChannel().getName());
 
         if (Helper.getCCCount(game, player.getColor()) > 15) {
             MessageHelper.sendMessageToChannel(
@@ -198,9 +202,9 @@ class CombatButtonHandler {
         String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         buttons.add(Buttons.green(
-                finChecker + "autoAssignAFBHits_" + tile.getPosition() + "_" + h,
+                factionChecker + "autoAssignAFBHits_" + tile.getPosition() + "_" + h,
                 "Auto-assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.red(
                 "getDamageButtons_" + tile.getPosition() + "_afb", "Manually Assign Hit" + (h == 1 ? "" : "s")));
@@ -219,9 +223,9 @@ class CombatButtonHandler {
         String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         buttons.add(Buttons.green(
-                finChecker + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_" + h,
+                factionChecker + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_" + h,
                 "Auto-Assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.red(
                 "getDamageButtons_" + tile.getPosition() + "_pds", "Manually Assign Hit" + (h == 1 ? "" : "s")));
@@ -242,9 +246,9 @@ class CombatButtonHandler {
         String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         buttons.add(Buttons.green(
-                finChecker + "autoAssignGroundHits_" + tile.getPosition() + "_" + h,
+                factionChecker + "autoAssignGroundHits_" + tile.getPosition() + "_" + h,
                 "Auto-assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.red(
                 "getDamageButtons_" + tile.getPosition() + "_groundcombat",
@@ -264,9 +268,9 @@ class CombatButtonHandler {
         String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         buttons.add(Buttons.green(
-                finChecker + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
+                factionChecker + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
                 "Auto-assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.red(
                 "getDamageButtons_" + tile.getPosition() + "_spacecombat",

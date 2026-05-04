@@ -44,7 +44,7 @@ public class MahactTokenService {
 
     public List<Button> removeFleetTokenOptions(Game game, Player player, boolean includeSelf, boolean keepButtons) {
         List<Button> buttons = new ArrayList<>();
-        String prefix = player.finChecker() + "loseMahactCC_";
+        String prefix = player.factionButtonChecker() + "loseMahactCC_";
         String suffix = keepButtons ? "_keep" : "";
         String label = "Lose your own token";
         String emoji;

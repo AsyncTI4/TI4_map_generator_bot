@@ -313,8 +313,8 @@
         "id": "meteor_slings",
         "name": "Meteor Slings",
         "faction": "khrask",
-        "window": "When a unit you control produces a hit as part of a BOMBARDMENT roll against a planet another player controls",
-        "windowEffect": "You may instead place 1 infantry from your reinforcements on the planet being bombarded, that infantry unit participates in ground combat, if able.",
+        "window": "When your units use Bombardment against a planet another player controls",
+        "windowEffect": "You may cancel any number of hits you produce to place that many infantry from your reinforcements onto that planet. Those units participate in ground combat, if able",
         "source": "ds"
     },
     {

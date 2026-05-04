@@ -58,7 +58,7 @@ public class AddUnitDamage extends GameStateCommand {
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString();
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit parsedUnit : parsedUnits) {
-            tile.addUnitDamage(parsedUnit.getLocation(), parsedUnit.getUnitKey(), parsedUnit.getCount());
+            tile.addUnitDamage(parsedUnit.location(), parsedUnit.unitKey(), parsedUnit.count());
         }
 
         UnitCommandHelper.handleGenerateMapOption(event, game);

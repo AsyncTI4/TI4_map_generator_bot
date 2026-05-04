@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -13,10 +11,11 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
-import ti4.discord.interactions.context.ButtonContext;
+import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -44,6 +43,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.tactical.TacticalActionService;
+import ti4.service.tech.PlayerTechService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -140,8 +140,6 @@ public class ButtonHelperCommanders {
                     player.getRepresentation() + " the system does not have your command token in it.");
             return;
         }
-        // player.setTg(player.getTg() - 2);
-        // player.setStrategicCC(player.getStrategicCC() - 1);
         RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
@@ -331,13 +329,13 @@ public class ButtonHelperCommanders {
                         .filter(unit -> uh.getUnits().get(unit) > 0)
                         .filter(player::unitBelongsToPlayer)
                         .collect(Collectors.toSet());
-                String prefix = player.getFinsFactionCheckerPrefix() + "ravenMigration_" + from.getPosition() + "_"
+                String prefix = player.factionButtonChecker() + "ravenMigration_" + from.getPosition() + "_"
                         + uh.getName() + "_";
                 keys.stream()
                         .filter(uk -> !player.getUnitFromUnitKey(uk).getIsStructure())
                         .map(uk -> Buttons.gray(
                                 prefix + uk.asyncID(),
-                                uk.getUnitType().humanReadableName() + " " + planetName,
+                                uk.unitType().humanReadableName() + " " + planetName,
                                 uk.unitEmoji()))
                         .forEach(newButtons::add);
             }
@@ -350,7 +348,7 @@ public class ButtonHelperCommanders {
             UnitType unitType = Units.findUnitType(matcher.group("unittype"));
             boolean ship = player.getUnitFromAsyncID(unitType.getValue()).getIsShip();
 
-            String prefix = player.getFinsFactionCheckerPrefix() + "ravenMigration_" + from.getPosition() + "_"
+            String prefix = player.factionButtonChecker() + "ravenMigration_" + from.getPosition() + "_"
                     + unitHolderFrom + "_" + unitType.value + "_";
             String suffix = ship ? "_space" : "";
 
@@ -373,7 +371,7 @@ public class ButtonHelperCommanders {
             UnitType unitType = Units.findUnitType(matcher.group("unittype"));
             Tile to = game.getTileByPosition(matcher.group("posto"));
 
-            String prefix = player.getFinsFactionCheckerPrefix() + "ravenMigration_" + from.getPosition() + "_"
+            String prefix = player.factionButtonChecker() + "ravenMigration_" + from.getPosition() + "_"
                     + unitHolderFrom + "_" + unitType.value + "_" + to.getPosition() + "_";
 
             newMessage = player.getRepresentation() + " You are migrating a " + unitType.humanReadableName() + " from "
@@ -467,12 +465,13 @@ public class ButtonHelperCommanders {
         AddUnitService.addUnits(event, tile, game, player.getColor(), "fighter");
         player.setGhostCommanderCounter(player.getGhostCommanderCounter() + 1);
         String factionEmoji = player.getFactionEmoji();
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                factionEmoji + " placed 1 fighter in " + tile.getRepresentation()
-                        + " using Sai Seravus, the Creuss commander.\n-# " + factionEmoji
-                        + " has placed a total of " + player.getGhostCommanderCounter()
-                        + " fighters over the course of this game.");
+
+        String method = game.isTwilightKart() ? "IFF Support Wing" : "Sai Seravus, the Creuss commander";
+        String msg = factionEmoji + " placed 1 fighter in " + tile.getRepresentation()
+                + " using " + method + ".\n-# " + factionEmoji
+                + " has placed a total of " + player.getGhostCommanderCounter()
+                + " fighters over the course of this game.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
 
     @ButtonHandler("placeKhraskCommanderInf_")
@@ -497,7 +496,7 @@ public class ButtonHelperCommanders {
         for (String planet : player.getExhaustedPlanets()) {
             Planet planetReal = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             if (planetReal != null
-                    && isNotBlank(planetReal.getOriginalPlanetType())
+                    && StringUtils.isNotBlank(planetReal.getOriginalPlanetType())
                     && player.getPlanetsAllianceMode().contains(planet)) {
                 List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
                 buttons.addAll(planetButtons);
@@ -513,35 +512,31 @@ public class ButtonHelperCommanders {
             abletobot = "_yes";
         }
         buttons.add(Buttons.green(
-                player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_industrial" + abletobot,
+                player.factionButtonChecker() + "uydaiCommanderLook_industrial" + abletobot,
                 "Industrial",
                 ExploreEmojis.Industrial));
         buttons.add(Buttons.red(
-                player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_hazardous" + abletobot,
+                player.factionButtonChecker() + "uydaiCommanderLook_hazardous" + abletobot,
                 "Hazardous",
                 ExploreEmojis.Hazardous));
         buttons.add(Buttons.blue(
-                player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_cultural" + abletobot,
+                player.factionButtonChecker() + "uydaiCommanderLook_cultural" + abletobot,
                 "Cultural",
                 ExploreEmojis.Cultural));
         buttons.add(Buttons.gray(
-                player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_frontier" + abletobot,
+                player.factionButtonChecker() + "uydaiCommanderLook_frontier" + abletobot,
                 "Frontier",
                 ExploreEmojis.Frontier));
         buttons.add(Buttons.green(
-                player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_relics" + abletobot,
-                "Relic",
-                ExploreEmojis.Relic));
+                player.factionButtonChecker() + "uydaiCommanderLook_relics" + abletobot, "Relic", ExploreEmojis.Relic));
         buttons.add(Buttons.red(
-                player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_secrets" + abletobot,
+                player.factionButtonChecker() + "uydaiCommanderLook_secrets" + abletobot,
                 "Secret",
                 CardEmojis.SecretObjective));
         buttons.add(Buttons.blue(
-                player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_agenda" + abletobot,
-                "Agenda",
-                CardEmojis.Agenda));
+                player.factionButtonChecker() + "uydaiCommanderLook_agenda" + abletobot, "Agenda", CardEmojis.Agenda));
         buttons.add(Buttons.gray(
-                player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_acs" + abletobot,
+                player.factionButtonChecker() + "uydaiCommanderLook_acs" + abletobot,
                 "Action Card",
                 CardEmojis.ActionCard));
         return buttons;
@@ -609,9 +604,8 @@ public class ButtonHelperCommanders {
         }
         if ("yes".equalsIgnoreCase(ableToBot)) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(
-                    Buttons.red(player.getFinsFactionCheckerPrefix() + "uydaiCommanderBottom_" + target, "Bottom It"));
-            buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Leave It On Top"));
+            buttons.add(Buttons.red(player.factionButtonChecker() + "uydaiCommanderBottom_" + target, "Bottom It"));
+            buttons.add(Buttons.gray(player.factionButtonChecker() + "deleteButtons", "Leave It On Top"));
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
                     player.getRepresentation() + ", would you like to bottom the card or leave it on top?",
@@ -723,13 +717,19 @@ public class ButtonHelperCommanders {
         }
         if (player.hasTech("tf-peaceaccords")) {
             List<Button> buttons2 = ButtonHelperAbilities.getXxchaPeaceAccordsButtons(
-                    game, player, event, player.getFinsFactionCheckerPrefix());
+                    game, player, event, player.factionButtonChecker());
             if (!buttons2.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged() + ", please resolve _Peace Accords_.",
                         buttons2);
             }
+        }
+        if (player.hasUnit("tk-sumerianrelay")) {
+            String msg = "Please choose the system in which you wish to produce a ship using ";
+            msg += Mapper.getUnit("tk-sumerianrelay").getNameRepresentation() + ".";
+            List<Button> buttons = PlayerTechService.getSlingRelayButtons(game, player);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
     }
 
@@ -751,7 +751,7 @@ public class ButtonHelperCommanders {
                                     game, game.getUnitHolderFromPlanet(planet), player, false, true)
                             .isEmpty()) {
                 buttons.add(Buttons.gray(
-                        player.getFinsFactionCheckerPrefix() + "exchangeProgramPart3_" + planet,
+                        player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
                         Helper.getPlanetRepresentation(planet, game)));
             }
         }
@@ -870,10 +870,14 @@ public class ButtonHelperCommanders {
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         Tile tile = game.getTileFromPlanet(planet);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planet);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getFactionEmoji() + " placed 1 infantry on " + Helper.getPlanetRepresentation(planet, game)
-                        + " using Claire Gibson, the Sol Commander.");
+
+        String msg = player.getFactionEmoji() + " placed 1 infantry on " + Helper.getPlanetRepresentation(planet, game);
+        if (player.hasUnit("tk-genesiscorps")) {
+            msg += " using " + UnitEmojis.infantry + " " + FactionEmojis.Sol + " _Genesis Corps_.";
+        } else {
+            msg += " using Claire Gibson, the Sol Commander.";
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 
     @ButtonHandler("utilizeMykoBT_")

@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.game.CreateGameButtonHandler;
+import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.ButtonHelper;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
@@ -30,7 +31,8 @@ class ChannelCreationListener extends ListenerAdapter {
         if (!JdaService.isReadyToReceiveCommands()) {
             return;
         }
-        handleMakingNewGamesThreadCreation(event);
+        ExecutorServiceManager.runAsync(
+                "ChannelCreationListener task", () -> handleMakingNewGamesThreadCreation(event));
     }
 
     private void handleMakingNewGamesThreadCreation(ChannelCreateEvent event) {

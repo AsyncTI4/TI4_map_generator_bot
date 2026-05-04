@@ -9,6 +9,7 @@ import java.time.ZoneId;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.executors.ExecutionLockManager;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
@@ -35,7 +36,7 @@ public class EndOldGamesCron {
                     .filter(not(ManagedGame::isHasEnded))
                     .map(ManagedGame::getName)
                     .forEach(gameName -> ExecutionLockManager.wrapWithLockAndRelease(
-                                    gameName, ExecutionLockManager.LockType.WRITE, () -> endIfOld(gameName))
+                                    gameName, ExecutionLockType.WRITE, () -> endIfOld(gameName))
                             .run());
         } catch (Exception e) {
             BotLogger.error("**Error ending inactive games!**", e);

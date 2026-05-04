@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDu
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.cron.CronManager;
@@ -23,7 +24,6 @@ import ti4.discord.JdaService;
 import ti4.executors.CircuitBreaker;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DiscordWebhook;
-import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.message.MessageHelper;
 import ti4.service.statistics.SREStats;
@@ -40,12 +40,16 @@ public class BotLogger {
     private static final int SECONDS_TO_WAIT_BEFORE_QUEUEING_STACKTRACE = 15;
 
     private static volatile long lastScheduledWebhook;
+    private static volatile String botLogWebhookUrl;
 
     /**
      * Initialize the BotLogger system. Should be called once at bot startup.
      */
     public static void init() {
-        if (!logToConsole()) getBotLogWebhookURL(); // Ensure webhook is created at startup if required
+        // Resolve and cache the URL once at startup
+        if (!logToConsole()) {
+            botLogWebhookUrl = getBotLogWebhookUrl();
+        }
     }
 
     private static boolean logToConsole() {
@@ -275,8 +279,10 @@ public class BotLogger {
 
         List<String> messageChunks = new ArrayList<>();
         // Handle message length overflow. Overflow length is derived from previous implementation
-        for (int i = 0; i <= msgLength; i += MAX_DISCORD_MESSAGE_SIZE) {
-            messageChunks.add(compiledMessage.substring(i, Math.min(i + MAX_DISCORD_MESSAGE_SIZE, msgLength)));
+        for (int i = 0; i < msgLength; i += MAX_DISCORD_MESSAGE_SIZE) {
+            int end = Math.min(i + MAX_DISCORD_MESSAGE_SIZE, msgLength);
+            String chunk = compiledMessage.substring(i, end);
+            if (StringUtils.isNotBlank(chunk)) messageChunks.add(chunk);
         }
 
         if (threadName != null && channel != null) {
@@ -294,8 +300,6 @@ public class BotLogger {
                     channel.sendMessage(msgChunk)
                             .queue(Consumers.nop(), BotLogger::catchRestError); // Send message on channel
             } else { // Handle error on last send
-                ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildPrimary);
-
                 if (channel == null) {
                     scheduleWebhookMessage(msgChunk); // Send message on webhook
                 } else {
@@ -328,7 +332,6 @@ public class BotLogger {
             @Nonnull String threadName,
             @Nonnull List<String> messageChunks,
             @Nullable Throwable err) {
-        ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildPrimary);
         ThreadGetter.getThreadInChannel(channel, threadName, thread -> {
             messageChunks.forEach(chunk -> thread.sendMessage(chunk).queue(Consumers.nop(), BotLogger::catchRestError));
             if (err != null) {
@@ -361,7 +364,7 @@ public class BotLogger {
         }
     }
 
-    private static String getBotLogWebhookURL() {
+    private static String getBotLogWebhookUrl() {
         String botLogWebhookURL = GlobalSettings.getSetting(
                 GlobalSettings.ImplementedSettings.BOT_LOG_WEBHOOK_URL.toString(), String.class, null);
         if (botLogWebhookURL == null) {
@@ -390,12 +393,12 @@ public class BotLogger {
     }
 
     private static void sendMessageToBotLogWebhook(String message) {
-        String botLogWebhookURL = getBotLogWebhookURL();
-        if (botLogWebhookURL == null) {
-            System.out.println("ERROR: NO WEBHOOK FOUND TO SEND ERROR MESSAGE: " + message);
+        if (botLogWebhookUrl == null) {
+            System.out.println("ERROR: NO WEBHOOK URL CACHED: " + message);
             return;
         }
-        DiscordWebhook webhook = new DiscordWebhook(botLogWebhookURL);
+
+        DiscordWebhook webhook = new DiscordWebhook(botLogWebhookUrl);
         webhook.setContent(message);
         try {
             webhook.execute();

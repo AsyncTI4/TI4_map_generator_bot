@@ -99,7 +99,7 @@ class StatusPhaseButtonHandler {
                 EndGameService.secondHalfOfGameEnd(event, game, true, true, false);
             } else {
                 var speakerPlayer = game.getSpeaker();
-                ObjectiveHelper.secondHalfOfPeakStage1(game, speakerPlayer, 1, true);
+                ObjectiveHelper.secondHalfOfPeakStage1(game, speakerPlayer, 1);
                 TextChannel tableTalkChannel = game.getTableTalkChannel();
                 if (!game.isFowMode() && tableTalkChannel != null) {
                     MessageHelper.sendMessageToChannel(
@@ -123,7 +123,7 @@ class StatusPhaseButtonHandler {
 
     @ButtonHandler("scoreAnObjective")
     public static void scoreAnObjective(ButtonInteractionEvent event, Player player, Game game) {
-        List<Button> poButtons = StatusHelper.getScoreObjectiveButtons(game, player.getFinsFactionCheckerPrefix());
+        List<Button> poButtons = StatusHelper.getScoreObjectiveButtons(game, player.factionButtonChecker());
         poButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
         MessageChannel channel = event.getMessageChannel();
         if (game.isFowMode()) {

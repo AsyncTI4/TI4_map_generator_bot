@@ -59,12 +59,15 @@ class RelicPurgeFragments extends GameStateSubcommand {
             fragmentsToPurge.removeFirst();
         }
 
-        while (fragmentsToPurge.size() < count) {
-            if (unknowns.isEmpty()) {
-                MessageHelper.sendMessageToEventChannel(event, "Not enough fragments. Note that default count is 3.");
+        if (fragmentsToPurge.size() < count) {
+            count = 1;
+            if (fragmentsToPurge.size() < count) {
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        "You don't have enough " + color + " fragments to purge. You need " + count + " but only have "
+                                + 0 + ". Purge cancelled.");
                 return;
             }
-            fragmentsToPurge.add(unknowns.removeFirst());
         }
 
         Game game = getGame();

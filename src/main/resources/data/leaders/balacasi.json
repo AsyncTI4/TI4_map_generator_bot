@@ -34,74 +34,6 @@
         "source": "balacasi"
     },
     {
-        "id": "arachianagent",
-        "faction": "arachian",
-        "type": "agent",
-        "name": "Qekob",
-        "title": "The Weaver",
-        "abilityWindow": "Action",
-        "abilityText": "Choose a system with a player’s command token. That player may move one of their ships from that system to that player’s home system if it contains no other player’s ships.",
-        "unlockCondition": "Always Unlocked",
-        "source": "other"
-    },
-    {
-        "id": "arachiancommander",
-        "faction": "arachian",
-        "type": "commander",
-        "name": "Zraaqu",
-        "title": "The Spinner",
-        "abilityWindow": "At the start of a space combat in a system with your command token:",
-        "abilityText": "For each of your command tokens in this system and adjacent systems, you may choose one of your opponent’s units. Those units roll 1 less combat die during the first round of this combat",
-        "unlockCondition": "Have 6 of your Command Tokens on the game board",
-        "source": "other"
-    },
-    {
-        "id": "arachianhero",
-        "faction": "arachian",
-        "type": "hero",
-        "name": "Zhossox",
-        "title": "Spider in Chief",
-        "abilityName": "Master Web",
-        "abilityWindow": "ACTION",
-        "abilityText": "Move up to 3 of your Command Tokens on the game board to an adjacent system. Then, purge this card. ",
-        "unlockCondition": "Have 3 scored objectives.",
-        "source": "other"
-    },
-    {
-        "id": "zooidagent",
-        "faction": "zooid",
-        "type": "agent",
-        "name": "Catostylus Mosaicus",
-        "title": "The No Title",
-        "abilityWindow": "Action",
-        "abilityText": "Exhaust this card to allow 1 player to either perform the secondary ability of an unchosen strategy card or draw 1 action card.",
-        "unlockCondition": "Always Unlocked",
-        "source": "other"
-    },
-    {
-        "id": "zooidcommander",
-        "faction": "zooid",
-        "type": "commander",
-        "name": "Quinquecirrha",
-        "title": "The No Title",
-        "abilityWindow": "When another player activates a system that contains your units",
-        "abilityText": "You may force them to give you 1 random action card from their hand.",
-        "unlockCondition": "Have 7 unscored or scored secret objectives.",
-        "source": "other"
-    },
-    {
-        "id": "zooidhero",
-        "faction": "zooid",
-        "type": "hero",
-        "name": "Turritopsis Dohrnii",
-        "title": "The No Title",
-        "abilityName": "The No Title",
-        "abilityWindow": "ACTION",
-        "abilityText": "Place this card faceup near the game board; draw 3 secret objectives. Other players may each draw 1 secret objective. Then, all players play with their secret objectives revealed for the remainder of the game.",
-        "unlockCondition": "Have 3 scored objectives.",
-        "source": "other"
-    },
-    {
         "id": "xanagent",
         "faction": "xan",
         "type": "agent",
@@ -187,7 +119,7 @@
         "name": "Syphrydon Umbas",
         "title": "The Judicial",
         "abilityWindow": "After you score a secret objective:",
-        "abilityText": "You may draw 1 secret objective.",
+        "abilityText": "Draw 1 secret objective.",
         "unlockCondition": "Have 4 carriers on the game board",
         "source": "balacasi"
     },
@@ -220,8 +152,8 @@
         "type": "commander",
         "name": "Strategist Kreel",
         "title": "The Judicial",
-        "abilityWindow": "When you resolve the primary or secondary ability of the Leadership strategy card:",
-        "abilityText": "Gain 1 additional command token.",
+        "abilityWindow": "After you draw a relic:",
+        "abilityText": "Gain 1 command token. After you gain control of a planet in The Fracture that was controlled by another player, gain 1 relic.",
         "unlockCondition": "Resolve the primary ability of a strategy card in 1 of your neighbors' play areas.",
         "source": "balacasi"
     },
@@ -233,7 +165,7 @@
         "title": "The Invincible",
         "abilityName": "Titles Are Silly",
         "abilityWindow": "ACTION:",
-        "abilityText": "For each system that contains 1 or more of your ships, you may move 1 ship in that system into an adjacent system that doesn’t contain another player's ships.",
+        "abilityText": "Move up to 1 ship from each system that contains 1 or more of your ships into an adjacent system. Then, resolve space combat in each system that contains both yours and another player's ships and purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "balacasi"
     },
@@ -254,8 +186,8 @@
         "type": "commander",
         "name": "Chrono-Tactician Xelthar",
         "title": "The Judicial",
-        "abilityWindow": "ACTION:",
-        "abilityText": "Spend 1 token from your strategy pool to place 1 mech on a planet you control. When a public objective is revealed, you may place 1 infantry on a planet you control.",
+        "abilityWindow": "",
+        "abilityText": "ACTION: Spend 1 token from your strategy pool to place 1 mech on a planet you control.\nWhen a public objective is revealed: You may place 1 infantry on a planet you control.",
         "unlockCondition": "Have 5 infantry that are not in or adjacent to your home system",
         "source": "balacasi"
     },

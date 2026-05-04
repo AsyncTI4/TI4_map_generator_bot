@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 import ti4.service.commodities.CommodityConversionService;
 
 @UtilityClass
-public class TradeStationButtonHandler {
+class TradeStationButtonHandler {
 
     @ButtonHandler("startTradeStationConvert")
     public static void startTradeStationConvert(ButtonInteractionEvent event, Player player, Game game) {
@@ -46,7 +46,7 @@ public class TradeStationButtonHandler {
     }
 
     @ButtonHandler("useTradeStation")
-    public static void useTradeStation(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+    private static void useTradeStation(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         String planet = buttonID.split("_")[1];
         player.exhaustPlanet(planet);
         CommodityConversionService.convertAllComm(event, player, game);

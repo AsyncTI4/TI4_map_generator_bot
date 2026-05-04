@@ -6,7 +6,7 @@ import ti4.helpers.AgendaHelper;
 
 public class AbsolChecksAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "absol_checks";
     }
 

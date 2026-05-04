@@ -100,7 +100,7 @@ public class PlotCardsService {
                 Planet p = tile.getUnitHolderFromPlanet(planet);
                 if (p == null) continue;
 
-                String id = player.finChecker() + "resolveSeethe_" + planet;
+                String id = player.factionButtonChecker() + "resolveSeethe_" + planet;
                 String label = Helper.getPlanetRepresentation(planet, game) + " [" + p.getUnitCount() + " units]";
                 buttons.add(Buttons.red(id, label));
             }

@@ -406,20 +406,24 @@ public class CombatModHelper {
                 }
             }
             case Constants.MOD_NEBULA_DEFENDER -> {
+                Player activePlayer = game.getActivePlayer();
                 if (onTile != null
                         && (onTile.isNebula() || tile.isNebula(game))
-                        && !game.getActivePlayerID().equals(player.getUserID())
-                        && !game.getActivePlayer().getAllianceMembers().contains(player.getFaction())
+                        && activePlayer != null
+                        && !activePlayer.getUserID().equals(player.getUserID())
+                        && !activePlayer.getAllianceMembers().contains(player.getFaction())
                         && !game.getStoredValue("mahactHeroTarget").equalsIgnoreCase(player.getFaction())) {
                     meetsCondition = true;
                 }
             }
             case "nebula_cosmic_defender" -> {
+                Player activePlayer = game.getActivePlayer();
                 if (game.isCosmicPhenomenaeMode()
                         && onTile != null
                         && (onTile.isNebula() || tile.isNebula(game))
-                        && !game.getActivePlayerID().equals(player.getUserID())
-                        && !game.getActivePlayer().getAllianceMembers().contains(player.getFaction())
+                        && activePlayer != null
+                        && !activePlayer.getUserID().equals(player.getUserID())
+                        && !activePlayer.getAllianceMembers().contains(player.getFaction())
                         && !game.getStoredValue("mahactHeroTarget").equalsIgnoreCase(player.getFaction())) {
                     meetsCondition = true;
                 }
@@ -640,9 +644,7 @@ public class CombatModHelper {
                         scalingCount += 1;
                         if (player.getDishonorCounter() < 4) {
                             scalingCount += 1;
-                            if (player.getDishonorCounter() < 7) {
-                                scalingCount += 1;
-                            }
+                            scalingCount += 1;
                         }
                     }
                 }
@@ -723,33 +725,33 @@ public class CombatModHelper {
                         scalingCount = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player);
                     }
                 }
-                case "damaged_units_same_type" -> {
+                case "damaged_units_max_2" -> {
+                    UnitKey key = Units.getUnitKey(origUnit.getUnitType(), player.getColor());
                     UnitHolder space = activeSystem.getUnitHolders().get("space");
                     if (origUnit.getIsGroundForce()
                             && !activeSystem.getPlanetUnitHolders().isEmpty()) {
                         for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
-                            if (planet.getUnitCount(
-                                            Mapper.getUnitKey(
-                                                            AliasHandler.resolveUnit(origUnit.getBaseType()),
-                                                            player.getColorID())
-                                                    .getUnitType(),
-                                            player)
-                                    > 0) {
+                            if (planet.getUnitCount(key) > 0) {
                                 space = planet;
                             }
                         }
                     }
-                    int count = 0;
-                    if (space.getUnitDamage()
-                                    .get(Mapper.getUnitKey(
-                                            AliasHandler.resolveUnit(origUnit.getBaseType()), player.getColorID()))
-                            != null) {
-                        count = space.getUnitDamage()
-                                .get(Mapper.getUnitKey(
-                                        AliasHandler.resolveUnit(origUnit.getBaseType()), player.getColorID()));
-                    }
+                    int count = space.getDamagedUnitCount(key);
                     scalingCount += count;
-                    scalingCount = Math.min(scalingCount, 2);
+                }
+                case "damaged_units" -> {
+                    UnitKey key = Units.getUnitKey(origUnit.getUnitType(), player.getColor());
+                    UnitHolder space = activeSystem.getUnitHolders().get("space");
+                    if (origUnit.getIsGroundForce()
+                            && !activeSystem.getPlanetUnitHolders().isEmpty()) {
+                        for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
+                            if (planet.getUnitCount(key) > 0) {
+                                space = planet;
+                            }
+                        }
+                    }
+                    int count = space.getDamagedUnitCount(key);
+                    scalingCount += count;
                 }
                 case "opponent_sftt" -> scalingCount = getOpponentSfttCount(opponent);
                 case "nonhome_system_with_planet" -> scalingCount = getSystemsWithControlledPlanets(game, player);
@@ -820,19 +822,6 @@ public class CombatModHelper {
         }
         return count;
     }
-
-    // public static int getGalvanizedUnitCount(Game game, Tile activeSystem, UnitModel origUnit, Player player) {
-    //     UnitKey uk = Units.getUnitKey(origUnit.getUnitType(), player.getColorID());
-    //     UnitHolder space = activeSystem.getSpaceUnitHolder();
-    //     if (origUnit.getIsGroundForce() && !activeSystem.getPlanetUnitHolders().isEmpty()) {
-    //         for (Planet planet : activeSystem.getPlanetUnitHolders()) {
-    //             if (planet.getUnitCount(uk) > 0) {
-    //                 space = planet;
-    //             }
-    //         }
-    //     }
-    //     return space.getGalvanizedUnitCount(uk);
-    // }
 
     private static int getGalvanizedUnitCount(Game game, UnitHolder uH, UnitModel origUnit, Player player) {
         UnitKey uk = Units.getUnitKey(origUnit.getUnitType(), player.getColorID());

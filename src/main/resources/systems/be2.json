@@ -3,7 +3,7 @@
     "name": "Prism/Spire - Chystellum",
     "aliases": [
         "be2",
-        "prismbe",
+        "prisma",
         "spire",
         "chystellum"
     ],
@@ -29,7 +29,7 @@
     ],
     "wormholes": [],
     "planets": [
-        "prismbe",
+        "prisma",
         "spire"
     ],
     "source": "beans",

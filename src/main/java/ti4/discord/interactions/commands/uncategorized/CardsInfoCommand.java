@@ -12,8 +12,9 @@ import ti4.service.info.CardsInfoService;
 
 public class CardsInfoCommand extends GameStateCommand {
 
+    // This has to save, due to the `game.checkPromissoryNotes();` call
     public CardsInfoCommand() {
-        super(false, true);
+        super(true, true);
     }
 
     @Override
@@ -35,10 +36,8 @@ public class CardsInfoCommand extends GameStateCommand {
             ThreadChannel channel = player.getCardsInfoThread();
             channel.getManager()
                     .setArchived(true)
-                    .queue(
-                            Consumers.nop(),
-                            BotLogger::catchRestError); // archiving it to combat a common bug that is solved via
-            // archiving
+                    // archiving it to combat a common bug that is solved via archiving
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
         CardsInfoService.sendCardsInfo(game, player, event);
     }

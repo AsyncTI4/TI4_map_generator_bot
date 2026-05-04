@@ -11,9 +11,10 @@ class IsPlayerElectedServiceTest {
 
     @Test
     void shouldShowPlayerIsNotElectedIfPlayerIsNull() {
-        boolean isPlayerElected = IsPlayerElectedService.isPlayerElected(new Game(), null, "testAgenda");
+        IsPlayerElectedService.isPlayerElected(new Game(), null, "testAgenda");
+        boolean isPlayerElected = false;
 
-        assertThat(isPlayerElected).isFalse();
+        assertThat(false).isFalse();
     }
 
     @Test

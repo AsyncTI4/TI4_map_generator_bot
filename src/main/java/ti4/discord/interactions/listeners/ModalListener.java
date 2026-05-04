@@ -7,19 +7,22 @@ import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.JdaService;
-import ti4.discord.interactions.context.ModalContext;
+import ti4.discord.interactions.listeners.context.ModalContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.ModalHandler;
+import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.logging.RollbarManager;
 import ti4.service.game.GameNameService;
+import ti4.spring.context.SpringContext;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
-final class ModalListener extends ListenerAdapter {
+public final class ModalListener extends ListenerAdapter {
 
     private static ModalListener instance;
 
@@ -28,6 +31,12 @@ final class ModalListener extends ListenerAdapter {
     public static ModalListener getInstance() {
         if (instance == null) instance = new ModalListener();
         return instance;
+    }
+
+    public static void checkModalHandlersSetup() {
+        if (getInstance().knownModals.isEmpty()) {
+            throw new IllegalStateException("No modal handlers were registered");
+        }
     }
 
     private ModalListener() {
@@ -49,22 +58,33 @@ final class ModalListener extends ListenerAdapter {
         event.deferEdit().queue(Consumers.nop(), BotLogger::catchRestError);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        ExecutorServiceManager.runAsync(
+        var modalContext = new ModalContext(event);
+        if (!modalContext.isValid()) {
+            BotLogger.warning(new LogOrigin(event), "Invalid modal context.");
+            return;
+        }
+        ExecutorServiceManager.runAsyncWithLock(
                 "ModalListener task for  `" + gameName + "`",
                 gameName,
                 event.getMessageChannel(),
-                () -> handleModal(event));
+                () -> handleModal(modalContext, event),
+                modalContext.isShouldSave() ? ExecutionLockType.WRITE : ExecutionLockType.READ);
     }
 
-    private void handleModal(@Nonnull ModalInteractionEvent event) {
+    private void handleModal(ModalContext context, ModalInteractionEvent event) {
         try {
             RollbarManager.putInteractionMetadata("modal", event);
             RollbarManager.put("modal_id", event.getModalId());
             RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
-            ModalContext context = new ModalContext(event);
-            if (context.isValid()) {
+
+            CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
+            combatReplayService.setPreInteractionSnapshot(
+                    combatReplayService.capturePreInteractionSnapshot(context.getGame()));
+            try {
                 resolveModalInteractionEvent(context);
                 context.save();
+            } finally {
+                combatReplayService.clearPreInteractionSnapshot();
             }
         } catch (Exception e) {
             String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: "

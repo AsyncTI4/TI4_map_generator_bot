@@ -2,20 +2,20 @@ package ti4.service.abilities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
+import java.util.Objects;
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
+import ti4.game.Leader;
 import ti4.game.Planet;
 import ti4.game.Player;
-import ti4.game.Space;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
@@ -24,9 +24,15 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.AgendaModel;
+import ti4.model.BreakthroughModel;
 import ti4.model.FactionModel;
 import ti4.model.GenericCardModel;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.TechnologyModel;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.UnitEmojis;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.HeroUnlockCheckService;
 import ti4.service.planet.AddPlanetService;
 
@@ -51,7 +57,7 @@ public class PuppetSoftHeBladeService {
         flipFactionToObsidian(game, player);
 
         // Announce Plots
-        String factionName = player.getDisplayName();
+        String factionName = player.getRepresentationNoPing();
         StringBuilder plotInfo = new StringBuilder("## __" + factionName + " plots are now revealed:__");
         for (String plotID : player.getPlotCards().keySet()) {
             GenericCardModel plot = Mapper.getPlot(plotID);
@@ -92,7 +98,7 @@ public class PuppetSoftHeBladeService {
 
     private static void revealPlotSeethe(Player obsidian, List<Player> puppets) {
         List<Button> seetheButtons = new ArrayList<>();
-        String prefix = obsidian.finChecker() + "revealSeethe_";
+        String prefix = obsidian.factionButtonChecker() + "revealSeethe_";
         for (Player p : puppets) {
             if (p == null) continue;
             String label = p.getFactionNameOrColor();
@@ -104,7 +110,7 @@ public class PuppetSoftHeBladeService {
 
     private static void revealPlotExtract(Player obsidian, List<Player> puppets) {
         List<Button> extractButtons = new ArrayList<>();
-        String prefix = obsidian.finChecker() + "revealExtract_";
+        String prefix = obsidian.factionButtonChecker() + "revealExtract_";
         for (Player p : puppets) {
             if (p == null) continue;
             String label = p.getFactionNameOrColor();
@@ -115,29 +121,165 @@ public class PuppetSoftHeBladeService {
     }
 
     private static void flipFactionToObsidian(Game game, Player player) {
-        FactionModel oldFactionModel = player.getFactionModel();
-        FactionModel newFactionModel = Mapper.getFaction("obsidian");
+        List<String> outputStrings = new ArrayList<>(flipFirmamentComponentsToObsidianComponents(game, player));
+        String msg = "### " + player.getRepresentationUnfogged();
+        msg += " the following components have been updated:\n> ";
+        msg += String.join("\n> ", outputStrings);
 
-        List<String> outputStrings = new ArrayList<>();
-        outputStrings.add(replaceHomeSystem(game, player, oldFactionModel, newFactionModel));
-        outputStrings.add(replaceFactionSheet(game, player, newFactionModel));
-        outputStrings.add(replaceBreakthrough(player));
-        outputStrings.add(replacePN(game, player, oldFactionModel, newFactionModel));
-        outputStrings.add(replaceTechAndFactionTech(game, player, oldFactionModel, newFactionModel));
-        outputStrings.add(replaceLaws(game, oldFactionModel, newFactionModel));
-        outputStrings.add(replaceStoredValues(game, oldFactionModel, newFactionModel));
-
-        String output =
-                "### " + player.getRepresentation(false, true) + " the following components have been updated:\n> ";
-        output += String.join("\n> ", outputStrings);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), output);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         resolveFirmamentMechFlip(game, player);
     }
 
+    private static List<String> flipFirmamentComponentsToObsidianComponents(Game game, Player player) {
+        List<String> output = new ArrayList<>();
+        output.add(flipFirmamentHomeSystem(player));
+        output.addAll(flipFirmamentFactionTechs(player));
+        output.addAll(flipFirmamentLeaders(player));
+        output.add(flipFirmamentMech(player));
+        output.add(flipFirmamentFlagship(player));
+        output.add(flipFirmamentPromissoryNote(player));
+        output.add(flipFirmamentBreakthrough(player));
+
+        if (!game.isFrankenGame()) {
+            output.addAll(replaceFirmamentMetadata(game, player));
+        }
+
+        return output.stream().filter(Objects::nonNull).toList();
+    }
+
+    @Nullable
+    private static String flipFirmamentHomeSystem(Player player) {
+        Tile oldHome = player.getHomeSystemTile();
+        if (!"96a".equals(oldHome.getTileID())) return null;
+        Game game = player.getGame();
+        // Replace the home system
+        Tile newHome = new Tile("96b", oldHome.getPosition(), oldHome.getSpaceUnitHolder());
+        newHome.inheritFogData(oldHome);
+
+        // Move stuff on cronos to cronos hollow
+        Planet cronos = oldHome.getUnitHolderFromPlanet("cronos");
+        Planet cronosH = newHome.getUnitHolderFromPlanet("cronoshollow");
+        cronosH.inheritEverythingFrom(cronos);
+
+        // Move stuff on tallin to tallin hollow
+        Planet tallin = oldHome.getUnitHolderFromPlanet("tallin");
+        Planet tallinH = newHome.getUnitHolderFromPlanet("tallinhollow");
+        tallinH.inheritEverythingFrom(tallin);
+
+        player.removePlanet("cronos");
+        player.removePlanet("tallin");
+        player.addPlanet("cronoshollow");
+        player.addPlanet("tallinhollow");
+        game.removeTile(oldHome.getPosition());
+        game.setTile(newHome);
+        player.setHomeSystemPosition(newHome.getPosition());
+
+        return "Sucessfully replaced home system tile.";
+    }
+
+    private static List<String> flipFirmamentFactionTechs(Player player) {
+        List<String> outputs = new ArrayList<>();
+
+        Map<String, String> techs = Map.of("planesplitter-firm", "planesplitter-obs", "parasite-firm", "parasite-obs");
+        for (Entry<String, String> e : techs.entrySet()) {
+            String oldTech = e.getKey();
+            String newTech = e.getValue();
+
+            if (player.getFactionTechs().contains(oldTech)) {
+                TechnologyModel oldModel = Mapper.getTech(oldTech);
+                TechnologyModel newModel = Mapper.getTech(newTech);
+                player.removeFactionTech(oldTech);
+                player.addFactionTech(newTech);
+                outputs.add("Flipped _" + oldModel.getName() + "_ to _" + newModel.getName() + "_.");
+            }
+            for (Player p2 : player.getGame().getRealPlayers()) {
+                if (p2.hasTech(oldTech)) {
+                    p2.removeTech(oldTech);
+                    p2.addTech(newTech);
+                }
+            }
+        }
+        return outputs;
+    }
+
+    private static List<String> flipFirmamentLeaders(Player player) {
+        String fmt = "Successfully replaced %s with %s.";
+        List<String> output = new ArrayList<>();
+        player.getLeaderByID("firmamentagent").ifPresent(oldLeader -> {
+            player.removeLeader(oldLeader);
+            Leader newLeader = new Leader("obsidianagent");
+            player.addLeader(newLeader);
+            output.add(String.format(fmt, oldLeader.getName(), newLeader.getName()));
+        });
+        player.getLeaderByID("firmamentcommander").ifPresent(oldLeader -> {
+            player.removeLeader(oldLeader);
+            Leader newLeader = new Leader("obsidiancommander");
+            player.addLeader(newLeader);
+            CommanderUnlockCheckService.checkPlayer(player, "obsidian");
+            output.add(String.format(fmt, oldLeader.getName(), newLeader.getName()));
+        });
+        player.getLeaderByID("firmamenthero").ifPresent(player::removeLeader);
+        Leader newLeader = new Leader("obsidianhero");
+        player.addLeader(newLeader);
+        HeroUnlockCheckService.checkIfHeroUnlocked(player.getGame(), player);
+        output.add(String.format(fmt, Mapper.getLeader("firmamenthero").getName(), newLeader.getName()));
+        return output;
+    }
+
+    @Nullable
+    private static String flipFirmamentMech(Player player) {
+        if (!player.hasUnit("firmament_mech")) return null;
+        player.removeOwnedUnitByID("firmament_mech");
+        player.addOwnedUnitByID("obsidian_mech");
+        String emojis = FactionEmojis.Firma_Obs + " " + UnitEmojis.mech;
+        return "Successfully flipped " + emojis + " _Viper EX-23_ to _Viper Hollow_.";
+    }
+
+    @Nullable
+    private static String flipFirmamentFlagship(Player player) {
+        if (!player.hasUnit("firmament_flagship")) return null;
+        player.removeOwnedUnitByID("firmament_flagship");
+        player.addOwnedUnitByID("obsidian_flagship");
+        String emojis = FactionEmojis.Firma_Obs + " " + UnitEmojis.flagship;
+        return "Successfully flipped " + emojis + " _Heaven's Eye_ to _Heaven's Hollow_.";
+    }
+
+    @Nullable
+    private static String flipFirmamentPromissoryNote(Player player) {
+        // Black Ops is automated by removing it from the list of notes owned,
+        // which makes it annoying to resolve in franken.
+        boolean modelOwnsPN = player.getFactionModel().getPromissoryNotes().contains("blackops");
+        boolean frankenPN = player.getStoredList("appliedFrankenItems").contains("PN:blackops");
+        if (!modelOwnsPN && !frankenPN) return null;
+
+        boolean stillHas = player.getPromissoryNotesOwned().contains("blackops");
+        player.removePromissoryNote("blackops");
+        player.removeOwnedPromissoryNoteByID("blackops");
+        player.setPromissoryNote("malevolency");
+        player.addOwnedPromissoryNoteByID("malevolency");
+
+        PromissoryNoteModel oldPN = Mapper.getPromissoryNote("blackops");
+        PromissoryNoteModel newPN = Mapper.getPromissoryNote("malevolency");
+        if (stillHas) {
+            return "Successfully flipped _" + oldPN.getName() + "_ to _" + newPN.getName() + "_.";
+        }
+        return "Successfully gained _" + newPN.getName() + "_.";
+    }
+
+    @Nullable
+    private static String flipFirmamentBreakthrough(Player player) {
+        if (!player.hasBreakthrough("firmamentbt")) return null;
+        if (!player.changeBreakthrough("firmamentbt", "obsidianbt")) return null;
+        BreakthroughModel firma = Mapper.getBreakthrough("firmamentbt");
+        BreakthroughModel obs = Mapper.getBreakthrough("obsidianbt");
+        return "Successfully flipped " + firma.getNameRepresentation() + " to " + obs.getNameRepresentation() + ".";
+    }
+
     private static void resolveFirmamentMechFlip(Game game, Player player) {
+        if (!player.hasUnit("obsidian_mech")) return;
         int count = 0;
-        StringBuilder output = new StringBuilder("### " + player.getRepresentation(false, true)
-                + ", the following planets have been taken control of by Vipers Hollow:");
+        StringBuilder output = new StringBuilder("### " + player.getRepresentationUnfogged());
+        output.append(", the following planet has been taken control of by your Viper Hollow:");
         for (String planet : game.getPlanetsPlayerIsCoexistingOn(player)) {
             UnitHolder uH = game.getUnitHolderFromPlanet(planet);
             if (uH != null && uH.getUnitCount(UnitType.Mech, player) > 0) {
@@ -148,177 +290,62 @@ public class PuppetSoftHeBladeService {
         }
 
         if (count > 0) {
+            String msg = output.toString();
+            if (count > 1) {
+                String plural = "planets have been taken control of by Vipers";
+                String singular = "planet has been taken control of by your Viper";
+                msg = msg.replace(singular, plural);
+            }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), output.toString());
         }
     }
 
-    // Replacing home system MUST be done before changing faction sheets
-    private static String replaceHomeSystem(
-            Game game, Player player, FactionModel oldFaction, FactionModel newFaction) {
-        if (player.getFaction().equals(newFaction.getAlias())) {
-            return "**__ERROR: Could not replace home system.__**";
+    private static List<String> replaceFirmamentMetadata(Game game, Player player) {
+        // we do not want to update meta things in franken, because the faction name is not changing
+        if (game.isFrankenGame()) return null;
+        List<String> outputs = new ArrayList<>();
+
+        // Replace faction sheet stuff
+        FactionModel obsidian = Mapper.getFaction("obsidian");
+        player.setFaction("obsidian");
+        player.setFactionEmoji(null);
+        player.setCommoditiesBase(obsidian.getCommodities());
+        FactionModel firmament = Mapper.getFaction("firmament");
+        for (String ability : firmament.getAbilities()) {
+            player.removeAbility(ability);
         }
-
-        Tile home = player.getHomeSystemTile();
-        UnitHolder origUnits = new Space("orig", null);
-        home.getUnitHolders().values().stream()
-                .flatMap(uh -> uh.getUnitsByState().entrySet().stream())
-                .forEach(entry -> origUnits.addUnitsWithStates(entry.getKey(), entry.getValue()));
-
-        Tile newHome = new Tile(newFaction.getHomeSystem(), home.getPosition());
-        newHome.inheritFogData(home);
-
-        String returnString = "Sucessfully replaced home system tile.";
-        if ("96a".equals(oldFaction.getHomeSystem()) && "96b".equals(newFaction.getHomeSystem())) { // obsidian
-            // Resolve control
-            for (Player p : game.getPlayers().values()) {
-                if (p.hasPlanet("cronos")) {
-                    p.addPlanet("cronoshollow");
-                    p.removePlanet("cronos");
-                }
-                if (p.hasPlanet("tallin")) {
-                    p.addPlanet("tallinhollow");
-                    p.removePlanet("tallin");
-                }
-            }
-
-            // Then add units and stuff
-            for (UnitHolder unitHolder : home.getUnitHolders().values()) {
-                String uh = unitHolder.getName();
-                if ("cronos".equals(uh) || "tallin".equals(uh)) {
-                    Planet p = newHome.getUnitHolderFromPlanet(uh + "hollow");
-                    if (p != null) p.inheritEverythingFrom(unitHolder);
-                } else if ("space".equals(uh)) {
-                    newHome.getSpaceUnitHolder().inheritEverythingFrom(unitHolder);
-                }
-            }
-        } else {
-            returnString =
-                    "**__WARNING:__** Replaced home system tile and moved all units to space. **__Resolve gaining/readying planets and moving units manually.__**";
-            newHome.getSpaceUnitHolder().inheritEverythingFrom(origUnits);
+        for (String ability : obsidian.getAbilities()) {
+            player.addAbility(ability);
         }
+        outputs.add("Successfully updated faction sheet to _Obsidian_.");
 
-        // remove the planets that have been removed from the game.
-        oldFaction.getHomePlanets().forEach(player::removePlanet);
-        game.removeTile(home.getPosition());
-        game.setTile(newHome);
-        player.setHomeSystemPosition(newHome.getPosition());
+        // Replace laws and stuff
+        outputs.add(replaceLaws(game, "firmament", "obsidian"));
 
-        return returnString;
+        // Replace stored value map data
+        outputs.add(replaceStoredValues(game, "firmament", "obsidian"));
+
+        return outputs;
     }
 
-    private static String replaceFactionSheet(Game game, Player player, FactionModel newFaction) {
-        player.setFaction(game, newFaction.getAlias());
-        HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
-
-        Set<String> playerOwnedUnits = new HashSet<>(newFaction.getUnits());
-        player.setUnitsOwned(playerOwnedUnits);
-
-        // BASE COMMODITIES
-        player.setCommoditiesBase(newFaction.getCommodities());
-
-        // Reset emoji
-        if (!game.isFrankenGame()) player.setFactionEmoji(null);
-
-        return "Successfully changed faction sheet.";
-    }
-
-    private static String replaceBreakthrough(Player player) {
-        // automate flipping sowing to reaping
-        if (!player.changeBreakthrough("firmamentbt", "obsidianbt"))
-            return "Failed to change breakthrough, player did not have The Sowing.";
-        return "Successfully changed breakthrough.";
-    }
-
-    // This will replace the promissory note(s) and put the new ones directly into the players hand
-    private static String replacePN(Game game, Player player, FactionModel oldFaction, FactionModel newFaction) {
-        oldFaction.getPromissoryNotes().forEach(pn -> {
-            player.removeOwnedPromissoryNoteByID(pn);
-            for (Player p : game.getRealPlayers()) {
-                p.removePromissoryNote(pn);
-                p.removePromissoryNoteFromPlayArea(pn);
-            }
-
-            // Remove any attachments
-            // Does not presently fix custodia vigilia
-            PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pn);
-            if (pnModel.getAttachment().isPresent()) {
-                String attachment = pnModel.getAttachment().get();
-                game.getTileMap().values().stream()
-                        .flatMap(t -> t.getUnitHolders().values().stream())
-                        .forEach(uh -> uh.removeToken(attachment));
-            }
-        });
-
-        newFaction.getPromissoryNotes().forEach(pn -> {
-            player.addOwnedPromissoryNoteByID(pn);
-            player.setPromissoryNote(pn);
-        });
-
-        return "Successfully updated promissory notes.";
-    }
-
-    private static String replaceTechAndFactionTech(
-            Game game, Player player, FactionModel oldFaction, FactionModel newFaction) {
-        // change over faction techs
-        List<String> failed = new ArrayList<>();
-        newFaction.getFactionTech().forEach(tech -> {
-            if (!tech.endsWith("-obs")) {
-                failed.add(tech);
-                return;
-            }
-            String replacableTech = tech.replace("-obs", "-firm");
-            for (Player p2 : game.getPlayers().values()) {
-                // replace tech for all players because nekro i guess
-                if (p2.hasTech(replacableTech)) {
-                    p2.removeTech(replacableTech);
-                    p2.addTech(tech);
-                }
-            }
-            player.removeFactionTech(replacableTech);
-            player.addFactionTech(tech);
-        });
-
-        // Remove and re-add all techs again (to fix units owned list)
-        List<String> techs = new ArrayList<>(player.getTechs());
-        for (String tech : techs) {
-            boolean exh = player.getExhaustedTechs().contains(tech);
-            player.removeTech(tech);
-            player.addTech(tech);
-            if (exh) {
-                player.exhaustTech(tech);
-            }
-        }
-
-        List<String> oldTech = oldFaction.getFactionTech().stream()
-                .filter(tech -> !tech.endsWith("-firm"))
-                .toList();
-        if (oldTech.isEmpty()) {
-            return "Sucessfully changed faction techs.";
-        }
-
-        String warning = "**__Warning encountered while changing faction techs:__**\n> - You owned [";
-        warning += String.join(", ", oldTech);
-        warning += "] and your new faction has the techs [";
-        warning += String.join(", ", failed);
-        warning += "]. Those techs cannot be automatically replaced,";
-        warning += " work with your table to find a suitable solution.";
-        return warning;
-    }
-
-    private static String replaceLaws(Game game, FactionModel oldFaction, FactionModel newFaction) {
+    @Nullable
+    private static String replaceLaws(Game game, String oldFaction, String newFaction) {
         List<String> laws = new ArrayList<>(game.getLawsInfo().keySet());
+        List<String> updated = new ArrayList<>();
         for (String law : laws) {
-            if (game.getLawsInfo().get(law).equalsIgnoreCase(oldFaction.getAlias())) {
-                game.reviseLaw(game.getLaws().get(law), newFaction.getAlias());
+            if (game.getLawsInfo().get(law).equalsIgnoreCase(oldFaction)) {
+                game.reviseLaw(game.getLaws().get(law), newFaction);
+                AgendaModel model = Mapper.getAgenda(law);
+                updated.add(model.getName());
             }
         }
+        if (updated.isEmpty()) return null;
 
-        return "Successfully updated laws.";
+        return "Successfully updated laws: _[" + String.join(", ", updated) + "]_";
     }
 
-    private static String replaceStoredValues(Game game, FactionModel oldFaction, FactionModel newFaction) {
-        Map<String, String> storedValues = new HashMap<>(game.getMessagesThatICheckedForAllReacts());
+    private static String replaceStoredValues(Game game, String oldAlias, String newAlias) {
+        Map<String, String> storedValues = new HashMap<>(game.getStoredValueMap());
 
         List<String> legitKeyFormats = new ArrayList<>();
         legitKeyFormats.add("$<f>^"); // standalone faction name
@@ -350,11 +377,10 @@ public class PuppetSoftHeBladeService {
 
             String newKey = null;
             for (String template : legitKeyFormats) {
-                String oldFormat = template.replace("<f>", oldFaction.getAlias());
+                String oldFormat = template.replace("<f>", oldAlias);
                 if (keyRx.contains(oldFormat)) {
-                    String newFormat = template.replace("<f>", newFaction.getAlias())
-                            .replace("$", "")
-                            .replace("^", "");
+                    String newFormat =
+                            template.replace("<f>", newAlias).replace("$", "").replace("^", "");
                     oldFormat = oldFormat.replace("$", "").replace("^", "");
                     newKey = entry.getKey().replaceAll(oldFormat, newFormat);
                     break;
@@ -363,11 +389,10 @@ public class PuppetSoftHeBladeService {
 
             String newValue = null;
             for (String template : legitValueFormats) {
-                String oldFormat = template.replace("<f>", oldFaction.getAlias());
+                String oldFormat = template.replace("<f>", oldAlias);
                 if (valueRx.contains(oldFormat)) {
-                    String newFormat = template.replace("<f>", newFaction.getAlias())
-                            .replace("$", "")
-                            .replace("^", "");
+                    String newFormat =
+                            template.replace("<f>", newAlias).replace("$", "").replace("^", "");
                     oldFormat = oldFormat.replace("$", "").replace("^", "");
                     newValue = entry.getValue().replaceAll(oldFormat, newFormat);
                     break;
@@ -377,14 +402,12 @@ public class PuppetSoftHeBladeService {
             if (newKey != null || newValue != null) {
                 newKey = newKey == null ? entry.getKey() : newKey;
                 newValue = newValue == null ? entry.getValue() : newValue;
-                game.getMessagesThatICheckedForAllReacts().remove(entry.getKey());
-                game.getMessagesThatICheckedForAllReacts().put(newKey, newValue);
+                game.getStoredValueMap().remove(entry.getKey());
+                game.getStoredValueMap().put(newKey, newValue);
             }
         }
 
         // Update Expedition Tokens
-        String oldAlias = oldFaction.getAlias();
-        String newAlias = newFaction.getAlias();
         if (oldAlias.equals(game.getExpeditions().getTradeGoods()))
             game.getExpeditions().setTradeGoods(newAlias);
         if (oldAlias.equals(game.getExpeditions().getFiveInf()))
@@ -398,6 +421,6 @@ public class PuppetSoftHeBladeService {
         if (oldAlias.equals(game.getExpeditions().getSecret()))
             game.getExpeditions().setSecret(newAlias);
 
-        return "Successfully (?) updated game stored values.";
+        return "Successfully updated game stored values.";
     }
 }

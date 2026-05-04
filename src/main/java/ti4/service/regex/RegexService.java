@@ -8,10 +8,12 @@ import ti4.logging.BotLogger;
 
 public final class RegexService {
 
+    @FunctionalInterface
     public interface CheckedConsumer<T> {
         void accept(T m) throws Exception;
     }
 
+    @FunctionalInterface
     public interface CheckedPredicate<T> {
         boolean accept(T m) throws Exception;
     }

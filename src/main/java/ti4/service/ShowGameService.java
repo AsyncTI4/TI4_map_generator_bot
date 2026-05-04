@@ -5,7 +5,6 @@ import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -39,12 +38,7 @@ public class ShowGameService {
 
         // For non-FoW games: persist the full map message ID
         Consumer<Message> persistMessageId = shouldPersistFullMapMessageId
-                ? msg -> SpringContext.getBean(GameImageService.class)
-                        .saveDiscordMessageId(
-                                game,
-                                msg.getIdLong(),
-                                msg.getGuild().getIdLong(),
-                                msg.getChannel().getIdLong())
+                ? msg -> SpringContext.getBean(GameImageService.class).saveDiscordMessage(game.getName(), msg)
                 : null;
 
         // For FoW games: persist the player-specific map message ID
@@ -126,7 +120,7 @@ public class ShowGameService {
                     && !channel.equals(privateChannel)) {
                 channel = privateChannel;
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), "Map Image sent to " + ((TextChannel) privateChannel).getJumpUrl());
+                        event.getMessageChannel(), "Map Image sent to " + privateChannel.getJumpUrl());
             }
         }
         return channel;

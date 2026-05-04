@@ -11,6 +11,7 @@ import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.milty.MiltyDraftSpec;
@@ -56,7 +57,16 @@ class StartMilty extends GameStateSubcommand {
         if (factionOption != null) {
             factionCount = factionOption.getAsInt();
         }
-        if (factionCount > 25) factionCount = 25;
+        List<String> unbannedFactions = new ArrayList<>(Mapper.getFactionsValues().stream()
+                .filter(f -> specs.factionSources.contains(f.getSource()))
+                .filter(f -> !specs.bannedFactions.contains(f.getAlias()))
+                .filter(f -> !f.getAlias().contains("obsidian"))
+                .filter(f -> !f.getAlias().contains("neutral"))
+                .filter(f -> !f.getAlias().contains("keleres")
+                        || "keleresm".equals(f.getAlias())) // Limit the pool to only 1 keleres flavor
+                .map(FactionModel::getAlias)
+                .toList());
+        if (factionCount > unbannedFactions.size()) factionCount = unbannedFactions.size();
         specs.setNumFactions(factionCount);
 
         // Slice count ----------------------------------------------------------------------------

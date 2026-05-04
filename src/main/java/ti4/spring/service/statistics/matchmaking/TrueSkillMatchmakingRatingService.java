@@ -34,7 +34,7 @@ class TrueSkillMatchmakingRatingService {
             for (int i = 0; i < gamePlayers.size(); i++) {
                 MatchmakingPlayer gamePlayer = gamePlayers.get(i);
                 var trueSkillPlayer = userIdToTrueSkillPlayer.computeIfAbsent(
-                        gamePlayer.userId(), k -> new Player<>(gamePlayer.userId()));
+                        gamePlayer.userId(), _ -> new Player<>(gamePlayer.userId()));
                 Rating rating =
                         trueSkillPlayerToRating.computeIfAbsent(trueSkillPlayer, id -> gameInfo.getDefaultRating());
                 userIdToUsername.put(gamePlayer.userId(), gamePlayer.username());

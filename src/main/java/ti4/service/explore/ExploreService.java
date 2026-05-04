@@ -323,7 +323,7 @@ public class ExploreService {
         }
 
         if (kolleccbt) {
-            player.setBreakthroughExhausted("kolleccbt", kolleccbt);
+            player.setBreakthroughExhausted("kolleccbt", true);
             MessageHelper.sendMessageToChannel(
                     (MessageChannel) event.getChannel(),
                     player.getRepresentation()
@@ -607,7 +607,7 @@ public class ExploreService {
                                 int amt = planetUnitHolder.getUnitCount(key);
                                 var removed = planetUnitHolder.removeUnit(key, amt);
                                 if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech)
-                                        .contains(key.getUnitType())) {
+                                        .contains(key.unitType())) {
                                     spaceUnitHolder.addUnitsWithStates(key, removed);
                                     groundForces.addAll(Collections.nCopies(
                                             amt, key.unitEmoji().emojiString()));
@@ -701,7 +701,7 @@ public class ExploreService {
                                     && !game.didPlayerScoreThisAlready(player.getUserID(), "deep_space")) {
                                 DisasterWatchHelper.sendMessageInDisasterWatch(
                                         game,
-                                        player.getRepresentation() + " is attempting to _Expore Deep Space_ in "
+                                        player.getRepresentation() + " is attempting to _Explore Deep Space_ in "
                                                 + game.getName() + ". Alas, alack, they have discovered Mirage!");
                             } else if (game.getRevealedPublicObjectives().containsKey("vast_territories")
                                     && !game.didPlayerScoreThisAlready(player.getUserID(), "vast_territories")) {
@@ -815,15 +815,6 @@ public class ExploreService {
                                     + " mech here.\n-# Do not do this prior to exploring; it is an \"after\", while exploring is a \"when\".",
                             saarButton);
                 }
-
-                // if (IsPlayerElectedService.isPlayerElected(game, player, "minister_exploration")) {
-                //     String fac = player.getFactionEmoji();
-                //     message = fac + " gained 1 trade good from _Minister of Exploration_ " + player.gainTG(1)
-                //             + ". You do have this trade good prior to exploring.";
-                //     MessageHelper.sendMessageToEventChannel(event, message);
-                //     ButtonHelperAbilities.pillageCheck(player, game);
-                //     ButtonHelperAgents.resolveArtunoCheck(player, 1);
-                // }
 
                 String exploredMessage = player.getRepresentation() + " explored the planet " + ExploreEmojis.Cultural
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(mirageID, game)
@@ -1183,7 +1174,7 @@ public class ExploreService {
             }
             case "suspiciouswreckage" -> {
                 Button button = Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "resolveDiplomaticPressureStep1",
+                        player.factionButtonChecker() + "resolveDiplomaticPressureStep1",
                         "Resolve Suspicious Wreckage");
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", button);
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", button);

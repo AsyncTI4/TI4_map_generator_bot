@@ -56,8 +56,9 @@ public class DataMigrationManager {
         // migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 
-    public static boolean runMigrations() {
-        if (migrations.isEmpty()) return false;
+    public static void runMigrations() {
+        if (migrations.isEmpty()) return;
+        BotLogger.info("STARTED MIGRATIONS");
         Map<String, List<String>> migrationNamesToAppliedGameNames = new HashMap<>();
 
         try {
@@ -78,7 +79,7 @@ public class DataMigrationManager {
                         migrationCutoffDate,
                         migrateEndedGames);
                 migrationNamesToAppliedGameNames
-                        .computeIfAbsent(entry.getKey(), k -> new ArrayList<>())
+                        .computeIfAbsent(entry.getKey(), _ -> new ArrayList<>())
                         .addAll(migratedGames);
             }
         } catch (Exception e) {
@@ -92,7 +93,8 @@ public class DataMigrationManager {
                         "Migration %s run on following maps successfully: \n%s", entry.getKey(), gameNames));
             }
         }
-        return true;
+
+        BotLogger.info("FINISHED MIGRATIONS");
     }
 
     private static Optional<LocalDate> getMigrationForGamesBeforeDate(String migrationName) {
@@ -141,8 +143,8 @@ public class DataMigrationManager {
 
             var changesMade = migrationMethod.apply(game);
             game.addMigration(migrationName);
-            GameManager.save(
-                    game, "Data Migration - " + migrationName); // TODO: We should be locking since we're saving
+            // TODO: Confirm games aren't able to make changes during this
+            GameManager.save(game, "Data Migration - " + migrationName);
             if (changesMade) {
                 migrationsApplied.add(game.getName());
             }

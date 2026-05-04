@@ -173,6 +173,10 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         return getRepresentationEmbed(false, true, false, false);
     }
 
+    public MessageEmbed getTfRepresentationEmbed() {
+        return getRepresentationEmbed(false, true, false, false, true);
+    }
+
     public MessageEmbed getRepresentationEmbed(boolean useTwilightsFallText) {
         return getRepresentationEmbed(false, true, false, false, useTwilightsFallText);
     }

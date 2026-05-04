@@ -42,12 +42,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.commands.planet.PlanetRemove;
+import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftCategory;
 import ti4.draft.FrankenDraft;
+import ti4.game.helper.StoredValueHelper;
+import ti4.game.helper.TwilightFallDeckFuncs;
 import ti4.game.manager.BorderAnomalyManager;
 import ti4.game.manager.StrategyCardManager;
-import ti4.game.persistence.GameManager;
 import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -101,7 +103,7 @@ import ti4.service.statistics.round.RoundStatsTracker;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
-public class Game extends GameProperties {
+public class Game extends GameProperties implements StoredValueHelper, TwilightFallDeckFuncs {
 
     private static final JsonMapper mapper = JsonMapperManager.basic();
 
@@ -121,7 +123,6 @@ public class Game extends GameProperties {
     @Getter
     private final Map<Integer, Boolean> scPlayed = new HashMap<>();
 
-    private final Map<String, String> checkingForAllReacts = new HashMap<>();
     private List<String> listOfTilePinged = new ArrayList<>();
 
     // TODO (Jazz): These should be easily added to GameProperties
@@ -384,6 +385,23 @@ public class Game extends GameProperties {
         return neutral;
     }
 
+    public Player setupNeutralPlayer() {
+        Player neutral = getPlayerFromColorOrFaction("neutral");
+        if (neutral != null) return neutral;
+        return setupNeutralPlayer(SetupNeutralPlayer.pickNeutralColor(this));
+    }
+
+    @NotNull
+    public Player getNeutral() {
+        if (getPlayerFromColorOrFaction("neutral") == null) return setupNeutralPlayer();
+        return getPlayerFromColorOrFaction("neutral");
+    }
+
+    @NotNull
+    public String getNeutralColor() {
+        return getNeutral().getColor();
+    }
+
     private int getNumberOfSOsInTheDeck() {
         return getSecretObjectives().size();
     }
@@ -600,18 +618,38 @@ public class Game extends GameProperties {
     public void setupTwilightsFallMode(GenericInteractionCreateEvent event) {
         setTwilightsFallMode(true);
         setThundersEdge(false);
-        validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_twilights_fall"));
-        validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
-        setStrategyCardSet("twilights_fall_sc");
-        removeSOFromGame("baf");
-        removeSOFromGame("dp");
-        removeSOFromGame("dtd");
-        removeSOFromGame("sb"); // get this stuff too
-        removeRelicFromGame("quantumcore");
-        removeRelicFromGame("mawofworlds");
-        removeRelicFromGame("prophetstears");
-        validateAndSetActionCardDeck(event, Mapper.getDeck("tf_action_deck"));
-        setTechnologyDeckID("techs_tf");
+
+        String agendaDeck = "agendas_twilights_fall";
+        String relicDeck = "relics_pok_te";
+        String stratCards = "twilights_fall_sc";
+        String acDeck = "tf_action_deck";
+        String techDeck = "techs_tf";
+
+        // Initialize splice decks
+        setAbilitySpliceDeckID("techs_tf");
+        setGenomeSpliceDeckID("tf_genome");
+        setParadigmSpliceDeckID("tf_paradigm");
+        setUnitSpliceDeckID("tf_units");
+
+        // Overrides for TK mode
+        if (isTwilightKart()) {
+            agendaDeck = "agendas_twilight_kart";
+            acDeck = "action_cards_twilight_kart";
+            setUnitSpliceDeckID("twilight_kart_units");
+        }
+
+        // Set other normal decks
+        validateAndSetAgendaDeck(event, Mapper.getDeck(agendaDeck));
+        validateAndSetRelicDeck(Mapper.getDeck(relicDeck));
+        setStrategyCardSet(stratCards);
+        validateAndSetActionCardDeck(event, Mapper.getDeck(acDeck));
+        setTechnologyDeckID(techDeck);
+
+        // Remove the secrets we have to remove
+        List.of("sb", "dtd", "dp", "baf").forEach(this::removeSOFromGame);
+
+        // Remove the Relics we have to remove
+        List.of("quantumcore", "mawofworlds", "prophetstears").forEach(this::removeRelicFromGame);
     }
 
     public void setPurgedPNs(List<String> purgedPN) {
@@ -831,7 +869,7 @@ public class Game extends GameProperties {
 
     private void clearTIGLSetupState() {
         TIGLHelper.removeFracturedTag(this);
-        setMinimumTIGLRankAtGameStart(null);
+        minimumTIGLRankAtGameStart = null;
         for (Player player : players.values()) {
             if (player != null) {
                 player.setPlayerTIGLRankAtGameStart(null);
@@ -1100,23 +1138,12 @@ public class Game extends GameProperties {
     }
 
     public void setCurrentReacts(String messageID, String factionsWhoReacted) {
-        checkingForAllReacts.put(messageID, factionsWhoReacted);
-    }
-
-    public Map<String, String> getMessagesThatICheckedForAllReacts() {
-        return checkingForAllReacts;
-    }
-
-    private String getFactionsThatReactedToThis(String messageID) {
-        if (checkingForAllReacts.get(messageID) != null) {
-            return checkingForAllReacts.get(messageID);
-        }
-        return "";
+        getStoredValueMap().put(messageID, factionsWhoReacted);
     }
 
     public void clearAllEmptyStoredValues() {
         // Remove the entry if the value is empty
-        checkingForAllReacts
+        getStoredValueMap()
                 .entrySet()
                 .removeIf(entry -> entry.getValue() == null || entry.getValue().isEmpty());
     }
@@ -1128,7 +1155,7 @@ public class Game extends GameProperties {
             return;
         }
         value = StringHelper.escape(value);
-        checkingForAllReacts.put(key, value);
+        getStoredValueMap().put(key, value);
     }
 
     public int changeCommsOnPlanet(int change, String planet) {
@@ -1147,12 +1174,12 @@ public class Game extends GameProperties {
     }
 
     public String getStoredValue(String key) {
-        String value = getFactionsThatReactedToThis(key);
+        String value = getStoredValueMap().getOrDefault(key, "");
         return StringHelper.unescape(value);
     }
 
     public String removeStoredValue(String key) {
-        return checkingForAllReacts.remove(key);
+        return getStoredValueMap().remove(key);
     }
 
     public void resetCurrentAgendaVotes() {
@@ -1782,6 +1809,29 @@ public class Game extends GameProperties {
             }
         }
         return custodiansTaken;
+    }
+
+    public Player getCustodiansTakerPlayer() {
+        String idC = "";
+        for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+            if (po.getValue().equals(0)) {
+                idC = po.getKey();
+                break;
+            }
+        }
+        if (!idC.isEmpty()) {
+            List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(idC, key -> new ArrayList<>());
+            if (!scoredPlayerList.isEmpty()) {
+                String playerID = scoredPlayerList.getFirst();
+                for (Player player : getRealAndEliminatedPlayers()) {
+                    if (player.getUserID().equalsIgnoreCase(playerID)) {
+                        return player;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     public boolean isCustodiansScored() {
@@ -2582,7 +2632,7 @@ public class Game extends GameProperties {
     }
 
     @NotNull
-    public Map<String, Integer> drawActionCard(Player player) {
+    private Map<String, Integer> drawActionCard(Player player) {
         if (!getActionCards().isEmpty()) {
             String id = getActionCards().getFirst();
             if (player.hasAbility("deceive")) {
@@ -2948,7 +2998,8 @@ public class Game extends GameProperties {
     }
 
     private boolean shouldPutCardOnRalnel(Player discardingPlayer) {
-        if (!"action".equals(getPhaseOfGame())) return false;
+        if (!"action".equals(getPhaseOfGame())
+                && getStoredValue("executiveOrder").isEmpty()) return false;
         for (Player p : getRealPlayers()) {
             if (p == discardingPlayer) continue;
             if (p.hasUnlockedBreakthrough("ralnelbt") && !p.isPassed()) return true;
@@ -3218,6 +3269,7 @@ public class Game extends GameProperties {
         return null;
     }
 
+    /** List of Relics remaining in the deck */
     public List<String> getAllRelics() {
         return relics;
     }
@@ -3955,7 +4007,6 @@ public class Game extends GameProperties {
             for (Player player : players.values()) {
                 PromissoryNoteHelper.checkAndAddPNs(this, player);
             }
-            GameManager.save(this, "Added missing promissory notes to players' hands: " + missingPromissoryNotes);
         }
     }
 
@@ -4276,7 +4327,7 @@ public class Game extends GameProperties {
 
     public Optional<Player> getPlayerByUnitKey(UnitKey unit) {
         return getRealPlayersNDummies().stream()
-                .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(unit.getColorID()))
+                .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(unit.colorID()))
                 .findFirst();
     }
 
@@ -4429,7 +4480,7 @@ public class Game extends GameProperties {
     }
 
     public UnitModel getUnitFromUnitKey(UnitKey unitKey) {
-        Player player = getPlayerFromColorOrFaction(unitKey.getColorID());
+        Player player = getPlayerFromColorOrFaction(unitKey.colorID());
         if (player == null) return null;
         return player.getUnitFromUnitKey(unitKey);
     }

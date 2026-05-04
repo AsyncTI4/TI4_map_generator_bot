@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 class ListTurnStats extends GameStateSubcommand {
 
     public ListTurnStats() {
-        super(Constants.TURN_STATS, "List average amount of time players take on their turns", false, false);
+        super(Constants.AVERAGE_TURN_STATS, "List average amount of time players take on their turns", false, false);
     }
 
     @Override
@@ -46,7 +46,7 @@ class ListTurnStats extends GameStateSubcommand {
             message.append('\n').append(turnString);
             if (min.map(player::is).orElse(false)) message.append(" 🐇");
             else if (max.map(player::is).orElse(false)) message.append(" 🐢");
-            else if (maxTime != null && maxTime < 30 * 60_000) message.append(" 🐢"); // 30 minutes
+            else if (maxTime < 30 * 60_000) message.append(" 🐢"); // 30 minutes
         }
         if (players.isEmpty()) {
             message.append("\n> Nobody has taken a turn yet :)");

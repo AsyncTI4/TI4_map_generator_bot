@@ -97,7 +97,7 @@ class ListPlayerInfoButtonHandler {
                         messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
                     }
                     for (String unit : p2.getUnitsOwned()) {
-                        if (unit.contains("_") || unit.contains("tf-")) {
+                        if (unit.contains("_") || unit.contains("tf-") || unit.contains("tk-")) {
                             messageEmbeds.add(Mapper.getUnit(unit).getRepresentationEmbed());
                         }
                     }

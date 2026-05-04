@@ -56,10 +56,12 @@ public final class TeHelperUnits {
     @ButtonHandler("revenantDeploy_")
     private static void revenantDeploy(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         String regex = "revenantDeploy_" + RegexHelper.unitHolderRegex(game, "planet");
-        if (!game.getTileByPosition(game.getActiveSystem())
-                .getSpaceUnitHolder()
-                .getTokenList()
-                .contains(Constants.TOKEN_BREACH_ACTIVE)) {
+
+        Tile tile = game.getTileByPosition(game.getActiveSystem());
+        UnitHolder space = tile.getSpaceUnitHolder();
+        boolean hasBreach = space.getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
+        boolean hasShips = tile.containsPlayersUnitsWithModelCondition(player, UnitModel::isNonFighterShip);
+        if (!hasBreach && !(game.isTwilightKart() && hasShips)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), "The system must have an active Breach in it to deploy a Revenant.");
             return;
@@ -69,9 +71,8 @@ public final class TeHelperUnits {
             AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "1 mech " + planet);
             String planetRep = Helper.getPlanetRepresentation(planet, game);
             String boringMsg = player.getRepresentation(true, false) + " deployed a Revenant on " + planetRep + ".";
-            String flavorMsg =
-                    "Out of the cold depths of the active Breach, a Rebellion Revenant has emerged, landing on "
-                            + planetRep + ".";
+            String flavorMsg = "Out of the cold depths of " + (game.isTwilightKart() ? "space" : "the active breach");
+            flavorMsg += ", a Rebellion _Revenant_ has emerged, landing on " + planetRep + ".";
 
             String msg = RandomHelper.isOneInX(20) ? flavorMsg : boringMsg;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -246,12 +247,14 @@ public final class TeHelperUnits {
                     && getForerunnerUnitButtonsForSystem(game, player, tile, t, forerunnerMap.get(adj))
                                     .size()
                             > 1) {
-                String id = player.finChecker() + "startForerunner_" + tile.getPosition() + "_" + t.getPosition();
+                String id =
+                        player.factionButtonChecker() + "startForerunner_" + tile.getPosition() + "_" + t.getPosition();
                 String label = t.getRepresentationForButtons(game, player);
                 buttons.add(Buttons.green(id, label));
             }
         }
-        buttons.add(Buttons.red(player.finChecker() + "finishForerunner_" + tile.getPosition(), "Done Moving"));
+        buttons.add(
+                Buttons.red(player.factionButtonChecker() + "finishForerunner_" + tile.getPosition(), "Done Moving"));
         return buttons;
     }
 
@@ -269,32 +272,30 @@ public final class TeHelperUnits {
 
                 // moved all of this unit already from this unit holder
                 String unitStr = uk.asyncID() + " " + uh.getName();
-                if (movedUnits != null
-                        && movedUnits.stream().filter(s -> s.equals(unitStr)).count() >= uh.getUnitCount(uk)) continue;
+                if (movedUnits.stream().filter(s -> s.equals(unitStr)).count() >= uh.getUnitCount(uk)) continue;
 
-                String id = player.finChecker() + "moveForerunner_" + destination.getPosition() + "_"
+                String id = player.factionButtonChecker() + "moveForerunner_" + destination.getPosition() + "_"
                         + source.getPosition() + "_" + uk.asyncID() + "_" + uh.getName();
-                String label = uk.getUnitType().humanReadableName() + " from " + uhName;
+                String label = uk.unitType().humanReadableName() + " from " + uhName;
                 buttons.add(Buttons.green(id, label, uk.unitEmoji()));
             }
         }
         // Get buttons to UNDO moving units from this system
-        if (movedUnits != null) {
-            Set<String> uniqueUnits = new HashSet<>(movedUnits);
-            for (String unit : uniqueUnits) {
-                String[] data = unit.split(" ");
-                UnitType type = Units.findUnitType(data[0]);
-                String uhName = Helper.getPlanetRepresentation(data[1], game);
-                if (type != null) {
-                    String id = player.finChecker() + "undoForerunner_" + destination.getPosition() + "_"
-                            + source.getPosition() + "_" + type + "_" + data[1];
-                    String label = "Return " + type.humanReadableName() + " to " + uhName;
-                    buttons.add(Buttons.red(id, label, type.getUnitTypeEmoji()));
-                }
+        Set<String> uniqueUnits = new HashSet<>(movedUnits);
+        for (String unit : uniqueUnits) {
+            String[] data = unit.split(" ");
+            UnitType type = Units.findUnitType(data[0]);
+            String uhName = Helper.getPlanetRepresentation(data[1], game);
+            if (type != null) {
+                String id = player.factionButtonChecker() + "undoForerunner_" + destination.getPosition() + "_"
+                        + source.getPosition() + "_" + type + "_" + data[1];
+                String label = "Return " + type.humanReadableName() + " to " + uhName;
+                buttons.add(Buttons.red(id, label, type.getUnitTypeEmoji()));
             }
         }
         // Choose another system button
-        buttons.add(Buttons.gray(player.finChecker() + "startForerunner_" + destination.getPosition(), "Done Moving"));
+        buttons.add(Buttons.gray(
+                player.factionButtonChecker() + "startForerunner_" + destination.getPosition(), "Done Moving"));
         return buttons;
     }
 
@@ -303,19 +304,18 @@ public final class TeHelperUnits {
         if (tile == null) return;
         if (!player.hasUnit("ralnel_flagship")) return;
 
-        String prefixID = player.finChecker() + "destroyUnit_" + pos + "_";
+        String prefixID = player.factionButtonChecker() + "destroyUnit_" + pos + "_";
         List<Button> destroyable = new ArrayList<>();
         for (UnitKey uk : tile.getSpaceUnitHolder().getUnitsByState().keySet()) {
             if (player.unitBelongsToPlayer(uk)) continue;
 
-            Player p2 = game.getPlayerFromColorOrFaction(uk.getColorID());
+            Player p2 = game.getPlayerFromColorOrFaction(uk.colorID());
             if (p2 == null) continue;
 
             UnitModel model = p2.getUnitFromUnitKey(uk);
             if (!model.getSustainDamage()) {
                 String id = prefixID + p2.getFaction() + "_" + uk.asyncID();
-                String label =
-                        "Destroy " + p2.getColor() + " " + uk.getUnitType().humanReadableName();
+                String label = "Destroy " + p2.getColor() + " " + uk.unitType().humanReadableName();
                 destroyable.add(Buttons.red(id, label, uk.unitEmoji()));
             }
         }

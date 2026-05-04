@@ -31,9 +31,6 @@ public class PublicSnakeDraftGroup extends SubcommandGroup {
 
     public static PublicSnakeDraftOrchestrator getOrchestrator(Game game) {
         DraftManager draftManager = game.getDraftManager();
-        if (draftManager == null) {
-            return null;
-        }
         DraftOrchestrator orchestrator = draftManager.getOrchestrator();
         if (!(orchestrator instanceof PublicSnakeDraftOrchestrator)) {
             return null;

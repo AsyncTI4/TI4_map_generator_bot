@@ -12,7 +12,7 @@ import ti4.service.async.RoleService;
 
 class SearchMyGames extends Subcommand {
 
-    public SearchMyGames() {
+    SearchMyGames() {
         super(Constants.SEARCH_MY_GAMES, "List all of your games you are currently in");
         addOptions(new OptionData(
                 OptionType.BOOLEAN, Constants.IS_MY_TURN, "True to only show games where it is your turn"));

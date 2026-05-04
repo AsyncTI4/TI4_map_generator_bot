@@ -1,6 +1,7 @@
 package ti4.service.button;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -139,39 +140,36 @@ public class ReactionService {
 
     public static void addReaction(
             Player player, boolean sendPublic, String message, String additionalMessage, String messageID, Game game) {
+        Message mainMessage =
+                game.getMainGameChannel().retrieveMessageById(messageID).complete();
+
+        Emoji emojiToUse = Helper.getPlayerReactionEmoji(game, player, mainMessage);
+        String messageId = mainMessage.getId();
+
         game.getMainGameChannel()
-                .retrieveMessageById(messageID)
-                .queue(
-                        mainMessage -> {
-                            Emoji emojiToUse = Helper.getPlayerReactionEmoji(game, player, mainMessage);
-                            String messageId = mainMessage.getId();
+                .addReactionById(messageId, emojiToUse)
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+        GameMessageManager.addReaction(game.getName(), player.getFaction(), messageId);
+        progressGameIfAllPlayersHaveReacted(messageId, game);
 
-                            game.getMainGameChannel()
-                                    .addReactionById(messageId, emojiToUse)
-                                    .queue(Consumers.nop(), BotLogger::catchRestError);
-                            GameMessageManager.addReaction(game.getName(), player.getFaction(), messageId);
-                            progressGameIfAllPlayersHaveReacted(messageId, game);
+        if (message == null || message.isEmpty()) {
+            return;
+        }
 
-                            if (message == null || message.isEmpty()) {
-                                return;
-                            }
+        String text = player.getRepresentation() + " " + message;
+        if (game.isFowMode() && sendPublic) {
+            text = message;
+        } else if (game.isFowMode()) {
+            text = "(You) " + emojiToUse.getFormatted() + " " + message;
+        }
 
-                            String text = player.getRepresentation() + " " + message;
-                            if (game.isFowMode() && sendPublic) {
-                                text = message;
-                            } else if (game.isFowMode()) {
-                                text = "(You) " + emojiToUse.getFormatted() + " " + message;
-                            }
+        if (additionalMessage != null && !additionalMessage.isEmpty()) {
+            text += game.getPing() + " " + additionalMessage;
+        }
 
-                            if (additionalMessage != null && !additionalMessage.isEmpty()) {
-                                text += game.getPing() + " " + additionalMessage;
-                            }
-
-                            if (game.isFowMode() && !sendPublic) {
-                                MessageHelper.sendPrivateMessageToPlayer(player, game, text);
-                            }
-                        },
-                        BotLogger::catchRestError);
+        if (game.isFowMode() && !sendPublic) {
+            MessageHelper.sendPrivateMessageToPlayer(player, game, text);
+        }
     }
 
     public static void progressGameIfAllPlayersHaveReacted(String messageId, Game game) {
@@ -191,15 +189,16 @@ public class ReactionService {
             return;
         }
 
-        game.getMainGameChannel().retrieveMessageById(gameMessage.messageId()).queue(message -> {
-            if (gameMessage.type() == GameMessageType.AGENDA_AFTER) {
-                handleAllPlayersReactingNoAfters(message, game);
-            } else if (gameMessage.type() == GameMessageType.AGENDA_WHEN) {
-                handleAllPlayersReactingNoWhens(message, game);
-            } else {
-                handleAllPlayersReactingNoSabotage(message, game, gameMessage);
-            }
-        });
+        var message = game.getMainGameChannel()
+                .retrieveMessageById(gameMessage.messageId())
+                .complete();
+        if (gameMessage.type() == GameMessageType.AGENDA_AFTER) {
+            handleAllPlayersReactingNoAfters(message, game);
+        } else if (gameMessage.type() == GameMessageType.AGENDA_WHEN) {
+            handleAllPlayersReactingNoWhens(message, game);
+        } else {
+            handleAllPlayersReactingNoSabotage(message, game, gameMessage);
+        }
     }
 
     public static void handleAllPlayersReactingNoAfters(Message message, Game game) {

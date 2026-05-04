@@ -472,7 +472,7 @@ public class PlayerAreaGenerator {
             }
 
             if (member != null) return member.getEffectiveName() + afk;
-            if (user != null) return user.getEffectiveName() + afk;
+            return user.getEffectiveName() + afk;
         } catch (Exception e) {
         }
         return player.getUserName() + afk;
@@ -1730,7 +1730,7 @@ public class PlayerAreaGenerator {
                     }
                 }
 
-                String unitName = unitKey.getUnitType().humanReadableName();
+                String unitName = unitKey.unitType().humanReadableName();
                 if (!game.isHasEnded() && numInReinforcements < 0 && game.isCcNPlasticLimit()) {
                     String warningMessage = player.getRepresentation()
                             + " is exceeding unit plastic or cardboard limits for " + unitName
@@ -1801,7 +1801,7 @@ public class PlayerAreaGenerator {
         for (UnitKey uk : unitHolder.getUnitKeys()) {
             int count = unitCount.getOrDefault(uk, 0);
 
-            if (uk.getUnitType() == UnitType.Infantry || uk.getUnitType() == UnitType.Fighter) {
+            if (uk.unitType() == UnitType.Infantry || uk.unitType() == UnitType.Fighter) {
                 if (ignoreInfantryFighters) continue;
                 count++;
             } else {
@@ -1908,7 +1908,7 @@ public class PlayerAreaGenerator {
         Set<UnitKey> units = new HashSet<>();
 
         for (UnitKey id : tempUnits) {
-            if (id.getUnitType() == UnitType.Mech) {
+            if (id.unitType() == UnitType.Mech) {
                 units.add(id);
             }
         }
@@ -1930,7 +1930,7 @@ public class PlayerAreaGenerator {
                 UnitType.Fighter,
                 UnitType.Infantry);
 
-        Map<UnitType, List<UnitKey>> collect = units.stream().collect(Collectors.groupingBy(UnitKey::getUnitType));
+        Map<UnitType, List<UnitKey>> collect = units.stream().collect(Collectors.groupingBy(UnitKey::unitType));
         for (UnitType orderKey : order) {
             List<UnitKey> keys = collect.get(orderKey);
             if (keys == null) {
@@ -1950,10 +1950,10 @@ public class PlayerAreaGenerator {
                 try {
                     String unitPath = getUnitPath(unitKey);
                     if (unitPath != null) {
-                        if (unitKey.getUnitType() == UnitType.Fighter) {
+                        if (unitKey.unitType() == UnitType.Fighter) {
                             unitPath = unitPath.replace(Constants.COLOR_FF, Constants.BULK_FF);
                             bulkUnitCount = unitCount;
-                        } else if (unitKey.getUnitType() == UnitType.Infantry) {
+                        } else if (unitKey.unitType() == UnitType.Infantry) {
                             unitPath = unitPath.replace(Constants.COLOR_GF, Constants.BULK_GF);
                             bulkUnitCount = unitCount;
                         }
@@ -1975,7 +1975,7 @@ public class PlayerAreaGenerator {
 
                 Point position = new Point(x, y);
                 boolean justNumber = false;
-                switch (unitKey.getUnitType()) {
+                switch (unitKey.unitType()) {
                     case Fighter -> {
                         position.translate(fighterPoint.x, fighterPoint.y);
                         justNumber = true;
@@ -2000,7 +2000,7 @@ public class PlayerAreaGenerator {
                         ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
 
                 BufferedImage spoopy = null;
-                if (unitKey.getUnitType() == UnitType.Warsun) {
+                if (unitKey.unitType() == UnitType.Warsun) {
                     int chanceToSeeSpoop = CalendarHelper.isNearHalloween() ? 10 : 1000;
                     if (ThreadLocalRandom.current().nextInt(chanceToSeeSpoop) == 0) {
                         String spoopyPath = ResourceHelper.getInstance().getSpoopyFile();
@@ -2024,7 +2024,7 @@ public class PlayerAreaGenerator {
                 for (int i = 0; i < unitCount; i++) {
                     graphics.drawImage(image, position.x, position.y + deltaY, null);
                     if (decal.isPresent()
-                            && !List.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.getUnitType())) {
+                            && !List.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.unitType())) {
                         graphics.drawImage(decal.get(), position.x, position.y + deltaY, null);
                     }
                     if (spoopy != null) {
@@ -2121,13 +2121,9 @@ public class PlayerAreaGenerator {
             int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, game);
             int totalPlayerResources = Helper.getPlayerResourcesTotal(player, game);
             int availablePlayerResourcesOptimal = Helper.getPlayerOptimalResourcesAvailable(player, game);
-            // int totalPlayerResourcesOptimal =
-            // Helper.getPlayerOptimalResourcesTotal(player, map);
             int availablePlayerInfluence = Helper.getPlayerInfluenceAvailable(player, game);
             int totalPlayerInfluence = Helper.getPlayerInfluenceTotal(player, game);
             int availablePlayerInfluenceOptimal = Helper.getPlayerOptimalInfluenceAvailable(player, game);
-            // int totalPlayerInfluenceOptimal =
-            // Helper.getPlayerOptimalInfluenceTotal(player, map);
             int availablePlayerFlex = Helper.getPlayerFlexResourcesInfluenceAvailable(player, game);
             // int totalPlayerFlex = Helper.getPlayerFlexResourcesInfluenceTotal(player,
             // map);
@@ -2185,9 +2181,6 @@ public class PlayerAreaGenerator {
                     String.valueOf(availablePlayerFlex),
                     new Rectangle(x + deltaX, y + 115, 150, 20),
                     Storage.getFont18());
-            // DrawingUtil.drawCenteredString(graphics, String.valueOf(totalPlayerFlex), new Rectangle(x
-            // + deltaX + 185, y + 109, 32, 32), Storage.getFont32());
-
         }
 
         deltaX += 156;
@@ -2560,9 +2553,6 @@ public class PlayerAreaGenerator {
 
     private int techInfo(Player player, int x, int y, Game game) {
         List<String> techs = player.getTechs();
-        List<String> exhaustedTechs = player.getExhaustedTechs();
-        List<String> purgedTechs = player.getPurgedTechs();
-
         Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : techs) {
             TechnologyModel techModel = Mapper.getTech(tech);
@@ -2589,12 +2579,13 @@ public class PlayerAreaGenerator {
             List<String> list = entry.getValue();
             list.sort(techComparator);
         }
-        purgedTechs.sort(techComparator);
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
 
         int deltaX = 0;
+
+        List<String> exhaustedTechs = player.getExhaustedTechs();
         if (game.isTwilightsFallMode()) {
             deltaX = techField(x, y, techsFiltered.get("generictf"), exhaustedTechs, deltaX, player);
         }
@@ -2615,7 +2606,10 @@ public class PlayerAreaGenerator {
                     graphics, x, y, VeiledHeartService.VeiledCardType.UNIT, deltaX, player);
         }
 
+        List<String> purgedTechs = player.getPurgedTechs();
         if (!purgedTechs.isEmpty()) {
+            purgedTechs = new ArrayList<>(purgedTechs);
+            purgedTechs.sort(techComparator);
             deltaX = techField(x, y, purgedTechs, Collections.emptyList(), deltaX, player);
         }
         return x + deltaX;
@@ -3192,7 +3186,7 @@ public class PlayerAreaGenerator {
             BufferedImage wsCrackImage = ImageHelper.read(ResourceHelper.getInstance()
                     .getTokenFile("agenda_publicize_weapon_schematics"
                             + (player.hasWarsunTech()
-                                    ? DrawingUtil.getBlackWhiteFileSuffix(unitKey.getColorID())
+                                    ? DrawingUtil.getBlackWhiteFileSuffix(unitKey.colorID())
                                     : "_blk.png")));
             graphics.drawImage(wsCrackImage, deltaX + x + unitOffset.x, y + unitOffset.y, null);
         }
@@ -3202,12 +3196,13 @@ public class PlayerAreaGenerator {
             playerUnitModels.add(Mapper.getUnit("nowarsun"));
         }
 
-        int tfMechCount = 0;
-        int tfMechIndex = 0;
+        int tfMechCount = 0, tfMechIndex = 0;
+        int tfFlagCount = 0, tfFlagIndex = 0;
         if (game.isTwilightsFallMode()) {
             for (UnitModel unit : playerUnitModels) {
-                if ("mf".equals(unit.getAsyncId())) {
-                    tfMechCount++;
+                switch (unit.getAsyncId()) {
+                    case "mf" -> tfMechCount++;
+                    case "fs" -> tfFlagCount++;
                 }
             }
         }
@@ -3222,6 +3217,7 @@ public class PlayerAreaGenerator {
 
                 if ("fs".equals(unit.getAsyncId())) {
                     String unitFaction = unit.getFaction().orElse("nekro").toLowerCase();
+
                     if (player.hasUnlockedBreakthrough("nekrobt")) {
                         List<String> flagships = new ArrayList<>(
                                 Arrays.asList(game.getStoredValue("valefarZ").split("\\|")));
@@ -3252,8 +3248,19 @@ public class PlayerAreaGenerator {
                         graphics.drawImage(
                                 valefarZ, deltaX + x + unitFactionOffset.x - 10, y + unitFactionOffset.y + 10, null);
                         unitFactionOffset.translate(-24, -24);
-                    } else if ("tf-echoofascension".equals(unit.getAlias())) {
-                        unitFactionOffset.translate(-24, -24);
+                    } else if (game.isTwilightsFallMode() && tfFlagCount >= 2) {
+                        if (unit.getAlias().endsWith("tf_flagship")) {
+                            if (tfFlagCount >= 3) unitFactionOffset.translate(0, 8);
+                        } else {
+                            if (tfFlagCount >= 3) unitFactionOffset.translate(0, -8);
+                            switch (++tfFlagIndex) {
+                                case 1 -> unitFactionOffset.translate(-24, -24);
+                                case 2 -> unitFactionOffset.translate(-8, -16);
+                                case 3 -> unitFactionOffset.translate(8, -8);
+                                case 4 -> unitFactionOffset.translate(24, 0);
+                                case 5 -> unitFactionOffset.translate(40, 8);
+                            }
+                        }
                     }
                 }
 

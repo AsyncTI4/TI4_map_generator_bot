@@ -21,8 +21,6 @@ import ti4.testUtils.BaseTi4Test;
 class ColorModelTest extends BaseTi4Test {
     @Test
     void testColors() {
-        beforeAll();
-
         List<ColorModel> models = Mapper.getColors();
 
         Set<String> aliasList = new HashSet<>();

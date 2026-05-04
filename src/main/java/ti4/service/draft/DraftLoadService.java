@@ -76,7 +76,7 @@ public class DraftLoadService {
                 PlayerDraftState playerState = draftManager.getPlayerStates().get(playerUserId);
                 playerState
                         .getPicks()
-                        .computeIfAbsent(choice.getType(), k -> new ArrayList<>())
+                        .computeIfAbsent(choice.type(), _ -> new ArrayList<>())
                         .add(choice);
             } else if (data.startsWith(playerOrchestratorStateKey)) {
                 if (orchestrator != null) {
@@ -140,7 +140,7 @@ public class DraftLoadService {
         for (Draftable draftable : draftables) {
             if (draftable.getType().equals(draftableType)) {
                 for (DraftChoice choice : draftable.getAllDraftChoices()) {
-                    if (choice.getChoiceKey().equals(choiceKey)) {
+                    if (choice.choiceKey().equals(choiceKey)) {
                         return choice;
                     }
                 }

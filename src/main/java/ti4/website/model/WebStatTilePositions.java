@@ -35,7 +35,7 @@ public class WebStatTilePositions {
             }
         }
 
-        webStatTilePositions.setStatTilePositions(factionToStatTiles);
+        webStatTilePositions.statTilePositions = factionToStatTiles;
         return webStatTilePositions;
     }
 }

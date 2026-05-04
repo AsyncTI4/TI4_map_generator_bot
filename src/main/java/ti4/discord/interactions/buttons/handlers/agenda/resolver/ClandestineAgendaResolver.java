@@ -11,7 +11,7 @@ import ti4.service.abilities.MahactTokenService;
 
 public class ClandestineAgendaResolver implements ForAgainstAgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "cladenstine";
     }
 

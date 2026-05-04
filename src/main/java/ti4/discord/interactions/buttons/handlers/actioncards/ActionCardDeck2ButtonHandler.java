@@ -183,9 +183,6 @@ class ActionCardDeck2ButtonHandler {
         //            buttons.add(Buttons.red("getDamageButtons_" + game.getActiveSystem() + "_" + "combat", "Assign
         // Hit" + (hits == 1 ? "" : "s")));
         //        }
-        //        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg + "\n " +
-        // player.getRepresentation() +
-        //            " your opponent needs to assign " + hits + " hit" + (hits == 1 ? "" : "s"), buttons);
     }
 
     @ButtonHandler("resolveFlawlessStrategy")
@@ -633,8 +630,8 @@ class ActionCardDeck2ButtonHandler {
         ButtonHelper.deleteMessage(event);
 
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "allianceRiderGainAlly", "Gain Ally"));
-        buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "allianceRiderPurgeAlly", "Purge Ally"));
+        buttons.add(Buttons.blue(player.factionButtonChecker() + "allianceRiderGainAlly", "Gain Ally"));
+        buttons.add(Buttons.red(player.factionButtonChecker() + "allianceRiderPurgeAlly", "Purge Ally"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", choose whether to gain or purge this ally.",

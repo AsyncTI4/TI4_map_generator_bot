@@ -26,9 +26,6 @@ public class SpeakerOrderDraftableGroup extends SubcommandGroup {
 
     public static SpeakerOrderDraftable getDraftable(Game game) {
         DraftManager draftManager = game.getDraftManager();
-        if (draftManager == null) {
-            return null;
-        }
         return (SpeakerOrderDraftable) draftManager.getDraftable(SpeakerOrderDraftable.TYPE);
     }
 }

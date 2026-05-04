@@ -71,16 +71,16 @@ public class DraftSaveService {
             for (var draftableTypes : sortedTypes) {
                 List<DraftChoice> choiceListValues = state.getPicks().get(draftableTypes);
                 var sortedPicks = choiceListValues.stream()
-                        .sorted(Comparator.comparing(DraftChoice::getChoiceKey))
+                        .sorted(Comparator.comparing(DraftChoice::choiceKey))
                         .toList();
                 for (DraftChoice choice : sortedPicks) {
                     lines.add(PLAYER_PICK_DATA
                             + KEY_SEPARATOR
                             + shortId
                             + DATA_SEPARATOR
-                            + choice.getType()
+                            + choice.type()
                             + DATA_SEPARATOR
-                            + choice.getChoiceKey());
+                            + choice.choiceKey());
                 }
             }
         }

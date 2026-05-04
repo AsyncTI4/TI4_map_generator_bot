@@ -1,8 +1,8 @@
 [
     {
         "alias": "arvaxibt",
-        "name": "Arvaxi Mobilization Engine",
-        "shortName": "Arvaxi\nMobilization Engine",
+        "name": " Experimental Mechanisms",
+        "shortName": " Experimental\nMechanisms",
         "faction": "arvaxi",
         "synergy": [
             "CYBERNETIC",
@@ -13,8 +13,8 @@
     },
     {
         "alias": "xanbt",
-        "name": "Kinetic Probe Network ",
-        "shortName": "Kinetic\nProbe Network ",
+        "name": "Kinetic Probe Network",
+        "shortName": "Kinetic\nProbe Network",
         "faction": "xan",
         "synergy": [
             "PROPULSION",
@@ -22,30 +22,6 @@
         ],
         "text": "Once per combat round, you may use the SUSTAIN DAMAGE ability of 1 of your units that is not participating in this combat. You can only use this ability on ships during space combat and on ground forces during ground combat.",
         "source": "balacasi"
-    },
-    {
-        "alias": "arachianbt",
-        "name": "The Weave Unraveled",
-        "shortName": "The Weave\nUnraveled",
-        "faction": "arachian",
-        "synergy": [
-            "BIOTIC",
-            "CYBERNETIC"
-        ],
-        "text": "Place The Weave system tile in your play area. Gain its legendary anomaly ability. You may treat this system as being adjacent to any system that contains both one of your command tokens and your units. Other players cannot move or place units or tokens into this system. Legendary anomaly ability: Fabric of the Weave At the end of your turn, exhaust this card to produce up to 3 units in The Weave. Reduce the combined cost of this production by 1.",
-        "source": "other"
-    },
-    {
-        "alias": "zooidbt",
-        "name": "Foresight Module",
-        "shortName": "Foresight\nModule",
-        "faction": "zooid",
-        "synergy": [
-            "BIOTIC",
-            "CYBERNETIC"
-        ],
-        "text": "When you are negotiating a transaction, secret objectives can be exchanged as part of that transaction. ACTION: Exhaust this card and discard 1 secret objective to draw 1 secret objective.",
-        "source": "other"
     },
     {
         "alias": "kalorabt",
@@ -80,7 +56,7 @@
             "CYBERNETIC",
             "BIOTIC"
         ],
-        "text": "When you resolve the primary ability of a strategy card, if The Fracture is not already in play, roll a die. On a result of 1 or 10, put The Fracture into play. At the start of a ground combat on a planet in The Fracture or in the wormhole nexus, you may choose any number of your infantry on that planet; replace each of those infantry with 1 mech from your reinforcements.",
+        "text": "When you resolve the primary ability of a strategy card, roll a die. On a result of 1 or 10, put The Fracture into play if it is not already; if it is, move an ingress token into a system that contains your units. At the start of a ground combat on a planet in The Fracture or in the wormhole nexus, you may choose any number of your infantry on that planet; replace each of those infantry with 1 mech from your reinforcements.",
         "source": "balacasi"
     },
     {
@@ -116,7 +92,7 @@
             "BIOTIC",
             "CYBERNETIC"
         ],
-        "text": "When you spend resources, you may place any number of your non-unit upgrade technologies on this card. For each technology placed on this card, reduce the resources spent by 1. Technologies on this card are treated as though they have no ability text. At the start of the status phase, remove all technologies from this card.",
+        "text": "When you spend resources, you may place any number of your non-unit upgrade technologies on this card. For each technology placed on this card, reduce the resources spent by 1. Technologies on this card are treated as though they have no ability text. When a player passes, remove 1 technology from this card.",
         "source": "balacasi"
     }
 ]

@@ -10,7 +10,11 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.edict.EdictPhaseHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.onyxxa.OnyxxaHeroButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.xan.XanHeroButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -31,8 +35,6 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
-import ti4.helpers.Units.UnitKey;
-import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.Mapper;
@@ -57,6 +59,7 @@ import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
+import ti4.spring.context.SpringContext;
 
 @UtilityClass
 public class PlayHeroService {
@@ -75,6 +78,12 @@ public class PlayHeroService {
         boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(game.getOutputVerbosity());
         StringBuilder sb = new StringBuilder();
         if (leaderModel != null) {
+            SpringContext.getBean(CombatReplayService.class)
+                    .mirrorLeaderPlayed(
+                            game,
+                            player,
+                            leaderModel.getAlias(),
+                            event.getChannel().getName());
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " played:");
             player.getCorrectChannel()
                     .sendMessageEmbeds(leaderModel.getRepresentationEmbed(
@@ -144,7 +153,7 @@ public class PlayHeroService {
                 // You may choose to no longer be passed; if you do, gain 2 command tokens, draw 1 action card, and
                 // purge this card
                 player.setPassed(false);
-                String prefix = player.getFinsFactionCheckerPrefix();
+                String prefix = player.factionButtonChecker();
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green(prefix + "gain_CC", "Gain 2 Command Tokens"));
                 buttons.add(Buttons.green(prefix + "drawActionCards_1", "Draw 1 Action Card"));
@@ -197,46 +206,10 @@ public class PlayHeroService {
                     ButtonHelperRelics.offerTitansHeroButtons(player, game, event);
                 }
             }
-            case "onyxxahero" -> {
-                List<Button> buttons = new ArrayList<>();
-                for (Tile tile : game.getTileMap().values()) {
-                    if (FoWHelper.playerHasActualShipsInSystem(player, tile)) {
-                        buttons.add(Buttons.green(
-                                "moveShipToAdjacentSystemStep2_" + tile.getPosition() + "_hero",
-                                tile.getRepresentationForButtons(game, player)));
-                    }
-                }
-
-                buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation()
-                                + ", please use buttons to resolve your _Titles Are Silly_ hero ability.",
-                        buttons);
-            }
-            case "xanhero" -> {
-                int amount = 0;
-                for (Tile tile : game.getTileMap().values()) {
-                    for (UnitHolder uh : tile.getUnitHolders().values()) {
-                        for (UnitKey uk : uh.getUnitKeys()) {
-                            amount += uh.getUnitCountForState(uk, UnitState.dmg);
-                        }
-                    }
-                }
-                game.getTileMap().values().stream()
-                        .flatMap(t -> t.getUnitHolders().values().stream())
-                        .forEach(uh -> uh.removeAllUnitDamage(player.getColorID()));
-                String gainedTg = player.gainTG(amount, true);
-                String message = player.getRepresentation() + " repaired all " + amount
-                        + " of their damaged units, and consequently gained " + amount + " trade good"
-                        + (amount == 1 ? "" : "s") + " " + gainedTg + ".";
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                ButtonHelperAgents.resolveArtunoCheck(player, amount);
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation()
-                                + " can now repair other players' units near their space docks (not automated, use `/remove_all_sustain_damage`).");
-            }
+            case "onyxxahero" -> OnyxxaHeroButtonHandler.postInitialButtons(game, player);
+            case "xanhero" -> XanHeroButtonHandler.postInitialButtons(game, player);
+            case "tyrishero" ->
+                game.setStoredValue("tyrisHeroRound" + game.getRound() + "_" + player.getFaction(), "true");
             case "mirvedahero" -> {
                 List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, "pds", "placeOneNDone_skipbuild");
                 String message = "Please choose a planet to place a PDS";
@@ -539,17 +512,14 @@ public class PlayHeroService {
                 }
             }
             case "voicehero" -> {
-                List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");
-                if (ButtonHelper.isLawInPlay(game, "tf-censure")) {
-                    edicts.removeIf("tf-censure"::equalsIgnoreCase);
-                }
+                List<String> edicts = EdictPhaseHandler.getEdictDeck(game);
                 List<Button> buttons = new ArrayList<>();
                 List<MessageEmbed> embeds = new ArrayList<>();
                 Player tyrant = player;
                 for (int x = 0; x < 3; x++) {
                     AgendaModel edict = Mapper.getAgenda(edicts.get(x));
                     buttons.add(Buttons.green(
-                            tyrant.getFinsFactionCheckerPrefix() + "resolveEdict_" + edicts.get(x), edict.getName()));
+                            tyrant.factionButtonChecker() + "resolveEdict_" + edicts.get(x), edict.getName()));
                     embeds.add(edict.getRepresentationEmbed());
                 }
                 String msg = tyrant.getRepresentation()
@@ -625,8 +595,8 @@ public class PlayHeroService {
             }
             case "yinhero" -> {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.blue(
-                        player.getFinsFactionCheckerPrefix() + "yinHeroStart", "Invade A Planet With Yin Hero"));
+                buttons.add(
+                        Buttons.blue(player.factionButtonChecker() + "yinHeroStart", "Invade A Planet With Yin Hero"));
                 buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
@@ -671,11 +641,9 @@ public class PlayHeroService {
             case "augershero" -> {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.blue(
-                        player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 1,
-                        "Resolve Ilyxum Hero on Stage 1 Deck"));
+                        player.factionButtonChecker() + "augersHeroStart_" + 1, "Resolve Ilyxum Hero on Stage 1 Deck"));
                 buttons.add(Buttons.blue(
-                        player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 2,
-                        "Resolve Ilyxum Hero on Stage 2 Deck"));
+                        player.factionButtonChecker() + "augersHeroStart_" + 2, "Resolve Ilyxum Hero on Stage 2 Deck"));
                 buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),

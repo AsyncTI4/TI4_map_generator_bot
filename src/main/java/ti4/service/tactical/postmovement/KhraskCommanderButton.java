@@ -9,13 +9,14 @@ import ti4.service.tactical.PostMovementButtonContext;
 
 public final class KhraskCommanderButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return !ctx.tile.getPlanetUnitHolders().isEmpty()
-                && ctx.game.playerHasLeaderUnlockedOrAlliance(ctx.player, "khraskcommander");
+        return !ctx.tile().getPlanetUnitHolders().isEmpty()
+                && ctx.game().playerHasLeaderUnlockedOrAlliance(ctx.player(), "khraskcommander");
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.blue(
-                ctx.player.finChecker() + "placeKhraskCommanderInf_" + ctx.tile.getPosition(),
+                ctx.player().factionButtonChecker() + "placeKhraskCommanderInf_"
+                        + ctx.tile().getPosition(),
                 "Place Infantry with Khrask Commander",
                 FactionEmojis.khrask));
     }

@@ -143,7 +143,7 @@ class GameSaveService {
             writer.write(System.lineSeparator());
             writer.write(game.getOwnerName());
             writer.write(System.lineSeparator());
-            writer.write(game.getName());
+            writer.write(game.getName().toLowerCase());
             writer.write(System.lineSeparator());
             saveGameInfo(writer, game);
 
@@ -261,7 +261,7 @@ class GameSaveService {
         writer.write(Constants.AGENDA_VOTE_INFO + " " + sb2);
         writer.write(System.lineSeparator());
 
-        Map<String, String> currentCheckingForAllReacts = game.getMessagesThatICheckedForAllReacts();
+        Map<String, String> currentCheckingForAllReacts = game.getStoredValueMap();
         sb2 = new StringBuilder();
         for (Map.Entry<String, String> entry : currentCheckingForAllReacts.entrySet()) {
             sb2.append(entry.getKey())
@@ -648,6 +648,12 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.EXPLORATION_DECK_ID + " " + game.getExplorationDeckID());
         writer.write(System.lineSeparator());
+
+        writeStrLine(writer, Constants.ABILITY_DECK_ID, game.getAbilitySpliceDeckID());
+        writeStrLine(writer, Constants.GENOME_DECK_ID, game.getGenomeSpliceDeckID());
+        writeStrLine(writer, Constants.PARADIGM_DECK_ID, game.getParadigmSpliceDeckID());
+        writeStrLine(writer, Constants.UNITUPGRADE_DECK_ID, game.getUnitSpliceDeckID());
+        writeBoolLine(writer, Constants.TWILIGHT_KART, game.isTwilightKart());
 
         writer.write(Constants.BAG_DRAFT + " "
                 + (game.getActiveBagDraft() == null
@@ -1123,8 +1129,7 @@ class GameSaveService {
     }
 
     private static void writeStrLine(Writer writer, String field, String str) throws IOException {
-        String output = StringHelper.escape(str != null ? str : "");
-        writer.write(field + " " + output);
+        writer.write(field + " " + str);
         writer.write(System.lineSeparator());
     }
 
@@ -1134,7 +1139,7 @@ class GameSaveService {
     }
 
     private static void writeBoolLine(Writer writer, String field, boolean bool) throws IOException {
-        String output = bool ? "true" : "false";
+        String output = Boolean.toString(bool);
         writer.write(field + " " + output);
         writer.write(System.lineSeparator());
     }
@@ -1158,7 +1163,7 @@ class GameSaveService {
 
     private static void writeStrBoolMap(Writer writer, String field, Map<String, Boolean> map) throws IOException {
         List<String> entries = map.entrySet().stream()
-                .map(e -> e.getKey() + "," + (e.getValue() ? "true" : "false"))
+                .map(e -> e.getKey() + "," + (e.getValue().toString()))
                 .toList();
         writer.write(field + " " + String.join(";", entries));
         writer.write(System.lineSeparator());

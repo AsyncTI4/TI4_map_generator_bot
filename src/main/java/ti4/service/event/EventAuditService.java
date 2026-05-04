@@ -30,8 +30,8 @@ public class EventAuditService {
                         || button.getButton().getCustomId().contains("requestAllFollow")) {
                     yield "someone pressed button: [CLASSIFIED]";
                 }
-                yield username + " pressed button: " + button.getButton().getCustomId() + " -- "
-                        + button.getButton().getLabel();
+                yield username + " pressed button: " + button.getButton().getLabel() + " ("
+                        + button.getButton().getCustomId() + ")";
             }
             case StringSelectInteractionEvent selectMenu ->
                 username + " used string selection: " + selectMenu.getComponentId();

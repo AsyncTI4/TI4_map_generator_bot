@@ -17,7 +17,7 @@ import ti4.service.unit.DestroyUnitService;
 
 public class TravelBanAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "travel_ban";
     }
 

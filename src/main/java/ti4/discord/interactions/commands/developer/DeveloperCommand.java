@@ -19,11 +19,14 @@ public class DeveloperCommand implements ParentCommand {
                     new ButtonProcessingStatistics(),
                     new CacheStatistics(),
                     new RestoreGame(),
+                    new ReloadCorruptedSaves(),
                     new RunCron(),
                     new RunAgainstAllGames(),
                     new CustomCommand(),
                     new RunAgainstSpecificGame(),
                     new ProduceNucleusGenStats(),
+                    // new StartLazaxSeason1(),
+                    // new PostLazaxSeason1Public(),
                     new RunSql())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

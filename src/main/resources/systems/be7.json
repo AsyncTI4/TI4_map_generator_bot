@@ -1,0 +1,39 @@
+{
+    "tileBack": "green",
+    "id": "be7",
+    "name": "Decay/Disorder/Demise - Natau",
+    "aliases": [
+        "be7",
+        "natau",
+        "decay",
+        "demise",
+        "disorder"
+    ],
+    "imagePath": "be7_natauhs.png",
+    "shipPositionsType": "TYPE03",
+    "spaceTokenLocations": [
+        {
+            "x": 250.0,
+            "y": 90.0
+        },
+        {
+            "x": 80.0,
+            "y": 10.0
+        },
+        {
+            "x": 135.0,
+            "y": 105.0
+        },
+        {
+            "x": 80.0,
+            "y": 185.0
+        }
+    ],
+    "wormholes": [],
+    "planets": [
+        "decay",
+        "demise",
+        "disorder"
+    ],
+    "source": "beans"
+}

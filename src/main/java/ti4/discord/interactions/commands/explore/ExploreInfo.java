@@ -13,7 +13,7 @@ import ti4.service.explore.ExploreService;
 
 class ExploreInfo extends GameStateSubcommand {
 
-    public ExploreInfo() {
+    ExploreInfo() {
         super(Constants.INFO, "Display cards in exploration decks and discards.", false, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.")
                 .setAutoComplete(true));
