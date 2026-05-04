@@ -1,6 +1,7 @@
 package ti4.contest.replay.house.mentak;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -9,6 +10,8 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import ti4.contest.replay.core.CombatCandidatePromotionStatus;
+import ti4.contest.replay.core.CombatCandidateStatus;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.core.CombatReplayHouse;
@@ -70,6 +73,38 @@ public class CombatReplayMentakAbilityService {
                 List.of(
                         Buttons.blue(MENTAK_MANAGE_VOTE_PREFIX + candidate.getId(), "Manage False Colors"),
                         Buttons.red(MENTAK_DO_NOT_USE + candidate.getId(), "Do Not Use False Colors")));
+    }
+
+    public boolean repostOpenFalseColorsVotingButtons() {
+        CombatCandidateEntity candidate = candidateRepository.findByStatus(CombatCandidateStatus.RESOLVED).stream()
+                .filter(phaseService::mentakPreviewOpen)
+                .filter(candidateEntity ->
+                        candidateEntity.getPromotionStatus() == CombatCandidatePromotionStatus.PENDING)
+                .filter(candidateEntity -> candidateEntity.getMentakPreviewPostedAt() != null)
+                .max(Comparator.comparing(CombatCandidateEntity::getMentakPreviewPostedAt))
+                .orElse(null);
+        if (candidate == null) return false;
+
+        TextChannel channel = houseChannel();
+        if (channel == null) return false;
+        postDirectDecoyVotingButtons(channel, candidate);
+        return true;
+    }
+
+    private void postDirectDecoyVotingButtons(TextChannel channel, CombatCandidateEntity candidate) {
+        Game game = loadGame(candidate.getGameName());
+        MessageHelper.sendMessageToChannelWithButtons(
+                channel,
+                "## " + FactionEmojis.getFactionIcon(CombatReplayHouse.MENTAK.displayName())
+                        + " Mentak Delegation False Colors\n"
+                        + CombatReplayAbilityWindowText.votesLockLine(previewLeadSeconds())
+                        + "\n"
+                        + favorBalanceLine()
+                        + "\n"
+                        + falseColorsSummaryLine(),
+                List.of(Buttons.red(MENTAK_DO_NOT_USE + candidate.getId(), "Vote: Do Not Use False Colors")));
+        postDecoyButtonsForFaction(channel, game, candidate, candidate.getAttackerFaction());
+        postDecoyButtonsForFaction(channel, game, candidate, candidate.getDefenderFaction());
     }
 
     public boolean shouldOfferDecoyVoting(CombatCandidateEntity candidate) {
@@ -266,6 +301,13 @@ public class CombatReplayMentakAbilityService {
         List<Button> buttons = decoyButtonsForFaction(candidate, faction);
         if (buttons.isEmpty()) return;
         MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, factionSectionTitle(game, faction), buttons);
+    }
+
+    private void postDecoyButtonsForFaction(
+            TextChannel channel, Game game, CombatCandidateEntity candidate, String faction) {
+        List<Button> buttons = decoyButtonsForFaction(candidate, faction);
+        if (buttons.isEmpty()) return;
+        MessageHelper.sendMessageToChannelWithButtons(channel, factionSectionTitle(game, faction), buttons);
     }
 
     private List<Button> decoyButtonsForFaction(CombatCandidateEntity candidate, String faction) {

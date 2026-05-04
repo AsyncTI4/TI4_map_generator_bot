@@ -16,6 +16,7 @@ import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
 import ti4.contest.replay.entities.CombatReplayHacanTradeConvoysEntity;
 import ti4.contest.replay.entities.CombatReplayHouseScoreEntity;
+import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
 import ti4.contest.replay.repository.CombatReplayHacanTradeConvoysRepository;
 import ti4.contest.replay.repository.CombatReplayHacanTradeConvoysVoteRepository;
@@ -40,6 +41,7 @@ class CombatReplayHacanTradeConvoysServiceTest {
             new CombatReplayHousePhaseService(settings, contestRepository),
             mock(CombatReplayHouseAbilityVoteService.class),
             houseFavorService,
+            mock(CombatCandidateRepository.class),
             contestRepository,
             mock(CombatReplayHouseAbilityUseRepository.class),
             tradeConvoysRepository,

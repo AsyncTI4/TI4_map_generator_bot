@@ -268,6 +268,7 @@ class CombatReplayContestLifecycleServiceTest {
                 mock(CombatReplayLeaderboardService.class),
                 mock(ti4.contest.replay.house.hacan.CombatReplayHacanTradeConvoysService.class),
                 mock(CombatReplayMentakAbilityService.class),
+                mock(CombatReplayHouseService.class),
                 mock(CombatReplayExecutionService.class),
                 mock(CombatReplayDiscordPostService.class));
         return new CombatReplayContestLifecycleService(promotionService, mock(CombatReplayExecutionService.class));

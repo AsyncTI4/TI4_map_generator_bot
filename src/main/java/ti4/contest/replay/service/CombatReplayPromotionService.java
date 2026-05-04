@@ -53,6 +53,7 @@ public class CombatReplayPromotionService {
     private final CombatReplayLeaderboardService replayLeaderboardService;
     private final CombatReplayHacanTradeConvoysService hacanTradeConvoysService;
     private final CombatReplayMentakAbilityService mentakAbilityService;
+    private final CombatReplayHouseService houseService;
     private final CombatReplayExecutionService replayExecutionService;
     private final CombatReplayDiscordPostService discordPostService;
     private Clock clock = Clock.systemDefaultZone();
@@ -202,6 +203,7 @@ public class CombatReplayPromotionService {
         try {
             LocalDateTime promotedAt = LocalDateTime.now(clock);
             Message posted = discordPostService.postPromotionMessage(contestChannel, message, game, winner);
+            houseService.postPublicParticipationControls(contestChannel);
             ThreadChannel thread = discordPostService.createReplayThread(posted, winner);
             CombatReplayContestEntity contest =
                     persistPromotedReplayContest(winner, promotedAt, contestChannel, posted, thread, existingContest);
