@@ -52,8 +52,9 @@ public class LazaxSeasonService {
         TextChannel channel = publicChannel();
         if (channel == null) return false;
 
+        houseService.assignLeaderboardEntriesByParticipation(
+                JdaService.guildPrimary, leaderboardEntryRepository.findAll());
         resetSeasonOneScores();
-        houseService.assignLeaderboardEntriesRandomly(JdaService.guildPrimary, leaderboardEntryRepository.findAll());
         houseLedgerService.resetSeasonOpeningBalances();
 
         postSeasonOneOpeningMessage(channel);
