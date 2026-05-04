@@ -109,6 +109,16 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
                 peekButtons(contest.getId()));
     }
 
+    public boolean repostOpenGiftOfForesightButtons() {
+        CombatReplayContestEntity contest =
+                replayContestRepository.findFirstByOrderByIdDesc().orElse(null);
+        if (!phaseService.discussionOpen(contest)) return false;
+        CombatCandidateEntity candidate = loadCandidate(contest);
+        if (candidate == null) return false;
+        postAbilityButtonsIfNeeded(contest, candidate);
+        return true;
+    }
+
     private String favorBalanceLine() {
         return "-# Total Favor: `" + houseFavorService.balance(CombatReplayHouse.NAALU) + "`";
     }

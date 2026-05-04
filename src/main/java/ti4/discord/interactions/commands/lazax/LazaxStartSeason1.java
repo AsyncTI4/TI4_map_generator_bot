@@ -7,15 +7,13 @@ import ti4.spring.context.SpringContext;
 
 class LazaxStartSeason1 extends Subcommand {
 
-    private static final String AUTHORIZED_USER_ID = "139760548471504897";
-
     LazaxStartSeason1() {
         super("start_season_1", "Start Lazax Season 1 with delegation setup.");
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        if (!AUTHORIZED_USER_ID.equals(event.getUser().getId())) {
+        if (!LazaxCommandAuthorization.isSeasonAdmin(event)) {
             LazaxReplyHelper.replyEphemeral(event, "You are not authorized to start Lazax Season 1.");
             return;
         }

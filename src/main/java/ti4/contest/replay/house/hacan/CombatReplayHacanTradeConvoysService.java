@@ -23,6 +23,7 @@ import ti4.contest.replay.entities.CombatReplayHacanTradeConvoysEntity;
 import ti4.contest.replay.entities.CombatReplayHacanTradeConvoysVoteEntity;
 import ti4.contest.replay.entities.CombatReplayHouseAbilityUseEntity;
 import ti4.contest.replay.entities.CombatReplayHouseScoreEntity;
+import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
 import ti4.contest.replay.repository.CombatReplayHacanTradeConvoysRepository;
 import ti4.contest.replay.repository.CombatReplayHacanTradeConvoysVoteRepository;
@@ -54,6 +55,7 @@ public class CombatReplayHacanTradeConvoysService {
     private final CombatReplayHousePhaseService phaseService;
     private final CombatReplayHouseAbilityVoteService voteService;
     private final CombatReplayHouseFavorService houseFavorService;
+    private final CombatCandidateRepository candidateRepository;
     private final CombatReplayContestRepository contestRepository;
     private final CombatReplayHouseAbilityUseRepository abilityUseRepository;
     private final CombatReplayHacanTradeConvoysRepository tradeConvoysRepository;
@@ -77,6 +79,17 @@ public class CombatReplayHacanTradeConvoysService {
             List<HousePredictionSummary> currentCombatSummaries) {
         if (!canOfferTradeConvoys(contest, candidate)) return;
         postTradeConvoysVotingButtons(contest, hacanFavorLedger(contest, currentCombatSummaries));
+    }
+
+    public boolean repostOpenTradeConvoysVotingButtons() {
+        CombatReplayContestEntity contest =
+                contestRepository.findFirstByOrderByIdDesc().orElse(null);
+        CombatCandidateEntity candidate = contest == null || contest.getCandidateId() == null
+                ? null
+                : candidateRepository.findById(contest.getCandidateId()).orElse(null);
+        if (!shouldOfferVoting(contest, candidate)) return false;
+        postTradeConvoysVotingButtons(contest);
+        return true;
     }
 
     private void postTradeConvoysVotingButtons(CombatReplayContestEntity contest) {
@@ -348,9 +361,13 @@ public class CombatReplayHacanTradeConvoysService {
         return phaseService.postCombatVoteOpen(contest);
     }
 
-    private boolean userHasHacan(String discordUserId) {
+    public boolean userHasHouse(String discordUserId) {
         if (settings.getRuntime().isDevMode()) return true;
         return houseService.houseForUser(discordUserId) == CombatReplayHouse.HACAN;
+    }
+
+    private boolean userHasHacan(String discordUserId) {
+        return userHasHouse(discordUserId);
     }
 
     private boolean isValidRequest(ParsedTradeConvoysButton request) {
