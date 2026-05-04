@@ -7,7 +7,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
@@ -178,8 +178,8 @@ public class ReactionCheckService {
                 if (game.isFowMode()) {
                     event.getInteraction().getMessage().reply(message).queueAfter(1, TimeUnit.SECONDS);
                 } else {
-                    GuildMessageChannel guildMessageChannel = Helper.getThreadChannelIfExists(event);
-                    guildMessageChannel.sendMessage(message).queueAfter(10, TimeUnit.SECONDS);
+                    MessageChannel messageChannel = Helper.getThreadChannelIfExists(event);
+                    messageChannel.sendMessage(message).queueAfter(10, TimeUnit.SECONDS);
                 }
             }
             case "no_when", "no_when_persistent" ->
