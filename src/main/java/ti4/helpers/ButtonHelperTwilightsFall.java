@@ -451,11 +451,7 @@ public final class ButtonHelperTwilightsFall {
             game.removeStoredValue("paid6ForSplice");
         }
         int size = 1 + participants.size();
-        // left here for legacy, remove when Jan 2026 occurs
-        if (!game.getStoredValue("researchagentSplice").isEmpty()) {
-            size += 3;
-            game.removeStoredValue("researchagentSplice");
-        }
+
         for (Player p : game.getRealPlayers()) {
             if (!game.getStoredValue("researchagentSplice" + p.getFaction()).isEmpty()) {
                 size += 3;

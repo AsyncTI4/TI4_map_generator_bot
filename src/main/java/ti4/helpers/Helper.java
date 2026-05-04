@@ -43,6 +43,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.utility.DiscordChannelUtility;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -1298,6 +1299,7 @@ public final class Helper {
                     && !thing.contains("warmachine")
                     && !thing.contains("manifest")
                     && !thing.contains("ghostbt")
+                    && !thing.contains("tyrisbt")
                     && !thing.contains("dwsDiscount")
                     && !thing.contains("aida")
                     && !thing.contains("commander")
@@ -1425,6 +1427,10 @@ public final class Helper {
                             .append(CardEmojis.getACEmoji(game))
                             .append('\n');
                     res += 3;
+                }
+                if ("tyrisbt".equals(thing)) {
+                    res += 1;
+                    msg.append("> Used _Non-Linear Time Progression_ for 1 resource discount\n");
                 }
                 if (thing.contains("ghostbt")) {
                     int wormholes =
@@ -2089,6 +2095,9 @@ public final class Helper {
                         || (!game.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")
                                 && !player.hasTech("tf-quantumdrive"))) {
                     cost += (int) removedUnit.getCost() * entry.getValue();
+                    if (MobilizationEngineHandler.hasEngineAttached(game)) {
+                        cost += MobilizationEngineHandler.getCostMod(game, player, removedUnit) * entry.getValue();
+                    }
                 }
                 totalUnits += entry.getValue();
                 if ((player.hasUnit("arvaxi_mech") || player.hasUnit("tf-valefarprime"))

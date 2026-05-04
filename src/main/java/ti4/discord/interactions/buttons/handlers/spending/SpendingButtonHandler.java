@@ -51,6 +51,8 @@ class SpendingButtonHandler {
             String messageText =
                     player.getRepresentation() + " exhausted " + Helper.getLeaderFullRepresentation(playerLeader) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), messageText);
+        } else {
+            game.removeStoredValue("keleresAgentTarget");
         }
         event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
     }
