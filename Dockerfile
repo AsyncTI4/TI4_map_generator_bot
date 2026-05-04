@@ -17,15 +17,17 @@ RUN --mount=type=cache,target=/root/.m2 \
     mvn -B -ntp -Dspotless.skip=true -Dmaven.test.skip=true clean package
 
 # ---- Runtime stage ----
-FROM amazoncorretto:26-alpine3.23
+# Use the glibc-based (Amazon Linux 2023) image so the async-profiler linux-x64 native
+# library can be loaded; Alpine uses musl libc which is binary-incompatible with it.
+FROM amazoncorretto:26
 WORKDIR /app
 
 # needed to handle fonts
-RUN apk add --no-cache fontconfig ttf-dejavu
+RUN dnf install -y fontconfig dejavu-fonts-all && dnf clean all
 
 # async-profiler: enables remote CPU/allocation profiling via IntelliJ Profiler
 ARG ASYNC_PROFILER_VERSION=4.4
-RUN wget -q "https://github.com/async-profiler/async-profiler/releases/download/v${ASYNC_PROFILER_VERSION}/async-profiler-${ASYNC_PROFILER_VERSION}-linux-musl-x64.tar.gz" \
+RUN curl -fsSL "https://github.com/async-profiler/async-profiler/releases/download/v${ASYNC_PROFILER_VERSION}/async-profiler-${ASYNC_PROFILER_VERSION}-linux-x64.tar.gz" \
         -O /tmp/async-profiler.tar.gz \
     && mkdir -p /app/async-profiler \
     && tar -xzf /tmp/async-profiler.tar.gz -C /app/async-profiler --strip-components=1 \
