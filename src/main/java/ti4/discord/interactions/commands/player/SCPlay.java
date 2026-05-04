@@ -16,7 +16,7 @@ import ti4.service.strategycard.PlayStrategyCardService;
 
 class SCPlay extends GameStateSubcommand {
 
-    public SCPlay() {
+    SCPlay() {
         super(Constants.SC_PLAY, "Play a Strategy Card", true, true);
         addOptions(new OptionData(
                 OptionType.INTEGER,

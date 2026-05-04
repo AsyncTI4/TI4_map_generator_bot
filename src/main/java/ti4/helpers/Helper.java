@@ -30,9 +30,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -44,6 +42,8 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
+import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -2095,6 +2095,9 @@ public final class Helper {
                         || (!game.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")
                                 && !player.hasTech("tf-quantumdrive"))) {
                     cost += (int) removedUnit.getCost() * entry.getValue();
+                    if (MobilizationEngineHandler.hasEngineAttached(game)) {
+                        cost += MobilizationEngineHandler.getCostMod(game, player, removedUnit) * entry.getValue();
+                    }
                 }
                 totalUnits += entry.getValue();
                 if ((player.hasUnit("arvaxi_mech") || player.hasUnit("tf-valefarprime"))
@@ -3030,20 +3033,13 @@ public final class Helper {
         }
     }
 
-    public static GuildMessageChannel getThreadChannelIfExists(ButtonInteractionEvent event) {
-        String messageID = event.getInteraction().getMessage().getId();
-        MessageChannel messageChannel = event.getMessageChannel();
-        List<ThreadChannel> threadChannels = event.getGuild().getThreadChannels();
+    public static MessageChannel getThreadChannelIfExists(ButtonInteractionEvent event) {
         try {
-            for (ThreadChannel threadChannel : threadChannels) {
-                if (threadChannel.getId().equals(messageID)) {
-                    return threadChannel;
-                }
-            }
-            return (GuildMessageChannel) messageChannel;
-        } catch (Exception e) {
-            BotLogger.error(new LogOrigin(event), "Something went wrong getting thread channels.", e);
-            return null;
+            String messageID = event.getInteraction().getMessage().getId();
+            return DiscordChannelUtility.retrieveThreadChannelById(event.getGuild(), messageID)
+                    .complete();
+        } catch (Exception ignored) {
+            return event.getMessageChannel();
         }
     }
 
