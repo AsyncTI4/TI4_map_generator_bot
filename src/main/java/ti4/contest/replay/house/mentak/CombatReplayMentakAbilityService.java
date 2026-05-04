@@ -9,8 +9,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import ti4.contest.replay.core.CombatCandidatePromotionStatus;
-import ti4.contest.replay.core.CombatCandidateStatus;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.core.CombatReplayHouse;
@@ -21,6 +19,7 @@ import ti4.contest.replay.repository.CombatReplayHouseAbilityUseRepository;
 import ti4.contest.replay.service.CombatReplayAbilityWindowText;
 import ti4.contest.replay.service.CombatReplayHouseAbilityVoteService;
 import ti4.contest.replay.service.CombatReplayHouseFavorService;
+import ti4.contest.replay.service.CombatReplayHousePhaseService;
 import ti4.contest.replay.service.CombatReplayHouseService;
 import ti4.contest.replay.service.CombatReplayInteractionResult;
 import ti4.discord.JdaService;
@@ -52,6 +51,7 @@ public class CombatReplayMentakAbilityService {
     private final CombatReplayHouseAbilityUseRepository houseAbilityUseRepository;
     private final CombatReplayHouseFavorService houseFavorService;
     private final CombatReplayHouseAbilityVoteService voteService;
+    private final CombatReplayHousePhaseService phaseService;
     private final CombatReplayHouseService houseService;
 
     public void postDecoyButtons(TextChannel channel, CombatCandidateEntity candidate) {
@@ -73,7 +73,7 @@ public class CombatReplayMentakAbilityService {
     }
 
     public boolean shouldOfferDecoyVoting(CombatCandidateEntity candidate) {
-        return settings.isHousesEnabled() && candidate != null;
+        return phaseService.discussionOpenForCandidate(candidate);
     }
 
     public String falseColorsSummaryLine() {
@@ -308,17 +308,10 @@ public class CombatReplayMentakAbilityService {
         };
     }
 
-    private boolean windowOpen(CombatCandidateEntity candidate) {
-        return candidate != null
-                && candidate.getStatus() == CombatCandidateStatus.RESOLVED
-                && candidate.getPromotionStatus() == CombatCandidatePromotionStatus.PENDING
-                && candidate.getMentakPreviewPostedAt() != null;
-    }
-
     private CombatCandidateEntity loadCandidateForVote(long candidateId) {
         CombatCandidateEntity candidate =
                 candidateRepository.findById(candidateId).orElse(null);
-        return windowOpen(candidate) ? candidate : null;
+        return phaseService.mentakPreviewOpen(candidate) ? candidate : null;
     }
 
     private Long manageVoteCandidateId(String buttonId) {

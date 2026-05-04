@@ -32,10 +32,11 @@ import ti4.contest.replay.repository.CombatReplayHacanMarketCompactDecisionRepos
 import ti4.contest.replay.repository.CombatReplayHacanSubsidyRepository;
 import ti4.contest.replay.repository.CombatReplayHacanSubsidyVoteRepository;
 import ti4.contest.replay.service.CombatReplayAbilityWindowText;
+import ti4.contest.replay.service.CombatReplayHouseAbilityVoteService;
+import ti4.contest.replay.service.CombatReplayHousePhaseService;
 import ti4.contest.replay.service.CombatReplayHouseService;
 import ti4.contest.replay.service.CombatReplayInteractionResult;
 import ti4.contest.replay.service.CombatReplaySideBetPayoutService;
-import ti4.contest.replay.service.CombatReplayVoteTally;
 import ti4.contest.replay.service.CombatSideBetAvailabilityService;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
@@ -61,7 +62,9 @@ public class CombatReplayHacanMarketCompactService {
     private final CombatReplayHacanSubsidyVoteRepository voteRepository;
     private final CombatReplayHacanSubsidyRepository marketRepository;
     private final CombatReplayHacanMarketCompactDecisionRepository decisionRepository;
+    private final CombatReplayHouseAbilityVoteService voteService;
     private final CombatReplayHouseService houseService;
+    private final CombatReplayHousePhaseService phaseService;
     private final CombatReplaySideBetPayoutService payoutService;
     private final CombatSideBetAvailabilityService availabilityService;
 
@@ -86,7 +89,7 @@ public class CombatReplayHacanMarketCompactService {
 
     public boolean shouldOfferVoting(CombatCandidateEntity candidate) {
         return enabled()
-                && discussionWindowSeconds() > 0
+                && phaseService.discussionWindowSeconds() > 0
                 && candidate != null
                 && Boolean.TRUE.equals(candidate.getSideBetCompatible());
     }
@@ -207,7 +210,7 @@ public class CombatReplayHacanMarketCompactService {
         }
 
         List<CombatReplayHacanSubsidyVoteEntity> votes = voteRepository.findByContestId(contest.getId());
-        if (distinctVoterCount(votes) < minimumAbilityVotesToResolve()) {
+        if (!voteService.meetsMinimumVoterThreshold(votes, CombatReplayHacanSubsidyVoteEntity::getDiscordUserId)) {
             lockNoMarkets(contest, game);
             return List.of();
         }
@@ -413,11 +416,7 @@ public class CombatReplayHacanMarketCompactService {
     }
 
     private boolean votingOpen(CombatReplayContestEntity contest) {
-        if (contest == null || contest.getId() == null || contest.getPostedAt() == null) return false;
-        if (contest.getSideBetMarketPostedAt() != null) return false;
-        if (contest.getReplayStartAt() == null || !LocalDateTime.now().isBefore(contest.getReplayStartAt()))
-            return false;
-        return LocalDateTime.now().isBefore(contest.getPostedAt().plusSeconds(discussionWindowSeconds()));
+        return phaseService.discussionOpen(contest);
     }
 
     private boolean isAvailableForCandidate(CombatCandidateEntity candidate, CombatSideBetType type, String faction) {
@@ -443,15 +442,7 @@ public class CombatReplayHacanMarketCompactService {
     }
 
     public int discussionWindowSeconds() {
-        return settings.getReplayExecution().getDiscussionWindowSeconds();
-    }
-
-    private long distinctVoterCount(List<CombatReplayHacanSubsidyVoteEntity> votes) {
-        return CombatReplayVoteTally.distinctVoterCount(votes, CombatReplayHacanSubsidyVoteEntity::getDiscordUserId);
-    }
-
-    private int minimumAbilityVotesToResolve() {
-        return Math.max(1, settings.getHouseAbilities().getMinimumAbilityVotesToResolve());
+        return phaseService.discussionWindowSeconds();
     }
 
     private String factionSectionTitle(Game game, String faction) {

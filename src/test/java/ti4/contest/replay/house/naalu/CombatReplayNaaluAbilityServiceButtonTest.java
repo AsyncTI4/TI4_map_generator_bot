@@ -16,6 +16,7 @@ import ti4.contest.replay.repository.CombatReplayContestRepository;
 import ti4.contest.replay.repository.CombatReplayHouseAbilityUseRepository;
 import ti4.contest.replay.service.CombatReplayHouseAbilityVoteService;
 import ti4.contest.replay.service.CombatReplayHouseFavorService;
+import ti4.contest.replay.service.CombatReplayHousePhaseService;
 import ti4.contest.replay.service.CombatReplayHouseService;
 import ti4.discord.interactions.buttons.Buttons;
 
@@ -30,6 +31,7 @@ class CombatReplayNaaluAbilityServiceButtonTest {
             mock(CombatReplayHouseAbilityUseRepository.class),
             houseFavorService,
             mock(CombatReplayHouseAbilityVoteService.class),
+            mock(CombatReplayHousePhaseService.class),
             mock(CombatReplayHouseService.class),
             new ReplayDispatchSerializer());
 

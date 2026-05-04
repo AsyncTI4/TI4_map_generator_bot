@@ -23,13 +23,17 @@ class CombatReplayHouseLedgerServiceFavorTest {
     private final CombatContestSettings settings = new CombatContestSettings();
     private final CombatReplayHouseScoreRepository houseScoreRepository = mock(CombatReplayHouseScoreRepository.class);
     private final CombatReplayHouseService houseService = mock(CombatReplayHouseService.class);
+    private final CombatReplayCustodianFavorScoringRule custodianFavorScoringRule =
+            new CombatReplayCustodianFavorScoringRule(settings, houseScoreRepository);
     private final CombatReplayHouseLedgerService service = new CombatReplayHouseLedgerService(
             settings,
             mock(CombatContestSideBetRepository.class),
             houseScoreRepository,
             houseService,
             mock(CombatReplayHacanMarketCompactService.class),
-            mock(CombatReplayHacanTradeConvoysService.class));
+            mock(CombatReplayHacanTradeConvoysService.class),
+            custodianFavorScoringRule,
+            List.of(custodianFavorScoringRule));
 
     @Test
     void defaultCombatFavorGainDoesNotApplyCatchupBonus() {

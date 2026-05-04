@@ -3,9 +3,7 @@ package ti4.contest.replay.house.hacan;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +29,9 @@ import ti4.contest.replay.repository.CombatReplayHacanTradeConvoysVoteRepository
 import ti4.contest.replay.repository.CombatReplayHouseAbilityUseRepository;
 import ti4.contest.replay.repository.CombatReplayHouseScoreRepository;
 import ti4.contest.replay.service.CombatReplayAbilityWindowText;
+import ti4.contest.replay.service.CombatReplayHouseAbilityVoteService;
 import ti4.contest.replay.service.CombatReplayHouseFavorService;
+import ti4.contest.replay.service.CombatReplayHousePhaseService;
 import ti4.contest.replay.service.CombatReplayHouseService;
 import ti4.contest.replay.service.CombatReplayInteractionResult;
 import ti4.contest.replay.service.CombatReplayVoteTally;
@@ -50,6 +50,8 @@ public class CombatReplayHacanTradeConvoysService {
     private static final String DELIMITER = "~";
     private final CombatContestSettings settings;
     private final CombatReplayHouseService houseService;
+    private final CombatReplayHousePhaseService phaseService;
+    private final CombatReplayHouseAbilityVoteService voteService;
     private final CombatReplayHouseFavorService houseFavorService;
     private final CombatReplayContestRepository contestRepository;
     private final CombatReplayHouseAbilityUseRepository abilityUseRepository;
@@ -192,8 +194,10 @@ public class CombatReplayHacanTradeConvoysService {
 
         List<CombatReplayHacanTradeConvoysVoteEntity> votes =
                 tradeConvoysVoteRepository.findByContestId(contest.getId());
-        if (distinctVoterCount(votes) < minimumAbilityVotesToResolve()) {
-            return lockNoTradeConvoys(contest, distinctVoterCount(votes));
+        if (!voteService.meetsMinimumVoterThreshold(votes, CombatReplayHacanTradeConvoysVoteEntity::getDiscordUserId)) {
+            return lockNoTradeConvoys(
+                    contest,
+                    voteService.distinctVoterCount(votes, CombatReplayHacanTradeConvoysVoteEntity::getDiscordUserId));
         }
 
         TradeConvoysTally winning = winningTally(votes);
@@ -219,7 +223,6 @@ public class CombatReplayHacanTradeConvoysService {
         tradeConvoys.setVoteCount(winning.voteCount());
         tradeConvoys.setSelectedAt(LocalDateTime.now());
         tradeConvoysRepository.save(tradeConvoys);
-        applyFavorGrant(tradeConvoys);
         postLockedTradeConvoysSummary(tradeConvoys);
         return toTradeConvoys(tradeConvoys);
     }
@@ -305,10 +308,7 @@ public class CombatReplayHacanTradeConvoysService {
     }
 
     private boolean postCombatVotingOpen(CombatReplayContestEntity contest) {
-        return contest != null
-                && contest.getId() != null
-                && !contestRepository.existsByIdGreaterThan(contest.getId())
-                && (contest.getReplayCompletedAt() != null || contest.getLeaderboardPostedAt() != null);
+        return phaseService.postCombatVoteOpen(contest);
     }
 
     private boolean userHasHacan(String discordUserId) {
@@ -335,21 +335,22 @@ public class CombatReplayHacanTradeConvoysService {
     }
 
     private TradeConvoysTally winningTally(List<CombatReplayHacanTradeConvoysVoteEntity> votes) {
-        return CombatReplayVoteTally.tallies(
+        return voteService
+                .winningTally(
                         votes,
                         vote -> new TradeConvoysOption(
                                 vote.getTargetHouse(),
                                 safeInt(vote.getFavorCost()),
-                                safeInt(vote.getPredictionBonus())))
-                .stream()
-                .max(Comparator.comparingInt(
-                                (CombatReplayVoteTally.Tally<
-                                                        CombatReplayHacanTradeConvoysVoteEntity, TradeConvoysOption>
-                                                tally) -> tally.voteCount())
-                        .thenComparingInt(tally -> tally.option().bonusPercent())
-                        .thenComparing(tally -> tally.option().targetHouse() == null
-                                ? ""
-                                : tally.option().targetHouse().displayName()))
+                                safeInt(vote.getPredictionBonus())),
+                        Comparator.comparingInt(
+                                        (CombatReplayVoteTally.Tally<
+                                                                CombatReplayHacanTradeConvoysVoteEntity,
+                                                                TradeConvoysOption>
+                                                        tally) -> tally.voteCount())
+                                .thenComparingInt(tally -> tally.option().bonusPercent())
+                                .thenComparing(tally -> tally.option().targetHouse() == null
+                                        ? ""
+                                        : tally.option().targetHouse().displayName()))
                 .map(tally -> {
                     CombatReplayHacanTradeConvoysVoteEntity firstVote = tally.firstVote();
                     return new TradeConvoysTally(
@@ -394,32 +395,11 @@ public class CombatReplayHacanTradeConvoysService {
         }
     }
 
-    private void applyFavorGrant(CombatReplayHacanTradeConvoysEntity tradeConvoys) {
-        if (tradeConvoys.getContestId() == null
-                || tradeConvoys.getTargetHouse() == null
-                || safeInt(tradeConvoys.getFavorCost()) <= 0) return;
-        for (CombatReplayHouseScoreEntity score : houseScoreRepository.findByContestId(tradeConvoys.getContestId())) {
-            if (score.getHouse() != tradeConvoys.getTargetHouse()) continue;
-            score.setFavorPoints(safeInt(score.getFavorPoints()) + safeInt(tradeConvoys.getFavorCost()));
-            houseScoreRepository.save(score);
-            return;
-        }
-    }
-
     private String voteSummary(Long contestId) {
         List<CombatReplayHacanTradeConvoysVoteEntity> votes = tradeConvoysVoteRepository.findByContestId(contestId);
         if (votes.isEmpty()) return "No Hacan Trade Convoys votes recorded.";
-        Map<String, Integer> countsByOption = new HashMap<>();
-        for (CombatReplayHacanTradeConvoysVoteEntity vote : votes) {
-            countsByOption.merge(optionLabel(vote), 1, Integer::sum);
-        }
-        List<String> lines = countsByOption.entrySet().stream()
-                .sorted(Map.Entry.<String, Integer>comparingByValue(Comparator.reverseOrder())
-                        .thenComparing(Map.Entry::getKey))
-                .map(entry -> "- " + entry.getKey() + ": `" + entry.getValue() + "`")
-                .toList();
-        return "Current tally:\n" + String.join("\n", lines) + "\nVotes needed to resolve: `"
-                + minimumAbilityVotesToResolve() + "`";
+        return voteService.voteSummary(votes, this::optionLabel) + "\nVotes needed to resolve: `"
+                + voteService.minimumAbilityVotesToResolve() + "`";
     }
 
     private String optionLabel(CombatReplayHacanTradeConvoysVoteEntity vote) {
@@ -473,15 +453,6 @@ public class CombatReplayHacanTradeConvoysService {
             if (scoredContestId > sourceContestId && scoredContestId < currentContestId) return false;
         }
         return true;
-    }
-
-    private long distinctVoterCount(List<CombatReplayHacanTradeConvoysVoteEntity> votes) {
-        return CombatReplayVoteTally.distinctVoterCount(
-                votes, CombatReplayHacanTradeConvoysVoteEntity::getDiscordUserId);
-    }
-
-    private int minimumAbilityVotesToResolve() {
-        return Math.max(1, settings.getHouseAbilities().getMinimumAbilityVotesToResolve());
     }
 
     private int effectiveFavorCost(int favorCost) {

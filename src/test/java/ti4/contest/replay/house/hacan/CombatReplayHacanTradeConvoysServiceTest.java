@@ -21,7 +21,9 @@ import ti4.contest.replay.repository.CombatReplayHacanTradeConvoysRepository;
 import ti4.contest.replay.repository.CombatReplayHacanTradeConvoysVoteRepository;
 import ti4.contest.replay.repository.CombatReplayHouseAbilityUseRepository;
 import ti4.contest.replay.repository.CombatReplayHouseScoreRepository;
+import ti4.contest.replay.service.CombatReplayHouseAbilityVoteService;
 import ti4.contest.replay.service.CombatReplayHouseFavorService;
+import ti4.contest.replay.service.CombatReplayHousePhaseService;
 import ti4.contest.replay.service.CombatReplayHouseService;
 
 class CombatReplayHacanTradeConvoysServiceTest {
@@ -31,9 +33,12 @@ class CombatReplayHacanTradeConvoysServiceTest {
     private final CombatReplayContestRepository contestRepository = mock(CombatReplayContestRepository.class);
     private final CombatReplayHouseScoreRepository houseScoreRepository = mock(CombatReplayHouseScoreRepository.class);
     private final CombatReplayHouseFavorService houseFavorService = mock(CombatReplayHouseFavorService.class);
+    private final CombatContestSettings settings = new CombatContestSettings();
     private final CombatReplayHacanTradeConvoysService service = new CombatReplayHacanTradeConvoysService(
-            new CombatContestSettings(),
+            settings,
             mock(CombatReplayHouseService.class),
+            new CombatReplayHousePhaseService(settings, contestRepository),
+            mock(CombatReplayHouseAbilityVoteService.class),
             houseFavorService,
             contestRepository,
             mock(CombatReplayHouseAbilityUseRepository.class),

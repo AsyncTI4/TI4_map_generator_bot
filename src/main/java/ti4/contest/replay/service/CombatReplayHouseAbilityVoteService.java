@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -94,7 +95,7 @@ public class CombatReplayHouseAbilityVoteService {
     public WinningVote winningVote(Long candidateId, CombatReplayHouse house, Function<String, String> optionLabel) {
         List<CombatReplayHouseAbilityVoteEntity> votes = voteRepository.findByCandidateIdAndHouse(candidateId, house);
         if (votes.isEmpty()) return null;
-        if (distinctVoterCount(votes) < minimumAbilityVotesToResolve()) return null;
+        if (!meetsMinimumVoterThreshold(votes, CombatReplayHouseAbilityVoteEntity::getDiscordUserId)) return null;
 
         return CombatReplayVoteTally.tallies(
                         votes,
@@ -137,8 +138,31 @@ public class CombatReplayHouseAbilityVoteService {
         return Math.max(1, settings.getHouseAbilities().getMinimumAbilityVotesToResolve());
     }
 
-    private long distinctVoterCount(List<CombatReplayHouseAbilityVoteEntity> votes) {
-        return CombatReplayVoteTally.distinctVoterCount(votes, CombatReplayHouseAbilityVoteEntity::getDiscordUserId);
+    public <V> boolean meetsMinimumVoterThreshold(List<V> votes, Function<V, String> voterId) {
+        return distinctVoterCount(votes, voterId) >= minimumAbilityVotesToResolve();
+    }
+
+    public <V, O> Optional<CombatReplayVoteTally.Tally<V, O>> winningTally(
+            List<V> votes, Function<V, O> option, Comparator<CombatReplayVoteTally.Tally<V, O>> comparator) {
+        return CombatReplayVoteTally.tallies(votes, option).stream().max(comparator);
+    }
+
+    public <V> String voteSummary(List<V> votes, Function<V, String> optionLabel) {
+        if (votes == null || votes.isEmpty()) return "No votes recorded.";
+        Map<String, Integer> countsByOption = new HashMap<>();
+        for (V vote : votes) {
+            countsByOption.merge(optionLabel.apply(vote), 1, Integer::sum);
+        }
+        List<String> lines = countsByOption.entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue(Comparator.reverseOrder())
+                        .thenComparing(Map.Entry::getKey))
+                .map(entry -> "- " + entry.getKey() + ": `" + entry.getValue() + "`")
+                .toList();
+        return "Current tally:\n" + String.join("\n", lines);
+    }
+
+    public <V> long distinctVoterCount(List<V> votes, Function<V, String> voterId) {
+        return CombatReplayVoteTally.distinctVoterCount(votes, voterId);
     }
 
     private String appendSummary(String message, String summary) {

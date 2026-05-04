@@ -46,6 +46,7 @@ class CombatReplayNaaluAbilityServiceTest {
             abilityUseRepository,
             mock(CombatReplayHouseFavorService.class),
             mock(CombatReplayHouseAbilityVoteService.class),
+            mock(CombatReplayHousePhaseService.class),
             mock(CombatReplayHouseService.class),
             serializer);
 

@@ -1,6 +1,5 @@
 package ti4.contest.replay.house.hacan;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -45,8 +44,7 @@ public class CombatReplayHacanAbilityService implements CombatReplayHouseAbility
     public void postDiscussionWindowAbilities(
             Game game, CombatReplayContestEntity contest, CombatCandidateEntity candidate) {
         boolean offerMarketCompact = marketCompactService.shouldOfferVoting(candidate);
-        boolean offerTradeConvoys = false;
-        if (!offerMarketCompact && !offerTradeConvoys) return;
+        if (!offerMarketCompact) return;
 
         TextChannel channel = houseChannel();
         if (channel == null) return;
@@ -61,17 +59,8 @@ public class CombatReplayHacanAbilityService implements CombatReplayHouseAbility
         if (offerMarketCompact) {
             message.append(marketCompactService.marketCompactSummaryLine()).append("\n");
         }
-        if (offerTradeConvoys) {
-            message.append(tradeConvoysService.tradeConvoysSummaryLine()).append("\n");
-        }
-
-        List<Button> buttons = new ArrayList<>();
-        if (offerMarketCompact) {
-            buttons.add(Buttons.blue(MANAGE_MARKET_COMPACT_BUTTON_PREFIX + contest.getId(), "Manage Market Compact"));
-        }
-        if (offerTradeConvoys) {
-            buttons.add(Buttons.blue(MANAGE_TRADE_CONVOYS_BUTTON_PREFIX + contest.getId(), "Manage Trade Convoys"));
-        }
+        List<Button> buttons =
+                List.of(Buttons.blue(MANAGE_MARKET_COMPACT_BUTTON_PREFIX + contest.getId(), "Manage Market Compact"));
 
         MessageHelper.sendMessageToChannelWithButtons(
                 channel, message.toString().trim(), buttons);

@@ -1,6 +1,5 @@
 package ti4.contest.replay.house.naalu;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +29,7 @@ import ti4.contest.replay.repository.CombatReplayHouseAbilityUseRepository;
 import ti4.contest.replay.service.CombatReplayAbilityWindowText;
 import ti4.contest.replay.service.CombatReplayHouseAbilityVoteService;
 import ti4.contest.replay.service.CombatReplayHouseFavorService;
+import ti4.contest.replay.service.CombatReplayHousePhaseService;
 import ti4.contest.replay.service.CombatReplayHouseService;
 import ti4.contest.replay.service.CombatReplayInteractionResult;
 import ti4.discord.JdaService;
@@ -69,6 +69,7 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
     private final CombatReplayHouseAbilityUseRepository houseAbilityUseRepository;
     private final CombatReplayHouseFavorService houseFavorService;
     private final CombatReplayHouseAbilityVoteService voteService;
+    private final CombatReplayHousePhaseService phaseService;
     private final CombatReplayHouseService houseService;
     private final ReplayDispatchSerializer payloadSerializer;
 
@@ -113,7 +114,7 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
     }
 
     private int discussionWindowSeconds() {
-        return settings.getReplayExecution().getDiscussionWindowSeconds();
+        return phaseService.discussionWindowSeconds();
     }
 
     public boolean userHasHouse(String discordUserId) {
@@ -138,7 +139,7 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
     private CombatReplayInteractionResult vote(
             long contestId, String optionKey, String optionLabel, String discordUserId, String discordUserName) {
         CombatReplayContestEntity contest = loadContest(contestId);
-        if (votingLocked(contest))
+        if (!phaseService.discussionOpen(contest))
             return CombatReplayInteractionResult.rejected(
                     "The Naalu Gift of Foresight window is closed for this combat.");
         CombatCandidateEntity candidate = loadCandidate(contest);
@@ -337,15 +338,6 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
 
     private int roundOneRollPeekFavorCost() {
         return settings.getHouseAbilities().getNaalu().getRoundOneRollPeekFavorCost();
-    }
-
-    private boolean votingLocked(CombatReplayContestEntity contest) {
-        return contest == null
-                || contest.getSideBetMarketPostedAt() != null
-                || contest.getPostedAt() == null
-                || !LocalDateTime.now()
-                        .isBefore(contest.getPostedAt()
-                                .plusSeconds(settings.getReplayExecution().getDiscussionWindowSeconds()));
     }
 
     private int minimumAbilityVotesToResolve() {
