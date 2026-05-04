@@ -17,20 +17,18 @@ RUN --mount=type=cache,target=/root/.m2 \
     mvn -B -ntp -Dspotless.skip=true -Dmaven.test.skip=true clean package
 
 # ---- Runtime stage ----
-# Use the glibc-based (Amazon Linux 2023) image so the async-profiler linux-x64 native
-# library can be loaded; Alpine uses musl libc which is binary-incompatible with it.
-FROM amazoncorretto:26
+FROM amazoncorretto:26-alpine3.23
 WORKDIR /app
 
-# needed to handle fonts
-RUN dnf install -y fontconfig dejavu-fonts-all && dnf clean all
+# needed to handle fonts; libc6-compat provides glibc shims required by async-profiler
+RUN apk add --no-cache fontconfig ttf-dejavu libc6-compat
 
 # async-profiler: enables remote CPU/allocation profiling via IntelliJ Profiler
 ARG ASYNC_PROFILER_VERSION=4.4
-RUN curl -fsSL "https://github.com/async-profiler/async-profiler/releases/download/v${ASYNC_PROFILER_VERSION}/async-profiler-${ASYNC_PROFILER_VERSION}-linux-x64.tar.gz" \
-        -O /tmp/async-profiler.tar.gz \
-    && mkdir -p /app/async-profiler \
-    && tar -xzf /tmp/async-profiler.tar.gz -C /app/async-profiler --strip-components=1 \
+RUN wget -qO /tmp/async-profiler.tar.gz \
+      "https://github.com/async-profiler/async-profiler/releases/download/v${ASYNC_PROFILER_VERSION}/async-profiler-${ASYNC_PROFILER_VERSION}-linux-x64.tar.gz" \
+    && mkdir -p /opt/async-profiler \
+    && tar -xzf /tmp/async-profiler.tar.gz --strip-components=1 -C /opt/async-profiler \
     && rm /tmp/async-profiler.tar.gz
 
 COPY --from=build /opt/app/target/TI4_map_generator_discord_bot-1.0-SNAPSHOT.jar tibot.jar
@@ -42,4 +40,6 @@ ENTRYPOINT ["java", \
             "-XX:MaxRAMPercentage=70.0", \
             "-XX:InitialRAMPercentage=20.0", \
             "-XX:+UseStringDeduplication", \
+            "-XX:+UnlockDiagnosticVMOptions", \
+            "-XX:+DebugNonSafepoints", \
             "-jar", "tibot.jar"]
