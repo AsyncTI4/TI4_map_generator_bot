@@ -382,6 +382,7 @@ public class CombatReplayPromotionService {
         CombatCandidateEntity previousCandidate =
                 candidateRepository.findById(previousContest.getCandidateId()).orElse(null);
         hacanTradeConvoysService.lockTradeConvoysIfNeeded(previousContest, previousCandidate);
+        replayLeaderboardService.computeAndPersistHouseScoresFromFacts(previousCandidate, previousContest);
     }
 
     private CombatReplayContestEntity resetReplayContest(

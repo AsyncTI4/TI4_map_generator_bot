@@ -115,6 +115,28 @@ public class CombatReplayLeaderboardService {
         houseLedgerService.clearContest(replayContestId);
     }
 
+    public List<HousePredictionSummary> computeAndPersistHouseScoresFromFacts(
+            CombatCandidateEntity candidate, CombatReplayContestEntity replayContest) {
+        if (candidate == null || replayContest == null || replayContest.getId() == null) return List.of();
+
+        ScoredPredictions scoredPredictions = replayPredictionRepository
+                .findByContestId(replayContest.getId())
+                .map(lockedPrediction -> {
+                    List<LockedPrediction> attackerPredictions =
+                            readLockedPredictions(lockedPrediction.getAttackerPredictionsJson());
+                    List<LockedPrediction> defenderPredictions =
+                            readLockedPredictions(lockedPrediction.getDefenderPredictionsJson());
+                    return CombatReplayPredictionScorer.score(
+                            attackerPredictions,
+                            defenderPredictions,
+                            candidate.getWinnerFaction(),
+                            candidate.getAttackerFaction());
+                })
+                .orElse(null);
+        return houseLedgerService.buildAndPersistPredictionSummaries(
+                replayContest, scoredPredictions, sideBetService.resolvedSideBetsFromFacts(candidate, replayContest));
+    }
+
     public void finalizeReplayLeaderboardContest(
             Game game, CombatReplayContestEntity replayContest, CombatCandidateEntity candidate) {
         if (replayContest.getId() == null) return;

@@ -238,7 +238,6 @@ public class CombatReplayHacanTradeConvoysService {
         tradeConvoys.setVoteCount(winning.voteCount());
         tradeConvoys.setSelectedAt(LocalDateTime.now());
         tradeConvoysRepository.save(tradeConvoys);
-        applyLockedTradeConvoysFavorGrant(tradeConvoys);
         postLockedTradeConvoysSummary(tradeConvoys);
         return toTradeConvoys(tradeConvoys);
     }
@@ -413,19 +412,6 @@ public class CombatReplayHacanTradeConvoysService {
         tradeConvoysRepository.save(tradeConvoys);
         postLockedTradeConvoysSummary(tradeConvoys);
         return TradeConvoys.none();
-    }
-
-    private void applyLockedTradeConvoysFavorGrant(CombatReplayHacanTradeConvoysEntity tradeConvoys) {
-        if (tradeConvoys.getContestId() == null
-                || tradeConvoys.getTargetHouse() == null
-                || safeInt(tradeConvoys.getFavorCost()) <= 0) return;
-        List<CombatReplayHouseScoreEntity> scores = houseScoreRepository.findByContestId(tradeConvoys.getContestId());
-        for (CombatReplayHouseScoreEntity score : scores) {
-            if (score.getHouse() != tradeConvoys.getTargetHouse()) continue;
-            score.setFavorPoints(safeInt(score.getFavorPoints()) + safeInt(tradeConvoys.getFavorCost()));
-            houseScoreRepository.saveAndFlush(score);
-            return;
-        }
     }
 
     private boolean claimHacanTradeConvoysUse(

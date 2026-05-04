@@ -184,6 +184,24 @@ public class CombatReplaySideBetService {
         return new SideBetResolution(resolved, List.copyOf(entriesByUser.values()));
     }
 
+    public List<ResolvedSideBet> resolvedSideBetsFromFacts(
+            CombatCandidateEntity candidate, CombatReplayContestEntity replayContest) {
+        if (candidate == null || replayContest == null || replayContest.getId() == null) return List.of();
+
+        List<ResolvedSideBet> resolved = new ArrayList<>();
+        for (CombatContestSideBetEntity sideBet : sideBetRepository.findByContestId(replayContest.getId())) {
+            if (sideBet.getResolvedAt() == null || !isWinningBet(candidate, sideBet)) continue;
+            resolved.add(new ResolvedSideBet(
+                    sideBet.getDiscordUserId(),
+                    sideBet.getDiscordUserName(),
+                    sideBet.getBetType(),
+                    sideBet.getTargetFaction(),
+                    sideBet.getBetType().label(),
+                    payoutService.resolvedProfitPoints(sideBet)));
+        }
+        return resolved;
+    }
+
     private Map<String, CombatReplayLeaderboardEntryEntity> loadLeaderboardEntries(
             List<CombatContestSideBetEntity> sideBets) {
         Set<String> userIds = new HashSet<>();
