@@ -13,6 +13,7 @@ public class LazaxCommand implements ParentCommand {
                     new LazaxMyPoints(),
                     new LazaxTop100(),
                     new LazaxStartSeason1(),
+                    new LazaxGrantFavor(),
                     new LazaxHacanTradeConvoys(),
                     new LazaxMentakFalseColors(),
                     new LazaxNaaluGiftForesight())
