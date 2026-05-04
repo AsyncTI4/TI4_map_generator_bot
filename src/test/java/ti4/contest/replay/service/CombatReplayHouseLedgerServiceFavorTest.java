@@ -59,7 +59,7 @@ class CombatReplayHouseLedgerServiceFavorTest {
         service.ensureSeasonOpeningBalances();
 
         ArgumentCaptor<List<CombatReplayHouseScoreEntity>> captor = ArgumentCaptor.forClass(List.class);
-        verify(houseScoreRepository).saveAll(captor.capture());
+        verify(houseScoreRepository).saveAllAndFlush(captor.capture());
         List<CombatReplayHouseScoreEntity> scores = captor.getValue();
 
         assertEquals(3, scores.size());

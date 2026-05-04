@@ -71,7 +71,7 @@ public class CombatReplayHouseLedgerService {
             score.setAbilityBreakdownJson(writeHouseAbilitySummaries(List.of()));
             score.setScoredAt(now);
         }
-        houseScoreRepository.saveAll(scores);
+        houseScoreRepository.saveAllAndFlush(scores);
         writeSeasonOpeningBalances();
     }
 
@@ -101,7 +101,7 @@ public class CombatReplayHouseLedgerService {
             score.setScoredAt(now);
             scores.add(score);
         }
-        houseScoreRepository.saveAll(scores);
+        houseScoreRepository.saveAllAndFlush(scores);
     }
 
     public List<HouseLeaderboardSummary> leaderboardSummaries() {
@@ -332,7 +332,7 @@ public class CombatReplayHouseLedgerService {
             score.setScoredAt(now);
             scores.add(score);
         }
-        houseScoreRepository.saveAll(scores);
+        houseScoreRepository.saveAllAndFlush(scores);
     }
 
     private void sortPredictionSummaries(List<HousePredictionSummary> summaries) {
