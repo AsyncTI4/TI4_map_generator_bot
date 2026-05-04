@@ -22,6 +22,7 @@ import ti4.logging.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.service.StatusCleanupService;
+import ti4.service.emoji.CardEmojis;
 import ti4.service.game.StartPhaseService;
 
 @UtilityClass
@@ -116,13 +117,41 @@ public class ReactionCheckService {
                     + " Please press one of the buttons below anyways though - don't worry, it won't reveal anything, it will just run cleanup.";
         }
         if (game.getRound() < 4 || !game.getPublicObjectives1Peekable().isEmpty()) {
-            buttons.add(drawStage1);
+            if (game.isTwilightsFallMode()
+                    && game.getPublicObjectives1Peekable().size() > 1
+                    && !game.getPublicObjectives1Peeked().isEmpty()) {
+                for (int loc = 1; loc <= game.getPublicObjectives1Peekable().size(); loc++) {
+                    String id = game.getSpeaker().factionButtonChecker() + "reveal_stage_1position_" + loc;
+                    String label = "Reveal Stage 1, Position " + loc;
+                    if (game.getPublicObjectives1Peeked()
+                            .containsKey(game.getPublicObjectives1Peekable().get(loc - 1))) {
+                        label += " (peeked at)";
+                    }
+                    buttons.add(Buttons.blue(id, label, CardEmojis.Public1alt));
+                }
+            } else {
+                buttons.add(drawStage1);
+            }
         }
         if ((game.getRound() > 3 || game.getPublicObjectives1Peekable().isEmpty()) && !game.isOmegaPhaseMode()) {
             if ("456".equalsIgnoreCase(game.getStoredValue("homebrewMode"))) {
                 buttons.add(draw2Stage2);
             } else {
-                buttons.add(drawStage2);
+                if (game.isTwilightsFallMode()
+                        && game.getPublicObjectives1Peekable().isEmpty()
+                        && !game.getPublicObjectives2Peeked().isEmpty()) {
+                    for (int loc = 1; loc <= game.getPublicObjectives2Peekable().size(); loc++) {
+                        String id = game.getSpeaker().factionButtonChecker() + "reveal_stage_2position_" + loc;
+                        String label = "Reveal Stage 2, Position " + loc;
+                        if (game.getPublicObjectives2Peeked()
+                                .containsKey(game.getPublicObjectives2Peekable().get(loc - 1))) {
+                            label += " (peeked at)";
+                        }
+                        buttons.add(Buttons.blue(id, label, CardEmojis.Public2alt));
+                    }
+                } else {
+                    buttons.add(drawStage2);
+                }
             }
         }
         var endGameDeck =

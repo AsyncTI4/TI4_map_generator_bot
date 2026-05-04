@@ -91,11 +91,15 @@ public class SusSlashCommandService {
         if (managedGame != null) {
             TextChannel actionsChannel = managedGame.getActionsChannel();
             TextChannel tableTalkChannel = managedGame.getTableTalkChannel();
+            String tabletalkLink = String.format(
+                    "[__[Tabletalk](%s)__]", managedGame.getTableTalkChannel().getJumpUrl());
+            String actionsLink = String.format(
+                    "[__[Actions](%s)__]", managedGame.getActionsChannel().getJumpUrl());
             if (actionsChannel != null) {
-                message.append("\nActions: ").append(actionsChannel.getAsMention());
+                message.append(" " + actionsLink);
             }
             if (tableTalkChannel != null) {
-                message.append("\nTabletalk: ").append(tableTalkChannel.getAsMention());
+                message.append(" ").append(tabletalkLink);
             }
         }
         MessageHelper.sendMessageToChannel(moderationLogChannel, message.toString());
