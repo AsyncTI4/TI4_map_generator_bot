@@ -5,7 +5,7 @@ candidateSelection:
   targetCandidatesPerHour: 4
 
 promotion:
-  enabled: false
+  enabled: true
   intervalSeconds: 60
   candidateLookbackHours: 12
   maxPromotionsPerHour: 1
