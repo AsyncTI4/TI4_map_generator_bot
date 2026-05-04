@@ -103,7 +103,10 @@ public class ArvaxiAgentButtonHandler {
                 spendButtons);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                "Sent " + target.getColor() + " the buttons for resolving Marik, the Wise, the Arvaxi agent.");
+                player.getRepresentationNoPing() + " used "
+                        + Mapper.getLeader("arvaxiagent").getNameRepresentation()
+                        + " to allow " + target.getRepresentationNoPing() + " to retrieve _" + acName
+                        + "_ " + CardEmojis.getACEmoji(game) + " from the discard pile.");
         ButtonHelper.deleteMessage(event);
     }
 }
