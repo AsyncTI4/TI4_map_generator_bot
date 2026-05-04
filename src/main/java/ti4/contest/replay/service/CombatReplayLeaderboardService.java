@@ -568,9 +568,13 @@ public class CombatReplayLeaderboardService {
     }
 
     private void appendTotalFavorLine(StringBuilder message, CombatReplayHouse house) {
-        message.append("- **Total Favor:** `")
-                .append(houseFavorService.balance(house))
-                .append("`\n");
+        CombatReplayHouseFavorService.FavorLedger favorLedger = houseFavorService.ledger(house);
+        if (favorLedger.spent() > 0) {
+            message.append("- **Favor Spent:** `")
+                    .append(formatSignedPoints(-favorLedger.spent()))
+                    .append("`\n");
+        }
+        message.append("- **Available Favor:** `").append(favorLedger.balance()).append("`\n");
     }
 
     private TextChannel houseChannel(CombatReplayHouse house) {

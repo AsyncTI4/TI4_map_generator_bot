@@ -16,7 +16,11 @@ public class CombatReplayHouseFavorService {
     private final CombatReplayHouseAbilityUseRepository houseAbilityUseRepository;
 
     public int balance(CombatReplayHouse house) {
-        if (house == null) return 0;
+        return ledger(house).balance();
+    }
+
+    public FavorLedger ledger(CombatReplayHouse house) {
+        if (house == null) return new FavorLedger(0, 0, 0);
 
         int earned = 0;
         for (CombatReplayHouseScoreEntity score : houseScoreRepository.findByHouse(house)) {
@@ -28,7 +32,7 @@ public class CombatReplayHouseFavorService {
             spent += safeInt(use.getFavorCost());
         }
 
-        return Math.max(0, earned - spent);
+        return new FavorLedger(earned, spent, Math.max(0, earned - spent));
     }
 
     public boolean canAfford(CombatReplayHouse house, int favorCost) {
@@ -38,4 +42,6 @@ public class CombatReplayHouseFavorService {
     private int safeInt(Integer value) {
         return value == null ? 0 : value;
     }
+
+    public record FavorLedger(int earned, int spent, int balance) {}
 }
