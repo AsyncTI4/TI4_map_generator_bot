@@ -105,6 +105,20 @@ class CombatReplayHacanTradeConvoysServiceTest {
         assertTrue(buttons.get(2).isDisabled());
     }
 
+    @Test
+    void tradeConvoysLockedTargetMessageDoesNotRevealHacanPayout() {
+        CombatReplayHacanTradeConvoysEntity convoy = convoy(1L, CombatReplayHouse.NAALU, 30, 15);
+
+        String hacanMessage = service.hacanLockedTradeConvoysMessage(convoy);
+        String targetMessage = service.targetLockedTradeConvoysMessage(convoy);
+
+        assertTrue(hacanMessage.contains("will gain `15%`"));
+        assertTrue(targetMessage.contains("Hacan sends `30 Favor` to Naalu Delegation"));
+        assertFalse(targetMessage.contains("15%"));
+        assertFalse(targetMessage.contains("earned points"));
+        assertFalse(targetMessage.contains("will gain"));
+    }
+
     private CombatReplayHacanTradeConvoysEntity convoy(
             Long contestId, CombatReplayHouse targetHouse, int favorCost, int bonusPercent) {
         CombatReplayHacanTradeConvoysEntity convoy = new CombatReplayHacanTradeConvoysEntity();
