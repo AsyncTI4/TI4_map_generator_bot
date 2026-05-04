@@ -31,7 +31,12 @@ sideBets:
   enableSideBets: true
   maxBetsPerUser: 3
   costPoints: 1
-  dynamicPayoutCap: 100
+  dynamicPayoutCap: 50
+  afbWhiffSelectionBias: 2.0
+  roundOneWhiffSelectionBias: 3.0
+  roundOneSlamSelectionBias: 3.0
+  winnerOneHpPayoutMultiplier: 0.75
+  dynamicPayoutTiers: "0.20:4,0.10:5,0.05:8,0.025:12,0.01:20,0.005:30"
 
 decoysEnabled: false
 housesEnabled: true
@@ -40,6 +45,7 @@ houseAbilities:
   minimumAbilityVotesToResolve: 3
   baseCombatFavorGain: 10
   initialHousePoints: 1000
+  initialIndividualPoints: 100
   catchupFavorPointsPerBonus: 100
   catchupFavorBonusStep: 0
   maxCatchupFavorBonus: 0

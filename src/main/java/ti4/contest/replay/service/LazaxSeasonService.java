@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -25,6 +26,7 @@ import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.entities.CombatReplayLeaderboardEntryEntity;
 import ti4.contest.replay.repository.CombatReplayLeaderboardEntryRepository;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
@@ -39,7 +41,6 @@ import ti4.service.image.FileUploadService;
 public class LazaxSeasonService {
 
     private static final String PUBLIC_CHANNEL_NAME = "lazax-war-archives";
-    private static final int INITIAL_INDIVIDUAL_POINTS = 100;
     public static final String CLAIM_DELEGATION_BUTTON_ID = "lazaxSeason1ClaimDelegation";
 
     private final CombatContestSettings settings;
@@ -51,8 +52,9 @@ public class LazaxSeasonService {
         TextChannel channel = publicChannel();
         if (channel == null) return false;
 
+        houseService.assignLeaderboardEntriesByParticipation(
+                JdaService.guildPrimary, leaderboardEntryRepository.findAll());
         resetSeasonOneScores();
-        houseService.assignLeaderboardEntriesRandomly(JdaService.guildPrimary, leaderboardEntryRepository.findAll());
         houseLedgerService.resetSeasonOpeningBalances();
 
         postSeasonOneOpeningMessage(channel);
@@ -79,9 +81,10 @@ public class LazaxSeasonService {
 
     private void resetSeasonOneScores() {
         LocalDateTime now = LocalDateTime.now();
+        int initialIndividualPoints = settings.getHouseAbilities().getInitialIndividualPoints();
         List<CombatReplayLeaderboardEntryEntity> entries = leaderboardEntryRepository.findAll();
         for (CombatReplayLeaderboardEntryEntity entry : entries) {
-            entry.setTotalPoints(INITIAL_INDIVIDUAL_POINTS);
+            entry.setTotalPoints(initialIndividualPoints);
             entry.setPredictionCount(0);
             entry.setCorrectPredictions(0);
             entry.setUpdatedAt(now);
@@ -95,7 +98,6 @@ public class LazaxSeasonService {
 
         CombatReplayHouse existingHouse = houseService.houseForUser(user.getId());
         if (existingHouse != null) {
-            ensureLeaderboardEntry(user);
             houseService.assignHouseIfAbsent(guild, member, user);
             return "You are already assigned to **"
                     + existingHouse.displayName()
@@ -104,7 +106,6 @@ public class LazaxSeasonService {
                     + ".";
         }
 
-        ensureLeaderboardEntry(user);
         var assignment = houseService.assignHouseIfAbsent(guild, member, user);
         if (assignment == null || assignment.getHouse() == null) {
             return "Could not assign your delegation. Please try again.";
@@ -115,19 +116,6 @@ public class LazaxSeasonService {
                 + " Delegation**. Report to "
                 + delegationChannelMention(guild, assignment.getHouse())
                 + ".";
-    }
-
-    private void ensureLeaderboardEntry(User user) {
-        leaderboardEntryRepository.findByDiscordUserId(user.getId()).orElseGet(() -> {
-            CombatReplayLeaderboardEntryEntity entry = new CombatReplayLeaderboardEntryEntity();
-            entry.setDiscordUserId(user.getId());
-            entry.setDiscordUserName(user.getName());
-            entry.setTotalPoints(INITIAL_INDIVIDUAL_POINTS);
-            entry.setPredictionCount(0);
-            entry.setCorrectPredictions(0);
-            entry.setUpdatedAt(LocalDateTime.now());
-            return leaderboardEntryRepository.save(entry);
-        });
     }
 
     private String delegationChannelMention(Guild guild, CombatReplayHouse house) {
@@ -158,7 +146,7 @@ public class LazaxSeasonService {
     private void postSeasonOneOpeningText(TextChannel channel) {
         MessageHelper.sendMessageToChannel(channel, seasonOneIntroMarkdown());
         channel.sendMessageEmbeds(seasonOneOpeningEmbeds())
-                // .setComponents(ActionRow.of(Buttons.green(CLAIM_DELEGATION_BUTTON_ID, "Receive Your Delegation")))
+                .setComponents(ActionRow.of(Buttons.green(CLAIM_DELEGATION_BUTTON_ID, "Receive Your Delegation")))
                 .queue(this::postFaqThread, BotLogger::catchRestError);
     }
 
@@ -516,7 +504,7 @@ public class LazaxSeasonService {
                         false)
                 .addField(
                         "Favor",
-                        "Favor is a resource granted by the Mecatol Custodians. Every Delegation gains Favor after each combat at a steady rate, with extra Favor given to Delegations that are behind in points. Favor is spent to activate abilities for key combats.",
+                        "Favor is a resource granted by the Mecatol Custodians. Every Delegation gains Favor after each combat at a steady rate. Favor is spent to activate abilities for key combats.",
                         false)
                 .setFooter(
                         "The Council will not remember the luckiest Delegation. It will remember the one that understood the war.")

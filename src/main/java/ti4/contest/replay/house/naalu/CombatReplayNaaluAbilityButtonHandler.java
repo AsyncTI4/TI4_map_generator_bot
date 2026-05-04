@@ -2,6 +2,7 @@ package ti4.contest.replay.house.naalu;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.contest.replay.service.CombatReplayInteractionResult;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.message.MessageHelper;
 import ti4.spring.context.SpringContext;
@@ -47,8 +48,7 @@ public class CombatReplayNaaluAbilityButtonHandler {
         MessageHelper.sendEphemeralMessageToEventChannel(event, "Unknown Gift of Foresight option.");
     }
 
-    private static void sendVoteResult(
-            ButtonInteractionEvent event, CombatReplayNaaluAbilityService.VoteResult result) {
+    private static void sendVoteResult(ButtonInteractionEvent event, CombatReplayInteractionResult result) {
         MessageHelper.sendEphemeralMessageToEventChannel(event, result.message());
     }
 

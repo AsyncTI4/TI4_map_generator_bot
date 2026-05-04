@@ -121,7 +121,9 @@ public class CombatReplayPromotionService {
 
         CombatReplayContestEntity existingContest =
                 replayContestRepository.findByCandidateId(candidateId).orElse(null);
-        if (existingContest != null && existingContest.getReplayStatus() != CombatContestReplayStatus.COMPLETED) {
+        if (existingContest != null
+                && existingContest.getReplayStatus() != CombatContestReplayStatus.COMPLETED
+                && existingContest.getReplayStatus() != CombatContestReplayStatus.PREVIEW) {
             return CombatReplayContestLifecycleService.ForcePromoteResult.rejected(
                     "Candidate already has an active replay contest", existingContest);
         }
@@ -254,6 +256,9 @@ public class CombatReplayPromotionService {
         TextChannel channel = discordPostService.houseChannel(CombatReplayHouse.MENTAK);
         if (observation == null || game == null || channel == null) return;
 
+        CombatReplayContestEntity previewContest = createPreviewContest(candidate);
+        lockPreviousContestTradeConvoys(previewContest);
+
         String startSummaryText = snapshotStartSummaryText(candidate);
         String message = LazaxCombatSupport.formatReplayAnnouncement(
                 game, candidate, discordPostService.getHouseRoleMention(CombatReplayHouse.MENTAK), startSummaryText);
@@ -379,9 +384,29 @@ public class CombatReplayPromotionService {
                 .findFirstByIdLessThanOrderByIdDesc(newContest.getId())
                 .orElse(null);
         if (previousContest == null || previousContest.getCandidateId() == null) return;
+        if (!isPostCombat(previousContest)) return;
         CombatCandidateEntity previousCandidate =
                 candidateRepository.findById(previousContest.getCandidateId()).orElse(null);
+        if (previousCandidate == null) return;
         hacanTradeConvoysService.lockTradeConvoysIfNeeded(previousContest, previousCandidate);
+        replayLeaderboardService.computeAndPersistHouseScoresFromFacts(previousCandidate, previousContest);
+    }
+
+    private boolean isPostCombat(CombatReplayContestEntity contest) {
+        return contest != null && (contest.getReplayCompletedAt() != null || contest.getLeaderboardPostedAt() != null);
+    }
+
+    private CombatReplayContestEntity createPreviewContest(CombatCandidateEntity candidate) {
+        CombatReplayContestEntity existingContest =
+                replayContestRepository.findByCandidateId(candidate.getId()).orElse(null);
+        if (existingContest != null) return existingContest;
+
+        CombatReplayContestEntity contest = new CombatReplayContestEntity();
+        contest.setCandidateId(candidate.getId());
+        contest.setReplayStatus(CombatContestReplayStatus.PREVIEW);
+        contest.setNextEventSequence(1);
+        contest.setSideBetPayoutModel(CombatReplaySideBetPayoutService.ODDS_V1);
+        return replayContestRepository.saveAndFlush(contest);
     }
 
     private CombatReplayContestEntity resetReplayContest(

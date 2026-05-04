@@ -37,6 +37,7 @@ class CombatReplaySideBetServiceTest {
     private final CombatReplaySideBetPayoutService payoutService = mock(CombatReplaySideBetPayoutService.class);
     private final CombatReplaySideBetUiService sideBetUiService = mock(CombatReplaySideBetUiService.class);
     private final CombatReplayHouseService houseService = mock(CombatReplayHouseService.class);
+    private final CombatSideBetAvailabilityService availabilityService = mock(CombatSideBetAvailabilityService.class);
     private final CombatReplaySideBetService service = new CombatReplaySideBetService(
             settings,
             replayContestRepository,
@@ -45,22 +46,25 @@ class CombatReplaySideBetServiceTest {
             leaderboardEntryRepository,
             payoutService,
             sideBetUiService,
-            houseService);
+            houseService,
+            availabilityService);
 
     @Test
     void afbSkippedAvailableForSideWithDestroyerUnlessSingleDestroyerIsFacingAssaultCannon() {
         CombatCandidateEntity candidate = candidate(1, 2, false, true);
+        CombatSideBetAvailabilityService realAvailabilityService = new CombatSideBetAvailabilityService(payoutService);
 
-        assertFalse(service.isAfbSkippedAvailable(candidate, "sol"));
-        assertTrue(service.isAfbSkippedAvailable(candidate, "yin"));
+        assertFalse(realAvailabilityService.isAfbSkippedAvailable(candidate, "sol"));
+        assertTrue(realAvailabilityService.isAfbSkippedAvailable(candidate, "yin"));
     }
 
     @Test
     void afbSkippedUnavailableWithoutDestroyers() {
         CombatCandidateEntity candidate = candidate(0, 1, false, false);
+        CombatSideBetAvailabilityService realAvailabilityService = new CombatSideBetAvailabilityService(payoutService);
 
-        assertFalse(service.isAfbSkippedAvailable(candidate, "sol"));
-        assertTrue(service.isAfbSkippedAvailable(candidate, "yin"));
+        assertFalse(realAvailabilityService.isAfbSkippedAvailable(candidate, "sol"));
+        assertTrue(realAvailabilityService.isAfbSkippedAvailable(candidate, "yin"));
     }
 
     @Test
@@ -83,6 +87,8 @@ class CombatReplaySideBetServiceTest {
         when(leaderboardEntryRepository.findByDiscordUserId("user-id")).thenReturn(Optional.of(entry));
         when(houseService.houseForUser("user-id")).thenReturn(CombatReplayHouse.HACAN);
         when(sideBetRepository.countByContestIdAndDiscordUserId(1L, "user-id")).thenReturn(0);
+        when(availabilityService.isAvailable(candidate, CombatSideBetType.ROUND_ONE_WHIFF, "sol"))
+                .thenReturn(true);
         when(payoutService.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_WHIFF, "sol"))
                 .thenReturn(10);
         when(sideBetUiService.renderUserSummary(contest, candidate, "user-id", 0))
@@ -116,6 +122,8 @@ class CombatReplaySideBetServiceTest {
         when(leaderboardEntryRepository.findByDiscordUserId("user-id")).thenReturn(Optional.empty());
         when(houseService.houseForUser("user-id")).thenReturn(CombatReplayHouse.HACAN);
         when(sideBetRepository.countByContestIdAndDiscordUserId(1L, "user-id")).thenReturn(0);
+        when(availabilityService.isAvailable(candidate, CombatSideBetType.ROUND_ONE_WHIFF, "sol"))
+                .thenReturn(true);
         when(payoutService.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_WHIFF, "sol"))
                 .thenReturn(10);
         when(sideBetUiService.renderUserSummary(contest, candidate, "user-id", 0))

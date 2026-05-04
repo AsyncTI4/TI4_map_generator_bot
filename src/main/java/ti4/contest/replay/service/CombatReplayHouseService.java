@@ -31,6 +31,7 @@ import ti4.contest.replay.entities.CombatReplayLeaderboardEntryEntity;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
 import ti4.contest.replay.repository.CombatReplayHouseRepository;
+import ti4.contest.replay.repository.CombatReplayLeaderboardEntryRepository;
 import ti4.discord.JdaService;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -45,6 +46,7 @@ public class CombatReplayHouseService {
     private final CombatReplayHouseRepository houseRepository;
     private final CombatReplayContestRepository replayContestRepository;
     private final CombatCandidateRepository candidateRepository;
+    private final CombatReplayLeaderboardEntryRepository leaderboardEntryRepository;
 
     public void addHouseEmojiReactionIfNeeded(MessageReceivedEvent event) {
         if (!settings.isHousesEnabled()) return;
@@ -141,6 +143,57 @@ public class CombatReplayHouseService {
             }
             assignment.setUpdatedAt(now);
             houseRepository.save(assignment);
+
+            Member member = retrieveMember(guild, entry.getDiscordUserId());
+            setOnlyHouseRole(guild, member, house);
+            assigned++;
+        }
+        return assigned;
+    }
+
+    public synchronized int assignLeaderboardEntriesByParticipation(
+            Guild guild, List<CombatReplayLeaderboardEntryEntity> leaderboardEntries) {
+        if (!settings.isHousesEnabled() || leaderboardEntries == null || leaderboardEntries.isEmpty()) return 0;
+
+        List<CombatReplayLeaderboardEntryEntity> entries = new ArrayList<>(leaderboardEntries);
+        entries.removeIf(entry -> entry == null
+                || StringUtils.isBlank(entry.getDiscordUserId())
+                || StringUtils.isBlank(entry.getDiscordUserName()));
+        entries.sort((left, right) -> {
+            int participationCompare =
+                    Integer.compare(safeInt(right.getPredictionCount()), safeInt(left.getPredictionCount()));
+            if (participationCompare != 0) return participationCompare;
+            int pointsCompare = Integer.compare(safeInt(right.getTotalPoints()), safeInt(left.getTotalPoints()));
+            if (pointsCompare != 0) return pointsCompare;
+            return StringUtils.compareIgnoreCase(left.getDiscordUserName(), right.getDiscordUserName());
+        });
+
+        Map<CombatReplayHouse, Integer> participationByHouse = new HashMap<>();
+        Map<CombatReplayHouse, Integer> membersByHouse = new HashMap<>();
+        for (CombatReplayHouse house : CombatReplayHouse.assignmentOrder()) {
+            participationByHouse.put(house, 0);
+            membersByHouse.put(house, 0);
+        }
+
+        int assigned = 0;
+        LocalDateTime now = LocalDateTime.now();
+        for (CombatReplayLeaderboardEntryEntity entry : entries) {
+            CombatReplayHouse house = houseWithLowestAssignedParticipation(participationByHouse, membersByHouse);
+            CombatReplayHouseEntity assignment = houseRepository
+                    .findByDiscordUserId(entry.getDiscordUserId())
+                    .orElseGet(CombatReplayHouseEntity::new);
+            assignment.setDiscordUserId(entry.getDiscordUserId());
+            assignment.setDiscordUserName(entry.getDiscordUserName());
+            assignment.setHouse(house);
+            if (assignment.getAssignedAt() == null) {
+                assignment.setAssignedAt(now);
+            }
+            assignment.setUpdatedAt(now);
+            houseRepository.save(assignment);
+
+            participationByHouse.computeIfPresent(
+                    house, (ignored, participation) -> participation + safeInt(entry.getPredictionCount()));
+            membersByHouse.computeIfPresent(house, (ignored, members) -> members + 1);
 
             Member member = retrieveMember(guild, entry.getDiscordUserId());
             setOnlyHouseRole(guild, member, house);
@@ -264,6 +317,7 @@ public class CombatReplayHouseService {
         CombatReplayHouseEntity existing =
                 houseRepository.findByDiscordUserId(discordUserId).orElse(null);
         if (existing != null) {
+            ensureLeaderboardEntry(discordUserId, safeUserName);
             if (!safeUserName.equals(existing.getDiscordUserName())) {
                 existing.setDiscordUserName(safeUserName);
                 existing.setUpdatedAt(LocalDateTime.now());
@@ -282,9 +336,23 @@ public class CombatReplayHouseService {
         assignment.setAssignedAt(now);
         assignment.setUpdatedAt(now);
         CombatReplayHouseEntity saved = houseRepository.save(assignment);
+        ensureLeaderboardEntry(discordUserId, safeUserName);
 
         grantHouseRole(guild, member, house, () -> announceHouseAssignment(guild, discordUserId, house));
         return saved;
+    }
+
+    private void ensureLeaderboardEntry(String discordUserId, String discordUserName) {
+        leaderboardEntryRepository.findByDiscordUserId(discordUserId).orElseGet(() -> {
+            CombatReplayLeaderboardEntryEntity entry = new CombatReplayLeaderboardEntryEntity();
+            entry.setDiscordUserId(discordUserId);
+            entry.setDiscordUserName(discordUserName);
+            entry.setTotalPoints(settings.getHouseAbilities().getInitialIndividualPoints());
+            entry.setPredictionCount(0);
+            entry.setCorrectPredictions(0);
+            entry.setUpdatedAt(LocalDateTime.now());
+            return leaderboardEntryRepository.save(entry);
+        });
     }
 
     private CombatReplayHouse houseWithFewestMembers() {
@@ -295,6 +363,24 @@ public class CombatReplayHouseService {
             if (count < selectedCount) {
                 selected = house;
                 selectedCount = count;
+            }
+        }
+        return selected;
+    }
+
+    private CombatReplayHouse houseWithLowestAssignedParticipation(
+            Map<CombatReplayHouse, Integer> participationByHouse, Map<CombatReplayHouse, Integer> membersByHouse) {
+        CombatReplayHouse selected = CombatReplayHouse.NAALU;
+        int selectedParticipation = Integer.MAX_VALUE;
+        int selectedMembers = Integer.MAX_VALUE;
+        for (CombatReplayHouse house : CombatReplayHouse.assignmentOrder()) {
+            int participation = participationByHouse.getOrDefault(house, 0);
+            int members = membersByHouse.getOrDefault(house, 0);
+            if (participation < selectedParticipation
+                    || (participation == selectedParticipation && members < selectedMembers)) {
+                selected = house;
+                selectedParticipation = participation;
+                selectedMembers = members;
             }
         }
         return selected;
@@ -361,6 +447,10 @@ public class CombatReplayHouseService {
         if (afterRoleUpdate != null) {
             afterRoleUpdate.run();
         }
+    }
+
+    private int safeInt(Integer value) {
+        return value == null ? 0 : value;
     }
 
     private void announceHouseAssignment(Guild guild, String discordUserId, CombatReplayHouse house) {

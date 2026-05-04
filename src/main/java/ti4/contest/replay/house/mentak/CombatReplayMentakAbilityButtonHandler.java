@@ -2,6 +2,7 @@ package ti4.contest.replay.house.mentak;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.contest.replay.service.CombatReplayInteractionResult;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
@@ -36,7 +37,7 @@ public class CombatReplayMentakAbilityButtonHandler {
                         event, "Could not read the Mentak false-colors request.");
                 return;
             }
-            CombatReplayMentakAbilityService.VoteResult result = service.voteDoNotUse(
+            CombatReplayInteractionResult result = service.voteDoNotUse(
                     candidateId, event.getUser().getId(), event.getUser().getName());
             MessageHelper.sendEphemeralMessageToEventChannel(event, result.message());
             return;
@@ -48,7 +49,7 @@ public class CombatReplayMentakAbilityButtonHandler {
             return;
         }
 
-        CombatReplayMentakAbilityService.VoteResult result = service.voteDecoy(
+        CombatReplayInteractionResult result = service.voteDecoy(
                 request.candidateId(),
                 request.targetFaction(),
                 request.unitType(),

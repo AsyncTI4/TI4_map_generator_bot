@@ -1,35 +1,27 @@
 package ti4.contest.replay.house.mentak;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import ti4.contest.replay.core.CombatCandidatePromotionStatus;
-import ti4.contest.replay.core.CombatCandidateStatus;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.entities.CombatCandidateEntity;
-import ti4.contest.replay.entities.CombatReplayHouseAbilityUseEntity;
-import ti4.contest.replay.entities.CombatReplayHouseAbilityVoteEntity;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatReplayHouseAbilityUseRepository;
-import ti4.contest.replay.repository.CombatReplayHouseAbilityVoteRepository;
 import ti4.contest.replay.service.CombatReplayAbilityWindowText;
+import ti4.contest.replay.service.CombatReplayHouseAbilityVoteService;
 import ti4.contest.replay.service.CombatReplayHouseFavorService;
+import ti4.contest.replay.service.CombatReplayHousePhaseService;
 import ti4.contest.replay.service.CombatReplayHouseService;
-import ti4.contest.replay.service.CombatReplayVoteTally;
+import ti4.contest.replay.service.CombatReplayInteractionResult;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
@@ -57,8 +49,9 @@ public class CombatReplayMentakAbilityService {
     private final CombatContestSettings settings;
     private final CombatCandidateRepository candidateRepository;
     private final CombatReplayHouseAbilityUseRepository houseAbilityUseRepository;
-    private final CombatReplayHouseAbilityVoteRepository houseAbilityVoteRepository;
     private final CombatReplayHouseFavorService houseFavorService;
+    private final CombatReplayHouseAbilityVoteService voteService;
+    private final CombatReplayHousePhaseService phaseService;
     private final CombatReplayHouseService houseService;
 
     public void postDecoyButtons(TextChannel channel, CombatCandidateEntity candidate) {
@@ -80,7 +73,7 @@ public class CombatReplayMentakAbilityService {
     }
 
     public boolean shouldOfferDecoyVoting(CombatCandidateEntity candidate) {
-        return settings.isHousesEnabled() && candidate != null;
+        return phaseService.discussionOpenForCandidate(candidate);
     }
 
     public String falseColorsSummaryLine() {
@@ -120,18 +113,20 @@ public class CombatReplayMentakAbilityService {
         return houseService.houseForUser(discordUserId) == CombatReplayHouse.MENTAK;
     }
 
-    public VoteResult voteDecoy(
+    public CombatReplayInteractionResult voteDecoy(
             long candidateId, String targetFaction, UnitType unitType, String discordUserId, String discordUserName) {
         CombatCandidateEntity candidate = loadCandidateForVote(candidateId);
         if (candidate == null)
-            return VoteResult.rejected("Could not find an open false-colors window for that combat.");
+            return CombatReplayInteractionResult.rejected(
+                    "Could not find an open false-colors window for that combat.");
         if (!isDecoyUnit(unitType)) {
-            return VoteResult.rejected("Mentak Delegation cannot fly false colors with that ship.");
+            return CombatReplayInteractionResult.rejected("Mentak Delegation cannot fly false colors with that ship.");
         }
 
         Game game = loadGame(candidate.getGameName());
         Player target = game == null ? null : game.getPlayerFromColorOrFaction(targetFaction);
-        if (target == null) return VoteResult.rejected("Could not find the target faction for that decoy.");
+        if (target == null)
+            return CombatReplayInteractionResult.rejected("Could not find the target faction for that decoy.");
 
         return recordVote(
                 candidate.getId(),
@@ -141,17 +136,19 @@ public class CombatReplayMentakAbilityService {
                 discordUserName);
     }
 
-    public VoteResult voteDoNotUse(long candidateId, String discordUserId, String discordUserName) {
+    public CombatReplayInteractionResult voteDoNotUse(long candidateId, String discordUserId, String discordUserName) {
         CombatCandidateEntity candidate = loadCandidateForVote(candidateId);
         if (candidate == null)
-            return VoteResult.rejected("Could not find an open false-colors window for that combat.");
+            return CombatReplayInteractionResult.rejected(
+                    "Could not find an open false-colors window for that combat.");
         return recordVote(candidate.getId(), DO_NOT_USE_ABILITY, "Do Not Use", discordUserId, discordUserName);
     }
 
     public void resolveVoteIfNeeded(CombatCandidateEntity candidate) {
         if (houseAbilityUseRepository.existsByCandidateIdAndHouse(candidate.getId(), CombatReplayHouse.MENTAK)) return;
 
-        WinningVote winningVote = winningVote(candidate.getId());
+        CombatReplayHouseAbilityVoteService.WinningVote winningVote =
+                voteService.winningVote(candidate.getId(), CombatReplayHouse.MENTAK, this::optionLabel);
         if (winningVote == null) {
             resolveNoSelection(candidate.getId());
             return;
@@ -198,58 +195,23 @@ public class CombatReplayMentakAbilityService {
         }
     }
 
-    private VoteResult recordVote(
+    private CombatReplayInteractionResult recordVote(
             long candidateId, String optionKey, String optionLabel, String discordUserId, String discordUserName) {
-        if (StringUtils.isBlank(discordUserId)) {
-            return VoteResult.rejected("Could not record that delegation ability vote.");
-        }
-        if (houseAbilityUseRepository.existsByCandidateIdAndHouse(candidateId, CombatReplayHouse.MENTAK)) {
-            return VoteResult.rejected("Mentak Delegation has already resolved its ability for this combat.");
-        }
-        int cost = favorCost(optionKey);
-        if (cost > 0 && !houseFavorService.canAfford(CombatReplayHouse.MENTAK, cost)) {
-            return VoteResult.rejected("Mentak Delegation lacks the Favor for that ability.");
-        }
-
-        CombatReplayHouseAbilityVoteEntity vote = houseAbilityVoteRepository
-                .findByCandidateIdAndHouseAndDiscordUserId(candidateId, CombatReplayHouse.MENTAK, discordUserId)
-                .orElse(null);
-        if (vote != null && optionKey.equals(vote.getOptionKey())) {
-            houseAbilityVoteRepository.delete(vote);
-            return VoteResult.accepted("Withdrew vote.");
-        }
-        if (vote == null) {
-            vote = new CombatReplayHouseAbilityVoteEntity();
-            vote.setCandidateId(candidateId);
-            vote.setHouse(CombatReplayHouse.MENTAK);
-            vote.setDiscordUserId(discordUserId);
-        }
-        vote.setOptionKey(optionKey);
-        vote.setDiscordUserName(StringUtils.defaultIfBlank(discordUserName, "Unknown User"));
-        vote.setVotedAt(LocalDateTime.now());
-        houseAbilityVoteRepository.save(vote);
-        return VoteResult.accepted("Cast vote for **" + optionLabel + "**.");
+        return voteService.recordVote(
+                candidateId,
+                CombatReplayHouse.MENTAK,
+                optionKey,
+                optionLabel,
+                discordUserId,
+                discordUserName,
+                this::favorCost,
+                ignored -> "",
+                "Mentak Delegation has already resolved its ability for this combat.",
+                "Mentak Delegation lacks the Favor for that ability.");
     }
 
     private boolean claimUse(long candidateId, int favorCost, String discordUserId, String discordUserName) {
-        if (StringUtils.isBlank(discordUserId)) return false;
-        if (houseAbilityUseRepository.existsByCandidateIdAndHouse(candidateId, CombatReplayHouse.MENTAK)) return false;
-        int cost = favorCost;
-        if (cost > 0 && !houseFavorService.canAfford(CombatReplayHouse.MENTAK, cost)) return false;
-
-        CombatReplayHouseAbilityUseEntity use = new CombatReplayHouseAbilityUseEntity();
-        use.setCandidateId(candidateId);
-        use.setHouse(CombatReplayHouse.MENTAK);
-        use.setFavorCost(cost);
-        use.setDiscordUserId(discordUserId);
-        use.setDiscordUserName(StringUtils.defaultIfBlank(discordUserName, "Unknown User"));
-        use.setUsedAt(LocalDateTime.now());
-        try {
-            houseAbilityUseRepository.saveAndFlush(use);
-            return true;
-        } catch (DataIntegrityViolationException e) {
-            return false;
-        }
+        return voteService.claimUse(candidateId, CombatReplayHouse.MENTAK, favorCost, discordUserId, discordUserName);
     }
 
     private void refreshWarSunDecoyTechSummary(
@@ -265,7 +227,7 @@ public class CombatReplayMentakAbilityService {
         }
     }
 
-    private void resolveDoNotUse(long candidateId, WinningVote winningVote) {
+    private void resolveDoNotUse(long candidateId, CombatReplayHouseAbilityVoteService.WinningVote winningVote) {
         if (!claimUse(candidateId, 0, winningVote.discordUserId(), winningVote.discordUserName())) {
             return;
         }
@@ -346,17 +308,10 @@ public class CombatReplayMentakAbilityService {
         };
     }
 
-    private boolean windowOpen(CombatCandidateEntity candidate) {
-        return candidate != null
-                && candidate.getStatus() == CombatCandidateStatus.RESOLVED
-                && candidate.getPromotionStatus() == CombatCandidatePromotionStatus.PENDING
-                && candidate.getMentakPreviewPostedAt() != null;
-    }
-
     private CombatCandidateEntity loadCandidateForVote(long candidateId) {
         CombatCandidateEntity candidate =
                 candidateRepository.findById(candidateId).orElse(null);
-        return windowOpen(candidate) ? candidate : null;
+        return phaseService.mentakPreviewOpen(candidate) ? candidate : null;
     }
 
     private Long manageVoteCandidateId(String buttonId) {
@@ -375,55 +330,12 @@ public class CombatReplayMentakAbilityService {
                 || unitType == UnitType.Warsun;
     }
 
-    private WinningVote winningVote(Long candidateId) {
-        List<CombatReplayHouseAbilityVoteEntity> votes =
-                houseAbilityVoteRepository.findByCandidateIdAndHouse(candidateId, CombatReplayHouse.MENTAK);
-        if (votes.isEmpty()) return null;
-        if (distinctVoterCount(votes) < minimumAbilityVotesToResolve()) return null;
-
-        return CombatReplayVoteTally.tallies(
-                        votes, vote -> new AbilityVoteOption(vote.getOptionKey(), optionLabel(vote.getOptionKey())))
-                .stream()
-                .sorted(Comparator.comparingInt(
-                                (CombatReplayVoteTally.Tally<CombatReplayHouseAbilityVoteEntity, AbilityVoteOption>
-                                                tally) -> tally.voteCount())
-                        .thenComparing(tally -> tally.option().label(), Comparator.reverseOrder())
-                        .reversed())
-                .findFirst()
-                .map(tally -> {
-                    CombatReplayHouseAbilityVoteEntity firstVote = tally.firstVote();
-                    return new WinningVote(
-                            tally.option().optionKey(),
-                            tally.option().label(),
-                            firstVote.getDiscordUserId(),
-                            firstVote.getDiscordUserName(),
-                            tally.voteCount());
-                })
-                .orElse(null);
-    }
-
-    private long distinctVoterCount(List<CombatReplayHouseAbilityVoteEntity> votes) {
-        return CombatReplayVoteTally.distinctVoterCount(votes, CombatReplayHouseAbilityVoteEntity::getDiscordUserId);
-    }
-
     private int minimumAbilityVotesToResolve() {
-        return Math.max(1, settings.getHouseAbilities().getMinimumAbilityVotesToResolve());
+        return voteService.minimumAbilityVotesToResolve();
     }
 
     private String voteSummary(Long candidateId) {
-        List<CombatReplayHouseAbilityVoteEntity> votes =
-                houseAbilityVoteRepository.findByCandidateIdAndHouse(candidateId, CombatReplayHouse.MENTAK);
-        if (votes.isEmpty()) return "No votes recorded.";
-        Map<String, Integer> countsByOption = new HashMap<>();
-        for (CombatReplayHouseAbilityVoteEntity vote : votes) {
-            countsByOption.merge(vote.getOptionKey(), 1, Integer::sum);
-        }
-        List<String> lines = countsByOption.entrySet().stream()
-                .sorted(Map.Entry.<String, Integer>comparingByValue(Comparator.reverseOrder())
-                        .thenComparing(entry -> optionLabel(entry.getKey())))
-                .map(entry -> "- " + optionLabel(entry.getKey()) + ": `" + entry.getValue() + "`")
-                .toList();
-        return "Current tally:\n" + String.join("\n", lines);
+        return voteService.voteSummary(candidateId, CombatReplayHouse.MENTAK, this::optionLabel);
     }
 
     private String optionLabel(String optionKey) {
@@ -483,21 +395,6 @@ public class CombatReplayMentakAbilityService {
         }
         return channel;
     }
-
-    public record VoteResult(boolean accepted, String message) {
-        public static VoteResult accepted(String message) {
-            return new VoteResult(true, message);
-        }
-
-        public static VoteResult rejected(String message) {
-            return new VoteResult(false, message);
-        }
-    }
-
-    private record WinningVote(
-            String optionKey, String label, String discordUserId, String discordUserName, int voteCount) {}
-
-    private record AbilityVoteOption(String optionKey, String label) {}
 
     private record MentakOption(String targetFaction, UnitType unitType) {}
 }

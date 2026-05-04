@@ -1,6 +1,7 @@
 package ti4.contest.replay.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +65,7 @@ public class CombatReplaySideBetPayoutService {
         if (betType == CombatSideBetType.AFB_WHIFF) {
             Double probability = afbWhiffProbabilityFromInitialSnapshot(candidate, targetFaction);
             if (probability == null) return fixedPayout(CombatSideBetType.AFB_WHIFF);
-            return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(probability);
+            return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(betType, probability);
         }
 
         Double probability = betType == CombatSideBetType.ROUND_ONE_SLAM
@@ -72,7 +73,7 @@ public class CombatReplaySideBetPayoutService {
                 : openingRoundProbabilityFromInitialSnapshot(candidate, targetFaction, false);
         if (probability == null) return fixedPayout(betType);
 
-        return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(probability);
+        return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(betType, probability);
     }
 
     public int resolvedProfitPoints(CombatContestSideBetEntity sideBet) {
@@ -90,14 +91,35 @@ public class CombatReplaySideBetPayoutService {
         return betType.profitPoints();
     }
 
-    private int dynamicPayout(double probability) {
-        if (probability >= 0.20) return 4;
-        if (probability >= 0.10) return 6;
-        if (probability >= 0.05) return 10;
-        if (probability >= 0.025) return 15;
-        if (probability >= 0.01) return 30;
-        if (probability >= 0.005) return 75;
+    private int dynamicPayout(CombatSideBetType betType, double probability) {
+        double adjustedProbability = Math.min(1.0, probability * selectionBiasMultiplier(betType));
+        for (PayoutTier tier : dynamicPayoutTiers()) {
+            if (adjustedProbability >= tier.minimumProbability()) return Math.min(tier.payout(), maxDynamicPayout());
+        }
         return maxDynamicPayout();
+    }
+
+    private double selectionBiasMultiplier(CombatSideBetType betType) {
+        return switch (betType) {
+            case AFB_WHIFF -> settings.getSideBets().getAfbWhiffSelectionBias();
+            case ROUND_ONE_WHIFF -> settings.getSideBets().getRoundOneWhiffSelectionBias();
+            case ROUND_ONE_SLAM -> settings.getSideBets().getRoundOneSlamSelectionBias();
+            default -> 1.0;
+        };
+    }
+
+    private List<PayoutTier> dynamicPayoutTiers() {
+        List<PayoutTier> tiers = new ArrayList<>();
+        String configuredTiers = settings.getSideBets().getDynamicPayoutTiers();
+        for (String rawTier : configuredTiers.split(",")) {
+            String[] parts = rawTier.trim().split(":", 2);
+            if (parts.length != 2) {
+                throw new IllegalStateException("Invalid dynamic payout tier: " + rawTier);
+            }
+            tiers.add(new PayoutTier(Double.parseDouble(parts[0]), Integer.parseInt(parts[1])));
+        }
+        tiers.sort(Comparator.comparingDouble(PayoutTier::minimumProbability).reversed());
+        return tiers;
     }
 
     private int maxDynamicPayout() {
@@ -110,7 +132,9 @@ public class CombatReplaySideBetPayoutService {
         double x = Math.max(0.0, totalHp - 8.0) / 52.0;
         int profitPoints = (int) Math.round(3.0 + Math.pow(x, 1.35) * (64.0 + 8.0 * Math.sqrt(balance)));
         profitPoints = Math.max(3, profitPoints);
-        return Math.min(settings.getSideBets().getDynamicPayoutCap(), profitPoints * 2);
+        int tunedPayout =
+                (int) Math.round(profitPoints * 2 * settings.getSideBets().getWinnerOneHpPayoutMultiplier());
+        return Math.min(maxDynamicPayout(), Math.max(1, tunedPayout));
     }
 
     private Double openingRoundSlamProbabilityFromInitialSnapshot(
@@ -475,4 +499,6 @@ public class CombatReplaySideBetPayoutService {
             Player player,
             Player opponent,
             LazaxCombatSupport.SpaceCombatSnapshot snapshot) {}
+
+    private record PayoutTier(double minimumProbability, int payout) {}
 }

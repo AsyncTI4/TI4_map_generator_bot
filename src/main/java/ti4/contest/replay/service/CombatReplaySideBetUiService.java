@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import ti4.contest.replay.buttons.CombatSideBetButtonIds;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatSideBetType;
-import ti4.contest.replay.core.CombatSideState;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatContestSideBetEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
@@ -39,6 +38,7 @@ class CombatReplaySideBetUiService {
     private final CombatReplayContestRepository replayContestRepository;
     private final CombatContestSideBetRepository sideBetRepository;
     private final CombatReplaySideBetPayoutService payoutService;
+    private final CombatSideBetAvailabilityService availabilityService;
 
     public boolean shouldShowButtons(CombatCandidateEntity candidate) {
         return candidate != null
@@ -88,10 +88,7 @@ class CombatReplaySideBetUiService {
     private List<Button> buttonsForFaction(
             Game game, CombatReplayContestEntity contest, CombatCandidateEntity candidate, String faction) {
         List<Button> buttons = new ArrayList<>();
-        CombatSideState state = CombatSideState.forFaction(candidate, faction);
-        if (state == null) return buttons;
-        for (CombatSideBetType type : CombatSideBetType.values()) {
-            if (!isAvailableForFaction(type, candidate, faction, state)) continue;
+        for (CombatSideBetType type : availabilityService.availableTypes(candidate, faction)) {
             int profitPoints = payoutService.offeredPayout(contest, candidate, type, faction);
             buttons.add(Buttons.gray(
                     CombatSideBetButtonIds.format(contest.getId(), type, faction),
@@ -99,25 +96,6 @@ class CombatReplaySideBetUiService {
                     type.emoji()));
         }
         return buttons;
-    }
-
-    private boolean isAvailableForFaction(
-            CombatSideBetType type, CombatCandidateEntity candidate, String faction, CombatSideState state) {
-        if (!type.isAvailable(state.destroyerCount())) return false;
-        if (type == CombatSideBetType.AFB_WHIFF) return payoutService.hasAfbUnits(candidate, faction);
-        if (type != CombatSideBetType.AFB_SKIPPED) return true;
-        return !(state.destroyerCount() == 1 && opponentHasAssaultCannon(candidate, faction));
-    }
-
-    private boolean opponentHasAssaultCannon(CombatCandidateEntity candidate, String faction) {
-        if (candidate == null || faction == null) return false;
-        if (faction.equalsIgnoreCase(candidate.getAttackerFaction())) {
-            return Boolean.TRUE.equals(candidate.getDefenderHasAssaultCannon());
-        }
-        if (faction.equalsIgnoreCase(candidate.getDefenderFaction())) {
-            return Boolean.TRUE.equals(candidate.getAttackerHasAssaultCannon());
-        }
-        return false;
     }
 
     private String buttonLabel(CombatSideBetType type, int profitPoints) {
