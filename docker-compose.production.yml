@@ -17,13 +17,8 @@ services:
     image: ${IMAGE_REPOSITORY:-ghcr.io/asyncti4/ti4-map-generator-bot}:${IMAGE_TAG:-master}
     restart: unless-stopped
     mem_limit: 7g
-    cap_add:
-      - SYS_ADMIN
-    security_opt:
-      - seccomp:unconfined
     volumes:
       - ${HOST_TI4_SAVES_DIR}:/opt/STORAGE
-      - ${HOST_TI4_SAVES_DIR}/profiles:/opt/profiles
       - ${HOST_TI4_REPO_DIR}/src/main/resources:/opt/resources:ro
     ports:
       # async-profiler socket — bound to loopback only; reach via SSH tunnel
@@ -38,7 +33,7 @@ services:
       DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET}
       DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI}
       GUILDID_LIST: ${GUILDID_LIST}
-      JAVA_TOOL_OPTIONS: "-agentpath=/opt/async-profiler/lib/libasyncProfiler.so=port=8849"
+      JAVA_TOOL_OPTIONS: "-agentpath=/app/async-profiler/lib/libasyncProfiler.so=port=8849"
       MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY: ${MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY}
       REPO_DISPATCH_TOKEN: ${REPO_DISPATCH_TOKEN}
       RESOURCE_PATH: /opt/resources
