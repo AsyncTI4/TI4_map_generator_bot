@@ -3038,10 +3038,9 @@ public final class Helper {
             String messageID = event.getInteraction().getMessage().getId();
             return DiscordChannelUtility.retrieveThreadChannelById(event.getGuild(), messageID)
                     .complete();
-        } catch (Exception e) {
-            BotLogger.error(new LogOrigin(event), "Something went wrong getting thread channels.", e);
+        } catch (Exception ignored) {
+            return event.getMessageChannel();
         }
-        return event.getMessageChannel();
     }
 
     /**
