@@ -5,9 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.CombatCandidateEventType;
 import ti4.contest.replay.core.CombatContestReplayStatus;
@@ -19,7 +17,6 @@ import ti4.contest.replay.repository.CombatCandidateEventRepository;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
 import ti4.game.Game;
-import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.RandomHelper;
 import ti4.logging.BotLogger;
@@ -83,7 +80,7 @@ public class CombatReplayExecutionService {
                 markSideBetMarketPosted(contest, LocalDateTime.now());
             }
             houseAbilityPhaseService.postDiscussionWindowAbilities(game, contest, winner);
-            announcePredictionLockCountdown(replayChannel, game, winner);
+            announcePredictionLockCountdown(replayChannel);
         } catch (Exception e) {
             BotLogger.error("Failed to post replay context at promotion.", e);
         }
@@ -189,7 +186,7 @@ public class CombatReplayExecutionService {
         replayContestRepository.save(contest);
     }
 
-    private void announcePredictionLockCountdown(MessageChannel channel, Game game, CombatCandidateEntity candidate) {
+    private void announcePredictionLockCountdown(MessageChannel channel) {
         int startDelaySeconds = replayStartDelaySeconds();
         String title = RandomHelper.pickRandomFromList(PREDICTION_LOCK_TITLES);
         String subtitle = RandomHelper.pickRandomFromList(PREDICTION_LOCK_SUBTITLES);
@@ -202,8 +199,7 @@ public class CombatReplayExecutionService {
                     : "## " + title + "\n" + subtitle + "\nVoting is now open for **"
                             + formatVotingWindow(startDelaySeconds) + "**.";
         }
-        Message posted = channel.sendMessage(message).complete();
-        addPredictionReactions(game, candidate, posted);
+        MessageHelper.sendMessageToChannel(channel, message);
     }
 
     private String housePhaseMessage(String title, String subtitle) {
@@ -217,21 +213,6 @@ public class CombatReplayExecutionService {
                 + "**. Side bets open afterward for **"
                 + formatVotingWindow(sideBetWindowSeconds)
                 + "**. Voting remains open until the combat begins.";
-    }
-
-    private void addPredictionReactions(Game game, CombatCandidateEntity candidate, Message message) {
-        if (game == null || candidate == null || message == null) return;
-        addPredictionReaction(game.getPlayerFromColorOrFaction(candidate.getAttackerFaction()), message);
-        addPredictionReaction(game.getPlayerFromColorOrFaction(candidate.getDefenderFaction()), message);
-    }
-
-    private void addPredictionReaction(Player player, Message message) {
-        if (player == null) return;
-        try {
-            message.addReaction(Emoji.fromFormatted(player.getFactionEmoji())).queue(null, BotLogger::catchRestError);
-        } catch (Exception e) {
-            BotLogger.error("Failed to parse replay contest prediction reaction emoji.", e);
-        }
     }
 
     private String formatVotingWindow(int startDelaySeconds) {
