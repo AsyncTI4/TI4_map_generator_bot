@@ -31,6 +31,7 @@ import ti4.contest.replay.service.CombatReplayAbilityWindowText;
 import ti4.contest.replay.service.CombatReplayHouseAbilityVoteService;
 import ti4.contest.replay.service.CombatReplayHouseFavorService;
 import ti4.contest.replay.service.CombatReplayHouseService;
+import ti4.contest.replay.service.CombatReplayInteractionResult;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
@@ -120,25 +121,28 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
         return houseService.houseForUser(discordUserId) == CombatReplayHouse.NAALU;
     }
 
-    public VoteResult voteActionCardPeek(long contestId, String discordUserId, String discordUserName) {
+    public CombatReplayInteractionResult voteActionCardPeek(
+            long contestId, String discordUserId, String discordUserName) {
         return vote(contestId, NAALU_ACTION_CARDS_ABILITY, "Action Cards", discordUserId, discordUserName);
     }
 
-    public VoteResult voteRoundOneRollPeek(long contestId, String discordUserId, String discordUserName) {
+    public CombatReplayInteractionResult voteRoundOneRollPeek(
+            long contestId, String discordUserId, String discordUserName) {
         return vote(contestId, NAALU_ROUND_ONE_ROLLS_ABILITY, "Round 1 Rolls", discordUserId, discordUserName);
     }
 
-    public VoteResult voteDoNotUse(long contestId, String discordUserId, String discordUserName) {
+    public CombatReplayInteractionResult voteDoNotUse(long contestId, String discordUserId, String discordUserName) {
         return vote(contestId, DO_NOT_USE_ABILITY, "Do Not Use", discordUserId, discordUserName);
     }
 
-    private VoteResult vote(
+    private CombatReplayInteractionResult vote(
             long contestId, String optionKey, String optionLabel, String discordUserId, String discordUserName) {
         CombatReplayContestEntity contest = loadContest(contestId);
         if (votingLocked(contest))
-            return VoteResult.rejected("The Naalu Gift of Foresight window is closed for this combat.");
+            return CombatReplayInteractionResult.rejected(
+                    "The Naalu Gift of Foresight window is closed for this combat.");
         CombatCandidateEntity candidate = loadCandidate(contest);
-        if (candidate == null) return VoteResult.rejected("Could not find that combat archive.");
+        if (candidate == null) return CombatReplayInteractionResult.rejected("Could not find that combat archive.");
         return recordVote(candidate.getId(), optionKey, optionLabel, discordUserId, discordUserName);
     }
 
@@ -231,9 +235,9 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
         return "## Gift of Foresight: Round 1 Rolls\n" + String.join("\n\n", rolls);
     }
 
-    private VoteResult recordVote(
+    private CombatReplayInteractionResult recordVote(
             long candidateId, String optionKey, String optionLabel, String discordUserId, String discordUserName) {
-        return VoteResult.from(voteService.recordVote(
+        return voteService.recordVote(
                 candidateId,
                 CombatReplayHouse.NAALU,
                 optionKey,
@@ -243,7 +247,7 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
                 this::favorCost,
                 this::voteSummary,
                 "Naalu Delegation has already resolved its ability for this combat.",
-                "Naalu Delegation lacks the Favor for that ability."));
+                "Naalu Delegation lacks the Favor for that ability.");
     }
 
     private boolean claimUse(long candidateId, int favorCost, String discordUserId, String discordUserName) {
@@ -407,19 +411,5 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
             BotLogger.warning("Lazax house channel not found: " + CombatReplayHouse.NAALU.channelName());
         }
         return channel;
-    }
-
-    public record VoteResult(boolean accepted, String message) {
-        public static VoteResult from(CombatReplayHouseAbilityVoteService.VoteResult result) {
-            return new VoteResult(result.accepted(), result.message());
-        }
-
-        public static VoteResult accepted(String message) {
-            return new VoteResult(true, message);
-        }
-
-        public static VoteResult rejected(String message) {
-            return new VoteResult(false, message);
-        }
     }
 }

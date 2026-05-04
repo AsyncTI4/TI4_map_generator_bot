@@ -26,7 +26,7 @@ public class CombatReplayHouseAbilityVoteService {
     private final CombatReplayHouseAbilityVoteRepository voteRepository;
     private final CombatReplayHouseFavorService favorService;
 
-    public VoteResult recordVote(
+    public CombatReplayInteractionResult recordVote(
             long candidateId,
             CombatReplayHouse house,
             String optionKey,
@@ -38,14 +38,14 @@ public class CombatReplayHouseAbilityVoteService {
             String alreadyResolvedMessage,
             String lacksFavorMessage) {
         if (StringUtils.isBlank(discordUserId)) {
-            return VoteResult.rejected("Could not record that delegation ability vote.");
+            return CombatReplayInteractionResult.rejected("Could not record that delegation ability vote.");
         }
         if (useRepository.existsByCandidateIdAndHouse(candidateId, house)) {
-            return VoteResult.rejected(alreadyResolvedMessage);
+            return CombatReplayInteractionResult.rejected(alreadyResolvedMessage);
         }
         int cost = favorCost.apply(optionKey);
         if (cost > 0 && !favorService.canAfford(house, cost)) {
-            return VoteResult.rejected(lacksFavorMessage);
+            return CombatReplayInteractionResult.rejected(lacksFavorMessage);
         }
 
         CombatReplayHouseAbilityVoteEntity vote = voteRepository
@@ -53,7 +53,8 @@ public class CombatReplayHouseAbilityVoteService {
                 .orElse(null);
         if (vote != null && optionKey.equals(vote.getOptionKey())) {
             voteRepository.delete(vote);
-            return VoteResult.accepted(appendSummary("Withdrew vote.", voteSummary.apply(candidateId)));
+            return CombatReplayInteractionResult.accepted(
+                    appendSummary("Withdrew vote.", voteSummary.apply(candidateId)));
         }
         if (vote == null) {
             vote = new CombatReplayHouseAbilityVoteEntity();
@@ -65,7 +66,7 @@ public class CombatReplayHouseAbilityVoteService {
         vote.setDiscordUserName(StringUtils.defaultIfBlank(discordUserName, "Unknown User"));
         vote.setVotedAt(LocalDateTime.now());
         voteRepository.save(vote);
-        return VoteResult.accepted(
+        return CombatReplayInteractionResult.accepted(
                 appendSummary("Cast vote for **" + optionLabel + "**.", voteSummary.apply(candidateId)));
     }
 
@@ -148,14 +149,4 @@ public class CombatReplayHouseAbilityVoteService {
 
     public record WinningVote(
             String optionKey, String label, String discordUserId, String discordUserName, int voteCount) {}
-
-    public record VoteResult(boolean accepted, String message) {
-        public static VoteResult accepted(String message) {
-            return new VoteResult(true, message);
-        }
-
-        public static VoteResult rejected(String message) {
-            return new VoteResult(false, message);
-        }
-    }
 }

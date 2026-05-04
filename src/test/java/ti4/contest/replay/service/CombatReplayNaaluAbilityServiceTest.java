@@ -92,7 +92,7 @@ class CombatReplayNaaluAbilityServiceTest {
         contest.setReplayStartAt(LocalDateTime.now().minusSeconds(1));
         when(contestRepository.findById(1L)).thenReturn(Optional.of(contest));
 
-        CombatReplayNaaluAbilityService.VoteResult result = service.voteActionCardPeek(1L, "user-id", "user-name");
+        CombatReplayInteractionResult result = service.voteActionCardPeek(1L, "user-id", "user-name");
 
         assertFalse(result.accepted());
         assertEquals("The Naalu Gift of Foresight window is closed for this combat.", result.message());

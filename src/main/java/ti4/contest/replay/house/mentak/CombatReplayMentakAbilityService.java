@@ -22,6 +22,7 @@ import ti4.contest.replay.service.CombatReplayAbilityWindowText;
 import ti4.contest.replay.service.CombatReplayHouseAbilityVoteService;
 import ti4.contest.replay.service.CombatReplayHouseFavorService;
 import ti4.contest.replay.service.CombatReplayHouseService;
+import ti4.contest.replay.service.CombatReplayInteractionResult;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
@@ -112,18 +113,20 @@ public class CombatReplayMentakAbilityService {
         return houseService.houseForUser(discordUserId) == CombatReplayHouse.MENTAK;
     }
 
-    public VoteResult voteDecoy(
+    public CombatReplayInteractionResult voteDecoy(
             long candidateId, String targetFaction, UnitType unitType, String discordUserId, String discordUserName) {
         CombatCandidateEntity candidate = loadCandidateForVote(candidateId);
         if (candidate == null)
-            return VoteResult.rejected("Could not find an open false-colors window for that combat.");
+            return CombatReplayInteractionResult.rejected(
+                    "Could not find an open false-colors window for that combat.");
         if (!isDecoyUnit(unitType)) {
-            return VoteResult.rejected("Mentak Delegation cannot fly false colors with that ship.");
+            return CombatReplayInteractionResult.rejected("Mentak Delegation cannot fly false colors with that ship.");
         }
 
         Game game = loadGame(candidate.getGameName());
         Player target = game == null ? null : game.getPlayerFromColorOrFaction(targetFaction);
-        if (target == null) return VoteResult.rejected("Could not find the target faction for that decoy.");
+        if (target == null)
+            return CombatReplayInteractionResult.rejected("Could not find the target faction for that decoy.");
 
         return recordVote(
                 candidate.getId(),
@@ -133,10 +136,11 @@ public class CombatReplayMentakAbilityService {
                 discordUserName);
     }
 
-    public VoteResult voteDoNotUse(long candidateId, String discordUserId, String discordUserName) {
+    public CombatReplayInteractionResult voteDoNotUse(long candidateId, String discordUserId, String discordUserName) {
         CombatCandidateEntity candidate = loadCandidateForVote(candidateId);
         if (candidate == null)
-            return VoteResult.rejected("Could not find an open false-colors window for that combat.");
+            return CombatReplayInteractionResult.rejected(
+                    "Could not find an open false-colors window for that combat.");
         return recordVote(candidate.getId(), DO_NOT_USE_ABILITY, "Do Not Use", discordUserId, discordUserName);
     }
 
@@ -191,9 +195,9 @@ public class CombatReplayMentakAbilityService {
         }
     }
 
-    private VoteResult recordVote(
+    private CombatReplayInteractionResult recordVote(
             long candidateId, String optionKey, String optionLabel, String discordUserId, String discordUserName) {
-        return VoteResult.from(voteService.recordVote(
+        return voteService.recordVote(
                 candidateId,
                 CombatReplayHouse.MENTAK,
                 optionKey,
@@ -203,7 +207,7 @@ public class CombatReplayMentakAbilityService {
                 this::favorCost,
                 ignored -> "",
                 "Mentak Delegation has already resolved its ability for this combat.",
-                "Mentak Delegation lacks the Favor for that ability."));
+                "Mentak Delegation lacks the Favor for that ability.");
     }
 
     private boolean claimUse(long candidateId, int favorCost, String discordUserId, String discordUserName) {
@@ -397,20 +401,6 @@ public class CombatReplayMentakAbilityService {
             BotLogger.warning("Lazax house channel not found: " + CombatReplayHouse.MENTAK.channelName());
         }
         return channel;
-    }
-
-    public record VoteResult(boolean accepted, String message) {
-        public static VoteResult from(CombatReplayHouseAbilityVoteService.VoteResult result) {
-            return new VoteResult(result.accepted(), result.message());
-        }
-
-        public static VoteResult accepted(String message) {
-            return new VoteResult(true, message);
-        }
-
-        public static VoteResult rejected(String message) {
-            return new VoteResult(false, message);
-        }
     }
 
     private record MentakOption(String targetFaction, UnitType unitType) {}

@@ -33,6 +33,7 @@ import ti4.contest.replay.repository.CombatReplayHouseScoreRepository;
 import ti4.contest.replay.service.CombatReplayAbilityWindowText;
 import ti4.contest.replay.service.CombatReplayHouseFavorService;
 import ti4.contest.replay.service.CombatReplayHouseService;
+import ti4.contest.replay.service.CombatReplayInteractionResult;
 import ti4.contest.replay.service.CombatReplayVoteTally;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
@@ -129,20 +130,24 @@ public class CombatReplayHacanTradeConvoysService {
     }
 
     @Transactional
-    public synchronized VoteResult recordTradeConvoysVote(
+    public synchronized CombatReplayInteractionResult recordTradeConvoysVote(
             ButtonInteractionEvent event, ParsedTradeConvoysButton request) {
-        if (!settings.isHousesEnabled()) return VoteResult.rejected("Hacan Delegation Trade Convoys is disabled.");
+        if (!settings.isHousesEnabled())
+            return CombatReplayInteractionResult.rejected("Hacan Delegation Trade Convoys is disabled.");
         if (!userHasHacan(event.getUser().getId())) {
-            return VoteResult.rejected("Only Hacan Delegation may broker Trade Convoys.");
+            return CombatReplayInteractionResult.rejected("Only Hacan Delegation may broker Trade Convoys.");
         }
-        if (!isValidRequest(request)) return VoteResult.rejected("That Hacan Trade Convoys option is not available.");
+        if (!isValidRequest(request))
+            return CombatReplayInteractionResult.rejected("That Hacan Trade Convoys option is not available.");
         CombatReplayContestEntity contest = tradeConvoysContest(request.contestId());
-        if (!votingOpen(contest)) return VoteResult.rejected("The Hacan Trade Convoys window is closed.");
+        if (!votingOpen(contest))
+            return CombatReplayInteractionResult.rejected("The Hacan Trade Convoys window is closed.");
         if (tradeConvoysRepository.findByContestId(request.contestId()).isPresent()) {
-            return VoteResult.rejected("Hacan Trade Convoys has already resolved for this combat.");
+            return CombatReplayInteractionResult.rejected("Hacan Trade Convoys has already resolved for this combat.");
         }
         if (!isDoNotUse(request) && !houseFavorService.canAfford(CombatReplayHouse.HACAN, request.favorCost())) {
-            return VoteResult.rejected("Hacan Delegation does not have enough Favor for that Trade Convoys option.");
+            return CombatReplayInteractionResult.rejected(
+                    "Hacan Delegation does not have enough Favor for that Trade Convoys option.");
         }
 
         CombatReplayHacanTradeConvoysVoteEntity vote = tradeConvoysVoteRepository
@@ -154,7 +159,8 @@ public class CombatReplayHacanTradeConvoysService {
                 && safeInt(vote.getFavorCost()) == request.favorCost()
                 && safeInt(vote.getPredictionBonus()) == request.bonusPercent()) {
             tradeConvoysVoteRepository.delete(vote);
-            return VoteResult.accepted("Withdrew Hacan Trade Convoys vote.\n" + voteSummary(request.contestId()));
+            return CombatReplayInteractionResult.accepted(
+                    "Withdrew Hacan Trade Convoys vote.\n" + voteSummary(request.contestId()));
         }
         if (vote == null) {
             vote = new CombatReplayHacanTradeConvoysVoteEntity();
@@ -168,8 +174,8 @@ public class CombatReplayHacanTradeConvoysService {
         vote.setVotedAt(LocalDateTime.now());
         tradeConvoysVoteRepository.save(vote);
 
-        return VoteResult.accepted("Cast Hacan Trade Convoys vote for **" + optionLabel(request) + "**.\n"
-                + voteSummary(request.contestId()));
+        return CombatReplayInteractionResult.accepted("Cast Hacan Trade Convoys vote for **" + optionLabel(request)
+                + "**.\n" + voteSummary(request.contestId()));
     }
 
     @Transactional
@@ -533,16 +539,6 @@ public class CombatReplayHacanTradeConvoysService {
 
     public record ParsedTradeConvoysButton(
             Long contestId, CombatReplayHouse targetHouse, int favorCost, int bonusPercent) {}
-
-    public record VoteResult(boolean accepted, String message) {
-        public static VoteResult accepted(String message) {
-            return new VoteResult(true, message);
-        }
-
-        public static VoteResult rejected(String message) {
-            return new VoteResult(false, message);
-        }
-    }
 
     public record TradeConvoys(Long sourceContestId, CombatReplayHouse targetHouse, int favorCost, int bonusPercent) {
         public static TradeConvoys none() {
