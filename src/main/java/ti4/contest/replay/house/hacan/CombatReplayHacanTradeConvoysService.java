@@ -476,23 +476,37 @@ public class CombatReplayHacanTradeConvoysService {
                             + " Hacan Delegation brokered no Trade Convoys for this combat.");
             return;
         }
-        String message = "## "
-                + FactionEmojis.getFactionIcon(CombatReplayHouse.HACAN.displayName())
-                + " Hacan Delegation Trade Convoys Locked\n"
-                + FactionEmojis.getFactionIcon(tradeConvoys.getTargetHouse().displayName())
-                + " Hacan sends `"
-                + safeInt(tradeConvoys.getFavorCost())
-                + " Favor` to " + tradeConvoys.getTargetHouse().displayName()
-                + " Delegation and will gain `"
-                + safeInt(tradeConvoys.getPredictionBonus())
-                + "%` of that Delegation's earned points in the next combat.";
-        sendTradeConvoysLockedMessage(CombatReplayHouse.HACAN, message);
-        sendTradeConvoysLockedMessage(tradeConvoys.getTargetHouse(), message);
+        sendTradeConvoysLockedMessage(CombatReplayHouse.HACAN, hacanLockedTradeConvoysMessage(tradeConvoys));
+        sendTradeConvoysLockedMessage(tradeConvoys.getTargetHouse(), targetLockedTradeConvoysMessage(tradeConvoys));
     }
 
     private void sendTradeConvoysLockedMessage(CombatReplayHouse house, String message) {
         TextChannel channel = houseChannel(house);
         if (channel != null) MessageHelper.sendMessageToChannel(channel, message);
+    }
+
+    String hacanLockedTradeConvoysMessage(CombatReplayHacanTradeConvoysEntity tradeConvoys) {
+        return lockedTradeConvoysHeader()
+                + "\n"
+                + lockedTradeConvoysFavorTransferLine(tradeConvoys)
+                + " and will gain `"
+                + safeInt(tradeConvoys.getPredictionBonus())
+                + "%` of that Delegation's earned points in the next combat.";
+    }
+
+    String targetLockedTradeConvoysMessage(CombatReplayHacanTradeConvoysEntity tradeConvoys) {
+        return lockedTradeConvoysHeader() + "\n" + lockedTradeConvoysFavorTransferLine(tradeConvoys) + ".";
+    }
+
+    private String lockedTradeConvoysHeader() {
+        return "## " + FactionEmojis.getFactionIcon(CombatReplayHouse.HACAN.displayName())
+                + " Hacan Delegation Trade Convoys Locked";
+    }
+
+    private String lockedTradeConvoysFavorTransferLine(CombatReplayHacanTradeConvoysEntity tradeConvoys) {
+        return FactionEmojis.getFactionIcon(tradeConvoys.getTargetHouse().displayName()) + " Hacan sends `"
+                + safeInt(tradeConvoys.getFavorCost()) + " Favor` to "
+                + tradeConvoys.getTargetHouse().displayName() + " Delegation";
     }
 
     private TradeConvoys toTradeConvoys(CombatReplayHacanTradeConvoysEntity entity) {

@@ -218,6 +218,37 @@ class CombatReplayContestLifecycleServiceTest {
     }
 
     @Test
+    void promoteBestCandidateIfDueFallsBackWhenMentakPreviewPostingFails() {
+        CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
+        CombatObservationRepository observationRepository = mock(CombatObservationRepository.class);
+        CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
+        CombatContestSettings settings = new CombatContestSettings();
+        settings.getPromotion().setEnabled(true);
+        settings.getRuntime().setDevMode(false);
+        settings.setHousesEnabled(true);
+        settings.getHouseAbilities().getMentak().setPreviewLeadSeconds(900);
+        CombatReplayContestLifecycleService service =
+                service(settings, candidateRepository, observationRepository, replayContestRepository);
+        service.setClock(fixedClock("2026-04-27T12:50:00"));
+        CombatCandidateEntity first = promotionCandidate(1L, LocalDateTime.parse("2026-04-27T12:20:00"), 10.0);
+        CombatCandidateEntity second = promotionCandidate(2L, LocalDateTime.parse("2026-04-27T12:25:00"), 5.0);
+
+        when(candidateRepository.findResolvedPromotionCandidates(
+                        CombatCandidateStatus.RESOLVED,
+                        CombatCandidatePromotionStatus.PENDING,
+                        LocalDateTime.parse("2026-04-27T00:50:00")))
+                .thenReturn(List.of(first, second));
+        when(observationRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of());
+        when(observationRepository.findById(1L)).thenReturn(java.util.Optional.empty());
+        when(observationRepository.findById(2L)).thenReturn(java.util.Optional.empty());
+
+        service.promoteBestCandidateIfDue();
+
+        verify(observationRepository).findById(1L);
+        verify(observationRepository).findById(2L);
+    }
+
+    @Test
     void promoteBestCandidateIfDueFallsBackWhenReadyMentakPreviewPromotionFails() {
         CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
         CombatObservationRepository observationRepository = mock(CombatObservationRepository.class);
@@ -296,6 +327,12 @@ class CombatReplayContestLifecycleServiceTest {
         candidate.setMentakPreviewPostedAt(previewedAt);
         candidate.setPromotionScore(promotionScore);
         candidate.setInitialRenderSnapshotJson("{\"context\":{}}");
+        return candidate;
+    }
+
+    private CombatCandidateEntity promotionCandidate(Long id, LocalDateTime resolvedAt, Double promotionScore) {
+        CombatCandidateEntity candidate = previewedCandidate(id, resolvedAt, promotionScore);
+        candidate.setMentakPreviewPostedAt(null);
         return candidate;
     }
 

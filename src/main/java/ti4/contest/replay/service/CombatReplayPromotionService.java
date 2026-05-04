@@ -219,9 +219,10 @@ public class CombatReplayPromotionService {
     private void postMentakPreviewIfDue(LocalDateTime now) {
         List<CombatCandidateEntity> candidates = findPromotionCandidates(now);
         if (candidates.stream().anyMatch(candidate -> candidate.getMentakPreviewPostedAt() != null)) return;
-        CombatCandidateEntity winner = selectPromotionWinner(candidates);
-        if (winner == null) return;
-        postMentakPreview(winner);
+        for (CombatCandidateEntity candidate : rankPromotionCandidates(candidates)) {
+            if (postMentakPreview(candidate) != null) return;
+            BotLogger.error("Mentak preview skipped for candidate " + candidate.getId() + " because posting failed.");
+        }
     }
 
     private void postProductionMentakPreviewIfDue(LocalDateTime now) {
@@ -286,19 +287,22 @@ public class CombatReplayPromotionService {
     }
 
     private CombatReplayContestEntity postMentakPreview(CombatCandidateEntity candidate) {
-        CombatObservationEntity observation =
-                observationRepository.findById(candidate.getObservationId()).orElse(null);
-        Game game = loadGame(candidate.getGameName());
-        TextChannel channel = discordPostService.houseChannel(CombatReplayHouse.MENTAK);
-        if (observation == null || game == null || channel == null) return null;
-
-        CombatReplayContestEntity previewContest = createPreviewContest(candidate);
-        lockPreviousContestTradeConvoys(previewContest);
-
-        String startSummaryText = snapshotStartSummaryText(candidate);
-        String message = LazaxCombatSupport.formatReplayAnnouncement(
-                game, candidate, discordPostService.getHouseRoleMention(CombatReplayHouse.MENTAK), startSummaryText);
         try {
+            CombatObservationEntity observation =
+                    observationRepository.findById(candidate.getObservationId()).orElse(null);
+            Game game = loadGame(candidate.getGameName());
+            TextChannel channel = discordPostService.houseChannel(CombatReplayHouse.MENTAK);
+            if (observation == null || game == null || channel == null) return null;
+
+            CombatReplayContestEntity previewContest = createPreviewContest(candidate);
+            lockPreviousContestTradeConvoys(previewContest);
+
+            String startSummaryText = snapshotStartSummaryText(candidate);
+            String message = LazaxCombatSupport.formatReplayAnnouncement(
+                    game,
+                    candidate,
+                    discordPostService.getHouseRoleMention(CombatReplayHouse.MENTAK),
+                    startSummaryText);
             discordPostService.postPromotionMessage(channel, message, game, candidate);
             mentakAbilityService.postDecoyButtons(channel, candidate);
             candidate.setMentakPreviewPostedAt(LocalDateTime.now(clock));
