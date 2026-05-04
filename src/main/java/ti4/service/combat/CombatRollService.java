@@ -28,6 +28,7 @@ import ti4.contest.replay.core.CombatRollPayload.DieRollSource;
 import ti4.contest.replay.core.CombatRollPayload.RollSegmentType;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -61,7 +62,6 @@ import ti4.model.PlanetModel;
 import ti4.model.RelicModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
-import ti4.service.breakthrough.ExperimentalMechanismsService;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -928,8 +928,8 @@ public class CombatRollService {
                     rollType,
                     activeSystem,
                     unitHolder);
-            if (rollType == CombatRollType.combatround && ExperimentalMechanismsService.hasEngineAttached(game)) {
-                modifierToHit += ExperimentalMechanismsService.getEngineCombatMod(game, player, unitModel);
+            if (rollType == CombatRollType.combatround && MobilizationEngineHandler.hasEngineAttached(game)) {
+                modifierToHit += MobilizationEngineHandler.getCombatMod(game, player, unitModel);
             }
             int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player);
             if (rollType == CombatRollType.combatround) {

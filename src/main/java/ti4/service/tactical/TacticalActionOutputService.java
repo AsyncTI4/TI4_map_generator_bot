@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -26,7 +27,6 @@ import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
-import ti4.service.breakthrough.ExperimentalMechanismsService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 
@@ -336,8 +336,8 @@ public class TacticalActionOutputService {
         if (player.hasUnit("tf-echoofascension") && model.getUnitType() == UnitType.Flagship) {
             bonusMoveValue++;
         }
-        if (ExperimentalMechanismsService.hasEngineAttached(game)) {
-            bonusMoveValue += ExperimentalMechanismsService.getEngineMoveMod(game, player, model);
+        if (MobilizationEngineHandler.hasEngineAttached(game)) {
+            bonusMoveValue += MobilizationEngineHandler.getMoveMod(game, player, model);
         }
         if (player.hasAbility("slipstream") && (tileHasWormhole || (movingFromHome && !game.isTwilightsFallMode()))) {
             bonusMoveValue++;

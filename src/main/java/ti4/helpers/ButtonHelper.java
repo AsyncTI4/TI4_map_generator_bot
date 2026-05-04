@@ -58,6 +58,7 @@ import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.PhantomEnergyHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.TyrisBreakthroughButtonHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
@@ -104,7 +105,6 @@ import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.agenda.IsPlayerElectedService;
-import ti4.service.breakthrough.ExperimentalMechanismsService;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
@@ -4078,9 +4078,8 @@ public class ButtonHelper {
                 UnitModel unit = entry.getKey();
                 if ("space".equalsIgnoreCase(capChecker.getName())) {
                     capacity += unit.getCapacityValue() * entry.getValue();
-                    if (ExperimentalMechanismsService.hasEngineAttached(game)) {
-                        capacity += ExperimentalMechanismsService.getEngineCapacityMod(game, player, unit)
-                                * entry.getValue();
+                    if (MobilizationEngineHandler.hasEngineAttached(game)) {
+                        capacity += MobilizationEngineHandler.getCapacityMod(game, player, unit) * entry.getValue();
                     }
                     if (unit.getUnitType() == UnitType.Carrier
                             && (player.hasUnit("lunarium_carrier") || player.hasUnit("lunarium_carrier2"))) {

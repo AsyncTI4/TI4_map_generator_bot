@@ -44,6 +44,7 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -75,7 +76,6 @@ import ti4.model.TechnologyModel;
 import ti4.model.TokenModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
-import ti4.service.breakthrough.ExperimentalMechanismsService;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -2096,9 +2096,8 @@ public final class Helper {
                         || (!game.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")
                                 && !player.hasTech("tf-quantumdrive"))) {
                     cost += (int) removedUnit.getCost() * entry.getValue();
-                    if (ExperimentalMechanismsService.hasEngineAttached(game)) {
-                        cost += ExperimentalMechanismsService.getEngineCostMod(game, player, removedUnit)
-                                * entry.getValue();
+                    if (MobilizationEngineHandler.hasEngineAttached(game)) {
+                        cost += MobilizationEngineHandler.getCostMod(game, player, removedUnit) * entry.getValue();
                     }
                 }
                 totalUnits += entry.getValue();
