@@ -31,7 +31,7 @@ sideBets:
   enableSideBets: true
   maxBetsPerUser: 3
   costPoints: 1
-  dynamicPayoutCap: 100
+  dynamicPayoutCap: 50
 
 decoysEnabled: false
 housesEnabled: true

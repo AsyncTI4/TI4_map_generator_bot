@@ -230,7 +230,7 @@ public class CombatContestSettings {
         private boolean enableSideBets = true;
         private int maxBetsPerUser = 3;
         private int costPoints = 1;
-        private int dynamicPayoutCap = 100;
+        private int dynamicPayoutCap = 50;
     }
 
     @Getter

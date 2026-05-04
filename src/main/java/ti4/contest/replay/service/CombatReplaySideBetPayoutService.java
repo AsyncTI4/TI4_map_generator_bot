@@ -38,6 +38,19 @@ public class CombatReplaySideBetPayoutService {
 
     public static final String ODDS_V1 = "ODDS_V1";
 
+    // Economy tuning knobs. Raw combat odds stay separate; these values account for bettor/recommender selection bias.
+    private static final double AFB_WHIFF_SELECTION_BIAS = 2.0;
+    private static final double ROUND_ONE_WHIFF_SELECTION_BIAS = 3.0;
+    private static final double ROUND_ONE_SLAM_SELECTION_BIAS = 3.0;
+    private static final double WINNER_ONE_HP_PAYOUT_MULTIPLIER = 0.75;
+    private static final List<PayoutTier> DEFAULT_DYNAMIC_PAYOUT_TIERS = List.of(
+            new PayoutTier(0.20, 4),
+            new PayoutTier(0.10, 5),
+            new PayoutTier(0.05, 8),
+            new PayoutTier(0.025, 12),
+            new PayoutTier(0.01, 20),
+            new PayoutTier(0.005, 30));
+
     private final CombatContestSettings settings;
 
     public int offeredPayout(
@@ -64,7 +77,7 @@ public class CombatReplaySideBetPayoutService {
         if (betType == CombatSideBetType.AFB_WHIFF) {
             Double probability = afbWhiffProbabilityFromInitialSnapshot(candidate, targetFaction);
             if (probability == null) return fixedPayout(CombatSideBetType.AFB_WHIFF);
-            return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(probability);
+            return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(betType, probability);
         }
 
         Double probability = betType == CombatSideBetType.ROUND_ONE_SLAM
@@ -72,7 +85,7 @@ public class CombatReplaySideBetPayoutService {
                 : openingRoundProbabilityFromInitialSnapshot(candidate, targetFaction, false);
         if (probability == null) return fixedPayout(betType);
 
-        return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(probability);
+        return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(betType, probability);
     }
 
     public int resolvedProfitPoints(CombatContestSideBetEntity sideBet) {
@@ -90,14 +103,21 @@ public class CombatReplaySideBetPayoutService {
         return betType.profitPoints();
     }
 
-    private int dynamicPayout(double probability) {
-        if (probability >= 0.20) return 4;
-        if (probability >= 0.10) return 6;
-        if (probability >= 0.05) return 10;
-        if (probability >= 0.025) return 15;
-        if (probability >= 0.01) return 30;
-        if (probability >= 0.005) return 75;
+    private int dynamicPayout(CombatSideBetType betType, double probability) {
+        double adjustedProbability = Math.min(1.0, probability * selectionBiasMultiplier(betType));
+        for (PayoutTier tier : DEFAULT_DYNAMIC_PAYOUT_TIERS) {
+            if (adjustedProbability >= tier.minimumProbability()) return Math.min(tier.payout(), maxDynamicPayout());
+        }
         return maxDynamicPayout();
+    }
+
+    private double selectionBiasMultiplier(CombatSideBetType betType) {
+        return switch (betType) {
+            case AFB_WHIFF -> AFB_WHIFF_SELECTION_BIAS;
+            case ROUND_ONE_WHIFF -> ROUND_ONE_WHIFF_SELECTION_BIAS;
+            case ROUND_ONE_SLAM -> ROUND_ONE_SLAM_SELECTION_BIAS;
+            default -> 1.0;
+        };
     }
 
     private int maxDynamicPayout() {
@@ -110,7 +130,8 @@ public class CombatReplaySideBetPayoutService {
         double x = Math.max(0.0, totalHp - 8.0) / 52.0;
         int profitPoints = (int) Math.round(3.0 + Math.pow(x, 1.35) * (64.0 + 8.0 * Math.sqrt(balance)));
         profitPoints = Math.max(3, profitPoints);
-        return Math.min(settings.getSideBets().getDynamicPayoutCap(), profitPoints * 2);
+        int tunedPayout = (int) Math.round(profitPoints * 2 * WINNER_ONE_HP_PAYOUT_MULTIPLIER);
+        return Math.min(maxDynamicPayout(), Math.max(1, tunedPayout));
     }
 
     private Double openingRoundSlamProbabilityFromInitialSnapshot(
@@ -475,4 +496,6 @@ public class CombatReplaySideBetPayoutService {
             Player player,
             Player opponent,
             LazaxCombatSupport.SpaceCombatSnapshot snapshot) {}
+
+    private record PayoutTier(double minimumProbability, int payout) {}
 }
