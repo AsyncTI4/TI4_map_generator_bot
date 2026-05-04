@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -25,6 +26,7 @@ import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.entities.CombatReplayLeaderboardEntryEntity;
 import ti4.contest.replay.repository.CombatReplayLeaderboardEntryRepository;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
@@ -158,7 +160,7 @@ public class LazaxSeasonService {
     private void postSeasonOneOpeningText(TextChannel channel) {
         MessageHelper.sendMessageToChannel(channel, seasonOneIntroMarkdown());
         channel.sendMessageEmbeds(seasonOneOpeningEmbeds())
-                // .setComponents(ActionRow.of(Buttons.green(CLAIM_DELEGATION_BUTTON_ID, "Receive Your Delegation")))
+                .setComponents(ActionRow.of(Buttons.green(CLAIM_DELEGATION_BUTTON_ID, "Receive Your Delegation")))
                 .queue(this::postFaqThread, BotLogger::catchRestError);
     }
 
