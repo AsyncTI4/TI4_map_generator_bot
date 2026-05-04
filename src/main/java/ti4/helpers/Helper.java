@@ -1299,6 +1299,7 @@ public final class Helper {
                     && !thing.contains("warmachine")
                     && !thing.contains("manifest")
                     && !thing.contains("ghostbt")
+                    && !thing.contains("tyrisbt")
                     && !thing.contains("dwsDiscount")
                     && !thing.contains("aida")
                     && !thing.contains("commander")
@@ -1426,6 +1427,10 @@ public final class Helper {
                             .append(CardEmojis.getACEmoji(game))
                             .append('\n');
                     res += 3;
+                }
+                if ("tyrisbt".equals(thing)) {
+                    res += 1;
+                    msg.append("> Used _Non-Linear Time Progression_ for 1 resource discount\n");
                 }
                 if (thing.contains("ghostbt")) {
                     int wormholes =
