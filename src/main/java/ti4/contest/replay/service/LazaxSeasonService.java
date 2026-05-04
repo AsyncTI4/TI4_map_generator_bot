@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -226,14 +225,13 @@ public class LazaxSeasonService {
 
             FileUpload banner = delegationBanner(summary);
             if (banner == null) {
-                MessageHelper.sendMessageToChannel(channel, delegationSummaryMarkdown(summary, channel.getGuild()));
+                MessageHelper.sendMessageToChannel(channel, delegationSummaryMarkdown(summary));
                 continue;
             }
             MessageHelper.sendFileUploadToChannel(
                     channel,
                     banner,
-                    ignored -> MessageHelper.sendMessageToChannel(
-                            channel, delegationSummaryMarkdown(summary, channel.getGuild())));
+                    ignored -> MessageHelper.sendMessageToChannel(channel, delegationSummaryMarkdown(summary)));
         }
     }
 
@@ -518,10 +516,8 @@ public class LazaxSeasonService {
         return header + "\n__" + summary.identity() + "__";
     }
 
-    private String delegationSummaryMarkdown(DelegationSummary summary, Guild guild) {
-        StringBuilder message = new StringBuilder(delegationRoleMention(summary.house(), guild))
-                .append("\n")
-                .append(delegationHeader(summary))
+    private String delegationSummaryMarkdown(DelegationSummary summary) {
+        StringBuilder message = new StringBuilder(delegationHeader(summary))
                 .append("\n")
                 .append(communicationRuleLine(summary.house()))
                 .append("\n\n");
@@ -541,14 +537,6 @@ public class LazaxSeasonService {
             case MENTAK -> "-# Communication: You may communicate with Hacan Delegation, but not Naalu Delegation.";
             case HACAN -> "-# Communication: You are the only delegation that may communicate with all parties.";
         };
-    }
-
-    private String delegationRoleMention(CombatReplayHouse house, Guild guild) {
-        if (guild == null || house == null) return "";
-        Role role = guild.getRolesByName(house.roleName(), true).stream()
-                .findFirst()
-                .orElse(null);
-        return role == null ? "" : role.getAsMention();
     }
 
     private void appendDelegationSection(StringBuilder message, String title, String text) {
