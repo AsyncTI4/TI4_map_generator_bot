@@ -38,7 +38,8 @@ class CombatReplayLeaderboardServiceTest {
         CombatReplayLeaderboardEntryEntity entry =
                 (CombatReplayLeaderboardEntryEntity) method.invoke(service, "123", "Player");
 
-        assertEquals(0, entry.getTotalPoints());
+        assertEquals(
+                new CombatContestSettings().getHouseAbilities().getInitialIndividualPoints(), entry.getTotalPoints());
         assertEquals(0, entry.getPredictionCount());
         assertEquals(0, entry.getCorrectPredictions());
     }

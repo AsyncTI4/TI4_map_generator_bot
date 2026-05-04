@@ -442,7 +442,7 @@ public class CombatReplayLeaderboardService {
         entry.setDiscordUserId(discordUserId);
         entry.setDiscordUserName(
                 discordUserName == null || discordUserName.isBlank() ? "Unknown User" : discordUserName);
-        entry.setTotalPoints(0);
+        entry.setTotalPoints(settings.getHouseAbilities().getInitialIndividualPoints());
         entry.setPredictionCount(0);
         entry.setCorrectPredictions(0);
         entry.setUpdatedAt(LocalDateTime.now());
