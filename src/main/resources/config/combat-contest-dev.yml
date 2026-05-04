@@ -51,7 +51,7 @@ houseAbilities:
   maxCatchupFavorBonus: 0
   naalu:
     # actionCardPeekFavorCost: 0
-    actionCardPeekFavorCost: 30
+    actionCardPeekFavorCost: 20
     # roundOneRollPeekFavorCost: 0
     roundOneRollPeekFavorCost: 40
   mentak:
