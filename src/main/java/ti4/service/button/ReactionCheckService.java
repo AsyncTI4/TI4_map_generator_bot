@@ -123,7 +123,8 @@ public class ReactionCheckService {
                 for (int loc = 1; loc <= game.getPublicObjectives1Peekable().size(); loc++) {
                     String id = game.getSpeaker().factionButtonChecker() + "reveal_stage_1position_" + loc;
                     String label = "Reveal Stage 1, Position " + loc;
-                    if (game.getPublicObjectives1Peeked().containsKey(id)) {
+                    if (game.getPublicObjectives1Peeked()
+                            .containsKey(game.getPublicObjectives1Peekable().get(loc - 1))) {
                         label += " (peeked at)";
                     }
                     buttons.add(Buttons.blue(id, label, CardEmojis.Public1alt));
@@ -142,7 +143,8 @@ public class ReactionCheckService {
                     for (int loc = 1; loc <= game.getPublicObjectives2Peekable().size(); loc++) {
                         String id = game.getSpeaker().factionButtonChecker() + "reveal_stage_2position_" + loc;
                         String label = "Reveal Stage 2, Position " + loc;
-                        if (game.getPublicObjectives2Peeked().containsKey(id)) {
+                        if (game.getPublicObjectives2Peeked()
+                                .containsKey(game.getPublicObjectives2Peekable().get(loc - 1))) {
                             label += " (peeked at)";
                         }
                         buttons.add(Buttons.blue(id, label, CardEmojis.Public2alt));
