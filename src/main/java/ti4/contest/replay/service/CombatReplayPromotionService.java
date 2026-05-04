@@ -238,15 +238,22 @@ public class CombatReplayPromotionService {
     }
 
     private void promoteMentakPreviewedCandidateIfDue(LocalDateTime now) {
-        if (!canPublicPromoteAt(now.truncatedTo(ChronoUnit.MINUTES))) return;
+        LocalDateTime publicPromotionWindow = mentakPublicPromotionWindow(now);
+        if (!canPublicPromoteAt(publicPromotionWindow)) return;
         List<CombatCandidateEntity> candidates = rankPromotionCandidates(findPromotionCandidates(now).stream()
-                .filter(candidate -> isMentakPreviewReadyForPublicPromotion(candidate, now))
+                .filter(candidate -> isMentakPreviewReadyForPublicPromotion(candidate, publicPromotionWindow))
                 .toList());
         for (CombatCandidateEntity candidate : candidates) {
             if (promoteCandidate(candidate) != null) return;
             BotLogger.error("Mentak preview promotion skipped for candidate " + candidate.getId()
                     + " because public promotion failed.");
         }
+    }
+
+    private LocalDateTime mentakPublicPromotionWindow(LocalDateTime now) {
+        LocalDateTime truncatedNow = now.truncatedTo(ChronoUnit.MINUTES);
+        if (settings.getRuntime().isDevMode()) return truncatedNow;
+        return truncatedNow.truncatedTo(ChronoUnit.HOURS);
     }
 
     private boolean usesMentakPreviewFlow() {

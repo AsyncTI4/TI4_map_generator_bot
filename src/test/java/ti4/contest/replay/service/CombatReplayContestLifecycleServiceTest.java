@@ -3,6 +3,7 @@ package ti4.contest.replay.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -153,7 +154,7 @@ class CombatReplayContestLifecycleServiceTest {
     }
 
     @Test
-    void promoteBestCandidateIfDueChecksReadyMentakPreviewsAwayFromTopOfHour() {
+    void promoteBestCandidateIfDueChecksReadyMentakPreviewsWhenCronRunsLateForHourlySlot() {
         CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
         CombatObservationRepository observationRepository = mock(CombatObservationRepository.class);
         CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
@@ -165,7 +166,7 @@ class CombatReplayContestLifecycleServiceTest {
         CombatReplayContestLifecycleService service =
                 service(settings, candidateRepository, observationRepository, replayContestRepository);
         service.setClock(fixedClock("2026-04-27T12:25:00"));
-        CombatCandidateEntity candidate = previewedCandidate(LocalDateTime.parse("2026-04-27T12:10:00"));
+        CombatCandidateEntity candidate = previewedCandidate(LocalDateTime.parse("2026-04-27T11:45:00"));
 
         when(candidateRepository.findResolvedPromotionCandidates(
                         CombatCandidateStatus.RESOLVED,
@@ -185,6 +186,38 @@ class CombatReplayContestLifecycleServiceTest {
     }
 
     @Test
+    void promoteBestCandidateIfDueWaitsForNextHourlySlotWhenPreviewBecomesReadyMidHour() {
+        CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
+        CombatObservationRepository observationRepository = mock(CombatObservationRepository.class);
+        CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
+        CombatContestSettings settings = new CombatContestSettings();
+        settings.getPromotion().setEnabled(true);
+        settings.getRuntime().setDevMode(false);
+        settings.setHousesEnabled(true);
+        settings.getHouseAbilities().getMentak().setPreviewLeadSeconds(900);
+        CombatReplayContestLifecycleService service =
+                service(settings, candidateRepository, observationRepository, replayContestRepository);
+        service.setClock(fixedClock("2026-04-27T12:25:00"));
+        CombatCandidateEntity candidate = previewedCandidate(LocalDateTime.parse("2026-04-27T12:10:00"));
+
+        when(candidateRepository.findResolvedPromotionCandidates(
+                        CombatCandidateStatus.RESOLVED,
+                        CombatCandidatePromotionStatus.PENDING,
+                        LocalDateTime.parse("2026-04-27T00:25:00")))
+                .thenReturn(List.of(candidate));
+        when(observationRepository.findAllById(List.of())).thenReturn(List.of());
+
+        service.promoteBestCandidateIfDue();
+
+        verify(candidateRepository)
+                .findResolvedPromotionCandidates(
+                        CombatCandidateStatus.RESOLVED,
+                        CombatCandidatePromotionStatus.PENDING,
+                        LocalDateTime.parse("2026-04-27T00:25:00"));
+        verify(observationRepository, never()).findById(1L);
+    }
+
+    @Test
     void promoteBestCandidateIfDueFallsBackWhenReadyMentakPreviewPromotionFails() {
         CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
         CombatObservationRepository observationRepository = mock(CombatObservationRepository.class);
@@ -197,8 +230,8 @@ class CombatReplayContestLifecycleServiceTest {
         CombatReplayContestLifecycleService service =
                 service(settings, candidateRepository, observationRepository, replayContestRepository);
         service.setClock(fixedClock("2026-04-27T12:25:00"));
-        CombatCandidateEntity first = previewedCandidate(1L, LocalDateTime.parse("2026-04-27T12:10:00"), 10.0);
-        CombatCandidateEntity second = previewedCandidate(2L, LocalDateTime.parse("2026-04-27T12:10:00"), 5.0);
+        CombatCandidateEntity first = previewedCandidate(1L, LocalDateTime.parse("2026-04-27T11:45:00"), 10.0);
+        CombatCandidateEntity second = previewedCandidate(2L, LocalDateTime.parse("2026-04-27T11:45:00"), 5.0);
 
         when(candidateRepository.findResolvedPromotionCandidates(
                         CombatCandidateStatus.RESOLVED,
