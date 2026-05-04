@@ -42,6 +42,8 @@ import ti4.service.emoji.TI4Emoji;
 @RequiredArgsConstructor
 public class CombatReplayHouseService {
 
+    private static final List<String> HOUSE_REACTION_CHANNEL_NAMES = List.of("lazax-hacan-mentak", "lazax-hacan-naalu");
+
     private final CombatContestSettings settings;
     private final CombatReplayHouseRepository houseRepository;
     private final CombatReplayContestRepository replayContestRepository;
@@ -291,9 +293,8 @@ public class CombatReplayHouseService {
         }
         return CombatReplayChannels.contestChannelName(settings).equalsIgnoreCase(channelName)
                 || channelName.toLowerCase().startsWith("lazax-war-archives")
-                || CombatReplayHouse.assignmentOrder().stream()
-                        .map(CombatReplayHouse::channelName)
-                        .anyMatch(houseChannelName -> houseChannelName.equalsIgnoreCase(channelName));
+                || HOUSE_REACTION_CHANNEL_NAMES.stream()
+                        .anyMatch(reactionChannelName -> reactionChannelName.equalsIgnoreCase(channelName));
     }
 
     private boolean isContestThread(ThreadChannel thread) {
