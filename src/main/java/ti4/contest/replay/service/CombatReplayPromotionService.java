@@ -244,7 +244,7 @@ public class CombatReplayPromotionService {
         LocalDateTime publicPromotionWindow = mentakPublicPromotionWindow(now);
         if (!canPublicPromoteAt(publicPromotionWindow)) return;
         List<CombatCandidateEntity> candidates = rankPromotionCandidates(findPromotionCandidates(now).stream()
-                .filter(candidate -> isMentakPreviewReadyForPublicPromotion(candidate, publicPromotionWindow))
+                .filter(candidate -> isMentakPreviewReadyForPublicPromotion(candidate, now))
                 .toList());
         for (CombatCandidateEntity candidate : candidates) {
             if (promoteCandidate(candidate) != null) return;
