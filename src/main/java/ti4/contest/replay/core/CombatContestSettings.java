@@ -65,6 +65,7 @@ public class CombatContestSettings {
                 "houseAbilities.minimumAbilityVotesToResolve must be > 0.");
         require(houseAbilities.baseCombatFavorGain >= 0, "houseAbilities.baseCombatFavorGain must be >= 0.");
         require(houseAbilities.initialHousePoints >= 0, "houseAbilities.initialHousePoints must be >= 0.");
+        require(houseAbilities.initialIndividualPoints >= 0, "houseAbilities.initialIndividualPoints must be >= 0.");
         require(
                 houseAbilities.catchupFavorPointsPerBonus > 0,
                 "houseAbilities.catchupFavorPointsPerBonus must be > 0.");
@@ -242,6 +243,7 @@ public class CombatContestSettings {
         private int minimumAbilityVotesToResolve = 3;
         private int baseCombatFavorGain = 10;
         private int initialHousePoints = 1000;
+        private int initialIndividualPoints = 100;
         private int catchupFavorPointsPerBonus = 100;
         private int catchupFavorBonusStep;
         private int maxCatchupFavorBonus;

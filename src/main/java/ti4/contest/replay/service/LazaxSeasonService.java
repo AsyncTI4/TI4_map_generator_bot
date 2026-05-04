@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import ti4.ResourceHelper;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayHouse;
-import ti4.contest.replay.core.LazaxSeasonConstants;
 import ti4.contest.replay.entities.CombatReplayLeaderboardEntryEntity;
 import ti4.contest.replay.repository.CombatReplayLeaderboardEntryRepository;
 import ti4.discord.JdaService;
@@ -81,9 +80,10 @@ public class LazaxSeasonService {
 
     private void resetSeasonOneScores() {
         LocalDateTime now = LocalDateTime.now();
+        int initialIndividualPoints = settings.getHouseAbilities().getInitialIndividualPoints();
         List<CombatReplayLeaderboardEntryEntity> entries = leaderboardEntryRepository.findAll();
         for (CombatReplayLeaderboardEntryEntity entry : entries) {
-            entry.setTotalPoints(LazaxSeasonConstants.INITIAL_INDIVIDUAL_POINTS);
+            entry.setTotalPoints(initialIndividualPoints);
             entry.setPredictionCount(0);
             entry.setCorrectPredictions(0);
             entry.setUpdatedAt(now);

@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayChannels;
 import ti4.contest.replay.core.CombatReplayHouse;
-import ti4.contest.replay.core.LazaxSeasonConstants;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
 import ti4.contest.replay.entities.CombatReplayHouseEntity;
@@ -297,7 +296,7 @@ public class CombatReplayHouseService {
             CombatReplayLeaderboardEntryEntity entry = new CombatReplayLeaderboardEntryEntity();
             entry.setDiscordUserId(discordUserId);
             entry.setDiscordUserName(discordUserName);
-            entry.setTotalPoints(LazaxSeasonConstants.INITIAL_INDIVIDUAL_POINTS);
+            entry.setTotalPoints(settings.getHouseAbilities().getInitialIndividualPoints());
             entry.setPredictionCount(0);
             entry.setCorrectPredictions(0);
             entry.setUpdatedAt(LocalDateTime.now());

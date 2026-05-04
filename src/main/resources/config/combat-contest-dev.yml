@@ -40,6 +40,7 @@ houseAbilities:
   minimumAbilityVotesToResolve: 1
   baseCombatFavorGain: 10
   initialHousePoints: 1000
+  initialIndividualPoints: 100
   catchupFavorPointsPerBonus: 100
   catchupFavorBonusStep: 0
   maxCatchupFavorBonus: 0

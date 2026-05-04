@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayHouse;
-import ti4.contest.replay.core.LazaxSeasonConstants;
 import ti4.contest.replay.entities.CombatReplayHouseEntity;
 import ti4.contest.replay.entities.CombatReplayLeaderboardEntryEntity;
 import ti4.contest.replay.repository.CombatCandidateRepository;
@@ -81,7 +80,8 @@ class CombatReplayHouseServiceTest {
         CombatReplayLeaderboardEntryEntity entry = captor.getValue();
         assertEquals("1", entry.getDiscordUserId());
         assertEquals("One", entry.getDiscordUserName());
-        assertEquals(LazaxSeasonConstants.INITIAL_INDIVIDUAL_POINTS, entry.getTotalPoints());
+        assertEquals(
+                new CombatContestSettings().getHouseAbilities().getInitialIndividualPoints(), entry.getTotalPoints());
         assertEquals(0, entry.getPredictionCount());
         assertEquals(0, entry.getCorrectPredictions());
     }
