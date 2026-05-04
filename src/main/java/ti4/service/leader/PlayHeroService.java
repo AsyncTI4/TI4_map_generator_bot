@@ -13,6 +13,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.edict.EdictPhaseHandler;
+import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecButtonHandlers;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.onyxxa.OnyxxaHeroButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.xan.XanHeroButtonHandler;
 import ti4.game.Game;
@@ -341,7 +342,7 @@ public class PlayHeroService {
                         buttons);
             }
             case "arborechero" -> {
-                List<Button> buttons = ButtonHelperHeroes.getArboHeroButtons(game, player);
+                List<Button> buttons = ArborecButtonHandlers.getArboHeroButtons(game, player);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation(true, showFlavourText)
