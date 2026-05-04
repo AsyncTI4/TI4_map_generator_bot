@@ -518,7 +518,7 @@ public class LazaxSeasonService {
                         false)
                 .addField(
                         "Favor",
-                        "Favor is a resource granted by the Mecatol Custodians. Every Delegation gains Favor after each combat at a steady rate, with extra Favor given to Delegations that are behind in points. Favor is spent to activate abilities for key combats.",
+                        "Favor is a resource granted by the Mecatol Custodians. Every Delegation gains Favor after each combat at a steady rate. Favor is spent to activate abilities for key combats.",
                         false)
                 .setFooter(
                         "The Council will not remember the luckiest Delegation. It will remember the one that understood the war.")
