@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayChannels;
 import ti4.contest.replay.core.CombatReplayHouse;
+import ti4.contest.replay.core.LazaxSeasonConstants;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
 import ti4.contest.replay.entities.CombatReplayHouseEntity;
@@ -31,6 +32,7 @@ import ti4.contest.replay.entities.CombatReplayLeaderboardEntryEntity;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
 import ti4.contest.replay.repository.CombatReplayHouseRepository;
+import ti4.contest.replay.repository.CombatReplayLeaderboardEntryRepository;
 import ti4.discord.JdaService;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -45,6 +47,7 @@ public class CombatReplayHouseService {
     private final CombatReplayHouseRepository houseRepository;
     private final CombatReplayContestRepository replayContestRepository;
     private final CombatCandidateRepository candidateRepository;
+    private final CombatReplayLeaderboardEntryRepository leaderboardEntryRepository;
 
     public void addHouseEmojiReactionIfNeeded(MessageReceivedEvent event) {
         if (!settings.isHousesEnabled()) return;
@@ -264,6 +267,7 @@ public class CombatReplayHouseService {
         CombatReplayHouseEntity existing =
                 houseRepository.findByDiscordUserId(discordUserId).orElse(null);
         if (existing != null) {
+            ensureLeaderboardEntry(discordUserId, safeUserName);
             if (!safeUserName.equals(existing.getDiscordUserName())) {
                 existing.setDiscordUserName(safeUserName);
                 existing.setUpdatedAt(LocalDateTime.now());
@@ -282,9 +286,23 @@ public class CombatReplayHouseService {
         assignment.setAssignedAt(now);
         assignment.setUpdatedAt(now);
         CombatReplayHouseEntity saved = houseRepository.save(assignment);
+        ensureLeaderboardEntry(discordUserId, safeUserName);
 
         grantHouseRole(guild, member, house, () -> announceHouseAssignment(guild, discordUserId, house));
         return saved;
+    }
+
+    private void ensureLeaderboardEntry(String discordUserId, String discordUserName) {
+        leaderboardEntryRepository.findByDiscordUserId(discordUserId).orElseGet(() -> {
+            CombatReplayLeaderboardEntryEntity entry = new CombatReplayLeaderboardEntryEntity();
+            entry.setDiscordUserId(discordUserId);
+            entry.setDiscordUserName(discordUserName);
+            entry.setTotalPoints(LazaxSeasonConstants.INITIAL_INDIVIDUAL_POINTS);
+            entry.setPredictionCount(0);
+            entry.setCorrectPredictions(0);
+            entry.setUpdatedAt(LocalDateTime.now());
+            return leaderboardEntryRepository.save(entry);
+        });
     }
 
     private CombatReplayHouse houseWithFewestMembers() {

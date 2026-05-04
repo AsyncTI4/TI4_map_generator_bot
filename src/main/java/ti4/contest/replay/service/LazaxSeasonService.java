@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import ti4.ResourceHelper;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayHouse;
+import ti4.contest.replay.core.LazaxSeasonConstants;
 import ti4.contest.replay.entities.CombatReplayLeaderboardEntryEntity;
 import ti4.contest.replay.repository.CombatReplayLeaderboardEntryRepository;
 import ti4.discord.JdaService;
@@ -41,7 +42,6 @@ import ti4.service.image.FileUploadService;
 public class LazaxSeasonService {
 
     private static final String PUBLIC_CHANNEL_NAME = "lazax-war-archives";
-    private static final int INITIAL_INDIVIDUAL_POINTS = 100;
     public static final String CLAIM_DELEGATION_BUTTON_ID = "lazaxSeason1ClaimDelegation";
 
     private final CombatContestSettings settings;
@@ -83,7 +83,7 @@ public class LazaxSeasonService {
         LocalDateTime now = LocalDateTime.now();
         List<CombatReplayLeaderboardEntryEntity> entries = leaderboardEntryRepository.findAll();
         for (CombatReplayLeaderboardEntryEntity entry : entries) {
-            entry.setTotalPoints(INITIAL_INDIVIDUAL_POINTS);
+            entry.setTotalPoints(LazaxSeasonConstants.INITIAL_INDIVIDUAL_POINTS);
             entry.setPredictionCount(0);
             entry.setCorrectPredictions(0);
             entry.setUpdatedAt(now);
@@ -97,7 +97,6 @@ public class LazaxSeasonService {
 
         CombatReplayHouse existingHouse = houseService.houseForUser(user.getId());
         if (existingHouse != null) {
-            ensureLeaderboardEntry(user);
             houseService.assignHouseIfAbsent(guild, member, user);
             return "You are already assigned to **"
                     + existingHouse.displayName()
@@ -106,7 +105,6 @@ public class LazaxSeasonService {
                     + ".";
         }
 
-        ensureLeaderboardEntry(user);
         var assignment = houseService.assignHouseIfAbsent(guild, member, user);
         if (assignment == null || assignment.getHouse() == null) {
             return "Could not assign your delegation. Please try again.";
@@ -117,19 +115,6 @@ public class LazaxSeasonService {
                 + " Delegation**. Report to "
                 + delegationChannelMention(guild, assignment.getHouse())
                 + ".";
-    }
-
-    private void ensureLeaderboardEntry(User user) {
-        leaderboardEntryRepository.findByDiscordUserId(user.getId()).orElseGet(() -> {
-            CombatReplayLeaderboardEntryEntity entry = new CombatReplayLeaderboardEntryEntity();
-            entry.setDiscordUserId(user.getId());
-            entry.setDiscordUserName(user.getName());
-            entry.setTotalPoints(INITIAL_INDIVIDUAL_POINTS);
-            entry.setPredictionCount(0);
-            entry.setCorrectPredictions(0);
-            entry.setUpdatedAt(LocalDateTime.now());
-            return leaderboardEntryRepository.save(entry);
-        });
     }
 
     private String delegationChannelMention(Guild guild, CombatReplayHouse house) {
