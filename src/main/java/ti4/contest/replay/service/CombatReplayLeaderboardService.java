@@ -127,7 +127,7 @@ public class CombatReplayLeaderboardService {
                 if (!settings.isHousesEnabled()) {
                     postSideBetResultsSummary(threadOrChannel, result);
                 }
-                postDelegationFavorAwards(result.housePredictionSummaries());
+                postDelegationFavorAwards(candidate, result.housePredictionSummaries());
                 hacanTradeConvoysService.postPostCombatTradeConvoysButtonsIfNeeded(
                         replayContest, candidate, result.housePredictionSummaries());
                 postParticipantFollowup(game, candidate, threadOrChannel);
@@ -532,16 +532,21 @@ public class CombatReplayLeaderboardService {
         return builder.toString().trim();
     }
 
-    private void postDelegationFavorAwards(List<HousePredictionSummary> summaries) {
+    private void postDelegationFavorAwards(CombatCandidateEntity candidate, List<HousePredictionSummary> summaries) {
         if (!settings.isHousesEnabled() || summaries == null || summaries.isEmpty()) return;
         for (HousePredictionSummary summary : summaries) {
             TextChannel channel = houseChannel(summary.house());
             if (channel == null) continue;
-            MessageHelper.sendMessageToChannel(channel, favorAwardMessage(summary));
+            MessageHelper.sendMessageToChannel(
+                    channel, favorAwardMessage(summary, candidate == null ? null : candidate.getId()));
         }
     }
 
     private String favorAwardMessage(HousePredictionSummary summary) {
+        return favorAwardMessage(summary, null);
+    }
+
+    private String favorAwardMessage(HousePredictionSummary summary, Long candidateId) {
         StringBuilder message = new StringBuilder("## Favor Granted\n")
                 .append(FactionEmojis.getFactionIcon(summary.house().displayName()))
                 .append(" ")
@@ -554,7 +559,7 @@ public class CombatReplayLeaderboardService {
             message.append("- `")
                     .append(formatSignedPoints(summary.favorPoints()))
                     .append("` from the Custodians sealing this combat's ledger.\n");
-            appendTotalFavorLine(message, summary.house());
+            appendTotalFavorLine(message, summary.house(), candidateId);
             return message.toString().trim();
         }
         for (HouseFavorSummary favorSummary : favorSummaries) {
@@ -564,15 +569,16 @@ public class CombatReplayLeaderboardService {
                     .append(favorSummary.label())
                     .append(".\n");
         }
-        appendTotalFavorLine(message, summary.house());
+        appendTotalFavorLine(message, summary.house(), candidateId);
         return message.toString().trim();
     }
 
-    private void appendTotalFavorLine(StringBuilder message, CombatReplayHouse house) {
+    private void appendTotalFavorLine(StringBuilder message, CombatReplayHouse house, Long candidateId) {
         CombatReplayHouseFavorService.FavorLedger favorLedger = houseFavorService.ledger(house);
-        if (favorLedger.spent() > 0) {
+        int contestSpend = houseFavorService.spentForContest(house, candidateId);
+        if (contestSpend > 0) {
             message.append("- **Favor Spent:** `")
-                    .append(formatSignedPoints(-favorLedger.spent()))
+                    .append(formatSignedPoints(-contestSpend))
                     .append("`\n");
         }
         message.append("- **Available Favor:** `").append(favorLedger.balance()).append("`\n");

@@ -63,6 +63,17 @@ public class CombatReplayHouseFavorService {
         return Math.max(0, favorCost) <= balance(house);
     }
 
+    public int spentForContest(CombatReplayHouse house, Long candidateId) {
+        if (house == null || candidateId == null) return 0;
+
+        int spent = 0;
+        for (CombatReplayHouseAbilityUseEntity use :
+                houseAbilityUseRepository.findByCandidateIdAndHouse(candidateId, house)) {
+            spent += safeInt(use.getFavorCost());
+        }
+        return spent;
+    }
+
     public void setAllBalancesForDebug(int targetBalance) {
         int desiredBalance = Math.max(0, targetBalance);
         Map<CombatReplayHouse, CombatReplayHouseScoreEntity> debugScoresByHouse =
