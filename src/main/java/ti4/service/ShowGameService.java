@@ -32,6 +32,14 @@ public class ShowGameService {
         simpleShowGame(game, event, DisplayType.all);
     }
 
+    public static void postShowGame(Game game, MessageChannel channel) {
+        postShowGame(game, channel, DisplayType.all);
+    }
+
+    public static void postShowGame(Game game, MessageChannel channel, Player fowPlayer) {
+        postShowGame(game, channel, DisplayType.all, fowPlayer);
+    }
+
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
         boolean shouldPersistFullMapMessageId = displayType == DisplayType.all && !game.isFowMode();
         boolean shouldPersistFowMapMessageId = displayType == DisplayType.all && game.isFowMode();
@@ -74,6 +82,39 @@ public class ShowGameService {
                 buttonEvent.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
             }
         });
+    }
+
+    static void postShowGame(Game game, MessageChannel channel, DisplayType displayType) {
+        postShowGame(game, channel, displayType, null);
+    }
+
+    static void postShowGame(Game game, MessageChannel channel, DisplayType displayType, Player fowPlayer) {
+        if (channel == null) {
+            return;
+        }
+        boolean shouldPersistFullMapMessageId = displayType == DisplayType.all && !game.isFowMode();
+        Consumer<Message> persistMessageId = shouldPersistFullMapMessageId
+                ? msg -> SpringContext.getBean(GameImageService.class)
+                        .saveDiscordMessageId(
+                                game.getName(),
+                                msg.getIdLong(),
+                                msg.getGuild().getIdLong(),
+                                msg.getChannel().getIdLong())
+                : null;
+
+        MapRenderPipeline.queue(
+                game,
+                null,
+                displayType,
+                fileUpload -> {
+                    if (includeButtons(displayType)) {
+                        ButtonHelper.sendFileWithCorrectButtons(
+                                channel, fileUpload, null, Buttons.mapImageButtons(game), game, persistMessageId);
+                    } else {
+                        MessageHelper.sendFileUploadToChannel(channel, fileUpload, persistMessageId);
+                    }
+                },
+                fowPlayer);
     }
 
     /**

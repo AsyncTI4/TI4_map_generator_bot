@@ -15,6 +15,7 @@ import ti4.helpers.Storage;
 
 @Getter
 public final class TestGameHarness implements AutoCloseable {
+
     private static final String DEFAULT_SOURCE_GAME_NAME = "pbd15036";
     private static final int GAME_NAME_LINE_INDEX = 2;
 
@@ -49,10 +50,6 @@ public final class TestGameHarness implements AutoCloseable {
 
     public Game load() {
         return GameLoadService.load(gameName);
-    }
-
-    public Path buildUndoPath(int undoIndex) {
-        return Storage.getGameUndo(gameName, gameName + "_" + undoIndex + Constants.TXT);
     }
 
     @Override

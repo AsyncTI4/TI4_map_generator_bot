@@ -92,6 +92,7 @@ public class MapGenerator implements AutoCloseable {
     private byte[] mainImageBytes;
     private String imageFormat = "webp";
     private final GenericInteractionCreateEvent event;
+    private final Player overriddenFowPlayer;
     private final int scoreTokenSpacing;
     private final Game game;
     private final DisplayType displayType;
@@ -121,7 +122,11 @@ public class MapGenerator implements AutoCloseable {
     private StopWatch debugDiscordTime;
     private StopWatch debugWebsiteTime;
 
-    MapGenerator(Game game, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
+    MapGenerator(
+            Game game,
+            @Nullable DisplayType displayType,
+            @Nullable GenericInteractionCreateEvent event,
+            @Nullable Player overriddenFowPlayer) {
         debug = GlobalSettings.getSetting(
                 GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, Boolean.FALSE);
         if (debug) debugAbsoluteStartTime = StopWatch.createStarted();
@@ -129,6 +134,7 @@ public class MapGenerator implements AutoCloseable {
         this.game = game;
         this.displayType = defaultIfNull(displayType);
         this.event = event;
+        this.overriddenFowPlayer = overriddenFowPlayer;
 
         // Get a control token to calculate needed width of objectives later based on number of players
         String controlID = Mapper.getControlID("red");
@@ -361,8 +367,16 @@ public class MapGenerator implements AutoCloseable {
         isFoWPrivate = true;
         // IMPORTANT NOTE : This method used to be local and was refactored to extract
         // any references to tilesToDisplay
-        fowPlayer = CommandHelper.getPlayerFromGame(
-                game, event.getMember(), event.getUser().getId());
+        if (overriddenFowPlayer != null) {
+            fowPlayer = overriddenFowPlayer;
+        } else if (event != null) {
+            fowPlayer = CommandHelper.getPlayerFromGame(
+                    game, event.getMember(), event.getUser().getId());
+        } else {
+            // This only applies when neither an explicit FoW player nor an interaction event is available.
+            isFoWPrivate = false;
+            return;
+        }
 
         Set<String> tilesToShow = FoWHelper.fowFilter(game, fowPlayer);
         Set<String> keys = new HashSet<>(tilesToDisplay.keySet());

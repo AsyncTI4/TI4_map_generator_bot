@@ -504,7 +504,8 @@ public class CreateGameService {
     private static Guild getServerWithMostCapacity() {
         List<Guild> guilds = JdaService.serversToCreateNewGamesOn.stream()
                 .filter(CreateGameService::serverHasRoomForNewFullCategory)
-                .sorted(Comparator.comparing(CreateGameService::getServerCapacityForNewGames))
+                .sorted(Comparator.comparing(CreateGameService::getServerCapacityForNewGames)
+                        .reversed())
                 .toList();
 
         if (guilds.isEmpty() && serverHasRoomForNewFullCategory(JdaService.guildPrimary)) {
@@ -521,7 +522,37 @@ public class CreateGameService {
                 .map(g -> g.getName() + ": " + getServerCapacityForNewGames(g))
                 .collect(Collectors.joining("\n"));
         BotLogger.info("Server Game Capacity Check:\n" + debugText);
-        return guilds.getLast();
+        return guilds.getFirst();
+    }
+
+    /**
+     * Selects the best guild for adding a single game's channels and role.
+     * Unlike {@link #getServerWithMostCapacity()}, this only requires per-game capacity rather than room for an
+     * entirely new category.
+     */
+    @Nullable
+    static Guild getServerWithMostCapacityForNewGame() {
+        List<Guild> guilds = JdaService.serversToCreateNewGamesOn.stream()
+                .filter(guild -> getServerCapacityForNewGames(guild) > 0)
+                .sorted(Comparator.comparing(CreateGameService::getServerCapacityForNewGames)
+                        .reversed())
+                .toList();
+
+        if (guilds.isEmpty() && getServerCapacityForNewGames(JdaService.guildPrimary) > 0) {
+            return JdaService.guildPrimary;
+        }
+
+        if (guilds.isEmpty()) {
+            BotLogger.warning(
+                    "`CreateGameService.getServerWithMostCapacityForNewGame` No available servers to create a new game");
+            return null;
+        }
+
+        String debugText = guilds.stream()
+                .map(g -> g.getName() + ": " + getServerCapacityForNewGames(g))
+                .collect(Collectors.joining("\n"));
+        BotLogger.info("Server Single Game Capacity Check:\n" + debugText);
+        return guilds.getFirst();
     }
 
     public static boolean serverCanHostNewGame(Guild guild) {
@@ -538,7 +569,10 @@ public class CreateGameService {
         return true;
     }
 
-    private static int getServerCapacityForNewGames(Guild guild) {
+    static int getServerCapacityForNewGames(@Nullable Guild guild) {
+        if (guild == null) {
+            return 0;
+        }
         int roleCount = guild.getRoles().size();
         int gameCountByRole = MAX_ROLE_COUNT - roleCount;
 

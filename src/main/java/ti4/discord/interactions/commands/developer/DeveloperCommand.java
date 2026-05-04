@@ -25,8 +25,7 @@ public class DeveloperCommand implements ParentCommand {
                     new CustomCommand(),
                     new RunAgainstSpecificGame(),
                     new ProduceNucleusGenStats(),
-                    // new StartLazaxSeason1(),
-                    // new PostLazaxSeason1Public(),
+                    new LocalDevelopment(),
                     new RunSql())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
