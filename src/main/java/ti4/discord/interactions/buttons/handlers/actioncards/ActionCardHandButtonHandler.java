@@ -74,8 +74,8 @@ class ActionCardHandButtonHandler {
         receiver.setActionCard(acID);
         MessageHelper.sendMessageToChannel(
                 game.getMainGameChannel(),
-                player.getRepresentationNoPing() + " gave _"
-                        + Mapper.getActionCard(acID).getName() + "_ to " + receiver.getRepresentationNoPing() + ".");
+                player.getRepresentationNoPing() + " gave an action card to " + receiver.getRepresentationNoPing()
+                        + ".");
         ActionCardHelper.sendActionCardInfo(game, player);
         ActionCardHelper.sendActionCardInfo(game, receiver);
         ButtonHelper.checkACLimit(game, receiver);

@@ -65,6 +65,7 @@ public class CombatContestSettings {
                 "houseAbilities.minimumAbilityVotesToResolve must be > 0.");
         require(houseAbilities.baseCombatFavorGain >= 0, "houseAbilities.baseCombatFavorGain must be >= 0.");
         require(houseAbilities.initialHousePoints >= 0, "houseAbilities.initialHousePoints must be >= 0.");
+        require(houseAbilities.initialIndividualPoints >= 0, "houseAbilities.initialIndividualPoints must be >= 0.");
         require(
                 houseAbilities.catchupFavorPointsPerBonus > 0,
                 "houseAbilities.catchupFavorPointsPerBonus must be > 0.");
@@ -95,12 +96,20 @@ public class CombatContestSettings {
         require(sideBets.maxBetsPerUser >= 0, "sideBets.maxBetsPerUser must be >= 0.");
         require(sideBets.costPoints >= 0, "sideBets.costPoints must be >= 0.");
         require(sideBets.dynamicPayoutCap >= 1, "sideBets.dynamicPayoutCap must be >= 1.");
+        require(sideBets.afbWhiffSelectionBias >= 0.0, "sideBets.afbWhiffSelectionBias must be >= 0.");
+        require(sideBets.roundOneWhiffSelectionBias >= 0.0, "sideBets.roundOneWhiffSelectionBias must be >= 0.");
+        require(sideBets.roundOneSlamSelectionBias >= 0.0, "sideBets.roundOneSlamSelectionBias must be >= 0.");
+        require(sideBets.winnerOneHpPayoutMultiplier >= 0.0, "sideBets.winnerOneHpPayoutMultiplier must be >= 0.");
+        require(
+                sideBets.dynamicPayoutTiers != null && !sideBets.dynamicPayoutTiers.isBlank(),
+                "sideBets.dynamicPayoutTiers is required.");
         require(
                 houseAbilities.naalu.actionCardPeekFavorCost >= 0,
                 "houseAbilities.naalu.actionCardPeekFavorCost must be >= 0.");
         require(
                 houseAbilities.naalu.roundOneRollPeekFavorCost >= 0,
                 "houseAbilities.naalu.roundOneRollPeekFavorCost must be >= 0.");
+        require(houseAbilities.naalu.luckOmensFavorCost >= 0, "houseAbilities.naalu.luckOmensFavorCost must be >= 0.");
         require(
                 houseAbilities.mentak.previewLeadSeconds >= 0,
                 "houseAbilities.mentak.previewLeadSeconds must be >= 0.");
@@ -120,6 +129,9 @@ public class CombatContestSettings {
                 houseAbilities.hacan.maxSubsidiesPerContest >= 0,
                 "houseAbilities.hacan.maxSubsidiesPerContest must be >= 0.");
         require(houseAbilities.hacan.subsidyFavorOnHit >= 0, "houseAbilities.hacan.subsidyFavorOnHit must be >= 0.");
+        require(
+                houseAbilities.hacan.baseCombatFavorGain >= 0,
+                "houseAbilities.hacan.baseCombatFavorGain must be >= 0.");
         require(
                 houseAbilities.hacan.marketMakerPointsPerBet >= 0,
                 "houseAbilities.hacan.marketMakerPointsPerBet must be >= 0.");
@@ -141,6 +153,18 @@ public class CombatContestSettings {
         require(
                 houseAbilities.hacan.highTradeConvoysPredictionBonus >= 0,
                 "houseAbilities.hacan.highTradeConvoysPredictionBonus must be >= 0.");
+        require(
+                houseAbilities.hacan.veryHighTradeConvoysFavorCost >= 0,
+                "houseAbilities.hacan.veryHighTradeConvoysFavorCost must be >= 0.");
+        require(
+                houseAbilities.hacan.veryHighTradeConvoysPredictionBonus >= 0,
+                "houseAbilities.hacan.veryHighTradeConvoysPredictionBonus must be >= 0.");
+        require(
+                houseAbilities.hacan.maximumTradeConvoysFavorCost >= 0,
+                "houseAbilities.hacan.maximumTradeConvoysFavorCost must be >= 0.");
+        require(
+                houseAbilities.hacan.maximumTradeConvoysPredictionBonus >= 0,
+                "houseAbilities.hacan.maximumTradeConvoysPredictionBonus must be >= 0.");
     }
 
     private void require(boolean condition, String message) {
@@ -230,7 +254,12 @@ public class CombatContestSettings {
         private boolean enableSideBets = true;
         private int maxBetsPerUser = 3;
         private int costPoints = 1;
-        private int dynamicPayoutCap = 100;
+        private int dynamicPayoutCap = 50;
+        private double afbWhiffSelectionBias = 2.0;
+        private double roundOneWhiffSelectionBias = 3.0;
+        private double roundOneSlamSelectionBias = 3.0;
+        private double winnerOneHpPayoutMultiplier = 0.75;
+        private String dynamicPayoutTiers = "0.20:4,0.10:5,0.05:8,0.025:12,0.01:20,0.005:30";
     }
 
     @Getter
@@ -242,6 +271,7 @@ public class CombatContestSettings {
         private int minimumAbilityVotesToResolve = 3;
         private int baseCombatFavorGain = 10;
         private int initialHousePoints = 1000;
+        private int initialIndividualPoints = 100;
         private int catchupFavorPointsPerBonus = 100;
         private int catchupFavorBonusStep;
         private int maxCatchupFavorBonus;
@@ -252,6 +282,7 @@ public class CombatContestSettings {
     public static class Naalu {
         private int actionCardPeekFavorCost = 30;
         private int roundOneRollPeekFavorCost = 50;
+        private int luckOmensFavorCost = 40;
     }
 
     @Getter
@@ -269,12 +300,17 @@ public class CombatContestSettings {
     public static class Hacan {
         private int maxSubsidiesPerContest = 2;
         private int subsidyFavorOnHit = 10;
-        private int marketMakerPointsPerBet = 1;
+        private int baseCombatFavorGain = 20;
+        private int marketMakerPointsPerBet = 2;
         private int lowTradeConvoysFavorCost = 10;
-        private int lowTradeConvoysPredictionBonus = 5;
+        private int lowTradeConvoysPredictionBonus = 10;
         private int mediumTradeConvoysFavorCost = 20;
-        private int mediumTradeConvoysPredictionBonus = 10;
+        private int mediumTradeConvoysPredictionBonus = 16;
         private int highTradeConvoysFavorCost = 30;
-        private int highTradeConvoysPredictionBonus = 15;
+        private int highTradeConvoysPredictionBonus = 22;
+        private int veryHighTradeConvoysFavorCost = 40;
+        private int veryHighTradeConvoysPredictionBonus = 29;
+        private int maximumTradeConvoysFavorCost = 50;
+        private int maximumTradeConvoysPredictionBonus = 36;
     }
 }

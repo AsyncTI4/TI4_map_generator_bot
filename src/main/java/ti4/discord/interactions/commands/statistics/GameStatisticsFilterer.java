@@ -197,6 +197,7 @@ public class GameStatisticsFilterer {
             case "tf" -> game.isTwilightsFallMode();
             case "tedemo" -> game.isThundersEdgeDemo();
             case "noswap" -> game.isNoSwapMode();
+            case "twilightkart" -> game.isTwilightKart();
             default -> false;
         };
     }

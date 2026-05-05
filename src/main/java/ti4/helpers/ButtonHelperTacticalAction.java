@@ -701,7 +701,11 @@ public final class ButtonHelperTacticalAction {
 
             for (Player remnant : game.getRealPlayers()) {
                 if (!remnant.ownsUnit("tk-saturnremnant")) continue;
-
+                if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, remnant, UnitType.Pds)
+                                .contains(activeSystem)
+                        || FoWHelper.otherPlayersHaveShipsInSystem(remnant, activeSystem, game)) {
+                    continue;
+                }
                 UnitKey key = Units.getUnitKey(UnitType.Cruiser, remnant.getColor());
                 if (ButtonHelperFactionSpecific.vortexButtonAvailable(game, key)) {
                     String id = remnant.factionButtonChecker() + "placeOneNDone_skipbuild_cruiser_"
@@ -847,7 +851,7 @@ public final class ButtonHelperTacticalAction {
     }
 
     public static List<Button> getButtonsForAllUnitsInSystem(Player player, Game game, Tile tile, String moveOrRemove) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         List<UnitType> movableFromPlanets = new ArrayList<>(List.of(UnitType.Infantry, UnitType.Mech));
         if (player.hasTech("ffac2") || player.hasUnit("tf-floatingfactory") || player.hasUnit("saar_spacedock")) {

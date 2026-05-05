@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -25,6 +25,7 @@ import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.entities.CombatReplayLeaderboardEntryEntity;
 import ti4.contest.replay.repository.CombatReplayLeaderboardEntryRepository;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
@@ -39,7 +40,6 @@ import ti4.service.image.FileUploadService;
 public class LazaxSeasonService {
 
     private static final String PUBLIC_CHANNEL_NAME = "lazax-war-archives";
-    private static final int INITIAL_INDIVIDUAL_POINTS = 100;
     public static final String CLAIM_DELEGATION_BUTTON_ID = "lazaxSeason1ClaimDelegation";
 
     private final CombatContestSettings settings;
@@ -51,8 +51,9 @@ public class LazaxSeasonService {
         TextChannel channel = publicChannel();
         if (channel == null) return false;
 
+        houseService.assignLeaderboardEntriesByParticipation(
+                JdaService.guildPrimary, leaderboardEntryRepository.findAll());
         resetSeasonOneScores();
-        houseService.assignLeaderboardEntriesRandomly(JdaService.guildPrimary, leaderboardEntryRepository.findAll());
         houseLedgerService.resetSeasonOpeningBalances();
 
         postSeasonOneOpeningMessage(channel);
@@ -79,9 +80,10 @@ public class LazaxSeasonService {
 
     private void resetSeasonOneScores() {
         LocalDateTime now = LocalDateTime.now();
+        int initialIndividualPoints = settings.getHouseAbilities().getInitialIndividualPoints();
         List<CombatReplayLeaderboardEntryEntity> entries = leaderboardEntryRepository.findAll();
         for (CombatReplayLeaderboardEntryEntity entry : entries) {
-            entry.setTotalPoints(INITIAL_INDIVIDUAL_POINTS);
+            entry.setTotalPoints(initialIndividualPoints);
             entry.setPredictionCount(0);
             entry.setCorrectPredictions(0);
             entry.setUpdatedAt(now);
@@ -95,7 +97,6 @@ public class LazaxSeasonService {
 
         CombatReplayHouse existingHouse = houseService.houseForUser(user.getId());
         if (existingHouse != null) {
-            ensureLeaderboardEntry(user);
             houseService.assignHouseIfAbsent(guild, member, user);
             return "You are already assigned to **"
                     + existingHouse.displayName()
@@ -104,7 +105,6 @@ public class LazaxSeasonService {
                     + ".";
         }
 
-        ensureLeaderboardEntry(user);
         var assignment = houseService.assignHouseIfAbsent(guild, member, user);
         if (assignment == null || assignment.getHouse() == null) {
             return "Could not assign your delegation. Please try again.";
@@ -115,19 +115,6 @@ public class LazaxSeasonService {
                 + " Delegation**. Report to "
                 + delegationChannelMention(guild, assignment.getHouse())
                 + ".";
-    }
-
-    private void ensureLeaderboardEntry(User user) {
-        leaderboardEntryRepository.findByDiscordUserId(user.getId()).orElseGet(() -> {
-            CombatReplayLeaderboardEntryEntity entry = new CombatReplayLeaderboardEntryEntity();
-            entry.setDiscordUserId(user.getId());
-            entry.setDiscordUserName(user.getName());
-            entry.setTotalPoints(INITIAL_INDIVIDUAL_POINTS);
-            entry.setPredictionCount(0);
-            entry.setCorrectPredictions(0);
-            entry.setUpdatedAt(LocalDateTime.now());
-            return leaderboardEntryRepository.save(entry);
-        });
     }
 
     private String delegationChannelMention(Guild guild, CombatReplayHouse house) {
@@ -158,7 +145,7 @@ public class LazaxSeasonService {
     private void postSeasonOneOpeningText(TextChannel channel) {
         MessageHelper.sendMessageToChannel(channel, seasonOneIntroMarkdown());
         channel.sendMessageEmbeds(seasonOneOpeningEmbeds())
-                // .setComponents(ActionRow.of(Buttons.green(CLAIM_DELEGATION_BUTTON_ID, "Receive Your Delegation")))
+                .setComponents(ActionRow.of(Buttons.green(CLAIM_DELEGATION_BUTTON_ID, "Receive Your Delegation")))
                 .queue(this::postFaqThread, BotLogger::catchRestError);
     }
 
@@ -238,14 +225,13 @@ public class LazaxSeasonService {
 
             FileUpload banner = delegationBanner(summary);
             if (banner == null) {
-                MessageHelper.sendMessageToChannel(channel, delegationSummaryMarkdown(summary, channel.getGuild()));
+                MessageHelper.sendMessageToChannel(channel, delegationSummaryMarkdown(summary));
                 continue;
             }
             MessageHelper.sendFileUploadToChannel(
                     channel,
                     banner,
-                    ignored -> MessageHelper.sendMessageToChannel(
-                            channel, delegationSummaryMarkdown(summary, channel.getGuild())));
+                    ignored -> MessageHelper.sendMessageToChannel(channel, delegationSummaryMarkdown(summary)));
         }
     }
 
@@ -302,7 +288,7 @@ public class LazaxSeasonService {
                         "Market Compact and Hacan Trade Convoys",
                         """
                         **Market Compact**
-                        Mark up to 2 side bets during discussion. Hacan gains `+1 point` for each non-Hacan player who takes this side bet. If a marked side bet hits, the Hacan also gain `+10 Favor`.
+                        Mark up to 2 side bets during discussion. Hacan gains `+1 point` for each non-Hacan player who takes this side bet. If a marked side bet hits, the Hacan also gain `+20 Favor`.
 
                         **Hacan Trade Convoys**
                         At the end of a combat, send `10`, `20`, or `30` favor to one of the other delegations. If you do so, get `5/10/15%` of their earned points in the next combat as a bonus.
@@ -516,7 +502,7 @@ public class LazaxSeasonService {
                         false)
                 .addField(
                         "Favor",
-                        "Favor is a resource granted by the Mecatol Custodians. Every Delegation gains Favor after each combat at a steady rate, with extra Favor given to Delegations that are behind in points. Favor is spent to activate abilities for key combats.",
+                        "Favor is a resource granted by the Mecatol Custodians. Every Delegation gains Favor after each combat at a steady rate. Favor is spent to activate abilities for key combats.",
                         false)
                 .setFooter(
                         "The Council will not remember the luckiest Delegation. It will remember the one that understood the war.")
@@ -530,10 +516,8 @@ public class LazaxSeasonService {
         return header + "\n__" + summary.identity() + "__";
     }
 
-    private String delegationSummaryMarkdown(DelegationSummary summary, Guild guild) {
-        StringBuilder message = new StringBuilder(delegationRoleMention(summary.house(), guild))
-                .append("\n")
-                .append(delegationHeader(summary))
+    private String delegationSummaryMarkdown(DelegationSummary summary) {
+        StringBuilder message = new StringBuilder(delegationHeader(summary))
                 .append("\n")
                 .append(communicationRuleLine(summary.house()))
                 .append("\n\n");
@@ -553,14 +537,6 @@ public class LazaxSeasonService {
             case MENTAK -> "-# Communication: You may communicate with Hacan Delegation, but not Naalu Delegation.";
             case HACAN -> "-# Communication: You are the only delegation that may communicate with all parties.";
         };
-    }
-
-    private String delegationRoleMention(CombatReplayHouse house, Guild guild) {
-        if (guild == null || house == null) return "";
-        Role role = guild.getRolesByName(house.roleName(), true).stream()
-                .findFirst()
-                .orElse(null);
-        return role == null ? "" : role.getAsMention();
     }
 
     private void appendDelegationSection(StringBuilder message, String title, String text) {

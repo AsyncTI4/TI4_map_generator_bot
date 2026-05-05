@@ -18,6 +18,7 @@ class CombatContestSettingsTest {
         assertEquals(60, settings.getReplayExecution().getSideBetWindowSeconds());
         assertEquals(15, settings.getHouseAbilities().getMentak().getPreviewLeadSeconds());
         assertEquals(1, settings.getHouseAbilities().getMinimumAbilityVotesToResolve());
+        assertEquals(100, settings.getHouseAbilities().getInitialIndividualPoints());
     }
 
     @Test
@@ -30,6 +31,7 @@ class CombatContestSettingsTest {
         assertEquals(600, settings.getReplayExecution().getSideBetWindowSeconds());
         assertEquals(900, settings.getHouseAbilities().getMentak().getPreviewLeadSeconds());
         assertEquals(3, settings.getHouseAbilities().getMinimumAbilityVotesToResolve());
+        assertEquals(100, settings.getHouseAbilities().getInitialIndividualPoints());
     }
 
     @Test
@@ -42,5 +44,6 @@ class CombatContestSettingsTest {
         assertEquals(60, settings.getReplayExecution().getSideBetWindowSeconds());
         assertEquals(15, settings.getHouseAbilities().getMentak().getPreviewLeadSeconds());
         assertEquals(1, settings.getHouseAbilities().getMinimumAbilityVotesToResolve());
+        assertEquals(100, settings.getHouseAbilities().getInitialIndividualPoints());
     }
 }

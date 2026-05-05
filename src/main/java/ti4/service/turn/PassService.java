@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.TyrisBreakthroughButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -131,6 +132,11 @@ public class PassService {
             }
         }
 
+        Player tyris =
+                game.getPlayersFromBreakthrough("tyrisbt").stream().findFirst().orElse(null);
+        if (tyris != null && tyris.hasUnlockedBreakthrough("tyrisbt")) {
+            TyrisBreakthroughButtonHandler.handlePlayerPassed(game, tyris);
+        }
         EndTurnService.pingNextPlayer(event, game, player, true);
         if (!autoPass) {
             StatusHelper.offerPreScoringButtons(game, player);

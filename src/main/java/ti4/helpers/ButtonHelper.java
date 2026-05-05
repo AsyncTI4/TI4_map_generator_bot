@@ -58,7 +58,9 @@ import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.PhantomEnergyHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.TyrisBreakthroughButtonHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.selections.selectmenus.SelectFaction;
@@ -719,6 +721,10 @@ public class ButtonHelper {
         if (player.hasAbility("diplomats")
                 && !ButtonHelperAbilities.getDiplomatButtons(game, player).isEmpty()) {
             buttons.add(Buttons.gray("getDiplomatsButtons", "Use Diplomats Ability", FactionEmojis.freesystems));
+        }
+        if ((whatIsItFor.contains("res") || whatIsItFor.contains("both"))
+                && player.hasUnlockedBreakthrough("tyrisbt")) {
+            TyrisBreakthroughButtonHandler.getPlaceButton(player, game).ifPresent(buttons::add);
         }
         buttons.add(Buttons.gray("resetSpend_" + whatIsItFor, "Reset Spent Planets and Trade Goods"));
         return buttons;
@@ -2215,7 +2221,7 @@ public class ButtonHelper {
                     player.getRepresentation()
                             + " spent 1 command token from their strategy pool to remove command token from a system where they have a space dock.");
         }
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         for (Tile tile : getTilesWithYourCC(player, game, event)) {
             if (CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)
                     .contains(tile)) {
@@ -2980,7 +2986,7 @@ public class ButtonHelper {
     }
 
     private static void doButtonsForSleepers(Player player, Game game, Tile tile, ButtonInteractionEvent event) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         if (!player.hasAbility("awaken") || game.isTwilightsFallMode()) {
             return;
         }
@@ -3006,7 +3012,7 @@ public class ButtonHelper {
     }
 
     private static List<Button> getButtonsForTurningPDSIntoFS(Player player, Game game, Tile tile) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> planetsWithPDS = new ArrayList<>();
         if (!(player.hasUnit("titans_flagship")
                 || player.hasUnit("sigma_ul_flagship_1")
@@ -3025,7 +3031,7 @@ public class ButtonHelper {
     }
 
     public static List<Button> getButtonsForRemovingASleeper(Player player, Game game) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> planetsWithSleepers = new ArrayList<>();
         for (String planet : game.getAllPlanetsWithSleeperTokens()) {
             planetsWithSleepers.add(
@@ -3145,7 +3151,7 @@ public class ButtonHelper {
 
         RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
 
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         if ("mahactCommander".equalsIgnoreCase(whatIsItFor)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -3558,7 +3564,7 @@ public class ButtonHelper {
     public static List<Button> getButtonsToRemoveYourCC(
             Player player, Game game, GenericInteractionCreateEvent event, String whatIsItFor) {
         List<Button> buttonsToRemoveCC = new ArrayList<>();
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         for (Tile tile : getTilesWithYourCC(player, game, event)) {
             if (whatIsItFor.contains("heartOfDominion")) {
                 if (tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, player) == 0) {
@@ -4072,6 +4078,9 @@ public class ButtonHelper {
                 UnitModel unit = entry.getKey();
                 if ("space".equalsIgnoreCase(capChecker.getName())) {
                     capacity += unit.getCapacityValue() * entry.getValue();
+                    if (MobilizationEngineHandler.hasEngineAttached(game)) {
+                        capacity += MobilizationEngineHandler.getCapacityMod(game, player, unit) * entry.getValue();
+                    }
                     if (unit.getUnitType() == UnitType.Carrier
                             && (player.hasUnit("lunarium_carrier") || player.hasUnit("lunarium_carrier2"))) {
                         capacity += player.getSoScored() * entry.getValue();
@@ -5125,7 +5134,7 @@ public class ButtonHelper {
     }
 
     public static List<Button> getPossibleRings(Player player, Game game) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> ringButtons = new ArrayList<>();
         // Pre-compute once in FoW+ mode to avoid repeated expensive recomputation in the helpers below.
         Set<String> visiblePositions =
@@ -5192,7 +5201,7 @@ public class ButtonHelper {
     }
 
     public static List<Button> getTileInARing(Player player, Game game, String buttonID) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> ringButtons = new ArrayList<>();
         String ringNum = buttonID.replace("ring_", "");
 
@@ -6067,7 +6076,7 @@ public class ButtonHelper {
     }
 
     public static void offerBuildOrRemove(Player player, Game game, Tile tile) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         Button buildButton = Buttons.green(
                 factionChecker + "genericBuild_" + tile.getPosition(),
@@ -6913,7 +6922,7 @@ public class ButtonHelper {
 
     private static List<Button> getButtonsForRollingThalnos(
             Player player, Game game, Tile tile, UnitHolder unitHolder) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         Map<UnitKey, Integer> units = unitHolder.getUnits();
         if (unitHolder instanceof Planet) {
@@ -7474,7 +7483,7 @@ public class ButtonHelper {
     }
 
     public static List<Button> getButtonsForStellar(Player player, Game game) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         List<Tile> tilesWithBombard = getTilesOfUnitsWithBombard(player, game);
         if (tilesWithBombard.isEmpty()) {
@@ -7507,7 +7516,7 @@ public class ButtonHelper {
     }
 
     public static List<Button> getButtonsForConventions(Player player, Game game) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         List<Tile> tilesWithBombard = getTilesOfUnitsWithBombard(player, game);
         for (Tile tile : tilesWithBombard) {

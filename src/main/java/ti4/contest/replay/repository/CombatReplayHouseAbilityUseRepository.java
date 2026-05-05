@@ -8,5 +8,7 @@ import ti4.contest.replay.entities.CombatReplayHouseAbilityUseEntity;
 public interface CombatReplayHouseAbilityUseRepository extends JpaRepository<CombatReplayHouseAbilityUseEntity, Long> {
     boolean existsByCandidateIdAndHouse(Long candidateId, CombatReplayHouse house);
 
+    List<CombatReplayHouseAbilityUseEntity> findByCandidateIdAndHouse(Long candidateId, CombatReplayHouse house);
+
     List<CombatReplayHouseAbilityUseEntity> findByHouse(CombatReplayHouse house);
 }

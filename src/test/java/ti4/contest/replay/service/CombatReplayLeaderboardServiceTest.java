@@ -3,6 +3,7 @@ package ti4.contest.replay.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -38,13 +39,17 @@ class CombatReplayLeaderboardServiceTest {
         CombatReplayLeaderboardEntryEntity entry =
                 (CombatReplayLeaderboardEntryEntity) method.invoke(service, "123", "Player");
 
-        assertEquals(0, entry.getTotalPoints());
+        assertEquals(
+                new CombatContestSettings().getHouseAbilities().getInitialIndividualPoints(), entry.getTotalPoints());
         assertEquals(0, entry.getPredictionCount());
         assertEquals(0, entry.getCorrectPredictions());
     }
 
     @Test
     void hacanFavorAwardMessageBreaksOutMarketCompactFavor() throws Exception {
+        CombatReplayHouseFavorService houseFavorService = mock(CombatReplayHouseFavorService.class);
+        when(houseFavorService.ledger(CombatReplayHouse.HACAN))
+                .thenReturn(new CombatReplayHouseFavorService.FavorLedger(13, 0, 13));
         CombatReplayLeaderboardService service = new CombatReplayLeaderboardService(
                 new CombatContestSettings(),
                 mock(CombatReplayContestRepository.class),
@@ -53,7 +58,7 @@ class CombatReplayLeaderboardServiceTest {
                 mock(CombatReplaySideBetService.class),
                 mock(CombatReplayHouseService.class),
                 mock(CombatReplayHouseLedgerService.class),
-                mock(CombatReplayHouseFavorService.class),
+                houseFavorService,
                 mock(CombatReplayHacanTradeConvoysService.class));
         Method method = CombatReplayLeaderboardService.class.getDeclaredMethod(
                 "favorAwardMessage", HousePredictionSummary.class);
@@ -77,6 +82,6 @@ class CombatReplayLeaderboardServiceTest {
         assertTrue(message.contains("receives `+13` Favor"));
         assertTrue(message.contains("- `+10` from the Custodians sealing this combat's ledger."));
         assertTrue(message.contains("- `+3` from Market Compact hits."));
-        assertTrue(message.contains("- **Total Favor:** `0`"));
+        assertTrue(message.contains("- **Available Favor:** `13`"));
     }
 }
