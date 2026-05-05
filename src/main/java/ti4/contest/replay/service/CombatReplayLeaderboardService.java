@@ -162,7 +162,7 @@ public class CombatReplayLeaderboardService {
 
     public boolean postLeaderboard() {
         if (settings.isHousesEnabled()) {
-            return postHouseLeaderboard();
+            return postDelegationLeaderboard();
         }
 
         List<CombatReplayLeaderboardEntryEntity> topEntries =
@@ -248,7 +248,7 @@ public class CombatReplayLeaderboardService {
         return "You have **" + points + "** Lazax " + label + ".";
     }
 
-    private boolean postHouseLeaderboard() {
+    public boolean postDelegationLeaderboard() {
         List<HouseLeaderboardSummary> summaries = houseLedgerService.leaderboardSummaries();
         if (summaries.isEmpty()) return false;
 
