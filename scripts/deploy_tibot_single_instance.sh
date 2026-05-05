@@ -137,7 +137,7 @@ fi
 
 echo "Rollout complete. Active $service container: $new_container_id"
 profiler_mapping="$(docker port "$new_container_id" 8849/tcp 2>/dev/null || true)"
-if docker exec "$new_container_id" test -f "$profiler_agent_path" >/dev/null 2>&1 \
+if docker exec "$new_container_id" sh -c "tr '\0' ' ' </proc/1/cmdline | grep -F -- '-agentpath:${profiler_agent_path}='" >/dev/null 2>&1 \
   && [ -n "$profiler_mapping" ]; then
   echo "JProfiler is reachable via $profiler_mapping"
 fi
