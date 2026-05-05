@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -2938,46 +2939,50 @@ public final class ButtonHelperActionCards {
 
     @ButtonHandler("resolveTwin_")
     public static void resolveTwinning(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
-        String acName = buttonID.replace("resolveTwin_", "");
-        List<String> acStrings = new ArrayList<>(game.getDiscardActionCards().keySet());
-        boolean found = false;
-        for (String acStringID : acStrings) {
-            ActionCardModel actionCard = Mapper.getActionCard(acStringID);
-            String actionCardTitle = actionCard.getName();
-            if (acName.equalsIgnoreCase(actionCardTitle)) {
-                boolean picked = game.pickActionCard(
-                        player.getUserID(), game.getDiscardActionCards().get(acStringID));
-                if (!picked) {
-                    MessageHelper.sendMessageToChannel(
-                            event.getChannel(), "No such action card ID found, please retry.");
-                    return;
-                }
-                ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel());
-                found = true;
-                break;
-            }
+        String twinningTarget = buttonID.replace("resolveTwin_", "");
+        String acStringID = findTwinningTargetActionCardId(game, twinningTarget);
+        if (acStringID == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such action card ID found, please retry.");
+            return;
         }
-        if (!found) {
-            Map<String, Integer> purgedActionCards = game.getPurgedActionCards();
-            acStrings = new ArrayList<>(purgedActionCards.keySet());
-            for (String acStringID : acStrings) {
-                ActionCardModel actionCard = Mapper.getActionCard(acStringID);
-                String actionCardTitle = actionCard.getName();
-                if (acName.equalsIgnoreCase(actionCardTitle)) {
-                    boolean picked =
-                            game.pickActionCardFromPurged(player.getUserID(), purgedActionCards.get(acStringID));
-                    if (!picked) {
-                        MessageHelper.sendMessageToChannel(
-                                event.getChannel(), "No such action card ID found, please retry.");
-                        return;
-                    }
-                    ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel());
-                    game.setPurgedActionCard(acStringID);
-                    break;
-                }
-            }
+        Integer discardIdentifier = game.getDiscardActionCards().get(acStringID);
+        if (discardIdentifier == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such action card ID found, please retry.");
+            return;
+        }
+        boolean purged = game.getDiscardACStatus().get(acStringID) == ActionCardHelper.ACStatus.purged;
+        boolean picked = purged
+                ? game.pickActionCardFromPurged(player.getUserID(), discardIdentifier)
+                : game.pickActionCard(player.getUserID(), discardIdentifier);
+        if (!picked) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such action card ID found, please retry.");
+            return;
+        }
+        ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel());
+        if (purged) {
+            game.setPurgedActionCard(acStringID);
         }
         ButtonHelper.deleteMessage(event);
+    }
+
+    static String findTwinningTargetActionCardId(Game game, String twinningTarget) {
+        if (StringUtils.isNumeric(twinningTarget)) {
+            Integer discardIdentifier = Integer.valueOf(twinningTarget);
+            for (Map.Entry<String, Integer> actionCard :
+                    game.getDiscardActionCards().entrySet()) {
+                if (discardIdentifier.equals(actionCard.getValue())) {
+                    return actionCard.getKey();
+                }
+            }
+            return null;
+        }
+        for (String acStringID : game.getDiscardActionCards().keySet()) {
+            ActionCardModel actionCard = Mapper.getActionCard(acStringID);
+            if (twinningTarget.equalsIgnoreCase(actionCard.getName())) {
+                return acStringID;
+            }
+        }
+        return null;
     }
 
     @ButtonHandler("economicInitiative")

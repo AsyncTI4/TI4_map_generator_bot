@@ -1871,8 +1871,12 @@ public class ActionCardHelper {
                 if (!model.getWindow().toLowerCase().startsWith("action")) {
                     continue;
                 }
+                Integer discardIdentifier = game.getDiscardActionCards().get(acID);
+                if (discardIdentifier == null) {
+                    continue;
+                }
 
-                String id = twinningPrefix + model.getName();
+                String id = twinningPrefix + discardIdentifier;
                 String label = "Twin " + model.getName();
                 lastCardName = model.getName();
                 twinningButtons.add(Buttons.green(id, label, CardEmojis.getACEmoji(game)));
