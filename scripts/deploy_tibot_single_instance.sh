@@ -136,6 +136,7 @@ fi
 
 echo "Rollout complete. Active $service container: $new_container_id"
 profiler_mapping="$(docker port "$new_container_id" 8849/tcp 2>/dev/null || true)"
-if [ -n "$profiler_mapping" ]; then
-  echo "async-profiler is reachable via $profiler_mapping"
+if docker exec "$new_container_id" test -f /opt/jprofiler/bin/linux-x64/libjprofilerti.so >/dev/null 2>&1 \
+  && [ -n "$profiler_mapping" ]; then
+  echo "JProfiler is reachable via $profiler_mapping"
 fi
