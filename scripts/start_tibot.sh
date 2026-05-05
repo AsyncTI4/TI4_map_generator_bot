@@ -8,6 +8,7 @@ java_args=(
 )
 
 agent_path="${JPROFILER_AGENT_PATH:-}"
+agent_path="$(realpath -e -- "$agent_path" 2>/dev/null || true)"
 if [[ -n "$agent_path" && "$agent_path" == /opt/jprofiler/* && -f "$agent_path" ]]; then
   java_args+=("-agentpath:${agent_path}=port=${JPROFILER_PORT:-8849},nowait")
 fi

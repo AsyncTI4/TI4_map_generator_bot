@@ -81,11 +81,12 @@ jobs:
               timestamp=$(date "+%F %T.%3N")
               curl -X POST -H 'Content-Type: application/json' -d "{\"content\":\"\`$timestamp\`NEW DEPLOYMENT TRIGGERED\"}" $DISCORD_WEBHOOK_URL
               echo "Pulling deployment config from GitHub..."
-              cd ${{ vars.HOST_TI4_REPO_DIR }}
-              git pull --ff-only
-              export HOST_TI4_SAVES_DIR="${{ vars.HOST_TI4_SAVES_DIR }}"
-              export HOST_TI4_REPO_DIR="${{ vars.HOST_TI4_REPO_DIR }}"
-              export GUILDID_LIST="${{ vars.GUILDID_LIST }}"
+               cd ${{ vars.HOST_TI4_REPO_DIR }}
+               git pull --ff-only
+               export HOST_TI4_SAVES_DIR="${{ vars.HOST_TI4_SAVES_DIR }}"
+               export HOST_TI4_JPROFILER_DIR="${{ vars.HOST_TI4_JPROFILER_DIR }}"
+               export HOST_TI4_REPO_DIR="${{ vars.HOST_TI4_REPO_DIR }}"
+               export GUILDID_LIST="${{ vars.GUILDID_LIST }}"
               export COMPOSE_PROJECT_NAME="ti4-bot"
               export IMAGE_REPOSITORY="${{ env.IMAGE_REPOSITORY }}"
               export IMAGE_TAG="${{ needs.buildImage.outputs.image_tag }}"

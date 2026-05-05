@@ -19,7 +19,7 @@ services:
     mem_limit: 7g
     volumes:
       - ${HOST_TI4_SAVES_DIR}:/opt/STORAGE
-      - ${HOST_TI4_JPROFILER_DIR:-/opt/jprofiler}:/opt/jprofiler:ro
+      - ${HOST_TI4_JPROFILER_DIR}:/opt/jprofiler:ro
       - ${HOST_TI4_REPO_DIR}/src/main/resources:/opt/resources:ro
     ports:
       # JProfiler agent port — use an ephemeral loopback port so rollout candidates can run in parallel
