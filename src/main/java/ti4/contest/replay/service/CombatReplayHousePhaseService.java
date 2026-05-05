@@ -42,7 +42,7 @@ public class CombatReplayHousePhaseService {
         return settings.isHousesEnabled()
                 && contest != null
                 && contest.getId() != null
-                && !contestRepository.existsByIdGreaterThan(contest.getId())
+                && !contestRepository.existsByIdGreaterThanAndReplayCompletedAtIsNotNull(contest.getId())
                 && (contest.getReplayCompletedAt() != null || contest.getLeaderboardPostedAt() != null);
     }
 

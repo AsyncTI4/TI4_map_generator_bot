@@ -1544,6 +1544,7 @@ public final class Constants {
     public static final String LAZAX = "lazax";
     public static final String LAZAX_MY_POINTS = "my_points";
     public static final String LAZAX_TOP_100 = "top_100";
+    public static final String LAZAX_DELEGATION_LEADERBOARD = "delegation_leaderboard";
     public static final String PUBLIC = "public";
     public static final String IS_FRACTURED = "is_fractured";
     public static final String SHOW_GAME_IDS = "show_game_ids";

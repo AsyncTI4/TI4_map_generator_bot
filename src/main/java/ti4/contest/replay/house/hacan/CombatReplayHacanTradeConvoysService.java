@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -48,8 +49,10 @@ import ti4.service.emoji.FactionEmojis;
 public class CombatReplayHacanTradeConvoysService {
 
     public static final String HACAN_TRADE_CONVOYS_PREFIX = "combatReplayHacanTradeConvoys_";
+    public static final String HACAN_TRADE_CONVOYS_SEND_NOW_PREFIX = "combatReplayHacanTradeConvoysSendNow_";
 
     private static final String DELIMITER = "~";
+    private static final String HACAN_CEO_ROLE_NAME = "Hacan CEO";
     private final CombatContestSettings settings;
     private final CombatReplayHouseService houseService;
     private final CombatReplayHousePhaseService phaseService;
@@ -77,19 +80,21 @@ public class CombatReplayHacanTradeConvoysService {
             CombatReplayContestEntity contest,
             CombatCandidateEntity candidate,
             List<HousePredictionSummary> currentCombatSummaries) {
+        lockPreviousTradeConvoysIfCurrentCombatEnded(contest);
         if (!canOfferTradeConvoys(contest, candidate)) return;
         postTradeConvoysVotingButtons(contest, hacanFavorLedger(contest, currentCombatSummaries));
     }
 
     public boolean repostOpenTradeConvoysVotingButtons() {
-        CombatReplayContestEntity contest =
-                contestRepository.findFirstByOrderByIdDesc().orElse(null);
-        CombatCandidateEntity candidate = contest == null || contest.getCandidateId() == null
-                ? null
-                : candidateRepository.findById(contest.getCandidateId()).orElse(null);
-        if (!shouldOfferVoting(contest, candidate)) return false;
-        postTradeConvoysVotingButtons(contest);
-        return true;
+        for (CombatReplayContestEntity contest : contestRepository.findAllByOrderByIdDesc()) {
+            CombatCandidateEntity candidate = contest == null || contest.getCandidateId() == null
+                    ? null
+                    : candidateRepository.findById(contest.getCandidateId()).orElse(null);
+            if (!shouldOfferVoting(contest, candidate)) continue;
+            postTradeConvoysVotingButtons(contest);
+            return true;
+        }
+        return false;
     }
 
     private void postTradeConvoysVotingButtons(CombatReplayContestEntity contest) {
@@ -106,7 +111,7 @@ public class CombatReplayHacanTradeConvoysService {
                 channel,
                 "## " + FactionEmojis.getFactionIcon(CombatReplayHouse.HACAN.displayName())
                         + " Hacan Delegation Trade Convoys\n"
-                        + CombatReplayAbilityWindowText.votesLockWhenNextContestPostsLine()
+                        + CombatReplayAbilityWindowText.votesLockWhenNextCombatEndsLine()
                         + "\n"
                         + favorBalanceLine(favorLedger)
                         + "\n"
@@ -126,7 +131,6 @@ public class CombatReplayHacanTradeConvoysService {
                 && contest != null
                 && contest.getId() != null
                 && candidate != null
-                && !contestRepository.existsByIdGreaterThan(contest.getId())
                 && tradeConvoysRepository.findByContestId(contest.getId()).isEmpty();
     }
 
@@ -148,7 +152,7 @@ public class CombatReplayHacanTradeConvoysService {
                 "## "
                         + FactionEmojis.getFactionIcon(CombatReplayHouse.HACAN.displayName())
                         + " Hacan Delegation Trade Convoys\n"
-                        + CombatReplayAbilityWindowText.votesLockWhenNextContestPostsLine()
+                        + CombatReplayAbilityWindowText.votesLockWhenNextCombatEndsLine()
                         + "\n"
                         + favorBalanceLine(null)
                         + "\n"
@@ -209,6 +213,56 @@ public class CombatReplayHacanTradeConvoysService {
     }
 
     @Transactional
+    public synchronized CombatReplayInteractionResult sendTradeConvoysNow(
+            ButtonInteractionEvent event, ParsedTradeConvoysButton request) {
+        if (!settings.isHousesEnabled())
+            return CombatReplayInteractionResult.rejected("Hacan Delegation Trade Convoys is disabled.");
+        if (!userCanSendTradeConvoysNow(event)) {
+            return CombatReplayInteractionResult.rejected("Only Hacan CEO may send Trade Convoys now.");
+        }
+        if (!isValidRequest(request) || isDoNotUse(request)) {
+            return CombatReplayInteractionResult.rejected("That Hacan Trade Convoys option is not available.");
+        }
+        CombatReplayContestEntity contest = tradeConvoysContest(request.contestId());
+        if (!votingOpen(contest))
+            return CombatReplayInteractionResult.rejected("The Hacan Trade Convoys window is closed.");
+        if (tradeConvoysRepository.findByContestId(request.contestId()).isPresent()) {
+            return CombatReplayInteractionResult.rejected("Hacan Trade Convoys has already resolved for this combat.");
+        }
+        CombatCandidateEntity candidate = contest == null || contest.getCandidateId() == null
+                ? null
+                : candidateRepository.findById(contest.getCandidateId()).orElse(null);
+        if (candidate == null || candidate.getId() == null) {
+            return CombatReplayInteractionResult.rejected("Could not find the combat for that Trade Convoys option.");
+        }
+        if (!houseFavorService.canAfford(CombatReplayHouse.HACAN, request.favorCost())) {
+            return CombatReplayInteractionResult.rejected(
+                    "Hacan Delegation does not have enough Favor for that Trade Convoys option.");
+        }
+        if (!claimHacanTradeConvoysUse(
+                candidate.getId(),
+                request.favorCost(),
+                event.getUser().getId(),
+                event.getUser().getEffectiveName())) {
+            return CombatReplayInteractionResult.rejected("Hacan Trade Convoys has already resolved for this combat.");
+        }
+
+        CombatReplayHacanTradeConvoysEntity tradeConvoys = new CombatReplayHacanTradeConvoysEntity();
+        tradeConvoys.setContestId(contest.getId());
+        tradeConvoys.setTargetHouse(request.targetHouse());
+        tradeConvoys.setFavorCost(request.favorCost());
+        tradeConvoys.setPredictionBonus(request.bonusPercent());
+        tradeConvoys.setVoteCount(1);
+        tradeConvoys.setSelectedAt(LocalDateTime.now());
+        tradeConvoysRepository.save(tradeConvoys);
+        creditTradeConvoysFavorTransferIfScored(tradeConvoys);
+        postLockedTradeConvoysSummary(tradeConvoys);
+
+        return CombatReplayInteractionResult.accepted(
+                "Sent Hacan Trade Convoys now for **" + optionLabel(request) + "**.");
+    }
+
+    @Transactional
     public synchronized TradeConvoys lockTradeConvoysIfNeeded(
             CombatReplayContestEntity contest, CombatCandidateEntity candidate) {
         if (!settings.isHousesEnabled()) return TradeConvoys.none();
@@ -222,11 +276,6 @@ public class CombatReplayHacanTradeConvoysService {
 
         List<CombatReplayHacanTradeConvoysVoteEntity> votes =
                 tradeConvoysVoteRepository.findByContestId(contest.getId());
-        if (!voteService.meetsMinimumVoterThreshold(votes, CombatReplayHacanTradeConvoysVoteEntity::getDiscordUserId)) {
-            return lockNoTradeConvoys(
-                    contest,
-                    voteService.distinctVoterCount(votes, CombatReplayHacanTradeConvoysVoteEntity::getDiscordUserId));
-        }
 
         TradeConvoysTally winning = winningTally(votes);
         if (winning == null || winning.targetHouse() == null || winning.bonusPercent() <= 0) {
@@ -251,6 +300,7 @@ public class CombatReplayHacanTradeConvoysService {
         tradeConvoys.setVoteCount(winning.voteCount());
         tradeConvoys.setSelectedAt(LocalDateTime.now());
         tradeConvoysRepository.save(tradeConvoys);
+        creditTradeConvoysFavorTransferIfScored(tradeConvoys);
         postLockedTradeConvoysSummary(tradeConvoys);
         return toTradeConvoys(tradeConvoys);
     }
@@ -319,6 +369,15 @@ public class CombatReplayHacanTradeConvoysService {
         return tradeConvoysButtonsForHouse(contest, target, houseFavorService.ledger(CombatReplayHouse.HACAN));
     }
 
+    public List<Button> sendNowButtons(ParsedTradeConvoysButton request, ButtonInteractionEvent event) {
+        if (!isValidRequest(request) || isDoNotUse(request) || !userCanSendTradeConvoysNow(event)) return List.of();
+        return List.of(Buttons.green(
+                formatSendNowButtonId(
+                        request.contestId(), request.targetHouse(), request.favorCost(), request.bonusPercent()),
+                "Send Now",
+                FactionEmojis.Hacan));
+    }
+
     private List<Button> tradeConvoysButtonsForHouse(
             CombatReplayContestEntity contest,
             CombatReplayHouse target,
@@ -361,6 +420,23 @@ public class CombatReplayHacanTradeConvoysService {
         return phaseService.postCombatVoteOpen(contest);
     }
 
+    public void lockPreviousTradeConvoysIfCurrentCombatEnded(CombatReplayContestEntity currentContest) {
+        if (currentContest == null || currentContest.getId() == null || currentContest.getReplayCompletedAt() == null)
+            return;
+        CombatReplayContestEntity previousContest = contestRepository
+                .findFirstByIdLessThanOrderByIdDesc(currentContest.getId())
+                .orElse(null);
+        if (previousContest == null
+                || previousContest.getCandidateId() == null
+                || (previousContest.getReplayCompletedAt() == null && previousContest.getLeaderboardPostedAt() == null))
+            return;
+        CombatCandidateEntity previousCandidate =
+                candidateRepository.findById(previousContest.getCandidateId()).orElse(null);
+        if (previousCandidate != null) {
+            lockTradeConvoysIfNeeded(previousContest, previousCandidate);
+        }
+    }
+
     public boolean userHasHouse(String discordUserId) {
         if (settings.getRuntime().isDevMode()) return true;
         return houseService.houseForUser(discordUserId) == CombatReplayHouse.HACAN;
@@ -368,6 +444,14 @@ public class CombatReplayHacanTradeConvoysService {
 
     private boolean userHasHacan(String discordUserId) {
         return userHasHouse(discordUserId);
+    }
+
+    private boolean userCanSendTradeConvoysNow(ButtonInteractionEvent event) {
+        if (settings.getRuntime().isDevMode()) return true;
+        if (event == null) return false;
+        Member member = event.getMember();
+        return member != null
+                && member.getRoles().stream().anyMatch(role -> HACAN_CEO_ROLE_NAME.equals(role.getName()));
     }
 
     private boolean isValidRequest(ParsedTradeConvoysButton request) {
@@ -385,7 +469,11 @@ public class CombatReplayHacanTradeConvoysService {
                 new TradeConvoysTier(hacan.getLowTradeConvoysFavorCost(), hacan.getLowTradeConvoysPredictionBonus()),
                 new TradeConvoysTier(
                         hacan.getMediumTradeConvoysFavorCost(), hacan.getMediumTradeConvoysPredictionBonus()),
-                new TradeConvoysTier(hacan.getHighTradeConvoysFavorCost(), hacan.getHighTradeConvoysPredictionBonus()));
+                new TradeConvoysTier(hacan.getHighTradeConvoysFavorCost(), hacan.getHighTradeConvoysPredictionBonus()),
+                new TradeConvoysTier(
+                        hacan.getVeryHighTradeConvoysFavorCost(), hacan.getVeryHighTradeConvoysPredictionBonus()),
+                new TradeConvoysTier(
+                        hacan.getMaximumTradeConvoysFavorCost(), hacan.getMaximumTradeConvoysPredictionBonus()));
     }
 
     private TradeConvoysTally winningTally(List<CombatReplayHacanTradeConvoysVoteEntity> votes) {
@@ -401,7 +489,7 @@ public class CombatReplayHacanTradeConvoysService {
                                                                 CombatReplayHacanTradeConvoysVoteEntity,
                                                                 TradeConvoysOption>
                                                         tally) -> tally.voteCount())
-                                .thenComparingInt(tally -> tally.option().bonusPercent())
+                                .thenComparingInt(tally -> tradeConvoysFavorTieRank(tally.option()))
                                 .thenComparing(tally -> tally.option().targetHouse() == null
                                         ? ""
                                         : tally.option().targetHouse().displayName()))
@@ -452,8 +540,12 @@ public class CombatReplayHacanTradeConvoysService {
     private String voteSummary(Long contestId) {
         List<CombatReplayHacanTradeConvoysVoteEntity> votes = tradeConvoysVoteRepository.findByContestId(contestId);
         if (votes.isEmpty()) return "No Hacan Trade Convoys votes recorded.";
-        return voteService.voteSummary(votes, this::optionLabel) + "\nVotes needed to resolve: `"
-                + voteService.minimumAbilityVotesToResolve() + "`";
+        return voteService.voteSummary(votes, this::optionLabel);
+    }
+
+    private int tradeConvoysFavorTieRank(TradeConvoysOption option) {
+        if (option.targetHouse() == null || option.bonusPercent() <= 0) return Integer.MIN_VALUE;
+        return -option.favorCost();
     }
 
     private String optionLabel(CombatReplayHacanTradeConvoysVoteEntity vote) {
@@ -483,6 +575,22 @@ public class CombatReplayHacanTradeConvoysService {
     private void sendTradeConvoysLockedMessage(CombatReplayHouse house, String message) {
         TextChannel channel = houseChannel(house);
         if (channel != null) MessageHelper.sendMessageToChannel(channel, message);
+    }
+
+    private void creditTradeConvoysFavorTransferIfScored(CombatReplayHacanTradeConvoysEntity tradeConvoys) {
+        if (tradeConvoys == null
+                || tradeConvoys.getContestId() == null
+                || tradeConvoys.getTargetHouse() == null
+                || safeInt(tradeConvoys.getFavorCost()) <= 0) {
+            return;
+        }
+        houseScoreRepository
+                .findByContestIdAndHouse(tradeConvoys.getContestId(), tradeConvoys.getTargetHouse())
+                .ifPresent(score -> {
+                    score.setFavorPoints(safeInt(score.getFavorPoints()) + safeInt(tradeConvoys.getFavorCost()));
+                    score.setScoredAt(LocalDateTime.now());
+                    houseScoreRepository.saveAndFlush(score);
+                });
     }
 
     String hacanLockedTradeConvoysMessage(CombatReplayHacanTradeConvoysEntity tradeConvoys) {
@@ -569,11 +677,27 @@ public class CombatReplayHacanTradeConvoysService {
                 + predictionBonus;
     }
 
+    private static String formatSendNowButtonId(
+            Long contestId, CombatReplayHouse targetHouse, int favorCost, int predictionBonus) {
+        return HACAN_TRADE_CONVOYS_SEND_NOW_PREFIX
+                + contestId
+                + DELIMITER
+                + targetHouse.name()
+                + DELIMITER
+                + favorCost
+                + DELIMITER
+                + predictionBonus;
+    }
+
     public static ParsedTradeConvoysButton parseButtonId(String buttonId) {
-        if (buttonId == null || !buttonId.startsWith(HACAN_TRADE_CONVOYS_PREFIX)) {
+        if (buttonId == null
+                || (!buttonId.startsWith(HACAN_TRADE_CONVOYS_PREFIX)
+                        && !buttonId.startsWith(HACAN_TRADE_CONVOYS_SEND_NOW_PREFIX))) {
             throw new IllegalArgumentException("Unknown Hacan Trade Convoys button id: " + buttonId);
         }
-        String encoded = buttonId.substring(HACAN_TRADE_CONVOYS_PREFIX.length());
+        String encoded = buttonId.startsWith(HACAN_TRADE_CONVOYS_SEND_NOW_PREFIX)
+                ? buttonId.substring(HACAN_TRADE_CONVOYS_SEND_NOW_PREFIX.length())
+                : buttonId.substring(HACAN_TRADE_CONVOYS_PREFIX.length());
         String[] parts = encoded.split(DELIMITER, 4);
         if (parts.length != 4)
             throw new IllegalArgumentException("Malformed Hacan Trade Convoys button id: " + buttonId);

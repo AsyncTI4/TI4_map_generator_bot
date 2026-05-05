@@ -116,6 +116,10 @@ public class CombatReplayPromotionService {
             return CombatReplayContestLifecycleService.ForcePromoteResult.rejected(
                     "Candidate uses the old replay snapshot format");
         }
+        if (expireIfDiscordantStars(candidate)) {
+            return CombatReplayContestLifecycleService.ForcePromoteResult.rejected(
+                    "Discordant Stars games are not eligible for promotion.");
+        }
 
         CombatReplayContestEntity existingContest =
                 replayContestRepository.findByCandidateId(candidateId).orElse(null);
@@ -169,6 +173,7 @@ public class CombatReplayPromotionService {
                     CombatCandidatePromotionStatus.PENDING,
                     now.minusHours(lookbackHours));
             candidates = candidates.stream()
+                    .filter(candidate -> !expireIfDiscordantStars(candidate))
                     .filter(this::usesCurrentReplaySnapshotFormat)
                     .toList();
             if (!candidates.isEmpty()) return candidates;
@@ -184,6 +189,8 @@ public class CombatReplayPromotionService {
 
     private CombatReplayContestEntity promoteCandidate(
             CombatCandidateEntity winner, CombatReplayContestEntity existingContest) {
+        if (expireIfDiscordantStars(winner)) return null;
+
         CombatObservationEntity observation =
                 observationRepository.findById(winner.getObservationId()).orElse(null);
         if (observation == null) return null;
@@ -288,6 +295,8 @@ public class CombatReplayPromotionService {
 
     private CombatReplayContestEntity postMentakPreview(CombatCandidateEntity candidate) {
         try {
+            if (expireIfDiscordantStars(candidate)) return null;
+
             CombatObservationEntity observation =
                     observationRepository.findById(candidate.getObservationId()).orElse(null);
             Game game = loadGame(candidate.getGameName());
@@ -303,7 +312,13 @@ public class CombatReplayPromotionService {
                     candidate,
                     discordPostService.getHouseRoleMention(CombatReplayHouse.MENTAK),
                     startSummaryText);
-            discordPostService.postPromotionMessage(channel, message, game, candidate);
+            Message posted = discordPostService.postPromotionMessage(channel, message, game, candidate);
+            ThreadChannel thread = discordPostService.createReplayThread(posted, candidate);
+            previewContest.setPublicChannelId(channel.getIdLong());
+            previewContest.setPublicMessageId(posted.getIdLong());
+            previewContest.setPublicThreadId(thread == null ? null : thread.getIdLong());
+            replayContestRepository.save(previewContest);
+            replayExecutionService.postPreviewContext(thread != null ? thread : channel, previewContest, candidate);
             mentakAbilityService.postDecoyButtons(channel, candidate);
             candidate.setMentakPreviewPostedAt(LocalDateTime.now(clock));
             candidateRepository.save(candidate);
@@ -353,6 +368,17 @@ public class CombatReplayPromotionService {
 
     private boolean usesCurrentReplaySnapshotFormat(CombatCandidateEntity candidate) {
         return candidate != null && CombatReplayTileRenderer.canRender(candidate.getInitialRenderSnapshotJson());
+    }
+
+    private boolean expireIfDiscordantStars(CombatCandidateEntity candidate) {
+        if (candidate == null || candidate.getPromotionStatus() != CombatCandidatePromotionStatus.PENDING) return false;
+        if (StringUtils.isBlank(candidate.getGameName())) return false;
+        Game game = loadGame(candidate.getGameName());
+        if (game == null || !game.isDiscordantStarsMode()) return false;
+        candidate.setPromotionStatus(CombatCandidatePromotionStatus.EXPIRED);
+        candidate.setCancellationReason("Ineligible for promotion because Discordant Stars games are excluded.");
+        candidateRepository.save(candidate);
+        return true;
     }
 
     private CombatCandidateEntity selectPromotionWinner(List<CombatCandidateEntity> candidates) {
@@ -425,6 +451,7 @@ public class CombatReplayPromotionService {
 
     private void lockPreviousContestTradeConvoys(CombatReplayContestEntity newContest) {
         if (newContest == null || newContest.getId() == null) return;
+        if (!isPostCombat(newContest)) return;
         CombatReplayContestEntity previousContest = replayContestRepository
                 .findFirstByIdLessThanOrderByIdDesc(newContest.getId())
                 .orElse(null);

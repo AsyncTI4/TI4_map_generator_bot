@@ -91,6 +91,8 @@ public class CombatReplayService {
     }
 
     public void onSpaceCombatStarted(Game game, Player attacker, Player defender, Tile tile) {
+        if (isDiscordantStarsGame(game)) return;
+
         boolean trackAllCombatsAsCandidates = settings.getRuntime().isTrackAllCombatsAsCandidates();
         if (!trackAllCombatsAsCandidates
                 && (!LazaxCombatSupport.isEligibleGame(game)
@@ -449,7 +451,6 @@ public class CombatReplayService {
                 roundsObserved));
         candidateRepository.save(candidate);
 
-        appendFalseColorsRevealedEvent(candidate, roundsObserved);
         appendTileRenderEvent(
                 candidate,
                 CombatCandidateEventType.RESOLVED,
@@ -484,7 +485,6 @@ public class CombatReplayService {
         }
         candidateRepository.save(candidate);
 
-        appendFalseColorsRevealedEvent(candidate, roundsObserved);
         appendTileRenderEvent(
                 candidate,
                 CombatCandidateEventType.RESOLVED,
@@ -506,14 +506,6 @@ public class CombatReplayService {
         candidateRepository.save(candidate);
 
         appendDiscordEvent(candidate, CombatCandidateEventType.CANCELLED, null, null, "## Contest Closed\n" + reason);
-    }
-
-    private void appendFalseColorsRevealedEvent(CombatCandidateEntity candidate, int roundsObserved) {
-        String message = CombatReplayDecoys.renderDisappearanceMessage(
-                CombatReplayDecoys.read(candidate.getReplayAbilitiesJson()));
-        if (message == null || message.isBlank()) return;
-
-        appendDiscordEvent(candidate, CombatCandidateEventType.RESOLVED, roundsObserved, null, message);
     }
 
     private boolean trackHitAssignments(
@@ -647,11 +639,10 @@ public class CombatReplayService {
         double roundScore = Math.sqrt(Math.max(0, roundsObserved)) * sizeFactor;
         double openingBalanceScore = 0.9 * Math.pow(strengthRatio, 3.0);
         double endingTensionScore = winnerRemainingHp <= 0 ? 0.0 : 5.0 * Math.exp(-6.0 * winnerSurvivalRatio);
-        double defenderWinBonus = winnerFaction.equalsIgnoreCase(candidate.getDefenderFaction()) ? 0.5 : 0.0;
-        return roundScore + openingBalanceScore + endingTensionScore + defenderWinBonus;
+        return roundScore + openingBalanceScore + endingTensionScore;
     }
 
-    private static double computeDrawPromotionScore(InitialCombatStats initialStats, int roundsObserved) {
+    public static double computeDrawPromotionScore(InitialCombatStats initialStats, int roundsObserved) {
         double weakerHp = Math.min(initialStats.attackerHp(), initialStats.defenderHp());
         double weakerStrength = Math.min(initialStats.attackerStrength(), initialStats.defenderStrength());
         double strongerStrength = Math.max(initialStats.attackerStrength(), initialStats.defenderStrength());
@@ -659,7 +650,7 @@ public class CombatReplayService {
         double strengthRatio = safeRatio(weakerStrength, strongerStrength);
         double roundScore = Math.sqrt(Math.max(0, roundsObserved)) * sizeFactor;
         double openingBalanceScore = 0.9 * Math.pow(strengthRatio, 3.0);
-        return roundScore + openingBalanceScore + 5.0;
+        return roundScore + openingBalanceScore;
     }
 
     public static InitialCombatStats initialCombatStats(CombatCandidateEntity candidate) {
@@ -839,12 +830,17 @@ public class CombatReplayService {
 
     private boolean isEligibleCandidate(
             Game game, Player attacker, Player defender, Tile tile, CombatReplaySelection.Evaluation evaluation) {
+        if (isDiscordantStarsGame(game)) return false;
         if (settings.getRuntime().isTrackAllCombatsAsCandidates()) {
             return getOpenCandidate(game, tile.getPosition()) == null;
         }
         return evaluation.eligible()
                 && !LazaxCombatSupport.hasExcludedFlagship(attacker, defender)
                 && getOpenCandidate(game, tile.getPosition()) == null;
+    }
+
+    private boolean isDiscordantStarsGame(Game game) {
+        return game != null && game.isDiscordantStarsMode();
     }
 
     private CombatReplaySelection selection() {

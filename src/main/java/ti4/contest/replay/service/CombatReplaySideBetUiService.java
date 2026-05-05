@@ -1,5 +1,6 @@
 package ti4.contest.replay.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -144,22 +145,38 @@ class CombatReplaySideBetUiService {
     private String renderSummaryMessage(Game game, CombatReplayContestEntity contest) {
         List<CombatContestSideBetEntity> sideBets = sideBetRepository.findByContestId(contest.getId());
         sideBets.sort(sideBetOrder());
+        boolean sideBetWindowClosed = sideBetWindowClosed(contest);
         StringBuilder message = new StringBuilder();
         if (sideBets.isEmpty()) {
             message.append("```text\n");
-            message.append(String.format("%-3s | %s%n", "Qty", "Bet"));
-            message.append("----+------------------------------\n");
-            message.append(" -  | Waiting for the first bet\n");
+            if (sideBetWindowClosed) {
+                message.append(String.format("%-3s | %s%n", "Qty", "Bet"));
+                message.append("----+------------------------------\n");
+                message.append(" -  | No side bets placed\n");
+            } else {
+                message.append("Bet\n");
+                message.append("------------------------------\n");
+                message.append("Waiting for the first bet\n");
+            }
             message.append("```");
             return message.toString();
         }
 
         Map<String, Long> countsByBet = summarizeBetCounts(sideBets, game);
         message.append("```text\n");
-        message.append(String.format("%-3s | %s%n", "Qty", "Bet"));
-        message.append("----+------------------------------\n");
-        for (Map.Entry<String, Long> entry : countsByBet.entrySet()) {
-            message.append(String.format("%-3s | %s%n", entry.getValue() + "x", entry.getKey()));
+        if (sideBetWindowClosed) {
+            message.append(String.format("%-3s | %s%n", "Qty", "Bet"));
+            message.append("----+------------------------------\n");
+            for (Map.Entry<String, Long> entry :
+                    sortBetCountsByQuantityDesc(countsByBet).entrySet()) {
+                message.append(String.format("%-3s | %s%n", entry.getValue() + "x", entry.getKey()));
+            }
+        } else {
+            message.append("Bet\n");
+            message.append("------------------------------\n");
+            for (String label : sortBetLabelsAlphabetically(countsByBet.keySet())) {
+                message.append(label).append("\n");
+            }
         }
         message.append("```");
         return message.toString();
@@ -203,7 +220,7 @@ class CombatReplaySideBetUiService {
             String label = formatFriendlyBetLabel(game, sideBet, true);
             countsByBet.merge(label, 1L, Long::sum);
         }
-        return sortBetCountsByQuantityDesc(countsByBet);
+        return countsByBet;
     }
 
     private Map<String, Long> summarizeUserBetCounts(List<CombatContestSideBetEntity> sideBets, Game game) {
@@ -225,6 +242,19 @@ class CombatReplaySideBetUiService {
             sorted.put(entry.getKey(), entry.getValue());
         }
         return sorted;
+    }
+
+    private List<String> sortBetLabelsAlphabetically(Iterable<String> labels) {
+        List<String> sorted = new ArrayList<>();
+        for (String label : labels) {
+            sorted.add(label);
+        }
+        sorted.sort(String.CASE_INSENSITIVE_ORDER.thenComparing(Comparator.naturalOrder()));
+        return sorted;
+    }
+
+    private boolean sideBetWindowClosed(CombatReplayContestEntity contest) {
+        return contest.getReplayStartAt() != null && !LocalDateTime.now().isBefore(contest.getReplayStartAt());
     }
 
     private String formatFriendlyBetLabel(Game game, CombatContestSideBetEntity sideBet, boolean useShortFactionId) {

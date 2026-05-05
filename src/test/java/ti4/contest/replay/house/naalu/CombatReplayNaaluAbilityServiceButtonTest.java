@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import org.junit.jupiter.api.Test;
 import ti4.contest.replay.core.CombatContestSettings;
@@ -45,5 +46,19 @@ class CombatReplayNaaluAbilityServiceButtonTest {
 
         assertFalse(affordable.isDisabled());
         assertTrue(unaffordable.isDisabled());
+    }
+
+    @Test
+    void normalWindowHidesActionCardsButKeepsRollOptions() {
+        when(houseFavorService.canAfford(CombatReplayHouse.NAALU, 20)).thenReturn(true);
+        when(houseFavorService.canAfford(CombatReplayHouse.NAALU, 40)).thenReturn(true);
+
+        List<String> labels =
+                service.peekButtons(1L).stream().map(Button::getLabel).toList();
+
+        assertTrue(labels.stream().anyMatch(label -> label.contains("Vote: Omens")));
+        assertTrue(labels.stream().anyMatch(label -> label.contains("Round 1 Rolls")));
+        assertTrue(labels.stream().anyMatch(label -> label.contains("Vote: Do Not Use")));
+        assertFalse(labels.stream().anyMatch(label -> label.contains("Action Cards")));
     }
 }
