@@ -135,3 +135,7 @@ if [ "$active_container_count" -ne 1 ]; then
 fi
 
 echo "Rollout complete. Active $service container: $new_container_id"
+profiler_mapping="$(docker port "$new_container_id" 8849/tcp 2>/dev/null || true)"
+if [ -n "$profiler_mapping" ]; then
+  echo "async-profiler is reachable via $profiler_mapping"
+fi

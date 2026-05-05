@@ -26,8 +26,8 @@ services:
       - ${HOST_TI4_SAVES_DIR}/profiles:/opt/profiles
       - ${HOST_TI4_REPO_DIR}/src/main/resources:/opt/resources:ro
     ports:
-      # async-profiler socket — bound to loopback only; reach via SSH tunnel
-      - "127.0.0.1:8849:8849"
+      # async-profiler socket — use an ephemeral loopback port so rollout candidates can run in parallel
+      - "127.0.0.1::8849"
     environment:
       AWS_ACCESS_KEY_ID: ${AWS_KEY}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET}

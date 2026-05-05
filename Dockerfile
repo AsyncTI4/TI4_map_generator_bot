@@ -17,11 +17,13 @@ RUN --mount=type=cache,target=/root/.m2 \
     mvn -B -ntp -Dspotless.skip=true -Dmaven.test.skip=true clean package
 
 # ---- Runtime stage ----
-FROM amazoncorretto:26-alpine3.23
+FROM eclipse-temurin:26-jre
 WORKDIR /app
 
-# needed to handle fonts; libc6-compat provides glibc shims required by async-profiler
-RUN apk add --no-cache fontconfig ttf-dejavu libc6-compat
+# needed to handle fonts; async-profiler also needs a glibc-based runtime
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends fontconfig fonts-dejavu-core wget \
+    && rm -rf /var/lib/apt/lists/*
 
 # async-profiler: enables remote CPU/allocation profiling via IntelliJ Profiler
 ARG ASYNC_PROFILER_VERSION=4.4
