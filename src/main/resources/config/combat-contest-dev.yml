@@ -69,8 +69,12 @@ houseAbilities:
     subsidyFavorOnHit: 20
     marketMakerPointsPerBet: 1
     lowTradeConvoysFavorCost: 10
-    lowTradeConvoysPredictionBonus: 5
+    lowTradeConvoysPredictionBonus: 10
     mediumTradeConvoysFavorCost: 20
-    mediumTradeConvoysPredictionBonus: 10
+    mediumTradeConvoysPredictionBonus: 16
     highTradeConvoysFavorCost: 30
-    highTradeConvoysPredictionBonus: 15
+    highTradeConvoysPredictionBonus: 22
+    veryHighTradeConvoysFavorCost: 40
+    veryHighTradeConvoysPredictionBonus: 29
+    maximumTradeConvoysFavorCost: 50
+    maximumTradeConvoysPredictionBonus: 36

@@ -222,11 +222,6 @@ public class CombatReplayHacanTradeConvoysService {
 
         List<CombatReplayHacanTradeConvoysVoteEntity> votes =
                 tradeConvoysVoteRepository.findByContestId(contest.getId());
-        if (!voteService.meetsMinimumVoterThreshold(votes, CombatReplayHacanTradeConvoysVoteEntity::getDiscordUserId)) {
-            return lockNoTradeConvoys(
-                    contest,
-                    voteService.distinctVoterCount(votes, CombatReplayHacanTradeConvoysVoteEntity::getDiscordUserId));
-        }
 
         TradeConvoysTally winning = winningTally(votes);
         if (winning == null || winning.targetHouse() == null || winning.bonusPercent() <= 0) {
@@ -385,7 +380,11 @@ public class CombatReplayHacanTradeConvoysService {
                 new TradeConvoysTier(hacan.getLowTradeConvoysFavorCost(), hacan.getLowTradeConvoysPredictionBonus()),
                 new TradeConvoysTier(
                         hacan.getMediumTradeConvoysFavorCost(), hacan.getMediumTradeConvoysPredictionBonus()),
-                new TradeConvoysTier(hacan.getHighTradeConvoysFavorCost(), hacan.getHighTradeConvoysPredictionBonus()));
+                new TradeConvoysTier(hacan.getHighTradeConvoysFavorCost(), hacan.getHighTradeConvoysPredictionBonus()),
+                new TradeConvoysTier(
+                        hacan.getVeryHighTradeConvoysFavorCost(), hacan.getVeryHighTradeConvoysPredictionBonus()),
+                new TradeConvoysTier(
+                        hacan.getMaximumTradeConvoysFavorCost(), hacan.getMaximumTradeConvoysPredictionBonus()));
     }
 
     private TradeConvoysTally winningTally(List<CombatReplayHacanTradeConvoysVoteEntity> votes) {
@@ -401,7 +400,7 @@ public class CombatReplayHacanTradeConvoysService {
                                                                 CombatReplayHacanTradeConvoysVoteEntity,
                                                                 TradeConvoysOption>
                                                         tally) -> tally.voteCount())
-                                .thenComparingInt(tally -> tally.option().bonusPercent())
+                                .thenComparingInt(tally -> tradeConvoysFavorTieRank(tally.option()))
                                 .thenComparing(tally -> tally.option().targetHouse() == null
                                         ? ""
                                         : tally.option().targetHouse().displayName()))
@@ -452,8 +451,12 @@ public class CombatReplayHacanTradeConvoysService {
     private String voteSummary(Long contestId) {
         List<CombatReplayHacanTradeConvoysVoteEntity> votes = tradeConvoysVoteRepository.findByContestId(contestId);
         if (votes.isEmpty()) return "No Hacan Trade Convoys votes recorded.";
-        return voteService.voteSummary(votes, this::optionLabel) + "\nVotes needed to resolve: `"
-                + voteService.minimumAbilityVotesToResolve() + "`";
+        return voteService.voteSummary(votes, this::optionLabel);
+    }
+
+    private int tradeConvoysFavorTieRank(TradeConvoysOption option) {
+        if (option.targetHouse() == null || option.bonusPercent() <= 0) return Integer.MIN_VALUE;
+        return -option.favorCost();
     }
 
     private String optionLabel(CombatReplayHacanTradeConvoysVoteEntity vote) {
