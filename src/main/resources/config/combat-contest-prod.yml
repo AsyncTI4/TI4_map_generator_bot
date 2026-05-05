@@ -52,6 +52,7 @@ houseAbilities:
   naalu:
     actionCardPeekFavorCost: 20
     roundOneRollPeekFavorCost: 40
+    luckOmensFavorCost: 20
   mentak:
     previewLeadSeconds: 900
     destroyerDecoyFavorCost: 20
@@ -63,8 +64,8 @@ houseAbilities:
     subsidyFavorOnHit: 10
     marketMakerPointsPerBet: 1
     lowTradeConvoysFavorCost: 10
-    lowTradeConvoysPredictionBonus: 5
+    lowTradeConvoysPredictionBonus: 10
     mediumTradeConvoysFavorCost: 20
-    mediumTradeConvoysPredictionBonus: 10
+    mediumTradeConvoysPredictionBonus: 15
     highTradeConvoysFavorCost: 30
-    highTradeConvoysPredictionBonus: 15
+    highTradeConvoysPredictionBonus: 20

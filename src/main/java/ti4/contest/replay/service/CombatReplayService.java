@@ -449,7 +449,6 @@ public class CombatReplayService {
                 roundsObserved));
         candidateRepository.save(candidate);
 
-        appendFalseColorsRevealedEvent(candidate, roundsObserved);
         appendTileRenderEvent(
                 candidate,
                 CombatCandidateEventType.RESOLVED,
@@ -484,7 +483,6 @@ public class CombatReplayService {
         }
         candidateRepository.save(candidate);
 
-        appendFalseColorsRevealedEvent(candidate, roundsObserved);
         appendTileRenderEvent(
                 candidate,
                 CombatCandidateEventType.RESOLVED,
@@ -506,14 +504,6 @@ public class CombatReplayService {
         candidateRepository.save(candidate);
 
         appendDiscordEvent(candidate, CombatCandidateEventType.CANCELLED, null, null, "## Contest Closed\n" + reason);
-    }
-
-    private void appendFalseColorsRevealedEvent(CombatCandidateEntity candidate, int roundsObserved) {
-        String message = CombatReplayDecoys.renderDisappearanceMessage(
-                CombatReplayDecoys.read(candidate.getReplayAbilitiesJson()));
-        if (message == null || message.isBlank()) return;
-
-        appendDiscordEvent(candidate, CombatCandidateEventType.RESOLVED, roundsObserved, null, message);
     }
 
     private boolean trackHitAssignments(
