@@ -7,6 +7,7 @@ rollout_timeout_seconds="${ROLLOUT_TIMEOUT_SECONDS:-540}"
 wait_after_healthy_seconds="${WAIT_AFTER_HEALTHY_SECONDS:-2}"
 stop_timeout_seconds="${STOP_TIMEOUT_SECONDS:-600}"
 log_tail_lines="${ROLLBACK_LOG_TAIL_LINES:-200}"
+profiler_agent_path="${JPROFILER_AGENT_PATH:-/opt/jprofiler/bin/linux-x64/libjprofilerti.so}"
 
 old_ids_file="$(mktemp)"
 new_ids_file="$(mktemp)"
@@ -136,7 +137,7 @@ fi
 
 echo "Rollout complete. Active $service container: $new_container_id"
 profiler_mapping="$(docker port "$new_container_id" 8849/tcp 2>/dev/null || true)"
-if docker exec "$new_container_id" test -f /opt/jprofiler/bin/linux-x64/libjprofilerti.so >/dev/null 2>&1 \
+if docker exec "$new_container_id" test -f "$profiler_agent_path" >/dev/null 2>&1 \
   && [ -n "$profiler_mapping" ]; then
   echo "JProfiler is reachable via $profiler_mapping"
 fi
