@@ -22,6 +22,8 @@ public interface CombatReplayContestRepository extends JpaRepository<CombatRepla
 
     boolean existsByIdGreaterThan(Long id);
 
+    boolean existsByIdGreaterThanAndReplayCompletedAtIsNotNull(Long id);
+
     List<CombatReplayContestEntity> findByReplayStatusInAndNextReplayAtLessThanEqualOrderByNextReplayAtAsc(
             Collection<CombatContestReplayStatus> replayStatuses, LocalDateTime nextReplayAt);
 

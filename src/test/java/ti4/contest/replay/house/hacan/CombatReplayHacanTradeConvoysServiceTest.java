@@ -10,6 +10,8 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import ti4.contest.replay.core.CombatContestSettings;
@@ -30,12 +32,14 @@ import ti4.contest.replay.service.CombatReplayHouseAbilityVoteService;
 import ti4.contest.replay.service.CombatReplayHouseFavorService;
 import ti4.contest.replay.service.CombatReplayHousePhaseService;
 import ti4.contest.replay.service.CombatReplayHouseService;
+import ti4.contest.replay.service.CombatReplayInteractionResult;
 
 class CombatReplayHacanTradeConvoysServiceTest {
 
     private final CombatReplayHacanTradeConvoysRepository tradeConvoysRepository =
             mock(CombatReplayHacanTradeConvoysRepository.class);
     private final CombatReplayContestRepository contestRepository = mock(CombatReplayContestRepository.class);
+    private final CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
     private final CombatReplayHouseScoreRepository houseScoreRepository = mock(CombatReplayHouseScoreRepository.class);
     private final CombatReplayHouseFavorService houseFavorService = mock(CombatReplayHouseFavorService.class);
     private final CombatReplayHouseAbilityUseRepository abilityUseRepository =
@@ -54,7 +58,7 @@ class CombatReplayHacanTradeConvoysServiceTest {
             new CombatReplayHousePhaseService(settings, contestRepository),
             voteService,
             houseFavorService,
-            mock(CombatCandidateRepository.class),
+            candidateRepository,
             contestRepository,
             abilityUseRepository,
             tradeConvoysRepository,
@@ -82,14 +86,15 @@ class CombatReplayHacanTradeConvoysServiceTest {
     }
 
     @Test
-    void tradeConvoysVotingOnlyOpensAfterCombatAndBeforeNextContest() {
+    void tradeConvoysVotingOnlyClosesAfterLaterCombatCompletes() {
         CombatCandidateEntity candidate = new CombatCandidateEntity();
         candidate.setId(7L);
         CombatReplayContestEntity contest = new CombatReplayContestEntity();
         contest.setId(3L);
         contest.setCandidateId(candidate.getId());
         when(tradeConvoysRepository.findByContestId(contest.getId())).thenReturn(Optional.empty());
-        when(contestRepository.existsByIdGreaterThan(contest.getId())).thenReturn(false);
+        when(contestRepository.existsByIdGreaterThanAndReplayCompletedAtIsNotNull(contest.getId()))
+                .thenReturn(false);
 
         assertFalse(service.shouldOfferVoting(contest, candidate));
 
@@ -97,7 +102,8 @@ class CombatReplayHacanTradeConvoysServiceTest {
 
         assertTrue(service.shouldOfferVoting(contest, candidate));
 
-        when(contestRepository.existsByIdGreaterThan(contest.getId())).thenReturn(true);
+        when(contestRepository.existsByIdGreaterThanAndReplayCompletedAtIsNotNull(contest.getId()))
+                .thenReturn(true);
 
         assertFalse(service.shouldOfferVoting(contest, candidate));
     }
@@ -140,6 +146,31 @@ class CombatReplayHacanTradeConvoysServiceTest {
     }
 
     @Test
+    void openingNewPostCombatWindowLocksPreviousTradeConvoys() {
+        CombatReplayContestEntity previousContest = contest(3L, 7L);
+        previousContest.setReplayCompletedAt(LocalDateTime.now().minusMinutes(10));
+        CombatReplayContestEntity currentContest = contest(4L, 8L);
+        currentContest.setReplayCompletedAt(LocalDateTime.now());
+        CombatCandidateEntity currentCandidate = candidate(8L);
+
+        when(contestRepository.findFirstByIdLessThanOrderByIdDesc(currentContest.getId()))
+                .thenReturn(Optional.of(previousContest));
+        when(candidateRepository.findById(previousContest.getCandidateId())).thenReturn(Optional.of(candidate(7L)));
+        when(tradeConvoysRepository.findByContestId(previousContest.getId())).thenReturn(Optional.empty());
+        when(tradeConvoysVoteRepository.findByContestId(previousContest.getId()))
+                .thenReturn(List.of(vote(CombatReplayHouse.NAALU, 10, 10, "user-1")));
+        when(houseFavorService.canAfford(CombatReplayHouse.HACAN, 10)).thenReturn(true);
+
+        service.postPostCombatTradeConvoysButtonsIfNeeded(currentContest, currentCandidate);
+
+        ArgumentCaptor<CombatReplayHacanTradeConvoysEntity> savedTradeConvoys =
+                ArgumentCaptor.forClass(CombatReplayHacanTradeConvoysEntity.class);
+        verify(tradeConvoysRepository).save(savedTradeConvoys.capture());
+        assertEquals(previousContest.getId(), savedTradeConvoys.getValue().getContestId());
+        assertEquals(CombatReplayHouse.NAALU, savedTradeConvoys.getValue().getTargetHouse());
+    }
+
+    @Test
     void tradeConvoysTieBetweenFavorOptionsLocksLowerFavorValue() {
         CombatReplayContestEntity contest = contest(3L, 7L);
         CombatCandidateEntity candidate = candidate(7L);
@@ -171,6 +202,54 @@ class CombatReplayHacanTradeConvoysServiceTest {
         assertFalse(targetMessage.contains("15%"));
         assertFalse(targetMessage.contains("earned points"));
         assertFalse(targetMessage.contains("will gain"));
+    }
+
+    @Test
+    void sendNowImmediatelyLocksAndCreditsFavorInDevMode() {
+        settings.getRuntime().setDevMode(true);
+        CombatReplayContestEntity contest = contest(3L, 7L);
+        contest.setReplayCompletedAt(LocalDateTime.now());
+        CombatCandidateEntity candidate = candidate(7L);
+        ButtonInteractionEvent event = mock(ButtonInteractionEvent.class);
+        User user = mock(User.class);
+        CombatReplayHouseScoreEntity targetScore = score(contest.getId());
+        targetScore.setHouse(CombatReplayHouse.NAALU);
+        targetScore.setFavorPoints(5);
+
+        when(event.getUser()).thenReturn(user);
+        when(user.getId()).thenReturn("user-1");
+        when(user.getEffectiveName()).thenReturn("User 1");
+        when(contestRepository.findById(contest.getId())).thenReturn(Optional.of(contest));
+        when(contestRepository.existsByIdGreaterThanAndReplayCompletedAtIsNotNull(contest.getId()))
+                .thenReturn(false);
+        when(candidateRepository.findById(candidate.getId())).thenReturn(Optional.of(candidate));
+        when(tradeConvoysRepository.findByContestId(contest.getId())).thenReturn(Optional.empty());
+        when(houseFavorService.canAfford(CombatReplayHouse.HACAN, 10)).thenReturn(true);
+        when(houseScoreRepository.findByContestIdAndHouse(contest.getId(), CombatReplayHouse.NAALU))
+                .thenReturn(Optional.of(targetScore));
+
+        CombatReplayInteractionResult result = service.sendTradeConvoysNow(
+                event,
+                new CombatReplayHacanTradeConvoysService.ParsedTradeConvoysButton(
+                        contest.getId(), CombatReplayHouse.NAALU, 10, 10));
+
+        assertTrue(result.accepted());
+        assertEquals(15, targetScore.getFavorPoints());
+        verify(tradeConvoysRepository)
+                .save(org.mockito.ArgumentMatchers.any(CombatReplayHacanTradeConvoysEntity.class));
+        verify(houseScoreRepository).saveAndFlush(targetScore);
+    }
+
+    @Test
+    void tradeConvoysParserAcceptsSendNowButtons() {
+        CombatReplayHacanTradeConvoysService.ParsedTradeConvoysButton parsed =
+                CombatReplayHacanTradeConvoysService.parseButtonId(
+                        CombatReplayHacanTradeConvoysService.HACAN_TRADE_CONVOYS_SEND_NOW_PREFIX + "3~NAALU~10~10");
+
+        assertEquals(3L, parsed.contestId());
+        assertEquals(CombatReplayHouse.NAALU, parsed.targetHouse());
+        assertEquals(10, parsed.favorCost());
+        assertEquals(10, parsed.bonusPercent());
     }
 
     private CombatReplayHacanTradeConvoysEntity convoy(

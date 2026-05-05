@@ -17,7 +17,6 @@ import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.core.CombatRollPayload;
-import ti4.contest.replay.core.renderers.CombatRollPayloadRenderer;
 import ti4.contest.replay.dispatch.ReplayDispatchPayload;
 import ti4.contest.replay.dispatch.ReplayDispatchSerializer;
 import ti4.contest.replay.entities.CombatCandidateEntity;
@@ -246,7 +245,7 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
             if (!isCombatRoundRoll(combatRoll.payload())) continue;
 
             CombatRollPayload payloadWithDecoys = CombatReplayDecoys.applyToRoll(combatRoll.payload(), abilities);
-            String rendered = CombatRollPayloadRenderer.render(payloadWithDecoys);
+            String rendered = renderRoundOneRollSummary(payloadWithDecoys);
             if (StringUtils.isBlank(rendered)) continue;
             rolls.add("### " + actor(game, event.getActorFaction()) + "\n" + rendered.strip());
         }
@@ -255,6 +254,12 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
             return "## Gift of Foresight: Round 1 Rolls\nNo first-round combat rolls have surfaced yet.";
         }
         return "## Gift of Foresight: Round 1 Rolls\n" + String.join("\n\n", rolls);
+    }
+
+    private String renderRoundOneRollSummary(CombatRollPayload payload) {
+        if (payload == null || payload.total() == null) return "";
+        int totalHits = payload.total().displayedTotalHits();
+        return "**Total hits " + totalHits + "** " + ":boom:".repeat(Math.max(0, totalHits));
     }
 
     public String renderLuckOmens(long contestId) {

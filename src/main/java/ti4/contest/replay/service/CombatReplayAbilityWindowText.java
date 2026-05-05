@@ -13,6 +13,10 @@ public class CombatReplayAbilityWindowText {
         return "-# Votes lock when the next contest is posted.";
     }
 
+    public String votesLockWhenNextCombatEndsLine() {
+        return "-# Votes lock when the next combat ends.";
+    }
+
     private String formatDuration(int seconds) {
         if (seconds <= 0) return "0 minutes";
         if (seconds < 60) return seconds + " " + (seconds == 1 ? "second" : "seconds");

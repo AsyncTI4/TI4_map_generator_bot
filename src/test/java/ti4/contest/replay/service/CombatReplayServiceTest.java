@@ -86,6 +86,15 @@ class CombatReplayServiceTest {
     }
 
     @Test
+    void drawPromotionScoreHasNoFlatBonus() {
+        CombatReplayService.InitialCombatStats initialStats = initialStats(10, 10, 8, 8);
+
+        double score = CombatReplayService.computeDrawPromotionScore(initialStats, 4);
+
+        assertEquals(2.9, score, 0.0001);
+    }
+
+    @Test
     void promotionScoreUsesInitialSnapshotStatsInsteadOfObservationStats() {
         CombatCandidateEntity candidate = candidate("letnev", "hacan");
         CombatReplayService.InitialCombatStats staleObservationStats = initialStats(13.0, 11.5, 11.0, 7.0);
