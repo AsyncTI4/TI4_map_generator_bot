@@ -2942,12 +2942,14 @@ public final class ButtonHelperActionCards {
         String twinningTarget = buttonID.replace("resolveTwin_", "");
         String acStringID = findTwinningTargetActionCardId(game, twinningTarget);
         if (acStringID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such action card ID found, please retry.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Could not resolve the Twinning target, please retry.");
             return;
         }
         Integer discardIdentifier = game.getDiscardActionCards().get(acStringID);
         if (discardIdentifier == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such action card ID found, please retry.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "The twinned action card is no longer in the discard area, please retry.");
             return;
         }
         boolean purged = game.getDiscardACStatus().get(acStringID) == ActionCardHelper.ACStatus.purged;
@@ -2955,7 +2957,8 @@ public final class ButtonHelperActionCards {
                 ? game.pickActionCardFromPurged(player.getUserID(), discardIdentifier)
                 : game.pickActionCard(player.getUserID(), discardIdentifier);
         if (!picked) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such action card ID found, please retry.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Unable to retrieve the twinned action card, please retry.");
             return;
         }
         ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel());
