@@ -312,7 +312,13 @@ public class CombatReplayPromotionService {
                     candidate,
                     discordPostService.getHouseRoleMention(CombatReplayHouse.MENTAK),
                     startSummaryText);
-            discordPostService.postPromotionMessage(channel, message, game, candidate);
+            Message posted = discordPostService.postPromotionMessage(channel, message, game, candidate);
+            ThreadChannel thread = discordPostService.createReplayThread(posted, candidate);
+            previewContest.setPublicChannelId(channel.getIdLong());
+            previewContest.setPublicMessageId(posted.getIdLong());
+            previewContest.setPublicThreadId(thread == null ? null : thread.getIdLong());
+            replayContestRepository.save(previewContest);
+            replayExecutionService.postPreviewContext(thread != null ? thread : channel, previewContest, candidate);
             mentakAbilityService.postDecoyButtons(channel, candidate);
             candidate.setMentakPreviewPostedAt(LocalDateTime.now(clock));
             candidateRepository.save(candidate);
@@ -366,6 +372,7 @@ public class CombatReplayPromotionService {
 
     private boolean expireIfDiscordantStars(CombatCandidateEntity candidate) {
         if (candidate == null || candidate.getPromotionStatus() != CombatCandidatePromotionStatus.PENDING) return false;
+        if (StringUtils.isBlank(candidate.getGameName())) return false;
         Game game = loadGame(candidate.getGameName());
         if (game == null || !game.isDiscordantStarsMode()) return false;
         candidate.setPromotionStatus(CombatCandidatePromotionStatus.EXPIRED);

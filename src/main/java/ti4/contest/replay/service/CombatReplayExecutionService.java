@@ -87,6 +87,15 @@ public class CombatReplayExecutionService {
         }
     }
 
+    public void postPreviewContext(
+            MessageChannel replayChannel, CombatReplayContestEntity contest, CombatCandidateEntity winner) {
+        try {
+            announcePreReplayContextIfNeeded(replayChannel, contest, winner);
+        } catch (Exception e) {
+            BotLogger.error("Failed to post replay context for preview.", e);
+        }
+    }
+
     private void postSideBetMarketsIfDue() {
         if (!settings.isHousesEnabled()) return;
         if (!settings.getSideBets().isEnableSideBets()) return;
