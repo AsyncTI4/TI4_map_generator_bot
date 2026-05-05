@@ -22,7 +22,7 @@ services:
       - ${HOST_TI4_JPROFILER_DIR}:/opt/jprofiler:ro
       - ${HOST_TI4_REPO_DIR}/src/main/resources:/opt/resources:ro
     ports:
-      # JProfiler agent port — use an ephemeral loopback port so rollout candidates can run in parallel
+      # JProfiler agent port — Docker assigns a random loopback host port here so two rollout candidates can both expose container port 8849
       - "127.0.0.1::8849"
     environment:
       AWS_ACCESS_KEY_ID: ${AWS_KEY}
