@@ -288,7 +288,7 @@ public class LazaxSeasonService {
                         "Market Compact and Hacan Trade Convoys",
                         """
                         **Market Compact**
-                        Mark up to 2 side bets during discussion. Hacan gains `+1 point` for each non-Hacan player who takes this side bet. If a marked side bet hits, the Hacan also gain `+10 Favor`.
+                        Mark up to 2 side bets during discussion. Hacan gains `+1 point` for each non-Hacan player who takes this side bet. If a marked side bet hits, the Hacan also gain `+20 Favor`.
 
                         **Hacan Trade Convoys**
                         At the end of a combat, send `10`, `20`, or `30` favor to one of the other delegations. If you do so, get `5/10/15%` of their earned points in the next combat as a bonus.
