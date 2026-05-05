@@ -72,7 +72,7 @@ class CombatReplayNaaluAbilityServiceTest {
         candidate.setReplayAbilitiesJson(JsonMapperManager.basic()
                 .writeValueAsString(new CombatReplayDecoys.Abilities(
                         new CombatReplayDecoys.Decoy(List.of(new CombatReplayDecoys.DecoyUnit(
-                                "naalu", ":naalu:", "blu", UnitType.Destroyer, Constants.SPACE, 1))))));
+                                "naalu", ":naalu:", "blue", UnitType.Destroyer, Constants.SPACE, 1))))));
         CombatReplayContestEntity contest = contest(candidate);
         CombatCandidateEventEntity event =
                 event(CombatCandidateEventType.ROLL, 1, "naalu", ReplayDispatchPayload.combatRoll("", rollPayload()));
@@ -84,6 +84,56 @@ class CombatReplayNaaluAbilityServiceTest {
         String peek = service.renderRoundOneRollPeek(1L);
 
         assertTrue(peek.contains("`2x`"));
+    }
+
+    @Test
+    void luckOmensBucketAllRollsWithoutExposingExpectedValues() {
+        CombatCandidateEntity candidate = candidate();
+        CombatReplayContestEntity contest = contest(candidate);
+        CombatCandidateEventEntity attackerRoll = event(
+                CombatCandidateEventType.ROLL,
+                1,
+                "naalu",
+                ReplayDispatchPayload.combatRoll("", luckPayload("naalu", true, true, true, true, true)));
+        CombatCandidateEventEntity defenderRoll = event(
+                CombatCandidateEventType.ROLL,
+                1,
+                "hacan",
+                ReplayDispatchPayload.combatRoll(
+                        "",
+                        luckPayload("hacan", false, false, false, false, false, false, false, false, false, false)));
+        when(contestRepository.findById(1L)).thenReturn(Optional.of(contest));
+        when(candidateRepository.findById(candidate.getId())).thenReturn(Optional.of(candidate));
+        when(eventRepository.findByCandidateIdOrderBySequenceNumberAsc(candidate.getId()))
+                .thenReturn(List.of(attackerRoll, defenderRoll));
+
+        String omens = service.renderLuckOmens(1L);
+
+        assertTrue(omens.contains("Overall: **Lucky**"));
+        assertTrue(omens.contains("naalu: **Lucky**"));
+        assertTrue(omens.contains("hacan: **Unlucky**"));
+        assertFalse(omens.contains("Expected"));
+        assertFalse(omens.contains("EV"));
+    }
+
+    @Test
+    void luckOmensUsesAverageBand() {
+        CombatCandidateEntity candidate = candidate();
+        CombatReplayContestEntity contest = contest(candidate);
+        CombatCandidateEventEntity event = event(
+                CombatCandidateEventType.ROLL,
+                1,
+                "naalu",
+                ReplayDispatchPayload.combatRoll("", luckPayload("naalu", true, false, false, false, false)));
+        when(contestRepository.findById(1L)).thenReturn(Optional.of(contest));
+        when(candidateRepository.findById(candidate.getId())).thenReturn(Optional.of(candidate));
+        when(eventRepository.findByCandidateIdOrderBySequenceNumberAsc(candidate.getId()))
+                .thenReturn(List.of(event));
+
+        String omens = service.renderLuckOmens(1L);
+
+        assertTrue(omens.contains("Overall: **Average**"));
+        assertTrue(omens.contains("naalu: **Average**"));
     }
 
     @Test
@@ -165,5 +215,49 @@ class CombatReplayNaaluAbilityServiceTest {
                         List.of(new CombatRollPayload.DieRoll(4, 9, false, CombatRollPayload.DieRollSource.PRIMARY)),
                         0)),
                 new CombatRollPayload.RollTotal(1, 0, 1, 1));
+    }
+
+    private CombatRollPayload luckPayload(String actorFaction, boolean... successes) {
+        List<CombatRollPayload.DieRoll> dice = new java.util.ArrayList<>();
+        for (boolean success : successes) {
+            dice.add(new CombatRollPayload.DieRoll(
+                    success ? 9 : 4, 9, success, CombatRollPayload.DieRollSource.PRIMARY));
+        }
+        return new CombatRollPayload(
+                new CombatRollPayload.RollHeader(
+                        actorFaction,
+                        "blue",
+                        ":" + actorFaction + ":",
+                        "opponent",
+                        "red",
+                        "101",
+                        "18",
+                        Constants.SPACE,
+                        "space combat",
+                        CombatRollType.combatround,
+                        1,
+                        false,
+                        false),
+                List.of(),
+                List.of(),
+                List.of(new CombatRollPayload.UnitRoll(
+                        "destroyer",
+                        "dd",
+                        "destroyer",
+                        "Destroyer",
+                        "Destroyer",
+                        ":destroyer:",
+                        1,
+                        successes.length,
+                        0,
+                        9,
+                        0,
+                        9,
+                        CombatRollPayload.RollSegmentType.PRIMARY,
+                        dice,
+                        (int) dice.stream()
+                                .filter(CombatRollPayload.DieRoll::success)
+                                .count())),
+                new CombatRollPayload.RollTotal(successes.length, 0, successes.length, successes.length));
     }
 }

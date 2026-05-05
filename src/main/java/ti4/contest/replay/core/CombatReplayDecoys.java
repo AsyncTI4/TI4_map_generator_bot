@@ -184,7 +184,7 @@ public class CombatReplayDecoys {
 
         String vanished = renderVanishedUnits(abilities.decoy().units());
         return "## False Colors Revealed\n"
-                + "As the battle ends, "
+                + "As the replay begins, "
                 + vanished
                 + " drop their false colors and vanish from the formation. No wreckage remains.";
     }

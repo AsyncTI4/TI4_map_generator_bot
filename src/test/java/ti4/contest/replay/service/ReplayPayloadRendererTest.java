@@ -45,7 +45,7 @@ class ReplayPayloadRendererTest {
     }
 
     @Test
-    void nonResolvedTileRenderKeepsReplayDecoys() {
+    void nonResolvedTileRenderSkipsReplayDecoysAfterReplayStarts() {
         CombatCandidateEventEntity event = event(
                 CombatCandidateEventType.HIT_ASSIGN,
                 ReplayDispatchPayload.tileRenderMessage("000", "{}", "## Combat Update"));
@@ -53,7 +53,7 @@ class ReplayPayloadRendererTest {
         ReplayPayloadRenderer.RenderedReplayEvent rendered = renderer.render(null, new CombatCandidateEntity(), event);
 
         ReplayPayloadRenderer.TileRenderResult tileRender = (ReplayPayloadRenderer.TileRenderResult) rendered;
-        assertTrue(tileRender.applyReplayDecoys());
+        assertFalse(tileRender.applyReplayDecoys());
     }
 
     private CombatCandidateEventEntity event(CombatCandidateEventType eventType, ReplayDispatchPayload payload) {
