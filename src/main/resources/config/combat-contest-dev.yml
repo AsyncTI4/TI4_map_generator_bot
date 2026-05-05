@@ -72,12 +72,12 @@ houseAbilities:
     baseCombatFavorGain: 20
     marketMakerPointsPerBet: 2
     lowTradeConvoysFavorCost: 10
-    lowTradeConvoysPredictionBonus: 10
+    lowTradeConvoysPredictionBonus: 9
     mediumTradeConvoysFavorCost: 20
-    mediumTradeConvoysPredictionBonus: 16
+    mediumTradeConvoysPredictionBonus: 14
     highTradeConvoysFavorCost: 30
-    highTradeConvoysPredictionBonus: 22
+    highTradeConvoysPredictionBonus: 19
     veryHighTradeConvoysFavorCost: 40
-    veryHighTradeConvoysPredictionBonus: 29
+    veryHighTradeConvoysPredictionBonus: 25
     maximumTradeConvoysFavorCost: 50
-    maximumTradeConvoysPredictionBonus: 36
+    maximumTradeConvoysPredictionBonus: 31
