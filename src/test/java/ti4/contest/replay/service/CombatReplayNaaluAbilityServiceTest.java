@@ -67,7 +67,7 @@ class CombatReplayNaaluAbilityServiceTest {
     }
 
     @Test
-    void roundOneRollPeekAppliesReplayDecoys() throws Exception {
+    void roundOneRollPeekOnlyShowsTotalHits() throws Exception {
         CombatCandidateEntity candidate = candidate();
         candidate.setReplayAbilitiesJson(JsonMapperManager.basic()
                 .writeValueAsString(new CombatReplayDecoys.Abilities(
@@ -83,7 +83,11 @@ class CombatReplayNaaluAbilityServiceTest {
 
         String peek = service.renderRoundOneRollPeek(1L);
 
-        assertTrue(peek.contains("`2x`"));
+        assertTrue(peek.contains("### naalu"));
+        assertTrue(peek.contains("**Total hits 0**"));
+        assertFalse(peek.contains("`2x`"));
+        assertFalse(peek.contains("Destroyer"));
+        assertFalse(peek.contains("hits on"));
     }
 
     @Test

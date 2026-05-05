@@ -425,6 +425,7 @@ public class CombatReplayPromotionService {
 
     private void lockPreviousContestTradeConvoys(CombatReplayContestEntity newContest) {
         if (newContest == null || newContest.getId() == null) return;
+        if (!isPostCombat(newContest)) return;
         CombatReplayContestEntity previousContest = replayContestRepository
                 .findFirstByIdLessThanOrderByIdDesc(newContest.getId())
                 .orElse(null);

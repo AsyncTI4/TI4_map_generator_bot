@@ -641,7 +641,7 @@ public class CombatReplayService {
         return roundScore + openingBalanceScore + endingTensionScore + defenderWinBonus;
     }
 
-    private static double computeDrawPromotionScore(InitialCombatStats initialStats, int roundsObserved) {
+    public static double computeDrawPromotionScore(InitialCombatStats initialStats, int roundsObserved) {
         double weakerHp = Math.min(initialStats.attackerHp(), initialStats.defenderHp());
         double weakerStrength = Math.min(initialStats.attackerStrength(), initialStats.defenderStrength());
         double strongerStrength = Math.max(initialStats.attackerStrength(), initialStats.defenderStrength());
@@ -649,7 +649,7 @@ public class CombatReplayService {
         double strengthRatio = safeRatio(weakerStrength, strongerStrength);
         double roundScore = Math.sqrt(Math.max(0, roundsObserved)) * sizeFactor;
         double openingBalanceScore = 0.9 * Math.pow(strengthRatio, 3.0);
-        return roundScore + openingBalanceScore + 5.0;
+        return roundScore + openingBalanceScore;
     }
 
     public static InitialCombatStats initialCombatStats(CombatCandidateEntity candidate) {
