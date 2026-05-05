@@ -65,13 +65,13 @@ class CombatReplayServiceTest {
                 "muaat",
                 4);
 
-        assertEquals(2.7033, blowoutScore, 0.0001);
-        assertEquals(4.1705, squeakerScore, 0.0001);
+        assertEquals(2.2033, blowoutScore, 0.0001);
+        assertEquals(3.6705, squeakerScore, 0.0001);
         assertTrue(squeakerScore > blowoutScore);
     }
 
     @Test
-    void promotionScoreAddsHalfPointBonusWhenDefenderWins() {
+    void promotionScoreDoesNotDependOnAttackerOrDefenderRole() {
         CombatCandidateEntity candidate = candidate("sol", "yin");
         CombatReplayService.InitialCombatStats initialStats = initialStats(12, 12, 8, 8);
 
@@ -82,7 +82,7 @@ class CombatReplayServiceTest {
         double defenderWinScore = CombatReplayService.computePromotionScore(
                 candidate, initialStats, attackerRemaining, defenderRemaining, "yin", 2);
 
-        assertEquals(attackerWinScore + 0.5, defenderWinScore, 0.0001);
+        assertEquals(attackerWinScore, defenderWinScore, 0.0001);
     }
 
     @Test
@@ -107,8 +107,8 @@ class CombatReplayServiceTest {
         double snapshotScore = CombatReplayService.computePromotionScore(
                 candidate, replaySnapshotStats, attackerRemaining, defenderRemaining, "hacan", 3);
 
-        assertEquals(2.7074, staleScore, 0.0001);
-        assertEquals(1.4888, snapshotScore, 0.0001);
+        assertEquals(2.2074, staleScore, 0.0001);
+        assertEquals(0.9888, snapshotScore, 0.0001);
         assertTrue(snapshotScore < staleScore);
     }
 
