@@ -52,6 +52,7 @@ houseAbilities:
   naalu:
     actionCardPeekFavorCost: 20
     roundOneRollPeekFavorCost: 40
+    luckOmensFavorCost: 20
   mentak:
     previewLeadSeconds: 900
     destroyerDecoyFavorCost: 20

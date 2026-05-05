@@ -8,9 +8,7 @@ import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import ti4.contest.replay.core.CombatCandidateEventType;
 import ti4.contest.replay.core.CombatReplayDecoys;
-import ti4.contest.replay.core.CombatRollPayload;
 import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
 import ti4.contest.replay.core.renderers.CombatRollPayloadRenderer;
 import ti4.contest.replay.dispatch.ReplayDispatchPayload;
@@ -127,12 +125,7 @@ public class ReplayPayloadRenderer {
                 : firstNonBlank(replayMessage.content(), context.event().getSummaryText());
         List<MessageEmbed> embeds =
                 replayMessage == null ? List.of() : ReplayDispatchSerializer.toMessageEmbeds(replayMessage.embeds());
-        return tileRender(
-                content,
-                embeds,
-                payload.tilePosition(),
-                payload.combatStateSnapshotJson(),
-                context.event().getEventType() != CombatCandidateEventType.RESOLVED);
+        return tileRender(content, embeds, payload.tilePosition(), payload.combatStateSnapshotJson(), false);
     }
 
     private RenderedReplayEvent renderGenericMessage(
@@ -142,9 +135,7 @@ public class ReplayPayloadRenderer {
 
     private RenderedReplayEvent renderCombatRoll(
             RenderContext context, ReplayDispatchPayload.CombatRollDispatch rollDispatch) {
-        CombatRollPayload payloadWithAbilities =
-                CombatReplayDecoys.applyToRoll(rollDispatch.payload(), readReplayAbilities(context.candidate()));
-        String rendered = CombatRollPayloadRenderer.render(payloadWithAbilities);
+        String rendered = CombatRollPayloadRenderer.render(rollDispatch.payload());
         String renderedWithHeader = StringUtils.isBlank(rendered) ? null : "## Roll Update\n" + rendered;
         String content = firstNonBlank(
                 renderedWithHeader,
@@ -252,7 +243,7 @@ public class ReplayPayloadRenderer {
 
     private TileRenderResult tileRender(
             String content, List<MessageEmbed> embeds, String tilePosition, String snapshotJson) {
-        return tileRender(content, embeds, tilePosition, snapshotJson, true);
+        return tileRender(content, embeds, tilePosition, snapshotJson, false);
     }
 
     private TileRenderResult tileRender(
@@ -276,10 +267,10 @@ public class ReplayPayloadRenderer {
         String previousSnapshotJson = previousTileSnapshotJson(context, payload.tilePosition());
         if (StringUtils.isBlank(previousSnapshotJson)) return null;
 
-        Game previous =
-                restoreReplayGame(previousSnapshotJson, context.game(), context.candidate(), payload.tilePosition());
+        Game previous = restoreReplayGame(
+                previousSnapshotJson, context.game(), context.candidate(), payload.tilePosition(), false);
         Game current = restoreReplayGame(
-                payload.combatStateSnapshotJson(), context.game(), context.candidate(), payload.tilePosition());
+                payload.combatStateSnapshotJson(), context.game(), context.candidate(), payload.tilePosition(), false);
         if (previous == null || current == null) return null;
 
         List<String> changes = hitAssignmentChanges(previous, current, payload.tilePosition());

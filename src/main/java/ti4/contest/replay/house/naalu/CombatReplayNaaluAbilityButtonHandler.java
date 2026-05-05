@@ -38,6 +38,13 @@ public class CombatReplayNaaluAbilityButtonHandler {
                             contestId, event.getUser().getId(), event.getUser().getName()));
             return;
         }
+        if (buttonId.startsWith(CombatReplayNaaluAbilityService.NAALU_LUCK_OMENS)) {
+            sendVoteResult(
+                    event,
+                    service.voteLuckOmens(
+                            contestId, event.getUser().getId(), event.getUser().getName()));
+            return;
+        }
         if (buttonId.startsWith(CombatReplayNaaluAbilityService.NAALU_DO_NOT_USE)) {
             sendVoteResult(
                     event,

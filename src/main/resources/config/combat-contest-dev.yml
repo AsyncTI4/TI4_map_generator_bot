@@ -54,6 +54,8 @@ houseAbilities:
     actionCardPeekFavorCost: 20
     # roundOneRollPeekFavorCost: 0
     roundOneRollPeekFavorCost: 40
+    # luckOmensFavorCost: 0
+    luckOmensFavorCost: 20
   mentak:
     previewLeadSeconds: 15
     # destroyerDecoyFavorCost: 0

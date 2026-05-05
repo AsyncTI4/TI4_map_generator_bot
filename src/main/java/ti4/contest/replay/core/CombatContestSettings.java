@@ -109,6 +109,7 @@ public class CombatContestSettings {
         require(
                 houseAbilities.naalu.roundOneRollPeekFavorCost >= 0,
                 "houseAbilities.naalu.roundOneRollPeekFavorCost must be >= 0.");
+        require(houseAbilities.naalu.luckOmensFavorCost >= 0, "houseAbilities.naalu.luckOmensFavorCost must be >= 0.");
         require(
                 houseAbilities.mentak.previewLeadSeconds >= 0,
                 "houseAbilities.mentak.previewLeadSeconds must be >= 0.");
@@ -281,6 +282,7 @@ public class CombatContestSettings {
     public static class Naalu {
         private int actionCardPeekFavorCost = 30;
         private int roundOneRollPeekFavorCost = 50;
+        private int luckOmensFavorCost = 40;
     }
 
     @Getter
