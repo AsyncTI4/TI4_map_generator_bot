@@ -7,8 +7,9 @@ java_args=(
   "-XX:+UseStringDeduplication"
 )
 
-if [[ -f "${JPROFILER_AGENT_PATH:-}" ]]; then
-  java_args+=("-agentpath:${JPROFILER_AGENT_PATH}=port=${JPROFILER_PORT:-8849},nowait")
+agent_path="${JPROFILER_AGENT_PATH:-}"
+if [[ -n "$agent_path" && -f "$agent_path" ]]; then
+  java_args+=("-agentpath:${agent_path}=port=${JPROFILER_PORT:-8849},nowait")
 fi
 
 exec java "${java_args[@]}" -jar /app/tibot.jar

@@ -30,8 +30,6 @@ COPY scripts/start_tibot.sh /app/start_tibot.sh
 RUN chmod +x /app/start_tibot.sh
 
 ENV DB_PATH=/opt/STORAGE
-ENV JPROFILER_AGENT_PATH=/opt/jprofiler/bin/linux-x64/libjprofilerti.so
-ENV JPROFILER_PORT=8849
 ENV RESOURCE_PATH=/opt/resources
 
 ENTRYPOINT ["/app/start_tibot.sh"]
