@@ -130,6 +130,9 @@ public class CombatContestSettings {
                 "houseAbilities.hacan.maxSubsidiesPerContest must be >= 0.");
         require(houseAbilities.hacan.subsidyFavorOnHit >= 0, "houseAbilities.hacan.subsidyFavorOnHit must be >= 0.");
         require(
+                houseAbilities.hacan.baseCombatFavorGain >= 0,
+                "houseAbilities.hacan.baseCombatFavorGain must be >= 0.");
+        require(
                 houseAbilities.hacan.marketMakerPointsPerBet >= 0,
                 "houseAbilities.hacan.marketMakerPointsPerBet must be >= 0.");
         require(
@@ -150,6 +153,18 @@ public class CombatContestSettings {
         require(
                 houseAbilities.hacan.highTradeConvoysPredictionBonus >= 0,
                 "houseAbilities.hacan.highTradeConvoysPredictionBonus must be >= 0.");
+        require(
+                houseAbilities.hacan.veryHighTradeConvoysFavorCost >= 0,
+                "houseAbilities.hacan.veryHighTradeConvoysFavorCost must be >= 0.");
+        require(
+                houseAbilities.hacan.veryHighTradeConvoysPredictionBonus >= 0,
+                "houseAbilities.hacan.veryHighTradeConvoysPredictionBonus must be >= 0.");
+        require(
+                houseAbilities.hacan.maximumTradeConvoysFavorCost >= 0,
+                "houseAbilities.hacan.maximumTradeConvoysFavorCost must be >= 0.");
+        require(
+                houseAbilities.hacan.maximumTradeConvoysPredictionBonus >= 0,
+                "houseAbilities.hacan.maximumTradeConvoysPredictionBonus must be >= 0.");
     }
 
     private void require(boolean condition, String message) {
@@ -285,12 +300,17 @@ public class CombatContestSettings {
     public static class Hacan {
         private int maxSubsidiesPerContest = 2;
         private int subsidyFavorOnHit = 10;
-        private int marketMakerPointsPerBet = 1;
+        private int baseCombatFavorGain = 20;
+        private int marketMakerPointsPerBet = 2;
         private int lowTradeConvoysFavorCost = 10;
-        private int lowTradeConvoysPredictionBonus = 5;
+        private int lowTradeConvoysPredictionBonus = 10;
         private int mediumTradeConvoysFavorCost = 20;
-        private int mediumTradeConvoysPredictionBonus = 10;
+        private int mediumTradeConvoysPredictionBonus = 16;
         private int highTradeConvoysFavorCost = 30;
-        private int highTradeConvoysPredictionBonus = 15;
+        private int highTradeConvoysPredictionBonus = 22;
+        private int veryHighTradeConvoysFavorCost = 40;
+        private int veryHighTradeConvoysPredictionBonus = 29;
+        private int maximumTradeConvoysFavorCost = 50;
+        private int maximumTradeConvoysPredictionBonus = 36;
     }
 }

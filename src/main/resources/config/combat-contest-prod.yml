@@ -62,10 +62,15 @@ houseAbilities:
   hacan:
     maxSubsidiesPerContest: 2
     subsidyFavorOnHit: 10
-    marketMakerPointsPerBet: 1
+    baseCombatFavorGain: 20
+    marketMakerPointsPerBet: 2
     lowTradeConvoysFavorCost: 10
     lowTradeConvoysPredictionBonus: 10
     mediumTradeConvoysFavorCost: 20
-    mediumTradeConvoysPredictionBonus: 15
+    mediumTradeConvoysPredictionBonus: 16
     highTradeConvoysFavorCost: 30
-    highTradeConvoysPredictionBonus: 20
+    highTradeConvoysPredictionBonus: 22
+    veryHighTradeConvoysFavorCost: 40
+    veryHighTradeConvoysPredictionBonus: 29
+    maximumTradeConvoysFavorCost: 50
+    maximumTradeConvoysPredictionBonus: 36

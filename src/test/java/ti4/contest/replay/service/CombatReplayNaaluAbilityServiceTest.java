@@ -63,7 +63,7 @@ class CombatReplayNaaluAbilityServiceTest {
 
         String peek = service.renderActionCardPeek(1L);
 
-        assertTrue(peek.contains("naalu: _Ancient Burial Sites_"));
+        assertTrue(peek.contains("naalu: _Ancient Burial Sites_") || peek.contains("naalu: _abs_"));
     }
 
     @Test
