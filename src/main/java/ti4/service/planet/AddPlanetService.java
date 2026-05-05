@@ -610,7 +610,7 @@ public class AddPlanetService {
             }
         }
 
-        if (!setup && tile != null && FealtyUplinkService.canUseFealty(game, player, tile)) {
+        if (!setup && tile != null && FealtyUplinkService.canUseFealty(player, tile)) {
             Planet p = tile.getUnitHolderFromPlanet(planet);
             if (p != null && !alreadyOwned) {
                 FealtyUplinkService.postInitialButtons(game, player, planet);
