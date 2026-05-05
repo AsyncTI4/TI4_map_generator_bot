@@ -51,7 +51,7 @@ class CombatReplayNaaluAbilityServiceTest {
             serializer);
 
     @Test
-    void actionCardPeekAttributesCardsToActors() {
+    void actionCardPeekAttributesCardsToFactions() {
         CombatCandidateEntity candidate = candidate();
         CombatReplayContestEntity contest = contest(candidate);
         CombatCandidateEventEntity event =
@@ -63,7 +63,8 @@ class CombatReplayNaaluAbilityServiceTest {
 
         String peek = service.renderActionCardPeek(1L);
 
-        assertTrue(peek.contains("naalu: _Ancient Burial Sites_") || peek.contains("naalu: _abs_"));
+        assertTrue(peek.contains("Naalu: _Ancient Burial Sites_") || peek.contains("Naalu: _abs_"));
+        assertFalse(peek.contains("user-name"));
     }
 
     @Test
@@ -83,8 +84,10 @@ class CombatReplayNaaluAbilityServiceTest {
 
         String peek = service.renderRoundOneRollPeek(1L);
 
-        assertTrue(peek.contains("### naalu"));
+        assertTrue(peek.contains("###"));
+        assertTrue(peek.contains("Naalu"));
         assertTrue(peek.contains("**Total hits 0**"));
+        assertFalse(peek.contains("user-name"));
         assertFalse(peek.contains("`2x`"));
         assertFalse(peek.contains("Destroyer"));
         assertFalse(peek.contains("hits on"));
@@ -114,8 +117,9 @@ class CombatReplayNaaluAbilityServiceTest {
         String omens = service.renderLuckOmens(1L);
 
         assertTrue(omens.contains("Overall: **Lucky**"));
-        assertTrue(omens.contains("naalu: **Lucky**"));
-        assertTrue(omens.contains("hacan: **Unlucky**"));
+        assertTrue(omens.contains("Naalu: **Lucky**"));
+        assertTrue(omens.contains("Hacan: **Unlucky**"));
+        assertFalse(omens.contains("user-name"));
         assertFalse(omens.contains("Expected"));
         assertFalse(omens.contains("EV"));
     }
@@ -137,7 +141,8 @@ class CombatReplayNaaluAbilityServiceTest {
         String omens = service.renderLuckOmens(1L);
 
         assertTrue(omens.contains("Overall: **Average**"));
-        assertTrue(omens.contains("naalu: **Average**"));
+        assertTrue(omens.contains("Naalu: **Average**"));
+        assertFalse(omens.contains("user-name"));
     }
 
     @Test
