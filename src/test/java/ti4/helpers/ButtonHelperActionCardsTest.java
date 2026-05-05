@@ -34,4 +34,14 @@ class ButtonHelperActionCardsTest extends BaseTi4Test {
         assertThat(ButtonHelperActionCards.findTwinningTargetActionCardId(game, "War Machine"))
                 .isIn("war_machine1", "war_machine2");
     }
+
+    @Test
+    void findTwinningTargetActionCardIdReturnsNullForUnknownTarget() {
+        Game game = new Game();
+
+        assertThat(ButtonHelperActionCards.findTwinningTargetActionCardId(game, "999"))
+                .isNull();
+        assertThat(ButtonHelperActionCards.findTwinningTargetActionCardId(game, "Not A Card"))
+                .isNull();
+    }
 }
