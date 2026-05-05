@@ -637,8 +637,7 @@ public class CombatReplayService {
         double roundScore = Math.sqrt(Math.max(0, roundsObserved)) * sizeFactor;
         double openingBalanceScore = 0.9 * Math.pow(strengthRatio, 3.0);
         double endingTensionScore = winnerRemainingHp <= 0 ? 0.0 : 5.0 * Math.exp(-6.0 * winnerSurvivalRatio);
-        double defenderWinBonus = winnerFaction.equalsIgnoreCase(candidate.getDefenderFaction()) ? 0.5 : 0.0;
-        return roundScore + openingBalanceScore + endingTensionScore + defenderWinBonus;
+        return roundScore + openingBalanceScore + endingTensionScore;
     }
 
     public static double computeDrawPromotionScore(InitialCombatStats initialStats, int roundsObserved) {
