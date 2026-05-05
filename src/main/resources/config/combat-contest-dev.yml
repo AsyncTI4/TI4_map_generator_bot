@@ -59,13 +59,13 @@ houseAbilities:
   mentak:
     previewLeadSeconds: 15
     # destroyerDecoyFavorCost: 0
-    destroyerDecoyFavorCost: 20
+    destroyerDecoyFavorCost: 15
     # cruiserDecoyFavorCost: 0
-    cruiserDecoyFavorCost: 30
+    cruiserDecoyFavorCost: 25
     # dreadnoughtDecoyFavorCost: 0
-    dreadnoughtDecoyFavorCost: 40
+    dreadnoughtDecoyFavorCost: 35
     # warSunDecoyFavorCost: 0
-    warSunDecoyFavorCost: 70
+    warSunDecoyFavorCost: 65
   hacan:
     maxSubsidiesPerContest: 2
     subsidyFavorOnHit: 10

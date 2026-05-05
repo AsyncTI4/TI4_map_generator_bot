@@ -49,23 +49,36 @@ public class CombatReplayMentakAbilityButtonHandler {
             return;
         }
 
+        if (request.count() == null) {
+            service.sendEphemeralQuantityControls(
+                    event, request.candidateId(), request.targetFaction(), request.unitType());
+            return;
+        }
+
         CombatReplayInteractionResult result = service.voteDecoy(
                 request.candidateId(),
                 request.targetFaction(),
                 request.unitType(),
+                request.count(),
                 event.getUser().getId(),
                 event.getUser().getName());
         MessageHelper.sendEphemeralMessageToEventChannel(event, result.message());
     }
 
     private static DecoyRequest parse(String buttonId) {
-        String request = buttonId.replace(CombatReplayMentakAbilityService.MENTAK_DECOY_PREFIX, "");
-        String[] parts = request.split("_", 3);
-        if (parts.length != 3) return null;
+        boolean quantityRequest = buttonId.startsWith(CombatReplayMentakAbilityService.MENTAK_DECOY_QUANTITY_PREFIX);
+        String request = buttonId.replace(
+                quantityRequest
+                        ? CombatReplayMentakAbilityService.MENTAK_DECOY_QUANTITY_PREFIX
+                        : CombatReplayMentakAbilityService.MENTAK_DECOY_PREFIX,
+                "");
+        String[] parts = request.split("_", quantityRequest ? 4 : 3);
+        if (parts.length != (quantityRequest ? 4 : 3)) return null;
         try {
             UnitType unitType = Units.findUnitType(parts[2]);
             if (unitType == null) return null;
-            return new DecoyRequest(Long.parseLong(parts[0]), parts[1], unitType);
+            Integer count = quantityRequest ? Integer.parseInt(parts[3]) : null;
+            return new DecoyRequest(Long.parseLong(parts[0]), parts[1], unitType, count);
         } catch (NumberFormatException e) {
             return null;
         }
@@ -80,5 +93,5 @@ public class CombatReplayMentakAbilityButtonHandler {
         }
     }
 
-    private record DecoyRequest(long candidateId, String targetFaction, UnitType unitType) {}
+    private record DecoyRequest(long candidateId, String targetFaction, UnitType unitType, Integer count) {}
 }
