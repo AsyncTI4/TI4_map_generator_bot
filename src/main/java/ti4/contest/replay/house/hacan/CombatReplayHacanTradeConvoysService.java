@@ -86,14 +86,15 @@ public class CombatReplayHacanTradeConvoysService {
     }
 
     public boolean repostOpenTradeConvoysVotingButtons() {
-        CombatReplayContestEntity contest =
-                contestRepository.findFirstByOrderByIdDesc().orElse(null);
-        CombatCandidateEntity candidate = contest == null || contest.getCandidateId() == null
-                ? null
-                : candidateRepository.findById(contest.getCandidateId()).orElse(null);
-        if (!shouldOfferVoting(contest, candidate)) return false;
-        postTradeConvoysVotingButtons(contest);
-        return true;
+        for (CombatReplayContestEntity contest : contestRepository.findAllByOrderByIdDesc()) {
+            CombatCandidateEntity candidate = contest == null || contest.getCandidateId() == null
+                    ? null
+                    : candidateRepository.findById(contest.getCandidateId()).orElse(null);
+            if (!shouldOfferVoting(contest, candidate)) continue;
+            postTradeConvoysVotingButtons(contest);
+            return true;
+        }
+        return false;
     }
 
     private void postTradeConvoysVotingButtons(CombatReplayContestEntity contest) {
