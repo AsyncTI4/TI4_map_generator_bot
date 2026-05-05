@@ -119,6 +119,10 @@ public class CombatReplayHouseAbilityVoteService {
                 .orElse(null);
     }
 
+    public List<CombatReplayHouseAbilityVoteEntity> votesFor(Long candidateId, CombatReplayHouse house) {
+        return voteRepository.findByCandidateIdAndHouse(candidateId, house);
+    }
+
     public String voteSummary(Long candidateId, CombatReplayHouse house, Function<String, String> optionLabel) {
         List<CombatReplayHouseAbilityVoteEntity> votes = voteRepository.findByCandidateIdAndHouse(candidateId, house);
         if (votes.isEmpty()) return "No votes recorded.";
