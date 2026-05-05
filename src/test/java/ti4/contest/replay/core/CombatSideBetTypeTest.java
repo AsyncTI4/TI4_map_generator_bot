@@ -26,7 +26,7 @@ class CombatSideBetTypeTest {
     void hacanMarkedBetsGrantFavorOnHit() {
         CombatContestSettings settings = new CombatContestSettings();
 
-        assertEquals(10, settings.getHouseAbilities().getHacan().getSubsidyFavorOnHit());
+        assertEquals(20, settings.getHouseAbilities().getHacan().getSubsidyFavorOnHit());
     }
 
     @Test
