@@ -19,6 +19,7 @@ import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.entities.CombatCandidateEntity;
+import ti4.contest.replay.entities.CombatReplayContestEntity;
 import ti4.contest.replay.entities.CombatReplayHouseAbilityVoteEntity;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatReplayHouseAbilityUseRepository;
@@ -46,10 +47,12 @@ public class CombatReplayMentakAbilityService {
 
     public static final String MENTAK_DECOY_PREFIX = "combatReplayMentakDecoy_";
     public static final String MENTAK_DECOY_QUANTITY_PREFIX = MENTAK_DECOY_PREFIX + "quantity_";
+    public static final String MENTAK_PREDICTION_PREFIX = "combatReplayMentakPrediction_";
     public static final String MENTAK_MANAGE_VOTE_PREFIX = "combatReplayMentakManageVote_";
     public static final String MENTAK_DO_NOT_USE = MENTAK_DECOY_PREFIX + "doNotUse_";
 
     private static final String DO_NOT_USE_ABILITY = "DO_NOT_USE";
+    private static final String PREDICTION_OPTION_PREFIX = "PREDICTION_";
     private static final int MAX_DECOY_COUNT = 5;
     private static final int MINIMUM_UNIT_TYPE_VOTES_TO_RESOLVE = 2;
     private static final String SYSTEM_USER_ID = "0";
@@ -152,6 +155,54 @@ public class CombatReplayMentakAbilityService {
     public boolean userHasHouse(String discordUserId) {
         if (settings.getRuntime().isDevMode()) return true;
         return houseService.houseForUser(discordUserId) == CombatReplayHouse.MENTAK;
+    }
+
+    public void postPredictionOverrideButtons(
+            Game game, CombatReplayContestEntity contest, CombatCandidateEntity candidate) {
+        if (contest == null || contest.getId() == null || candidate == null) return;
+        TextChannel channel = houseChannel();
+        if (channel == null) return;
+
+        Player attacker = game == null ? null : game.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
+        Player defender = game == null ? null : game.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
+        MessageHelper.sendMessageToChannelWithButtons(
+                channel,
+                "## " + FactionEmojis.getFactionIcon(CombatReplayHouse.MENTAK.displayName())
+                        + " Mentak Delegation Hidden Wagers\n"
+                        + "-# Public reactions remain on the table. These sealed pirate marks are what the archive will count for Mentak delegates when predictions lock.",
+                List.of(
+                        predictionButton(contest.getId(), candidate.getAttackerFaction(), attacker),
+                        predictionButton(contest.getId(), candidate.getDefenderFaction(), defender)));
+    }
+
+    public CombatReplayInteractionResult votePredictionOverride(
+            long contestId, String predictedFaction, String discordUserId, String discordUserName) {
+        if (StringUtils.isBlank(predictedFaction)) {
+            return CombatReplayInteractionResult.rejected("Could not read that Mentak prediction.");
+        }
+        return voteService.recordVote(
+                predictionVoteKey(contestId),
+                CombatReplayHouse.MENTAK,
+                predictionOptionKey(predictedFaction),
+                StringUtils.capitalize(predictedFaction),
+                discordUserId,
+                discordUserName,
+                ignored -> 0,
+                this::predictionVoteSummary,
+                "Mentak Delegation has already resolved its ability for this combat.",
+                "Mentak Delegation cannot afford that prediction.");
+    }
+
+    public Map<String, String> predictionOverridesFor(Long contestId) {
+        if (contestId == null) return Map.of();
+        Map<String, String> overrides = new HashMap<>();
+        for (CombatReplayHouseAbilityVoteEntity vote :
+                voteService.votesFor(predictionVoteKey(contestId), CombatReplayHouse.MENTAK)) {
+            String faction = predictionFaction(vote.getOptionKey());
+            if (StringUtils.isBlank(faction)) continue;
+            overrides.put(vote.getDiscordUserId(), faction);
+        }
+        return overrides;
     }
 
     public CombatReplayInteractionResult voteDecoy(
@@ -369,6 +420,16 @@ public class CombatReplayMentakAbilityService {
                 unitType.getUnitTypeEmoji());
     }
 
+    private Button predictionButton(Long contestId, String faction, Player player) {
+        String label = player == null || player.getFactionModel() == null
+                ? "Predict " + StringUtils.capitalize(faction)
+                : "Predict " + player.getFactionModel().getFactionName();
+        String buttonId = MENTAK_PREDICTION_PREFIX + contestId + "_" + faction;
+        return player == null
+                ? Buttons.blue(buttonId, label, FactionEmojis.getFactionIcon(faction))
+                : Buttons.blue(buttonId, label, player.getFactionEmoji());
+    }
+
     List<Button> quantityButtons(CombatCandidateEntity candidate, String faction, UnitType unitType) {
         List<Button> buttons = new ArrayList<>();
         if (StringUtils.isBlank(faction)) return buttons;
@@ -455,6 +516,11 @@ public class CombatReplayMentakAbilityService {
                 + "` pooled votes. Quantity ties choose the lower count.";
     }
 
+    private String predictionVoteSummary(Long contestVoteKey) {
+        return voteService.voteSummary(contestVoteKey, CombatReplayHouse.MENTAK, this::predictionOptionLabel)
+                + "\n-# These are private Mentak winner predictions. Public reactions are only cover.";
+    }
+
     private String optionLabel(String optionKey) {
         if (DO_NOT_USE_ABILITY.equals(optionKey)) return "Do Not Use";
         MentakOption option = parseOption(optionKey);
@@ -462,6 +528,24 @@ public class CombatReplayMentakAbilityService {
             return optionLabel(option.targetFaction(), option.unitType(), option.count());
         }
         return optionKey;
+    }
+
+    private String predictionOptionLabel(String optionKey) {
+        String faction = predictionFaction(optionKey);
+        return StringUtils.isBlank(faction) ? optionKey : StringUtils.capitalize(faction);
+    }
+
+    private Long predictionVoteKey(long contestId) {
+        return -Math.abs(contestId);
+    }
+
+    private String predictionOptionKey(String faction) {
+        return PREDICTION_OPTION_PREFIX + faction;
+    }
+
+    private String predictionFaction(String optionKey) {
+        if (StringUtils.isBlank(optionKey) || !optionKey.startsWith(PREDICTION_OPTION_PREFIX)) return null;
+        return optionKey.substring(PREDICTION_OPTION_PREFIX.length());
     }
 
     private String optionLabel(String targetFaction, UnitType unitType, int count) {
