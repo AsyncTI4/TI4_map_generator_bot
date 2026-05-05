@@ -65,7 +65,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
                 MessageHelper.sendMessageToEventChannel(
                         event,
                         "You don't have enough " + color + " fragments to purge. You need " + count + " but only have "
-                                + fragmentsToPurge.size() + ". Purge cancelled.");
+                                + 0 + ". Purge cancelled.");
                 return;
             }
         }

@@ -34,7 +34,7 @@ public class UserGameInfoService {
         for (PlayerEntity player : players) {
             UserGameStatsAccumulator stats = statsByUserId.computeIfAbsent(
                     player.getUser().getId(),
-                    k -> new UserGameStatsAccumulator(player.getUser().getName()));
+                    _ -> new UserGameStatsAccumulator(player.getUser().getName()));
 
             if (player.getGame().getEndedEpochMilliseconds() == null) {
                 if (player.isReplaced()) {

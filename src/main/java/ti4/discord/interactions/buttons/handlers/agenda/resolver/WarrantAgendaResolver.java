@@ -8,7 +8,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 
 public class WarrantAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "warrant";
     }
 

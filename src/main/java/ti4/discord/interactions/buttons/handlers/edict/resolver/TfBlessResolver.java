@@ -61,10 +61,7 @@ public class TfBlessResolver implements EdictResolver {
         boolean resolvedCC = player.hasStoredValue("blessBoonCC");
         if (!isTyrant && (resolvedAC || resolvedCC || resolvedTG)) {
             return true;
-        } else if (isTyrant && resolvedAC && resolvedCC && resolvedTG) {
-            return true;
-        }
-        return false;
+        } else return isTyrant && resolvedAC && resolvedCC && resolvedTG;
     }
 
     @ButtonHandler("blessBoonTg")
@@ -101,7 +98,7 @@ public class TfBlessResolver implements EdictResolver {
             return;
         }
         player.setStoredValue(buttonID, "y");
-        CommandCounterButtonHandler.gainCC(event, player, game);
+        CommandCounterButtonHandler.gainCCNoDelete(event, player, game);
         afterResolve(event, game, player);
     }
 

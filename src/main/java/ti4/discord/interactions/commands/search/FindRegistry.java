@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
+import ti4.model.AbilityModel;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.EmbeddableModel;
@@ -29,7 +30,7 @@ class FindRegistry {
                             Constants.SEARCH_ABILITIES,
                             "Abilities",
                             () -> Mapper.getAbilities().values(),
-                            model -> model.getRepresentationEmbed(),
+                            AbilityModel::getRepresentationEmbed,
                             model -> model.getRepresentationEmbed(true)),
                     spec(
                             Constants.SEARCH_ACTION_CARDS,

@@ -14,7 +14,10 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.contest.replay.core.CombatCandidatePromotionStatus;
 import ti4.contest.replay.core.CombatCandidateStatus;
+import ti4.contest.replay.core.CombatContestReplayStatus;
 import ti4.contest.replay.core.CombatContestSettings;
+import ti4.contest.replay.entities.CombatCandidateEntity;
+import ti4.contest.replay.entities.CombatReplayContestEntity;
 import ti4.contest.replay.house.mentak.CombatReplayMentakAbilityService;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatObservationRepository;
@@ -101,18 +104,201 @@ class CombatReplayContestLifecycleServiceTest {
         verifyNoInteractions(candidateRepository, replayContestRepository);
     }
 
+    @Test
+    void forcePromoteCandidateDoesNotPubliclyPromoteBeforeMentakPreviewWindowExpires() {
+        CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
+        CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
+        CombatContestSettings settings = new CombatContestSettings();
+        settings.getPromotion().setEnabled(true);
+        settings.setHousesEnabled(true);
+        settings.getHouseAbilities().getMentak().setPreviewLeadSeconds(900);
+        CombatReplayContestLifecycleService service = service(settings, candidateRepository, replayContestRepository);
+        service.setClock(fixedClock("2026-04-27T12:14:59"));
+        CombatCandidateEntity candidate = previewedCandidate(LocalDateTime.parse("2026-04-27T12:00:00"));
+        CombatReplayContestEntity contest = previewContest();
+
+        when(candidateRepository.findById(1L)).thenReturn(java.util.Optional.of(candidate));
+        when(replayContestRepository.findByCandidateId(1L)).thenReturn(java.util.Optional.of(contest));
+
+        CombatReplayContestLifecycleService.ForcePromoteResult result = service.forcePromoteCandidate(1L);
+
+        assertFalse(result.promoted());
+        assertEquals("Mentak preview window is still open.", result.reason());
+        assertEquals(contest, result.contest());
+    }
+
+    @Test
+    void forcePromoteCandidateCanPubliclyPromoteAfterMentakPreviewWindowExpires() {
+        CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
+        CombatObservationRepository observationRepository = mock(CombatObservationRepository.class);
+        CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
+        CombatContestSettings settings = new CombatContestSettings();
+        settings.getPromotion().setEnabled(true);
+        settings.setHousesEnabled(true);
+        settings.getHouseAbilities().getMentak().setPreviewLeadSeconds(900);
+        CombatReplayContestLifecycleService service =
+                service(settings, candidateRepository, observationRepository, replayContestRepository);
+        service.setClock(fixedClock("2026-04-27T12:15:00"));
+        CombatCandidateEntity candidate = previewedCandidate(LocalDateTime.parse("2026-04-27T12:00:00"));
+        CombatReplayContestEntity contest = previewContest();
+
+        when(candidateRepository.findById(1L)).thenReturn(java.util.Optional.of(candidate));
+        when(replayContestRepository.findByCandidateId(1L)).thenReturn(java.util.Optional.of(contest));
+
+        CombatReplayContestLifecycleService.ForcePromoteResult result = service.forcePromoteCandidate(1L);
+
+        assertFalse(result.promoted());
+        assertEquals("Promotion failed", result.reason());
+        verify(observationRepository).findById(1L);
+    }
+
+    @Test
+    void promoteBestCandidateIfDueChecksReadyMentakPreviewsWhenCronRunsLateForHourlySlot() {
+        CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
+        CombatObservationRepository observationRepository = mock(CombatObservationRepository.class);
+        CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
+        CombatContestSettings settings = new CombatContestSettings();
+        settings.getPromotion().setEnabled(true);
+        settings.getRuntime().setDevMode(false);
+        settings.setHousesEnabled(true);
+        settings.getHouseAbilities().getMentak().setPreviewLeadSeconds(900);
+        CombatReplayContestLifecycleService service =
+                service(settings, candidateRepository, observationRepository, replayContestRepository);
+        service.setClock(fixedClock("2026-04-27T12:25:00"));
+        CombatCandidateEntity candidate = previewedCandidate(LocalDateTime.parse("2026-04-27T11:45:00"));
+
+        when(candidateRepository.findResolvedPromotionCandidates(
+                        CombatCandidateStatus.RESOLVED,
+                        CombatCandidatePromotionStatus.PENDING,
+                        LocalDateTime.parse("2026-04-27T00:25:00")))
+                .thenReturn(List.of(candidate));
+        when(observationRepository.findAllById(List.of(1L))).thenReturn(List.of());
+
+        service.promoteBestCandidateIfDue();
+
+        verify(candidateRepository)
+                .findResolvedPromotionCandidates(
+                        CombatCandidateStatus.RESOLVED,
+                        CombatCandidatePromotionStatus.PENDING,
+                        LocalDateTime.parse("2026-04-27T00:25:00"));
+        verify(observationRepository).findById(1L);
+    }
+
+    @Test
+    void promoteBestCandidateIfDueUsesActualTimeWhenPreviewBecomesReadyMidHour() {
+        CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
+        CombatObservationRepository observationRepository = mock(CombatObservationRepository.class);
+        CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
+        CombatContestSettings settings = new CombatContestSettings();
+        settings.getPromotion().setEnabled(true);
+        settings.getRuntime().setDevMode(false);
+        settings.setHousesEnabled(true);
+        settings.getHouseAbilities().getMentak().setPreviewLeadSeconds(900);
+        CombatReplayContestLifecycleService service =
+                service(settings, candidateRepository, observationRepository, replayContestRepository);
+        service.setClock(fixedClock("2026-04-27T12:25:00"));
+        CombatCandidateEntity candidate = previewedCandidate(LocalDateTime.parse("2026-04-27T12:10:00"));
+
+        when(candidateRepository.findResolvedPromotionCandidates(
+                        CombatCandidateStatus.RESOLVED,
+                        CombatCandidatePromotionStatus.PENDING,
+                        LocalDateTime.parse("2026-04-27T00:25:00")))
+                .thenReturn(List.of(candidate));
+        when(observationRepository.findAllById(List.of(1L))).thenReturn(List.of());
+
+        service.promoteBestCandidateIfDue();
+
+        verify(candidateRepository)
+                .findResolvedPromotionCandidates(
+                        CombatCandidateStatus.RESOLVED,
+                        CombatCandidatePromotionStatus.PENDING,
+                        LocalDateTime.parse("2026-04-27T00:25:00"));
+        verify(observationRepository).findById(1L);
+    }
+
+    @Test
+    void promoteBestCandidateIfDueFallsBackWhenMentakPreviewPostingFails() {
+        CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
+        CombatObservationRepository observationRepository = mock(CombatObservationRepository.class);
+        CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
+        CombatContestSettings settings = new CombatContestSettings();
+        settings.getPromotion().setEnabled(true);
+        settings.getRuntime().setDevMode(false);
+        settings.setHousesEnabled(true);
+        settings.getHouseAbilities().getMentak().setPreviewLeadSeconds(900);
+        CombatReplayContestLifecycleService service =
+                service(settings, candidateRepository, observationRepository, replayContestRepository);
+        service.setClock(fixedClock("2026-04-27T12:50:00"));
+        CombatCandidateEntity first = promotionCandidate(1L, LocalDateTime.parse("2026-04-27T12:20:00"), 10.0);
+        CombatCandidateEntity second = promotionCandidate(2L, LocalDateTime.parse("2026-04-27T12:25:00"), 5.0);
+
+        when(candidateRepository.findResolvedPromotionCandidates(
+                        CombatCandidateStatus.RESOLVED,
+                        CombatCandidatePromotionStatus.PENDING,
+                        LocalDateTime.parse("2026-04-27T00:50:00")))
+                .thenReturn(List.of(first, second));
+        when(observationRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of());
+        when(observationRepository.findById(1L)).thenReturn(java.util.Optional.empty());
+        when(observationRepository.findById(2L)).thenReturn(java.util.Optional.empty());
+
+        service.promoteBestCandidateIfDue();
+
+        verify(observationRepository).findById(1L);
+        verify(observationRepository).findById(2L);
+    }
+
+    @Test
+    void promoteBestCandidateIfDueFallsBackWhenReadyMentakPreviewPromotionFails() {
+        CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
+        CombatObservationRepository observationRepository = mock(CombatObservationRepository.class);
+        CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
+        CombatContestSettings settings = new CombatContestSettings();
+        settings.getPromotion().setEnabled(true);
+        settings.getRuntime().setDevMode(false);
+        settings.setHousesEnabled(true);
+        settings.getHouseAbilities().getMentak().setPreviewLeadSeconds(900);
+        CombatReplayContestLifecycleService service =
+                service(settings, candidateRepository, observationRepository, replayContestRepository);
+        service.setClock(fixedClock("2026-04-27T12:25:00"));
+        CombatCandidateEntity first = previewedCandidate(1L, LocalDateTime.parse("2026-04-27T11:45:00"), 10.0);
+        CombatCandidateEntity second = previewedCandidate(2L, LocalDateTime.parse("2026-04-27T11:45:00"), 5.0);
+
+        when(candidateRepository.findResolvedPromotionCandidates(
+                        CombatCandidateStatus.RESOLVED,
+                        CombatCandidatePromotionStatus.PENDING,
+                        LocalDateTime.parse("2026-04-27T00:25:00")))
+                .thenReturn(List.of(first, second));
+        when(observationRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of());
+        when(observationRepository.findById(1L)).thenReturn(java.util.Optional.empty());
+        when(observationRepository.findById(2L)).thenReturn(java.util.Optional.empty());
+
+        service.promoteBestCandidateIfDue();
+
+        verify(observationRepository).findById(1L);
+        verify(observationRepository).findById(2L);
+    }
+
     private CombatReplayContestLifecycleService service(
             CombatContestSettings settings,
             CombatCandidateRepository candidateRepository,
             CombatReplayContestRepository replayContestRepository) {
+        return service(settings, candidateRepository, mock(CombatObservationRepository.class), replayContestRepository);
+    }
+
+    private CombatReplayContestLifecycleService service(
+            CombatContestSettings settings,
+            CombatCandidateRepository candidateRepository,
+            CombatObservationRepository observationRepository,
+            CombatReplayContestRepository replayContestRepository) {
         CombatReplayPromotionService promotionService = new CombatReplayPromotionService(
                 settings,
                 candidateRepository,
-                mock(CombatObservationRepository.class),
+                observationRepository,
                 replayContestRepository,
                 mock(CombatReplayLeaderboardService.class),
                 mock(ti4.contest.replay.house.hacan.CombatReplayHacanTradeConvoysService.class),
                 mock(CombatReplayMentakAbilityService.class),
+                mock(CombatReplayHouseService.class),
                 mock(CombatReplayExecutionService.class),
                 mock(CombatReplayDiscordPostService.class));
         return new CombatReplayContestLifecycleService(promotionService, mock(CombatReplayExecutionService.class));
@@ -124,5 +310,34 @@ class CombatReplayContestLifecycleServiceTest {
                         .atZone(ZoneId.systemDefault())
                         .toInstant(),
                 ZoneId.systemDefault());
+    }
+
+    private CombatCandidateEntity previewedCandidate(LocalDateTime previewedAt) {
+        return previewedCandidate(1L, previewedAt, null);
+    }
+
+    private CombatCandidateEntity previewedCandidate(Long id, LocalDateTime previewedAt, Double promotionScore) {
+        CombatCandidateEntity candidate = new CombatCandidateEntity();
+        candidate.setId(id);
+        candidate.setObservationId(id);
+        candidate.setStatus(CombatCandidateStatus.RESOLVED);
+        candidate.setPromotionStatus(CombatCandidatePromotionStatus.PENDING);
+        candidate.setResolvedAt(previewedAt);
+        candidate.setMentakPreviewPostedAt(previewedAt);
+        candidate.setPromotionScore(promotionScore);
+        candidate.setInitialRenderSnapshotJson("{\"context\":{}}");
+        return candidate;
+    }
+
+    private CombatCandidateEntity promotionCandidate(Long id, LocalDateTime resolvedAt, Double promotionScore) {
+        CombatCandidateEntity candidate = previewedCandidate(id, resolvedAt, promotionScore);
+        candidate.setMentakPreviewPostedAt(null);
+        return candidate;
+    }
+
+    private CombatReplayContestEntity previewContest() {
+        CombatReplayContestEntity contest = new CombatReplayContestEntity();
+        contest.setReplayStatus(CombatContestReplayStatus.PREVIEW);
+        return contest;
     }
 }

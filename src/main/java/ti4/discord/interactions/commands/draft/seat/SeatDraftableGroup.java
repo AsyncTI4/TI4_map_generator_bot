@@ -27,9 +27,6 @@ public class SeatDraftableGroup extends SubcommandGroup {
 
     public static SeatDraftable getDraftable(Game game) {
         DraftManager draftManager = game.getDraftManager();
-        if (draftManager == null) {
-            return null;
-        }
         return (SeatDraftable) draftManager.getDraftable(SeatDraftable.TYPE);
     }
 }

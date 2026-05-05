@@ -9,11 +9,11 @@ import ti4.service.tactical.PostMovementButtonContext;
 
 public final class RohdhnaHeroButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return ctx.player.hasLeaderUnlocked("rohdhnahero");
+        return ctx.player().hasLeaderUnlocked("rohdhnahero");
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
-        return List.of(
-                Buttons.blue(ctx.player.finChecker() + "purgeRohdhnaHero", "Use Roh'Dhna Hero", FactionEmojis.rohdhna));
+        return List.of(Buttons.blue(
+                ctx.player().factionButtonChecker() + "purgeRohdhnaHero", "Use Roh'Dhna Hero", FactionEmojis.rohdhna));
     }
 }

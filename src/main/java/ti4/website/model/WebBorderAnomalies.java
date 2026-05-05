@@ -10,12 +10,10 @@ import ti4.model.BorderAnomalyModel.BorderAnomalyType;
 @Data
 public class WebBorderAnomalies {
 
-    @Data
-    public static class BorderAnomalyInfo {
-        private final String tile;
-        private final int direction;
-        private final String type; // e.g., "VOID_TETHER", "SPATIAL_TEAR", etc.
-    }
+    /**
+     * @param type e.g., "VOID_TETHER", "SPATIAL_TEAR", etc.
+     */
+    public record BorderAnomalyInfo(String tile, int direction, String type) {}
 
     private List<BorderAnomalyInfo> borderAnomalies;
 

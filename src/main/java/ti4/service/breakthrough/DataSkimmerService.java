@@ -34,12 +34,12 @@ public class DataSkimmerService {
 
     public static void fixDataSkimmer(Game game, Player ralnel) {
         if (!ralnel.hasUnlockedBreakthrough("ralnelbt")) return;
-        String finChecker = ralnel.finChecker();
+        String factionChecker = ralnel.factionButtonChecker();
 
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green(finChecker + "dataSkimmer_page0", "Use Data Skimmer", FactionEmojis.Ralnel));
+        buttons.add(Buttons.green(factionChecker + "dataSkimmer_page0", "Use Data Skimmer", FactionEmojis.Ralnel));
         buttons.add(Buttons.red(
-                finChecker + "discardDataSkimmer", "Discard Cards on Data Skimmer", CardEmojis.getACEmoji(game)));
+                factionChecker + "discardDataSkimmer", "Discard Cards on Data Skimmer", CardEmojis.getACEmoji(game)));
         buttons.add(Buttons.DONE_DELETE_BUTTONS);
 
         String message = "Use these buttons to interact with _Data Skimmer_.";
@@ -72,7 +72,7 @@ public class DataSkimmerService {
 
     @ButtonHandler("dataSkimmer_")
     private static void handleDataSkimmer(ButtonInteractionEvent event, Game game, Player ralnel, String buttonID) {
-        String buttonPrefix = ralnel.finChecker() + "dataSkimmer_";
+        String buttonPrefix = ralnel.factionButtonChecker() + "dataSkimmer_";
         List<Button> pickButtons = getPickCardButtons(game, ralnel, buttonPrefix);
         List<Button> peekButton = List.of(Buttons.gray("peekDataSkimmer", "See Cards on Data Skimmer", "👀"));
 

@@ -100,9 +100,9 @@ public class ParseUnitService {
 
     private boolean validateParsedUnit(
             ParsedUnit parsedUnit, Tile tile, String unitListToken, GenericInteractionCreateEvent event) {
-        boolean isValidUnit = parsedUnit.getUnitKey() != null;
+        boolean isValidUnit = parsedUnit.unitKey() != null;
         boolean isValidUnitHolder =
-                Constants.SPACE.equals(parsedUnit.getLocation()) || tile.isSpaceHolderValid(parsedUnit.getLocation());
+                Constants.SPACE.equals(parsedUnit.location()) || tile.isSpaceHolderValid(parsedUnit.location());
 
         if (isValidUnit && isValidUnitHolder) {
             return true;
@@ -123,12 +123,12 @@ public class ParseUnitService {
                 + formatValidationMessage(
                         "Unit",
                         isValidUnit,
-                        parsedUnit.getUnitKey(),
+                        parsedUnit.unitKey(),
                         "UnitID or Alias not found. Try: `inf, mech, dn, etc.`")
                 + formatValidationMessage(
                         "Planet",
                         isValidUnitHolder,
-                        parsedUnit.getLocation(),
+                        parsedUnit.location(),
                         "Planets in this system are: "
                                 + String.join(", ", tile.getUnitHolders().keySet()));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);

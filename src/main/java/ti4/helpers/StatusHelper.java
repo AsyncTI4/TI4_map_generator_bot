@@ -150,11 +150,6 @@ public final class StatusHelper {
     }
 
     public static void beginScoring(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
-        if (game.isOmegaPhaseMode()) {
-            // Show the effects of the Agendas while scoring
-            ButtonHelper.updateMap(game, event, "After Agendas, Round " + game.getRound() + ".");
-        }
-
         game.setPhaseOfGame("statusScoring");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", System.currentTimeMillis() + "");
         GMService.logActivity(game, "**StatusScoring** Phase for Round " + game.getRound() + " started.", true);
@@ -218,9 +213,8 @@ public final class StatusHelper {
             }
             if (player.hasTech("tf-radicaladvancement")) {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "radicalAdvancementStart", "Replace a tech"));
-                buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
+                buttons.add(Buttons.green(player.factionButtonChecker() + "radicalAdvancementStart", "Replace a tech"));
+                buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
@@ -453,6 +447,10 @@ public final class StatusHelper {
         if (allReacted) {
             ReactionCheckService.respondAllHaveScored(game);
         }
+        if (game.isOmegaPhaseMode()) {
+            // Show the effects of the Agendas while scoring
+            ButtonHelper.updateMap(game, event, "After Agendas, Round " + game.getRound() + ".");
+        }
     }
 
     public static List<Player> getPlayersInScoringOrder(Game game) {
@@ -623,7 +621,7 @@ public final class StatusHelper {
             }
             List<Button> buttons = new ArrayList<>();
             for (Planet planet : home.getPlanetUnitHolders()) {
-                String id = player.finChecker() + "placeOneNDone_skipbuild_gf_" + planet.getName();
+                String id = player.factionButtonChecker() + "placeOneNDone_skipbuild_gf_" + planet.getName();
                 String label = Helper.getUnitHolderRepresentation(home, planet.getName(), game, player);
                 buttons.add(Buttons.green(id, label, PlanetEmojis.getPlanetEmoji(planet.getName())));
             }
@@ -727,7 +725,7 @@ public final class StatusHelper {
                     .map(tech -> {
                         TechnologyModel model = Mapper.getTech(tech);
                         return Buttons.green(
-                                player.getFinsFactionCheckerPrefix() + "entropicScar_" + tech,
+                                player.factionButtonChecker() + "entropicScar_" + tech,
                                 model.getName(),
                                 model.getCondensedReqsEmojis(true));
                     })

@@ -111,11 +111,6 @@ public class MiltySettings extends SettingsMenu {
         String prefix = menuAction + "_" + navId() + "_";
 
         buttons.add(Buttons.green(prefix + "startMilty", "Start Milty Draft!"));
-        // switch (draftMode.getValue()) {
-        //     case milty -> buttons.add(Buttons.green(prefix + "startMilty", "Start Milty Draft!"));
-        //     case franken -> buttons.add(Buttons.green(prefix + "startFranken", "Start Franken Draft!"));
-        //     default -> buttons.clear();
-        // }
         return buttons;
     }
 

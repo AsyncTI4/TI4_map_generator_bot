@@ -19,7 +19,7 @@ public class TfCensureResolver implements EdictResolver {
 
     private List<Button> buttons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        String id = player.finChecker() + "electCensure_";
+        String id = player.factionButtonChecker() + "electCensure_";
         for (Player p2 : game.getRealPlayers()) {
             buttons.add(Buttons.green(id + p2.getFaction(), p2.getFogSafeDisplayName(), p2.fogSafeEmoji()));
         }

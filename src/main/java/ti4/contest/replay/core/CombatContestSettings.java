@@ -24,7 +24,7 @@ public class CombatContestSettings {
     public static final int PROMOTION_LOOKBACK_FALLBACK_MAX_HOURS = 8;
 
     @Setter(AccessLevel.NONE)
-    private boolean isProd = false;
+    private boolean isProd;
 
     private CandidateSelection candidateSelection = new CandidateSelection();
     private Promotion promotion = new Promotion();
@@ -43,8 +43,8 @@ public class CombatContestSettings {
 
     @Autowired
     public CombatContestSettings(@Value("${combat-contest.is-dev:false}") boolean isDev) {
-        this.isProd = !isDev;
-        loadEnvironmentDefaults(this.isProd);
+        isProd = !isDev;
+        loadEnvironmentDefaults(isProd);
         validate();
     }
 
@@ -65,6 +65,7 @@ public class CombatContestSettings {
                 "houseAbilities.minimumAbilityVotesToResolve must be > 0.");
         require(houseAbilities.baseCombatFavorGain >= 0, "houseAbilities.baseCombatFavorGain must be >= 0.");
         require(houseAbilities.initialHousePoints >= 0, "houseAbilities.initialHousePoints must be >= 0.");
+        require(houseAbilities.initialIndividualPoints >= 0, "houseAbilities.initialIndividualPoints must be >= 0.");
         require(
                 houseAbilities.catchupFavorPointsPerBonus > 0,
                 "houseAbilities.catchupFavorPointsPerBonus must be > 0.");
@@ -95,12 +96,20 @@ public class CombatContestSettings {
         require(sideBets.maxBetsPerUser >= 0, "sideBets.maxBetsPerUser must be >= 0.");
         require(sideBets.costPoints >= 0, "sideBets.costPoints must be >= 0.");
         require(sideBets.dynamicPayoutCap >= 1, "sideBets.dynamicPayoutCap must be >= 1.");
+        require(sideBets.afbWhiffSelectionBias >= 0.0, "sideBets.afbWhiffSelectionBias must be >= 0.");
+        require(sideBets.roundOneWhiffSelectionBias >= 0.0, "sideBets.roundOneWhiffSelectionBias must be >= 0.");
+        require(sideBets.roundOneSlamSelectionBias >= 0.0, "sideBets.roundOneSlamSelectionBias must be >= 0.");
+        require(sideBets.winnerOneHpPayoutMultiplier >= 0.0, "sideBets.winnerOneHpPayoutMultiplier must be >= 0.");
+        require(
+                sideBets.dynamicPayoutTiers != null && !sideBets.dynamicPayoutTiers.isBlank(),
+                "sideBets.dynamicPayoutTiers is required.");
         require(
                 houseAbilities.naalu.actionCardPeekFavorCost >= 0,
                 "houseAbilities.naalu.actionCardPeekFavorCost must be >= 0.");
         require(
                 houseAbilities.naalu.roundOneRollPeekFavorCost >= 0,
                 "houseAbilities.naalu.roundOneRollPeekFavorCost must be >= 0.");
+        require(houseAbilities.naalu.luckOmensFavorCost >= 0, "houseAbilities.naalu.luckOmensFavorCost must be >= 0.");
         require(
                 houseAbilities.mentak.previewLeadSeconds >= 0,
                 "houseAbilities.mentak.previewLeadSeconds must be >= 0.");
@@ -192,7 +201,7 @@ public class CombatContestSettings {
     @Getter
     @Setter
     public static class Promotion {
-        private boolean enabled = false;
+        private boolean enabled;
         private int intervalSeconds = 60;
         private int candidateLookbackHours = 12;
         private int maxPromotionsPerHour = 1;
@@ -230,7 +239,12 @@ public class CombatContestSettings {
         private boolean enableSideBets = true;
         private int maxBetsPerUser = 3;
         private int costPoints = 1;
-        private int dynamicPayoutCap = 100;
+        private int dynamicPayoutCap = 50;
+        private double afbWhiffSelectionBias = 2.0;
+        private double roundOneWhiffSelectionBias = 3.0;
+        private double roundOneSlamSelectionBias = 3.0;
+        private double winnerOneHpPayoutMultiplier = 0.75;
+        private String dynamicPayoutTiers = "0.20:4,0.10:5,0.05:8,0.025:12,0.01:20,0.005:30";
     }
 
     @Getter
@@ -242,9 +256,10 @@ public class CombatContestSettings {
         private int minimumAbilityVotesToResolve = 3;
         private int baseCombatFavorGain = 10;
         private int initialHousePoints = 1000;
+        private int initialIndividualPoints = 100;
         private int catchupFavorPointsPerBonus = 100;
-        private int catchupFavorBonusStep = 0;
-        private int maxCatchupFavorBonus = 0;
+        private int catchupFavorBonusStep;
+        private int maxCatchupFavorBonus;
     }
 
     @Getter
@@ -252,6 +267,7 @@ public class CombatContestSettings {
     public static class Naalu {
         private int actionCardPeekFavorCost = 30;
         private int roundOneRollPeekFavorCost = 50;
+        private int luckOmensFavorCost = 40;
     }
 
     @Getter

@@ -10,7 +10,7 @@ import ti4.logging.BotLogger;
 import ti4.spring.context.SpringContext;
 
 @UtilityClass
-public class CombatSideBetButtonHandler {
+class CombatSideBetButtonHandler {
 
     @ButtonHandler(value = CombatSideBetButtonIds.PREFIX, save = false)
     public static void placeSideBet(ButtonInteractionEvent event, String buttonId) {

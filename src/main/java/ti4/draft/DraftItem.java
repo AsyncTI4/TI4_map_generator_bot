@@ -82,29 +82,27 @@ public abstract class DraftItem {
     }
 
     public static DraftItem generate(DraftCategory category, String itemId) {
-        DraftItem item =
-                switch (category) {
-                    case ABILITY -> item = new AbilityDraftItem(itemId);
-                    case TECH -> item = new TechDraftItem(itemId);
-                    case AGENT -> item = new AgentDraftItem(itemId);
-                    case COMMANDER -> item = new CommanderDraftItem(itemId);
-                    case HERO -> item = new HeroDraftItem(itemId);
-                    case MECH -> item = new MechDraftItem(itemId);
-                    case FLAGSHIP -> item = new FlagshipDraftItem(itemId);
-                    case COMMODITIES -> item = new CommoditiesDraftItem(itemId);
-                    case PN -> item = new PNDraftItem(itemId);
-                    case HOMESYSTEM -> item = new HomeSystemDraftItem(itemId);
-                    case STARTINGTECH -> item = new StartingTechDraftItem(itemId);
-                    case STARTINGFLEET -> item = new StartingFleetDraftItem(itemId);
-                    case BLUETILE -> item = new BlueTileDraftItem(itemId);
-                    case REDTILE -> item = new RedTileDraftItem(itemId);
-                    case DRAFTORDER -> item = new SpeakerOrderDraftItem(itemId);
-                    case MAHACTKING -> item = new MahactKingDraftItem(itemId);
-                    case UNIT -> item = new UnitDraftItem(itemId);
-                    case BREAKTHROUGH -> item = new BreakthroughDraftItem(itemId);
-                    case PLOT -> item = new PlotDraftItem(itemId);
-                };
-        return item;
+        return switch (category) {
+            case ABILITY -> new AbilityDraftItem(itemId);
+            case TECH -> new TechDraftItem(itemId);
+            case AGENT -> new AgentDraftItem(itemId);
+            case COMMANDER -> new CommanderDraftItem(itemId);
+            case HERO -> new HeroDraftItem(itemId);
+            case MECH -> new MechDraftItem(itemId);
+            case FLAGSHIP -> new FlagshipDraftItem(itemId);
+            case COMMODITIES -> new CommoditiesDraftItem(itemId);
+            case PN -> new PNDraftItem(itemId);
+            case HOMESYSTEM -> new HomeSystemDraftItem(itemId);
+            case STARTINGTECH -> new StartingTechDraftItem(itemId);
+            case STARTINGFLEET -> new StartingFleetDraftItem(itemId);
+            case BLUETILE -> new BlueTileDraftItem(itemId);
+            case REDTILE -> new RedTileDraftItem(itemId);
+            case DRAFTORDER -> new SpeakerOrderDraftItem(itemId);
+            case MAHACTKING -> new MahactKingDraftItem(itemId);
+            case UNIT -> new UnitDraftItem(itemId);
+            case BREAKTHROUGH -> new BreakthroughDraftItem(itemId);
+            case PLOT -> new PlotDraftItem(itemId);
+        };
     }
 
     public static DraftItem generateFromAlias(String alias) {

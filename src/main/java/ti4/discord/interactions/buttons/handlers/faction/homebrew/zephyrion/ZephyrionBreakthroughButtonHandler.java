@@ -42,17 +42,17 @@ class ZephyrionBreakthroughButtonHandler {
                         agentModel.getRepresentationEmbed());
             }
             buttons.add(Buttons.green(
-                    player.getFinsFactionCheckerPrefix() + "zephyrionbtAttach_" + agentID + "_" + opponentFaction,
+                    player.factionButtonChecker() + "zephyrionbtAttach_" + agentID + "_" + opponentFaction,
                     "Attach " + agentName));
             buttons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "zephyrionbtPurge_" + agentID + "_" + opponentFaction,
+                    player.factionButtonChecker() + "zephyrionbtPurge_" + agentID + "_" + opponentFaction,
                     "Purge & Exhaust Opponent's Agent"));
         } else {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentation() + " has no unused agents available to draw via _Subdue Chancellor_.");
             buttons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "zephyrionbtExhaustOp_" + opponentFaction,
+                    player.factionButtonChecker() + "zephyrionbtExhaustOp_" + opponentFaction,
                     "Exhaust Opponent's Agent"));
         }
 
@@ -145,8 +145,7 @@ class ZephyrionBreakthroughButtonHandler {
                     ? Mapper.getLeader(agent.getId()).getName()
                     : agent.getId();
             buttons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "zephyrionbtExhaustAgent_" + opponentFaction + "_"
-                            + agent.getId(),
+                    player.factionButtonChecker() + "zephyrionbtExhaustAgent_" + opponentFaction + "_" + agent.getId(),
                     "Exhaust " + agentName));
         }
         MessageHelper.sendMessageToChannelWithButtons(

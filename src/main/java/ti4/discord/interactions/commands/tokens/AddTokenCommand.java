@@ -117,7 +117,7 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
                     int amt = planetUnitHolder.getUnitCount(key);
                     var removed = planetUnitHolder.removeUnit(key, amt);
                     if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech)
-                            .contains(key.getUnitType())) {
+                            .contains(key.unitType())) {
                         spaceUnitHolder.addUnitsWithStates(key, removed);
                     }
                 }

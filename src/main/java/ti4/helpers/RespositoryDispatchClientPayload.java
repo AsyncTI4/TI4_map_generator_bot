@@ -2,21 +2,15 @@ package ti4.helpers;
 
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Getter;
 
-@Getter
-class RespositoryDispatchClientPayload {
-    private final Map<String, String> records;
-
+record RespositoryDispatchClientPayload(Map<String, String> records) {
     /**
      * <a href="https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#create-a-repository-dispatch-event">...</a>
      */
-    public RespositoryDispatchClientPayload(Map<String, String> records) {
-        this.records = records;
-    }
+    RespositoryDispatchClientPayload {}
 
     public RespositoryDispatchClientPayload() {
-        records = new HashMap<>(1);
+        this(new HashMap<>(1));
     }
 
     public void addRecord(String key, String value) {

@@ -479,6 +479,7 @@ class AutoCompleteProvider {
                         "ordinian",
                         "te",
                         "tf",
+                        "twilightkart",
                         "tedemo",
                         "noswap");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
@@ -1103,16 +1104,16 @@ class AutoCompleteProvider {
                 List<DraftChoice> choices = draftable.getAllDraftChoices();
                 List<DraftChoice> alreadyPicked = draftManager.getAllPicksOfType(draftableType);
                 Predicate<DraftChoice> notPicked = choice -> alreadyPicked.stream()
-                        .noneMatch(picked -> picked.getChoiceKey().equals(choice.getChoiceKey()));
+                        .noneMatch(picked -> picked.choiceKey().equals(choice.choiceKey()));
                 Predicate<DraftChoice> matchesEnteredText =
-                        choice -> choice.getChoiceKey().toLowerCase().contains(enteredValue)
-                                || choice.getUnformattedName().toLowerCase().contains(enteredValue);
+                        choice -> choice.choiceKey().toLowerCase().contains(enteredValue)
+                                || choice.unformattedName().toLowerCase().contains(enteredValue);
 
                 List<Command.Choice> options = choices.stream()
                         .filter(notPicked)
                         .filter(matchesEnteredText)
                         .limit(25)
-                        .map(option -> new Command.Choice(option.getUnformattedName(), option.getChoiceKey()))
+                        .map(option -> new Command.Choice(option.unformattedName(), option.choiceKey()))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
@@ -1128,7 +1129,7 @@ class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 List<DraftChoice> choices = draftable.getAllDraftChoices();
                 List<FactionModel> availableFactions = choices.stream()
-                        .map(choice -> Mapper.getFactions().get(choice.getChoiceKey()))
+                        .map(choice -> Mapper.getFactions().get(choice.choiceKey()))
                         .filter(Objects::nonNull)
                         .toList();
                 List<Command.Choice> options = availableFactions.stream()
@@ -1155,12 +1156,12 @@ class AutoCompleteProvider {
                 List<String> keleresFlavors = FactionDraftable.getKeleresFlavors();
                 List<String> alreadyPickedFlavors = keleresFlavors.stream()
                         .filter(faction -> pickedFactions.stream()
-                                .anyMatch(picked -> picked.getChoiceKey().equals(faction)))
+                                .anyMatch(picked -> picked.choiceKey().equals(faction)))
                         .toList();
                 List<String> possiblyPickedFlavors = keleresFlavors.stream()
                         .filter(faction -> alreadyPickedFlavors.stream().noneMatch(picked -> picked.equals(faction)))
                         .filter(faction -> choices.stream()
-                                .anyMatch(choice -> choice.getChoiceKey().equals(faction)))
+                                .anyMatch(choice -> choice.choiceKey().equals(faction)))
                         .toList();
                 List<String> safeFlavors = keleresFlavors.stream()
                         .filter(faction -> possiblyPickedFlavors.stream().noneMatch(picked -> picked.equals(faction)))
@@ -1305,11 +1306,10 @@ class AutoCompleteProvider {
 
                 List<DraftChoice> allPicks = draftManager.getAllPicksOfType(draftableType);
                 event.replyChoices(allPicks.stream()
-                                .filter(option -> option.getUnformattedName()
-                                        .toLowerCase()
-                                        .contains(enteredValue))
+                                .filter(option ->
+                                        option.unformattedName().toLowerCase().contains(enteredValue))
                                 .limit(25)
-                                .map(option -> new Command.Choice(option.getUnformattedName(), option.getChoiceKey()))
+                                .map(option -> new Command.Choice(option.unformattedName(), option.choiceKey()))
                                 .collect(Collectors.toList()))
                         .queue(Consumers.nop(), BotLogger::catchRestError);
             }

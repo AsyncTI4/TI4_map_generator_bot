@@ -10,14 +10,15 @@ import ti4.service.tactical.PostMovementButtonContext;
 
 public final class VaylerianBTButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return ctx.player.hasUnlockedBreakthrough("vaylerianbt")
-                && FoWHelper.playerHasActualShipsInSystem(ctx.player, ctx.tile)
-                && ctx.player.getAcCount() > 0;
+        return ctx.player().hasUnlockedBreakthrough("vaylerianbt")
+                && FoWHelper.playerHasActualShipsInSystem(ctx.player(), ctx.tile())
+                && ctx.player().getAcCount() > 0;
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.blue(
-                ctx.player.finChecker() + "useVaylerianBT_" + ctx.tile.getPosition(),
+                ctx.player().factionButtonChecker() + "useVaylerianBT_"
+                        + ctx.tile().getPosition(),
                 "Discard Action Card To Move Ship",
                 FactionEmojis.vaylerian));
     }

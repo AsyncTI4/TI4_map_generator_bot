@@ -71,7 +71,7 @@ public class RollbarManager {
                         "rollbar-shutdown"));
     }
 
-    public static boolean isEnabled() {
+    private static boolean isEnabled() {
         if (!INITIALIZED.get()) {
             init();
         }

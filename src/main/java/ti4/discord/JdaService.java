@@ -24,17 +24,20 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.AsyncTI4DiscordBot;
 import ti4.contest.cron.CombatContestJanitorCron;
 import ti4.contest.cron.CombatReplayCron;
 import ti4.contest.cron.CombatReplayPromotionCron;
 import ti4.contest.cron.CombatReplayPromotionScoreBackfillCron;
 import ti4.contest.cron.CombatReplaySelectionCron;
 import ti4.cron.AutoPingCron;
+import ti4.cron.BothelperDashboardCron;
 import ti4.cron.CategoryCleanupCron;
 import ti4.cron.CloseLaunchThreadsCron;
 import ti4.cron.CronManager;
 import ti4.cron.EndOldGamesCron;
 import ti4.cron.FastScFollowCron;
+import ti4.cron.GameMessageCleanupCron;
 import ti4.cron.InteractionLogCron;
 import ti4.cron.LogButtonRuntimeStatisticsCron;
 import ti4.cron.LogCacheStatsCron;
@@ -300,6 +303,7 @@ public class JdaService {
         UploadRecentStatsCron.register();
         OldUndoFileCleanupCron.register();
         EndOldGamesCron.register();
+        GameMessageCleanupCron.register();
         LogButtonRuntimeStatisticsCron.register();
         TechSummaryCron.register();
         SabotageAutoReactCron.register();
@@ -313,6 +317,7 @@ public class JdaService {
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
         CategoryCleanupCron.register();
+        BothelperDashboardCron.register();
     }
 
     public static void markProcessReady() {
@@ -569,6 +574,7 @@ public class JdaService {
 
     public static void shutdown() {
         try {
+            AsyncTI4DiscordBot.markShuttingDown();
             jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
             BotLogger.info("SHUTDOWN PROCESS STARTED");
             ActiveLeaseService.setCurrentProcessReady(false);

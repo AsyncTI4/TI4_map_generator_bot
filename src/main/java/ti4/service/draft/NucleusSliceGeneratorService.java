@@ -500,7 +500,7 @@ public class NucleusSliceGeneratorService {
             }
         }
 
-        if (bestSpread == null || toAdd == null || toRemove == null) return false;
+        if (bestSpread == null) return false;
 
         // Search for the remove tile on board and in slices, then swap when found
         for (PlacedTile pt : placedTiles) {

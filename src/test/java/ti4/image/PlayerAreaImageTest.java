@@ -4,6 +4,7 @@ import java.util.HashSet;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -23,11 +24,11 @@ import ti4.testUtils.BaseTi4Test;
  * <p> 3. Change TestMode back to "Compare"
  * <p><p> For advanced tips & complaints, ping Jazzxhands in discord
  */
-@org.junit.jupiter.api.Disabled
+@Disabled
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PlayerAreaImageTest extends BaseTi4Test {
 
-    public static Game testGame;
+    private static Game testGame;
     private static Player testPlayer1;
     private static Player testPlayer2;
     private static Player testPlayer3;

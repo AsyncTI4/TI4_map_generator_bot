@@ -46,7 +46,7 @@ public class PersistenceManager {
         return readObjectFromJsonFile(directory, fileName, ref);
     }
 
-    private static <T> T readObjectFromJsonFile(String directory, String fileName, JavaType clazz) throws IOException {
+    private static <T> T readObjectFromJsonFile(String directory, String fileName, JavaType clazz) {
         if (fileName == null || fileName.isEmpty()) {
             throw new IllegalArgumentException("The file path cannot be null or empty.");
         }

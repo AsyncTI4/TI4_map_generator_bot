@@ -19,7 +19,7 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 
 class ButtonListener extends ListenerAdapter {
 
-    private static final Set<String> BUTTONS_TO_THINK_ABOUT = Set.of("showGameAgain");
+    private static final Set<String> BUTTONS_TO_THINK_ABOUT = Set.of("showGameAgain", "bothelperDashboard_manageRoles");
 
     private static ButtonListener instance;
 
@@ -75,7 +75,6 @@ class ButtonListener extends ListenerAdapter {
 
     private static final class EventLatencyChecker {
 
-        private static final Duration TO_WAIT_BEFORE_CHECKS_START = Duration.ofMinutes(2);
         private static final long THRESHOLD_MS = 2000;
         private static final Duration WARNING_COOLDOWN_WINDOW = Duration.ofMinutes(2);
         private static final int EVENT_COUNT_THRESHOLD = 10;
@@ -84,7 +83,7 @@ class ButtonListener extends ListenerAdapter {
         private static final AtomicLong lastWarningTimeMs = new AtomicLong(0);
 
         static void check(GenericInteractionCreateEvent event) {
-            if (!AsyncTI4DiscordBot.durationHasPassedSinceStartup(TO_WAIT_BEFORE_CHECKS_START)) return;
+            if (AsyncTI4DiscordBot.isUnstable()) return;
 
             long now = System.currentTimeMillis();
             long lastWarning = lastWarningTimeMs.get();

@@ -17,7 +17,7 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 
 @UtilityClass
-public class CymiaeButtonHandler {
+class CymiaeButtonHandler {
 
     @ButtonHandler("cymiaeHeroAutonetic")
     public static void cymiaeHeroAutonetic(ButtonInteractionEvent event, Player player, Game game) {

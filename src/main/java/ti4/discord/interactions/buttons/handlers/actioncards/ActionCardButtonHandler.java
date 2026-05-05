@@ -17,7 +17,7 @@ import ti4.message.MessageHelper;
 import ti4.service.button.ReactionService;
 
 @UtilityClass
-public class ActionCardButtonHandler {
+class ActionCardButtonHandler {
 
     @ButtonHandler("no_sabotage")
     public static void noSabotage(ButtonInteractionEvent event, Game game, Player player) {

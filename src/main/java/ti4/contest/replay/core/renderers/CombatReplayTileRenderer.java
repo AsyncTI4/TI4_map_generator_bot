@@ -106,7 +106,7 @@ public class CombatReplayTileRenderer {
         Set<String> colorIds = new LinkedHashSet<>();
         for (UnitHolder holder : tile.getUnitHolders().values()) {
             for (UnitKey unitKey : holder.getUnitsByState().keySet()) {
-                colorIds.add(unitKey.getColorID());
+                colorIds.add(unitKey.colorID());
             }
         }
 
@@ -229,8 +229,8 @@ public class CombatReplayTileRenderer {
         List<UnitStateEntry> units = new ArrayList<>();
         for (Map.Entry<UnitKey, List<Integer>> entry : unitsByState.entrySet()) {
             UnitStateEntry unit = new UnitStateEntry();
-            unit.setUnitType(entry.getKey().getUnitType());
-            unit.setColorId(entry.getKey().getColorID());
+            unit.setUnitType(entry.getKey().unitType());
+            unit.setColorId(entry.getKey().colorID());
             unit.setCounts(new ArrayList<>(entry.getValue()));
             units.add(unit);
         }

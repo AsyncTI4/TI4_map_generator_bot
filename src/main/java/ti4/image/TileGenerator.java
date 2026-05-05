@@ -171,8 +171,8 @@ public class TileGenerator {
                     List<Point> coordinates = unitEntry.getValue();
 
                     unitCoordinatesByFaction
-                            .computeIfAbsent(faction, k -> new HashMap<>())
-                            .computeIfAbsent(unitId, k -> new ArrayList<>())
+                            .computeIfAbsent(faction, _ -> new HashMap<>())
+                            .computeIfAbsent(unitId, _ -> new ArrayList<>())
                             .addAll(coordinates);
                 }
             }
@@ -1648,7 +1648,7 @@ public class TileGenerator {
     }
 
     public static Point offsetTokenPositionForTokenPlanets(Point position, UnitHolder planet, Tile tile) {
-        if (position == null) return position;
+        if (position == null) return null;
         if (Constants.TOKEN_PLANETS.contains(planet.getName())) {
             Point centerPosition = planet.getHolderCenterPosition(tile);
             int radius = 55;

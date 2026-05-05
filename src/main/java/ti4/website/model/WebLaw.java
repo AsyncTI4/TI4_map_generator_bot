@@ -36,42 +36,42 @@ public class WebLaw {
         WebLaw webLaw = new WebLaw();
 
         // Basic identification
-        webLaw.setId(lawId);
-        webLaw.setUniqueId(uniqueId);
+        webLaw.id = lawId;
+        webLaw.uniqueId = uniqueId;
 
         // Get agenda model
         AgendaModel agendaModel = Mapper.getAgenda(lawId);
         if (agendaModel != null) {
-            webLaw.setName(agendaModel.getName());
-            webLaw.setType(agendaModel.getType());
-            webLaw.setTarget(agendaModel.getTarget());
-            webLaw.setText1(agendaModel.getText1());
-            webLaw.setText2(agendaModel.getText2());
-            webLaw.setMapText(agendaModel.getMapText());
-            webLaw.setDisplaysElectedFaction(agendaModel.displayElectedFaction());
+            webLaw.name = agendaModel.getName();
+            webLaw.type = agendaModel.getType();
+            webLaw.target = agendaModel.getTarget();
+            webLaw.text1 = agendaModel.getText1();
+            webLaw.text2 = agendaModel.getText2();
+            webLaw.mapText = agendaModel.getMapText();
+            webLaw.displaysElectedFaction = agendaModel.displayElectedFaction();
         }
 
         // Get elected information
         String electedInfo = game.getLawsInfo().get(lawId);
-        webLaw.setElectedInfo(electedInfo);
+        webLaw.electedInfo = electedInfo;
 
         if (electedInfo != null && !electedInfo.isEmpty()) {
             // Check if it's a player faction
             if (Mapper.isValidFaction(electedInfo)) {
-                webLaw.setElectedType("player");
-                webLaw.setElectedFaction(electedInfo);
+                webLaw.electedType = "player";
+                webLaw.electedFaction = electedInfo;
             }
             // Check if it's a planet
             else if (Mapper.isValidPlanet(electedInfo)) {
-                webLaw.setElectedType("planet");
+                webLaw.electedType = "planet";
             }
             // Check if it's a secret objective
             else if (Mapper.isValidSecretObjective(electedInfo)) {
-                webLaw.setElectedType("objective");
+                webLaw.electedType = "objective";
             }
             // Otherwise it's some other type of election
             else {
-                webLaw.setElectedType("other");
+                webLaw.electedType = "other";
             }
         }
 
@@ -86,7 +86,7 @@ public class WebLaw {
                 }
             }
         }
-        webLaw.setControlTokens(controlTokens);
+        webLaw.controlTokens = controlTokens;
 
         return webLaw;
     }

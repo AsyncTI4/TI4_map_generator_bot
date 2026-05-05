@@ -136,7 +136,7 @@ class DashboardSettingsService {
     }
 
     private static List<String> normalizePreferredColors(List<String> preferredColors) {
-        LinkedHashSet<String> normalized = new LinkedHashSet<>();
+        Set<String> normalized = new LinkedHashSet<>();
         for (String preferredColor : preferredColors) {
             if (preferredColor == null || preferredColor.isBlank()) {
                 continue;
@@ -151,7 +151,7 @@ class DashboardSettingsService {
     }
 
     private static String normalizeAfkHours(List<Integer> afkHours) {
-        LinkedHashSet<Integer> normalized = new LinkedHashSet<>();
+        Set<Integer> normalized = new LinkedHashSet<>();
         for (Integer afkHour : afkHours) {
             validate(afkHour != null, "AFK hours cannot contain null.");
             validate(afkHour >= 0 && afkHour < 24, "AFK hours must be between 0 and 23.");

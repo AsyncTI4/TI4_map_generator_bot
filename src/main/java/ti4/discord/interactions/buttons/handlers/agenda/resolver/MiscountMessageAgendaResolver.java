@@ -5,20 +5,10 @@ import ti4.game.Game;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 
-public class MiscountMessageAgendaResolver implements AgendaResolver {
-    @Override
-    public String getAgendaId() {
-        return agendaId;
-    }
-
-    private final String agendaId;
+public record MiscountMessageAgendaResolver(String agendaId) implements AgendaResolver {
 
     public MiscountMessageAgendaResolver() {
         this("miscount");
-    }
-
-    public MiscountMessageAgendaResolver(String agendaId) {
-        this.agendaId = agendaId;
     }
 
     @Override

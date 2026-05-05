@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -18,7 +19,16 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.helpers.*;
+import ti4.helpers.ActionCardHelper;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperTwilightsFall;
+import ti4.helpers.Helper;
+import ti4.helpers.NewStuffHelper;
+import ti4.helpers.RegexHelper;
+import ti4.helpers.StringHelper;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
@@ -50,7 +60,7 @@ public class TkHelperActionCards {
     public static boolean resolveTkActionCard(ActionCardModel card, Player player, String introMsg) {
         Game game = player.getGame();
         String resolve = "Resolve " + card.getName();
-        String ffcc = player.finChecker();
+        String ffcc = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
 
         // TODO ACTION CARDS
@@ -93,18 +103,14 @@ public class TkHelperActionCards {
             }
             case "tk-raze" -> buttons.add(Buttons.green(ffcc + "resolveRaze_" + game.getActiveSystem(), resolve));
             case "tk-riposte" -> nop(); // Button is automatically served upon being activated
-            case "tk-spite" -> {
-                // TODO
+            case "tk-spite" -> // TODO
                 nop();
-            }
-            case "tk-succor" -> {
-                // TODO
+            case "tk-succor" -> // TODO
                 nop();
-            }
             case "tk-thwart" -> buttons.add(Buttons.green(ffcc + "startThwart", "Start Thwart"));
         }
 
-        if (buttons != null && !buttons.isEmpty()) {
+        if (!buttons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), introMsg, buttons);
             return true;
         }
@@ -155,10 +161,10 @@ public class TkHelperActionCards {
     }
 
     private static List<Button> getTkBestowButtons(Player player, String resolve) {
-        String id = player.finChecker() + "resolveTkBestow_";
-        List<Button> buttons = List.of(1, 2, 3, 4).stream()
+        String id = player.factionButtonChecker() + "resolveTkBestow_";
+        List<Button> buttons = Stream.of(1, 2, 3, 4)
                 .map(n -> Buttons.green(id + n, "Resolve " + StringHelper.ordinal(n) + " Bestow"))
-                .collect(Collectors.toCollection(() -> new ArrayList<>()));
+                .collect(Collectors.toCollection(ArrayList::new));
         buttons.add(Buttons.DONE_DELETE_BUTTONS);
         return buttons;
     }
@@ -184,7 +190,7 @@ public class TkHelperActionCards {
                         && !p.getTokenList().contains("dmz")
                         && !p.getTokenList().contains("dmz_large"))
                 .map(p -> {
-                    String id = player.finChecker() + "resolveTkCommission_" + p.getName();
+                    String id = player.factionButtonChecker() + "resolveTkCommission_" + p.getName();
                     String label = Helper.getPlanetRepresentation(p.getName(), game);
                     for (Player p2 : game.getRealPlayers()) {
                         if (p2.hasPlanet(p.getName())) {
@@ -196,7 +202,7 @@ public class TkHelperActionCards {
                 .filter(Objects::nonNull)
                 .toList();
 
-        String prefix = player.finChecker() + "resolveTkCommission__";
+        String prefix = player.factionButtonChecker() + "resolveTkCommission__";
         String message = player.getRepresentation() + ", please choose a planet to place 1 neutral mech on.";
         NewStuffHelper.checkAndHandlePaginationChange(
                 event, player.getCorrectChannel(), buttons, message, prefix, buttonID);
@@ -267,15 +273,15 @@ public class TkHelperActionCards {
         List<String> unitStrs = new ArrayList<>();
         List<String> unitDescrs = new ArrayList<>();
         for (UnitKey key : space.getUnitKeysForPlayer(player)) {
-            UnitModel model = player.getUnitByType(key.getUnitType());
+            UnitModel model = player.getUnitByType(key.unitType());
 
             int amt = space.getUnitCount(key);
-            unitStrs.add(amt + " " + key.getUnitType().getValue());
+            unitStrs.add(amt + " " + key.unitType().getValue());
             unitDescrs.add(amt + "x " + model.getUnitEmoji() + " "
                     + model.getUnitType().humanReadableName());
 
-            if (model.getIsShip() && !key.getUnitType().equals(UnitType.Fighter)) {
-                cost += amt * model.getCost();
+            if (model.getIsShip() && key.unitType() != UnitType.Fighter) {
+                cost += (int) (amt * model.getCost());
             }
         }
 
@@ -304,11 +310,11 @@ public class TkHelperActionCards {
 
             for (UnitState state : UnitState.values()) {
                 if (space.getUnitCountForState(key, state) == 0) continue;
-                String unitStateStr = key.getUnitType().getValue() + "_" + state.name();
-                String stateStr = state.humanDescr() + (state.equals(UnitState.none) ? "" : " ");
+                String unitStateStr = key.unitType().getValue() + "_" + state.name();
+                String stateStr = state.humanDescr() + (state == UnitState.none ? "" : " ");
 
-                String id = player.finChecker() + "incubateUnit_" + pos + "_" + unitStateStr;
-                String label = "Replace 1 " + stateStr + key.getUnitType().humanReadableName();
+                String id = player.factionButtonChecker() + "incubateUnit_" + pos + "_" + unitStateStr;
+                String label = "Replace 1 " + stateStr + key.unitType().humanReadableName();
                 buttons.add(Buttons.blue(id, label, model.getUnitEmoji()));
             }
         }
@@ -331,7 +337,7 @@ public class TkHelperActionCards {
             RemoveUnitService.removeUnit(event, tile, game, player, space, type, 1, state);
             AddUnitService.addUnits(event, tile, game, player.getColor(), "dn");
 
-            String stateMsg = state.humanDescr() + (state.equals(UnitState.none) ? "" : " ");
+            String stateMsg = state.humanDescr() + (state == UnitState.none ? "" : " ");
             String message =
                     player.getRepresentationUnfogged() + " replaced 1 " + stateMsg + type.humanReadableName() + " on ";
             message +=
@@ -370,7 +376,7 @@ public class TkHelperActionCards {
         int h = ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous", false);
         int tgs = Math.max(c, Math.max(i, h));
 
-        String idPre = player.finChecker() + "tkInitiate_";
+        String idPre = player.factionButtonChecker() + "tkInitiate_";
         List<Button> buttons = new ArrayList<>();
         if (cr + ci > 0)
             buttons.add(Buttons.blue(
@@ -429,7 +435,7 @@ public class TkHelperActionCards {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getExhaustedPlanets()) {
             if (ButtonHelper.checkForTechSkips(game, planet)) {
-                String id = player.finChecker() + "ordainReadyPlanet_" + planet;
+                String id = player.factionButtonChecker() + "ordainReadyPlanet_" + planet;
                 String label = "Ready " + Helper.getPlanetRepresentation(planet, game);
                 buttons.add(Buttons.green(id, label));
             }
@@ -463,7 +469,7 @@ public class TkHelperActionCards {
                 }
             }
             if (count > 0) {
-                String id = player.finChecker() + "ordainDiscardOne_" + planetName + "_" + p2.getColor();
+                String id = player.factionButtonChecker() + "ordainDiscardOne_" + planetName + "_" + p2.getColor();
                 String label = "Discard " + p2.getColorDisplayName() + " ability (" + count + " available)";
                 buttons.add(Buttons.red(id, label, p2.getFactionEmoji()));
             }
@@ -491,7 +497,7 @@ public class TkHelperActionCards {
         // If they have biosynthetic, then that is the only discardable ability
         if (victim.hasAbility("tf-biosyntheticsynergy")) abilities = List.of("tf-biosyntheticsynergy");
 
-        String idPre = player.finChecker() + "ordainDiscard_" + victim.getColor() + "_";
+        String idPre = player.factionButtonChecker() + "ordainDiscard_" + victim.getColor() + "_";
         List<Button> buttons = new ArrayList<>();
         for (String tech : abilities) {
             TechnologyModel model = Mapper.getTech(tech);
@@ -567,7 +573,7 @@ public class TkHelperActionCards {
                 continue;
             }
             buttons.add(Buttons.gray(
-                    player.finChecker() + "rescuePart2_" + pos + "_" + tile.getPosition(),
+                    player.factionButtonChecker() + "rescuePart2_" + pos + "_" + tile.getPosition(),
                     tile.getRepresentationForButtons()));
         }
         MessageHelper.sendMessageToChannelWithButtons(

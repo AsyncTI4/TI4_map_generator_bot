@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
-import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
@@ -30,7 +29,7 @@ public class ArvaxiAgentButtonHandler {
             if (!p.hasUnexhaustedLeader("arvaxiagent")) continue;
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.gray(
-                    p.getFinsFactionCheckerPrefix() + "arvaxiAgentOffer_" + acIndex + "_" + discarder.getFaction(),
+                    p.factionButtonChecker() + "arvaxiAgentOffer_" + acIndex + "_" + discarder.getFaction(),
                     "Use Arvaxi Agent on " + acName,
                     CardEmojis.getACEmoji(game)));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
@@ -90,8 +89,7 @@ public class ArvaxiAgentButtonHandler {
         String acID = ActionCardHelper.getDiscardedAcID(game, acIndex);
         String acName = acID != null ? Mapper.getActionCard(acID).getName() : "the action card";
 
-        Leader agent = player.getLeader("arvaxiagent").orElse(null);
-        if (agent != null) ExhaustLeaderService.exhaustLeader(game, player, agent);
+        player.getLeader("arvaxiagent").ifPresent(agent -> ExhaustLeaderService.exhaustLeader(game, player, agent));
 
         game.pickActionCard(target.getUserID(), acIndex);
         ActionCardHelper.sendActionCardInfo(game, target);
@@ -105,7 +103,10 @@ public class ArvaxiAgentButtonHandler {
                 spendButtons);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                "Sent " + target.getColor() + " the buttons for resolving Marik, the Wise, the Arvaxi agent.");
+                player.getRepresentationNoPing() + " used "
+                        + Mapper.getLeader("arvaxiagent").getNameRepresentation()
+                        + " to allow " + target.getRepresentationNoPing() + " to retrieve _" + acName
+                        + "_ " + CardEmojis.getACEmoji(game) + " from the discard pile.");
         ButtonHelper.deleteMessage(event);
     }
 }

@@ -351,7 +351,7 @@ class Stats extends GameStateSubcommand {
                 }
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(
-                        player.getFinsFactionCheckerPrefix() + "removePlayerPermissions_" + player.getFaction(),
+                        player.factionButtonChecker() + "removePlayerPermissions_" + player.getFaction(),
                         "Remove View Permissions For " + player.getUserName()));
                 buttons.add(Buttons.red("deleteButtons", "Stay in channels"));
                 String msg = player.getRepresentation()

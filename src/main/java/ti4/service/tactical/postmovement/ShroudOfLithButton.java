@@ -10,8 +10,8 @@ import ti4.service.tactical.PostMovementButtonContext;
 
 public final class ShroudOfLithButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return ctx.player.hasAbility("shroud_of_lith")
-                && ButtonHelperFactionSpecific.getKolleccReleaseButtons(ctx.player, ctx.game)
+        return ctx.player().hasAbility("shroud_of_lith")
+                && ButtonHelperFactionSpecific.getKolleccReleaseButtons(ctx.player(), ctx.game())
                                 .size()
                         > 1;
     }

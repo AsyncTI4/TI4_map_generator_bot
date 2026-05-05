@@ -20,12 +20,11 @@ import ti4.contest.replay.persistence.CombatSideBetTypeConverter;
 @Entity
 @Table(
         name = "combat_replay_hacan_subsidy",
-        indexes = {@Index(name = "idx_hacan_subsidy_contest", columnList = "contest_id")},
-        uniqueConstraints = {
-            @UniqueConstraint(
-                    name = "uk_hacan_subsidy_contest_bet",
-                    columnNames = {"contest_id", "bet_type", "target_faction"})
-        })
+        indexes = @Index(name = "idx_hacan_subsidy_contest", columnList = "contest_id"),
+        uniqueConstraints =
+                @UniqueConstraint(
+                        name = "uk_hacan_subsidy_contest_bet",
+                        columnNames = {"contest_id", "bet_type", "target_faction"}))
 public class CombatReplayHacanSubsidyEntity {
 
     @Id

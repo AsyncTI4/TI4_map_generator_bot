@@ -21,12 +21,12 @@ public class TfForetellResolver implements EdictResolver {
     private static List<Button> buttons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (int loc = 1; loc <= game.getPublicObjectives1Peekable().size(); loc++) {
-            String id = player.finChecker() + "foretellPeak_1_" + loc;
+            String id = player.factionButtonChecker() + "foretellPeak_1_" + loc;
             String label = "Stage 1, Position " + loc;
             buttons.add(Buttons.green(id, label, CardEmojis.Public1alt));
         }
         for (int loc = 1; loc <= game.getPublicObjectives2Peekable().size(); loc++) {
-            String id = player.finChecker() + "foretellPeak_2_" + loc;
+            String id = player.factionButtonChecker() + "foretellPeak_2_" + loc;
             String label = "Stage 2, Position " + loc;
             buttons.add(Buttons.blue(id, label, CardEmojis.Public2alt));
         }
@@ -37,6 +37,9 @@ public class TfForetellResolver implements EdictResolver {
     public void handle(ButtonInteractionEvent event, Game game, Player player) {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), playerPing(player), buttons(game, player));
+        MessageHelper.sendMessageToChannel(
+                game.getMainGameChannel(),
+                "## A rules note: the speaker can choose which objective to reveal during status phase. Normally this doesnt matter, but if certain objectives have been peeked at with foretell, the speaker can purposely choose to reveal or not reveal those particular objectives (provided there are other valid options to choose from).");
     }
 
     @ButtonHandler("foretellPeak_")

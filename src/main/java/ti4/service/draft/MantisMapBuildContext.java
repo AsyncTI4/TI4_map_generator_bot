@@ -145,7 +145,7 @@ public record MantisMapBuildContext(
             }
             // This is 1-based
             Integer playerPosition = SpeakerOrderDraftable.getSpeakerOrderFromChoiceKey(
-                    picks.getFirst().getChoiceKey());
+                    picks.getFirst().choiceKey());
 
             if (playerPosition != null && playerPosition == playerNum) {
                 if (game.getPlayer(playerId) == null) {
@@ -170,10 +170,10 @@ public record MantisMapBuildContext(
             List<DraftChoice> mantisPicks = new ArrayList<>(entry.getValue().getPicks(MantisTileDraftable.TYPE));
 
             // Remove tiles that are placed on the game board
-            mantisPicks.removeIf(pick -> placedTiles.contains(MantisTileDraftable.getItemId(pick.getChoiceKey())));
+            mantisPicks.removeIf(pick -> placedTiles.contains(MantisTileDraftable.getItemId(pick.choiceKey())));
 
             // Remove tiles that are discarded
-            mantisPicks.removeIf(pick -> discardedTiles.contains(MantisTileDraftable.getItemId(pick.getChoiceKey())));
+            mantisPicks.removeIf(pick -> discardedTiles.contains(MantisTileDraftable.getItemId(pick.choiceKey())));
 
             // Collect unplaced picks as separate lists of BlueTileDraftItems and
             // RedTileDraftItems
@@ -193,8 +193,8 @@ public record MantisMapBuildContext(
             for (DraftChoice choice : playerPicks) {
 
                 // Add choice to the correct list
-                DraftCategory category = mantisDraftable.getItemCategory(choice.getChoiceKey());
-                String tileId = MantisTileDraftable.getItemId(choice.getChoiceKey());
+                DraftCategory category = mantisDraftable.getItemCategory(choice.choiceKey());
+                String tileId = MantisTileDraftable.getItemId(choice.choiceKey());
                 if (category == DraftCategory.BLUETILE) {
                     blueTileIds.add(tileId);
                 } else if (category == DraftCategory.REDTILE) {

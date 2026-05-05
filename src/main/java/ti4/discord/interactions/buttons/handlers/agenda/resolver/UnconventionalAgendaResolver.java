@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 public class UnconventionalAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "unconventional";
     }
 

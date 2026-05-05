@@ -19,7 +19,7 @@ public enum CombatSideBetType {
     /** Current dynamic side bet: every die in player's first combat roll hits. */
     ROUND_ONE_SLAM("R1 Slam", DiceEmojis.d10green_0, 0, 30),
     /** Current tracked interaction side bet. */
-    MORALE_BOOST("Plays Morale Boost", CardEmojis.ActionCard, 0, 8),
+    MORALE_BOOST("Plays Morale Boost", CardEmojis.ActionCard, 0, 12),
     /** Current tracked interaction side bet. */
     SHIELDS_HOLDING("Plays Shields Holding", CardEmojis.ActionCard, 0, 8),
     /** Current tracked interaction side bet. */
@@ -27,7 +27,7 @@ public enum CombatSideBetType {
     /** Current tracked interaction side bet. */
     FIGHTER_PROTOTYPE("Plays Fighter Prototype", CardEmojis.ActionCard, 0, 24),
     /** Current dynamic resolution side bet. */
-    WINNER_ONE_HP("Wins On 1\uFE0F\u20E3 HP", "1\uFE0F\u20E3", 0, 35);
+    WINNER_ONE_HP("Wins On 1️⃣ HP", "1️⃣", 0, 35);
 
     private final String label;
     private final TI4Emoji emoji;

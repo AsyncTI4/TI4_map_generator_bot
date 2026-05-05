@@ -17,7 +17,7 @@ public class TfAriseResolver implements EdictResolver {
     String edict = "tf-arise";
 
     private static List<Button> buttons(Player player) {
-        String id = player.finChecker();
+        String id = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(id + "riseOfAMessiah", "Infantry On Every Planet", UnitEmojis.infantry));
         buttons.add(Buttons.green(id + "fighterConscription", "Fighter With Every Ship", UnitEmojis.fighter));

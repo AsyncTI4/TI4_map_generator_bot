@@ -63,8 +63,8 @@ class UnitsTest extends BaseTi4Test {
             UnitKey restoredUnitKey = JsonValidator.jsonCycleObject(unitKey, UnitKey.class);
 
             // Then
-            assertEquals(expectedColorId, restoredUnitKey.getColorID());
-            assertEquals(expectedUnitType, restoredUnitKey.getUnitType());
+            assertEquals(expectedColorId, restoredUnitKey.colorID());
+            assertEquals(expectedUnitType, restoredUnitKey.unitType());
         }
 
         @Test
@@ -72,7 +72,7 @@ class UnitsTest extends BaseTi4Test {
             UnitKey restoredUnitKey =
                     JSON_MAPPER.readValue("{\"unitType\":\"Cruiser\",\"colorID\":\"blu\"}", UnitKey.class);
 
-            assertEquals(UnitType.Cruiser, restoredUnitKey.getUnitType());
+            assertEquals(UnitType.Cruiser, restoredUnitKey.unitType());
         }
 
         @Test

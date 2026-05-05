@@ -114,7 +114,7 @@ public class RepositoryDispatchEvent {
                         .build();
 
                 try (Response response = client.newCall(request).execute()) {
-                    if (!response.isSuccessful() || response.body() == null) continue;
+                    if (!response.isSuccessful()) continue;
 
                     JsonNode root =
                             JsonMapperManager.basic().readTree(response.body().string());

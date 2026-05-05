@@ -15,6 +15,8 @@ public final class MidasTurbineButton implements MoveAbilityButton {
 
     public List<Button> build(MoveContext ctx) {
         return List.of(Buttons.green(
-                ctx.player.finChecker() + "exhaustTech_dsvadeb", "Exhaust Midas Turbine", FactionEmojis.vaden));
+                ctx.player.factionButtonChecker() + "exhaustTech_dsvadeb",
+                "Exhaust Midas Turbine",
+                FactionEmojis.vaden));
     }
 }

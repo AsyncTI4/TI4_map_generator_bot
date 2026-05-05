@@ -12,18 +12,7 @@ import ti4.message.MessageHelper;
 import ti4.service.agenda.IxthianArtifactService;
 import ti4.service.emoji.PlanetEmojis;
 
-public class ArtifactAgendaResolver implements ForAgainstAgendaResolver {
-
-    private final String agendaId;
-
-    public ArtifactAgendaResolver(String agendaId) {
-        this.agendaId = agendaId;
-    }
-
-    @Override
-    public String getAgendaId() {
-        return agendaId;
-    }
+public record ArtifactAgendaResolver(String agendaId) implements ForAgainstAgendaResolver {
 
     @Override
     public void handleFor(Game game, ButtonInteractionEvent event, int agendaNumericId) {

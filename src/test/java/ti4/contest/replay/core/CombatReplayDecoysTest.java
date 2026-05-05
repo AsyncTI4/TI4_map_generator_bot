@@ -263,6 +263,7 @@ class CombatReplayDecoysTest extends BaseTi4Test {
         String message = CombatReplayDecoys.renderDisappearanceMessage(abilities);
 
         assertTrue(message.contains("## False Colors Revealed"));
+        assertTrue(message.contains("As the replay begins"));
         assertTrue(message.contains("<ghost> 2 cruisers"));
         assertTrue(message.contains("<yin> 1 destroyer"));
     }

@@ -25,7 +25,7 @@ class RotateHyperlane extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String positionOption = event.getOptions().get(0).getAsString();
+        String positionOption = event.getOptions().getFirst().getAsString();
         Set<String> positions = Helper.getSetFromCSV(positionOption);
 
         for (String position : positions) {

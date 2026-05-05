@@ -9,6 +9,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -305,9 +306,7 @@ public class PlayerTechService {
             case "absol_nm" -> { // Absol's Neural Motivator
                 ButtonHelper.deleteTheOneButton(event);
                 Button draw2ACButton = Buttons.gray(
-                        player.getFinsFactionCheckerPrefix() + "draw2 AC",
-                        "Draw 2 Action Cards",
-                        CardEmojis.getACEmoji(game));
+                        player.factionButtonChecker() + "draw2 AC", "Draw 2 Action Cards", CardEmojis.getACEmoji(game));
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", draw2ACButton);
                 // sendNextActionButtonsIfButtonEvent(event, game, player);
             }
@@ -330,7 +329,7 @@ public class PlayerTechService {
                 ButtonHelper.resolveTransitDiodesStep1(game, player);
             case "miltymod_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
                 Button gainCC = Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "gain_CCdeletethismessage", "Gain Command Tokens");
+                        player.factionButtonChecker() + "gain_CCdeletethismessage", "Gain Command Tokens");
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getFactionEmojiOrColor() + " use button to gain 1 command token.",
@@ -339,7 +338,7 @@ public class PlayerTechService {
             case "absol_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "gain_CCdeletethismessage", "Gain Command Tokens"));
+                        player.factionButtonChecker() + "gain_CCdeletethismessage", "Gain Command Tokens"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getFactionEmojiOrColor() + " use button to gain 1 command token.",
@@ -526,8 +525,7 @@ public class PlayerTechService {
     }
 
     public static List<Button> getSlingRelayButtons(Game game, Player player) {
-        Set<Tile> tiles = new HashSet<>();
-        tiles.addAll(
+        Set<Tile> tiles = new HashSet<>(
                 ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock, UnitType.PlenaryOrbital));
         if (player.hasUnit("ghoti_flagship")) {
             tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Flagship));
@@ -551,7 +549,7 @@ public class PlayerTechService {
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player || p2.getAcCount() == 0) continue;
 
-            String id = player.finChecker() + "getACFrom_" + p2.getFaction();
+            String id = player.factionButtonChecker() + "getACFrom_" + p2.getFaction();
             String label = p2.getFactionModel().getShortName();
             String emoji = p2.getFactionEmoji();
 
@@ -578,7 +576,7 @@ public class PlayerTechService {
 
     private static void deleteIfButtonEvent(GenericInteractionCreateEvent event) {
         if (event instanceof ButtonInteractionEvent) {
-            ((ButtonInteractionEvent) event).getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            ((ComponentInteraction) event).getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 

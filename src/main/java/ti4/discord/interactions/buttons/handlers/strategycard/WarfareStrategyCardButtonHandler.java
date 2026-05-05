@@ -17,7 +17,7 @@ import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 
 @UtilityClass
-public class WarfareStrategyCardButtonHandler {
+class WarfareStrategyCardButtonHandler {
 
     @ButtonHandler("primaryOfWarfare")
     public static void primaryOfWarfare(ButtonInteractionEvent event, Player player, Game game) {
@@ -34,8 +34,9 @@ public class WarfareStrategyCardButtonHandler {
 
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.blue(
-                player.finChecker() + "redistributeCCButtons_deleteThisButton", "Redistribute Command Tokens"));
-        buttons.add(Buttons.red(player.finChecker() + "beginTacticalTeWarfare", "Perform Tactical Action"));
+                player.factionButtonChecker() + "redistributeCCButtons_deleteThisButton",
+                "Redistribute Command Tokens"));
+        buttons.add(Buttons.red(player.factionButtonChecker() + "beginTacticalTeWarfare", "Perform Tactical Action"));
         String message =
                 "Use the buttons to resolve the primary of **Warfare**. Redistributing your command tokens is optional.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);

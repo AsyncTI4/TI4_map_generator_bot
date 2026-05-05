@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 import ti4.service.actioncard.ForceGiveActionCardService;
 
 @UtilityClass
-public class ArvaxiAbilityButtonHandler {
+class ArvaxiAbilityButtonHandler {
 
     @ButtonHandler("underhandedManeuverPickNeighbor")
     public static void underhandedManeuverPickNeighbor(ButtonInteractionEvent event, Player player, Game game) {

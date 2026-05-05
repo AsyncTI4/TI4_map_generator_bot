@@ -235,11 +235,11 @@ public class FrankenDraftBagService {
             List<Button> queueButtons = new ArrayList<>();
             if (isQueueFull || draftables.isEmpty()) {
                 queueButtons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "frankenDraftAction;confirm_draft",
+                        player.factionButtonChecker() + "frankenDraftAction;confirm_draft",
                         "I wish to draft these cards."));
             }
             queueButtons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "frankenDraftAction;reset_queue",
+                    player.factionButtonChecker() + "frankenDraftAction;reset_queue",
                     "I wish to draft different cards."));
             MessageHelper.sendMessageToChannelWithButtons(
                     bagChannel,
@@ -304,10 +304,8 @@ public class FrankenDraftBagService {
         List<Button> buttons = new ArrayList<>();
         boolean draftable = DraftItem.isDraftable(player, cat);
         if (!items.isEmpty()) {
-            // String descrButtonID = ACTION_NAME + "showDescr_" + cat.ordinal();
-            // buttons.add(Buttons.blue(descrButtonID, "Show " + cat + " Descriptions"));
             for (DraftItem item : items) {
-                String buttonID = player.finChecker() + ACTION_NAME + item.getAlias();
+                String buttonID = player.factionButtonChecker() + ACTION_NAME + item.getAlias();
                 Button b = Buttons.green(buttonID, item.getShortDescription(), item.getItemEmoji());
                 if (!draftable) b = b.asDisabled().withStyle(ButtonStyle.DANGER);
                 buttons.add(b);

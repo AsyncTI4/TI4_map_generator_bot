@@ -152,8 +152,7 @@ public class FOWCombatThreadMirroring {
             if (pChan != null) {
                 boolean combatParticipant = combatParticipants.contains(playerOther);
                 String newMessage =
-                        (combatParticipant ? playerOther.getRepresentation(true, combatParticipant) + " " : "")
-                                + message;
+                        (combatParticipant ? playerOther.getRepresentation(true, true) + " " : "") + message;
 
                 List<ThreadChannel> threadChannels = pChan.getThreadChannels();
                 for (ThreadChannel threadChannel_ : threadChannels) {

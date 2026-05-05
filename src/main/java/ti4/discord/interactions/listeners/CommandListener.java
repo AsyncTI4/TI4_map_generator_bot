@@ -1,6 +1,5 @@
 package ti4.discord.interactions.listeners;
 
-import java.time.Duration;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.AsyncTI4DiscordBot;
@@ -31,7 +30,7 @@ interface CommandListener {
 
     default <T extends GenericCommandInteractionEvent> void warnForLongRunningCommands(
             T event, long processStartTimeMs) {
-        if (!AsyncTI4DiscordBot.durationHasPassedSinceStartup(Duration.ofMinutes(2))) return;
+        if (AsyncTI4DiscordBot.isUnstable()) return;
 
         long endTime = System.currentTimeMillis();
         long eventTimeMs = DateTimeHelper.getLongDateTimeFromDiscordSnowflake(event.getInteraction());

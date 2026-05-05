@@ -9,7 +9,7 @@ import ti4.helpers.Helper;
 
 public class PlowsharesAgendaResolver implements ForAgainstAgendaResolver {
     @Override
-    public String getAgendaId() {
+    public String agendaId() {
         return "plowshares";
     }
 

@@ -19,7 +19,7 @@ import ti4.model.TechnologyModel;
 import ti4.service.option.TEOptionService;
 
 @UtilityClass
-public class GalacticEventButtonHandler {
+class GalacticEventButtonHandler {
 
     @ButtonHandler("enableDaneMode_")
     public static void enableGalacticEvent(ButtonInteractionEvent event, String buttonID, Game game) {

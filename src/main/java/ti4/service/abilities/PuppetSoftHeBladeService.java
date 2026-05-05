@@ -57,7 +57,7 @@ public class PuppetSoftHeBladeService {
         flipFactionToObsidian(game, player);
 
         // Announce Plots
-        String factionName = player.getDisplayName();
+        String factionName = player.getRepresentationNoPing();
         StringBuilder plotInfo = new StringBuilder("## __" + factionName + " plots are now revealed:__");
         for (String plotID : player.getPlotCards().keySet()) {
             GenericCardModel plot = Mapper.getPlot(plotID);
@@ -98,7 +98,7 @@ public class PuppetSoftHeBladeService {
 
     private static void revealPlotSeethe(Player obsidian, List<Player> puppets) {
         List<Button> seetheButtons = new ArrayList<>();
-        String prefix = obsidian.finChecker() + "revealSeethe_";
+        String prefix = obsidian.factionButtonChecker() + "revealSeethe_";
         for (Player p : puppets) {
             if (p == null) continue;
             String label = p.getFactionNameOrColor();
@@ -110,7 +110,7 @@ public class PuppetSoftHeBladeService {
 
     private static void revealPlotExtract(Player obsidian, List<Player> puppets) {
         List<Button> extractButtons = new ArrayList<>();
-        String prefix = obsidian.finChecker() + "revealExtract_";
+        String prefix = obsidian.factionButtonChecker() + "revealExtract_";
         for (Player p : puppets) {
             if (p == null) continue;
             String label = p.getFactionNameOrColor();
@@ -121,8 +121,7 @@ public class PuppetSoftHeBladeService {
     }
 
     private static void flipFactionToObsidian(Game game, Player player) {
-        List<String> outputStrings = new ArrayList<>();
-        outputStrings.addAll(flipFirmamentComponentsToObsidianComponents(game, player));
+        List<String> outputStrings = new ArrayList<>(flipFirmamentComponentsToObsidianComponents(game, player));
         String msg = "### " + player.getRepresentationUnfogged();
         msg += " the following components have been updated:\n> ";
         msg += String.join("\n> ", outputStrings);
@@ -219,9 +218,7 @@ public class PuppetSoftHeBladeService {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
             output.add(String.format(fmt, oldLeader.getName(), newLeader.getName()));
         });
-        player.getLeaderByID("firmamenthero").ifPresent(oldLeader -> {
-            player.removeLeader(oldLeader);
-        });
+        player.getLeaderByID("firmamenthero").ifPresent(player::removeLeader);
         Leader newLeader = new Leader("obsidianhero");
         player.addLeader(newLeader);
         HeroUnlockCheckService.checkIfHeroUnlocked(player.getGame(), player);
@@ -313,6 +310,13 @@ public class PuppetSoftHeBladeService {
         player.setFaction("obsidian");
         player.setFactionEmoji(null);
         player.setCommoditiesBase(obsidian.getCommodities());
+        FactionModel firmament = Mapper.getFaction("firmament");
+        for (String ability : firmament.getAbilities()) {
+            player.removeAbility(ability);
+        }
+        for (String ability : obsidian.getAbilities()) {
+            player.addAbility(ability);
+        }
         outputs.add("Successfully updated faction sheet to _Obsidian_.");
 
         // Replace laws and stuff

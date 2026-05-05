@@ -37,17 +37,14 @@ public class FealtyUplinkService {
     public boolean canUseFealty(Game game, Player player, Tile tile) {
         if (tile == null) return false;
         if (player.hasUnlockedBreakthrough("l1z1xbt")) return true;
-        if (player.hasUnit("tk-fealtycore") && tile.getSpaceUnitHolder().getUnitCount(UnitType.Warsun, player) > 0) {
-            return true;
-        }
-        return false;
+        return player.hasUnit("tk-fealtycore") && tile.getSpaceUnitHolder().getUnitCount(UnitType.Warsun, player) > 0;
     }
 
     public void postInitialButtons(Game game, Player player, String planetName) {
         String prettyPlanet = Helper.getPlanetRepresentationNoResInf(planetName, game);
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
-                player.finChecker() + "fealtyUplink_" + planetName,
+                player.factionButtonChecker() + "fealtyUplink_" + planetName,
                 "Use " + name(game) + " on " + prettyPlanet,
                 FactionEmojis.L1Z1X));
         String message = "When you gain control of a planet, you may use " + rep(game);

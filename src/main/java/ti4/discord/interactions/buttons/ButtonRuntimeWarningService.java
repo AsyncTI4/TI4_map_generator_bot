@@ -19,7 +19,6 @@ class ButtonRuntimeWarningService {
             Duration.ofMinutes(2).toSeconds();
     private static final long PAUSE_AFTER_WARNING_SECONDS =
             Duration.ofMinutes(5).toSeconds();
-    private static final Duration TO_WAIT_BEFORE_CHECKS_START = Duration.ofMinutes(2);
 
     private int runtimeWarningCount;
     private Instant pauseWarningsUntil = Instant.now();
@@ -44,7 +43,7 @@ class ButtonRuntimeWarningService {
             long contextCreationRuntimeMs,
             long resolveRuntimeMs,
             long saveRuntimeMs) {
-        if (!AsyncTI4DiscordBot.durationHasPassedSinceStartup(TO_WAIT_BEFORE_CHECKS_START)) return;
+        if (AsyncTI4DiscordBot.isUnstable()) return;
 
         runtimeSubmissionCount++;
 

@@ -39,7 +39,7 @@ class MantisTileDraftableConfigure extends GameStateSubcommand {
         if (event.getOption("mulliganed_tiles") != null) {
             String commaSeparatedTiles = event.getOption("mulliganed_tiles").getAsString();
             draftable.getMulliganTileIDs().clear();
-            if (commaSeparatedTiles != null && !commaSeparatedTiles.trim().isEmpty()) {
+            if (!commaSeparatedTiles.trim().isEmpty()) {
                 draftable
                         .getMulliganTileIDs()
                         .addAll(Stream.of(commaSeparatedTiles.split(","))
@@ -51,7 +51,7 @@ class MantisTileDraftableConfigure extends GameStateSubcommand {
         if (event.getOption("discarded_tiles") != null) {
             String commaSeparatedTiles = event.getOption("discarded_tiles").getAsString();
             draftable.getDiscardedTileIDs().clear();
-            if (commaSeparatedTiles != null && !commaSeparatedTiles.trim().isEmpty()) {
+            if (!commaSeparatedTiles.trim().isEmpty()) {
                 draftable
                         .getDiscardedTileIDs()
                         .addAll(Stream.of(commaSeparatedTiles.split(","))

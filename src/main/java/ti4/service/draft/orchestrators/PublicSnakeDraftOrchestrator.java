@@ -161,7 +161,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         }
         // Ensure no one else has picked this choice
         if (!draftManager
-                .getPlayersWithChoiceKey(choice.getType(), choice.getChoiceKey())
+                .getPlayersWithChoiceKey(choice.type(), choice.choiceKey())
                 .isEmpty()) {
             return DraftButtonService.USER_MISTAKE_PREFIX + "That choice has already been taken.";
         }
@@ -169,7 +169,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         // Persist the choice in Player State.
         Map<DraftableType, List<DraftChoice>> playerChoices =
                 draftManager.getPlayerStates().get(playerUserId).getPicks();
-        playerChoices.computeIfAbsent(choice.getType(), k -> new ArrayList<>()).add(choice);
+        playerChoices.computeIfAbsent(choice.type(), _ -> new ArrayList<>()).add(choice);
 
         // Send announcement of pick
         Player player = draftManager.getGame().getPlayer(playerUserId);
@@ -183,7 +183,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             sb.append("(from queue) ");
         }
 
-        sb.append(choice.getFormattedName()).append("!");
+        sb.append(choice.formattedName()).append("!");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
 
         // Move the draft to the next player
@@ -215,11 +215,11 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         if (!undeterministicPicks && !totalPossiblePicks.isEmpty() && totalPossiblePicks.size() == simultaneousPicks) {
             Player nextPlayer = draftManager.getGame().getPlayer(getCurrentPlayer(playerOrder));
             DraftChoice forcedPick = totalPossiblePicks.getFirst();
-            Draftable forcedDraftable = draftManager.getDraftable(forcedPick.getType());
+            Draftable forcedDraftable = draftManager.getDraftable(forcedPick.type());
             String status = draftManager.routeCommand(
                     event,
                     nextPlayer,
-                    forcedDraftable.makeCommandKey(forcedPick.getChoiceKey()),
+                    forcedDraftable.makeCommandKey(forcedPick.choiceKey()),
                     DraftManager.CommandSource.DETERMINISTIC_PICK);
             DraftButtonService.handleButtonResult(event, status);
         } else {
@@ -231,7 +231,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
                     playerOrder,
                     getCurrentPlayer(playerOrder),
                     getNextPlayer(playerOrder),
-                    choice.getType());
+                    choice.type());
             PublicDraftInfoService.pingCurrentPlayer(
                     draftManager,
                     getCurrentPlayer(playerOrder),
