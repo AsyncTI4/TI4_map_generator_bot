@@ -5127,11 +5127,10 @@ public class ButtonHelper {
     public static List<Button> getPossibleRings(Player player, Game game) {
         String factionChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> ringButtons = new ArrayList<>();
-        // Pre-compute once in FoW+ mode to avoid repeated expensive recomputation in the helpers below.
-        Set<String> visiblePositions =
+        Set<String> visibleFOWPositions =
                 FOWPlusService.isActive(game) ? FoWHelper.getTilePositionsToShow(game, player) : null;
         Tile centerTile = game.getTileByPosition("000");
-        if (centerTile != null && FOWPlusService.canActivatePosition("000", player, game, visiblePositions)) {
+        if (centerTile != null && FOWPlusService.canActivatePosition("000", player, game, visibleFOWPositions)) {
             if (!CommandCounterHelper.hasCC(player, centerTile) || game.isWarfareAction() || game.isL1Hero()) {
                 Button rex = Buttons.green(
                         factionChecker + "ringTile_000",
@@ -5142,7 +5141,7 @@ public class ButtonHelper {
         }
         int rings = game.getRingCount();
         for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)) {
-            if (!canActivateTile(game, player, tile, visiblePositions)) continue;
+            if (!canActivateTile(game, player, tile, visibleFOWPositions)) continue;
             ringButtons.add(Buttons.green(
                     factionChecker + "ringTile_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player),
@@ -5157,7 +5156,7 @@ public class ButtonHelper {
         Button corners = Buttons.green(factionChecker + "ring_corners", cornerStr);
         ringButtons.add(corners);
         if (FOWPlusService.isActive(game)) {
-            FOWPlusService.filterRingButtons(ringButtons, player, game, visiblePositions);
+            FOWPlusService.filterRingButtons(ringButtons, player, game, visibleFOWPositions);
             ringButtons.add(Buttons.red(factionChecker + "blindTileSelection~MDL", "Blind Tile"));
         }
         return ringButtons;
@@ -5167,11 +5166,6 @@ public class ButtonHelper {
         return canActivateTile(game, player, tile, null);
     }
 
-    /**
-     * @param visiblePositions optional pre-computed result of {@link FoWHelper#getTilePositionsToShow}; pass
-     *     {@code null} to let this method compute it on demand. Callers that already hold the set should pass it to
-     *     avoid redundant expensive recomputation.
-     */
     public static boolean canActivateTile(Game game, Player player, Tile tile, @Nullable Set<String> visiblePositions) {
         if (tile == null || (tile.getTileModel() != null && tile.getTileModel().isHyperlane())) return false;
         if (game.isNaaluAgent() && tile.isHomeSystem(game)) return false;

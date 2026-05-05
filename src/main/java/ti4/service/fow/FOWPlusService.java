@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nullable;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
@@ -114,16 +115,6 @@ public final class FOWPlusService {
         }
     }
 
-    // Only allow activating positions player can see
-    public static boolean canActivatePosition(String position, Player player, Game game) {
-        return canActivatePosition(position, player, game, null);
-    }
-
-    /**
-     * @param visiblePositions optional pre-computed result of {@link FoWHelper#getTilePositionsToShow}; pass
-     *     {@code null} to let this method compute it on demand. Callers that already hold the set should pass it to
-     *     avoid redundant expensive recomputation.
-     */
     public static boolean canActivatePosition(String position, Player player, Game game, Set<String> visiblePositions) {
         if (!isActive(game) || game.isWarfareAction()) return true;
         if (visiblePositions != null) return visiblePositions.contains(position);
@@ -185,17 +176,9 @@ public final class FOWPlusService {
         event.getMessageChannel().deleteMessageById(origMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    // Remove ring buttons player has no tiles they can activate
-    public static void filterRingButtons(List<Button> ringButtons, Player player, Game game) {
-        filterRingButtons(ringButtons, player, game, FoWHelper.getTilePositionsToShow(game, player));
-    }
-
-    /**
-     * @param visiblePositions pre-computed result of {@link FoWHelper#getTilePositionsToShow} for {@code player}.
-     *     Callers that already hold the set should pass it to avoid redundant recomputation.
-     */
     public static void filterRingButtons(
-            List<Button> ringButtons, Player player, Game game, Set<String> visiblePositions) {
+            List<Button> ringButtons, Player player, Game game, @Nullable Set<String> visiblePositions) {
+        if (visiblePositions == null) visiblePositions = FoWHelper.getTilePositionsToShow(game, player);
         Tile centerTile = game.getTileByPosition("000");
         if (!visiblePositions.contains("000")
                 || centerTile != null
@@ -211,19 +194,12 @@ public final class FOWPlusService {
         for (Button button : new ArrayList<>(ringButtons)) {
             if (button.getLabel().startsWith("Ring #")) {
                 String ring = button.getLabel().replace("Ring #", "");
-                int ringN = Integer.parseInt(ring);
-                int totalTiles = ringN * 6;
-                boolean hasActivatableTile = false;
-                for (int x = 1; x <= totalTiles && !hasActivatableTile; x++) {
-                    String pos = ringN + (x < 10 ? "0" + x : "" + x);
-                    if (visiblePositions.contains(pos)) {
-                        Tile tile = game.getTileByPosition(pos);
-                        if (ButtonHelper.canActivateTile(game, player, tile, visiblePositions)) {
-                            hasActivatableTile = true;
-                        }
-                    }
-                }
-                if (!hasActivatableTile) {
+                int leftSize = ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_left")
+                        .size();
+                int rightSize = ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_right")
+                        .size();
+                int availableTiles = leftSize + rightSize - 2;
+                if (availableTiles == 0) {
                     ringButtons.remove(button);
                 }
             }
