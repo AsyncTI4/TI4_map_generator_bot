@@ -1,7 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -903,7 +902,7 @@ public final class ButtonHelperAbilities {
             if (player.hasUnexhaustedLeader("mentakagent")) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green(
-                        "FFCC_" + player.getFaction() + "_" + "exhaustAgent_mentakagent_" + pillaged.getFaction(),
+                        player.factionButtonChecker() + "exhaustAgent_mentakagent_" + pillaged.getFaction(),
                         "Use Mentak Agent",
                         FactionEmojis.Mentak));
                 buttons.add(Buttons.red("deleteButtons", "Done"));
@@ -2342,6 +2341,7 @@ public final class ButtonHelperAbilities {
         switch (reason) {
             case "mitosis" -> reason = "**Mitosis**";
             case "refit" -> reason = "_Refit Troops_";
+            case "l1z1x" -> reason = "L1Z1X Agent";
             default -> reason = "_" + capitalize(reason) + "_";
         }
         String successMessage;

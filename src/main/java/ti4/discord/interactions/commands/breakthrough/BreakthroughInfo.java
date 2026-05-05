@@ -2,6 +2,7 @@ package ti4.discord.interactions.commands.breakthrough;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.TyrisBreakthroughButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
@@ -17,6 +18,10 @@ class BreakthroughInfo extends GameStateSubcommand {
 
     public void execute(SlashCommandInteractionEvent event) {
         Player p2 = CommandHelper.getOtherPlayerFromEvent(getGame(), event);
+        if (p2 == null) p2 = getPlayer();
         BreakthroughCommandHelper.sendBreakthroughInfo(event, getGame(), getPlayer(), p2);
+        if (p2.hasUnlockedBreakthrough("tyrisbt")) {
+            TyrisBreakthroughButtonHandler.sendNonLinearTimeProgressionInfo(getGame(), p2, getPlayer());
+        }
     }
 }

@@ -812,7 +812,7 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getTilesToGhotiHeroIn(Player player, Game game) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
             if (FoWHelper.playerHasShipsInSystem(player, tileEntry.getValue())) {
@@ -829,7 +829,7 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getUnitsToGlimmersHero(Player player, Tile tile) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         Set<UnitType> allowedUnits = Set.of(
                 UnitType.Destroyer,
                 UnitType.Cruiser,
@@ -868,7 +868,7 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getTilesToGlimmersHeroIn(Player player, Game game) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
             if (FoWHelper.playerHasShipsInSystem(player, tileEntry.getValue())) {
@@ -916,7 +916,7 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getButtonsForGheminaLadyHero(Player player, Game game) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         List<Tile> tilesWithBombard = CheckUnitContainmentService.getTilesContainingPlayersUnits(
                 game, player, UnitType.Lady, UnitType.Flagship);
@@ -943,7 +943,7 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getButtonsForGheminaLordHero(Player player, Game game) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         List<Tile> tilesWithBombard = CheckUnitContainmentService.getTilesContainingPlayersUnits(
                 game, player, UnitType.Lady, UnitType.Flagship);
@@ -1030,23 +1030,6 @@ public class ButtonHelperHeroes {
         return techToGain;
     }
 
-    public static List<Button> getArboHeroButtons(Game game, Player player) {
-        List<Button> buttons = new ArrayList<>();
-        List<Tile> tiles = new ArrayList<>();
-        tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Infantry));
-        tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Mech));
-        List<String> poses = new ArrayList<>();
-        for (Tile tile : tiles) {
-            if (!poses.contains(tile.getPosition())) {
-                buttons.add(Buttons.green(
-                        "arboHeroBuild_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
-                poses.add(tile.getPosition());
-            }
-        }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
-        return buttons;
-    }
-
     public static List<Button> getSaarHeroButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         List<Tile> tilesUsed = new ArrayList<>();
@@ -1100,17 +1083,6 @@ public class ButtonHelperHeroes {
                 player.getFactionEmoji() + " destroyed all opposing infantry and fighters in "
                         + tile.getRepresentationForButtons(game, player) + " using Gurno Aggero, the Saar hero.");
         ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("arboHeroBuild_")
-    public static void resolveArboHeroBuild(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        String pos = buttonID.split("_")[1];
-        List<Button> buttons;
-        buttons =
-                Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "arboHeroBuild", "place");
-        String message = player.getRepresentation() + " Use the buttons to produce units. ";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     public static List<Button> getNekroHeroButtons(Player player, Game game) {
@@ -1282,7 +1254,7 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getCabalHeroButtons(Player player, Game game) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> empties = new ArrayList<>();
 
         List<Tile> tiles = new ArrayList<>();
@@ -1335,7 +1307,7 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getEmpyHeroButtons(Player player, Game game) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         var frontierTokenId = Mapper.getTokenID(Constants.FRONTIER);
         return game.getTileMap().values().stream()
                 .filter(tile -> FoWHelper.playerHasShipsInSystem(player, tile))
@@ -1674,7 +1646,7 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getJolNarHeroSwapOutOptions(Player player) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
@@ -1687,7 +1659,7 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getBenediction1stTileOptions(Player player, Game game) {
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         for (Tile tile1 : game.getTileMap().values()) {
             String pos1 = tile1.getPosition();

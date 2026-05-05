@@ -1,7 +1,7 @@
 package ti4.game;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -1651,7 +1651,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     private void swapObjective(List<String> objectiveList, int place1, int place2) {
-        if (objectiveList.isEmpty()) return;
+        if (objectiveList.isEmpty() || place1 == place2) return;
         place1 -= 1;
         place2 -= 1;
         String id = objectiveList.get(place1);

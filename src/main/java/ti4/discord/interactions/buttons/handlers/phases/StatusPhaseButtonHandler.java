@@ -67,6 +67,14 @@ class StatusPhaseButtonHandler {
         if (!game.isRedTapeMode() && !game.isCivilizedSocietyMode()) {
             if ("2".equalsIgnoreCase(stage)) {
                 RevealPublicObjectiveService.revealS2(game, event);
+            } else if (stage.contains("2position_")) {
+                int location = Integer.parseInt(stage.replace("2position_", ""));
+                game.swapStage2(1, location);
+                RevealPublicObjectiveService.revealS2(game, event);
+            } else if (stage.contains("1position_")) {
+                int location = Integer.parseInt(stage.replace("1position_", ""));
+                game.swapStage1(1, location);
+                RevealPublicObjectiveService.revealS1(game, event);
             } else if ("2x2".equalsIgnoreCase(stage)) {
                 RevealPublicObjectiveService.revealTwoStage2(game, event.getChannel());
             } else if ("none".equalsIgnoreCase(stage)) {

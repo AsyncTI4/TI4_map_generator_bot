@@ -1742,7 +1742,7 @@ public final class AgendaHelper {
         if (!game.isFowMode()
                 && Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1705824000011L)) < 0) {
             for (Player player : game.getRealPlayers()) {
-                String factionChecker = "FFCC_" + player.getFaction() + "_";
+                String factionChecker = player.factionButtonChecker();
                 String planet = "tarrock";
                 if (player.getPlanets().contains(planet)
                         && !player.getExhaustedPlanetsAbilities().contains(planet)) {

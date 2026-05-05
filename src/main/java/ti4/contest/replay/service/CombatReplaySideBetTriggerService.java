@@ -2,6 +2,7 @@ package ti4.contest.replay.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.core.CombatSideBetType;
@@ -14,7 +15,10 @@ import ti4.service.combat.CombatRollType;
  * Converts tracked combat moments into replay announcements for side bets that just hit.
  */
 @Service
+@RequiredArgsConstructor
 public class CombatReplaySideBetTriggerService {
+
+    private final CombatSideBetAvailabilityService availabilityService;
 
     public List<SideBetTriggerAnnouncement> fromRoll(
             CombatCandidateEntity candidate,
@@ -38,7 +42,7 @@ public class CombatReplaySideBetTriggerService {
         }
         if (rollType == CombatRollType.combatround
                 && round == 1
-                && isAfbSkippedAvailable(candidate, player.getFaction())
+                && availabilityService.isAfbSkippedAvailable(candidate, player.getFaction())
                 && state != null
                 && state.skippedAfb()) {
             announcements.add(announcement(player, "Skipped AFB!"));
@@ -82,22 +86,6 @@ public class CombatReplaySideBetTriggerService {
     private SideBetTriggerAnnouncement announcement(Player player, String triggerLabel) {
         return new SideBetTriggerAnnouncement(
                 player.getFaction(), "### " + player.getFactionEmoji() + " " + triggerLabel);
-    }
-
-    private boolean isAfbSkippedAvailable(CombatCandidateEntity candidate, String faction) {
-        CombatSideState state = CombatSideState.forFaction(candidate, faction);
-        if (state == null || !CombatSideBetType.AFB_SKIPPED.isAvailable(state.destroyerCount())) return false;
-        return !(state.destroyerCount() == 1 && opponentHasAssaultCannon(candidate, faction));
-    }
-
-    private boolean opponentHasAssaultCannon(CombatCandidateEntity candidate, String faction) {
-        if (faction.equalsIgnoreCase(candidate.getAttackerFaction())) {
-            return Boolean.TRUE.equals(candidate.getDefenderHasAssaultCannon());
-        }
-        if (faction.equalsIgnoreCase(candidate.getDefenderFaction())) {
-            return Boolean.TRUE.equals(candidate.getAttackerHasAssaultCannon());
-        }
-        return false;
     }
 
     public record SideBetTriggerAnnouncement(String faction, String message) {}

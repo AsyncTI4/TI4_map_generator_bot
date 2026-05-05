@@ -143,7 +143,7 @@ class UserLeaveServerListener extends ListenerAdapter {
         String actionsLink =
                 String.format("[__[Actions](%s)__]", game.getActionsChannel().getJumpUrl());
         String round = "(Round " + game.getRound() + ")";
-        String header = String.format("> %s %s %s %s %s", websiteLink, faction, tabletalkLink, actionsLink, round);
+        String header = String.format("> %s %s %s %s", faction, tabletalkLink, actionsLink, round);
 
         // Last player turn start
         game.getLastActivePlayerChange().getTime();

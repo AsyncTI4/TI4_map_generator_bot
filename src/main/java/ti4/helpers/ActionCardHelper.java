@@ -1661,7 +1661,7 @@ public class ActionCardHelper {
                     || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
                 AutoPingMetadataManager.delayPing(game.getName());
 
-                String factionChecker = "FFCC_" + player.getFaction() + "_";
+                String factionChecker = player.factionButtonChecker();
                 if (actionCard.getText().toLowerCase().contains("predict aloud")) {
                     List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, game, factionChecker);
                     MessageHelper.sendMessageToChannelWithFactionReact(

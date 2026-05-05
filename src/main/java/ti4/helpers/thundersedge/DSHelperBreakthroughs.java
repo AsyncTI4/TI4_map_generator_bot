@@ -77,7 +77,7 @@ public final class DSHelperBreakthroughs {
     public static void cheiranBTIn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.substring(buttonID.indexOf('_') + 1);
         Tile tile = game.getTileByPosition(pos);
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         Set<UnitType> allowedUnits = Set.of(
                 UnitType.Destroyer,
                 UnitType.Cruiser,
