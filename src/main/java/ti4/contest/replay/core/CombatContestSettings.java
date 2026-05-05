@@ -129,6 +129,9 @@ public class CombatContestSettings {
                 "houseAbilities.hacan.maxSubsidiesPerContest must be >= 0.");
         require(houseAbilities.hacan.subsidyFavorOnHit >= 0, "houseAbilities.hacan.subsidyFavorOnHit must be >= 0.");
         require(
+                houseAbilities.hacan.baseCombatFavorGain >= 0,
+                "houseAbilities.hacan.baseCombatFavorGain must be >= 0.");
+        require(
                 houseAbilities.hacan.marketMakerPointsPerBet >= 0,
                 "houseAbilities.hacan.marketMakerPointsPerBet must be >= 0.");
         require(
@@ -294,8 +297,9 @@ public class CombatContestSettings {
     @Setter
     public static class Hacan {
         private int maxSubsidiesPerContest = 2;
-        private int subsidyFavorOnHit = 20;
-        private int marketMakerPointsPerBet = 1;
+        private int subsidyFavorOnHit = 10;
+        private int baseCombatFavorGain = 20;
+        private int marketMakerPointsPerBet = 2;
         private int lowTradeConvoysFavorCost = 10;
         private int lowTradeConvoysPredictionBonus = 10;
         private int mediumTradeConvoysFavorCost = 20;

@@ -60,8 +60,9 @@ houseAbilities:
     warSunDecoyFavorCost: 70
   hacan:
     maxSubsidiesPerContest: 2
-    subsidyFavorOnHit: 20
-    marketMakerPointsPerBet: 1
+    subsidyFavorOnHit: 10
+    baseCombatFavorGain: 20
+    marketMakerPointsPerBet: 2
     lowTradeConvoysFavorCost: 10
     lowTradeConvoysPredictionBonus: 10
     mediumTradeConvoysFavorCost: 20

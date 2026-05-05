@@ -16,17 +16,17 @@ class CombatSideBetTypeTest {
     }
 
     @Test
-    void hacanMarketMakerDefaultsToOnePointPerTakenMarkedBet() {
+    void hacanMarketMakerDefaultsToTwoPointsPerTakenMarkedBet() {
         CombatContestSettings settings = new CombatContestSettings();
 
-        assertEquals(1, settings.getHouseAbilities().getHacan().getMarketMakerPointsPerBet());
+        assertEquals(2, settings.getHouseAbilities().getHacan().getMarketMakerPointsPerBet());
     }
 
     @Test
     void hacanMarkedBetsGrantFavorOnHit() {
         CombatContestSettings settings = new CombatContestSettings();
 
-        assertEquals(20, settings.getHouseAbilities().getHacan().getSubsidyFavorOnHit());
+        assertEquals(10, settings.getHouseAbilities().getHacan().getSubsidyFavorOnHit());
     }
 
     @Test

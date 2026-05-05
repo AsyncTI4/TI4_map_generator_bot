@@ -42,6 +42,12 @@ class CombatReplayHouseLedgerServiceFavorTest {
     }
 
     @Test
+    void hacanGetsHigherBaseCombatFavorGain() {
+        assertEquals(10, custodianFavorScoringRule.combatFavorGain(CombatReplayHouse.NAALU, 0));
+        assertEquals(20, custodianFavorScoringRule.combatFavorGain(CombatReplayHouse.HACAN, 0));
+    }
+
+    @Test
     void catchupFavorCanBeConfiguredBackOn() {
         settings.getHouseAbilities().setCatchupFavorBonusStep(10);
         settings.getHouseAbilities().setMaxCatchupFavorBonus(30);
