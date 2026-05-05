@@ -289,10 +289,10 @@ public class CombatContestSettings {
     @Setter
     public static class Mentak {
         private int previewLeadSeconds = 5 * 60;
-        private int destroyerDecoyFavorCost = 30;
-        private int cruiserDecoyFavorCost = 40;
-        private int dreadnoughtDecoyFavorCost = 60;
-        private int warSunDecoyFavorCost = 80;
+        private int destroyerDecoyFavorCost = 20;
+        private int cruiserDecoyFavorCost = 30;
+        private int dreadnoughtDecoyFavorCost = 40;
+        private int warSunDecoyFavorCost = 70;
     }
 
     @Getter
