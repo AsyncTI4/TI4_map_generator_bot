@@ -2,6 +2,8 @@ package ti4.contest.replay.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -11,7 +13,9 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import ti4.contest.replay.core.CombatCandidatePromotionStatus;
 import ti4.contest.replay.core.CombatCandidateStatus;
 import ti4.contest.replay.core.CombatContestReplayStatus;
@@ -22,6 +26,9 @@ import ti4.contest.replay.house.mentak.CombatReplayMentakAbilityService;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatObservationRepository;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
+import ti4.game.Game;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
 
 class CombatReplayContestLifecycleServiceTest {
 
@@ -278,6 +285,50 @@ class CombatReplayContestLifecycleServiceTest {
         verify(observationRepository).findById(2L);
     }
 
+    @Test
+    void promoteBestCandidateIfDueExpiresDiscordantStarsCandidateAndContinues() {
+        CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
+        CombatObservationRepository observationRepository = mock(CombatObservationRepository.class);
+        CombatReplayContestRepository replayContestRepository = mock(CombatReplayContestRepository.class);
+        CombatContestSettings settings = new CombatContestSettings();
+        settings.getPromotion().setEnabled(true);
+        settings.setHousesEnabled(false);
+        settings.getRuntime().setDevMode(false);
+        CombatReplayContestLifecycleService service =
+                service(settings, candidateRepository, observationRepository, replayContestRepository);
+        service.setClock(fixedClock("2026-04-27T12:00:00"));
+        CombatCandidateEntity discordantStarsCandidate =
+                promotionCandidate(1L, LocalDateTime.parse("2026-04-27T11:30:00"), 10.0);
+        discordantStarsCandidate.setGameName("pbd-ds");
+        CombatCandidateEntity nextBestCandidate =
+                promotionCandidate(2L, LocalDateTime.parse("2026-04-27T11:35:00"), 5.0);
+        nextBestCandidate.setGameName("pbd-pok");
+        Game discordantStarsGame = game("pbd-ds", true);
+        Game normalGame = game("pbd-pok", false);
+        ManagedGame discordantStarsManagedGame = mock(ManagedGame.class);
+        ManagedGame normalManagedGame = mock(ManagedGame.class);
+
+        when(replayContestRepository.countByPostedAtGreaterThanEqual(any())).thenReturn(0L);
+        when(candidateRepository.findResolvedPromotionCandidates(
+                        eq(CombatCandidateStatus.RESOLVED), eq(CombatCandidatePromotionStatus.PENDING), any()))
+                .thenReturn(List.of(discordantStarsCandidate, nextBestCandidate));
+        when(observationRepository.findAllById(List.of(2L))).thenReturn(List.of());
+        when(observationRepository.findById(2L)).thenReturn(java.util.Optional.empty());
+        when(discordantStarsManagedGame.getGame()).thenReturn(discordantStarsGame);
+        when(normalManagedGame.getGame()).thenReturn(normalGame);
+
+        try (MockedStatic<GameManager> gameManager = org.mockito.Mockito.mockStatic(GameManager.class)) {
+            gameManager.when(() -> GameManager.getManagedGame("pbd-ds")).thenReturn(discordantStarsManagedGame);
+            gameManager.when(() -> GameManager.getManagedGame("pbd-pok")).thenReturn(normalManagedGame);
+
+            service.promoteBestCandidateIfDue();
+        }
+
+        Assertions.assertEquals(CombatCandidatePromotionStatus.EXPIRED, discordantStarsCandidate.getPromotionStatus());
+        verify(candidateRepository).save(discordantStarsCandidate);
+        verify(observationRepository).findById(2L);
+    }
+
     private CombatReplayContestLifecycleService service(
             CombatContestSettings settings,
             CombatCandidateRepository candidateRepository,
@@ -339,5 +390,12 @@ class CombatReplayContestLifecycleServiceTest {
         CombatReplayContestEntity contest = new CombatReplayContestEntity();
         contest.setReplayStatus(CombatContestReplayStatus.PREVIEW);
         return contest;
+    }
+
+    private Game game(String name, boolean discordantStarsMode) {
+        Game game = new Game();
+        game.setName(name);
+        game.setDiscordantStarsMode(discordantStarsMode);
+        return game;
     }
 }

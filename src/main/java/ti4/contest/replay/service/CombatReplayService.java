@@ -91,6 +91,8 @@ public class CombatReplayService {
     }
 
     public void onSpaceCombatStarted(Game game, Player attacker, Player defender, Tile tile) {
+        if (isDiscordantStarsGame(game)) return;
+
         boolean trackAllCombatsAsCandidates = settings.getRuntime().isTrackAllCombatsAsCandidates();
         if (!trackAllCombatsAsCandidates
                 && (!LazaxCombatSupport.isEligibleGame(game)
@@ -828,12 +830,17 @@ public class CombatReplayService {
 
     private boolean isEligibleCandidate(
             Game game, Player attacker, Player defender, Tile tile, CombatReplaySelection.Evaluation evaluation) {
+        if (isDiscordantStarsGame(game)) return false;
         if (settings.getRuntime().isTrackAllCombatsAsCandidates()) {
             return getOpenCandidate(game, tile.getPosition()) == null;
         }
         return evaluation.eligible()
                 && !LazaxCombatSupport.hasExcludedFlagship(attacker, defender)
                 && getOpenCandidate(game, tile.getPosition()) == null;
+    }
+
+    private boolean isDiscordantStarsGame(Game game) {
+        return game != null && game.isDiscordantStarsMode();
     }
 
     private CombatReplaySelection selection() {

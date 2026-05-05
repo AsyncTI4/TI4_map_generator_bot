@@ -109,6 +109,27 @@ class CombatReplayHacanTradeConvoysServiceTest {
     }
 
     @Test
+    void repostOpenTradeConvoysUsesPreviousWindowDuringCurrentPreview() {
+        CombatReplayContestEntity previewContest = contest(4L, 8L);
+        CombatCandidateEntity previewCandidate = candidate(8L);
+        CombatReplayContestEntity previousContest = contest(3L, 7L);
+        previousContest.setReplayCompletedAt(LocalDateTime.now().minusMinutes(10));
+        CombatCandidateEntity previousCandidate = candidate(7L);
+
+        when(contestRepository.findAllByOrderByIdDesc()).thenReturn(List.of(previewContest, previousContest));
+        when(candidateRepository.findById(previewContest.getCandidateId())).thenReturn(Optional.of(previewCandidate));
+        when(candidateRepository.findById(previousContest.getCandidateId())).thenReturn(Optional.of(previousCandidate));
+        when(tradeConvoysRepository.findByContestId(previewContest.getId())).thenReturn(Optional.empty());
+        when(tradeConvoysRepository.findByContestId(previousContest.getId())).thenReturn(Optional.empty());
+        when(contestRepository.existsByIdGreaterThanAndReplayCompletedAtIsNotNull(previousContest.getId()))
+                .thenReturn(false);
+
+        assertTrue(service.repostOpenTradeConvoysVotingButtons());
+
+        verify(tradeConvoysRepository).findByContestId(previousContest.getId());
+    }
+
+    @Test
     void tradeConvoysButtonsStayVisibleButDisableUnaffordableFavorCosts() {
         CombatReplayContestEntity contest = new CombatReplayContestEntity();
         contest.setId(3L);

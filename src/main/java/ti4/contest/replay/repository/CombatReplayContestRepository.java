@@ -20,6 +20,8 @@ public interface CombatReplayContestRepository extends JpaRepository<CombatRepla
 
     Optional<CombatReplayContestEntity> findFirstByOrderByIdDesc();
 
+    List<CombatReplayContestEntity> findAllByOrderByIdDesc();
+
     boolean existsByIdGreaterThan(Long id);
 
     boolean existsByIdGreaterThanAndReplayCompletedAtIsNotNull(Long id);

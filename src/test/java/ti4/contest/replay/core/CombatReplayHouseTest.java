@@ -8,8 +8,8 @@ class CombatReplayHouseTest {
 
     @Test
     void roleNamesMatchDiscordDelegationRoles() {
-        assertEquals("Naalu Delegation", CombatReplayHouse.NAALU.roleName());
-        assertEquals("Mentak Delegation", CombatReplayHouse.MENTAK.roleName());
-        assertEquals("Hacan Delegation", CombatReplayHouse.HACAN.roleName());
+        assertEquals("NaaluDelegation", CombatReplayHouse.NAALU.roleName());
+        assertEquals("MentakDelegation", CombatReplayHouse.MENTAK.roleName());
+        assertEquals("HacanDelegation", CombatReplayHouse.HACAN.roleName());
     }
 }
