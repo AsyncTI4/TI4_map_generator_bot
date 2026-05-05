@@ -215,6 +215,7 @@ public class CombatReplayPromotionService {
             CombatReplayContestEntity contest =
                     persistPromotedReplayContest(winner, promotedAt, contestChannel, posted, thread, existingContest);
             addPredictionReactions(game, winner, posted);
+            mentakAbilityService.postPredictionOverrideButtons(game, contest, winner);
             replayExecutionService.postPromotionContext(thread != null ? thread : contestChannel, contest, winner);
             return contest;
         } catch (Exception e) {

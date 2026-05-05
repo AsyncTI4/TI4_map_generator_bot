@@ -140,7 +140,7 @@ class CombatReplayHacanTradeConvoysServiceTest {
                 service.tradeConvoysButtonsForHouse(contest, CombatReplayHouse.NAALU);
 
         assertEquals(5, buttons.size());
-        assertTrue(buttons.get(4).getLabel().startsWith("50 Favor: 36%"));
+        assertTrue(buttons.get(4).getLabel().startsWith("50 Favor: 31%"));
         assertFalse(buttons.get(0).isDisabled());
         assertTrue(buttons.get(1).isDisabled());
         assertTrue(buttons.get(2).isDisabled());
@@ -154,7 +154,7 @@ class CombatReplayHacanTradeConvoysServiceTest {
         CombatCandidateEntity candidate = candidate(7L);
         when(tradeConvoysRepository.findByContestId(contest.getId())).thenReturn(Optional.empty());
         when(tradeConvoysVoteRepository.findByContestId(contest.getId()))
-                .thenReturn(List.of(vote(CombatReplayHouse.NAALU, 10, 10, "user-1")));
+                .thenReturn(List.of(vote(CombatReplayHouse.NAALU, 10, 9, "user-1")));
         when(houseFavorService.canAfford(CombatReplayHouse.HACAN, 10)).thenReturn(true);
 
         CombatReplayHacanTradeConvoysService.TradeConvoys tradeConvoys =
@@ -163,7 +163,7 @@ class CombatReplayHacanTradeConvoysServiceTest {
         assertTrue(tradeConvoys.active());
         assertEquals(CombatReplayHouse.NAALU, tradeConvoys.targetHouse());
         assertEquals(10, tradeConvoys.favorCost());
-        assertEquals(10, tradeConvoys.bonusPercent());
+        assertEquals(9, tradeConvoys.bonusPercent());
     }
 
     @Test
@@ -179,7 +179,7 @@ class CombatReplayHacanTradeConvoysServiceTest {
         when(candidateRepository.findById(previousContest.getCandidateId())).thenReturn(Optional.of(candidate(7L)));
         when(tradeConvoysRepository.findByContestId(previousContest.getId())).thenReturn(Optional.empty());
         when(tradeConvoysVoteRepository.findByContestId(previousContest.getId()))
-                .thenReturn(List.of(vote(CombatReplayHouse.NAALU, 10, 10, "user-1")));
+                .thenReturn(List.of(vote(CombatReplayHouse.NAALU, 10, 9, "user-1")));
         when(houseFavorService.canAfford(CombatReplayHouse.HACAN, 10)).thenReturn(true);
 
         service.postPostCombatTradeConvoysButtonsIfNeeded(currentContest, currentCandidate);
@@ -198,8 +198,8 @@ class CombatReplayHacanTradeConvoysServiceTest {
         when(tradeConvoysRepository.findByContestId(contest.getId())).thenReturn(Optional.empty());
         when(tradeConvoysVoteRepository.findByContestId(contest.getId()))
                 .thenReturn(List.of(
-                        vote(CombatReplayHouse.NAALU, 50, 36, "user-1"),
-                        vote(CombatReplayHouse.MENTAK, 10, 10, "user-2")));
+                        vote(CombatReplayHouse.NAALU, 50, 31, "user-1"),
+                        vote(CombatReplayHouse.MENTAK, 10, 9, "user-2")));
         when(houseFavorService.canAfford(CombatReplayHouse.HACAN, 10)).thenReturn(true);
 
         service.lockTradeConvoysIfNeeded(contest, candidate);
@@ -208,7 +208,7 @@ class CombatReplayHacanTradeConvoysServiceTest {
                 ArgumentCaptor.forClass(CombatReplayHacanTradeConvoysEntity.class);
         verify(tradeConvoysRepository).save(savedTradeConvoys.capture());
         assertEquals(10, savedTradeConvoys.getValue().getFavorCost());
-        assertEquals(10, savedTradeConvoys.getValue().getPredictionBonus());
+        assertEquals(9, savedTradeConvoys.getValue().getPredictionBonus());
     }
 
     @Test
@@ -252,7 +252,7 @@ class CombatReplayHacanTradeConvoysServiceTest {
         CombatReplayInteractionResult result = service.sendTradeConvoysNow(
                 event,
                 new CombatReplayHacanTradeConvoysService.ParsedTradeConvoysButton(
-                        contest.getId(), CombatReplayHouse.NAALU, 10, 10));
+                        contest.getId(), CombatReplayHouse.NAALU, 10, 9));
 
         assertTrue(result.accepted());
         assertEquals(15, targetScore.getFavorPoints());

@@ -55,22 +55,22 @@ houseAbilities:
     luckOmensFavorCost: 30
   mentak:
     previewLeadSeconds: 900
-    destroyerDecoyFavorCost: 15
-    cruiserDecoyFavorCost: 25
-    dreadnoughtDecoyFavorCost: 35
-    warSunDecoyFavorCost: 65
+    destroyerDecoyFavorCost: 20
+    cruiserDecoyFavorCost: 30
+    dreadnoughtDecoyFavorCost: 40
+    warSunDecoyFavorCost: 70
   hacan:
     maxSubsidiesPerContest: 2
     subsidyFavorOnHit: 10
     baseCombatFavorGain: 20
     marketMakerPointsPerBet: 2
     lowTradeConvoysFavorCost: 10
-    lowTradeConvoysPredictionBonus: 10
+    lowTradeConvoysPredictionBonus: 9
     mediumTradeConvoysFavorCost: 20
-    mediumTradeConvoysPredictionBonus: 16
+    mediumTradeConvoysPredictionBonus: 14
     highTradeConvoysFavorCost: 30
-    highTradeConvoysPredictionBonus: 22
+    highTradeConvoysPredictionBonus: 19
     veryHighTradeConvoysFavorCost: 40
-    veryHighTradeConvoysPredictionBonus: 29
+    veryHighTradeConvoysPredictionBonus: 25
     maximumTradeConvoysFavorCost: 50
-    maximumTradeConvoysPredictionBonus: 36
+    maximumTradeConvoysPredictionBonus: 31

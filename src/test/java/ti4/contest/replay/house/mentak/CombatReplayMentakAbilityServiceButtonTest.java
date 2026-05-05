@@ -40,17 +40,17 @@ class CombatReplayMentakAbilityServiceButtonTest {
     void quantityButtonsShowTotalCostAndDisableUnaffordableCounts() {
         CombatCandidateEntity candidate = new CombatCandidateEntity();
         candidate.setId(7L);
-        when(houseFavorService.canAfford(eq(CombatReplayHouse.MENTAK), eq(25))).thenReturn(true);
-        when(houseFavorService.canAfford(eq(CombatReplayHouse.MENTAK), eq(44))).thenReturn(false);
-        when(houseFavorService.canAfford(eq(CombatReplayHouse.MENTAK), eq(63))).thenReturn(false);
-        when(houseFavorService.canAfford(eq(CombatReplayHouse.MENTAK), eq(82))).thenReturn(false);
-        when(houseFavorService.canAfford(eq(CombatReplayHouse.MENTAK), eq(101))).thenReturn(false);
+        when(houseFavorService.canAfford(eq(CombatReplayHouse.MENTAK), eq(30))).thenReturn(true);
+        when(houseFavorService.canAfford(eq(CombatReplayHouse.MENTAK), eq(53))).thenReturn(false);
+        when(houseFavorService.canAfford(eq(CombatReplayHouse.MENTAK), eq(76))).thenReturn(false);
+        when(houseFavorService.canAfford(eq(CombatReplayHouse.MENTAK), eq(99))).thenReturn(false);
+        when(houseFavorService.canAfford(eq(CombatReplayHouse.MENTAK), eq(122))).thenReturn(false);
 
         List<Button> buttons = service.quantityButtons(candidate, "naalu", UnitType.Cruiser);
 
-        assertEquals("1x (-25 Favor)", buttons.getFirst().getLabel());
+        assertEquals("1x (-30 Favor)", buttons.getFirst().getLabel());
         assertFalse(buttons.getFirst().isDisabled());
-        assertEquals("2x (-44 Favor)", buttons.get(1).getLabel());
+        assertEquals("2x (-53 Favor)", buttons.get(1).getLabel());
         assertTrue(buttons.get(1).isDisabled());
     }
 
