@@ -20,16 +20,8 @@ RUN --mount=type=cache,target=/root/.m2 \
 FROM amazoncorretto:26-alpine3.23
 WORKDIR /app
 
-# needed to handle fonts; libc6-compat provides glibc shims required by async-profiler
-RUN apk add --no-cache fontconfig ttf-dejavu libc6-compat
-
-# async-profiler: enables remote CPU/allocation profiling via IntelliJ Profiler
-ARG ASYNC_PROFILER_VERSION=4.4
-RUN wget -qO /tmp/async-profiler.tar.gz \
-      "https://github.com/async-profiler/async-profiler/releases/download/v${ASYNC_PROFILER_VERSION}/async-profiler-${ASYNC_PROFILER_VERSION}-linux-x64.tar.gz" \
-    && mkdir -p /opt/async-profiler \
-    && tar -xzf /tmp/async-profiler.tar.gz --strip-components=1 -C /opt/async-profiler \
-    && rm /tmp/async-profiler.tar.gz
+# needed to handle fonts
+RUN apk add --no-cache fontconfig ttf-dejavu
 
 COPY --from=build /opt/app/target/TI4_map_generator_discord_bot-1.0-SNAPSHOT.jar tibot.jar
 
@@ -40,6 +32,4 @@ ENTRYPOINT ["java", \
             "-XX:MaxRAMPercentage=70.0", \
             "-XX:InitialRAMPercentage=20.0", \
             "-XX:+UseStringDeduplication", \
-            "-XX:+UnlockDiagnosticVMOptions", \
-            "-XX:+DebugNonSafepoints", \
             "-jar", "tibot.jar"]
