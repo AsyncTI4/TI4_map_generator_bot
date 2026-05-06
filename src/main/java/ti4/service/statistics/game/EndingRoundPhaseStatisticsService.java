@@ -1,8 +1,6 @@
 package ti4.service.statistics.game;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -118,15 +116,14 @@ class EndingRoundPhaseStatisticsService {
         }
 
         String formatRoundPhaseCounts() {
-            List<String> formattedCounts = new ArrayList<>();
-            winsByRoundAndPhase.entrySet().stream()
+            return winsByRoundAndPhase.entrySet().stream()
                     .sorted(Map.Entry.comparingByKey())
-                    .forEach(roundEntry -> roundEntry.getValue().entrySet().stream()
+                    .flatMap(roundEntry -> roundEntry.getValue().entrySet().stream()
                             .sorted((left, right) -> Integer.compare(
                                     getPhaseSortOrder(left.getKey()), getPhaseSortOrder(right.getKey())))
-                            .forEach(phaseEntry -> formattedCounts.add(
-                                    "R" + roundEntry.getKey() + phaseEntry.getKey() + ": " + phaseEntry.getValue())));
-            return formattedCounts.stream().collect(Collectors.joining(", "));
+                            .map(phaseEntry ->
+                                    "R" + roundEntry.getKey() + phaseEntry.getKey() + ": " + phaseEntry.getValue()))
+                    .collect(Collectors.joining(", "));
         }
     }
 }

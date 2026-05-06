@@ -58,6 +58,10 @@ class EndingRoundPhaseStatisticsServiceTest extends BaseTi4Test {
         assertTrue(report.contains("4.4 avg (R4AP: 2, R4SP: 1, R5AP: 2)"));
         assertTrue(report.contains("5.5 avg (R5AgP: 1, R6SP: 1)"));
         assertFalse(report.contains("R4AgP"));
-        assertTrue(report.indexOf("Arborec") < report.indexOf("Argent"));
+        int arborecIndex = report.indexOf("Arborec");
+        int argentIndex = report.indexOf("Argent");
+        assertTrue(arborecIndex >= 0);
+        assertTrue(argentIndex >= 0);
+        assertTrue(arborecIndex < argentIndex);
     }
 }
