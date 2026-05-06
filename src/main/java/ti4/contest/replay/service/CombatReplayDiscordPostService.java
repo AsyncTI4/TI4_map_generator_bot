@@ -1,7 +1,6 @@
 package ti4.contest.replay.service;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.entities.Message;
@@ -23,7 +22,6 @@ import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.helpers.ThreadGetter;
 import ti4.image.TileGenerator;
-import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
 @Service
@@ -100,16 +98,9 @@ public class CombatReplayDiscordPostService {
     }
 
     public ThreadChannel createReplayThread(Message posted, CombatCandidateEntity winner) {
-        ThreadChannel thread = posted.createThreadChannel(buildReplayThreadName(winner))
-                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS)
+        return posted.createThreadChannel(buildReplayThreadName(winner))
+                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR)
                 .complete();
-        scheduleReplayThreadArchive(thread);
-        return thread;
-    }
-
-    private void scheduleReplayThreadArchive(ThreadChannel thread) {
-        if (thread == null) return;
-        thread.getManager().setArchived(true).queueAfter(2, TimeUnit.HOURS, ignored -> {}, BotLogger::catchRestError);
     }
 
     public MessageChannel getContestThreadOrChannel(CombatReplayContestEntity contest) {
