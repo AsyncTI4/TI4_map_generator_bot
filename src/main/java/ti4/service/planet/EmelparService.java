@@ -88,7 +88,7 @@ public class EmelparService {
         return buttons;
     }
 
-    @ButtonHandler("getOtherFactionsEmelpar")
+    @ButtonHandler(value = "getOtherFactionsEmelpar", save = false)
     private static void getOtherFactionsEmelpar(ButtonInteractionEvent event, Game game) {
         List<Button> buttons = new ArrayList<>();
         for (Player player2 : game.getRealPlayers()) {
@@ -102,7 +102,7 @@ public class EmelparService {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("getEmelparButtons_")
+    @ButtonHandler(value = "getEmelparButtons_", save = false)
     private static void getEmelparButtons(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String msg = player.getRepresentationUnfogged() + ", please choose a component to ready.";
         Player player2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);

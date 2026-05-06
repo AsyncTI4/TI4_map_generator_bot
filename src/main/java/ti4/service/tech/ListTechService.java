@@ -161,7 +161,7 @@ public class ListTechService {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
 
-    @ButtonHandler("getAllTechOfType_")
+    @ButtonHandler(value = "getAllTechOfType_", save = false)
     public static void getAllTechOfType(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         getAllTechOfType(event, player, buttonID, game, event.getMessageChannel());
     }

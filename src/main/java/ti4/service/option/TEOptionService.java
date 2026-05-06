@@ -56,7 +56,7 @@ public class TEOptionService {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("editTFHomebrew")
+    @ButtonHandler(value = "editTFHomebrew", save = false)
     private static void postTwilightFallHomebrewOptions(ButtonInteractionEvent event, Game game) {
         String msg = "Use the buttons to enable or disable various homebrew options:";
         List<ContainerChildComponent> sections = getTFHomebrewInfo(game);
@@ -118,7 +118,7 @@ public class TEOptionService {
                         + " components.");
     }
 
-    @ButtonHandler("offerTEOptionButtons")
+    @ButtonHandler(value = "offerTEOptionButtons", save = false)
     public static void offerTEOptionButtons(Game game, MessageChannel channel) {
         List<Button> galacticEventButtons = getGalacticEventButtons(game);
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
