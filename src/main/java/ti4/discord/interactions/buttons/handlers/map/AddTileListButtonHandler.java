@@ -12,7 +12,7 @@ import ti4.service.map.AddTileListService;
 @UtilityClass
 class AddTileListButtonHandler {
 
-    @ButtonHandler("addMapString~MDL")
+    @ButtonHandler(value = "addMapString~MDL", save = false)
     public static void presentMapStringModal(ButtonInteractionEvent event, Game game) {
         Modal modal = AddTileListService.buildMapStringModal(game, "addMapString");
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
