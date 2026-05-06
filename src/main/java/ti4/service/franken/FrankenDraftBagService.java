@@ -543,6 +543,6 @@ public class FrankenDraftBagService {
         long date = game.getLastModifiedDate();
         return game.getActionsChannel()
                 .sendMessage(msg)
-                .onSuccess(m -> GameMessageManager.replace(name, m.getId(), type, date));
+                .onSuccess(m -> GameMessageManager.replace(name, new GameMessage(m.getId(), type, date)));
     }
 }
