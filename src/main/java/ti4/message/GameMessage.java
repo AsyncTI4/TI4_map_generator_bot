@@ -32,9 +32,7 @@ public record GameMessage(
     }
 
     public boolean isStrategyCard(int round, int sc) {
-        return type == GameMessageType.STRATEGY_CARD
-                && Integer.toString(round).equals(info.get("round"))
-                && Integer.toString(sc).equals(info.get("sc"));
+        return type == GameMessageType.STRATEGY_CARD && getInfoAsInt("round") == round && getInfoAsInt("sc") == sc;
     }
 
     public long getInfoAsLong(String key) {

@@ -503,7 +503,7 @@ public class PlayStrategyCardService {
                     continue;
                 }
                 if (p2.isNpc()) {
-                    autoReactToStrategyCard(playersToReact, game, p2, scToPlay, event);
+                    markPlayerAsAutoFollowing(playersToReact, game, p2, scToPlay, event);
                     continue;
                 }
                 if (scToPlay == 5) {
@@ -519,7 +519,7 @@ public class PlayStrategyCardService {
                         && !p2.hasUnexhaustedLeader("mahactagent")
                         && !p2.hasUnexhaustedLeader("yssarilagent")
                         && scToPlay != 1) {
-                    autoReactToStrategyCard(playersToReact, game, p2, scToPlay, event);
+                    markPlayerAsAutoFollowing(playersToReact, game, p2, scToPlay, event);
                     MessageHelper.sendMessageToChannel(
                             p2.getCardsInfoThread(),
                             "You were automatically marked as not following **" + stratCardName
@@ -531,7 +531,7 @@ public class PlayStrategyCardService {
                             && !CheckUnitContainmentService.getTilesContainingPlayersUnits(
                                             game, p2, Units.UnitType.Spacedock)
                                     .contains(p2.getHomeSystemTile())) {
-                        autoReactToStrategyCard(playersToReact, game, p2, scToPlay, event);
+                        markPlayerAsAutoFollowing(playersToReact, game, p2, scToPlay, event);
                         MessageHelper.sendMessageToChannel(
                                 p2.getCardsInfoThread(),
                                 "You were automatically marked as not following **"
@@ -543,7 +543,7 @@ public class PlayStrategyCardService {
                         && !game.getStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction())
                                 .isEmpty()) {
                     game.removeStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction());
-                    autoReactToStrategyCard(playersToReact, game, p2, scToPlay, event);
+                    markPlayerAsAutoFollowing(playersToReact, game, p2, scToPlay, event);
                     MessageHelper.sendMessageToChannel(
                             p2.getCardsInfoThread(),
                             "You were automatically marked as not following **"
@@ -551,7 +551,7 @@ public class PlayStrategyCardService {
                                     + "** because you told the bot earlier that you wished to pass on it.");
                 } else {
                     if (scToPlay == 8 && p2.getSoScored() == p2.getMaxSOCount() && !game.isTwilightsFallMode()) {
-                        autoReactToStrategyCard(playersToReact, game, p2, scToPlay, event);
+                        markPlayerAsAutoFollowing(playersToReact, game, p2, scToPlay, event);
                         MessageHelper.sendMessageToChannel(
                                 p2.getCardsInfoThread(),
                                 "You were automatically marked as not following **" + stratCardName
@@ -607,7 +607,7 @@ public class PlayStrategyCardService {
             return;
         }
 
-        String threadName = game.getName() + "-round-" + playRound + "-" + scModel.getName();
+        String threadName = getStrategyCardThreadName(game.getName(), playRound, scModel.getName());
         ThreadChannelAction threadChannel = game.getMainGameChannel().createThreadChannel(threadName, message.getId());
         threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
         threadChannel.queue(m5 -> {
@@ -699,7 +699,11 @@ public class PlayStrategyCardService {
         });
     }
 
-    private static void autoReactToStrategyCard(
+    private static String getStrategyCardThreadName(String gameName, int round, String strategyCardName) {
+        return gameName + "-round-" + round + "-" + strategyCardName;
+    }
+
+    private static void markPlayerAsAutoFollowing(
             List<Player> playersToReact, Game game, Player player, int scToPlay, GenericInteractionCreateEvent event) {
         playersToReact.add(player);
         player.addFollowedSC(scToPlay, event);
