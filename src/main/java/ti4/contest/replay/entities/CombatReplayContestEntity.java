@@ -48,6 +48,12 @@ public class CombatReplayContestEntity {
     @Column(name = "side_bet_summary_message_id")
     private Long sideBetSummaryMessageId;
 
+    @Column(name = "side_bet_attacker_button_message_id")
+    private Long sideBetAttackerButtonMessageId;
+
+    @Column(name = "side_bet_defender_button_message_id")
+    private Long sideBetDefenderButtonMessageId;
+
     @Column(name = "side_bet_market_posted_at")
     private LocalDateTime sideBetMarketPostedAt;
 
