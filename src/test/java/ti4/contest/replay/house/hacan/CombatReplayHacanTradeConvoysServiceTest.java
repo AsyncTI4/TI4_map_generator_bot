@@ -13,7 +13,6 @@ import java.util.Optional;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.entities.CombatCandidateEntity;
@@ -140,7 +139,7 @@ class CombatReplayHacanTradeConvoysServiceTest {
                 service.tradeConvoysButtonsForHouse(contest, CombatReplayHouse.NAALU);
 
         assertEquals(5, buttons.size());
-        assertTrue(buttons.get(4).getLabel().startsWith("50 Favor: 36%"));
+        assertTrue(buttons.get(4).getLabel().startsWith("50 Favor: 31%"));
         assertFalse(buttons.get(0).isDisabled());
         assertTrue(buttons.get(1).isDisabled());
         assertTrue(buttons.get(2).isDisabled());
@@ -149,25 +148,23 @@ class CombatReplayHacanTradeConvoysServiceTest {
     }
 
     @Test
-    void tradeConvoysLocksWithSingleVote() {
+    void tradeConvoysVotesDoNotAutoLock() {
         CombatReplayContestEntity contest = contest(3L, 7L);
         CombatCandidateEntity candidate = candidate(7L);
         when(tradeConvoysRepository.findByContestId(contest.getId())).thenReturn(Optional.empty());
         when(tradeConvoysVoteRepository.findByContestId(contest.getId()))
-                .thenReturn(List.of(vote(CombatReplayHouse.NAALU, 10, 10, "user-1")));
+                .thenReturn(List.of(vote(CombatReplayHouse.NAALU, 10, 9, "user-1")));
         when(houseFavorService.canAfford(CombatReplayHouse.HACAN, 10)).thenReturn(true);
 
         CombatReplayHacanTradeConvoysService.TradeConvoys tradeConvoys =
                 service.lockTradeConvoysIfNeeded(contest, candidate);
 
-        assertTrue(tradeConvoys.active());
-        assertEquals(CombatReplayHouse.NAALU, tradeConvoys.targetHouse());
-        assertEquals(10, tradeConvoys.favorCost());
-        assertEquals(10, tradeConvoys.bonusPercent());
+        assertFalse(tradeConvoys.active());
+        verify(tradeConvoysRepository, org.mockito.Mockito.never()).save(org.mockito.Mockito.any());
     }
 
     @Test
-    void openingNewPostCombatWindowLocksPreviousTradeConvoys() {
+    void openingNewPostCombatWindowDoesNotLockPreviousTradeConvoysVotes() {
         CombatReplayContestEntity previousContest = contest(3L, 7L);
         previousContest.setReplayCompletedAt(LocalDateTime.now().minusMinutes(10));
         CombatReplayContestEntity currentContest = contest(4L, 8L);
@@ -179,36 +176,28 @@ class CombatReplayHacanTradeConvoysServiceTest {
         when(candidateRepository.findById(previousContest.getCandidateId())).thenReturn(Optional.of(candidate(7L)));
         when(tradeConvoysRepository.findByContestId(previousContest.getId())).thenReturn(Optional.empty());
         when(tradeConvoysVoteRepository.findByContestId(previousContest.getId()))
-                .thenReturn(List.of(vote(CombatReplayHouse.NAALU, 10, 10, "user-1")));
+                .thenReturn(List.of(vote(CombatReplayHouse.NAALU, 10, 9, "user-1")));
         when(houseFavorService.canAfford(CombatReplayHouse.HACAN, 10)).thenReturn(true);
 
         service.postPostCombatTradeConvoysButtonsIfNeeded(currentContest, currentCandidate);
 
-        ArgumentCaptor<CombatReplayHacanTradeConvoysEntity> savedTradeConvoys =
-                ArgumentCaptor.forClass(CombatReplayHacanTradeConvoysEntity.class);
-        verify(tradeConvoysRepository).save(savedTradeConvoys.capture());
-        assertEquals(previousContest.getId(), savedTradeConvoys.getValue().getContestId());
-        assertEquals(CombatReplayHouse.NAALU, savedTradeConvoys.getValue().getTargetHouse());
+        verify(tradeConvoysRepository, org.mockito.Mockito.never()).save(org.mockito.Mockito.any());
     }
 
     @Test
-    void tradeConvoysTieBetweenFavorOptionsLocksLowerFavorValue() {
+    void tradeConvoysTieBetweenFavorOptionsDoesNotAutoLock() {
         CombatReplayContestEntity contest = contest(3L, 7L);
         CombatCandidateEntity candidate = candidate(7L);
         when(tradeConvoysRepository.findByContestId(contest.getId())).thenReturn(Optional.empty());
         when(tradeConvoysVoteRepository.findByContestId(contest.getId()))
                 .thenReturn(List.of(
-                        vote(CombatReplayHouse.NAALU, 50, 36, "user-1"),
-                        vote(CombatReplayHouse.MENTAK, 10, 10, "user-2")));
+                        vote(CombatReplayHouse.NAALU, 50, 31, "user-1"),
+                        vote(CombatReplayHouse.MENTAK, 10, 9, "user-2")));
         when(houseFavorService.canAfford(CombatReplayHouse.HACAN, 10)).thenReturn(true);
 
         service.lockTradeConvoysIfNeeded(contest, candidate);
 
-        ArgumentCaptor<CombatReplayHacanTradeConvoysEntity> savedTradeConvoys =
-                ArgumentCaptor.forClass(CombatReplayHacanTradeConvoysEntity.class);
-        verify(tradeConvoysRepository).save(savedTradeConvoys.capture());
-        assertEquals(10, savedTradeConvoys.getValue().getFavorCost());
-        assertEquals(10, savedTradeConvoys.getValue().getPredictionBonus());
+        verify(tradeConvoysRepository, org.mockito.Mockito.never()).save(org.mockito.Mockito.any());
     }
 
     @Test
@@ -252,7 +241,7 @@ class CombatReplayHacanTradeConvoysServiceTest {
         CombatReplayInteractionResult result = service.sendTradeConvoysNow(
                 event,
                 new CombatReplayHacanTradeConvoysService.ParsedTradeConvoysButton(
-                        contest.getId(), CombatReplayHouse.NAALU, 10, 10));
+                        contest.getId(), CombatReplayHouse.NAALU, 10, 9));
 
         assertTrue(result.accepted());
         assertEquals(15, targetScore.getFavorPoints());

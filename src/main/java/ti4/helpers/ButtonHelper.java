@@ -5195,6 +5195,11 @@ public class ButtonHelper {
     }
 
     public static List<Button> getTileInARing(Player player, Game game, String buttonID) {
+        return getTileInARing(player, game, buttonID, null);
+    }
+
+    public static List<Button> getTileInARing(
+            Player player, Game game, String buttonID, @Nullable Set<String> visiblePositions) {
         String factionChecker = player.factionButtonChecker();
         List<Button> ringButtons = new ArrayList<>();
         String ringNum = buttonID.replace("ring_", "");
@@ -5204,7 +5209,7 @@ public class ButtonHelper {
                     List.of("tl", "tr", "bl", "br", "frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7");
             for (String pos : cornerPositions) {
                 Tile t = game.getTileByPosition(pos);
-                if (canActivateTile(game, player, t)) {
+                if (canActivateTile(game, player, t, visiblePositions)) {
                     Button corners = Buttons.green(
                             factionChecker + "ringTile_" + pos,
                             t.getRepresentationForButtons(game, player),
@@ -5226,7 +5231,7 @@ public class ButtonHelper {
                     for (int x = totalTiles / 2; x < totalTiles + 1; x++) {
                         String pos = ringN + "" + x;
                         Tile tile = game.getTileByPosition(pos);
-                        if (canActivateTile(game, player, tile)) {
+                        if (canActivateTile(game, player, tile, visiblePositions)) {
                             String id = factionChecker + "ringTile_" + pos;
                             String label = tile.getRepresentationForButtons(game, player);
                             ringButtons.add(Buttons.green(id, label, tile.getTileEmoji(player)));
@@ -5234,7 +5239,7 @@ public class ButtonHelper {
                     }
                     String pos = ringN + "01";
                     Tile tile = game.getTileByPosition(pos);
-                    if (canActivateTile(game, player, tile)) {
+                    if (canActivateTile(game, player, tile, visiblePositions)) {
                         String id = factionChecker + "ringTile_" + pos;
                         String label = tile.getRepresentationForButtons(game, player);
                         ringButtons.add(Buttons.green(id, label, tile.getTileEmoji(player)));
@@ -5246,7 +5251,7 @@ public class ButtonHelper {
                             pos = ringN + "0" + x;
                         }
                         Tile tile = game.getTileByPosition(pos);
-                        if (canActivateTile(game, player, tile)) {
+                        if (canActivateTile(game, player, tile, visiblePositions)) {
                             String id = factionChecker + "ringTile_" + pos;
                             String label = tile.getRepresentationForButtons(game, player);
                             ringButtons.add(Buttons.green(id, label, tile.getTileEmoji(player)));
@@ -5261,7 +5266,7 @@ public class ButtonHelper {
                             pos = ringN + "0" + x;
                         }
                         Tile tile = game.getTileByPosition(pos);
-                        if (canActivateTile(game, player, tile)) {
+                        if (canActivateTile(game, player, tile, visiblePositions)) {
                             String id = factionChecker + "ringTile_" + pos;
                             String label = tile.getRepresentationForButtons(game, player);
                             ringButtons.add(Buttons.green(id, label, tile.getTileEmoji(player)));

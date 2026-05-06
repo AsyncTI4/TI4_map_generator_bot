@@ -20,7 +20,7 @@ import ti4.contest.replay.service.CombatReplayHouseScoringRule;
 public class CombatReplayMentakScoringRule implements CombatReplayHouseScoringRule {
 
     private static final int PILLAGE_POINTS_PER_OTHER_DELEGATION_MISS = 4;
-    private static final int PROMISE_OF_PROTECTION_MULTIPLIER = 5;
+    private static final int PROMISE_OF_PROTECTION_POINTS = 60;
 
     private final CombatCandidateRepository candidateRepository;
     private final CombatReplayHouseAbilityUseRepository abilityUseRepository;
@@ -61,7 +61,6 @@ public class CombatReplayMentakScoringRule implements CombatReplayHouseScoringRu
                 .orElse(0);
         if (favorCost <= 0) return;
 
-        context.addAbilitySummary(
-                CombatReplayHouse.MENTAK, "Promise of Protection", favorCost * PROMISE_OF_PROTECTION_MULTIPLIER);
+        context.addAbilitySummary(CombatReplayHouse.MENTAK, "Promise of Protection", PROMISE_OF_PROTECTION_POINTS);
     }
 }

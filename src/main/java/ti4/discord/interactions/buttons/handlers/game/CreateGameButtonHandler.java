@@ -82,7 +82,7 @@ public class CreateGameButtonHandler {
                 .queue();
     }
 
-    @ButtonHandler("editPlayers~MDL")
+    @ButtonHandler(value = "editPlayers~MDL", save = false)
     public static void editPlayers(ButtonInteractionEvent event) {
         String modalID = "signupModal";
         String fieldID = "players";
@@ -120,7 +120,7 @@ public class CreateGameButtonHandler {
                 .queue();
     }
 
-    @ButtonHandler("addSillyName~MDL")
+    @ButtonHandler(value = "addSillyName~MDL", save = false)
     public static void addSillyName(ButtonInteractionEvent event) {
         String modalID = "addSillyNameModal";
         String fieldID = "sillyName";
@@ -134,7 +134,7 @@ public class CreateGameButtonHandler {
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    @ButtonHandler("removePlayers~MDL")
+    @ButtonHandler(value = "removePlayers~MDL", save = false)
     public static void removePlayers(ButtonInteractionEvent event) {
         String modalID = "removeSignupModal";
         String fieldID = "players";
@@ -252,7 +252,7 @@ public class CreateGameButtonHandler {
         return memberList.toString() + activityList;
     }
 
-    @ButtonHandler("joinGameList")
+    @ButtonHandler(value = "joinGameList", save = false)
     public static void joinGameList(ButtonInteractionEvent event) {
         List<Member> members = fetchMembersFromMessage(event);
         if (!members.contains(event.getMember())) {
@@ -264,7 +264,7 @@ public class CreateGameButtonHandler {
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " joined the game.");
     }
 
-    @ButtonHandler("leaveGameList")
+    @ButtonHandler(value = "leaveGameList", save = false)
     public static void leaveGameList(ButtonInteractionEvent event) {
         List<Member> members = fetchMembersFromMessage(event);
         members.remove(event.getMember());
