@@ -31,7 +31,7 @@ class CombatReplayMentakScoringRuleTest {
             new CombatReplayMentakScoringRule(candidateRepository, abilityUseRepository);
 
     @Test
-    void promiseOfProtectionPaysFiveTimesFalseColorsCostWhenDecoyedFactionWins() {
+    void promiseOfProtectionPaysFlatPointsWhenDecoyedFactionWins() {
         CombatCandidateEntity candidate = candidate("ghost", "ghost", 40);
         when(candidateRepository.findById(candidate.getId())).thenReturn(Optional.of(candidate));
         when(abilityUseRepository.findByCandidateIdAndHouse(candidate.getId(), CombatReplayHouse.MENTAK))
@@ -42,7 +42,7 @@ class CombatReplayMentakScoringRuleTest {
         rule.apply(context(candidate, abilities));
 
         assertTrue(abilities.get(CombatReplayHouse.MENTAK).stream()
-                .anyMatch(summary -> "Promise of Protection".equals(summary.label()) && summary.points() == 200));
+                .anyMatch(summary -> "Promise of Protection".equals(summary.label()) && summary.points() == 60));
     }
 
     @Test
