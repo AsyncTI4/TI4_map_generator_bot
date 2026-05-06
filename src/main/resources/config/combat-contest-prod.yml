@@ -1,6 +1,6 @@
 candidateSelection:
   window:
-    lookbackMinutes: 60
+    lookbackMinutes: 480
     refreshCronIntervalSeconds: 300
   targetCandidatesPerHour: 4
 
