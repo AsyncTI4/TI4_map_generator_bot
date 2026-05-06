@@ -908,7 +908,7 @@ public class StartPhaseService {
                 .build();
 
         game.getMainGameChannel().sendMessage(messageObject).queue(Consumers.nop(), BotLogger::catchRestError);
-
+      
         for (Player player : game.getRealPlayers()) {
             if (!player.getAllianceMembers().isEmpty()) {
                 MessageHelper.sendMessageToChannel(

@@ -211,12 +211,13 @@ public class GameMessageManager {
                 continue;
             }
 
+            boolean removedLegacyStatusEndMessages = removeLegacyStatusEndMessages(messages);
             int playerCount = game.getRealPlayers().size();
             long twoWeeksAgo = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(14);
             boolean removed = messages.removeIf(
                     msg -> (playerCount > 0 && msg.factionsThatReacted().size() >= playerCount)
                             || msg.gameSaveTime() <= twoWeeksAgo);
-            if (removed) {
+            if (removedLegacyStatusEndMessages || removed) {
                 removedMessages = true;
                 BotLogger.info("GameMessageCleanupCron removed GameMessages for " + gameName);
             }
@@ -232,6 +233,11 @@ public class GameMessageManager {
                 BotLogger.info("GameMessageCleanupCron removed the following games " + removedGames);
             persistFile(allGameMessages);
         }
+    }
+
+    // Remove after STATUS_END has been removed from persisted GameMessages.
+    private static boolean removeLegacyStatusEndMessages(List<GameMessage> messages) {
+        return messages.removeIf(message -> message.type == GameMessageType.STATUS_END);
     }
 
     public static synchronized List<GameMessage> getAll(String gameName, GameMessageType type) {
