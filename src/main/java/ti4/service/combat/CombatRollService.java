@@ -931,6 +931,12 @@ public class CombatRollService {
             if (rollType == CombatRollType.combatround && MobilizationEngineHandler.hasEngineAttached(game)) {
                 modifierToHit += MobilizationEngineHandler.getCombatMod(game, player, unitModel);
             }
+            if (rollType == CombatRollType.combatround
+                    && player.hasTech("baconcg")
+                    && opponent.getSCs().stream()
+                            .allMatch(sc -> game.getPlayedSCs().contains(sc))) {
+                modifierToHit += 1;
+            }
             int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player);
             if (rollType == CombatRollType.combatround) {
                 CombatStatsService.CombatRoundProfile combatRoundProfile = CombatStatsService.getCombatRoundProfile(
