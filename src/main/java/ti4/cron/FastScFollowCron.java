@@ -121,9 +121,8 @@ public class FastScFollowCron {
                 .append(" command token")
                 .append(player.getStrategicCC() == 1 ? "" : "s")
                 .append(" in your strategy pool.");
-        if (!player.hasFollowedSC(sc)) {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
-        }
+
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
     }
 
     private static void handleSecretObjectiveDrawOrder(Game game, Player player) {

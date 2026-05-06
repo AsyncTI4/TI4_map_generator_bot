@@ -304,7 +304,7 @@ public class StartTurnService {
         }
     }
 
-    public static void reviveInfantryII(Player player) {
+    private static void reviveInfantryII(Player player) {
         Game game = player.getGame();
         if (player.getStasisInfantry() > 0 && !player.hasUnit("tf-yinclone") && player.hasInf2Tech()) {
             if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
@@ -373,12 +373,8 @@ public class StartTurnService {
                         .orElse(null);
                 if (scMessage != null) {
                     msg += " " + scMessage.asJumpLink(game.getMainGameChannel()) + "\n";
-                    try {
-                        Long id = Long.parseLong(scMessage.messageId());
-                        thingsToFollow.put(id, msg);
-                    } catch (NumberFormatException e) {
-                        sb.append(msg).append('\n');
-                    }
+                    Long id = Long.parseLong(scMessage.messageId());
+                    thingsToFollow.put(id, msg);
                 } else {
                     sb.append(msg).append('\n');
                 }

@@ -17,9 +17,9 @@ public class StrategyCardMessageService {
                 .findFirst();
     }
 
-    public static void replaceStrategyCardMessage(
-            String gameName, String messageId, int round, int sc, long gameSaveTime) {
-        GameMessageManager.replace(gameName, messageId, GameMessageType.STRATEGY_CARD, gameSaveTime, getKey(round, sc));
+    static void replaceStrategyCardMessage(String gameName, String messageId, int round, int sc, long gameSaveTime) {
+        GameMessageManager.replace(
+                gameName, new GameMessage(messageId, GameMessageType.STRATEGY_CARD, gameSaveTime, getKey(round, sc)));
     }
 
     public static String getKey(int round, int sc) {

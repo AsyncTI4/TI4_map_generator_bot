@@ -11,6 +11,20 @@ public record GameMessage(
         @JsonInclude(JsonInclude.Include.NON_EMPTY) LinkedHashSet<String> factionsThatReacted,
         long gameSaveTime,
         @JsonInclude(JsonInclude.Include.NON_NULL) String key) {
+
+    public GameMessage(String messageId, GameMessageType type, long gameSaveTime) {
+        this(messageId, type, null, gameSaveTime, null);
+    }
+
+    public GameMessage(String messageId, GameMessageType type, long gameSaveTime, String key) {
+        this(messageId, type, null, gameSaveTime, key);
+    }
+
+    public GameMessage(
+            String messageId, GameMessageType type, LinkedHashSet<String> factionsThatReacted, long gameSaveTime) {
+        this(messageId, type, factionsThatReacted, gameSaveTime, null);
+    }
+
     public GameMessage(
             String messageId,
             GameMessageType type,
