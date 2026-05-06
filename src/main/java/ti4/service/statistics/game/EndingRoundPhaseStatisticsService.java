@@ -26,7 +26,8 @@ class EndingRoundPhaseStatisticsService {
         Map<String, FactionWinningRoundStats> statsByFaction = new HashMap<>();
 
         GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilterForWonGame(event), game -> collectFactionWinningRoundStats(game, statsByFaction));
+                GameStatisticsFilterer.getGamesFilterForWonGame(event),
+                game -> collectFactionWinningRoundStats(game, statsByFaction));
 
         StringBuilder sb = new StringBuilder("__**Game Endings by Round and Phase:**__\n");
         sb.append(buildFactionWinningRoundReport(statsByFaction));
@@ -64,7 +65,8 @@ class EndingRoundPhaseStatisticsService {
                             .append(' ')
                             .append(factionName)
                             .append(": ")
-                            .append(String.format(Locale.ROOT, "%.1f", entry.getValue().getAverageRound()))
+                            .append(String.format(
+                                    Locale.ROOT, "%.1f", entry.getValue().getAverageRound()))
                             .append(" avg (")
                             .append(entry.getValue().formatRoundPhaseCounts())
                             .append(")\n");
@@ -76,13 +78,14 @@ class EndingRoundPhaseStatisticsService {
         if (phase == null || phase.isBlank()) {
             return UNKNOWN_PHASE_CODE;
         }
-        if (phase.contains("status")) {
+        String normalizedPhase = phase.toLowerCase(Locale.ROOT);
+        if (normalizedPhase.contains("status")) {
             return "SP";
         }
-        if (phase.contains("agenda")) {
+        if (normalizedPhase.contains("agenda")) {
             return "AgP";
         }
-        if (phase.contains("action")) {
+        if (normalizedPhase.contains("action")) {
             return "AP";
         }
         return UNKNOWN_PHASE_CODE;

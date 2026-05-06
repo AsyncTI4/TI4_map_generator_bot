@@ -1,6 +1,7 @@
 package ti4.service.statistics.game;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
@@ -56,7 +57,7 @@ class EndingRoundPhaseStatisticsServiceTest extends BaseTi4Test {
         assertTrue(report.contains("Argent"));
         assertTrue(report.contains("4.4 avg (R4AP: 2, R4SP: 1, R5AP: 2)"));
         assertTrue(report.contains("5.5 avg (R5AgP: 1, R6SP: 1)"));
-        assertTrue(!report.contains("R4AgP"));
+        assertFalse(report.contains("R4AgP"));
         assertTrue(report.indexOf("Arborec") < report.indexOf("Argent"));
     }
 }
