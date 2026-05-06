@@ -38,4 +38,14 @@ class GameMessageManagerTest {
 
         assertThat(reread.info()).containsEntry("strategyCard", "1");
     }
+
+    @Test
+    void gameMessageOmitsEmptyInfoFromJson() throws Exception {
+        GameMessageManager.GameMessage original =
+                new GameMessageManager.GameMessage("789", GameMessageType.TURN, new LinkedHashSet<>(), 99L, Map.of());
+
+        String json = JsonMapperManager.basic().writeValueAsString(original);
+
+        assertThat(json).doesNotContain("\"info\"");
+    }
 }

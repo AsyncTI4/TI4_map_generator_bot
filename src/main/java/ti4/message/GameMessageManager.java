@@ -1,5 +1,7 @@
 package ti4.message;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -296,7 +298,7 @@ public class GameMessageManager {
             GameMessageType type,
             LinkedHashSet<String> factionsThatReacted,
             long gameSaveTime,
-            Map<String, String> info) {
+            @JsonInclude(Include.NON_EMPTY) Map<String, String> info) {
         public GameMessage(
                 String messageId,
                 GameMessageType type,
