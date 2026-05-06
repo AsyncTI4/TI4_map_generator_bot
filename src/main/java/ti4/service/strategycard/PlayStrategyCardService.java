@@ -489,8 +489,6 @@ public class PlayStrategyCardService {
             StrategyCardModel scModel,
             List<Button> scButtons) {
         String stratCardName = Helper.getSCName(scToPlay, game);
-        int playRound = game.getRound();
-        long playGameSaveTime = game.getLastModifiedDate();
         List<Player> playersToReact = new ArrayList<>();
         playersToReact.add(player);
         player.addFollowedSC(scToPlay, event);
@@ -531,7 +529,7 @@ public class PlayStrategyCardService {
                             && !CheckUnitContainmentService.getTilesContainingPlayersUnits(
                                             game, p2, Units.UnitType.Spacedock)
                                     .contains(p2.getHomeSystemTile())) {
-                        markPlayerAsAutoFollowing(playersToReact, game, p2, scToPlay, event);
+                        markPlayerAsAutoFollowing(playersToReact, game, p2, 6, event);
                         MessageHelper.sendMessageToChannel(
                                 p2.getCardsInfoThread(),
                                 "You were automatically marked as not following **"
@@ -551,7 +549,7 @@ public class PlayStrategyCardService {
                                     + "** because you told the bot earlier that you wished to pass on it.");
                 } else {
                     if (scToPlay == 8 && p2.getSoScored() == p2.getMaxSOCount() && !game.isTwilightsFallMode()) {
-                        markPlayerAsAutoFollowing(playersToReact, game, p2, scToPlay, event);
+                        markPlayerAsAutoFollowing(playersToReact, game, p2, 8, event);
                         MessageHelper.sendMessageToChannel(
                                 p2.getCardsInfoThread(),
                                 "You were automatically marked as not following **" + stratCardName
@@ -567,6 +565,8 @@ public class PlayStrategyCardService {
                 game.removeStoredValue("scPlayPingCount" + scToPlay + p2.getFaction());
             }
         }
+        int playRound = game.getRound();
+        long playGameSaveTime = game.getLastModifiedDate();
         game.getMainGameChannel()
                 .sendMessage(toSend)
                 .queue(
