@@ -118,10 +118,12 @@ class ButtonListener extends ListenerAdapter {
             slowEvents.clear();
 
             long gatewayPing = event.getJDA().getGatewayPing();
+            long warningWindowMinutes = WARNING_TRIM_WINDOW.toMinutes();
+            String minuteLabel = warningWindowMinutes == 1 ? "minute" : "minutes";
             BotLogger.error("⚠ **High Discord/JDA latency detected: "
                     + EVENT_COUNT_THRESHOLD
                     + "+ slow events in the last "
-                    + WARNING_TRIM_WINDOW.toMinutes() + "  minutes.**"
+                    + warningWindowMinutes + " " + minuteLabel + ".**"
                     + "\n**Gateway ping:** " + gatewayPing);
         }
     }
