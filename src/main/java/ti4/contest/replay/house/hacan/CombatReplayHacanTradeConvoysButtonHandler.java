@@ -15,11 +15,24 @@ public class CombatReplayHacanTradeConvoysButtonHandler {
     public static void handleHacanTradeConvoys(ButtonInteractionEvent event, String buttonId) {
         try {
             ParsedTradeConvoysButton parsed = CombatReplayHacanTradeConvoysService.parseButtonId(buttonId);
-            CombatReplayInteractionResult result = SpringContext.getBean(CombatReplayHacanTradeConvoysService.class)
-                    .recordTradeConvoysVote(event, parsed);
+            CombatReplayHacanTradeConvoysService service =
+                    SpringContext.getBean(CombatReplayHacanTradeConvoysService.class);
+            CombatReplayInteractionResult result = service.sendTradeConvoysNow(event, parsed);
             MessageHelper.sendEphemeralMessageToEventChannel(event, result.message());
         } catch (IllegalArgumentException e) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not read that Hacan Trade Convoys vote.");
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not read that Hacan Trade Convoys request.");
+        }
+    }
+
+    @ButtonHandler(CombatReplayHacanTradeConvoysService.HACAN_TRADE_CONVOYS_SEND_NOW_PREFIX)
+    public static void handleHacanTradeConvoysSendNow(ButtonInteractionEvent event, String buttonId) {
+        try {
+            ParsedTradeConvoysButton parsed = CombatReplayHacanTradeConvoysService.parseButtonId(buttonId);
+            CombatReplayInteractionResult result = SpringContext.getBean(CombatReplayHacanTradeConvoysService.class)
+                    .sendTradeConvoysNow(event, parsed);
+            MessageHelper.sendEphemeralMessageToEventChannel(event, result.message());
+        } catch (IllegalArgumentException e) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not read that Hacan Trade Convoys request.");
         }
     }
 }

@@ -25,6 +25,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
+import ti4.helpers.ButtonHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -70,7 +71,9 @@ class CombatReplaySideBetUiService {
 
     public void refreshSummaryMessage(
             MessageChannel channel, CombatReplayContestEntity contest, CombatCandidateEntity candidate) {
-        refreshSummaryMessage(channel, contest, loadReplayGame(candidate));
+        Game game = loadReplayGame(candidate);
+        refreshSummaryMessage(channel, contest, game);
+        revealPublicSideBetButtonsIfClosed(channel, game, contest, candidate);
     }
 
     public String renderUserSummary(
@@ -86,24 +89,89 @@ class CombatReplaySideBetUiService {
             String faction) {
         List<Button> buttons = buttonsForFaction(game, contest, candidate, faction);
         if (buttons.isEmpty()) return;
-        MessageHelper.sendMessageToChannelWithButtons(channel, factionSectionTitle(game, faction), buttons);
+        MessageHelper.splitAndSentWithAction(
+                factionSectionTitle(game, faction),
+                channel,
+                buttons,
+                message -> saveSideBetButtonMessageId(contest, candidate, faction, message.getIdLong()));
     }
 
     private List<Button> buttonsForFaction(
             Game game, CombatReplayContestEntity contest, CombatCandidateEntity candidate, String faction) {
+        return buttonsForFaction(game, contest, candidate, faction, false, false);
+    }
+
+    private List<Button> buttonsForFaction(
+            Game game,
+            CombatReplayContestEntity contest,
+            CombatCandidateEntity candidate,
+            String faction,
+            boolean revealPayouts,
+            boolean disabled) {
         List<Button> buttons = new ArrayList<>();
         for (CombatSideBetType type : availabilityService.availableTypes(candidate, faction)) {
             int profitPoints = payoutService.offeredPayout(contest, candidate, type, faction);
-            buttons.add(Buttons.gray(
+            Button button = Buttons.gray(
                     CombatSideBetButtonIds.format(contest.getId(), type, faction),
-                    buttonLabel(type, profitPoints),
-                    type.emoji()));
+                    buttonLabel(type, profitPoints, revealPayouts),
+                    type.emoji());
+            buttons.add(disabled ? button.asDisabled() : button);
         }
         return buttons;
     }
 
-    private String buttonLabel(CombatSideBetType type, int profitPoints) {
-        return type.label() + " +" + profitPoints + " pts";
+    private String buttonLabel(CombatSideBetType type, int profitPoints, boolean revealPayout) {
+        return revealPayout ? type.label() + " +" + profitPoints + " pts" : type.label();
+    }
+
+    private void saveSideBetButtonMessageId(
+            CombatReplayContestEntity contest, CombatCandidateEntity candidate, String faction, long messageId) {
+        if (contest == null || candidate == null || faction == null || messageId <= 0) return;
+        if (faction.equalsIgnoreCase(candidate.getAttackerFaction())) {
+            contest.setSideBetAttackerButtonMessageId(messageId);
+        } else if (faction.equalsIgnoreCase(candidate.getDefenderFaction())) {
+            contest.setSideBetDefenderButtonMessageId(messageId);
+        } else {
+            return;
+        }
+        replayContestRepository.save(contest);
+    }
+
+    private void revealPublicSideBetButtonsIfClosed(
+            MessageChannel channel, Game game, CombatReplayContestEntity contest, CombatCandidateEntity candidate) {
+        if (channel == null || contest == null || candidate == null || !sideBetWindowClosed(contest)) return;
+        revealPublicSideBetButtons(
+                channel,
+                game,
+                contest,
+                candidate,
+                candidate.getAttackerFaction(),
+                contest.getSideBetAttackerButtonMessageId());
+        revealPublicSideBetButtons(
+                channel,
+                game,
+                contest,
+                candidate,
+                candidate.getDefenderFaction(),
+                contest.getSideBetDefenderButtonMessageId());
+    }
+
+    private void revealPublicSideBetButtons(
+            MessageChannel channel,
+            Game game,
+            CombatReplayContestEntity contest,
+            CombatCandidateEntity candidate,
+            String faction,
+            Long messageId) {
+        if (messageId == null || messageId <= 0) return;
+        List<Button> buttons = buttonsForFaction(game, contest, candidate, faction, true, true);
+        if (buttons.isEmpty()) return;
+        channel.retrieveMessageById(messageId)
+                .queue(
+                        message -> message.editMessage(factionSectionTitle(game, faction))
+                                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
+                                .queue(Consumers.nop(), BotLogger::catchRestError),
+                        BotLogger::catchRestError);
     }
 
     private void ensureSummaryMessage(MessageChannel channel, Game game, CombatReplayContestEntity contest) {
@@ -162,7 +230,7 @@ class CombatReplaySideBetUiService {
             return message.toString();
         }
 
-        Map<String, Long> countsByBet = summarizeBetCounts(sideBets, game);
+        Map<String, Long> countsByBet = summarizeBetCounts(sideBets, game, sideBetWindowClosed);
         message.append("```text\n");
         if (sideBetWindowClosed) {
             message.append(String.format("%-3s | %s%n", "Qty", "Bet"));
@@ -198,7 +266,8 @@ class CombatReplaySideBetUiService {
             return message.toString();
         }
 
-        for (Map.Entry<String, Long> entry : summarizeUserBetCounts(bets, game).entrySet()) {
+        for (Map.Entry<String, Long> entry :
+                summarizeUserBetCounts(bets, game, sideBetWindowClosed(contest)).entrySet()) {
             message.append("- ")
                     .append(entry.getValue())
                     .append("x ")
@@ -214,19 +283,21 @@ class CombatReplaySideBetUiService {
                 .thenComparing(CombatContestSideBetEntity::getId, Comparator.nullsLast(Comparator.naturalOrder()));
     }
 
-    private Map<String, Long> summarizeBetCounts(List<CombatContestSideBetEntity> sideBets, Game game) {
+    private Map<String, Long> summarizeBetCounts(
+            List<CombatContestSideBetEntity> sideBets, Game game, boolean revealPayouts) {
         Map<String, Long> countsByBet = new LinkedHashMap<>();
         for (CombatContestSideBetEntity sideBet : sideBets) {
-            String label = formatFriendlyBetLabel(game, sideBet, true);
+            String label = formatFriendlyBetLabel(game, sideBet, true, revealPayouts);
             countsByBet.merge(label, 1L, Long::sum);
         }
         return countsByBet;
     }
 
-    private Map<String, Long> summarizeUserBetCounts(List<CombatContestSideBetEntity> sideBets, Game game) {
+    private Map<String, Long> summarizeUserBetCounts(
+            List<CombatContestSideBetEntity> sideBets, Game game, boolean revealPayouts) {
         Map<String, Long> countsByBet = new LinkedHashMap<>();
         for (CombatContestSideBetEntity sideBet : sideBets) {
-            String label = formatFriendlyBetLabel(game, sideBet, false);
+            String label = formatFriendlyBetLabel(game, sideBet, false, revealPayouts);
             countsByBet.merge(label, 1L, Long::sum);
         }
         return countsByBet;
@@ -257,11 +328,13 @@ class CombatReplaySideBetUiService {
         return contest.getReplayStartAt() != null && !LocalDateTime.now().isBefore(contest.getReplayStartAt());
     }
 
-    private String formatFriendlyBetLabel(Game game, CombatContestSideBetEntity sideBet, boolean useShortFactionId) {
+    private String formatFriendlyBetLabel(
+            Game game, CombatContestSideBetEntity sideBet, boolean useShortFactionId, boolean revealPayout) {
         String faction = useShortFactionId
                 ? buttonFactionIdLabel(game, sideBet.getTargetFaction())
                 : buttonFactionDisplayName(game, sideBet.getTargetFaction());
-        return faction + " " + sideBet.getBetType().label() + " +" + payoutService.resolvedProfitPoints(sideBet);
+        String label = faction + " " + sideBet.getBetType().label();
+        return revealPayout ? label + " +" + payoutService.resolvedProfitPoints(sideBet) : label;
     }
 
     private String factionSectionTitle(Game game, String faction) {

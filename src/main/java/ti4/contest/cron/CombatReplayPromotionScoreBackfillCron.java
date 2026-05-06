@@ -117,6 +117,19 @@ public class CombatReplayPromotionScoreBackfillCron {
         CombatReplayService.InitialCombatStats initialStats = CombatReplayService.initialCombatStats(candidate);
         if (initialStats == null) return false;
 
+        int roundsObserved = SpringContext.getBean(CombatCandidateEventRepository.class)
+                .findMaxRoundNumberByCandidateId(candidate.getId())
+                .orElse(0);
+        if (isDraw(candidate)) {
+            candidate.setPromotionScore(CombatReplayService.computeDrawPromotionScore(initialStats, roundsObserved));
+            candidate.setAttackerStrength(initialStats.attackerStrength());
+            candidate.setDefenderStrength(initialStats.defenderStrength());
+            candidate.setAttackerHp(initialStats.attackerHp());
+            candidate.setDefenderHp(initialStats.defenderHp());
+            SpringContext.getBean(CombatCandidateRepository.class).save(candidate);
+            return true;
+        }
+
         String snapshotJson = extractLatestSnapshotJson(candidate.getId());
         if (snapshotJson == null || snapshotJson.isBlank()) return false;
 
@@ -137,9 +150,6 @@ public class CombatReplayPromotionScoreBackfillCron {
                 LazaxCombatSupport.calculateFleetStrength(attacker, defender, tile, space);
         LazaxCombatSupport.FleetStrength defenderRemainingStrength =
                 LazaxCombatSupport.calculateFleetStrength(defender, attacker, tile, space);
-        int roundsObserved = SpringContext.getBean(CombatCandidateEventRepository.class)
-                .findMaxRoundNumberByCandidateId(candidate.getId())
-                .orElse(0);
         candidate.setPromotionScore(CombatReplayService.computePromotionScore(
                 candidate,
                 initialStats,
@@ -153,6 +163,10 @@ public class CombatReplayPromotionScoreBackfillCron {
         candidate.setDefenderHp(initialStats.defenderHp());
         SpringContext.getBean(CombatCandidateRepository.class).save(candidate);
         return true;
+    }
+
+    private static boolean isDraw(CombatCandidateEntity candidate) {
+        return candidate.getWinnerFaction() == null && candidate.getLoserFaction() == null;
     }
 
     private static String extractLatestSnapshotJson(Long candidateId) {

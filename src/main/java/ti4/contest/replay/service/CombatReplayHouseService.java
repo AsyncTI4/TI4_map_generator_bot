@@ -293,16 +293,16 @@ public class CombatReplayHouseService {
         if (guild == null || member == null) return "Could not update your Lazax delegation role.";
 
         Role role = findRole(guild, assignment.getHouse());
-        if (role == null) return "Could not find the " + assignment.getHouse().displayName() + " Delegation role.";
+        if (role == null) return "Could not find the " + assignment.getHouse().roleName() + " role.";
 
         if (member.getRoles().contains(role)) {
             guild.removeRoleFromMember(member, role).queue(null, BotLogger::catchRestError);
-            return "Removed your **" + assignment.getHouse().displayName()
-                    + " Delegation** role. Your delegation assignment is unchanged.";
+            return "Removed your **" + assignment.getHouse().roleName()
+                    + "** role. Your delegation assignment is unchanged.";
         }
 
         grantHouseRole(guild, member, assignment.getHouse(), null);
-        return "Added your **" + assignment.getHouse().displayName() + " Delegation** role.";
+        return "Added your **" + assignment.getHouse().roleName() + "** role.";
     }
 
     public synchronized String toggleHouseOptIn(Guild guild, Member member, User user) {
@@ -375,9 +375,9 @@ public class CombatReplayHouseService {
     }
 
     private String houseRoleMention(Guild guild, CombatReplayHouse house) {
-        if (guild == null) return "**" + house.displayName() + " Delegation**";
+        if (guild == null) return "**" + house.roleName() + "**";
         Role role = findRole(guild, house);
-        return role == null ? "**" + house.displayName() + " Delegation**" : role.getAsMention();
+        return role == null ? "**" + house.roleName() + "**" : role.getAsMention();
     }
 
     public List<CombatReplayHouseEntity> allHouseAssignments() {

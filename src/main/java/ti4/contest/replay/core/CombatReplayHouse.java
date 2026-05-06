@@ -23,7 +23,7 @@ public enum CombatReplayHouse {
     }
 
     public String roleName() {
-        return displayName + " Delegation";
+        return displayName + "Delegation";
     }
 
     public String channelName() {

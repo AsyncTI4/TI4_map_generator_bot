@@ -17,7 +17,6 @@ import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.core.CombatRollPayload;
-import ti4.contest.replay.core.renderers.CombatRollPayloadRenderer;
 import ti4.contest.replay.dispatch.ReplayDispatchPayload;
 import ti4.contest.replay.dispatch.ReplayDispatchSerializer;
 import ti4.contest.replay.entities.CombatCandidateEntity;
@@ -37,8 +36,6 @@ import ti4.contest.replay.service.CombatReplayInteractionResult;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
-import ti4.game.Player;
-import ti4.game.persistence.GameManager;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -211,7 +208,6 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
         CombatCandidateEntity candidate = loadCandidate(contest);
         if (candidate == null) return "Could not find that combat archive.";
 
-        Game game = loadGame(candidate.getGameName());
         List<String> lines = new ArrayList<>();
         for (CombatCandidateEventEntity event : orderedEvents(candidate)) {
             ReplayDispatchPayload payload = payloadSerializer.read(event);
@@ -219,7 +215,7 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
 
             ActionCardModel actionCard = Mapper.getActionCard(actionCardId);
             String cardName = actionCard == null ? actionCardId : actionCard.getName();
-            lines.add("- " + actor(game, event.getActorFaction()) + ": _" + cardName + "_");
+            lines.add("- " + actor(event.getActorFaction()) + ": _" + cardName + "_");
         }
 
         if (lines.isEmpty()) {
@@ -233,7 +229,6 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
         CombatCandidateEntity candidate = loadCandidate(contest);
         if (candidate == null) return "Could not find that combat archive.";
 
-        Game game = loadGame(candidate.getGameName());
         CombatReplayDecoys.Abilities abilities = CombatReplayDecoys.read(candidate.getReplayAbilitiesJson());
         List<String> rolls = new ArrayList<>();
         for (CombatCandidateEventEntity event : orderedEvents(candidate)) {
@@ -246,9 +241,9 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
             if (!isCombatRoundRoll(combatRoll.payload())) continue;
 
             CombatRollPayload payloadWithDecoys = CombatReplayDecoys.applyToRoll(combatRoll.payload(), abilities);
-            String rendered = CombatRollPayloadRenderer.render(payloadWithDecoys);
+            String rendered = renderRoundOneRollSummary(payloadWithDecoys);
             if (StringUtils.isBlank(rendered)) continue;
-            rolls.add("### " + actor(game, event.getActorFaction()) + "\n" + rendered.strip());
+            rolls.add("### " + actor(event.getActorFaction()) + "\n" + rendered.strip());
         }
 
         if (rolls.isEmpty()) {
@@ -257,12 +252,17 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
         return "## Gift of Foresight: Round 1 Rolls\n" + String.join("\n\n", rolls);
     }
 
+    private String renderRoundOneRollSummary(CombatRollPayload payload) {
+        if (payload == null || payload.total() == null) return "";
+        int totalHits = payload.total().displayedTotalHits();
+        return "**Total hits " + totalHits + "** " + ":boom:".repeat(Math.max(0, totalHits));
+    }
+
     public String renderLuckOmens(long contestId) {
         CombatReplayContestEntity contest = loadContest(contestId);
         CombatCandidateEntity candidate = loadCandidate(contest);
         if (candidate == null) return "Could not find that combat archive.";
 
-        Game game = loadGame(candidate.getGameName());
         LuckAccumulator overall = new LuckAccumulator();
         Map<String, LuckAccumulator> actorLuck = new LinkedHashMap<>();
         for (CombatCandidateEventEntity event : orderedEvents(candidate)) {
@@ -293,7 +293,7 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
         for (Map.Entry<String, LuckAccumulator> entry : actorLuck.entrySet()) {
             LuckAccumulator actorAccumulator = entry.getValue();
             if (actorAccumulator.diceRolled() == 0) continue;
-            lines.add(actor(game, entry.getKey()) + ": **" + luckLabel(actorAccumulator.delta()) + "**");
+            lines.add(actor(entry.getKey()) + ": **" + luckLabel(actorAccumulator.delta()) + "**");
         }
         return "## Gift of Foresight: Omens\n" + String.join("\n", lines);
     }
@@ -449,10 +449,9 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
         return payload != null && payload.header() != null && payload.header().rollType() == CombatRollType.combatround;
     }
 
-    private String actor(Game game, String actorFaction) {
-        Player player = game == null ? null : game.getPlayerFromColorOrFaction(actorFaction);
-        if (player != null) return player.getRepresentationNoPing();
-        return StringUtils.defaultIfBlank(actorFaction, "Unknown player");
+    private String actor(String actorFaction) {
+        if (StringUtils.isBlank(actorFaction)) return "Unknown faction";
+        return factionLabel(actorFaction);
     }
 
     private String factionLabel(String faction) {
@@ -466,15 +465,6 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
     private CombatCandidateEntity loadCandidate(CombatReplayContestEntity contest) {
         if (contest == null) return null;
         return candidateRepository.findById(contest.getCandidateId()).orElse(null);
-    }
-
-    private Game loadGame(String gameName) {
-        try {
-            var managedGame = GameManager.getManagedGame(gameName);
-            return managedGame == null ? null : managedGame.getGame();
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     private TextChannel houseChannel() {
