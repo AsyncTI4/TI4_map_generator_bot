@@ -20,6 +20,26 @@ public class BeansButtonHandler {
         DreamButtonHandler.addNexusToken(event, game, player, buttonID);
     }
 
+    @ButtonHandler("beans_dream_move_nexus_from_")
+    public static void moveNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        DreamButtonHandler.moveNexusToken(event, game, player, buttonID);
+    }
+
+    @ButtonHandler("beans_dream_offer_add_nexus")
+    public static void offerAddNexusButtons(ButtonInteractionEvent event, Game game, Player player) {
+        DreamButtonHandler.offerAddNexusButtons(event, game, player);
+    }
+
+    @ButtonHandler("beans_dream_offer_move_nexus")
+    public static void offerMoveNexusButtons(ButtonInteractionEvent event, Game game, Player player) {
+        DreamButtonHandler.offerMoveNexusButtons(event, game, player);
+    }
+
+    @ButtonHandler("beans_dream_liturgy_menu_back")
+    public static void showLiturgyMenu(ButtonInteractionEvent event, Game game, Player player) {
+        DreamButtonHandler.showLiturgyMenu(event, game, player);
+    }
+
     @ButtonHandler("beans_not_implemented")
     public static void beansNotImplemented(ButtonInteractionEvent event) {
         MessageHelper.sendMessageToEventChannel(event, "This Beans automation button is not implemented yet.");
