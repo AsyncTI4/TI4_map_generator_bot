@@ -56,6 +56,7 @@ import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.tech.BastionTechService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.spring.context.SpringContext;
 
 @UtilityClass
@@ -1329,6 +1330,14 @@ public class StartCombatService {
         buttons.add(Buttons.blue(
                 "refreshViewOfSystem_" + pos + "_" + p1.getFaction() + "_" + p2.getFaction() + "_" + groundOrSpace,
                 "Refresh Picture"));
+
+        // Minimal hook: allow Dreaming Throne to inject Incomprehensible Form button(s) alongside assign/hits/roll buttons
+        try {
+            if (isSpaceCombat) {
+                buttons.addAll(DreamButtonHandler.getIncomprehensibleFormButtons(game, p1, p2, tile));
+            }
+        } catch (Exception ignored) {
+        }
 
         if (p1.hasTechReady("sc") || (!game.isFowMode() && p2.hasTechReady("sc"))) {
             if (p1.hasTechReady("sc")) {

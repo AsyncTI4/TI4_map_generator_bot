@@ -40,6 +40,30 @@ public class BeansButtonHandler {
         DreamButtonHandler.showLiturgyMenu(event, game, player);
     }
 
+    @ButtonHandler("beans_incomprehensible_form_")
+    public static void incomprehensibleForm(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        DreamButtonHandler.presentIncomprehensibleChoices(event, game, player, buttonID);
+    }
+
+    @ButtonHandler("beans_incomprehensible_form_use_token_")
+    public static void incomprehensibleFormUseToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        DreamButtonHandler.useIncomprehensibleForm(event, game, player, buttonID);
+    }
+
+    @ButtonHandler("beans_incomprehensible_form_use_flagship_")
+    public static void incomprehensibleFormUseFlagship(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        DreamButtonHandler.useIncomprehensibleForm(event, game, player, buttonID);
+    }
+
+    @ButtonHandler("beans_promissory_bepndream_return_")
+    public static void visionsReturnPromissory(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        DreamButtonHandler.resolveVisionsPromissory(event, game, player, buttonID);
+    }
+
+    public static void offerVisionsPromissoryAtTacticalStart(Game game, Player player) {
+        DreamButtonHandler.offerVisionsPromissoryAtTacticalStart(game, player);
+    }
+
     @ButtonHandler("beans_not_implemented")
     public static void beansNotImplemented(ButtonInteractionEvent event) {
         MessageHelper.sendMessageToEventChannel(event, "This Beans automation button is not implemented yet.");
