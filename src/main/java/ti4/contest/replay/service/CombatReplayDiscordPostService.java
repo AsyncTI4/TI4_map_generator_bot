@@ -99,7 +99,7 @@ public class CombatReplayDiscordPostService {
 
     public ThreadChannel createReplayThread(Message posted, CombatCandidateEntity winner) {
         return posted.createThreadChannel(buildReplayThreadName(winner))
-                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS)
+                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR)
                 .complete();
     }
 
