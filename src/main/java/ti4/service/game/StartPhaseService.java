@@ -106,9 +106,9 @@ public class StartPhaseService {
                 game.setExplorationDeckID(deckModel.getAlias());
             }
             case "statusScoring" -> {
-                StatusHelper.AnnounceStatusPhase(game);
+                StatusHelper.announceStatusPhase(game);
                 StatusHelper.beginScoring(event, game, event.getMessageChannel());
-                StatusHelper.HandleStatusPhaseMiddle(event, game, event.getMessageChannel());
+                StatusHelper.handleStatusPhaseMiddle(event, game, event.getMessageChannel());
                 game.updateActivePlayer(null);
             }
             case "endOfGameSummary" -> {
@@ -649,8 +649,7 @@ public class StartPhaseService {
         }
     }
 
-    public static void sendStatusReminders(GenericInteractionCreateEvent event, Game game, Player player) {
-
+    public static void sendStatusReminders(Game game, Player player) {
         if (game.getRound() < 4) {
             StringBuilder preferences = new StringBuilder();
             for (Player p2 : game.getRealPlayers()) {
@@ -832,7 +831,7 @@ public class StartPhaseService {
             }
         }
         for (Player player : game.getRealPlayers()) {
-            sendStatusReminders(event, game, player);
+            sendStatusReminders(game, player);
         }
 
         Button draw1AC = Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.getACEmoji(game));
