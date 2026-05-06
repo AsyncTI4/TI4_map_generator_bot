@@ -197,7 +197,7 @@ public final class AnnotationHandler {
                                 .getInteraction()
                                 .getMessage()
                                 .reply(
-                                        "The button failed. An exception has been logged for the developers. Please report this to "
+                                        "The selection menu failed. An exception has been logged for the developers. Please report this to "
                                                 + getBotBugsChannelLink()
                                                 + " if it doesn't resolve within an hour. Do not ping anyone until that time passes.")
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
