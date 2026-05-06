@@ -861,7 +861,7 @@ public class StartCombatService {
                     && !player.getMahactCC().contains(otherPlayer.getColor())
                     && !"neutral".equalsIgnoreCase(otherPlayer.getFaction())) {
                 buttons = new ArrayList<>();
-                String factionChecker = "FFCC_" + player.getFaction() + "_";
+                String factionChecker = player.factionButtonChecker();
                 buttons.add(Buttons.gray(
                         factionChecker + "mahactStealCC_" + otherPlayer.getColor(),
                         "Add " + otherPlayer.getColor() + " Token to Fleet",
@@ -984,7 +984,7 @@ public class StartCombatService {
                         buttons);
             }
             if ("space".equalsIgnoreCase(type) && game.playerHasLeaderUnlockedOrAlliance(player, "mentakcommander")) {
-                String factionChecker = "FFCC_" + player.getFaction() + "_";
+                String factionChecker = player.factionButtonChecker();
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(
                         factionChecker + "mentakCommander_" + otherPlayer.getColor(),
@@ -997,7 +997,7 @@ public class StartCombatService {
                         buttons);
             }
             if (player.getLeader("qhethero").map(Leader::isActive).orElse(false)) {
-                String factionChecker = "FFCC_" + player.getFaction() + "_";
+                String factionChecker = player.factionButtonChecker();
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(
                         factionChecker + "qhetHero_" + tile.getPosition(),
@@ -1012,7 +1012,7 @@ public class StartCombatService {
             if (player.hasAbility("black_ops") && player == game.getActivePlayer()) {
                 int debt = player.getDebtTokenCount(otherPlayer.getColor());
                 if (debt > 2) {
-                    String factionChecker = "FFCC_" + player.getFaction() + "_";
+                    String factionChecker = player.factionButtonChecker();
                     buttons = new ArrayList<>();
                     buttons.add(Buttons.gray(
                             factionChecker + "blackOps_" + otherPlayer.getColor() + "_3",
@@ -1039,7 +1039,7 @@ public class StartCombatService {
                         player.getRepresentationUnfogged() + ", a reminder you have _Alloy Shipment_.");
             }
             if (player.hasAbility("moult") && player != game.getActivePlayer() && "space".equalsIgnoreCase(type)) {
-                String factionChecker = "FFCC_" + player.getFaction() + "_";
+                String factionChecker = player.factionButtonChecker();
                 buttons = new ArrayList<>();
                 buttons.add(
                         Buttons.gray(factionChecker + "moult_" + tile.getPosition(), "Moult", FactionEmojis.cheiran));
@@ -1054,7 +1054,7 @@ public class StartCombatService {
                     && !player.getPromissoryNotesOwned().contains("dspnmort")
                     && player != game.getActivePlayer()
                     && "space".equalsIgnoreCase(type)) {
-                String factionChecker = "FFCC_" + player.getFaction() + "_";
+                String factionChecker = player.factionButtonChecker();
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(
                         factionChecker + "startFacsimile_" + tile.getPosition(),

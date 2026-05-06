@@ -16,10 +16,10 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ti4.contest.replay.buttons.CombatSideBetButtonIds.Parsed;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.core.CombatSideBetType;
-import ti4.contest.replay.core.CombatSideState;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatContestSideBetEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
@@ -32,9 +32,12 @@ import ti4.contest.replay.repository.CombatReplayHacanMarketCompactDecisionRepos
 import ti4.contest.replay.repository.CombatReplayHacanSubsidyRepository;
 import ti4.contest.replay.repository.CombatReplayHacanSubsidyVoteRepository;
 import ti4.contest.replay.service.CombatReplayAbilityWindowText;
+import ti4.contest.replay.service.CombatReplayHouseAbilityVoteService;
+import ti4.contest.replay.service.CombatReplayHousePhaseService;
 import ti4.contest.replay.service.CombatReplayHouseService;
+import ti4.contest.replay.service.CombatReplayInteractionResult;
 import ti4.contest.replay.service.CombatReplaySideBetPayoutService;
-import ti4.contest.replay.service.CombatReplayVoteTally;
+import ti4.contest.replay.service.CombatSideBetAvailabilityService;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
@@ -59,8 +62,11 @@ public class CombatReplayHacanMarketCompactService {
     private final CombatReplayHacanSubsidyVoteRepository voteRepository;
     private final CombatReplayHacanSubsidyRepository marketRepository;
     private final CombatReplayHacanMarketCompactDecisionRepository decisionRepository;
+    private final CombatReplayHouseAbilityVoteService voteService;
     private final CombatReplayHouseService houseService;
+    private final CombatReplayHousePhaseService phaseService;
     private final CombatReplaySideBetPayoutService payoutService;
+    private final CombatSideBetAvailabilityService availabilityService;
 
     public void postVotingButtonsIfNeeded(
             Game game, CombatReplayContestEntity contest, CombatCandidateEntity candidate) {
@@ -83,7 +89,7 @@ public class CombatReplayHacanMarketCompactService {
 
     public boolean shouldOfferVoting(CombatCandidateEntity candidate) {
         return enabled()
-                && discussionWindowSeconds() > 0
+                && phaseService.discussionWindowSeconds() > 0
                 && candidate != null
                 && Boolean.TRUE.equals(candidate.getSideBetCompatible());
     }
@@ -117,23 +123,24 @@ public class CombatReplayHacanMarketCompactService {
     }
 
     @Transactional
-    public synchronized VoteResult recordMarketVote(
+    public synchronized CombatReplayInteractionResult recordMarketVote(
             ButtonInteractionEvent event, Long contestId, CombatSideBetType betType, String targetFaction) {
-        if (!enabled()) return VoteResult.rejected("Hacan Delegation's Market Compact is disabled.");
+        if (!enabled()) return CombatReplayInteractionResult.rejected("Hacan Delegation's Market Compact is disabled.");
         if (!userHasHacan(event.getUser().getId())) {
-            return VoteResult.rejected("Only Hacan Delegation may broker the battle market.");
+            return CombatReplayInteractionResult.rejected("Only Hacan Delegation may broker the battle market.");
         }
 
         CombatReplayContestEntity contest =
                 replayContestRepository.findById(contestId).orElse(null);
-        if (!votingOpen(contest)) return VoteResult.rejected("The Hacan Market Compact window is closed.");
+        if (!votingOpen(contest))
+            return CombatReplayInteractionResult.rejected("The Hacan Market Compact window is closed.");
         if (isDoNotUseVote(betType, targetFaction)) {
             return recordDoNotUseVote(event, contestId);
         }
 
         CombatCandidateEntity candidate = loadCandidate(contest);
         if (!isAvailableForCandidate(candidate, betType, targetFaction)) {
-            return VoteResult.rejected("That side bet is not available for this combat.");
+            return CombatReplayInteractionResult.rejected("That side bet is not available for this combat.");
         }
 
         String userId = event.getUser().getId();
@@ -142,7 +149,8 @@ public class CombatReplayHacanMarketCompactService {
                 contestId, userId, betType, targetFaction);
         if (existing.isPresent()) {
             voteRepository.delete(existing.get());
-            return VoteResult.accepted(renderUserVoteSummary(contestId, userId, "Withdrew market backing."));
+            return CombatReplayInteractionResult.accepted(
+                    renderUserVoteSummary(contestId, userId, "Withdrew market backing."));
         }
 
         List<CombatReplayHacanSubsidyVoteEntity> userVotes =
@@ -151,7 +159,8 @@ public class CombatReplayHacanMarketCompactService {
         userVotes = userVotes.stream().filter(vote -> !isDoNotUseVote(vote)).toList();
         int maxVotes = maxMarkedBets();
         if (userVotes.size() >= maxVotes) {
-            return VoteResult.rejected("You already backed " + maxVotes + " markets. Click one to withdraw it first.");
+            return CombatReplayInteractionResult.rejected(
+                    "You already backed " + maxVotes + " markets. Click one to withdraw it first.");
         }
 
         CombatReplayHacanSubsidyVoteEntity vote = new CombatReplayHacanSubsidyVoteEntity();
@@ -162,17 +171,19 @@ public class CombatReplayHacanMarketCompactService {
         vote.setTargetFaction(targetFaction);
         vote.setVotedAt(LocalDateTime.now());
         voteRepository.save(vote);
-        return VoteResult.accepted(renderUserVoteSummary(contestId, userId, "Added market backing."));
+        return CombatReplayInteractionResult.accepted(
+                renderUserVoteSummary(contestId, userId, "Added market backing."));
     }
 
-    private VoteResult recordDoNotUseVote(ButtonInteractionEvent event, Long contestId) {
+    private CombatReplayInteractionResult recordDoNotUseVote(ButtonInteractionEvent event, Long contestId) {
         String userId = event.getUser().getId();
         String userName = event.getUser().getEffectiveName();
         var existing = voteRepository.findByContestIdAndDiscordUserIdAndBetTypeAndTargetFaction(
                 contestId, userId, doNotUseBetType(), DO_NOT_USE_TARGET);
         if (existing.isPresent()) {
             voteRepository.delete(existing.get());
-            return VoteResult.accepted(renderUserVoteSummary(contestId, userId, "Withdrew Do Not Use."));
+            return CombatReplayInteractionResult.accepted(
+                    renderUserVoteSummary(contestId, userId, "Withdrew Do Not Use."));
         }
 
         voteRepository.deleteAll(voteRepository.findByContestIdAndDiscordUserId(contestId, userId));
@@ -184,7 +195,8 @@ public class CombatReplayHacanMarketCompactService {
         vote.setTargetFaction(DO_NOT_USE_TARGET);
         vote.setVotedAt(LocalDateTime.now());
         voteRepository.save(vote);
-        return VoteResult.accepted(renderUserVoteSummary(contestId, userId, "Voted to not use Market Compact."));
+        return CombatReplayInteractionResult.accepted(
+                renderUserVoteSummary(contestId, userId, "Voted to not use Market Compact."));
     }
 
     @Transactional
@@ -198,7 +210,7 @@ public class CombatReplayHacanMarketCompactService {
         }
 
         List<CombatReplayHacanSubsidyVoteEntity> votes = voteRepository.findByContestId(contest.getId());
-        if (distinctVoterCount(votes) < minimumAbilityVotesToResolve()) {
+        if (!voteService.meetsMinimumVoterThreshold(votes, CombatReplayHacanSubsidyVoteEntity::getDiscordUserId)) {
             lockNoMarkets(contest, game);
             return List.of();
         }
@@ -306,13 +318,9 @@ public class CombatReplayHacanMarketCompactService {
     private List<Button> buttonsForFaction(
             Game game, CombatReplayContestEntity contest, CombatCandidateEntity candidate, String faction) {
         List<Button> buttons = new ArrayList<>();
-        CombatSideState state = CombatSideState.forFaction(candidate, faction);
-        if (state == null) return buttons;
-        for (CombatSideBetType type : CombatSideBetType.values()) {
-            if (!isAvailableForFaction(type, candidate, faction, state)) continue;
-            int points = payoutService.offeredPayout(contest, candidate, type, faction);
-            buttons.add(Buttons.gray(
-                    formatButtonId(contest.getId(), type, faction), shortBetLabel(type) + " +" + points, type.emoji()));
+        for (CombatSideBetType type : availabilityService.availableTypes(candidate, faction)) {
+            buttons.add(
+                    Buttons.gray(formatButtonId(contest.getId(), type, faction), shortBetLabel(type), type.emoji()));
         }
         return buttons;
     }
@@ -407,35 +415,12 @@ public class CombatReplayHacanMarketCompactService {
     }
 
     private boolean votingOpen(CombatReplayContestEntity contest) {
-        if (contest == null || contest.getId() == null || contest.getPostedAt() == null) return false;
-        if (contest.getSideBetMarketPostedAt() != null) return false;
-        if (contest.getReplayStartAt() == null || !LocalDateTime.now().isBefore(contest.getReplayStartAt()))
-            return false;
-        return LocalDateTime.now().isBefore(contest.getPostedAt().plusSeconds(discussionWindowSeconds()));
+        return phaseService.discussionOpen(contest);
     }
 
     private boolean isAvailableForCandidate(CombatCandidateEntity candidate, CombatSideBetType type, String faction) {
         if (candidate == null || type == null || StringUtils.isBlank(faction)) return false;
-        CombatSideState state = CombatSideState.forFaction(candidate, faction);
-        return state != null && isAvailableForFaction(type, candidate, faction, state);
-    }
-
-    private boolean isAvailableForFaction(
-            CombatSideBetType type, CombatCandidateEntity candidate, String faction, CombatSideState state) {
-        if (!type.isAvailable(state.destroyerCount())) return false;
-        if (type == CombatSideBetType.AFB_WHIFF) return payoutService.hasAfbUnits(candidate, faction);
-        if (type != CombatSideBetType.AFB_SKIPPED) return true;
-        return !(state.destroyerCount() == 1 && opponentHasAssaultCannon(candidate, faction));
-    }
-
-    private boolean opponentHasAssaultCannon(CombatCandidateEntity candidate, String faction) {
-        if (faction.equalsIgnoreCase(candidate.getAttackerFaction())) {
-            return Boolean.TRUE.equals(candidate.getDefenderHasAssaultCannon());
-        }
-        if (faction.equalsIgnoreCase(candidate.getDefenderFaction())) {
-            return Boolean.TRUE.equals(candidate.getAttackerHasAssaultCannon());
-        }
-        return false;
+        return availabilityService.isAvailable(candidate, type, faction);
     }
 
     private boolean userHasHacan(String discordUserId) {
@@ -456,15 +441,7 @@ public class CombatReplayHacanMarketCompactService {
     }
 
     public int discussionWindowSeconds() {
-        return settings.getReplayExecution().getDiscussionWindowSeconds();
-    }
-
-    private long distinctVoterCount(List<CombatReplayHacanSubsidyVoteEntity> votes) {
-        return CombatReplayVoteTally.distinctVoterCount(votes, CombatReplayHacanSubsidyVoteEntity::getDiscordUserId);
-    }
-
-    private int minimumAbilityVotesToResolve() {
-        return Math.max(1, settings.getHouseAbilities().getMinimumAbilityVotesToResolve());
+        return phaseService.discussionWindowSeconds();
     }
 
     private String factionSectionTitle(Game game, String faction) {
@@ -540,12 +517,12 @@ public class CombatReplayHacanMarketCompactService {
         return StringUtils.defaultString(faction).trim().toLowerCase();
     }
 
-    public static ParsedMarketButton parseButtonId(String buttonId) {
+    public static Parsed parseButtonId(String buttonId) {
         if (buttonId == null || !buttonId.startsWith(BUTTON_PREFIX)) {
             throw new IllegalArgumentException("Unknown Hacan market button id: " + buttonId);
         }
         if (buttonId.startsWith(DO_NOT_USE_BUTTON)) {
-            return new ParsedMarketButton(
+            return new Parsed(
                     Long.parseLong(buttonId.substring(DO_NOT_USE_BUTTON.length())),
                     doNotUseBetType(),
                     DO_NOT_USE_TARGET);
@@ -556,19 +533,7 @@ public class CombatReplayHacanMarketCompactService {
         if (parts.length != 3) {
             throw new IllegalArgumentException("Malformed Hacan market button id: " + buttonId);
         }
-        return new ParsedMarketButton(Long.parseLong(parts[0]), CombatSideBetType.fromKey(parts[1]), parts[2]);
-    }
-
-    public record ParsedMarketButton(Long contestId, CombatSideBetType betType, String targetFaction) {}
-
-    public record VoteResult(boolean accepted, String message) {
-        public static VoteResult accepted(String message) {
-            return new VoteResult(true, message);
-        }
-
-        public static VoteResult rejected(String message) {
-            return new VoteResult(false, message);
-        }
+        return new Parsed(Long.parseLong(parts[0]), CombatSideBetType.fromKey(parts[1]), parts[2]);
     }
 
     public record MarkedSideBet(CombatSideBetType betType, String targetFaction) {}

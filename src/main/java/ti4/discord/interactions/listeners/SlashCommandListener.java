@@ -110,14 +110,17 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
         String susPrefix = command.isSuspicious(event) ? "sus" : "notSus";
         String commandText =
                 "```" + susPrefix + "\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
-        event.getChannel()
-                .sendMessage(commandText)
-                .queue(
-                        m -> {
-                            BotLogger.logSlashCommand(event, m);
-                            SusSlashCommandService.checkIfShouldReportSusSlashCommand(event, m.getJumpUrl());
-                        },
-                        BotLogger::catchRestError);
+        if (!event.getCommandString().contains("/rules ask")
+                && !event.getCommandString().contains("/fow whisper")) {
+            event.getChannel()
+                    .sendMessage(commandText)
+                    .queue(
+                            m -> {
+                                BotLogger.logSlashCommand(event, m);
+                                SusSlashCommandService.checkIfShouldReportSusSlashCommand(event, m.getJumpUrl());
+                            },
+                            BotLogger::catchRestError);
+        }
     }
 
     private static ExecutionLockType getLockType(Command<SlashCommandInteractionEvent> command) {

@@ -1,6 +1,6 @@
 candidateSelection:
   window:
-    lookbackMinutes: 60
+    lookbackMinutes: 480
     refreshCronIntervalSeconds: 300
   targetCandidatesPerHour: 4
 
@@ -31,7 +31,12 @@ sideBets:
   enableSideBets: true
   maxBetsPerUser: 3
   costPoints: 1
-  dynamicPayoutCap: 100
+  dynamicPayoutCap: 50
+  afbWhiffSelectionBias: 2.0
+  roundOneWhiffSelectionBias: 3.0
+  roundOneSlamSelectionBias: 3.0
+  winnerOneHpPayoutMultiplier: 0.75
+  dynamicPayoutTiers: "0.20:4,0.10:5,0.05:8,0.025:12,0.01:20,0.005:30"
 
 decoysEnabled: false
 housesEnabled: true
@@ -40,31 +45,39 @@ houseAbilities:
   minimumAbilityVotesToResolve: 1
   baseCombatFavorGain: 10
   initialHousePoints: 1000
+  initialIndividualPoints: 100
   catchupFavorPointsPerBonus: 100
   catchupFavorBonusStep: 0
   maxCatchupFavorBonus: 0
   naalu:
     # actionCardPeekFavorCost: 0
-    actionCardPeekFavorCost: 30
+    actionCardPeekFavorCost: 20
     # roundOneRollPeekFavorCost: 0
-    roundOneRollPeekFavorCost: 50
+    roundOneRollPeekFavorCost: 40
+    # luckOmensFavorCost: 0
+    luckOmensFavorCost: 30
   mentak:
     previewLeadSeconds: 15
     # destroyerDecoyFavorCost: 0
-    destroyerDecoyFavorCost: 30
+    destroyerDecoyFavorCost: 20
     # cruiserDecoyFavorCost: 0
-    cruiserDecoyFavorCost: 40
+    cruiserDecoyFavorCost: 30
     # dreadnoughtDecoyFavorCost: 0
-    dreadnoughtDecoyFavorCost: 60
+    dreadnoughtDecoyFavorCost: 40
     # warSunDecoyFavorCost: 0
-    warSunDecoyFavorCost: 80
+    warSunDecoyFavorCost: 70
   hacan:
     maxSubsidiesPerContest: 2
     subsidyFavorOnHit: 10
-    marketMakerPointsPerBet: 1
+    baseCombatFavorGain: 20
+    marketMakerPointsPerBet: 2
     lowTradeConvoysFavorCost: 10
-    lowTradeConvoysPredictionBonus: 5
+    lowTradeConvoysPredictionBonus: 9
     mediumTradeConvoysFavorCost: 20
-    mediumTradeConvoysPredictionBonus: 10
+    mediumTradeConvoysPredictionBonus: 14
     highTradeConvoysFavorCost: 30
-    highTradeConvoysPredictionBonus: 15
+    highTradeConvoysPredictionBonus: 19
+    veryHighTradeConvoysFavorCost: 40
+    veryHighTradeConvoysPredictionBonus: 25
+    maximumTradeConvoysFavorCost: 50
+    maximumTradeConvoysPredictionBonus: 31

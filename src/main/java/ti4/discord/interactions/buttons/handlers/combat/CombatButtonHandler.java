@@ -202,7 +202,7 @@ class CombatButtonHandler {
         String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         buttons.add(Buttons.green(
                 factionChecker + "autoAssignAFBHits_" + tile.getPosition() + "_" + h,
                 "Auto-assign Hit" + (h == 1 ? "" : "s")));
@@ -223,7 +223,7 @@ class CombatButtonHandler {
         String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         buttons.add(Buttons.green(
                 factionChecker + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_" + h,
                 "Auto-Assign Hit" + (h == 1 ? "" : "s")));
@@ -246,7 +246,7 @@ class CombatButtonHandler {
         String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         buttons.add(Buttons.green(
                 factionChecker + "autoAssignGroundHits_" + tile.getPosition() + "_" + h,
                 "Auto-assign Hit" + (h == 1 ? "" : "s")));
@@ -268,7 +268,7 @@ class CombatButtonHandler {
         String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
-        String factionChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         buttons.add(Buttons.green(
                 factionChecker + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
                 "Auto-assign Hit" + (h == 1 ? "" : "s")));

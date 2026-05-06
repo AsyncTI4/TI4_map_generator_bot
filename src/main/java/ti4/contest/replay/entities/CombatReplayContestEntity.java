@@ -33,13 +33,13 @@ public class CombatReplayContestEntity {
     @Column(name = "candidate_id", nullable = false, unique = true)
     private Long candidateId;
 
-    @Column(name = "posted_at", nullable = false)
+    @Column(name = "posted_at")
     private LocalDateTime postedAt;
 
-    @Column(name = "public_channel_id", nullable = false)
+    @Column(name = "public_channel_id")
     private Long publicChannelId;
 
-    @Column(name = "public_message_id", nullable = false)
+    @Column(name = "public_message_id")
     private Long publicMessageId;
 
     @Column(name = "public_thread_id")
@@ -47,6 +47,12 @@ public class CombatReplayContestEntity {
 
     @Column(name = "side_bet_summary_message_id")
     private Long sideBetSummaryMessageId;
+
+    @Column(name = "side_bet_attacker_button_message_id")
+    private Long sideBetAttackerButtonMessageId;
+
+    @Column(name = "side_bet_defender_button_message_id")
+    private Long sideBetDefenderButtonMessageId;
 
     @Column(name = "side_bet_market_posted_at")
     private LocalDateTime sideBetMarketPostedAt;
@@ -57,10 +63,10 @@ public class CombatReplayContestEntity {
     @Column(name = "replay_status", nullable = false)
     private CombatContestReplayStatus replayStatus;
 
-    @Column(name = "replay_start_at", nullable = false)
+    @Column(name = "replay_start_at")
     private LocalDateTime replayStartAt;
 
-    @Column(name = "next_replay_at", nullable = false)
+    @Column(name = "next_replay_at")
     private LocalDateTime nextReplayAt;
 
     @Column(name = "next_event_sequence", nullable = false)

@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +17,10 @@ import ti4.contest.replay.entities.CombatReplayContestEntity;
 import ti4.contest.replay.entities.CombatReplayHouseEntity;
 import ti4.contest.replay.entities.CombatReplayHouseScoreEntity;
 import ti4.contest.replay.house.hacan.CombatReplayHacanMarketCompactService;
-import ti4.contest.replay.house.hacan.CombatReplayHacanMarketCompactService.MarkedSideBet;
 import ti4.contest.replay.house.hacan.CombatReplayHacanTradeConvoysService;
 import ti4.contest.replay.repository.CombatContestSideBetRepository;
 import ti4.contest.replay.repository.CombatReplayHouseScoreRepository;
+import ti4.contest.replay.service.CombatReplayHouseScoringContext.HouseTotals;
 import ti4.contest.replay.service.CombatReplayPredictionScorer.LockedPrediction;
 import ti4.contest.replay.service.CombatReplayPredictionScorer.ScoredPredictions;
 import ti4.contest.replay.service.CombatReplaySideBetService.ResolvedSideBet;
@@ -33,8 +32,6 @@ public class CombatReplayHouseLedgerService {
 
     private static final long SEASON_OPENING_BALANCE_CONTEST_ID = 0L;
     private static final int WRONG_PREDICTION_PENALTY = -4;
-    private static final int NAALU_GIFT_POINTS_PER_CORRECT_PREDICTION = 4;
-    private static final int MENTAK_PILLAGE_POINTS_PER_OTHER_DELEGATION_MISS = 4;
 
     private final CombatContestSettings settings;
     private final CombatContestSideBetRepository sideBetRepository;
@@ -42,6 +39,8 @@ public class CombatReplayHouseLedgerService {
     private final CombatReplayHouseService houseService;
     private final CombatReplayHacanMarketCompactService hacanMarketCompactService;
     private final CombatReplayHacanTradeConvoysService hacanTradeConvoysService;
+    private final CombatReplayCustodianFavorScoringRule custodianFavorScoringRule;
+    private final List<CombatReplayHouseScoringRule> houseScoringRules;
 
     public void clearContest(Long contestId) {
         if (contestId == null) return;
@@ -72,7 +71,7 @@ public class CombatReplayHouseLedgerService {
             score.setAbilityBreakdownJson(writeHouseAbilitySummaries(List.of()));
             score.setScoredAt(now);
         }
-        houseScoreRepository.saveAll(scores);
+        houseScoreRepository.saveAllAndFlush(scores);
         writeSeasonOpeningBalances();
     }
 
@@ -102,7 +101,7 @@ public class CombatReplayHouseLedgerService {
             score.setScoredAt(now);
             scores.add(score);
         }
-        houseScoreRepository.saveAll(scores);
+        houseScoreRepository.saveAllAndFlush(scores);
     }
 
     public List<HouseLeaderboardSummary> leaderboardSummaries() {
@@ -214,40 +213,23 @@ public class CombatReplayHouseLedgerService {
             favorsByHouse.put(house, new ArrayList<>());
         }
 
-        applyPredictionLedger(
+        applyPredictionLedger(scoredPredictions, allPredictions, winningUserIds, housesByUser, totalsByHouse);
+        applySideBetLedger(sideBets, resolvedSideBets, housesByUser, totalsByHouse);
+        CombatReplayHouseScoringContext scoringContext = new CombatReplayHouseScoringContext(
                 replayContest,
-                scoredPredictions,
                 allPredictions,
                 winningUserIds,
-                housesByUser,
-                totalsByHouse,
-                abilitiesByHouse);
-        applySideBetLedger(
-                replayContest,
                 sideBets,
                 resolvedSideBets,
                 housesByUser,
                 totalsByHouse,
                 abilitiesByHouse,
                 favorsByHouse);
-        applyHacanTradeConvoysFavorTransfer(replayContest, totalsByHouse, favorsByHouse);
-        applyHacanTradeConvoysLedger(replayContest, totalsByHouse, abilitiesByHouse);
-
-        EnumMap<CombatReplayHouse, Integer> currentAbilityPointsByHouse = currentAbilityPoints(abilitiesByHouse);
-        EnumMap<CombatReplayHouse, Integer> currentContestPointsByHouse =
-                currentContestPointsByHouse(totalsByHouse, currentAbilityPointsByHouse);
-        for (Map.Entry<CombatReplayHouse, Integer> entry : combatFavorAwards(
-                        replayContest.getId(), currentContestPointsByHouse)
-                .entrySet()) {
-            totalsByHouse.get(entry.getKey()).favorPoints += entry.getValue();
-            addFavorSummary(
-                    favorsByHouse,
-                    entry.getKey(),
-                    "the Custodians sealing this combat's ledger",
-                    entry.getValue(),
-                    true);
+        for (CombatReplayHouseScoringRule scoringRule : houseScoringRules) {
+            scoringRule.apply(scoringContext);
         }
 
+        EnumMap<CombatReplayHouse, Integer> currentAbilityPointsByHouse = currentAbilityPoints(abilitiesByHouse);
         List<HousePredictionSummary> summaries = new ArrayList<>();
         for (Map.Entry<CombatReplayHouse, HouseTotals> entry : totalsByHouse.entrySet()) {
             HouseTotals totals = entry.getValue();
@@ -268,15 +250,11 @@ public class CombatReplayHouseLedgerService {
     }
 
     private void applyPredictionLedger(
-            CombatReplayContestEntity replayContest,
             ScoredPredictions scoredPredictions,
             List<LockedPrediction> allPredictions,
             Set<String> winningUserIds,
             Map<String, CombatReplayHouse> housesByUser,
-            EnumMap<CombatReplayHouse, HouseTotals> totalsByHouse,
-            EnumMap<CombatReplayHouse, List<HouseAbilitySummary>> abilitiesByHouse) {
-        int naaluGiftPoints = 0;
-        int mentakPillagePoints = 0;
+            EnumMap<CombatReplayHouse, HouseTotals> totalsByHouse) {
         for (LockedPrediction prediction : allPredictions) {
             CombatReplayHouse house = housesByUser.get(prediction.discordUserId());
             if (house == null) continue;
@@ -286,82 +264,27 @@ public class CombatReplayHouseLedgerService {
             totals.predictionCount++;
             if (correct) {
                 totals.correctPredictions++;
-                if (house == CombatReplayHouse.NAALU) naaluGiftPoints += NAALU_GIFT_POINTS_PER_CORRECT_PREDICTION;
-            } else if (house != CombatReplayHouse.MENTAK) {
-                mentakPillagePoints += MENTAK_PILLAGE_POINTS_PER_OTHER_DELEGATION_MISS;
             }
         }
-
-        addAbilitySummary(abilitiesByHouse, CombatReplayHouse.NAALU, "Gift of Prophecy", naaluGiftPoints, true);
-        addAbilitySummary(abilitiesByHouse, CombatReplayHouse.MENTAK, "Pillage", mentakPillagePoints, true);
     }
 
     private void applySideBetLedger(
-            CombatReplayContestEntity replayContest,
             List<CombatContestSideBetEntity> sideBets,
             List<ResolvedSideBet> resolvedSideBets,
             Map<String, CombatReplayHouse> housesByUser,
-            EnumMap<CombatReplayHouse, HouseTotals> totalsByHouse,
-            EnumMap<CombatReplayHouse, List<HouseAbilitySummary>> abilitiesByHouse,
-            EnumMap<CombatReplayHouse, List<HouseFavorSummary>> favorsByHouse) {
+            EnumMap<CombatReplayHouse, HouseTotals> totalsByHouse) {
         int sideBetCost = settings.getSideBets().getCostPoints();
-        int hacanInsiderTradingPoints = 0;
         for (CombatContestSideBetEntity sideBet : sideBets) {
             CombatReplayHouse house = housesByUser.get(sideBet.getDiscordUserId());
             if (house == null) continue;
             totalsByHouse.get(house).sideBetPoints -= sideBetCost;
-            if (house == CombatReplayHouse.HACAN) hacanInsiderTradingPoints += sideBetCost;
         }
 
-        int favorOnHit = hacanMarketCompactService.favorOnHit();
-        Set<MarkedSideBet> markedSideBetHits = new HashSet<>();
         for (ResolvedSideBet sideBet : resolvedSideBets == null ? List.<ResolvedSideBet>of() : resolvedSideBets) {
             CombatReplayHouse house = housesByUser.get(sideBet.discordUserId());
             if (house == null) continue;
             totalsByHouse.get(house).sideBetPoints += sideBet.profitPoints();
-            if (favorOnHit > 0
-                    && hacanMarketCompactService.isMarked(
-                            replayContest.getId(), sideBet.betType(), sideBet.targetFaction())) {
-                MarkedSideBet hit = new MarkedSideBet(sideBet.betType(), normalizeFaction(sideBet.targetFaction()));
-                if (markedSideBetHits.add(hit)) {
-                    totalsByHouse.get(CombatReplayHouse.HACAN).favorPoints += favorOnHit;
-                    addFavorSummary(favorsByHouse, CombatReplayHouse.HACAN, "Market Compact hits", favorOnHit, false);
-                }
-            }
         }
-
-        addAbilitySummary(abilitiesByHouse, CombatReplayHouse.HACAN, "Insider Trading", hacanInsiderTradingPoints);
-        addAbilitySummary(
-                abilitiesByHouse,
-                CombatReplayHouse.HACAN,
-                "Market Compact",
-                hacanMarketCompactService.marketMakerPoints(replayContest.getId(), sideBets));
-    }
-
-    private void applyHacanTradeConvoysLedger(
-            CombatReplayContestEntity replayContest,
-            EnumMap<CombatReplayHouse, HouseTotals> totalsByHouse,
-            EnumMap<CombatReplayHouse, List<HouseAbilitySummary>> abilitiesByHouse) {
-        CombatReplayHacanTradeConvoysService.TradeConvoys tradeConvoys =
-                hacanTradeConvoysService.tradeConvoysForNextCombat(replayContest.getId());
-        if (!tradeConvoys.active()) return;
-
-        int targetEarnedPoints = earnedPointsForHouse(
-                totalsByHouse.get(tradeConvoys.targetHouse()), abilitiesByHouse.get(tradeConvoys.targetHouse()));
-        int bonusPoints = CombatReplayHacanTradeConvoysService.tradeConvoysBonusPoints(
-                targetEarnedPoints, tradeConvoys.bonusPercent());
-        addAbilitySummary(abilitiesByHouse, CombatReplayHouse.HACAN, "Hacan Trade Convoys", bonusPoints);
-    }
-
-    private void applyHacanTradeConvoysFavorTransfer(
-            CombatReplayContestEntity replayContest,
-            EnumMap<CombatReplayHouse, HouseTotals> totalsByHouse,
-            EnumMap<CombatReplayHouse, List<HouseFavorSummary>> favorsByHouse) {
-        CombatReplayHacanTradeConvoysService.TradeConvoys tradeConvoys =
-                hacanTradeConvoysService.tradeConvoysForContest(replayContest.getId());
-        if (!tradeConvoys.active()) return;
-        totalsByHouse.get(tradeConvoys.targetHouse()).favorPoints += tradeConvoys.favorCost();
-        addFavorSummary(favorsByHouse, tradeConvoys.targetHouse(), "Trade Convoys", tradeConvoys.favorCost(), false);
     }
 
     private EnumMap<CombatReplayHouse, Integer> currentAbilityPoints(
@@ -377,103 +300,8 @@ public class CombatReplayHouseLedgerService {
         return currentAbilityPointsByHouse;
     }
 
-    private EnumMap<CombatReplayHouse, Integer> currentContestPointsByHouse(
-            EnumMap<CombatReplayHouse, HouseTotals> totalsByHouse,
-            EnumMap<CombatReplayHouse, Integer> currentAbilityPointsByHouse) {
-        EnumMap<CombatReplayHouse, Integer> pointsByHouse = new EnumMap<>(CombatReplayHouse.class);
-        for (CombatReplayHouse house : CombatReplayHouse.assignmentOrder()) {
-            HouseTotals totals = totalsByHouse.get(house);
-            int points = totals == null ? 0 : totals.predictionPoints + totals.sideBetPoints;
-            pointsByHouse.put(house, points + currentAbilityPointsByHouse.getOrDefault(house, 0));
-        }
-        return pointsByHouse;
-    }
-
-    private int earnedPointsForHouse(HouseTotals totals, List<HouseAbilitySummary> abilitySummaries) {
-        if (totals == null) return 0;
-        int abilityPoints = abilitySummaries == null
-                ? 0
-                : abilitySummaries.stream()
-                        .mapToInt(HouseAbilitySummary::points)
-                        .sum();
-        return totals.predictionPoints + totals.sideBetPoints + abilityPoints;
-    }
-
-    private void addAbilitySummary(
-            EnumMap<CombatReplayHouse, List<HouseAbilitySummary>> abilitiesByHouse,
-            CombatReplayHouse house,
-            String label,
-            int points) {
-        addAbilitySummary(abilitiesByHouse, house, label, points, false);
-    }
-
-    private void addAbilitySummary(
-            EnumMap<CombatReplayHouse, List<HouseAbilitySummary>> abilitiesByHouse,
-            CombatReplayHouse house,
-            String label,
-            int points,
-            boolean includeZero) {
-        if (house == null || (!includeZero && points <= 0)) return;
-        abilitiesByHouse.get(house).add(new HouseAbilitySummary(label, points));
-    }
-
-    private void addFavorSummary(
-            EnumMap<CombatReplayHouse, List<HouseFavorSummary>> favorsByHouse,
-            CombatReplayHouse house,
-            String label,
-            int favor,
-            boolean includeZero) {
-        if (house == null || (!includeZero && favor <= 0)) return;
-        List<HouseFavorSummary> summaries = favorsByHouse.get(house);
-        for (int index = 0; index < summaries.size(); index++) {
-            HouseFavorSummary summary = summaries.get(index);
-            if (summary.label().equals(label)) {
-                summaries.set(index, new HouseFavorSummary(label, summary.favor() + favor));
-                return;
-            }
-        }
-        summaries.add(new HouseFavorSummary(label, favor));
-    }
-
-    private EnumMap<CombatReplayHouse, Integer> combatFavorAwards(
-            Long currentContestId, EnumMap<CombatReplayHouse, Integer> currentAbilityPointsByHouse) {
-        EnumMap<CombatReplayHouse, Integer> seasonPointsByHouse =
-                currentSeasonPointsByHouse(currentContestId, currentAbilityPointsByHouse);
-        int leaderPoints = seasonPointsByHouse.values().stream()
-                .mapToInt(Integer::intValue)
-                .max()
-                .orElse(0);
-
-        EnumMap<CombatReplayHouse, Integer> favorAwards = new EnumMap<>(CombatReplayHouse.class);
-        for (CombatReplayHouse house : CombatReplayHouse.assignmentOrder()) {
-            int pointsBehind = Math.max(0, leaderPoints - seasonPointsByHouse.getOrDefault(house, 0));
-            favorAwards.put(house, combatFavorGain(pointsBehind));
-        }
-        return favorAwards;
-    }
-
     public int combatFavorGain(int pointsBehindLeader) {
-        CombatContestSettings.HouseAbilities houseAbilities = settings.getHouseAbilities();
-        int catchupBonus = Math.min(
-                houseAbilities.getMaxCatchupFavorBonus(),
-                (Math.max(0, pointsBehindLeader) / houseAbilities.getCatchupFavorPointsPerBonus())
-                        * houseAbilities.getCatchupFavorBonusStep());
-        return houseAbilities.getBaseCombatFavorGain() + catchupBonus;
-    }
-
-    private EnumMap<CombatReplayHouse, Integer> currentSeasonPointsByHouse(
-            Long currentContestId, EnumMap<CombatReplayHouse, Integer> currentContestPointsByHouse) {
-        EnumMap<CombatReplayHouse, Integer> pointsByHouse = new EnumMap<>(CombatReplayHouse.class);
-        for (CombatReplayHouse house : CombatReplayHouse.assignmentOrder()) {
-            pointsByHouse.put(house, currentContestPointsByHouse.getOrDefault(house, 0));
-        }
-
-        for (CombatReplayHouseScoreEntity score : houseScoreRepository.findAll()) {
-            if (currentContestId != null && currentContestId.equals(score.getContestId())) continue;
-            pointsByHouse.computeIfPresent(
-                    score.getHouse(), (house, points) -> points + safeInt(score.getTotalPoints()));
-        }
-        return pointsByHouse;
+        return custodianFavorScoringRule.combatFavorGain(pointsBehindLeader);
     }
 
     private void persistPredictionSummaries(
@@ -504,7 +332,7 @@ public class CombatReplayHouseLedgerService {
             score.setScoredAt(now);
             scores.add(score);
         }
-        houseScoreRepository.saveAll(scores);
+        houseScoreRepository.saveAllAndFlush(scores);
     }
 
     private void sortPredictionSummaries(List<HousePredictionSummary> summaries) {
@@ -538,27 +366,12 @@ public class CombatReplayHouseLedgerService {
         return value == null ? 0 : value;
     }
 
-    private String normalizeFaction(String faction) {
-        return faction == null ? "" : faction.trim().toLowerCase(Locale.ROOT);
-    }
-
     private EnumMap<CombatReplayHouse, HouseTotals> emptyTotalsByHouse() {
         EnumMap<CombatReplayHouse, HouseTotals> totalsByHouse = new EnumMap<>(CombatReplayHouse.class);
         for (CombatReplayHouse house : CombatReplayHouse.assignmentOrder()) {
             totalsByHouse.put(house, new HouseTotals());
         }
         return totalsByHouse;
-    }
-
-    private static class HouseTotals {
-        private int predictionPoints;
-        private int sideBetPoints;
-        private int favorPoints;
-        private int predictionCount;
-        private int correctPredictions;
-        private int memberCount;
-        private int abilityPoints;
-        private int totalPoints;
     }
 
     public record HouseAbilitySummary(String label, int points) {}

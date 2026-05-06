@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import org.junit.jupiter.api.Test;
 import ti4.contest.replay.core.CombatContestSettings;
@@ -14,8 +15,9 @@ import ti4.contest.replay.repository.CombatCandidateEventRepository;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
 import ti4.contest.replay.repository.CombatReplayHouseAbilityUseRepository;
-import ti4.contest.replay.repository.CombatReplayHouseAbilityVoteRepository;
+import ti4.contest.replay.service.CombatReplayHouseAbilityVoteService;
 import ti4.contest.replay.service.CombatReplayHouseFavorService;
+import ti4.contest.replay.service.CombatReplayHousePhaseService;
 import ti4.contest.replay.service.CombatReplayHouseService;
 import ti4.discord.interactions.buttons.Buttons;
 
@@ -28,8 +30,9 @@ class CombatReplayNaaluAbilityServiceButtonTest {
             mock(CombatCandidateRepository.class),
             mock(CombatCandidateEventRepository.class),
             mock(CombatReplayHouseAbilityUseRepository.class),
-            mock(CombatReplayHouseAbilityVoteRepository.class),
             houseFavorService,
+            mock(CombatReplayHouseAbilityVoteService.class),
+            mock(CombatReplayHousePhaseService.class),
             mock(CombatReplayHouseService.class),
             new ReplayDispatchSerializer());
 
@@ -43,5 +46,19 @@ class CombatReplayNaaluAbilityServiceButtonTest {
 
         assertFalse(affordable.isDisabled());
         assertTrue(unaffordable.isDisabled());
+    }
+
+    @Test
+    void normalWindowHidesActionCardsButKeepsRollOptions() {
+        when(houseFavorService.canAfford(CombatReplayHouse.NAALU, 20)).thenReturn(true);
+        when(houseFavorService.canAfford(CombatReplayHouse.NAALU, 40)).thenReturn(true);
+
+        List<String> labels =
+                service.peekButtons(1L).stream().map(Button::getLabel).toList();
+
+        assertTrue(labels.stream().anyMatch(label -> label.contains("Vote: Omens")));
+        assertTrue(labels.stream().anyMatch(label -> label.contains("Round 1 Rolls")));
+        assertTrue(labels.stream().anyMatch(label -> label.contains("Vote: Do Not Use")));
+        assertFalse(labels.stream().anyMatch(label -> label.contains("Action Cards")));
     }
 }

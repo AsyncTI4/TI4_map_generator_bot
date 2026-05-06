@@ -68,13 +68,13 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void capsVeryLowOddsRoundOneSlamFromInitialSnapshotAtMaxPayout() {
+    void capsVeryLowOddsRoundOneSlamAfterSelectionBias() {
         CombatReplayContestEntity contest = oddsContest();
         CombatCandidateEntity candidate = snapshotCandidate(4, 1);
 
         int payout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_SLAM, "sol");
 
-        assertEquals(100, payout);
+        assertEquals(50, payout);
         verifyNoInteractions(eventRepository);
     }
 
@@ -86,8 +86,8 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
         int yinPayout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_SLAM, "yin");
         int solPayout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_SLAM, "sol");
 
-        assertEquals(75, yinPayout);
-        assertEquals(100, solPayout);
+        assertEquals(12, yinPayout);
+        assertEquals(50, solPayout);
         verifyNoInteractions(eventRepository);
     }
 
@@ -98,7 +98,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
 
         int payout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_SLAM, "yin");
 
-        assertEquals(6, payout);
+        assertEquals(4, payout);
         verifyNoInteractions(eventRepository);
     }
 
@@ -113,8 +113,8 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
         int unlockedPayout =
                 service.offeredPayout(contest, unlockedCommanderCandidate, CombatSideBetType.ROUND_ONE_SLAM, "yin");
 
-        assertEquals(10, lockedPayout);
-        assertEquals(6, unlockedPayout);
+        assertEquals(4, lockedPayout);
+        assertEquals(4, unlockedPayout);
         verifyNoInteractions(eventRepository);
     }
 
@@ -126,7 +126,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
         int payout = service.offeredPayout(contest, candidate, CombatSideBetType.AFB_WHIFF, "sol");
 
         assertTrue(service.hasAfbUnits(candidate, "sol"));
-        assertEquals(6, payout);
+        assertEquals(4, payout);
         verifyNoInteractions(eventRepository);
     }
 
@@ -175,7 +175,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
 
         int payout = service.offeredPayout(oddsContest(), candidate, CombatSideBetType.WINNER_ONE_HP, "sol");
 
-        assertEquals(6, payout);
+        assertEquals(5, payout);
         verifyNoInteractions(eventRepository);
     }
 
@@ -187,7 +187,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
 
         int payout = service.offeredPayout(oddsContest(), candidate, CombatSideBetType.WINNER_ONE_HP, "sol");
 
-        assertEquals(6, payout);
+        assertEquals(5, payout);
         verifyNoInteractions(eventRepository);
     }
 

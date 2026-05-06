@@ -53,6 +53,7 @@ public class CombatReplayPromotionService {
     private final CombatReplayLeaderboardService replayLeaderboardService;
     private final CombatReplayHacanTradeConvoysService hacanTradeConvoysService;
     private final CombatReplayMentakAbilityService mentakAbilityService;
+    private final CombatReplayHouseService houseService;
     private final CombatReplayExecutionService replayExecutionService;
     private final CombatReplayDiscordPostService discordPostService;
     private Clock clock = Clock.systemDefaultZone();
@@ -79,9 +80,6 @@ public class CombatReplayPromotionService {
             }
 
             postProductionMentakPreviewIfDue(now);
-            LocalDateTime publicPromotionWindow = now.truncatedTo(ChronoUnit.MINUTES);
-            if (publicPromotionWindow.getMinute() != 0) return;
-            if (!canPublicPromoteAt(publicPromotionWindow)) return;
             promoteMentakPreviewedCandidateIfDue(now);
             return;
         }
@@ -118,12 +116,29 @@ public class CombatReplayPromotionService {
             return CombatReplayContestLifecycleService.ForcePromoteResult.rejected(
                     "Candidate uses the old replay snapshot format");
         }
+        if (expireIfDiscordantStars(candidate)) {
+            return CombatReplayContestLifecycleService.ForcePromoteResult.rejected(
+                    "Discordant Stars games are not eligible for promotion.");
+        }
 
         CombatReplayContestEntity existingContest =
                 replayContestRepository.findByCandidateId(candidateId).orElse(null);
-        if (existingContest != null && existingContest.getReplayStatus() != CombatContestReplayStatus.COMPLETED) {
+        if (existingContest != null
+                && existingContest.getReplayStatus() != CombatContestReplayStatus.COMPLETED
+                && existingContest.getReplayStatus() != CombatContestReplayStatus.PREVIEW) {
             return CombatReplayContestLifecycleService.ForcePromoteResult.rejected(
                     "Candidate already has an active replay contest", existingContest);
+        }
+
+        if (usesMentakPreviewFlow()) {
+            if (isMentakPreviewReadyForPublicPromotion(candidate, LocalDateTime.now(clock))) {
+                CombatReplayContestEntity contest = promoteCandidate(candidate, existingContest);
+                if (contest == null) {
+                    return CombatReplayContestLifecycleService.ForcePromoteResult.rejected("Promotion failed");
+                }
+                return CombatReplayContestLifecycleService.ForcePromoteResult.promoted(contest);
+            }
+            return forceMentakPreviewCandidate(candidate, existingContest);
         }
 
         CombatReplayContestEntity contest = promoteCandidate(candidate, existingContest);
@@ -131,6 +146,21 @@ public class CombatReplayPromotionService {
             return CombatReplayContestLifecycleService.ForcePromoteResult.rejected("Promotion failed");
         }
         return CombatReplayContestLifecycleService.ForcePromoteResult.promoted(contest);
+    }
+
+    private CombatReplayContestLifecycleService.ForcePromoteResult forceMentakPreviewCandidate(
+            CombatCandidateEntity candidate, CombatReplayContestEntity existingContest) {
+        if (candidate.getMentakPreviewPostedAt() != null) {
+            return CombatReplayContestLifecycleService.ForcePromoteResult.rejected(
+                    "Mentak preview window is still open.", existingContest);
+        }
+
+        CombatReplayContestEntity contest = postMentakPreview(candidate);
+        if (contest == null) {
+            return CombatReplayContestLifecycleService.ForcePromoteResult.rejected("Mentak preview failed.");
+        }
+        return CombatReplayContestLifecycleService.ForcePromoteResult.rejected(
+                "Mentak preview posted. Public promotion will be available after the preview window.", contest);
     }
 
     private List<CombatCandidateEntity> findPromotionCandidates(LocalDateTime now) {
@@ -143,6 +173,7 @@ public class CombatReplayPromotionService {
                     CombatCandidatePromotionStatus.PENDING,
                     now.minusHours(lookbackHours));
             candidates = candidates.stream()
+                    .filter(candidate -> !expireIfDiscordantStars(candidate))
                     .filter(this::usesCurrentReplaySnapshotFormat)
                     .toList();
             if (!candidates.isEmpty()) return candidates;
@@ -158,6 +189,8 @@ public class CombatReplayPromotionService {
 
     private CombatReplayContestEntity promoteCandidate(
             CombatCandidateEntity winner, CombatReplayContestEntity existingContest) {
+        if (expireIfDiscordantStars(winner)) return null;
+
         CombatObservationEntity observation =
                 observationRepository.findById(winner.getObservationId()).orElse(null);
         if (observation == null) return null;
@@ -169,7 +202,7 @@ public class CombatReplayPromotionService {
 
         String startSummaryText = snapshotStartSummaryText(winner);
         String message = LazaxCombatSupport.formatReplayAnnouncement(
-                game, winner, discordPostService.getLazaxRoleMention(), startSummaryText);
+                game, winner, discordPostService.getHouseRoleMentions(), startSummaryText);
 
         TextChannel contestChannel = discordPostService.getContestChannel();
         if (contestChannel == null) return null;
@@ -177,10 +210,12 @@ public class CombatReplayPromotionService {
         try {
             LocalDateTime promotedAt = LocalDateTime.now(clock);
             Message posted = discordPostService.postPromotionMessage(contestChannel, message, game, winner);
+            houseService.postPublicParticipationControls(contestChannel);
             ThreadChannel thread = discordPostService.createReplayThread(posted, winner);
             CombatReplayContestEntity contest =
                     persistPromotedReplayContest(winner, promotedAt, contestChannel, posted, thread, existingContest);
             addPredictionReactions(game, winner, posted);
+            mentakAbilityService.postPredictionOverrideButtons(game, contest, winner);
             replayExecutionService.postPromotionContext(thread != null ? thread : contestChannel, contest, winner);
             return contest;
         } catch (Exception e) {
@@ -192,9 +227,10 @@ public class CombatReplayPromotionService {
     private void postMentakPreviewIfDue(LocalDateTime now) {
         List<CombatCandidateEntity> candidates = findPromotionCandidates(now);
         if (candidates.stream().anyMatch(candidate -> candidate.getMentakPreviewPostedAt() != null)) return;
-        CombatCandidateEntity winner = selectPromotionWinner(candidates);
-        if (winner == null) return;
-        postMentakPreview(winner);
+        for (CombatCandidateEntity candidate : rankPromotionCandidates(candidates)) {
+            if (postMentakPreview(candidate) != null) return;
+            BotLogger.error("Mentak preview skipped for candidate " + candidate.getId() + " because posting failed.");
+        }
     }
 
     private void postProductionMentakPreviewIfDue(LocalDateTime now) {
@@ -213,11 +249,22 @@ public class CombatReplayPromotionService {
     }
 
     private void promoteMentakPreviewedCandidateIfDue(LocalDateTime now) {
-        CombatCandidateEntity winner = selectPromotionWinner(findPromotionCandidates(now).stream()
+        LocalDateTime publicPromotionWindow = mentakPublicPromotionWindow(now);
+        if (!canPublicPromoteAt(publicPromotionWindow)) return;
+        List<CombatCandidateEntity> candidates = rankPromotionCandidates(findPromotionCandidates(now).stream()
                 .filter(candidate -> isMentakPreviewReadyForPublicPromotion(candidate, now))
                 .toList());
-        if (winner == null) return;
-        promoteCandidate(winner);
+        for (CombatCandidateEntity candidate : candidates) {
+            if (promoteCandidate(candidate) != null) return;
+            BotLogger.error("Mentak preview promotion skipped for candidate " + candidate.getId()
+                    + " because public promotion failed.");
+        }
+    }
+
+    private LocalDateTime mentakPublicPromotionWindow(LocalDateTime now) {
+        LocalDateTime truncatedNow = now.truncatedTo(ChronoUnit.MINUTES);
+        if (settings.getRuntime().isDevMode()) return truncatedNow;
+        return truncatedNow.truncatedTo(ChronoUnit.HOURS);
     }
 
     private boolean usesMentakPreviewFlow() {
@@ -247,23 +294,38 @@ public class CombatReplayPromotionService {
                 .isAfter(now);
     }
 
-    private void postMentakPreview(CombatCandidateEntity candidate) {
-        CombatObservationEntity observation =
-                observationRepository.findById(candidate.getObservationId()).orElse(null);
-        Game game = loadGame(candidate.getGameName());
-        TextChannel channel = discordPostService.houseChannel(CombatReplayHouse.MENTAK);
-        if (observation == null || game == null || channel == null) return;
-
-        String startSummaryText = snapshotStartSummaryText(candidate);
-        String message = LazaxCombatSupport.formatReplayAnnouncement(
-                game, candidate, discordPostService.getHouseRoleMention(CombatReplayHouse.MENTAK), startSummaryText);
+    private CombatReplayContestEntity postMentakPreview(CombatCandidateEntity candidate) {
         try {
-            discordPostService.postPromotionMessage(channel, message, game, candidate);
+            if (expireIfDiscordantStars(candidate)) return null;
+
+            CombatObservationEntity observation =
+                    observationRepository.findById(candidate.getObservationId()).orElse(null);
+            Game game = loadGame(candidate.getGameName());
+            TextChannel channel = discordPostService.houseChannel(CombatReplayHouse.MENTAK);
+            if (observation == null || game == null || channel == null) return null;
+
+            CombatReplayContestEntity previewContest = createPreviewContest(candidate);
+
+            String startSummaryText = snapshotStartSummaryText(candidate);
+            String message = LazaxCombatSupport.formatReplayAnnouncement(
+                    game,
+                    candidate,
+                    discordPostService.getHouseRoleMention(CombatReplayHouse.MENTAK),
+                    startSummaryText);
+            Message posted = discordPostService.postPromotionMessage(channel, message, game, candidate);
+            ThreadChannel thread = discordPostService.createReplayThread(posted, candidate);
+            previewContest.setPublicChannelId(channel.getIdLong());
+            previewContest.setPublicMessageId(posted.getIdLong());
+            previewContest.setPublicThreadId(thread == null ? null : thread.getIdLong());
+            replayContestRepository.save(previewContest);
+            replayExecutionService.postPreviewContext(thread != null ? thread : channel, previewContest, candidate);
             mentakAbilityService.postDecoyButtons(channel, candidate);
             candidate.setMentakPreviewPostedAt(LocalDateTime.now(clock));
             candidateRepository.save(candidate);
+            return previewContest;
         } catch (Exception e) {
             BotLogger.error("Failed to post Mentak combat replay preview.", e);
+            return null;
         }
     }
 
@@ -308,19 +370,33 @@ public class CombatReplayPromotionService {
         return candidate != null && CombatReplayTileRenderer.canRender(candidate.getInitialRenderSnapshotJson());
     }
 
+    private boolean expireIfDiscordantStars(CombatCandidateEntity candidate) {
+        if (candidate == null || candidate.getPromotionStatus() != CombatCandidatePromotionStatus.PENDING) return false;
+        if (StringUtils.isBlank(candidate.getGameName())) return false;
+        Game game = loadGame(candidate.getGameName());
+        if (game == null || !game.isDiscordantStarsMode()) return false;
+        candidate.setPromotionStatus(CombatCandidatePromotionStatus.EXPIRED);
+        candidate.setCancellationReason("Ineligible for promotion because Discordant Stars games are excluded.");
+        candidateRepository.save(candidate);
+        return true;
+    }
+
     private CombatCandidateEntity selectPromotionWinner(List<CombatCandidateEntity> candidates) {
+        List<CombatCandidateEntity> rankedCandidates = rankPromotionCandidates(candidates);
+        return rankedCandidates.isEmpty() ? null : rankedCandidates.getFirst();
+    }
+
+    private List<CombatCandidateEntity> rankPromotionCandidates(List<CombatCandidateEntity> candidates) {
         Map<Long, Double> jointScoresByObservationId = loadJointScores(candidates);
-        CombatCandidateEntity winner = null;
         Comparator<CombatCandidateEntity> comparator = candidateComparator(jointScoresByObservationId);
         List<CombatCandidateEntity> previewedCandidates = candidates.stream()
                 .filter(candidate -> candidate.getMentakPreviewPostedAt() != null)
                 .toList();
         if (!previewedCandidates.isEmpty()) candidates = previewedCandidates;
-        for (CombatCandidateEntity candidate : candidates) {
-            if (candidate.getResolvedAt() == null) continue;
-            if (winner == null || comparator.compare(candidate, winner) > 0) winner = candidate;
-        }
-        return winner;
+        return candidates.stream()
+                .filter(candidate -> candidate.getResolvedAt() != null)
+                .sorted(comparator.reversed())
+                .toList();
     }
 
     private Map<Long, Double> loadJointScores(List<CombatCandidateEntity> candidates) {
@@ -365,23 +441,23 @@ public class CombatReplayPromotionService {
                 : resetReplayContest(
                         existingContest, winner, publicChannelId, publicMessageId, publicThreadId, promotedAt);
         CombatReplayContestEntity savedContest = replayContestRepository.save(contest);
-        lockPreviousContestTradeConvoys(savedContest);
-
         winner.setPromotionStatus(CombatCandidatePromotionStatus.PROMOTED);
         winner.setPromotedAt(promotedAt);
         candidateRepository.save(winner);
         return savedContest;
     }
 
-    private void lockPreviousContestTradeConvoys(CombatReplayContestEntity newContest) {
-        if (newContest == null || newContest.getId() == null) return;
-        CombatReplayContestEntity previousContest = replayContestRepository
-                .findFirstByIdLessThanOrderByIdDesc(newContest.getId())
-                .orElse(null);
-        if (previousContest == null || previousContest.getCandidateId() == null) return;
-        CombatCandidateEntity previousCandidate =
-                candidateRepository.findById(previousContest.getCandidateId()).orElse(null);
-        hacanTradeConvoysService.lockTradeConvoysIfNeeded(previousContest, previousCandidate);
+    private CombatReplayContestEntity createPreviewContest(CombatCandidateEntity candidate) {
+        CombatReplayContestEntity existingContest =
+                replayContestRepository.findByCandidateId(candidate.getId()).orElse(null);
+        if (existingContest != null) return existingContest;
+
+        CombatReplayContestEntity contest = new CombatReplayContestEntity();
+        contest.setCandidateId(candidate.getId());
+        contest.setReplayStatus(CombatContestReplayStatus.PREVIEW);
+        contest.setNextEventSequence(1);
+        contest.setSideBetPayoutModel(CombatReplaySideBetPayoutService.ODDS_V1);
+        return replayContestRepository.saveAndFlush(contest);
     }
 
     private CombatReplayContestEntity resetReplayContest(

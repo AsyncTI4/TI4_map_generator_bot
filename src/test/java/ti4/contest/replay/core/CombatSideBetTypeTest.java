@@ -12,13 +12,14 @@ class CombatSideBetTypeTest {
         CombatContestSettings settings = new CombatContestSettings();
 
         assertEquals(1, settings.getSideBets().getCostPoints());
+        assertEquals(50, settings.getSideBets().getDynamicPayoutCap());
     }
 
     @Test
-    void hacanMarketMakerDefaultsToOnePointPerTakenMarkedBet() {
+    void hacanMarketMakerDefaultsToTwoPointsPerTakenMarkedBet() {
         CombatContestSettings settings = new CombatContestSettings();
 
-        assertEquals(1, settings.getHouseAbilities().getHacan().getMarketMakerPointsPerBet());
+        assertEquals(2, settings.getHouseAbilities().getHacan().getMarketMakerPointsPerBet());
     }
 
     @Test
@@ -44,8 +45,10 @@ class CombatSideBetTypeTest {
                 CombatSideBetType.AFB_WHIFF, 4,
                 CombatSideBetType.ROUND_ONE_WHIFF, 10,
                 CombatSideBetType.ROUND_ONE_SLAM, 30,
-                CombatSideBetType.MORALE_BOOST, 8,
+                CombatSideBetType.MORALE_BOOST, 12,
                 CombatSideBetType.SHIELDS_HOLDING, 8,
+                CombatSideBetType.DIRECT_HIT, 8,
+                CombatSideBetType.FIGHTER_PROTOTYPE, 24,
                 CombatSideBetType.WINNER_ONE_HP, 35);
 
         expectedPayouts.forEach((type, expectedPayout) -> assertEquals(expectedPayout, type.profitPoints()));

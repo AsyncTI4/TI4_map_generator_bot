@@ -37,6 +37,9 @@ public class TfForetellResolver implements EdictResolver {
     public void handle(ButtonInteractionEvent event, Game game, Player player) {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), playerPing(player), buttons(game, player));
+        MessageHelper.sendMessageToChannel(
+                game.getMainGameChannel(),
+                "## A rules note: the speaker can choose which objective to reveal during status phase. Normally this doesnt matter, but if certain objectives have been peeked at with foretell, the speaker can purposely choose to reveal or not reveal those particular objectives (provided there are other valid options to choose from).");
     }
 
     @ButtonHandler("foretellPeak_")

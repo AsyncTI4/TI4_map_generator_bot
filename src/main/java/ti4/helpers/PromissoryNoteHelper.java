@@ -544,7 +544,7 @@ public class PromissoryNoteHelper {
         }
         if (id.contains("rider")) {
             String riderName = "Keleres Rider";
-            String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
+            String finsFactionCheckerPrefix = player.factionButtonChecker();
 
             List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
             List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
@@ -557,7 +557,7 @@ public class PromissoryNoteHelper {
         }
         if ("dspnedyn".equalsIgnoreCase(id)) {
             String riderName = "Edyn Rider";
-            String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
+            String finsFactionCheckerPrefix = player.factionButtonChecker();
 
             List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
             // List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
@@ -570,7 +570,7 @@ public class PromissoryNoteHelper {
         }
         if ("dspnkyro".equalsIgnoreCase(id)) {
             String riderName = "Kyro Rider";
-            String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
+            String finsFactionCheckerPrefix = player.factionButtonChecker();
 
             List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
             // List<Button> afterButtons = AgendaHelper.getAfterButtons(game);

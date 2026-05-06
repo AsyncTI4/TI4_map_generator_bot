@@ -140,7 +140,7 @@ public class FrankenButtonHandler {
     }
 
     @ButtonHandler("finishedBuilding")
-    private static void finishedBuildingFaction(Game game, Player player) {
+    private static void finishedBuildingFaction(Game game, Player player, ButtonInteractionEvent event) {
         String key = "frankenBuilt";
         player.setStoredValue(key, "y");
 
@@ -162,6 +162,7 @@ public class FrankenButtonHandler {
         builder.append(game.getPing() + " Every player has chosen their components! Press this button to continue.");
         builder.append(Buttons.DEAL_2_SO);
         builder.send();
+        ButtonHelper.deleteMessage(event);
     }
 
     private static void applyFrankenItemToPlayer(ButtonInteractionEvent event, Player player, DraftItem item) {
