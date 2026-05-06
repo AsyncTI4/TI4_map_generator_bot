@@ -11,21 +11,18 @@ import ti4.message.GameMessageType;
 public class StrategyCardMessageService {
 
     public static Optional<GameMessage> getStrategyCardMessage(String gameName, int round, int sc) {
-        String secondaryKey = getSecondaryKey(round, sc);
+        String key = getKey(round, sc);
         return GameMessageManager.getAll(gameName, GameMessageType.STRATEGY_CARD).stream()
-                .filter(message -> Objects.equals(message.secondaryKey(), secondaryKey))
+                .filter(message -> Objects.equals(message.key(), key))
                 .findFirst();
     }
 
     public static void replaceStrategyCardMessage(
             String gameName, String messageId, int round, int sc, long gameSaveTime) {
-        getStrategyCardMessage(gameName, round, sc)
-                .ifPresent(message -> GameMessageManager.remove(gameName, message.messageId()));
-        GameMessageManager.add(
-                gameName, messageId, GameMessageType.STRATEGY_CARD, gameSaveTime, getSecondaryKey(round, sc));
+        GameMessageManager.replace(gameName, messageId, GameMessageType.STRATEGY_CARD, gameSaveTime, getKey(round, sc));
     }
 
-    public static String getSecondaryKey(int round, int sc) {
+    public static String getKey(int round, int sc) {
         return round + "::" + sc;
     }
 }

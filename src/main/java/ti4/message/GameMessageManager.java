@@ -27,7 +27,7 @@ public class GameMessageManager {
     }
 
     public static synchronized void add(
-            String gameName, String messageId, GameMessageType type, long gameSaveTime, String secondaryKey) {
+            String gameName, String messageId, GameMessageType type, long gameSaveTime, String key) {
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             allGameMessages = new GameMessages(new HashMap<>());
@@ -39,7 +39,7 @@ public class GameMessageManager {
             return;
         }
 
-        messages.add(new GameMessage(messageId, type, new LinkedHashSet<>(), gameSaveTime, secondaryKey));
+        messages.add(new GameMessage(messageId, type, new LinkedHashSet<>(), gameSaveTime, key));
 
         persistFile(allGameMessages);
     }
@@ -50,7 +50,7 @@ public class GameMessageManager {
     }
 
     public static synchronized String replace(
-            String gameName, String messageId, GameMessageType type, long gameSaveTime, String secondaryKey) {
+            String gameName, String messageId, GameMessageType type, long gameSaveTime, String key) {
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             allGameMessages = new GameMessages(new HashMap<>());
@@ -61,7 +61,7 @@ public class GameMessageManager {
 
         String replacedMessageId = null;
         GameMessage oldMessage = messages.stream()
-                .filter(message -> message.type() == type)
+                .filter(message -> message.type() == type && (key == null || key.equals(message.key())))
                 .findFirst()
                 .orElse(null);
         if (oldMessage != null) {
@@ -69,7 +69,7 @@ public class GameMessageManager {
             messages.remove(oldMessage);
         }
 
-        messages.add(new GameMessage(messageId, type, new LinkedHashSet<>(), gameSaveTime, secondaryKey));
+        messages.add(new GameMessage(messageId, type, new LinkedHashSet<>(), gameSaveTime, key));
 
         persistFile(allGameMessages);
 

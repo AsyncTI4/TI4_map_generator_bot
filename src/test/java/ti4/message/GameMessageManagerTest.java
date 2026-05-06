@@ -9,7 +9,7 @@ import ti4.json.JsonMapperManager;
 class GameMessageManagerTest {
 
     @Test
-    void gameMessageDeserializesLegacyJsonWithoutSecondaryKey() throws Exception {
+    void gameMessageDeserializesLegacyJsonWithoutKey() throws Exception {
         String legacyJson = """
             {
               "messageId": "123",
@@ -21,56 +21,44 @@ class GameMessageManagerTest {
 
         GameMessage gameMessage = JsonMapperManager.basic().readValue(legacyJson, GameMessage.class);
 
-        assertThat(gameMessage.secondaryKey()).isNull();
+        assertThat(gameMessage.key()).isNull();
         assertThat(gameMessage.factionsThatReacted()).containsExactly("hacan");
     }
 
     @Test
-    void gameMessageRoundTripsSecondaryKey() throws Exception {
+    void gameMessageRoundTripsKey() throws Exception {
         GameMessage original = new GameMessage("456", GameMessageType.TURN, new LinkedHashSet<>(), 99L, "4::1");
 
         String json = JsonMapperManager.basic().writeValueAsString(original);
         GameMessage reread = JsonMapperManager.basic().readValue(json, GameMessage.class);
 
-        assertThat(reread.secondaryKey()).isEqualTo("4::1");
+        assertThat(reread.key()).isEqualTo("4::1");
     }
 
     @Test
-    void gameMessageOmitsNullSecondaryKeyFromJson() throws Exception {
+    void gameMessageOmitsNullKeyFromJson() throws Exception {
         GameMessage original = new GameMessage("789", GameMessageType.TURN, new LinkedHashSet<>(), 99L, null);
 
         String json = JsonMapperManager.basic().writeValueAsString(original);
 
-        assertThat(json).doesNotContain("\"secondaryKey\"");
+        assertThat(json).doesNotContain("\"key\"");
     }
 
     @Test
-    void gameMessageDeserializesLegacyStrategyCardInfoAsSecondaryKey() throws Exception {
-        String legacyJson = """
-            {
-              "messageId": "999",
-              "type": "STRATEGY_CARD",
-              "factionsThatReacted": [],
-              "gameSaveTime": 123,
-              "info": {
-                "round": "4",
-                "sc": "8",
-                "playedAt": "456"
-              }
-            }
-            """;
-
-        GameMessage gameMessage = JsonMapperManager.basic().readValue(legacyJson, GameMessage.class);
-
-        assertThat(gameMessage.secondaryKey()).isEqualTo("4::8");
-    }
-
-    @Test
-    void gameMessageKeepsExplicitSecondaryKey() {
+    void gameMessageKeepsExplicitKey() {
         GameMessage gameMessage =
                 new GameMessage("999", GameMessageType.STRATEGY_CARD, new LinkedHashSet<>(), 123L, "4::8");
 
-        assertThat(gameMessage.secondaryKey()).isEqualTo("4::8");
+        assertThat(gameMessage.key()).isEqualTo("4::8");
         assertThat(gameMessage.gameSaveTime()).isEqualTo(123L);
+    }
+
+    @Test
+    void gameMessageOmitsEmptyFactionsThatReactedFromJson() throws Exception {
+        GameMessage original = new GameMessage("789", GameMessageType.TURN, new LinkedHashSet<>(), 99L, null);
+
+        String json = JsonMapperManager.basic().writeValueAsString(original);
+
+        assertThat(json).doesNotContain("\"factionsThatReacted\"");
     }
 }
