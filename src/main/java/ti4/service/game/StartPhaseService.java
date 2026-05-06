@@ -42,6 +42,7 @@ import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
+import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
@@ -909,7 +910,9 @@ public class StartPhaseService {
         game.getMainGameChannel()
                 .sendMessage(messageObject)
                 .queue(message -> GameMessageManager.replace(
-                        game.getName(), message.getId(), GameMessageType.STATUS_END, game.getLastModifiedDate()));
+                        game.getName(),
+                        new GameMessage(message.getId(), GameMessageType.STATUS_END, game.getLastModifiedDate())));
+
         for (Player player : game.getRealPlayers()) {
             if (!player.getAllianceMembers().isEmpty()) {
                 MessageHelper.sendMessageToChannel(

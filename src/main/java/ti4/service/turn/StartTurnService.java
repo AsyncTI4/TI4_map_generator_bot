@@ -1,7 +1,6 @@
 package ti4.service.turn;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,8 +29,8 @@ import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
+import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
-import ti4.message.GameMessageManager.GameMessage;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
@@ -51,6 +50,7 @@ import ti4.service.fow.WhisperService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.service.strategycard.StrategyCardMessageService;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -304,7 +304,7 @@ public class StartTurnService {
         }
     }
 
-    public static void reviveInfantryII(Player player) {
+    private static void reviveInfantryII(Player player) {
         Game game = player.getGame();
         if (player.getStasisInfantry() > 0 && !player.hasUnit("tf-yinclone") && player.hasInf2Tech()) {
             if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
@@ -368,10 +368,12 @@ public class StartTurnService {
 
             if (!player.hasFollowedSC(sc)) {
                 String msg = "> " + game.getSCEmojiWordRepresentation(sc);
-                String jumplink = game.getStoredValue("scPlay" + sc);
-                if (!jumplink.isEmpty()) {
-                    msg += " " + jumplink + "\n";
-                    Long id = Long.parseLong(Arrays.asList(jumplink.split("/")).getLast());
+                GameMessage scMessage = StrategyCardMessageService.getStrategyCardMessage(
+                                game.getName(), game.getRound(), sc)
+                        .orElse(null);
+                if (scMessage != null) {
+                    msg += " " + scMessage.asJumpLink(game.getMainGameChannel()) + "\n";
+                    Long id = Long.parseLong(scMessage.messageId());
                     thingsToFollow.put(id, msg);
                 } else {
                     sb.append(msg).append('\n');
@@ -559,11 +561,12 @@ public class StartTurnService {
                             .append("** has been played and now it is their turn again and you haven't reacted.")
                             .append(" If you already reacted, check if your reaction got undone.");
 
-                    if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
-                        sb.append(" Message link is: ")
-                                .append(game.getStoredValue("scPlay" + sc))
-                                .append(".\n");
-                    }
+                    StrategyCardMessageService.getStrategyCardMessage(game.getName(), game.getRound(), sc)
+                            .ifPresent(scMessage -> {
+                                sb.append(" Message link is: ")
+                                        .append(scMessage.asJumpLink(game.getMainGameChannel()))
+                                        .append(".\n");
+                            });
                     sb.append("You currently have ")
                             .append(p2.getStrategicCC())
                             .append(" command token")

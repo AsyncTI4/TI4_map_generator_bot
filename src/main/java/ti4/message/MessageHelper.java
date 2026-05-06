@@ -248,7 +248,8 @@ public class MessageHelper {
         Consumer<Message> addFactionReact = (message) -> {
             if (saboable) {
                 GameMessageManager.add(
-                        game.getName(), message.getId(), GameMessageType.ACTION_CARD, game.getLastModifiedDate());
+                        game.getName(),
+                        new GameMessage(message.getId(), GameMessageType.ACTION_CARD, game.getLastModifiedDate()));
             }
             addFactionReactToMessage(game, player, message);
             if (!saboable) {
@@ -289,9 +290,8 @@ public class MessageHelper {
                         case AGENDA_WHEN -> {
                             String oldMessageId = GameMessageManager.replace(
                                     game.getName(),
-                                    message.getId(),
-                                    GameMessageType.AGENDA_WHEN,
-                                    game.getLastModifiedDate());
+                                    new GameMessage(
+                                            message.getId(), GameMessageType.AGENDA_WHEN, game.getLastModifiedDate()));
                             if (oldMessageId != null) {
                                 game.getMainGameChannel()
                                         .deleteMessageById(oldMessageId)
@@ -302,9 +302,8 @@ public class MessageHelper {
                         case AGENDA_AFTER -> {
                             String oldMessageId = GameMessageManager.replace(
                                     game.getName(),
-                                    message.getId(),
-                                    GameMessageType.AGENDA_AFTER,
-                                    game.getLastModifiedDate());
+                                    new GameMessage(
+                                            message.getId(), GameMessageType.AGENDA_AFTER, game.getLastModifiedDate()));
                             if (oldMessageId != null) {
                                 game.getMainGameChannel()
                                         .deleteMessageById(oldMessageId)
@@ -653,14 +652,14 @@ public class MessageHelper {
         if (text.contains("Use buttons to do your turn")
                 || text.contains("Use buttons to end turn")
                 || text.contains("Use the buttons to end turn")) {
-            String old = GameMessageManager.replace(gameName, id, GameMessageType.TURN, date);
+            String old = GameMessageManager.replace(gameName, new GameMessage(id, GameMessageType.TURN, date));
             if (old != null) {
                 message.getChannel().deleteMessageById(old).queue(Consumers.nop(), BotLogger::catchRestError);
             }
         }
 
         if (text.contains(VisionariaSelectService.initialButtonHeader())) {
-            GameMessageManager.replace(gameName, id, GameMessageType.VISIONARIA, date);
+            GameMessageManager.replace(gameName, new GameMessage(id, GameMessageType.VISIONARIA, date));
         }
     }
 
