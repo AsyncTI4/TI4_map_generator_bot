@@ -2,8 +2,8 @@ package ti4.executors;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -15,12 +15,12 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class CircuitBreaker {
 
-    private static final int CIRCUIT_BREAK_THRESHOLD = 10;
-    private static final int MINUTES_TO_WAIT_BEFORE_CLOSING = 5;
+    private static final int CIRCUIT_BREAK_THRESHOLD = 15;
+    private static final int MINUTES_TO_WAIT_BEFORE_CLOSING = 3;
     private static final int MINUTES_TO_WAIT_BEFORE_RESETTING_THRESHOLD = 1;
 
     private static int thresholdCount;
-    private static final List<String> openReasons = new ArrayList<>();
+    private static final Set<String> openReasons = new HashSet<>();
 
     @Getter
     private static boolean open;
@@ -29,6 +29,9 @@ public class CircuitBreaker {
 
     public static synchronized boolean incrementThresholdCount(String reason) {
         if (open) {
+            return false;
+        }
+        if (openReasons.contains(reason)) {
             return false;
         }
         thresholdCount++;
