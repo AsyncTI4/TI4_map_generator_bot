@@ -31,10 +31,6 @@ public record GameMessage(
         return String.format(Message.JUMP_URL, channel.getGuild().getId(), channel.getId(), messageId);
     }
 
-    public boolean isStrategyCard(int round, int sc) {
-        return type == GameMessageType.STRATEGY_CARD && getInfoAsInt("round") == round && getInfoAsInt("sc") == sc;
-    }
-
     public long getInfoAsLong(String key) {
         String value = requireInfoValue(key);
         try {

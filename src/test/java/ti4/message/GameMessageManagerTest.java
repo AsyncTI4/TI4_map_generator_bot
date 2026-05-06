@@ -1,6 +1,7 @@
 package ti4.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -47,7 +48,7 @@ class GameMessageManagerTest {
     }
 
     @Test
-    void strategyCardGameMessageMatchesRoundAndScFromInfo() {
+    void gameMessageParsesTypedInfoValues() {
         GameMessage gameMessage = new GameMessage(
                 "999",
                 GameMessageType.STRATEGY_CARD,
@@ -55,9 +56,17 @@ class GameMessageManagerTest {
                 123L,
                 Map.of("round", "4", "sc", "8", "playedAt", "456"));
 
-        assertThat(gameMessage.isStrategyCard(4, 8)).isTrue();
-        assertThat(gameMessage.isStrategyCard(4, 7)).isFalse();
         assertThat(gameMessage.getInfoAsLong("playedAt")).isEqualTo(456L);
         assertThat(gameMessage.getInfoAsInt("sc")).isEqualTo(8);
+    }
+
+    @Test
+    void gameMessageThrowsOnMissingTypedInfoValue() {
+        GameMessage gameMessage =
+                new GameMessage("999", GameMessageType.STRATEGY_CARD, new LinkedHashSet<>(), 123L, Map.of());
+
+        assertThatThrownBy(() -> gameMessage.getInfoAsInt("sc"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Missing info value for key 'sc'");
     }
 }

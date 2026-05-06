@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -23,9 +22,6 @@ import ti4.logging.BotLogger;
 public class GameMessageManager {
 
     private static final String GAME_MESSAGES_FILE = "GameMessages.json";
-    private static final String INFO_PLAYED_AT = "playedAt";
-    private static final String INFO_ROUND = "round";
-    private static final String INFO_SC = "sc";
 
     public static synchronized void add(String gameName, String messageId, GameMessageType type, long gameSaveTime) {
         add(gameName, messageId, type, gameSaveTime, Map.of());
@@ -56,33 +52,6 @@ public class GameMessageManager {
 
     public static synchronized String replace(
             String gameName, String messageId, GameMessageType type, long gameSaveTime, Map<String, String> info) {
-        return replace(gameName, messageId, message -> message.type() == type, type, gameSaveTime, info);
-    }
-
-    public static synchronized String replaceStrategyCardMessage(
-            String gameName, String messageId, int round, int sc, long gameSaveTime, long playedAt) {
-        return replace(
-                gameName,
-                messageId,
-                message -> message.isStrategyCard(round, sc),
-                GameMessageType.STRATEGY_CARD,
-                gameSaveTime,
-                Map.of(
-                        INFO_ROUND,
-                        Integer.toString(round),
-                        INFO_SC,
-                        Integer.toString(sc),
-                        INFO_PLAYED_AT,
-                        Long.toString(playedAt)));
-    }
-
-    private static synchronized String replace(
-            String gameName,
-            String messageId,
-            Predicate<GameMessage> filter,
-            GameMessageType type,
-            long gameSaveTime,
-            Map<String, String> info) {
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             allGameMessages = new GameMessages(new HashMap<>());
@@ -92,12 +61,11 @@ public class GameMessageManager {
                 allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
 
         String replacedMessageId = null;
-        for (Iterator<GameMessage> iterator = messages.iterator(); iterator.hasNext(); ) {
-            GameMessage message = iterator.next();
-            if (filter.test(message)) {
-                replacedMessageId = message.messageId();
-                iterator.remove();
-            }
+        GameMessage oldMessage =
+                messages.stream().filter(message -> message.type() == type).findFirst().orElse(null);
+        if (oldMessage != null) {
+            replacedMessageId = oldMessage.messageId();
+            messages.remove(oldMessage);
         }
 
         messages.add(new GameMessage(messageId, type, new LinkedHashSet<>(), gameSaveTime, info));
@@ -182,10 +150,6 @@ public class GameMessageManager {
 
     public static synchronized Optional<GameMessage> getOne(String gameName, String messageId) {
         return getOne(gameName, message -> message.messageId().equals(messageId));
-    }
-
-    public static synchronized Optional<GameMessage> getStrategyCardMessage(String gameName, int round, int sc) {
-        return getOne(gameName, message -> message.isStrategyCard(round, sc));
     }
 
     private static synchronized Optional<GameMessage> getOne(String gameName, Predicate<GameMessage> filter) {

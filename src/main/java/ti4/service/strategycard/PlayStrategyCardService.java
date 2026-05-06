@@ -593,7 +593,7 @@ public class PlayStrategyCardService {
             StrategyCardModel scModel,
             List<Button> scButtons,
             List<Player> playersToReact) {
-        GameMessageManager.replaceStrategyCardMessage(
+        StrategyCardMessageService.replaceStrategyCardMessage(
                 game.getName(), message.getId(), playRound, scToPlay, playGameSaveTime, System.currentTimeMillis());
         for (Player reactingPlayer : playersToReact) {
             Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, reactingPlayer, message);

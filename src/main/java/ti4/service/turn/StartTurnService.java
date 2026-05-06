@@ -367,7 +367,7 @@ public class StartTurnService {
 
             if (!player.hasFollowedSC(sc)) {
                 String msg = "> " + game.getSCEmojiWordRepresentation(sc);
-                GameMessage scMessage = GameMessageManager.getStrategyCardMessage(game.getName(), game.getRound(), sc)
+                GameMessage scMessage = StrategyCardMessageService.getStrategyCardMessage(game.getName(), game.getRound(), sc)
                         .orElse(null);
                 if (scMessage != null) {
                     msg += " " + scMessage.asJumpLink(game.getMainGameChannel()) + "\n";
@@ -563,7 +563,7 @@ public class StartTurnService {
                             .append("** has been played and now it is their turn again and you haven't reacted.")
                             .append(" If you already reacted, check if your reaction got undone.");
 
-                    GameMessageManager.getStrategyCardMessage(game.getName(), game.getRound(), sc)
+                    StrategyCardMessageService.getStrategyCardMessage(game.getName(), game.getRound(), sc)
                             .ifPresent(scMessage -> {
                                 sb.append(" Message link is: ")
                                         .append(scMessage.asJumpLink(game.getMainGameChannel()))

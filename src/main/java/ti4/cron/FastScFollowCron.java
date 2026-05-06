@@ -15,10 +15,10 @@ import ti4.helpers.Helper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.GameMessage;
-import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 import ti4.service.button.ReactionService;
+import ti4.service.strategycard.StrategyCardMessageService;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
@@ -62,7 +62,7 @@ public class FastScFollowCron {
             for (int sc : game.getPlayedSCsInOrder(player)) {
                 if (player.hasFollowedSC(sc)) continue;
 
-                GameMessage scMessage = GameMessageManager.getStrategyCardMessage(game.getName(), game.getRound(), sc)
+                GameMessage scMessage = StrategyCardMessageService.getStrategyCardMessage(game.getName(), game.getRound(), sc)
                         .orElse(null);
                 if (scMessage == null) continue;
 
@@ -74,7 +74,7 @@ public class FastScFollowCron {
                 }
                 long twelveHoursInMilliseconds = half * ONE_HOUR_IN_MILLISECONDS;
                 long twentyFourHoursInMilliseconds = twenty4 * ONE_HOUR_IN_MILLISECONDS;
-                long scPlayTime = scMessage.getInfoAsLong("playedAt");
+                long scPlayTime = scMessage.getInfoAsLong(StrategyCardMessageService.INFO_PLAYED_AT);
                 long timeDifference = System.currentTimeMillis() - scPlayTime;
                 String timesPinged = game.getStoredValue("scPlayPingCount" + sc + player.getFaction());
                 if (timeDifference > twelveHoursInMilliseconds
