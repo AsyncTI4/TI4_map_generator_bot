@@ -3,6 +3,7 @@ package ti4.service.statistics.game;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -21,30 +22,64 @@ class EndingRoundPhaseStatisticsService {
     private static final String UNKNOWN_PHASE_CODE = "UP";
 
     static void showEndingRoundPhaseStatistics(SlashCommandInteractionEvent event) {
+        Map<String, Integer> endingRoundAndPhaseCount = new HashMap<>();
         Map<String, FactionWinningRoundStats> statsByFaction = new HashMap<>();
 
         GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilterForWonGame(event),
-                game -> collectFactionWinningRoundStats(game, statsByFaction));
+                GameStatisticsFilterer.getGamesFilter(event),
+                game -> collectEndingRoundStats(game, endingRoundAndPhaseCount, statsByFaction));
 
         StringBuilder sb = new StringBuilder("__**Game Endings by Round and Phase:**__\n");
-        sb.append(buildFactionWinningRoundReport(statsByFaction));
+        if (endingRoundAndPhaseCount.isEmpty()) {
+            sb.append("No ended games found for the selected filters.\n");
+        } else {
+            sb.append(buildEndingRoundPhaseReport(endingRoundAndPhaseCount));
+            sb.append("\n__**Faction Average Winning End Round:**__\n");
+            sb.append(buildFactionWinningRoundReport(statsByFaction));
+        }
 
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Game Ending Rounds", sb.toString());
     }
 
-    static void collectFactionWinningRoundStats(Game game, Map<String, FactionWinningRoundStats> statsByFaction) {
+    static void collectEndingRoundStats(
+            Game game,
+            Map<String, Integer> endingRoundAndPhaseCount,
+            Map<String, FactionWinningRoundStats> statsByFaction) {
         if (!game.isHasEnded()) {
             return;
         }
 
         String phaseCode = normalizePhaseCode(game.getPhaseOfGame());
+        endingRoundAndPhaseCount.merge(formatFullRoundPhaseLabel(game.getRound(), phaseCode), 1, Integer::sum);
         for (Player winner : game.getWinners()) {
             statsByFaction
                     .computeIfAbsent(winner.getFaction(), ignored -> new FactionWinningRoundStats())
                     .addWin(game.getRound(), phaseCode);
         }
+    }
+
+    static String buildEndingRoundPhaseReport(Map<String, Integer> endingRoundAndPhaseCount) {
+        int totalEndedGames = endingRoundAndPhaseCount.values().stream()
+                .mapToInt(Integer::intValue)
+                .sum();
+        if (totalEndedGames == 0) {
+            return "No ended games found for the selected filters.\n";
+        }
+
+        AtomicInteger index = new AtomicInteger();
+        StringBuilder sb = new StringBuilder();
+        endingRoundAndPhaseCount.entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .forEach(entry -> sb.append(index.incrementAndGet())
+                        .append(". `")
+                        .append(entry.getValue())
+                        .append(" (")
+                        .append(Math.round(100 * entry.getValue() / (double) totalEndedGames))
+                        .append("%)` ")
+                        .append(entry.getKey())
+                        .append('\n'));
+        return sb.toString();
     }
 
     static String buildFactionWinningRoundReport(Map<String, FactionWinningRoundStats> statsByFaction) {
@@ -70,6 +105,16 @@ class EndingRoundPhaseStatisticsService {
                             .append(")\n");
                 });
         return sb.toString();
+    }
+
+    static String formatFullRoundPhaseLabel(int round, String phaseCode) {
+        return "Round " + round + " - "
+                + switch (phaseCode) {
+                    case "AP" -> "action";
+                    case "SP" -> "status";
+                    case "AgP" -> "agenda";
+                    default -> "unknown";
+                };
     }
 
     static String normalizePhaseCode(String phase) {

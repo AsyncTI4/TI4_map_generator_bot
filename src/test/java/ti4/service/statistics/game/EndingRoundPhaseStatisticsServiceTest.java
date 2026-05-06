@@ -14,7 +14,7 @@ import ti4.testUtils.BaseTi4Test;
 class EndingRoundPhaseStatisticsServiceTest extends BaseTi4Test {
 
     @Test
-    void collectFactionWinningRoundStatsBucketsWinsByFactionRoundAndPhase() {
+    void collectEndingRoundStatsBucketsOverallAndPerFactionCounts() {
         Game game = new Game();
         game.setName("ending-round-faction-stats");
         game.setHasEnded(true);
@@ -25,13 +25,26 @@ class EndingRoundPhaseStatisticsServiceTest extends BaseTi4Test {
         winner.setFaction("arborec");
         winner.setColor("green");
 
+        Map<String, Integer> endingRoundAndPhaseCount = new HashMap<>();
         Map<String, EndingRoundPhaseStatisticsService.FactionWinningRoundStats> statsByFaction = new HashMap<>();
 
-        EndingRoundPhaseStatisticsService.collectFactionWinningRoundStats(game, statsByFaction);
+        EndingRoundPhaseStatisticsService.collectEndingRoundStats(game, endingRoundAndPhaseCount, statsByFaction);
 
+        assertEquals(1, endingRoundAndPhaseCount.size());
+        assertEquals(1, endingRoundAndPhaseCount.get("Round 5 - status"));
         assertEquals(1, statsByFaction.size());
         assertEquals(5.0, statsByFaction.get("arborec").getAverageRound());
         assertEquals("R5SP: 1", statsByFaction.get("arborec").formatRoundPhaseCounts());
+    }
+
+    @Test
+    void buildEndingRoundPhaseReportFormatsOriginalOutput() {
+        String report = EndingRoundPhaseStatisticsService.buildEndingRoundPhaseReport(Map.of(
+                "Round 5 - action", 2,
+                "Round 4 - status", 1));
+
+        assertTrue(report.contains("1. `2 (67%)` Round 5 - action"));
+        assertTrue(report.contains("2. `1 (33%)` Round 4 - status"));
     }
 
     @Test
@@ -63,5 +76,13 @@ class EndingRoundPhaseStatisticsServiceTest extends BaseTi4Test {
         assertTrue(arborecIndex >= 0);
         assertTrue(argentIndex >= 0);
         assertTrue(arborecIndex < argentIndex);
+    }
+
+    @Test
+    void formatFullRoundPhaseLabelExpandsPhaseCodes() {
+        assertEquals("Round 4 - action", EndingRoundPhaseStatisticsService.formatFullRoundPhaseLabel(4, "AP"));
+        assertEquals("Round 5 - status", EndingRoundPhaseStatisticsService.formatFullRoundPhaseLabel(5, "SP"));
+        assertEquals("Round 6 - agenda", EndingRoundPhaseStatisticsService.formatFullRoundPhaseLabel(6, "AgP"));
+        assertEquals("Round 7 - unknown", EndingRoundPhaseStatisticsService.formatFullRoundPhaseLabel(7, "UP"));
     }
 }
