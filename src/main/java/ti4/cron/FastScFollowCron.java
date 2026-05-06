@@ -111,12 +111,10 @@ public class FastScFollowCron {
     }
 
     private static void appendScMessages(Game game, Player player, GameMessage scMessage, StringBuilder sb) {
-        if (scMessage != null) {
-            sb.append("Message link is: ")
-                    .append(scMessage.asJumpLink(game.getMainGameChannel()))
-                    .append('\n');
-        }
-        sb.append("You currently have ")
+        sb.append("Message link is: ")
+                .append(scMessage.asJumpLink(game.getMainGameChannel()))
+                .append('\n')
+                .append("You currently have ")
                 .append(player.getStrategicCC())
                 .append(" command token")
                 .append(player.getStrategicCC() == 1 ? "" : "s")
