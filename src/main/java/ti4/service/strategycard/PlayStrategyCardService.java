@@ -503,9 +503,7 @@ public class PlayStrategyCardService {
                     continue;
                 }
                 if (p2.isNpc()) {
-                    playersToReact.add(p2);
-                    p2.addFollowedSC(scToPlay, event);
-                    handleAutoNoFollowForImperial(game, p2, scToPlay);
+                    autoReactToStrategyCard(playersToReact, game, p2, scToPlay, event);
                     continue;
                 }
                 if (scToPlay == 5) {
@@ -521,9 +519,7 @@ public class PlayStrategyCardService {
                         && !p2.hasUnexhaustedLeader("mahactagent")
                         && !p2.hasUnexhaustedLeader("yssarilagent")
                         && scToPlay != 1) {
-                    playersToReact.add(p2);
-                    p2.addFollowedSC(scToPlay, event);
-                    handleAutoNoFollowForImperial(game, p2, scToPlay);
+                    autoReactToStrategyCard(playersToReact, game, p2, scToPlay, event);
                     MessageHelper.sendMessageToChannel(
                             p2.getCardsInfoThread(),
                             "You were automatically marked as not following **" + stratCardName
@@ -535,8 +531,7 @@ public class PlayStrategyCardService {
                             && !CheckUnitContainmentService.getTilesContainingPlayersUnits(
                                             game, p2, Units.UnitType.Spacedock)
                                     .contains(p2.getHomeSystemTile())) {
-                        playersToReact.add(p2);
-                        p2.addFollowedSC(6, event);
+                        autoReactToStrategyCard(playersToReact, game, p2, scToPlay, event);
                         MessageHelper.sendMessageToChannel(
                                 p2.getCardsInfoThread(),
                                 "You were automatically marked as not following **"
@@ -548,9 +543,7 @@ public class PlayStrategyCardService {
                         && !game.getStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction())
                                 .isEmpty()) {
                     game.removeStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction());
-                    playersToReact.add(p2);
-                    p2.addFollowedSC(scToPlay, event);
-                    handleAutoNoFollowForImperial(game, p2, scToPlay);
+                    autoReactToStrategyCard(playersToReact, game, p2, scToPlay, event);
                     MessageHelper.sendMessageToChannel(
                             p2.getCardsInfoThread(),
                             "You were automatically marked as not following **"
@@ -558,9 +551,7 @@ public class PlayStrategyCardService {
                                     + "** because you told the bot earlier that you wished to pass on it.");
                 } else {
                     if (scToPlay == 8 && p2.getSoScored() == p2.getMaxSOCount() && !game.isTwilightsFallMode()) {
-                        playersToReact.add(p2);
-                        p2.addFollowedSC(8, event);
-                        handleAutoNoFollowForImperial(game, p2, scToPlay);
+                        autoReactToStrategyCard(playersToReact, game, p2, scToPlay, event);
                         MessageHelper.sendMessageToChannel(
                                 p2.getCardsInfoThread(),
                                 "You were automatically marked as not following **" + stratCardName
@@ -706,6 +697,13 @@ public class PlayStrategyCardService {
                 }
             }
         });
+    }
+
+    private static void autoReactToStrategyCard(
+            List<Player> playersToReact, Game game, Player player, int scToPlay, GenericInteractionCreateEvent event) {
+        playersToReact.add(player);
+        player.addFollowedSC(scToPlay, event);
+        handleAutoNoFollowForImperial(game, player, scToPlay);
     }
 
     private static void handleAutoNoFollowForImperial(Game game, Player player, int scToPlay) {
