@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -42,8 +43,7 @@ import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
-import ti4.message.GameMessageManager;
-import ti4.message.GameMessageType;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.DeckModel;
 import ti4.model.PromissoryNoteModel;
@@ -907,10 +907,8 @@ public class StartPhaseService {
                 .addComponents(ActionRow.of(buttons))
                 .build();
 
-        game.getMainGameChannel()
-                .sendMessage(messageObject)
-                .queue(message -> GameMessageManager.replace(
-                        game.getName(), message.getId(), GameMessageType.STATUS_END, game.getLastModifiedDate()));
+        game.getMainGameChannel().sendMessage(messageObject).queue(Consumers.nop(), BotLogger::catchRestError);
+
         for (Player player : game.getRealPlayers()) {
             if (!player.getAllianceMembers().isEmpty()) {
                 MessageHelper.sendMessageToChannel(

@@ -17,6 +17,7 @@ import ti4.game.Player;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Helper;
 import ti4.logging.BotLogger;
+import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
@@ -177,7 +178,7 @@ public class ReactionService {
                 .ifPresent(gameMessage -> progressGameIfAllPlayersHaveReacted(gameMessage, game));
     }
 
-    private static void progressGameIfAllPlayersHaveReacted(GameMessageManager.GameMessage gameMessage, Game game) {
+    private static void progressGameIfAllPlayersHaveReacted(GameMessage gameMessage, Game game) {
         int matchingFactionReactions = 0;
         for (Player player : game.getRealPlayers()) {
             if (gameMessage.factionsThatReacted().contains(player.getFaction())) {
@@ -218,8 +219,7 @@ public class ReactionService {
         handleAllPlayersReactingNoSabotage(message, game, gameMessage);
     }
 
-    private static void handleAllPlayersReactingNoSabotage(
-            Message message, Game game, GameMessageManager.GameMessage gameMessage) {
+    private static void handleAllPlayersReactingNoSabotage(Message message, Game game, GameMessage gameMessage) {
         Matcher acToReact = CARDS_PATTERN.matcher(message.getContentRaw());
         String msg2 =
                 "All players have indicated \"No Sabotage\"" + (acToReact.find() ? " to " + acToReact.group(1) : "");
@@ -239,7 +239,7 @@ public class ReactionService {
         GameMessageManager.remove(game.getName(), message.getId());
     }
 
-    private static boolean checkForSpecificPlayerReact(Player player, GameMessageManager.GameMessage gameMessage) {
+    private static boolean checkForSpecificPlayerReact(Player player, GameMessage gameMessage) {
         return gameMessage.factionsThatReacted().contains(player.getFaction());
     }
 

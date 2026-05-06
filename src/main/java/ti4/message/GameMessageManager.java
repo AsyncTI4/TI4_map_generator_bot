@@ -1,14 +1,11 @@
 package ti4.message;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -16,8 +13,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.json.PersistenceManager;
@@ -41,7 +36,7 @@ public class GameMessageManager {
 
         List<GameMessage> messages =
                 allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
-        if (messages.stream().anyMatch(message -> message.messageId.equals(messageId))) {
+        if (messages.stream().anyMatch(message -> message.messageId().equals(messageId))) {
             return;
         }
 
@@ -69,7 +64,7 @@ public class GameMessageManager {
         if (!messages.isEmpty()) {
             for (int i = 0; i < messages.size(); i++) {
                 GameMessage message = messages.get(i);
-                if (message.type == type) {
+                if (message.type() == type) {
                     replacedMessageId = messages.remove(i).messageId();
                 }
             }
@@ -106,7 +101,7 @@ public class GameMessageManager {
             return;
         }
 
-        messages.removeIf(message -> message.gameSaveTime > gameSaveTime);
+        messages.removeIf(message -> message.gameSaveTime() > gameSaveTime);
 
         persistFile(allGameMessages);
     }
@@ -123,7 +118,7 @@ public class GameMessageManager {
         }
 
         GameMessage message =
-                messages.stream().filter(m -> m.type == type).findFirst().orElse(null);
+                messages.stream().filter(m -> m.type() == type).findFirst().orElse(null);
         if (message == null) {
             return Optional.empty();
         }
@@ -132,7 +127,7 @@ public class GameMessageManager {
 
         persistFile(allGameMessages);
 
-        return Optional.of(message.messageId);
+        return Optional.of(message.messageId());
     }
 
     public static synchronized void remove(String gameName, String messageId) {
@@ -146,17 +141,17 @@ public class GameMessageManager {
             return;
         }
 
-        messages.removeIf(message -> message.messageId.equals(messageId));
+        messages.removeIf(message -> message.messageId().equals(messageId));
 
         persistFile(allGameMessages);
     }
 
     public static synchronized Optional<GameMessage> getOne(String gameName, GameMessageType type) {
-        return getOne(gameName, message -> message.type == type);
+        return getOne(gameName, message -> message.type() == type);
     }
 
     public static synchronized Optional<GameMessage> getOne(String gameName, String messageId) {
-        return getOne(gameName, message -> message.messageId.equals(messageId));
+        return getOne(gameName, message -> message.messageId().equals(messageId));
     }
 
     private static synchronized Optional<GameMessage> getOne(String gameName, Predicate<GameMessage> filter) {
@@ -180,7 +175,7 @@ public class GameMessageManager {
         for (var entry : allGameMessages.gameNameToMessages.entrySet()) {
             List<GameMessage> filtered = null;
             for (GameMessage message : entry.getValue()) {
-                if (message.type == type) {
+                if (message.type() == type) {
                     if (filtered == null) {
                         filtered = new ArrayList<>();
                     }
@@ -245,15 +240,15 @@ public class GameMessageManager {
 
         List<GameMessage> messages =
                 allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
-        return messages.stream().filter(m -> m.type == type).toList();
+        return messages.stream().filter(m -> m.type() == type).toList();
     }
 
     public static synchronized void addReaction(String gameName, String faction, GameMessageType type) {
-        addReaction(gameName, faction, message -> message.type == type);
+        addReaction(gameName, faction, message -> message.type() == type);
     }
 
     public static synchronized void addReaction(String gameName, String faction, String messageId) {
-        addReaction(gameName, faction, message -> message.messageId.equals(messageId));
+        addReaction(gameName, faction, message -> message.messageId().equals(messageId));
     }
 
     private static void addReaction(String gameName, String faction, Predicate<GameMessage> filter) {
@@ -268,7 +263,7 @@ public class GameMessageManager {
         }
 
         messages.stream().filter(filter).findFirst().ifPresent(message -> {
-            message.factionsThatReacted.add(faction);
+            message.factionsThatReacted().add(faction);
             persistFile(allGameMessages);
         });
     }
@@ -293,29 +288,4 @@ public class GameMessageManager {
     }
 
     private record GameMessages(Map<String, List<GameMessage>> gameNameToMessages) {}
-
-    public record GameMessage(
-            String messageId,
-            GameMessageType type,
-            LinkedHashSet<String> factionsThatReacted,
-            long gameSaveTime,
-            @JsonInclude(Include.NON_EMPTY) Map<String, String> info) {
-        public GameMessage(
-                String messageId,
-                GameMessageType type,
-                LinkedHashSet<String> factionsThatReacted,
-                long gameSaveTime,
-                Map<String, String> info) {
-            this.messageId = messageId;
-            this.type = type;
-            this.factionsThatReacted =
-                    factionsThatReacted == null ? new LinkedHashSet<>() : new LinkedHashSet<>(factionsThatReacted);
-            this.gameSaveTime = gameSaveTime;
-            this.info = info == null ? new LinkedHashMap<>() : new LinkedHashMap<>(info);
-        }
-
-        public String asJumpLink(TextChannel channel) {
-            return String.format(Message.JUMP_URL, channel.getGuild().getId(), channel.getId(), messageId);
-        }
-    }
 }
