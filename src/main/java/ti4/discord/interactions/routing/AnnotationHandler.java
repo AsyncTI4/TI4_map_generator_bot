@@ -30,6 +30,7 @@ import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.listeners.context.ListenerContext;
 import ti4.discord.interactions.listeners.context.ModalContext;
 import ti4.discord.interactions.listeners.context.SelectionMenuContext;
+import ti4.executors.CircuitBreaker;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -200,6 +201,9 @@ public final class AnnotationHandler {
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                 }
+                CircuitBreaker.incrementThresholdCount(
+                        "Annotation handler \"" + method.getDeclaringClass().getSimpleName() + "#" + method.getName()
+                                + "\" threw an exception.");
                 BotLogger.error(
                         origin,
                         "Error within handler \"" + method.getDeclaringClass().getSimpleName() + "#" + method.getName()
