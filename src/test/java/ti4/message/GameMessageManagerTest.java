@@ -58,5 +58,6 @@ class GameMessageManagerTest {
         assertThat(gameMessage.isStrategyCard(4, 8)).isTrue();
         assertThat(gameMessage.isStrategyCard(4, 7)).isFalse();
         assertThat(gameMessage.getInfoAsLong("playedAt")).isEqualTo(456L);
+        assertThat(gameMessage.getInfoAsInt("sc")).isEqualTo(8);
     }
 }

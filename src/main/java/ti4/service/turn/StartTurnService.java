@@ -371,8 +371,12 @@ public class StartTurnService {
                         .orElse(null);
                 if (scMessage != null) {
                     msg += " " + scMessage.asJumpLink(game.getMainGameChannel()) + "\n";
-                    Long id = Long.parseLong(scMessage.messageId());
-                    thingsToFollow.put(id, msg);
+                    try {
+                        Long id = Long.parseLong(scMessage.messageId());
+                        thingsToFollow.put(id, msg);
+                    } catch (NumberFormatException e) {
+                        sb.append(msg).append('\n');
+                    }
                 } else {
                     sb.append(msg).append('\n');
                 }

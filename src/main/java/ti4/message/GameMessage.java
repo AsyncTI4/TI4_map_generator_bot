@@ -32,14 +32,13 @@ public record GameMessage(
     }
 
     public boolean isStrategyCard(int round, int sc) {
-        return type == GameMessageType.STRATEGY_CARD && getInfoAsInt("round") == round && getInfoAsInt("sc") == sc;
+        return type == GameMessageType.STRATEGY_CARD
+                && Integer.toString(round).equals(info.get("round"))
+                && Integer.toString(sc).equals(info.get("sc"));
     }
 
     public long getInfoAsLong(String key) {
-        String value = info.get(key);
-        if (value == null) {
-            return 0L;
-        }
+        String value = requireInfoValue(key);
         try {
             return Long.parseLong(value);
         } catch (NumberFormatException e) {
@@ -48,14 +47,19 @@ public record GameMessage(
     }
 
     public int getInfoAsInt(String key) {
-        String value = info.get(key);
-        if (value == null) {
-            return 0;
-        }
+        String value = requireInfoValue(key);
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid int info value for key '" + key + "': " + value, e);
         }
+    }
+
+    private String requireInfoValue(String key) {
+        String value = info.get(key);
+        if (value == null) {
+            throw new IllegalArgumentException("Missing info value for key '" + key + "'");
+        }
+        return value;
     }
 }
