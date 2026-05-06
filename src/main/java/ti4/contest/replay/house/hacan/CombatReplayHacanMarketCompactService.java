@@ -319,9 +319,8 @@ public class CombatReplayHacanMarketCompactService {
             Game game, CombatReplayContestEntity contest, CombatCandidateEntity candidate, String faction) {
         List<Button> buttons = new ArrayList<>();
         for (CombatSideBetType type : availabilityService.availableTypes(candidate, faction)) {
-            int points = payoutService.offeredPayout(contest, candidate, type, faction);
-            buttons.add(Buttons.gray(
-                    formatButtonId(contest.getId(), type, faction), shortBetLabel(type) + " +" + points, type.emoji()));
+            buttons.add(
+                    Buttons.gray(formatButtonId(contest.getId(), type, faction), shortBetLabel(type), type.emoji()));
         }
         return buttons;
     }
