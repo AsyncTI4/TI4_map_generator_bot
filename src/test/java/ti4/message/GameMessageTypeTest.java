@@ -9,8 +9,7 @@ class GameMessageTypeTest {
 
     @Test
     void testLegacyStatusEndDeserializes() {
-        GameMessageType restored =
-                JsonMapperManager.basic().readValue("\"STATUS_END\"", GameMessageType.class);
+        GameMessageType restored = JsonMapperManager.basic().readValue("\"STATUS_END\"", GameMessageType.class);
 
         assertEquals(GameMessageType.STATUS_END, restored);
     }
