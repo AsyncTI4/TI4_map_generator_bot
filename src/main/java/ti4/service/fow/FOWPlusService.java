@@ -136,7 +136,7 @@ public final class FOWPlusService {
         return new Tile(VOID_TILEID, position);
     }
 
-    @ButtonHandler("blindTileSelection~MDL")
+    @ButtonHandler(value = "blindTileSelection~MDL", save = false)
     public static void offerBlindActivation(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         TextInput position = TextInput.create(Constants.POSITION, TextInputStyle.SHORT)
                 .setRequired(true)

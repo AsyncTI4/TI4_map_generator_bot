@@ -54,7 +54,7 @@ public class HomebrewService {
         }
     }
 
-    @ButtonHandler("offerGameHomebrewButtons")
+    @ButtonHandler(value = "offerGameHomebrewButtons", save = false)
     public static void offerGameHomebrewButtons(MessageChannel channel) {
         List<Button> homebrewButtons = new ArrayList<>();
         homebrewButtons.add(Buttons.green("getHomebrewButtons", "Yes Homebrew"));
@@ -66,7 +66,7 @@ public class HomebrewService {
                 homebrewButtons);
     }
 
-    @ButtonHandler("getHomebrewButtons")
+    @ButtonHandler(value = "getHomebrewButtons", save = false)
     public static void offerHomeBrewButtons(Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
 

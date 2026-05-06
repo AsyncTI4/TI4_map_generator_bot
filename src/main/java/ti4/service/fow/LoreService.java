@@ -147,18 +147,18 @@ public final class LoreService {
         }
     }
 
-    @ButtonHandler("gmLoreRefresh")
+    @ButtonHandler(value = "gmLoreRefresh", save = false)
     private static void refreshLoreButtons(ButtonInteractionEvent event, String buttonID, Game game) {
         showLoreButtons(event, buttonID, game);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    @ButtonHandler("gmLoreExportImportButtons")
+    @ButtonHandler(value = "gmLoreExportImportButtons", save = false)
     private static void gmLoreExportImportButtons(ButtonInteractionEvent event, Game game) {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", LORE_EXPORT_IMPORT_BUTTONS);
     }
 
-    @ButtonHandler("gmLoreExport")
+    @ButtonHandler(value = "gmLoreExport", save = false)
     private static void exportLore(ButtonInteractionEvent event, Game game) {
         File exportFile = new File(game.getName() + LORE_EXPORT_FILENAME);
         try (FileWriter writer = new FileWriter(exportFile, StandardCharsets.UTF_8)) {
@@ -174,7 +174,7 @@ public final class LoreService {
                 .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    @ButtonHandler("gmLoreImport~MDL")
+    @ButtonHandler(value = "gmLoreImport~MDL", save = false)
     public static void importLore(ButtonInteractionEvent event, Game game) {
         TextInput.Builder url = TextInput.create("url", TextInputStyle.SHORT)
                 .setRequired(true)
@@ -210,7 +210,7 @@ public final class LoreService {
         MessageHelper.sendMessageToChannel(event.getChannel(), importedLore.size() + " lore entries imported.");
     }
 
-    @ButtonHandler("gmLore")
+    @ButtonHandler(value = "gmLore", save = false)
     public static void showLoreButtons(GenericInteractionCreateEvent event, String buttonID, Game game) {
         String page = StringUtils.substringAfter(buttonID, "page");
         int pageNum = StringUtils.isBlank(page) ? 1 : Integer.parseInt(page);

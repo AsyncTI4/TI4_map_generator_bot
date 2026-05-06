@@ -207,7 +207,7 @@ public class FowCommunicationThreadService {
         return newCommPartners;
     }
 
-    @ButtonHandler("fowComms_")
+    @ButtonHandler(value = "fowComms_", save = false)
     public static void showComms(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         List<Button> buttons = new ArrayList<>();
         for (String color : buttonID.replace("fowComms_", "").split("-")) {

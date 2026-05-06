@@ -60,7 +60,7 @@ final class GameOptionButtonHandler {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("offerGameOptionButtons")
+    @ButtonHandler(value = "offerGameOptionButtons", save = false)
     public static void offerGameOptionButtons(Game game, MessageChannel channel) {
         GameOptionService.offerGameOptionButtons(game, channel);
     }
