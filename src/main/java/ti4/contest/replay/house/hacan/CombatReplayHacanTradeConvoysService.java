@@ -30,7 +30,6 @@ import ti4.contest.replay.repository.CombatReplayHacanTradeConvoysRepository;
 import ti4.contest.replay.repository.CombatReplayHacanTradeConvoysVoteRepository;
 import ti4.contest.replay.repository.CombatReplayHouseAbilityUseRepository;
 import ti4.contest.replay.repository.CombatReplayHouseScoreRepository;
-import ti4.contest.replay.service.CombatReplayAbilityWindowText;
 import ti4.contest.replay.service.CombatReplayHouseAbilityVoteService;
 import ti4.contest.replay.service.CombatReplayHouseFavorService;
 import ti4.contest.replay.service.CombatReplayHouseLedgerService.HousePredictionSummary;
@@ -80,7 +79,6 @@ public class CombatReplayHacanTradeConvoysService {
             CombatReplayContestEntity contest,
             CombatCandidateEntity candidate,
             List<HousePredictionSummary> currentCombatSummaries) {
-        lockPreviousTradeConvoysIfCurrentCombatEnded(contest);
         if (!canOfferTradeConvoys(contest, candidate)) return;
         postTradeConvoysVotingButtons(contest, hacanFavorLedger(contest, currentCombatSummaries));
     }
@@ -111,13 +109,12 @@ public class CombatReplayHacanTradeConvoysService {
                 channel,
                 "## " + FactionEmojis.getFactionIcon(CombatReplayHouse.HACAN.displayName())
                         + " Hacan Delegation Trade Convoys\n"
-                        + CombatReplayAbilityWindowText.votesLockWhenNextCombatEndsLine()
+                        + "-# Hacan CEO may send one Trade Convoys offer while this window is open."
                         + "\n"
                         + favorBalanceLine(favorLedger)
                         + "\n"
                         + tradeConvoysSummaryLine(),
-                List.of(Buttons.red(
-                        formatButtonId(contest.getId(), CombatReplayHouse.HACAN, 0, 0), "Do Not Use Trade Convoys")));
+                List.of());
         postTradeConvoysButtonsForHouse(channel, contest, CombatReplayHouse.NAALU, favorLedger);
         postTradeConvoysButtonsForHouse(channel, contest, CombatReplayHouse.MENTAK, favorLedger);
     }
@@ -152,13 +149,12 @@ public class CombatReplayHacanTradeConvoysService {
                 "## "
                         + FactionEmojis.getFactionIcon(CombatReplayHouse.HACAN.displayName())
                         + " Hacan Delegation Trade Convoys\n"
-                        + CombatReplayAbilityWindowText.votesLockWhenNextCombatEndsLine()
+                        + "-# Hacan CEO may send one Trade Convoys offer while this window is open."
                         + "\n"
                         + favorBalanceLine(null)
                         + "\n"
-                        + voteSummary(contest.getId()),
-                List.of(Buttons.red(
-                        formatButtonId(contest.getId(), CombatReplayHouse.HACAN, 0, 0), "Do Not Use Trade Convoys")));
+                        + tradeConvoysSummaryLine(),
+                List.of());
         sendEphemeralTradeConvoysButtonsForHouse(event, contest, CombatReplayHouse.NAALU);
         sendEphemeralTradeConvoysButtonsForHouse(event, contest, CombatReplayHouse.MENTAK);
     }
@@ -273,36 +269,7 @@ public class CombatReplayHacanTradeConvoysService {
         CombatReplayHacanTradeConvoysEntity existing =
                 tradeConvoysRepository.findByContestId(contest.getId()).orElse(null);
         if (existing != null) return toTradeConvoys(existing);
-
-        List<CombatReplayHacanTradeConvoysVoteEntity> votes =
-                tradeConvoysVoteRepository.findByContestId(contest.getId());
-
-        TradeConvoysTally winning = winningTally(votes);
-        if (winning == null || winning.targetHouse() == null || winning.bonusPercent() <= 0) {
-            return lockNoTradeConvoys(contest, winning == null ? 0 : winning.voteCount());
-        }
-        if (!houseFavorService.canAfford(CombatReplayHouse.HACAN, effectiveFavorCost(winning.favorCost()))) {
-            return lockNoTradeConvoys(contest, winning.voteCount());
-        }
-        if (!claimHacanTradeConvoysUse(
-                candidate.getId(),
-                effectiveFavorCost(winning.favorCost()),
-                winning.discordUserId(),
-                winning.discordUserName())) {
-            return lockNoTradeConvoys(contest, winning.voteCount());
-        }
-
-        CombatReplayHacanTradeConvoysEntity tradeConvoys = new CombatReplayHacanTradeConvoysEntity();
-        tradeConvoys.setContestId(contest.getId());
-        tradeConvoys.setTargetHouse(winning.targetHouse());
-        tradeConvoys.setFavorCost(winning.favorCost());
-        tradeConvoys.setPredictionBonus(winning.bonusPercent());
-        tradeConvoys.setVoteCount(winning.voteCount());
-        tradeConvoys.setSelectedAt(LocalDateTime.now());
-        tradeConvoysRepository.save(tradeConvoys);
-        creditTradeConvoysFavorTransferIfScored(tradeConvoys);
-        postLockedTradeConvoysSummary(tradeConvoys);
-        return toTradeConvoys(tradeConvoys);
+        return TradeConvoys.none();
     }
 
     public TradeConvoys tradeConvoysForContest(Long contestId) {
@@ -423,18 +390,7 @@ public class CombatReplayHacanTradeConvoysService {
     public void lockPreviousTradeConvoysIfCurrentCombatEnded(CombatReplayContestEntity currentContest) {
         if (currentContest == null || currentContest.getId() == null || currentContest.getReplayCompletedAt() == null)
             return;
-        CombatReplayContestEntity previousContest = contestRepository
-                .findFirstByIdLessThanOrderByIdDesc(currentContest.getId())
-                .orElse(null);
-        if (previousContest == null
-                || previousContest.getCandidateId() == null
-                || (previousContest.getReplayCompletedAt() == null && previousContest.getLeaderboardPostedAt() == null))
-            return;
-        CombatCandidateEntity previousCandidate =
-                candidateRepository.findById(previousContest.getCandidateId()).orElse(null);
-        if (previousCandidate != null) {
-            lockTradeConvoysIfNeeded(previousContest, previousCandidate);
-        }
+        // Trade Convoys no longer auto-resolves from delegation votes. Hacan CEO must use Send Now.
     }
 
     public boolean userHasHouse(String discordUserId) {

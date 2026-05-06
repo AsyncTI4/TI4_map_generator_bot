@@ -305,7 +305,6 @@ public class CombatReplayPromotionService {
             if (observation == null || game == null || channel == null) return null;
 
             CombatReplayContestEntity previewContest = createPreviewContest(candidate);
-            lockPreviousContestTradeConvoys(previewContest);
 
             String startSummaryText = snapshotStartSummaryText(candidate);
             String message = LazaxCombatSupport.formatReplayAnnouncement(
@@ -442,31 +441,10 @@ public class CombatReplayPromotionService {
                 : resetReplayContest(
                         existingContest, winner, publicChannelId, publicMessageId, publicThreadId, promotedAt);
         CombatReplayContestEntity savedContest = replayContestRepository.save(contest);
-        lockPreviousContestTradeConvoys(savedContest);
-
         winner.setPromotionStatus(CombatCandidatePromotionStatus.PROMOTED);
         winner.setPromotedAt(promotedAt);
         candidateRepository.save(winner);
         return savedContest;
-    }
-
-    private void lockPreviousContestTradeConvoys(CombatReplayContestEntity newContest) {
-        if (newContest == null || newContest.getId() == null) return;
-        if (!isPostCombat(newContest)) return;
-        CombatReplayContestEntity previousContest = replayContestRepository
-                .findFirstByIdLessThanOrderByIdDesc(newContest.getId())
-                .orElse(null);
-        if (previousContest == null || previousContest.getCandidateId() == null) return;
-        if (!isPostCombat(previousContest)) return;
-        CombatCandidateEntity previousCandidate =
-                candidateRepository.findById(previousContest.getCandidateId()).orElse(null);
-        if (previousCandidate == null) return;
-        hacanTradeConvoysService.lockTradeConvoysIfNeeded(previousContest, previousCandidate);
-        replayLeaderboardService.computeAndPersistHouseScoresFromFacts(previousCandidate, previousContest);
-    }
-
-    private boolean isPostCombat(CombatReplayContestEntity contest) {
-        return contest != null && (contest.getReplayCompletedAt() != null || contest.getLeaderboardPostedAt() != null);
     }
 
     private CombatReplayContestEntity createPreviewContest(CombatCandidateEntity candidate) {

@@ -144,7 +144,6 @@ public class CombatReplayLeaderboardService {
         if (replayContest.getId() == null) return;
         if (replayContest.getLeaderboardPostedAt() != null) return;
 
-        hacanTradeConvoysService.lockPreviousTradeConvoysIfCurrentCombatEnded(replayContest);
         ScoredContestResult result = scoreReplayContest(candidate, replayContest);
         MessageChannel threadOrChannel = getContestThreadOrChannel(replayContest);
         if (threadOrChannel != null) {
