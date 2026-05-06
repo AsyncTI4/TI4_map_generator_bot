@@ -1,7 +1,8 @@
 package ti4.message;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import java.util.LinkedHashMap;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import net.dv8tion.jda.api.entities.Message;
@@ -12,48 +13,50 @@ public record GameMessage(
         GameMessageType type,
         LinkedHashSet<String> factionsThatReacted,
         long gameSaveTime,
-        @JsonInclude(JsonInclude.Include.NON_EMPTY) Map<String, String> info) {
+        @JsonInclude(JsonInclude.Include.NON_NULL) String secondaryKey) {
     public GameMessage(
             String messageId,
             GameMessageType type,
             LinkedHashSet<String> factionsThatReacted,
             long gameSaveTime,
-            Map<String, String> info) {
+            String secondaryKey) {
         this.messageId = messageId;
         this.type = type;
         this.factionsThatReacted =
                 factionsThatReacted == null ? new LinkedHashSet<>() : new LinkedHashSet<>(factionsThatReacted);
         this.gameSaveTime = gameSaveTime;
-        this.info = info == null ? new LinkedHashMap<>() : new LinkedHashMap<>(info);
+        this.secondaryKey = secondaryKey;
+    }
+
+    @JsonCreator
+    public static GameMessage create(
+            @JsonProperty("messageId") String messageId,
+            @JsonProperty("type") GameMessageType type,
+            @JsonProperty("factionsThatReacted") LinkedHashSet<String> factionsThatReacted,
+            @JsonProperty("gameSaveTime") long gameSaveTime,
+            @JsonProperty("secondaryKey") String secondaryKey,
+            @JsonProperty("info") Map<String, String> legacyInfo) {
+        return new GameMessage(
+                messageId,
+                type,
+                factionsThatReacted,
+                gameSaveTime,
+                secondaryKey != null ? secondaryKey : getLegacySecondaryKey(type, legacyInfo));
     }
 
     public String asJumpLink(TextChannel channel) {
         return String.format(Message.JUMP_URL, channel.getGuild().getId(), channel.getId(), messageId);
     }
 
-    public long getInfoAsLong(String key) {
-        String value = requireInfoValue(key);
-        try {
-            return Long.parseLong(value);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid long info value for key '" + key + "': " + value, e);
+    private static String getLegacySecondaryKey(GameMessageType type, Map<String, String> legacyInfo) {
+        if (type != GameMessageType.STRATEGY_CARD || legacyInfo == null) {
+            return null;
         }
-    }
-
-    public int getInfoAsInt(String key) {
-        String value = requireInfoValue(key);
-        try {
-            return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid int info value for key '" + key + "': " + value, e);
+        String round = legacyInfo.get("round");
+        String sc = legacyInfo.get("sc");
+        if (round == null || sc == null) {
+            return null;
         }
-    }
-
-    private String requireInfoValue(String key) {
-        String value = info.get(key);
-        if (value == null) {
-            throw new IllegalArgumentException("Missing info value for key '" + key + "'");
-        }
-        return value;
+        return round + "::" + sc;
     }
 }

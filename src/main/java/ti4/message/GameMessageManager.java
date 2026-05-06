@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -24,11 +23,11 @@ public class GameMessageManager {
     private static final String GAME_MESSAGES_FILE = "GameMessages.json";
 
     public static synchronized void add(String gameName, String messageId, GameMessageType type, long gameSaveTime) {
-        add(gameName, messageId, type, gameSaveTime, Map.of());
+        add(gameName, messageId, type, gameSaveTime, null);
     }
 
     public static synchronized void add(
-            String gameName, String messageId, GameMessageType type, long gameSaveTime, Map<String, String> info) {
+            String gameName, String messageId, GameMessageType type, long gameSaveTime, String secondaryKey) {
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             allGameMessages = new GameMessages(new HashMap<>());
@@ -40,18 +39,18 @@ public class GameMessageManager {
             return;
         }
 
-        messages.add(new GameMessage(messageId, type, new LinkedHashSet<>(), gameSaveTime, info));
+        messages.add(new GameMessage(messageId, type, new LinkedHashSet<>(), gameSaveTime, secondaryKey));
 
         persistFile(allGameMessages);
     }
 
     public static synchronized String replace(
             String gameName, String messageId, GameMessageType type, long gameSaveTime) {
-        return replace(gameName, messageId, type, gameSaveTime, Map.of());
+        return replace(gameName, messageId, type, gameSaveTime, null);
     }
 
     public static synchronized String replace(
-            String gameName, String messageId, GameMessageType type, long gameSaveTime, Map<String, String> info) {
+            String gameName, String messageId, GameMessageType type, long gameSaveTime, String secondaryKey) {
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             allGameMessages = new GameMessages(new HashMap<>());
@@ -70,7 +69,7 @@ public class GameMessageManager {
             messages.remove(oldMessage);
         }
 
-        messages.add(new GameMessage(messageId, type, new LinkedHashSet<>(), gameSaveTime, info));
+        messages.add(new GameMessage(messageId, type, new LinkedHashSet<>(), gameSaveTime, secondaryKey));
 
         persistFile(allGameMessages);
 

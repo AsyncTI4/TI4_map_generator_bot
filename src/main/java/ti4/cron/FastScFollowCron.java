@@ -75,7 +75,7 @@ public class FastScFollowCron {
                 }
                 long twelveHoursInMilliseconds = half * ONE_HOUR_IN_MILLISECONDS;
                 long twentyFourHoursInMilliseconds = twenty4 * ONE_HOUR_IN_MILLISECONDS;
-                long scPlayTime = scMessage.getInfoAsLong(StrategyCardMessageService.INFO_PLAYED_AT);
+                long scPlayTime = scMessage.gameSaveTime();
                 long timeDifference = System.currentTimeMillis() - scPlayTime;
                 String timesPinged = game.getStoredValue("scPlayPingCount" + sc + player.getFaction());
                 if (timeDifference > twelveHoursInMilliseconds

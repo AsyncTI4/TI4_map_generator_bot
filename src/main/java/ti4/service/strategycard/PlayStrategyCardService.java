@@ -594,7 +594,7 @@ public class PlayStrategyCardService {
             List<Button> scButtons,
             List<Player> playersToReact) {
         StrategyCardMessageService.replaceStrategyCardMessage(
-                game.getName(), message.getId(), playRound, scToPlay, playGameSaveTime, System.currentTimeMillis());
+                game.getName(), message.getId(), playRound, scToPlay, playGameSaveTime);
         for (Player reactingPlayer : playersToReact) {
             Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, reactingPlayer, message);
             message.addReaction(reactionEmoji).queue(Consumers.nop(), BotLogger::catchRestError);
