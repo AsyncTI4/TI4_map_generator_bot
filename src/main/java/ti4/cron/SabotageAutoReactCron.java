@@ -15,6 +15,7 @@ import ti4.game.persistence.ManagedGame;
 import ti4.helpers.discord.DiscordHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.service.actioncard.SabotageService;
@@ -40,11 +41,10 @@ public class SabotageAutoReactCron {
         if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running SabotageAutoReactCron.");
 
-        Map<String, List<GameMessageManager.GameMessage>> acMessagesByGame =
-                GameMessageManager.getAllByGame(GameMessageType.ACTION_CARD);
+        Map<String, List<GameMessage>> acMessagesByGame = GameMessageManager.getAllByGame(GameMessageType.ACTION_CARD);
 
         var gamesToRemove = new HashSet<String>();
-        for (Map.Entry<String, List<GameMessageManager.GameMessage>> entry : acMessagesByGame.entrySet()) {
+        for (Map.Entry<String, List<GameMessage>> entry : acMessagesByGame.entrySet()) {
             String gameName = entry.getKey();
 
             ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
@@ -55,7 +55,7 @@ public class SabotageAutoReactCron {
                         }
 
                         Game game = managedGame.getGame();
-                        List<GameMessageManager.GameMessage> acMessages = entry.getValue();
+                        List<GameMessage> acMessages = entry.getValue();
                         try {
                             automaticallyReactToSabotageWindows(game, acMessages);
                         } catch (Exception e) {
@@ -71,8 +71,7 @@ public class SabotageAutoReactCron {
         BotLogger.logCron("Finished SabotageAutoReactCron.");
     }
 
-    private static void automaticallyReactToSabotageWindows(
-            Game game, List<GameMessageManager.GameMessage> acMessages) {
+    private static void automaticallyReactToSabotageWindows(Game game, List<GameMessage> acMessages) {
         for (Player player : game.getRealPlayers()) {
             if (!playerShouldRandomlyReact(player, game)) {
                 continue;

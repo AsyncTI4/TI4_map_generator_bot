@@ -6,15 +6,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.json.PersistenceManager;
@@ -25,7 +24,7 @@ public class GameMessageManager {
 
     private static final String GAME_MESSAGES_FILE = "GameMessages.json";
 
-    public static synchronized void add(String gameName, String messageId, GameMessageType type, long gameSaveTime) {
+    public static synchronized void add(String gameName, GameMessage gameMessage) {
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             allGameMessages = new GameMessages(new HashMap<>());
@@ -33,17 +32,16 @@ public class GameMessageManager {
 
         List<GameMessage> messages =
                 allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
-        if (messages.stream().anyMatch(message -> message.messageId.equals(messageId))) {
+        if (messages.stream().anyMatch(message -> message.messageId().equals(gameMessage.messageId()))) {
             return;
         }
 
-        messages.add(new GameMessage(messageId, type, new LinkedHashSet<>(), gameSaveTime));
+        messages.add(gameMessage);
 
         persistFile(allGameMessages);
     }
 
-    public static synchronized String replace(
-            String gameName, String messageId, GameMessageType type, long gameSaveTime) {
+    public static synchronized String replace(String gameName, GameMessage gameMessage) {
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             allGameMessages = new GameMessages(new HashMap<>());
@@ -53,16 +51,17 @@ public class GameMessageManager {
                 allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
 
         String replacedMessageId = null;
-        if (!messages.isEmpty()) {
-            for (int i = 0; i < messages.size(); i++) {
-                GameMessage message = messages.get(i);
-                if (message.type == type) {
-                    replacedMessageId = messages.remove(i).messageId();
-                }
-            }
+        GameMessage oldMessage = messages.stream()
+                .filter(message ->
+                        message.type() == gameMessage.type() && Objects.equals(message.key(), gameMessage.key()))
+                .findFirst()
+                .orElse(null);
+        if (oldMessage != null) {
+            replacedMessageId = oldMessage.messageId();
+            messages.remove(oldMessage);
         }
 
-        messages.add(new GameMessage(messageId, type, new LinkedHashSet<>(), gameSaveTime));
+        messages.add(gameMessage);
 
         persistFile(allGameMessages);
 
@@ -93,12 +92,16 @@ public class GameMessageManager {
             return;
         }
 
-        messages.removeIf(message -> message.gameSaveTime > gameSaveTime);
+        messages.removeIf(message -> message.gameSaveTime() > gameSaveTime);
 
         persistFile(allGameMessages);
     }
 
     public static synchronized Optional<String> remove(String gameName, GameMessageType type) {
+        return remove(gameName, type, null);
+    }
+
+    public static synchronized Optional<String> remove(String gameName, GameMessageType type, @Nullable String key) {
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             return Optional.empty();
@@ -109,8 +112,10 @@ public class GameMessageManager {
             return Optional.empty();
         }
 
-        GameMessage message =
-                messages.stream().filter(m -> m.type == type).findFirst().orElse(null);
+        GameMessage message = messages.stream()
+                .filter(m -> m.type() == type && Objects.equals(m.key(), key))
+                .findFirst()
+                .orElse(null);
         if (message == null) {
             return Optional.empty();
         }
@@ -119,7 +124,7 @@ public class GameMessageManager {
 
         persistFile(allGameMessages);
 
-        return Optional.of(message.messageId);
+        return Optional.of(message.messageId());
     }
 
     public static synchronized void remove(String gameName, String messageId) {
@@ -133,17 +138,22 @@ public class GameMessageManager {
             return;
         }
 
-        messages.removeIf(message -> message.messageId.equals(messageId));
+        messages.removeIf(message -> message.messageId().equals(messageId));
 
         persistFile(allGameMessages);
     }
 
     public static synchronized Optional<GameMessage> getOne(String gameName, GameMessageType type) {
-        return getOne(gameName, message -> message.type == type);
+        return getOne(gameName, type, null);
+    }
+
+    public static synchronized Optional<GameMessage> getOne(
+            String gameName, GameMessageType type, @Nullable String key) {
+        return getOne(gameName, message -> message.type() == type && Objects.equals(message.key(), key));
     }
 
     public static synchronized Optional<GameMessage> getOne(String gameName, String messageId) {
-        return getOne(gameName, message -> message.messageId.equals(messageId));
+        return getOne(gameName, message -> message.messageId().equals(messageId));
     }
 
     private static synchronized Optional<GameMessage> getOne(String gameName, Predicate<GameMessage> filter) {
@@ -167,7 +177,7 @@ public class GameMessageManager {
         for (var entry : allGameMessages.gameNameToMessages.entrySet()) {
             List<GameMessage> filtered = null;
             for (GameMessage message : entry.getValue()) {
-                if (message.type == type) {
+                if (message.type() == type) {
                     if (filtered == null) {
                         filtered = new ArrayList<>();
                     }
@@ -201,13 +211,12 @@ public class GameMessageManager {
                 continue;
             }
 
-            boolean removedLegacyStatusEndMessages = removeLegacyStatusEndMessages(messages);
             int playerCount = game.getRealPlayers().size();
             long twoWeeksAgo = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(14);
             boolean removed = messages.removeIf(
                     msg -> (playerCount > 0 && msg.factionsThatReacted().size() >= playerCount)
                             || msg.gameSaveTime() <= twoWeeksAgo);
-            if (removedLegacyStatusEndMessages || removed) {
+            if (removed) {
                 removedMessages = true;
                 BotLogger.info("GameMessageCleanupCron removed GameMessages for " + gameName);
             }
@@ -225,11 +234,6 @@ public class GameMessageManager {
         }
     }
 
-    // Remove after STATUS_END has been removed from persisted GameMessages.
-    private static boolean removeLegacyStatusEndMessages(List<GameMessage> messages) {
-        return messages.removeIf(message -> message.type == GameMessageType.STATUS_END);
-    }
-
     public static synchronized List<GameMessage> getAll(String gameName, GameMessageType type) {
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
@@ -238,15 +242,19 @@ public class GameMessageManager {
 
         List<GameMessage> messages =
                 allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
-        return messages.stream().filter(m -> m.type == type).toList();
+        return messages.stream().filter(m -> m.type() == type).toList();
     }
 
     public static synchronized void addReaction(String gameName, String faction, GameMessageType type) {
-        addReaction(gameName, faction, message -> message.type == type);
+        addReaction(gameName, faction, type, null);
+    }
+
+    public static synchronized void addReaction(String gameName, String faction, GameMessageType type, String key) {
+        addReaction(gameName, faction, message -> message.type() == type && Objects.equals(message.key(), key));
     }
 
     public static synchronized void addReaction(String gameName, String faction, String messageId) {
-        addReaction(gameName, faction, message -> message.messageId.equals(messageId));
+        addReaction(gameName, faction, message -> message.messageId().equals(messageId));
     }
 
     private static void addReaction(String gameName, String faction, Predicate<GameMessage> filter) {
@@ -261,7 +269,7 @@ public class GameMessageManager {
         }
 
         messages.stream().filter(filter).findFirst().ifPresent(message -> {
-            message.factionsThatReacted.add(faction);
+            message.factionsThatReacted().add(faction);
             persistFile(allGameMessages);
         });
     }
@@ -286,11 +294,4 @@ public class GameMessageManager {
     }
 
     private record GameMessages(Map<String, List<GameMessage>> gameNameToMessages) {}
-
-    public record GameMessage(
-            String messageId, GameMessageType type, LinkedHashSet<String> factionsThatReacted, long gameSaveTime) {
-        public String asJumpLink(TextChannel channel) {
-            return String.format(Message.JUMP_URL, channel.getGuild().getId(), channel.getId(), messageId);
-        }
-    }
 }
