@@ -14,6 +14,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.RegexHelper;
 import ti4.image.Mapper;
+import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.StrategyCardModel;
@@ -94,8 +95,9 @@ public class MindsieveService {
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(naalu, sc, game, event);
                     naalu.addFollowedSC(sc, event);
 
-                    String messageID = game.getStoredValue("scPlayMsgID" + sc);
-                    ReactionService.addReaction(naalu, false, null, null, messageID, game);
+                    GameMessageManager.getStrategyCardMessage(game.getName(), game.getRound(), sc)
+                            .ifPresent(scMessage ->
+                                    ReactionService.addReaction(naalu, false, null, null, scMessage.messageId(), game));
 
                     MessageChannel scChannel = ButtonHelper.getSCFollowChannel(game, naalu, sc);
                     String msg = naalu.getRepresentationUnfogged() + " sent a promissory note to "

@@ -1,7 +1,6 @@
 package ti4.service.turn;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -368,10 +367,11 @@ public class StartTurnService {
 
             if (!player.hasFollowedSC(sc)) {
                 String msg = "> " + game.getSCEmojiWordRepresentation(sc);
-                String jumplink = game.getStoredValue("scPlay" + sc);
-                if (!jumplink.isEmpty()) {
-                    msg += " " + jumplink + "\n";
-                    Long id = Long.parseLong(Arrays.asList(jumplink.split("/")).getLast());
+                GameMessage scMessage = GameMessageManager.getStrategyCardMessage(game.getName(), game.getRound(), sc)
+                        .orElse(null);
+                if (scMessage != null) {
+                    msg += " " + scMessage.asJumpLink(game.getMainGameChannel()) + "\n";
+                    Long id = Long.parseLong(scMessage.messageId());
                     thingsToFollow.put(id, msg);
                 } else {
                     sb.append(msg).append('\n');
@@ -559,11 +559,12 @@ public class StartTurnService {
                             .append("** has been played and now it is their turn again and you haven't reacted.")
                             .append(" If you already reacted, check if your reaction got undone.");
 
-                    if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
-                        sb.append(" Message link is: ")
-                                .append(game.getStoredValue("scPlay" + sc))
-                                .append(".\n");
-                    }
+                    GameMessageManager.getStrategyCardMessage(game.getName(), game.getRound(), sc)
+                            .ifPresent(scMessage -> {
+                                sb.append(" Message link is: ")
+                                        .append(scMessage.asJumpLink(game.getMainGameChannel()))
+                                        .append(".\n");
+                            });
                     sb.append("You currently have ")
                             .append(p2.getStrategicCC())
                             .append(" command token")

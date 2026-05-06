@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.AgendaHelper;
@@ -197,6 +198,8 @@ public class ReactionService {
             handleAllPlayersReactingNoAfters(message, game);
         } else if (gameMessage.type() == GameMessageType.AGENDA_WHEN) {
             handleAllPlayersReactingNoWhens(message, game);
+        } else if (gameMessage.type() == GameMessageType.STRATEGY_CARD) {
+            handleAllPlayersReactingToStrategyCard(message, game);
         } else {
             handleAllPlayersReactingNoSabotage(message, game, gameMessage);
         }
@@ -217,6 +220,15 @@ public class ReactionService {
         var gameMessage =
                 GameMessageManager.getOne(game.getName(), message.getId()).orElse(null);
         handleAllPlayersReactingNoSabotage(message, game, gameMessage);
+    }
+
+    public static void handleAllPlayersReactingToStrategyCard(Message message, Game game) {
+        String response = "All players have reacted to this strategy card.";
+        DiscordChannelUtility.retrieveThreadChannelById(message.getGuild(), message.getId())
+                .queue(
+                        thread -> thread.sendMessage(response).queueAfter(10, TimeUnit.SECONDS),
+                        error -> message.reply(response).queueAfter(1, TimeUnit.SECONDS));
+        GameMessageManager.remove(game.getName(), message.getId());
     }
 
     private static void handleAllPlayersReactingNoSabotage(Message message, Game game, GameMessage gameMessage) {

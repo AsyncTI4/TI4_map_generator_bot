@@ -14,6 +14,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.message.GameMessage;
+import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 import ti4.service.button.ReactionService;
@@ -60,8 +62,9 @@ public class FastScFollowCron {
             for (int sc : game.getPlayedSCsInOrder(player)) {
                 if (player.hasFollowedSC(sc)) continue;
 
-                String scTime = game.getStoredValue("scPlayMsgTime" + game.getRound() + sc);
-                if (scTime.isEmpty()) continue;
+                GameMessage scMessage = GameMessageManager.getStrategyCardMessage(game.getName(), game.getRound(), sc)
+                        .orElse(null);
+                if (scMessage == null) continue;
 
                 int twenty4 = 24;
                 int half = 12;
@@ -71,7 +74,7 @@ public class FastScFollowCron {
                 }
                 long twelveHoursInMilliseconds = half * ONE_HOUR_IN_MILLISECONDS;
                 long twentyFourHoursInMilliseconds = twenty4 * ONE_HOUR_IN_MILLISECONDS;
-                long scPlayTime = Long.parseLong(scTime);
+                long scPlayTime = scMessage.getInfoAsLong("playedAt");
                 long timeDifference = System.currentTimeMillis() - scPlayTime;
                 String timesPinged = game.getStoredValue("scPlayPingCount" + sc + player.getFaction());
                 if (timeDifference > twelveHoursInMilliseconds
@@ -84,7 +87,7 @@ public class FastScFollowCron {
                             .append(
                                     " has been played and now it has been half the allotted time and you haven't reacted. Please do so, or after another")
                             .append(" half you will be marked as not following.");
-                    appendScMessages(game, player, sc, sb);
+                    appendScMessages(game, player, scMessage, sb);
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "1");
                 }
                 if (timeDifference > twentyFourHoursInMilliseconds && !"2".equalsIgnoreCase(timesPinged)) {
@@ -94,8 +97,7 @@ public class FastScFollowCron {
                     ButtonHelper.sendMessageToRightStratThread(player, game, message, ButtonHelper.getStratName(sc));
                     player.addFollowedSC(sc);
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "2");
-                    String messageID = game.getStoredValue("scPlayMsgID" + sc);
-                    ReactionService.addReaction(player, true, "not following.", "", messageID, game);
+                    ReactionService.addReaction(player, true, "not following.", "", scMessage.messageId(), game);
 
                     StrategyCardModel scModel =
                             game.getStrategyCardModelByInitiative(sc).orElse(null);
@@ -107,10 +109,10 @@ public class FastScFollowCron {
         }
     }
 
-    private static void appendScMessages(Game game, Player player, int sc, StringBuilder sb) {
-        if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
+    private static void appendScMessages(Game game, Player player, GameMessage scMessage, StringBuilder sb) {
+        if (scMessage != null) {
             sb.append("Message link is: ")
-                    .append(game.getStoredValue("scPlay" + sc))
+                    .append(scMessage.asJumpLink(game.getMainGameChannel()))
                     .append('\n');
         }
         sb.append("You currently have ")

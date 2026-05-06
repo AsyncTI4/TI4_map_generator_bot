@@ -45,4 +45,18 @@ class GameMessageManagerTest {
 
         assertThat(json).doesNotContain("\"info\"");
     }
+
+    @Test
+    void strategyCardGameMessageMatchesRoundAndScFromInfo() {
+        GameMessage gameMessage = new GameMessage(
+                "999",
+                GameMessageType.STRATEGY_CARD,
+                new LinkedHashSet<>(),
+                123L,
+                Map.of("round", "4", "sc", "8", "playedAt", "456"));
+
+        assertThat(gameMessage.isStrategyCard(4, 8)).isTrue();
+        assertThat(gameMessage.isStrategyCard(4, 7)).isFalse();
+        assertThat(gameMessage.getInfoAsLong("playedAt")).isEqualTo(456L);
+    }
 }
