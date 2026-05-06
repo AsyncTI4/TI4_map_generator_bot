@@ -8,7 +8,7 @@ import ti4.json.JsonMapperManager;
 class GameMessageTypeTest {
 
     @Test
-    void testLegacyStatusEndDeserializes() {
+    void testLegacyStatusEndDeserializes() throws Exception {
         GameMessageType restored = JsonMapperManager.basic().readValue("\"STATUS_END\"", GameMessageType.class);
 
         assertEquals(GameMessageType.STATUS_END, restored);
