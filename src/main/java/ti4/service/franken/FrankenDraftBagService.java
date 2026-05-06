@@ -39,8 +39,8 @@ import ti4.helpers.discord.ContainerHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
-import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
+import ti4.message.GameMessageManager.GameMessage;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
@@ -543,6 +543,6 @@ public class FrankenDraftBagService {
         long date = game.getLastModifiedDate();
         return game.getActionsChannel()
                 .sendMessage(msg)
-                .onSuccess(m -> GameMessageManager.replace(name, new GameMessage(m.getId(), type, date)));
+                .onSuccess(m -> GameMessageManager.replace(name, m.getId(), type, date));
     }
 }

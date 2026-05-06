@@ -12,7 +12,6 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
-import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.model.LeaderModel;
@@ -201,7 +200,7 @@ public class SabotageService {
 
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {
         var gameMessages = GameMessageManager.getAll(game.getName(), GameMessageType.ACTION_CARD);
-        for (GameMessage gameMessage : gameMessages) {
+        for (GameMessageManager.GameMessage gameMessage : gameMessages) {
             if (ReactionService.checkForSpecificPlayerReact(gameMessage.messageId(), player, game)) continue;
 
             game.getMainGameChannel()

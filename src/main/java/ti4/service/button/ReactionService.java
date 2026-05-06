@@ -12,13 +12,11 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Helper;
 import ti4.logging.BotLogger;
-import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
@@ -28,8 +26,6 @@ import ti4.service.fow.GMService;
 public class ReactionService {
 
     private static final Pattern CARDS_PATTERN = Pattern.compile("card\\s(.*)");
-    private static final long STRATEGY_CARD_FALLBACK_REPLY_DELAY_SECONDS = 1;
-    private static final long STRATEGY_CARD_THREAD_REPLY_DELAY_SECONDS = 10;
 
     public static void addReaction(
             ButtonInteractionEvent event,
@@ -181,7 +177,7 @@ public class ReactionService {
                 .ifPresent(gameMessage -> progressGameIfAllPlayersHaveReacted(gameMessage, game));
     }
 
-    private static void progressGameIfAllPlayersHaveReacted(GameMessage gameMessage, Game game) {
+    private static void progressGameIfAllPlayersHaveReacted(GameMessageManager.GameMessage gameMessage, Game game) {
         int matchingFactionReactions = 0;
         for (Player player : game.getRealPlayers()) {
             if (gameMessage.factionsThatReacted().contains(player.getFaction())) {
@@ -200,8 +196,6 @@ public class ReactionService {
             handleAllPlayersReactingNoAfters(message, game);
         } else if (gameMessage.type() == GameMessageType.AGENDA_WHEN) {
             handleAllPlayersReactingNoWhens(message, game);
-        } else if (gameMessage.type() == GameMessageType.STRATEGY_CARD) {
-            handleAllPlayersReactingToStrategyCard(message, game);
         } else {
             handleAllPlayersReactingNoSabotage(message, game, gameMessage);
         }
@@ -224,18 +218,8 @@ public class ReactionService {
         handleAllPlayersReactingNoSabotage(message, game, gameMessage);
     }
 
-    public static void handleAllPlayersReactingToStrategyCard(Message message, Game game) {
-        String response = "All players have reacted to this strategy card.";
-        DiscordChannelUtility.retrieveThreadChannelById(message.getGuild(), message.getId())
-                .queue(
-                        thread -> thread.sendMessage(response)
-                                .queueAfter(STRATEGY_CARD_THREAD_REPLY_DELAY_SECONDS, TimeUnit.SECONDS),
-                        error -> message.reply(response)
-                                .queueAfter(STRATEGY_CARD_FALLBACK_REPLY_DELAY_SECONDS, TimeUnit.SECONDS));
-        GameMessageManager.remove(game.getName(), message.getId());
-    }
-
-    private static void handleAllPlayersReactingNoSabotage(Message message, Game game, GameMessage gameMessage) {
+    private static void handleAllPlayersReactingNoSabotage(
+            Message message, Game game, GameMessageManager.GameMessage gameMessage) {
         Matcher acToReact = CARDS_PATTERN.matcher(message.getContentRaw());
         String msg2 =
                 "All players have indicated \"No Sabotage\"" + (acToReact.find() ? " to " + acToReact.group(1) : "");
@@ -255,7 +239,7 @@ public class ReactionService {
         GameMessageManager.remove(game.getName(), message.getId());
     }
 
-    private static boolean checkForSpecificPlayerReact(Player player, GameMessage gameMessage) {
+    private static boolean checkForSpecificPlayerReact(Player player, GameMessageManager.GameMessage gameMessage) {
         return gameMessage.factionsThatReacted().contains(player.getFaction());
     }
 
