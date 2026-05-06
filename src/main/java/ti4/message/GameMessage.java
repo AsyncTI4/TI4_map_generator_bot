@@ -37,11 +37,25 @@ public record GameMessage(
 
     public long getInfoAsLong(String key) {
         String value = info.get(key);
-        return value == null ? 0L : Long.parseLong(value);
+        if (value == null) {
+            return 0L;
+        }
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid long info value for key '" + key + "': " + value, e);
+        }
     }
 
     public int getInfoAsInt(String key) {
         String value = info.get(key);
-        return value == null ? 0 : Integer.parseInt(value);
+        if (value == null) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid int info value for key '" + key + "': " + value, e);
+        }
     }
 }

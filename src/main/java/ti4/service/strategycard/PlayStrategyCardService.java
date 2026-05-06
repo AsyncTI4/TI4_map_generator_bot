@@ -579,7 +579,7 @@ public class PlayStrategyCardService {
                                 playGameSaveTime,
                                 scModel,
                                 scButtons,
-                                playersToReact),
+                                List.copyOf(playersToReact)),
                         BotLogger::catchRestError);
     }
 

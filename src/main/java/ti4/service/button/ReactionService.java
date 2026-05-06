@@ -28,6 +28,7 @@ import ti4.service.fow.GMService;
 public class ReactionService {
 
     private static final Pattern CARDS_PATTERN = Pattern.compile("card\\s(.*)");
+    private static final long STRATEGY_CARD_FALLBACK_REPLY_DELAY_SECONDS = 1;
     private static final long STRATEGY_CARD_THREAD_REPLY_DELAY_SECONDS = 10;
 
     public static void addReaction(
@@ -229,7 +230,8 @@ public class ReactionService {
                 .queue(
                         thread -> thread.sendMessage(response)
                                 .queueAfter(STRATEGY_CARD_THREAD_REPLY_DELAY_SECONDS, TimeUnit.SECONDS),
-                        error -> message.reply(response).queueAfter(1, TimeUnit.SECONDS));
+                        error -> message.reply(response)
+                                .queueAfter(STRATEGY_CARD_FALLBACK_REPLY_DELAY_SECONDS, TimeUnit.SECONDS));
         GameMessageManager.remove(game.getName(), message.getId());
     }
 
