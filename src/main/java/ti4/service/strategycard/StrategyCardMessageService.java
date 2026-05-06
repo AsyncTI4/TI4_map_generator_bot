@@ -17,10 +17,12 @@ public class StrategyCardMessageService {
                 .findFirst();
     }
 
-    public static void replaceStrategyCardMessage(String gameName, String messageId, int round, int sc, long gameSaveTime) {
+    public static void replaceStrategyCardMessage(
+            String gameName, String messageId, int round, int sc, long gameSaveTime) {
         getStrategyCardMessage(gameName, round, sc)
                 .ifPresent(message -> GameMessageManager.remove(gameName, message.messageId()));
-        GameMessageManager.add(gameName, messageId, GameMessageType.STRATEGY_CARD, gameSaveTime, getSecondaryKey(round, sc));
+        GameMessageManager.add(
+                gameName, messageId, GameMessageType.STRATEGY_CARD, gameSaveTime, getSecondaryKey(round, sc));
     }
 
     public static String getSecondaryKey(int round, int sc) {

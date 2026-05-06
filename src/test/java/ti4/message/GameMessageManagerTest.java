@@ -67,8 +67,8 @@ class GameMessageManagerTest {
 
     @Test
     void gameMessageKeepsExplicitSecondaryKey() {
-        GameMessage gameMessage = new GameMessage(
-                "999", GameMessageType.STRATEGY_CARD, new LinkedHashSet<>(), 123L, "4::8");
+        GameMessage gameMessage =
+                new GameMessage("999", GameMessageType.STRATEGY_CARD, new LinkedHashSet<>(), 123L, "4::8");
 
         assertThat(gameMessage.secondaryKey()).isEqualTo("4::8");
         assertThat(gameMessage.gameSaveTime()).isEqualTo(123L);
