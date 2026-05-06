@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,11 @@ public class GameMessageManager {
     private static final String GAME_MESSAGES_FILE = "GameMessages.json";
 
     public static synchronized void add(String gameName, String messageId, GameMessageType type, long gameSaveTime) {
+        add(gameName, messageId, type, gameSaveTime, Map.of());
+    }
+
+    public static synchronized void add(
+            String gameName, String messageId, GameMessageType type, long gameSaveTime, Map<String, String> info) {
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             allGameMessages = new GameMessages(new HashMap<>());
@@ -37,13 +43,18 @@ public class GameMessageManager {
             return;
         }
 
-        messages.add(new GameMessage(messageId, type, new LinkedHashSet<>(), gameSaveTime));
+        messages.add(new GameMessage(messageId, type, new LinkedHashSet<>(), gameSaveTime, info));
 
         persistFile(allGameMessages);
     }
 
     public static synchronized String replace(
             String gameName, String messageId, GameMessageType type, long gameSaveTime) {
+        return replace(gameName, messageId, type, gameSaveTime, Map.of());
+    }
+
+    public static synchronized String replace(
+            String gameName, String messageId, GameMessageType type, long gameSaveTime, Map<String, String> info) {
         GameMessages allGameMessages = readFile();
         if (allGameMessages == null) {
             allGameMessages = new GameMessages(new HashMap<>());
@@ -62,7 +73,7 @@ public class GameMessageManager {
             }
         }
 
-        messages.add(new GameMessage(messageId, type, new LinkedHashSet<>(), gameSaveTime));
+        messages.add(new GameMessage(messageId, type, new LinkedHashSet<>(), gameSaveTime, info));
 
         persistFile(allGameMessages);
 
@@ -281,7 +292,25 @@ public class GameMessageManager {
     private record GameMessages(Map<String, List<GameMessage>> gameNameToMessages) {}
 
     public record GameMessage(
-            String messageId, GameMessageType type, LinkedHashSet<String> factionsThatReacted, long gameSaveTime) {
+            String messageId,
+            GameMessageType type,
+            LinkedHashSet<String> factionsThatReacted,
+            long gameSaveTime,
+            Map<String, String> info) {
+        public GameMessage(
+                String messageId,
+                GameMessageType type,
+                LinkedHashSet<String> factionsThatReacted,
+                long gameSaveTime,
+                Map<String, String> info) {
+            this.messageId = messageId;
+            this.type = type;
+            this.factionsThatReacted =
+                    factionsThatReacted == null ? new LinkedHashSet<>() : new LinkedHashSet<>(factionsThatReacted);
+            this.gameSaveTime = gameSaveTime;
+            this.info = info == null ? new LinkedHashMap<>() : new LinkedHashMap<>(info);
+        }
+
         public String asJumpLink(TextChannel channel) {
             return String.format(Message.JUMP_URL, channel.getGuild().getId(), channel.getId(), messageId);
         }
