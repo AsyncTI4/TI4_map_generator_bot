@@ -10,6 +10,7 @@ public enum GameMessageType {
     COMMAND_EVIDENCE,
     BAG_DRAFT,
     STATUS_SCORING,
+    @Deprecated(since = "STATUS_SCORING")
     STATUS_END,
     VISIONARIA
 }
