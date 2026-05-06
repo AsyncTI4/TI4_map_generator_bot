@@ -100,7 +100,8 @@
         "requirements": "YY",
         "faction": "onyxxa",
         "source": "balacasi",
-        "text": "Once per action, when you would spend a token from your strategy pool to resolve the primary or secondary ability of a strategy card, you may destroy 1 of your non-fighter ships in or adjacent to a system that contains the active player's units. If you do, spend that token from your reinforcements instead."
+        "text": "Once per action, when you would spend a token from your strategy pool to resolve the primary or secondary ability of a strategy card, you may destroy 1 of your non-fighter ships in or adjacent to a system that contains the active player's units. If you do, spend that token from your reinforcements instead.",
+        "notes": "This can also be used on your own SC."
     },
     {
         "alias": "baconcg",
