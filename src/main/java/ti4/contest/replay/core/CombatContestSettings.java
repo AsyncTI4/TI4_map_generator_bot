@@ -203,13 +203,13 @@ public class CombatContestSettings {
     @Setter
     public static class CandidateSelection {
         private Window window = new Window();
-        private int targetCandidatesPerHour = 16;
+        private int targetCandidatesPerHour = 4;
     }
 
     @Getter
     @Setter
     public static class Window {
-        private int lookbackMinutes = 1440;
+        private int lookbackMinutes = 480;
         private int refreshCronIntervalSeconds = 300;
     }
 
@@ -289,10 +289,10 @@ public class CombatContestSettings {
     @Setter
     public static class Mentak {
         private int previewLeadSeconds = 5 * 60;
-        private int destroyerDecoyFavorCost = 30;
-        private int cruiserDecoyFavorCost = 40;
-        private int dreadnoughtDecoyFavorCost = 60;
-        private int warSunDecoyFavorCost = 80;
+        private int destroyerDecoyFavorCost = 20;
+        private int cruiserDecoyFavorCost = 30;
+        private int dreadnoughtDecoyFavorCost = 40;
+        private int warSunDecoyFavorCost = 70;
     }
 
     @Getter
@@ -303,14 +303,14 @@ public class CombatContestSettings {
         private int baseCombatFavorGain = 20;
         private int marketMakerPointsPerBet = 2;
         private int lowTradeConvoysFavorCost = 10;
-        private int lowTradeConvoysPredictionBonus = 10;
+        private int lowTradeConvoysPredictionBonus = 9;
         private int mediumTradeConvoysFavorCost = 20;
-        private int mediumTradeConvoysPredictionBonus = 16;
+        private int mediumTradeConvoysPredictionBonus = 14;
         private int highTradeConvoysFavorCost = 30;
-        private int highTradeConvoysPredictionBonus = 22;
+        private int highTradeConvoysPredictionBonus = 19;
         private int veryHighTradeConvoysFavorCost = 40;
-        private int veryHighTradeConvoysPredictionBonus = 29;
+        private int veryHighTradeConvoysPredictionBonus = 25;
         private int maximumTradeConvoysFavorCost = 50;
-        private int maximumTradeConvoysPredictionBonus = 36;
+        private int maximumTradeConvoysPredictionBonus = 31;
     }
 }

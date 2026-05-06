@@ -12,6 +12,28 @@ import ti4.spring.context.SpringContext;
 @UtilityClass
 public class CombatReplayMentakAbilityButtonHandler {
 
+    @ButtonHandler(CombatReplayMentakAbilityService.MENTAK_PREDICTION_PREFIX)
+    public static void handleMentakPrediction(ButtonInteractionEvent event, String buttonId) {
+        CombatReplayMentakAbilityService service = SpringContext.getBean(CombatReplayMentakAbilityService.class);
+        if (!service.userHasHouse(event.getUser().getId())) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Only Mentak Delegation may seal pirate wagers.");
+            return;
+        }
+
+        PredictionRequest request = parsePrediction(buttonId);
+        if (request == null) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not read the Mentak prediction.");
+            return;
+        }
+
+        CombatReplayInteractionResult result = service.votePredictionOverride(
+                request.contestId(),
+                request.predictedFaction(),
+                event.getUser().getId(),
+                event.getUser().getName());
+        MessageHelper.sendEphemeralMessageToEventChannel(event, result.message());
+    }
+
     @ButtonHandler(CombatReplayMentakAbilityService.MENTAK_MANAGE_VOTE_PREFIX)
     public static void handleManageMentakVote(ButtonInteractionEvent event, String buttonId) {
         CombatReplayMentakAbilityService service = SpringContext.getBean(CombatReplayMentakAbilityService.class);
@@ -49,23 +71,36 @@ public class CombatReplayMentakAbilityButtonHandler {
             return;
         }
 
+        if (request.count() == null) {
+            service.sendEphemeralQuantityControls(
+                    event, request.candidateId(), request.targetFaction(), request.unitType());
+            return;
+        }
+
         CombatReplayInteractionResult result = service.voteDecoy(
                 request.candidateId(),
                 request.targetFaction(),
                 request.unitType(),
+                request.count(),
                 event.getUser().getId(),
                 event.getUser().getName());
         MessageHelper.sendEphemeralMessageToEventChannel(event, result.message());
     }
 
     private static DecoyRequest parse(String buttonId) {
-        String request = buttonId.replace(CombatReplayMentakAbilityService.MENTAK_DECOY_PREFIX, "");
-        String[] parts = request.split("_", 3);
-        if (parts.length != 3) return null;
+        boolean quantityRequest = buttonId.startsWith(CombatReplayMentakAbilityService.MENTAK_DECOY_QUANTITY_PREFIX);
+        String request = buttonId.replace(
+                quantityRequest
+                        ? CombatReplayMentakAbilityService.MENTAK_DECOY_QUANTITY_PREFIX
+                        : CombatReplayMentakAbilityService.MENTAK_DECOY_PREFIX,
+                "");
+        String[] parts = request.split("_", quantityRequest ? 4 : 3);
+        if (parts.length != (quantityRequest ? 4 : 3)) return null;
         try {
             UnitType unitType = Units.findUnitType(parts[2]);
             if (unitType == null) return null;
-            return new DecoyRequest(Long.parseLong(parts[0]), parts[1], unitType);
+            Integer count = quantityRequest ? Integer.parseInt(parts[3]) : null;
+            return new DecoyRequest(Long.parseLong(parts[0]), parts[1], unitType, count);
         } catch (NumberFormatException e) {
             return null;
         }
@@ -80,5 +115,18 @@ public class CombatReplayMentakAbilityButtonHandler {
         }
     }
 
-    private record DecoyRequest(long candidateId, String targetFaction, UnitType unitType) {}
+    private static PredictionRequest parsePrediction(String buttonId) {
+        String request = buttonId.replace(CombatReplayMentakAbilityService.MENTAK_PREDICTION_PREFIX, "");
+        String[] parts = request.split("_", 2);
+        if (parts.length != 2) return null;
+        try {
+            return new PredictionRequest(Long.parseLong(parts[0]), parts[1]);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private record DecoyRequest(long candidateId, String targetFaction, UnitType unitType, Integer count) {}
+
+    private record PredictionRequest(long contestId, String predictedFaction) {}
 }

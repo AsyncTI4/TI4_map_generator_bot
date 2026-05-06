@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -199,6 +200,28 @@ class CombatReplayServiceTest {
 
         assertFalse(service.isTrackedCandidateRoll(game, attacker, defender, tile, CombatRollType.bombardment));
         assertFalse(service.isTrackedCandidateRoll(game, attacker, outsider, tile, CombatRollType.combatround));
+    }
+
+    @Test
+    void doesNotTrackDiscordantStarsCombatsEvenWhenTrackAllIsEnabled() {
+        CombatContestSettings settings = new CombatContestSettings();
+        settings.getRuntime().setTrackAllCombatsAsCandidates(true);
+        CombatObservationRepository observationRepository = mock(CombatObservationRepository.class);
+        CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
+        CombatReplayService service = new CombatReplayService(
+                settings,
+                observationRepository,
+                candidateRepository,
+                mock(CombatCandidateEventRepository.class),
+                mock(CombatReplayEventAppender.class),
+                mock(CombatReplaySideBetTriggerService.class),
+                mock(CombatSideBetAvailabilityService.class));
+        Game game = game("pbd-discordant-stars");
+        game.setDiscordantStarsMode(true);
+
+        service.onSpaceCombatStarted(game, player(game, "rohdhna"), player(game, "khrask"), new Tile("d31", "317"));
+
+        verifyNoInteractions(observationRepository, candidateRepository);
     }
 
     private CombatReplayService service(CombatCandidateRepository candidateRepository) {
