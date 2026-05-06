@@ -1,8 +1,6 @@
 package ti4.contest.replay.house.hacan;
 
-import java.util.List;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.contest.replay.house.hacan.CombatReplayHacanTradeConvoysService.ParsedTradeConvoysButton;
 import ti4.contest.replay.service.CombatReplayInteractionResult;
@@ -19,15 +17,10 @@ public class CombatReplayHacanTradeConvoysButtonHandler {
             ParsedTradeConvoysButton parsed = CombatReplayHacanTradeConvoysService.parseButtonId(buttonId);
             CombatReplayHacanTradeConvoysService service =
                     SpringContext.getBean(CombatReplayHacanTradeConvoysService.class);
-            CombatReplayInteractionResult result = service.recordTradeConvoysVote(event, parsed);
-            List<Button> sendNowButtons = service.sendNowButtons(parsed, event);
-            if (sendNowButtons.isEmpty()) {
-                MessageHelper.sendEphemeralMessageToEventChannel(event, result.message());
-            } else {
-                MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, result.message(), sendNowButtons);
-            }
+            CombatReplayInteractionResult result = service.sendTradeConvoysNow(event, parsed);
+            MessageHelper.sendEphemeralMessageToEventChannel(event, result.message());
         } catch (IllegalArgumentException e) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not read that Hacan Trade Convoys vote.");
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not read that Hacan Trade Convoys request.");
         }
     }
 
