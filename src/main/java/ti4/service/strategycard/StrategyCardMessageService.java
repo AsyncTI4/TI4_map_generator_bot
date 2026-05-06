@@ -22,13 +22,20 @@ public class StrategyCardMessageService {
 
     public static void replaceStrategyCardMessage(
             String gameName, String messageId, int round, int sc, long gameSaveTime, long playedAt) {
-        getStrategyCardMessage(gameName, round, sc).ifPresent(message -> GameMessageManager.remove(gameName, message.messageId()));
+        getStrategyCardMessage(gameName, round, sc)
+                .ifPresent(message -> GameMessageManager.remove(gameName, message.messageId()));
         GameMessageManager.add(
                 gameName,
                 messageId,
                 GameMessageType.STRATEGY_CARD,
                 gameSaveTime,
-                Map.of(INFO_ROUND, Integer.toString(round), INFO_SC, Integer.toString(sc), INFO_PLAYED_AT, Long.toString(playedAt)));
+                Map.of(
+                        INFO_ROUND,
+                        Integer.toString(round),
+                        INFO_SC,
+                        Integer.toString(sc),
+                        INFO_PLAYED_AT,
+                        Long.toString(playedAt)));
     }
 
     private static boolean isStrategyCardMessage(GameMessage message, int round, int sc) {

@@ -62,7 +62,8 @@ public class FastScFollowCron {
             for (int sc : game.getPlayedSCsInOrder(player)) {
                 if (player.hasFollowedSC(sc)) continue;
 
-                GameMessage scMessage = StrategyCardMessageService.getStrategyCardMessage(game.getName(), game.getRound(), sc)
+                GameMessage scMessage = StrategyCardMessageService.getStrategyCardMessage(
+                                game.getName(), game.getRound(), sc)
                         .orElse(null);
                 if (scMessage == null) continue;
 

@@ -61,8 +61,10 @@ public class GameMessageManager {
                 allGameMessages.gameNameToMessages.computeIfAbsent(gameName, _ -> new ArrayList<>());
 
         String replacedMessageId = null;
-        GameMessage oldMessage =
-                messages.stream().filter(message -> message.type() == type).findFirst().orElse(null);
+        GameMessage oldMessage = messages.stream()
+                .filter(message -> message.type() == type)
+                .findFirst()
+                .orElse(null);
         if (oldMessage != null) {
             replacedMessageId = oldMessage.messageId();
             messages.remove(oldMessage);

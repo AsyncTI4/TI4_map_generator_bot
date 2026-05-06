@@ -50,6 +50,7 @@ import ti4.service.fow.WhisperService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.service.strategycard.StrategyCardMessageService;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -367,7 +368,8 @@ public class StartTurnService {
 
             if (!player.hasFollowedSC(sc)) {
                 String msg = "> " + game.getSCEmojiWordRepresentation(sc);
-                GameMessage scMessage = StrategyCardMessageService.getStrategyCardMessage(game.getName(), game.getRound(), sc)
+                GameMessage scMessage = StrategyCardMessageService.getStrategyCardMessage(
+                                game.getName(), game.getRound(), sc)
                         .orElse(null);
                 if (scMessage != null) {
                     msg += " " + scMessage.asJumpLink(game.getMainGameChannel()) + "\n";
