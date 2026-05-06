@@ -136,7 +136,7 @@ public final class FOWPlusService {
         return new Tile(VOID_TILEID, position);
     }
 
-    @ButtonHandler("blindTileSelection~MDL")
+    @ButtonHandler(value = "blindTileSelection~MDL", save = false)
     public static void offerBlindActivation(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         TextInput position = TextInput.create(Constants.POSITION, TextInputStyle.SHORT)
                 .setRequired(true)
@@ -194,11 +194,11 @@ public final class FOWPlusService {
         for (Button button : new ArrayList<>(ringButtons)) {
             if (button.getLabel().startsWith("Ring #")) {
                 String ring = button.getLabel().replace("Ring #", "");
-                int leftSize = ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_left")
+                int leftSize = ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_left", visiblePositions)
                         .size();
-                int rightSize = ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_right")
+                int rightSize = ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_right", visiblePositions)
                         .size();
-                int availableTiles = leftSize + rightSize - 2;
+                int availableTiles = Math.max(0, leftSize - 2) + Math.max(0, rightSize - 2);
                 if (availableTiles == 0) {
                     ringButtons.remove(button);
                 }

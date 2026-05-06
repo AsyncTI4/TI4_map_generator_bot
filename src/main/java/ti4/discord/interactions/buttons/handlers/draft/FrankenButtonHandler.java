@@ -126,7 +126,7 @@ public class FrankenButtonHandler {
         }
     }
 
-    @ButtonHandler("factionEmbedRefresh")
+    @ButtonHandler(value = "factionEmbedRefresh", save = false)
     private static void factionEmbedRefresh(ButtonInteractionEvent event, Player player) {
         Container container = FrankenDraftBagService.getFrankenPlayerSummaryContainer(player);
 
