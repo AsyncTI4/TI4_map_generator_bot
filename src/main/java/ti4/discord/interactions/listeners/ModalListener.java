@@ -39,7 +39,7 @@ public final class ModalListener extends ListenerAdapter {
     }
 
     private ModalListener() {
-        registry = AnnotationHandler.findKnownHandlers(ModalContext.class, ModalHandler.class);
+        registry = AnnotationHandler.buildHandlerRegistry(ModalContext.class, ModalHandler.class);
     }
 
     @Override

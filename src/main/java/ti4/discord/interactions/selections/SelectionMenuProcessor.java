@@ -22,7 +22,7 @@ import ti4.spring.context.SpringContext;
 public final class SelectionMenuProcessor {
 
     private static final HandlerRegistry<SelectionMenuContext> registry =
-            AnnotationHandler.findKnownHandlers(SelectionMenuContext.class, SelectionHandler.class);
+            AnnotationHandler.buildHandlerRegistry(SelectionMenuContext.class, SelectionHandler.class);
 
     public static void checkSelectionMenuHandlersSetup() {
         if (registry.getSize() == 0) {

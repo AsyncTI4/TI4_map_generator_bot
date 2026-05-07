@@ -46,7 +46,7 @@ import ti4.spring.context.SpringContext;
 public class ButtonProcessor {
 
     private static final HandlerRegistry<ButtonContext> registry =
-            AnnotationHandler.findKnownHandlers(ButtonContext.class, ButtonHandler.class);
+            AnnotationHandler.buildHandlerRegistry(ButtonContext.class, ButtonHandler.class);
     private static final ButtonRuntimeWarningService runtimeWarningService = new ButtonRuntimeWarningService();
 
     public static void checkButtonHandlersSetup() {

@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
-import org.jspecify.annotations.NonNull;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
@@ -260,7 +259,7 @@ public class AnnotationHandler {
      * @param handlerClass Which handler annotation to look for
      * @return A {@link HandlerRegistry} mapping component-ID prefixes to Handler instances.
      */
-    public static <C extends ListenerContext, H extends Annotation> HandlerRegistry<C> findKnownHandlers(
+    public static <C extends ListenerContext, H extends Annotation> HandlerRegistry<C> buildHandlerRegistry(
             Class<C> contextClass, Class<H> handlerClass) {
         try {
             if (!handlers().contains(handlerClass)) {
@@ -274,7 +273,8 @@ public class AnnotationHandler {
                 return new HandlerRegistry<>();
             }
 
-            HandlerRegistry<C> handlerRegistry = buildHandlerRegistry(contextClass, handlerClass);
+            var handlerRegistry = new HandlerRegistry<C>();
+            registerHandlers(contextClass, handlerClass, handlerRegistry);
             BotLogger.info("Registered " + handlerRegistry.getSize() + " handlers of type " + handlerClass.getName());
             return handlerRegistry;
         } catch (SecurityException e) {
@@ -285,9 +285,8 @@ public class AnnotationHandler {
         return new HandlerRegistry<>();
     }
 
-    private static <C extends ListenerContext, H extends Annotation> @NonNull HandlerRegistry<C> buildHandlerRegistry(
-            Class<C> contextClass, Class<H> handlerClass) {
-        var handlerRegistry = new HandlerRegistry<C>();
+    private static <C extends ListenerContext, H extends Annotation> void registerHandlers(
+            Class<C> contextClass, Class<H> handlerClass, HandlerRegistry<C> handlerRegistry) {
         for (Class<?> klass : getAllClasses()) {
             for (Method method : klass.getDeclaredMethods()) {
                 method.setAccessible(true);
@@ -327,7 +326,6 @@ public class AnnotationHandler {
                 }
             }
         }
-        return handlerRegistry;
     }
 
     private static List<Class<?>> getAllClasses() {
