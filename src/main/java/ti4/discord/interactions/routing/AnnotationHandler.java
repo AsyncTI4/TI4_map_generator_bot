@@ -257,21 +257,22 @@ public final class AnnotationHandler {
      * @param <H> {@link AnnotationHandler#handlers}
      * @param contextClass Which context type to accept parameters based upon
      * @param handlerClass Which handler annotation to look for
-     * @return A map of prefix -> consumer which will
+     * @return A {@link HandlerRegistry} bundling the prefix→consumer map and the prefix→save-flag map.
      */
-    public static <C extends ListenerContext, H extends Annotation> Map<String, Consumer<C>> findKnownHandlers(
+    public static <C extends ListenerContext, H extends Annotation> HandlerRegistry<C> findKnownHandlers(
             Class<C> contextClass, Class<H> handlerClass) {
         Map<String, Consumer<C>> consumers = new HashMap<>();
+        Map<String, Boolean> saveFlags = new HashMap<>();
         try {
             if (!handlers().contains(handlerClass)) {
                 BotLogger.warning(
                         "Unknown handler class `" + handlerClass.getName() + "`. Please fix " + Constants.jazzPing());
-                return consumers;
+                return new HandlerRegistry<>(consumers, saveFlags);
             }
             if (!contexts().contains(contextClass)) {
                 BotLogger.warning(
                         "Unknown context class `" + contextClass.getName() + "`. Please fix " + Constants.jazzPing());
-                return consumers;
+                return new HandlerRegistry<>(consumers, saveFlags);
             }
             for (Class<?> klass : getAllClasses()) {
                 for (Method method : klass.getDeclaredMethods()) {
@@ -298,11 +299,18 @@ public final class AnnotationHandler {
                             val = bh.value();
                             save = bh.save();
                         }
-                        if (handler instanceof SelectionHandler sh) val = sh.value();
-                        if (handler instanceof ModalHandler mh) val = mh.value();
+                        if (handler instanceof SelectionHandler sh) {
+                            val = sh.value();
+                            save = sh.save();
+                        }
+                        if (handler instanceof ModalHandler mh) {
+                            val = mh.value();
+                            save = mh.save();
+                        }
                         if (val == null) continue;
                         Consumer<C> consumer = buildConsumer(method, argGetter, save);
                         consumers.put(val, consumer);
+                        saveFlags.put(val, save);
                     }
                 }
             }
@@ -313,7 +321,7 @@ public final class AnnotationHandler {
         }
 
         BotLogger.info("Registered " + consumers.size() + " handlers of type " + handlerClass.getName());
-        return consumers;
+        return new HandlerRegistry<>(consumers, saveFlags);
     }
 
     private static List<Class<?>> getAllClasses() {

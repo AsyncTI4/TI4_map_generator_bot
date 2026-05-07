@@ -14,4 +14,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface ModalHandler {
     String value();
+
+    boolean save() default true;
 }

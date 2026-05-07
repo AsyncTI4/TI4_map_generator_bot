@@ -1,13 +1,12 @@
 package ti4.discord.interactions.selections;
 
-import java.util.Map;
-import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.listeners.context.SelectionMenuContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
+import ti4.discord.interactions.routing.HandlerRegistry;
 import ti4.discord.interactions.routing.SelectionHandler;
 import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
@@ -21,28 +20,32 @@ import ti4.spring.context.SpringContext;
 @UtilityClass
 public final class SelectionMenuProcessor {
 
-    private static final Map<String, Consumer<SelectionMenuContext>> knownMenus =
+    private static final HandlerRegistry<SelectionMenuContext> registry =
             AnnotationHandler.findKnownHandlers(SelectionMenuContext.class, SelectionHandler.class);
 
     public static void checkSelectionMenuHandlersSetup() {
-        if (knownMenus.isEmpty()) {
+        if (registry.handlers().isEmpty()) {
             throw new IllegalStateException("No button handlers were registered");
         }
     }
 
     public static void queue(StringSelectInteractionEvent event) {
         String gameName = GameNameService.getGameNameFromChannel(event);
-        SelectionMenuContext context = new SelectionMenuContext(event);
-        if (!context.isValid()) {
-            BotLogger.warning(new LogOrigin(event), "Invalid selection menu context.");
-            return;
-        }
+        String rawComponentID = event.getSelectMenu().getCustomId();
+        ExecutionLockType lockType = registry.isSave(rawComponentID) ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutorServiceManager.runAsyncWithLock(
                 "SelectionMenuProcessor task for `" + gameName + "`",
                 gameName,
                 event.getMessageChannel(),
-                () -> process(context, event),
-                context.isShouldSave() ? ExecutionLockType.WRITE : ExecutionLockType.READ);
+                () -> {
+                    SelectionMenuContext context = new SelectionMenuContext(event);
+                    if (!context.isValid()) {
+                        BotLogger.warning(new LogOrigin(event), "Invalid selection menu context.");
+                        return;
+                    }
+                    process(context, event);
+                },
+                lockType);
     }
 
     private static void process(SelectionMenuContext context, StringSelectInteractionEvent event) {
@@ -74,15 +77,15 @@ public final class SelectionMenuProcessor {
     private static boolean handleKnownMenus(SelectionMenuContext context) {
         String menuID = context.getMenuID();
         // Check for exact match first
-        if (knownMenus.containsKey(menuID)) {
+        if (registry.handlers().containsKey(menuID)) {
             RollbarManager.put("menu_handler_id", menuID);
-            knownMenus.get(menuID).accept(context);
+            registry.handlers().get(menuID).accept(context);
             return true;
         }
 
         // Then check for prefix match
         String longestPrefixMatch = null;
-        for (String key : knownMenus.keySet()) {
+        for (String key : registry.handlers().keySet()) {
             if (menuID.startsWith(key)) {
                 if (longestPrefixMatch == null || key.length() > longestPrefixMatch.length()) {
                     longestPrefixMatch = key;
@@ -92,7 +95,7 @@ public final class SelectionMenuProcessor {
 
         if (longestPrefixMatch != null) {
             RollbarManager.put("menu_handler_id", longestPrefixMatch);
-            knownMenus.get(longestPrefixMatch).accept(context);
+            registry.handlers().get(longestPrefixMatch).accept(context);
             return true;
         }
         return false;

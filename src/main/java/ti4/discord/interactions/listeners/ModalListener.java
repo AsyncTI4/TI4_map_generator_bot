@@ -1,6 +1,5 @@
 package ti4.discord.interactions.listeners;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
@@ -11,6 +10,7 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.listeners.context.ModalContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
+import ti4.discord.interactions.routing.HandlerRegistry;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
@@ -26,7 +26,7 @@ public final class ModalListener extends ListenerAdapter {
 
     private static ModalListener instance;
 
-    private final Map<String, Consumer<ModalContext>> knownModals = new HashMap<>();
+    private final HandlerRegistry<ModalContext> registry;
 
     public static ModalListener getInstance() {
         if (instance == null) instance = new ModalListener();
@@ -34,13 +34,13 @@ public final class ModalListener extends ListenerAdapter {
     }
 
     public static void checkModalHandlersSetup() {
-        if (getInstance().knownModals.isEmpty()) {
+        if (getInstance().registry.handlers().isEmpty()) {
             throw new IllegalStateException("No modal handlers were registered");
         }
     }
 
     private ModalListener() {
-        knownModals.putAll(AnnotationHandler.findKnownHandlers(ModalContext.class, ModalHandler.class));
+        registry = AnnotationHandler.findKnownHandlers(ModalContext.class, ModalHandler.class);
     }
 
     @Override
@@ -58,17 +58,21 @@ public final class ModalListener extends ListenerAdapter {
         event.deferEdit().queue(Consumers.nop(), BotLogger::catchRestError);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        var modalContext = new ModalContext(event);
-        if (!modalContext.isValid()) {
-            BotLogger.warning(new LogOrigin(event), "Invalid modal context.");
-            return;
-        }
+        String rawModalID = event.getModalId();
+        ExecutionLockType lockType = registry.isSave(rawModalID) ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutorServiceManager.runAsyncWithLock(
                 "ModalListener task for  `" + gameName + "`",
                 gameName,
                 event.getMessageChannel(),
-                () -> handleModal(modalContext, event),
-                modalContext.isShouldSave() ? ExecutionLockType.WRITE : ExecutionLockType.READ);
+                () -> {
+                    var modalContext = new ModalContext(event);
+                    if (!modalContext.isValid()) {
+                        BotLogger.warning(new LogOrigin(event), "Invalid modal context.");
+                        return;
+                    }
+                    handleModal(modalContext, event);
+                },
+                lockType);
     }
 
     private void handleModal(ModalContext context, ModalInteractionEvent event) {
@@ -98,14 +102,15 @@ public final class ModalListener extends ListenerAdapter {
     private boolean handleKnownModals(ModalContext context) {
         String modalID = context.getModalID();
         // Check for exact match first
-        if (knownModals.containsKey(modalID)) {
+        if (registry.handlers().containsKey(modalID)) {
             RollbarManager.put("modal_handler_id", modalID);
-            knownModals.get(modalID).accept(context);
+            registry.handlers().get(modalID).accept(context);
             return true;
         }
 
         // Then check for prefix match
-        for (Map.Entry<String, Consumer<ModalContext>> entry : knownModals.entrySet()) {
+        for (Map.Entry<String, Consumer<ModalContext>> entry :
+                registry.handlers().entrySet()) {
             if (modalID.startsWith(entry.getKey())) {
                 RollbarManager.put("modal_handler_id", entry.getKey());
                 entry.getValue().accept(context);
