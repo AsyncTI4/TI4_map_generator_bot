@@ -62,7 +62,9 @@ public class CommandHelper {
                     .queue(Consumers.nop(), BotLogger::catchRestError);
             return false;
         }
-        if (checkChannel && !event.getChannel().getName().startsWith(managedGame.getName() + "-")) {
+        if (checkChannel
+                && !event.getChannel().getName().startsWith(managedGame.getName() + "-")
+                && getPlayerFromChannel(managedGame.getGame(), event) == null) {
             event.getHook()
                     .editOriginal("'" + event.getFullCommandName() + "' can only be executed in a game channel.")
                     .queue(Consumers.nop(), BotLogger::catchRestError);
