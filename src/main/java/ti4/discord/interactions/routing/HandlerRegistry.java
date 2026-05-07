@@ -1,14 +1,19 @@
 package ti4.discord.interactions.routing;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import ti4.discord.interactions.listeners.context.ListenerContext;
 import ti4.logging.RollbarManager;
 
-public record HandlerRegistry<C extends ListenerContext>(Map<String, Handler<C>> handlers) {
+public class HandlerRegistry<C extends ListenerContext> {
 
-    record Handler<C extends ListenerContext>(Consumer<C> consumer, boolean shouldSave) {}
+    private final Map<String, Handler<C>> handlers = new HashMap<>();
+
+    public void register(String key, Consumer<C> consumer, boolean shouldSave) {
+        handlers.put(key, new Handler<>(consumer, shouldSave));
+    }
 
     public boolean isSave(String componentId) {
         Handler<C> handler = findHandler(componentId);
@@ -35,10 +40,15 @@ public record HandlerRegistry<C extends ListenerContext>(Map<String, Handler<C>>
     private String findMatchedKey(String componentId) {
         if (handlers.containsKey(componentId)) return componentId;
 
-      return handlers.keySet()
-          .stream()
-          .filter(componentId::startsWith)
-          .max(Comparator.comparingInt(String::length))
-          .orElse(null);
+        return handlers.keySet().stream()
+                .filter(componentId::startsWith)
+                .max(Comparator.comparingInt(String::length))
+                .orElse(null);
     }
+
+    public int getSize() {
+        return handlers.size();
+    }
+
+    private record Handler<C extends ListenerContext>(Consumer<C> consumer, boolean shouldSave) {}
 }

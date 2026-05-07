@@ -9,11 +9,10 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -21,6 +20,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import org.jspecify.annotations.NonNull;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
@@ -36,7 +36,8 @@ import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
 
-public final class AnnotationHandler {
+@UtilityClass
+public class AnnotationHandler {
 
     private static final List<Class<?>> classes = new ArrayList<>();
 
@@ -257,69 +258,76 @@ public final class AnnotationHandler {
      * @param <H> {@link AnnotationHandler#handlers}
      * @param contextClass Which context type to accept parameters based upon
      * @param handlerClass Which handler annotation to look for
-     * @return A {@link HandlerRegistry} mapping component-ID prefixes to {@link HandlerRegistry.Handler} instances.
+     * @return A {@link HandlerRegistry} mapping component-ID prefixes to Handler instances.
      */
     public static <C extends ListenerContext, H extends Annotation> HandlerRegistry<C> findKnownHandlers(
             Class<C> contextClass, Class<H> handlerClass) {
-        Map<String, HandlerRegistry.Handler<C>> handlers = new HashMap<>();
         try {
             if (!handlers().contains(handlerClass)) {
                 BotLogger.warning(
                         "Unknown handler class `" + handlerClass.getName() + "`. Please fix " + Constants.jazzPing());
-                return new HandlerRegistry<>(handlers);
+                return new HandlerRegistry<>();
             }
             if (!contexts().contains(contextClass)) {
                 BotLogger.warning(
                         "Unknown context class `" + contextClass.getName() + "`. Please fix " + Constants.jazzPing());
-                return new HandlerRegistry<>(handlers);
+                return new HandlerRegistry<>();
             }
-            for (Class<?> klass : getAllClasses()) {
-                for (Method method : klass.getDeclaredMethods()) {
-                    method.setAccessible(true);
-                    List<H> annotationList = Arrays.asList(method.getAnnotationsByType(handlerClass));
-                    if (annotationList.isEmpty()) continue;
 
-                    String methodName = klass.getName() + "." + method.getName();
-                    if (!Modifier.isStatic(method.getModifiers())) {
-                        BotLogger.warning(
-                                "Method `" + methodName + "` is not static. Please fix it " + Constants.jazzPing());
-                        continue;
-                    }
-
-                    Function<C, List<Object>> argGetter = getArgs(method, contextClass);
-                    if (argGetter == null) {
-                        continue;
-                    }
-
-                    for (H handler : annotationList) {
-                        String val = null;
-                        boolean save = true;
-                        if (handler instanceof ButtonHandler bh) {
-                            val = bh.value();
-                            save = bh.save();
-                        }
-                        if (handler instanceof SelectionHandler sh) {
-                            val = sh.value();
-                            save = sh.save();
-                        }
-                        if (handler instanceof ModalHandler mh) {
-                            val = mh.value();
-                            save = mh.save();
-                        }
-                        if (val == null) continue;
-                        Consumer<C> consumer = buildConsumer(method, argGetter, save);
-                        handlers.put(val, new HandlerRegistry.Handler<>(consumer, save));
-                    }
-                }
-            }
+            HandlerRegistry<C> handlerRegistry = buildHandlerRegistry(contextClass, handlerClass);
+            BotLogger.info("Registered " + handlerRegistry.getSize() + " handlers of type " + handlerClass.getName());
+            return handlerRegistry;
         } catch (SecurityException e) {
             BotLogger.error(Constants.jazzPing() + " bot cannot read methods in the file.", e);
         } catch (Exception e) {
             BotLogger.error(Constants.jazzPing() + " some other issue registering buttons.", e);
         }
+        return new HandlerRegistry<>();
+    }
 
-        BotLogger.info("Registered " + handlers.size() + " handlers of type " + handlerClass.getName());
-        return new HandlerRegistry<>(handlers);
+    private static <C extends ListenerContext, H extends Annotation> @NonNull HandlerRegistry<C> buildHandlerRegistry(
+            Class<C> contextClass, Class<H> handlerClass) {
+        var handlerRegistry = new HandlerRegistry<C>();
+        for (Class<?> klass : getAllClasses()) {
+            for (Method method : klass.getDeclaredMethods()) {
+                method.setAccessible(true);
+                List<H> annotationList = Arrays.asList(method.getAnnotationsByType(handlerClass));
+                if (annotationList.isEmpty()) continue;
+
+                String methodName = klass.getName() + "." + method.getName();
+                if (!Modifier.isStatic(method.getModifiers())) {
+                    BotLogger.warning(
+                            "Method `" + methodName + "` is not static. Please fix it " + Constants.jazzPing());
+                    continue;
+                }
+
+                Function<C, List<Object>> argGetter = getArgs(method, contextClass);
+                if (argGetter == null) {
+                    continue;
+                }
+
+                for (H handler : annotationList) {
+                    String val = null;
+                    boolean save = true;
+                    if (handler instanceof ButtonHandler bh) {
+                        val = bh.value();
+                        save = bh.save();
+                    }
+                    if (handler instanceof SelectionHandler sh) {
+                        val = sh.value();
+                        save = sh.save();
+                    }
+                    if (handler instanceof ModalHandler mh) {
+                        val = mh.value();
+                        save = mh.save();
+                    }
+                    if (val == null) continue;
+                    Consumer<C> consumer = buildConsumer(method, argGetter, save);
+                    handlerRegistry.register(val, consumer, save);
+                }
+            }
+        }
+        return handlerRegistry;
     }
 
     private static List<Class<?>> getAllClasses() {

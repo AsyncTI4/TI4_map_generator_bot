@@ -33,7 +33,7 @@ public final class ModalListener extends ListenerAdapter {
     }
 
     public static void checkModalHandlersSetup() {
-        if (getInstance().registry.handlers().isEmpty()) {
+        if (getInstance().registry.getSize() == 0) {
             throw new IllegalStateException("No modal handlers were registered");
         }
     }

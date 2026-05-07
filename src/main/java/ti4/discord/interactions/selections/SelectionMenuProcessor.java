@@ -25,7 +25,7 @@ public final class SelectionMenuProcessor {
             AnnotationHandler.findKnownHandlers(SelectionMenuContext.class, SelectionHandler.class);
 
     public static void checkSelectionMenuHandlersSetup() {
-        if (registry.handlers().isEmpty()) {
+        if (registry.getSize() == 0) {
             throw new IllegalStateException("No button handlers were registered");
         }
     }
