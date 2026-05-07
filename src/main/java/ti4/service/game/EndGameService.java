@@ -295,7 +295,7 @@ public class EndGameService {
     private static void sendFeedbackMessage(ThreadChannel t, Game game) {
         StringBuilder message = new StringBuilder();
         for (String playerID : game.getRealPlayerIDs()) { // GET ALL PLAYER PINGS
-            Member member = game.getGuild().getMemberById(playerID);
+            Member member = JdaService.getMemberById(game.getGuild(), playerID);
             if (member != null) message.append(member.getAsMention()).append(' ');
         }
         message.append(
@@ -315,7 +315,7 @@ public class EndGameService {
     }
 
     private static void appendUserName(StringBuilder sb, Player player) {
-        Optional<User> user = Optional.ofNullable(JdaService.jda.getUserById(player.getUserID()));
+        Optional<User> user = Optional.ofNullable(JdaService.getUserById(player.getUserID()));
         if (user.isPresent()) {
             sb.append(user.get().getAsMention());
         } else {

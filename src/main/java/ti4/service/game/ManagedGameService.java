@@ -33,7 +33,7 @@ public class ManagedGameService {
         }
         StringBuilder sb = new StringBuilder(game.getName()).append(' ');
         for (var player : game.getPlayers()) {
-            User user = JdaService.jda.getUserById(player.getId());
+            User user = JdaService.getUserById(player.getId());
             if (user != null) sb.append(user.getAsMention()).append(' ');
         }
         return sb.toString();

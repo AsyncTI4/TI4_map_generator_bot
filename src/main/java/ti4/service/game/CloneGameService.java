@@ -1,5 +1,6 @@
 package ti4.service.game;
 
+import ti4.discord.JdaService;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -30,7 +31,7 @@ public class CloneGameService {
         Role gameRole =
                 guild.createRole().setName(cloneName).setMentionable(true).complete();
         for (Player player : game.getRealPlayers()) {
-            Member member = guild.getMemberById(player.getUserID());
+            Member member = JdaService.getMemberById(guild, player.getUserID());
             if (member != null) {
                 guild.addRoleToMember(member, gameRole).complete();
             }

@@ -34,7 +34,7 @@ public class BanCleanupService {
             "bot-questions-and-discussions");
 
     private User getUser(UserSnowflake id) {
-        return JdaService.jda.getUserById(id.getId());
+        return JdaService.getUserById(id.getId());
     }
 
     private String getIdent(UserSnowflake id) {

@@ -343,7 +343,7 @@ public class DrawingUtil {
     @Nullable
     public static Image getUserDiscordAvatar(String userID) {
         try {
-            User user = JdaService.jda.getUserById(userID);
+            User user = JdaService.getUserById(userID);
             if (user == null) return null;
             return ImageHelper.readURLScaled(
                     user.getEffectiveAvatar().getUrl(), DISCORD_AVATAR_SIZE, DISCORD_AVATAR_SIZE);

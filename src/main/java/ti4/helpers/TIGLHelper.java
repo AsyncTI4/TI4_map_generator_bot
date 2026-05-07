@@ -270,7 +270,7 @@ public final class TIGLHelper {
     }
 
     private static List<TIGLRank> getUsersTIGLRanks(User user, boolean isFractured) {
-        Member hubMember = JdaService.guildPrimary.getMemberById(user.getId());
+        Member hubMember = JdaService.getMemberById(JdaService.guildPrimary, user.getId());
         if (hubMember == null) {
             return new ArrayList<>();
         }
@@ -297,7 +297,7 @@ public final class TIGLHelper {
 
     private static boolean allUsersAreMembersOfHubServer(List<User> users) {
         for (User user : users) {
-            Member hubMember = JdaService.guildPrimary.getMemberById(user.getId());
+            Member hubMember = JdaService.getMemberById(JdaService.guildPrimary, user.getId());
             if (hubMember == null) {
                 return false;
             }

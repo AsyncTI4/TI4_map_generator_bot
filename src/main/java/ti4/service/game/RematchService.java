@@ -1,5 +1,6 @@
 package ti4.service.game;
 
+import ti4.discord.JdaService;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -63,7 +64,7 @@ public class RematchService {
         } else {
             gameRole = guild.createRole().setName(newName).setMentionable(true).complete();
             for (Player player : game.getRealPlayers()) {
-                Member member = guild.getMemberById(player.getUserID());
+                Member member = JdaService.getMemberById(guild, player.getUserID());
                 if (member != null) {
                     guild.addRoleToMember(member, gameRole).complete();
                 }
@@ -87,10 +88,10 @@ public class RematchService {
                 .getManager()
                 .setName(newName + "-actions")
                 .queue(Consumers.nop(), BotLogger::catchRestError);
-        Member gameOwner = guild.getMemberById(game.getOwnerID());
+        Member gameOwner = JdaService.getMemberById(guild, game.getOwnerID());
         if (gameOwner == null) {
             for (Player player : game.getPlayers().values()) {
-                gameOwner = guild.getMemberById(player.getUserID());
+                gameOwner = JdaService.getMemberById(guild, player.getUserID());
                 break;
             }
         }

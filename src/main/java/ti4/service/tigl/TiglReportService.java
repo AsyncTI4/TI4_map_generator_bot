@@ -45,7 +45,7 @@ public class TiglReportService {
         int index = 1;
         for (Player player : game.getRealAndEliminatedPlayers()) {
             int playerVP = player.isEliminated() ? 0 : player.getTotalVictoryPoints();
-            Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
+            Optional<User> user = Optional.ofNullable(JdaService.getUserById(player.getUserID()));
             sb.append("  ").append(index).append(". ");
             sb.append(player.getFaction()).append(" - ");
             if (user.isPresent()) {
@@ -127,7 +127,7 @@ public class TiglReportService {
         if (userId == null) {
             return player.getStatsTrackedUserName();
         }
-        User user = JdaService.jda.getUserById(userId);
+        User user = JdaService.getUserById(Long.toString(userId));
         return user == null ? player.getStatsTrackedUserName() : user.getName();
     }
 

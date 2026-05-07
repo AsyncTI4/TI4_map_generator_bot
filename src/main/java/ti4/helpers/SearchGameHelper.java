@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import ti4.discord.JdaService;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -153,8 +154,8 @@ public class SearchGameHelper {
         for (var managedGame : filteredManagedGames) {
             if (managedGame.getTableTalkChannel() != null) {
                 String name = user.getName();
-                if (managedGame.getTableTalkChannel().getGuild().getMemberById(user.getId()) != null) {
-                    Member mem = managedGame.getTableTalkChannel().getGuild().getMemberById(user.getId());
+                if (JdaService.getMemberById(managedGame.getTableTalkChannel().getGuild(), user.getId()) != null) {
+                    Member mem = JdaService.getMemberById(managedGame.getTableTalkChannel().getGuild(), user.getId());
                     name = mem.getNickname();
                     if (name == null) {
                         name = mem.getEffectiveName();

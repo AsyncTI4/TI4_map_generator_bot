@@ -779,7 +779,7 @@ public class MessageHelper {
             String failText,
             String successText) {
         if (messageText == null || messageText.isEmpty()) return true; // blank message counts as a success
-        User user = player == null ? null : JdaService.jda.getUserById(player.getUserID());
+        User user = player == null ? null : JdaService.getUserById(player.getUserID());
         if (user == null) {
             sendMessageToChannel(feedbackChannel, failText);
             return false;

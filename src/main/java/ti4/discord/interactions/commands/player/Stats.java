@@ -1,5 +1,6 @@
 package ti4.discord.interactions.commands.player;
 
+import ti4.discord.JdaService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -343,7 +344,7 @@ class Stats extends GameStateSubcommand {
                 UserSettingsManager.save(userSettings);
 
                 Guild guild = event.getGuild();
-                Member removedMember = guild.getMemberById(player.getUserID());
+                Member removedMember = JdaService.getMemberById(guild, player.getUserID());
                 List<Role> roles = guild.getRolesByName(game.getName(), true);
                 if (removedMember != null && roles.size() == 1) {
                     guild.removeRoleFromMember(removedMember, roles.getFirst())

@@ -44,11 +44,11 @@ class RemoveAllianceMember extends GameStateSubcommand {
         }
 
         player.getCardsInfoThread()
-                .removeThreadMember(JdaService.jda.getUserById(targetPlayer.getUserID()))
+                .removeThreadMember(JdaService.getUserById(targetPlayer.getUserID()))
                 .queue(Consumers.nop(), BotLogger::catchRestError);
         targetPlayer
                 .getCardsInfoThread()
-                .removeThreadMember(JdaService.jda.getUserById(player.getUserID()))
+                .removeThreadMember(JdaService.getUserById(player.getUserID()))
                 .queue(Consumers.nop(), BotLogger::catchRestError);
 
         MessageHelper.sendMessageToEventChannel(

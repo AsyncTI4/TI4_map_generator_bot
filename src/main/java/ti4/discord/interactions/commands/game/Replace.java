@@ -86,14 +86,14 @@ class Replace extends GameStateSubcommand {
         if (guild == null) {
             guild = event.getGuild();
         }
-        Member newMember = guild.getMemberById(replacementUser.getId());
+        Member newMember = JdaService.getMemberById(guild, replacementUser.getId());
         if (newMember == null) {
             MessageHelper.replyToMessage(event, "Added player must be on the game's server.");
             return;
         }
 
         // REMOVE ROLE
-        Member oldMember = guild.getMemberById(replacedPlayer.getUserID());
+        Member oldMember = JdaService.getMemberById(guild, replacedPlayer.getUserID());
         List<Role> roles = guild.getRolesByName(game.getName(), true);
         if (oldMember != null && roles.size() == 1) {
             guild.removeRoleFromMember(oldMember, roles.getFirst()).queue(Consumers.nop(), BotLogger::catchRestError);

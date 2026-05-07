@@ -465,7 +465,7 @@ public class PlayerAreaGenerator {
     private String getPlayerNameFromID(Player player, String id) {
         String afk = AFKService.userIsAFK(id) ? " (AFK)" : "";
         try {
-            User user = JdaService.jda.getUserById(id);
+            User user = JdaService.getUserById(id);
             Member member = game.getGuild().getMember(user);
             if (member == null) {
                 member = JdaService.guildPrimary.getMember(user);

@@ -28,7 +28,7 @@ public class TourneyWinnerService {
         StringBuilder sb = new StringBuilder("__**All Async TI4 Tournament Winners:**__");
         List<TournamentWinner> winners = tournamentWinnerRepository.findAll();
         for (TournamentWinner winner : winners) {
-            User user = JdaService.jda.getUserById(winner.getUserId());
+            User user = JdaService.getUserById(winner.getUserId());
             String name = user != null ? user.getEffectiveName() : winner.getUserName();
             sb.append("\n> ").append(name).append(" won ").append(winner.getTourneyName());
         }

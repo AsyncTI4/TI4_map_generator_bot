@@ -1512,7 +1512,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (game == null) return null;
         Guild guild = game.getGuild();
         if (guild == null) return null;
-        return guild.getMemberById(getUserID());
+        return JdaService.getMemberById(guild, getUserID());
     }
 
     public User getUser() {
@@ -1521,7 +1521,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     private User getUser(String userId) {
         // TODO: This is to handle JDA being null during tests. We should think of a cleaner solution.
-        return JdaService.jda == null ? null : JdaService.jda.getUserById(userId);
+        return JdaService.jda == null ? null : JdaService.getUserById(userId);
     }
 
     @Override
@@ -1538,7 +1538,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         User userById = getUser();
         if (userById == null) return super.getUserName();
 
-        Member member = JdaService.guildPrimary.getMemberById(getUserID());
+        Member member = JdaService.getMemberById(JdaService.guildPrimary, getUserID());
         if (member == null) {
             setUserName(userById.getName());
         } else {
@@ -1605,7 +1605,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             if (roleForCommunity == null && !getTeamMateIDs().isEmpty()) {
                 StringBuilder sb = new StringBuilder((noFactionIcon ? "" : getFactionEmoji()));
                 for (String userID : getTeamMateIDs()) {
-                    User userById = JdaService.jda.getUserById(userID);
+                    User userById = JdaService.getUserById(userID);
                     if (userById == null) {
                         continue;
                     }

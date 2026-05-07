@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import ti4.discord.JdaService;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.text.SimpleDateFormat;
@@ -2989,7 +2990,7 @@ public final class Helper {
         if (textChannel != null) {
             TextChannelManager textChannelManager = textChannel.getManager();
             for (String playerID : playerIds) {
-                Member member = guild.getMemberById(playerID);
+                Member member = JdaService.getMemberById(guild, playerID);
                 if (member == null) continue;
                 long allow = Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
                 textChannelManager = textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
@@ -3002,7 +3003,7 @@ public final class Helper {
         TextChannel textChannel = guild.getTextChannelById(channel.getId());
         if (textChannel != null) {
             TextChannelManager textChannelManager = textChannel.getManager();
-            Member member = guild.getMemberById(playerID);
+            Member member = JdaService.getMemberById(guild, playerID);
             long deny = Permission.MESSAGE_MANAGE.getRawValue()
                     | Permission.PIN_MESSAGES.getRawValue()
                     | Permission.VIEW_CHANNEL.getRawValue();
@@ -3026,7 +3027,7 @@ public final class Helper {
             if (game.getRound() > 1 && !game.getPlayer(playerId).isRealPlayer()) {
                 continue;
             }
-            Member member = guild.getMemberById(playerId);
+            Member member = JdaService.getMemberById(guild, playerId);
             if (member != null && !member.getRoles().contains(role))
                 guild.addRoleToMember(member, role).queue(Consumers.nop(), BotLogger::catchRestError);
         }

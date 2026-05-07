@@ -1,5 +1,6 @@
 package ti4.discord.interactions.commands.game;
 
+import ti4.discord.JdaService;
 import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.Permission;
@@ -52,10 +53,10 @@ class Observer extends Subcommand {
 
         ManagedGame game = GameManager.getManagedGame(gameName);
         Guild guild = game.getGuild();
-        Member member = guild.getMemberById(user.getId());
+        Member member = JdaService.getMemberById(guild, user.getId());
 
         if (member == null && event.getGuild() != null) {
-            member = event.getGuild().getMemberById(user.getId());
+            member = JdaService.getMemberById(event.getGuild(), user.getId());
         }
 
         // INVITE TO GAME SERVER IF MISSING
@@ -101,7 +102,7 @@ class Observer extends Subcommand {
             SlashCommandInteractionEvent event, String userID, GuildChannel channel, boolean skipMessage) {
         if (channel == null) return;
         Guild guild = channel.getGuild();
-        Member user = guild.getMemberById(userID);
+        Member user = JdaService.getMemberById(guild, userID);
         channel.getPermissionContainer()
                 .upsertPermissionOverride(user)
                 .grant(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)
@@ -121,7 +122,7 @@ class Observer extends Subcommand {
         // This resets the member's perms to the default value,
         //   -> -> ->  SO IF THE USER IS IN THE GAME, THEY DON'T GET REMOVED
         Guild guild = channel.getGuild();
-        Member user = guild.getMemberById(userID);
+        Member user = JdaService.getMemberById(guild, userID);
         channel.getPermissionContainer()
                 .upsertPermissionOverride(user)
                 .clear(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)

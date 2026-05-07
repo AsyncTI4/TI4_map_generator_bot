@@ -3650,7 +3650,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         StringBuilder sb = new StringBuilder(getName()).append(' ');
         for (String playerID : getPlayerIDs()) {
-            User user = JdaService.jda.getUserById(playerID);
+            User user = JdaService.getUserById(playerID);
             if (user != null) sb.append(user.getAsMention()).append(' ');
         }
         return sb.toString();
@@ -3771,7 +3771,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         Role gmRole = roles.isEmpty() ? null : roles.getFirst();
         return players.values().stream()
                 .filter(player -> {
-                    Member user = getGuild().getMemberById(player.getUserID());
+                    Member user = JdaService.getMemberById(getGuild(), player.getUserID());
                     return user != null && user.getRoles().contains(gmRole);
                 })
                 .toList();

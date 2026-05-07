@@ -1,5 +1,6 @@
 package ti4.discord.interactions.commands.event;
 
+import ti4.discord.JdaService;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -45,7 +46,7 @@ class LookAtTopEvent extends GameStateSubcommand {
         sb.append("-----------\n");
 
         Player player = getPlayer();
-        User userById = event.getJDA().getUserById(player.getUserID());
+        User userById = JdaService.getUserById(player.getUserID());
         if (userById != null) {
             if (game.isCommunityMode() && player.getPrivateChannel() != null) {
                 MessageHelper.sendMessageToChannel(player.getPrivateChannel(), sb.toString());

@@ -1056,7 +1056,7 @@ class AutoCompleteProvider {
                 DraftManager draftManager = game.getDraftManager();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Predicate<String> isUnknownUserId =
-                        id -> game.getPlayer(id) == null || event.getGuild().getMemberById(id) == null;
+                        id -> game.getPlayer(id) == null || JdaService.getMemberById(event.getGuild(), id) == null;
                 List<String> userIDs = draftManager.getPlayerUserIds().stream()
                         .filter(isUnknownUserId)
                         .toList();

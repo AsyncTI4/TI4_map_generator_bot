@@ -433,11 +433,9 @@ public class CreateGameService {
 
     private static List<Member> inviteUsersToServer(
             Guild guild, List<Member> members, MessageChannel channel, String gameName) {
-        List<String> guildMemberIDs =
-                guild.getMembers().stream().map(ISnowflake::getId).toList();
         List<Member> missingMembers = new ArrayList<>();
         for (Member member : members) {
-            if (!guildMemberIDs.contains(member.getId())) {
+            if (JdaService.getMemberById(guild, member.getId()) == null) {
                 missingMembers.add(member);
             }
         }

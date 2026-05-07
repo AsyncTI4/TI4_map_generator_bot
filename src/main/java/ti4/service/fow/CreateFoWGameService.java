@@ -92,7 +92,7 @@ public class CreateFoWGameService {
         // Get GM
         String gmLine = StringUtils.substringBetween(buttonMsg, "GM: ", "\n");
         String gmId = StringUtils.substringBefore(gmLine, ".");
-        Member gm = event.getGuild().getMemberById(gmId);
+        Member gm = JdaService.getMemberById(event.getGuild(), gmId);
 
         // Get Members
         List<Member> members = new ArrayList<>();
@@ -114,7 +114,7 @@ public class CreateFoWGameService {
                 // Example line: 1:[userid].([username]])
                 String userId = StringUtils.substringBetween(line, ":", ".");
                 if (userId != null) {
-                    Member member = event.getGuild().getMemberById(userId);
+                    Member member = JdaService.getMemberById(event.getGuild(), userId);
                     if (member != null) {
                         members.add(member);
                     }

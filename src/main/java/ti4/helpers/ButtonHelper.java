@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import ti4.discord.JdaService;
 import static org.apache.commons.lang3.StringUtils.countMatches;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
@@ -930,7 +931,7 @@ public class ButtonHelper {
         }
 
         Guild guild = event.getGuild();
-        Member removedMember = guild.getMemberById(player.getUserID());
+        Member removedMember = JdaService.getMemberById(guild, player.getUserID());
         List<Role> roles = guild.getRolesByName(game.getName(), true);
         if (removedMember != null && roles.size() == 1) {
             guild.removeRoleFromMember(removedMember, roles.getFirst())
@@ -8391,7 +8392,7 @@ public class ButtonHelper {
         String threadName = game.getName() + "-round-" + game.getRound() + "-" + stratName.toLowerCase();
         for (ThreadChannel threadChannel_ : threadChannels) {
             if ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName())) {
-                if (!threadChannel_.getMembers().contains(game.getGuild().getMemberById(player.getUserID()))) {
+                if (!threadChannel_.getMembers().contains(JdaService.getMemberById(game.getGuild(), player.getUserID()))) {
                     continue;
                 }
             }

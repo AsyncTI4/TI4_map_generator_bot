@@ -1,5 +1,6 @@
 package ti4.discord.interactions.commands.bothelper;
 
+import ti4.discord.JdaService;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
@@ -53,12 +54,10 @@ class CreateFOWGameChannels extends Subcommand {
         }
 
         // CHECK IF GUILD HAS ALL PLAYERS LISTED
-        List<String> guildMemberIDs =
-                guild.getMembers().stream().map(ISnowflake::getId).toList();
         boolean sendInviteLink = false;
         int count = 0;
         for (Member member : members) {
-            if (!guildMemberIDs.contains(member.getId())) {
+            if (JdaService.getMemberById(guild, member.getId()) == null) {
                 MessageHelper.sendMessageToEventChannel(
                         event,
                         member.getAsMention() + " is not a member of the server **" + guild.getName()

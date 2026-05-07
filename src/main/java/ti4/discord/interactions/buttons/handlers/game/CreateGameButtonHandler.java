@@ -156,7 +156,7 @@ public class CreateGameButtonHandler {
         for (int i = 0; i < StringUtils.countMatches(buttonMsg, "<@"); i++) {
             String user = buttonMsg.split("@")[i + 1];
             user = StringUtils.substringBefore(user, ">");
-            Member member = event.getGuild().getMemberById(user);
+            Member member = JdaService.getMemberById(event.getGuild(), user);
             if (member != null) {
                 members.add(member);
             }
@@ -170,7 +170,7 @@ public class CreateGameButtonHandler {
         for (int i = 0; i < StringUtils.countMatches(buttonMsg, "<@"); i++) {
             String user = buttonMsg.split("@")[i + 1];
             user = StringUtils.substringBefore(user, ">");
-            Member member = event.getGuild().getMemberById(user);
+            Member member = JdaService.getMemberById(event.getGuild(), user);
             if (member != null) {
                 members.add(member);
             }
@@ -400,7 +400,7 @@ public class CreateGameButtonHandler {
 
         for (int i = 3; i < parts.length; i++) {
             String userId = StringUtils.substringBefore(parts[i], ".");
-            Member member = event.getGuild().getMemberById(userId);
+            Member member = JdaService.getMemberById(event.getGuild(), userId);
             if (member != null) {
                 members.add(member);
             }
