@@ -9,6 +9,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import ti4.executors.ExecutorUtility;
+import ti4.executors.ShutdownResult;
 import ti4.helpers.TimedRunnable;
 
 @UtilityClass
@@ -63,8 +64,7 @@ public class CronManager {
         return CRONS.keySet();
     }
 
-    public static ExecutorUtility.ShutdownResult shutdown() {
-        return ExecutorUtility.shutdownAndAwaitTermination(
-                "cron scheduler", SCHEDULER, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+    public static ShutdownResult shutdown() {
+        return ExecutorUtility.shutdownAndAwaitTermination(SCHEDULER, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 }

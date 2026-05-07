@@ -69,8 +69,8 @@ public class ExecutorServiceManager {
         ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
     }
 
-    public static ExecutorUtility.ShutdownResult shutdown() {
+    public static ShutdownResult shutdown() {
         return ExecutorUtility.shutdownAndAwaitTermination(
-                "async executor threadpool", EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 }

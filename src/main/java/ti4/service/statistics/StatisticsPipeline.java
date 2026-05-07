@@ -9,6 +9,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.executors.CircuitBreaker;
 import ti4.executors.ExecutionHistoryManager;
 import ti4.executors.ExecutorUtility;
+import ti4.executors.ShutdownResult;
 import ti4.helpers.TimedRunnable;
 import ti4.logging.BotLogger;
 
@@ -32,9 +33,9 @@ public class StatisticsPipeline {
         ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
     }
 
-    public static ExecutorUtility.ShutdownResult shutdown() {
+    public static ShutdownResult shutdown() {
         return ExecutorUtility.shutdownAndAwaitTermination(
-                "statistics pipeline", EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
     private static String eventToString(SlashCommandInteractionEvent event) {

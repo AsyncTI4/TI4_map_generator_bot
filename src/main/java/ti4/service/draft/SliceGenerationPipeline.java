@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.executors.CircuitBreaker;
 import ti4.executors.ExecutionHistoryManager;
 import ti4.executors.ExecutorUtility;
+import ti4.executors.ShutdownResult;
 import ti4.game.Game;
 import ti4.helpers.TimedRunnable;
 import ti4.logging.BotLogger;
@@ -88,9 +89,9 @@ public class SliceGenerationPipeline {
         generate(new NucleusGenerateEvent(event, game, nucleusSpecs, callback));
     }
 
-    public static ExecutorUtility.ShutdownResult shutdown() {
+    public static ShutdownResult shutdown() {
         return ExecutorUtility.shutdownAndAwaitTermination(
-                "slice generation pipeline", EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
     record MiltyGenerateEvent(

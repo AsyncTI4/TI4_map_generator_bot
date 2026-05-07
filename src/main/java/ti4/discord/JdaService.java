@@ -58,6 +58,7 @@ import ti4.discord.interactions.listeners.ListenerManager;
 import ti4.discord.interactions.selections.SelectionManager;
 import ti4.executors.ExecutorServiceManager;
 import ti4.executors.ExecutorUtility;
+import ti4.executors.ShutdownResult;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -78,6 +79,23 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class JdaService {
+
+    private static final String JDA_EVENT_POOL_NAME = "JDA Event Pool";
+    private static final int EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS = 5;
+    private static final int JDA_SHUTDOWN_TIMEOUT_SECONDS = 20;
+    private static final Set<CacheFlag> DISABLED_JDA_CACHE_FLAGS = EnumSet.of(
+            // User is playing a game, listening to Spotify, etc.
+            CacheFlag.ACTIVITY,
+            // User on Desktop, Mobile, or Web? Could be useful for stats
+            CacheFlag.CLIENT_STATUS,
+            // User is online, idle, etc
+            CacheFlag.ONLINE_STATUS,
+            // Needed for Role.getTags()
+            CacheFlag.ROLE_TAGS,
+            CacheFlag.SCHEDULED_EVENTS,
+            CacheFlag.SOUNDBOARD_SOUNDS,
+            CacheFlag.STICKER,
+            CacheFlag.VOICE_STATE);
 
     // TODO:
     //       we may not want to trust any old "Admin" role on a server
@@ -111,21 +129,6 @@ public class JdaService {
     public static final Set<Guild> guilds = new HashSet<>();
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
     public static final List<Guild> fowServers = new ArrayList<>();
-    private static final int EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS = 5;
-    private static final int JDA_SHUTDOWN_TIMEOUT_SECONDS = 20;
-    private static final Set<CacheFlag> DISABLED_JDA_CACHE_FLAGS = EnumSet.of(
-            // User is playing a game, listening to Spotify, etc.
-            CacheFlag.ACTIVITY,
-            // User on Desktop, Mobile, or Web? Could be useful for stats
-            CacheFlag.CLIENT_STATUS,
-            // User is online, idle, etc
-            CacheFlag.ONLINE_STATUS,
-            // Needed for Role.getTags()
-            CacheFlag.ROLE_TAGS,
-            CacheFlag.SCHEDULED_EVENTS,
-            CacheFlag.SOUNDBOARD_SOUNDS,
-            CacheFlag.STICKER,
-            CacheFlag.VOICE_STATE);
 
     private static final ExecutorService EVENT_EXECUTOR = Executors.newFixedThreadPool(
             Runtime.getRuntime().availableProcessors(),
@@ -597,22 +600,19 @@ public class JdaService {
             ActiveLeaseService.setCurrentProcessReady(false);
             BotLogger.info("NO LONGER ACCEPTING COMMANDS");
 
-            logShutdownResult("JDA event pool", shutdownEventExecutor());
-            logShutdownResult("async executor threadpool", ExecutorServiceManager.shutdown());
-            logShutdownResult("map render pipeline", MapRenderPipeline.shutdown());
-            logShutdownResult("slice generation pipeline", SliceGenerationPipeline.shutdown());
-            logShutdownResult("statistics pipeline", StatisticsPipeline.shutdown());
-            logShutdownResult("cron scheduler", CronManager.shutdown());
-
-            LogBufferManager.sendBufferedLogsToDiscord();
+            logShutdownResult(JDA_EVENT_POOL_NAME, shutdownEventExecutor());
+            logShutdownResult(ExecutorServiceManager.class.getSimpleName(), ExecutorServiceManager.shutdown());
+            logShutdownResult(MapRenderPipeline.class.getSimpleName(), MapRenderPipeline.shutdown());
+            logShutdownResult(SliceGenerationPipeline.class.getSimpleName(), SliceGenerationPipeline.shutdown());
+            logShutdownResult(StatisticsPipeline.class.getSimpleName(), StatisticsPipeline.shutdown());
+            logShutdownResult(CronManager.class.getSimpleName(), CronManager.shutdown());
 
             SpringContext.getBean(ActiveLeaseService.class).releaseLease();
             BotLogger.info("RELEASED ACTIVE LEASE");
 
-            BotLogger.info("SHUTTING DOWN JDA. GOOD BYE!");
+            BotLogger.info("SHUTTING DOWN JDA.");
 
-            // wait for BotLogger
-            TimeUnit.SECONDS.sleep(1);
+            LogBufferManager.sendBufferedLogsToDiscord();
 
             shutdownJda();
         } catch (Exception e) {
@@ -620,31 +620,36 @@ public class JdaService {
         }
     }
 
-    private static ExecutorUtility.ShutdownResult shutdownEventExecutor() {
+    private static ShutdownResult shutdownEventExecutor() {
         return ExecutorUtility.shutdownAndAwaitTermination(
-                "JDA event pool", EVENT_EXECUTOR, EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                EVENT_EXECUTOR, EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
-    private static void logShutdownResult(String executorName, ExecutorUtility.ShutdownResult result) {
+    private static void logShutdownResult(String executorName, ShutdownResult result) {
         switch (result) {
             case GRACEFUL_TERMINATION -> BotLogger.info(executorName + " terminated gracefully.");
-            case FORCED_TERMINATION -> BotLogger.info(executorName + " terminated after forced shutdown.");
+            case FORCED_TERMINATION -> BotLogger.info(executorName + " terminated after interrupt request.");
             case TIMED_OUT -> BotLogger.info(executorName + " did not terminate before the shutdown timeout.");
             case INTERRUPTED -> BotLogger.info(executorName + " shutdown was interrupted.");
         }
     }
 
-    private static void shutdownJda() {
+    private static ShutdownResult shutdownJda() {
         jda.shutdown();
         try {
             if (!jda.awaitShutdown(JDA_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
                 jda.shutdownNow();
-                jda.awaitShutdown(JDA_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                if (jda.awaitShutdown(JDA_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                    return ShutdownResult.FORCED_TERMINATION;
+                }
+                return ShutdownResult.TIMED_OUT;
             }
+            return ShutdownResult.GRACEFUL_TERMINATION;
         } catch (InterruptedException e) {
             BotLogger.error("JDA shutdown interrupted.", e);
             Thread.currentThread().interrupt();
             jda.shutdownNow();
+            return ShutdownResult.INTERRUPTED;
         }
     }
 }

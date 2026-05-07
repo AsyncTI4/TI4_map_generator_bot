@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.executors.CircuitBreaker;
 import ti4.executors.ExecutionHistoryManager;
 import ti4.executors.ExecutorUtility;
+import ti4.executors.ShutdownResult;
 import ti4.game.Game;
 import ti4.helpers.DisplayType;
 import ti4.helpers.TimedRunnable;
@@ -98,9 +99,9 @@ public class MapRenderPipeline {
         render(new RenderEvent(game, event, displayType, callback, uploadToDiscord, uploadToWebsite));
     }
 
-    public static ExecutorUtility.ShutdownResult shutdown() {
+    public static ShutdownResult shutdown() {
         return ExecutorUtility.shutdownAndAwaitTermination(
-                "map render pipeline", EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
     private record RenderEvent(
