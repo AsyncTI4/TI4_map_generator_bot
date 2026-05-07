@@ -37,19 +37,24 @@ class ButtonRuntimeWarningServiceTest {
                 MockedStatic<SREStats> sreStats = mockStatic(SREStats.class);
                 MockedStatic<BotLogger> logger = mockStatic(BotLogger.class)) {
             unstable.when(AsyncTI4DiscordBot::isUnstable).thenReturn(false);
-            time.when(() -> DateTimeHelper.getLongDateTimeFromDiscordSnowflake(any())).thenReturn(1_000L, 2_000L);
-            time.when(() -> DateTimeHelper.getTimestampFromMillisecondsEpoch(4_000L)).thenReturn("`at-4000`");
-            time.when(() -> DateTimeHelper.getTimestampFromMillisecondsEpoch(6_000L)).thenReturn("`at-6000`");
-            time.when(() -> DateTimeHelper.getTimeRepresentationToMilliseconds(anyLong())).thenCallRealMethod();
+            time.when(() -> DateTimeHelper.getLongDateTimeFromDiscordSnowflake(any()))
+                    .thenReturn(1_000L, 2_000L);
+            time.when(() -> DateTimeHelper.getTimestampFromMillisecondsEpoch(4_000L))
+                    .thenReturn("`at-4000`");
+            time.when(() -> DateTimeHelper.getTimestampFromMillisecondsEpoch(6_000L))
+                    .thenReturn("`at-6000`");
+            time.when(() -> DateTimeHelper.getTimeRepresentationToMilliseconds(anyLong()))
+                    .thenCallRealMethod();
 
             service.submitNewRuntime(firstEvent, 2_500L, 4_000L, 50L, 1_400L, 100L);
             service.submitNewRuntime(secondEvent, 3_500L, 6_000L, 75L, 2_400L, 100L);
 
-            logger.verify(() -> BotLogger.error(org.mockito.ArgumentMatchers.argThat(message -> message.contains("**Reasons:**")
-                    && message.contains("__**Alpha**__  `[alpha-id]`")
-                    && message.contains("__**Beta**__  `[beta-id]`")
-                    && message.contains("`at-4000` • `00m:03s:000ms`")
-                    && message.contains("`at-6000` • `00m:04s:000ms`"))));
+            logger.verify(() ->
+                    BotLogger.error(org.mockito.ArgumentMatchers.argThat(message -> message.contains("**Reasons:**")
+                            && message.contains("__**Alpha**__  `[alpha-id]`")
+                            && message.contains("__**Beta**__  `[beta-id]`")
+                            && message.contains("`at-4000` • `00m:03s:000ms`")
+                            && message.contains("`at-6000` • `00m:04s:000ms`"))));
         }
     }
 
@@ -64,14 +69,13 @@ class ButtonRuntimeWarningServiceTest {
                 MockedStatic<SREStats> sreStats = mockStatic(SREStats.class);
                 MockedStatic<BotLogger> logger = mockStatic(BotLogger.class)) {
             unstable.when(AsyncTI4DiscordBot::isUnstable).thenReturn(false);
-            time.when(() -> DateTimeHelper.getLongDateTimeFromDiscordSnowflake(any())).thenReturn(1_000L, 2_000L);
-            time.when(() -> DateTimeHelper.getTimeRepresentationToMilliseconds(anyLong())).thenCallRealMethod();
+            time.when(() -> DateTimeHelper.getLongDateTimeFromDiscordSnowflake(any()))
+                    .thenReturn(1_000L, 2_000L);
+            time.when(() -> DateTimeHelper.getTimeRepresentationToMilliseconds(anyLong()))
+                    .thenCallRealMethod();
 
             service.submitNewRuntime(firstEvent, 2_500L, 4_000L, 50L, 1_400L, 100L);
-            setField(
-                    service,
-                    "lastWarningTime",
-                    Instant.now().minusSeconds(61));
+            setField(service, "lastWarningTime", Instant.now().minusSeconds(61));
             setField(service, "runtimeWarningCount", 15);
             service.submitNewRuntime(secondEvent, 3_500L, 6_000L, 75L, 2_400L, 100L);
 
