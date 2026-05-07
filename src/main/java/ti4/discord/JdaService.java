@@ -57,6 +57,7 @@ import ti4.discord.interactions.context.ContextCommandManager;
 import ti4.discord.interactions.listeners.ListenerManager;
 import ti4.discord.interactions.selections.SelectionManager;
 import ti4.executors.ExecutorServiceManager;
+import ti4.executors.ExecutorUtility;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -110,7 +111,8 @@ public class JdaService {
     public static final Set<Guild> guilds = new HashSet<>();
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
     public static final List<Guild> fowServers = new ArrayList<>();
-    private static final int EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS = 20;
+    private static final int EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS = 5;
+    private static final int JDA_SHUTDOWN_TIMEOUT_SECONDS = 20;
     private static final Set<CacheFlag> DISABLED_JDA_CACHE_FLAGS = EnumSet.of(
             // User is playing a game, listening to Spotify, etc.
             CacheFlag.ACTIVITY,
@@ -588,70 +590,81 @@ public class JdaService {
     public static void shutdown() {
         try {
             AsyncTI4DiscordBot.markShuttingDown();
+
             jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
             BotLogger.info("SHUTDOWN PROCESS STARTED");
+
             ActiveLeaseService.setCurrentProcessReady(false);
             BotLogger.info("NO LONGER ACCEPTING COMMANDS");
-            // will wait up to 20 seconds gracefully, then up to 20 more after interruption
+
             if (shutdownEventExecutor()) {
                 BotLogger.info("FINISHED PROCESSING JDA EVENT POOL");
             } else {
                 BotLogger.info("DID NOT FINISH PROCESSING JDA EVENT POOL");
             }
-            // will wait for up to an additional 20 seconds
+
             if (ExecutorServiceManager.shutdown()) {
                 BotLogger.info("FINISHED PROCESSING ASYNC EXECUTOR THREADPOOL");
             } else {
                 BotLogger.info("DID NOT FINISH PROCESSING ASYNC EXECUTOR THREADPOOL");
             }
-            // will wait for up to an additional 20 seconds
+
             if (MapRenderPipeline.shutdown()) {
                 BotLogger.info("FINISHED RENDERING MAPS");
             } else {
                 BotLogger.info("DID NOT FINISH RENDERING MAPS");
             }
-            // will wait for up to an additional 20 seconds
+
             if (SliceGenerationPipeline.shutdown()) {
                 BotLogger.info("FINISHED RENDERING SLICE DRAFTS");
             } else {
                 BotLogger.info("DID NOT FINISH RENDERING SLICE DRAFTS");
             }
-            // will wait for up to an additional 20 seconds
+
             if (StatisticsPipeline.shutdown()) {
                 BotLogger.info("FINISHED PROCESSING STATISTICS");
             } else {
                 BotLogger.info("DID NOT FINISH PROCESSING STATISTICS");
             }
-            // will wait for up to an additional 20 seconds
-            CronManager.shutdown();
-            // will drain the log buffer and doesn't have a timeout
+
+            if (CronManager.shutdown()) {
+                BotLogger.info("FINISHED PROCESSING CRONS");
+            } else {
+                BotLogger.info("DID NOT FINISH PROCESSING CRONS");
+            }
+
             LogBufferManager.sendBufferedLogsToDiscord();
+
             SpringContext.getBean(ActiveLeaseService.class).releaseLease();
             BotLogger.info("RELEASED ACTIVE LEASE");
-            BotLogger.info("SHUTDOWN PROCESS COMPLETE");
+
+            BotLogger.info("SHUTTING DOWN JDA. GOOD BYE!");
+
             // wait for BotLogger
             TimeUnit.SECONDS.sleep(1);
-            jda.shutdown();
-            jda.awaitShutdown(30, TimeUnit.SECONDS);
+
+            shutdownJda();
         } catch (Exception e) {
             BotLogger.error("Error encountered within shutdown process:\n> ", e);
         }
     }
 
     private static boolean shutdownEventExecutor() {
-        EVENT_EXECUTOR.shutdown();
-        try {
-            if (EVENT_EXECUTOR.awaitTermination(EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
-                return true;
-            }
+        return ExecutorUtility.shutdownAndAwaitTermination(
+                EVENT_EXECUTOR, EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+    }
 
-            EVENT_EXECUTOR.shutdownNow();
-            return EVENT_EXECUTOR.awaitTermination(EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+    private static void shutdownJda() {
+        jda.shutdown();
+        try {
+            if (!jda.awaitShutdown(JDA_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                jda.shutdownNow();
+                jda.awaitShutdown(JDA_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            }
         } catch (InterruptedException e) {
-            EVENT_EXECUTOR.shutdownNow();
-            BotLogger.error("JdaService event thread pool shutdown interrupted.", e);
+            BotLogger.error("JDA shutdown interrupted.", e);
             Thread.currentThread().interrupt();
-            return false;
+            jda.shutdownNow();
         }
     }
 }

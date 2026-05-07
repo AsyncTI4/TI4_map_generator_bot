@@ -8,13 +8,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import org.apache.commons.lang3.function.Consumers;
 import ti4.executors.CircuitBreaker;
 import ti4.executors.ExecutionHistoryManager;
+import ti4.executors.ExecutorUtility;
 import ti4.helpers.TimedRunnable;
 import ti4.logging.BotLogger;
 
 @UtilityClass
 public class StatisticsPipeline {
 
-    private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
+    private static final int SHUTDOWN_TIMEOUT_SECONDS = 10;
     private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 60;
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor(
             Thread.ofPlatform().name("ti4-statistics-gatherer-", 0).factory());
@@ -32,14 +33,8 @@ public class StatisticsPipeline {
     }
 
     public static boolean shutdown() {
-        EXECUTOR_SERVICE.shutdownNow();
-        try {
-            return EXECUTOR_SERVICE.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            BotLogger.error("MapRenderPipeline shutdown interrupted.", e);
-            Thread.currentThread().interrupt();
-            return false;
-        }
+        return ExecutorUtility.shutdownAndAwaitTermination(
+                EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
     private static String eventToString(SlashCommandInteractionEvent event) {

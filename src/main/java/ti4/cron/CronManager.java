@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
+import ti4.executors.ExecutorUtility;
 import ti4.helpers.TimedRunnable;
 
 @UtilityClass
@@ -15,7 +16,7 @@ public class CronManager {
 
     private static final ScheduledThreadPoolExecutor SCHEDULER = new ScheduledThreadPoolExecutor(1);
     private static final Map<String, Runnable> CRONS = new ConcurrentHashMap<>();
-    private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
+    private static final int SHUTDOWN_TIMEOUT_SECONDS = 30;
 
     public static void schedulePeriodically(
             Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
@@ -28,10 +29,6 @@ public class CronManager {
         CRONS.put(clazz.getSimpleName(), runnable);
         TimedRunnable timedRunnable = new TimedRunnable(clazz.getSimpleName(), runnable);
         SCHEDULER.schedule(timedRunnable, initialDelay, unit);
-    }
-
-    public static void registerManual(Class<?> clazz, Runnable runnable) {
-        CRONS.put(clazz.getSimpleName(), runnable);
     }
 
     public static void schedulePeriodicallyAtTime(
@@ -66,15 +63,7 @@ public class CronManager {
         return CRONS.keySet();
     }
 
-    public static void shutdown() {
-        SCHEDULER.shutdown();
-        try {
-            if (!SCHEDULER.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
-                SCHEDULER.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            SCHEDULER.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
+    public static boolean shutdown() {
+        return ExecutorUtility.shutdownAndAwaitTermination(SCHEDULER, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 }

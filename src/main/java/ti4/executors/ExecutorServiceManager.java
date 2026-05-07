@@ -12,7 +12,7 @@ import ti4.helpers.TimedRunnable;
 @UtilityClass
 public class ExecutorServiceManager {
 
-    private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
+    private static final int SHUTDOWN_TIMEOUT_SECONDS = 60;
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newThreadPerTaskExecutor(
             Thread.ofVirtual().name("ti4-worker-", 0).factory());
 
@@ -70,17 +70,7 @@ public class ExecutorServiceManager {
     }
 
     public static boolean shutdown() {
-        EXECUTOR_SERVICE.shutdown();
-        try {
-            if (!EXECUTOR_SERVICE.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
-                EXECUTOR_SERVICE.shutdownNow();
-                return false;
-            }
-        } catch (InterruptedException e) {
-            EXECUTOR_SERVICE.shutdownNow();
-            Thread.currentThread().interrupt();
-            return false;
-        }
-        return true;
+        return ExecutorUtility.shutdownAndAwaitTermination(
+                EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 }
