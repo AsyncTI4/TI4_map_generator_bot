@@ -111,6 +111,8 @@ public class JdaService {
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
     public static final List<Guild> fowServers = new ArrayList<>();
 
+    private static final int MEMBER_CACHE_MAX_SIZE = 20_000;
+
     private static final ExecutorService EVENT_EXECUTOR = Executors.newFixedThreadPool(
             Runtime.getRuntime().availableProcessors(),
             Thread.ofPlatform().name("ti4-jda-event-", 0).factory());
@@ -125,9 +127,9 @@ public class JdaService {
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
                 // Needed for emoji searches and validation
                 .enableIntents(GatewayIntent.GUILD_EXPRESSIONS)
-                // Cache members as they are encountered (events, REST calls) without pre-loading
-                // all guild members at startup. ChunkingFilter.NONE prevents the startup bulk load.
-                .setMemberCachePolicy(MemberCachePolicy.ALL)
+                // Cache up to MEMBER_CACHE_MAX_SIZE most-recently-used members, evicting older
+                // entries automatically. ChunkingFilter.NONE prevents the startup bulk load.
+                .setMemberCachePolicy(MemberCachePolicy.lru(MEMBER_CACHE_MAX_SIZE))
                 .setChunkingFilter(ChunkingFilter.NONE)
                 // This allows us to use our own ShutdownHook, created below
                 .setEnableShutdownHook(false)
@@ -569,15 +571,14 @@ public class JdaService {
     }
 
     /**
-     * Resolves a guild member by user ID. Returns from JDA's local cache immediately if present,
-     * otherwise makes a blocking REST call to Discord. Should only be called from background threads
-     * (e.g. ExecutorServiceManager tasks), not from JDA event-dispatch threads.
+     * Resolves a guild member by user ID. Uses JDA's cache-aware {@code retrieveMemberById}, which
+     * returns the cached member immediately if available, otherwise makes a blocking REST call.
+     * Should only be called from background threads (e.g. ExecutorServiceManager tasks), not from
+     * JDA event-dispatch threads.
      */
     @Nullable
     public static Member getMemberById(@Nullable Guild guild, @Nullable String userId) {
         if (guild == null || userId == null) return null;
-        Member member = guild.getMemberById(userId);
-        if (member != null) return member;
         try {
             return guild.retrieveMemberById(userId).complete();
         } catch (ErrorResponseException e) {
@@ -591,15 +592,14 @@ public class JdaService {
     }
 
     /**
-     * Resolves a Discord user by user ID. Returns from JDA's local cache immediately if present,
-     * otherwise makes a blocking REST call to Discord. Should only be called from background threads
-     * (e.g. ExecutorServiceManager tasks), not from JDA event-dispatch threads.
+     * Resolves a Discord user by user ID. Uses JDA's cache-aware {@code retrieveUserById}, which
+     * returns the cached user immediately if available, otherwise makes a blocking REST call.
+     * Should only be called from background threads (e.g. ExecutorServiceManager tasks), not from
+     * JDA event-dispatch threads.
      */
     @Nullable
     public static User getUserById(@Nullable String userId) {
         if (jda == null || userId == null) return null;
-        User user = jda.getUserById(userId);
-        if (user != null) return user;
         try {
             return jda.retrieveUserById(userId).complete();
         } catch (ErrorResponseException e) {
