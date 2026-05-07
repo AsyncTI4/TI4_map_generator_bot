@@ -58,15 +58,7 @@ public class ButtonProcessor {
         String rawComponentID = event.getButton().getCustomId();
         ExecutionLockType lockType = registry.isSave(rawComponentID) ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutorServiceManager.runAsyncWithLock(
-                eventToString(event, gameName),
-                gameName,
-                event.getMessageChannel(),
-                () -> {
-                    var buttonContext = new ButtonContext(event);
-                    if (!buttonContext.isValid()) return;
-                    process(buttonContext, event);
-                },
-                lockType);
+                eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event), lockType);
     }
 
     private static String eventToString(ButtonInteractionEvent event, String gameName) {
@@ -76,7 +68,8 @@ public class ButtonProcessor {
                 + ButtonHelper.getButtonRepresentation(event.getButton());
     }
 
-    private static void process(ButtonContext context, ButtonInteractionEvent event) {
+    private static void process(ButtonInteractionEvent event) {
+        ButtonContext context = new ButtonContext(event);
         long processStartTime = System.currentTimeMillis();
         long resolveRuntime = 0;
         long saveRuntime = 0;
@@ -131,33 +124,6 @@ public class ButtonProcessor {
         UserSettingsManager.save(userSettings);
     }
 
-    private static boolean handleKnownButtons(ButtonContext context) {
-        String buttonID = context.getButtonID();
-        // Check for exact match first
-        if (registry.handlers().containsKey(buttonID)) {
-            RollbarManager.put("button_handler_id", buttonID);
-            registry.handlers().get(buttonID).accept(context);
-            return true;
-        }
-
-        // Then check for prefix match
-        String longestPrefixMatch = null;
-        for (String key : registry.handlers().keySet()) {
-            if (buttonID.startsWith(key)) {
-                if (longestPrefixMatch == null || key.length() > longestPrefixMatch.length()) {
-                    longestPrefixMatch = key;
-                }
-            }
-        }
-
-        if (longestPrefixMatch != null) {
-            RollbarManager.put("button_handler_id", longestPrefixMatch);
-            registry.handlers().get(longestPrefixMatch).accept(context);
-            return true;
-        }
-        return false;
-    }
-
     private static void resolveButtonInteractionEvent(ButtonContext context) {
         // pull values from context for easier access
         ButtonInteractionEvent event = context.getEvent();
@@ -168,7 +134,7 @@ public class ButtonProcessor {
         MessageChannel mainGameChannel = context.getMainGameChannel();
 
         // Check the list of ButtonHandlers first
-        if (handleKnownButtons(context)) return;
+        if (registry.handle(buttonID, context)) return;
 
         // TODO Convert all else..if..startsWith to use @ButtonHandler
         if (false) {

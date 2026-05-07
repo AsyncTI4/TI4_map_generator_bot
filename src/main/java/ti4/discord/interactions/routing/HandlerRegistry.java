@@ -3,24 +3,42 @@ package ti4.discord.interactions.routing;
 import java.util.Map;
 import java.util.function.Consumer;
 import ti4.discord.interactions.listeners.context.ListenerContext;
+import ti4.logging.RollbarManager;
 
 /**
- * Bundles the handler consumer map with the corresponding save-flag map for a single interaction type.
+ * Maps component-ID prefixes to {@link Handler} instances for a single interaction type.
  *
  * @param <C> The {@link ListenerContext} subtype handled by this registry.
- * @param handlers Map of component-ID prefix → handler consumer.
- * @param saveFlags Map of component-ID prefix → whether the handler persists game state.
+ * @param handlers Map of component-ID prefix → {@link Handler}.
  */
-public record HandlerRegistry<C extends ListenerContext>(
-        Map<String, Consumer<C>> handlers, Map<String, Boolean> saveFlags) {
+public record HandlerRegistry<C extends ListenerContext>(Map<String, Handler<C>> handlers) {
+
+    /**
+     * Holds a handler consumer together with the flag that says whether it persists game state.
+     *
+     * @param <C> The {@link ListenerContext} subtype.
+     * @param consumer The action to run when this handler is invoked.
+     * @param save     Whether the game should be saved after the handler runs.
+     */
+    public record Handler<C extends ListenerContext>(Consumer<C> consumer, boolean save) {
+        /** Returns the consumer for this handler. */
+        public Consumer<C> consumer() {
+            return consumer;
+        }
+
+        /** Returns whether this handler saves game state. */
+        public boolean isSave() {
+            return save;
+        }
+    }
 
     /**
      * Determines whether handling the given {@code componentID} should save game state.
      *
      * <p>Resolution order:
      * <ol>
-     *   <li>Exact match in {@code saveFlags}</li>
-     *   <li>Longest prefix match in {@code saveFlags}</li>
+     *   <li>Exact match in {@code handlers}</li>
+     *   <li>Longest prefix match in {@code handlers}</li>
      *   <li>Defaults to {@code true} (WRITE lock) when no match is found</li>
      * </ol>
      *
@@ -28,19 +46,41 @@ public record HandlerRegistry<C extends ListenerContext>(
      * @return {@code true} if the matched handler saves game state (or no match — defaults to WRITE).
      */
     public boolean isSave(String componentID) {
-        if (componentID == null) return true;
+        Handler<C> handler = findHandler(componentID);
+        return handler == null || handler.isSave();
+    }
 
-        Boolean exact = saveFlags.get(componentID);
+    /**
+     * Dispatches {@code context} to the best-matching handler for {@code componentID}.
+     *
+     * <p>Uses exact match first, then longest-prefix match.
+     *
+     * @param componentID The raw component ID from the Discord interaction event.
+     * @param context     The interaction context to pass to the handler.
+     * @return {@code true} if a handler was found and invoked, {@code false} otherwise.
+     */
+    public boolean handle(String componentID, C context) {
+        Handler<C> handler = findHandler(componentID);
+        if (handler == null) return false;
+        RollbarManager.put("handler_id", componentID);
+        handler.consumer().accept(context);
+        return true;
+    }
+
+    private Handler<C> findHandler(String componentID) {
+        if (componentID == null) return null;
+
+        Handler<C> exact = handlers.get(componentID);
         if (exact != null) return exact;
 
         String longestMatch = null;
-        for (String key : saveFlags.keySet()) {
+        for (String key : handlers.keySet()) {
             if (componentID.startsWith(key)) {
                 if (longestMatch == null || key.length() > longestMatch.length()) {
                     longestMatch = key;
                 }
             }
         }
-        return longestMatch == null || saveFlags.get(longestMatch);
+        return longestMatch == null ? null : handlers.get(longestMatch);
     }
 }

@@ -37,18 +37,12 @@ public final class SelectionMenuProcessor {
                 "SelectionMenuProcessor task for `" + gameName + "`",
                 gameName,
                 event.getMessageChannel(),
-                () -> {
-                    SelectionMenuContext context = new SelectionMenuContext(event);
-                    if (!context.isValid()) {
-                        BotLogger.warning(new LogOrigin(event), "Invalid selection menu context.");
-                        return;
-                    }
-                    process(context, event);
-                },
+                () -> process(event),
                 lockType);
     }
 
-    private static void process(SelectionMenuContext context, StringSelectInteractionEvent event) {
+    private static void process(StringSelectInteractionEvent event) {
+        SelectionMenuContext context = new SelectionMenuContext(event);
         try {
             RollbarManager.putInteractionMetadata("select_menu", event);
             RollbarManager.put("menu_id", event.getComponentId());
@@ -74,35 +68,8 @@ public final class SelectionMenuProcessor {
         }
     }
 
-    private static boolean handleKnownMenus(SelectionMenuContext context) {
-        String menuID = context.getMenuID();
-        // Check for exact match first
-        if (registry.handlers().containsKey(menuID)) {
-            RollbarManager.put("menu_handler_id", menuID);
-            registry.handlers().get(menuID).accept(context);
-            return true;
-        }
-
-        // Then check for prefix match
-        String longestPrefixMatch = null;
-        for (String key : registry.handlers().keySet()) {
-            if (menuID.startsWith(key)) {
-                if (longestPrefixMatch == null || key.length() > longestPrefixMatch.length()) {
-                    longestPrefixMatch = key;
-                }
-            }
-        }
-
-        if (longestPrefixMatch != null) {
-            RollbarManager.put("menu_handler_id", longestPrefixMatch);
-            registry.handlers().get(longestPrefixMatch).accept(context);
-            return true;
-        }
-        return false;
-    }
-
     private static void resolveSelectionMenu(SelectionMenuContext context) {
-        if (handleKnownMenus(context)) {
+        if (registry.handle(context.getMenuID(), context)) {
             return;
         }
 

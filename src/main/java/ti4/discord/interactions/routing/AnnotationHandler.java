@@ -257,28 +257,27 @@ public final class AnnotationHandler {
      * @param <H> {@link AnnotationHandler#handlers}
      * @param contextClass Which context type to accept parameters based upon
      * @param handlerClass Which handler annotation to look for
-     * @return A {@link HandlerRegistry} bundling the prefix→consumer map and the prefix→save-flag map.
+     * @return A {@link HandlerRegistry} mapping component-ID prefixes to {@link HandlerRegistry.Handler} instances.
      */
     public static <C extends ListenerContext, H extends Annotation> HandlerRegistry<C> findKnownHandlers(
             Class<C> contextClass, Class<H> handlerClass) {
-        Map<String, Consumer<C>> consumers = new HashMap<>();
-        Map<String, Boolean> saveFlags = new HashMap<>();
+        Map<String, HandlerRegistry.Handler<C>> handlers = new HashMap<>();
         try {
             if (!handlers().contains(handlerClass)) {
                 BotLogger.warning(
                         "Unknown handler class `" + handlerClass.getName() + "`. Please fix " + Constants.jazzPing());
-                return new HandlerRegistry<>(consumers, saveFlags);
+                return new HandlerRegistry<>(handlers);
             }
             if (!contexts().contains(contextClass)) {
                 BotLogger.warning(
                         "Unknown context class `" + contextClass.getName() + "`. Please fix " + Constants.jazzPing());
-                return new HandlerRegistry<>(consumers, saveFlags);
+                return new HandlerRegistry<>(handlers);
             }
             for (Class<?> klass : getAllClasses()) {
                 for (Method method : klass.getDeclaredMethods()) {
                     method.setAccessible(true);
-                    List<H> handlers = Arrays.asList(method.getAnnotationsByType(handlerClass));
-                    if (handlers.isEmpty()) continue;
+                    List<H> annotationList = Arrays.asList(method.getAnnotationsByType(handlerClass));
+                    if (annotationList.isEmpty()) continue;
 
                     String methodName = klass.getName() + "." + method.getName();
                     if (!Modifier.isStatic(method.getModifiers())) {
@@ -292,7 +291,7 @@ public final class AnnotationHandler {
                         continue;
                     }
 
-                    for (H handler : handlers) {
+                    for (H handler : annotationList) {
                         String val = null;
                         boolean save = true;
                         if (handler instanceof ButtonHandler bh) {
@@ -309,8 +308,7 @@ public final class AnnotationHandler {
                         }
                         if (val == null) continue;
                         Consumer<C> consumer = buildConsumer(method, argGetter, save);
-                        consumers.put(val, consumer);
-                        saveFlags.put(val, save);
+                        handlers.put(val, new HandlerRegistry.Handler<>(consumer, save));
                     }
                 }
             }
@@ -320,8 +318,8 @@ public final class AnnotationHandler {
             BotLogger.error(Constants.jazzPing() + " some other issue registering buttons.", e);
         }
 
-        BotLogger.info("Registered " + consumers.size() + " handlers of type " + handlerClass.getName());
-        return new HandlerRegistry<>(consumers, saveFlags);
+        BotLogger.info("Registered " + handlers.size() + " handlers of type " + handlerClass.getName());
+        return new HandlerRegistry<>(handlers);
     }
 
     private static List<Class<?>> getAllClasses() {

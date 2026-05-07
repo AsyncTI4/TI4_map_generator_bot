@@ -1,7 +1,5 @@
 package ti4.discord.interactions.listeners;
 
-import java.util.Map;
-import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -64,18 +62,12 @@ public final class ModalListener extends ListenerAdapter {
                 "ModalListener task for  `" + gameName + "`",
                 gameName,
                 event.getMessageChannel(),
-                () -> {
-                    var modalContext = new ModalContext(event);
-                    if (!modalContext.isValid()) {
-                        BotLogger.warning(new LogOrigin(event), "Invalid modal context.");
-                        return;
-                    }
-                    handleModal(modalContext, event);
-                },
+                () -> handleModal(event),
                 lockType);
     }
 
-    private void handleModal(ModalContext context, ModalInteractionEvent event) {
+    private void handleModal(ModalInteractionEvent event) {
+        ModalContext context = new ModalContext(event);
         try {
             RollbarManager.putInteractionMetadata("modal", event);
             RollbarManager.put("modal_id", event.getModalId());
@@ -99,32 +91,11 @@ public final class ModalListener extends ListenerAdapter {
         }
     }
 
-    private boolean handleKnownModals(ModalContext context) {
-        String modalID = context.getModalID();
-        // Check for exact match first
-        if (registry.handlers().containsKey(modalID)) {
-            RollbarManager.put("modal_handler_id", modalID);
-            registry.handlers().get(modalID).accept(context);
-            return true;
-        }
-
-        // Then check for prefix match
-        for (Map.Entry<String, Consumer<ModalContext>> entry :
-                registry.handlers().entrySet()) {
-            if (modalID.startsWith(entry.getKey())) {
-                RollbarManager.put("modal_handler_id", entry.getKey());
-                entry.getValue().accept(context);
-                return true;
-            }
-        }
-        return false;
-    }
-
     private void resolveModalInteractionEvent(@Nonnull ModalContext context) {
         String modalID = context.getModalID();
         Game game = context.getGame();
 
-        if (handleKnownModals(context)) return;
+        if (registry.handle(modalID, context)) return;
 
         if (modalID.startsWith("jmfA_")) {
             // Detect new settings menu navId() to route to the correct handler.
