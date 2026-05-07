@@ -682,6 +682,17 @@ public class ActionCardHelper {
             String acID,
             int acIndex,
             MessageChannel channel) {
+        return resolveActionCard(event, game, player, acID, acIndex, channel, false);
+    }
+
+    public static String resolveActionCard(
+            GenericInteractionCreateEvent event,
+            Game game,
+            Player player,
+            String acID,
+            int acIndex,
+            MessageChannel channel,
+            boolean playedOffTwinning) {
         MessageChannel mainGameChannel = game.getMainGameChannel() == null ? channel : game.getMainGameChannel();
         ActionCardModel actionCard = Mapper.getActionCard(acID);
         String actionCardTitle = actionCard.getName();
@@ -748,13 +759,16 @@ public class ActionCardHelper {
             game.discardActionCard(player.getUserID(), acIndex);
         }
 
-        boolean actionCardIsCancelable = isActionCardCancelable(actionCard);
+        boolean actionCardIsCancelable = !playedOffTwinning && isActionCardCancelable(actionCard);
 
         String pingGame = actionCardIsCancelable ? game.getPing() + ", " : "";
         String message = pingGame + (game.isFowMode() ? "someone" : player.getRepresentation());
         message += fromGarbozia ? " purged " : " played ";
         message += "the action card _" + actionCardTitle + "_";
         message += fromGarbozia ? " using _Dok 'N Pic's Salvage Yard_." : ".";
+        if (playedOffTwinning) {
+            message += " It was played via _Twinning_ and cannot be canceled.";
+        }
 
         List<Button> buttons = new ArrayList<>();
 
@@ -1907,6 +1921,16 @@ public class ActionCardHelper {
 
     public static String playAC(
             GenericInteractionCreateEvent event, Game game, Player player, String value, MessageChannel channel) {
+        return playAC(event, game, player, value, channel, false);
+    }
+
+    public static String playAC(
+            GenericInteractionCreateEvent event,
+            Game game,
+            Player player,
+            String value,
+            MessageChannel channel,
+            boolean playedOffTwinning) {
         String acID = null;
         int acIndex = -1;
         try {
@@ -1945,7 +1969,7 @@ public class ActionCardHelper {
         if (acID == null) {
             return "No such Action Card ID found, please retry";
         }
-        return resolveActionCard(event, game, player, acID, acIndex, channel);
+        return resolveActionCard(event, game, player, acID, acIndex, channel, playedOffTwinning);
     }
 
     private static String getGarboziaACIdentByAlias(Game game, Player player, String key) {

@@ -219,7 +219,8 @@ class ActionCardHandButtonHandler {
             Button button = Buttons.green("resolveTwin_" + actionCardTitle, "Play " + actionCardTitle + " Immediately");
             MessageHelper.sendMessageToChannelWithButton(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", after checking for Sabos, use the button to resolve _Twinning_.",
+                    player.getRepresentation()
+                            + ", use the button to resolve _Twinning_. The Twin'd card cannot be canceled.",
                     button);
         }
         if (acID.contains("counterstroke_")) {

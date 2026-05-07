@@ -2952,7 +2952,7 @@ public final class ButtonHelperActionCards {
                             event.getChannel(), "No such action card ID found, please retry.");
                     return;
                 }
-                ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel());
+                ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel(), true);
                 found = true;
                 break;
             }
@@ -2971,7 +2971,7 @@ public final class ButtonHelperActionCards {
                                 event.getChannel(), "No such action card ID found, please retry.");
                         return;
                     }
-                    ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel());
+                    ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel(), true);
                     game.setPurgedActionCard(acStringID);
                     break;
                 }
