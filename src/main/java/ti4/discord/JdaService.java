@@ -590,7 +590,7 @@ public class JdaService {
             BotLogger.info("SHUTDOWN PROCESS STARTED");
             ActiveLeaseService.setCurrentProcessReady(false);
             BotLogger.info("NO LONGER ACCEPTING COMMANDS");
-            if (shutdownEventExecutor()) { // will wait for up to an additional 40 seconds
+            if (shutdownEventExecutor()) { // will wait up to 20 seconds gracefully, then up to 20 more after interruption
                 BotLogger.info("FINISHED PROCESSING JDA EVENT POOL");
             } else {
                 BotLogger.info("DID NOT FINISH PROCESSING JDA EVENT POOL");
