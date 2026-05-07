@@ -115,6 +115,49 @@ public class CombatReplayHouseFavorService {
         houseScoreRepository.saveAllAndFlush(scores);
     }
 
+    public FavorLedger adjustFavorForAdmin(CombatReplayHouse house, int favorDelta) {
+        if (house == null || favorDelta == 0) return ledger(house);
+        return setAdminAdjustedBalance(house, balance(house) + favorDelta);
+    }
+
+    private FavorLedger setAdminAdjustedBalance(CombatReplayHouse house, int targetBalance) {
+        int desiredBalance = Math.max(0, targetBalance);
+        CombatReplayHouseScoreEntity adminScore = null;
+        for (CombatReplayHouseScoreEntity score :
+                houseScoreRepository.findByContestId(DEBUG_FAVOR_BALANCE_CONTEST_ID)) {
+            if (score.getHouse() == house) {
+                adminScore = score;
+                break;
+            }
+        }
+
+        int earnedOutsideAdminScore = 0;
+        for (CombatReplayHouseScoreEntity score : houseScoreRepository.findByHouse(house)) {
+            if (DEBUG_FAVOR_BALANCE_CONTEST_ID == safeLong(score.getContestId())) continue;
+            earnedOutsideAdminScore += safeInt(score.getFavorPoints());
+        }
+
+        int spent = 0;
+        for (CombatReplayHouseAbilityUseEntity use : houseAbilityUseRepository.findByHouse(house)) {
+            spent += safeInt(use.getFavorCost());
+        }
+
+        CombatReplayHouseScoreEntity score = adminScore == null ? new CombatReplayHouseScoreEntity() : adminScore;
+        score.setContestId(DEBUG_FAVOR_BALANCE_CONTEST_ID);
+        score.setHouse(house);
+        score.setPredictionPoints(safeInt(score.getPredictionPoints()));
+        score.setSideBetPoints(safeInt(score.getSideBetPoints()));
+        score.setAbilityPoints(safeInt(score.getAbilityPoints()));
+        score.setFavorPoints(desiredBalance + spent - earnedOutsideAdminScore);
+        score.setTotalPoints(safeInt(score.getTotalPoints()));
+        score.setPredictionCount(safeInt(score.getPredictionCount()));
+        score.setCorrectPredictions(safeInt(score.getCorrectPredictions()));
+        score.setAbilityBreakdownJson(score.getAbilityBreakdownJson() == null ? "[]" : score.getAbilityBreakdownJson());
+        score.setScoredAt(LocalDateTime.now());
+        houseScoreRepository.saveAndFlush(score);
+        return ledger(house);
+    }
+
     private int safeInt(Integer value) {
         return value == null ? 0 : value;
     }

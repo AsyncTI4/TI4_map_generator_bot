@@ -10,7 +10,14 @@ import ti4.helpers.Constants;
 public class LazaxCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new LazaxMyPoints(), new LazaxTop100(), new LazaxStartSeason1())
+                    new LazaxMyPoints(),
+                    new LazaxTop100(),
+                    new LazaxDelegationLeaderboard(),
+                    new LazaxStartSeason1(),
+                    new LazaxGrantFavor(),
+                    new LazaxHacanTradeConvoys(),
+                    new LazaxMentakFalseColors(),
+                    new LazaxNaaluGiftForesight())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

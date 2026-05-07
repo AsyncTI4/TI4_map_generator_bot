@@ -76,8 +76,9 @@ class ButtonListener extends ListenerAdapter {
     private static final class EventLatencyChecker {
 
         private static final long THRESHOLD_MS = 2000;
-        private static final Duration WARNING_COOLDOWN_WINDOW = Duration.ofMinutes(2);
-        private static final int EVENT_COUNT_THRESHOLD = 10;
+        private static final Duration WARNING_COOLDOWN_WINDOW = Duration.ofMinutes(5);
+        private static final Duration WARNING_TRIM_WINDOW = Duration.ofMinutes(1);
+        private static final int EVENT_COUNT_THRESHOLD = 15;
 
         private static final ConcurrentLinkedDeque<Long> slowEvents = new ConcurrentLinkedDeque<>();
         private static final AtomicLong lastWarningTimeMs = new AtomicLong(0);
@@ -101,8 +102,7 @@ class ButtonListener extends ListenerAdapter {
 
             slowEvents.addLast(now);
 
-            // trim old entries outside 5-minute window
-            long windowMs = WARNING_COOLDOWN_WINDOW.toMillis();
+            long windowMs = WARNING_TRIM_WINDOW.toMillis();
             while (!slowEvents.isEmpty() && now - slowEvents.getFirst() > windowMs) {
                 slowEvents.removeFirst();
             }
@@ -118,10 +118,12 @@ class ButtonListener extends ListenerAdapter {
             slowEvents.clear();
 
             long gatewayPing = event.getJDA().getGatewayPing();
+            long warningWindowMinutes = WARNING_TRIM_WINDOW.toMinutes();
+            String minuteLabel = warningWindowMinutes == 1 ? "minute" : "minutes";
             BotLogger.error("⚠ **High Discord/JDA latency detected: "
                     + EVENT_COUNT_THRESHOLD
                     + "+ slow events in the last "
-                    + WARNING_COOLDOWN_WINDOW.toMinutes() + "  minutes.**"
+                    + warningWindowMinutes + " " + minuteLabel + ".**"
                     + "\n**Gateway ping:** " + gatewayPing);
         }
     }

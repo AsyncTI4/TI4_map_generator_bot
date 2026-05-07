@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -27,12 +28,15 @@ import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
 import ti4.contest.replay.entities.CombatReplayHouseEntity;
+import ti4.contest.replay.entities.CombatReplayHouseOptOutEntity;
 import ti4.contest.replay.entities.CombatReplayLeaderboardEntryEntity;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
+import ti4.contest.replay.repository.CombatReplayHouseOptOutRepository;
 import ti4.contest.replay.repository.CombatReplayHouseRepository;
 import ti4.contest.replay.repository.CombatReplayLeaderboardEntryRepository;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
@@ -42,11 +46,28 @@ import ti4.service.emoji.TI4Emoji;
 @RequiredArgsConstructor
 public class CombatReplayHouseService {
 
+    public static final String TOGGLE_HOUSE_ROLE_BUTTON_ID = "lazaxToggleHouseRole";
+    public static final String TOGGLE_HOUSE_OPT_IN_BUTTON_ID = "lazaxToggleHouseOptIn";
+
+    private static final List<String> HOUSE_REACTION_CHANNEL_NAMES = List.of("lazax-hacan-mentak", "lazax-hacan-naalu");
+
     private final CombatContestSettings settings;
     private final CombatReplayHouseRepository houseRepository;
+    private final CombatReplayHouseOptOutRepository houseOptOutRepository;
     private final CombatReplayContestRepository replayContestRepository;
     private final CombatCandidateRepository candidateRepository;
     private final CombatReplayLeaderboardEntryRepository leaderboardEntryRepository;
+
+    public void postPublicParticipationControls(TextChannel channel) {
+        if (!settings.isHousesEnabled() || channel == null) return;
+        List<Button> buttons = List.of(
+                Buttons.gray(TOGGLE_HOUSE_ROLE_BUTTON_ID, "Toggle Role"),
+                Buttons.red(TOGGLE_HOUSE_OPT_IN_BUTTON_ID, "Opt In/Out Entirely"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                channel,
+                "-# Lazax delegation controls: toggle your Discord role visibility, or opt out entirely while preserving your delegation for a future opt-in.",
+                buttons);
+    }
 
     public void addHouseEmojiReactionIfNeeded(MessageReceivedEvent event) {
         if (!settings.isHousesEnabled()) return;
@@ -143,6 +164,9 @@ public class CombatReplayHouseService {
             }
             assignment.setUpdatedAt(now);
             houseRepository.save(assignment);
+            houseOptOutRepository
+                    .findByDiscordUserId(entry.getDiscordUserId())
+                    .ifPresent(houseOptOutRepository::delete);
 
             Member member = retrieveMember(guild, entry.getDiscordUserId());
             setOnlyHouseRole(guild, member, house);
@@ -190,6 +214,9 @@ public class CombatReplayHouseService {
             }
             assignment.setUpdatedAt(now);
             houseRepository.save(assignment);
+            houseOptOutRepository
+                    .findByDiscordUserId(entry.getDiscordUserId())
+                    .ifPresent(houseOptOutRepository::delete);
 
             participationByHouse.computeIfPresent(
                     house, (ignored, participation) -> participation + safeInt(entry.getPredictionCount()));
@@ -219,6 +246,7 @@ public class CombatReplayHouseService {
         }
         assignment.setUpdatedAt(now);
         CombatReplayHouseEntity saved = houseRepository.save(assignment);
+        houseOptOutRepository.findByDiscordUserId(discordUserId).ifPresent(houseOptOutRepository::delete);
 
         setOnlyHouseRole(guild, member, house);
         return saved;
@@ -250,6 +278,79 @@ public class CombatReplayHouseService {
         return true;
     }
 
+    public synchronized String toggleHouseRole(Guild guild, Member member, User user) {
+        if (!settings.isHousesEnabled()) return "Lazax delegations are not enabled.";
+        if (user == null || user.isBot()) return "Could not identify your Lazax delegation.";
+
+        CombatReplayHouseEntity assignment =
+                houseRepository.findByDiscordUserId(user.getId()).orElse(null);
+        if (assignment == null) {
+            if (houseOptOutRepository.findByDiscordUserId(user.getId()).isPresent()) {
+                return "You are opted out of Lazax delegations. Use **Opt In/Out Entirely** to opt back in first.";
+            }
+            return "You do not have a Lazax delegation yet.";
+        }
+        if (guild == null || member == null) return "Could not update your Lazax delegation role.";
+
+        Role role = findRole(guild, assignment.getHouse());
+        if (role == null) return "Could not find the " + assignment.getHouse().roleName() + " role.";
+
+        if (member.getRoles().contains(role)) {
+            guild.removeRoleFromMember(member, role).queue(null, BotLogger::catchRestError);
+            return "Removed your **" + assignment.getHouse().roleName()
+                    + "** role. Your delegation assignment is unchanged.";
+        }
+
+        grantHouseRole(guild, member, assignment.getHouse(), null);
+        return "Added your **" + assignment.getHouse().roleName() + "** role.";
+    }
+
+    public synchronized String toggleHouseOptIn(Guild guild, Member member, User user) {
+        if (!settings.isHousesEnabled()) return "Lazax delegations are not enabled.";
+        if (user == null || user.isBot()) return "Could not identify your Lazax delegation.";
+
+        CombatReplayHouseEntity assignment =
+                houseRepository.findByDiscordUserId(user.getId()).orElse(null);
+        if (assignment != null) {
+            CombatReplayHouseOptOutEntity optOut = houseOptOutRepository
+                    .findByDiscordUserId(user.getId())
+                    .orElseGet(CombatReplayHouseOptOutEntity::new);
+            optOut.setDiscordUserId(assignment.getDiscordUserId());
+            optOut.setDiscordUserName(assignment.getDiscordUserName());
+            optOut.setHouse(assignment.getHouse());
+            optOut.setAssignedAt(assignment.getAssignedAt());
+            optOut.setOptedOutAt(LocalDateTime.now());
+            houseOptOutRepository.save(optOut);
+
+            houseRepository.delete(assignment);
+            clearHouseRoles(guild, member);
+            return "Opted out of Lazax delegations. Your **"
+                    + assignment.getHouse().displayName()
+                    + " Delegation** assignment is saved if you opt back in later.";
+        }
+
+        CombatReplayHouseOptOutEntity optOut =
+                houseOptOutRepository.findByDiscordUserId(user.getId()).orElse(null);
+        if (optOut != null) {
+            CombatReplayHouseEntity restored = new CombatReplayHouseEntity();
+            restored.setDiscordUserId(optOut.getDiscordUserId());
+            restored.setDiscordUserName(StringUtils.defaultIfBlank(user.getName(), optOut.getDiscordUserName()));
+            restored.setHouse(optOut.getHouse());
+            restored.setAssignedAt(optOut.getAssignedAt());
+            restored.setUpdatedAt(LocalDateTime.now());
+            houseRepository.save(restored);
+            houseOptOutRepository.delete(optOut);
+            ensureLeaderboardEntry(restored.getDiscordUserId(), restored.getDiscordUserName());
+            setOnlyHouseRole(guild, member, restored.getHouse());
+            return "Opted back in to **" + restored.getHouse().displayName() + " Delegation**.";
+        }
+
+        CombatReplayHouseEntity newAssignment = assignHouseIfAbsent(guild, member, user.getId(), user.getName());
+        return newAssignment == null
+                ? "Could not opt you in to Lazax delegations."
+                : "Opted in to **" + newAssignment.getHouse().displayName() + " Delegation**.";
+    }
+
     public Map<String, CombatReplayHouse> housesByUserIds(Collection<String> discordUserIds) {
         Map<String, CombatReplayHouse> housesByUser = new HashMap<>();
         if (discordUserIds == null || discordUserIds.isEmpty()) return housesByUser;
@@ -274,9 +375,9 @@ public class CombatReplayHouseService {
     }
 
     private String houseRoleMention(Guild guild, CombatReplayHouse house) {
-        if (guild == null) return "**" + house.displayName() + " Delegation**";
+        if (guild == null) return "**" + house.roleName() + "**";
         Role role = findRole(guild, house);
-        return role == null ? "**" + house.displayName() + " Delegation**" : role.getAsMention();
+        return role == null ? "**" + house.roleName() + "**" : role.getAsMention();
     }
 
     public List<CombatReplayHouseEntity> allHouseAssignments() {
@@ -291,9 +392,8 @@ public class CombatReplayHouseService {
         }
         return CombatReplayChannels.contestChannelName(settings).equalsIgnoreCase(channelName)
                 || channelName.toLowerCase().startsWith("lazax-war-archives")
-                || CombatReplayHouse.assignmentOrder().stream()
-                        .map(CombatReplayHouse::channelName)
-                        .anyMatch(houseChannelName -> houseChannelName.equalsIgnoreCase(channelName));
+                || HOUSE_REACTION_CHANNEL_NAMES.stream()
+                        .anyMatch(reactionChannelName -> reactionChannelName.equalsIgnoreCase(channelName));
     }
 
     private boolean isContestThread(ThreadChannel thread) {
@@ -325,6 +425,10 @@ public class CombatReplayHouseService {
             }
             ensureHouseRole(guild, member, existing.getHouse());
             return existing;
+        }
+        if (houseOptOutRepository.findByDiscordUserId(discordUserId).isPresent()) {
+            clearHouseRoles(guild, member);
+            return null;
         }
 
         CombatReplayHouse house = houseWithFewestMembers();

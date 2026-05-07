@@ -12,6 +12,7 @@ import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.entities.CombatReplayLeaderboardEntryEntity;
 import ti4.contest.replay.house.hacan.CombatReplayHacanTradeConvoysService;
+import ti4.contest.replay.house.mentak.CombatReplayMentakAbilityService;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
 import ti4.contest.replay.repository.CombatReplayLeaderboardEntryRepository;
 import ti4.contest.replay.repository.CombatReplayPredictionRepository;
@@ -31,7 +32,8 @@ class CombatReplayLeaderboardServiceTest {
                 mock(CombatReplayHouseService.class),
                 mock(CombatReplayHouseLedgerService.class),
                 mock(CombatReplayHouseFavorService.class),
-                mock(CombatReplayHacanTradeConvoysService.class));
+                mock(CombatReplayHacanTradeConvoysService.class),
+                mock(CombatReplayMentakAbilityService.class));
         Method method = CombatReplayLeaderboardService.class.getDeclaredMethod(
                 "newLeaderboardEntry", String.class, String.class);
         method.setAccessible(true);
@@ -59,7 +61,8 @@ class CombatReplayLeaderboardServiceTest {
                 mock(CombatReplayHouseService.class),
                 mock(CombatReplayHouseLedgerService.class),
                 houseFavorService,
-                mock(CombatReplayHacanTradeConvoysService.class));
+                mock(CombatReplayHacanTradeConvoysService.class),
+                mock(CombatReplayMentakAbilityService.class));
         Method method = CombatReplayLeaderboardService.class.getDeclaredMethod(
                 "favorAwardMessage", HousePredictionSummary.class);
         method.setAccessible(true);

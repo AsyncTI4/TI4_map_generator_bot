@@ -10,6 +10,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import ti4.contest.replay.core.CombatContestSettings;
@@ -18,20 +19,30 @@ import ti4.contest.replay.entities.CombatReplayHouseEntity;
 import ti4.contest.replay.entities.CombatReplayLeaderboardEntryEntity;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
+import ti4.contest.replay.repository.CombatReplayHouseOptOutRepository;
 import ti4.contest.replay.repository.CombatReplayHouseRepository;
 import ti4.contest.replay.repository.CombatReplayLeaderboardEntryRepository;
 
 class CombatReplayHouseServiceTest {
 
     private final CombatReplayHouseRepository houseRepository = mock(CombatReplayHouseRepository.class);
+    private final CombatReplayHouseOptOutRepository houseOptOutRepository =
+            mock(CombatReplayHouseOptOutRepository.class);
     private final CombatReplayLeaderboardEntryRepository leaderboardEntryRepository =
             mock(CombatReplayLeaderboardEntryRepository.class);
     private final CombatReplayHouseService service = new CombatReplayHouseService(
             new CombatContestSettings(),
             houseRepository,
+            houseOptOutRepository,
             mock(CombatReplayContestRepository.class),
             mock(CombatCandidateRepository.class),
             leaderboardEntryRepository);
+
+    @BeforeEach
+    void setup() {
+        when(houseOptOutRepository.findByDiscordUserId(org.mockito.Mockito.anyString()))
+                .thenReturn(Optional.empty());
+    }
 
     @Test
     void seasonStartRandomlyAssignsLeaderboardEntriesIntoBalancedDelegations() {

@@ -23,7 +23,7 @@ import ti4.service.regex.RegexService;
 @UtilityClass
 class MiltyDraftButtonHandlers {
 
-    @ButtonHandler("showMiltyDraft")
+    @ButtonHandler(value = "showMiltyDraft", save = false)
     private void postDraftInfo(ButtonInteractionEvent event, Game game) {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         MiltyDraftDisplayService.repostDraftInformation(manager, game);
@@ -120,7 +120,7 @@ class MiltyDraftButtonHandlers {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
-    @ButtonHandler("miltyFactionInfo_")
+    @ButtonHandler(value = "miltyFactionInfo_", save = false)
     private void sendAvailableFactionInfo(Game game, Player player, String buttonID) {
         if (player == null) return;
         String whichOnes = buttonID.replace("miltyFactionInfo_", "");

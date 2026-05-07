@@ -151,13 +151,13 @@ public final class GMService {
         }
     }
 
-    @ButtonHandler("gmRefresh")
+    @ButtonHandler(value = "gmRefresh", save = false)
     public static void refreshGMButtons(ButtonInteractionEvent event, Game game) {
         showGMButtons(game);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    @ButtonHandler("gmShowGameAs_")
+    @ButtonHandler(value = "gmShowGameAs_", save = false)
     public static void showGameAs(ButtonInteractionEvent event, String buttonID, Game game) {
         String faction = buttonID.replace("gmShowGameAs_", "");
         if (!faction.isEmpty()) {
@@ -178,7 +178,7 @@ public final class GMService {
         }
     }
 
-    @ButtonHandler("gmCheckPlayerHands_")
+    @ButtonHandler(value = "gmCheckPlayerHands_", save = false)
     public static void checkPlayerHands(ButtonInteractionEvent event, String buttonID, Game game) {
         String option = buttonID.replace("gmCheckPlayerHands_", "");
         switch (option) {
@@ -274,7 +274,7 @@ public final class GMService {
         }
     }
 
-    @ButtonHandler("gmWhoCanSee~MDL")
+    @ButtonHandler(value = "gmWhoCanSee~MDL", save = false)
     public static void whoCanSeePosition(ButtonInteractionEvent event) {
         TextInput position = TextInput.create(Constants.POSITION, TextInputStyle.SHORT)
                 .setPlaceholder("000")

@@ -51,6 +51,11 @@ public class CombatReplaySideBetService {
         sideBetUiService.postSideBetButtonsIfNeeded(channel, game, contest, candidate);
     }
 
+    public void refreshSideBetSummary(
+            MessageChannel channel, CombatReplayContestEntity contest, CombatCandidateEntity candidate) {
+        sideBetUiService.refreshSummaryMessage(channel, contest, candidate);
+    }
+
     public PlacementResult placeSideBet(
             ButtonInteractionEvent event, Long contestId, CombatSideBetType betType, String targetFaction) {
         if (contestId == null || event == null) {

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -65,13 +66,13 @@ class CombatReplayServiceTest {
                 "muaat",
                 4);
 
-        assertEquals(2.7033, blowoutScore, 0.0001);
-        assertEquals(4.1705, squeakerScore, 0.0001);
+        assertEquals(2.2033, blowoutScore, 0.0001);
+        assertEquals(3.6705, squeakerScore, 0.0001);
         assertTrue(squeakerScore > blowoutScore);
     }
 
     @Test
-    void promotionScoreAddsHalfPointBonusWhenDefenderWins() {
+    void promotionScoreDoesNotDependOnAttackerOrDefenderRole() {
         CombatCandidateEntity candidate = candidate("sol", "yin");
         CombatReplayService.InitialCombatStats initialStats = initialStats(12, 12, 8, 8);
 
@@ -82,7 +83,16 @@ class CombatReplayServiceTest {
         double defenderWinScore = CombatReplayService.computePromotionScore(
                 candidate, initialStats, attackerRemaining, defenderRemaining, "yin", 2);
 
-        assertEquals(attackerWinScore + 0.5, defenderWinScore, 0.0001);
+        assertEquals(attackerWinScore, defenderWinScore, 0.0001);
+    }
+
+    @Test
+    void drawPromotionScoreHasNoFlatBonus() {
+        CombatReplayService.InitialCombatStats initialStats = initialStats(10, 10, 8, 8);
+
+        double score = CombatReplayService.computeDrawPromotionScore(initialStats, 4);
+
+        assertEquals(2.9, score, 0.0001);
     }
 
     @Test
@@ -98,8 +108,8 @@ class CombatReplayServiceTest {
         double snapshotScore = CombatReplayService.computePromotionScore(
                 candidate, replaySnapshotStats, attackerRemaining, defenderRemaining, "hacan", 3);
 
-        assertEquals(2.7074, staleScore, 0.0001);
-        assertEquals(1.4888, snapshotScore, 0.0001);
+        assertEquals(2.2074, staleScore, 0.0001);
+        assertEquals(0.9888, snapshotScore, 0.0001);
         assertTrue(snapshotScore < staleScore);
     }
 
@@ -190,6 +200,28 @@ class CombatReplayServiceTest {
 
         assertFalse(service.isTrackedCandidateRoll(game, attacker, defender, tile, CombatRollType.bombardment));
         assertFalse(service.isTrackedCandidateRoll(game, attacker, outsider, tile, CombatRollType.combatround));
+    }
+
+    @Test
+    void doesNotTrackDiscordantStarsCombatsEvenWhenTrackAllIsEnabled() {
+        CombatContestSettings settings = new CombatContestSettings();
+        settings.getRuntime().setTrackAllCombatsAsCandidates(true);
+        CombatObservationRepository observationRepository = mock(CombatObservationRepository.class);
+        CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
+        CombatReplayService service = new CombatReplayService(
+                settings,
+                observationRepository,
+                candidateRepository,
+                mock(CombatCandidateEventRepository.class),
+                mock(CombatReplayEventAppender.class),
+                mock(CombatReplaySideBetTriggerService.class),
+                mock(CombatSideBetAvailabilityService.class));
+        Game game = game("pbd-discordant-stars");
+        game.setDiscordantStarsMode(true);
+
+        service.onSpaceCombatStarted(game, player(game, "rohdhna"), player(game, "khrask"), new Tile("d31", "317"));
+
+        verifyNoInteractions(observationRepository, candidateRepository);
     }
 
     private CombatReplayService service(CombatCandidateRepository candidateRepository) {

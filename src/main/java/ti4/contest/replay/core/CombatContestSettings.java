@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import ti4.spring.context.SpringContext;
 
 /**
  * Mutable in-memory settings for the replay contest system.
@@ -26,6 +27,7 @@ public class CombatContestSettings {
     @Setter(AccessLevel.NONE)
     private boolean isProd;
 
+    private boolean enabled;
     private CandidateSelection candidateSelection = new CandidateSelection();
     private Promotion promotion = new Promotion();
     private ReplayExecution replayExecution = new ReplayExecution();
@@ -109,6 +111,7 @@ public class CombatContestSettings {
         require(
                 houseAbilities.naalu.roundOneRollPeekFavorCost >= 0,
                 "houseAbilities.naalu.roundOneRollPeekFavorCost must be >= 0.");
+        require(houseAbilities.naalu.luckOmensFavorCost >= 0, "houseAbilities.naalu.luckOmensFavorCost must be >= 0.");
         require(
                 houseAbilities.mentak.previewLeadSeconds >= 0,
                 "houseAbilities.mentak.previewLeadSeconds must be >= 0.");
@@ -128,6 +131,9 @@ public class CombatContestSettings {
                 houseAbilities.hacan.maxSubsidiesPerContest >= 0,
                 "houseAbilities.hacan.maxSubsidiesPerContest must be >= 0.");
         require(houseAbilities.hacan.subsidyFavorOnHit >= 0, "houseAbilities.hacan.subsidyFavorOnHit must be >= 0.");
+        require(
+                houseAbilities.hacan.baseCombatFavorGain >= 0,
+                "houseAbilities.hacan.baseCombatFavorGain must be >= 0.");
         require(
                 houseAbilities.hacan.marketMakerPointsPerBet >= 0,
                 "houseAbilities.hacan.marketMakerPointsPerBet must be >= 0.");
@@ -149,6 +155,18 @@ public class CombatContestSettings {
         require(
                 houseAbilities.hacan.highTradeConvoysPredictionBonus >= 0,
                 "houseAbilities.hacan.highTradeConvoysPredictionBonus must be >= 0.");
+        require(
+                houseAbilities.hacan.veryHighTradeConvoysFavorCost >= 0,
+                "houseAbilities.hacan.veryHighTradeConvoysFavorCost must be >= 0.");
+        require(
+                houseAbilities.hacan.veryHighTradeConvoysPredictionBonus >= 0,
+                "houseAbilities.hacan.veryHighTradeConvoysPredictionBonus must be >= 0.");
+        require(
+                houseAbilities.hacan.maximumTradeConvoysFavorCost >= 0,
+                "houseAbilities.hacan.maximumTradeConvoysFavorCost must be >= 0.");
+        require(
+                houseAbilities.hacan.maximumTradeConvoysPredictionBonus >= 0,
+                "houseAbilities.hacan.maximumTradeConvoysPredictionBonus must be >= 0.");
     }
 
     private void require(boolean condition, String message) {
@@ -160,6 +178,10 @@ public class CombatContestSettings {
     @JsonProperty("isProd")
     public boolean isProd() {
         return isProd;
+    }
+
+    public static boolean isEnabledStatic() {
+        return SpringContext.getBean(CombatContestSettings.class).isEnabled();
     }
 
     private void loadEnvironmentDefaults(boolean isProd) {
@@ -187,13 +209,13 @@ public class CombatContestSettings {
     @Setter
     public static class CandidateSelection {
         private Window window = new Window();
-        private int targetCandidatesPerHour = 16;
+        private int targetCandidatesPerHour = 4;
     }
 
     @Getter
     @Setter
     public static class Window {
-        private int lookbackMinutes = 1440;
+        private int lookbackMinutes = 480;
         private int refreshCronIntervalSeconds = 300;
     }
 
@@ -266,16 +288,17 @@ public class CombatContestSettings {
     public static class Naalu {
         private int actionCardPeekFavorCost = 30;
         private int roundOneRollPeekFavorCost = 50;
+        private int luckOmensFavorCost = 40;
     }
 
     @Getter
     @Setter
     public static class Mentak {
         private int previewLeadSeconds = 5 * 60;
-        private int destroyerDecoyFavorCost = 30;
-        private int cruiserDecoyFavorCost = 40;
-        private int dreadnoughtDecoyFavorCost = 60;
-        private int warSunDecoyFavorCost = 80;
+        private int destroyerDecoyFavorCost = 20;
+        private int cruiserDecoyFavorCost = 30;
+        private int dreadnoughtDecoyFavorCost = 40;
+        private int warSunDecoyFavorCost = 70;
     }
 
     @Getter
@@ -283,12 +306,17 @@ public class CombatContestSettings {
     public static class Hacan {
         private int maxSubsidiesPerContest = 2;
         private int subsidyFavorOnHit = 10;
-        private int marketMakerPointsPerBet = 1;
+        private int baseCombatFavorGain = 20;
+        private int marketMakerPointsPerBet = 2;
         private int lowTradeConvoysFavorCost = 10;
-        private int lowTradeConvoysPredictionBonus = 5;
+        private int lowTradeConvoysPredictionBonus = 9;
         private int mediumTradeConvoysFavorCost = 20;
-        private int mediumTradeConvoysPredictionBonus = 10;
+        private int mediumTradeConvoysPredictionBonus = 14;
         private int highTradeConvoysFavorCost = 30;
-        private int highTradeConvoysPredictionBonus = 15;
+        private int highTradeConvoysPredictionBonus = 19;
+        private int veryHighTradeConvoysFavorCost = 40;
+        private int veryHighTradeConvoysPredictionBonus = 25;
+        private int maximumTradeConvoysFavorCost = 50;
+        private int maximumTradeConvoysPredictionBonus = 31;
     }
 }

@@ -27,19 +27,30 @@ public class CombatReplayCustodianFavorScoringRule implements CombatReplayHouseS
 
         for (CombatReplayHouse house : CombatReplayHouse.assignmentOrder()) {
             int pointsBehind = Math.max(0, leaderPoints - seasonPointsByHouse.getOrDefault(house, 0));
-            int favor = combatFavorGain(pointsBehind);
+            int favor = combatFavorGain(house, pointsBehind);
             context.totals(house).favorPoints += favor;
             context.addFavorSummary(house, "the Custodians sealing this combat's ledger", favor, true);
         }
     }
 
     public int combatFavorGain(int pointsBehindLeader) {
+        return combatFavorGain(null, pointsBehindLeader);
+    }
+
+    public int combatFavorGain(CombatReplayHouse house, int pointsBehindLeader) {
         CombatContestSettings.HouseAbilities houseAbilities = settings.getHouseAbilities();
         int catchupBonus = Math.min(
                 houseAbilities.getMaxCatchupFavorBonus(),
                 (Math.max(0, pointsBehindLeader) / houseAbilities.getCatchupFavorPointsPerBonus())
                         * houseAbilities.getCatchupFavorBonusStep());
-        return houseAbilities.getBaseCombatFavorGain() + catchupBonus;
+        return baseCombatFavorGain(house, houseAbilities) + catchupBonus;
+    }
+
+    private int baseCombatFavorGain(CombatReplayHouse house, CombatContestSettings.HouseAbilities houseAbilities) {
+        if (house == CombatReplayHouse.HACAN) {
+            return houseAbilities.getHacan().getBaseCombatFavorGain();
+        }
+        return houseAbilities.getBaseCombatFavorGain();
     }
 
     private EnumMap<CombatReplayHouse, Integer> currentSeasonPointsByHouse(CombatReplayHouseScoringContext context) {

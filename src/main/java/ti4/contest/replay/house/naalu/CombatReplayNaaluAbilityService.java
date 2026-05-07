@@ -1,7 +1,9 @@
 package ti4.contest.replay.house.naalu;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
@@ -15,7 +17,6 @@ import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.core.CombatRollPayload;
-import ti4.contest.replay.core.renderers.CombatRollPayloadRenderer;
 import ti4.contest.replay.dispatch.ReplayDispatchPayload;
 import ti4.contest.replay.dispatch.ReplayDispatchSerializer;
 import ti4.contest.replay.entities.CombatCandidateEntity;
@@ -35,14 +36,11 @@ import ti4.contest.replay.service.CombatReplayInteractionResult;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
-import ti4.game.Player;
-import ti4.game.persistence.GameManager;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.service.combat.CombatRollType;
-import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.DiceEmojis;
 import ti4.service.emoji.FactionEmojis;
 
@@ -54,13 +52,17 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
     public static final String NAALU_PEEK_PREFIX = "combatReplayNaaluPeek_";
     public static final String NAALU_ACTION_CARDS = NAALU_PEEK_PREFIX + "actionCards_";
     public static final String NAALU_ROUND_ONE_ROLLS = NAALU_PEEK_PREFIX + "roundOneRolls_";
+    public static final String NAALU_LUCK_OMENS = NAALU_PEEK_PREFIX + "luckOmens_";
     public static final String NAALU_DO_NOT_USE = NAALU_PEEK_PREFIX + "doNotUse_";
 
     private static final String NAALU_ACTION_CARDS_ABILITY = "NAALU_ACTION_CARDS";
     private static final String NAALU_ROUND_ONE_ROLLS_ABILITY = "NAALU_ROUND_ONE_ROLLS";
+    private static final String NAALU_LUCK_OMENS_ABILITY = "NAALU_LUCK_OMENS";
     private static final String DO_NOT_USE_ABILITY = "DO_NOT_USE";
     private static final String SYSTEM_USER_ID = "0";
     private static final String SYSTEM_USER_NAME = "Naalu Delegation";
+    private static final double AVERAGE_DELTA_LIMIT = 0.5;
+    private static final double STRONG_LUCK_DELTA_LIMIT = 1.5;
 
     private final CombatContestSettings settings;
     private final CombatReplayContestRepository replayContestRepository;
@@ -105,8 +107,18 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
                         + CombatReplayAbilityWindowText.votesLockLine(discussionWindowSeconds())
                         + "\n"
                         + favorBalanceLine()
-                        + "\n-# Gift of Foresight: choose one vision to reveal when discussion ends. Predictions and side bets remain open afterward.",
+                        + "\n-# Gift of Foresight: choose whether to read the combat's omens when discussion ends. Predictions and side bets remain open afterward.",
                 peekButtons(contest.getId()));
+    }
+
+    public boolean repostOpenGiftOfForesightButtons() {
+        CombatReplayContestEntity contest =
+                replayContestRepository.findFirstByOrderByIdDesc().orElse(null);
+        if (!phaseService.discussionOpen(contest)) return false;
+        CombatCandidateEntity candidate = loadCandidate(contest);
+        if (candidate == null) return false;
+        postAbilityButtonsIfNeeded(contest, candidate);
+        return true;
     }
 
     private String favorBalanceLine() {
@@ -130,6 +142,10 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
     public CombatReplayInteractionResult voteRoundOneRollPeek(
             long contestId, String discordUserId, String discordUserName) {
         return vote(contestId, NAALU_ROUND_ONE_ROLLS_ABILITY, "Round 1 Rolls", discordUserId, discordUserName);
+    }
+
+    public CombatReplayInteractionResult voteLuckOmens(long contestId, String discordUserId, String discordUserName) {
+        return vote(contestId, NAALU_LUCK_OMENS_ABILITY, "Omens", discordUserId, discordUserName);
     }
 
     public CombatReplayInteractionResult voteDoNotUse(long contestId, String discordUserId, String discordUserName) {
@@ -166,6 +182,8 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
             reveal = renderActionCardPeek(contest.getId());
         } else if (NAALU_ROUND_ONE_ROLLS_ABILITY.equals(winningVote.optionKey())) {
             reveal = renderRoundOneRollPeek(contest.getId());
+        } else if (NAALU_LUCK_OMENS_ABILITY.equals(winningVote.optionKey())) {
+            reveal = renderLuckOmens(contest.getId());
         } else {
             return;
         }
@@ -190,7 +208,6 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
         CombatCandidateEntity candidate = loadCandidate(contest);
         if (candidate == null) return "Could not find that combat archive.";
 
-        Game game = loadGame(candidate.getGameName());
         List<String> lines = new ArrayList<>();
         for (CombatCandidateEventEntity event : orderedEvents(candidate)) {
             ReplayDispatchPayload payload = payloadSerializer.read(event);
@@ -198,7 +215,7 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
 
             ActionCardModel actionCard = Mapper.getActionCard(actionCardId);
             String cardName = actionCard == null ? actionCardId : actionCard.getName();
-            lines.add("- " + actor(game, event.getActorFaction()) + ": _" + cardName + "_");
+            lines.add("- " + actor(event.getActorFaction()) + ": _" + cardName + "_");
         }
 
         if (lines.isEmpty()) {
@@ -212,7 +229,6 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
         CombatCandidateEntity candidate = loadCandidate(contest);
         if (candidate == null) return "Could not find that combat archive.";
 
-        Game game = loadGame(candidate.getGameName());
         CombatReplayDecoys.Abilities abilities = CombatReplayDecoys.read(candidate.getReplayAbilitiesJson());
         List<String> rolls = new ArrayList<>();
         for (CombatCandidateEventEntity event : orderedEvents(candidate)) {
@@ -225,15 +241,73 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
             if (!isCombatRoundRoll(combatRoll.payload())) continue;
 
             CombatRollPayload payloadWithDecoys = CombatReplayDecoys.applyToRoll(combatRoll.payload(), abilities);
-            String rendered = CombatRollPayloadRenderer.render(payloadWithDecoys);
+            String rendered = renderRoundOneRollSummary(payloadWithDecoys);
             if (StringUtils.isBlank(rendered)) continue;
-            rolls.add("### " + actor(game, event.getActorFaction()) + "\n" + rendered.strip());
+            rolls.add("### " + actor(event.getActorFaction()) + "\n" + rendered.strip());
         }
 
         if (rolls.isEmpty()) {
             return "## Gift of Foresight: Round 1 Rolls\nNo first-round combat rolls have surfaced yet.";
         }
         return "## Gift of Foresight: Round 1 Rolls\n" + String.join("\n\n", rolls);
+    }
+
+    private String renderRoundOneRollSummary(CombatRollPayload payload) {
+        if (payload == null || payload.total() == null) return "";
+        int totalHits = payload.total().displayedTotalHits();
+        return "**Total hits " + totalHits + "** " + ":boom:".repeat(Math.max(0, totalHits));
+    }
+
+    public String renderLuckOmens(long contestId) {
+        CombatReplayContestEntity contest = loadContest(contestId);
+        CombatCandidateEntity candidate = loadCandidate(contest);
+        if (candidate == null) return "Could not find that combat archive.";
+
+        LuckAccumulator overall = new LuckAccumulator();
+        Map<String, LuckAccumulator> actorLuck = new LinkedHashMap<>();
+        for (CombatCandidateEventEntity event : orderedEvents(candidate)) {
+            if (event.getEventType() != CombatCandidateEventType.ROLL) continue;
+            ReplayDispatchPayload payload = payloadSerializer.read(event);
+            if (!(payload instanceof ReplayDispatchPayload.CombatRollDispatch combatRoll)) continue;
+            if (combatRoll.payload() == null) continue;
+
+            String actorFaction = actorFaction(event, combatRoll.payload());
+            LuckAccumulator actorAccumulator =
+                    actorLuck.computeIfAbsent(actorFaction, ignored -> new LuckAccumulator());
+            for (CombatRollPayload.UnitRoll unitRoll : combatRoll.payload().unitRolls()) {
+                for (CombatRollPayload.DieRoll die : unitRoll.dice()) {
+                    double expectedHits = hitProbability(die.threshold());
+                    int actualHits = die.success() ? 1 : 0;
+                    overall.record(actualHits, expectedHits);
+                    actorAccumulator.record(actualHits, expectedHits);
+                }
+            }
+        }
+
+        if (overall.diceRolled() == 0) {
+            return "## Gift of Foresight: Omens\nNo combat rolls have surfaced yet.";
+        }
+
+        List<String> lines = new ArrayList<>();
+        lines.add("Overall: **" + luckLabel(overall.delta()) + "**");
+        for (Map.Entry<String, LuckAccumulator> entry : actorLuck.entrySet()) {
+            LuckAccumulator actorAccumulator = entry.getValue();
+            if (actorAccumulator.diceRolled() == 0) continue;
+            lines.add(actor(entry.getKey()) + ": **" + luckLabel(actorAccumulator.delta()) + "**");
+        }
+        return "## Gift of Foresight: Omens\n" + String.join("\n", lines);
+    }
+
+    private double hitProbability(int threshold) {
+        return Math.max(0.0, Math.min(1.0, (11 - threshold) / 10.0));
+    }
+
+    private String luckLabel(double delta) {
+        if (delta <= -STRONG_LUCK_DELTA_LIMIT) return "Unlucky";
+        if (delta < -AVERAGE_DELTA_LIMIT) return "Slightly Unlucky";
+        if (delta <= AVERAGE_DELTA_LIMIT) return "Average";
+        if (delta < STRONG_LUCK_DELTA_LIMIT) return "Slightly Lucky";
+        return "Lucky";
     }
 
     private CombatReplayInteractionResult recordVote(
@@ -291,24 +365,22 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
     }
 
     private String activeResolutionMessage(CombatReplayHouseAbilityVoteService.WinningVote winningVote, String reveal) {
-        String action =
-                NAALU_ACTION_CARDS_ABILITY.equals(winningVote.optionKey()) ? "action cards" : "first-round rolls";
-        return "## Naalu Gift of Foresight\nNaalu Delegation used Gift of Foresight to view "
-                + action
+        return "## Naalu Gift of Foresight\nNaalu Delegation used Gift of Foresight: "
+                + optionLabel(winningVote.optionKey())
                 + " for this combat (`"
                 + winningVote.voteCount()
                 + "` votes).\n\n"
                 + reveal;
     }
 
-    private List<Button> peekButtons(Long contestId) {
+    List<Button> peekButtons(Long contestId) {
         return List.of(
                 abilityButton(
                         Buttons.blue(
-                                NAALU_ACTION_CARDS + contestId,
-                                "Vote: Action Cards" + favorCostSuffix(actionCardPeekFavorCost()),
-                                CardEmojis.ActionCard),
-                        actionCardPeekFavorCost()),
+                                NAALU_LUCK_OMENS + contestId,
+                                "Vote: Omens" + favorCostSuffix(luckOmensFavorCost()),
+                                FactionEmojis.Naalu),
+                        luckOmensFavorCost()),
                 abilityButton(
                         Buttons.blue(
                                 NAALU_ROUND_ONE_ROLLS + contestId,
@@ -329,6 +401,7 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
     private int favorCost(String optionKey) {
         if (NAALU_ACTION_CARDS_ABILITY.equals(optionKey)) return actionCardPeekFavorCost();
         if (NAALU_ROUND_ONE_ROLLS_ABILITY.equals(optionKey)) return roundOneRollPeekFavorCost();
+        if (NAALU_LUCK_OMENS_ABILITY.equals(optionKey)) return luckOmensFavorCost();
         return 0;
     }
 
@@ -338,6 +411,10 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
 
     private int roundOneRollPeekFavorCost() {
         return settings.getHouseAbilities().getNaalu().getRoundOneRollPeekFavorCost();
+    }
+
+    private int luckOmensFavorCost() {
+        return settings.getHouseAbilities().getNaalu().getLuckOmensFavorCost();
     }
 
     private int minimumAbilityVotesToResolve() {
@@ -354,6 +431,7 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
         if (DO_NOT_USE_ABILITY.equals(optionKey)) return "Do Not Use";
         if (NAALU_ACTION_CARDS_ABILITY.equals(optionKey)) return "Action Cards";
         if (NAALU_ROUND_ONE_ROLLS_ABILITY.equals(optionKey)) return "Round 1 Rolls";
+        if (NAALU_LUCK_OMENS_ABILITY.equals(optionKey)) return "Omens";
         return optionKey;
     }
 
@@ -361,14 +439,19 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
         return candidateEventRepository.findByCandidateIdOrderBySequenceNumberAsc(candidate.getId());
     }
 
+    private String actorFaction(CombatCandidateEventEntity event, CombatRollPayload payload) {
+        if (StringUtils.isNotBlank(event.getActorFaction())) return event.getActorFaction();
+        if (payload != null && payload.header() != null) return payload.header().actorFaction();
+        return null;
+    }
+
     private boolean isCombatRoundRoll(CombatRollPayload payload) {
         return payload != null && payload.header() != null && payload.header().rollType() == CombatRollType.combatround;
     }
 
-    private String actor(Game game, String actorFaction) {
-        Player player = game == null ? null : game.getPlayerFromColorOrFaction(actorFaction);
-        if (player != null) return player.getRepresentationNoPing();
-        return StringUtils.defaultIfBlank(actorFaction, "Unknown player");
+    private String actor(String actorFaction) {
+        if (StringUtils.isBlank(actorFaction)) return "Unknown faction";
+        return factionLabel(actorFaction);
     }
 
     private String factionLabel(String faction) {
@@ -384,15 +467,6 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
         return candidateRepository.findById(contest.getCandidateId()).orElse(null);
     }
 
-    private Game loadGame(String gameName) {
-        try {
-            var managedGame = GameManager.getManagedGame(gameName);
-            return managedGame == null ? null : managedGame.getGame();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     private TextChannel houseChannel() {
         Guild guild = JdaService.guildPrimary;
         if (guild == null) return null;
@@ -403,5 +477,25 @@ public class CombatReplayNaaluAbilityService implements CombatReplayHouseAbility
             BotLogger.warning("Lazax house channel not found: " + CombatReplayHouse.NAALU.channelName());
         }
         return channel;
+    }
+
+    private static class LuckAccumulator {
+        private int actualHits;
+        private double expectedHits;
+        private int diceRolled;
+
+        private void record(int actualHits, double expectedHits) {
+            this.actualHits += actualHits;
+            this.expectedHits += expectedHits;
+            diceRolled++;
+        }
+
+        private double delta() {
+            return actualHits - expectedHits;
+        }
+
+        private int diceRolled() {
+            return diceRolled;
+        }
     }
 }

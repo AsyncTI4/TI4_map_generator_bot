@@ -104,7 +104,7 @@ public class BlindSelectionService {
         buttons.add(Buttons.red("blindSelection~MDL_" + encodedButtonPrefix + "_" + TYPE, "Blind Target"));
     }
 
-    @ButtonHandler("blindSelection~MDL")
+    @ButtonHandler(value = "blindSelection~MDL", save = false)
     public static void offerBlindPositionSelection(ButtonInteractionEvent event, String buttonID) {
         String[] splitButton = buttonID.replace("blindSelection~MDL_", "").split("_");
         String encodedButtonPrefix = splitButton[0];

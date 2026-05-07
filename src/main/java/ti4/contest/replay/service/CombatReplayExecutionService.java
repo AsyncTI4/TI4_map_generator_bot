@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.CombatCandidateEventType;
 import ti4.contest.replay.core.CombatContestReplayStatus;
 import ti4.contest.replay.core.CombatContestSettings;
+import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatCandidateEventEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
@@ -86,6 +87,15 @@ public class CombatReplayExecutionService {
         }
     }
 
+    public void postPreviewContext(
+            MessageChannel replayChannel, CombatReplayContestEntity contest, CombatCandidateEntity winner) {
+        try {
+            announcePreReplayContextIfNeeded(replayChannel, contest, winner);
+        } catch (Exception e) {
+            BotLogger.error("Failed to post replay context for preview.", e);
+        }
+    }
+
     private void postSideBetMarketsIfDue() {
         if (!settings.isHousesEnabled()) return;
         if (!settings.getSideBets().isEnableSideBets()) return;
@@ -150,6 +160,8 @@ public class CombatReplayExecutionService {
             }
             if (contest.getReplayStatus() == CombatContestReplayStatus.PENDING && candidate != null && game != null) {
                 announcePreReplayContextIfNeeded(channel, contest, candidate);
+                announceFalseColorsRevealAtReplayStart(channel, candidate);
+                replaySideBetService.refreshSideBetSummary(channel, contest, candidate);
                 replayLeaderboardService.lockPredictionsAtReplayStart(game, contest, candidate);
                 replayLeaderboardService.announceLockedPredictionsIfNeeded(channel, game, contest, candidate);
             }
@@ -184,6 +196,14 @@ public class CombatReplayExecutionService {
         }
         contest.setPreReplayContextPostedAt(LocalDateTime.now());
         replayContestRepository.save(contest);
+    }
+
+    private void announceFalseColorsRevealAtReplayStart(MessageChannel channel, CombatCandidateEntity candidate) {
+        String message = CombatReplayDecoys.renderDisappearanceMessage(
+                CombatReplayDecoys.read(candidate.getReplayAbilitiesJson()));
+        if (message != null && !message.isBlank()) {
+            MessageHelper.sendMessageToChannel(channel, message);
+        }
     }
 
     private void announcePredictionLockCountdown(MessageChannel channel) {

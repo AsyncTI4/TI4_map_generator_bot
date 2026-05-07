@@ -11,7 +11,6 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
@@ -94,7 +93,7 @@ public class ArvaxiAgentButtonHandler {
         game.pickActionCard(target.getUserID(), acIndex);
         ActionCardHelper.sendActionCardInfo(game, target);
 
-        List<Button> spendButtons = Helper.getPlanetExhaustButtons(target, game, "inf");
+        List<Button> spendButtons = ButtonHelper.getExhaustButtonsWithTG(game, target, "inf");
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCardsInfoThread(),
                 target.getRepresentationUnfogged()

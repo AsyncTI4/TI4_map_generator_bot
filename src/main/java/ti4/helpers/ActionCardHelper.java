@@ -574,7 +574,7 @@ public class ActionCardHelper {
         return acButtons;
     }
 
-    @ButtonHandler("refreshACInfo")
+    @ButtonHandler(value = "refreshACInfo", save = false)
     public static void sendActionCardInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);

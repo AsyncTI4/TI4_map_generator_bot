@@ -51,7 +51,7 @@ class CombatReplayHacanMarketCompactServiceTest {
                         sideBet("mentak-user", CombatSideBetType.ROUND_ONE_WHIFF, "sol"),
                         sideBet("mentak-user", CombatSideBetType.ROUND_ONE_SLAM, "sol")));
 
-        assertEquals(3, points);
+        assertEquals(6, points);
     }
 
     private CombatReplayHacanSubsidyEntity markedBet() {
