@@ -3,6 +3,7 @@ package ti4.executors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
+import ti4.logging.BotLogger;
 
 @UtilityClass
 public class ExecutorUtility {
@@ -22,6 +23,7 @@ public class ExecutorUtility {
 
             return ShutdownResult.TIMED_OUT;
         } catch (InterruptedException e) {
+            BotLogger.error("Executor was interrupted during shutdown.", e);
             Thread.currentThread().interrupt();
             service.shutdownNow();
             return ShutdownResult.INTERRUPTED;
