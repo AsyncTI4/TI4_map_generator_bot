@@ -220,7 +220,7 @@ class ActionCardHandButtonHandler {
             MessageHelper.sendMessageToChannelWithButton(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + ", use the button to resolve _Twinning_. The Twin'd card cannot be canceled.",
+                            + ", use the button to resolve _Twinning_. The twinned card cannot be canceled.",
                     button);
         }
         if (acID.contains("counterstroke_")) {
