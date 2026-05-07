@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -16,6 +17,7 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.combat.CombatRollService;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.transaction.SendPromissoryService;
 
 @UtilityClass
 public class DreamButtonHandler {
@@ -45,6 +47,12 @@ public class DreamButtonHandler {
         sendLiturgyMenu(game, player);
     }
 
+    @ButtonHandler("beans_incomprehensible_form_")
+    public static void buttonPresentIncomprehensibleChoices(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        presentIncomprehensibleChoices(event, game, player, buttonID);
+    }
+
     public static void showLiturgyMenu(ButtonInteractionEvent event, Game game, Player player) {
         Tile tile = getActiveLiturgyTile(game, player);
         // Only the Dreaming Throne may open the Liturgy menu
@@ -58,6 +66,18 @@ public class DreamButtonHandler {
         sendLiturgyMenu(game, player);
     }
 
+    @ButtonHandler("beans_incomprehensible_form_use_token_")
+    public static void buttonUseIncomprehensibleFormToken(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        useIncomprehensibleForm(event, game, player, buttonID);
+    }
+
+    @ButtonHandler("beans_incomprehensible_form_use_flagship_")
+    public static void buttonUseIncomprehensibleFormFlagship(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        useIncomprehensibleForm(event, game, player, buttonID);
+    }
+
     private static void sendLiturgyMenu(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(OFFER_ADD_NEXUS_BUTTON_ID, "Add Nexus Token"));
@@ -69,6 +89,12 @@ public class DreamButtonHandler {
                 player.getRepresentation()
                         + " you may resolve _Liturgy_ unit ability now by placing or moving 1 nexus token.",
                 buttons);
+    }
+
+    @ButtonHandler("beans_promissory_bepndream_return_")
+    public static void buttonResolveVisionsPromissory(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        resolveVisionsPromissory(event, game, player, buttonID);
     }
 
     public static void offerAddNexusButtons(ButtonInteractionEvent event, Game game, Player player) {
@@ -103,6 +129,11 @@ public class DreamButtonHandler {
                 player.getCorrectChannel(),
                 player.getRepresentation() + " choose where to add a nexus token:",
                 buttons);
+    }
+
+    @ButtonHandler("beans_dream_offer_add_nexus")
+    public static void buttonOfferAddNexusButtons(ButtonInteractionEvent event, Game game, Player player) {
+        offerAddNexusButtons(event, game, player);
     }
 
     public static void offerMoveNexusButtons(ButtonInteractionEvent event, Game game, Player player) {
@@ -143,6 +174,11 @@ public class DreamButtonHandler {
                 player.getCorrectChannel(),
                 player.getRepresentation() + " choose where to move a nexus token:",
                 buttons);
+    }
+
+    @ButtonHandler("beans_dream_offer_move_nexus")
+    public static void buttonOfferMoveNexusButtons(ButtonInteractionEvent event, Game game, Player player) {
+        offerMoveNexusButtons(event, game, player);
     }
 
     static boolean hasLiturgyII(Player player, Tile tile) {
@@ -217,6 +253,11 @@ public class DreamButtonHandler {
                         + ".");
     }
 
+    @ButtonHandler("beans_dream_add_nexus_")
+    public static void buttonAddNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        addNexusToken(event, game, player, buttonID);
+    }
+
     public static void moveNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         // Only the Dreaming Throne may move nexus tokens via Liturgy
         if (player == null || !"dream".equalsIgnoreCase(player.getFaction())) {
@@ -247,6 +288,11 @@ public class DreamButtonHandler {
                 event,
                 player.getRepresentation() + " moved a nexus token to "
                         + toTile.getRepresentationForButtons(game, player) + ".");
+    }
+
+    @ButtonHandler("beans_dream_move_nexus_from_")
+    public static void buttonMoveNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        moveNexusToken(event, game, player, buttonID);
     }
 
     public static void removeNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
@@ -319,6 +365,11 @@ public class DreamButtonHandler {
                 event,
                 player.getRepresentation() + " removed a nexus token from "
                         + tile.getRepresentationForButtons(game, player) + ".");
+    }
+
+    @ButtonHandler("beans_dream_remove_nexus_")
+    public static void buttonRemoveNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        removeNexusToken(event, game, player, buttonID);
     }
 
     public static void offerTheWakingButtons(Game game) {
@@ -429,8 +480,7 @@ public class DreamButtonHandler {
         }
 
         // Use canonical service to transfer the promissory (handles play-area -> owner and hand cases)
-        ti4.service.transaction.SendPromissoryService.sendPromissoryToPlayer(
-                event, game, player, dreamOwner, "bepndream");
+        SendPromissoryService.sendPromissoryToPlayer(event, game, player, dreamOwner, "bepndream");
 
         // Remove actual nexus token string robustly
         String mappedTokenId = Mapper.getTokenID(NEXUS_TOKEN);
