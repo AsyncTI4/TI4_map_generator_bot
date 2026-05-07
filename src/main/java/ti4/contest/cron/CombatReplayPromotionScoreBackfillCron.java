@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.experimental.UtilityClass;
 import ti4.contest.replay.core.CombatCandidateEventType;
 import ti4.contest.replay.core.CombatCandidateStatus;
+import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
 import ti4.contest.replay.dispatch.ReplayDispatchPayload;
@@ -42,6 +43,7 @@ public class CombatReplayPromotionScoreBackfillCron {
 
     private static void runBackfill() {
         if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
+        if (!CombatContestSettings.isEnabledStatic()) return;
         BotLogger.logCron("Running CombatReplayPromotionScoreBackfillCron.");
         try {
             runBackfillInternal();

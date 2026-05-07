@@ -13,6 +13,7 @@ class CombatContestSettingsTest {
         CombatContestSettings settings = new CombatContestSettings();
 
         assertFalse(settings.isProd());
+        assertTrue(settings.isEnabled());
         assertTrue(settings.getRuntime().isDevMode());
         assertEquals(60, settings.getReplayExecution().getDiscussionWindowSeconds());
         assertEquals(60, settings.getReplayExecution().getSideBetWindowSeconds());
@@ -26,6 +27,7 @@ class CombatContestSettingsTest {
         CombatContestSettings settings = new CombatContestSettings(false);
 
         assertTrue(settings.isProd());
+        assertFalse(settings.isEnabled());
         assertFalse(settings.getRuntime().isDevMode());
         assertEquals(900, settings.getReplayExecution().getDiscussionWindowSeconds());
         assertEquals(600, settings.getReplayExecution().getSideBetWindowSeconds());
@@ -39,6 +41,7 @@ class CombatContestSettingsTest {
         CombatContestSettings settings = new CombatContestSettings(true);
 
         assertFalse(settings.isProd());
+        assertTrue(settings.isEnabled());
         assertTrue(settings.getRuntime().isDevMode());
         assertEquals(60, settings.getReplayExecution().getDiscussionWindowSeconds());
         assertEquals(60, settings.getReplayExecution().getSideBetWindowSeconds());

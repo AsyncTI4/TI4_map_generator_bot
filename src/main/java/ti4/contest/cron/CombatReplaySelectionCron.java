@@ -25,6 +25,7 @@ public class CombatReplaySelectionCron {
 
     private static void refreshSelectionSettings() {
         if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
+        if (!CombatContestSettings.isEnabledStatic()) return;
         CombatContestSettings settings = SpringContext.getBean(CombatContestSettings.class);
         if (!shouldRun(settings.getCandidateSelection().getWindow().getRefreshCronIntervalSeconds())) return;
         BotLogger.logCron("Running CombatReplaySelectionCron.");

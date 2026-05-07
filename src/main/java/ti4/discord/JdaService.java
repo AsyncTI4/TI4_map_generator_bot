@@ -30,6 +30,7 @@ import ti4.contest.cron.CombatReplayCron;
 import ti4.contest.cron.CombatReplayPromotionCron;
 import ti4.contest.cron.CombatReplayPromotionScoreBackfillCron;
 import ti4.contest.cron.CombatReplaySelectionCron;
+import ti4.contest.replay.core.CombatContestSettings;
 import ti4.cron.AutoPingCron;
 import ti4.cron.BothelperDashboardCron;
 import ti4.cron.CategoryCleanupCron;
@@ -308,11 +309,13 @@ public class JdaService {
         SabotageAutoReactCron.register();
         FastScFollowCron.register();
         CloseLaunchThreadsCron.register();
-        CombatReplaySelectionCron.register();
-        CombatReplayPromotionCron.register();
-        CombatReplayPromotionScoreBackfillCron.register();
-        CombatReplayCron.register();
-        CombatContestJanitorCron.register();
+        if (CombatContestSettings.isEnabledStatic()) {
+            CombatReplaySelectionCron.register();
+            CombatReplayPromotionCron.register();
+            CombatReplayPromotionScoreBackfillCron.register();
+            CombatReplayCron.register();
+            CombatContestJanitorCron.register();
+        }
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
         CategoryCleanupCron.register();
