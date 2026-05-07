@@ -88,10 +88,8 @@ class ButtonRuntimeWarningService {
         String resolveTime = formatMillisecondsWithWarning(resolveRuntimeMs);
         String saveTime = formatMillisecondsWithWarning(saveRuntimeMs);
         String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(processingEndTimeMs - eventTimeMs);
-        thresholdWarningReasons.add(new ThresholdWarningReason(
-                ButtonHelper.getButtonRepresentation(event.getButton()),
-                responseTime,
-                DateTimeHelper.getTimestampFromMillisecondsEpoch(processingEndTimeMs)));
+        thresholdWarningReasons.add(
+                new ThresholdWarningReason(eventTime, ButtonHelper.getButtonRepresentation(event.getButton()), responseTime));
 
         String message = event.getUser().getEffectiveName()
                 + " pressed button: "
@@ -138,10 +136,11 @@ class ButtonRuntimeWarningService {
         for (ThresholdWarningReason reason : thresholdWarningReasons) {
             sb.append("\n> - ")
                     .append(reason.occurredAt())
+                    .append(" • ")
+                    .append(reason.buttonRepresentation())
                     .append(" • `")
                     .append(reason.totalRuntime())
-                    .append("` • ")
-                    .append(reason.buttonRepresentation());
+                    .append("`");
         }
         return sb.toString();
     }
@@ -158,5 +157,5 @@ class ButtonRuntimeWarningService {
         return runtimeSubmissionCount == 0 ? 0 : runtimeThresholdMissCount / (double) runtimeSubmissionCount;
     }
 
-    private record ThresholdWarningReason(String buttonRepresentation, String totalRuntime, String occurredAt) {}
+    private record ThresholdWarningReason(String occurredAt, String buttonRepresentation, String totalRuntime) {}
 }

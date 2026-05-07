@@ -40,10 +40,10 @@ class ButtonRuntimeWarningServiceTest {
             unstable.when(AsyncTI4DiscordBot::isUnstable).thenReturn(false);
             time.when(() -> DateTimeHelper.getLongDateTimeFromDiscordSnowflake(any()))
                     .thenReturn(1_000L, 2_000L, 3_000L);
-            time.when(() -> DateTimeHelper.getTimestampFromMillisecondsEpoch(4_000L))
-                    .thenReturn("`at-4000`");
-            time.when(() -> DateTimeHelper.getTimestampFromMillisecondsEpoch(6_000L))
-                    .thenReturn("`at-6000`");
+            time.when(() -> DateTimeHelper.getTimestampFromMillisecondsEpoch(2_000L))
+                    .thenReturn("`at-2000`");
+            time.when(() -> DateTimeHelper.getTimestampFromMillisecondsEpoch(3_000L))
+                    .thenReturn("`at-3000`");
             time.when(() -> DateTimeHelper.getTimeRepresentationToMilliseconds(anyLong()))
                     .thenCallRealMethod();
 
@@ -54,10 +54,8 @@ class ButtonRuntimeWarningServiceTest {
             logger.verify(() ->
                     BotLogger.error(org.mockito.ArgumentMatchers.argThat(message -> message.contains("**Reasons:**")
                             && !message.contains("__**Fast**__  `[fast-id]`")
-                            && message.contains("__**Alpha**__  `[alpha-id]`")
-                            && message.contains("__**Beta**__  `[beta-id]`")
-                            && message.contains("`at-4000` • `00m:03s:000ms`")
-                            && message.contains("`at-6000` • `00m:04s:000ms`"))));
+                            && message.contains("`at-2000` • __**Alpha**__  `[alpha-id]` • `00m:03s:000ms`")
+                            && message.contains("`at-3000` • __**Beta**__  `[beta-id]` • `00m:04s:000ms`"))));
         }
     }
 
@@ -74,6 +72,10 @@ class ButtonRuntimeWarningServiceTest {
             unstable.when(AsyncTI4DiscordBot::isUnstable).thenReturn(false);
             time.when(() -> DateTimeHelper.getLongDateTimeFromDiscordSnowflake(any()))
                     .thenReturn(1_000L, 2_000L);
+            time.when(() -> DateTimeHelper.getTimestampFromMillisecondsEpoch(1_000L))
+                    .thenReturn("`at-1000`");
+            time.when(() -> DateTimeHelper.getTimestampFromMillisecondsEpoch(2_000L))
+                    .thenReturn("`at-2000`");
             time.when(() -> DateTimeHelper.getTimeRepresentationToMilliseconds(anyLong()))
                     .thenCallRealMethod();
 
