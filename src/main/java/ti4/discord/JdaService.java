@@ -117,13 +117,12 @@ public class JdaService {
         BotLogger.info("STARTING JDA");
         jda = JDABuilder.createDefault(args[0])
                 .setEventPool(EVENT_EXECUTOR)
-                // This is a privileged gateway intent that is used to update user information and join/leaves
-                // (including kicks). This is required to cache all members of a guild (including chunking)
+                // Needed to listen for joins/leaves.
+                // This is required to cache all members of a guild (including chunking)
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
-                // This is a privileged gateway intent this is only used to enable access to the user content in
-                // messages (also including embeds/attachments/components).
+                // Needed to parse raw user messages.
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-                // not 100 sure this is needed? It may be for the Emoji cache... but do we actually need that?
+                // Needed for emoji searches and validation
                 .enableIntents(GatewayIntent.GUILD_EXPRESSIONS)
                 // It *appears* we need to pull all members or else the bot has trouble pinging players
                 // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
