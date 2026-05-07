@@ -112,10 +112,13 @@ public class JdaService {
     public static final List<Guild> fowServers = new ArrayList<>();
     private static final int EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS = 20;
     private static final Set<CacheFlag> DISABLED_JDA_CACHE_FLAGS = EnumSet.of(
+            // User is playing a game, listening to Spotify, etc.
             CacheFlag.ACTIVITY,
+            // User on Desktop, Mobile, or Web? Could be useful for stats
             CacheFlag.CLIENT_STATUS,
-            CacheFlag.FORUM_TAGS,
+            // User is online, idle, etc
             CacheFlag.ONLINE_STATUS,
+            // Needed for Role.getTags()
             CacheFlag.ROLE_TAGS,
             CacheFlag.SCHEDULED_EVENTS,
             CacheFlag.SOUNDBOARD_SOUNDS,
@@ -589,37 +592,45 @@ public class JdaService {
             BotLogger.info("SHUTDOWN PROCESS STARTED");
             ActiveLeaseService.setCurrentProcessReady(false);
             BotLogger.info("NO LONGER ACCEPTING COMMANDS");
-            if (shutdownEventExecutor()) { // will wait up to 20 seconds gracefully, then up to 20 more after interruption
+            // will wait up to 20 seconds gracefully, then up to 20 more after interruption
+            if (shutdownEventExecutor()) {
                 BotLogger.info("FINISHED PROCESSING JDA EVENT POOL");
             } else {
                 BotLogger.info("DID NOT FINISH PROCESSING JDA EVENT POOL");
             }
-            if (ExecutorServiceManager.shutdown()) { // will wait for up to an additional 20 seconds
+            // will wait for up to an additional 20 seconds
+            if (ExecutorServiceManager.shutdown()) {
                 BotLogger.info("FINISHED PROCESSING ASYNC EXECUTOR THREADPOOL");
             } else {
                 BotLogger.info("DID NOT FINISH PROCESSING ASYNC EXECUTOR THREADPOOL");
             }
-            if (MapRenderPipeline.shutdown()) { // will wait for up to an additional 20 seconds
+            // will wait for up to an additional 20 seconds
+            if (MapRenderPipeline.shutdown()) {
                 BotLogger.info("FINISHED RENDERING MAPS");
             } else {
                 BotLogger.info("DID NOT FINISH RENDERING MAPS");
             }
-            if (SliceGenerationPipeline.shutdown()) { // will wait for up to an additional 20 seconds
+            // will wait for up to an additional 20 seconds
+            if (SliceGenerationPipeline.shutdown()) {
                 BotLogger.info("FINISHED RENDERING SLICE DRAFTS");
             } else {
                 BotLogger.info("DID NOT FINISH RENDERING SLICE DRAFTS");
             }
-            if (StatisticsPipeline.shutdown()) { // will wait for up to an additional 20 seconds
+            // will wait for up to an additional 20 seconds
+            if (StatisticsPipeline.shutdown()) {
                 BotLogger.info("FINISHED PROCESSING STATISTICS");
             } else {
                 BotLogger.info("DID NOT FINISH PROCESSING STATISTICS");
             }
-            CronManager.shutdown(); // will wait for up to an additional 20 seconds
-            LogBufferManager.sendBufferedLogsToDiscord(); // will drain the log buffer and doesn't have a timeout
+            // will wait for up to an additional 20 seconds
+            CronManager.shutdown();
+            // will drain the log buffer and doesn't have a timeout
+            LogBufferManager.sendBufferedLogsToDiscord();
             SpringContext.getBean(ActiveLeaseService.class).releaseLease();
             BotLogger.info("RELEASED ACTIVE LEASE");
             BotLogger.info("SHUTDOWN PROCESS COMPLETE");
-            TimeUnit.SECONDS.sleep(1); // wait for BotLogger
+            // wait for BotLogger
+            TimeUnit.SECONDS.sleep(1);
             jda.shutdown();
             jda.awaitShutdown(30, TimeUnit.SECONDS);
         } catch (Exception e) {
