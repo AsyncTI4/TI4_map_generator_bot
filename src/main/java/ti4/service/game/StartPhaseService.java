@@ -350,6 +350,26 @@ public class StartPhaseService {
                     game.getMainGameChannel(),
                     "Exhausted all home system planets due _New Constitution_ resolving \"For\".");
         }
+        if (!game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
+            game.setStoredValue("agendaChecksNBalancesAgainst", "");
+            for (Player player2 : game.getRealPlayers()) {
+                String message = player2.getRepresentationUnfogged();
+                List<Button> buttons = Helper.getPlanetRefreshButtons(player2, game);
+                if (buttons.size() <= 3) {
+                    message +=
+                            ", you had no more than 3 planets exhausted. Planets readied because of _Checks and Balances_ resolving \"Against\".";
+                    PlanetService.refreshAllPlanets(player2);
+                    buttons = new ArrayList<>();
+                } else {
+                    message +=
+                            ", please choose up to 3 planets you wish to ready because of _Checks and Balances_ resolving \"Against\".";
+                    buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Readying Planets")); // spitItOut
+                }
+                MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), message, buttons);
+            }
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(), "Sent buttons to ready 3 planets due to _Checks and Balances_.");
+        }
         if (!game.getStoredValue("agendaArmsReduction").isEmpty()) {
             game.setStoredValue("agendaArmsReduction", "");
             for (Player player2 : game.getRealPlayers()) {
@@ -381,26 +401,7 @@ public class StartPhaseService {
                     game.getMainGameChannel(),
                     "Exhausted all planets with technology specialties due to _Arms Reduction_ resolving \"Against\".");
         }
-        if (!game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
-            game.setStoredValue("agendaChecksNBalancesAgainst", "");
-            for (Player player2 : game.getRealPlayers()) {
-                String message = player2.getRepresentationUnfogged();
-                List<Button> buttons = Helper.getPlanetRefreshButtons(player2, game);
-                if (buttons.size() <= 3) {
-                    message +=
-                            ", you had no more than 3 planets exhausted. Planets readied because of _Checks and Balances_ resolving \"Against\".";
-                    PlanetService.refreshAllPlanets(player2);
-                    buttons = new ArrayList<>();
-                } else {
-                    message +=
-                            ", please choose up to 3 planets you wish to ready because of _Checks and Balances_ resolving \"Against\".";
-                    buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Readying Planets")); // spitItOut
-                }
-                MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), message, buttons);
-            }
-            MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Sent buttons to ready 3 planets due to _Checks and Balances_.");
-        }
+
         if (!game.getStoredValue("agendaRevolution").isEmpty()) {
             game.setStoredValue("agendaRevolution", "");
             for (Player player2 : game.getRealPlayers()) {

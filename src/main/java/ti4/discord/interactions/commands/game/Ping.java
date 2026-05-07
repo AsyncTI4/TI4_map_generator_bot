@@ -1,5 +1,7 @@
 package ti4.discord.interactions.commands.game;
 
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.GameStateSubcommand;
@@ -21,6 +23,13 @@ class Ping extends GameStateSubcommand {
     }
 
     private void pingGame(GenericInteractionCreateEvent event, Game game) {
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Ping Game: " + game.getPing());
+        MessageChannel channel = event.getMessageChannel();
+        if (channel instanceof ThreadChannel threadChannel) {
+            if (threadChannel.getName().toLowerCase().contains("cards info")) {
+                MessageHelper.sendMessageToChannel(threadChannel, "Pinging game in main channel...");
+                channel = game.getMainGameChannel();
+            }
+        }
+        MessageHelper.sendMessageToChannel(channel, "Ping Game: " + game.getPing());
     }
 }

@@ -426,7 +426,7 @@ public final class ButtonHelperTwilightsFallActionCards {
         TechnologyModel tech1 = Mapper.getTech(ability1);
         buttons.add(Buttons.gray(
                 p2.factionButtonChecker() + "coerceStep3_" + player.getFaction() + "_" + ability1,
-                "Give" + tech1.getName()));
+                "Give " + tech1.getName()));
         buttons.add(
                 Buttons.gray(p2.factionButtonChecker() + "poisonHeroStep4_" + player.getFaction(), "Give 2 Abilities"));
         String msg = p2.getRepresentation()
