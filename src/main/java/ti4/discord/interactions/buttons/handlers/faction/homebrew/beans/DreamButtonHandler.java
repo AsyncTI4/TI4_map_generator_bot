@@ -29,15 +29,6 @@ public class DreamButtonHandler {
     private static final String BACK_TO_LITURGY_MENU_BUTTON_ID = "dream_liturgy_menu_back";
 
     public static void offerLiturgyButtons(GenericInteractionCreateEvent event, Game game, Player player) {
-        // Only the Dreaming Throne may open the Liturgy menu
-        if (player == null || !"dream".equalsIgnoreCase(player.getFaction())) {
-            if (player != null) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(), "Only the Dreaming Throne may use this ability.");
-            }
-            return;
-        }
-
         Tile tile = getActiveLiturgyTile(game, player);
         if (tile == null) {
             return;
@@ -48,11 +39,6 @@ public class DreamButtonHandler {
     @ButtonHandler("dream_liturgy_menu")
     public static void showLiturgyMenu(ButtonInteractionEvent event, Game game, Player player) {
         Tile tile = getActiveLiturgyTile(game, player);
-        // Only the Dreaming Throne may open the Liturgy menu
-        if (player == null || !"dream".equalsIgnoreCase(player.getFaction())) {
-            MessageHelper.sendMessageToEventChannel(event, "Only the Dreaming Throne may use this ability.");
-            return;
-        }
         if (tile == null) return;
 
         ButtonHelper.deleteMessage(event);
@@ -76,11 +62,6 @@ public class DreamButtonHandler {
     public static void offerAddNexusButtons(ButtonInteractionEvent event, Game game, Player player) {
         Tile activeTile = getActiveLiturgyTile(game, player);
         if (activeTile == null) return;
-        // Only the Dreaming Throne may add nexus tokens via Liturgy
-        if (player == null || !"dream".equalsIgnoreCase(player.getFaction())) {
-            MessageHelper.sendMessageToEventChannel(event, "Only the Dreaming Throne may use this ability.");
-            return;
-        }
 
         ButtonHelper.deleteMessage(event);
         if (countNexusTokens(game) >= 3) {
@@ -111,12 +92,6 @@ public class DreamButtonHandler {
     public static void offerMoveNexusButtons(ButtonInteractionEvent event, Game game, Player player) {
         Tile activeTile = getActiveLiturgyTile(game, player);
         if (activeTile == null) return;
-        // Only the Dreaming Throne may move nexus tokens via Liturgy
-        if (player == null || !"dream".equalsIgnoreCase(player.getFaction())) {
-            MessageHelper.sendMessageToEventChannel(event, "Only the Dreaming Throne may use this ability.");
-            return;
-        }
-
         ButtonHelper.deleteMessage(event);
         List<Tile> tilesWithUnits =
                 hasLiturgyII(player, activeTile) ? getTilesContainingPlayersUnits(game, player) : List.of(activeTile);
@@ -200,12 +175,6 @@ public class DreamButtonHandler {
 
     @ButtonHandler("dream_add_nexus")
     public static void addNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        // Only the Dreaming Throne may add nexus tokens via Liturgy
-        if (player == null || !"dream".equalsIgnoreCase(player.getFaction())) {
-            MessageHelper.sendMessageToEventChannel(event, "Only the Dreaming Throne may use this ability.");
-            return;
-        }
-
         String position = buttonID.replace("dream_add_nexus", "");
         Tile tile = game.getTileByPosition(position);
         if (tile == null) {
@@ -223,12 +192,6 @@ public class DreamButtonHandler {
 
     @ButtonHandler("dream_move_nexus")
     public static void moveNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        // Only the Dreaming Throne may move nexus tokens via Liturgy
-        if (player == null || !"dream".equalsIgnoreCase(player.getFaction())) {
-            MessageHelper.sendMessageToEventChannel(event, "Only the Dreaming Throne may use this ability.");
-            return;
-        }
-
         String data = buttonID.replace("dream_move_nexus", "");
         String[] parts = data.split("_to_");
         if (parts.length != 2) {
@@ -526,11 +489,6 @@ public class DreamButtonHandler {
     @ButtonHandler("incomprehensible_form_")
     public static void presentIncomprehensibleChoices(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        // Only Dream player may use these abilities
-        if (player == null || !"dream".equalsIgnoreCase(player.getFaction())) {
-            MessageHelper.sendMessageToEventChannel(event, "Only the Dreaming Throne may use this ability.");
-            return;
-        }
         String pos = buttonID.replace("incomprehensible_form_", "");
         Tile tile = game.getTileByPosition(pos);
         if (tile == null) {
@@ -580,12 +538,6 @@ public class DreamButtonHandler {
     @ButtonHandler("incomprehensible_form_use_token_")
     public static void useIncomprehensibleForm(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        // Only Dream player may use these abilities
-        if (player == null || !"dream".equalsIgnoreCase(player.getFaction())) {
-            MessageHelper.sendMessageToEventChannel(event, "Only the Dreaming Throne may use this ability.");
-            return;
-        }
-
         boolean choiceFlagship = buttonID.contains("_use_flagship_");
         String pos = buttonID.replace("incomprehensible_form_use_flagship_", "")
                 .replace("incomprehensible_form_use_token_", "")
