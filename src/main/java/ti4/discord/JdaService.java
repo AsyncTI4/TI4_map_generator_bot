@@ -110,7 +110,7 @@ public class JdaService {
     public static final Set<Guild> guilds = new HashSet<>();
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
     public static final List<Guild> fowServers = new ArrayList<>();
-    private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
+    private static final int EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS = 20;
     private static final Set<CacheFlag> DISABLED_JDA_CACHE_FLAGS = EnumSet.of(
             CacheFlag.ACTIVITY,
             CacheFlag.CLIENT_STATUS,
@@ -631,12 +631,12 @@ public class JdaService {
     private static boolean shutdownEventExecutor() {
         EVENT_EXECUTOR.shutdown();
         try {
-            if (EVENT_EXECUTOR.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+            if (EVENT_EXECUTOR.awaitTermination(EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
                 return true;
             }
 
             EVENT_EXECUTOR.shutdownNow();
-            return EVENT_EXECUTOR.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            return EVENT_EXECUTOR.awaitTermination(EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             EVENT_EXECUTOR.shutdownNow();
             BotLogger.error("JdaService event thread pool shutdown interrupted.", e);
