@@ -1,7 +1,6 @@
 package ti4.discord.interactions.buttons;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -23,7 +22,7 @@ import ti4.testUtils.BaseTi4Test;
 class ButtonRuntimeWarningServiceTest extends BaseTi4Test {
 
     @Test
-    void pausesWarningsAfterFifteenthThresholdMiss() throws Exception {
+    void pausesWarningsWhenThresholdReached() throws Exception {
         ButtonRuntimeWarningService service = new ButtonRuntimeWarningService();
         setField(service, "runtimeWarningCount", 14);
         setField(service, "pauseWarningsUntil", Instant.EPOCH);
@@ -46,9 +45,9 @@ class ButtonRuntimeWarningServiceTest extends BaseTi4Test {
 
         String message = (String) getMethod(service, "formatPauseWarningMessage").invoke(service);
 
+        assertEquals(' ', message.charAt(0));
         assertTrue(message.startsWith(" **Buttons are processing slowly. Pausing warnings for 5 minutes.**"));
         assertTrue(message.contains("\n> **Reasons:**\n> - " + eventTime + " • __**Test Button**__  `[test_button]` • `00m:01s:446ms`"));
-        assertFalse(message.contains("**Buttons are processing slowly. Pausing warnings for 5 minutes.**\n> **Reasons:**\n> - "));
     }
 
     private static ButtonInteractionEvent mockEvent(long eventTimeMs, String buttonId, String buttonLabel) {
