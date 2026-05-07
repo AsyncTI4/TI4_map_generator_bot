@@ -109,10 +109,9 @@ class ButtonRuntimeWarningService {
 
         runtimeWarningCount++;
 
-        if (runtimeWarningCount > RUNTIME_WARNING_COUNT_THRESHOLD) {
+        if (runtimeWarningCount >= RUNTIME_WARNING_COUNT_THRESHOLD) {
             pauseWarningsUntil = now.plusSeconds(PAUSE_AFTER_WARNING_SECONDS);
-            BotLogger.error("**Buttons are processing slowly. Pausing warnings for 5 minutes.**"
-                    + formatThresholdWarningReasons());
+            BotLogger.error(formatPauseWarningMessage());
             runtimeWarningCount = 0;
             thresholdWarningReasons.clear();
         }
@@ -126,6 +125,10 @@ class ButtonRuntimeWarningService {
             return formattedRuntime + " ❗";
         }
         return formattedRuntime;
+    }
+
+    private String formatPauseWarningMessage() {
+        return "**Buttons are processing slowly. Pausing warnings for 5 minutes.**" + formatThresholdWarningReasons();
     }
 
     private String formatThresholdWarningReasons() {
