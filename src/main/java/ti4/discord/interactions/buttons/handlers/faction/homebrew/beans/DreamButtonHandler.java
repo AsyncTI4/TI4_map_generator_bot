@@ -26,9 +26,7 @@ public class DreamButtonHandler {
     private static final String LITURGY_I_UNIT = "dream_destroyer";
     private static final String LITURGY_II_UNIT = "dream_destroyer2";
     private static final String LITURGY_II_TECH = "bedreamdd";
-    private static final String OFFER_ADD_NEXUS_BUTTON_ID = "beans_dream_offer_add_nexus";
-    private static final String OFFER_MOVE_NEXUS_BUTTON_ID = "beans_dream_offer_move_nexus";
-    private static final String BACK_TO_LITURGY_MENU_BUTTON_ID = "beans_dream_liturgy_menu_back";
+    private static final String BACK_TO_LITURGY_MENU_BUTTON_ID = "dream_liturgy_menu_back";
 
     public static void offerLiturgyButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         // Only the Dreaming Throne may open the Liturgy menu
@@ -47,12 +45,7 @@ public class DreamButtonHandler {
         sendLiturgyMenu(game, player);
     }
 
-    @ButtonHandler("beans_incomprehensible_form_")
-    public static void buttonPresentIncomprehensibleChoices(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        presentIncomprehensibleChoices(event, game, player, buttonID);
-    }
-
+    @ButtonHandler("dream_liturgy_menu")
     public static void showLiturgyMenu(ButtonInteractionEvent event, Game game, Player player) {
         Tile tile = getActiveLiturgyTile(game, player);
         // Only the Dreaming Throne may open the Liturgy menu
@@ -66,22 +59,10 @@ public class DreamButtonHandler {
         sendLiturgyMenu(game, player);
     }
 
-    @ButtonHandler("beans_incomprehensible_form_use_token_")
-    public static void buttonUseIncomprehensibleFormToken(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        useIncomprehensibleForm(event, game, player, buttonID);
-    }
-
-    @ButtonHandler("beans_incomprehensible_form_use_flagship_")
-    public static void buttonUseIncomprehensibleFormFlagship(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        useIncomprehensibleForm(event, game, player, buttonID);
-    }
-
     private static void sendLiturgyMenu(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green(OFFER_ADD_NEXUS_BUTTON_ID, "Add Nexus Token"));
-        buttons.add(Buttons.blue(OFFER_MOVE_NEXUS_BUTTON_ID, "Move Nexus Token"));
+        buttons.add(Buttons.green("dream_offer_add_nexus", "Add Nexus Token"));
+        buttons.add(Buttons.blue("dream_offer_move_nexus", "Move Nexus Token"));
         buttons.add(Buttons.red("deleteButtons", "Decline"));
 
         MessageHelper.sendMessageToChannelWithButtons(
@@ -91,12 +72,7 @@ public class DreamButtonHandler {
                 buttons);
     }
 
-    @ButtonHandler("beans_promissory_bepndream_return_")
-    public static void buttonResolveVisionsPromissory(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        resolveVisionsPromissory(event, game, player, buttonID);
-    }
-
+    @ButtonHandler("dream_offer_add_nexus")
     public static void offerAddNexusButtons(ButtonInteractionEvent event, Game game, Player player) {
         Tile activeTile = getActiveLiturgyTile(game, player);
         if (activeTile == null) return;
@@ -119,7 +95,7 @@ public class DreamButtonHandler {
         List<Button> buttons = new ArrayList<>();
         for (Tile tileWithUnits : tilesWithUnits) {
             buttons.add(Buttons.green(
-                    "beans_dream_add_nexus_" + tileWithUnits.getPosition(),
+                    "dream_add_nexus" + tileWithUnits.getPosition(),
                     "Place nexus in " + tileWithUnits.getRepresentationForButtons(game, player)));
         }
         buttons.add(Buttons.gray(BACK_TO_LITURGY_MENU_BUTTON_ID, "Back"));
@@ -131,11 +107,7 @@ public class DreamButtonHandler {
                 buttons);
     }
 
-    @ButtonHandler("beans_dream_offer_add_nexus")
-    public static void buttonOfferAddNexusButtons(ButtonInteractionEvent event, Game game, Player player) {
-        offerAddNexusButtons(event, game, player);
-    }
-
+    @ButtonHandler("dream_offer_move_nexus")
     public static void offerMoveNexusButtons(ButtonInteractionEvent event, Game game, Player player) {
         Tile activeTile = getActiveLiturgyTile(game, player);
         if (activeTile == null) return;
@@ -156,7 +128,7 @@ public class DreamButtonHandler {
                     continue;
                 }
                 buttons.add(Buttons.blue(
-                        "beans_dream_move_nexus_from_" + fromTile.getPosition() + "_to_" + toTile.getPosition(),
+                        "dream_move_nexus" + fromTile.getPosition() + "_to_" + toTile.getPosition(),
                         "Move from " + fromTile.getRepresentationForButtons(game, player) + " to "
                                 + toTile.getRepresentationForButtons(game, player)));
             }
@@ -174,11 +146,6 @@ public class DreamButtonHandler {
                 player.getCorrectChannel(),
                 player.getRepresentation() + " choose where to move a nexus token:",
                 buttons);
-    }
-
-    @ButtonHandler("beans_dream_offer_move_nexus")
-    public static void buttonOfferMoveNexusButtons(ButtonInteractionEvent event, Game game, Player player) {
-        offerMoveNexusButtons(event, game, player);
     }
 
     static boolean hasLiturgyII(Player player, Tile tile) {
@@ -231,6 +198,7 @@ public class DreamButtonHandler {
         return tile;
     }
 
+    @ButtonHandler("dream_add_nexus")
     public static void addNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         // Only the Dreaming Throne may add nexus tokens via Liturgy
         if (player == null || !"dream".equalsIgnoreCase(player.getFaction())) {
@@ -238,7 +206,7 @@ public class DreamButtonHandler {
             return;
         }
 
-        String position = buttonID.replace("beans_dream_add_nexus_", "");
+        String position = buttonID.replace("dream_add_nexus", "");
         Tile tile = game.getTileByPosition(position);
         if (tile == null) {
             MessageHelper.sendMessageToEventChannel(event, "Could not find that system.");
@@ -253,11 +221,7 @@ public class DreamButtonHandler {
                         + ".");
     }
 
-    @ButtonHandler("beans_dream_add_nexus_")
-    public static void buttonAddNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        addNexusToken(event, game, player, buttonID);
-    }
-
+    @ButtonHandler("dream_move_nexus")
     public static void moveNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         // Only the Dreaming Throne may move nexus tokens via Liturgy
         if (player == null || !"dream".equalsIgnoreCase(player.getFaction())) {
@@ -265,7 +229,7 @@ public class DreamButtonHandler {
             return;
         }
 
-        String data = buttonID.replace("beans_dream_move_nexus_from_", "");
+        String data = buttonID.replace("dream_move_nexus", "");
         String[] parts = data.split("_to_");
         if (parts.length != 2) {
             MessageHelper.sendMessageToEventChannel(event, "Could not parse nexus move request.");
@@ -290,18 +254,14 @@ public class DreamButtonHandler {
                         + toTile.getRepresentationForButtons(game, player) + ".");
     }
 
-    @ButtonHandler("beans_dream_move_nexus_from_")
-    public static void buttonMoveNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        moveNexusToken(event, game, player, buttonID);
-    }
-
+    @ButtonHandler("dream_remove_nexus")
     public static void removeNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         // The Dreaming Throne is not eligible to resolve The Waking
         if (player != null && "dream".equalsIgnoreCase(player.getFaction())) {
             MessageHelper.sendMessageToEventChannel(event, "The Dreaming Throne may not resolve _The Waking_.");
             return;
         }
-        String position = buttonID.replace("beans_dream_remove_nexus_", "");
+        String position = buttonID.replace("dream_remove_nexus", "");
         Tile tile = game.getTileByPosition(position);
         if (tile == null) {
             MessageHelper.sendMessageToEventChannel(event, "Could not find that system.");
@@ -367,11 +327,6 @@ public class DreamButtonHandler {
                         + tile.getRepresentationForButtons(game, player) + ".");
     }
 
-    @ButtonHandler("beans_dream_remove_nexus_")
-    public static void buttonRemoveNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        removeNexusToken(event, game, player, buttonID);
-    }
-
     public static void offerTheWakingButtons(Game game) {
         // Only offer The Waking during statusHomework
         if (!"statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) return;
@@ -394,7 +349,7 @@ public class DreamButtonHandler {
             List<Button> buttons = new ArrayList<>();
             for (Tile tile : eligibleTiles) {
                 buttons.add(Buttons.red(
-                        "beans_dream_remove_nexus_" + tile.getPosition(),
+                        "dream_remove_nexus_" + tile.getPosition(),
                         "Remove nexus from " + tile.getRepresentationForButtons(game, player)));
             }
             buttons.add(Buttons.red("deleteButtons", "Decline"));
@@ -429,7 +384,7 @@ public class DreamButtonHandler {
         List<Button> buttons = new ArrayList<>();
         for (Tile t : eligible) {
             buttons.add(Buttons.green(
-                    "beans_promissory_bepndream_return_" + t.getPosition(),
+                    "promissory_bepndream_return_" + t.getPosition(),
                     "Return Visions to Dream & remove nexus from " + t.getRepresentationForButtons(game, player)));
         }
         buttons.add(Buttons.red("deleteButtons", "Decline"));
@@ -440,6 +395,7 @@ public class DreamButtonHandler {
                 buttons);
     }
 
+    @ButtonHandler("promissory_bepndream_return_")
     public static void resolveVisionsPromissory(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (player == null) return;
@@ -453,7 +409,7 @@ public class DreamButtonHandler {
             return;
         }
 
-        String pos = buttonID.replace("beans_promissory_bepndream_return_", "");
+        String pos = buttonID.replace("promissory_bepndream_return_", "");
         Tile tile = game.getTileByPosition(pos);
         if (tile == null) {
             MessageHelper.sendMessageToEventChannel(event, "Could not find that system.");
@@ -552,7 +508,6 @@ public class DreamButtonHandler {
         return tileContainsNexusToken(game, tile, false);
     }
 
-    // Exposed for minimal injection from StartCombatService
     public static List<Button> getIncomprehensibleFormButtons(Game game, Player p1, Player p2, Tile tile) {
         List<Button> out = new ArrayList<>();
         if (tile == null) return out;
@@ -564,10 +519,11 @@ public class DreamButtonHandler {
         if (!p1IsDream && !p2IsDream) return out;
 
         out.add(Buttons.gray(
-                "beans_incomprehensible_form_" + tile.getPosition(), "Use Incomprehensible Form", FactionEmojis.dream));
+                "incomprehensible_form_" + tile.getPosition(), "Use Incomprehensible Form", FactionEmojis.dream));
         return out;
     }
 
+    @ButtonHandler("incomprehensible_form_")
     public static void presentIncomprehensibleChoices(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         // Only Dream player may use these abilities
@@ -575,7 +531,7 @@ public class DreamButtonHandler {
             MessageHelper.sendMessageToEventChannel(event, "Only the Dreaming Throne may use this ability.");
             return;
         }
-        String pos = buttonID.replace("beans_incomprehensible_form_", "");
+        String pos = buttonID.replace("incomprehensible_form_", "");
         Tile tile = game.getTileByPosition(pos);
         if (tile == null) {
             MessageHelper.sendMessageToEventChannel(event, "Could not find that system.");
@@ -605,14 +561,12 @@ public class DreamButtonHandler {
 
         List<Button> buttons = new ArrayList<>();
         if (hasToken) {
-            buttons.add(Buttons.gray(
-                    "beans_incomprehensible_form_use_token_" + pos, "Remove Nexus Token", FactionEmojis.dream));
+            buttons.add(
+                    Buttons.gray("incomprehensible_form_use_token_" + pos, "Remove Nexus Token", FactionEmojis.dream));
         }
         if (hasFlagship) {
             buttons.add(Buttons.blue(
-                    "beans_incomprehensible_form_use_flagship_" + pos,
-                    "Use Dream Flagship as Nexus",
-                    FactionEmojis.dream));
+                    "incomprehensible_form_use_flagship_" + pos, "Use Dream Flagship as Nexus", FactionEmojis.dream));
         }
         buttons.add(Buttons.red("deleteButtons", "Decline"));
 
@@ -622,6 +576,8 @@ public class DreamButtonHandler {
                 buttons);
     }
 
+    @ButtonHandler("incomprehensible_form_use_flagship_")
+    @ButtonHandler("incomprehensible_form_use_token_")
     public static void useIncomprehensibleForm(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         // Only Dream player may use these abilities
@@ -631,9 +587,9 @@ public class DreamButtonHandler {
         }
 
         boolean choiceFlagship = buttonID.contains("_use_flagship_");
-        String pos = buttonID.replace("beans_incomprehensible_form_use_flagship_", "")
-                .replace("beans_incomprehensible_form_use_token_", "")
-                .replace("beans_incomprehensible_form_", "");
+        String pos = buttonID.replace("incomprehensible_form_use_flagship_", "")
+                .replace("incomprehensible_form_use_token_", "")
+                .replace("incomprehensible_form_", "");
         Tile tile = game.getTileByPosition(pos);
         if (tile == null) {
             MessageHelper.sendMessageToEventChannel(event, "Could not find that system.");
