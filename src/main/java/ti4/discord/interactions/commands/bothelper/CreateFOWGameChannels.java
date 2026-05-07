@@ -3,7 +3,6 @@ package ti4.discord.interactions.commands.bothelper;
 import ti4.discord.JdaService;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;

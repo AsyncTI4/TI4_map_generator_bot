@@ -154,11 +154,11 @@ public class SearchGameHelper {
         for (var managedGame : filteredManagedGames) {
             if (managedGame.getTableTalkChannel() != null) {
                 String name = user.getName();
-                if (JdaService.getMemberById(managedGame.getTableTalkChannel().getGuild(), user.getId()) != null) {
-                    Member mem = JdaService.getMemberById(managedGame.getTableTalkChannel().getGuild(), user.getId());
-                    name = mem.getNickname();
+                Member member = JdaService.getMemberById(managedGame.getTableTalkChannel().getGuild(), user.getId());
+                if (member != null) {
+                    name = member.getNickname();
                     if (name == null) {
-                        name = mem.getEffectiveName();
+                        name = member.getEffectiveName();
                     }
                 }
                 String msg2 = "The player " + name + " sends the following msg:\n" + msg;

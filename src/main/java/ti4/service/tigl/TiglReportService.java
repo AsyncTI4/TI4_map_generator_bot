@@ -127,7 +127,7 @@ public class TiglReportService {
         if (userId == null) {
             return player.getStatsTrackedUserName();
         }
-        User user = JdaService.getUserById(Long.toString(userId));
+        User user = JdaService.getUserById(String.valueOf(userId));
         return user == null ? player.getStatsTrackedUserName() : user.getName();
     }
 

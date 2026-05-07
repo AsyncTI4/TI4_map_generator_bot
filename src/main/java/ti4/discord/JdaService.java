@@ -130,8 +130,7 @@ public class JdaService {
         BotLogger.info("STARTING JDA");
         jda = JDABuilder.createDefault(args[0])
                 .setEventPool(EVENT_EXECUTOR)
-                // Needed to listen for joins/leaves.
-                // This is required to cache all members of a guild (including chunking)
+                // Needed to listen for joins/leaves and perform targeted member fetches.
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 // Needed to parse raw user messages.
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
