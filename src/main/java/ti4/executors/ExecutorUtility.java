@@ -8,19 +8,32 @@ import ti4.logging.BotLogger;
 @UtilityClass
 public class ExecutorUtility {
 
-    public static boolean shutdownAndAwaitTermination(ExecutorService service, long timeout, TimeUnit unit) {
+    public enum ShutdownResult {
+        GRACEFUL_TERMINATION,
+        FORCED_TERMINATION,
+        TIMED_OUT,
+        INTERRUPTED
+    }
+
+    public static ShutdownResult shutdownAndAwaitTermination(ExecutorService service, long timeout, TimeUnit unit) {
         long halfTimeoutNanos = unit.toNanos(timeout) / 2;
         service.shutdown();
         try {
-            if (!service.awaitTermination(halfTimeoutNanos, TimeUnit.NANOSECONDS)) {
-                service.shutdownNow();
-                service.awaitTermination(halfTimeoutNanos, TimeUnit.NANOSECONDS);
+            if (service.awaitTermination(halfTimeoutNanos, TimeUnit.NANOSECONDS)) {
+                return ShutdownResult.GRACEFUL_TERMINATION;
             }
+
+            service.shutdownNow();
+            if (service.awaitTermination(halfTimeoutNanos, TimeUnit.NANOSECONDS)) {
+                return ShutdownResult.FORCED_TERMINATION;
+            }
+
+            return ShutdownResult.TIMED_OUT;
         } catch (InterruptedException e) {
             BotLogger.error("ExecutorService shutdown interrupted.", e);
             Thread.currentThread().interrupt();
             service.shutdownNow();
+            return ShutdownResult.INTERRUPTED;
         }
-        return service.isTerminated();
     }
 }
