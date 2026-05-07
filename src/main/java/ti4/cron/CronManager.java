@@ -63,7 +63,8 @@ public class CronManager {
         return CRONS.keySet();
     }
 
-    public static boolean shutdown() {
-        return ExecutorUtility.shutdownAndAwaitTermination(SCHEDULER, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+    public static ExecutorUtility.ShutdownResult shutdown() {
+        return ExecutorUtility.shutdownAndAwaitTermination(
+                "cron scheduler", SCHEDULER, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 }

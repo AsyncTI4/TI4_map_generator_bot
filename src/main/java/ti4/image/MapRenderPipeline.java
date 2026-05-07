@@ -98,9 +98,9 @@ public class MapRenderPipeline {
         render(new RenderEvent(game, event, displayType, callback, uploadToDiscord, uploadToWebsite));
     }
 
-    public static boolean shutdown() {
+    public static ExecutorUtility.ShutdownResult shutdown() {
         return ExecutorUtility.shutdownAndAwaitTermination(
-                EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                "map render pipeline", EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
     private record RenderEvent(

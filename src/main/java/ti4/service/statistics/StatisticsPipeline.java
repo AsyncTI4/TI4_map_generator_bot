@@ -32,9 +32,9 @@ public class StatisticsPipeline {
         ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
     }
 
-    public static boolean shutdown() {
+    public static ExecutorUtility.ShutdownResult shutdown() {
         return ExecutorUtility.shutdownAndAwaitTermination(
-                EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                "statistics pipeline", EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
     private static String eventToString(SlashCommandInteractionEvent event) {

@@ -88,9 +88,9 @@ public class SliceGenerationPipeline {
         generate(new NucleusGenerateEvent(event, game, nucleusSpecs, callback));
     }
 
-    public static boolean shutdown() {
+    public static ExecutorUtility.ShutdownResult shutdown() {
         return ExecutorUtility.shutdownAndAwaitTermination(
-                EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                "slice generation pipeline", EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
     record MiltyGenerateEvent(

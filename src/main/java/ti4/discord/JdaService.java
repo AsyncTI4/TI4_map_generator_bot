@@ -597,41 +597,12 @@ public class JdaService {
             ActiveLeaseService.setCurrentProcessReady(false);
             BotLogger.info("NO LONGER ACCEPTING COMMANDS");
 
-            if (shutdownEventExecutor()) {
-                BotLogger.info("FINISHED PROCESSING JDA EVENT POOL");
-            } else {
-                BotLogger.info("DID NOT FINISH PROCESSING JDA EVENT POOL");
-            }
-
-            if (ExecutorServiceManager.shutdown()) {
-                BotLogger.info("FINISHED PROCESSING ASYNC EXECUTOR THREADPOOL");
-            } else {
-                BotLogger.info("DID NOT FINISH PROCESSING ASYNC EXECUTOR THREADPOOL");
-            }
-
-            if (MapRenderPipeline.shutdown()) {
-                BotLogger.info("FINISHED RENDERING MAPS");
-            } else {
-                BotLogger.info("DID NOT FINISH RENDERING MAPS");
-            }
-
-            if (SliceGenerationPipeline.shutdown()) {
-                BotLogger.info("FINISHED RENDERING SLICE DRAFTS");
-            } else {
-                BotLogger.info("DID NOT FINISH RENDERING SLICE DRAFTS");
-            }
-
-            if (StatisticsPipeline.shutdown()) {
-                BotLogger.info("FINISHED PROCESSING STATISTICS");
-            } else {
-                BotLogger.info("DID NOT FINISH PROCESSING STATISTICS");
-            }
-
-            if (CronManager.shutdown()) {
-                BotLogger.info("FINISHED PROCESSING CRONS");
-            } else {
-                BotLogger.info("DID NOT FINISH PROCESSING CRONS");
-            }
+            logShutdownResult("JDA event pool", shutdownEventExecutor());
+            logShutdownResult("async executor threadpool", ExecutorServiceManager.shutdown());
+            logShutdownResult("map render pipeline", MapRenderPipeline.shutdown());
+            logShutdownResult("slice generation pipeline", SliceGenerationPipeline.shutdown());
+            logShutdownResult("statistics pipeline", StatisticsPipeline.shutdown());
+            logShutdownResult("cron scheduler", CronManager.shutdown());
 
             LogBufferManager.sendBufferedLogsToDiscord();
 
@@ -649,9 +620,18 @@ public class JdaService {
         }
     }
 
-    private static boolean shutdownEventExecutor() {
+    private static ExecutorUtility.ShutdownResult shutdownEventExecutor() {
         return ExecutorUtility.shutdownAndAwaitTermination(
-                EVENT_EXECUTOR, EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                "JDA event pool", EVENT_EXECUTOR, EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+    }
+
+    private static void logShutdownResult(String executorName, ExecutorUtility.ShutdownResult result) {
+        switch (result) {
+            case GRACEFUL_TERMINATION -> BotLogger.info(executorName + " terminated gracefully.");
+            case FORCED_TERMINATION -> BotLogger.info(executorName + " terminated after forced shutdown.");
+            case TIMED_OUT -> BotLogger.info(executorName + " did not terminate before the shutdown timeout.");
+            case INTERRUPTED -> BotLogger.info(executorName + " shutdown was interrupted.");
+        }
     }
 
     private static void shutdownJda() {
