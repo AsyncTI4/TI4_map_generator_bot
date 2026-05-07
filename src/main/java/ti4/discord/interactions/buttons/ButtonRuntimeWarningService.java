@@ -88,16 +88,16 @@ class ButtonRuntimeWarningService {
         String resolveTime = formatMillisecondsWithWarning(resolveRuntimeMs);
         String saveTime = formatMillisecondsWithWarning(saveRuntimeMs);
         String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(processingEndTimeMs - eventTimeMs);
-        thresholdWarningReasons.add(new ThresholdWarningReason(
-                eventTime, ButtonHelper.getButtonRepresentation(event.getButton()), responseTime));
+        String buttonRepresentation = ButtonHelper.getButtonRepresentation(event.getButton());
+        thresholdWarningReasons.add(new ThresholdWarningReason(eventTime, buttonRepresentation, responseTime));
 
         String message = event.getUser().getEffectiveName()
                 + " pressed button: "
-                + ButtonHelper.getButtonRepresentation(event.getButton())
+                + buttonRepresentation
                 + " in: [" + event.getChannel().getName() + "]("
                 + event.getMessage().getJumpUrl() + ") "
                 + "\n> ⚠ **Slow Button Warning:**"
-                + "\n> 🕒 Event start: `" + eventTime + "`"
+                + "\n> 🕒 Event start: " + eventTime
                 + "\n> 🧩 Built context in: `" + contextTime + "`"
                 + "\n> 🛠 Executed in: `" + resolveTime + "`"
                 + "\n> 💾 Saved in: `" + saveTime + "`"
