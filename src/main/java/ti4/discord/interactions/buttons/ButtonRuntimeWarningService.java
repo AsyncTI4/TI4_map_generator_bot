@@ -2,6 +2,8 @@ package ti4.discord.interactions.buttons;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.AsyncTI4DiscordBot;
@@ -23,6 +25,7 @@ class ButtonRuntimeWarningService {
     private int runtimeWarningCount;
     private Instant pauseWarningsUntil = Instant.now();
     private Instant lastWarningTime = Instant.now();
+    private final List<ThresholdWarningReason> thresholdWarningReasons = new ArrayList<>();
 
     @Getter
     private long runtimeSubmissionCount;
@@ -60,6 +63,7 @@ class ButtonRuntimeWarningService {
         var now = Instant.now();
         if (lastWarningTime.isBefore(now.minusSeconds(RESET_WARNING_COUNT_AFTER_SECONDS))) {
             runtimeWarningCount = 0;
+            thresholdWarningReasons.clear();
         }
 
         boolean slowPreprocess = preprocessingTimeMs >= PREPROCESSING_WARNING_THRESHOLD_MILLISECONDS;
@@ -84,6 +88,10 @@ class ButtonRuntimeWarningService {
         String resolveTime = formatMillisecondsWithWarning(resolveRuntimeMs);
         String saveTime = formatMillisecondsWithWarning(saveRuntimeMs);
         String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(processingEndTimeMs - eventTimeMs);
+        thresholdWarningReasons.add(new ThresholdWarningReason(
+                ButtonHelper.getButtonRepresentation(event.getButton()),
+                responseTime,
+                DateTimeHelper.getTimestampFromMillisecondsEpoch(processingEndTimeMs)));
 
         String message = event.getUser().getEffectiveName()
                 + " pressed button: "
@@ -105,8 +113,10 @@ class ButtonRuntimeWarningService {
 
         if (runtimeWarningCount > RUNTIME_WARNING_COUNT_THRESHOLD) {
             pauseWarningsUntil = now.plusSeconds(PAUSE_AFTER_WARNING_SECONDS);
-            BotLogger.error("**Buttons are processing slowly. Pausing warnings for 5 minutes.**");
+            BotLogger.error("**Buttons are processing slowly. Pausing warnings for 5 minutes.**"
+                    + formatThresholdWarningReasons());
             runtimeWarningCount = 0;
+            thresholdWarningReasons.clear();
         }
 
         lastWarningTime = now;
@@ -120,6 +130,22 @@ class ButtonRuntimeWarningService {
         return formattedRuntime;
     }
 
+    private String formatThresholdWarningReasons() {
+        if (thresholdWarningReasons.isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder("\n> **Reasons:**");
+        for (ThresholdWarningReason reason : thresholdWarningReasons) {
+            sb.append("\n> - ")
+                    .append(reason.occurredAt())
+                    .append(" • `")
+                    .append(reason.totalRuntime())
+                    .append("` • ")
+                    .append(reason.buttonRepresentation());
+        }
+        return sb.toString();
+    }
+
     synchronized double getAveragePreprocessingTime() {
         return runtimeSubmissionCount == 0 ? 0 : totalPreprocessingTime / (double) runtimeSubmissionCount;
     }
@@ -131,4 +157,6 @@ class ButtonRuntimeWarningService {
     synchronized double getThresholdMissPercent() {
         return runtimeSubmissionCount == 0 ? 0 : runtimeThresholdMissCount / (double) runtimeSubmissionCount;
     }
+
+    private record ThresholdWarningReason(String buttonRepresentation, String totalRuntime, String occurredAt) {}
 }
