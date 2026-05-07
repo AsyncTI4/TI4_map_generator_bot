@@ -2,6 +2,7 @@ package ti4.discord;
 
 import jakarta.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -23,6 +24,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.AsyncTI4DiscordBot;
 import ti4.contest.cron.CombatContestJanitorCron;
@@ -108,6 +110,17 @@ public class JdaService {
     public static final Set<Guild> guilds = new HashSet<>();
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
     public static final List<Guild> fowServers = new ArrayList<>();
+    private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
+    private static final Set<CacheFlag> DISABLED_JDA_CACHE_FLAGS = EnumSet.of(
+            CacheFlag.ACTIVITY,
+            CacheFlag.CLIENT_STATUS,
+            CacheFlag.FORUM_TAGS,
+            CacheFlag.ONLINE_STATUS,
+            CacheFlag.ROLE_TAGS,
+            CacheFlag.SCHEDULED_EVENTS,
+            CacheFlag.SOUNDBOARD_SOUNDS,
+            CacheFlag.STICKER,
+            CacheFlag.VOICE_STATE);
 
     private static final ExecutorService EVENT_EXECUTOR = Executors.newFixedThreadPool(
             Runtime.getRuntime().availableProcessors(),
@@ -128,6 +141,7 @@ public class JdaService {
                 // It *appears* we need to pull all members or else the bot has trouble pinging players
                 // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
                 // and avoid loading every user at startup
+                .disableCache(DISABLED_JDA_CACHE_FLAGS)
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setChunkingFilter(ChunkingFilter.ALL)
                 // This allows us to use our own ShutdownHook, created below
@@ -576,15 +590,15 @@ public class JdaService {
             BotLogger.info("SHUTDOWN PROCESS STARTED");
             ActiveLeaseService.setCurrentProcessReady(false);
             BotLogger.info("NO LONGER ACCEPTING COMMANDS");
-            if (shutdownEventExecutor()) { // will wait for up to an additional 20 seconds
-                BotLogger.info("FINISHED PROCESSING ASYNC THREADPOOL");
+            if (shutdownEventExecutor()) { // will wait for up to an additional 40 seconds
+                BotLogger.info("FINISHED PROCESSING JDA EVENT POOL");
             } else {
-                BotLogger.info("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
+                BotLogger.info("DID NOT FINISH PROCESSING JDA EVENT POOL");
             }
             if (ExecutorServiceManager.shutdown()) { // will wait for up to an additional 20 seconds
-                BotLogger.info("FINISHED PROCESSING ASYNC THREADPOOL");
+                BotLogger.info("FINISHED PROCESSING ASYNC EXECUTOR THREADPOOL");
             } else {
-                BotLogger.info("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
+                BotLogger.info("DID NOT FINISH PROCESSING ASYNC EXECUTOR THREADPOOL");
             }
             if (MapRenderPipeline.shutdown()) { // will wait for up to an additional 20 seconds
                 BotLogger.info("FINISHED RENDERING MAPS");
@@ -615,10 +629,16 @@ public class JdaService {
     }
 
     private static boolean shutdownEventExecutor() {
-        EVENT_EXECUTOR.shutdownNow();
+        EVENT_EXECUTOR.shutdown();
         try {
-            return EVENT_EXECUTOR.awaitTermination(20, TimeUnit.SECONDS);
+            if (EVENT_EXECUTOR.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                return true;
+            }
+
+            EVENT_EXECUTOR.shutdownNow();
+            return EVENT_EXECUTOR.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
+            EVENT_EXECUTOR.shutdownNow();
             BotLogger.error("JdaService event thread pool shutdown interrupted.", e);
             Thread.currentThread().interrupt();
             return false;
