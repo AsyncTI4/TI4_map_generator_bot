@@ -88,8 +88,8 @@ class ButtonRuntimeWarningService {
         String resolveTime = formatMillisecondsWithWarning(resolveRuntimeMs);
         String saveTime = formatMillisecondsWithWarning(saveRuntimeMs);
         String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(processingEndTimeMs - eventTimeMs);
-        thresholdWarningReasons.add(
-                new ThresholdWarningReason(eventTime, ButtonHelper.getButtonRepresentation(event.getButton()), responseTime));
+        thresholdWarningReasons.add(new ThresholdWarningReason(
+                eventTime, ButtonHelper.getButtonRepresentation(event.getButton()), responseTime));
 
         String message = event.getUser().getEffectiveName()
                 + " pressed button: "
