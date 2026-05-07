@@ -15,7 +15,6 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.UnitHolder;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
@@ -530,15 +529,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             }
         }
         if (player.hasUnit("ralnel_destroyer2") && "destroyer".equalsIgnoreCase(baseType)) {
-            Game game = player.getGame();
-            if (Helper.getDateDifference(
-                            Helper.getDateRepresentation(game.getCreationDateTime()),
-                            Helper.getDateRepresentation(1771475738353L))
-                    < 0) {
-                return player.hasTech("pds2");
-            } else {
-                return false;
-            }
+            return false;
         }
         if (player.hasUnit("tk-shellofloncara") && "flagship".equalsIgnoreCase(baseType)) {
             return true;

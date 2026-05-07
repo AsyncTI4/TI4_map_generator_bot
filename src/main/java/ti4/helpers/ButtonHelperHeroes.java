@@ -1,8 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBefore;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1327,9 +1325,6 @@ public class ButtonHelperHeroes {
                     factionChecker + "cabalHeroTile_" + tile.getPosition(),
                     "Roll For Units In " + tile.getRepresentationForButtons(game, player)));
         }
-        empties.add(Buttons.red(
-                factionChecker + "cabalHeroAll",
-                "Resolve " + (game.isTwilightsFallMode() ? "Paradigm" : "Hero") + " For All Tiles [Experimental]"));
         SortHelper.sortButtonsByTitle(empties);
         return empties;
     }

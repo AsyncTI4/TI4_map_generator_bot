@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -287,7 +284,10 @@ public class ButtonHelper {
 
     public static void resolveInfantryDestroy(Player player, int totalAmount, Tile tile) {
         resolveInfantryRemoval(player, totalAmount, tile);
-        if (totalAmount <= 0 || (!player.hasInf2Tech() && !player.hasUnit("mahact_infantry"))) return;
+        if (totalAmount <= 0
+                || (!player.hasInf2Tech()
+                        && !player.hasUnit("mahact_infantry")
+                        && !player.hasUnit("tk-twilightlegionnaire"))) return;
         if (player.getUnitsOwned().contains("pharadn_infantry")
                 || player.getUnitsOwned().contains("pharadn_infantry2")
                 || player.hasUnit("tf-yinclone")) return;
@@ -1432,6 +1432,16 @@ public class ButtonHelper {
                     .filter(p -> p.getUnitColorsOnHolder().contains(player.getColorID()))
                     .flatMap(p -> p.getUnitColorsOnHolder().stream())
                     .toList();
+            if (player == titans) {
+                colorsCoexisting = new ArrayList<>();
+                for (String planet : game.getPlanetsPlayerIsCoexistingOn(player)) {
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (p2.getPlanets().contains(planet) && p2 != player) {
+                            colorsCoexisting.add(p2.getColorID());
+                        }
+                    }
+                }
+            }
             List<String> seenColors = new ArrayList<>();
 
             for (String col : colorsCoexisting) {

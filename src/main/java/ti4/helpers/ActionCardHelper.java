@@ -686,6 +686,7 @@ public class ActionCardHelper {
         ActionCardModel actionCard = Mapper.getActionCard(acID);
         String actionCardTitle = actionCard.getName();
         String actionCardWindow = actionCard.getWindow();
+        boolean twinned = (acIndex == -99);
 
         String activePlayerID = game.getActivePlayerID();
         if (player.isPassed() && activePlayerID != null) {
@@ -737,18 +738,21 @@ public class ActionCardHelper {
                         + "_ action card.");
 
         boolean fromGarbozia = false;
-        if (player.hasPlanet("garbozia") && game.getDiscardACStatus().getOrDefault(acID, null) == ACStatus.garbozia) {
-            game.getDiscardACStatus().put(acID, ACStatus.purged);
-            if (!game.isFowMode()) {
-                fromGarbozia = true;
+        if (!twinned) {
+            if (player.hasPlanet("garbozia")
+                    && game.getDiscardACStatus().getOrDefault(acID, null) == ACStatus.garbozia) {
+                game.getDiscardACStatus().put(acID, ACStatus.purged);
+                if (!game.isFowMode()) {
+                    fromGarbozia = true;
+                }
+            } else if (player.hasAbility("cybernetic_madness")) {
+                game.purgedActionCard(player.getUserID(), acIndex);
+            } else {
+                game.discardActionCard(player.getUserID(), acIndex);
             }
-        } else if (player.hasAbility("cybernetic_madness")) {
-            game.purgedActionCard(player.getUserID(), acIndex);
-        } else {
-            game.discardActionCard(player.getUserID(), acIndex);
         }
 
-        boolean actionCardIsCancelable = isActionCardCancelable(actionCard);
+        boolean actionCardIsCancelable = isActionCardCancelable(actionCard) && !twinned;
 
         String pingGame = actionCardIsCancelable ? game.getPing() + ", " : "";
         String message = pingGame + (game.isFowMode() ? "someone" : player.getRepresentation());
