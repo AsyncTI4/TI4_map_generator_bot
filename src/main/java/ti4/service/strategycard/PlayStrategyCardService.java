@@ -652,7 +652,7 @@ public class PlayStrategyCardService {
                     for (Player p2 : game.getRealPlayers()) {
                         Member member = game.getGuild().getMemberById(p2.getUserID());
                         if (member != null) {
-                            m5.addThreadMember(member);
+                            m5.addThreadMember(member).queue();
                         }
                     }
                 }
