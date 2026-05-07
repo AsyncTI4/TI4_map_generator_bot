@@ -634,22 +634,16 @@ public class JdaService {
         }
     }
 
-    private static ShutdownResult shutdownJda() {
+    private static void shutdownJda() {
         jda.shutdown();
         try {
             if (!jda.awaitShutdown(JDA_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
                 jda.shutdownNow();
-                if (jda.awaitShutdown(JDA_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
-                    return ShutdownResult.FORCED_TERMINATION;
-                }
-                return ShutdownResult.TIMED_OUT;
+                jda.awaitShutdown(JDA_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             }
-            return ShutdownResult.GRACEFUL_TERMINATION;
         } catch (InterruptedException e) {
-            BotLogger.error("JDA shutdown interrupted.", e);
             Thread.currentThread().interrupt();
             jda.shutdownNow();
-            return ShutdownResult.INTERRUPTED;
         }
     }
 }
