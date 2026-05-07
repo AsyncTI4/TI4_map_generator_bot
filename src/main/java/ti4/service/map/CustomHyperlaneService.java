@@ -58,7 +58,7 @@ public class CustomHyperlaneService {
         offerManageHyperlaneButtons(game, event, null);
     }
 
-    @ButtonHandler("customHyperlanePagination")
+    @ButtonHandler(value = "customHyperlanePagination", save = false)
     public static void offerManageHyperlaneButtons(ButtonInteractionEvent event, String buttonID, Game game) {
         offerManageHyperlaneButtons(game, event, buttonID);
     }
@@ -113,18 +113,18 @@ public class CustomHyperlaneService {
         return hyperlaneTileButtons;
     }
 
-    @ButtonHandler("customHyperlaneRefresh")
+    @ButtonHandler(value = "customHyperlaneRefresh", save = false)
     public static void refreshHyperlaneButtons(ButtonInteractionEvent event, Game game) {
         offerManageHyperlaneButtons(game, event, null);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    @ButtonHandler("customHyperlaneMore")
+    @ButtonHandler(value = "customHyperlaneMore", save = false)
     public static void moreHyperlaneButtons(ButtonInteractionEvent event) {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", HYPERLANE_MORE_BUTTONS);
     }
 
-    @ButtonHandler("customHyperlaneExport")
+    @ButtonHandler(value = "customHyperlaneExport", save = false)
     public static void exportHyperlaneData(ButtonInteractionEvent event, Game game) {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : game.getCustomHyperlaneData().entrySet()) {
@@ -136,7 +136,7 @@ public class CustomHyperlaneService {
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
 
-    @ButtonHandler("customHyperlaneImport~MDL")
+    @ButtonHandler(value = "customHyperlaneImport~MDL", save = false)
     public static void importHyperlaneData(ButtonInteractionEvent event) {
         TextInput.Builder data = TextInput.create(Constants.SETTING_VALUE, TextInputStyle.PARAGRAPH);
 
@@ -232,7 +232,7 @@ public class CustomHyperlaneService {
         game.getCustomHyperlaneData().put(position, normalizeMatrix(hyperlaneData));
     }
 
-    @ButtonHandler("customHyperlaneTransform~MDL")
+    @ButtonHandler(value = "customHyperlaneTransform~MDL", save = false)
     public static void transformHyperlane(ButtonInteractionEvent event) {
         TextInput.Builder data1 = TextInput.create("staticToCustom", TextInputStyle.SHORT)
                 .setPlaceholder("Comma separated positions or ALL")

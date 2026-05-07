@@ -241,7 +241,7 @@ public final class RiftSetModeService {
         buttons.add(Buttons.gray("riftsetshowcaptured", "Show captured units", SourceEmojis.Eronous));
     }
 
-    @ButtonHandler("riftsetshowcaptured")
+    @ButtonHandler(value = "riftsetshowcaptured", save = false)
     public static void showCapturedUnits(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         if (!isActive(game)) return;
 
