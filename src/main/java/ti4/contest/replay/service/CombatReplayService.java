@@ -69,6 +69,7 @@ public class CombatReplayService {
     }
 
     public PreInteractionSnapshot capturePreInteractionSnapshot(Game game) {
+        if (!settings.isEnabled()) return PreInteractionSnapshot.empty();
         if (game == null) return PreInteractionSnapshot.empty();
 
         Map<Long, CandidateInitialSnapshot> snapshots = new HashMap<>();
@@ -91,6 +92,7 @@ public class CombatReplayService {
     }
 
     public void onSpaceCombatStarted(Game game, Player attacker, Player defender, Tile tile) {
+        if (!settings.isEnabled()) return;
         if (isDiscordantStarsGame(game)) return;
 
         boolean trackAllCombatsAsCandidates = settings.getRuntime().isTrackAllCombatsAsCandidates();
@@ -116,6 +118,7 @@ public class CombatReplayService {
     }
 
     public void onButtonInteractionSettled(Game game, Player player, ButtonInteractionEvent event) {
+        if (!settings.isEnabled()) return;
         for (CombatCandidateEntity candidate : getOpenCandidates(game)) {
             if (candidate.getStatus() == CombatCandidateStatus.PENDING_RESOLUTION
                     && !candidate
@@ -136,6 +139,7 @@ public class CombatReplayService {
     }
 
     public void finalizeExpiredPendingResolutionCandidates() {
+        if (!settings.isEnabled()) return;
         LocalDateTime cutoff =
                 LocalDateTime.now().minusSeconds(settings.getReplayExecution().getPendingResolutionWindowSeconds());
         for (CombatCandidateEntity candidate : candidateRepository.findByStatusAndPendingResolutionStartedAtBefore(
@@ -155,6 +159,7 @@ public class CombatReplayService {
             boolean whiff,
             boolean slam,
             CombatRollPayload payload) {
+        if (!settings.isEnabled()) return;
         CombatCandidateEntity candidate = getTrackingCandidate(game, tile.getPosition());
         if (candidate == null || !isReplayRoll(rollType)) return;
         if (rollType != CombatRollType.SpaceCannonOffence && !matchesParticipants(candidate, player, opponent)) return;
@@ -175,6 +180,7 @@ public class CombatReplayService {
 
     public boolean isTrackedCandidateRoll(
             Game game, Player player, Player opponent, Tile tile, CombatRollType rollType) {
+        if (!settings.isEnabled()) return false;
         if (game == null || player == null || opponent == null || tile == null || !isReplayRoll(rollType)) {
             return false;
         }
@@ -202,6 +208,7 @@ public class CombatReplayService {
             MessageEmbed embed,
             String sourceChannelName,
             CombatReplayTrackedEvent trackedEvent) {
+        if (!settings.isEnabled()) return;
         CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
         if (candidate == null) return;
         ensureInitialSnapshot(candidate, game);
@@ -213,6 +220,7 @@ public class CombatReplayService {
     }
 
     public void mirrorLeaderPlayed(Game game, Player player, String leaderId, String sourceChannelName) {
+        if (!settings.isEnabled()) return;
         CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
         if (candidate == null) return;
         ensureInitialSnapshot(candidate, game);
@@ -232,6 +240,7 @@ public class CombatReplayService {
             String actionCardId,
             String sourceChannelName,
             CombatReplayTrackedEvent trackedEvent) {
+        if (!settings.isEnabled()) return;
         CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
         if (candidate == null) return;
         ensureInitialSnapshot(candidate, game);
@@ -248,6 +257,7 @@ public class CombatReplayService {
     }
 
     public void mirrorRetreatDeclared(Game game, Player player, String sourceChannelName) {
+        if (!settings.isEnabled()) return;
         CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
         if (candidate == null) return;
         ensureInitialSnapshot(candidate, game);
@@ -262,6 +272,7 @@ public class CombatReplayService {
     }
 
     public void mirrorRetreatResolved(Game game, Player player, String destination, String sourceChannelName) {
+        if (!settings.isEnabled()) return;
         CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
         if (candidate == null) return;
         ensureInitialSnapshot(candidate, game);
@@ -276,6 +287,7 @@ public class CombatReplayService {
     }
 
     public void mirrorAssaultCannonAssigned(Game game, Player player, String sourceChannelName) {
+        if (!settings.isEnabled()) return;
         CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
         if (candidate == null) return;
         ensureInitialSnapshot(candidate, game);
@@ -290,6 +302,7 @@ public class CombatReplayService {
     }
 
     public void mirrorGravitonExhausted(Game game, Player player, String sourceChannelName) {
+        if (!settings.isEnabled()) return;
         CombatCandidateEntity candidate = resolveCandidateForMirrorEvent(game, player, sourceChannelName);
         if (candidate == null) return;
         ensureInitialSnapshot(candidate, game);
@@ -611,6 +624,7 @@ public class CombatReplayService {
     }
 
     public void refreshSelectionSnapshot() {
+        if (!settings.isEnabled()) return;
         LocalDateTime now = LocalDateTime.now();
         List<CombatObservationEntity> window = observationRepository.findByStartedAtGreaterThanEqualOrderByStartedAtAsc(
                 now.minusMinutes(settings.getCandidateSelection().getWindow().getLookbackMinutes()));
