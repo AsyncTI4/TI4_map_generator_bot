@@ -602,10 +602,10 @@ public class JdaService {
 
             logShutdownResult(JDA_EVENT_POOL_NAME, shutdownEventExecutor());
             logShutdownResult(ExecutorServiceManager.class.getSimpleName(), ExecutorServiceManager.shutdown());
-            logShutdownResult(MapRenderPipeline.class.getSimpleName(), MapRenderPipeline.shutdown());
-            logShutdownResult(SliceGenerationPipeline.class.getSimpleName(), SliceGenerationPipeline.shutdown());
-            logShutdownResult(StatisticsPipeline.class.getSimpleName(), StatisticsPipeline.shutdown());
             logShutdownResult(CronManager.class.getSimpleName(), CronManager.shutdown());
+            logShutdownResult(SliceGenerationPipeline.class.getSimpleName(), SliceGenerationPipeline.shutdown());
+            logShutdownResult(MapRenderPipeline.class.getSimpleName(), MapRenderPipeline.shutdown());
+            logShutdownResult(StatisticsPipeline.class.getSimpleName(), StatisticsPipeline.shutdown());
 
             SpringContext.getBean(ActiveLeaseService.class).releaseLease();
             BotLogger.info("RELEASED ACTIVE LEASE");
