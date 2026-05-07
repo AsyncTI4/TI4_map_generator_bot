@@ -60,11 +60,31 @@ public record HandlerRegistry<C extends ListenerContext>(Map<String, Handler<C>>
      * @return {@code true} if a handler was found and invoked, {@code false} otherwise.
      */
     public boolean handle(String componentID, C context) {
-        Handler<C> handler = findHandler(componentID);
-        if (handler == null) return false;
-        RollbarManager.put("handler_id", componentID);
-        handler.consumer().accept(context);
-        return true;
+        if (componentID == null) return false;
+
+        // Check for exact match first
+        Handler<C> exact = handlers.get(componentID);
+        if (exact != null) {
+            RollbarManager.put("handler_id", componentID);
+            exact.consumer().accept(context);
+            return true;
+        }
+
+        // Then check for longest prefix match
+        String longestMatch = null;
+        for (String key : handlers.keySet()) {
+            if (componentID.startsWith(key)) {
+                if (longestMatch == null || key.length() > longestMatch.length()) {
+                    longestMatch = key;
+                }
+            }
+        }
+        if (longestMatch != null) {
+            RollbarManager.put("handler_id", longestMatch);
+            handlers.get(longestMatch).consumer().accept(context);
+            return true;
+        }
+        return false;
     }
 
     private Handler<C> findHandler(String componentID) {

@@ -68,6 +68,10 @@ public final class ModalListener extends ListenerAdapter {
 
     private void handleModal(ModalInteractionEvent event) {
         ModalContext context = new ModalContext(event);
+        if (!context.isValid()) {
+            BotLogger.warning(new LogOrigin(event), "Invalid modal context.");
+            return;
+        }
         try {
             RollbarManager.putInteractionMetadata("modal", event);
             RollbarManager.put("modal_id", event.getModalId());

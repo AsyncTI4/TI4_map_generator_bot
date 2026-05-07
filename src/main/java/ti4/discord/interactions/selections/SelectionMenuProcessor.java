@@ -43,21 +43,23 @@ public final class SelectionMenuProcessor {
 
     private static void process(StringSelectInteractionEvent event) {
         SelectionMenuContext context = new SelectionMenuContext(event);
+        if (!context.isValid()) {
+            BotLogger.warning(new LogOrigin(event), "Invalid selection menu context.");
+            return;
+        }
         try {
             RollbarManager.putInteractionMetadata("select_menu", event);
             RollbarManager.put("menu_id", event.getComponentId());
             RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
 
-            if (context.isValid()) {
-                CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
-                combatReplayService.setPreInteractionSnapshot(
-                        combatReplayService.capturePreInteractionSnapshot(context.getGame()));
-                try {
-                    resolveSelectionMenu(context);
-                    context.save();
-                } finally {
-                    combatReplayService.clearPreInteractionSnapshot();
-                }
+            CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
+            combatReplayService.setPreInteractionSnapshot(
+                    combatReplayService.capturePreInteractionSnapshot(context.getGame()));
+            try {
+                resolveSelectionMenu(context);
+                context.save();
+            } finally {
+                combatReplayService.clearPreInteractionSnapshot();
             }
         } catch (Exception e) {
             String message = "Selection Menu issue in event: " + event.getComponentId() + "\n> Channel: "

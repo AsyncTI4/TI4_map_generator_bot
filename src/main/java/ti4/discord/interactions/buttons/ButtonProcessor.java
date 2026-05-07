@@ -70,6 +70,8 @@ public class ButtonProcessor {
 
     private static void process(ButtonInteractionEvent event) {
         ButtonContext context = new ButtonContext(event);
+        if (!context.isValid()) return;
+
         long processStartTime = System.currentTimeMillis();
         long resolveRuntime = 0;
         long saveRuntime = 0;
