@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
+import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
@@ -126,7 +127,9 @@ public class StartCombatService {
             GenericInteractionCreateEvent event,
             String specialCombatTitle) {
         RoundStatsTracker.incrementCombatsInitiated(game, player);
-        SpringContext.getBean(CombatReplayService.class).onSpaceCombatStarted(game, player, player2, tile);
+        if (CombatContestSettings.isEnabledStatic()) {
+            SpringContext.getBean(CombatReplayService.class).onSpaceCombatStarted(game, player, player2, tile);
+        }
         String threadName = combatThreadName(game, player, player2, tile, specialCombatTitle);
         if (!game.isFowMode()) {
             findOrCreateCombatThread(
@@ -360,7 +363,7 @@ public class StartCombatService {
                 amount++;
             }
         }
-        if (amount > 2 || tile.getNumberOfUnitsInSystem() > 2) {
+        if (CombatContestSettings.isEnabledStatic() && (amount > 2 || tile.getNumberOfUnitsInSystem() > 2)) {
             MessageHelper.sendMessageToChannel(
                     threadChannel,
                     CombatReplayDecoys.appendDebugDecoySummary(
