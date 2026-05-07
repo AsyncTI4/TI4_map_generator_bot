@@ -584,7 +584,8 @@ public class AddPlanetService {
                         buttons);
             }
         }
-        if (!unitHolder.isSpaceStation() && IsPlayerElectedService.isPlayerElected(game, player, "minister_exploration")) {
+        if (!unitHolder.isSpaceStation()
+                && IsPlayerElectedService.isPlayerElected(game, player, "minister_exploration")) {
             String fac = player.getFactionEmoji();
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
