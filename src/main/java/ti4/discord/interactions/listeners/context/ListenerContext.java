@@ -99,7 +99,6 @@ public abstract class ListenerContext {
             }
 
             if ("button".equals(getContextType())) {
-                componentID = componentID.replace("delete_buttons_", "resolveAgendaVote_");
                 game.increaseButtonPressCount();
             }
 
