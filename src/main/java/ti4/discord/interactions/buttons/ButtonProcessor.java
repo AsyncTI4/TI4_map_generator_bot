@@ -98,7 +98,7 @@ public class ButtonProcessor {
                 beforeTime = System.currentTimeMillis();
                 context.save();
                 saveRuntime = System.currentTimeMillis() - beforeTime;
-                
+
                 if (combatReplayService != null && context.getGame() != null) {
                     combatReplayService.onButtonInteractionSettled(context.getGame(), context.getPlayer(), event);
                 }
