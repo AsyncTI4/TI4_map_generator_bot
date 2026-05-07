@@ -30,6 +30,7 @@ import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.listeners.context.ListenerContext;
 import ti4.discord.interactions.listeners.context.ModalContext;
 import ti4.discord.interactions.listeners.context.SelectionMenuContext;
+import ti4.executors.CircuitBreaker;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -186,7 +187,8 @@ public final class AnnotationHandler {
                                 .getMessage()
                                 .reply(
                                         "The button failed. An exception has been logged for the developers. Please report this to "
-                                                + getBotBugsChannelLink() + ". It will probably require a code change.")
+                                                + getBotBugsChannelLink()
+                                                + " if it doesn't resolve within an hour. Do not ping anyone until that time passes.")
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                     if (arg instanceof StringSelectInteractionEvent selectInteractionEvent) {
@@ -195,8 +197,9 @@ public final class AnnotationHandler {
                                 .getInteraction()
                                 .getMessage()
                                 .reply(
-                                        "The selection failed. An exception has been logged for the developers. Please report this to "
-                                                + getBotBugsChannelLink() + ". It will probably require a code change.")
+                                        "The selection menu failed. An exception has been logged for the developers. Please report this to "
+                                                + getBotBugsChannelLink()
+                                                + " if it doesn't resolve within an hour. Do not ping anyone until that time passes.")
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                 }
@@ -205,6 +208,8 @@ public final class AnnotationHandler {
                         "Error within handler \"" + method.getDeclaringClass().getSimpleName() + "#" + method.getName()
                                 + "\":",
                         e.getCause());
+                CircuitBreaker.incrementThresholdCount(
+                        "InvocationTargetException in AnnotationHandler for: " + context.getOrigComponentID());
             } catch (Exception e) {
                 List<String> paramTypes = Arrays.stream(method.getParameters())
                         .map(param -> param.getType().getSimpleName())

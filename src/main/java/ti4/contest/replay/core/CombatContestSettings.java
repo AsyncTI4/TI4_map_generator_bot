@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import ti4.spring.context.SpringContext;
 
 /**
  * Mutable in-memory settings for the replay contest system.
@@ -26,6 +27,7 @@ public class CombatContestSettings {
     @Setter(AccessLevel.NONE)
     private boolean isProd;
 
+    private boolean enabled;
     private CandidateSelection candidateSelection = new CandidateSelection();
     private Promotion promotion = new Promotion();
     private ReplayExecution replayExecution = new ReplayExecution();
@@ -176,6 +178,10 @@ public class CombatContestSettings {
     @JsonProperty("isProd")
     public boolean isProd() {
         return isProd;
+    }
+
+    public static boolean isEnabledStatic() {
+        return SpringContext.getBean(CombatContestSettings.class).isEnabled();
     }
 
     private void loadEnvironmentDefaults(boolean isProd) {

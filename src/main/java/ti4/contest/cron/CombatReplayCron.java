@@ -22,6 +22,7 @@ public class CombatReplayCron {
 
     private static void runReplayTick() {
         if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
+        if (!CombatContestSettings.isEnabledStatic()) return;
         CombatContestSettings settings = SpringContext.getBean(CombatContestSettings.class);
         if (!shouldRun(settings.getReplayExecution().getReplayIntervalSeconds())) return;
         try {
