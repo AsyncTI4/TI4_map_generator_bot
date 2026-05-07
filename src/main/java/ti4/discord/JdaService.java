@@ -139,13 +139,13 @@ public class JdaService {
         jda = JDABuilder.createDefault(args[0])
                 .setEventPool(EVENT_EXECUTOR)
                 .enableIntents(
-                    // Needed to listen for joins/leaves.
-                    // Needed to cache all members of a guild (including chunking) - remove?
-                    GatewayIntent.GUILD_MEMBERS,
-                    // Needed to parse raw user messages.
-                    GatewayIntent.MESSAGE_CONTENT,
-                    // Needed for emoji searches and validation
-                    GatewayIntent.GUILD_EXPRESSIONS)
+                        // Needed to listen for joins/leaves
+                        // Needed to cache all members of a guild (including chunking) - remove?
+                        GatewayIntent.GUILD_MEMBERS,
+                        // Needed to parse raw user messages
+                        GatewayIntent.MESSAGE_CONTENT,
+                        // Needed for emoji searches and validation
+                        GatewayIntent.GUILD_EXPRESSIONS)
                 // It *appears* we need to pull all members or else the bot has trouble pinging players
                 // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
                 // and avoid loading every user at startup
