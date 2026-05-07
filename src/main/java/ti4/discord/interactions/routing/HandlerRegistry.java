@@ -21,11 +21,6 @@ public record HandlerRegistry<C extends ListenerContext>(Map<String, Handler<C>>
      * @param save     Whether the game should be saved after the handler runs.
      */
     public record Handler<C extends ListenerContext>(Consumer<C> consumer, boolean save) {
-        /** Returns the consumer for this handler. */
-        public Consumer<C> consumer() {
-            return consumer;
-        }
-
         /** Returns whether this handler saves game state. */
         public boolean isSave() {
             return save;
@@ -62,36 +57,22 @@ public record HandlerRegistry<C extends ListenerContext>(Map<String, Handler<C>>
     public boolean handle(String componentID, C context) {
         if (componentID == null) return false;
 
-        // Check for exact match first
-        Handler<C> exact = handlers.get(componentID);
-        if (exact != null) {
-            RollbarManager.put("handler_id", componentID);
-            exact.consumer().accept(context);
-            return true;
-        }
+        String matchedKey = findMatchedKey(componentID);
+        if (matchedKey == null) return false;
 
-        // Then check for longest prefix match
-        String longestMatch = null;
-        for (String key : handlers.keySet()) {
-            if (componentID.startsWith(key)) {
-                if (longestMatch == null || key.length() > longestMatch.length()) {
-                    longestMatch = key;
-                }
-            }
-        }
-        if (longestMatch != null) {
-            RollbarManager.put("handler_id", longestMatch);
-            handlers.get(longestMatch).consumer().accept(context);
-            return true;
-        }
-        return false;
+        RollbarManager.put("handler_id", matchedKey);
+        handlers.get(matchedKey).consumer().accept(context);
+        return true;
     }
 
     private Handler<C> findHandler(String componentID) {
         if (componentID == null) return null;
+        String key = findMatchedKey(componentID);
+        return key == null ? null : handlers.get(key);
+    }
 
-        Handler<C> exact = handlers.get(componentID);
-        if (exact != null) return exact;
+    private String findMatchedKey(String componentID) {
+        if (handlers.containsKey(componentID)) return componentID;
 
         String longestMatch = null;
         for (String key : handlers.keySet()) {
@@ -101,6 +82,6 @@ public record HandlerRegistry<C extends ListenerContext>(Map<String, Handler<C>>
                 }
             }
         }
-        return longestMatch == null ? null : handlers.get(longestMatch);
+        return longestMatch;
     }
 }
