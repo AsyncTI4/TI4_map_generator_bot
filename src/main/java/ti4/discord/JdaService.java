@@ -138,19 +138,20 @@ public class JdaService {
         BotLogger.info("STARTING JDA");
         jda = JDABuilder.createDefault(args[0])
                 .setEventPool(EVENT_EXECUTOR)
-                // Needed to listen for joins/leaves.
-                // This is required to cache all members of a guild (including chunking)
-                .enableIntents(GatewayIntent.GUILD_MEMBERS)
-                // Needed to parse raw user messages.
-                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-                // Needed for emoji searches and validation
-                .enableIntents(GatewayIntent.GUILD_EXPRESSIONS)
+                .enableIntents(
+                    // Needed to listen for joins/leaves.
+                    // Needed to cache all members of a guild (including chunking) - remove?
+                    GatewayIntent.GUILD_MEMBERS,
+                    // Needed to parse raw user messages.
+                    GatewayIntent.MESSAGE_CONTENT,
+                    // Needed for emoji searches and validation
+                    GatewayIntent.GUILD_EXPRESSIONS)
                 // It *appears* we need to pull all members or else the bot has trouble pinging players
                 // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
                 // and avoid loading every user at startup
-                .disableCache(DISABLED_JDA_CACHE_FLAGS)
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setChunkingFilter(ChunkingFilter.ALL)
+                .disableCache(DISABLED_JDA_CACHE_FLAGS)
                 // This allows us to use our own ShutdownHook, created below
                 .setEnableShutdownHook(false)
                 .build();
