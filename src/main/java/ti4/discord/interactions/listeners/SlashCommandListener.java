@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.commands.Command;
 import ti4.discord.interactions.commands.GameStateContainer;
@@ -73,11 +74,12 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
 
         ParentCommand command = SlashCommandManager.getCommand(event.getName());
         Command<SlashCommandInteractionEvent> resolvedCommand = getCommand(event);
-        CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
+        CombatReplayService combatReplayService =
+                CombatContestSettings.isEnabledStatic() ? SpringContext.getBean(CombatReplayService.class) : null;
         try {
             if (command.accept(event)) {
                 command.preExecute(event);
-                if (resolvedCommand instanceof GameStateContainer gameStateContainer) {
+                if (combatReplayService != null && resolvedCommand instanceof GameStateContainer gameStateContainer) {
                     combatReplayService.setPreInteractionSnapshot(
                             combatReplayService.capturePreInteractionSnapshot(gameStateContainer.getGame()));
                 }
@@ -91,7 +93,9 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
         } catch (Exception e) {
             command.onException(event, e);
         } finally {
-            combatReplayService.clearPreInteractionSnapshot();
+            if (combatReplayService != null) {
+                combatReplayService.clearPreInteractionSnapshot();
+            }
             RollbarManager.clear();
         }
 

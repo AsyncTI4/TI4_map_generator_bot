@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.contest.replay.buttons.CombatSideBetButtonIds;
+import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
@@ -78,10 +80,13 @@ public class ButtonProcessor {
 
         log(event);
         try {
-            CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
-            CombatReplayService.PreInteractionSnapshot preInteractionSnapshot =
-                    combatReplayService.capturePreInteractionSnapshot(context.getGame());
-            combatReplayService.setPreInteractionSnapshot(preInteractionSnapshot);
+            CombatReplayService combatReplayService =
+                    CombatContestSettings.isEnabledStatic() ? SpringContext.getBean(CombatReplayService.class) : null;
+            if (combatReplayService != null) {
+                CombatReplayService.PreInteractionSnapshot preInteractionSnapshot =
+                        combatReplayService.capturePreInteractionSnapshot(context.getGame());
+                combatReplayService.setPreInteractionSnapshot(preInteractionSnapshot);
+            }
             try {
                 long beforeTime = System.currentTimeMillis();
                 resolveButtonInteractionEvent(context);
@@ -89,12 +94,15 @@ public class ButtonProcessor {
 
                 beforeTime = System.currentTimeMillis();
                 context.save();
-                if (context.getGame() != null) {
+                saveRuntime = System.currentTimeMillis() - beforeTime;
+
+                if (combatReplayService != null && context.getGame() != null) {
                     combatReplayService.onButtonInteractionSettled(context.getGame(), context.getPlayer(), event);
                 }
-                saveRuntime = System.currentTimeMillis() - beforeTime;
             } finally {
-                combatReplayService.clearPreInteractionSnapshot();
+                if (combatReplayService != null) {
+                    combatReplayService.clearPreInteractionSnapshot();
+                }
             }
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(event, context), "Something went wrong with button interaction", e);
@@ -126,6 +134,11 @@ public class ButtonProcessor {
         UserSettingsManager.save(userSettings);
     }
 
+    private static boolean isCombatReplayButton(String buttonID) {
+        return buttonID != null
+                && (buttonID.startsWith(CombatSideBetButtonIds.PREFIX) || buttonID.startsWith("combatReplayDebug_"));
+    }
+
     private static void resolveButtonInteractionEvent(ButtonContext context) {
         // pull values from context for easier access
         ButtonInteractionEvent event = context.getEvent();
@@ -134,6 +147,9 @@ public class ButtonProcessor {
         Game game = context.getGame();
         MessageChannel privateChannel = context.getPrivateChannel();
         MessageChannel mainGameChannel = context.getMainGameChannel();
+
+        // Skip combat replay buttons when the feature is disabled
+        if (!CombatContestSettings.isEnabledStatic() && isCombatReplayButton(buttonID)) return;
 
         // Check the list of ButtonHandlers first
         if (registry.handle(buttonID, context)) return;

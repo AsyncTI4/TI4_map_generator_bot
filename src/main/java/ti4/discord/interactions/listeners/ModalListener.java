@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.listeners.context.ModalContext;
@@ -77,14 +78,19 @@ public final class ModalListener extends ListenerAdapter {
             RollbarManager.put("modal_id", event.getModalId());
             RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
 
-            CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
-            combatReplayService.setPreInteractionSnapshot(
-                    combatReplayService.capturePreInteractionSnapshot(context.getGame()));
+            CombatReplayService combatReplayService =
+                    CombatContestSettings.isEnabledStatic() ? SpringContext.getBean(CombatReplayService.class) : null;
+            if (combatReplayService != null) {
+                combatReplayService.setPreInteractionSnapshot(
+                        combatReplayService.capturePreInteractionSnapshot(context.getGame()));
+            }
             try {
                 resolveModalInteractionEvent(context);
                 context.save();
             } finally {
-                combatReplayService.clearPreInteractionSnapshot();
+                if (combatReplayService != null) {
+                    combatReplayService.clearPreInteractionSnapshot();
+                }
             }
         } catch (Exception e) {
             String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: "
