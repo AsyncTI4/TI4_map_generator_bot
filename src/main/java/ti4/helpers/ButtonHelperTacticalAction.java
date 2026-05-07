@@ -127,7 +127,9 @@ public final class ButtonHelperTacticalAction {
                         + ", your **Warfare** action is finished, you may redistribute your command tokens again.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), warfareDone, redistro);
             }
-            DreamButtonHandler.offerLiturgyButtons(event, game, player);
+            if (player.hasAbility("dream_nexus")) {
+                DreamButtonHandler.offerLiturgyButtons(event, game, player);
+            }
             RoundStatsTracker.finalizeTactical(game, player);
             resetStoredValuesForTacticalAction(game);
         }
