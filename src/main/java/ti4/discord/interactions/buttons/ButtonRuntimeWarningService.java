@@ -127,6 +127,10 @@ class ButtonRuntimeWarningService {
         return formattedRuntime;
     }
 
+    private String formatPauseWarningMessage() {
+        return "**Buttons are processing slowly. Pausing warnings for 5 minutes.**" + formatThresholdWarningReasons();
+    }
+
     private String formatThresholdWarningReasons() {
         if (thresholdWarningReasons.isEmpty()) {
             return "";
@@ -142,10 +146,6 @@ class ButtonRuntimeWarningService {
                     .append("`");
         }
         return sb.toString();
-    }
-
-    private String formatPauseWarningMessage() {
-        return " **Buttons are processing slowly. Pausing warnings for 5 minutes.**" + formatThresholdWarningReasons();
     }
 
     synchronized double getAveragePreprocessingTime() {
