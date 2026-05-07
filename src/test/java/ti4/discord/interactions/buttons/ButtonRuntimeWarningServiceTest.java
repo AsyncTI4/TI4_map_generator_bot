@@ -29,8 +29,8 @@ class ButtonRuntimeWarningServiceTest {
         ButtonRuntimeWarningService service = new ButtonRuntimeWarningService();
         setField(service, "runtimeWarningCount", 14);
 
-        ButtonInteractionEvent firstEvent = mockEvent("Alpha", "alpha-id", "Alpha User");
-        ButtonInteractionEvent secondEvent = mockEvent("Beta", "beta-id", "Beta User");
+        ButtonInteractionEvent firstEvent = mockEvent("Alpha", "alpha-id");
+        ButtonInteractionEvent secondEvent = mockEvent("Beta", "beta-id");
 
         try (MockedStatic<AsyncTI4DiscordBot> unstable = mockStatic(AsyncTI4DiscordBot.class);
                 MockedStatic<DateTimeHelper> time = mockStatic(DateTimeHelper.class, CALLS_REAL_METHODS);
@@ -61,8 +61,8 @@ class ButtonRuntimeWarningServiceTest {
     @Test
     void warningReasonsResetAfterWindowExpires() {
         ButtonRuntimeWarningService service = new ButtonRuntimeWarningService();
-        ButtonInteractionEvent firstEvent = mockEvent("Alpha", "alpha-id", "Alpha User");
-        ButtonInteractionEvent secondEvent = mockEvent("Beta", "beta-id", "Beta User");
+        ButtonInteractionEvent firstEvent = mockEvent("Alpha", "alpha-id");
+        ButtonInteractionEvent secondEvent = mockEvent("Beta", "beta-id");
 
         try (MockedStatic<AsyncTI4DiscordBot> unstable = mockStatic(AsyncTI4DiscordBot.class);
                 MockedStatic<DateTimeHelper> time = mockStatic(DateTimeHelper.class, CALLS_REAL_METHODS);
@@ -86,16 +86,13 @@ class ButtonRuntimeWarningServiceTest {
         }
     }
 
-    private static ButtonInteractionEvent mockEvent(String label, String buttonId, String userName) {
+    private static ButtonInteractionEvent mockEvent(String label, String buttonId) {
         ButtonInteractionEvent event = mock(ButtonInteractionEvent.class, RETURNS_DEEP_STUBS);
         Button button = mock(Button.class);
         when(button.getCustomId()).thenReturn(buttonId);
         when(button.getLabel()).thenReturn(label);
         when(button.getEmoji()).thenReturn(null);
         when(event.getButton()).thenReturn(button);
-        when(event.getUser().getEffectiveName()).thenReturn(userName);
-        when(event.getChannel().getName()).thenReturn("button-channel");
-        when(event.getMessage().getJumpUrl()).thenReturn("https://example.invalid/jump");
         return event;
     }
 
