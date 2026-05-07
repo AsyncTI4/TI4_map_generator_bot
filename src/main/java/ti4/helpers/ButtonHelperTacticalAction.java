@@ -10,9 +10,9 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.commands.tokens.AddTokenCommand;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -416,7 +416,8 @@ public final class ButtonHelperTacticalAction {
             List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, ringButtons);
         }
-        // Offer the Dreaming Throne promissory 'Visions' (bepndream) at the start of a tactical action. Handler will check eligibility and present options.
+        // Offer the Dreaming Throne promissory 'Visions' (bepndream) at the start of a tactical action. Handler will
+        // check eligibility and present options.
         BeansButtonHandler.offerVisionsPromissoryAtTacticalStart(game, player);
     }
 

@@ -46,17 +46,20 @@ public class BeansButtonHandler {
     }
 
     @ButtonHandler("beans_incomprehensible_form_use_token_")
-    public static void incomprehensibleFormUseToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void incomprehensibleFormUseToken(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         DreamButtonHandler.useIncomprehensibleForm(event, game, player, buttonID);
     }
 
     @ButtonHandler("beans_incomprehensible_form_use_flagship_")
-    public static void incomprehensibleFormUseFlagship(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void incomprehensibleFormUseFlagship(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         DreamButtonHandler.useIncomprehensibleForm(event, game, player, buttonID);
     }
 
     @ButtonHandler("beans_promissory_bepndream_return_")
-    public static void visionsReturnPromissory(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void visionsReturnPromissory(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         DreamButtonHandler.resolveVisionsPromissory(event, game, player, buttonID);
     }
 
