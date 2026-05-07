@@ -901,7 +901,7 @@
         "alias": "kyro",
         "factionName": "Kyro Sodality",
         "homeSystem": "d10",
-        "startingFleet": "dn,cv,dd,ff,3 inf a,sd a",
+        "startingFleet": "dn,cv,dd,3 inf a,sd a",
         "commodities": 2,
         "factionTech": [
             "dskyrog",

@@ -821,6 +821,33 @@ public final class ButtonHelperTwilightsFall {
                                             || unit.getUpgradesFromUnitId().isEmpty())
                                     .toList();
                             for (UnitModel u : unitsToRemove) {
+                                if (u.getAlias().contains("tf-") || u.getAlias().contains("tk-")) {
+                                    List<Button> buttons = new ArrayList<>();
+                                    buttons.add(Buttons.green("keepUnit_" + u.getAlias(), "Keep " + u.getName()));
+                                    buttons.add(Buttons.red("deleteButtons", "Keep the New Unit"));
+                                    MessageHelper.sendMessageToChannel(
+                                            player.getCorrectChannel(),
+                                            player.getRepresentation() + " you automatically lost the "
+                                                    + u.getNameRepresentation()
+                                                    + " unit upgrade. If you would like to keep it and lose the newly acquired unit upgrade, please click the green button.",
+                                            buttons);
+                                }
+                                if ("tf-floatingfactory".equalsIgnoreCase(u.getAlias())) {
+                                    for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(
+                                            game, player, UnitType.Spacedock)) {
+                                        for (UnitHolder uh : tile.getPlanetUnitHolders()) {
+                                            if (uh.getUnitCount(UnitType.Spacedock, player) > 0) {
+                                                RemoveUnitService.removeUnit(
+                                                        event, tile, game, player, uh, UnitType.Spacedock, 1, false);
+                                                AddUnitService.addUnits(event, tile, game, player.getColor(), "sd");
+                                            }
+                                        }
+                                    }
+                                    MessageHelper.sendMessageToChannel(
+                                            player.getCorrectChannel(),
+                                            player.getRepresentation()
+                                                    + " has transformed their Spacedocks into Floating Factories, and so their spacedocks have been moved to the space area.");
+                                }
                                 player.removeOwnedUnitByID(u.getId());
                             }
                         }
@@ -968,6 +995,33 @@ public final class ButtonHelperTwilightsFall {
                                 || unit.getUpgradesFromUnitId().isEmpty())
                         .toList();
                 for (UnitModel u : unitsToRemove) {
+                    if (u.getAlias().contains("tf-") || u.getAlias().contains("tk-")) {
+                        List<Button> buttons = new ArrayList<>();
+                        buttons.add(Buttons.green("keepUnit_" + u.getAlias(), "Keep " + u.getName()));
+                        buttons.add(Buttons.red("deleteButtons", "Keep the New Unit"));
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentation() + " you automatically lost the "
+                                        + u.getNameRepresentation()
+                                        + " unit upgrade. If you would like to keep it and lose the newly acquired unit upgrade, please click the green button.",
+                                buttons);
+                    }
+                    if ("tf-floatingfactory".equalsIgnoreCase(u.getAlias())) {
+                        for (Tile tile :
+                                ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
+                            for (UnitHolder uh : tile.getPlanetUnitHolders()) {
+                                if (uh.getUnitCount(UnitType.Spacedock, player) > 0) {
+                                    RemoveUnitService.removeUnit(
+                                            event, tile, game, player, uh, UnitType.Spacedock, 1, false);
+                                    AddUnitService.addUnits(event, tile, game, player.getColor(), "sd");
+                                }
+                            }
+                        }
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentation()
+                                        + " has transformed their Spacedocks into Floating Factories, and so their spacedocks have been moved to the space area.");
+                    }
                     player.removeOwnedUnitByID(u.getId());
                 }
             }

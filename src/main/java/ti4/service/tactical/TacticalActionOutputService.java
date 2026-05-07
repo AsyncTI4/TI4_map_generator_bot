@@ -245,7 +245,9 @@ public class TacticalActionOutputService {
                 maxBonus++;
                 output.append(", used _Gravity Drive_)");
             } else {
-                output.append(", __does not have _Gravity Drive___)");
+                if (!game.isTwilightsFallMode()) {
+                    output.append(", __does not have _Gravity Drive___)");
+                }
             }
             if (player.hasUnit("tk-voidcarver")) {
                 maxBonus++;
@@ -275,6 +277,9 @@ public class TacticalActionOutputService {
                 output.append(" (gravity rifts along a path could add +")
                         .append(distance - riftDistance)
                         .append(" movement if used)");
+                if (player.hasRelic("circletofthevoid")) {
+                    output.append(" (Does not roll for rifts due to circlet of the void)");
+                }
                 game.setStoredValue("possiblyUsedRift", "yes");
             }
         }
