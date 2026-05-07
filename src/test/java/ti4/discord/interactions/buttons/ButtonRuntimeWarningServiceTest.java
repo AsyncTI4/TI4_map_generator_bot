@@ -25,10 +25,11 @@ import ti4.service.statistics.SREStats;
 class ButtonRuntimeWarningServiceTest {
 
     @Test
-    void thresholdPauseWarningIncludesTrackedReasons() {
+    void thresholdPauseWarningIncludesOnlySlowTrackedReasons() {
         ButtonRuntimeWarningService service = new ButtonRuntimeWarningService();
         setField(service, "runtimeWarningCount", 14);
 
+        ButtonInteractionEvent fastEvent = mockEvent("Fast", "fast-id");
         ButtonInteractionEvent firstEvent = mockEvent("Alpha", "alpha-id");
         ButtonInteractionEvent secondEvent = mockEvent("Beta", "beta-id");
 
@@ -38,7 +39,7 @@ class ButtonRuntimeWarningServiceTest {
                 MockedStatic<BotLogger> logger = mockStatic(BotLogger.class)) {
             unstable.when(AsyncTI4DiscordBot::isUnstable).thenReturn(false);
             time.when(() -> DateTimeHelper.getLongDateTimeFromDiscordSnowflake(any()))
-                    .thenReturn(1_000L, 2_000L);
+                    .thenReturn(1_000L, 2_000L, 3_000L);
             time.when(() -> DateTimeHelper.getTimestampFromMillisecondsEpoch(4_000L))
                     .thenReturn("`at-4000`");
             time.when(() -> DateTimeHelper.getTimestampFromMillisecondsEpoch(6_000L))
@@ -46,11 +47,13 @@ class ButtonRuntimeWarningServiceTest {
             time.when(() -> DateTimeHelper.getTimeRepresentationToMilliseconds(anyLong()))
                     .thenCallRealMethod();
 
+            service.submitNewRuntime(fastEvent, 1_100L, 1_200L, 50L, 75L, 25L);
             service.submitNewRuntime(firstEvent, 2_500L, 4_000L, 50L, 1_400L, 100L);
             service.submitNewRuntime(secondEvent, 3_500L, 6_000L, 75L, 2_400L, 100L);
 
             logger.verify(() ->
                     BotLogger.error(org.mockito.ArgumentMatchers.argThat(message -> message.contains("**Reasons:**")
+                            && !message.contains("__**Fast**__  `[fast-id]`")
                             && message.contains("__**Alpha**__  `[alpha-id]`")
                             && message.contains("__**Beta**__  `[beta-id]`")
                             && message.contains("`at-4000` • `00m:03s:000ms`")
@@ -96,9 +99,10 @@ class ButtonRuntimeWarningServiceTest {
         return event;
     }
 
-    @SuppressWarnings("unchecked")
-    private static List<Object> getReasons(ButtonRuntimeWarningService service) {
-        return (List<Object>) getField(service, "thresholdWarningReasons");
+    private static List<?> getReasons(ButtonRuntimeWarningService service) {
+        Object reasons = getField(service, "thresholdWarningReasons");
+        assertThat(reasons).isInstanceOf(List.class);
+        return (List<?>) reasons;
     }
 
     private static Object buttonRepresentation(Object reason) {
