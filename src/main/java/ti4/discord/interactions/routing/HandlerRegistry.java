@@ -1,63 +1,24 @@
 package ti4.discord.interactions.routing;
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.function.Consumer;
 import ti4.discord.interactions.listeners.context.ListenerContext;
 import ti4.logging.RollbarManager;
 
-/**
- * Maps component-ID prefixes to {@link Handler} instances for a single interaction type.
- *
- * @param <C> The {@link ListenerContext} subtype handled by this registry.
- * @param handlers Map of component-ID prefix → {@link Handler}.
- */
 public record HandlerRegistry<C extends ListenerContext>(Map<String, Handler<C>> handlers) {
 
-    /**
-     * Holds a handler consumer together with the flag that says whether it persists game state.
-     *
-     * @param <C> The {@link ListenerContext} subtype.
-     * @param consumer The action to run when this handler is invoked.
-     * @param save     Whether the game should be saved after the handler runs.
-     */
-    public record Handler<C extends ListenerContext>(Consumer<C> consumer, boolean save) {
-        /** Returns whether this handler saves game state. */
-        public boolean isSave() {
-            return save;
-        }
+    record Handler<C extends ListenerContext>(Consumer<C> consumer, boolean shouldSave) {}
+
+    public boolean isSave(String componentId) {
+        Handler<C> handler = findHandler(componentId);
+        return handler == null || handler.shouldSave();
     }
 
-    /**
-     * Determines whether handling the given {@code componentID} should save game state.
-     *
-     * <p>Resolution order:
-     * <ol>
-     *   <li>Exact match in {@code handlers}</li>
-     *   <li>Longest prefix match in {@code handlers}</li>
-     *   <li>Defaults to {@code true} (WRITE lock) when no match is found</li>
-     * </ol>
-     *
-     * @param componentID The raw component ID from the Discord interaction event.
-     * @return {@code true} if the matched handler saves game state (or no match — defaults to WRITE).
-     */
-    public boolean isSave(String componentID) {
-        Handler<C> handler = findHandler(componentID);
-        return handler == null || handler.isSave();
-    }
+    public boolean handle(String componentId, C context) {
+        if (componentId == null) return false;
 
-    /**
-     * Dispatches {@code context} to the best-matching handler for {@code componentID}.
-     *
-     * <p>Uses exact match first, then longest-prefix match.
-     *
-     * @param componentID The raw component ID from the Discord interaction event.
-     * @param context     The interaction context to pass to the handler.
-     * @return {@code true} if a handler was found and invoked, {@code false} otherwise.
-     */
-    public boolean handle(String componentID, C context) {
-        if (componentID == null) return false;
-
-        String matchedKey = findMatchedKey(componentID);
+        String matchedKey = findMatchedKey(componentId);
         if (matchedKey == null) return false;
 
         RollbarManager.put("handler_id", matchedKey);
@@ -65,23 +26,19 @@ public record HandlerRegistry<C extends ListenerContext>(Map<String, Handler<C>>
         return true;
     }
 
-    private Handler<C> findHandler(String componentID) {
-        if (componentID == null) return null;
-        String key = findMatchedKey(componentID);
+    private Handler<C> findHandler(String componentId) {
+        if (componentId == null) return null;
+        String key = findMatchedKey(componentId);
         return key == null ? null : handlers.get(key);
     }
 
-    private String findMatchedKey(String componentID) {
-        if (handlers.containsKey(componentID)) return componentID;
+    private String findMatchedKey(String componentId) {
+        if (handlers.containsKey(componentId)) return componentId;
 
-        String longestMatch = null;
-        for (String key : handlers.keySet()) {
-            if (componentID.startsWith(key)) {
-                if (longestMatch == null || key.length() > longestMatch.length()) {
-                    longestMatch = key;
-                }
-            }
-        }
-        return longestMatch;
+      return handlers.keySet()
+          .stream()
+          .filter(componentId::startsWith)
+          .max(Comparator.comparingInt(String::length))
+          .orElse(null);
     }
 }
