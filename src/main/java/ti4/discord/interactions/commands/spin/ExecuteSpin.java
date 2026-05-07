@@ -41,14 +41,6 @@ class ExecuteSpin extends GameStateSubcommand {
             return;
         }
 
-        if (game.isFowMode()
-                && !getPlayer().isGM()
-                && (StringUtils.isNotBlank(custom)
-                        || List.of(ALL, RND, AutoTrigger.valuesAsStringList()).contains(trigger.toUpperCase()))) {
-            MessageHelper.replyToMessage(event, "You are not authorized to use this command.");
-            return;
-        }
-
         List<SpinSetting> spinSettings = SpinService.getSpinSettings(game);
         List<SpinSetting> settingsToExecute = new ArrayList<>();
         if (ALL.equals(trigger)) {
