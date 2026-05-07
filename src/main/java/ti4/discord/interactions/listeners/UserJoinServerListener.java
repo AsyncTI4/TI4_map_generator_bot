@@ -30,7 +30,6 @@ class UserJoinServerListener extends ListenerAdapter {
 
     private void handleGuildMemberJoin(GuildMemberJoinEvent event) {
         try {
-            JdaService.cacheMember(event.getMember());
             welcomeNewUserToHUBServer(event);
             RoleService.checkIfNewUserIsInExistingGamesAndAutoAddRole(event.getGuild(), event.getUser());
             RoleService.checkIfNewUserIsInAnyGamesAndAddRole(event.getUser());

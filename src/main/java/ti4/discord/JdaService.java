@@ -1,14 +1,10 @@
 package ti4.discord;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import jakarta.annotation.Nullable;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,7 +27,6 @@ import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.AsyncTI4DiscordBot;
-import ti4.cache.CacheManager;
 import ti4.contest.cron.CombatContestJanitorCron;
 import ti4.contest.cron.CombatReplayCron;
 import ti4.contest.cron.CombatReplayPromotionCron;
@@ -116,12 +111,6 @@ public class JdaService {
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
     public static final List<Guild> fowServers = new ArrayList<>();
 
-    private static final int USER_CACHE_MAX_SIZE = 20_000;
-    private static final int MEMBER_CACHE_MAX_SIZE = 20_000;
-    private static final Duration DISCORD_ENTITY_CACHE_TTL = Duration.ofHours(6);
-    private static final Cache<String, Optional<User>> USER_CACHE = createUserCache();
-    private static final Cache<MemberCacheKey, Optional<Member>> MEMBER_CACHE = createMemberCache();
-
     private static final ExecutorService EVENT_EXECUTOR = Executors.newFixedThreadPool(
             Runtime.getRuntime().availableProcessors(),
             Thread.ofPlatform().name("ti4-jda-event-", 0).factory());
@@ -136,8 +125,9 @@ public class JdaService {
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
                 // Needed for emoji searches and validation
                 .enableIntents(GatewayIntent.GUILD_EXPRESSIONS)
-                // Avoid loading every guild member at startup and rely on targeted lookups instead.
-                .setMemberCachePolicy(MemberCachePolicy.NONE)
+                // Cache members as they are encountered (events, REST calls) without pre-loading
+                // all guild members at startup. ChunkingFilter.NONE prevents the startup bulk load.
+                .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setChunkingFilter(ChunkingFilter.NONE)
                 // This allows us to use our own ShutdownHook, created below
                 .setEnableShutdownHook(false)
@@ -578,38 +568,46 @@ public class JdaService {
         return null;
     }
 
+    /**
+     * Resolves a guild member by user ID. Returns from JDA's local cache immediately if present,
+     * otherwise makes a blocking REST call to Discord. Should only be called from background threads
+     * (e.g. ExecutorServiceManager tasks), not from JDA event-dispatch threads.
+     */
     @Nullable
     public static Member getMemberById(@Nullable Guild guild, @Nullable String userId) {
         if (guild == null || userId == null) return null;
         Member member = guild.getMemberById(userId);
-        if (member != null) {
-            cacheMember(member);
-            return member;
+        if (member != null) return member;
+        try {
+            return guild.retrieveMemberById(userId).complete();
+        } catch (ErrorResponseException e) {
+            if (e.getErrorResponse() != ErrorResponse.UNKNOWN_MEMBER
+                    && e.getErrorResponse() != ErrorResponse.UNKNOWN_USER) {
+                BotLogger.warning(
+                        "Unable to retrieve Discord member `" + userId + "` from guild `" + guild.getId() + "`.", e);
+            }
+            return null;
         }
-        return MEMBER_CACHE.get(new MemberCacheKey(guild.getId(), userId), _ -> retrieveMember(guild, userId))
-                .orElse(null);
     }
 
+    /**
+     * Resolves a Discord user by user ID. Returns from JDA's local cache immediately if present,
+     * otherwise makes a blocking REST call to Discord. Should only be called from background threads
+     * (e.g. ExecutorServiceManager tasks), not from JDA event-dispatch threads.
+     */
     @Nullable
     public static User getUserById(@Nullable String userId) {
         if (jda == null || userId == null) return null;
         User user = jda.getUserById(userId);
-        if (user != null) {
-            cacheUser(user);
-            return user;
+        if (user != null) return user;
+        try {
+            return jda.retrieveUserById(userId).complete();
+        } catch (ErrorResponseException e) {
+            if (e.getErrorResponse() != ErrorResponse.UNKNOWN_USER) {
+                BotLogger.warning("Unable to retrieve Discord user `" + userId + "`.", e);
+            }
+            return null;
         }
-        return USER_CACHE.get(userId, JdaService::retrieveUser).orElse(null);
-    }
-
-    public static void cacheMember(@Nullable Member member) {
-        if (member == null) return;
-        MEMBER_CACHE.put(new MemberCacheKey(member.getGuild().getId(), member.getId()), Optional.of(member));
-        cacheUser(member.getUser());
-    }
-
-    public static void invalidateMember(@Nullable Guild guild, @Nullable String userId) {
-        if (guild == null || userId == null) return;
-        MEMBER_CACHE.invalidate(new MemberCacheKey(guild.getId(), userId));
     }
 
     public static void shutdown() {
@@ -666,61 +664,5 @@ public class JdaService {
             Thread.currentThread().interrupt();
             return false;
         }
-    }
-
-    private static Cache<String, Optional<User>> createUserCache() {
-        Cache<String, Optional<User>> cache = Caffeine.newBuilder()
-                .maximumSize(USER_CACHE_MAX_SIZE)
-                .expireAfterAccess(DISCORD_ENTITY_CACHE_TTL)
-                .recordStats()
-                .build();
-        CacheManager.registerCache("discordUserCache", cache);
-        return cache;
-    }
-
-    private static Cache<MemberCacheKey, Optional<Member>> createMemberCache() {
-        Cache<MemberCacheKey, Optional<Member>> cache = Caffeine.newBuilder()
-                .maximumSize(MEMBER_CACHE_MAX_SIZE)
-                .expireAfterAccess(DISCORD_ENTITY_CACHE_TTL)
-                .recordStats()
-                .build();
-        CacheManager.registerCache("discordMemberCache", cache);
-        return cache;
-    }
-
-    private static void cacheUser(@Nullable User user) {
-        if (user == null) return;
-        USER_CACHE.put(user.getId(), Optional.of(user));
-    }
-
-    private static Optional<User> retrieveUser(String userId) {
-        try {
-            return Optional.of(jda.retrieveUserById(userId).complete());
-        } catch (ErrorResponseException e) {
-            if (e.getErrorResponse() == ErrorResponse.UNKNOWN_USER) {
-                return Optional.empty();
-            }
-            BotLogger.warning("Unable to retrieve Discord user `" + userId + "`.", e);
-            return Optional.empty();
-        }
-    }
-
-    private static Optional<Member> retrieveMember(Guild guild, String userId) {
-        try {
-            Member member = guild.retrieveMemberById(userId).complete();
-            cacheUser(member.getUser());
-            return Optional.of(member);
-        } catch (ErrorResponseException e) {
-            if (e.getErrorResponse() == ErrorResponse.UNKNOWN_MEMBER
-                    || e.getErrorResponse() == ErrorResponse.UNKNOWN_USER) {
-                return Optional.empty();
-            }
-            BotLogger.warning(
-                    "Unable to retrieve Discord member `" + userId + "` from guild `" + guild.getId() + "`.", e);
-            return Optional.empty();
-        }
-    }
-
-    private record MemberCacheKey(String guildId, String userId) {
     }
 }

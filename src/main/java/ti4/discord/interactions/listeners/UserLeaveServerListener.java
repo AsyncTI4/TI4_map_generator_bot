@@ -38,7 +38,6 @@ class UserLeaveServerListener extends ListenerAdapter {
 
     private void handleGuildMemberRemove(GuildMemberRemoveEvent event) {
         try {
-            JdaService.invalidateMember(event.getGuild(), event.getUser().getId());
             event.getGuild()
                     .retrieveAuditLogs()
                     .queueAfter(
