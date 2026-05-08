@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import ti4.game.persistence.GameManager;
-import ti4.service.persistence.SqlitePersistenceGate;
+import ti4.service.persistence.DatabasePersistenceGate;
 
 @Service
 @RequiredArgsConstructor
@@ -23,14 +23,14 @@ public class GameImageService {
 
     @NotNull
     Optional<MapImageData> getLatestMapImageData(String gameName) {
-        if (SqlitePersistenceGate.isDisabled()) return Optional.empty();
+        if (DatabasePersistenceGate.isDisabled()) return Optional.empty();
         if (!GameManager.isValid(gameName)) return Optional.empty();
         return mapImageDataRepository.findById(gameName);
     }
 
     @Nullable
     public String getLatestMapImageName(String gameName) {
-        if (SqlitePersistenceGate.isDisabled()) return null;
+        if (DatabasePersistenceGate.isDisabled()) return null;
         if (!GameManager.isValid(gameName)) return null;
         return mapImageDataRepository
                 .findById(gameName)
@@ -39,7 +39,7 @@ public class GameImageService {
     }
 
     public void saveDiscordMessageId(String gameName, long discordMessageId, long guildId, long channelId) {
-        if (SqlitePersistenceGate.isDisabled()) return;
+        if (DatabasePersistenceGate.isDisabled()) return;
         if (isBlank(gameName) || !GameManager.isValid(gameName)) return;
         MapImageData mapImageData = loadOrCreate(gameName);
         mapImageData.setLatestDiscordMessageId(discordMessageId);
@@ -66,7 +66,7 @@ public class GameImageService {
      * This allows the web frontend to retrieve the player's personalized map.
      */
     public void savePlayerDiscordMessageId(String gameName, String playerId, long messageId, long channelId) {
-        if (SqlitePersistenceGate.isDisabled()) return;
+        if (DatabasePersistenceGate.isDisabled()) return;
         if (isBlank(gameName) || isBlank(playerId)) return;
 
         PlayerMapImageData data = playerMapImageDataRepository
@@ -84,7 +84,7 @@ public class GameImageService {
      */
     @NotNull
     Optional<PlayerMapImageData> getPlayerMapImageData(String gameName, String playerId) {
-        if (SqlitePersistenceGate.isDisabled()) return Optional.empty();
+        if (DatabasePersistenceGate.isDisabled()) return Optional.empty();
         if (isBlank(gameName) || isBlank(playerId)) return Optional.empty();
         return playerMapImageDataRepository.findByGameNameAndPlayerId(gameName, playerId);
     }

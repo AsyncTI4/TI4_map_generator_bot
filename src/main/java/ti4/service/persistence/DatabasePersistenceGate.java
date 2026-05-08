@@ -4,7 +4,7 @@ import lombok.experimental.UtilityClass;
 import ti4.settings.GlobalSettings;
 
 @UtilityClass
-public class SqlitePersistenceGate {
+public class DatabasePersistenceGate {
 
     public static boolean isDisabled() {
         return GlobalSettings.ImplementedSettings.SQLITE_PERSISTENCE_DISABLED.getAsBoolean(false);
@@ -16,10 +16,9 @@ public class SqlitePersistenceGate {
 
     public static String statusMessage() {
         if (!isDisabled()) {
-            return "SQLite-backed auxiliary persistence is **ON**.";
+            return "Database maintenance mode is **OFF**. Database-backed features are enabled.";
         }
-        return "SQLite-backed auxiliary persistence is **OFF**. Game commands and file saves still run, but"
-                + " SQLite/JDBC-backed statistics, dashboard caches, map image metadata, message cache, and SQL"
-                + " developer commands are no-op.";
+        return "Database maintenance mode is **ON**. Game commands and file saves still run, but statistics, dashboard data,"
+                + " map image metadata, message cache, and SQL developer tools are temporarily paused.";
     }
 }

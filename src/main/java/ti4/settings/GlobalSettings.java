@@ -29,6 +29,7 @@ public final class GlobalSettings {
         MAX_GAMES_PER_CATEGORY, // Max # of games when creating a category
         ALLOW_GAME_CREATION,
         SQLITE_PERSISTENCE_DISABLED, // Temporarily no-op auxiliary SQLite/JDBC reads and writes during migration
+        ROUND_STATS_TRACKING_DISABLED, // Temporarily no-op round stats tracking reads and writes
         READY_TO_RECEIVE_COMMANDS, // Whether the bot is ready to receive commands
         BOT_LOG_WEBHOOK_URL; // Webhook URL to send rogue bot log messages to
 
