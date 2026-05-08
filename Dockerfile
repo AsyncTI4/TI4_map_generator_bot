@@ -10,6 +10,7 @@ RUN --mount=type=cache,target=/root/.m2 \
 # add sources late for better layer reuse
 # Only package classpath config; runtime assets are mounted from the host repo.
 COPY src/main/resources/config ./src/main/resources/config
+COPY src/main/resources/db ./src/main/resources/db
 COPY src/main/resources/logback.xml ./src/main/resources/logback.xml
 COPY src/main/java ./src/main/java
 

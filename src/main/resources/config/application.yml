@@ -9,18 +9,18 @@ management:
 
 spring:
   datasource:
-    url: "jdbc:sqlite:${DB_PATH:./}/tibot.db"
-    driver-class-name: org.sqlite.JDBC
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:tibot;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
     hikari:
-      # SQLite permits only one writer at a time; extra pooled connections increase lock contention.
-      maximum-pool-size: 1
-      connection-init-sql: |
-        PRAGMA journal_mode=WAL;
-        PRAGMA busy_timeout=30000;
-        PRAGMA synchronous=NORMAL;
+      maximum-pool-size: ${SPRING_DATASOURCE_MAXIMUM_POOL_SIZE:10}
+  flyway:
+    enabled: ${SPRING_FLYWAY_ENABLED:false}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     properties:
       hibernate:
         format_sql: false

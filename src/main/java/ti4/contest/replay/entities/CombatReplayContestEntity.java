@@ -19,7 +19,15 @@ import ti4.contest.replay.core.CombatContestReplayStatus;
         name = "combat_contest",
         indexes = {
             @Index(name = "idx_replay_contest_replay_status_due", columnList = "replay_status, next_replay_at"),
-            @Index(name = "idx_replay_contest_posted_at", columnList = "posted_at")
+            @Index(name = "idx_replay_contest_posted_at", columnList = "posted_at"),
+            @Index(name = "idx_replay_contest_public_message", columnList = "public_message_id"),
+            @Index(name = "idx_replay_contest_public_thread", columnList = "public_thread_id"),
+            @Index(
+                    name = "idx_replay_contest_side_bet_posting",
+                    columnList = "replay_status, side_bet_market_posted_at, posted_at"),
+            @Index(
+                    name = "idx_replay_contest_leaderboard_posting",
+                    columnList = "replay_status, leaderboard_posted_at, replay_completed_at")
         })
 /**
  * Tracks the public replay contest lifecycle once a candidate has been promoted.

@@ -17,7 +17,12 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(
         name = "combat_replay_leaderboard_entry",
-        indexes = @Index(name = "idx_replay_leaderboard_points", columnList = "total_points"),
+        indexes = {
+            @Index(name = "idx_replay_leaderboard_points", columnList = "total_points"),
+            @Index(
+                    name = "idx_replay_leaderboard_rank",
+                    columnList = "total_points, correct_predictions, prediction_count, discord_user_name")
+        },
         uniqueConstraints = @UniqueConstraint(name = "uk_replay_leaderboard_user", columnNames = "discord_user_id"))
 /**
  * Stores cumulative replay leaderboard totals per Discord user.

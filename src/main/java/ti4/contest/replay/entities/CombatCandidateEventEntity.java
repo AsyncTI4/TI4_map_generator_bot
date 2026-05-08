@@ -22,7 +22,11 @@ import ti4.contest.replay.core.CombatCandidateEventType;
                     name = "idx_combat_candidate_event_candidate_sequence",
                     columnList = "candidate_id, sequence_number",
                     unique = true),
-            @Index(name = "idx_combat_candidate_event_candidate_occurred_at", columnList = "candidate_id, occurred_at")
+            @Index(name = "idx_combat_candidate_event_candidate_occurred_at", columnList = "candidate_id, occurred_at"),
+            @Index(
+                    name = "idx_combat_candidate_event_candidate_type",
+                    columnList = "candidate_id, event_type, actor_faction, round_number"),
+            @Index(name = "idx_combat_candidate_event_occurred_at", columnList = "occurred_at")
         })
 /**
  * Persists the ordered replay event stream for a single combat candidate.
