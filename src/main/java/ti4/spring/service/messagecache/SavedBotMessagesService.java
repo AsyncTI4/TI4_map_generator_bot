@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.logging.BotLogger;
-import ti4.service.persistence.SqlitePersistenceGate;
+import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.spring.context.SpringContext;
 
 @AllArgsConstructor
@@ -20,7 +20,7 @@ public class SavedBotMessagesService {
     private final BotDiscordMessageEntityRepository botDiscordMessageEntityRepository;
 
     public void cache(Message message) {
-        if (SqlitePersistenceGate.isDisabled()) return;
+        if (DatabasePersistenceGate.isDisabled()) return;
         if (!isImportantMessage(message)) return;
 
         long createdAtEpochMillis = message.getTimeCreated().toInstant().toEpochMilli();
@@ -42,7 +42,7 @@ public class SavedBotMessagesService {
 
     @Nullable
     public String getContent(long messageId) {
-        if (SqlitePersistenceGate.isDisabled()) return null;
+        if (DatabasePersistenceGate.isDisabled()) return null;
         return botDiscordMessageEntityRepository
                 .findById(messageId)
                 .map(BotDiscordMessageEntity::getContent)
@@ -52,9 +52,8 @@ public class SavedBotMessagesService {
     @Scheduled(cron = "0 */30 * * * *")
     @Transactional
     public void removeExpiredMessages() {
-        if (SqlitePersistenceGate.isDisabled()) {
-            BotLogger.info(
-                    "Skipping bot message cache cleanup because SQLite-backed auxiliary persistence is disabled.");
+        if (DatabasePersistenceGate.isDisabled()) {
+            BotLogger.info("Skipping bot message cache cleanup because database maintenance mode is active.");
             return;
         }
         long cutoff = System.currentTimeMillis() - RETENTION_MILLIS;
@@ -63,7 +62,7 @@ public class SavedBotMessagesService {
     }
 
     public void remove(long messageId) {
-        if (SqlitePersistenceGate.isDisabled()) return;
+        if (DatabasePersistenceGate.isDisabled()) return;
         botDiscordMessageEntityRepository.deleteById(messageId);
     }
 

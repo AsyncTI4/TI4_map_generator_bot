@@ -5,7 +5,7 @@ import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.logging.BotLogger;
-import ti4.service.persistence.SqlitePersistenceGate;
+import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.settings.GlobalSettings;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.roundstats.GameRoundStatsService;
@@ -67,7 +67,7 @@ public class RoundStatsTracker {
     }
 
     private static boolean isDisabled() {
-        return SqlitePersistenceGate.isDisabled()
+        return DatabasePersistenceGate.isDisabled()
                 || GlobalSettings.ImplementedSettings.ROUND_STATS_TRACKING_DISABLED.getAsBoolean(false);
     }
 }
