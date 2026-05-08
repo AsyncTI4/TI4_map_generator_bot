@@ -25,7 +25,7 @@ public class DeveloperCommand implements ParentCommand {
                     new CustomCommand(),
                     new RunAgainstSpecificGame(),
                     new ProduceNucleusGenStats(),
-                    new SqlitePersistence(),
+                    new DatabasePersistence(),
                     new RunSql())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
