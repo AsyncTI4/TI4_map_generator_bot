@@ -1341,7 +1341,8 @@ public final class TransactionHelper {
         if (target.getPromissoryNotesInPlayArea().contains("pop")) return false;
         if (target.hasUnlockedBreakthrough("vadenbt")) return false;
         if (target.getPromissoryNotesInPlayArea().contains("sigma_promise_of_protection")) return false;
-        return projectedTg > 2 && target.getNeighbouringPlayers(true).contains(pillager);
+        return projectedTg > 2 // Pillage requires more than 2 TGs (i.e. at least 3)
+                && target.getNeighbouringPlayers(true).contains(pillager);
     }
 
     @ButtonHandler("transact_")
