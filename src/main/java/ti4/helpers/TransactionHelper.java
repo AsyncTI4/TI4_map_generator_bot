@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -1216,15 +1217,15 @@ public final class TransactionHelper {
                     sentMeme = true;
                 }
             }
-            if (!sentMeme) {
-                String offerMessage = "Trade offer from " + player.getRepresentationNoPing() + " to "
-                        + p2.getRepresentationNoPing() + ":\n" + publicOfferText;
-                MessageHelper.sendMessageToChannel(tableTalkChannel, offerMessage);
-            } else {
+            if (sentMeme) {
                 String pillageNotice = buildPillageNotice(game, player, p2);
                 if (!pillageNotice.isEmpty()) {
                     MessageHelper.sendMessageToChannel(tableTalkChannel, pillageNotice);
                 }
+            } else {
+                String offerMessage = "Trade offer from " + player.getRepresentationNoPing() + " to "
+                        + p2.getRepresentationNoPing() + ":\n" + publicOfferText;
+                MessageHelper.sendMessageToChannel(tableTalkChannel, offerMessage);
             }
         }
 
@@ -1312,7 +1313,7 @@ public final class TransactionHelper {
             }
         }
 
-        Map<Player, List<String>> redistributionSources = new java.util.LinkedHashMap<>();
+        Map<Player, List<String>> redistributionSources = new LinkedHashMap<>();
         if (ButtonHelperAbilities.canBePillaged(p1, game, p1TgAfter)) {
             for (Player neighbor : p1.getNeighbouringPlayers(true)) {
                 if (neighbor == p1 || neighbor == p2 || !neighbor.hasAbility("pillage")) {
