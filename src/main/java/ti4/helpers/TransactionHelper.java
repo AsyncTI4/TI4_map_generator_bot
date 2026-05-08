@@ -1203,8 +1203,9 @@ public final class TransactionHelper {
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " sent a transaction offer to " + p2.getRepresentationNoPing()
                         + ".");
-        String publicOfferText = buildTradeOfferText(player, p2, game, true);
-        String privateOfferText = buildTradeOfferText(player, p2, game, false);
+        String pillageNotice = buildPillageNotice(game, player, p2);
+        String publicOfferText = buildTradeOfferText(player, p2, game, true, pillageNotice);
+        String privateOfferText = buildTradeOfferText(player, p2, game, false, pillageNotice);
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         if (tableTalkChannel != null) {
             boolean sentMeme = false;
@@ -1218,7 +1219,6 @@ public final class TransactionHelper {
                 }
             }
             if (sentMeme) {
-                String pillageNotice = buildPillageNotice(game, player, p2);
                 if (!pillageNotice.isEmpty()) {
                     MessageHelper.sendMessageToChannel(tableTalkChannel, pillageNotice);
                 }
@@ -1272,9 +1272,9 @@ public final class TransactionHelper {
         checkTransactionLegality(game, p2, player);
     }
 
-    private static String buildTradeOfferText(Player p1, Player p2, Game game, boolean hidePrivateCardText) {
+    private static String buildTradeOfferText(
+            Player p1, Player p2, Game game, boolean hidePrivateCardText, String pillageNotice) {
         String offerText = buildTransactionOffer(p1, p2, game, hidePrivateCardText);
-        String pillageNotice = buildPillageNotice(game, p1, p2);
         if (pillageNotice.isEmpty()) {
             return offerText;
         }
