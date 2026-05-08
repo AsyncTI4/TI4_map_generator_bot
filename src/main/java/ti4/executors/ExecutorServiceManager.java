@@ -57,11 +57,13 @@ public class ExecutorServiceManager {
         runAsync(timedRunnable);
     }
 
+    /** Runs a task asynchronously, bypassing the circuit breaker. Only use for privileged (developer) commands. */
     public static void runAsyncBypassCircuitBreaker(String name, Runnable runnable) {
         var timedRunnable = new TimedRunnable(name, runnable);
         runAsync(timedRunnable);
     }
 
+    /** Runs a task asynchronously with a lock, bypassing the circuit breaker. Only use for privileged (developer) commands. */
     public static void runAsyncWithLockBypassCircuitBreaker(
             String taskName,
             String lockName,
