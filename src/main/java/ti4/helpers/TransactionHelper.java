@@ -1202,11 +1202,11 @@ public final class TransactionHelper {
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " sent a transaction offer to " + p2.getRepresentationNoPing()
                         + ".");
-        String pillageNotice = buildPillageNotice(game, player, p2);
+        String publicOfferText = buildTradeOfferText(player, p2, game, true);
+        String privateOfferText = buildTradeOfferText(player, p2, game, false);
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         if (tableTalkChannel != null) {
             boolean sentMeme = false;
-            String publicOfferText = buildTransactionOffer(player, p2, game, true);
             if (sendMemeInsteadOfText(event, game)) {
                 BufferedImage tradeOfferMeme = TransactionGenerator.drawTradeOfferMeme(game, player, p2);
                 if (tradeOfferMeme != null) {
@@ -1219,12 +1219,12 @@ public final class TransactionHelper {
             if (!sentMeme) {
                 String offerMessage = "Trade offer from " + player.getRepresentationNoPing() + " to "
                         + p2.getRepresentationNoPing() + ":\n" + publicOfferText;
-                if (!pillageNotice.isEmpty()) {
-                    offerMessage += "\n" + pillageNotice;
-                }
                 MessageHelper.sendMessageToChannel(tableTalkChannel, offerMessage);
-            } else if (!pillageNotice.isEmpty()) {
-                MessageHelper.sendMessageToChannel(tableTalkChannel, pillageNotice);
+            } else {
+                String pillageNotice = buildPillageNotice(game, player, p2);
+                if (!pillageNotice.isEmpty()) {
+                    MessageHelper.sendMessageToChannel(tableTalkChannel, pillageNotice);
+                }
             }
         }
 
@@ -1249,7 +1249,7 @@ public final class TransactionHelper {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentationNoPing() + " you sent a transaction offer to " + p2.getRepresentationNoPing()
-                        + ":\n" + buildTransactionOffer(player, p2, game, false),
+                        + ":\n" + privateOfferText,
                 buttons);
 
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -1266,22 +1266,23 @@ public final class TransactionHelper {
         buttons.add(Buttons.red("rejectOffer_" + player.getFaction() + bmdSuffix, "Reject"));
         buttons.add(Buttons.red("resetOffer_" + player.getFaction() + bmdSuffix, "Reject and CounterOffer"));
         String p2OfferMsg = p2.getRepresentation() + " you have received a transaction offer from "
-                + player.getRepresentationNoPing() + ":\n" + buildTransactionOffer(player, p2, game, false);
-        if (!pillageNotice.isEmpty()) {
-            p2OfferMsg += "\n" + pillageNotice;
-        }
+                + player.getRepresentationNoPing() + ":\n" + privateOfferText;
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), p2OfferMsg, buttons);
         checkTransactionLegality(game, p2, player);
     }
 
-    /**
-     * Checks whether any player with the {@code pillage} ability could steal from either trade participant
-     * once the transaction is complete, and returns a formatted warning notice if so.
-     */
+    private static String buildTradeOfferText(Player p1, Player p2, Game game, boolean hidePrivateCardText) {
+        String offerText = buildTransactionOffer(p1, p2, game, hidePrivateCardText);
+        String pillageNotice = buildPillageNotice(game, p1, p2);
+        if (pillageNotice.isEmpty()) {
+            return offerText;
+        }
+        return offerText + "\n" + pillageNotice;
+    }
+
     private static String buildPillageNotice(Game game, Player p1, Player p2) {
         if (game.isTwilightsFallMode() || game.isFowMode()) return "";
 
-        // Estimate projected TGs for each player after the trade resolves
         int p1TgAfter = p1.getTg();
         int p2TgAfter = p2.getTg();
         for (String item : p1.getTransactionItemsWithPlayer(p2)) {
@@ -1300,7 +1301,6 @@ public final class TransactionHelper {
                         p1TgAfter += amount;
                     }
                 } else if ("Comms".equals(type)) {
-                    // Commodities convert to trade goods for the receiver (unless they are alliance members)
                     int amount = Integer.parseInt(detail);
                     if (item.contains("sending" + p1.getFaction())) {
                         if (!p1.isPlayerMemberOfAlliance(p2)) p2TgAfter += amount;
@@ -1309,40 +1309,43 @@ public final class TransactionHelper {
                     }
                 }
             } catch (NumberFormatException ignored) {
-                // malformed item — skip
+            }
+        }
+
+        Map<Player, List<String>> redistributionSources = new java.util.LinkedHashMap<>();
+        if (ButtonHelperAbilities.canBePillaged(p1, game, p1TgAfter)) {
+            for (Player neighbor : p1.getNeighbouringPlayers(true)) {
+                if (neighbor == p1 || neighbor == p2 || !neighbor.hasAbility("pillage")) {
+                    continue;
+                }
+                redistributionSources
+                        .computeIfAbsent(neighbor, ignored -> new ArrayList<>())
+                        .add(p1.getRepresentationNoPing());
+            }
+        }
+        if (ButtonHelperAbilities.canBePillaged(p2, game, p2TgAfter)) {
+            for (Player neighbor : p2.getNeighbouringPlayers(true)) {
+                if (neighbor == p1 || neighbor == p2 || !neighbor.hasAbility("pillage")) {
+                    continue;
+                }
+                redistributionSources
+                        .computeIfAbsent(neighbor, ignored -> new ArrayList<>())
+                        .add(p2.getRepresentationNoPing());
             }
         }
 
         StringBuilder notice = new StringBuilder();
-        for (Player pillager : game.getRealPlayers()) {
-            if (!pillager.hasAbility("pillage") || pillager == p1 || pillager == p2) continue;
-            List<String> targets = new ArrayList<>();
-            if (couldBePillagedBy(p1, pillager, p1TgAfter)) {
-                targets.add(p1.getRepresentationNoPing() + " (" + p1TgAfter + MiscEmojis.tg + " after trade)");
+        for (Map.Entry<Player, List<String>> redistribution : redistributionSources.entrySet()) {
+            if (!notice.isEmpty()) {
+                notice.append('\n');
             }
-            if (couldBePillagedBy(p2, pillager, p2TgAfter)) {
-                targets.add(p2.getRepresentationNoPing() + " (" + p2TgAfter + MiscEmojis.tg + " after trade)");
-            }
-            if (!targets.isEmpty()) {
-                if (!notice.isEmpty()) notice.append('\n');
-                notice.append("**NOTICE OF REDISTRIBUTION**\n");
-                notice.append("From: ")
-                        .append(pillager.getRepresentationNoPing())
-                        .append('\n');
-                for (String target : targets) {
-                    notice.append("Potential recipient: ").append(target).append('\n');
-                }
-            }
+            notice.append("NOTICE OF REDISTRIBUTION\n");
+            notice.append("From: ")
+                    .append(String.join(", ", redistribution.getValue()))
+                    .append('\n');
+            notice.append("To: ").append(redistribution.getKey().getRepresentationNoPing());
         }
         return notice.toString();
-    }
-
-    private static boolean couldBePillagedBy(Player target, Player pillager, int projectedTg) {
-        if (target.getPromissoryNotesInPlayArea().contains("pop")) return false;
-        if (target.hasUnlockedBreakthrough("vadenbt")) return false;
-        if (target.getPromissoryNotesInPlayArea().contains("sigma_promise_of_protection")) return false;
-        return projectedTg > 2 // Pillage requires more than 2 TGs (i.e. at least 3)
-                && target.getNeighbouringPlayers(true).contains(pillager);
     }
 
     @ButtonHandler("transact_")
