@@ -4,8 +4,6 @@ import java.text.DecimalFormat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.User;
@@ -17,6 +15,7 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.HandlerRegistry;
 import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
@@ -46,27 +45,22 @@ import ti4.spring.context.SpringContext;
 @UtilityClass
 public class ButtonProcessor {
 
-    private static final Map<String, Consumer<ButtonContext>> knownButtons =
-            AnnotationHandler.findKnownHandlers(ButtonContext.class, ButtonHandler.class);
+    private static final HandlerRegistry<ButtonContext> registry =
+            AnnotationHandler.buildHandlerRegistry(ButtonContext.class, ButtonHandler.class);
     private static final ButtonRuntimeWarningService runtimeWarningService = new ButtonRuntimeWarningService();
 
     public static void checkButtonHandlersSetup() {
-        if (knownButtons.isEmpty()) {
+        if (registry.getSize() == 0) {
             throw new IllegalStateException("No button handlers were registered");
         }
     }
 
     public static void queue(ButtonInteractionEvent event) {
-        var buttonContext = new ButtonContext(event);
-        if (!buttonContext.isValid()) return;
-
         String gameName = GameNameService.getGameNameFromChannel(event);
+        String rawComponentID = event.getButton().getCustomId();
+        ExecutionLockType lockType = registry.isSave(rawComponentID) ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutorServiceManager.runAsyncWithLock(
-                eventToString(event, gameName),
-                gameName,
-                event.getMessageChannel(),
-                () -> process(buttonContext, event),
-                buttonContext.isShouldSave() ? ExecutionLockType.WRITE : ExecutionLockType.READ);
+                eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event), lockType);
     }
 
     private static String eventToString(ButtonInteractionEvent event, String gameName) {
@@ -76,7 +70,10 @@ public class ButtonProcessor {
                 + ButtonHelper.getButtonRepresentation(event.getButton());
     }
 
-    private static void process(ButtonContext context, ButtonInteractionEvent event) {
+    private static void process(ButtonInteractionEvent event) {
+        ButtonContext context = new ButtonContext(event);
+        if (!context.isValid()) return;
+
         long processStartTime = System.currentTimeMillis();
         long resolveRuntime = 0;
         long saveRuntime = 0;
@@ -137,34 +134,6 @@ public class ButtonProcessor {
         UserSettingsManager.save(userSettings);
     }
 
-    private static boolean handleKnownButtons(ButtonContext context) {
-        String buttonID = context.getButtonID();
-        if (!CombatContestSettings.isEnabledStatic() && isCombatReplayButton(buttonID)) return true;
-        // Check for exact match first
-        if (knownButtons.containsKey(buttonID)) {
-            RollbarManager.put("button_handler_id", buttonID);
-            knownButtons.get(buttonID).accept(context);
-            return true;
-        }
-
-        // Then check for prefix match
-        String longestPrefixMatch = null;
-        for (String key : knownButtons.keySet()) {
-            if (buttonID.startsWith(key)) {
-                if (longestPrefixMatch == null || key.length() > longestPrefixMatch.length()) {
-                    longestPrefixMatch = key;
-                }
-            }
-        }
-
-        if (longestPrefixMatch != null) {
-            RollbarManager.put("button_handler_id", longestPrefixMatch);
-            knownButtons.get(longestPrefixMatch).accept(context);
-            return true;
-        }
-        return false;
-    }
-
     private static boolean isCombatReplayButton(String buttonID) {
         return buttonID != null
                 && (buttonID.startsWith(CombatSideBetButtonIds.PREFIX) || buttonID.startsWith("combatReplayDebug_"));
@@ -179,8 +148,11 @@ public class ButtonProcessor {
         MessageChannel privateChannel = context.getPrivateChannel();
         MessageChannel mainGameChannel = context.getMainGameChannel();
 
+        // Skip combat replay buttons when the feature is disabled
+        if (!CombatContestSettings.isEnabledStatic() && isCombatReplayButton(buttonID)) return;
+
         // Check the list of ButtonHandlers first
-        if (handleKnownButtons(context)) return;
+        if (registry.handle(buttonID, context)) return;
 
         // TODO Convert all else..if..startsWith to use @ButtonHandler
         if (false) {
