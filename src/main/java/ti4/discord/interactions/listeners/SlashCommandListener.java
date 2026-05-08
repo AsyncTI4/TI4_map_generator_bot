@@ -49,13 +49,23 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
         Command<SlashCommandInteractionEvent> command = getCommand(event);
         ExecutionLockType lockType = getLockType(command);
         String eventString = eventToString(event);
+        boolean isDeveloperCommand = Constants.DEVELOPER.equals(event.getName());
         if (lockType == null) {
-            ExecutorServiceManager.runAsync(eventString, () -> process(event));
+            if (isDeveloperCommand) {
+                ExecutorServiceManager.runAsyncBypassCircuitBreaker(eventString, () -> process(event));
+            } else {
+                ExecutorServiceManager.runAsync(eventString, () -> process(event));
+            }
             return;
         }
         String gameName = GameNameService.getGameName(event);
-        ExecutorServiceManager.runAsyncWithLock(
-                eventString, gameName, event.getMessageChannel(), () -> process(event), lockType);
+        if (isDeveloperCommand) {
+            ExecutorServiceManager.runAsyncWithLockBypassCircuitBreaker(
+                    eventString, gameName, event.getMessageChannel(), () -> process(event), lockType);
+        } else {
+            ExecutorServiceManager.runAsyncWithLock(
+                    eventString, gameName, event.getMessageChannel(), () -> process(event), lockType);
+        }
     }
 
     public String eventToString(GenericCommandInteractionEvent event) {

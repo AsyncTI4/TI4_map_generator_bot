@@ -57,6 +57,24 @@ public class ExecutorServiceManager {
         runAsync(timedRunnable);
     }
 
+    public static void runAsyncBypassCircuitBreaker(String name, Runnable runnable) {
+        var timedRunnable = new TimedRunnable(name, runnable);
+        runAsync(timedRunnable);
+    }
+
+    public static void runAsyncWithLockBypassCircuitBreaker(
+            String taskName,
+            String lockName,
+            MessageChannel messageChannel,
+            Runnable runnable,
+            ExecutionLockType lockType) {
+        if (isNotBlank(lockName)) {
+            runnable = ExecutionLockManager.wrapWithTryLockAndRelease(lockName, lockType, runnable, messageChannel);
+        }
+        var timedRunnable = new TimedRunnable(taskName, runnable);
+        runAsync(timedRunnable);
+    }
+
     public static void runAsync(String name, int executionTimeWarningThresholdSeconds, Runnable runnable) {
         if (CircuitBreaker.isOpen()) {
             return;
