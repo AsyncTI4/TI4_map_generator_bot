@@ -12,9 +12,8 @@ import ti4.service.info.CardsInfoService;
 
 public class CardsInfoCommand extends GameStateCommand {
 
-    // This has to save, due to the `game.checkPromissoryNotes();` call
     public CardsInfoCommand() {
-        super(true, true);
+        super(false, true);
     }
 
     @Override
@@ -31,7 +30,6 @@ public class CardsInfoCommand extends GameStateCommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         Player player = getPlayer();
-        game.checkPromissoryNotes();
         if (!game.isFowMode()) {
             ThreadChannel channel = player.getCardsInfoThread();
             channel.getManager()

@@ -58,6 +58,7 @@
     "asyncId": "dd",
     "name": "Liturgy II",
     "upgradesFromUnitId": "dream_destroyer",
+    "requiredTechId": "bedreamdd",
     "faction": "dream",
     "source": "beans",
     "moveValue": 3,

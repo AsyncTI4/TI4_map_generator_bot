@@ -2,6 +2,8 @@ package ti4.discord.interactions.buttons;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.AsyncTI4DiscordBot;
@@ -14,15 +16,16 @@ class ButtonRuntimeWarningService {
 
     private static final int PREPROCESSING_WARNING_THRESHOLD_MILLISECONDS = 2500;
     private static final int PROCESSING_WARNING_THRESHOLD_MILLISECONDS = 1000;
-    private static final int RUNTIME_WARNING_COUNT_THRESHOLD = 10;
+    private static final int RUNTIME_WARNING_COUNT_THRESHOLD = 15;
     private static final long RESET_WARNING_COUNT_AFTER_SECONDS =
-            Duration.ofMinutes(2).toSeconds();
+            Duration.ofMinutes(1).toSeconds();
     private static final long PAUSE_AFTER_WARNING_SECONDS =
             Duration.ofMinutes(5).toSeconds();
 
     private int runtimeWarningCount;
     private Instant pauseWarningsUntil = Instant.now();
     private Instant lastWarningTime = Instant.now();
+    private final List<ThresholdWarningReason> thresholdWarningReasons = new ArrayList<>();
 
     @Getter
     private long runtimeSubmissionCount;
@@ -60,6 +63,7 @@ class ButtonRuntimeWarningService {
         var now = Instant.now();
         if (lastWarningTime.isBefore(now.minusSeconds(RESET_WARNING_COUNT_AFTER_SECONDS))) {
             runtimeWarningCount = 0;
+            thresholdWarningReasons.clear();
         }
 
         boolean slowPreprocess = preprocessingTimeMs >= PREPROCESSING_WARNING_THRESHOLD_MILLISECONDS;
@@ -84,14 +88,16 @@ class ButtonRuntimeWarningService {
         String resolveTime = formatMillisecondsWithWarning(resolveRuntimeMs);
         String saveTime = formatMillisecondsWithWarning(saveRuntimeMs);
         String responseTime = DateTimeHelper.getTimeRepresentationToMilliseconds(processingEndTimeMs - eventTimeMs);
+        String buttonRepresentation = ButtonHelper.getButtonRepresentation(event.getButton());
+        thresholdWarningReasons.add(new ThresholdWarningReason(eventTime, buttonRepresentation, responseTime));
 
         String message = event.getUser().getEffectiveName()
                 + " pressed button: "
-                + ButtonHelper.getButtonRepresentation(event.getButton())
+                + buttonRepresentation
                 + " in: [" + event.getChannel().getName() + "]("
                 + event.getMessage().getJumpUrl() + ") "
                 + "\n> ⚠ **Slow Button Warning:**"
-                + "\n> 🕒 Event start: `" + eventTime + "`"
+                + "\n> 🕒 Event start: " + eventTime
                 + "\n> 🧩 Built context in: `" + contextTime + "`"
                 + "\n> 🛠 Executed in: `" + resolveTime + "`"
                 + "\n> 💾 Saved in: `" + saveTime + "`"
@@ -103,10 +109,11 @@ class ButtonRuntimeWarningService {
 
         runtimeWarningCount++;
 
-        if (runtimeWarningCount > RUNTIME_WARNING_COUNT_THRESHOLD) {
+        if (runtimeWarningCount >= RUNTIME_WARNING_COUNT_THRESHOLD) {
             pauseWarningsUntil = now.plusSeconds(PAUSE_AFTER_WARNING_SECONDS);
-            BotLogger.error("**Buttons are processing slowly. Pausing warnings for 5 minutes.**");
+            BotLogger.error(formatPauseWarningMessage());
             runtimeWarningCount = 0;
+            thresholdWarningReasons.clear();
         }
 
         lastWarningTime = now;
@@ -120,6 +127,27 @@ class ButtonRuntimeWarningService {
         return formattedRuntime;
     }
 
+    private String formatPauseWarningMessage() {
+        return "**Buttons are processing slowly. Pausing warnings for 5 minutes.**" + formatThresholdWarningReasons();
+    }
+
+    private String formatThresholdWarningReasons() {
+        if (thresholdWarningReasons.isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder("\n> **Reasons:**");
+        for (ThresholdWarningReason reason : thresholdWarningReasons) {
+            sb.append("\n> - ")
+                    .append(reason.occurredAt())
+                    .append(" • ")
+                    .append(reason.buttonRepresentation())
+                    .append(" • `")
+                    .append(reason.totalRuntime())
+                    .append("`");
+        }
+        return sb.toString();
+    }
+
     synchronized double getAveragePreprocessingTime() {
         return runtimeSubmissionCount == 0 ? 0 : totalPreprocessingTime / (double) runtimeSubmissionCount;
     }
@@ -131,4 +159,6 @@ class ButtonRuntimeWarningService {
     synchronized double getThresholdMissPercent() {
         return runtimeSubmissionCount == 0 ? 0 : runtimeThresholdMissCount / (double) runtimeSubmissionCount;
     }
+
+    private record ThresholdWarningReason(String occurredAt, String buttonRepresentation, String totalRuntime) {}
 }

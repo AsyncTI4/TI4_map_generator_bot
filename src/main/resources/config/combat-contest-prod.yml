@@ -1,3 +1,5 @@
+enabled: false
+
 candidateSelection:
   window:
     lookbackMinutes: 480

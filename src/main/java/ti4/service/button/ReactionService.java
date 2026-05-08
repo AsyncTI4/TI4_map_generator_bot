@@ -1,7 +1,6 @@
 package ti4.service.button;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -46,7 +45,7 @@ public class ReactionService {
                     text = message;
                 } else if (game.isFowMode()) {
                     text = "(You) " + message;
-                } else if ("not following.".equalsIgnoreCase(message)) {
+                } else if (message.contains("following")) {
                     text = player.getRepresentation(false, false) + " " + message;
                 } else {
                     text = player.getRepresentation() + " " + message;

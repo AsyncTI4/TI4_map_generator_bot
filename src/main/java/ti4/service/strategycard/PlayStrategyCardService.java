@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -566,7 +567,6 @@ public class PlayStrategyCardService {
             }
         }
         int playRound = game.getRound();
-        long playGameSaveTime = game.getLastModifiedDate();
         game.getMainGameChannel()
                 .sendMessage(toSend)
                 .queue(
@@ -576,7 +576,6 @@ public class PlayStrategyCardService {
                                 player,
                                 scToPlay,
                                 playRound,
-                                playGameSaveTime,
                                 scModel,
                                 scButtons,
                                 playersToReact),
@@ -589,10 +588,10 @@ public class PlayStrategyCardService {
             Player player,
             int scToPlay,
             int playRound,
-            long playGameSaveTime,
             StrategyCardModel scModel,
             List<Button> scButtons,
             List<Player> playersToReact) {
+        long playGameSaveTime = message.getTimeCreated().toInstant().toEpochMilli();
         StrategyCardMessageService.replaceStrategyCardMessage(
                 game.getName(), message.getId(), playRound, scToPlay, playGameSaveTime);
         for (Player reactingPlayer : playersToReact) {
@@ -632,6 +631,12 @@ public class PlayStrategyCardService {
                         playerOrder.append('\n');
                     }
                     MessageHelper.sendMessageToChannel(m5, playerOrder.toString());
+                }
+                for (Player p2 : game.getRealPlayers()) {
+                    Member member = game.getGuild().getMemberById(p2.getUserID());
+                    if (member != null) {
+                        m5.addThreadMember(member).queue();
+                    }
                 }
             }
 

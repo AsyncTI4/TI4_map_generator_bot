@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.message.MessageHelper;
+import ti4.service.persistence.SqlitePersistenceGate;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.developer.RunSqlService;
 
@@ -20,6 +21,11 @@ class RunSql extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
+        if (SqlitePersistenceGate.isDisabled()) {
+            MessageHelper.sendMessageToEventChannel(
+                    event, "SQL execution is disabled while SQLite-backed auxiliary persistence is off.");
+            return;
+        }
         String sql = event.getOption("sql").getAsString();
         RunSqlService runSqlService = SpringContext.getBean(RunSqlService.class);
         String result = runSqlService.executeSql(sql);

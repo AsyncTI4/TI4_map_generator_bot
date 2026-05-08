@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.listeners.context.SelectionMenuContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
@@ -52,14 +53,20 @@ public final class SelectionMenuProcessor {
             RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
 
             if (context.isValid()) {
-                CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
-                combatReplayService.setPreInteractionSnapshot(
-                        combatReplayService.capturePreInteractionSnapshot(context.getGame()));
+                CombatReplayService combatReplayService = CombatContestSettings.isEnabledStatic()
+                        ? SpringContext.getBean(CombatReplayService.class)
+                        : null;
+                if (combatReplayService != null) {
+                    combatReplayService.setPreInteractionSnapshot(
+                            combatReplayService.capturePreInteractionSnapshot(context.getGame()));
+                }
                 try {
                     resolveSelectionMenu(context);
                     context.save();
                 } finally {
-                    combatReplayService.clearPreInteractionSnapshot();
+                    if (combatReplayService != null) {
+                        combatReplayService.clearPreInteractionSnapshot();
+                    }
                 }
             }
         } catch (Exception e) {

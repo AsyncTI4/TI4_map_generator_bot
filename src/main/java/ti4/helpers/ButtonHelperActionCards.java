@@ -2939,42 +2939,14 @@ public final class ButtonHelperActionCards {
     @ButtonHandler("resolveTwin_")
     public static void resolveTwinning(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String acName = buttonID.replace("resolveTwin_", "");
-        List<String> acStrings = new ArrayList<>(game.getDiscardActionCards().keySet());
-        boolean found = false;
+        List<String> acStrings =
+                new ArrayList<>(Mapper.getDeck(game.getAcDeckID()).getCardIDs());
         for (String acStringID : acStrings) {
             ActionCardModel actionCard = Mapper.getActionCard(acStringID);
             String actionCardTitle = actionCard.getName();
             if (acName.equalsIgnoreCase(actionCardTitle)) {
-                boolean picked = game.pickActionCard(
-                        player.getUserID(), game.getDiscardActionCards().get(acStringID));
-                if (!picked) {
-                    MessageHelper.sendMessageToChannel(
-                            event.getChannel(), "No such action card ID found, please retry.");
-                    return;
-                }
-                ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel());
-                found = true;
+                ActionCardHelper.resolveActionCard(event, game, player, acStringID, -99, player.getCorrectChannel());
                 break;
-            }
-        }
-        if (!found) {
-            Map<String, Integer> purgedActionCards = game.getPurgedActionCards();
-            acStrings = new ArrayList<>(purgedActionCards.keySet());
-            for (String acStringID : acStrings) {
-                ActionCardModel actionCard = Mapper.getActionCard(acStringID);
-                String actionCardTitle = actionCard.getName();
-                if (acName.equalsIgnoreCase(actionCardTitle)) {
-                    boolean picked =
-                            game.pickActionCardFromPurged(player.getUserID(), purgedActionCards.get(acStringID));
-                    if (!picked) {
-                        MessageHelper.sendMessageToChannel(
-                                event.getChannel(), "No such action card ID found, please retry.");
-                        return;
-                    }
-                    ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel());
-                    game.setPurgedActionCard(acStringID);
-                    break;
-                }
             }
         }
         ButtonHelper.deleteMessage(event);

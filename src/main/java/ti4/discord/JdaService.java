@@ -30,6 +30,7 @@ import ti4.contest.cron.CombatReplayCron;
 import ti4.contest.cron.CombatReplayPromotionCron;
 import ti4.contest.cron.CombatReplayPromotionScoreBackfillCron;
 import ti4.contest.cron.CombatReplaySelectionCron;
+import ti4.contest.replay.core.CombatContestSettings;
 import ti4.cron.AutoPingCron;
 import ti4.cron.BothelperDashboardCron;
 import ti4.cron.CategoryCleanupCron;
@@ -117,13 +118,12 @@ public class JdaService {
         BotLogger.info("STARTING JDA");
         jda = JDABuilder.createDefault(args[0])
                 .setEventPool(EVENT_EXECUTOR)
-                // This is a privileged gateway intent that is used to update user information and join/leaves
-                // (including kicks). This is required to cache all members of a guild (including chunking)
+                // Needed to listen for joins/leaves.
+                // This is required to cache all members of a guild (including chunking)
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
-                // This is a privileged gateway intent this is only used to enable access to the user content in
-                // messages (also including embeds/attachments/components).
+                // Needed to parse raw user messages.
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-                // not 100 sure this is needed? It may be for the Emoji cache... but do we actually need that?
+                // Needed for emoji searches and validation
                 .enableIntents(GatewayIntent.GUILD_EXPRESSIONS)
                 // It *appears* we need to pull all members or else the bot has trouble pinging players
                 // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
@@ -309,11 +309,13 @@ public class JdaService {
         SabotageAutoReactCron.register();
         FastScFollowCron.register();
         CloseLaunchThreadsCron.register();
-        CombatReplaySelectionCron.register();
-        CombatReplayPromotionCron.register();
-        CombatReplayPromotionScoreBackfillCron.register();
-        CombatReplayCron.register();
-        CombatContestJanitorCron.register();
+        if (CombatContestSettings.isEnabledStatic()) {
+            CombatReplaySelectionCron.register();
+            CombatReplayPromotionCron.register();
+            CombatReplayPromotionScoreBackfillCron.register();
+            CombatReplayCron.register();
+            CombatContestJanitorCron.register();
+        }
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
         CategoryCleanupCron.register();
@@ -459,6 +461,7 @@ public class JdaService {
         adminRoles.add(jda.getRoleById("1335330636935987343")); // Jabberwocky's server
         adminRoles.add(jda.getRoleById("1465619434839347276")); // Ariel's server
         adminRoles.add(jda.getRoleById("1487725249398308884")); // Balacasi's server
+        adminRoles.add(jda.getRoleById("1500012691224395906")); // BEANS's server
 
         adminRoles.removeIf(Objects::isNull);
 
@@ -496,6 +499,7 @@ public class JdaService {
         developerRoles.add(jda.getRoleById("1335330959767375902")); // Jabberwocky's server
         developerRoles.add(jda.getRoleById("1465619572718567526")); // Ariel's server
         developerRoles.add(jda.getRoleById("1487725369766449173")); // Balacasi's server
+        developerRoles.add(jda.getRoleById("1500012939326001263")); // BEANS's server
 
         developerRoles.removeIf(Objects::isNull);
 
@@ -537,6 +541,7 @@ public class JdaService {
         bothelperRoles.add(jda.getRoleById("1335331011147595929")); // Jabberwocky's Server
         bothelperRoles.add(jda.getRoleById("1465619810577678442")); // Ariel's server
         bothelperRoles.add(jda.getRoleById("1487725393673719950")); // Balacasi's server
+        bothelperRoles.add(jda.getRoleById("1500013009492246558")); // BEANS's server
 
         bothelperRoles.removeIf(Objects::isNull);
     }

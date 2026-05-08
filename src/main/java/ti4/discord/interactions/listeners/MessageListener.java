@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayHouseService;
 import ti4.discord.JdaService;
 import ti4.executors.ExecutorServiceManager;
@@ -48,7 +49,7 @@ class MessageListener extends ListenerAdapter {
 
         Please do not ping bothelper again, the first ping is enough, just explain without a 2nd ping.
         """;
-    private static final List<String> INTERESTING_MESSAGES = List.of("please stop", "retard");
+    private static final List<String> INTERESTING_MESSAGES = List.of("please stop");
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
@@ -115,6 +116,7 @@ class MessageListener extends ListenerAdapter {
     }
 
     private static void addHouseEmojiReactionToLazaxMessages(MessageReceivedEvent event) {
+        if (!CombatContestSettings.isEnabledStatic()) return;
         SpringContext.getBean(CombatReplayHouseService.class).addHouseEmojiReactionIfNeeded(event);
     }
 

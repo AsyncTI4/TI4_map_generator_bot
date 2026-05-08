@@ -96,7 +96,7 @@ public class TkHelperActionCards {
             case "tk-initiate" -> buttons.addAll(getTkInitiateButtons(game, player));
             case "tk-oppress" -> buttons.addAll(PlayerTechService.getMageonImplantsButtons(game, player));
             case "tk-ordain" -> buttons.add(Buttons.green(ffcc + "startOrdain", resolve));
-            case "tk-posture" -> buttons.add(Buttons.green(ffcc + "non_sc_draw_so", resolve));
+            case "tk-posture" -> buttons.add(Buttons.green(ffcc + "non_sc_draw_sodeleteThisMessage", resolve));
             case "tk-preside" -> {
                 List<String> edicts = EdictPhaseHandler.getEdictDeck(game);
                 buttons.add(Buttons.green(ffcc + "resolveEdict_" + edicts.getFirst(), "Resolve 1 Edict"));
@@ -158,6 +158,11 @@ public class TkHelperActionCards {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
+        Button button = Buttons.red("discardSpliceCard_genome", "Discard 1 Genome", MiscEmojis.tf_genome);
+        Button deleteButton = Buttons.DONE_DELETE_BUTTONS;
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(), "Use the button to discard a genome card.", List.of(button, deleteButton));
     }
 
     private static List<Button> getTkBestowButtons(Player player, String resolve) {

@@ -1,8 +1,6 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,6 +51,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
@@ -2041,6 +2040,10 @@ public class CombatRollService {
                 continue;
             }
             Tile adjTile = game.getTileByPosition(adjacentTilePosition);
+            if (TeHelperUnits.affectedByQuietus(game, player, adjTile) || adjTile.isScar(game)) {
+                continue;
+            }
+
             for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
                 getUnitsOnHolderByAsyncIdForSpaceCannon(colorID, adjacentUnitsByAsyncId, unitHolder, player);
             }

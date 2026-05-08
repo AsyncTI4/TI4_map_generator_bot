@@ -19,10 +19,12 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
+import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.ArvaxiCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -125,7 +127,9 @@ public class StartCombatService {
             GenericInteractionCreateEvent event,
             String specialCombatTitle) {
         RoundStatsTracker.incrementCombatsInitiated(game, player);
-        SpringContext.getBean(CombatReplayService.class).onSpaceCombatStarted(game, player, player2, tile);
+        if (CombatContestSettings.isEnabledStatic()) {
+            SpringContext.getBean(CombatReplayService.class).onSpaceCombatStarted(game, player, player2, tile);
+        }
         String threadName = combatThreadName(game, player, player2, tile, specialCombatTitle);
         if (!game.isFowMode()) {
             findOrCreateCombatThread(
@@ -359,7 +363,7 @@ public class StartCombatService {
                 amount++;
             }
         }
-        if (amount > 2 || tile.getNumberOfUnitsInSystem() > 2) {
+        if (CombatContestSettings.isEnabledStatic() && (amount > 2 || tile.getNumberOfUnitsInSystem() > 2)) {
             MessageHelper.sendMessageToChannel(
                     threadChannel,
                     CombatReplayDecoys.appendDebugDecoySummary(
@@ -1329,6 +1333,13 @@ public class StartCombatService {
         buttons.add(Buttons.blue(
                 "refreshViewOfSystem_" + pos + "_" + p1.getFaction() + "_" + p2.getFaction() + "_" + groundOrSpace,
                 "Refresh Picture"));
+        // Incomprehensible Form
+        try {
+            if (isSpaceCombat) {
+                buttons.addAll(DreamButtonHandler.getIncomprehensibleFormButtons(game, p1, p2, tile));
+            }
+        } catch (Exception ignored) {
+        }
 
         if (p1.hasTechReady("sc") || (!game.isFowMode() && p2.hasTechReady("sc"))) {
             if (p1.hasTechReady("sc")) {
