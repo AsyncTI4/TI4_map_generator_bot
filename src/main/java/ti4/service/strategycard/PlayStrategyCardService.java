@@ -571,14 +571,7 @@ public class PlayStrategyCardService {
                 .sendMessage(toSend)
                 .queue(
                         message -> handleScMessageResponse(
-                                message,
-                                game,
-                                player,
-                                scToPlay,
-                                playRound,
-                                scModel,
-                                scButtons,
-                                playersToReact),
+                                message, game, player, scToPlay, playRound, scModel, scButtons, playersToReact),
                         BotLogger::catchRestError);
     }
 
