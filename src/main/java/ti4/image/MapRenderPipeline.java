@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.executors.CircuitBreaker;
 import ti4.executors.ExecutionHistoryManager;
+import ti4.executors.ExecutorUtility;
+import ti4.executors.ShutdownResult;
 import ti4.game.Game;
 import ti4.helpers.DisplayType;
 import ti4.helpers.TimedRunnable;
@@ -97,15 +99,9 @@ public class MapRenderPipeline {
         render(new RenderEvent(game, event, displayType, callback, uploadToDiscord, uploadToWebsite));
     }
 
-    public static boolean shutdown() {
-        EXECUTOR_SERVICE.shutdownNow();
-        try {
-            return EXECUTOR_SERVICE.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            BotLogger.error("MapRenderPipeline shutdown interrupted.", e);
-            Thread.currentThread().interrupt();
-            return false;
-        }
+    public static ShutdownResult shutdown() {
+        return ExecutorUtility.shutdownAndAwaitTermination(
+                EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
     private record RenderEvent(

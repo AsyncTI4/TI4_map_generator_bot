@@ -111,6 +111,7 @@ public class ReactionCheckService {
         Button draw2Stage2 = Buttons.green("reveal_stage_2x2", "Reveal 2 Stage 2");
         Button drawStage2 = Buttons.green("reveal_stage_2", "Reveal Stage 2");
         Button drawStage1 = Buttons.green("reveal_stage_1", "Reveal Stage 1");
+        boolean tfWarning = false;
         List<Button> buttons = new ArrayList<>();
         if (game.isRedTapeMode() || game.isCivilizedSocietyMode()) {
             message2 = "All players have indicated scoring. In this game mode, no objective is revealed at this stage."
@@ -128,6 +129,7 @@ public class ReactionCheckService {
                         label += " (peeked at)";
                     }
                     buttons.add(Buttons.blue(id, label, CardEmojis.Public1alt));
+                    tfWarning = true;
                 }
             } else {
                 buttons.add(drawStage1);
@@ -147,6 +149,7 @@ public class ReactionCheckService {
                                 .containsKey(game.getPublicObjectives2Peekable().get(loc - 1))) {
                             label += " (peeked at)";
                         }
+                        tfWarning = true;
                         buttons.add(Buttons.blue(id, label, CardEmojis.Public2alt));
                     }
                 } else {
@@ -174,6 +177,11 @@ public class ReactionCheckService {
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message2, buttons);
+        if (tfWarning) {
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(),
+                    "Since this game is in Twilight's Fall mode and there are multiple objectives available to be picked from, some of which have been peeked at, the buttons will specify the position of the card they will reveal. The speaker gets to pick which one they reveal, per the rules.");
+        }
     }
 
     private static void respondAllPlayersReacted(ButtonInteractionEvent event, Game game) {

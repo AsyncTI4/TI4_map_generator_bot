@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -125,6 +126,9 @@ public final class ButtonHelperTacticalAction {
                 String warfareDone = player.getRepresentationUnfogged()
                         + ", your **Warfare** action is finished, you may redistribute your command tokens again.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), warfareDone, redistro);
+            }
+            if (player.hasAbility("dream_nexus")) {
+                DreamButtonHandler.offerLiturgyButtons(event, game, player);
             }
             RoundStatsTracker.finalizeTactical(game, player);
             resetStoredValuesForTacticalAction(game);
@@ -413,6 +417,8 @@ public final class ButtonHelperTacticalAction {
             List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, ringButtons);
         }
+        // Offer the Dreaming Throne promissory 'Visions' buttons
+        DreamButtonHandler.offerVisionsPromissoryAtTacticalStart(game, player);
     }
 
     private static void alternateWayOfOfferingTiles(Player player, Game game) {
@@ -673,7 +679,8 @@ public final class ButtonHelperTacticalAction {
 
             for (Player btb : game.getRealPlayers()) {
                 if (!btb.ownsUnit("tk-blacktrenchbulwark")) continue;
-                if (!activeSystem.containsPlayersUnitsWithModelCondition(btb, UnitModel::getIsStructure)) continue;
+                if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Pds)
+                        .contains(activeSystem)) continue;
 
                 String id = btb.factionButtonChecker() + "useMagenDefense_" + activeSystem.getPosition();
                 Button use = Buttons.red(id, "Use Black Trench Bulwark", UnitEmojis.pds);

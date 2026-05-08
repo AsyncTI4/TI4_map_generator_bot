@@ -287,10 +287,10 @@ public final class ButtonHelperFactionSpecific {
             }
             case "Commission" -> {
                 player.setStarbalanceCounter(player.getStarbalanceCounter() - 2);
-                ButtonHelperStats.replenishComms(event, game, player, false);
+                ButtonHelperStats.replenishComms(event, game, p2, false);
 
                 String msg = p2.getRepresentation() + " gained " + 2 + MiscEmojis.getTGorNomadCoinEmoji(game) + " "
-                        + player.gainTG(2) + " and replenished commodities.";
+                        + p2.gainTG(2) + " and replenished commodities.";
                 ButtonHelperAgents.resolveArtunoCheck(p2, 2);
                 ButtonHelperAbilities.pillageCheck(p2, game);
                 MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);

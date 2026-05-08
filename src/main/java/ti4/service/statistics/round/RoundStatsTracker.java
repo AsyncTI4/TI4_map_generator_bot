@@ -5,6 +5,7 @@ import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.logging.BotLogger;
+import ti4.service.persistence.SqlitePersistenceGate;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.roundstats.GameRoundStatsService;
 
@@ -52,6 +53,9 @@ public class RoundStatsTracker {
     }
 
     private static void withService(Consumer<GameRoundStatsService> operation) {
+        if (SqlitePersistenceGate.isDisabled()) {
+            return;
+        }
         try {
             operation.accept(SpringContext.getBean(GameRoundStatsService.class));
         } catch (IllegalStateException ignored) {

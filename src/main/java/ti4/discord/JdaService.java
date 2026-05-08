@@ -2,6 +2,7 @@ package ti4.discord;
 
 import jakarta.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -23,6 +24,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.AsyncTI4DiscordBot;
 import ti4.contest.cron.CombatContestJanitorCron;
@@ -56,6 +58,8 @@ import ti4.discord.interactions.context.ContextCommandManager;
 import ti4.discord.interactions.listeners.ListenerManager;
 import ti4.discord.interactions.selections.SelectionManager;
 import ti4.executors.ExecutorServiceManager;
+import ti4.executors.ExecutorUtility;
+import ti4.executors.ShutdownResult;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -76,6 +80,23 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class JdaService {
+
+    private static final String JDA_EVENT_POOL_NAME = "JDA Event Pool";
+    private static final int EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS = 5;
+    private static final int JDA_SHUTDOWN_TIMEOUT_SECONDS = 20;
+    private static final Set<CacheFlag> DISABLED_JDA_CACHE_FLAGS = EnumSet.of(
+            // User is playing a game, listening to Spotify, etc.
+            CacheFlag.ACTIVITY,
+            // User on Desktop, Mobile, or Web? Could be useful for stats
+            CacheFlag.CLIENT_STATUS,
+            // User is online, idle, etc
+            CacheFlag.ONLINE_STATUS,
+            // Needed for Role.getTags()
+            CacheFlag.ROLE_TAGS,
+            CacheFlag.SCHEDULED_EVENTS,
+            CacheFlag.SOUNDBOARD_SOUNDS,
+            CacheFlag.STICKER,
+            CacheFlag.VOICE_STATE);
 
     // TODO:
     //       we may not want to trust any old "Admin" role on a server
@@ -118,18 +139,20 @@ public class JdaService {
         BotLogger.info("STARTING JDA");
         jda = JDABuilder.createDefault(args[0])
                 .setEventPool(EVENT_EXECUTOR)
-                // Needed to listen for joins/leaves.
-                // This is required to cache all members of a guild (including chunking)
-                .enableIntents(GatewayIntent.GUILD_MEMBERS)
-                // Needed to parse raw user messages.
-                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-                // Needed for emoji searches and validation
-                .enableIntents(GatewayIntent.GUILD_EXPRESSIONS)
+                .enableIntents(
+                        // Needed to listen for joins/leaves
+                        // Needed to cache all members of a guild (including chunking) - remove?
+                        GatewayIntent.GUILD_MEMBERS,
+                        // Needed to parse raw user messages
+                        GatewayIntent.MESSAGE_CONTENT,
+                        // Needed for emoji searches and validation
+                        GatewayIntent.GUILD_EXPRESSIONS)
                 // It *appears* we need to pull all members or else the bot has trouble pinging players
                 // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
                 // and avoid loading every user at startup
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setChunkingFilter(ChunkingFilter.ALL)
+                .disableCache(DISABLED_JDA_CACHE_FLAGS)
                 // This allows us to use our own ShutdownHook, created below
                 .setEnableShutdownHook(false)
                 .build();
@@ -461,6 +484,7 @@ public class JdaService {
         adminRoles.add(jda.getRoleById("1335330636935987343")); // Jabberwocky's server
         adminRoles.add(jda.getRoleById("1465619434839347276")); // Ariel's server
         adminRoles.add(jda.getRoleById("1487725249398308884")); // Balacasi's server
+        adminRoles.add(jda.getRoleById("1500012691224395906")); // BEANS's server
 
         adminRoles.removeIf(Objects::isNull);
 
@@ -498,6 +522,7 @@ public class JdaService {
         developerRoles.add(jda.getRoleById("1335330959767375902")); // Jabberwocky's server
         developerRoles.add(jda.getRoleById("1465619572718567526")); // Ariel's server
         developerRoles.add(jda.getRoleById("1487725369766449173")); // Balacasi's server
+        developerRoles.add(jda.getRoleById("1500012939326001263")); // BEANS's server
 
         developerRoles.removeIf(Objects::isNull);
 
@@ -539,6 +564,7 @@ public class JdaService {
         bothelperRoles.add(jda.getRoleById("1335331011147595929")); // Jabberwocky's Server
         bothelperRoles.add(jda.getRoleById("1465619810577678442")); // Ariel's server
         bothelperRoles.add(jda.getRoleById("1487725393673719950")); // Balacasi's server
+        bothelperRoles.add(jda.getRoleById("1500013009492246558")); // BEANS's server
 
         bothelperRoles.removeIf(Objects::isNull);
     }
@@ -574,56 +600,57 @@ public class JdaService {
     public static void shutdown() {
         try {
             AsyncTI4DiscordBot.markShuttingDown();
+
             jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
             BotLogger.info("SHUTDOWN PROCESS STARTED");
+
             ActiveLeaseService.setCurrentProcessReady(false);
             BotLogger.info("NO LONGER ACCEPTING COMMANDS");
-            if (shutdownEventExecutor()) { // will wait for up to an additional 20 seconds
-                BotLogger.info("FINISHED PROCESSING ASYNC THREADPOOL");
-            } else {
-                BotLogger.info("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
-            }
-            if (ExecutorServiceManager.shutdown()) { // will wait for up to an additional 20 seconds
-                BotLogger.info("FINISHED PROCESSING ASYNC THREADPOOL");
-            } else {
-                BotLogger.info("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
-            }
-            if (MapRenderPipeline.shutdown()) { // will wait for up to an additional 20 seconds
-                BotLogger.info("FINISHED RENDERING MAPS");
-            } else {
-                BotLogger.info("DID NOT FINISH RENDERING MAPS");
-            }
-            if (SliceGenerationPipeline.shutdown()) { // will wait for up to an additional 20 seconds
-                BotLogger.info("FINISHED RENDERING SLICE DRAFTS");
-            } else {
-                BotLogger.info("DID NOT FINISH RENDERING SLICE DRAFTS");
-            }
-            if (StatisticsPipeline.shutdown()) { // will wait for up to an additional 20 seconds
-                BotLogger.info("FINISHED PROCESSING STATISTICS");
-            } else {
-                BotLogger.info("DID NOT FINISH PROCESSING STATISTICS");
-            }
-            CronManager.shutdown(); // will wait for up to an additional 20 seconds
-            LogBufferManager.sendBufferedLogsToDiscord(); // will drain the log buffer and doesn't have a timeout
+
+            logShutdownResult(JDA_EVENT_POOL_NAME, shutdownEventExecutor());
+            logShutdownResult(ExecutorServiceManager.class.getSimpleName(), ExecutorServiceManager.shutdown());
+            logShutdownResult(CronManager.class.getSimpleName(), CronManager.shutdown());
+            logShutdownResult(SliceGenerationPipeline.class.getSimpleName(), SliceGenerationPipeline.shutdown());
+            logShutdownResult(MapRenderPipeline.class.getSimpleName(), MapRenderPipeline.shutdown());
+            logShutdownResult(StatisticsPipeline.class.getSimpleName(), StatisticsPipeline.shutdown());
+
             SpringContext.getBean(ActiveLeaseService.class).releaseLease();
             BotLogger.info("RELEASED ACTIVE LEASE");
-            BotLogger.info("SHUTDOWN PROCESS COMPLETE");
-            TimeUnit.SECONDS.sleep(1); // wait for BotLogger
-            jda.shutdown();
-            jda.awaitShutdown(30, TimeUnit.SECONDS);
+
+            BotLogger.info("SHUTTING DOWN JDA.");
+
+            LogBufferManager.sendBufferedLogsToDiscord();
+
+            shutdownJda();
         } catch (Exception e) {
             BotLogger.error("Error encountered within shutdown process:\n> ", e);
         }
     }
 
-    private static boolean shutdownEventExecutor() {
-        EVENT_EXECUTOR.shutdownNow();
+    private static ShutdownResult shutdownEventExecutor() {
+        return ExecutorUtility.shutdownAndAwaitTermination(
+                EVENT_EXECUTOR, EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+    }
+
+    private static void logShutdownResult(String executorName, ShutdownResult result) {
+        switch (result) {
+            case GRACEFUL_TERMINATION -> BotLogger.info(executorName + " terminated gracefully.");
+            case FORCED_TERMINATION -> BotLogger.info(executorName + " terminated after interrupt request.");
+            case TIMED_OUT -> BotLogger.info(executorName + " did not terminate before the shutdown timeout.");
+            case INTERRUPTED -> BotLogger.info(executorName + " shutdown was interrupted.");
+        }
+    }
+
+    private static void shutdownJda() {
+        jda.shutdown();
         try {
-            return EVENT_EXECUTOR.awaitTermination(20, TimeUnit.SECONDS);
+            if (!jda.awaitShutdown(JDA_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                jda.shutdownNow();
+                jda.awaitShutdown(JDA_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            }
         } catch (InterruptedException e) {
-            BotLogger.error("JdaService event thread pool shutdown interrupted.", e);
             Thread.currentThread().interrupt();
-            return false;
+            jda.shutdownNow();
         }
     }
 }

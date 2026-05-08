@@ -8,6 +8,8 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.executors.CircuitBreaker;
 import ti4.executors.ExecutionHistoryManager;
+import ti4.executors.ExecutorUtility;
+import ti4.executors.ShutdownResult;
 import ti4.game.Game;
 import ti4.helpers.TimedRunnable;
 import ti4.logging.BotLogger;
@@ -16,11 +18,10 @@ import ti4.service.draft.NucleusSliceGeneratorService.NucleusOutcome;
 import ti4.service.draft.draftables.SliceDraftable;
 
 // TODO: This affects game state, and should lock buttons for a given game while working.
-
 @UtilityClass
 public class SliceGenerationPipeline {
 
-    private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
+    private static final int SHUTDOWN_TIMEOUT_SECONDS = 30;
     private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 10;
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor(
             Thread.ofPlatform().name("ti4-slice-generator-", 0).factory());
@@ -88,15 +89,9 @@ public class SliceGenerationPipeline {
         generate(new NucleusGenerateEvent(event, game, nucleusSpecs, callback));
     }
 
-    public static boolean shutdown() {
-        EXECUTOR_SERVICE.shutdownNow();
-        try {
-            return EXECUTOR_SERVICE.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            BotLogger.error("SliceGenerationPipeline shutdown interrupted.", e);
-            Thread.currentThread().interrupt();
-            return false;
-        }
+    public static ShutdownResult shutdown() {
+        return ExecutorUtility.shutdownAndAwaitTermination(
+                EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
     record MiltyGenerateEvent(

@@ -25,6 +25,7 @@ import ti4.game.persistence.ManagedGame;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.model.TechnologyModel;
+import ti4.service.persistence.SqlitePersistenceGate;
 import ti4.spring.service.roundstats.GameRoundPlayerStats;
 import ti4.spring.service.roundstats.GameRoundPlayerStatsRepository;
 import tools.jackson.databind.json.JsonMapper;
@@ -66,6 +67,10 @@ class PlayerAggregatesService {
      * 4) Return fresh cached payload if present, otherwise an empty aggregate shell.
      */
     PlayerDashboardResponse.PlayerAggregates getOrQueueRefresh(String userId, List<ManagedGame> playerGames) {
+        if (SqlitePersistenceGate.isDisabled()) {
+            List<String> completedGameIds = getTrackedCompletedGameIds(playerGames);
+            return emptyAggregates(false, "", completedGameIds.size(), 0, null, completedGameIds);
+        }
         CacheContext context = buildCacheContext(userId, playerGames);
         if (needsRefresh(context)) {
             queueRecompute(context.userId(), context.completedGameIds(), context.completedGamesHash());
