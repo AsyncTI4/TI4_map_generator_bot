@@ -71,14 +71,17 @@ public class ButtonProcessor {
     }
 
     private static void process(ButtonInteractionEvent event) {
+        long processStartTime = System.currentTimeMillis();
+
         ButtonContext context = new ButtonContext(event);
         if (!context.isValid()) return;
 
-        long processStartTime = System.currentTimeMillis();
+        long beforeTime = System.currentTimeMillis();
+        log(event);
+        long logRuntime = System.currentTimeMillis() - beforeTime;
+
         long resolveRuntime = 0;
         long saveRuntime = 0;
-
-        log(event);
         try {
             CombatReplayService combatReplayService =
                     CombatContestSettings.isEnabledStatic() ? SpringContext.getBean(CombatReplayService.class) : null;
@@ -88,7 +91,7 @@ public class ButtonProcessor {
                 combatReplayService.setPreInteractionSnapshot(preInteractionSnapshot);
             }
             try {
-                long beforeTime = System.currentTimeMillis();
+                beforeTime = System.currentTimeMillis();
                 resolveButtonInteractionEvent(context);
                 resolveRuntime = System.currentTimeMillis() - beforeTime;
 
@@ -116,6 +119,7 @@ public class ButtonProcessor {
                 processStartTime,
                 System.currentTimeMillis(),
                 contextCreationRuntime,
+                logRuntime,
                 resolveRuntime,
                 saveRuntime);
     }

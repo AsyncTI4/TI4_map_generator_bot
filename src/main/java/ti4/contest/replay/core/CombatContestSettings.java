@@ -103,7 +103,7 @@ public class CombatContestSettings {
     }
 
     public static boolean isEnabledStatic() {
-        return SpringContext.getBean(CombatContestSettings.class).isEnabled();
+        return SpringContext.getBean(CombatContestSettings.class).enabled;
     }
 
     private void loadEnvironmentDefaults(boolean isProd) {
