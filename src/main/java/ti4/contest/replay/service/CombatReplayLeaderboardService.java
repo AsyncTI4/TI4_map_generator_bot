@@ -337,7 +337,7 @@ public class CombatReplayLeaderboardService {
         for (LockedPrediction prediction : allPredictions) {
             CombatReplayLeaderboardEntryEntity entry = entriesByUser.computeIfAbsent(
                     prediction.discordUserId(),
-                    ignored -> newLeaderboardEntry(prediction.discordUserId(), prediction.discordUserName()));
+                    _ -> newLeaderboardEntry(prediction.discordUserId(), prediction.discordUserName()));
             entry.setDiscordUserName(prediction.discordUserName());
             entry.setPredictionCount(safeInt(entry.getPredictionCount()) + 1);
             if (winningUserIds.contains(prediction.discordUserId())) {
@@ -391,7 +391,7 @@ public class CombatReplayLeaderboardService {
             }
             message = winners.toString().trim();
         }
-        MessageHelper.splitAndSentWithAction(message, threadOrChannel, ignored -> {
+        MessageHelper.splitAndSentWithAction(message, threadOrChannel, _ -> {
             if (afterPost != null) {
                 afterPost.run();
             }

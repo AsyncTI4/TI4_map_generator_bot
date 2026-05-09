@@ -1341,28 +1341,9 @@ public final class TransactionHelper {
             }
         }
 
-        // compute who can pillage
         Map<String, List<String>> pillagersToPillaged = new LinkedHashMap<>();
-        if (ButtonHelperAbilities.canBePillaged(p1, game, p1TgAfter)) {
-            for (Player neighbor : p1.getNeighbouringPlayers(true)) {
-                if (!neighbor.hasAbility("pillage")) {
-                    continue;
-                }
-                pillagersToPillaged
-                        .computeIfAbsent(neighbor.getRepresentationNoPing(), ignored -> new ArrayList<>())
-                        .add(p1.getRepresentationNoPing());
-            }
-        }
-        if (ButtonHelperAbilities.canBePillaged(p2, game, p2TgAfter)) {
-            for (Player neighbor : p2.getNeighbouringPlayers(true)) {
-                if (!neighbor.hasAbility("pillage")) {
-                    continue;
-                }
-                pillagersToPillaged
-                        .computeIfAbsent(neighbor.getRepresentationNoPing(), ignored -> new ArrayList<>())
-                        .add(p2.getRepresentationNoPing());
-            }
-        }
+        getPillagers(game, p1, p1TgAfter, pillagersToPillaged);
+        getPillagers(game, p2, p2TgAfter, pillagersToPillaged);
 
         if (pillagersToPillaged.isEmpty()) return "";
 
@@ -1385,12 +1366,27 @@ public final class TransactionHelper {
         return notice.toString();
     }
 
+    private static void getPillagers(
+            Game game, Player p1, int p1TgAfter, Map<String, List<String>> pillagersToPillaged) {
+        if (ButtonHelperAbilities.canBePillaged(p1, game, p1TgAfter)) {
+            for (Player neighbor : p1.getNeighbouringPlayers(true)) {
+                if (!neighbor.hasAbility("pillage")) {
+                    continue;
+                }
+                String neighborRepresentation = neighbor.getRepresentation(false, false, true);
+                pillagersToPillaged
+                        .computeIfAbsent(neighborRepresentation, _ -> new ArrayList<>())
+                        .add(p1.getRepresentationNoPing());
+            }
+        }
+    }
+
     private static void appendPillageMessage(
             StringBuilder stringBuilder, Map.Entry<String, List<String>> pillagerToPillaged) {
         stringBuilder
-                .append(" from ")
+                .append("from ")
                 .append(String.join(", ", pillagerToPillaged.getValue()))
-                .append(" to ")
+                .append(" by ")
                 .append(pillagerToPillaged.getKey());
     }
 
