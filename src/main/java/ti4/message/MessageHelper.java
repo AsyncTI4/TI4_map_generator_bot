@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -890,15 +891,13 @@ public class MessageHelper {
         threadChannel
                 .retrievePinnedMessages()
                 .queue(
-                        messages -> {
-                            for (var pinnedMessage : messages) {
-                                Message message = pinnedMessage.getMessage();
-                                if (isBotCardsInfoPin(message)) {
-                                    message.unpin().queue(Consumers.nop(), BotLogger::catchRestError);
-                                }
-                            }
+                        pinnedMessages -> {
+                            List<Message> messagesToUnpin = pinnedMessages.stream()
+                                    .map(pinnedMessage -> pinnedMessage.getMessage())
+                                    .filter(MessageHelper::isBotCardsInfoPin)
+                                    .toList();
                             clearStoredCardsInfoPinIds(game, threadChannel, storedValueKeyPrefixes);
-                            afterCleared.run();
+                            unpinCardsInfoMessages(messagesToUnpin, afterCleared);
                         },
                         error -> {
                             BotLogger.warning(
@@ -935,6 +934,27 @@ public class MessageHelper {
             @NotNull Game game, @NotNull ThreadChannel threadChannel, @NotNull List<String> storedValueKeyPrefixes) {
         for (String storedValueKeyPrefix : storedValueKeyPrefixes) {
             game.removeStoredValue(storedValueKeyPrefix + "_" + threadChannel.getId());
+        }
+    }
+
+    private static void unpinCardsInfoMessages(@NotNull List<Message> messagesToUnpin, @NotNull Runnable afterCleared) {
+        if (messagesToUnpin.isEmpty()) {
+            afterCleared.run();
+            return;
+        }
+
+        AtomicInteger remaining = new AtomicInteger(messagesToUnpin.size());
+        for (Message message : messagesToUnpin) {
+            message.unpin().queue(ignored -> runAfterLastCardsInfoUnpin(remaining, afterCleared), error -> {
+                BotLogger.catchRestError(error);
+                runAfterLastCardsInfoUnpin(remaining, afterCleared);
+            });
+        }
+    }
+
+    private static void runAfterLastCardsInfoUnpin(@NotNull AtomicInteger remaining, @NotNull Runnable afterCleared) {
+        if (remaining.decrementAndGet() == 0) {
+            afterCleared.run();
         }
     }
 
