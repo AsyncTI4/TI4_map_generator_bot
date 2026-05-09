@@ -27,25 +27,18 @@ import ti4.message.MessageHelper;
 public class CombatReplayExecutionService {
 
     private static final List<String> PREDICTION_LOCK_TITLES = List.of(
+            "Predictions and Side Bets Open",
             "The Wagers Open",
-            "The Archives Open",
-            "Predictions Are Open",
-            "The War Ledger Opens",
             "The Betting Hall Opens",
-            "Call for Predictions",
-            "The Scribes Await",
+            "The War Ledger Opens",
+            "The Archives Open",
             "Cast Your Wager");
     private static final List<String> PREDICTION_LOCK_SUBTITLES = List.of(
-            "_The Lazax recorders now accept predictions for the coming clash._",
-            "_The archives invite your judgment before the battle unfolds._",
-            "_The war ledger opens to all who would call the victor._",
+            "_The Lazax ledgers now accept predictions and side bets for the coming clash._",
             "_The betting hall stirs as a new contest enters the record._",
-            "_The scribes stand ready to record your chosen champion._",
-            "_A new combat has been entered into the annals; predictions are welcome._",
-            "_The archives seek your verdict before the first volleys are fired._",
-            "_The next battle stands before the record; declare your pick._",
-            "_The Lazax ledgers are open to those bold enough to choose a side._",
-            "_Another clash enters the chronicles; place your wager in the record._");
+            "_The war ledger opens before the battle unfolds._",
+            "_The next battle stands before the record; place your wager._",
+            "_Another clash enters the chronicles; place your calls and side bets in the record._");
 
     private final CombatContestSettings settings;
     private final CombatCandidateRepository candidateRepository;
@@ -72,7 +65,7 @@ public class CombatReplayExecutionService {
             Game game = loadGame(winner.getGameName());
             replaySideBetService.postSideBetButtonsIfNeeded(replayChannel, game, contest, winner);
             markSideBetButtonsPosted(contest, LocalDateTime.now());
-            announcePredictionLockCountdown(replayChannel);
+            announcePredictionLockCountdown(replayChannel, contest);
         } catch (Exception e) {
             BotLogger.error("Failed to post replay context at promotion.", e);
         }
@@ -140,29 +133,56 @@ public class CombatReplayExecutionService {
         replayContestRepository.save(contest);
     }
 
-    private void announcePredictionLockCountdown(MessageChannel channel) {
-        int startDelaySeconds = replayStartDelaySeconds();
+    private void announcePredictionLockCountdown(MessageChannel channel, CombatReplayContestEntity contest) {
+        Duration votingWindow = votingWindowRemaining(contest);
         String title = RandomHelper.pickRandomFromList(PREDICTION_LOCK_TITLES);
         String subtitle = RandomHelper.pickRandomFromList(PREDICTION_LOCK_SUBTITLES);
-        String message = startDelaySeconds <= 0
-                ? "## " + title + "\n" + subtitle + "\nVoting is now open. The combat begins immediately."
-                : "## " + title + "\n" + subtitle + "\nVoting is now open for **"
-                        + formatVotingWindow(startDelaySeconds) + "**.";
+        String message = votingWindow.isZero() || votingWindow.isNegative()
+                ? "## " + title + "\n" + subtitle
+                        + "\nPredictions and side bets are open. The combat begins immediately."
+                : "## " + title + "\n" + subtitle + "\nPredictions and side bets are open for **"
+                        + formatVotingWindow(votingWindow) + "**." + predictionLockTimeText();
         MessageHelper.sendMessageToChannel(channel, message);
     }
 
-    private String formatVotingWindow(int startDelaySeconds) {
-        if (startDelaySeconds < 60) {
-            return startDelaySeconds + " " + (startDelaySeconds == 1 ? "second" : "seconds");
+    private String predictionLockTimeText() {
+        int dailyLockHourCentral = settings.getReplayExecution().getDailyLockHourCentral();
+        if (dailyLockHourCentral < 0) return "";
+        return "\nPredictions and side bets lock at **"
+                + formatCentralLockTime(
+                        dailyLockHourCentral, settings.getReplayExecution().getDailyLockMinuteCentral())
+                + " Central**.";
+    }
+
+    private String formatCentralLockTime(int hour, int minute) {
+        int displayHour = hour % 12;
+        if (displayHour == 0) displayHour = 12;
+        return String.format("%d:%02d %s", displayHour, minute, hour < 12 ? "AM" : "PM");
+    }
+
+    private Duration votingWindowRemaining(CombatReplayContestEntity contest) {
+        if (contest == null || contest.getReplayStartAt() == null) {
+            return Duration.ofSeconds(settings.getReplayExecution().getStartDelaySeconds());
         }
-        if (startDelaySeconds % 60 == 0) {
-            int minutes = startDelaySeconds / 60;
+        return Duration.between(LocalDateTime.now(), contest.getReplayStartAt());
+    }
+
+    private String formatVotingWindow(Duration votingWindow) {
+        long totalSeconds = Math.max(0, votingWindow.toSeconds());
+        if (totalSeconds < 60) {
+            return totalSeconds + " " + (totalSeconds == 1 ? "second" : "seconds");
+        }
+        if (totalSeconds < 3600) {
+            long minutes = (totalSeconds + 59) / 60;
             return minutes + " " + (minutes == 1 ? "minute" : "minutes");
         }
-        int minutes = startDelaySeconds / 60;
-        int seconds = startDelaySeconds % 60;
-        return minutes + " " + (minutes == 1 ? "minute" : "minutes") + " " + seconds + " "
-                + (seconds == 1 ? "second" : "seconds");
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        if (minutes == 0) {
+            return hours + " " + (hours == 1 ? "hour" : "hours");
+        }
+        return hours + " " + (hours == 1 ? "hour" : "hours") + " " + minutes + " "
+                + (minutes == 1 ? "minute" : "minutes");
     }
 
     private void completeReplayContest(CombatReplayContestEntity contest) {
@@ -220,10 +240,6 @@ public class CombatReplayExecutionService {
                 currentEvent,
                 nextEvent,
                 Duration.ofSeconds(settings.getReplayExecution().getMaxEventGapSeconds()));
-    }
-
-    private int replayStartDelaySeconds() {
-        return settings.getReplayExecution().getStartDelaySeconds();
     }
 
     private CombatCandidateEntity loadCandidate(Long candidateId) {

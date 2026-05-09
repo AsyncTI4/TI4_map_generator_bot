@@ -22,8 +22,6 @@ import ti4.spring.context.SpringContext;
 @Setter
 public class CombatContestSettings {
 
-    public static final int PROMOTION_LOOKBACK_FALLBACK_MAX_HOURS = 8;
-
     @Setter(AccessLevel.NONE)
     private boolean isProd;
 
@@ -67,9 +65,13 @@ public class CombatContestSettings {
                 candidateSelection.targetCandidatesPerHour >= 0,
                 "candidateSelection.targetCandidatesPerHour must be >= 0.");
         require(promotion.intervalSeconds > 0, "promotion.intervalSeconds must be > 0.");
-        require(promotion.candidateLookbackHours > 0, "promotion.candidateLookbackHours must be > 0.");
-        require(promotion.maxPromotionsPerHour >= 0, "promotion.maxPromotionsPerHour must be >= 0.");
         require(replayExecution.startDelaySeconds >= 0, "replayExecution.startDelaySeconds must be >= 0.");
+        require(
+                replayExecution.dailyLockHourCentral >= -1 && replayExecution.dailyLockHourCentral <= 23,
+                "replayExecution.dailyLockHourCentral must be between -1 and 23.");
+        require(
+                replayExecution.dailyLockMinuteCentral >= 0 && replayExecution.dailyLockMinuteCentral <= 59,
+                "replayExecution.dailyLockMinuteCentral must be between 0 and 59.");
         require(replayExecution.replayIntervalSeconds > 0, "replayExecution.replayIntervalSeconds must be > 0.");
         require(replayExecution.maxEventGapSeconds >= 0, "replayExecution.maxEventGapSeconds must be >= 0.");
         require(
@@ -144,14 +146,14 @@ public class CombatContestSettings {
     public static class Promotion {
         private boolean enabled;
         private int intervalSeconds = 60;
-        private int candidateLookbackHours = 12;
-        private int maxPromotionsPerHour = 1;
     }
 
     @Getter
     @Setter
     public static class ReplayExecution {
         private int startDelaySeconds = 15 * 60;
+        private int dailyLockHourCentral = -1;
+        private int dailyLockMinuteCentral;
         private int replayIntervalSeconds = 15;
         private int maxEventGapSeconds = 30;
         private int pendingResolutionWindowSeconds = 900;

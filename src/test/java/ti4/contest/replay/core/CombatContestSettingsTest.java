@@ -23,8 +23,12 @@ class CombatContestSettingsTest {
         CombatContestSettings settings = new CombatContestSettings(false);
 
         assertTrue(settings.isProd());
-        assertFalse(settings.isEnabled());
+        assertTrue(settings.isEnabled());
         assertFalse(settings.getRuntime().isDevMode());
+        assertEquals(8, settings.getCandidateSelection().getTargetCandidatesPerHour());
+        assertEquals(86_400, settings.getReplayExecution().getStartDelaySeconds());
+        assertEquals(10, settings.getReplayExecution().getDailyLockHourCentral());
+        assertEquals(0, settings.getReplayExecution().getDailyLockMinuteCentral());
         assertEquals(100, settings.getInitialIndividualPoints());
     }
 

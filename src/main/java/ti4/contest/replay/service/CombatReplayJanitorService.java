@@ -30,23 +30,9 @@ public class CombatReplayJanitorService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime observationCutoff = now.minusDays(settings.getRetention().getObservationRetentionDays());
 
-        expireStaleResolvedCandidates(now);
         observationRepository.deleteAll(observationRepository.findByStartedAtBefore(observationCutoff));
         deleteExpiredCandidateEvents(now);
         clearCompletedReplayErrors();
-    }
-
-    private void expireStaleResolvedCandidates(LocalDateTime now) {
-        int expirationLookbackHours = Math.max(
-                settings.getPromotion().getCandidateLookbackHours(),
-                CombatContestSettings.PROMOTION_LOOKBACK_FALLBACK_MAX_HOURS);
-        List<CombatCandidateEntity> staleCandidates = candidateRepository.findByPromotionStatusAndResolvedAtBefore(
-                CombatCandidatePromotionStatus.PENDING, now.minusHours(expirationLookbackHours));
-        for (CombatCandidateEntity candidate : staleCandidates) {
-            if (candidate.getStatus() != CombatCandidateStatus.RESOLVED) continue;
-            candidate.setPromotionStatus(CombatCandidatePromotionStatus.EXPIRED);
-            candidateRepository.save(candidate);
-        }
     }
 
     private void deleteExpiredCandidateEvents(LocalDateTime now) {
@@ -75,6 +61,7 @@ public class CombatReplayJanitorService {
         for (CombatCandidateEventEntity event : oldEvents) {
             CombatCandidateEntity candidate = candidatesById.get(event.getCandidateId());
             if (candidate == null || candidate.getStatus() == CombatCandidateStatus.TRACKING) continue;
+            if (candidate.getPromotionStatus() == CombatCandidatePromotionStatus.PENDING) continue;
 
             if (!isPastRetentionCutoff(candidate, retentionCutoff)) {
                 continue;

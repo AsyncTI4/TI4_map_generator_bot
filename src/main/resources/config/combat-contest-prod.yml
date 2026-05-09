@@ -1,19 +1,19 @@
-enabled: false
+enabled: true
 
 candidateSelection:
   window:
     lookbackMinutes: 480
     refreshCronIntervalSeconds: 300
-  targetCandidatesPerHour: 4
+  targetCandidatesPerHour: 8
 
 promotion:
   enabled: true
-  intervalSeconds: 60
-  candidateLookbackHours: 12
-  maxPromotionsPerHour: 1
+  intervalSeconds: 5
 
 replayExecution:
-  startDelaySeconds: 900
+  startDelaySeconds: 86400
+  dailyLockHourCentral: 10
+  dailyLockMinuteCentral: 0
   replayIntervalSeconds: 15
   maxEventGapSeconds: 30
   pendingResolutionWindowSeconds: 900
