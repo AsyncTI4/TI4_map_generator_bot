@@ -15,11 +15,7 @@ class CombatContestSettingsTest {
         assertFalse(settings.isProd());
         assertTrue(settings.isEnabled());
         assertTrue(settings.getRuntime().isDevMode());
-        assertEquals(60, settings.getReplayExecution().getDiscussionWindowSeconds());
-        assertEquals(60, settings.getReplayExecution().getSideBetWindowSeconds());
-        assertEquals(15, settings.getHouseAbilities().getMentak().getPreviewLeadSeconds());
-        assertEquals(1, settings.getHouseAbilities().getMinimumAbilityVotesToResolve());
-        assertEquals(100, settings.getHouseAbilities().getInitialIndividualPoints());
+        assertEquals(100, settings.getInitialIndividualPoints());
     }
 
     @Test
@@ -29,11 +25,7 @@ class CombatContestSettingsTest {
         assertTrue(settings.isProd());
         assertFalse(settings.isEnabled());
         assertFalse(settings.getRuntime().isDevMode());
-        assertEquals(900, settings.getReplayExecution().getDiscussionWindowSeconds());
-        assertEquals(600, settings.getReplayExecution().getSideBetWindowSeconds());
-        assertEquals(900, settings.getHouseAbilities().getMentak().getPreviewLeadSeconds());
-        assertEquals(3, settings.getHouseAbilities().getMinimumAbilityVotesToResolve());
-        assertEquals(100, settings.getHouseAbilities().getInitialIndividualPoints());
+        assertEquals(100, settings.getInitialIndividualPoints());
     }
 
     @Test
@@ -43,10 +35,6 @@ class CombatContestSettingsTest {
         assertFalse(settings.isProd());
         assertTrue(settings.isEnabled());
         assertTrue(settings.getRuntime().isDevMode());
-        assertEquals(60, settings.getReplayExecution().getDiscussionWindowSeconds());
-        assertEquals(60, settings.getReplayExecution().getSideBetWindowSeconds());
-        assertEquals(15, settings.getHouseAbilities().getMentak().getPreviewLeadSeconds());
-        assertEquals(1, settings.getHouseAbilities().getMinimumAbilityVotesToResolve());
-        assertEquals(100, settings.getHouseAbilities().getInitialIndividualPoints());
+        assertEquals(100, settings.getInitialIndividualPoints());
     }
 }

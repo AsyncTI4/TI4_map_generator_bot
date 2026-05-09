@@ -37,8 +37,6 @@ import ti4.service.combat.CombatUnitSelectionHelper;
 @RequiredArgsConstructor
 public class CombatReplaySideBetPayoutService {
 
-    public static final String ODDS_V1 = "ODDS_V1";
-
     private final CombatContestSettings settings;
 
     public int offeredPayout(
@@ -46,11 +44,10 @@ public class CombatReplaySideBetPayoutService {
             CombatCandidateEntity candidate,
             CombatSideBetType betType,
             String targetFaction) {
-        if (!ODDS_V1.equalsIgnoreCase(contest.getSideBetPayoutModel())
-                || (betType != CombatSideBetType.AFB_WHIFF
-                        && betType != CombatSideBetType.ROUND_ONE_WHIFF
-                        && betType != CombatSideBetType.ROUND_ONE_SLAM
-                        && betType != CombatSideBetType.WINNER_ONE_HP)) {
+        if (betType != CombatSideBetType.AFB_WHIFF
+                && betType != CombatSideBetType.ROUND_ONE_WHIFF
+                && betType != CombatSideBetType.ROUND_ONE_SLAM
+                && betType != CombatSideBetType.WINNER_ONE_HP) {
             return fixedPayout(betType);
         }
 
@@ -77,8 +74,7 @@ public class CombatReplaySideBetPayoutService {
     }
 
     public int resolvedProfitPoints(CombatContestSideBetEntity sideBet) {
-        Integer offeredProfitPoints = sideBet.getOfferedProfitPoints();
-        return offeredProfitPoints == null ? sideBet.getBetType().profitPoints() : offeredProfitPoints;
+        return sideBet.getOfferedProfitPoints();
     }
 
     public boolean hasAfbUnits(CombatCandidateEntity candidate, String targetFaction) {

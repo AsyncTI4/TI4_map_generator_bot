@@ -150,8 +150,7 @@ public class CombatReplayDebugController {
                 settings.getPromotion().isEnabled(),
                 settings.getRuntime().isDevMode(),
                 settings.getRuntime().isTrackAllCombatsAsCandidates(),
-                settings.getRuntime().isImmediatePromotionOnResolve(),
-                settings.isDecoysEnabled());
+                settings.getRuntime().isImmediatePromotionOnResolve());
     }
 
     private CandidateSummary toCandidateSummary(CombatCandidateEntity candidate) {
@@ -201,8 +200,7 @@ public class CombatReplayDebugController {
             boolean promotionEnabled,
             boolean devMode,
             boolean trackAllCombatsAsCandidates,
-            boolean immediatePromotionOnResolve,
-            boolean decoysEnabled) {}
+            boolean immediatePromotionOnResolve) {}
 
     private record CandidateListResponse(RuntimeStateResponse runtime, List<CandidateSummary> candidates) {}
 

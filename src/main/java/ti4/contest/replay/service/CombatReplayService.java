@@ -18,7 +18,6 @@ import ti4.contest.replay.core.CombatCandidateEventType;
 import ti4.contest.replay.core.CombatCandidatePromotionStatus;
 import ti4.contest.replay.core.CombatCandidateStatus;
 import ti4.contest.replay.core.CombatContestSettings;
-import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.core.CombatReplaySelection;
 import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.core.CombatRollPayload;
@@ -568,7 +567,6 @@ public class CombatReplayService {
 
         candidate.setPreReplayContextText(snapshot.preReplayContextText());
         candidate.setInitialRenderSnapshotJson(snapshot.initialRenderSnapshotJson());
-        candidate.setReplayAbilitiesJson(snapshot.replayAbilitiesJson());
         candidate.setAttackerDestroyerCount(snapshot.attackerDestroyerCount());
         candidate.setDefenderDestroyerCount(snapshot.defenderDestroyerCount());
         candidate.setAttackerHasAssaultCannon(snapshot.attackerHasAssaultCannon());
@@ -595,12 +593,9 @@ public class CombatReplayService {
         LazaxCombatSupport.SpaceCombatSnapshot combatSnapshot =
                 LazaxCombatSupport.buildSpaceCombatSnapshot(game, attacker, defender, tile);
         if (combatSnapshot == null) return null;
-        String replayAbilitiesJson = CombatReplayDecoys.buildJson(attacker, defender, tile, settings.isDecoysEnabled());
         return new CandidateInitialSnapshot(
-                LazaxCombatSupport.formatCombatTechSummary(
-                        tile, attacker, defender, CombatReplayDecoys.read(replayAbilitiesJson)),
+                LazaxCombatSupport.formatCombatTechSummary(tile, attacker, defender),
                 CombatReplayTileRenderer.captureInitialSnapshot(game, tile.getPosition()),
-                replayAbilitiesJson,
                 countDestroyersInCombat(tile, attacker),
                 countDestroyersInCombat(tile, defender),
                 hasAssaultCannon(attacker),
@@ -1059,7 +1054,6 @@ public class CombatReplayService {
     public record CandidateInitialSnapshot(
             String preReplayContextText,
             String initialRenderSnapshotJson,
-            String replayAbilitiesJson,
             int attackerDestroyerCount,
             int defenderDestroyerCount,
             boolean attackerHasAssaultCannon,
