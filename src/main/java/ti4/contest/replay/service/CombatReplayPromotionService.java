@@ -20,15 +20,11 @@ import ti4.contest.replay.core.CombatCandidatePromotionStatus;
 import ti4.contest.replay.core.CombatCandidateStatus;
 import ti4.contest.replay.core.CombatContestReplayStatus;
 import ti4.contest.replay.core.CombatContestSettings;
-import ti4.contest.replay.core.CombatReplayDecoys;
-import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.core.LazaxCombatSupport;
 import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatObservationEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
-import ti4.contest.replay.house.hacan.CombatReplayHacanTradeConvoysService;
-import ti4.contest.replay.house.mentak.CombatReplayMentakAbilityService;
 import ti4.contest.replay.repository.CombatCandidateRepository;
 import ti4.contest.replay.repository.CombatObservationRepository;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
@@ -51,9 +47,6 @@ public class CombatReplayPromotionService {
     private final CombatObservationRepository observationRepository;
     private final CombatReplayContestRepository replayContestRepository;
     private final CombatReplayLeaderboardService replayLeaderboardService;
-    private final CombatReplayHacanTradeConvoysService hacanTradeConvoysService;
-    private final CombatReplayMentakAbilityService mentakAbilityService;
-    private final CombatReplayHouseService houseService;
     private final CombatReplayExecutionService replayExecutionService;
     private final CombatReplayDiscordPostService discordPostService;
     private Clock clock = Clock.systemDefaultZone();
@@ -71,18 +64,6 @@ public class CombatReplayPromotionService {
 
         int maxPromotionsPerHour = settings.getPromotion().getMaxPromotionsPerHour();
         if (maxPromotionsPerHour <= 0) return;
-
-        if (usesMentakPreviewFlow()) {
-            if (settings.getRuntime().isDevMode()) {
-                postMentakPreviewIfDue(now);
-                promoteMentakPreviewedCandidateIfDue(now);
-                return;
-            }
-
-            postProductionMentakPreviewIfDue(now);
-            promoteMentakPreviewedCandidateIfDue(now);
-            return;
-        }
 
         LocalDateTime publicPromotionWindow = now.truncatedTo(ChronoUnit.MINUTES);
         if (publicPromotionWindow.getMinute() != 0) return;
@@ -114,7 +95,7 @@ public class CombatReplayPromotionService {
         }
         if (!usesCurrentReplaySnapshotFormat(candidate)) {
             return CombatReplayContestLifecycleService.ForcePromoteResult.rejected(
-                    "Candidate uses the old replay snapshot format");
+                    "Candidate is missing a renderable replay snapshot");
         }
         if (expireIfDiscordantStars(candidate)) {
             return CombatReplayContestLifecycleService.ForcePromoteResult.rejected(
@@ -123,22 +104,9 @@ public class CombatReplayPromotionService {
 
         CombatReplayContestEntity existingContest =
                 replayContestRepository.findByCandidateId(candidateId).orElse(null);
-        if (existingContest != null
-                && existingContest.getReplayStatus() != CombatContestReplayStatus.COMPLETED
-                && existingContest.getReplayStatus() != CombatContestReplayStatus.PREVIEW) {
+        if (existingContest != null && existingContest.getReplayStatus() != CombatContestReplayStatus.COMPLETED) {
             return CombatReplayContestLifecycleService.ForcePromoteResult.rejected(
                     "Candidate already has an active replay contest", existingContest);
-        }
-
-        if (usesMentakPreviewFlow()) {
-            if (isMentakPreviewReadyForPublicPromotion(candidate, LocalDateTime.now(clock))) {
-                CombatReplayContestEntity contest = promoteCandidate(candidate, existingContest);
-                if (contest == null) {
-                    return CombatReplayContestLifecycleService.ForcePromoteResult.rejected("Promotion failed");
-                }
-                return CombatReplayContestLifecycleService.ForcePromoteResult.promoted(contest);
-            }
-            return forceMentakPreviewCandidate(candidate, existingContest);
         }
 
         CombatReplayContestEntity contest = promoteCandidate(candidate, existingContest);
@@ -146,21 +114,6 @@ public class CombatReplayPromotionService {
             return CombatReplayContestLifecycleService.ForcePromoteResult.rejected("Promotion failed");
         }
         return CombatReplayContestLifecycleService.ForcePromoteResult.promoted(contest);
-    }
-
-    private CombatReplayContestLifecycleService.ForcePromoteResult forceMentakPreviewCandidate(
-            CombatCandidateEntity candidate, CombatReplayContestEntity existingContest) {
-        if (candidate.getMentakPreviewPostedAt() != null) {
-            return CombatReplayContestLifecycleService.ForcePromoteResult.rejected(
-                    "Mentak preview window is still open.", existingContest);
-        }
-
-        CombatReplayContestEntity contest = postMentakPreview(candidate);
-        if (contest == null) {
-            return CombatReplayContestLifecycleService.ForcePromoteResult.rejected("Mentak preview failed.");
-        }
-        return CombatReplayContestLifecycleService.ForcePromoteResult.rejected(
-                "Mentak preview posted. Public promotion will be available after the preview window.", contest);
     }
 
     private List<CombatCandidateEntity> findPromotionCandidates(LocalDateTime now) {
@@ -198,11 +151,8 @@ public class CombatReplayPromotionService {
         Game game = loadGame(winner.getGameName());
         if (game == null) return null;
 
-        mentakAbilityService.resolveVoteIfNeeded(winner);
-
         String startSummaryText = snapshotStartSummaryText(winner);
-        String message = LazaxCombatSupport.formatReplayAnnouncement(
-                game, winner, discordPostService.getHouseRoleMentions(), startSummaryText);
+        String message = LazaxCombatSupport.formatReplayAnnouncement(game, winner, "", startSummaryText);
 
         TextChannel contestChannel = discordPostService.getContestChannel();
         if (contestChannel == null) return null;
@@ -210,66 +160,16 @@ public class CombatReplayPromotionService {
         try {
             LocalDateTime promotedAt = LocalDateTime.now(clock);
             Message posted = discordPostService.postPromotionMessage(contestChannel, message, game, winner);
-            houseService.postPublicParticipationControls(contestChannel);
             ThreadChannel thread = discordPostService.createReplayThread(posted, winner);
             CombatReplayContestEntity contest =
                     persistPromotedReplayContest(winner, promotedAt, contestChannel, posted, thread, existingContest);
             addPredictionReactions(game, winner, posted);
-            mentakAbilityService.postPredictionOverrideButtons(game, contest, winner);
             replayExecutionService.postPromotionContext(thread != null ? thread : contestChannel, contest, winner);
             return contest;
         } catch (Exception e) {
             BotLogger.error("Replay contest promotion failed.", e);
             return null;
         }
-    }
-
-    private void postMentakPreviewIfDue(LocalDateTime now) {
-        List<CombatCandidateEntity> candidates = findPromotionCandidates(now);
-        if (candidates.stream().anyMatch(candidate -> candidate.getMentakPreviewPostedAt() != null)) return;
-        for (CombatCandidateEntity candidate : rankPromotionCandidates(candidates)) {
-            if (postMentakPreview(candidate) != null) return;
-            BotLogger.error("Mentak preview skipped for candidate " + candidate.getId() + " because posting failed.");
-        }
-    }
-
-    private void postProductionMentakPreviewIfDue(LocalDateTime now) {
-        int previewLeadSeconds = settings.getHouseAbilities().getMentak().getPreviewLeadSeconds();
-        LocalDateTime nextPublicPromotion = now.truncatedTo(ChronoUnit.HOURS).plusHours(1);
-        if (!isMentakPreviewWindow(now, nextPublicPromotion, previewLeadSeconds)) return;
-        if (!canPublicPromoteAt(nextPublicPromotion)) return;
-        postMentakPreviewIfDue(now);
-    }
-
-    private boolean isMentakPreviewWindow(
-            LocalDateTime now, LocalDateTime publicPromotionWindow, int previewLeadSeconds) {
-        long secondsUntilPromotion =
-                Duration.between(now, publicPromotionWindow).toSeconds();
-        return secondsUntilPromotion >= 0 && secondsUntilPromotion <= previewLeadSeconds;
-    }
-
-    private void promoteMentakPreviewedCandidateIfDue(LocalDateTime now) {
-        LocalDateTime publicPromotionWindow = mentakPublicPromotionWindow(now);
-        if (!canPublicPromoteAt(publicPromotionWindow)) return;
-        List<CombatCandidateEntity> candidates = rankPromotionCandidates(findPromotionCandidates(now).stream()
-                .filter(candidate -> isMentakPreviewReadyForPublicPromotion(candidate, now))
-                .toList());
-        for (CombatCandidateEntity candidate : candidates) {
-            if (promoteCandidate(candidate) != null) return;
-            BotLogger.error("Mentak preview promotion skipped for candidate " + candidate.getId()
-                    + " because public promotion failed.");
-        }
-    }
-
-    private LocalDateTime mentakPublicPromotionWindow(LocalDateTime now) {
-        LocalDateTime truncatedNow = now.truncatedTo(ChronoUnit.MINUTES);
-        if (settings.getRuntime().isDevMode()) return truncatedNow;
-        return truncatedNow.truncatedTo(ChronoUnit.HOURS);
-    }
-
-    private boolean usesMentakPreviewFlow() {
-        return settings.isHousesEnabled()
-                && settings.getHouseAbilities().getMentak().getPreviewLeadSeconds() > 0;
     }
 
     private boolean canPublicPromoteAt(LocalDateTime publicPromotionWindow) {
@@ -283,50 +183,6 @@ public class CombatReplayPromotionService {
         return replayContestRepository.countByPostedAtGreaterThanEqual(
                         publicPromotionWindow.truncatedTo(ChronoUnit.HOURS))
                 < settings.getPromotion().getMaxPromotionsPerHour();
-    }
-
-    private boolean isMentakPreviewReadyForPublicPromotion(CombatCandidateEntity candidate, LocalDateTime now) {
-        if (candidate == null || candidate.getMentakPreviewPostedAt() == null) return false;
-        int previewLeadSeconds = settings.getHouseAbilities().getMentak().getPreviewLeadSeconds();
-        return !candidate
-                .getMentakPreviewPostedAt()
-                .plusSeconds(previewLeadSeconds)
-                .isAfter(now);
-    }
-
-    private CombatReplayContestEntity postMentakPreview(CombatCandidateEntity candidate) {
-        try {
-            if (expireIfDiscordantStars(candidate)) return null;
-
-            CombatObservationEntity observation =
-                    observationRepository.findById(candidate.getObservationId()).orElse(null);
-            Game game = loadGame(candidate.getGameName());
-            TextChannel channel = discordPostService.houseChannel(CombatReplayHouse.MENTAK);
-            if (observation == null || game == null || channel == null) return null;
-
-            CombatReplayContestEntity previewContest = createPreviewContest(candidate);
-
-            String startSummaryText = snapshotStartSummaryText(candidate);
-            String message = LazaxCombatSupport.formatReplayAnnouncement(
-                    game,
-                    candidate,
-                    discordPostService.getHouseRoleMention(CombatReplayHouse.MENTAK),
-                    startSummaryText);
-            Message posted = discordPostService.postPromotionMessage(channel, message, game, candidate);
-            ThreadChannel thread = discordPostService.createReplayThread(posted, candidate);
-            previewContest.setPublicChannelId(channel.getIdLong());
-            previewContest.setPublicMessageId(posted.getIdLong());
-            previewContest.setPublicThreadId(thread == null ? null : thread.getIdLong());
-            replayContestRepository.save(previewContest);
-            replayExecutionService.postPreviewContext(thread != null ? thread : channel, previewContest, candidate);
-            mentakAbilityService.postDecoyButtons(channel, candidate);
-            candidate.setMentakPreviewPostedAt(LocalDateTime.now(clock));
-            candidateRepository.save(candidate);
-            return previewContest;
-        } catch (Exception e) {
-            BotLogger.error("Failed to post Mentak combat replay preview.", e);
-            return null;
-        }
     }
 
     void setClock(Clock clock) {
@@ -347,9 +203,6 @@ public class CombatReplayPromotionService {
         Player defender = snapshotGame.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
         Tile tile = snapshotGame.getTileByPosition(candidate.getTilePosition());
         if (attacker == null || defender == null || tile == null) return null;
-        CombatReplayDecoys.applyToTile(
-                snapshotGame, candidate.getTilePosition(), CombatReplayDecoys.read(candidate.getReplayAbilitiesJson()));
-
         LazaxCombatSupport.SpaceCombatSnapshot snapshot =
                 LazaxCombatSupport.buildSpaceCombatSnapshot(snapshotGame, attacker, defender, tile);
         return snapshot == null ? null : snapshot.replaySummaryText();
@@ -389,10 +242,6 @@ public class CombatReplayPromotionService {
     private List<CombatCandidateEntity> rankPromotionCandidates(List<CombatCandidateEntity> candidates) {
         Map<Long, Double> jointScoresByObservationId = loadJointScores(candidates);
         Comparator<CombatCandidateEntity> comparator = candidateComparator(jointScoresByObservationId);
-        List<CombatCandidateEntity> previewedCandidates = candidates.stream()
-                .filter(candidate -> candidate.getMentakPreviewPostedAt() != null)
-                .toList();
-        if (!previewedCandidates.isEmpty()) candidates = previewedCandidates;
         return candidates.stream()
                 .filter(candidate -> candidate.getResolvedAt() != null)
                 .sorted(comparator.reversed())
@@ -447,19 +296,6 @@ public class CombatReplayPromotionService {
         return savedContest;
     }
 
-    private CombatReplayContestEntity createPreviewContest(CombatCandidateEntity candidate) {
-        CombatReplayContestEntity existingContest =
-                replayContestRepository.findByCandidateId(candidate.getId()).orElse(null);
-        if (existingContest != null) return existingContest;
-
-        CombatReplayContestEntity contest = new CombatReplayContestEntity();
-        contest.setCandidateId(candidate.getId());
-        contest.setReplayStatus(CombatContestReplayStatus.PREVIEW);
-        contest.setNextEventSequence(1);
-        contest.setSideBetPayoutModel(CombatReplaySideBetPayoutService.ODDS_V1);
-        return replayContestRepository.saveAndFlush(contest);
-    }
-
     private CombatReplayContestEntity resetReplayContest(
             CombatReplayContestEntity existingContest,
             CombatCandidateEntity winner,
@@ -472,7 +308,7 @@ public class CombatReplayPromotionService {
         existingContest.setPreReplayContextPostedAt(null);
         existingContest.setLeaderboardPostedAt(null);
         existingContest.setSideBetSummaryMessageId(null);
-        existingContest.setSideBetMarketPostedAt(null);
+        existingContest.setSideBetButtonsPostedAt(null);
         existingContest.setReplayError(null);
         replayLeaderboardService.clearLockedPredictions(existingContest.getId());
         return existingContest;
@@ -486,7 +322,6 @@ public class CombatReplayPromotionService {
             LocalDateTime promotedAt) {
         CombatReplayContestEntity contest = new CombatReplayContestEntity();
         configureReplayContest(contest, winner, publicChannelId, publicMessageId, publicThreadId, promotedAt);
-        contest.setSideBetPayoutModel(CombatReplaySideBetPayoutService.ODDS_V1);
         return contest;
     }
 
@@ -510,9 +345,7 @@ public class CombatReplayPromotionService {
     }
 
     private int replayStartDelaySeconds() {
-        if (!settings.isHousesEnabled()) return settings.getReplayExecution().getStartDelaySeconds();
-        return settings.getReplayExecution().getDiscussionWindowSeconds()
-                + settings.getReplayExecution().getSideBetWindowSeconds();
+        return settings.getReplayExecution().getStartDelaySeconds();
     }
 
     private Game loadGame(String gameName) {

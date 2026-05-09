@@ -34,9 +34,7 @@ public class CombatContestSettings {
     private Retention retention = new Retention();
     private Runtime runtime = new Runtime();
     private SideBets sideBets = new SideBets();
-    private boolean decoysEnabled;
-    private HouseAbilities houseAbilities = new HouseAbilities();
-    private boolean housesEnabled = true;
+    private int initialIndividualPoints = 100;
 
     public CombatContestSettings() {
         loadEnvironmentDefaults(false);
@@ -58,21 +56,7 @@ public class CombatContestSettings {
         require(retention != null, "retention is required.");
         require(runtime != null, "runtime is required.");
         require(sideBets != null, "sideBets is required.");
-        require(houseAbilities != null, "houseAbilities is required.");
-        require(houseAbilities.naalu != null, "houseAbilities.naalu is required.");
-        require(houseAbilities.mentak != null, "houseAbilities.mentak is required.");
-        require(houseAbilities.hacan != null, "houseAbilities.hacan is required.");
-        require(
-                houseAbilities.minimumAbilityVotesToResolve > 0,
-                "houseAbilities.minimumAbilityVotesToResolve must be > 0.");
-        require(houseAbilities.baseCombatFavorGain >= 0, "houseAbilities.baseCombatFavorGain must be >= 0.");
-        require(houseAbilities.initialHousePoints >= 0, "houseAbilities.initialHousePoints must be >= 0.");
-        require(houseAbilities.initialIndividualPoints >= 0, "houseAbilities.initialIndividualPoints must be >= 0.");
-        require(
-                houseAbilities.catchupFavorPointsPerBonus > 0,
-                "houseAbilities.catchupFavorPointsPerBonus must be > 0.");
-        require(houseAbilities.catchupFavorBonusStep >= 0, "houseAbilities.catchupFavorBonusStep must be >= 0.");
-        require(houseAbilities.maxCatchupFavorBonus >= 0, "houseAbilities.maxCatchupFavorBonus must be >= 0.");
+        require(initialIndividualPoints >= 0, "initialIndividualPoints must be >= 0.");
         require(
                 candidateSelection.window.lookbackMinutes > 0,
                 "candidateSelection.window.lookbackMinutes must be > 0.");
@@ -86,8 +70,6 @@ public class CombatContestSettings {
         require(promotion.candidateLookbackHours > 0, "promotion.candidateLookbackHours must be > 0.");
         require(promotion.maxPromotionsPerHour >= 0, "promotion.maxPromotionsPerHour must be >= 0.");
         require(replayExecution.startDelaySeconds >= 0, "replayExecution.startDelaySeconds must be >= 0.");
-        require(replayExecution.discussionWindowSeconds >= 0, "replayExecution.discussionWindowSeconds must be >= 0.");
-        require(replayExecution.sideBetWindowSeconds >= 0, "replayExecution.sideBetWindowSeconds must be >= 0.");
         require(replayExecution.replayIntervalSeconds > 0, "replayExecution.replayIntervalSeconds must be > 0.");
         require(replayExecution.maxEventGapSeconds >= 0, "replayExecution.maxEventGapSeconds must be >= 0.");
         require(
@@ -105,68 +87,6 @@ public class CombatContestSettings {
         require(
                 sideBets.dynamicPayoutTiers != null && !sideBets.dynamicPayoutTiers.isBlank(),
                 "sideBets.dynamicPayoutTiers is required.");
-        require(
-                houseAbilities.naalu.actionCardPeekFavorCost >= 0,
-                "houseAbilities.naalu.actionCardPeekFavorCost must be >= 0.");
-        require(
-                houseAbilities.naalu.roundOneRollPeekFavorCost >= 0,
-                "houseAbilities.naalu.roundOneRollPeekFavorCost must be >= 0.");
-        require(houseAbilities.naalu.luckOmensFavorCost >= 0, "houseAbilities.naalu.luckOmensFavorCost must be >= 0.");
-        require(
-                houseAbilities.mentak.previewLeadSeconds >= 0,
-                "houseAbilities.mentak.previewLeadSeconds must be >= 0.");
-        require(
-                houseAbilities.mentak.destroyerDecoyFavorCost >= 0,
-                "houseAbilities.mentak.destroyerDecoyFavorCost must be >= 0.");
-        require(
-                houseAbilities.mentak.cruiserDecoyFavorCost >= 0,
-                "houseAbilities.mentak.cruiserDecoyFavorCost must be >= 0.");
-        require(
-                houseAbilities.mentak.dreadnoughtDecoyFavorCost >= 0,
-                "houseAbilities.mentak.dreadnoughtDecoyFavorCost must be >= 0.");
-        require(
-                houseAbilities.mentak.warSunDecoyFavorCost >= 0,
-                "houseAbilities.mentak.warSunDecoyFavorCost must be >= 0.");
-        require(
-                houseAbilities.hacan.maxSubsidiesPerContest >= 0,
-                "houseAbilities.hacan.maxSubsidiesPerContest must be >= 0.");
-        require(houseAbilities.hacan.subsidyFavorOnHit >= 0, "houseAbilities.hacan.subsidyFavorOnHit must be >= 0.");
-        require(
-                houseAbilities.hacan.baseCombatFavorGain >= 0,
-                "houseAbilities.hacan.baseCombatFavorGain must be >= 0.");
-        require(
-                houseAbilities.hacan.marketMakerPointsPerBet >= 0,
-                "houseAbilities.hacan.marketMakerPointsPerBet must be >= 0.");
-        require(
-                houseAbilities.hacan.lowTradeConvoysFavorCost >= 0,
-                "houseAbilities.hacan.lowTradeConvoysFavorCost must be >= 0.");
-        require(
-                houseAbilities.hacan.lowTradeConvoysPredictionBonus >= 0,
-                "houseAbilities.hacan.lowTradeConvoysPredictionBonus must be >= 0.");
-        require(
-                houseAbilities.hacan.mediumTradeConvoysFavorCost >= 0,
-                "houseAbilities.hacan.mediumTradeConvoysFavorCost must be >= 0.");
-        require(
-                houseAbilities.hacan.mediumTradeConvoysPredictionBonus >= 0,
-                "houseAbilities.hacan.mediumTradeConvoysPredictionBonus must be >= 0.");
-        require(
-                houseAbilities.hacan.highTradeConvoysFavorCost >= 0,
-                "houseAbilities.hacan.highTradeConvoysFavorCost must be >= 0.");
-        require(
-                houseAbilities.hacan.highTradeConvoysPredictionBonus >= 0,
-                "houseAbilities.hacan.highTradeConvoysPredictionBonus must be >= 0.");
-        require(
-                houseAbilities.hacan.veryHighTradeConvoysFavorCost >= 0,
-                "houseAbilities.hacan.veryHighTradeConvoysFavorCost must be >= 0.");
-        require(
-                houseAbilities.hacan.veryHighTradeConvoysPredictionBonus >= 0,
-                "houseAbilities.hacan.veryHighTradeConvoysPredictionBonus must be >= 0.");
-        require(
-                houseAbilities.hacan.maximumTradeConvoysFavorCost >= 0,
-                "houseAbilities.hacan.maximumTradeConvoysFavorCost must be >= 0.");
-        require(
-                houseAbilities.hacan.maximumTradeConvoysPredictionBonus >= 0,
-                "houseAbilities.hacan.maximumTradeConvoysPredictionBonus must be >= 0.");
     }
 
     private void require(boolean condition, String message) {
@@ -232,8 +152,6 @@ public class CombatContestSettings {
     @Setter
     public static class ReplayExecution {
         private int startDelaySeconds = 15 * 60;
-        private int discussionWindowSeconds = 5 * 60;
-        private int sideBetWindowSeconds = 10 * 60;
         private int replayIntervalSeconds = 15;
         private int maxEventGapSeconds = 30;
         private int pendingResolutionWindowSeconds = 900;
@@ -266,57 +184,5 @@ public class CombatContestSettings {
         private double roundOneSlamSelectionBias = 3.0;
         private double winnerOneHpPayoutMultiplier = 0.75;
         private String dynamicPayoutTiers = "0.20:4,0.10:5,0.05:8,0.025:12,0.01:20,0.005:30";
-    }
-
-    @Getter
-    @Setter
-    public static class HouseAbilities {
-        private Naalu naalu = new Naalu();
-        private Mentak mentak = new Mentak();
-        private Hacan hacan = new Hacan();
-        private int minimumAbilityVotesToResolve = 3;
-        private int baseCombatFavorGain = 10;
-        private int initialHousePoints = 1000;
-        private int initialIndividualPoints = 100;
-        private int catchupFavorPointsPerBonus = 100;
-        private int catchupFavorBonusStep;
-        private int maxCatchupFavorBonus;
-    }
-
-    @Getter
-    @Setter
-    public static class Naalu {
-        private int actionCardPeekFavorCost = 30;
-        private int roundOneRollPeekFavorCost = 50;
-        private int luckOmensFavorCost = 40;
-    }
-
-    @Getter
-    @Setter
-    public static class Mentak {
-        private int previewLeadSeconds = 5 * 60;
-        private int destroyerDecoyFavorCost = 20;
-        private int cruiserDecoyFavorCost = 30;
-        private int dreadnoughtDecoyFavorCost = 40;
-        private int warSunDecoyFavorCost = 70;
-    }
-
-    @Getter
-    @Setter
-    public static class Hacan {
-        private int maxSubsidiesPerContest = 2;
-        private int subsidyFavorOnHit = 10;
-        private int baseCombatFavorGain = 20;
-        private int marketMakerPointsPerBet = 2;
-        private int lowTradeConvoysFavorCost = 10;
-        private int lowTradeConvoysPredictionBonus = 9;
-        private int mediumTradeConvoysFavorCost = 20;
-        private int mediumTradeConvoysPredictionBonus = 14;
-        private int highTradeConvoysFavorCost = 30;
-        private int highTradeConvoysPredictionBonus = 19;
-        private int veryHighTradeConvoysFavorCost = 40;
-        private int veryHighTradeConvoysPredictionBonus = 25;
-        private int maximumTradeConvoysFavorCost = 50;
-        private int maximumTradeConvoysPredictionBonus = 31;
     }
 }

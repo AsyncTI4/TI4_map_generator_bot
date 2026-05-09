@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.contest.replay.core.CombatContestSettings;
-import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.ArvaxiCommanderHandler;
@@ -363,17 +362,8 @@ public class StartCombatService {
         if (CombatContestSettings.isEnabledStatic() && (amount > 2 || tile.getNumberOfUnitsInSystem() > 2)) {
             MessageHelper.sendMessageToChannel(
                     threadChannel,
-                    CombatReplayDecoys.appendDebugDecoySummary(
-                            ButtonHelper.getCombatTileSummaryMessage(
-                                    game,
-                                    tile,
-                                    player1,
-                                    event,
-                                    spaceOrGround,
-                                    unitHolderName,
-                                    List.of(player1, player2)),
-                            game,
-                            tile));
+                    ButtonHelper.getCombatTileSummaryMessage(
+                            game, tile, player1, event, spaceOrGround, unitHolderName, List.of(player1, player2)));
         }
 
         // Space Cannon Offense
