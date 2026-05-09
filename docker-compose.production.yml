@@ -17,6 +17,8 @@ services:
     image: ${IMAGE_REPOSITORY:-ghcr.io/asyncti4/ti4-map-generator-bot}:${IMAGE_TAG:-master}
     restart: unless-stopped
     mem_limit: 7g
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ${HOST_TI4_SAVES_DIR}:/opt/STORAGE
       - ${HOST_TI4_REPO_DIR}/src/main/resources:/opt/resources:ro
@@ -36,6 +38,11 @@ services:
       ROLLBAR_ACCESS_TOKEN: ${ROLLBAR_ACCESS_TOKEN}
       ROLLBAR_CODE_VERSION: ${ROLLBAR_CODE_VERSION}
       ROLLBAR_ENVIRONMENT: ${ROLLBAR_ENVIRONMENT}
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:postgresql://host.docker.internal:5432/tibot}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-tibot}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_FLYWAY_ENABLED: ${SPRING_FLYWAY_ENABLED:-true}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO:-validate}
       TI4_ULTIMATE_STATISTICS_API_KEY: ${TI4_ULTIMATE_STATISTICS_API_KEY}
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:8081/api/public/ping >/dev/null 2>&1"]

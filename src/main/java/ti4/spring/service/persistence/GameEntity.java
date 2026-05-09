@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
@@ -18,7 +19,17 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "game")
+@Table(
+        name = "game",
+        indexes = {
+            @Index(name = "idx_game_ended_at", columnList = "ended_epoch_milliseconds"),
+            @Index(
+                    name = "idx_game_completed_six_player_non_alliance",
+                    columnList = "is_completed, is_alliance_mode, player_count, is_twilight_imperium_global_league"),
+            @Index(
+                    name = "idx_game_active_tigl",
+                    columnList = "is_twilight_imperium_global_league, ended_epoch_milliseconds")
+        })
 public class GameEntity {
 
     @Id

@@ -9,4 +9,6 @@ node_modules
 src/main/resources/**
 !src/main/resources/config/
 !src/main/resources/config/application.yml
+!src/main/resources/db/
+!src/main/resources/db/**
 !src/main/resources/logback.xml

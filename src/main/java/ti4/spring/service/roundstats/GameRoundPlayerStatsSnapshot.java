@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @IdClass(GameRoundPlayerStatsSnapshotId.class)
-@Table(name = "game_round_player_stats_snapshot")
+@Table(
+        name = "game_round_player_stats_snapshot",
+        indexes = @Index(name = "idx_game_round_player_stats_snapshot_game_undo", columnList = "game_id, undo_index"))
 public class GameRoundPlayerStatsSnapshot {
 
     @Id

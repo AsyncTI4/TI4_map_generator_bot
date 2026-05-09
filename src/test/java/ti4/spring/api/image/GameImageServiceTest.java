@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import ti4.game.persistence.GameManager;
+import ti4.service.persistence.DatabasePersistenceGate;
 
 class GameImageServiceTest {
 
@@ -34,7 +35,9 @@ class GameImageServiceTest {
         when(mapImageDataRepository.findById("pbd11223")).thenReturn(Optional.empty());
         when(mapImageDataRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        try (MockedStatic<GameManager> gameManager = mockStatic(GameManager.class)) {
+        try (MockedStatic<DatabasePersistenceGate> persistenceGate = mockStatic(DatabasePersistenceGate.class);
+                MockedStatic<GameManager> gameManager = mockStatic(GameManager.class)) {
+            persistenceGate.when(DatabasePersistenceGate::isDisabled).thenReturn(false);
             gameManager.when(() -> GameManager.isValid("pbd11223")).thenReturn(true);
 
             service.saveDiscordMessage("pbd11223", message);
