@@ -1373,13 +1373,25 @@ public final class TransactionHelper {
                 .append("\nResolution: 1 ")
                 .append(MiscEmojis.tg)
                 .append(" possibly routed from ");
-        for (Map.Entry<String, List<String>> pillagerToPillaged : pillagersToPillaged.entrySet()) {
-            notice.append("\n • ")
-                    .append(String.join(", ", pillagerToPillaged.getValue()))
-                    .append(" to ")
-                    .append(pillagerToPillaged.getKey());
+        if (pillagersToPillaged.size() == 1) {
+            Map.Entry<String, List<String>> pillagerToPillaged =
+                    pillagersToPillaged.entrySet().iterator().next();
+            appendPillageMessage(notice, pillagerToPillaged);
+        } else {
+            for (Map.Entry<String, List<String>> pillagerToPillaged : pillagersToPillaged.entrySet()) {
+                notice.append("\n • ");
+                appendPillageMessage(notice, pillagerToPillaged);
+            }
         }
         return notice.toString();
+    }
+
+    private static void appendPillageMessage(
+            StringBuilder stringBuilder, Map.Entry<String, List<String>> pillagerToPillaged) {
+        stringBuilder
+                .append(String.join(", ", pillagerToPillaged.getValue()))
+                .append(" to ")
+                .append(pillagerToPillaged.getKey());
     }
 
     private static String getRandomPillageSource() {

@@ -51,22 +51,22 @@ class TransactionHelperTest extends BaseTi4Test {
                         .startsWith(harness.publicPrefix())
                         .contains(harness.senderOfferLine())
                         .contains(harness.receiverOfferHeader())
-                        .doesNotContain("NOTICE OF REDISTRIBUTION"));
+                        .doesNotContain("NOTICE OF PROXIMITY SURCHARGE"));
         assertThat(messages.buttonMessagesFor(harness.senderThread))
                 .singleElement()
                 .satisfies(message -> assertThat(message)
                         .startsWith(harness.senderThreadPrefix())
                         .contains(harness.senderOfferLine())
                         .contains(harness.receiverOfferHeader())
-                        .doesNotContain("NOTICE OF REDISTRIBUTION"));
+                        .doesNotContain("NOTICE OF PROXIMITY SURCHARGE"));
         assertThat(messages.buttonMessagesFor(harness.receiverThread))
                 .singleElement()
                 .satisfies(message -> assertThat(message)
                         .startsWith(harness.receiverThreadPrefix())
                         .contains(harness.senderOfferLine())
                         .contains(harness.receiverOfferHeader())
-                        .doesNotContain("NOTICE OF REDISTRIBUTION"));
-        assertThat(messages.allText()).noneMatch(message -> message.contains("NOTICE OF REDISTRIBUTION"));
+                        .doesNotContain("NOTICE OF PROXIMITY SURCHARGE"));
+        assertThat(messages.allText()).noneMatch(message -> message.contains("NOTICE OF PROXIMITY SURCHARGE"));
     }
 
     private static SentMessages invokeSendOffer(SendOfferHarness harness) {
@@ -199,17 +199,6 @@ class TransactionHelperTest extends BaseTi4Test {
             return "> " + receiver.getRepresentation(false, false, true) + " gives:";
         }
 
-        private String notice() {
-            List<String> notices = new ArrayList<>();
-            for (Player neighbor : receiverNeighbors) {
-                if (neighbor != sender && neighbor.hasAbility("pillage")) {
-                    notices.add("NOTICE OF REDISTRIBUTION\nFrom: " + receiver.getRepresentationNoPing() + "\nTo: "
-                            + neighbor.getRepresentationNoPing());
-                }
-            }
-            return String.join("\n", notices);
-        }
-
         private String mainChannelMessage() {
             return sender.getRepresentationNoPing() + " sent a transaction offer to "
                     + receiver.getRepresentationNoPing() + ".";
@@ -255,10 +244,6 @@ class TransactionHelperTest extends BaseTi4Test {
             allText.addAll(channelMessages.stream().map(SentMessage::message).toList());
             allText.addAll(buttonMessages.stream().map(SentMessage::message).toList());
             return allText;
-        }
-
-        private String publicText() {
-            return messagesFor(harness.tableTalkChannel()).getFirst();
         }
     }
 }
