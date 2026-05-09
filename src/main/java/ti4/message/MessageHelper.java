@@ -876,6 +876,38 @@ public class MessageHelper {
                 msg -> rotatePinnedCardsInfoMessage(game, threadChannel, storedValueKeyPrefix, msg));
     }
 
+    public static void clearPinnedCardsInfoMessages(
+            @NotNull Game game,
+            @NotNull Player player,
+            @NotNull List<String> storedValueKeyPrefixes,
+            @NotNull Runnable afterCleared) {
+        ThreadChannel threadChannel = player.getCardsInfoThread();
+        if (threadChannel == null) {
+            afterCleared.run();
+            return;
+        }
+
+        threadChannel
+                .retrievePinnedMessages()
+                .queue(
+                        messages -> {
+                            for (var pinnedMessage : messages) {
+                                Message message = pinnedMessage.getMessage();
+                                if (isBotCardsInfoPin(message)) {
+                                    message.unpin().queue(Consumers.nop(), BotLogger::catchRestError);
+                                }
+                            }
+                            clearStoredCardsInfoPinIds(game, threadChannel, storedValueKeyPrefixes);
+                            afterCleared.run();
+                        },
+                        error -> {
+                            BotLogger.warning(
+                                    "Failed to retrieve pinned cards info messages for " + player.getUserName(), error);
+                            clearStoredCardsInfoPinIds(game, threadChannel, storedValueKeyPrefixes);
+                            afterCleared.run();
+                        });
+    }
+
     public static void sendMessageToPlayerCardsInfoThreadWithButtonsAndPin(
             @NotNull Game game,
             @NotNull Player player,
@@ -897,6 +929,23 @@ public class MessageHelper {
                 msg -> rotatePinnedCardsInfoMessage(game, threadChannel, storedValueKeyPrefix, msg),
                 null,
                 buttons);
+    }
+
+    private static void clearStoredCardsInfoPinIds(
+            @NotNull Game game, @NotNull ThreadChannel threadChannel, @NotNull List<String> storedValueKeyPrefixes) {
+        for (String storedValueKeyPrefix : storedValueKeyPrefixes) {
+            game.removeStoredValue(storedValueKeyPrefix + "_" + threadChannel.getId());
+        }
+    }
+
+    private static boolean isBotCardsInfoPin(@NotNull Message message) {
+        if (!message.getAuthor().isBot()) return false;
+        String content = message.getContentRaw();
+        return content.startsWith("__Scored Secret Objectives__")
+                || content.startsWith("__Unscored Secret Objectives:")
+                || content.startsWith("__Action Cards__")
+                || content.startsWith("### __Promissory notes")
+                || content.startsWith("## __Promissory notes__");
     }
 
     private static void rotatePinnedCardsInfoMessage(

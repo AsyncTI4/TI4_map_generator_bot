@@ -28,14 +28,25 @@ import ti4.service.fow.RiftSetModeService;
 @UtilityClass
 public class CardsInfoService {
 
+    private static final List<String> PINNED_CARDS_INFO_MESSAGE_KEYS =
+            List.of("pinned_so_info_message_id", "pinned_ac_info_message_id", "pinned_pn_info_message_id");
+
     public static void sendCardsInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         if (player == null) return;
-        String headerText = player.getRepresentation() + " Somebody" + CommandHelper.getHeaderText(event);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
-        sendCardsInfo(game, player);
+        MessageHelper.clearPinnedCardsInfoMessages(game, player, PINNED_CARDS_INFO_MESSAGE_KEYS, () -> {
+            String headerText = player.getRepresentation() + " Somebody" + CommandHelper.getHeaderText(event);
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
+            sendCardsInfoWithoutPinCleanup(game, player);
+        });
     }
 
     public static void sendCardsInfo(Game game, Player player) {
+        if (player == null) return;
+        MessageHelper.clearPinnedCardsInfoMessages(
+                game, player, PINNED_CARDS_INFO_MESSAGE_KEYS, () -> sendCardsInfoWithoutPinCleanup(game, player));
+    }
+
+    private static void sendCardsInfoWithoutPinCleanup(Game game, Player player) {
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         ActionCardHelper.sendActionCardInfo(game, player);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
