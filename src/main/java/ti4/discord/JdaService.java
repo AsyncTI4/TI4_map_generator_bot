@@ -27,7 +27,6 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.AsyncTI4DiscordBot;
-import ti4.contest.cron.CombatContestJanitorCron;
 import ti4.contest.cron.CombatReplayCron;
 import ti4.contest.cron.CombatReplayPromotionCron;
 import ti4.contest.cron.CombatReplayPromotionScoreBackfillCron;
@@ -337,7 +336,6 @@ public class JdaService {
             CombatReplayPromotionCron.register();
             CombatReplayPromotionScoreBackfillCron.register();
             CombatReplayCron.register();
-            CombatContestJanitorCron.register();
         }
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
