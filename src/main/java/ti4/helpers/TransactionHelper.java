@@ -51,6 +51,37 @@ import ti4.settings.users.UserSettingsManager;
 
 public final class TransactionHelper {
 
+    private static final List<String> shadyOrganizations = List.of(
+            "The Trade Adjustment Bureau",
+            "The Revenue Rebalancing Division",
+            "The Asset Discovery Group",
+            "The Trade Compliance Office",
+            "The Interstellar Tariff Commission",
+            "The Bureau of Fair Exchange (Terms Pending)",
+            "The Celestial Tax Authority",
+            "Hostile Acquisitions United",
+            "Liquidation Services",
+            "Yoink Industries",
+            "Mentax LLC",
+            "Loot & Scoot LLC",
+            "Third-Party Logistics (Uninvited)",
+            "The Unscheduled Audit Team",
+            "Cargo Inspection Services",
+            "The Department of Spontaneous Fees",
+            "Transaction Integrity Consultants",
+            "Surprise Donation Coordinators",
+            "Finders Keepers Ltd.",
+            "A Totally Legitimate Business",
+            "The Bureau of Unsolicited Redistribution",
+            "The Internal Robbery Service",
+            "Audits Without Borders",
+            "Robinhood and Crew",
+            "Alternative Investment Strategies LLC",
+            "Peg Leg Medical Care Society",
+            "Eye Patch Distribution Services",
+            "P.I.L.L.A.G.E (Proximity Induced Liquidity Loss & Asset Garnishment Entity)",
+            "Deviants Without Borders");
+
     private static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
         List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
         List<Player> players = new ArrayList<>();
@@ -1001,7 +1032,7 @@ public final class TransactionHelper {
     }
 
     // Left for future reference.
-    private static Modal buildTransactionModel(Player p1, Player p2, Game game) {
+    private static Modal buildTransactionModel(Player p1, Player p2) {
         Modal.Builder modal = Modal.create("transactionModelFinish_" + p1.getFaction(), "Traction");
         List<Player> players = new ArrayList<>();
         players.add(p1);
@@ -1061,7 +1092,7 @@ public final class TransactionHelper {
     }
 
     @ModalHandler("finishTrackRecord_")
-    public static void finishTrackRecord(ModalInteractionEvent event, Game game, Player player, String modalID) {
+    public static void finishTrackRecord(ModalInteractionEvent event, String modalID) {
         ModalMapping mapping = event.getValue("record");
         String thoughts = mapping.getAsString();
         String userId = modalID.split("_")[1];
@@ -1282,10 +1313,11 @@ public final class TransactionHelper {
     }
 
     private static String buildPillageNotice(Game game, Player p1, Player p2) {
-        if (game.isTwilightsFallMode() || game.isFowMode()) return "";
+        if (game.isFowMode()) return "";
 
         int p1TgAfter = p1.getTg();
         int p2TgAfter = p2.getTg();
+        // compute TGs after transaction is complete
         for (String item : p1.getTransactionItemsWithPlayer(p2)) {
             String[] parts = item.split("_");
             if (parts.length < 4) continue;
@@ -1313,40 +1345,48 @@ public final class TransactionHelper {
             }
         }
 
-        Map<Player, List<String>> redistributionSources = new LinkedHashMap<>();
+        // compute who can pillage
+        Map<String, List<String>> pillagersToPillaged = new LinkedHashMap<>();
         if (ButtonHelperAbilities.canBePillaged(p1, game, p1TgAfter)) {
             for (Player neighbor : p1.getNeighbouringPlayers(true)) {
-                if (neighbor == p1 || neighbor == p2 || !neighbor.hasAbility("pillage")) {
+                if (!neighbor.hasAbility("pillage")) {
                     continue;
                 }
-                redistributionSources
-                        .computeIfAbsent(neighbor, ignored -> new ArrayList<>())
+                pillagersToPillaged
+                        .computeIfAbsent(neighbor.getRepresentationNoPing(), ignored -> new ArrayList<>())
                         .add(p1.getRepresentationNoPing());
             }
         }
         if (ButtonHelperAbilities.canBePillaged(p2, game, p2TgAfter)) {
             for (Player neighbor : p2.getNeighbouringPlayers(true)) {
-                if (neighbor == p1 || neighbor == p2 || !neighbor.hasAbility("pillage")) {
+                if (!neighbor.hasAbility("pillage")) {
                     continue;
                 }
-                redistributionSources
-                        .computeIfAbsent(neighbor, ignored -> new ArrayList<>())
+                pillagersToPillaged
+                        .computeIfAbsent(neighbor.getRepresentationNoPing(), ignored -> new ArrayList<>())
                         .add(p2.getRepresentationNoPing());
             }
         }
 
         StringBuilder notice = new StringBuilder();
-        for (Map.Entry<Player, List<String>> redistribution : redistributionSources.entrySet()) {
-            if (!notice.isEmpty()) {
-                notice.append('\n');
-            }
-            notice.append("NOTICE OF REDISTRIBUTION\n");
-            notice.append("From: ")
-                    .append(String.join(", ", redistribution.getValue()))
-                    .append('\n');
-            notice.append("To: ").append(redistribution.getKey().getRepresentationNoPing());
+        notice.append("NOTICE OF PROXIMITY SURCHARGE")
+                .append("\nFrom: ")
+                .append(getRandomPillageSource())
+                .append("\nResolution: 1 ")
+                .append(MiscEmojis.tg)
+                .append(" possibly routed from ");
+        for (Map.Entry<String, List<String>> pillagerToPillaged : pillagersToPillaged.entrySet()) {
+            notice.append("\n • ")
+                    .append(String.join(", ", pillagerToPillaged.getValue()))
+                    .append(" to ")
+                    .append(pillagerToPillaged.getKey());
         }
         return notice.toString();
+    }
+
+    private static String getRandomPillageSource() {
+        int randomIndex = ThreadLocalRandom.current().nextInt(0, shadyOrganizations.size());
+        return shadyOrganizations.get(randomIndex);
     }
 
     @ButtonHandler("transact_")
