@@ -7,12 +7,10 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.contest.replay.core.CombatContestSettings;
-import ti4.contest.replay.service.CombatReplayHouseService;
 import ti4.contest.replay.service.CombatReplayLeaderboardService;
 import ti4.discord.JdaService;
 import ti4.executors.ExecutorServiceManager;
 import ti4.logging.BotLogger;
-import ti4.spring.context.SpringContext;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
 class LazaxMinigameReactionListener extends ListenerAdapter {
@@ -48,12 +46,7 @@ class LazaxMinigameReactionListener extends ListenerAdapter {
     private void handleLazaxMinigameReaction(MessageReactionAddEvent event, Message message) {
         if (!CombatContestSettings.isEnabledStatic()) return;
         if (!message.getAuthor().isBot()) return;
-        applyHouseAssignmentIfPredictionReaction(event, message);
         applyRoleUpdateIfSubscriptionPrompt(event, message);
-    }
-
-    private void applyHouseAssignmentIfPredictionReaction(MessageReactionAddEvent event, Message message) {
-        SpringContext.getBean(CombatReplayHouseService.class).assignHouseForPredictionReaction(event, message);
     }
 
     private void applyRoleUpdateIfSubscriptionPrompt(MessageReactionAddEvent event, Message message) {

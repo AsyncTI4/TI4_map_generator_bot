@@ -54,11 +54,8 @@ public class CombatReplayContestEntity {
     @Column(name = "side_bet_defender_button_message_id")
     private Long sideBetDefenderButtonMessageId;
 
-    @Column(name = "side_bet_market_posted_at")
-    private LocalDateTime sideBetMarketPostedAt;
-
-    @Column(name = "side_bet_payout_model")
-    private String sideBetPayoutModel;
+    @Column(name = "side_bet_buttons_posted_at")
+    private LocalDateTime sideBetButtonsPostedAt;
 
     @Column(name = "replay_status", nullable = false)
     private CombatContestReplayStatus replayStatus;

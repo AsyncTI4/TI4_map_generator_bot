@@ -4,10 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
-import java.util.List;
 import org.junit.jupiter.api.Test;
-import ti4.contest.replay.core.CombatReplayDecoys.Decoy;
-import ti4.contest.replay.core.CombatReplayDecoys.DecoyUnit;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -52,20 +49,6 @@ class LazaxCombatSupportTest extends BaseTi4Test {
         String summary = LazaxCombatSupport.formatCombatTechSummary(combatTile, attacker, defender);
 
         assertTrue(summary.contains("Quietus: active Breach in play"));
-    }
-
-    @Test
-    void combatSummaryIncludesWarSunTechForReplayWarSunDecoy() {
-        Harness harness = new Harness();
-        Player attacker = harness.player("sol", "blue");
-        Player defender = harness.player("sardakk", "green");
-        Tile combatTile = harness.tile("112");
-        CombatReplayDecoys.Abilities abilities = new CombatReplayDecoys.Abilities(new Decoy(List.of(
-                new DecoyUnit(attacker.getFaction(), attacker.getFactionEmoji(), "blu", UnitType.Warsun, "space", 1))));
-
-        String summary = LazaxCombatSupport.formatCombatTechSummary(combatTile, attacker, defender, abilities);
-
-        assertTrue(summary.contains("War Sun"));
     }
 
     private static final class Harness {

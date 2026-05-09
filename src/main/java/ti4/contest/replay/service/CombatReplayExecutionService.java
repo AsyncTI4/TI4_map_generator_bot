@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.CombatCandidateEventType;
 import ti4.contest.replay.core.CombatContestReplayStatus;
 import ti4.contest.replay.core.CombatContestSettings;
-import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatCandidateEventEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
@@ -54,12 +53,9 @@ public class CombatReplayExecutionService {
     private final CombatCandidateEventRepository candidateEventRepository;
     private final CombatReplayLeaderboardService replayLeaderboardService;
     private final CombatReplaySideBetService replaySideBetService;
-    private final CombatReplayHouseAbilityPhaseService houseAbilityPhaseService;
     private final CombatReplayDiscordPostService discordPostService;
 
     public void runReplayTick() {
-        postSideBetMarketsIfDue();
-
         List<CombatReplayContestEntity> dueContests =
                 replayContestRepository.findByReplayStatusInAndNextReplayAtLessThanEqualOrderByNextReplayAtAsc(
                         Set.of(CombatContestReplayStatus.PENDING, CombatContestReplayStatus.REPLAYING),
@@ -74,70 +70,17 @@ public class CombatReplayExecutionService {
         try {
             announcePreReplayContextIfNeeded(replayChannel, contest, winner);
             Game game = loadGame(winner.getGameName());
-            if (settings.isHousesEnabled()) {
-                postImmediateSideBetMarketIfNoDiscussionWindow(replayChannel, game, contest, winner);
-            } else {
-                replaySideBetService.postSideBetButtonsIfNeeded(replayChannel, game, contest, winner);
-                markSideBetMarketPosted(contest, LocalDateTime.now());
-            }
-            houseAbilityPhaseService.postDiscussionWindowAbilities(game, contest, winner);
+            replaySideBetService.postSideBetButtonsIfNeeded(replayChannel, game, contest, winner);
+            markSideBetButtonsPosted(contest, LocalDateTime.now());
             announcePredictionLockCountdown(replayChannel);
         } catch (Exception e) {
             BotLogger.error("Failed to post replay context at promotion.", e);
         }
     }
 
-    public void postPreviewContext(
-            MessageChannel replayChannel, CombatReplayContestEntity contest, CombatCandidateEntity winner) {
-        try {
-            announcePreReplayContextIfNeeded(replayChannel, contest, winner);
-        } catch (Exception e) {
-            BotLogger.error("Failed to post replay context for preview.", e);
-        }
-    }
-
-    private void postSideBetMarketsIfDue() {
-        if (!settings.isHousesEnabled()) return;
-        if (!settings.getSideBets().isEnableSideBets()) return;
-
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime discussionStartedBefore = now.minusSeconds(discussionWindowSeconds());
-        List<CombatReplayContestEntity> contests =
-                replayContestRepository
-                        .findByReplayStatusAndSideBetMarketPostedAtIsNullAndPostedAtLessThanEqualOrderByPostedAtAsc(
-                                CombatContestReplayStatus.PENDING, discussionStartedBefore);
-        for (CombatReplayContestEntity contest : contests) {
-            postSideBetMarketIfDue(contest, now);
-        }
-    }
-
-    private void postSideBetMarketIfDue(CombatReplayContestEntity contest, LocalDateTime now) {
-        if (contest.getReplayStartAt() == null || !now.isBefore(contest.getReplayStartAt())) {
-            markSideBetMarketPosted(contest, now);
-            return;
-        }
-        if (contest.getSideBetSummaryMessageId() != null) {
-            markSideBetMarketPosted(contest, now);
-            return;
-        }
-
-        CombatCandidateEntity candidate = loadCandidate(contest.getCandidateId());
-        if (candidate == null) return;
-        Game game = loadGame(candidate.getGameName());
-        MessageChannel channel = discordPostService.getContestThreadOrChannel(contest);
-        if (game == null || channel == null) return;
-
-        try {
-            houseAbilityPhaseService.openSideBetMarket(channel, game, contest, candidate);
-            markSideBetMarketPosted(contest, now);
-        } catch (Exception e) {
-            BotLogger.error("Failed to open combat replay side-bet market.", e);
-        }
-    }
-
-    private void markSideBetMarketPosted(CombatReplayContestEntity contest, LocalDateTime now) {
-        if (contest.getSideBetMarketPostedAt() != null) return;
-        contest.setSideBetMarketPostedAt(now);
+    private void markSideBetButtonsPosted(CombatReplayContestEntity contest, LocalDateTime now) {
+        if (contest.getSideBetButtonsPostedAt() != null) return;
+        contest.setSideBetButtonsPostedAt(now);
         replayContestRepository.save(contest);
     }
 
@@ -160,7 +103,6 @@ public class CombatReplayExecutionService {
             }
             if (contest.getReplayStatus() == CombatContestReplayStatus.PENDING && candidate != null && game != null) {
                 announcePreReplayContextIfNeeded(channel, contest, candidate);
-                announceFalseColorsRevealAtReplayStart(channel, candidate);
                 replaySideBetService.refreshSideBetSummary(channel, contest, candidate);
                 replayLeaderboardService.lockPredictionsAtReplayStart(game, contest, candidate);
                 replayLeaderboardService.announceLockedPredictionsIfNeeded(channel, game, contest, candidate);
@@ -198,41 +140,15 @@ public class CombatReplayExecutionService {
         replayContestRepository.save(contest);
     }
 
-    private void announceFalseColorsRevealAtReplayStart(MessageChannel channel, CombatCandidateEntity candidate) {
-        String message = CombatReplayDecoys.renderDisappearanceMessage(
-                CombatReplayDecoys.read(candidate.getReplayAbilitiesJson()));
-        if (message != null && !message.isBlank()) {
-            MessageHelper.sendMessageToChannel(channel, message);
-        }
-    }
-
     private void announcePredictionLockCountdown(MessageChannel channel) {
         int startDelaySeconds = replayStartDelaySeconds();
         String title = RandomHelper.pickRandomFromList(PREDICTION_LOCK_TITLES);
         String subtitle = RandomHelper.pickRandomFromList(PREDICTION_LOCK_SUBTITLES);
-        String message;
-        if (settings.isHousesEnabled()) {
-            message = housePhaseMessage(title, subtitle);
-        } else {
-            message = startDelaySeconds <= 0
-                    ? "## " + title + "\n" + subtitle + "\nVoting is now open. The combat begins immediately."
-                    : "## " + title + "\n" + subtitle + "\nVoting is now open for **"
-                            + formatVotingWindow(startDelaySeconds) + "**.";
-        }
+        String message = startDelaySeconds <= 0
+                ? "## " + title + "\n" + subtitle + "\nVoting is now open. The combat begins immediately."
+                : "## " + title + "\n" + subtitle + "\nVoting is now open for **"
+                        + formatVotingWindow(startDelaySeconds) + "**.";
         MessageHelper.sendMessageToChannel(channel, message);
-    }
-
-    private String housePhaseMessage(String title, String subtitle) {
-        int discussionWindowSeconds = discussionWindowSeconds();
-        int sideBetWindowSeconds = sideBetWindowSeconds();
-        if (discussionWindowSeconds <= 0 && sideBetWindowSeconds <= 0) {
-            return "## " + title + "\n" + subtitle + "\nVoting is now open. The combat begins immediately.";
-        }
-        return "## " + title + "\n" + subtitle + "\nDiscussion is open for **"
-                + formatVotingWindow(discussionWindowSeconds)
-                + "**. Side bets open afterward for **"
-                + formatVotingWindow(sideBetWindowSeconds)
-                + "**. Voting remains open until the combat begins.";
     }
 
     private String formatVotingWindow(int startDelaySeconds) {
@@ -247,13 +163,6 @@ public class CombatReplayExecutionService {
         int seconds = startDelaySeconds % 60;
         return minutes + " " + (minutes == 1 ? "minute" : "minutes") + " " + seconds + " "
                 + (seconds == 1 ? "second" : "seconds");
-    }
-
-    private void postImmediateSideBetMarketIfNoDiscussionWindow(
-            MessageChannel replayChannel, Game game, CombatReplayContestEntity contest, CombatCandidateEntity winner) {
-        if (discussionWindowSeconds() > 0) return;
-        houseAbilityPhaseService.openSideBetMarket(replayChannel, game, contest, winner);
-        markSideBetMarketPosted(contest, LocalDateTime.now());
     }
 
     private void completeReplayContest(CombatReplayContestEntity contest) {
@@ -314,16 +223,7 @@ public class CombatReplayExecutionService {
     }
 
     private int replayStartDelaySeconds() {
-        if (!settings.isHousesEnabled()) return settings.getReplayExecution().getStartDelaySeconds();
-        return discussionWindowSeconds() + sideBetWindowSeconds();
-    }
-
-    private int discussionWindowSeconds() {
-        return settings.getReplayExecution().getDiscussionWindowSeconds();
-    }
-
-    private int sideBetWindowSeconds() {
-        return settings.getReplayExecution().getSideBetWindowSeconds();
+        return settings.getReplayExecution().getStartDelaySeconds();
     }
 
     private CombatCandidateEntity loadCandidate(Long candidateId) {

@@ -41,7 +41,6 @@ class CombatReplaySideBetUiService {
     private final CombatContestSideBetRepository sideBetRepository;
     private final CombatReplaySideBetPayoutService payoutService;
     private final CombatSideBetAvailabilityService availabilityService;
-    private final CombatReplayDiscordPostService discordPostService;
 
     public boolean shouldShowButtons(CombatCandidateEntity candidate) {
         return candidate != null
@@ -60,13 +59,7 @@ class CombatReplaySideBetUiService {
 
     private String sideBetPrompt() {
         int maxBets = settings.getSideBets().getMaxBetsPerUser();
-        if (!settings.isHousesEnabled()) {
-            return "## Side Bets\nPlace up to " + maxBets + " side bets before the replay begins.";
-        }
-        return "## Side-Bet Market\n"
-                + discordPostService.getHouseRoleMentions()
-                + "\nThe battle market is open. Place up to " + maxBets
-                + " side bets before the replay begins.";
+        return "## Side Bets\nPlace up to " + maxBets + " side bets before the replay begins.";
     }
 
     public void refreshSummaryMessage(
