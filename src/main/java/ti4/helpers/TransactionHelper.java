@@ -52,34 +52,37 @@ import ti4.settings.users.UserSettingsManager;
 public final class TransactionHelper {
 
     private static final List<String> shadyOrganizations = List.of(
-            "The Trade Adjustment Bureau",
-            "The Revenue Rebalancing Division",
-            "The Asset Discovery Group",
-            "The Interstellar Tariff Commission",
-            "The Bureau of Fair Exchange (Terms Pending)",
-            "The Celestial Tax Authority",
+            "the Trade Adjustment Bureau",
+            "the Revenue Rebalancing Division",
+            "the Asset Discovery Group",
+            "the Interstellar Tariff Commission",
+            "the Bureau of \"Fair\" Exchange",
+            "the Celestial Tax Authority",
             "Hostile Acquisitions United",
             "Liquidation Services",
             "Yoink Industries",
             "Mentax LLC",
             "Loot & Scoot LLC",
             "Third-Party Logistics (Uninvited)",
-            "An Unscheduled Audit Team",
+            "an Unscheduled Audit Team",
             "Cargo Inspection Services",
-            "The Department of Spontaneous Fees",
+            "the Department of Spontaneous Fees",
             "Transaction Integrity Consultants",
             "Surprise Donation Coordinators",
             "Finders Keepers Ltd.",
-            "A Totally Legitimate Business",
-            "The Bureau of Unsolicited Redistribution",
-            "The Internal Robbery Service",
+            "a Totally Legitimate Business",
+            "the Bureau of Unsolicited Redistribution",
+            "the Internal Robbery Service",
             "Audits Without Borders",
             "Robinhood and Crew",
             "Alternative Investment Strategies LLC",
-            "Peg Leg Medical Care Society",
+            "the Peg Leg Medical Care Society",
             "Eye Patch Distribution Services",
             "P.I.L.L.A.G.E (Proximity Induced Liquidity Loss & Asset Garnishment Entity)",
-            "Deviants Without Borders");
+            "Deviants Within Borders",
+            "the Suffi An Fan Club",
+            "the Fifth Moon Fund",
+            "Dane's Torment Engine LLC");
 
     private static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
         List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
@@ -1364,12 +1367,11 @@ public final class TransactionHelper {
         if (pillagersToPillaged.isEmpty()) return "";
 
         StringBuilder notice = new StringBuilder();
-        notice.append("> NOTICE OF PROXIMITY SURCHARGE")
-                .append("\n> FROM: ")
+        notice.append("> This is a surcharge notice from ")
                 .append(getRandomPillageSource())
                 .append("\n> 1 ")
                 .append(MiscEmojis.tg)
-                .append(" possibly routed from ");
+                .append(" possibly pillaged ");
         if (pillagersToPillaged.size() == 1) {
             Map.Entry<String, List<String>> pillagerToPillaged =
                     pillagersToPillaged.entrySet().iterator().next();
@@ -1386,6 +1388,7 @@ public final class TransactionHelper {
     private static void appendPillageMessage(
             StringBuilder stringBuilder, Map.Entry<String, List<String>> pillagerToPillaged) {
         stringBuilder
+                .append(" from ")
                 .append(String.join(", ", pillagerToPillaged.getValue()))
                 .append(" to ")
                 .append(pillagerToPillaged.getKey());
