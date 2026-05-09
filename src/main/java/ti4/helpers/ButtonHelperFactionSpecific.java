@@ -77,7 +77,6 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.HeroUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.planet.AddPlanetService;
-import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.tech.PlayerTechService;
 import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
@@ -1544,7 +1543,6 @@ public final class ButtonHelperFactionSpecific {
                 int extraRollsForUnit = 0;
                 int numRollsPerUnit = 1;
                 int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
-                RoundStatsTracker.recordDiceRolled(game, player, numRolls);
                 List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
                 player.setExpectedHitsTimes10(
                         player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
@@ -1597,7 +1595,6 @@ public final class ButtonHelperFactionSpecific {
         int extraRollsForUnit = 0;
         int numRollsPerUnit = 1;
         int numRolls = 3;
-        RoundStatsTracker.recordDiceRolled(player.getGame(), player, numRolls);
         List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
         player.setExpectedHitsTimes10(player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
         int hitRolls = DiceHelper.countSuccesses(resultRolls);

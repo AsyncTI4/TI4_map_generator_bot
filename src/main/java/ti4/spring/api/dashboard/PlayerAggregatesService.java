@@ -26,8 +26,6 @@ import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.model.TechnologyModel;
 import ti4.service.persistence.DatabasePersistenceGate;
-import ti4.spring.service.roundstats.GameRoundPlayerStats;
-import ti4.spring.service.roundstats.GameRoundPlayerStatsRepository;
 import tools.jackson.databind.json.JsonMapper;
 
 @RequiredArgsConstructor
@@ -45,17 +43,12 @@ import tools.jackson.databind.json.JsonMapper;
 */
 class PlayerAggregatesService {
 
-    private static final int CURRENT_AGGREGATES_VERSION = 3;
+    private static final int CURRENT_AGGREGATES_VERSION = 4;
     private static final int FAILED_AGGREGATES_VERSION = -1;
     private static final String HASH_DELIMITER = "\u001F";
     private static final JsonMapper mapper = ti4.json.JsonMapperManager.basic();
 
-    private static final double AGGRESSION_WEIGHT_COMBATS = 0.45;
-    private static final double AGGRESSION_WEIGHT_STOLEN = 0.35;
-    private static final double AGGRESSION_WEIGHT_TACTICALS = 0.20;
-
     private final PlayerAggregatesCacheRepository repository;
-    private final GameRoundPlayerStatsRepository roundStatsRepository;
 
     /**
      * Returns aggregates for the player and triggers cache refresh when stale.
@@ -150,16 +143,11 @@ class PlayerAggregatesService {
                 context.completedGameIds(),
                 techStats,
                 factionWinStats,
-                Optional.ofNullable(stored.strategyCardStats())
-                        .orElseGet(() -> emptyStrategyCardStats(completedCount, 0)),
-                Optional.ofNullable(stored.combatProfile()).orElseGet(() -> emptyCombatProfile(completedCount, 0)),
                 Optional.ofNullable(stored.economyProfile())
                         .orElseGet(() -> new PlayerDashboardResponse.EconomyProfile(0, 0, completedCount)),
                 Optional.ofNullable(stored.factionTechSynergy())
                         .orElseGet(() -> new PlayerDashboardResponse.FactionTechSynergy(Map.of())),
-                Optional.ofNullable(stored.speakerImpact()).orElseGet(PlayerAggregatesService::emptySpeakerImpact),
-                Optional.ofNullable(stored.aggressionProfile())
-                        .orElseGet(() -> emptyAggressionProfile(completedCount, 0)));
+                Optional.ofNullable(stored.speakerImpact()).orElseGet(PlayerAggregatesService::emptySpeakerImpact));
     }
 
     private static boolean isStoredAggregateUsable(StoredAggregates stored) {
@@ -167,12 +155,9 @@ class PlayerAggregatesService {
                 && stored.techById() != null
                 && stored.eligibleGameCount() != null
                 && stored.factionWinsById() != null
-                && stored.strategyCardStats() != null
-                && stored.combatProfile() != null
                 && stored.economyProfile() != null
                 && stored.factionTechSynergy() != null
-                && stored.speakerImpact() != null
-                && stored.aggressionProfile() != null;
+                && stored.speakerImpact() != null;
     }
 
     private static PlayerDashboardResponse.PlayerAggregates emptyAggregates(
@@ -192,27 +177,9 @@ class PlayerAggregatesService {
                 completedGameIds,
                 new PlayerDashboardResponse.TechStats(Map.of()),
                 new PlayerDashboardResponse.FactionWinStats(Map.of()),
-                emptyStrategyCardStats(completedGameCount, 0),
-                emptyCombatProfile(completedGameCount, 0),
                 new PlayerDashboardResponse.EconomyProfile(0, 0, completedGameCount),
                 new PlayerDashboardResponse.FactionTechSynergy(Map.of()),
-                emptySpeakerImpact(),
-                emptyAggressionProfile(completedGameCount, 0));
-    }
-
-    private static PlayerDashboardResponse.StrategyCardStats emptyStrategyCardStats(
-            int completedGamesConsidered, int gamesWithRoundStats) {
-        return new PlayerDashboardResponse.StrategyCardStats(
-                Map.of(),
-                new PlayerDashboardResponse.StrategyCardStatsMeta(completedGamesConsidered, gamesWithRoundStats));
-    }
-
-    private static PlayerDashboardResponse.CombatProfile emptyCombatProfile(
-            int completedGamesConsidered, int gamesWithRoundStats) {
-        return new PlayerDashboardResponse.CombatProfile(
-                new PlayerDashboardResponse.CombatTotals(0, 0, 0, 0, 0),
-                new PlayerDashboardResponse.CombatAverages(0, 0, 0, 0, 0),
-                new PlayerDashboardResponse.Coverage(completedGamesConsidered, gamesWithRoundStats));
+                emptySpeakerImpact());
     }
 
     private static PlayerDashboardResponse.SpeakerImpact emptySpeakerImpact() {
@@ -220,16 +187,6 @@ class PlayerAggregatesService {
                 new PlayerDashboardResponse.SpeakerBucket(0, 0, 0),
                 new PlayerDashboardResponse.SpeakerBucket(0, 0, 0),
                 0);
-    }
-
-    private static PlayerDashboardResponse.AggressionProfile emptyAggressionProfile(
-            int completedGamesConsidered, int gamesWithRoundStats) {
-        return new PlayerDashboardResponse.AggressionProfile(
-                new PlayerDashboardResponse.AggressionWeights(
-                        AGGRESSION_WEIGHT_COMBATS, AGGRESSION_WEIGHT_STOLEN, AGGRESSION_WEIGHT_TACTICALS),
-                Map.of(),
-                new PlayerDashboardResponse.AggressionSummary(0, 0, 0, 0, null),
-                new PlayerDashboardResponse.Coverage(completedGamesConsidered, gamesWithRoundStats));
     }
 
     /**
@@ -297,12 +254,9 @@ class PlayerAggregatesService {
                     computed.eligibleGameCount(),
                     computed.byTech(),
                     computed.factionWinsById(),
-                    computed.strategyCardStats(),
-                    computed.combatProfile(),
                     computed.economyProfile(),
                     computed.factionTechSynergy(),
-                    computed.speakerImpact(),
-                    computed.aggressionProfile());
+                    computed.speakerImpact());
 
             PlayerAggregatesCache row = repository.findById(userId).orElseGet(PlayerAggregatesCache::new);
             row.setUserId(userId);
@@ -349,167 +303,26 @@ class PlayerAggregatesService {
     }
 
     /**
-     * Computes all aggregate views from final game state and round stats.
+     * Computes all aggregate views from final game state.
      */
     private ComputedAggregates computeAggregates(String userId, Collection<String> completedGameIds) {
         List<GameAggregateSnapshot> snapshots = loadPlayerSnapshotsPerGame(userId, completedGameIds);
-        Map<String, List<GameRoundPlayerStats>> roundStatsByGame = loadRoundStatsByGame(userId, snapshots);
 
         TechCountAccumulator techCounts = accumulateEligibleCounts(snapshots);
         Map<String, PlayerDashboardResponse.TechStat> byTech = toTechStatMap(techCounts);
         Map<String, Integer> factionWinsById = countFactionWins(snapshots);
 
-        PlayerDashboardResponse.StrategyCardStats strategyCardStats =
-                computeStrategyCardStats(snapshots, roundStatsByGame);
-        PlayerDashboardResponse.CombatProfile combatProfile = computeCombatProfile(snapshots, roundStatsByGame);
         PlayerDashboardResponse.EconomyProfile economyProfile = computeEconomyProfile(snapshots);
         PlayerDashboardResponse.FactionTechSynergy factionTechSynergy = computeFactionTechSynergy(snapshots);
         PlayerDashboardResponse.SpeakerImpact speakerImpact = computeSpeakerImpact(snapshots);
-        PlayerDashboardResponse.AggressionProfile aggressionProfile =
-                computeAggressionProfile(snapshots, roundStatsByGame);
 
         return new ComputedAggregates(
                 techCounts.eligibleGameCount(),
                 byTech,
                 factionWinsById,
-                strategyCardStats,
-                combatProfile,
                 economyProfile,
                 factionTechSynergy,
-                speakerImpact,
-                aggressionProfile);
-    }
-
-    private Map<String, List<GameRoundPlayerStats>> loadRoundStatsByGame(
-            String userId, List<GameAggregateSnapshot> snapshots) {
-        if (snapshots.isEmpty()) {
-            return Map.of();
-        }
-        List<String> gameIds =
-                snapshots.stream().map(GameAggregateSnapshot::gameId).toList();
-        List<GameRoundPlayerStats> rows = roundStatsRepository.findByUserDiscordIdAndGameIdIn(userId, gameIds);
-        Map<String, List<GameRoundPlayerStats>> byGame = new HashMap<>();
-        for (GameRoundPlayerStats row : rows) {
-            if (row == null || row.getGameId() == null) {
-                continue;
-            }
-            byGame.computeIfAbsent(row.getGameId(), ignored -> new ArrayList<>())
-                    .add(row);
-        }
-        return byGame;
-    }
-
-    private static PlayerDashboardResponse.StrategyCardStats computeStrategyCardStats(
-            List<GameAggregateSnapshot> snapshots, Map<String, List<GameRoundPlayerStats>> roundStatsByGame) {
-        Map<Integer, Integer> totalPicksBySc = new HashMap<>();
-        Map<Integer, Set<String>> gamesPickedBySc = new HashMap<>();
-        Map<Integer, Integer> winsInGamesPickedBySc = new HashMap<>();
-
-        int gamesWithRoundStats = 0;
-        for (GameAggregateSnapshot snapshot : snapshots) {
-            List<GameRoundPlayerStats> rows = roundStatsByGame.getOrDefault(snapshot.gameId(), List.of());
-            if (!rows.isEmpty()) {
-                gamesWithRoundStats++;
-            }
-
-            Set<Integer> scSeenInGame = new HashSet<>();
-            for (GameRoundPlayerStats row : rows) {
-                for (Integer sc : parseScPicks(row.getScPicks())) {
-                    totalPicksBySc.merge(sc, 1, Integer::sum);
-                    scSeenInGame.add(sc);
-                }
-            }
-
-            for (Integer sc : scSeenInGame) {
-                gamesPickedBySc.computeIfAbsent(sc, ignored -> new HashSet<>()).add(snapshot.gameId());
-                if (snapshot.playerWon()) {
-                    winsInGamesPickedBySc.merge(sc, 1, Integer::sum);
-                }
-            }
-        }
-
-        Set<Integer> scKeys = new HashSet<>();
-        scKeys.addAll(totalPicksBySc.keySet());
-        scKeys.addAll(gamesPickedBySc.keySet());
-
-        Map<Integer, PlayerDashboardResponse.StrategyCardStat> bySc = scKeys.stream()
-                .sorted()
-                .collect(java.util.stream.Collectors.toMap(
-                        sc -> sc,
-                        sc -> {
-                            int totalPicks = totalPicksBySc.getOrDefault(sc, 0);
-                            int gamesPicked =
-                                    gamesPickedBySc.getOrDefault(sc, Set.of()).size();
-                            int winsInGamesPicked = winsInGamesPickedBySc.getOrDefault(sc, 0);
-                            double winRate = gamesPicked == 0 ? 0.0 : (winsInGamesPicked * 100.0) / gamesPicked;
-                            return new PlayerDashboardResponse.StrategyCardStat(
-                                    totalPicks, gamesPicked, winsInGamesPicked, winRate);
-                        },
-                        (a, b) -> a,
-                        LinkedHashMap::new));
-
-        return new PlayerDashboardResponse.StrategyCardStats(
-                bySc, new PlayerDashboardResponse.StrategyCardStatsMeta(snapshots.size(), gamesWithRoundStats));
-    }
-
-    private static List<Integer> parseScPicks(String csv) {
-        if (StringUtils.isBlank(csv)) {
-            return List.of();
-        }
-        List<Integer> picks = new ArrayList<>();
-        for (String token : csv.split(",")) {
-            if (StringUtils.isBlank(token)) {
-                continue;
-            }
-            try {
-                picks.add(Integer.parseInt(token.trim()));
-            } catch (NumberFormatException ignored) {
-                // Ignore malformed SC values in historical rows.
-            }
-        }
-        return picks;
-    }
-
-    private static PlayerDashboardResponse.CombatProfile computeCombatProfile(
-            List<GameAggregateSnapshot> snapshots, Map<String, List<GameRoundPlayerStats>> roundStatsByGame) {
-        long combatsInitiated = 0;
-        long tacticalsWithCombat = 0;
-        long planetsTaken = 0;
-        long planetsStolen = 0;
-        long diceRolled = 0;
-        int gamesWithRoundStats = 0;
-
-        for (GameAggregateSnapshot snapshot : snapshots) {
-            List<GameRoundPlayerStats> rows = roundStatsByGame.getOrDefault(snapshot.gameId(), List.of());
-            if (!rows.isEmpty()) {
-                gamesWithRoundStats++;
-            }
-            for (GameRoundPlayerStats row : rows) {
-                combatsInitiated += zeroIfNull(row.getCombatsInitiated());
-                tacticalsWithCombat += zeroIfNull(row.getTacticalsWithCombat());
-                planetsTaken += zeroIfNull(row.getPlanetsTaken());
-                planetsStolen += zeroIfNull(row.getPlanetsStolen());
-                diceRolled += zeroIfNull(row.getDiceRolled());
-            }
-        }
-
-        int completedGamesConsidered = snapshots.size();
-        double denom = completedGamesConsidered == 0 ? 1.0 : completedGamesConsidered;
-
-        return new PlayerDashboardResponse.CombatProfile(
-                new PlayerDashboardResponse.CombatTotals(
-                        safeToInt(combatsInitiated),
-                        safeToInt(tacticalsWithCombat),
-                        safeToInt(planetsTaken),
-                        safeToInt(planetsStolen),
-                        safeToInt(diceRolled)),
-                new PlayerDashboardResponse.CombatAverages(
-                        combatsInitiated / denom,
-                        tacticalsWithCombat / denom,
-                        planetsTaken / denom,
-                        planetsStolen / denom,
-                        diceRolled / denom),
-                new PlayerDashboardResponse.Coverage(completedGamesConsidered, gamesWithRoundStats));
+                speakerImpact);
     }
 
     private static PlayerDashboardResponse.EconomyProfile computeEconomyProfile(List<GameAggregateSnapshot> snapshots) {
@@ -612,162 +425,6 @@ class PlayerAggregatesService {
                 new PlayerDashboardResponse.SpeakerBucket(speakerGames, speakerWins, speakerWinRate),
                 new PlayerDashboardResponse.SpeakerBucket(nonSpeakerGames, nonSpeakerWins, nonSpeakerWinRate),
                 speakerWinRate - nonSpeakerWinRate);
-    }
-
-    private static PlayerDashboardResponse.AggressionProfile computeAggressionProfile(
-            List<GameAggregateSnapshot> snapshots, Map<String, List<GameRoundPlayerStats>> roundStatsByGame) {
-        Map<String, AggressionInput> byGameInput = new LinkedHashMap<>();
-        int gamesWithRoundStats = 0;
-
-        for (GameAggregateSnapshot snapshot : snapshots) {
-            List<GameRoundPlayerStats> rows = roundStatsByGame.getOrDefault(snapshot.gameId(), List.of());
-            if (rows.isEmpty()) continue;
-            gamesWithRoundStats++;
-
-            int combats = 0;
-            int stolen = 0;
-            int tacticals = 0;
-
-            for (GameRoundPlayerStats row : rows) {
-                combats += zeroIfNull(row.getCombatsInitiated());
-                stolen += zeroIfNull(row.getPlanetsStolen());
-                tacticals += zeroIfNull(row.getTacticalsWithCombat());
-            }
-
-            byGameInput.put(snapshot.gameId(), new AggressionInput(combats, stolen, tacticals));
-        }
-
-        return buildAggressionProfileFromGameInputs(byGameInput, snapshots.size(), gamesWithRoundStats);
-    }
-
-    static PlayerDashboardResponse.AggressionProfile buildAggressionProfileFromGameInputs(
-            Map<String, AggressionInput> byGameInput, int completedGamesConsidered, int gamesWithRoundStats) {
-        Map<String, AggressionInput> gameInputs = byGameInput == null ? Map.of() : byGameInput;
-        Map<String, Double> byGameScore = new LinkedHashMap<>();
-        if (gamesWithRoundStats < 2) {
-            gameInputs.keySet().forEach(gameId -> byGameScore.put(gameId, 0.0));
-            return new PlayerDashboardResponse.AggressionProfile(
-                    new PlayerDashboardResponse.AggressionWeights(
-                            AGGRESSION_WEIGHT_COMBATS, AGGRESSION_WEIGHT_STOLEN, AGGRESSION_WEIGHT_TACTICALS),
-                    byGameScore,
-                    new PlayerDashboardResponse.AggressionSummary(0, 0, 0, 0, null),
-                    new PlayerDashboardResponse.Coverage(completedGamesConsidered, gamesWithRoundStats));
-        }
-
-        List<Double> combatsValues = gameInputs.values().stream()
-                .map(i -> (double) i.combatsInitiated())
-                .toList();
-        List<Double> stolenValues = gameInputs.values().stream()
-                .map(i -> (double) i.planetsStolen())
-                .toList();
-        List<Double> tacticalsValues = gameInputs.values().stream()
-                .map(i -> (double) i.tacticalsWithCombat())
-                .toList();
-
-        double combatsMean = mean(combatsValues);
-        double stolenMean = mean(stolenValues);
-        double tacticalsMean = mean(tacticalsValues);
-
-        double combatsStd = stdDev(combatsValues, combatsMean);
-        double stolenStd = stdDev(stolenValues, stolenMean);
-        double tacticalsStd = stdDev(tacticalsValues, tacticalsMean);
-
-        double sum = 0;
-        double min = Double.POSITIVE_INFINITY;
-        double max = Double.NEGATIVE_INFINITY;
-        String mostAggressiveGameId = null;
-
-        for (Map.Entry<String, AggressionInput> entry : gameInputs.entrySet()) {
-            AggressionInput input = entry.getValue();
-            double combatsZ = zScore(input.combatsInitiated(), combatsMean, combatsStd);
-            double stolenZ = zScore(input.planetsStolen(), stolenMean, stolenStd);
-            double tacticalsZ = zScore(input.tacticalsWithCombat(), tacticalsMean, tacticalsStd);
-
-            double score = (AGGRESSION_WEIGHT_COMBATS * combatsZ)
-                    + (AGGRESSION_WEIGHT_STOLEN * stolenZ)
-                    + (AGGRESSION_WEIGHT_TACTICALS * tacticalsZ);
-
-            byGameScore.put(entry.getKey(), score);
-            sum += score;
-            if (score > max) {
-                max = score;
-                mostAggressiveGameId = entry.getKey();
-            }
-            if (score < min) {
-                min = score;
-            }
-        }
-
-        List<Double> scores = new ArrayList<>(byGameScore.values());
-        double avg = scores.isEmpty() ? 0.0 : (sum / scores.size());
-        double median = median(scores);
-
-        return new PlayerDashboardResponse.AggressionProfile(
-                new PlayerDashboardResponse.AggressionWeights(
-                        AGGRESSION_WEIGHT_COMBATS, AGGRESSION_WEIGHT_STOLEN, AGGRESSION_WEIGHT_TACTICALS),
-                byGameScore,
-                new PlayerDashboardResponse.AggressionSummary(
-                        avg,
-                        median,
-                        Double.isInfinite(max) ? 0 : max,
-                        Double.isInfinite(min) ? 0 : min,
-                        mostAggressiveGameId),
-                new PlayerDashboardResponse.Coverage(completedGamesConsidered, gamesWithRoundStats));
-    }
-
-    private static double mean(List<Double> values) {
-        if (values.isEmpty()) {
-            return 0.0;
-        }
-        return values.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
-    }
-
-    private static double stdDev(List<Double> values, double mean) {
-        if (values.size() < 2) {
-            return 0.0;
-        }
-        double variance = values.stream()
-                .mapToDouble(v -> {
-                    double delta = v - mean;
-                    return delta * delta;
-                })
-                .average()
-                .orElse(0.0);
-        return Math.sqrt(variance);
-    }
-
-    private static double zScore(double value, double mean, double stdDev) {
-        if (stdDev == 0.0) {
-            return 0.0;
-        }
-        return (value - mean) / stdDev;
-    }
-
-    private static double median(List<Double> values) {
-        if (values.isEmpty()) {
-            return 0.0;
-        }
-        List<Double> sorted = new ArrayList<>(values);
-        Collections.sort(sorted);
-        int middle = sorted.size() / 2;
-        if (sorted.size() % 2 == 0) {
-            return (sorted.get(middle - 1) + sorted.get(middle)) / 2.0;
-        }
-        return sorted.get(middle);
-    }
-
-    private static int zeroIfNull(Integer value) {
-        return value == null ? 0 : Math.max(value, 0);
-    }
-
-    private static int safeToInt(long value) {
-        if (value <= 0) {
-            return 0;
-        }
-        if (value >= Integer.MAX_VALUE) {
-            return Integer.MAX_VALUE;
-        }
-        return (int) value;
     }
 
     /**
@@ -1115,12 +772,9 @@ class PlayerAggregatesService {
             int eligibleGameCount,
             Map<String, PlayerDashboardResponse.TechStat> byTech,
             Map<String, Integer> factionWinsById,
-            PlayerDashboardResponse.StrategyCardStats strategyCardStats,
-            PlayerDashboardResponse.CombatProfile combatProfile,
             PlayerDashboardResponse.EconomyProfile economyProfile,
             PlayerDashboardResponse.FactionTechSynergy factionTechSynergy,
-            PlayerDashboardResponse.SpeakerImpact speakerImpact,
-            PlayerDashboardResponse.AggressionProfile aggressionProfile) {}
+            PlayerDashboardResponse.SpeakerImpact speakerImpact) {}
 
     private record StoredAggregates(
             int version,
@@ -1129,12 +783,9 @@ class PlayerAggregatesService {
             Integer eligibleGameCount,
             Map<String, PlayerDashboardResponse.TechStat> techById,
             Map<String, Integer> factionWinsById,
-            PlayerDashboardResponse.StrategyCardStats strategyCardStats,
-            PlayerDashboardResponse.CombatProfile combatProfile,
             PlayerDashboardResponse.EconomyProfile economyProfile,
             PlayerDashboardResponse.FactionTechSynergy factionTechSynergy,
-            PlayerDashboardResponse.SpeakerImpact speakerImpact,
-            PlayerDashboardResponse.AggressionProfile aggressionProfile) {}
+            PlayerDashboardResponse.SpeakerImpact speakerImpact) {}
 
     private static final class MutableFactionSynergy {
         private int games;
@@ -1148,6 +799,4 @@ class PlayerAggregatesService {
         private int winsWithTech;
         private int nonWinsWithTech;
     }
-
-    record AggressionInput(int combatsInitiated, int planetsStolen, int tacticalsWithCombat) {}
 }

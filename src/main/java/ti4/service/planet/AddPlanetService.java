@@ -41,7 +41,6 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
-import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 
@@ -285,9 +284,6 @@ public class AddPlanetService {
                     + ". Click to confirm a valid combat occurred and to draw 1 action card or delete these buttons (note: this technology is max once per action).";
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), msg10, ButtonHelper.getScavengerExosButtons(player));
-        }
-        if (!setup && player.isRealPlayer()) {
-            RoundStatsTracker.recordPlanetTaken(game, player, alreadyOwned);
         }
         if (!alreadyOwned
                 && game.isMinorFactionsMode()
