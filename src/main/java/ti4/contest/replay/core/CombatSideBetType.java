@@ -7,7 +7,7 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 
 /**
- * Defines the supported combat side bets, their labels, availability gates, and legacy flat payouts.
+ * Defines the supported combat side bets, their labels, availability gates, and baseline payouts.
  */
 public enum CombatSideBetType {
     /** Current AFB side bet: player skips available anti-fighter barrage. */

@@ -38,7 +38,6 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.LoreService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.leader.CommanderUnlockCheckService;
-import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -130,7 +129,6 @@ public final class ButtonHelperTacticalAction {
             if (player.hasAbility("dream_nexus")) {
                 DreamButtonHandler.offerLiturgyButtons(event, game, player);
             }
-            RoundStatsTracker.finalizeTactical(game, player);
             resetStoredValuesForTacticalAction(game);
         }
     }
@@ -396,13 +394,9 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("ghostagent_active");
 
         game.getTacticalActionDisplacement().clear();
-        for (Player player : game.getRealPlayers()) {
-            RoundStatsTracker.clearTacticalMarkers(game, player);
-        }
     }
 
     public static void beginTacticalAction(Game game, Player player) {
-        RoundStatsTracker.markTacticalStart(game, player);
         boolean prefersDistanceBasedTacticalActions =
                 UserSettingsManager.get(player.getUserID()).isPrefersDistanceBasedTacticalActions();
         if (!game.isFowMode() && game.getRingCount() < 5 && prefersDistanceBasedTacticalActions) {

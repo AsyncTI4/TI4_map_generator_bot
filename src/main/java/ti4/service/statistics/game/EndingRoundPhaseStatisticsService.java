@@ -54,7 +54,7 @@ class EndingRoundPhaseStatisticsService {
         endingRoundAndPhaseCount.merge(formatFullRoundPhaseLabel(game.getRound(), phaseCode), 1, Integer::sum);
         for (Player winner : game.getWinners()) {
             statsByFaction
-                    .computeIfAbsent(winner.getFaction(), ignored -> new FactionWinningRoundStats())
+                    .computeIfAbsent(winner.getFaction(), _ -> new FactionWinningRoundStats())
                     .addWin(game.getRound(), phaseCode);
         }
     }
@@ -151,9 +151,7 @@ class EndingRoundPhaseStatisticsService {
         void addWin(int round, String phaseCode) {
             totalWins++;
             totalRoundSum += round;
-            winsByRoundAndPhase
-                    .computeIfAbsent(round, ignored -> new HashMap<>())
-                    .merge(phaseCode, 1, Integer::sum);
+            winsByRoundAndPhase.computeIfAbsent(round, _ -> new HashMap<>()).merge(phaseCode, 1, Integer::sum);
         }
 
         double getAverageRound() {

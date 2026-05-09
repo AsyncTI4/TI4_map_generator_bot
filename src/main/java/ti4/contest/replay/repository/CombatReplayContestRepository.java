@@ -29,10 +29,6 @@ public interface CombatReplayContestRepository extends JpaRepository<CombatRepla
     List<CombatReplayContestEntity> findByReplayStatusInAndNextReplayAtLessThanEqualOrderByNextReplayAtAsc(
             Collection<CombatContestReplayStatus> replayStatuses, LocalDateTime nextReplayAt);
 
-    List<CombatReplayContestEntity>
-            findByReplayStatusAndSideBetMarketPostedAtIsNullAndPostedAtLessThanEqualOrderByPostedAtAsc(
-                    CombatContestReplayStatus replayStatus, LocalDateTime postedAt);
-
     boolean existsByPostedAtGreaterThanEqual(LocalDateTime postedAt);
 
     long countByPostedAtGreaterThanEqual(LocalDateTime postedAt);
