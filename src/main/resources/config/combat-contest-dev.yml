@@ -9,11 +9,11 @@ candidateSelection:
 promotion:
   enabled: true
   intervalSeconds: 5
-  candidateLookbackHours: 12
-  maxPromotionsPerHour: 100
 
 replayExecution:
   startDelaySeconds: 15
+  dailyLockHourCentral: -1
+  dailyLockMinuteCentral: 0
   replayIntervalSeconds: 1
   maxEventGapSeconds: 1
   pendingResolutionWindowSeconds: 30

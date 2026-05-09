@@ -1,14 +1,15 @@
 package ti4.contest.replay.service;
 
 import java.time.Clock;
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -39,8 +40,9 @@ import ti4.logging.BotLogger;
 public class CombatReplayPromotionService {
 
     private static final String PROMOTION_DISABLED_REASON = "Candidate-to-contest promotion is disabled.";
-    private static final Duration PUBLIC_PROMOTION_COOLDOWN = Duration.ofHours(2);
-    private static final Duration PUBLIC_PROMOTION_COOLDOWN_GRACE = Duration.ofMinutes(5);
+    private static final ZoneId CENTRAL_TIME = ZoneId.of("America/Chicago");
+    private static final Set<CombatContestReplayStatus> ACTIVE_REPLAY_STATUSES =
+            Set.of(CombatContestReplayStatus.PENDING, CombatContestReplayStatus.REPLAYING);
 
     private final CombatContestSettings settings;
     private final CombatCandidateRepository candidateRepository;
@@ -54,22 +56,16 @@ public class CombatReplayPromotionService {
     public void promoteBestCandidateIfDue() {
         if (!settings.getPromotion().isEnabled()) return;
 
-        LocalDateTime now = LocalDateTime.now(clock);
         if (settings.getRuntime().isImmediatePromotionOnResolve()) {
-            CombatCandidateEntity winner = selectPromotionWinner(findPromotionCandidates(now));
+            CombatCandidateEntity winner = selectPromotionWinner(findPromotionCandidates());
             if (winner == null) return;
             promoteCandidate(winner);
             return;
         }
 
-        int maxPromotionsPerHour = settings.getPromotion().getMaxPromotionsPerHour();
-        if (maxPromotionsPerHour <= 0) return;
+        if (replayContestRepository.existsByReplayStatusIn(ACTIVE_REPLAY_STATUSES)) return;
 
-        LocalDateTime publicPromotionWindow = now.truncatedTo(ChronoUnit.MINUTES);
-        if (publicPromotionWindow.getMinute() != 0) return;
-        if (!canPublicPromoteAt(publicPromotionWindow)) return;
-
-        CombatCandidateEntity winner = selectPromotionWinner(findPromotionCandidates(publicPromotionWindow));
+        CombatCandidateEntity winner = selectPromotionWinner(findPromotionCandidates());
         if (winner == null) return;
         promoteCandidate(winner);
     }
@@ -116,22 +112,13 @@ public class CombatReplayPromotionService {
         return CombatReplayContestLifecycleService.ForcePromoteResult.promoted(contest);
     }
 
-    private List<CombatCandidateEntity> findPromotionCandidates(LocalDateTime now) {
-        int configuredLookbackHours = settings.getPromotion().getCandidateLookbackHours();
-        int maxLookbackHours =
-                Math.max(configuredLookbackHours, CombatContestSettings.PROMOTION_LOOKBACK_FALLBACK_MAX_HOURS);
-        for (int lookbackHours = configuredLookbackHours; lookbackHours <= maxLookbackHours; lookbackHours++) {
-            List<CombatCandidateEntity> candidates = candidateRepository.findResolvedPromotionCandidates(
-                    CombatCandidateStatus.RESOLVED,
-                    CombatCandidatePromotionStatus.PENDING,
-                    now.minusHours(lookbackHours));
-            candidates = candidates.stream()
-                    .filter(candidate -> !expireIfDiscordantStars(candidate))
-                    .filter(this::usesCurrentReplaySnapshotFormat)
-                    .toList();
-            if (!candidates.isEmpty()) return candidates;
-        }
-        return List.of();
+    private List<CombatCandidateEntity> findPromotionCandidates() {
+        List<CombatCandidateEntity> candidates = candidateRepository.findResolvedPromotionCandidates(
+                CombatCandidateStatus.RESOLVED, CombatCandidatePromotionStatus.PENDING);
+        return candidates.stream()
+                .filter(candidate -> !expireIfDiscordantStars(candidate))
+                .filter(this::usesCurrentReplaySnapshotFormat)
+                .toList();
     }
 
     private CombatReplayContestEntity promoteCandidate(CombatCandidateEntity winner) {
@@ -143,10 +130,6 @@ public class CombatReplayPromotionService {
     private CombatReplayContestEntity promoteCandidate(
             CombatCandidateEntity winner, CombatReplayContestEntity existingContest) {
         if (expireIfDiscordantStars(winner)) return null;
-
-        CombatObservationEntity observation =
-                observationRepository.findById(winner.getObservationId()).orElse(null);
-        if (observation == null) return null;
 
         Game game = loadGame(winner.getGameName());
         if (game == null) return null;
@@ -172,25 +155,8 @@ public class CombatReplayPromotionService {
         }
     }
 
-    private boolean canPublicPromoteAt(LocalDateTime publicPromotionWindow) {
-        if (publicPromotionWindow == null) return false;
-        if (!settings.getRuntime().isDevMode()
-                && replayContestRepository.countByPostedAtGreaterThanEqual(
-                                publicPromotionCooldownCutoff(publicPromotionWindow))
-                        > 0) {
-            return false;
-        }
-        return replayContestRepository.countByPostedAtGreaterThanEqual(
-                        publicPromotionWindow.truncatedTo(ChronoUnit.HOURS))
-                < settings.getPromotion().getMaxPromotionsPerHour();
-    }
-
     void setClock(Clock clock) {
         this.clock = clock == null ? Clock.systemDefaultZone() : clock;
-    }
-
-    static LocalDateTime publicPromotionCooldownCutoff(LocalDateTime now) {
-        return now.minus(PUBLIC_PROMOTION_COOLDOWN).plus(PUBLIC_PROMOTION_COOLDOWN_GRACE);
     }
 
     String snapshotStartSummaryText(CombatCandidateEntity candidate) {
@@ -332,7 +298,7 @@ public class CombatReplayPromotionService {
             long publicMessageId,
             Long publicThreadId,
             LocalDateTime promotedAt) {
-        LocalDateTime replayStartAt = promotedAt.plusSeconds(replayStartDelaySeconds());
+        LocalDateTime replayStartAt = computeReplayStartAt(promotedAt);
         contest.setCandidateId(winner.getId());
         contest.setPostedAt(promotedAt);
         contest.setPublicChannelId(publicChannelId);
@@ -344,8 +310,22 @@ public class CombatReplayPromotionService {
         contest.setNextEventSequence(1);
     }
 
-    private int replayStartDelaySeconds() {
-        return settings.getReplayExecution().getStartDelaySeconds();
+    private LocalDateTime computeReplayStartAt(LocalDateTime promotedAt) {
+        int dailyLockHourCentral = settings.getReplayExecution().getDailyLockHourCentral();
+        if (dailyLockHourCentral < 0) {
+            return promotedAt.plusSeconds(settings.getReplayExecution().getStartDelaySeconds());
+        }
+
+        ZonedDateTime promotedCentral = promotedAt.atZone(clock.getZone()).withZoneSameInstant(CENTRAL_TIME);
+        ZonedDateTime replayStartCentral = promotedCentral
+                .withHour(dailyLockHourCentral)
+                .withMinute(settings.getReplayExecution().getDailyLockMinuteCentral())
+                .withSecond(0)
+                .withNano(0);
+        if (!replayStartCentral.isAfter(promotedCentral)) {
+            replayStartCentral = replayStartCentral.plusDays(1);
+        }
+        return replayStartCentral.withZoneSameInstant(clock.getZone()).toLocalDateTime();
     }
 
     private Game loadGame(String gameName) {

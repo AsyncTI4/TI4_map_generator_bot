@@ -184,7 +184,7 @@ public class LazaxCombatSupport {
                 + "\n"
                 + "**System:** " + tileRepresentation + "\n"
                 + "**Combat:** Space Combat\n"
-                + "**Predict the winner by reacting below.**\n"
+                + "**React below to predict the winner. Side betting is open in the replay thread.**\n"
                 + "_Losers get -4 points._\n"
                 + attackerLine + "\n"
                 + defenderLine;
