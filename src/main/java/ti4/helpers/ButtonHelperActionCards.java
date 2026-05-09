@@ -669,7 +669,7 @@ public final class ButtonHelperActionCards {
 
                     if (hitRolls > 0) {
                         pendingRemovals
-                                .computeIfAbsent(uH, ignored -> new HashMap<>())
+                                .computeIfAbsent(uH, _ -> new HashMap<>())
                                 .put(key, hitRolls);
                         totalDamageDealt += hitRolls;
                         if (key.unitType() == UnitType.Mech && player_.hasActiveBreakthrough("naazbt")) {

@@ -34,7 +34,7 @@ public class FactionTopColorsStatisticsService {
                     }
 
                     colorCountsByFaction
-                            .computeIfAbsent(faction, ignored -> new HashMap<>())
+                            .computeIfAbsent(faction, _ -> new HashMap<>())
                             .merge(color, 1, Integer::sum);
                 }));
 

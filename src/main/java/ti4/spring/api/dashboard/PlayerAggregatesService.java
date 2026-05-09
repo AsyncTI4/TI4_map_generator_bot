@@ -344,8 +344,7 @@ class PlayerAggregatesService {
                 continue;
             }
 
-            MutableFactionSynergy faction =
-                    accumulators.computeIfAbsent(factionId, ignored -> new MutableFactionSynergy());
+            MutableFactionSynergy faction = accumulators.computeIfAbsent(factionId, _ -> new MutableFactionSynergy());
             faction.games++;
             if (snapshot.playerWon()) {
                 faction.wins++;
@@ -354,7 +353,7 @@ class PlayerAggregatesService {
             }
 
             for (String techId : snapshot.canonicalTechs()) {
-                MutableFactionTech tech = faction.byTech.computeIfAbsent(techId, ignored -> new MutableFactionTech());
+                MutableFactionTech tech = faction.byTech.computeIfAbsent(techId, _ -> new MutableFactionTech());
                 tech.gamesWithTech++;
                 if (snapshot.playerWon()) {
                     tech.winsWithTech++;
