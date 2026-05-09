@@ -1364,6 +1364,8 @@ public final class TransactionHelper {
             }
         }
 
+        if (pillagersToPillaged.isEmpty()) return "";
+
         StringBuilder notice = new StringBuilder();
         notice.append("NOTICE OF PROXIMITY SURCHARGE")
                 .append("\nFrom: ")
