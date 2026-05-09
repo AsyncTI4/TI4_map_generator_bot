@@ -55,7 +55,6 @@ public final class TransactionHelper {
             "The Trade Adjustment Bureau",
             "The Revenue Rebalancing Division",
             "The Asset Discovery Group",
-            "The Trade Compliance Office",
             "The Interstellar Tariff Commission",
             "The Bureau of Fair Exchange (Terms Pending)",
             "The Celestial Tax Authority",
@@ -65,7 +64,7 @@ public final class TransactionHelper {
             "Mentax LLC",
             "Loot & Scoot LLC",
             "Third-Party Logistics (Uninvited)",
-            "The Unscheduled Audit Team",
+            "An Unscheduled Audit Team",
             "Cargo Inspection Services",
             "The Department of Spontaneous Fees",
             "Transaction Integrity Consultants",
@@ -389,9 +388,7 @@ public final class TransactionHelper {
                         }
                     }
                     case "Frags" ->
-                        trans.append(ExploreEmojis.getFragEmoji(furtherDetail)
-                                .toString()
-                                .repeat(amountToTransact));
+                        trans.repeat(ExploreEmojis.getFragEmoji(furtherDetail).toString(), amountToTransact);
                     case "Technology" ->
                         trans.append(Mapper.getTech(furtherDetail).getRepresentation(false));
                     case "Planets", "AlliancePlanets", "dmz" ->
@@ -1367,10 +1364,10 @@ public final class TransactionHelper {
         if (pillagersToPillaged.isEmpty()) return "";
 
         StringBuilder notice = new StringBuilder();
-        notice.append("NOTICE OF PROXIMITY SURCHARGE")
-                .append("\nFrom: ")
+        notice.append("> NOTICE OF PROXIMITY SURCHARGE")
+                .append("\n> FROM: ")
                 .append(getRandomPillageSource())
-                .append("\nResolution: 1 ")
+                .append("\n> 1 ")
                 .append(MiscEmojis.tg)
                 .append(" possibly routed from ");
         if (pillagersToPillaged.size() == 1) {
@@ -1379,7 +1376,7 @@ public final class TransactionHelper {
             appendPillageMessage(notice, pillagerToPillaged);
         } else {
             for (Map.Entry<String, List<String>> pillagerToPillaged : pillagersToPillaged.entrySet()) {
-                notice.append("\n • ");
+                notice.append("\n> • ");
                 appendPillageMessage(notice, pillagerToPillaged);
             }
         }
