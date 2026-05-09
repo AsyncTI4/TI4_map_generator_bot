@@ -1235,10 +1235,10 @@ public final class TransactionHelper {
                 player.getRepresentationNoPing() + " sent a transaction offer to " + p2.getRepresentationNoPing()
                         + ".");
         String pillageNotice = buildPillageNotice(game, player, p2);
-        String publicOfferText = buildTradeOfferText(player, p2, game, true, pillageNotice);
         String privateOfferText = buildTradeOfferText(player, p2, game, false, pillageNotice);
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         if (tableTalkChannel != null) {
+            String publicOfferText = buildTradeOfferText(player, p2, game, true, pillageNotice);
             boolean sentMeme = false;
             if (sendMemeInsteadOfText(event, game)) {
                 BufferedImage tradeOfferMeme = TransactionGenerator.drawTradeOfferMeme(game, player, p2);
@@ -1249,11 +1249,7 @@ public final class TransactionHelper {
                     sentMeme = true;
                 }
             }
-            if (sentMeme) {
-                if (!pillageNotice.isEmpty()) {
-                    MessageHelper.sendMessageToChannel(tableTalkChannel, pillageNotice);
-                }
-            } else {
+            if (!sentMeme) {
                 String offerMessage = "Trade offer from " + player.getRepresentationNoPing() + " to "
                         + p2.getRepresentationNoPing() + ":\n" + publicOfferText;
                 MessageHelper.sendMessageToChannel(tableTalkChannel, offerMessage);
