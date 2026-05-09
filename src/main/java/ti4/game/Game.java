@@ -99,7 +99,6 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
-import ti4.service.statistics.round.RoundStatsTracker;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -1421,15 +1420,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             elapsedTime = 60_000; // if for some reason the last Active player change was never set, ignore the time
         }
         if (prevPlayer != null) {
-            long effectiveTurnTime = elapsedTime;
             if (!factionsInCombat.contains(prevFaction) && !isTemporaryPingDisable()) {
                 prevPlayer.updateTurnStats(elapsedTime);
             } else {
-                effectiveTurnTime =
-                        Math.min(elapsedTime, prevPlayer.getTotalTurnTime() / (prevPlayer.getNumberOfTurns() + 1));
                 prevPlayer.updateTurnStatsWithAverage(elapsedTime);
             }
-            RoundStatsTracker.recordTurnTime(this, prevPlayer, effectiveTurnTime);
         }
 
         setStoredValue("factionsInCombat", "");
