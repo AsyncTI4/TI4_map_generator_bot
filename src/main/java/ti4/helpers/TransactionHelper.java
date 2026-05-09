@@ -51,6 +51,37 @@ import ti4.settings.users.UserSettingsManager;
 
 public final class TransactionHelper {
 
+    private static final List<String> shadyOrganizations = List.of(
+            "The Trade Adjustment Bureau",
+            "The Revenue Rebalancing Division",
+            "The Asset Discovery Group",
+            "The Trade Compliance Office",
+            "The Interstellar Tariff Commission",
+            "The Bureau of Fair Exchange (Terms Pending)",
+            "The Celestial Tax Authority",
+            "Hostile Acquisitions United",
+            "Liquidation Services",
+            "Yoink Industries",
+            "Mentax LLC",
+            "Loot & Scoot LLC",
+            "Third-Party Logistics (Uninvited)",
+            "The Unscheduled Audit Team",
+            "Cargo Inspection Services",
+            "The Department of Spontaneous Fees",
+            "Transaction Integrity Consultants",
+            "Surprise Donation Coordinators",
+            "Finders Keepers Ltd.",
+            "A Totally Legitimate Business",
+            "The Bureau of Unsolicited Redistribution",
+            "The Internal Robbery Service",
+            "Audits Without Borders",
+            "Robinhood and Crew",
+            "Alternative Investment Strategies LLC",
+            "Peg Leg Medical Care Society",
+            "Eye Patch Distribution Services",
+            "P.I.L.L.A.G.E (Proximity Induced Liquidity Loss & Asset Garnishment Entity)",
+            "Deviants Without Borders");
+
     private static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
         List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
         List<Player> players = new ArrayList<>();
@@ -1310,44 +1341,48 @@ public final class TransactionHelper {
             }
         }
 
-        Map<Player, List<String>> pillagersToPillaged = new LinkedHashMap<>();
+        // compute who can pillage
+        Map<String, List<String>> pillagersToPillaged = new LinkedHashMap<>();
         if (ButtonHelperAbilities.canBePillaged(p1, game, p1TgAfter)) {
             for (Player neighbor : p1.getNeighbouringPlayers(true)) {
-                if (neighbor == p1 || neighbor == p2 || !neighbor.hasAbility("pillage")) {
+                if (!neighbor.hasAbility("pillage")) {
                     continue;
                 }
                 pillagersToPillaged
-                        .computeIfAbsent(neighbor, ignored -> new ArrayList<>())
+                        .computeIfAbsent(neighbor.getRepresentationNoPing(), ignored -> new ArrayList<>())
                         .add(p1.getRepresentationNoPing());
             }
         }
         if (ButtonHelperAbilities.canBePillaged(p2, game, p2TgAfter)) {
             for (Player neighbor : p2.getNeighbouringPlayers(true)) {
-                if (neighbor == p1 || neighbor == p2 || !neighbor.hasAbility("pillage")) {
+                if (!neighbor.hasAbility("pillage")) {
                     continue;
                 }
                 pillagersToPillaged
-                        .computeIfAbsent(neighbor, ignored -> new ArrayList<>())
+                        .computeIfAbsent(neighbor.getRepresentationNoPing(), ignored -> new ArrayList<>())
                         .add(p2.getRepresentationNoPing());
             }
         }
 
-        if (pillagersToPillaged.isEmpty()) {
-            return "";
-        }
-
         StringBuilder notice = new StringBuilder();
-        for (Map.Entry<Player, List<String>> pillagerToPillaged : pillagersToPillaged.entrySet()) {
-            if (!notice.isEmpty()) {
-                notice.append('\n');
-            }
-            notice.append("NOTICE OF REDISTRIBUTION")
-                    .append("\nFrom: ")
+        notice.append("NOTICE OF PROXIMITY SURCHARGE")
+                .append("\nFrom: ")
+                .append(getRandomPillageSource())
+                .append("\nResolution: 1 ")
+                .append(MiscEmojis.tg)
+                .append(" possibly routed from ");
+        for (Map.Entry<String, List<String>> pillagerToPillaged : pillagersToPillaged.entrySet()) {
+            notice.append("\n • ")
                     .append(String.join(", ", pillagerToPillaged.getValue()))
-                    .append("\nTo: ")
-                    .append(pillagerToPillaged.getKey().getRepresentationNoPing());
+                    .append(" to ")
+                    .append(pillagerToPillaged.getKey());
         }
         return notice.toString();
+    }
+
+    private static String getRandomPillageSource() {
+        int randomIndex = ThreadLocalRandom.current().nextInt(0, shadyOrganizations.size());
+        return shadyOrganizations.get(randomIndex);
     }
 
     @ButtonHandler("transact_")
