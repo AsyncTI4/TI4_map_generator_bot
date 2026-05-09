@@ -14,6 +14,8 @@ class ThreadCreateListener extends ListenerAdapter {
     public void onChannelCreate(@NotNull ChannelCreateEvent event) {
         if (!ActiveLeaseService.shouldHandleCurrentProcessInteraction()) return;
         if (!event.getChannelType().isThread()) return;
+        // These are archived already, and if this listener fails it could death spiral on Stack Trace threads
+        if ("Stack Trace".equalsIgnoreCase(event.getChannel().getName())) return;
 
         // lock per guild so we don't run it more than once
         ExecutorServiceManager.runAsyncWithLock(
