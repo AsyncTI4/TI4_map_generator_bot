@@ -43,12 +43,10 @@ public interface CombatCandidateRepository extends JpaRepository<CombatCandidate
             where c.status = :status
               and c.promotionStatus = :promotionStatus
               and c.resolvedAt is not null
-              and c.resolvedAt >= :resolvedAfter
             """)
     List<CombatCandidateEntity> findResolvedPromotionCandidates(
             @Param("status") CombatCandidateStatus status,
-            @Param("promotionStatus") CombatCandidatePromotionStatus promotionStatus,
-            @Param("resolvedAfter") LocalDateTime resolvedAfter);
+            @Param("promotionStatus") CombatCandidatePromotionStatus promotionStatus);
 
     List<CombatCandidateEntity> findByPromotionStatusAndResolvedAtBefore(
             CombatCandidatePromotionStatus promotionStatus, LocalDateTime resolvedAt);
