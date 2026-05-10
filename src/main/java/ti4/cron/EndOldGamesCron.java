@@ -43,7 +43,7 @@ public class EndOldGamesCron {
         BotLogger.logCron("Finished EndOldGamesCron.");
     }
 
-    private void endIfOld(Game game) {
+    private static void endIfOld(Game game) {
         LocalDate lastModifiedDate = Instant.ofEpochMilli(game.getLastModifiedDate())
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();

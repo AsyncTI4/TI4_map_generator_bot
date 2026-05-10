@@ -32,12 +32,13 @@ public class ConsumeGameUtility {
             var managed = GameManager.getManagedGame(gameName);
             if (managed == null) continue;
             ExecutionLockManager.wrapWithLockAndRelease(gameName, lockType, () -> {
-                Game game = managed.getGame();
+                        Game game = managed.getGame();
 
-                if (filter == null || filter.test(game)) {
-                    consumer.accept(game);
-                }
-            });
+                        if (filter == null || filter.test(game)) {
+                            consumer.accept(game);
+                        }
+                    })
+                    .run();
         }
     }
 }
