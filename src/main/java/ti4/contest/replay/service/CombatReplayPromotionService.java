@@ -134,11 +134,12 @@ public class CombatReplayPromotionService {
         Game game = loadGame(winner.getGameName());
         if (game == null) return null;
 
-        String startSummaryText = snapshotStartSummaryText(winner);
-        String message = LazaxCombatSupport.formatReplayAnnouncement(game, winner, "", startSummaryText);
-
         TextChannel contestChannel = discordPostService.getContestChannel();
         if (contestChannel == null) return null;
+
+        String startSummaryText = snapshotStartSummaryText(winner);
+        String message = LazaxCombatSupport.formatReplayAnnouncement(
+                game, winner, LazaxMinigameRoleHelper.mention(contestChannel), startSummaryText);
 
         try {
             LocalDateTime promotedAt = LocalDateTime.now(clock);
@@ -272,6 +273,7 @@ public class CombatReplayPromotionService {
         configureReplayContest(existingContest, winner, publicChannelId, publicMessageId, publicThreadId, promotedAt);
         existingContest.setReplayCompletedAt(null);
         existingContest.setPreReplayContextPostedAt(null);
+        existingContest.setReplayStartWarningPostedAt(null);
         existingContest.setLeaderboardPostedAt(null);
         existingContest.setSideBetSummaryMessageId(null);
         existingContest.setSideBetButtonsPostedAt(null);

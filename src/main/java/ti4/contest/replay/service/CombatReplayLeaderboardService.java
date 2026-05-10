@@ -48,7 +48,7 @@ import ti4.message.MessageHelper;
 public class CombatReplayLeaderboardService {
 
     public static final String LAZAX_MINIGAME_SUBSCRIPTION_MARKER = "-# Lazax Minigame Subscription";
-    public static final String LAZAX_MINIGAME_ROLE_NAME = "Lazax Minigame";
+    public static final String LAZAX_MINIGAME_ROLE_NAME = LazaxMinigameRoleHelper.ROLE_NAME;
 
     private static final int WRONG_PREDICTION_PENALTY = -4;
     private static final String SUBSCRIBE_EMOJI = "\uD83D\uDFE2";
@@ -381,9 +381,8 @@ public class CombatReplayLeaderboardService {
         } else {
             StringBuilder winners = new StringBuilder(message).append("\n\n");
             for (WinningPredictionSummary prediction : winningPredictions) {
-                winners.append("<@")
-                        .append(prediction.discordUserId())
-                        .append("> - ")
+                winners.append(getSafeLeaderboardName(prediction.discordUserName()))
+                        .append(" - ")
                         .append(prediction.totalPoints())
                         .append(" points (pred +")
                         .append(prediction.pointsAwarded())
@@ -405,9 +404,8 @@ public class CombatReplayLeaderboardService {
         StringBuilder message = new StringBuilder("## Side Bets\n");
         for (AggregatedSideBetSummary sideBet : aggregatedSideBets) {
             String repeats = sideBet.hitCount() > 1 ? " x" + sideBet.hitCount() : "";
-            message.append("<@")
-                    .append(sideBet.discordUserId())
-                    .append("> - *")
+            message.append(getSafeLeaderboardName(sideBet.discordUserName()))
+                    .append(" - *")
                     .append(sideBet.label())
                     .append("*")
                     .append(repeats)

@@ -179,9 +179,8 @@ public class LazaxCombatSupport {
         String attackerLine = formatReplayLegendLine(attacker, candidate.getAttackerFaction(), false);
         String defenderLine = formatReplayLegendLine(defender, candidate.getDefenderFaction(), false);
 
-        String openerText = "## A New Combat Contest Has Emerged!\n"
-                + roleMention
-                + "\n"
+        String openerText = (roleMention == null || roleMention.isBlank() ? "" : roleMention + "\n")
+                + "## A New Combat Contest Has Emerged!\n"
                 + "**System:** " + tileRepresentation + "\n"
                 + "**Combat:** Space Combat\n"
                 + "**React below to predict the winner. Side betting is open in the replay thread.**\n"

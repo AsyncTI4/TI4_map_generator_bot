@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayLeaderboardService;
+import ti4.contest.replay.service.LazaxMinigameRoleHelper;
 import ti4.discord.JdaService;
 import ti4.executors.ExecutorServiceManager;
 import ti4.logging.BotLogger;
@@ -56,10 +57,7 @@ class LazaxMinigameReactionListener extends ListenerAdapter {
         String emoji = event.getEmoji().getName();
         if (!SUBSCRIBE_EMOJI.equals(emoji) && !UNSUBSCRIBE_EMOJI.equals(emoji)) return;
 
-        Role role =
-                event.getGuild().getRolesByName(CombatReplayLeaderboardService.LAZAX_MINIGAME_ROLE_NAME, true).stream()
-                        .findFirst()
-                        .orElse(null);
+        Role role = LazaxMinigameRoleHelper.findRole(event.getGuild());
         if (role == null) {
             BotLogger.warning("Lazax Minigame role not found in guild: "
                     + event.getGuild().getId());
