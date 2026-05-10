@@ -15,6 +15,6 @@ public class EndPhaseService {
         } else {
             StartPhaseService.startStatusHomework(event, game);
         }
-        StatusHelper.handleStatusPhaseMiddle(event, game, gameChannel);
+        StatusHelper.handleStatusPhaseMiddle(game);
     }
 }

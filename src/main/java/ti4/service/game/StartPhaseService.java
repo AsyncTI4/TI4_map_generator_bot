@@ -110,7 +110,7 @@ public class StartPhaseService {
             case "statusScoring" -> {
                 StatusHelper.announceStatusPhase(game);
                 StatusHelper.beginScoring(event, game, event.getMessageChannel());
-                StatusHelper.handleStatusPhaseMiddle(event, game, event.getMessageChannel());
+                StatusHelper.handleStatusPhaseMiddle(game);
                 game.updateActivePlayer(null);
             }
             case "endOfGameSummary" -> {
