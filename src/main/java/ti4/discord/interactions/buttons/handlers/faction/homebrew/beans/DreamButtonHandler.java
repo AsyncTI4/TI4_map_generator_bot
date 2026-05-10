@@ -32,15 +32,21 @@ import ti4.service.unit.RemoveUnitService;
 @UtilityClass
 public class DreamButtonHandler {
 
-    private static final String NEXUS_TOKEN = "beansnexus";
+    private static final String DREAM_FACTION = "dream";
+    private static final String DREAM_FLAGSHIP_UNIT = "dream_flagship";
+    private static final String NEXUS_TOKEN_ALIAS = "beansnexus";
+    private static final String NO_SOURCE_PLANET = "none";
+
     private static final String LITURGY_I_UNIT = "dream_destroyer";
     private static final String LITURGY_II_UNIT = "dream_destroyer2";
     private static final String LITURGY_II_TECH = "bedreamdd";
-    private static final String BACK_TO_LITURGY_MENU_BUTTON_ID = "dream_liturgy_menu_back";
-    private static final String DREAM_AGENT_TILE_KEY = "dreamAgentIgnoredAnomalyTile";
-    private static final String DREAM_AGENT_PLAYER_KEY = "dreamAgentIgnoredAnomalyPlayer";
-    private static final String DREAM_HERO_NEXUS_USES_KEY = "dreamHeroNexusUses";
-    private static final String NO_RECURRING_MECH_SOURCE_PLANET = "none";
+    private static final String LITURGY_MENU_BUTTON_ID = "dream_liturgy_menu_back";
+
+    private static final String AGENT_IGNORED_ANOMALY_TILE_KEY = "dreamAgentIgnoredAnomalyTile";
+    private static final String AGENT_IGNORED_ANOMALY_PLAYER_KEY = "dreamAgentIgnoredAnomalyPlayer";
+    private static final String HERO_NEXUS_USES_KEY = "dreamHeroNexusUses";
+
+    // Liturgy I / II
 
     public static void offerLiturgyButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         Tile tile = getActiveLiturgyTile(game, player);
@@ -93,7 +99,7 @@ public class DreamButtonHandler {
                     "dream_add_nexus" + tileWithUnits.getPosition(),
                     "Place nexus in " + tileWithUnits.getRepresentationForButtons(game, player)));
         }
-        buttons.add(Buttons.gray(BACK_TO_LITURGY_MENU_BUTTON_ID, "Back"));
+        buttons.add(Buttons.gray(LITURGY_MENU_BUTTON_ID, "Back"));
         buttons.add(Buttons.red("deleteButtons", "Decline"));
 
         MessageHelper.sendMessageToChannelWithButtons(
@@ -128,13 +134,73 @@ public class DreamButtonHandler {
                     player.getRepresentation() + " has no valid nexus token moves available right now.");
             return;
         }
-        buttons.add(Buttons.gray(BACK_TO_LITURGY_MENU_BUTTON_ID, "Back"));
+        buttons.add(Buttons.gray(LITURGY_MENU_BUTTON_ID, "Back"));
         buttons.add(Buttons.red("deleteButtons", "Decline"));
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " choose where to move a nexus token:",
                 buttons);
+    }
+
+    @ButtonHandler("dream_add_nexus")
+    public static void addNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String position = buttonID.replace("dream_add_nexus", "");
+        Tile tile = game.getTileByPosition(position);
+        if (tile == null) {
+            MessageHelper.sendMessageToEventChannel(event, "Could not find that system.");
+            return;
+        }
+        addNexusTokenToTile(game, player, tile);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToEventChannel(
+                event,
+                player.getRepresentation() + " added a nexus token to " + tile.getRepresentationForButtons(game, player)
+                        + ".");
+    }
+
+    @ButtonHandler("dream_move_nexus")
+    public static void moveNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String data = buttonID.replace("dream_move_nexus", "");
+        String[] parts = data.split("_to_");
+        if (parts.length != 2) {
+            MessageHelper.sendMessageToEventChannel(event, "Could not parse nexus move request.");
+            return;
+        }
+        Tile fromTile = game.getTileByPosition(parts[0]);
+        Tile toTile = game.getTileByPosition(parts[1]);
+        if (fromTile == null || toTile == null) {
+            MessageHelper.sendMessageToEventChannel(event, "Could not find one of those systems.");
+            return;
+        }
+        if (!moveNexusTokenBetweenTiles(game, player, fromTile, toTile)) {
+            MessageHelper.sendMessageToEventChannel(event, "The source system does not contain a nexus token.");
+            return;
+        }
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToEventChannel(
+                event,
+                player.getRepresentation() + " moved a nexus token to "
+                        + toTile.getRepresentationForButtons(game, player) + ".");
+    }
+
+    private static Tile getActiveLiturgyTile(Game game, Player player) {
+        if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
+            return null;
+        }
+        String activeSystem = game.getActiveSystem();
+        if (activeSystem == null || activeSystem.isBlank()) {
+            return null;
+        }
+        Tile tile = game.getTileByPosition(activeSystem);
+        if (tile == null) {
+            return null;
+        }
+        if (!ButtonHelper.doesPlayerHaveUnitHere(LITURGY_I_UNIT, player, tile)
+                && !ButtonHelper.doesPlayerHaveUnitHere(LITURGY_II_UNIT, player, tile)) {
+            return null;
+        }
+        return tile;
     }
 
     static boolean hasLiturgyII(Player player, Tile tile) {
@@ -148,6 +214,8 @@ public class DreamButtonHandler {
                 .filter(tile -> tile.containsPlayersUnits(player))
                 .toList();
     }
+
+    // Shared nexus queries
 
     public static List<Tile> getNexusTokenTiles(Game game) {
         List<Tile> nexusTiles = new ArrayList<>();
@@ -183,6 +251,8 @@ public class DreamButtonHandler {
         adjacentPositions.remove(position);
         return adjacentPositions;
     }
+
+    // Xal'thuun, the Dreaming Throne agent
 
     public static void offerDreamAgentButtons(Game game, Player activePlayer) {
         if (game.isL1Hero()
@@ -255,8 +325,8 @@ public class DreamButtonHandler {
             MessageHelper.sendMessageToEventChannel(event, "That is not a valid non-home anomaly.");
             return;
         }
-        game.setStoredValue(DREAM_AGENT_TILE_KEY, tile.getPosition());
-        game.setStoredValue(DREAM_AGENT_PLAYER_KEY, player.getFaction());
+        game.setStoredValue(AGENT_IGNORED_ANOMALY_TILE_KEY, tile.getPosition());
+        game.setStoredValue(AGENT_IGNORED_ANOMALY_PLAYER_KEY, player.getFaction());
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToEventChannel(
                 event,
@@ -266,13 +336,13 @@ public class DreamButtonHandler {
 
     public static boolean playerIgnoresDreamAgentAnomaly(Game game, Player player, Tile tile) {
         if (game == null || player == null || tile == null) return false;
-        return tile.getPosition().equalsIgnoreCase(game.getStoredValue(DREAM_AGENT_TILE_KEY))
-                && player.getFaction().equalsIgnoreCase(game.getStoredValue(DREAM_AGENT_PLAYER_KEY));
+        return tile.getPosition().equalsIgnoreCase(game.getStoredValue(AGENT_IGNORED_ANOMALY_TILE_KEY))
+                && player.getFaction().equalsIgnoreCase(game.getStoredValue(AGENT_IGNORED_ANOMALY_PLAYER_KEY));
     }
 
     public static void clearDreamAgentAnomaly(Game game) {
-        game.removeStoredValue(DREAM_AGENT_TILE_KEY);
-        game.removeStoredValue(DREAM_AGENT_PLAYER_KEY);
+        game.removeStoredValue(AGENT_IGNORED_ANOMALY_TILE_KEY);
+        game.removeStoredValue(AGENT_IGNORED_ANOMALY_PLAYER_KEY);
     }
 
     private static List<Tile> getDreamAgentAnomalyTiles(Game game) {
@@ -282,8 +352,10 @@ public class DreamButtonHandler {
                 .toList();
     }
 
+    // Reality Unbound - Unknown Geometries, the Dreaming Throne hero
+
     public static void postDreamHeroButtons(Game game, Player player) {
-        game.setStoredValue(DREAM_HERO_NEXUS_USES_KEY + player.getFaction(), "0");
+        game.setStoredValue(HERO_NEXUS_USES_KEY + player.getFaction(), "0");
         sendDreamHeroNexusMenu(game, player);
     }
 
@@ -487,7 +559,7 @@ public class DreamButtonHandler {
                 event,
                 player.getRepresentation() + " placed " + units + " in "
                         + tile.getRepresentationForButtons(game, player) + ".");
-        game.removeStoredValue(DREAM_HERO_NEXUS_USES_KEY + player.getFaction());
+        game.removeStoredValue(HERO_NEXUS_USES_KEY + player.getFaction());
         if (FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
             StartCombatService.combatCheck(game, event, tile);
         }
@@ -496,21 +568,20 @@ public class DreamButtonHandler {
     @ButtonHandler("dream_hero_skip_units")
     public static void dreamHeroSkipUnits(ButtonInteractionEvent event, Game game, Player player) {
         ButtonHelper.deleteMessage(event);
-        game.removeStoredValue(DREAM_HERO_NEXUS_USES_KEY + player.getFaction());
+        game.removeStoredValue(HERO_NEXUS_USES_KEY + player.getFaction());
         MessageHelper.sendMessageToEventChannel(
                 event, player.getRepresentation() + " skipped the hero unit placement.");
     }
 
     private static int getDreamHeroNexusUses(Game game, Player player) {
-        String value = game.getStoredValue(DREAM_HERO_NEXUS_USES_KEY + player.getFaction());
+        String value = game.getStoredValue(HERO_NEXUS_USES_KEY + player.getFaction());
         if (value.isBlank()) return 0;
         return Integer.parseInt(value);
     }
 
     private static void incrementDreamHeroNexusUses(Game game, Player player) {
         game.setStoredValue(
-                DREAM_HERO_NEXUS_USES_KEY + player.getFaction(),
-                Integer.toString(getDreamHeroNexusUses(game, player) + 1));
+                HERO_NEXUS_USES_KEY + player.getFaction(), Integer.toString(getDreamHeroNexusUses(game, player) + 1));
     }
 
     private static List<Tile> getDreamHeroNexusDestinations(Game game) {
@@ -524,40 +595,16 @@ public class DreamButtonHandler {
     }
 
     private static List<Tile> getDreamHeroUnitDestinations(Game game, Player player) {
-        return game.getTileMap().values().stream()
-                .filter(tile -> tile.getPlanetUnitHolders().stream()
-                        .anyMatch(planet -> player.getPlanets().contains(planet.getName())))
-                .toList();
+        return getTilesWithPlanetsControlledBy(game, player);
     }
 
-    private static boolean removeNexusTokenFromTile(Tile tile) {
-        String mappedTokenId = Mapper.getTokenID(NEXUS_TOKEN);
-        for (String token : tile.getSpaceUnitHolder().getTokenList()) {
-            if ((mappedTokenId != null && mappedTokenId.equalsIgnoreCase(token))
-                    || NEXUS_TOKEN.equalsIgnoreCase(token)
-                    || NEXUS_TOKEN.equalsIgnoreCase(Mapper.getTokenKey(token))) {
-                return tile.removeToken(token, "space");
-            }
-        }
-        return false;
-    }
-
-    private static void addNexusTokenToTile(Game game, Player player, Tile tile) {
-        tile.addToken(Mapper.getTokenID(NEXUS_TOKEN), "space");
-        CommanderUnlockCheckService.checkPlayer(player, "dream");
-    }
-
-    private static boolean moveNexusTokenBetweenTiles(Game game, Player player, Tile fromTile, Tile toTile) {
-        if (!removeNexusTokenFromTile(fromTile)) return false;
-        addNexusTokenToTile(game, player, toTile);
-        return true;
-    }
+    // The Recurring, the Dreaming Throne mech
 
     public static void offerRecurringMechButtons(
             GenericInteractionCreateEvent event, Game game, Player player, int amount, String sourcePlanet) {
         if (amount < 1) return;
         String source = sourcePlanet == null || sourcePlanet.isBlank() || "space".equalsIgnoreCase(sourcePlanet)
-                ? NO_RECURRING_MECH_SOURCE_PLANET
+                ? NO_SOURCE_PLANET
                 : sourcePlanet;
         List<Button> placeButtons = getRecurringMechPlanetButtons(game, player, amount, source);
         if (placeButtons.isEmpty()) {
@@ -629,6 +676,8 @@ public class DreamButtonHandler {
         return buttons;
     }
 
+    // Dream-Space Convergence, the Dreaming Throne breakthrough
+
     public static void postDreamBtMoveNexusButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         List<Tile> sourceTiles = getNexusTokenTiles(game);
         if (sourceTiles.isEmpty()) {
@@ -661,7 +710,7 @@ public class DreamButtonHandler {
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String fromPosition = buttonID.replace("dream_bt_move_nexus_from_", "");
         Tile fromTile = game.getTileByPosition(fromPosition);
-        if (fromTile == null || !tileContainsNexusToken(game, fromTile)) {
+        if (fromTile == null || !tileContainsNexusToken(game, fromTile, false)) {
             MessageHelper.sendMessageToEventChannel(event, "That system does not contain a movable nexus token.");
             return;
         }
@@ -709,9 +758,8 @@ public class DreamButtonHandler {
     private static List<Tile> getDreamBtNexusDestinations(Game game, Player player, Tile fromTile) {
         return game.getTileMap().values().stream()
                 .filter(tile -> !tile.getPosition().equals(fromTile.getPosition()))
-                .filter(tile -> !tileContainsNexusToken(game, tile))
-                .filter(tile -> tile.getPlanetUnitHolders().stream()
-                        .anyMatch(planet -> player.getPlanets().contains(planet.getName())))
+                .filter(tile -> !tileContainsNexusToken(game, tile, false))
+                .filter(tile -> containsPlanetControlledBy(tile, player))
                 .toList();
     }
 
@@ -742,65 +790,7 @@ public class DreamButtonHandler {
                         + tile.getRepresentationForButtons(game, player) + " with _Dream-Space Convergence_.");
     }
 
-    private static Tile getActiveLiturgyTile(Game game, Player player) {
-        if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
-            return null;
-        }
-        String activeSystem = game.getActiveSystem();
-        if (activeSystem == null || activeSystem.isBlank()) {
-            return null;
-        }
-        Tile tile = game.getTileByPosition(activeSystem);
-        if (tile == null) {
-            return null;
-        }
-        if (!ButtonHelper.doesPlayerHaveUnitHere(LITURGY_I_UNIT, player, tile)
-                && !ButtonHelper.doesPlayerHaveUnitHere(LITURGY_II_UNIT, player, tile)) {
-            return null;
-        }
-        return tile;
-    }
-
-    @ButtonHandler("dream_add_nexus")
-    public static void addNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String position = buttonID.replace("dream_add_nexus", "");
-        Tile tile = game.getTileByPosition(position);
-        if (tile == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Could not find that system.");
-            return;
-        }
-        addNexusTokenToTile(game, player, tile);
-        ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToEventChannel(
-                event,
-                player.getRepresentation() + " added a nexus token to " + tile.getRepresentationForButtons(game, player)
-                        + ".");
-    }
-
-    @ButtonHandler("dream_move_nexus")
-    public static void moveNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String data = buttonID.replace("dream_move_nexus", "");
-        String[] parts = data.split("_to_");
-        if (parts.length != 2) {
-            MessageHelper.sendMessageToEventChannel(event, "Could not parse nexus move request.");
-            return;
-        }
-        Tile fromTile = game.getTileByPosition(parts[0]);
-        Tile toTile = game.getTileByPosition(parts[1]);
-        if (fromTile == null || toTile == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Could not find one of those systems.");
-            return;
-        }
-        if (!moveNexusTokenBetweenTiles(game, player, fromTile, toTile)) {
-            MessageHelper.sendMessageToEventChannel(event, "The source system does not contain a nexus token.");
-            return;
-        }
-        ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToEventChannel(
-                event,
-                player.getRepresentation() + " moved a nexus token to "
-                        + toTile.getRepresentationForButtons(game, player) + ".");
-    }
+    // The Waking and Visions promissory note
 
     @ButtonHandler("dream_remove_nexus_")
     public static void removeNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
@@ -814,7 +804,7 @@ public class DreamButtonHandler {
         // Validate that this tile contains both the player's ships and a nexus token
         boolean hasShips =
                 FoWHelper.playerHasShipsInSystem(player, tile) || FoWHelper.playerHasActualShipsInSystem(player, tile);
-        if (!hasShips || !tileContainsNexusToken(game, tile)) {
+        if (!hasShips || !tileContainsNexusToken(game, tile, false)) {
             MessageHelper.sendMessageToEventChannel(
                     event,
                     "You can only resolve _The Waking_ in a system that contains both your ships and a Dreaming Throne nexus token.");
@@ -859,13 +849,13 @@ public class DreamButtonHandler {
     }
 
     private static List<Tile> getTheWakingEligibleTiles(Game game, Player player) {
-        if (player == null || "dream".equalsIgnoreCase(player.getFaction())) return List.of();
+        if (player == null || DREAM_FACTION.equalsIgnoreCase(player.getFaction())) return List.of();
         String key = "theWakingRemovedFor" + player.getFaction() + "Round" + game.getRound();
         String val = game.getStoredValue(key);
         if (val != null && !val.isBlank()) return List.of();
 
         return game.getTileMap().values().stream()
-                .filter(tile -> tileContainsNexusToken(game, tile))
+                .filter(tile -> tileContainsNexusToken(game, tile, false))
                 .filter(tile -> FoWHelper.playerHasShipsInSystem(player, tile)
                         || FoWHelper.playerHasActualShipsInSystem(player, tile))
                 .toList();
@@ -904,7 +894,7 @@ public class DreamButtonHandler {
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (player == null) return;
         // Only non-Dream players who own the promissory may use it
-        if ("dream".equalsIgnoreCase(player.getFaction())) {
+        if (DREAM_FACTION.equalsIgnoreCase(player.getFaction())) {
             MessageHelper.sendMessageToEventChannel(event, "The Dreaming Throne may not resolve this promissory.");
             return;
         }
@@ -954,37 +944,63 @@ public class DreamButtonHandler {
                         + " and removed a nexus token from " + tile.getRepresentationForButtons(game, player) + ".");
     }
 
-    static List<Tile> getTilesContainingNexusTokensWithPlayersShips(Game game, Player player) {
+    // Shared helpers
+
+    public static boolean tileContainsNexusToken(Game game, Tile tile, boolean includeFlagship) {
+        return getPhysicalNexusToken(tile) != null
+                || (includeFlagship && getDreamFlagshipPlayerInTile(game, tile) != null);
+    }
+
+    private static String getPhysicalNexusToken(Tile tile) {
+        String tokenId = Mapper.getTokenID(NEXUS_TOKEN_ALIAS);
+        for (String token : tile.getSpaceUnitHolder().getTokenList()) {
+            if ((tokenId != null && tokenId.equalsIgnoreCase(token))
+                    || NEXUS_TOKEN_ALIAS.equalsIgnoreCase(token)
+                    || NEXUS_TOKEN_ALIAS.equalsIgnoreCase(Mapper.getTokenKey(token))) {
+                return token;
+            }
+        }
+        return null;
+    }
+
+    private static Player getDreamFlagshipPlayerInTile(Game game, Tile tile) {
+        for (Player player : game.getRealPlayers()) {
+            if (DREAM_FACTION.equalsIgnoreCase(player.getFaction())
+                    && ButtonHelper.doesPlayerHaveFSHere(DREAM_FLAGSHIP_UNIT, player, tile)) {
+                return player;
+            }
+        }
+        return null;
+    }
+
+    private static boolean removeNexusTokenFromTile(Tile tile) {
+        String token = getPhysicalNexusToken(tile);
+        return token != null && tile.removeToken(token, "space");
+    }
+
+    private static void addNexusTokenToTile(Game game, Player player, Tile tile) {
+        tile.addToken(Mapper.getTokenID(NEXUS_TOKEN_ALIAS), "space");
+        CommanderUnlockCheckService.checkPlayer(player, DREAM_FACTION);
+    }
+
+    private static boolean moveNexusTokenBetweenTiles(Game game, Player player, Tile fromTile, Tile toTile) {
+        if (!removeNexusTokenFromTile(fromTile)) return false;
+        addNexusTokenToTile(game, player, toTile);
+        return true;
+    }
+
+    private static List<Tile> getTilesWithPlanetsControlledBy(Game game, Player player) {
         return game.getTileMap().values().stream()
-                .filter(tile -> FoWHelper.playerHasShipsInSystem(player, tile))
-                .filter(tile -> tileContainsNexusToken(game, tile, true))
+                .filter(tile -> containsPlanetControlledBy(tile, player))
                 .toList();
     }
 
-    /**
-     * Check whether a system contains a nexus token. If includeFlagship is true, a Dream flagship
-     * present in the system also counts as a nexus token (used by abilities other than Liturgy I/II).
-     */
-    public static boolean tileContainsNexusToken(Game game, Tile tile, boolean includeFlagship) {
-        String tokenId = Mapper.getTokenID(NEXUS_TOKEN);
-        boolean hasToken = tile.getSpaceUnitHolder().getTokenList().stream()
-                .anyMatch(token -> (tokenId != null && tokenId.equals(token))
-                        || NEXUS_TOKEN.equalsIgnoreCase(token)
-                        || NEXUS_TOKEN.equalsIgnoreCase(Mapper.getTokenKey(token)));
-        if (hasToken) return true;
-        if (!includeFlagship) return false;
-        // Treat Dream flagship as a nexus token when includeFlagship is true
-        for (Player p : game.getRealPlayers()) {
-            if (!"dream".equalsIgnoreCase(p.getFaction())) continue;
-            if (ButtonHelper.doesPlayerHaveFSHere("dream_flagship", p, tile)) return true;
-        }
-        return false;
+    private static boolean containsPlanetControlledBy(Tile tile, Player player) {
+        return tile.getPlanetUnitHolders().stream()
+                .anyMatch(planet -> player.getPlanets().contains(planet.getName()));
     }
 
-    // Backwards-compatible helper for internal calls that want the default behavior (includeFlagship=false)
-    private static boolean tileContainsNexusToken(Game game, Tile tile) {
-        return tileContainsNexusToken(game, tile, false);
-    }
+    // Incomprehensible Form
 
     public static List<Button> getIncomprehensibleFormButtons(Game game, Player p1, Player p2, Tile tile) {
         List<Button> out = new ArrayList<>();
@@ -1004,14 +1020,7 @@ public class DreamButtonHandler {
         }
 
         boolean hasToken = tileContainsNexusToken(game, tile, false);
-        boolean hasFlagship = false;
-        for (Player p : game.getRealPlayers()) {
-            if (!"dream".equalsIgnoreCase(p.getFaction())) continue;
-            if (ButtonHelper.doesPlayerHaveFSHere("dream_flagship", p, tile)) {
-                hasFlagship = true;
-                break;
-            }
-        }
+        boolean hasFlagship = getDreamFlagshipPlayerInTile(game, tile) != null;
 
         if (!hasToken && !hasFlagship) {
             MessageHelper.sendMessageToEventChannel(event, "There is no nexus token or Dream flagship in that system.");
@@ -1051,15 +1060,7 @@ public class DreamButtonHandler {
 
         boolean usedFlagship = false;
         if (choiceFlagship) {
-            // user explicitly chose to use the flagship
-            Player dreamPlayer = null;
-            for (Player p : game.getRealPlayers()) {
-                if (!"dream".equalsIgnoreCase(p.getFaction())) continue;
-                if (ButtonHelper.doesPlayerHaveFSHere("dream_flagship", p, tile)) {
-                    dreamPlayer = p;
-                    break;
-                }
-            }
+            Player dreamPlayer = getDreamFlagshipPlayerInTile(game, tile);
             if (dreamPlayer == null) {
                 MessageHelper.sendMessageToEventChannel(event, "There is no Dream flagship in that system to use.");
                 return;
@@ -1072,7 +1073,6 @@ public class DreamButtonHandler {
             }
             usedFlagship = true;
         } else {
-            // token path (either explicitly chosen or default)
             if (!removeNexusTokenFromTile(tile)) {
                 MessageHelper.sendMessageToEventChannel(
                         event, "Failed to remove the nexus token from the active system.");
@@ -1080,15 +1080,12 @@ public class DreamButtonHandler {
             }
         }
 
-        // Announce the effect in the same channel/thread without deleting the combat buttons
         MessageHelper.sendMessageToEventChannel(
                 event,
                 player.getRepresentation()
                         + " used **Incomprehensible Form** in " + tile.getRepresentationForButtons(game, player)
                         + " to remove a nexus token from the active system instead of destroying a ship. If the Dreaming Throne player removed their flagship, the hit produced is assigned by the Dreaming Throne player.");
 
-        // If the nexus was represented by the Dream flagship, produce 1 hit that the Dream player assigns to the
-        // opponent's ships
         if (usedFlagship) {
             String playersInCombat = game.getStoredValue("factionsInCombat");
             if (!playersInCombat.isBlank() && playersInCombat.contains(player.getFaction())) {
