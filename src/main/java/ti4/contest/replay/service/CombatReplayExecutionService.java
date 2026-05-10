@@ -39,6 +39,13 @@ public class CombatReplayExecutionService {
             "_The war ledger opens before the battle unfolds._",
             "_The next battle stands before the record; place your wager._",
             "_Another clash enters the chronicles; place your calls and side bets in the record._");
+    private static final Duration REPLAY_START_WARNING_LEAD_TIME = Duration.ofMinutes(5);
+    private static final List<String> REPLAY_START_WARNING_LORE = List.of(
+            "_The arbiters have sealed the last wagers, and the archive-drones are turning their lenses toward the field._",
+            "_Across the old imperial datavaults, quills of light scratch the names of fleets about to become precedent._",
+            "_The Hall of Cartographers grows silent as the final tactical overlays settle into place._",
+            "_A Lazax clerk strikes the bronze bell of remembrance; the combat record is nearly ready to unfold._",
+            "_Witness-scribes gather at the edge of the war table while the last echoes of prophecy fade._");
 
     private final CombatContestSettings settings;
     private final CombatCandidateRepository candidateRepository;
@@ -49,6 +56,7 @@ public class CombatReplayExecutionService {
     private final CombatReplayDiscordPostService discordPostService;
 
     public void runReplayTick() {
+        postReplayStartWarnings();
         List<CombatReplayContestEntity> dueContests =
                 replayContestRepository.findByReplayStatusInAndNextReplayAtLessThanEqualOrderByNextReplayAtAsc(
                         Set.of(CombatContestReplayStatus.PENDING, CombatContestReplayStatus.REPLAYING),
@@ -56,6 +64,36 @@ public class CombatReplayExecutionService {
         for (CombatReplayContestEntity contest : dueContests) {
             replaySingleContest(contest);
         }
+    }
+
+    private void postReplayStartWarnings() {
+        LocalDateTime now = LocalDateTime.now();
+        List<CombatReplayContestEntity> contests =
+                replayContestRepository
+                        .findByReplayStatusAndReplayStartWarningPostedAtIsNullAndReplayStartAtBetweenOrderByReplayStartAtAsc(
+                                CombatContestReplayStatus.PENDING, now, now.plus(REPLAY_START_WARNING_LEAD_TIME));
+        for (CombatReplayContestEntity contest : contests) {
+            postReplayStartWarning(contest);
+        }
+    }
+
+    private void postReplayStartWarning(CombatReplayContestEntity contest) {
+        try {
+            int claimed =
+                    replayContestRepository.markReplayStartWarningPostedIfUnset(contest.getId(), LocalDateTime.now());
+            if (claimed == 0) return;
+
+            MessageChannel channel = discordPostService.getContestThreadOrChannel(contest);
+            if (channel == null) return;
+            MessageHelper.sendMessageToChannel(channel, buildReplayStartWarningMessage(channel));
+        } catch (Exception e) {
+            BotLogger.error("Failed to post combat replay start warning.", e);
+        }
+    }
+
+    private String buildReplayStartWarningMessage(MessageChannel channel) {
+        return LazaxMinigameRoleHelper.mention(channel) + " replay starts in 5 minutes!\n"
+                + RandomHelper.pickRandomFromList(REPLAY_START_WARNING_LORE);
     }
 
     public void postPromotionContext(

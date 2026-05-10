@@ -75,6 +75,9 @@ public class CombatReplayContestEntity {
     @Column(name = "pre_replay_context_posted_at")
     private LocalDateTime preReplayContextPostedAt;
 
+    @Column(name = "replay_start_warning_posted_at")
+    private LocalDateTime replayStartWarningPostedAt;
+
     @Column(name = "leaderboard_posted_at")
     private LocalDateTime leaderboardPostedAt;
 
