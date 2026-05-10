@@ -903,6 +903,13 @@ public class StartCombatService {
                                 + ", a reminder that if you win the combat, you may use this button to remove a command token from the system.",
                         buttons);
             }
+            if (player == p2
+                    && player.hasUnlockedBreakthrough("dreambt")
+                    && tile.getPosition().equals(game.getActiveSystem())
+                    && CommandCounterHelper.hasCC(player, tile)
+                    && DreamButtonHandler.tileContainsNexusToken(game, tile, true)) {
+                DreamButtonHandler.offerDreamBtRemoveCommandTokenButton(game, player, tile, msg);
+            }
             if (player.hasUnlockedBreakthrough("zephyrionbt")
                     && "space".equalsIgnoreCase(type)
                     && ButtonHelper.isTileInOrAdjacentToPlayersHome(game, tile, otherPlayer, player)) {
@@ -1333,13 +1340,7 @@ public class StartCombatService {
         buttons.add(Buttons.blue(
                 "refreshViewOfSystem_" + pos + "_" + p1.getFaction() + "_" + p2.getFaction() + "_" + groundOrSpace,
                 "Refresh Picture"));
-        // Incomprehensible Form
-        try {
-            if (isSpaceCombat) {
-                buttons.addAll(DreamButtonHandler.getIncomprehensibleFormButtons(game, p1, p2, tile));
-            }
-        } catch (Exception ignored) {
-        }
+        checkAndAddIncomprehensibleFormButton(game, p1, p2, isSpaceCombat, tile, buttons);
 
         if (p1.hasTechReady("sc") || (!game.isFowMode() && p2.hasTechReady("sc"))) {
             if (p1.hasTechReady("sc")) {
@@ -2330,6 +2331,17 @@ public class StartCombatService {
                     "Use Subatomic Splicer (Upon Each Destroy)",
                     FactionEmojis.Crimson));
         }
+    }
+
+    private static void checkAndAddIncomprehensibleFormButton(
+            Game game, Player p1, Player p2, boolean isSpaceCombat, Tile tile, List<Button> buttons) {
+        if (!isSpaceCombat
+                || tile == null
+                || (!p1.hasAbility("incomprehensible_form") && !p2.hasAbility("incomprehensible_form"))
+                || !DreamButtonHandler.tileContainsNexusToken(game, tile, true)) {
+            return;
+        }
+        buttons.addAll(DreamButtonHandler.getIncomprehensibleFormButtons(game, p1, p2, tile));
     }
 
     private static String getSpaceCombatIntroMessage() {

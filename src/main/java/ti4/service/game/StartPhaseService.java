@@ -836,7 +836,9 @@ public class StartPhaseService {
         for (Player player : game.getRealPlayers()) {
             sendStatusReminders(event, game, player);
         }
-        DreamButtonHandler.offerTheWakingButtons(game);
+        if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("the_waking"))) {
+            DreamButtonHandler.offerTheWakingButtons(game);
+        }
 
         Button draw1AC = Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.getACEmoji(game));
         Button getCCs = Buttons.green("redistributeCCButtons", "Redistribute, Gain, & Confirm Command Tokens")
