@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.persistence.GamesPage;
 import ti4.message.MessageHelper;
@@ -21,7 +22,9 @@ class RoundTimeStatisticsService {
         Map<String, Integer> amountCount = new HashMap<>();
 
         GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilter(event), game -> getRoundTimes(game, timeCount, amountCount));
+                GameStatisticsFilterer.getGamesFilter(event),
+                game -> getRoundTimes(game, timeCount, amountCount),
+                ExecutionLockType.READ);
 
         StringBuilder sb = new StringBuilder();
         sb.append("Time Per Phase:").append('\n');

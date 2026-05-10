@@ -10,6 +10,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GamesPage;
@@ -43,7 +44,8 @@ public class FactionRecordOfTechService {
 
         GamesPage.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event),
-                game -> getFactionRecordOfTech(game, techsResearched, gamesThatHadThem, faction, factionModel));
+                game -> getFactionRecordOfTech(game, techsResearched, gamesThatHadThem, faction, factionModel),
+                ExecutionLockType.READ);
 
         StringBuilder sb = new StringBuilder();
 

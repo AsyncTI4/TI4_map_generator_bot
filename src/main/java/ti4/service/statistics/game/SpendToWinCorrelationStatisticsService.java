@@ -5,6 +5,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GamesPage;
@@ -20,7 +21,8 @@ class SpendToWinCorrelationStatisticsService {
 
         GamesPage.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event),
-                game -> calculate(game, num, gamesWhereHighestWon, names));
+                game -> calculate(game, num, gamesWhereHighestWon, names),
+                ExecutionLockType.READ);
 
         names.append("Total games where highest spender won was ")
                 .append(gamesWhereHighestWon)

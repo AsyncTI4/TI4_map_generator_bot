@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.Subcommand;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.GamesPage;
@@ -25,14 +26,16 @@ class RunAgainstAllGames extends Subcommand {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Running custom command against all games.");
 
         Set<String> changedGames = new HashSet<>();
-        GamesPage.consumeAllGames(game -> {
-            boolean changed = makeChanges(game, event);
-            if (changed) {
-                changedGames.add(game.getName());
-                // TODO: Need to figure out how to lock here. Maybe add a "consumeAllGamesWithLock"
-                GameManager.save(game, "Developer ran custom command against this game, probably migration related.");
-            }
-        });
+        GamesPage.consumeAllGames(
+                game -> {
+                    boolean changed = makeChanges(game, event);
+                    if (changed) {
+                        changedGames.add(game.getName());
+                        GameManager.save(
+                                game, "Developer ran custom command against this game, probably migration related.");
+                    }
+                },
+                ExecutionLockType.WRITE);
 
         MessageHelper.sendMessageToChannel(event.getChannel(), "Finished custom command against all games.");
         BotLogger.info("Changes made to " + changedGames.size() + " games out of " + GameManager.getGameCount()

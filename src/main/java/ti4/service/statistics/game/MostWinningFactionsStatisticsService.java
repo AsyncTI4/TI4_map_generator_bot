@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.persistence.GamesPage;
 import ti4.image.Mapper;
@@ -22,7 +23,8 @@ class MostWinningFactionsStatisticsService {
 
         GamesPage.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event),
-                game -> countFactionWins(game, factionToWinCount));
+                game -> countFactionWins(game, factionToWinCount),
+                ExecutionLockType.READ);
 
         StringBuilder sb = new StringBuilder();
         sb.append("Wins per Faction:").append('\n');

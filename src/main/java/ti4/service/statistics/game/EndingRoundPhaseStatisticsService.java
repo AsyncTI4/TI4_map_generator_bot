@@ -9,6 +9,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GamesPage;
@@ -27,7 +28,8 @@ class EndingRoundPhaseStatisticsService {
 
         GamesPage.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event),
-                game -> collectEndingRoundStats(game, endingRoundAndPhaseCount, statsByFaction));
+                game -> collectEndingRoundStats(game, endingRoundAndPhaseCount, statsByFaction),
+                ExecutionLockType.READ);
 
         StringBuilder sb = new StringBuilder("__**Game Endings by Round and Phase:**__\n");
         if (endingRoundAndPhaseCount.isEmpty()) {

@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GamesPage;
@@ -26,7 +27,8 @@ class PlayerExpectedWinDeltaStatisticsService {
         GamesPage.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event),
                 game -> calculate(
-                        game, playerWinCount, playerExpectedWinCount, playerGameCount, playerUserIdToUsername));
+                        game, playerWinCount, playerExpectedWinCount, playerGameCount, playerUserIdToUsername),
+                ExecutionLockType.READ);
 
         int maximumListedPlayers = event.getOption("max_list_size", 50, OptionMapping::getAsInt);
         int minimumGameCountFilter = event.getOption("min_game_count", 10, OptionMapping::getAsInt);

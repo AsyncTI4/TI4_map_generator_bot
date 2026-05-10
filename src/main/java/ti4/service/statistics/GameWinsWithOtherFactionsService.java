@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GamesPage;
@@ -38,7 +39,8 @@ public class GameWinsWithOtherFactionsService {
 
         GamesPage.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event),
-                game -> getGameWinsWithOtherFactions(game, factionWinCount, factionGameCount, reqFactions));
+                game -> getGameWinsWithOtherFactions(game, factionWinCount, factionGameCount, reqFactions),
+                ExecutionLockType.READ);
 
         StringBuilder sb = new StringBuilder();
         sb.append("Faction Win Percent:").append('\n');

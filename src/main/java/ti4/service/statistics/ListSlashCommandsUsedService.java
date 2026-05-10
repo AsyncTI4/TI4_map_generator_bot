@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.persistence.GamesPage;
 import ti4.helpers.Constants;
@@ -35,17 +36,19 @@ public class ListSlashCommandsUsedService {
         Map<String, Integer> actionCards = new HashMap<>();
         Map<String, Integer> actionCardsPlayed = new HashMap<>();
 
-        GamesPage.consumeAllGames(game -> listSlashCommandsUsed(
-                game,
-                useOnlyLastMonth,
-                slashCommands,
-                actionCards,
-                actionCardsPlayed,
-                largestGame,
-                largestAmountOfButtonsIn1Game,
-                buttonsPressed,
-                slashCommandsUsed,
-                acsSabod));
+        GamesPage.consumeAllGames(
+                game -> listSlashCommandsUsed(
+                        game,
+                        useOnlyLastMonth,
+                        slashCommands,
+                        actionCards,
+                        actionCardsPlayed,
+                        largestGame,
+                        largestAmountOfButtonsIn1Game,
+                        buttonsPressed,
+                        slashCommandsUsed,
+                        acsSabod),
+                ExecutionLockType.READ);
 
         StringBuilder longMsg = new StringBuilder("The number of button pressed so far recorded is " + buttonsPressed
                 + ". The largest number of buttons pressed in a single game is " + largestAmountOfButtonsIn1Game

@@ -10,6 +10,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.helper.GameHelper;
 import ti4.game.persistence.GamesPage;
@@ -22,7 +23,10 @@ class AllNamesStatisticsService {
         StringBuilder names = new StringBuilder();
         AtomicInteger count = new AtomicInteger();
 
-        GamesPage.consumeAllGames(GameStatisticsFilterer.getGamesFilter(event), game -> getName(game, count, names));
+        GamesPage.consumeAllGames(
+                GameStatisticsFilterer.getGamesFilter(event),
+                game -> getName(game, count, names),
+                ExecutionLockType.READ);
 
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Game Names", names.toString());

@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Expeditions;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -47,7 +48,8 @@ class ExpeditionWinRateStatisticsService {
                         lastExpeditionStats,
                         thundersEdgeControlStats,
                         gamesThatDidNotFinishExpeditionsVersusDid,
-                        playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough));
+                        playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough),
+                ExecutionLockType.READ);
 
         StringBuilder sb = new StringBuilder("__**Thunder's Edge Win Rate Correlations**__\n");
 

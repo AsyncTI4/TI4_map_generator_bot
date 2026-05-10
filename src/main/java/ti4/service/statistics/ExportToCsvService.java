@@ -9,6 +9,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GamesPage;
@@ -27,7 +28,8 @@ public class ExportToCsvService {
 
         GamesPage.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event),
-                game -> output.append(System.lineSeparator()).append(gameToCsv(game)));
+                game -> output.append(System.lineSeparator()).append(gameToCsv(game)),
+                ExecutionLockType.READ);
 
         if (output.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No games found matching filter.");

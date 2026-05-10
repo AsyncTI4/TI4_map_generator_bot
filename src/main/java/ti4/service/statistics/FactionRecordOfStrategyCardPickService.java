@@ -8,6 +8,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GamesPage;
@@ -46,7 +47,8 @@ public class FactionRecordOfStrategyCardPickService {
 
         GamesPage.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event),
-                game -> getScPick(game, round, faction, gamesThatHadThem, scsPicked, custodians));
+                game -> getScPick(game, round, faction, gamesThatHadThem, scsPicked, custodians),
+                ExecutionLockType.READ);
 
         StringBuilder sb = new StringBuilder();
 

@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GamesPage;
@@ -21,7 +22,9 @@ class MostPlayerColorService {
         Map<String, Integer> colorCount = new HashMap<>();
 
         GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilter(event), game -> getMostPlayedColor(game, colorCount));
+                GameStatisticsFilterer.getGamesFilter(event),
+                game -> getMostPlayedColor(game, colorCount),
+                ExecutionLockType.READ);
 
         StringBuilder sb = new StringBuilder();
         sb.append("Plays per Colour:").append('\n');
