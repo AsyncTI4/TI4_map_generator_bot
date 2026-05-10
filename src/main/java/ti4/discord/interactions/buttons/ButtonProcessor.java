@@ -31,6 +31,7 @@ import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.SearchGameHelper;
 import ti4.helpers.StatusHelper;
+import ti4.helpers.TimedRunnable;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.logging.RollbarManager;
@@ -71,14 +72,17 @@ public class ButtonProcessor {
     }
 
     private static void process(ButtonInteractionEvent event) {
+        long processStartTime = System.currentTimeMillis();
+
         ButtonContext context = new ButtonContext(event);
         if (!context.isValid()) return;
 
-        long processStartTime = System.currentTimeMillis();
+        long beforeTime = System.currentTimeMillis();
+        log(event);
+        long logRuntime = System.currentTimeMillis() - beforeTime;
+
         long resolveRuntime = 0;
         long saveRuntime = 0;
-
-        log(event);
         try {
             CombatReplayService combatReplayService =
                     CombatContestSettings.isEnabledStatic() ? SpringContext.getBean(CombatReplayService.class) : null;
@@ -88,7 +92,7 @@ public class ButtonProcessor {
                 combatReplayService.setPreInteractionSnapshot(preInteractionSnapshot);
             }
             try {
-                long beforeTime = System.currentTimeMillis();
+                beforeTime = System.currentTimeMillis();
                 resolveButtonInteractionEvent(context);
                 resolveRuntime = System.currentTimeMillis() - beforeTime;
 
@@ -116,22 +120,32 @@ public class ButtonProcessor {
                 processStartTime,
                 System.currentTimeMillis(),
                 contextCreationRuntime,
+                logRuntime,
                 resolveRuntime,
                 saveRuntime);
     }
 
     private static void log(ButtonInteractionEvent event) {
-        BotLogger.logButton(event);
+        // TODO: These timings are temporary to track down any spikes...
+        int warningThresholdSeconds = 1;
+        new TimedRunnable("ButtonProcessor BotLogger log", warningThresholdSeconds, () -> BotLogger.logButton(event))
+                .run();
 
-        RollbarManager.putInteractionMetadata("button", event);
-        RollbarManager.put("button_id", event.getButton().getCustomId());
-        RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
+        new TimedRunnable("ButtonProcessor Rollbar setup", warningThresholdSeconds, () -> {
+                    RollbarManager.putInteractionMetadata("button", event);
+                    RollbarManager.put("button_id", event.getButton().getCustomId());
+                    RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
+                })
+                .run();
 
-        User user = event.getUser();
-        UserSettings userSettings = UserSettingsManager.get(user.getId());
-        int currentHourUTC = ZonedDateTime.now(ZoneId.of("UTC")).getHour();
-        userSettings.addActiveHour(currentHourUTC);
-        UserSettingsManager.save(userSettings);
+        new TimedRunnable("ButtonProcessor user settings save", warningThresholdSeconds, () -> {
+                    User user = event.getUser();
+                    UserSettings userSettings = UserSettingsManager.get(user.getId());
+                    int currentHourUTC = ZonedDateTime.now(ZoneId.of("UTC")).getHour();
+                    userSettings.addActiveHour(currentHourUTC);
+                    UserSettingsManager.save(userSettings);
+                })
+                .run();
     }
 
     private static boolean isCombatReplayButton(String buttonID) {
