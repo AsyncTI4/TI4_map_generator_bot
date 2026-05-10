@@ -40,7 +40,6 @@ import ti4.service.fow.BlindSelectionService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
-import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
@@ -597,7 +596,6 @@ public final class ButtonHelperActionCards {
             }
 
             int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
-            RoundStatsTracker.recordDiceRolled(game, player, numRolls);
             List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
             player.setExpectedHitsTimes10(player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
             int hitRolls = DiceHelper.countSuccesses(resultRolls);
@@ -648,7 +646,6 @@ public final class ButtonHelperActionCards {
                             .append(key.getColor())
                             .append(".\n");
                     int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
-                    RoundStatsTracker.recordDiceRolled(game, player, numRolls);
                     List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
                     player.setExpectedHitsTimes10(
                             player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
@@ -672,7 +669,7 @@ public final class ButtonHelperActionCards {
 
                     if (hitRolls > 0) {
                         pendingRemovals
-                                .computeIfAbsent(uH, ignored -> new HashMap<>())
+                                .computeIfAbsent(uH, _ -> new HashMap<>())
                                 .put(key, hitRolls);
                         totalDamageDealt += hitRolls;
                         if (key.unitType() == UnitType.Mech && player_.hasActiveBreakthrough("naazbt")) {

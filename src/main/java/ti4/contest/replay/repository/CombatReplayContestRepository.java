@@ -5,6 +5,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import ti4.contest.replay.core.CombatContestReplayStatus;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
 
@@ -30,8 +33,20 @@ public interface CombatReplayContestRepository extends JpaRepository<CombatRepla
             Collection<CombatContestReplayStatus> replayStatuses, LocalDateTime nextReplayAt);
 
     List<CombatReplayContestEntity>
-            findByReplayStatusAndSideBetMarketPostedAtIsNullAndPostedAtLessThanEqualOrderByPostedAtAsc(
-                    CombatContestReplayStatus replayStatus, LocalDateTime postedAt);
+            findByReplayStatusAndReplayStartWarningPostedAtIsNullAndReplayStartAtBetweenOrderByReplayStartAtAsc(
+                    CombatContestReplayStatus replayStatus, LocalDateTime startInclusive, LocalDateTime endInclusive);
+
+    @Transactional
+    @Modifying
+    @Query("""
+            update CombatReplayContestEntity contest
+            set contest.replayStartWarningPostedAt = ?2
+            where contest.id = ?1
+                and contest.replayStartWarningPostedAt is null
+            """)
+    int markReplayStartWarningPostedIfUnset(Long contestId, LocalDateTime postedAt);
+
+    boolean existsByReplayStatusIn(Collection<CombatContestReplayStatus> replayStatuses);
 
     boolean existsByPostedAtGreaterThanEqual(LocalDateTime postedAt);
 

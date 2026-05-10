@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -49,6 +50,39 @@ import ti4.service.transaction.SendPromissoryService;
 import ti4.settings.users.UserSettingsManager;
 
 public final class TransactionHelper {
+
+    private static final List<String> shadyOrganizations = List.of(
+            "the Trade Adjustment Bureau",
+            "the Revenue Rebalancing Division",
+            "the Asset Discovery Group",
+            "the Interstellar Tariff Commission",
+            "the Bureau of \"Fair\" Exchange",
+            "the Celestial Tax Authority",
+            "Hostile Acquisitions United",
+            "Liquidation Services",
+            "Yoink Industries",
+            "Mentax LLC",
+            "Loot & Scoot LLC",
+            "Third-Party Logistics (Uninvited)",
+            "an Unscheduled Audit Team",
+            "Cargo Inspection Services",
+            "the Department of Spontaneous Fees",
+            "Transaction Integrity Consultants",
+            "Surprise Donation Coordinators",
+            "Finders Keepers Ltd.",
+            "a Totally Legitimate Business",
+            "the Bureau of Unsolicited Redistribution",
+            "the Internal Robbery Service",
+            "Audits Without Borders",
+            "Robinhood and Crew",
+            "Alternative Investment Strategies LLC",
+            "the Peg Leg Medical Care Society",
+            "Eye Patch Distribution Services",
+            "P.I.L.L.A.G.E (Proximity Induced Liquidity Loss & Asset Garnishment Entity)",
+            "Deviants Within Borders",
+            "the Suffi An Fan Club",
+            "the Fifth Moon Fund",
+            "Dane's Torment Engine LLC");
 
     private static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
         List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
@@ -357,9 +391,7 @@ public final class TransactionHelper {
                         }
                     }
                     case "Frags" ->
-                        trans.append(ExploreEmojis.getFragEmoji(furtherDetail)
-                                .toString()
-                                .repeat(amountToTransact));
+                        trans.repeat(ExploreEmojis.getFragEmoji(furtherDetail).toString(), amountToTransact);
                     case "Technology" ->
                         trans.append(Mapper.getTech(furtherDetail).getRepresentation(false));
                     case "Planets", "AlliancePlanets", "dmz" ->
@@ -1000,7 +1032,7 @@ public final class TransactionHelper {
     }
 
     // Left for future reference.
-    private static Modal buildTransactionModel(Player p1, Player p2, Game game) {
+    private static Modal buildTransactionModel(Player p1, Player p2) {
         Modal.Builder modal = Modal.create("transactionModelFinish_" + p1.getFaction(), "Traction");
         List<Player> players = new ArrayList<>();
         players.add(p1);
@@ -1060,7 +1092,7 @@ public final class TransactionHelper {
     }
 
     @ModalHandler("finishTrackRecord_")
-    public static void finishTrackRecord(ModalInteractionEvent event, Game game, Player player, String modalID) {
+    public static void finishTrackRecord(ModalInteractionEvent event, String modalID) {
         ModalMapping mapping = event.getValue("record");
         String thoughts = mapping.getAsString();
         String userId = modalID.split("_")[1];
@@ -1202,10 +1234,12 @@ public final class TransactionHelper {
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " sent a transaction offer to " + p2.getRepresentationNoPing()
                         + ".");
+        String pillageNotice = buildPillageNotice(game, player, p2);
+        String privateOfferText = buildTradeOfferText(player, p2, game, false, pillageNotice);
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         if (tableTalkChannel != null) {
+            String publicOfferText = buildTradeOfferText(player, p2, game, true, pillageNotice);
             boolean sentMeme = false;
-            String publicOfferText = buildTransactionOffer(player, p2, game, true);
             if (sendMemeInsteadOfText(event, game)) {
                 BufferedImage tradeOfferMeme = TransactionGenerator.drawTradeOfferMeme(game, player, p2);
                 if (tradeOfferMeme != null) {
@@ -1243,7 +1277,7 @@ public final class TransactionHelper {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentationNoPing() + " you sent a transaction offer to " + p2.getRepresentationNoPing()
-                        + ":\n" + buildTransactionOffer(player, p2, game, false),
+                        + ":\n" + privateOfferText,
                 buttons);
 
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -1259,12 +1293,106 @@ public final class TransactionHelper {
         buttons.add(Buttons.green("acceptOffer_" + player.getFaction() + "_" + offerNumber, "Accept"));
         buttons.add(Buttons.red("rejectOffer_" + player.getFaction() + bmdSuffix, "Reject"));
         buttons.add(Buttons.red("resetOffer_" + player.getFaction() + bmdSuffix, "Reject and CounterOffer"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                p2.getCardsInfoThread(),
-                p2.getRepresentation() + " you have received a transaction offer from "
-                        + player.getRepresentationNoPing() + ":\n" + buildTransactionOffer(player, p2, game, false),
-                buttons);
+        String p2OfferMsg = p2.getRepresentation() + " you have received a transaction offer from "
+                + player.getRepresentationNoPing() + ":\n" + privateOfferText;
+        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), p2OfferMsg, buttons);
         checkTransactionLegality(game, p2, player);
+    }
+
+    private static String buildTradeOfferText(
+            Player p1, Player p2, Game game, boolean hidePrivateCardText, String pillageNotice) {
+        String offerText = buildTransactionOffer(p1, p2, game, hidePrivateCardText);
+        if (pillageNotice.isEmpty()) {
+            return offerText;
+        }
+        return offerText + "\n" + pillageNotice;
+    }
+
+    private static String buildPillageNotice(Game game, Player p1, Player p2) {
+        if (game.isFowMode()) return "";
+
+        int p1TgAfter = p1.getTg();
+        int p2TgAfter = p2.getTg();
+        // compute TGs after transaction is complete
+        for (String item : p1.getTransactionItemsWithPlayer(p2)) {
+            String[] parts = item.split("_");
+            if (parts.length < 4) continue;
+            String type = parts[2];
+            String detail = item.replace(parts[0] + "_" + parts[1] + "_" + type + "_", "");
+            try {
+                if ("TGs".equals(type)) {
+                    int amount = Integer.parseInt(detail);
+                    if (item.contains("sending" + p1.getFaction())) {
+                        p1TgAfter -= amount;
+                        p2TgAfter += amount;
+                    } else {
+                        p2TgAfter -= amount;
+                        p1TgAfter += amount;
+                    }
+                } else if ("Comms".equals(type)) {
+                    int amount = Integer.parseInt(detail);
+                    if (item.contains("sending" + p1.getFaction())) {
+                        if (!p1.isPlayerMemberOfAlliance(p2)) p2TgAfter += amount;
+                    } else {
+                        if (!p2.isPlayerMemberOfAlliance(p1)) p1TgAfter += amount;
+                    }
+                }
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        Map<String, List<String>> pillagersToPillaged = new LinkedHashMap<>();
+        getPillagers(game, p1, p1TgAfter, pillagersToPillaged);
+        getPillagers(game, p2, p2TgAfter, pillagersToPillaged);
+
+        if (pillagersToPillaged.isEmpty()) return "";
+
+        StringBuilder notice = new StringBuilder();
+        notice.append("> This is a surcharge notice from ")
+                .append(getRandomPillageSource())
+                .append("\n> 1 ")
+                .append(MiscEmojis.tg)
+                .append(" possibly pillaged ");
+        if (pillagersToPillaged.size() == 1) {
+            Map.Entry<String, List<String>> pillagerToPillaged =
+                    pillagersToPillaged.entrySet().iterator().next();
+            appendPillageMessage(notice, pillagerToPillaged);
+        } else {
+            for (Map.Entry<String, List<String>> pillagerToPillaged : pillagersToPillaged.entrySet()) {
+                notice.append("\n> • ");
+                appendPillageMessage(notice, pillagerToPillaged);
+            }
+        }
+        return notice.toString();
+    }
+
+    private static void getPillagers(
+            Game game, Player p1, int p1TgAfter, Map<String, List<String>> pillagersToPillaged) {
+        if (ButtonHelperAbilities.canBePillaged(p1, game, p1TgAfter)) {
+            for (Player neighbor : p1.getNeighbouringPlayers(true)) {
+                if (!neighbor.hasAbility("pillage")) {
+                    continue;
+                }
+                String neighborRepresentation = neighbor.getRepresentation(false, false, true);
+                pillagersToPillaged
+                        .computeIfAbsent(neighborRepresentation, _ -> new ArrayList<>())
+                        .add(p1.getRepresentationNoPing());
+            }
+        }
+    }
+
+    private static void appendPillageMessage(
+            StringBuilder stringBuilder, Map.Entry<String, List<String>> pillagerToPillaged) {
+        stringBuilder
+                .append("from ")
+                .append(String.join(", ", pillagerToPillaged.getValue()))
+                .append(" by ")
+                .append(pillagerToPillaged.getKey());
+    }
+
+    private static String getRandomPillageSource() {
+        int randomIndex = ThreadLocalRandom.current().nextInt(0, shadyOrganizations.size());
+        return shadyOrganizations.get(randomIndex);
     }
 
     @ButtonHandler("transact_")

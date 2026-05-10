@@ -16,29 +16,6 @@ class CombatSideBetTypeTest {
     }
 
     @Test
-    void hacanMarketMakerDefaultsToTwoPointsPerTakenMarkedBet() {
-        CombatContestSettings settings = new CombatContestSettings();
-
-        assertEquals(2, settings.getHouseAbilities().getHacan().getMarketMakerPointsPerBet());
-    }
-
-    @Test
-    void hacanMarkedBetsGrantFavorOnHit() {
-        CombatContestSettings settings = new CombatContestSettings();
-
-        assertEquals(10, settings.getHouseAbilities().getHacan().getSubsidyFavorOnHit());
-    }
-
-    @Test
-    void devHousePhaseWindowsAreCompressed() {
-        CombatContestSettings settings = new CombatContestSettings();
-
-        assertEquals(15, settings.getHouseAbilities().getMentak().getPreviewLeadSeconds());
-        assertEquals(60, settings.getReplayExecution().getDiscussionWindowSeconds());
-        assertEquals(60, settings.getReplayExecution().getSideBetWindowSeconds());
-    }
-
-    @Test
     void usesConfiguredSideBetPayouts() {
         Map<CombatSideBetType, Integer> expectedPayouts = Map.of(
                 CombatSideBetType.AFB_SKIPPED, 6,

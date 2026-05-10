@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.contest.replay.core.CombatContestSettings;
-import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.ArvaxiCommanderHandler;
@@ -54,7 +53,6 @@ import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.leader.CommanderUnlockCheckService;
-import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.tech.BastionTechService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -126,7 +124,6 @@ public class StartCombatService {
             Tile tile,
             GenericInteractionCreateEvent event,
             String specialCombatTitle) {
-        RoundStatsTracker.incrementCombatsInitiated(game, player);
         if (CombatContestSettings.isEnabledStatic()) {
             SpringContext.getBean(CombatReplayService.class).onSpaceCombatStarted(game, player, player2, tile);
         }
@@ -173,7 +170,6 @@ public class StartCombatService {
             GenericInteractionCreateEvent event,
             UnitHolder unitHolder,
             Tile tile) {
-        RoundStatsTracker.incrementCombatsInitiated(game, player);
         String threadName = combatThreadName(game, player, player2, tile, null);
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),
@@ -366,17 +362,8 @@ public class StartCombatService {
         if (CombatContestSettings.isEnabledStatic() && (amount > 2 || tile.getNumberOfUnitsInSystem() > 2)) {
             MessageHelper.sendMessageToChannel(
                     threadChannel,
-                    CombatReplayDecoys.appendDebugDecoySummary(
-                            ButtonHelper.getCombatTileSummaryMessage(
-                                    game,
-                                    tile,
-                                    player1,
-                                    event,
-                                    spaceOrGround,
-                                    unitHolderName,
-                                    List.of(player1, player2)),
-                            game,
-                            tile));
+                    ButtonHelper.getCombatTileSummaryMessage(
+                            game, tile, player1, event, spaceOrGround, unitHolderName, List.of(player1, player2)));
         }
 
         // Space Cannon Offense

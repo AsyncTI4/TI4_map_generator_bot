@@ -5,10 +5,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.contest.replay.core.CombatContestSettings;
-import ti4.contest.replay.core.CombatReplayDecoys;
-import ti4.contest.replay.core.CombatReplayHouse;
-import ti4.contest.replay.service.CombatReplayHouseFavorService;
-import ti4.contest.replay.service.CombatReplayHouseService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -33,9 +29,6 @@ public class CombatReplayDebugButtonHandler {
     private static final String START_MR_FIGHT = PREFIX + "start_mecatol_rex_fight";
     private static final String TAKE_MORALE_BOOST = PREFIX + "take_morale_boost";
     private static final String TAKE_SHIELDS_HOLDING = PREFIX + "take_shields_holding";
-    private static final String HOUSE_OVERRIDE = PREFIX + "house_";
-    private static final String HOUSE_UNASSIGN = PREFIX + "house_unassign";
-    private static final String SET_ALL_HOUSE_FAVOR_100 = PREFIX + "set_all_house_favor_100";
     private static final String WIPE_MR_SPACE = PREFIX + "wipe_mecatol_rex_space";
     private static final String DEBUG_FLEET = "carrier, dreadnought, cruiser, destroyer, 3 fighter";
 
@@ -48,12 +41,7 @@ public class CombatReplayDebugButtonHandler {
                 Buttons.blue(START_MR_FIGHT, "Start a Fight at Mecatol Rex"),
                 Buttons.green(TAKE_MORALE_BOOST, "Get Morale Boost", CardEmojis.ActionCard),
                 Buttons.green(TAKE_SHIELDS_HOLDING, "Get Shields Holding", CardEmojis.ActionCard),
-                Buttons.red(WIPE_MR_SPACE, "Wipe Space Army on Rex"),
-                Buttons.gray(HOUSE_OVERRIDE + CombatReplayHouse.NAALU.name(), "Set My Delegation: Naalu"),
-                Buttons.gray(HOUSE_OVERRIDE + CombatReplayHouse.MENTAK.name(), "Set My Delegation: Mentak"),
-                Buttons.gray(HOUSE_OVERRIDE + CombatReplayHouse.HACAN.name(), "Set My Delegation: Hacan"),
-                Buttons.green(SET_ALL_HOUSE_FAVOR_100, "Set All Delegation Favor to 100"),
-                Buttons.red(HOUSE_UNASSIGN, "Unassign My Delegation"));
+                Buttons.red(WIPE_MR_SPACE, "Wipe Space Army on Rex"));
     }
 
     @ButtonHandler(PREFIX)
@@ -75,52 +63,12 @@ public class CombatReplayDebugButtonHandler {
             case TAKE_SHIELDS_HOLDING ->
                 takeDebugActionCard(event, game, player, "Shields Holding", List.of("sh1", "sh2", "sh3", "sh4"));
             case WIPE_MR_SPACE -> wipeMecatolRexSpace(event, game);
-            case HOUSE_UNASSIGN -> unassignHouse(event);
-            case SET_ALL_HOUSE_FAVOR_100 -> setAllHouseFavorTo100(event);
-            default -> {
-                if (buttonId.startsWith(HOUSE_OVERRIDE)) {
-                    overrideHouse(event, buttonId.replace(HOUSE_OVERRIDE, ""));
-                    return;
-                }
-                MessageHelper.sendEphemeralMessageToEventChannel(event, "Unknown combat replay debug action.");
-            }
+            default -> MessageHelper.sendEphemeralMessageToEventChannel(event, "Unknown combat replay debug action.");
         }
     }
 
     private static boolean isEnabled() {
         return SpringContext.getBean(CombatContestSettings.class).getRuntime().isDevMode();
-    }
-
-    private static void overrideHouse(ButtonInteractionEvent event, String houseName) {
-        CombatReplayHouse house = CombatReplayHouse.fromName(houseName);
-        if (house == null) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Unknown house: `" + houseName + "`.");
-            return;
-        }
-
-        SpringContext.getBean(CombatReplayHouseService.class)
-                .overrideHouse(
-                        event.getGuild(),
-                        event.getMember(),
-                        event.getUser().getId(),
-                        event.getUser().getName(),
-                        house);
-        MessageHelper.sendEphemeralMessageToEventChannel(
-                event, "Set your combat replay delegation to " + house.displayName() + ".");
-    }
-
-    private static void unassignHouse(ButtonInteractionEvent event) {
-        boolean removed = SpringContext.getBean(CombatReplayHouseService.class)
-                .unassignHouse(
-                        event.getGuild(), event.getMember(), event.getUser().getId());
-        MessageHelper.sendEphemeralMessageToEventChannel(
-                event,
-                removed ? "Removed your combat replay delegation assignment." : "You had no delegation assignment.");
-    }
-
-    private static void setAllHouseFavorTo100(ButtonInteractionEvent event) {
-        SpringContext.getBean(CombatReplayHouseFavorService.class).setAllBalancesForDebug(100);
-        MessageHelper.sendEphemeralMessageToEventChannel(event, "Set every combat replay delegation's Favor to 100.");
     }
 
     private static void takeDebugActionCard(
@@ -218,7 +166,6 @@ public class CombatReplayDebugButtonHandler {
         }
 
         mecatolRex.getSpaceUnitHolder().getUnitsByState().clear();
-        CombatReplayDecoys.clearDebugDecoys(game, mecatolRex);
         AddUnitService.addUnits(event, mecatolRex, game, player.getColor(), DEBUG_FLEET);
         AddUnitService.addUnits(event, mecatolRex, game, opponent.getColor(), DEBUG_FLEET);
         game.setActiveSystem(mecatolRex.getPosition());
@@ -242,7 +189,6 @@ public class CombatReplayDebugButtonHandler {
         }
 
         mecatolRex.getSpaceUnitHolder().getUnitsByState().clear();
-        CombatReplayDecoys.clearDebugDecoys(game, mecatolRex);
         MessageHelper.sendMessageToEventChannel(event, "Removed all space units from Mecatol Rex.");
     }
 

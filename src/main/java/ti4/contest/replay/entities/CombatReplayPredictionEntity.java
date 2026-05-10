@@ -46,9 +46,6 @@ public class CombatReplayPredictionEntity {
     @Column(name = "defender_prediction_count", nullable = false)
     private Integer defenderPredictionCount;
 
-    @Column(name = "mentak_prediction_override_count", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
-    private Integer mentakPredictionOverrideCount = 0;
-
     @Column(name = "attacker_predictions_json", nullable = false, columnDefinition = "TEXT")
     private String attackerPredictionsJson;
 
