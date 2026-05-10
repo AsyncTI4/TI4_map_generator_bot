@@ -11,6 +11,7 @@ import ti4.game.Player;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.helpers.discord.DiscordHelper;
 import ti4.logging.BotLogger;
+import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.service.actioncard.SabotageService;
@@ -36,8 +37,7 @@ public class SabotageAutoReactCron {
         if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running SabotageAutoReactCron.");
 
-        Map<String, List<GameMessageManager.GameMessage>> acMessagesByGame =
-                GameMessageManager.getAllByGame(GameMessageType.ACTION_CARD);
+        Map<String, List<GameMessage>> acMessagesByGame = GameMessageManager.getAllByGame(GameMessageType.ACTION_CARD);
 
         ConsumeGameUtility.consumeGames(
                 acMessagesByGame.keySet(),
@@ -47,8 +47,7 @@ public class SabotageAutoReactCron {
         BotLogger.logCron("Finished SabotageAutoReactCron.");
     }
 
-    private static void automaticallyReactToSabotageWindows(
-            Game game, List<GameMessageManager.GameMessage> acMessages) {
+    private static void automaticallyReactToSabotageWindows(Game game, List<GameMessage> acMessages) {
         for (Player player : game.getRealPlayers()) {
             if (!playerShouldRandomlyReact(player, game)) {
                 continue;
