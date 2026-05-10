@@ -10,7 +10,7 @@ import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.statistics.FactionStatisticsHelper;
@@ -22,7 +22,7 @@ class FactionAverageTurnsInGameStatisticsService {
         Map<String, Integer> factionCount = new HashMap<>();
         Map<String, Integer> factionTurnCount = new HashMap<>();
 
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event),
                 game -> averageTurnsInAGameByFaction(game, factionCount, factionTurnCount),
                 ExecutionLockType.READ);

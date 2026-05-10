@@ -13,7 +13,7 @@ import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.helper.GameHelper;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -23,7 +23,7 @@ class AllNamesStatisticsService {
         StringBuilder names = new StringBuilder();
         AtomicInteger count = new AtomicInteger();
 
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event),
                 game -> getName(game, count, names),
                 ExecutionLockType.READ);

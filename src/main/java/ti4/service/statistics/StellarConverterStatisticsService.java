@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.UnitHolder;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -32,7 +32,8 @@ public class StellarConverterStatisticsService {
         Map<String, Integer> numberConverts = new HashMap<>();
         AtomicInteger count = new AtomicInteger();
 
-        GamesPage.consumeAllGames(game -> getStellarConverterInfo(game, count, numberConverts), ExecutionLockType.READ);
+        ConsumeGameUtility.consumeAllGames(
+                game -> getStellarConverterInfo(game, count, numberConverts), ExecutionLockType.READ);
 
         Comparator<Map.Entry<String, Integer>> comparator =
                 (p1, p2) -> (-1) * p1.getValue().compareTo(p2.getValue());

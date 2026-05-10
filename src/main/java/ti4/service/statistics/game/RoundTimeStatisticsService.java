@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -21,7 +21,7 @@ class RoundTimeStatisticsService {
         Map<String, Long> timeCount = new HashMap<>();
         Map<String, Integer> amountCount = new HashMap<>();
 
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event),
                 game -> getRoundTimes(game, timeCount, amountCount),
                 ExecutionLockType.READ);

@@ -12,7 +12,7 @@ import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -25,7 +25,7 @@ class VictoryPointsScoredStatisticsService {
         Map<String, Integer> publics = new HashMap<>();
         Map<String, Integer> relics = new HashMap<>();
 
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event),
                 game -> listScoredVictoryPoints(game, secrets, publics, relics),
                 ExecutionLockType.READ);

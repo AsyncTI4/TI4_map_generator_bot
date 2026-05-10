@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -35,7 +35,7 @@ class TwilightsFallSpliceWinRateStatisticsService {
     private static void showWinRates(SlashCommandInteractionEvent event) {
         AtomicInteger gameCount = new AtomicInteger();
         TwilightsFallSpliceWinRateStats stats = new TwilightsFallSpliceWinRateStats();
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event).and(Game::isTwilightsFallMode),
                 game -> {
                     gameCount.incrementAndGet();

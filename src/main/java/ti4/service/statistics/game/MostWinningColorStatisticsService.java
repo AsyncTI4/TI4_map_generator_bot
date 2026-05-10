@@ -11,7 +11,7 @@ import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
@@ -22,7 +22,7 @@ class MostWinningColorStatisticsService {
     static void showMostWinningColor(SlashCommandInteractionEvent event) {
         Map<String, Integer> winnerColorCount = new HashMap<>();
 
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event),
                 game -> getWinningColor(game, winnerColorCount),
                 ExecutionLockType.READ);

@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.message.MessageHelper;
 import ti4.service.game.GameModeService;
 
@@ -19,7 +19,7 @@ class GameModeStatisticsService {
         AtomicInteger totalGames = new AtomicInteger();
         Map<String, Integer> modeCounts = new HashMap<>();
 
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event),
                 game -> {
                     totalGames.incrementAndGet();

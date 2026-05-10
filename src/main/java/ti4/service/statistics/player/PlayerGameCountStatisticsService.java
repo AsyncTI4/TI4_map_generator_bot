@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -21,7 +21,7 @@ class PlayerGameCountStatisticsService {
         Map<String, Integer> playerGameCount = new HashMap<>();
         Map<String, String> playerUserIdToUsername = new HashMap<>();
 
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event),
                 game -> getPlayerGameCount(game, playerGameCount, playerUserIdToUsername),
                 ExecutionLockType.READ);

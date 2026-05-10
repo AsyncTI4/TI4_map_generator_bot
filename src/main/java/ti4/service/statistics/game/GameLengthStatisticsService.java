@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.helpers.Helper;
 import ti4.helpers.SortHelper;
 import ti4.message.MessageHelper;
@@ -23,7 +23,7 @@ class GameLengthStatisticsService {
         AtomicInteger atomicTotal = new AtomicInteger();
         Map<String, Integer> endedGames = new HashMap<>();
 
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event),
                 game -> calculate(game, pastDays, atomicNum, atomicTotal, endedGames),
                 ExecutionLockType.READ);

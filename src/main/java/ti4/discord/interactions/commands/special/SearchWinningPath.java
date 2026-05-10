@@ -10,7 +10,7 @@ import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.PatternHelper;
@@ -35,7 +35,7 @@ class SearchWinningPath extends Subcommand {
                 .append(searchedPath)
                 .append('\n');
 
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event).and(game -> game.getWinner()
                         .map(winner -> hasWinningPath(game, winner, searchedPath))
                         .orElse(false)),

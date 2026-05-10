@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -18,7 +18,7 @@ class WinningPathsStatisticsService {
     static void showWinningPaths(SlashCommandInteractionEvent event) {
         Map<String, Integer> winningPathCount = new HashMap<>();
 
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event),
                 game -> getWinningPath(game, winningPathCount),
                 ExecutionLockType.READ);
@@ -52,7 +52,7 @@ class WinningPathsStatisticsService {
         Map<Integer, Integer> supportWinCount = new HashMap<>();
         AtomicInteger gameWithWinnerCount = new AtomicInteger();
 
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event),
                 game -> getWinsWithSupport(game, supportWinCount, gameWithWinnerCount),
                 ExecutionLockType.READ);

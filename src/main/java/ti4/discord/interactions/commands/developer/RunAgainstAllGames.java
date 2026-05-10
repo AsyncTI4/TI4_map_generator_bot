@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.game.persistence.GameManager;
-import ti4.game.persistence.GamesPage;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -26,7 +26,7 @@ class RunAgainstAllGames extends Subcommand {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Running custom command against all games.");
 
         Set<String> changedGames = new HashSet<>();
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 game -> {
                     boolean changed = makeChanges(game, event);
                     if (changed) {

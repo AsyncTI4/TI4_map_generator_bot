@@ -13,7 +13,7 @@ import ti4.executors.ExecutionLockType;
 import ti4.game.Expeditions;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.message.MessageHelper;
 import ti4.service.statistics.StatisticsPipeline;
 
@@ -38,7 +38,7 @@ class ExpeditionWinRateStatisticsService {
         int[] gamesThatDidNotFinishExpeditionsVersusDid = {0, 0};
         int[] playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough = {0, 0};
 
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 ExpeditionWinRateStatisticsService::isEligibleGame,
                 game -> consumeGame(
                         game,
