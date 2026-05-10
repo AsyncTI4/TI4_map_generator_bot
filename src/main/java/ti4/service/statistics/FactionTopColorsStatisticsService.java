@@ -9,7 +9,8 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
-import ti4.game.persistence.GamesPage;
+import ti4.executors.ExecutionLockType;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 
@@ -25,8 +26,9 @@ public class FactionTopColorsStatisticsService {
     private static void showTopColorsByFaction(SlashCommandInteractionEvent event) {
         Map<String, Map<String, Integer>> colorCountsByFaction = new HashMap<>();
 
-        GamesPage.consumeAllGames(GameStatisticsFilterer.getGamesFilter(event), game -> game.getRealPlayers()
-                .forEach(player -> {
+        ConsumeGameUtility.consumeAllGames(
+                GameStatisticsFilterer.getGamesFilter(event),
+                game -> game.getRealPlayers().forEach(player -> {
                     String faction = player.getFaction();
                     String color = player.getColor();
                     if (faction == null || color == null || "null".equals(color)) {
@@ -36,7 +38,8 @@ public class FactionTopColorsStatisticsService {
                     colorCountsByFaction
                             .computeIfAbsent(faction, _ -> new HashMap<>())
                             .merge(color, 1, Integer::sum);
-                }));
+                }),
+                ExecutionLockType.READ);
 
         String message = Mapper.getFactionsValues().stream()
                 .map(factionModel ->

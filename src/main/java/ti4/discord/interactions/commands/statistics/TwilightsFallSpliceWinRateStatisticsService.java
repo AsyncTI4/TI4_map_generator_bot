@@ -10,9 +10,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -34,11 +35,13 @@ class TwilightsFallSpliceWinRateStatisticsService {
     private static void showWinRates(SlashCommandInteractionEvent event) {
         AtomicInteger gameCount = new AtomicInteger();
         TwilightsFallSpliceWinRateStats stats = new TwilightsFallSpliceWinRateStats();
-        GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilterForWonGame(event).and(Game::isTwilightsFallMode), game -> {
+        ConsumeGameUtility.consumeAllGames(
+                GameStatisticsFilterer.getGamesFilterForWonGame(event).and(Game::isTwilightsFallMode),
+                game -> {
                     gameCount.incrementAndGet();
                     accumulateGame(game, stats);
-                });
+                },
+                ExecutionLockType.READ);
 
         String report = buildReport(gameCount.get(), stats);
         MessageHelper.sendMessageToThread(event.getChannel(), "Twilight's Fall splice win rates", report);
