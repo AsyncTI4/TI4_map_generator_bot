@@ -29,17 +29,17 @@ public final class GamesPage {
     public static void consumeAllGames(Predicate<Game> filter, Consumer<Game> consumer, ExecutionLockType lockType) {
         int currentPage = 0;
         GamesPage pagedGames = null;
-        try {
-            do {
+        do {
+            try {
                 pagedGames = getPage(currentPage, lockType);
                 currentPage++;
                 pagedGames.games.stream().filter(filter).forEach(consumer);
-            } while (pagedGames.hasNextPage);
-        } finally {
-            if (pagedGames != null) {
-                pagedGames.gameLocks.forEach(gameName -> ExecutionLockManager.unlock(gameName, lockType));
+            } finally {
+                if (pagedGames != null) {
+                    pagedGames.gameLocks.forEach(gameName -> ExecutionLockManager.unlock(gameName, lockType));
+                }
             }
-        }
+        } while (pagedGames.hasNextPage);
     }
 
     // WARNING, THIS INVOLVES READING MANY GAMES. IT IS AN EXPENSIVE OPERATION.
