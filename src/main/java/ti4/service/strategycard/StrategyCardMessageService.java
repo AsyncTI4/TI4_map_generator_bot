@@ -13,7 +13,8 @@ public class StrategyCardMessageService {
         return GameMessageManager.getOne(gameName, GameMessageType.STRATEGY_CARD, getKey(round, sc));
     }
 
-    public static void replaceStrategyCardMessage(String gameName, String messageId, int round, int sc, long gameSaveTime) {
+    public static void replaceStrategyCardMessage(
+            String gameName, String messageId, int round, int sc, long gameSaveTime) {
         GameMessageManager.replace(
                 gameName, new GameMessage(messageId, GameMessageType.STRATEGY_CARD, gameSaveTime, getKey(round, sc)));
     }

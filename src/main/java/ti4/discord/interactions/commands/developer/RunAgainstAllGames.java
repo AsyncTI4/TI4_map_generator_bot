@@ -92,7 +92,8 @@ class RunAgainstAllGames extends Subcommand {
 
         for (int sc : game.getPlayedSCs()) {
             // Skip SCs that have already been migrated into GameMessageManager.
-            if (StrategyCardMessageService.getStrategyCardMessage(game.getName(), round, sc).isPresent()) {
+            if (StrategyCardMessageService.getStrategyCardMessage(game.getName(), round, sc)
+                    .isPresent()) {
                 continue;
             }
 
