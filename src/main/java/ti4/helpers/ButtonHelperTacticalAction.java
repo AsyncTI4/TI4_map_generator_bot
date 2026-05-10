@@ -394,6 +394,7 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("absolLux");
         game.removeStoredValue("mentakHero");
         game.removeStoredValue("ghostagent_active");
+        DreamButtonHandler.clearDreamAgentAnomaly(game);
 
         game.getTacticalActionDisplacement().clear();
         for (Player player : game.getRealPlayers()) {
@@ -418,7 +419,11 @@ public final class ButtonHelperTacticalAction {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, ringButtons);
         }
         // Offer the Dreaming Throne promissory 'Visions' buttons
-        DreamButtonHandler.offerVisionsPromissoryAtTacticalStart(game, player);
+        if (player != null
+                && !"dream".equalsIgnoreCase(player.getFaction())
+                && player.getPromissoryNotes().containsKey("bepndream")) {
+            DreamButtonHandler.offerVisionsPromissoryAtTacticalStart(game, player);
+        }
     }
 
     private static void alternateWayOfOfferingTiles(Player player, Game game) {
@@ -817,6 +822,8 @@ public final class ButtonHelperTacticalAction {
                 }
             }
         }
+
+        DreamButtonHandler.offerDreamAgentButtons(game, player);
 
         // Send buttons to move
         MessageHelper.sendMessageToChannelWithButtons(
