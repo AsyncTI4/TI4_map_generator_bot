@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -1145,7 +1146,7 @@ public class StartPhaseService {
             StringBuilder hold = new StringBuilder();
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
-                    "All players have picked a strategy card.\n" + nextPlayer.getRepresentation()
+                    "All players have picked a strategy card.\n" + nextPlayer.getRepresentationNoPing()
                             + " is first in initiative order.");
             postSurveyResults(game);
             for (Player p2 : game.getRealPlayers()) {

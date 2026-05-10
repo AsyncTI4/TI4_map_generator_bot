@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -673,7 +674,7 @@ public final class ButtonHelperTacticalAction {
 
             for (Player btb : game.getRealPlayers()) {
                 if (!btb.ownsUnit("tk-blacktrenchbulwark")) continue;
-                if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Pds)
+                if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, btb, UnitType.Pds)
                         .contains(activeSystem)) continue;
 
                 String id = btb.factionButtonChecker() + "useMagenDefense_" + activeSystem.getPosition();

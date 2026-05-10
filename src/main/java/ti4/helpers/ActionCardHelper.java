@@ -11,14 +11,16 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
@@ -722,10 +724,10 @@ public class ActionCardHelper {
                         + " thus you no longer have your token on the _Stellar Atomics_ event card, and therefore cannot play action cards during the Agenda Phase.";
             }
         }
-        // Async leniency: reveal-window agenda cards may still be played anywhere before outcome resolution.
-        if (actionCard.getPlayTiming().isDuringAgendaReveal() && !AgendaHelper.isPreResolutionAgendaPhase(game)) {
-            return "This action card can only be played during the agenda phase before outcome resolution.";
-        }
+        // // Async leniency: reveal-window agenda cards may still be played anywhere before outcome resolution.
+        // if (actionCard.getPlayTiming().isDuringAgendaReveal() && !AgendaHelper.isPreResolutionAgendaPhase(game)) {
+        //     return "This action card can only be played during the agenda phase before outcome resolution.";
+        // }
 
         CryypterHelper.checkForAssigningYssarilEnvoy(event, game, player, acID);
         if (game.isWildWildGalaxyMode() && actionCard.getName().toLowerCase().contains("morale boost")) {
