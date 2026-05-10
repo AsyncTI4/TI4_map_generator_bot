@@ -31,7 +31,7 @@ class RunAgainstAllGames extends Subcommand {
         Set<String> changedGames = new HashSet<>();
         ConsumeGameUtility.consumeAllGames(
                 game -> {
-                    boolean changed = makeChanges(game, event);
+                    boolean changed = makeChanges(game);
                     if (changed) {
                         changedGames.add(game.getName());
                         GameManager.save(
@@ -45,7 +45,7 @@ class RunAgainstAllGames extends Subcommand {
                 + " games: " + String.join(", ", changedGames));
     }
 
-    private static boolean makeChanges(Game game, SlashCommandInteractionEvent event) {
+    private static boolean makeChanges(Game game) {
         if (!game.isHasEnded()) {
             return migrateScMessages(game);
         }
