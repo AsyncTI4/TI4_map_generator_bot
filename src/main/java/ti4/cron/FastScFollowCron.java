@@ -2,12 +2,13 @@ package ti4.cron;
 
 import static java.util.function.Predicate.not;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
-import ti4.executors.ExecutionLockManager;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.helpers.ButtonHelper;
@@ -35,19 +36,16 @@ public class FastScFollowCron {
         if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running FastScFollowCron");
 
-        GameManager.getManagedGames().stream()
+        List<String> gameNames = GameManager.getManagedGames().stream()
                 .filter(not(ManagedGame::isHasEnded))
-                .filter(ManagedGame::isFastScFollowMode)
                 .map(ManagedGame::getName)
-                .forEach(gameName -> ExecutionLockManager.wrapWithLockAndRelease(
-                                gameName, ExecutionLockType.WRITE, () -> handleFastScFollow(gameName))
-                        .run());
+                .toList();
+        ConsumeGameUtility.consumeGames(gameNames, FastScFollowCron::handleFastScFollow, ExecutionLockType.WRITE);
 
         BotLogger.logCron("Finished FastScFollowCron");
     }
 
-    private static void handleFastScFollow(String gameName) {
-        Game game = GameManager.getManagedGame(gameName).getGame();
+    private static void handleFastScFollow(Game game) {
         try {
             handleFastScFollowMode(game);
             GameManager.save(

@@ -1,20 +1,16 @@
 package ti4.cron;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
-import ti4.executors.ExecutionLockManager;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.persistence.GameManager;
-import ti4.game.persistence.ManagedGame;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.helpers.discord.DiscordHelper;
 import ti4.logging.BotLogger;
-import ti4.logging.LogOrigin;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
@@ -43,30 +39,10 @@ public class SabotageAutoReactCron {
 
         Map<String, List<GameMessage>> acMessagesByGame = GameMessageManager.getAllByGame(GameMessageType.ACTION_CARD);
 
-        var gamesToRemove = new HashSet<String>();
-        for (Map.Entry<String, List<GameMessage>> entry : acMessagesByGame.entrySet()) {
-            String gameName = entry.getKey();
-
-            ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
-                        ManagedGame managedGame = GameManager.getManagedGame(gameName);
-                        if (managedGame == null || managedGame.isHasEnded()) {
-                            gamesToRemove.add(gameName);
-                            return;
-                        }
-
-                        Game game = managedGame.getGame();
-                        List<GameMessage> acMessages = entry.getValue();
-                        try {
-                            automaticallyReactToSabotageWindows(game, acMessages);
-                        } catch (Exception e) {
-                            BotLogger.error(
-                                    new LogOrigin(game), "SabotageAutoReactCron failed for game: " + game.getName(), e);
-                        }
-                    })
-                    .run();
-        }
-
-        GameMessageManager.remove(gamesToRemove);
+        ConsumeGameUtility.consumeGames(
+                acMessagesByGame.keySet(),
+                game -> automaticallyReactToSabotageWindows(game, acMessagesByGame.get(game.getName())),
+                ExecutionLockType.WRITE);
 
         BotLogger.logCron("Finished SabotageAutoReactCron.");
     }
