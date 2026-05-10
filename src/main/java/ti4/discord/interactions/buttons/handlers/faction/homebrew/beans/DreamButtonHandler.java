@@ -611,18 +611,43 @@ public class DreamButtonHandler {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + " has no valid planet for _The Recurring_ in a system with a nexus token or flagship.");
+                            + " has no valid planet they control for _The Recurring_ in a system with a nexus token or flagship.");
             return;
         }
 
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-        buttons.addAll(placeButtons);
+        buttons.add(Buttons.green("dream_recurring_mech_paid_" + amount + "_from_" + source, "Done Spending"));
         buttons.add(Buttons.red("deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " may spend 1 influence to place "
                         + (amount == 1 ? "_The Recurring_" : "1 of " + amount + " destroyed _Recurring_ mechs")
-                        + " on another planet in a system that contains a nexus token or your flagship.",
+                        + " on another planet you control in a system that contains a nexus token or your flagship. After spending, click Done Spending to choose the destination.",
+                buttons);
+    }
+
+    @ButtonHandler("dream_recurring_mech_paid_")
+    public static void offerRecurringMechPlacementButtons(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] parts = buttonID.replace("dream_recurring_mech_paid_", "").split("_from_", 2);
+        if (parts.length != 2) {
+            MessageHelper.sendMessageToEventChannel(event, "Could not parse that _Recurring_ payment confirmation.");
+            return;
+        }
+
+        int remaining = Integer.parseInt(parts[0]);
+        String source = parts[1];
+        List<Button> buttons = getRecurringMechPlanetButtons(game, player, remaining, source);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToEventChannel(event, "There are no valid planets for _The Recurring_ anymore.");
+            return;
+        }
+
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " choose where to place _The Recurring_.",
                 buttons);
     }
 
@@ -668,6 +693,7 @@ public class DreamButtonHandler {
             if (!tileContainsNexusToken(game, tile, true)) continue;
             for (var planet : tile.getPlanetUnitHolders()) {
                 if (planet.getName().equalsIgnoreCase(sourcePlanet)) continue;
+                if (!player.getPlanets().contains(planet.getName())) continue;
                 buttons.add(Buttons.green(
                         "dream_recurring_mech_" + remaining + "_to_" + planet.getName() + "_from_" + sourcePlanet,
                         "Place on " + Helper.getPlanetRepresentation(planet.getName(), game)));
@@ -677,6 +703,11 @@ public class DreamButtonHandler {
     }
 
     // Dream-Space Convergence, the Dreaming Throne breakthrough
+
+    public static boolean hasDreamBtNexusMove(Game game, Player player) {
+        return getNexusTokenTiles(game).stream().anyMatch(tile -> !getDreamBtNexusDestinations(game, player, tile)
+                .isEmpty());
+    }
 
     public static void postDreamBtMoveNexusButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         List<Tile> sourceTiles = getNexusTokenTiles(game);
@@ -784,8 +815,8 @@ public class DreamButtonHandler {
         }
         RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToEventChannel(
-                event,
+        MessageHelper.sendMessageToChannel(
+                game.getActionsChannel(),
                 player.getRepresentation() + " removed their command token from "
                         + tile.getRepresentationForButtons(game, player) + " with _Dream-Space Convergence_.");
     }

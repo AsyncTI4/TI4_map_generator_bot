@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.TyrisHeroButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -473,6 +474,12 @@ public class StartTurnService {
                             CardEmojis.getSCFrontFromInteger(SC));
                     startButtons.add(strategicAction);
                 }
+            }
+            if (player.hasReadyBreakthrough("dreambt") && DreamButtonHandler.hasDreamBtNexusMove(game, player)) {
+                startButtons.add(Buttons.gray(
+                        factionChecker + "componentActionRes_exhaustBT_dreambt",
+                        "Exhaust Dream-Space Convergence",
+                        FactionEmojis.dream));
             }
             String prefix = "componentActionRes_";
             for (Leader leader : player.getLeaders()) {
