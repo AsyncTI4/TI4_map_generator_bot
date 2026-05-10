@@ -46,7 +46,6 @@ import ti4.model.UnitModel;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.player.PlayerColorService;
-import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.unit.DestroyUnitService;
 import ti4.spring.context.SpringContext;
 import ti4.testUtils.BaseTi4Test;
@@ -227,7 +226,6 @@ class CombatRollPayloadRendererParityTest extends BaseTi4Test {
         try (MockedStatic<DiceHelper> dice = mockDice(10);
                 MockedStatic<MessageHelper> ignoredMessages = mockStatic(MessageHelper.class);
                 MockedStatic<FOWCombatThreadMirroring> ignoredFow = mockStatic(FOWCombatThreadMirroring.class);
-                MockedStatic<RoundStatsTracker> ignoredRoundStats = mockStatic(RoundStatsTracker.class);
                 MockedStatic<SpringContext> spring = mockStatic(SpringContext.class)) {
             spring.when(() -> SpringContext.getBean(CombatReplayService.class)).thenReturn(replayService);
 

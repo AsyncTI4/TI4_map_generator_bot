@@ -21,7 +21,6 @@ import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.service.game.GameUndoNameService;
 import ti4.service.info.CardsInfoService;
-import ti4.service.statistics.round.RoundStatsTracker;
 
 @UtilityClass
 class GameUndoService {
@@ -104,7 +103,6 @@ class GameUndoService {
             generateSavedButtons(gameToUndo);
             sendAnyChangedCardsInfo(gameToUndo, loadedGame);
             GameMessageManager.removeAfter(gameName, loadedGame.getLastModifiedDate());
-            RoundStatsTracker.restoreAfterUndo(loadedGame, undoIndex);
 
             sendUndoConfirmationMessage(gameToUndo, undoIndex, latestUndoIndex);
             return loadedGame;

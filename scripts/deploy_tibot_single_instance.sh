@@ -9,11 +9,12 @@ stop_timeout_seconds="${STOP_TIMEOUT_SECONDS:-600}"
 log_tail_lines="${ROLLBACK_LOG_TAIL_LINES:-200}"
 
 old_ids_file="$(mktemp)"
+existing_ids_file="$(mktemp)"
 new_ids_file="$(mktemp)"
 new_container_id=""
 
 cleanup_tmp_files() {
-  rm -f "$old_ids_file" "$new_ids_file"
+  rm -f "$old_ids_file" "$existing_ids_file" "$new_ids_file"
 }
 
 cleanup_new_container() {
@@ -51,12 +52,23 @@ health_status() {
 
 trap 'cleanup_tmp_files' EXIT
 
+existing_container_ids="$(compose ps --all -q "$service" || true)"
+printf '%s\n' "$existing_container_ids" | sed '/^$/d' > "$existing_ids_file"
+
 old_container_ids="$(compose ps -q "$service" || true)"
 printf '%s\n' "$old_container_ids" | sed '/^$/d' > "$old_ids_file"
 old_container_count="$(count_lines < "$old_ids_file")"
 target_container_count=$((old_container_count + 1))
 
-echo "Found $old_container_count existing $service container(s)."
+echo "Found $old_container_count running $service container(s)."
+while IFS= read -r existing_container_id; do
+  [ -z "$existing_container_id" ] && continue
+  if ! grep -qxF "$existing_container_id" "$old_ids_file"; then
+    echo "Removing stopped $service container before rollout: $existing_container_id"
+    docker rm "$existing_container_id" || true
+  fi
+done < "$existing_ids_file"
+
 echo "Scaling '$service' to $target_container_count total container(s) to create exactly one rollout candidate."
 compose up --detach --scale "$service=$target_container_count" --no-recreate "$service"
 

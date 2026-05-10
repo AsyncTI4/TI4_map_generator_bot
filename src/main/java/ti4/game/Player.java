@@ -101,7 +101,6 @@ import ti4.service.fow.GMService;
 import ti4.service.fow.LoreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.map.FractureService;
-import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -2468,7 +2467,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             return;
         }
         getTechs().add(techID);
-        RoundStatsTracker.recordTechGained(game, this, techID);
         doAdditionalThingsWhenAddingTech(techID);
     }
 

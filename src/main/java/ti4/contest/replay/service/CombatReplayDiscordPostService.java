@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -14,7 +13,6 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ti4.contest.replay.core.CombatReplayChannels;
-import ti4.contest.replay.core.CombatReplayHouse;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatCandidateEventEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
@@ -52,14 +50,12 @@ public class CombatReplayDiscordPostService {
                         String content,
                         List<MessageEmbed> embeds,
                         String tilePosition,
-                        String snapshotJson,
-                        boolean applyReplayDecoys)) {
+                        String snapshotJson)) {
             sendTileRenderMessage(
                     channel,
                     content,
                     embeds,
-                    replayPayloadRenderer.restoreReplayGame(
-                            snapshotJson, game, candidate, tilePosition, applyReplayDecoys),
+                    replayPayloadRenderer.restoreReplayGame(snapshotJson, game, candidate, tilePosition),
                     tilePosition);
             return;
         }
@@ -119,27 +115,6 @@ public class CombatReplayDiscordPostService {
         List<TextChannel> channels =
                 JdaService.guildPrimary.getTextChannelsByName(CombatReplayChannels.contestChannelName(settings), true);
         return channels.isEmpty() ? null : channels.getFirst();
-    }
-
-    public TextChannel houseChannel(CombatReplayHouse house) {
-        if (JdaService.guildPrimary == null || house == null) return null;
-        List<TextChannel> channels = JdaService.guildPrimary.getTextChannelsByName(house.channelName(), true);
-        return channels.isEmpty() ? null : channels.getFirst();
-    }
-
-    public String getHouseRoleMention(CombatReplayHouse house) {
-        if (JdaService.guildPrimary == null || house == null) return "";
-        List<Role> roles = JdaService.guildPrimary.getRolesByName(house.roleName(), true);
-        Role role = roles.isEmpty() ? null : roles.getFirst();
-        return role == null ? "" : role.getAsMention();
-    }
-
-    public String getHouseRoleMentions() {
-        if (JdaService.guildPrimary == null) return "";
-        return CombatReplayHouse.assignmentOrder().stream()
-                .map(this::getHouseRoleMention)
-                .filter(mention -> !mention.isBlank())
-                .collect(java.util.stream.Collectors.joining(" "));
     }
 
     private String buildReplayThreadName(CombatCandidateEntity candidate) {

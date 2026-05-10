@@ -65,7 +65,6 @@ import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
-import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.HacanFlagshipService;
@@ -1010,7 +1009,6 @@ public class CombatRollService {
                                         : RollSegmentType.GRAVLEASH_REST;
                             default -> RollSegmentType.PRIMARY;
                         };
-                RoundStatsTracker.recordDiceRolled(game, player, numRolls);
                 List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
                 int mult = 1;
 
@@ -1099,7 +1097,6 @@ public class CombatRollService {
                         || "sigma_jolnar_flagship_2".equalsIgnoreCase(unitModel.getId())) {
                     int additionalDice = hitRolls;
                     while (hitRolls < 100 && additionalDice > 0) {
-                        RoundStatsTracker.recordDiceRolled(game, player, additionalDice);
                         List<Die> additionalResultRolls = DiceHelper.rollDice(toHit - modifierToHit, additionalDice);
                         additionalDice = DiceHelper.countSuccesses(additionalResultRolls);
                         hitRolls += additionalDice;
@@ -1235,7 +1232,6 @@ public class CombatRollService {
 
                     if (opponent == player && rollType == CombatRollType.bombardment && player.hasTech("proxima")) {
                         if (hitRolls > 0) {
-                            RoundStatsTracker.recordDiceRolled(game, player, hitRolls);
                             resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, hitRolls);
                             // Very important to remove the rerolled dice from the original dice pool
                             resultRolls.removeIf(Die::isSuccess);
@@ -1274,7 +1270,6 @@ public class CombatRollService {
                         }
                     } else {
                         if (numMisses > 0) {
-                            RoundStatsTracker.recordDiceRolled(game, player, numMisses);
                             resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numMisses);
                             // Very important to remove the rerolled dice from the original dice pool
                             resultRolls.removeIf(Predicate.not(Die::isSuccess));
@@ -1379,7 +1374,6 @@ public class CombatRollService {
                         }
                     }
                     if (num1s > 0) {
-                        RoundStatsTracker.recordDiceRolled(game, player, num1s);
                         resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, num1s);
                         player.setExpectedHitsTimes10(
                                 player.getExpectedHitsTimes10() + (num1s * (11 - toHit + modifierToHit)));
@@ -1419,7 +1413,6 @@ public class CombatRollService {
                         && rollType == CombatRollType.combatround
                         && numMisses > 0
                         && !isThalnosReroll) { // do not munitions after thalnos
-                    RoundStatsTracker.recordDiceRolled(game, player, numMisses);
                     resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numMisses);
                     // Very important to remove the rerolled dice from the original dice pool
                     resultRolls.removeIf(Predicate.not(Die::isSuccess));
@@ -1479,7 +1472,6 @@ public class CombatRollService {
                     resultRolls.removeIf(d -> d.getResult() == 1);
 
                     if (num1s > 0) {
-                        RoundStatsTracker.recordDiceRolled(game, player, num1s);
                         resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, num1s);
                         player.setExpectedHitsTimes10(
                                 player.getExpectedHitsTimes10() + (num1s * (11 - toHit + modifierToHit)));

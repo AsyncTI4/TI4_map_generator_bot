@@ -9,7 +9,6 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import java.util.HashSet;
 import org.junit.jupiter.api.Test;
 import ti4.contest.replay.core.CombatContestSettings;
-import ti4.contest.replay.core.CombatReplayDecoys;
 import ti4.contest.replay.core.CombatSideBetType;
 import ti4.contest.replay.core.renderers.CombatReplayTileRenderer;
 import ti4.contest.replay.entities.CombatCandidateEntity;
@@ -47,19 +46,6 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
     void pricesRoundOneWhiffFromInitialSnapshotOnly() {
         CombatReplayContestEntity contest = oddsContest();
         CombatCandidateEntity candidate = snapshotCandidate(4, 1);
-
-        int payout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_WHIFF, "sol");
-
-        assertEquals(4, payout);
-        verifyNoInteractions(eventRepository);
-    }
-
-    @Test
-    void roundOneOddsIgnoreReplayOnlyWarSunDecoy() {
-        CombatReplayContestEntity contest = oddsContest();
-        CombatCandidateEntity candidate = snapshotCandidate(1, 1);
-        candidate.setReplayAbilitiesJson(CombatReplayDecoys.addDecoy(
-                null, new CombatReplayDecoys.DecoyUnit("sol", "<sol>", "blu", UnitType.Warsun, Constants.SPACE, 1)));
 
         int payout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_WHIFF, "sol");
 
@@ -131,20 +117,6 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void afbAvailabilityIgnoresReplayOnlyDestroyerDecoy() {
-        CombatReplayContestEntity contest = oddsContest();
-        CombatCandidateEntity candidate = snapshotCandidate(1, 1);
-        candidate.setReplayAbilitiesJson(CombatReplayDecoys.addDecoy(
-                null, new CombatReplayDecoys.DecoyUnit("sol", "<sol>", "blu", UnitType.Destroyer, Constants.SPACE, 1)));
-
-        int payout = service.offeredPayout(contest, candidate, CombatSideBetType.AFB_WHIFF, "sol");
-
-        assertFalse(service.hasAfbUnits(candidate, "sol"));
-        assertEquals(4, payout);
-        verifyNoInteractions(eventRepository);
-    }
-
-    @Test
     void afbWhiffIsUnavailableWithoutInitialSnapshotAfbUnits() {
         CombatReplayContestEntity contest = oddsContest();
         CombatCandidateEntity candidate = snapshotCandidate(4, 1);
@@ -180,27 +152,11 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void oneHpPayoutIgnoresReplayOnlyWarSunDecoy() {
-        CombatCandidateEntity candidate = snapshotCandidate(1, 1);
-        candidate.setReplayAbilitiesJson(CombatReplayDecoys.addDecoy(
-                null, new CombatReplayDecoys.DecoyUnit("sol", "<sol>", "blu", UnitType.Warsun, Constants.SPACE, 1)));
-
-        int payout = service.offeredPayout(oddsContest(), candidate, CombatSideBetType.WINNER_ONE_HP, "sol");
-
-        assertEquals(5, payout);
-        verifyNoInteractions(eventRepository);
-    }
-
-    @Test
-    void resolvesOldRowsWithLegacyFixedPayoutAndNewRowsWithLockedSnapshot() {
-        CombatContestSideBetEntity legacy = new CombatContestSideBetEntity();
-        legacy.setBetType(CombatSideBetType.ROUND_ONE_WHIFF);
-
+    void resolvesLockedSideBetPayout() {
         CombatContestSideBetEntity locked = new CombatContestSideBetEntity();
         locked.setBetType(CombatSideBetType.ROUND_ONE_WHIFF);
         locked.setOfferedProfitPoints(17);
 
-        assertEquals(10, service.resolvedProfitPoints(legacy));
         assertEquals(17, service.resolvedProfitPoints(locked));
     }
 
@@ -319,9 +275,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
     }
 
     private CombatReplayContestEntity oddsContest() {
-        CombatReplayContestEntity contest = new CombatReplayContestEntity();
-        contest.setSideBetPayoutModel(CombatReplaySideBetPayoutService.ODDS_V1);
-        return contest;
+        return new CombatReplayContestEntity();
     }
 
     private Player player(Game game, String faction) {

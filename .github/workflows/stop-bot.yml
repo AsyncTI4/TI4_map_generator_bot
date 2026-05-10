@@ -18,12 +18,30 @@ jobs:
           set -eu
           
           cd ${{ vars.HOST_TI4_REPO_DIR }}
-          
-          echo "Building docker image..."
+
+          echo "Pulling deployment config from GitHub..."
+          git pull --ff-only
+
+          export COMPOSE_PROJECT_NAME="ti4-bot"
           docker version
-          docker build -t tibot .
-          
-          echo "Shutting Down TIBot... giving 600 seconds to shutdown"
-          docker stop $(docker ps -q) --time 600
+
+          running_tibot_containers="$(docker ps -q --filter "label=com.docker.compose.project=${COMPOSE_PROJECT_NAME}" --filter "label=com.docker.compose.service=tibot" || true)"
+          if [ -z "$running_tibot_containers" ]; then
+            echo "No running TIBot containers found."
+          fi
+
+          for container in $running_tibot_containers; do
+            echo "Draining TIBot container $container"
+            docker exec "$container" sh -c 'wget -qO- --post-data="" http://127.0.0.1:8081/api/public/deploy/drain || true; for i in $(seq 1 15); do wget -q -O - http://127.0.0.1:8081/api/public/ready >/dev/null 2>&1 || break; sleep 1; done' || true
+
+            echo "Stopping TIBot container $container... giving 600 seconds to shutdown"
+            docker stop --time 600 "$container"
+          done
+
+          stopped_tibot_containers="$(docker ps -a -q --filter "label=com.docker.compose.project=${COMPOSE_PROJECT_NAME}" --filter "label=com.docker.compose.service=tibot" || true)"
+          for container in $stopped_tibot_containers; do
+            echo "Removing stopped TIBot container $container"
+            docker rm "$container" || true
+          done
 
           echo "DONE!"

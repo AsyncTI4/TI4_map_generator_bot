@@ -727,7 +727,7 @@ public class MessageHelper {
         sb.append(channel.getAsMention()).append("\nRestAction Failure within MessageHelper.splitAndSentWithAction: ");
         sb.append(errorHeader);
         sb.append("\n```").append(error.getMessage()).append("```");
-        if (messageCreateData != null) {
+        if (messageCreateData != null && !isDiscordServerError(error)) {
             String messageJSON = messageCreateData.toData().toPrettyString();
             sb.append("\nMessageContent: ").append(messageCreateData.getContent());
             int maxJSONLength = 1500;

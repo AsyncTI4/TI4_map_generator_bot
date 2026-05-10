@@ -7,8 +7,9 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -17,8 +18,10 @@ class WinningPathsStatisticsService {
     static void showWinningPaths(SlashCommandInteractionEvent event) {
         Map<String, Integer> winningPathCount = new HashMap<>();
 
-        GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilterForWonGame(event), game -> getWinningPath(game, winningPathCount));
+        ConsumeGameUtility.consumeAllGames(
+                GameStatisticsFilterer.getGamesFilterForWonGame(event),
+                game -> getWinningPath(game, winningPathCount),
+                ExecutionLockType.READ);
 
         int gamesWithWinnerCount = winningPathCount.values().stream().reduce(0, Integer::sum);
         AtomicInteger atomicInteger = new AtomicInteger();
@@ -49,9 +52,10 @@ class WinningPathsStatisticsService {
         Map<Integer, Integer> supportWinCount = new HashMap<>();
         AtomicInteger gameWithWinnerCount = new AtomicInteger();
 
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event),
-                game -> getWinsWithSupport(game, supportWinCount, gameWithWinnerCount));
+                game -> getWinsWithSupport(game, supportWinCount, gameWithWinnerCount),
+                ExecutionLockType.READ);
 
         AtomicInteger atomicInteger = new AtomicInteger();
         StringBuilder sb = new StringBuilder();

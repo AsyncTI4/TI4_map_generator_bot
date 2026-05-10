@@ -9,9 +9,10 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -25,9 +26,10 @@ class EndingRoundPhaseStatisticsService {
         Map<String, Integer> endingRoundAndPhaseCount = new HashMap<>();
         Map<String, FactionWinningRoundStats> statsByFaction = new HashMap<>();
 
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event),
-                game -> collectEndingRoundStats(game, endingRoundAndPhaseCount, statsByFaction));
+                game -> collectEndingRoundStats(game, endingRoundAndPhaseCount, statsByFaction),
+                ExecutionLockType.READ);
 
         StringBuilder sb = new StringBuilder("__**Game Endings by Round and Phase:**__\n");
         if (endingRoundAndPhaseCount.isEmpty()) {
@@ -54,7 +56,7 @@ class EndingRoundPhaseStatisticsService {
         endingRoundAndPhaseCount.merge(formatFullRoundPhaseLabel(game.getRound(), phaseCode), 1, Integer::sum);
         for (Player winner : game.getWinners()) {
             statsByFaction
-                    .computeIfAbsent(winner.getFaction(), ignored -> new FactionWinningRoundStats())
+                    .computeIfAbsent(winner.getFaction(), _ -> new FactionWinningRoundStats())
                     .addWin(game.getRound(), phaseCode);
         }
     }
@@ -151,9 +153,7 @@ class EndingRoundPhaseStatisticsService {
         void addWin(int round, String phaseCode) {
             totalWins++;
             totalRoundSum += round;
-            winsByRoundAndPhase
-                    .computeIfAbsent(round, ignored -> new HashMap<>())
-                    .merge(phaseCode, 1, Integer::sum);
+            winsByRoundAndPhase.computeIfAbsent(round, _ -> new HashMap<>()).merge(phaseCode, 1, Integer::sum);
         }
 
         double getAverageRound() {

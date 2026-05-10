@@ -1,12 +1,12 @@
 package ti4.discord.interactions.commands.user;
 
-import java.util.HashSet;
+import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.Subcommand;
-import ti4.executors.ExecutionLockManager;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.game.persistence.ManagedPlayer;
@@ -26,20 +26,15 @@ class WipeTurnTime extends Subcommand {
         if (managedPlayer == null) {
             return;
         }
-        // We need to place the games into a new set, to avoid a concurrent modification exception
-        new HashSet<>(managedPlayer.getGames())
-                .stream()
-                        .map(ManagedGame::getName)
-                        .distinct()
-                        .forEach(gameName -> ExecutionLockManager.wrapWithLockAndRelease(
-                                        gameName, ExecutionLockType.WRITE, () -> wipeTurnTime(gameName, userId))
-                                .run());
+
+        List<String> gameNames =
+                managedPlayer.getGames().stream().map(ManagedGame::getName).toList();
+        ConsumeGameUtility.consumeGames(gameNames, game -> wipeTurnTime(game, userId), ExecutionLockType.WRITE);
 
         MessageHelper.sendMessageToChannel(event.getChannel(), "Wiped all of your turn times");
     }
 
-    private void wipeTurnTime(String gameName, String playerId) {
-        Game game = GameManager.getManagedGame(gameName).getGame();
+    private void wipeTurnTime(Game game, String playerId) {
         Player player = game.getPlayer(playerId);
         if (player != null) {
             player.setTotalTurnTime(0);

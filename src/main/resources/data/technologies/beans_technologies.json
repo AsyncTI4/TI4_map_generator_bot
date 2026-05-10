@@ -9,7 +9,7 @@
         "faction": "dream",
         "baseUpgrade": "dd2",
         "source": "beans",
-        "text": "At the end of a tactical action in this unit's system, you may place or move 1 nexus token into this unit's system."
+        "text": "At the end of a tactical action in this unit's system, you may place or move 1 nexus token into any system that contains your units."
     },
     {
         "alias": "bedreamneg",

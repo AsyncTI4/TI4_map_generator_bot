@@ -96,11 +96,8 @@ public class LazaxCombatSupport {
 
         FleetStrength attackerStrength = calculateFleetStrength(attacker, defender, tile, space);
         FleetStrength defenderStrength = calculateFleetStrength(defender, attacker, tile, space);
-        String summary = CombatReplayDecoys.appendDebugDecoySummary(
-                extractSpaceOnlySummary(ButtonHelper.getCombatTileSummaryMessage(
-                        game, tile, attacker, null, "space", Constants.SPACE, List.of(attacker, defender))),
-                game,
-                tile);
+        String summary = extractSpaceOnlySummary(ButtonHelper.getCombatTileSummaryMessage(
+                game, tile, attacker, null, "space", Constants.SPACE, List.of(attacker, defender)));
         String activePlayerSummary = formatActivePlayerSummary(game);
         String openerText = formatReplayHeader(game, tile, attacker, defender, activePlayerSummary);
         String parentPostText = openerText + "\n\n" + summary;
@@ -146,17 +143,12 @@ public class LazaxCombatSupport {
     }
 
     public String formatCombatTechSummary(Tile tile, Player attacker, Player defender) {
-        return formatCombatTechSummary(tile, attacker, defender, new CombatReplayDecoys.Abilities(null));
-    }
-
-    public String formatCombatTechSummary(
-            Tile tile, Player attacker, Player defender, CombatReplayDecoys.Abilities abilities) {
         if (attacker == null || defender == null) return null;
 
         StringBuilder message = new StringBuilder("## Combat Technologies\n")
-                .append(formatCombatTechLine(attacker, abilities))
+                .append(formatCombatTechLine(attacker))
                 .append("\n")
-                .append(formatCombatTechLine(defender, abilities));
+                .append(formatCombatTechLine(defender));
         String relicSection = formatCombatRelicSection(attacker, defender);
         if (relicSection != null) {
             message.append("\n").append(relicSection);
@@ -187,12 +179,11 @@ public class LazaxCombatSupport {
         String attackerLine = formatReplayLegendLine(attacker, candidate.getAttackerFaction(), false);
         String defenderLine = formatReplayLegendLine(defender, candidate.getDefenderFaction(), false);
 
-        String openerText = "## A New Combat Contest Has Emerged!\n"
-                + roleMention
-                + "\n"
+        String openerText = (roleMention == null || roleMention.isBlank() ? "" : roleMention + "\n")
+                + "## A New Combat Contest Has Emerged!\n"
                 + "**System:** " + tileRepresentation + "\n"
                 + "**Combat:** Space Combat\n"
-                + "**Predict the winner by reacting below.**\n"
+                + "**React below to predict the winner. Side betting is open in the replay thread.**\n"
                 + "_Losers get -4 points._\n"
                 + attackerLine + "\n"
                 + defenderLine;
@@ -247,12 +238,9 @@ public class LazaxCombatSupport {
         return damagedCountsByAsyncId;
     }
 
-    private String formatCombatTechLine(Player player, CombatReplayDecoys.Abilities abilities) {
+    private String formatCombatTechLine(Player player) {
         List<TechnologyModel> combatTechs = new ArrayList<>();
         Set<String> techIds = new LinkedHashSet<>(player.getTechs());
-        if (CombatReplayDecoys.hasWarSunDecoyForPlayer(abilities, player)) {
-            techIds.add("ws");
-        }
         for (String techId : techIds) {
             TechnologyModel tech = Mapper.getTech(techId);
             if (tech == null) continue;
