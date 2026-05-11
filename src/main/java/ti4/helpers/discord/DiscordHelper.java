@@ -29,8 +29,7 @@ public class DiscordHelper {
     }
 
     public static boolean isUnknownEmojiError(Throwable error) {
-        return error instanceof ErrorResponseException restError
-                && restError.getErrorCode() == DISCORD_UNKNOWN_EMOJI_ERROR_CODE;
+        return hasDiscordErrorCode(error, DISCORD_UNKNOWN_EMOJI_ERROR_CODE);
     }
 
     public static boolean isIgnorableError(Throwable error) {
