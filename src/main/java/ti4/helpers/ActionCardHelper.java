@@ -242,14 +242,13 @@ public class ActionCardHelper {
     }
 
     public static void sendPlotCardInfo(Game game, Player player) {
-        ThreadChannel cardsInfoThread = player.getCardsInfoThread();
-        if (cardsInfoThread == null) {
-            return;
-        }
-        sendPlotCardInfo(game, player, cardsInfoThread);
+        sendPlotCardInfo(game, player, player.getCardsInfoThread());
     }
 
     public static void sendPlotCardInfo(Game game, Player player, ThreadChannel cardsInfoThread) {
+        if (cardsInfoThread == null) {
+            return;
+        }
         if (player.hasAbility("plotsplots")
                 || player.hasAbility("bladesorchestra")
                 || player.hasAbility("puppetsoftheblade")) { // firmament/obsidian plot abilities
