@@ -89,13 +89,13 @@ public class ComponentActionHelper {
             compButtons.add(Buttons.red(factionChecker + prefix + "stellarAtomicsAction_", "Use Stellar Atomics"));
         }
         if (game.isMercenariesForHireMode()) {
-            if (game.getStoredValue("mercCommander").isEmpty()) {
-                game.setStoredValue("mercCommander", UnusedCommanderHelper.getUnusedCommander(game));
+            String mercCommander = getValidMercenaryCommander(game);
+            if (!mercCommander.isEmpty()) {
+                String commanderName = StringUtils.capitalize(mercCommander.replace("commander", " Commander"));
+                compButtons.add(Buttons.red(
+                        factionChecker + prefix + "mercenariesForHireAction_",
+                        "Spend 3 Trade Goods For " + commanderName));
             }
-            String commanderName =
-                    StringUtils.capitalize(game.getStoredValue("mercCommander").replace("commander", " Commander"));
-            compButtons.add(Buttons.red(
-                    factionChecker + prefix + "mercenariesForHireAction_", "Spend 3 Trade Goods For " + commanderName));
         }
         if (ButtonHelper.getNumberOfStarCharts(p1) > 1) {
             compButtons.add(Buttons.red(factionChecker + prefix + "doStarCharts_", "Purge 2 Star Charts"));
@@ -911,7 +911,16 @@ public class ComponentActionHelper {
                         buttons);
             }
             case "mercenariesForHireAction" -> {
-                if (p1.getTg() < 2) {
+                String leaderID = getValidMercenaryCommander(game);
+                LeaderModel mercCommander = Mapper.getLeader(leaderID);
+                if (mercCommander == null) {
+                    MessageHelper.sendMessageToChannel(
+                            p1.getCorrectChannel(),
+                            p1.getRepresentation()
+                                    + " cannot gain a new commander, as all commanders are already in play.");
+                    return;
+                }
+                if (p1.getTg() < 3) {
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
                             "You don't have three trade goods to pay your mercenaries. And Bad Things™ happen when you shortchange mercenaries.");
@@ -921,33 +930,24 @@ public class ComponentActionHelper {
                 MessageHelper.sendMessageToChannel(
                         p1.getCorrectChannel(),
                         p1.getRepresentationUnfogged() + " has spent 3 trade goods to hire mercenaries.");
-                String leaderID = game.getStoredValue("mercCommander");
-                if (leaderID != null) {
-                    p1.addLeader(leaderID);
-                    game.addFakeCommander(leaderID);
-                    MessageHelper.sendMessageToChannel(
-                            p1.getCorrectChannel(),
-                            p1.getRepresentation() + " acquired a new commander, "
-                                    + Mapper.getLeader(leaderID).getName() + "!");
-                    UnlockLeaderService.unlockLeader(leaderID, game, p1);
-                    game.setStoredValue("mercCommander", UnusedCommanderHelper.getUnusedCommander(game));
-                    if (!game.getStoredValue("mercCommander").isEmpty()) {
-                        LeaderModel led = Mapper.getLeader(game.getStoredValue("mercCommander"));
-                        if (led != null) {
-                            MessageHelper.sendMessageToChannelWithEmbed(
-                                    game.getActionsChannel(),
-                                    game.getPing() + ", this is the next commander on top of the mercenary pile.",
-                                    led.getRepresentationEmbed());
-                        }
-                    } else {
-                        MessageHelper.sendMessageToChannel(
-                                p1.getCorrectChannel(), "## There are no more commanders in the mercenary pile.");
+                p1.addLeader(leaderID);
+                game.addFakeCommander(leaderID);
+                MessageHelper.sendMessageToChannel(
+                        p1.getCorrectChannel(),
+                        p1.getRepresentation() + " acquired a new commander, " + mercCommander.getName() + "!");
+                UnlockLeaderService.unlockLeader(leaderID, game, p1);
+                game.setStoredValue("mercCommander", UnusedCommanderHelper.getUnusedCommander(game));
+                if (!game.getStoredValue("mercCommander").isEmpty()) {
+                    LeaderModel led = Mapper.getLeader(game.getStoredValue("mercCommander"));
+                    if (led != null) {
+                        MessageHelper.sendMessageToChannelWithEmbed(
+                                game.getActionsChannel(),
+                                game.getPing() + ", this is the next commander on top of the mercenary pile.",
+                                led.getRepresentationEmbed());
                     }
                 } else {
                     MessageHelper.sendMessageToChannel(
-                            p1.getCorrectChannel(),
-                            p1.getRepresentation()
-                                    + " cannot gain a new commander, as all commanders are already in play.");
+                            p1.getCorrectChannel(), "## There are no more commanders in the mercenary pile.");
                 }
             }
             case "exhaustBT" -> {
@@ -1209,6 +1209,17 @@ public class ComponentActionHelper {
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(), "This relic is not tied to any automation. Please resolve manually.");
         }
+    }
+
+    private static String getValidMercenaryCommander(Game game) {
+        String leaderID = game.getStoredValue("mercCommander");
+        if (!StringUtils.isBlank(leaderID) && Mapper.getLeader(leaderID) != null) {
+            return leaderID;
+        }
+
+        leaderID = UnusedCommanderHelper.getUnusedCommander(game);
+        game.setStoredValue("mercCommander", leaderID);
+        return leaderID;
     }
 
     public static void serveNextComponentActionButtons(GenericInteractionCreateEvent event, Game game, Player player) {
