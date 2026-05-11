@@ -232,11 +232,20 @@ public class TacticalActionOutputService {
         int moveValue = getUnitMoveValue(game, player, tile, unit, allMovingUnits, false);
         if (moveValue == 0) return "";
 
+        // The rift benefit is guaranteed (not optional) when ships start in a gravity rift
+        // (they must exit through it) or when Crucible is active (ships moving out of or
+        // through a gravity rift get +1 without rolling). In these cases, use riftDistance
+        // for the comparison rather than the normal distance.
+        boolean startingInGravityRift = tile.isGravityRift(game);
+        boolean crucibleActive = !game.getStoredValue("crucibleBoost").isEmpty();
+        boolean riftBenefitIsGuaranteed = riftDistance < distance && (startingInGravityRift || crucibleActive);
+        int checkDistance = riftBenefitIsGuaranteed ? riftDistance : distance;
+
         StringBuilder output = new StringBuilder();
         int maxBonus = 0;
-        if (distance > moveValue && distance < 90) {
+        if (checkDistance > moveValue && distance < 90) {
             output.append(" (distance exceeds move value (")
-                    .append(distance)
+                    .append(checkDistance)
                     .append(" > ")
                     .append(moveValue)
                     .append(")");
@@ -272,7 +281,7 @@ public class TacticalActionOutputService {
                 maxBonus++;
                 output.append(" (has _Lightning Drives_ for +1 movement if not transporting)");
             }
-            if (riftDistance < distance) {
+            if (!riftBenefitIsGuaranteed && riftDistance < distance) {
                 // maxBonus += distance - riftDistance; // Don't automatically count rifts, allow the GM to verify
                 output.append(" (gravity rifts along a path could add +")
                         .append(distance - riftDistance)
@@ -282,8 +291,17 @@ public class TacticalActionOutputService {
                 }
                 game.setStoredValue("possiblyUsedRift", "yes");
             }
+        } else if (riftBenefitIsGuaranteed && distance > moveValue) {
+            // The move is valid because the guaranteed rift benefit brought the effective
+            // distance within range. Note how many tiles the rift saved.
+            int riftBonus = distance - riftDistance;
+            if (startingInGravityRift) {
+                output.append(" (+").append(riftBonus).append(" movement from leaving gravity rift)");
+            } else {
+                output.append(" (+").append(riftBonus).append(" movement from Crucible gravity rift bonus)");
+            }
         }
-        if ((distance > (moveValue + maxBonus)) && game.isFowMode()) {
+        if ((checkDistance > (moveValue + maxBonus)) && game.isFowMode()) {
             GMService.logPlayerActivity(game, player, output.toString());
         }
         if (distance > 90 && player.hasAbility("sundered")) {
