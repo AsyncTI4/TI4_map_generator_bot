@@ -40,9 +40,8 @@ class GameLoadServiceTest extends BaseTi4Test {
             assertThatCode(harness::load).doesNotThrowAnyException();
 
             Game game = harness.load();
-            assertThat(game.getPlayers().values())
-                    .anySatisfy(player -> assertThat(player.getLeaderByID("legacyleader"))
-                            .hasValueSatisfying(leader -> assertThat(leader.getType()).isEqualTo("agent")));
+            assertThat(game.getPlayers().values()).anySatisfy(player -> assertThat(player.getLeaderByID("legacyleader"))
+                    .hasValueSatisfying(leader -> assertThat(leader.getType()).isEqualTo("agent")));
         }
     }
 }
