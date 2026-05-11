@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -80,32 +81,34 @@ public class ActionCardHelper {
     }
 
     public static void sendActionCardInfo(Game game, Player player) {
+        ThreadChannel cardsInfoThread = player.getCardsInfoThread();
+        if (cardsInfoThread == null) {
+            return;
+        }
         // AC INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThreadAndPin(
-                game, player, PINNED_AC_INFO_MESSAGE_ID, getActionCardInfo(game, player));
+        MessageHelper.sendMessageToThreadChannelAndPin(
+                game, cardsInfoThread, PINNED_AC_INFO_MESSAGE_ID, getActionCardInfo(game, player));
         Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCardsInfoThread(),
-                    "Click a button below to play an action card.",
-                    getPlayActionCardButtons(game, player));
+                    cardsInfoThread, "Click a button below to play an action card.", getPlayActionCardButtons(game, player));
         }
 
         if (game.isWildWildGalaxyMode()) {
             MessageHelper.sendMessageToChannel(
-                    player.getCardsInfoThread(),
+                    cardsInfoThread,
                     "This is a reminder that in Wild, Wild Galaxy mode, each of the four-of-a-type action cards are modified in some way. The text you see may not be entirely accurate as a result.");
         }
 
-        sendTrapCardInfo(player);
-        sendPlotCardInfo(game, player);
-        sendGarboziaInfo(game, player);
+        sendTrapCardInfo(player, cardsInfoThread);
+        sendPlotCardInfo(game, player, cardsInfoThread);
+        sendGarboziaInfo(game, player, cardsInfoThread);
     }
 
-    private static void sendGarboziaInfo(Game game, Player player) {
+    private static void sendGarboziaInfo(Game game, Player player, ThreadChannel cardsInfoThread) {
         if (player.hasPlanet("garbozia")) {
             MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCardsInfoThread(), getGarboziaInfo(game), getPurgeGarboziaActionCardButtons(game));
+                    cardsInfoThread, getGarboziaInfo(game), getPurgeGarboziaActionCardButtons(game));
         }
     }
 
@@ -166,9 +169,9 @@ public class ActionCardHelper {
         return buttons;
     }
 
-    private static void sendTrapCardInfo(Player player) {
+    private static void sendTrapCardInfo(Player player, ThreadChannel cardsInfoThread) {
         if (player.hasAbility("cunning") || player.hasAbility("subterfuge")) { // Lih-zo trap abilities
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, getTrapCardInfo(player));
+            MessageHelper.sendMessageToChannel(cardsInfoThread, getTrapCardInfo(player));
         }
         if (player.hasAbility("classified_developments")) {
             String[] superWeapons = {
@@ -189,7 +192,7 @@ public class ActionCardHelper {
                 sb.append('\n');
             }
 
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
+            MessageHelper.sendMessageToChannel(cardsInfoThread, sb.toString());
         }
     }
 
@@ -237,12 +240,19 @@ public class ActionCardHelper {
     }
 
     public static void sendPlotCardInfo(Game game, Player player) {
+        ThreadChannel cardsInfoThread = player.getCardsInfoThread();
+        if (cardsInfoThread == null) {
+            return;
+        }
+        sendPlotCardInfo(game, player, cardsInfoThread);
+    }
+
+    public static void sendPlotCardInfo(Game game, Player player, ThreadChannel cardsInfoThread) {
         if (player.hasAbility("plotsplots")
                 || player.hasAbility("bladesorchestra")
                 || player.hasAbility("puppetsoftheblade")) { // firmament/obsidian plot abilities
             List<Button> buttons = getPlotCardButtons(player);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCardsInfoThread(), getPlotCardInfo(game, player), buttons);
+            MessageHelper.sendMessageToChannelWithButtons(cardsInfoThread, getPlotCardInfo(game, player), buttons);
         }
     }
 

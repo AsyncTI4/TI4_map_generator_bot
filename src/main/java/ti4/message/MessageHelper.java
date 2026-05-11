@@ -864,8 +864,12 @@ public class MessageHelper {
             return;
         }
 
-        ThreadChannel threadChannel = player.getCardsInfoThread();
-        if (threadChannel == null) {
+        sendMessageToThreadChannelAndPin(game, player.getCardsInfoThread(), storedValueKeyPrefix, messageText);
+    }
+
+    public static void sendMessageToThreadChannelAndPin(
+            @NotNull Game game, @Nullable ThreadChannel threadChannel, @NotNull String storedValueKeyPrefix, String messageText) {
+        if (messageText == null || messageText.isEmpty() || threadChannel == null) {
             return;
         }
 
