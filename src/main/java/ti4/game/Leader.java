@@ -10,15 +10,17 @@ import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
+import ti4.logging.BotLogger;
 import ti4.model.LeaderModel;
 import ti4.service.emoji.MiscEmojis;
 
 @Getter
 public class Leader {
     private final String id;
-    private String type;
+    private final String type;
 
     @Setter
     private int tgCount;
@@ -41,7 +43,7 @@ public class Leader {
             @JsonProperty("locked") boolean locked,
             @JsonProperty("active") boolean active) {
         this.id = id;
-        this.type = type == null ? getTypeFromLeaderId(id) : type;
+        this.type = type;
         this.tgCount = tgCount;
         this.exhausted = exhausted;
         this.locked = locked;
@@ -49,13 +51,16 @@ public class Leader {
     }
 
     public Leader(String id) {
+        this(id, null);
+    }
+
+    public Leader(String id, String type) {
         this.id = id;
-        type = getTypeFromLeaderId(id);
+        this.type = StringUtils.isBlank(type) ? getTypeFromLeaderId(id) : type;
         if (Constants.AGENT.equals(type)) {
             locked = false;
         }
     }
-
 
     private static String getTypeFromLeaderId(String id) {
         if (id.contains(Constants.AGENT)) {
@@ -70,6 +75,7 @@ public class Leader {
         if (id.contains(Constants.ENVOY)) {
             return Constants.ENVOY;
         }
+        BotLogger.error("Could not infer Leader type from id: " + id);
         return null;
     }
 
