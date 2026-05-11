@@ -41,7 +41,7 @@ public class Leader {
             @JsonProperty("locked") boolean locked,
             @JsonProperty("active") boolean active) {
         this.id = id;
-        this.type = type;
+        this.type = type == null ? getTypeFromLeaderId(id) : type;
         this.tgCount = tgCount;
         this.exhausted = exhausted;
         this.locked = locked;
@@ -50,16 +50,27 @@ public class Leader {
 
     public Leader(String id) {
         this.id = id;
-        if (id.contains(Constants.AGENT)) {
+        type = getTypeFromLeaderId(id);
+        if (Constants.AGENT.equals(type)) {
             locked = false;
-            type = Constants.AGENT;
-        } else if (id.contains(Constants.COMMANDER)) {
-            type = Constants.COMMANDER;
-        } else if (id.contains(Constants.HERO)) {
-            type = Constants.HERO;
-        } else if (id.contains(Constants.ENVOY)) {
-            type = Constants.ENVOY;
         }
+    }
+
+
+    private static String getTypeFromLeaderId(String id) {
+        if (id.contains(Constants.AGENT)) {
+            return Constants.AGENT;
+        }
+        if (id.contains(Constants.COMMANDER)) {
+            return Constants.COMMANDER;
+        }
+        if (id.contains(Constants.HERO)) {
+            return Constants.HERO;
+        }
+        if (id.contains(Constants.ENVOY)) {
+            return Constants.ENVOY;
+        }
+        return null;
     }
 
     @JsonIgnore
