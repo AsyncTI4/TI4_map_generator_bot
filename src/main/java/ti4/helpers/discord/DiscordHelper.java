@@ -3,6 +3,7 @@ package ti4.helpers.discord;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.Response;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 @UtilityClass
 public class DiscordHelper {
@@ -19,17 +20,20 @@ public class DiscordHelper {
     }
 
     public static boolean isUnknownMessageError(Throwable error) {
-        return error instanceof ErrorResponseException restError
-                && restError.getErrorCode() == DISCORD_UNKNOWN_MESSAGE_ERROR_CODE;
+        return hasDiscordErrorCode(error, DISCORD_UNKNOWN_MESSAGE_ERROR_CODE);
     }
 
     public static boolean isUnknownWebhookError(Throwable error) {
-        return error instanceof ErrorResponseException restError
-                && restError.getErrorCode() == DISCORD_UNKNOWN_WEBHOOK_ERROR_CODE;
+        return hasDiscordErrorCode(error, DISCORD_UNKNOWN_WEBHOOK_ERROR_CODE);
     }
 
     public static boolean isIgnorableError(Throwable error) {
         // Typically caused by the bot trying to delete or edit a message that has already been deleted.
         return isUnknownMessageError(error) || isUnknownWebhookError(error);
+    }
+
+    private static boolean hasDiscordErrorCode(Throwable error, int errorCode) {
+        ErrorResponseException restError = ExceptionUtils.throwableOfType(error, ErrorResponseException.class);
+        return restError != null && restError.getErrorCode() == errorCode;
     }
 }
