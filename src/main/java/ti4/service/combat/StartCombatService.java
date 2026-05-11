@@ -1402,6 +1402,13 @@ public class StartCombatService {
                                 + "Valiant Genome",
                         FactionEmojis.Bastion));
             }
+            if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("obsidianagent")) {
+                buttons.add(Buttons.gray(
+                        factionChecker + "getAgentSelection_obsidianagent",
+                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                                + "Obsidian Agent",
+                        FactionEmojis.Obsidian));
+            }
 
             if ((!game.isFowMode() || agentHolder == p1)
                     && agentHolder.hasUnexhaustedLeader("kyroagent")

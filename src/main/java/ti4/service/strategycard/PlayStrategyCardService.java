@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -624,12 +623,6 @@ public class PlayStrategyCardService {
                         playerOrder.append('\n');
                     }
                     MessageHelper.sendMessageToChannel(m5, playerOrder.toString());
-                }
-                for (Player p2 : game.getRealPlayers()) {
-                    Member member = game.getGuild().getMemberById(p2.getUserID());
-                    if (member != null) {
-                        m5.addThreadMember(member).queue();
-                    }
                 }
             }
 
