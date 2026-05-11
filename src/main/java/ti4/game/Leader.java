@@ -50,16 +50,29 @@ public class Leader {
 
     public Leader(String id) {
         this.id = id;
-        if (id.contains(Constants.AGENT)) {
+        type = deriveType(id);
+        if (Constants.AGENT.equals(type)) {
             locked = false;
-            type = Constants.AGENT;
-        } else if (id.contains(Constants.COMMANDER)) {
-            type = Constants.COMMANDER;
-        } else if (id.contains(Constants.HERO)) {
-            type = Constants.HERO;
-        } else if (id.contains(Constants.ENVOY)) {
-            type = Constants.ENVOY;
         }
+    }
+
+    public static String deriveType(String id) {
+        if (id == null) {
+            return null;
+        }
+        if (id.contains(Constants.AGENT)) {
+            return Constants.AGENT;
+        }
+        if (id.contains(Constants.COMMANDER)) {
+            return Constants.COMMANDER;
+        }
+        if (id.contains(Constants.HERO)) {
+            return Constants.HERO;
+        }
+        if (id.contains(Constants.ENVOY)) {
+            return Constants.ENVOY;
+        }
+        return null;
     }
 
     @JsonIgnore
@@ -81,8 +94,7 @@ public class Leader {
 
     @JsonIgnore
     public static Comparator<Leader> sortByType() {
-        return Comparator.comparing(Leader::getType, Comparator.nullsLast(String::compareTo))
-                .thenComparing(Leader::getId, Comparator.nullsLast(String::compareTo));
+        return Comparator.comparing(Leader::getType, Comparator.nullsLast(String::compareTo));
     }
 
     @JsonIgnore

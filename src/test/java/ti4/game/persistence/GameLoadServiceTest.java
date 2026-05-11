@@ -1,7 +1,6 @@
 package ti4.game.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 
 import java.nio.file.Files;
 import java.util.List;
@@ -36,8 +35,6 @@ class GameLoadServiceTest extends BaseTi4Test {
                 }
             }
             Files.write(gamePath, lines);
-
-            assertThatCode(harness::load).doesNotThrowAnyException();
 
             Game game = harness.load();
             assertThat(game.getPlayers().values()).anySatisfy(player -> assertThat(player.getLeaderByID("legacyleader"))

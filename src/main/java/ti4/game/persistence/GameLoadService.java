@@ -1069,7 +1069,7 @@ class GameLoadService {
                         String[] split = leaderInfos.nextToken().split(",");
                         String leaderType = split.length > 1 && !isBlank(split[1]) && !"null".equalsIgnoreCase(split[1])
                                 ? split[1]
-                                : new Leader(split[0]).getType();
+                                : Leader.deriveType(split[0]);
                         Leader leader = new Leader(
                                 split[0],
                                 leaderType,
