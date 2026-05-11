@@ -25,6 +25,9 @@ import ti4.spring.context.SpringContext;
 public class ShowGameService {
 
     public static void simpleEphemeralShowGame(Game game, GenericInteractionCreateEvent event) {
+        if (!hasGameToShow(game, event)) {
+            return;
+        }
         ephemeralShowGame(game, event, DisplayType.map);
     }
 
@@ -33,6 +36,9 @@ public class ShowGameService {
     }
 
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
+        if (!hasGameToShow(game, event)) {
+            return;
+        }
         boolean shouldPersistFullMapMessageId = displayType == DisplayType.all && !game.isFowMode();
         boolean shouldPersistFowMapMessageId = displayType == DisplayType.all && game.isFowMode();
 
@@ -141,5 +147,14 @@ public class ShowGameService {
                     unlocked -> false;
             default -> true;
         };
+    }
+
+    private static boolean hasGameToShow(Game game, GenericInteractionCreateEvent event) {
+        if (game != null) {
+            return true;
+        }
+        MessageHelper.sendEphemeralMessageToEventChannel(
+                event, "Could not find a game to show. Please use this from a current game channel.");
+        return false;
     }
 }
