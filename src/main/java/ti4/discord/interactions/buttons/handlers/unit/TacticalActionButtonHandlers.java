@@ -105,6 +105,13 @@ class TacticalActionButtonHandlers {
         TacticalActionOutputService.refreshButtonsAndMessageForChoosingTile(event, game, player);
     }
 
+    @ButtonHandler("moveFromTilePage_page")
+    public static void changeMoveFromTilePage(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String page = StringUtils.substringAfterLast(buttonID, "page");
+        TacticalActionOutputService.refreshButtonsAndMessageForChoosingTile(
+                event, game, player, Integer.parseInt(page));
+    }
+
     @ButtonHandler("resetTacticalMovement")
     public static void resetTacticsMovement(ButtonInteractionEvent event, Player player, Game game) {
         // start over movement
