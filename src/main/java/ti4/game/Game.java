@@ -838,7 +838,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     @Override
     public void setCompetitiveTIGLGame(boolean competitiveTIGLGame) {
         boolean isFracturedTIGL = TIGLHelper.isFracturedTIGLGame(this);
-        boolean hasAlwaysIncompatibleMode = isAllianceMode() || isCommunityMode();
+        boolean hasAlwaysIncompatibleMode = super.isAllianceMode() || super.isCommunityMode();
         boolean hasStandardOnlyIncompatibleMode =
                 isAbsolMode() || isMiltyModMode() || isDiscordantStarsMode() || isHomebrewSCMode() || isFowMode();
         if (hasAlwaysIncompatibleMode || (!isFracturedTIGL && hasStandardOnlyIncompatibleMode)) {
