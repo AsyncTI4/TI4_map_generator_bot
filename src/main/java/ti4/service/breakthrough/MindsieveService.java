@@ -20,6 +20,7 @@ import ti4.model.StrategyCardModel;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.regex.RegexService;
+import ti4.service.strategycard.StrategyCardMessageService;
 import ti4.service.transaction.SendPromissoryService;
 
 @UtilityClass
@@ -94,8 +95,9 @@ public class MindsieveService {
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(naalu, sc, game, event);
                     naalu.addFollowedSC(sc, event);
 
-                    String messageID = game.getStoredValue("scPlayMsgID" + sc);
-                    ReactionService.addReaction(naalu, false, null, null, messageID, game);
+                    StrategyCardMessageService.getStrategyCardMessage(game.getName(), game.getRound(), sc)
+                            .ifPresent(scMessage ->
+                                    ReactionService.addReaction(naalu, false, null, null, scMessage.messageId(), game));
 
                     MessageChannel scChannel = ButtonHelper.getSCFollowChannel(game, naalu, sc);
                     String msg = naalu.getRepresentationUnfogged() + " sent a promissory note to "

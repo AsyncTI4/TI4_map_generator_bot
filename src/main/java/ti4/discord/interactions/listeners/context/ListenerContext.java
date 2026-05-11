@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.contest.replay.buttons.CombatDoubleOrBustButtonIds;
 import ti4.contest.replay.buttons.CombatSideBetButtonIds;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
@@ -54,7 +55,9 @@ public abstract class ListenerContext {
     }
 
     private boolean allowsNonPlayerInteraction() {
-        return "showGameAgain".equalsIgnoreCase(componentID) || componentID.startsWith(CombatSideBetButtonIds.PREFIX);
+        return "showGameAgain".equalsIgnoreCase(componentID)
+                || componentID.startsWith(CombatSideBetButtonIds.PREFIX)
+                || componentID.startsWith(CombatDoubleOrBustButtonIds.PREFIX);
     }
 
     ListenerContext(GenericInteractionCreateEvent event, String compID) {

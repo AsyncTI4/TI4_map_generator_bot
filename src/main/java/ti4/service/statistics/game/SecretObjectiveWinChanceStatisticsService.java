@@ -11,9 +11,10 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
@@ -36,28 +37,31 @@ class SecretObjectiveWinChanceStatisticsService {
         Map<String, Integer> winsWithSecretInHand = new HashMap<>();
         Map<String, Integer> gamesWithSecretScoredOrInHand = new HashMap<>();
         Map<String, Integer> winsWithSecretScoredOrInHand = new HashMap<>();
-        GamesPage.consumeAllGames(GameStatisticsFilterer.getGamesFilterForWonGame(event), game -> {
-            if (shouldIgnoreGameForSecretObjectiveStats(game)) {
-                return;
-            }
+        ConsumeGameUtility.consumeAllGames(
+                GameStatisticsFilterer.getGamesFilterForWonGame(event),
+                game -> {
+                    if (shouldIgnoreGameForSecretObjectiveStats(game)) {
+                        return;
+                    }
 
-            collectSecretObjectiveWinChanceStats(
-                    game,
-                    playersByScoredAPSecretCount,
-                    winsByScoredAPSecretCount,
-                    playersByScoredSecretCount,
-                    winsByScoredSecretCount,
-                    playersByExactScoredSecretCountAndMinimumAPCount,
-                    winsByExactScoredSecretCountAndMinimumAPCount,
-                    playersBySecretPhaseCombination,
-                    winsBySecretPhaseCombination,
-                    gamesWithSecretScored,
-                    winsWithSecretScored,
-                    gamesWithSecretInHand,
-                    winsWithSecretInHand,
-                    gamesWithSecretScoredOrInHand,
-                    winsWithSecretScoredOrInHand);
-        });
+                    collectSecretObjectiveWinChanceStats(
+                            game,
+                            playersByScoredAPSecretCount,
+                            winsByScoredAPSecretCount,
+                            playersByScoredSecretCount,
+                            winsByScoredSecretCount,
+                            playersByExactScoredSecretCountAndMinimumAPCount,
+                            winsByExactScoredSecretCountAndMinimumAPCount,
+                            playersBySecretPhaseCombination,
+                            winsBySecretPhaseCombination,
+                            gamesWithSecretScored,
+                            winsWithSecretScored,
+                            gamesWithSecretInHand,
+                            winsWithSecretInHand,
+                            gamesWithSecretScoredOrInHand,
+                            winsWithSecretScoredOrInHand);
+                },
+                ExecutionLockType.READ);
 
         StringBuilder sb = new StringBuilder();
         appendWinningPlayerActionPhaseSecretRateSection(sb, winsByScoredAPSecretCount);

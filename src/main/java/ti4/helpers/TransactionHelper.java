@@ -1350,44 +1350,33 @@ public final class TransactionHelper {
         StringBuilder notice = new StringBuilder();
         notice.append("> This is a surcharge notice from ")
                 .append(getRandomPillageSource())
-                .append("\n> 1 ")
-                .append(MiscEmojis.tg)
-                .append(" possibly pillaged ");
-        if (pillagersToPillaged.size() == 1) {
-            Map.Entry<String, List<String>> pillagerToPillaged =
-                    pillagersToPillaged.entrySet().iterator().next();
-            appendPillageMessage(notice, pillagerToPillaged);
-        } else {
-            for (Map.Entry<String, List<String>> pillagerToPillaged : pillagersToPillaged.entrySet()) {
-                notice.append("\n> • ");
-                appendPillageMessage(notice, pillagerToPillaged);
-            }
+                .append(":");
+        for (Map.Entry<String, List<String>> pillagerToPillaged : pillagersToPillaged.entrySet()) {
+            notice.append("\n> • ")
+                    .append(MiscEmojis.tg)
+                    .append(" possibly pillaged from ")
+                    .append(String.join(" and ", pillagerToPillaged.getValue()))
+                    .append(" by ")
+                    .append(pillagerToPillaged.getKey());
         }
         return notice.toString();
     }
 
     private static void getPillagers(
-            Game game, Player p1, int p1TgAfter, Map<String, List<String>> pillagersToPillaged) {
-        if (ButtonHelperAbilities.canBePillaged(p1, game, p1TgAfter)) {
-            for (Player neighbor : p1.getNeighbouringPlayers(true)) {
-                if (!neighbor.hasAbility("pillage")) {
-                    continue;
-                }
-                String neighborRepresentation = neighbor.getRepresentation(false, false, true);
-                pillagersToPillaged
-                        .computeIfAbsent(neighborRepresentation, _ -> new ArrayList<>())
-                        .add(p1.getRepresentationNoPing());
-            }
+            Game game, Player player, int playerTradeGoodCount, Map<String, List<String>> pillagersToPillaged) {
+        if (!ButtonHelperAbilities.canBePillaged(player, game, playerTradeGoodCount)) {
+            return;
         }
-    }
-
-    private static void appendPillageMessage(
-            StringBuilder stringBuilder, Map.Entry<String, List<String>> pillagerToPillaged) {
-        stringBuilder
-                .append("from ")
-                .append(String.join(", ", pillagerToPillaged.getValue()))
-                .append(" by ")
-                .append(pillagerToPillaged.getKey());
+        String playerRepresentation = player.getRepresentation(false, false, true);
+        for (Player neighbor : player.getNeighbouringPlayers(true)) {
+            if (!neighbor.hasAbility("pillage")) {
+                continue;
+            }
+            String neighborRepresentation = neighbor.getRepresentation(false, false, true);
+            pillagersToPillaged
+                    .computeIfAbsent(neighborRepresentation, _ -> new ArrayList<>())
+                    .add(playerRepresentation);
+        }
     }
 
     private static String getRandomPillageSource() {

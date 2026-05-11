@@ -678,7 +678,7 @@ public final class ButtonHelperTacticalAction {
 
             for (Player btb : game.getRealPlayers()) {
                 if (!btb.ownsUnit("tk-blacktrenchbulwark")) continue;
-                if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Pds)
+                if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, btb, UnitType.Pds)
                         .contains(activeSystem)) continue;
 
                 String id = btb.factionButtonChecker() + "useMagenDefense_" + activeSystem.getPosition();
