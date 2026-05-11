@@ -9,6 +9,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 public class DiscordHelper {
 
     private static final int DISCORD_UNKNOWN_MESSAGE_ERROR_CODE = 10_008;
+    private static final int DISCORD_UNKNOWN_EMOJI_ERROR_CODE = 10_014;
     private static final int DISCORD_UNKNOWN_WEBHOOK_ERROR_CODE = 10_015;
 
     public static boolean isDiscordServerError(Throwable error) {
@@ -25,6 +26,11 @@ public class DiscordHelper {
 
     public static boolean isUnknownWebhookError(Throwable error) {
         return hasDiscordErrorCode(error, DISCORD_UNKNOWN_WEBHOOK_ERROR_CODE);
+    }
+
+    public static boolean isUnknownEmojiError(Throwable error) {
+        return error instanceof ErrorResponseException restError
+                && restError.getErrorCode() == DISCORD_UNKNOWN_EMOJI_ERROR_CODE;
     }
 
     public static boolean isIgnorableError(Throwable error) {
