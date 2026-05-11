@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.contest.replay.buttons.CombatDoubleOrBustButtonIds;
 import ti4.contest.replay.buttons.CombatSideBetButtonIds;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
@@ -150,7 +151,9 @@ public class ButtonProcessor {
 
     private static boolean isCombatReplayButton(String buttonID) {
         return buttonID != null
-                && (buttonID.startsWith(CombatSideBetButtonIds.PREFIX) || buttonID.startsWith("combatReplayDebug_"));
+                && (buttonID.startsWith(CombatSideBetButtonIds.PREFIX)
+                        || buttonID.startsWith(CombatDoubleOrBustButtonIds.PREFIX)
+                        || buttonID.startsWith("combatReplayDebug_"));
     }
 
     private static void resolveButtonInteractionEvent(ButtonContext context) {

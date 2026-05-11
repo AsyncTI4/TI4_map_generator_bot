@@ -27,6 +27,7 @@ import ti4.contest.replay.entities.CombatReplayPredictionEntity;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
 import ti4.contest.replay.repository.CombatReplayLeaderboardEntryRepository;
 import ti4.contest.replay.repository.CombatReplayPredictionRepository;
+import ti4.contest.replay.service.CombatReplayPredictionScorer.BustedPredictionSummary;
 import ti4.contest.replay.service.CombatReplayPredictionScorer.LockedPrediction;
 import ti4.contest.replay.service.CombatReplayPredictionScorer.ScoredPredictions;
 import ti4.contest.replay.service.CombatReplayPredictionScorer.WinningPredictionSummary;
@@ -62,6 +63,7 @@ public class CombatReplayLeaderboardService {
     private final CombatReplayPredictionRepository replayPredictionRepository;
     private final CombatReplayLeaderboardEntryRepository leaderboardEntryRepository;
     private final CombatReplaySideBetService sideBetService;
+    private final CombatDoubleOrBustService doubleOrBustService;
 
     public void lockPredictionsAtReplayStart(
             Game game, CombatReplayContestEntity replayContest, CombatCandidateEntity candidate) {
@@ -259,13 +261,18 @@ public class CombatReplayLeaderboardService {
         lockedPrediction.setDefenderPredictionCount(defenderPredictions.size());
         lockedPrediction.setAttackerPredictionsJson(writeLockedPredictions(attackerPredictions));
         lockedPrediction.setDefenderPredictionsJson(writeLockedPredictions(defenderPredictions));
+        Set<String> doubleOrBustUserIds = doubleOrBustService.lockedDoubleOrBustUserIds(replayContest.getId());
+        lockedPrediction.setAttackerDoubleOrBustJson(
+                writeStringSet(retainPredictedUserIds(attackerPredictions, doubleOrBustUserIds)));
+        lockedPrediction.setDefenderDoubleOrBustJson(
+                writeStringSet(retainPredictedUserIds(defenderPredictions, doubleOrBustUserIds)));
         return lockedPrediction;
     }
 
     private ScoredContestResult scoreSideBetOnlyContest(
             CombatCandidateEntity candidate, CombatReplayContestEntity replayContest) {
         SideBetResolution sideBetResolution = sideBetService.resolveSideBets(candidate, replayContest);
-        return new ScoredContestResult(0, List.of(), sideBetResolution.resolvedSideBets());
+        return new ScoredContestResult(0, List.of(), List.of(), sideBetResolution.resolvedSideBets());
     }
 
     private synchronized ScoredContestResult scoreReplayContest(
@@ -287,7 +294,12 @@ public class CombatReplayLeaderboardService {
         List<LockedPrediction> defenderPredictions =
                 readLockedPredictions(lockedPrediction.getDefenderPredictionsJson());
         ScoredPredictions scoredPredictions = CombatReplayPredictionScorer.score(
-                attackerPredictions, defenderPredictions, candidate.getWinnerFaction(), candidate.getAttackerFaction());
+                attackerPredictions,
+                defenderPredictions,
+                readStringSet(lockedPrediction.getAttackerDoubleOrBustJson()),
+                readStringSet(lockedPrediction.getDefenderDoubleOrBustJson()),
+                candidate.getWinnerFaction(),
+                candidate.getAttackerFaction());
 
         List<String> userIds = new ArrayList<>();
         for (LockedPrediction prediction : scoredPredictions.allPredictions()) {
@@ -304,7 +316,11 @@ public class CombatReplayLeaderboardService {
             applyContestResult(
                     scoredPredictions.allPredictions(),
                     scoredPredictions.winningPredictions(),
+                    scoredPredictions.losingPredictions(),
                     scoredPredictions.pointsAwarded(),
+                    scoredPredictions.winningDoubleOrBustUserIds(),
+                    scoredPredictions.losingDoubleOrBustUserIds(),
+                    scoredPredictions.bustPenalty(),
                     entriesByUser);
             leaderboardEntryRepository.saveAll(entriesByUser.values());
             SideBetResolution sideBetResolution = sideBetService.resolveSideBets(candidate, replayContest);
@@ -319,18 +335,34 @@ public class CombatReplayLeaderboardService {
         return new ScoredContestResult(
                 scoredPredictions.totalPredictions(),
                 CombatReplayPredictionScorer.resultSummaries(
-                        scoredPredictions.winningPredictions(), scoredPredictions.pointsAwarded(), entriesByUser),
+                        scoredPredictions.winningPredictions(),
+                        scoredPredictions.pointsAwarded(),
+                        scoredPredictions.winningDoubleOrBustUserIds(),
+                        entriesByUser),
+                CombatReplayPredictionScorer.bustedSummaries(
+                        scoredPredictions.losingPredictions(),
+                        scoredPredictions.losingDoubleOrBustUserIds(),
+                        scoredPredictions.bustPenalty(),
+                        entriesByUser),
                 resolvedSideBets);
     }
 
     private void applyContestResult(
             List<LockedPrediction> allPredictions,
             List<LockedPrediction> winningPredictions,
+            List<LockedPrediction> losingPredictions,
             int pointsAwarded,
+            Set<String> winningDoubleOrBustUserIds,
+            Set<String> losingDoubleOrBustUserIds,
+            int bustPenalty,
             Map<String, CombatReplayLeaderboardEntryEntity> entriesByUser) {
         Set<String> winningUserIds = new HashSet<>();
         for (LockedPrediction prediction : winningPredictions) {
             winningUserIds.add(prediction.discordUserId());
+        }
+        Set<String> losingUserIds = new HashSet<>();
+        for (LockedPrediction prediction : losingPredictions) {
+            losingUserIds.add(prediction.discordUserId());
         }
         LocalDateTime now = LocalDateTime.now();
 
@@ -342,9 +374,17 @@ public class CombatReplayLeaderboardService {
             entry.setPredictionCount(safeInt(entry.getPredictionCount()) + 1);
             if (winningUserIds.contains(prediction.discordUserId())) {
                 entry.setCorrectPredictions(safeInt(entry.getCorrectPredictions()) + 1);
-                entry.setTotalPoints(safeInt(entry.getTotalPoints()) + pointsAwarded);
+                int bonus = winningDoubleOrBustUserIds.contains(prediction.discordUserId())
+                        ? pointsAwarded * 2
+                        : pointsAwarded;
+                entry.setTotalPoints(safeInt(entry.getTotalPoints()) + bonus);
             } else {
-                entry.setTotalPoints(Math.max(0, safeInt(entry.getTotalPoints()) + WRONG_PREDICTION_PENALTY));
+                int penalty = WRONG_PREDICTION_PENALTY;
+                if (losingUserIds.contains(prediction.discordUserId())
+                        && losingDoubleOrBustUserIds.contains(prediction.discordUserId())) {
+                    penalty -= bustPenalty;
+                }
+                entry.setTotalPoints(Math.max(0, safeInt(entry.getTotalPoints()) + penalty));
             }
             entry.setUpdatedAt(now);
         }
@@ -386,9 +426,21 @@ public class CombatReplayLeaderboardService {
                         .append(prediction.totalPoints())
                         .append(" points (pred +")
                         .append(prediction.pointsAwarded())
+                        .append(prediction.doubled() ? ", doubled!" : "")
                         .append(")\n");
             }
             message = winners.toString().trim();
+        }
+        if (!result.bustedPredictions().isEmpty()) {
+            StringBuilder withBusted = new StringBuilder(message).append("\n\n");
+            for (BustedPredictionSummary prediction : result.bustedPredictions()) {
+                withBusted
+                        .append(getSafeLeaderboardName(prediction.discordUserName()))
+                        .append(" - -")
+                        .append(prediction.pointsLost())
+                        .append(" points (busted!)\n");
+            }
+            message = withBusted.toString().trim();
         }
         MessageHelper.splitAndSentWithAction(message, threadOrChannel, _ -> {
             if (afterPost != null) {
@@ -506,6 +558,25 @@ public class CombatReplayLeaderboardService {
         }
     }
 
+    private Set<String> retainPredictedUserIds(List<LockedPrediction> predictions, Set<String> userIds) {
+        if (predictions == null || predictions.isEmpty() || userIds == null || userIds.isEmpty()) return Set.of();
+        Set<String> retained = new HashSet<>();
+        for (LockedPrediction prediction : predictions) {
+            if (userIds.contains(prediction.discordUserId())) {
+                retained.add(prediction.discordUserId());
+            }
+        }
+        return retained;
+    }
+
+    private String writeStringSet(Set<String> values) {
+        try {
+            return JsonMapperManager.basic().writeValueAsString(values == null ? Set.of() : values);
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to write Double or Bust snapshot.", e);
+        }
+    }
+
     private List<LockedPrediction> readLockedPredictions(String predictionsJson) {
         if (predictionsJson == null || predictionsJson.isBlank()) return List.of();
         try {
@@ -514,6 +585,16 @@ public class CombatReplayLeaderboardService {
                     .readValue(predictionsJson);
         } catch (Exception e) {
             throw new IllegalStateException("Failed to read replay prediction snapshot.", e);
+        }
+    }
+
+    private Set<String> readStringSet(String valuesJson) {
+        if (valuesJson == null || valuesJson.isBlank()) return Set.of();
+        try {
+            return new HashSet<>(
+                    JsonMapperManager.basic().readerForListOf(String.class).readValue(valuesJson));
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to read Double or Bust snapshot.", e);
         }
     }
 
@@ -553,5 +634,6 @@ public class CombatReplayLeaderboardService {
     record ScoredContestResult(
             int totalPredictions,
             List<WinningPredictionSummary> winningPredictions,
+            List<BustedPredictionSummary> bustedPredictions,
             List<ResolvedSideBet> winningSideBets) {}
 }
