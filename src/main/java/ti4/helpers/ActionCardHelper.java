@@ -91,7 +91,9 @@ public class ActionCardHelper {
         Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(
-                    cardsInfoThread, "Click a button below to play an action card.", getPlayActionCardButtons(game, player));
+                    cardsInfoThread,
+                    "Click a button below to play an action card.",
+                    getPlayActionCardButtons(game, player));
         }
 
         if (game.isWildWildGalaxyMode()) {

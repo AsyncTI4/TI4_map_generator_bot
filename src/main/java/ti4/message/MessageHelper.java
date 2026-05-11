@@ -868,7 +868,10 @@ public class MessageHelper {
     }
 
     public static void sendMessageToThreadChannelAndPin(
-            @NotNull Game game, @Nullable ThreadChannel threadChannel, @NotNull String storedValueKeyPrefix, String messageText) {
+            @NotNull Game game,
+            @Nullable ThreadChannel threadChannel,
+            @NotNull String storedValueKeyPrefix,
+            String messageText) {
         if (messageText == null || messageText.isEmpty() || threadChannel == null) {
             return;
         }
