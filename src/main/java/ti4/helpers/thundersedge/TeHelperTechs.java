@@ -43,6 +43,7 @@ import ti4.service.unit.DestroyUnitService;
 public final class TeHelperTechs {
 
     // Generic Tech
+    @Deprecated
     @ButtonHandler("useMagenDefense_")
     private static void useMagenDefenseGrid(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String regex = "useMagenDefense_" + RegexHelper.posRegex(game);
@@ -84,6 +85,50 @@ public final class TeHelperTechs {
             ButtonHelper.deleteMessage(event);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), String.format(msg.toString(), total));
         });
+    }
+
+    public static void resolveMagen(Game game, Player player, Tile tile, boolean bulwark) {
+        int total = 0;
+        UnitKey infKey = Units.getUnitKey(UnitType.Infantry, player.getColorID());
+        String ability = bulwark ? "_Black Trench Bulwark_" : "_Magen Defense Grid_";
+        StringBuilder msg = new StringBuilder(
+                player.getFactionEmoji() + " resolved " + ability + " on " + tile.getPosition() + ":");
+        for (UnitHolder uh : tile.getUnitHolders().values()) {
+            int count = uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure);
+            if (player.hasAbility("byssus")) count += uh.getUnitCount(UnitType.Mech, player);
+            for (String token : uh.getTokenList()) {
+                if (player.getPlanets().contains(uh.getName()) && token.contains("superweapon")) {
+                    count++;
+                }
+            }
+            if (bulwark) {
+                count = uh.getUnitCount(UnitType.Pds, player);
+            }
+            if (count > 0) {
+                total += count;
+                uh.addUnit(infKey, count);
+                String emoji = infKey.unitEmoji().emojiString();
+                String infStr = emoji.repeat(count);
+                if (count > 6) infStr += "(" + count + " total)";
+                if (uh instanceof Space) {
+                    msg.append("\n-# > ").append(infStr).append(" added to space.");
+                } else {
+                    msg.append("\n-# > ")
+                            .append(infStr)
+                            .append(" added to ")
+                            .append(Helper.getPlanetRepresentation(uh.getName(), game))
+                            .append(".");
+                }
+            }
+        }
+        player.setMagenInfantryCounter(player.getMagenInfantryCounter() + total);
+        int counter = player.getMagenInfantryCounter();
+        msg.append("\n-# ")
+                .append(ability)
+                .append(" has placed ")
+                .append(counter)
+                .append(" infantry this game so far.");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg.toString());
     }
 
     // Nanomachines

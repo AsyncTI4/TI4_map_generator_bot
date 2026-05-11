@@ -131,7 +131,6 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.PlanetService;
-import ti4.service.regex.RegexService;
 import ti4.service.tech.ShowTechDeckService;
 import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.EndTurnService;
@@ -3684,57 +3683,6 @@ public class ButtonHelper {
         if (event instanceof ButtonInteractionEvent bevent) {
             deleteButtonAndDeleteMessageIfEmpty(bevent, true);
         }
-    }
-
-    @ButtonHandler("useMagenDefense_")
-    private static void useMagenDefenseGrid(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String regex = "useMagenDefense_" + RegexHelper.posRegex(game);
-        RegexService.runMatcher(regex, buttonID, matcher -> {
-            String pos = matcher.group("pos");
-            Tile tile = game.getTileByPosition(pos);
-
-            int total = 0;
-            UnitKey infKey = Units.getUnitKey(UnitType.Infantry, player.getColorID());
-
-            boolean bulwark = player.hasUnit("tk-blacktrenchbulwark");
-            String ability = bulwark ? "_Black Trench Bulwark_" : "_Magen Defense Grid_";
-            StringBuilder msg = new StringBuilder(player.getFactionEmoji() + " resolved " + ability + " on "
-                    + tile.getPosition() + ", placing %s infantry (%s total so far):");
-            for (UnitHolder uh : tile.getUnitHolders().values()) {
-                int count = uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure);
-                if (player.hasAbility("byssus")) count += uh.getUnitCount(UnitType.Mech, player);
-
-                for (String token : uh.getTokenList()) {
-                    if (player.getPlanets().contains(uh.getName()) && token.contains("superweapon")) {
-                        count++;
-                    }
-                }
-                if (bulwark) {
-                    count = uh.getUnitCount(UnitType.Pds, player);
-                }
-
-                if (count > 0) {
-                    total += count;
-                    uh.addUnit(infKey, count);
-                    String emoji = infKey.unitEmoji().emojiString();
-                    String infStr = emoji.repeat(count);
-                    if (count > 6) infStr += "(" + count + " total)";
-                    if (uh instanceof Space) {
-                        msg.append("\n-# > ").append(infStr).append(" added to space.");
-                    } else {
-                        msg.append("\n-# > ")
-                                .append(infStr)
-                                .append(" added to ")
-                                .append(Helper.getPlanetRepresentation(uh.getName(), game))
-                                .append(".");
-                    }
-                }
-            }
-            player.setMagenInfantryCounter(player.getMagenInfantryCounter() + total);
-            deleteMessage(event);
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), String.format(msg.toString(), total, player.getMagenInfantryCounter()));
-        });
     }
 
     public static void deleteButtonsWithPartialID(GenericInteractionCreateEvent event, String partialID) {
