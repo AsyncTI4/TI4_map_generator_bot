@@ -816,8 +816,14 @@ public final class ButtonHelperTacticalAction {
                 }
             }
         }
-
-        DreamButtonHandler.offerDreamAgentButtons(game, player);
+        if (!game.isL1Hero()
+                && !DreamButtonHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
+            for (Player dreamPlayer : game.getRealPlayers()) {
+                if (dreamPlayer.hasUnexhaustedLeader("dreamagent")) {
+                    DreamButtonHandler.offerDreamAgentButtons(game, player, dreamPlayer);
+                }
+            }
+        }
 
         // Send buttons to move
         MessageHelper.sendMessageToChannelWithButtons(
