@@ -198,10 +198,9 @@ public class DestroyUnitService {
             case Infantry -> capturing.addAll(CaptureUnitService.listCapturingMechPlayers(game, allUnits, unit));
             case Mech -> {
                 handleSelfAssemblyRoutines(player, totalAmount, game);
-                UnitModel unitModel = player == null ? null : player.getUnitFromUnitKey(unit.unitKey());
-                if (unitModel != null && "dream_mech".equalsIgnoreCase(unitModel.getId())) {
+                if (player.hasUnit("dream_mech")) {
                     DreamButtonHandler.offerRecurringMechButtons(
-                            event, game, player, totalAmount, unit.uh().getName());
+                            event, game, player, totalAmount, unit.uh().getName(), unit.unitKey());
                 }
                 if (player.hasUnit("mykomentori_mech") || player.hasTech("tf-specops")) {
                     for (int x = 0; x < totalAmount; x++) {

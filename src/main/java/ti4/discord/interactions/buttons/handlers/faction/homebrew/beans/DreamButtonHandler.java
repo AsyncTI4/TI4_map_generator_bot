@@ -17,6 +17,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -680,6 +681,23 @@ public class DreamButtonHandler {
     // The Recurring, the Dreaming Throne mech
 
     public static void offerRecurringMechButtons(
+            GenericInteractionCreateEvent event,
+            Game game,
+            Player player,
+            int amount,
+            String sourcePlanet,
+            UnitKey unitKey) {
+        if (!isDestroyedDreamMech(player, unitKey)) return;
+        sendRecurringMechSpendButtons(event, game, player, amount, sourcePlanet);
+    }
+
+    private static boolean isDestroyedDreamMech(Player player, UnitKey unitKey) {
+        if (player == null || unitKey == null) return false;
+        var unitModel = player.getUnitFromUnitKey(unitKey);
+        return unitModel != null && "dream_mech".equalsIgnoreCase(unitModel.getId());
+    }
+
+    private static void sendRecurringMechSpendButtons(
             GenericInteractionCreateEvent event, Game game, Player player, int amount, String sourcePlanet) {
         if (amount < 1) return;
         String source = sourcePlanet == null || sourcePlanet.isBlank() || "space".equalsIgnoreCase(sourcePlanet)
@@ -761,7 +779,7 @@ public class DreamButtonHandler {
                 player.getRepresentation() + " placed _The Recurring_ on "
                         + Helper.getPlanetRepresentation(planet, game) + ".");
         if (remaining > 1) {
-            offerRecurringMechButtons(event, game, player, remaining - 1, source);
+            sendRecurringMechSpendButtons(event, game, player, remaining - 1, source);
         }
     }
 
