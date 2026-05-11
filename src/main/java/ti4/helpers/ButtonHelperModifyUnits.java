@@ -1129,6 +1129,9 @@ public final class ButtonHelperModifyUnits {
         }
         for (String pos2 : positions) {
             Tile tile = game.getTileByPosition(pos2);
+            if (tile == null) {
+                continue;
+            }
             boolean skipNonFrontierEmptySystem = !Mapper.getFrontierTileIds().contains(tile.getTileID())
                     && tile.getPlanetUnitHolders().isEmpty()
                     && tile.getUnitHolders().size() != 2;
