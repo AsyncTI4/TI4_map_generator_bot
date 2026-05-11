@@ -44,6 +44,7 @@ import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
+import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
@@ -108,9 +109,9 @@ public class StartPhaseService {
                 game.setExplorationDeckID(deckModel.getAlias());
             }
             case "statusScoring" -> {
-                StatusHelper.AnnounceStatusPhase(game);
+                StatusHelper.announceStatusPhase(game);
                 StatusHelper.beginScoring(event, game, event.getMessageChannel());
-                StatusHelper.HandleStatusPhaseMiddle(event, game, event.getMessageChannel());
+                StatusHelper.handleStatusPhaseMiddle(game);
                 game.updateActivePlayer(null);
             }
             case "endOfGameSummary" -> {
@@ -652,8 +653,7 @@ public class StartPhaseService {
         }
     }
 
-    public static void sendStatusReminders(GenericInteractionCreateEvent event, Game game, Player player) {
-
+    public static void sendStatusReminders(Game game, Player player) {
         if (game.getRound() < 4) {
             StringBuilder preferences = new StringBuilder();
             for (Player p2 : game.getRealPlayers()) {
@@ -835,7 +835,7 @@ public class StartPhaseService {
             }
         }
         for (Player player : game.getRealPlayers()) {
-            sendStatusReminders(event, game, player);
+            sendStatusReminders(game, player);
         }
         DreamButtonHandler.offerTheWakingButtons(game);
 
@@ -914,7 +914,9 @@ public class StartPhaseService {
         game.getMainGameChannel()
                 .sendMessage(messageObject)
                 .queue(message -> GameMessageManager.replace(
-                        game.getName(), message.getId(), GameMessageType.STATUS_END, game.getLastModifiedDate()));
+                        game.getName(),
+                        new GameMessage(message.getId(), GameMessageType.STATUS_END, game.getLastModifiedDate())));
+
         for (Player player : game.getRealPlayers()) {
             if (!player.getAllianceMembers().isEmpty()) {
                 MessageHelper.sendMessageToChannel(

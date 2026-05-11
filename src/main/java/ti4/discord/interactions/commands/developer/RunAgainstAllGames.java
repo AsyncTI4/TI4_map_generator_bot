@@ -28,7 +28,7 @@ class RunAgainstAllGames extends Subcommand {
         Set<String> changedGames = new HashSet<>();
         ConsumeGameUtility.consumeAllGames(
                 game -> {
-                    boolean changed = makeChanges(game, event);
+                    boolean changed = makeChanges(game);
                     if (changed) {
                         changedGames.add(game.getName());
                         GameManager.save(
@@ -42,39 +42,7 @@ class RunAgainstAllGames extends Subcommand {
                 + " games: " + String.join(", ", changedGames));
     }
 
-    private static boolean makeChanges(Game game, SlashCommandInteractionEvent event) {
-        if (!game.isHasEnded()) {
-            return false;
-        }
-
-        long now = System.currentTimeMillis();
-        long creationDateTime = game.getCreationDateTime();
-        long endedDate = game.getEndedDate();
-        boolean changed = false;
-
-        if (creationDateTime > now) {
-            long newCreationDateTime = now - ONE_DAY_MILLIS;
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    game.getName() + " has creationDateTime in the future. creationDateTime=" + creationDateTime
-                            + ". Setting to " + newCreationDateTime + ".");
-            game.setCreationDateTime(newCreationDateTime);
-            creationDateTime = newCreationDateTime;
-            changed = true;
-        }
-
-        if (endedDate < creationDateTime) {
-            long daysToEnd = Duration.ofMillis(endedDate - creationDateTime).toDays();
-            long newEndedDate = Math.min(creationDateTime + THIRTY_DAYS_MILLIS, now);
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    game.getName() + " ended before it started (" + daysToEnd + " days). creationDateTime="
-                            + creationDateTime + ", endedDate=" + endedDate
-                            + ". Updating end date to " + newEndedDate + ".");
-            game.setEndedDate(newEndedDate);
-            changed = true;
-        }
-
-        return changed;
+    private static boolean makeChanges(Game game) {
+        return false;
     }
 }
