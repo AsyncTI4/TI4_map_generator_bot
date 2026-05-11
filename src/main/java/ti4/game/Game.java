@@ -1,7 +1,7 @@
 package ti4.game;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -1061,7 +1061,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 setMainChannelID(mainGameChannel.getId());
                 return mainGameChannel;
             }
-            // BotLogger.log("Could not retrieve MainGameChannel for " + getName(), e);
         }
         return null;
     }
