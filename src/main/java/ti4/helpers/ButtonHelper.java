@@ -3464,7 +3464,7 @@ public class ButtonHelper {
                         sb.append(unitModel.getUnitEmoji()).append(' ');
                         sb.append(privateGame ? unitModel.getBaseType() : unitModel.getName());
                         sb.append(getCombatProfileForTileSummary(
-                                        tile, unitHolder, unitModel, player, combatSummaryContext))
+                                        game, tile, unitHolder, unitModel, player, combatSummaryContext))
                                 .append('\n');
                     } else {
                         sb.append(unitKey).append('\n');
@@ -3478,12 +3478,14 @@ public class ButtonHelper {
     }
 
     private static String getCombatProfileForTileSummary(
+            Game game,
             Tile tile,
             UnitHolder unitHolder,
             UnitModel unitModel,
             Player player,
             @Nullable CombatSummaryContext combatSummaryContext) {
-        if (combatSummaryContext == null
+        if (game.isFowMode()
+                || combatSummaryContext == null
                 || !combatSummaryContext.combatPlayers().contains(player)) {
             return "";
         }
