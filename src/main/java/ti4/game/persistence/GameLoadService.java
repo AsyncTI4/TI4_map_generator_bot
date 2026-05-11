@@ -1067,13 +1067,16 @@ class GameLoadService {
                     List<Leader> leaderList = new ArrayList<>();
                     while (leaderInfos.hasMoreTokens()) {
                         String[] split = leaderInfos.nextToken().split(",");
-                        Leader leader = new Leader(split[0]);
-                        leader.setTgCount(Integer.parseInt(split[2]));
-                        leader.setExhausted(Boolean.parseBoolean(split[3]));
-                        leader.setLocked(Boolean.parseBoolean(split[4]));
-                        if (split.length == 6) {
-                            leader.setActive(Boolean.parseBoolean(split[5]));
-                        }
+                        String leaderType = split.length > 1 && !isBlank(split[1]) && !"null".equalsIgnoreCase(split[1])
+                                ? split[1]
+                                : new Leader(split[0]).getType();
+                        Leader leader = new Leader(
+                                split[0],
+                                leaderType,
+                                Integer.parseInt(split[2]),
+                                Boolean.parseBoolean(split[3]),
+                                Boolean.parseBoolean(split[4]),
+                                split.length > 5 && Boolean.parseBoolean(split[5]));
                         leaderList.add(leader);
                     }
                     player.setLeaders(leaderList);

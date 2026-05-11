@@ -81,7 +81,8 @@ public class Leader {
 
     @JsonIgnore
     public static Comparator<Leader> sortByType() {
-        return Comparator.comparing(Leader::getType);
+        return Comparator.comparing(Leader::getType, Comparator.nullsLast(String::compareTo))
+                .thenComparing(Leader::getId, Comparator.nullsLast(String::compareTo));
     }
 
     @JsonIgnore

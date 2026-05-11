@@ -1848,7 +1848,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public Optional<Leader> getLeaderByType(String leaderType) {
         for (Leader leader : leaders) {
-            if (leader.getType().equals(leaderType)) {
+            if (Objects.equals(leader.getType(), leaderType)) {
                 return Optional.of(leader);
             }
         }
