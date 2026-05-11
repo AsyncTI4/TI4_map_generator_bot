@@ -2,6 +2,7 @@ package ti4.message;
 
 import static ti4.helpers.discord.DiscordHelper.isDiscordServerError;
 import static ti4.helpers.discord.DiscordHelper.isIgnorableError;
+import static ti4.helpers.discord.DiscordHelper.isUnknownEmojiError;
 import static ti4.helpers.discord.DiscordHelper.isUnknownMessageError;
 
 import java.io.File;
@@ -205,13 +206,14 @@ public class MessageHelper {
 
     private static void addFactionReactToMessage(Game game, Player player, Message message) {
         Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, message);
-        message.addReaction(reactionEmoji).queue(null, error -> handleFailedReaction(game, player, message, error));
-        String messageId = message.getId();
-        GameMessageManager.addReaction(game.getName(), player.getFaction(), messageId);
+        message.addReaction(reactionEmoji)
+                .queue(
+                        _ -> GameMessageManager.addReaction(game.getName(), player.getFaction(), message.getId()),
+                        error -> handleFailedReaction(game, player, message, error));
     }
 
     private static void handleFailedReaction(Game game, Player player, Message message, Throwable error) {
-        if (isUnknownMessageError(error)) {
+        if (isUnknownMessageError(error) || isUnknownEmojiError(error)) {
             return;
         }
         if (isDiscordServerError(error)) {

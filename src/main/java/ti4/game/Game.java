@@ -838,7 +838,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     @Override
     public void setCompetitiveTIGLGame(boolean competitiveTIGLGame) {
         boolean isFracturedTIGL = TIGLHelper.isFracturedTIGLGame(this);
-        boolean hasAlwaysIncompatibleMode = isAllianceMode() || isCommunityMode();
+        boolean hasAlwaysIncompatibleMode = super.isAllianceMode() || super.isCommunityMode();
         boolean hasStandardOnlyIncompatibleMode =
                 isAbsolMode() || isMiltyModMode() || isDiscordantStarsMode() || isHomebrewSCMode() || isFowMode();
         if (hasAlwaysIncompatibleMode || (!isFracturedTIGL && hasStandardOnlyIncompatibleMode)) {
@@ -1128,11 +1128,25 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     /**
-     * @return Guild that the ActionsChannel or MainGameChannel resides
+     * @return Guild associated with this game's channels or stored guild id
      */
     @Nullable
     public Guild getGuild() {
-        return getActionsChannel() == null ? null : getActionsChannel().getGuild();
+        TextChannel actionsChannel = getActionsChannel();
+        if (actionsChannel != null) {
+            return actionsChannel.getGuild();
+        }
+
+        TextChannel tableTalkChannel = getTableTalkChannel();
+        if (tableTalkChannel != null) {
+            return tableTalkChannel.getGuild();
+        }
+
+        if (JdaService.jda != null && StringUtils.isNumeric(getGuildID())) {
+            return JdaService.jda.getGuildById(getGuildID());
+        }
+
+        return null;
     }
 
     public void setCurrentReacts(String messageID, String factionsWhoReacted) {

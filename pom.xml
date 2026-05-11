@@ -17,6 +17,7 @@
     <java.version>26</java.version>
     <lombok.version>1.18.46</lombok.version>
     <jda.version>6.4.1</jda.version>
+    <trove4j.version>3.0.3</trove4j.version>
     <aws.sdk.version>2.44.0</aws.sdk.version>
     <hibernate-dialects.version>7.3.2.Final</hibernate-dialects.version>
     <reflections.version>0.10.2</reflections.version>
@@ -95,6 +96,11 @@
           <artifactId>opus-java</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.trove4j</groupId>
+      <artifactId>trove4j</artifactId>
+      <version>${trove4j.version}</version>
     </dependency>
 
     <dependency>

@@ -115,6 +115,13 @@ public class BastionTechService {
                     break;
                 }
             }
+            if (p2 == null) {
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        "Cannot use " + proxima() + " on " + planet.getRepresentation(game)
+                                + " because there are no opposing units there.");
+                return;
+            }
 
             var units = CombatRollService.getProximaBombardUnit(p1);
             String planetN = planet.getName();
