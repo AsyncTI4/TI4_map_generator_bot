@@ -1128,11 +1128,25 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     /**
-     * @return Guild that the ActionsChannel or MainGameChannel resides
+     * @return Guild associated with this game's channels or stored guild id
      */
     @Nullable
     public Guild getGuild() {
-        return getActionsChannel() == null ? null : getActionsChannel().getGuild();
+        TextChannel actionsChannel = getActionsChannel();
+        if (actionsChannel != null) {
+            return actionsChannel.getGuild();
+        }
+
+        TextChannel tableTalkChannel = getTableTalkChannel();
+        if (tableTalkChannel != null) {
+            return tableTalkChannel.getGuild();
+        }
+
+        if (JdaService.jda != null && StringUtils.isNumeric(getGuildID())) {
+            return JdaService.jda.getGuildById(getGuildID());
+        }
+
+        return null;
     }
 
     public void setCurrentReacts(String messageID, String factionsWhoReacted) {

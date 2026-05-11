@@ -52,6 +52,14 @@ class Observer extends Subcommand {
 
         ManagedGame game = GameManager.getManagedGame(gameName);
         Guild guild = game.getGuild();
+        if (guild == null) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Could not determine the server for game: " + gameName
+                            + ". Please make sure the game channels still exist.");
+            return;
+        }
+
         Member member = guild.getMemberById(user.getId());
 
         if (member == null && event.getGuild() != null) {
