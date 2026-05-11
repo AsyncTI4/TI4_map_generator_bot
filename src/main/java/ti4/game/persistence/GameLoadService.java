@@ -1067,16 +1067,15 @@ class GameLoadService {
                     List<Leader> leaderList = new ArrayList<>();
                     while (leaderInfos.hasMoreTokens()) {
                         String[] split = leaderInfos.nextToken().split(",");
+                        String leaderId = split[0];
                         String leaderType = split.length > 1 && !isBlank(split[1]) && !"null".equalsIgnoreCase(split[1])
                                 ? split[1]
-                                : Leader.deriveType(split[0]);
-                        Leader leader = new Leader(
-                                split[0],
-                                leaderType,
-                                Integer.parseInt(split[2]),
-                                Boolean.parseBoolean(split[3]),
-                                Boolean.parseBoolean(split[4]),
-                                split.length > 5 && Boolean.parseBoolean(split[5]));
+                                : Leader.deriveType(leaderId);
+                        int tgCount = Integer.parseInt(split[2]);
+                        boolean exhausted = Boolean.parseBoolean(split[3]);
+                        boolean locked = Boolean.parseBoolean(split[4]);
+                        boolean active = split.length > 5 && Boolean.parseBoolean(split[5]);
+                        Leader leader = new Leader(leaderId, leaderType, tgCount, exhausted, locked, active);
                         leaderList.add(leader);
                     }
                     player.setLeaders(leaderList);

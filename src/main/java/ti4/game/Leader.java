@@ -56,6 +56,12 @@ public class Leader {
         }
     }
 
+    /**
+     * Derives a leader type from its persisted identifier when no explicit type is available.
+     *
+     * @param id the persisted leader identifier
+     * @return the inferred leader type, or {@code null} when the identifier does not encode one
+     */
     public static String deriveType(String id) {
         if (id == null) {
             return null;
