@@ -1149,7 +1149,7 @@ public class StartPhaseService {
             StringBuilder hold = new StringBuilder();
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
-                    "All players have picked a strategy card.\n" + nextPlayer.getRepresentation()
+                    "All players have picked a strategy card.\n" + nextPlayer.getRepresentationNoPing()
                             + " is first in initiative order.");
             postSurveyResults(game);
             for (Player p2 : game.getRealPlayers()) {

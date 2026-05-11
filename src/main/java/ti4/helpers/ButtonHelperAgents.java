@@ -1094,6 +1094,13 @@ public final class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(
                     channel2, p2.getRepresentation() + ", please choose the unit you wish to galvanize.", buttons);
         }
+        if ("obsidianagent".equalsIgnoreCase(agent)) {
+            String exhaustText = player.getRepresentation() + " has exhausted the " + ssruuClever + "_Obsidian Agent_.";
+            MessageHelper.sendMessageToChannel(channel, exhaustText);
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Just tell the relevant player to destroy the unit with the assign hits button available under the picture of the combat.");
+        }
         if ("valiantagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted the " + ssruuClever + "_Valiant Genome_.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
