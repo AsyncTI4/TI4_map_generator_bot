@@ -1,5 +1,7 @@
 package ti4.game;
 
+import static ti4.helpers.discord.DiscordHelper.isUnknownChannelError;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -664,7 +666,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 ? String.format("%s-cards-info-%s-private", game.getName(), userName)
                 : String.format("%s%s-%s", Constants.CARDS_INFO_THREAD_PREFIX, game.getName(), userName);
 
-        ThreadChannel foundThread = findCardsInfoThreadByIdOrName(actionsChannel, threadName);
+        ThreadChannel foundThread = findCardsInfoThreadByIdOrName(actionsChannel, threadName, createIfMissing);
 
         if (foundThread != null) {
             setCardsInfoThreadID(foundThread.getId());
@@ -692,15 +694,43 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     @Nullable
-    private ThreadChannel findCardsInfoThreadByIdOrName(TextChannel actionsChannel, String name) {
+    private ThreadChannel findCardsInfoThreadByIdOrName(
+            TextChannel actionsChannel, String name, boolean createIfMissing) {
         Long id = getCardsInfoThreadIdLong();
         if (id != null) {
-            ThreadChannel thread = DiscordChannelUtility.retrieveThreadChannelById(actionsChannel.getGuild(), id)
-                    .complete();
-            if (thread != null) return thread;
+            try {
+                ThreadChannel thread = DiscordChannelUtility.retrieveThreadChannelById(actionsChannel.getGuild(), id)
+                        .complete();
+                if (thread != null) return thread;
+            } catch (RuntimeException e) {
+                if (isUnknownChannelError(e)) {
+                    if (createIfMissing || !game.isHasEnded()) {
+                        BotLogger.warning(
+                                new LogOrigin(this),
+                                "`Player.getCardsInfoThread`: Stored #cards-info thread ID no longer exists: "
+                                        + getCardsInfoThreadID() + " for potential thread name: " + name,
+                                e);
+                    }
+                    setCardsInfoThreadID(null);
+                } else {
+                    logCardsInfoThreadLookupFailure(
+                            "`Player.getCardsInfoThread`: Could not find existing #cards-info thread using ID: "
+                                    + getCardsInfoThreadID() + " for potential thread name: " + name,
+                            e,
+                            createIfMissing);
+                }
+            }
         }
-        return DiscordChannelUtility.retrieveFirstThreadChannelByNameIgnoringCase(actionsChannel, name)
-                .complete();
+        try {
+            return DiscordChannelUtility.retrieveFirstThreadChannelByNameIgnoringCase(actionsChannel, name)
+                    .complete();
+        } catch (RuntimeException e) {
+            logCardsInfoThreadLookupFailure(
+                    "`Player.getCardsInfoThread`: Could not find existing #cards-info thread using name: " + name,
+                    e,
+                    createIfMissing);
+            return null;
+        }
     }
 
     private Long getCardsInfoThreadIdLong() {
