@@ -37,7 +37,6 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
@@ -588,7 +587,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     @Nullable
-    public MessageChannel getPrivateChannel() {
+    public TextChannel getPrivateChannel() {
         try {
             return JdaService.jda.getTextChannelById(getPrivateChannelID());
         } catch (Exception e) {
@@ -657,8 +656,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     private ThreadChannel getCardsInfoThread(boolean createIfMissing) {
         if (isNpc() || isDummy()) return null;
 
-        TextChannel actionsChannel = resolveActionsChannel();
-        if (actionsChannel == null) {
+        TextChannel parentChannel = getCorrectChannel();
+        if (parentChannel == null) {
             logMissingChannel();
             return null;
         }
@@ -668,42 +667,25 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 ? String.format("%s-cards-info-%s-private", game.getName(), userName)
                 : String.format("%s%s-%s", Constants.CARDS_INFO_THREAD_PREFIX, game.getName(), userName);
 
-        ThreadChannel foundThread = findCardsInfoThreadByIdOrName(actionsChannel, threadName);
+        ThreadChannel foundThread = findCardsInfoThreadByIdOrName(parentChannel, threadName);
 
         if (foundThread != null) {
             setCardsInfoThreadID(foundThread.getId());
             return foundThread;
         }
 
-        return createIfMissing ? createNewThread(actionsChannel, threadName) : null;
-    }
-
-    private TextChannel resolveActionsChannel() {
-        if (!game.isFowMode() && !game.isCommunityMode()) {
-            return game.getMainGameChannel();
-        }
-
-        TextChannel channel = (TextChannel) getPrivateChannel();
-
-        // Check for specific GM room if the player is a GM
-        if (!isRealPlayer() && isGM()) {
-            channel = game.getGuild().getTextChannelsByName(game.getName() + "-gm-room", true).stream()
-                    .findFirst()
-                    .orElse(channel);
-        }
-
-        return channel != null ? channel : game.getMainGameChannel();
+        return createIfMissing ? createNewThread(parentChannel, threadName) : null;
     }
 
     @Nullable
-    private ThreadChannel findCardsInfoThreadByIdOrName(TextChannel actionsChannel, String name) {
+    private ThreadChannel findCardsInfoThreadByIdOrName(TextChannel parentChannel, String name) {
         Long id = getCardsInfoThreadIdLong();
         if (id != null) {
-            ThreadChannel thread = DiscordChannelUtility.retrieveThreadChannelById(actionsChannel.getGuild(), id)
+            ThreadChannel thread = DiscordChannelUtility.retrieveThreadChannelById(parentChannel.getGuild(), id)
                     .complete();
             if (thread != null) return thread;
         }
-        return DiscordChannelUtility.retrieveFirstThreadChannelByNameIgnoringCase(actionsChannel, name)
+        return DiscordChannelUtility.retrieveFirstThreadChannelByNameIgnoringCase(parentChannel, name)
                 .complete();
     }
 
@@ -1842,7 +1824,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             return !getLeaderByID(leaderId).map(Leader::isExhausted).orElse(true);
         } else {
             if (leaderId.contains("keleresagent")
-                    && getGame().getStoredValue("keleresAgentTarget").equalsIgnoreCase(getFaction())) {
+                    && game.getStoredValue("keleresAgentTarget").equalsIgnoreCase(getFaction())) {
                 return true;
             }
             return hasExternalAccessToLeader(leaderId)
@@ -3051,15 +3033,15 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     /**
      * @return Player's private channel if Fog of War game, otherwise the GM channel
      */
-    public MessageChannel getCorrectChannel() {
+    public TextChannel getCorrectChannel() {
+        TextChannel privateChannel = getPrivateChannel();
         if (game.isFowMode()) {
-            if (getPrivateChannel() != null) {
+            if (privateChannel != null) {
                 return getPrivateChannel();
-            } else {
-                return GMService.getGMChannel(game);
             }
+            return GMService.getGMChannel(game);
         }
-        return game.getMainGameChannel();
+        return privateChannel != null ? privateChannel : game.getMainGameChannel();
     }
 
     public String bannerName() {
