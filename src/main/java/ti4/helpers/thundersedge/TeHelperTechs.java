@@ -110,13 +110,12 @@ public final class TeHelperTechs {
                 }
             }
         }
-        player.setMagenInfantryCounter(player.getMagenInfantryCounter() + total);
-        int counter = player.getMagenInfantryCounter();
-        msg.append("\n-# ")
-                .append(ability)
-                .append(" has placed ")
-                .append(counter)
-                .append(" infantry this game so far.");
+        if (!bulwark) {
+            player.setMagenInfantryCounter(player.getMagenInfantryCounter() + total);
+            msg.append("\n-# _Magen Defense Grid_ has placed ")
+                    .append(player.getMagenInfantryCounter())
+                    .append(" infantry this game so far.");
+        }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg.toString());
     }
 
