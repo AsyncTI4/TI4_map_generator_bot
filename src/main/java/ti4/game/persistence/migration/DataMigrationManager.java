@@ -54,8 +54,9 @@ public class DataMigrationManager {
         //         DataMigrationManager::renameGarboziaToBozgarbia_201025_withEnded);
         // migrations.put("fixMisspelledAgendaIds_200226", DataMigrationManager::fixMisspelledAgendaIds_200226);
         // migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
-        migrations.put(
-                "unlockLockedAgentsBySetupState_120526", DataMigrationManager::unlockLockedAgentsBySetupState_120526);
+        // migrations.put(
+        //         "unlockLockedAgentsBySetupState_120526",
+        //         DataMigrationManager::unlockLockedAgentsBySetupState_120526);
     }
 
     public static void runMigrations() {
