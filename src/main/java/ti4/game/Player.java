@@ -658,7 +658,11 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
         TextChannel parentChannel = getCorrectChannel();
         if (parentChannel == null) {
-            logMissingChannel();
+            if (!game.isHasEnded()) {
+                BotLogger.warning(
+                        new LogOrigin(this),
+                        "`Player.getCardsInfoThread`: parent channel is null for game: " + game.getName());
+            }
             return null;
         }
 
@@ -711,14 +715,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         MessageHelper.sendMessageToChannel(thread, "Hello " + getPing() + "! This is your private channel.");
         setCardsInfoThreadID(thread.getId());
         return thread;
-    }
-
-    private void logMissingChannel() {
-        if (!game.isHasEnded()) {
-            BotLogger.warning(
-                    new LogOrigin(this),
-                    "`Player.getCardsInfoThread`: actionsChannel is null for game: " + game.getName());
-        }
     }
 
     public String getCardsInfoThreadJumpLink() {
@@ -3037,7 +3033,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         TextChannel privateChannel = getPrivateChannel();
         if (game.isFowMode()) {
             if (privateChannel != null) {
-                return getPrivateChannel();
+                return privateChannel;
             }
             return GMService.getGMChannel(game);
         }

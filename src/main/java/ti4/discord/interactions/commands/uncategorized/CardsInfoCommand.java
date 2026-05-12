@@ -32,7 +32,7 @@ public class CardsInfoCommand extends GameStateCommand {
 
     @Override
     public List<OptionData> getOptions() {
-        return List.of(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color", false, true));
+        return List.of(new OptionData(OptionType.USER, Constants.PLAYER, "Player to clear choices for", true, false));
     }
 
     @Override
@@ -43,15 +43,16 @@ public class CardsInfoCommand extends GameStateCommand {
             return;
         }
 
+        ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
+        if (cardsInfoThreadChannel == null) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Unable to find the player's cards info thread.");
+            return;
+        }
+
         Game game = getGame();
         if (!game.isFowMode()) {
-            ThreadChannel channel = player.getCardsInfoThread();
-            if (channel == null) {
-                MessageHelper.sendEphemeralMessageToEventChannel(
-                        event, "Unable to find the player's cards info thread.");
-                return;
-            }
-            channel.getManager()
+            cardsInfoThreadChannel
+                    .getManager()
                     .setArchived(true)
                     // archiving it to combat a common bug that is solved via archiving
                     .queue(Consumers.nop(), BotLogger::catchRestError);
