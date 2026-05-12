@@ -273,11 +273,11 @@ public class MessageHelper {
                     game.getName(),
                     new GameMessage(
                             message.getId(),
-                            GameMessageType.STRATEGY_CARD_FOLLOW,
+                            GameMessageType.STRATEGY_FOLLOW,
                             game.getLastModifiedDate(),
                             game.getRound() + "_" + scNum));
         };
-        splitAndSentWithAction(messageText, channel, addFactionReact);
+        splitAndSentWithAction(messageText, channel, null, null, null);
     }
 
     public static void sendMessageToChannelWithPersistentReacts(

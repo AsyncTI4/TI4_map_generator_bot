@@ -2115,7 +2115,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                     "followedSC" + sc + "_" + game.getRound(),
                     game.getStoredValue("followedSC" + sc + "_" + game.getRound()) + "_" + getFaction());
             GameMessage gameMessage = GameMessageManager.getOne(
-                            game.getName(), GameMessageType.STRATEGY_CARD_FOLLOW, game.getRound() + "_" + sc)
+                            game.getName(), GameMessageType.STRATEGY_FOLLOW, game.getRound() + "_" + sc)
                     .orElse(null);
             if (gameMessage != null) {
                 game.getMainGameChannel()

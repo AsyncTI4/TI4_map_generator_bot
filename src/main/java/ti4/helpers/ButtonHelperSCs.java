@@ -1486,7 +1486,7 @@ public final class ButtonHelperSCs {
         }
         int scNum2 = scNum;
         GameMessage gameMessage = GameMessageManager.getOne(
-                        game.getName(), GameMessageType.STRATEGY_CARD_FOLLOW, game.getRound() + "_" + scNum2)
+                        game.getName(), GameMessageType.STRATEGY_FOLLOW, game.getRound() + "_" + scNum2)
                 .orElse(null);
         if (gameMessage != null) {
             game.getMainGameChannel()
