@@ -656,8 +656,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     private ThreadChannel getCardsInfoThread(boolean createIfMissing) {
         if (isNpc() || isDummy()) return null;
 
-        TextChannel actionsChannel = getCorrectChannel();
-        if (actionsChannel == null) {
+        TextChannel parentChannel = getCorrectChannel();
+        if (parentChannel == null) {
             logMissingChannel();
             return null;
         }
@@ -667,25 +667,25 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 ? String.format("%s-cards-info-%s-private", game.getName(), userName)
                 : String.format("%s%s-%s", Constants.CARDS_INFO_THREAD_PREFIX, game.getName(), userName);
 
-        ThreadChannel foundThread = findCardsInfoThreadByIdOrName(actionsChannel, threadName);
+        ThreadChannel foundThread = findCardsInfoThreadByIdOrName(parentChannel, threadName);
 
         if (foundThread != null) {
             setCardsInfoThreadID(foundThread.getId());
             return foundThread;
         }
 
-        return createIfMissing ? createNewThread(actionsChannel, threadName) : null;
+        return createIfMissing ? createNewThread(parentChannel, threadName) : null;
     }
 
     @Nullable
-    private ThreadChannel findCardsInfoThreadByIdOrName(TextChannel actionsChannel, String name) {
+    private ThreadChannel findCardsInfoThreadByIdOrName(TextChannel parentChannel, String name) {
         Long id = getCardsInfoThreadIdLong();
         if (id != null) {
-            ThreadChannel thread = DiscordChannelUtility.retrieveThreadChannelById(actionsChannel.getGuild(), id)
+            ThreadChannel thread = DiscordChannelUtility.retrieveThreadChannelById(parentChannel.getGuild(), id)
                     .complete();
             if (thread != null) return thread;
         }
-        return DiscordChannelUtility.retrieveFirstThreadChannelByNameIgnoringCase(actionsChannel, name)
+        return DiscordChannelUtility.retrieveFirstThreadChannelByNameIgnoringCase(parentChannel, name)
                 .complete();
     }
 
