@@ -18,6 +18,35 @@ class GameTest {
         assertThat(game.getActionPhaseTurnOrder("doesNotExist")).isEqualTo(-1);
     }
 
+    @Test
+    void scorePublicObjectiveFailsWhenGameHasEnded() {
+        var game = new Game();
+        var player = createPlayer("player1", Set.of(), game);
+        game.setPlayers(Map.of("player1", player));
+        Integer publicObjectiveId = game.addCustomPO("Test Objective", 1);
+        game.setHasEnded(true);
+
+        boolean scored = game.scorePublicObjective(player.getUserID(), publicObjectiveId);
+
+        assertThat(scored).isFalse();
+        assertThat(game.getScoredPublicObjectives()).isEmpty();
+    }
+
+    @Test
+    void scoreSecretObjectiveFailsWhenGameHasEnded() {
+        var game = new Game();
+        var player = createPlayer("player1", Set.of(), game);
+        game.setPlayers(Map.of("player1", player));
+        player.setSecret("test_secret_objective", 42);
+        game.setHasEnded(true);
+
+        boolean scored = game.scoreSecretObjective(player.getUserID(), 42);
+
+        assertThat(scored).isFalse();
+        assertThat(player.getSecrets()).containsEntry("test_secret_objective", 42);
+        assertThat(player.getSecretsScored()).isEmpty();
+    }
+
     private Game createThreePlayerGame() {
         var game = new Game();
         game.setName("threePlayerGame");
