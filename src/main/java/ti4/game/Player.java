@@ -3034,14 +3034,14 @@ public class Player extends PlayerProperties implements StoredValueHelper {
      * @return Player's private channel if Fog of War game, otherwise the GM channel
      */
     public TextChannel getCorrectChannel() {
+        TextChannel privateChannel = getPrivateChannel();
         if (game.isFowMode()) {
-            if (getPrivateChannel() != null) {
+            if (privateChannel != null) {
                 return getPrivateChannel();
-            } else {
-                return GMService.getGMChannel(game);
             }
+            return GMService.getGMChannel(game);
         }
-        return game.getMainGameChannel();
+        return privateChannel != null ? privateChannel : game.getMainGameChannel();
     }
 
     public String bannerName() {
