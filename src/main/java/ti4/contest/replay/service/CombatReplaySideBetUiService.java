@@ -13,13 +13,16 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.apache.commons.lang3.function.Consumers;
 import org.springframework.stereotype.Service;
+import ti4.contest.replay.buttons.CombatDoubleOrBustButtonIds;
 import ti4.contest.replay.buttons.CombatSideBetButtonIds;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatSideBetType;
 import ti4.contest.replay.entities.CombatCandidateEntity;
 import ti4.contest.replay.entities.CombatContestSideBetEntity;
+import ti4.contest.replay.entities.CombatDoubleOrBustEntity;
 import ti4.contest.replay.entities.CombatReplayContestEntity;
 import ti4.contest.replay.repository.CombatContestSideBetRepository;
+import ti4.contest.replay.repository.CombatDoubleOrBustRepository;
 import ti4.contest.replay.repository.CombatReplayContestRepository;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
@@ -38,6 +41,7 @@ class CombatReplaySideBetUiService {
     private final CombatContestSettings settings;
     private final CombatReplayContestRepository replayContestRepository;
     private final CombatContestSideBetRepository sideBetRepository;
+    private final CombatDoubleOrBustRepository doubleOrBustRepository;
     private final CombatReplaySideBetPayoutService payoutService;
     private final CombatSideBetAvailabilityService availabilityService;
 
@@ -54,6 +58,7 @@ class CombatReplaySideBetUiService {
         ensureSummaryMessage(channel, game, contest);
         postFactionButtons(channel, game, contest, candidate, candidate.getAttackerFaction());
         postFactionButtons(channel, game, contest, candidate, candidate.getDefenderFaction());
+        postDoubleOrBustButton(channel, contest);
     }
 
     private String sideBetPrompt() {
@@ -127,6 +132,14 @@ class CombatReplaySideBetUiService {
         replayContestRepository.save(contest);
     }
 
+    private void postDoubleOrBustButton(MessageChannel channel, CombatReplayContestEntity contest) {
+        if (channel == null || contest == null || contest.getId() == null) return;
+        Button button = Buttons.green(CombatDoubleOrBustButtonIds.format(contest.getId()), "Double or Bust");
+        if (sideBetWindowClosed(contest)) button = button.asDisabled();
+        MessageHelper.sendMessageToChannelWithButton(
+                channel, "## Double or Bust\nSet your Double or Bust before the replay begins.", button);
+    }
+
     private void ensureSummaryMessage(MessageChannel channel, Game game, CombatReplayContestEntity contest) {
         Long summaryMessageId = contest.getSideBetSummaryMessageId();
         if (summaryMessageId != null && summaryMessageId > 0) {
@@ -165,6 +178,8 @@ class CombatReplaySideBetUiService {
 
     private String renderSummaryMessage(Game game, CombatReplayContestEntity contest) {
         List<CombatContestSideBetEntity> sideBets = sideBetRepository.findByContestId(contest.getId());
+        List<CombatDoubleOrBustEntity> doubleOrBusts =
+                doubleOrBustRepository.findByContestIdAndEnabledTrue(contest.getId());
         sideBets.sort(sideBetOrder());
         StringBuilder message = new StringBuilder();
         message.append("```text\n");
@@ -172,14 +187,21 @@ class CombatReplaySideBetUiService {
         message.append("----+------------------------------\n");
         if (sideBets.isEmpty()) {
             message.append(" -  | No side bets placed\n");
-            message.append("```");
-            return message.toString();
+        } else {
+            Map<String, Long> countsByBet = summarizeBetCounts(sideBets, game);
+            for (Map.Entry<String, Long> entry :
+                    sortBetCountsByQuantityDesc(countsByBet).entrySet()) {
+                message.append(String.format("%-3s | %s%n", entry.getValue() + "x", entry.getKey()));
+            }
         }
 
-        Map<String, Long> countsByBet = summarizeBetCounts(sideBets, game);
-        for (Map.Entry<String, Long> entry :
-                sortBetCountsByQuantityDesc(countsByBet).entrySet()) {
-            message.append(String.format("%-3s | %s%n", entry.getValue() + "x", entry.getKey()));
+        message.append("\n");
+        message.append(String.format("%-3s | %s%n", "Qty", "Double or Bust"));
+        message.append("----+------------------------------\n");
+        if (doubleOrBusts.isEmpty()) {
+            message.append(" -  | No Double or Bust entries\n");
+        } else {
+            message.append(String.format("%-3s | People enabled%n", doubleOrBusts.size() + "x"));
         }
         message.append("```");
         return message.toString();

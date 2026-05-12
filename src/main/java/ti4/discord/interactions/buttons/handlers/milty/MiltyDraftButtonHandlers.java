@@ -97,8 +97,13 @@ class MiltyDraftButtonHandlers {
     private void queueMiltyDraftPick(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         ButtonHelper.deleteMessage(event);
-        if (manager.getCurrentDraftPlayer(game) == null
-                && manager.getCurrentDraftPlayer(game).equals(player)) {
+        Player currentDraftPlayer = manager.getCurrentDraftPlayer(game);
+        if (currentDraftPlayer == null) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "No one is currently up to draft, so queueing a pick is not available.");
+            return;
+        }
+        if (currentDraftPlayer.equals(player)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "You are up to draft and you should just do that instead of queueing.");
             return;

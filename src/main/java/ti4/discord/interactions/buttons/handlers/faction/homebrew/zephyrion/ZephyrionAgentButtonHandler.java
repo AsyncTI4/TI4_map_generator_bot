@@ -61,6 +61,7 @@ public class ZephyrionAgentButtonHandler {
             MessageHelper.sendMessageToChannel(
                     p2.getCorrectChannel(),
                     p2.getRepresentationNoPing() + " received trade goods equal to the ship's cost.");
+            ZephyrionBountyButtonHandler.claimBounty(game, player, p2, unit.getUnitType(), false);
         }
         List<Button> removeButtons = new ArrayList<>();
         for (Button b : ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(p2, game, unitTypeString, true, true)) {

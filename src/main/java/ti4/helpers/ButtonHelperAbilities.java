@@ -2238,7 +2238,7 @@ public final class ButtonHelperAbilities {
                 rollOmenDiceAtStartOfStrat(game, player);
             }
             if (player.hasAbility("marked_prey")) {
-                ZephyrionBountyButtonHandler.offerBountyButtons(game, player);
+                ZephyrionBountyButtonHandler.offerBountyButtons(game, player, false);
             }
             PhantomEnergyHandler.checkFlagshipPhantomEnergy(game, player);
             if (player.hasAbility("protocols")) {

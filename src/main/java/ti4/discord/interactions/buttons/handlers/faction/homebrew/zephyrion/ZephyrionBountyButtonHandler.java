@@ -21,30 +21,37 @@ import ti4.service.emoji.FactionEmojis;
 public class ZephyrionBountyButtonHandler {
 
     public static void offerBountyButtons(Game game, Player player) {
+        offerBountyButtons(game, player, true);
+    }
+
+    public static void offerBountyButtons(Game game, Player player, boolean showRemove) {
         List<String> currentBounties = getBountiesForPlayer(game);
-        boolean atCap = currentBounties.size() >= 3;
 
         String msg = player.getRepresentationUnfogged()
-                + ", please choose which player's ships you wish to place a bounty on."
-                + " You may have up to 3 bounties at a time.";
+                + ", please choose which player's ships you wish to place a bounty on"
+                + (showRemove ? ", or which bounty you want to remove" : "")
+                + ". You may have up to 3 bounties at a time.";
         if (!currentBounties.isEmpty()) {
             msg += "\nYou currently have the following bounties: " + String.join(", ", currentBounties) + ".";
         } else {
             msg += " You currently have no bounties.";
         }
 
-        if (atCap) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-            return;
-        }
-
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-            String id = player.factionButtonChecker() + "bountyStep1_" + p2.getFaction();
+            String id = player.factionButtonChecker() + "bountyPickPlayer_" + p2.getFaction();
             if (game.isFowMode()) {
                 buttons.add(Buttons.green(id, p2.getColor(), p2.getFactionEmojiOrColor()));
             } else {
                 buttons.add(Buttons.green(id, p2.getFactionModel().getShortName(), p2.getFactionEmoji()));
+            }
+        }
+        if (showRemove) {
+            for (String bounty : currentBounties) {
+                String faction = bounty.split(" ")[0].toLowerCase();
+                String ship = bounty.split(" ")[1].toLowerCase();
+                buttons.add(Buttons.blue(
+                        player.factionButtonChecker() + "removeBounty_" + faction + "_" + ship, "Remove: " + bounty));
             }
         }
         buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Delete These Buttons"));
@@ -65,9 +72,9 @@ public class ZephyrionBountyButtonHandler {
         return bounties;
     }
 
-    @ButtonHandler("bountyStep1_")
-    static void bountyStep1(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        buttonID = buttonID.replace("bountyStep1_", "");
+    @ButtonHandler("bountyPickPlayer_")
+    static void bountyPickPlayer(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        buttonID = buttonID.replace("bountyPickPlayer_", "");
         Player p2 = game.getPlayerFromColorOrFaction(buttonID);
         if (p2 == null) {
             MessageHelper.sendMessageToChannel(
@@ -87,7 +94,7 @@ public class ZephyrionBountyButtonHandler {
         List<Button> buttons = new ArrayList<>();
         for (UnitType unitType : allowedUnits) {
             buttons.add(Buttons.green(
-                    player.factionButtonChecker() + "bountyStep2_" + p2.getFaction() + "_"
+                    player.factionButtonChecker() + "bountyPickShip_" + p2.getFaction() + "_"
                             + unitType.humanReadableName().toLowerCase(),
                     unitType.humanReadableName(),
                     unitType.getUnitTypeEmoji()));
@@ -96,9 +103,9 @@ public class ZephyrionBountyButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 
-    @ButtonHandler("bountyStep2_")
-    static void bountyStep2(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        buttonID = buttonID.replace("bountyStep2_", "");
+    @ButtonHandler("bountyPickShip_")
+    static void bountyPickShip(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        buttonID = buttonID.replace("bountyPickShip_", "");
         String colorPlayer = buttonID.split("_")[0];
         String unitTypeString = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(colorPlayer);
@@ -114,6 +121,24 @@ public class ZephyrionBountyButtonHandler {
         }
         game.setStoredValue("bounties" + p2.getFaction() + unitTypeString, unitTypeString);
         String msg = player.getRepresentationUnfogged() + " placed a bounty on a "
+                + StringUtils.capitalize(unitTypeString) + " belonging to " + p2.getRepresentationNoPing() + ".";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler("removeBounty_")
+    static void removeBounty(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        buttonID = buttonID.replace("removeBounty_", "");
+        String faction = buttonID.split("_")[0];
+        String unitTypeString = buttonID.split("_")[1].toLowerCase();
+        Player p2 = game.getPlayerFromColorOrFaction(faction);
+        if (p2 == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not find player, please resolve manually.");
+            return;
+        }
+        game.removeStoredValue("bounties" + p2.getFaction() + unitTypeString);
+        String msg = player.getRepresentationUnfogged() + " removed the bounty on a "
                 + StringUtils.capitalize(unitTypeString) + " belonging to " + p2.getRepresentationNoPing() + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteTheOneButton(event);

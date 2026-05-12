@@ -1067,7 +1067,7 @@ class GameLoadService {
                     List<Leader> leaderList = new ArrayList<>();
                     while (leaderInfos.hasMoreTokens()) {
                         String[] split = leaderInfos.nextToken().split(",");
-                        Leader leader = new Leader(split[0]);
+                        Leader leader = new Leader(split[0], split[1]);
                         leader.setTgCount(Integer.parseInt(split[2]));
                         leader.setExhausted(Boolean.parseBoolean(split[3]));
                         leader.setLocked(Boolean.parseBoolean(split[4]));
