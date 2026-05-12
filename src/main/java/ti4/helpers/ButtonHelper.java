@@ -3464,7 +3464,7 @@ public class ButtonHelper {
                         sb.append(unitModel.getUnitEmoji()).append(' ');
                         sb.append(privateGame ? unitModel.getBaseType() : unitModel.getName());
                         sb.append(getCombatProfileForTileSummary(
-                                        tile, unitHolder, unitModel, player, combatSummaryContext))
+                                        game, tile, unitHolder, unitModel, player, combatSummaryContext))
                                 .append('\n');
                     } else {
                         sb.append(unitKey).append('\n');
@@ -3478,12 +3478,14 @@ public class ButtonHelper {
     }
 
     private static String getCombatProfileForTileSummary(
+            Game game,
             Tile tile,
             UnitHolder unitHolder,
             UnitModel unitModel,
             Player player,
             @Nullable CombatSummaryContext combatSummaryContext) {
-        if (combatSummaryContext == null
+        if (game.isFowMode()
+                || combatSummaryContext == null
                 || !combatSummaryContext.combatPlayers().contains(player)) {
             return "";
         }
@@ -5841,7 +5843,8 @@ public class ButtonHelper {
         for (Planet planetUnit : tile.getPlanetUnitHolders()) {
             Planet planetReal = planetUnit;
             String planet = planetReal.getName();
-            if (FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
+            if (FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)
+                    && player.getPlanetsAllianceMode().contains(planet)) {
                 List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player, false, true);
                 buttons.addAll(planetButtons);
             }
@@ -8357,7 +8360,7 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
-    private static String getStratName(String ogName, Game game) {
+    public static String getStratName(String ogName, Game game) {
         if (!game.isTwilightsFallMode()) {
             return ogName;
         }
@@ -8395,25 +8398,28 @@ public class ButtonHelper {
         };
     }
 
-    public static void sendMessageToRightStratThread(
-            Player player, Game game, String message, String stratName, @Nullable List<Button> buttons) {
+    public static ThreadChannel getRightStratThread(Game game, String stratName) {
         List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
         String threadName = game.getName() + "-round-" + game.getRound() + "-" + stratName.toLowerCase();
         for (ThreadChannel threadChannel_ : threadChannels) {
-            if ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName())) {
-                if (!threadChannel_.getMembers().contains(game.getGuild().getMemberById(player.getUserID()))) {
-                    continue;
-                }
-            }
             if ((threadChannel_.getName().toLowerCase().startsWith(threadName.toLowerCase())
                             || threadChannel_
                                     .getName()
                                     .toLowerCase()
                                     .equals(threadName.toLowerCase() + "WinnuHero".toLowerCase()))
                     && (!"technology".equalsIgnoreCase(stratName) || !game.isComponentAction())) {
-                MessageHelper.sendMessageToChannelWithButtons(threadChannel_, message, buttons);
-                return;
+                return threadChannel_;
             }
+        }
+        return null;
+    }
+
+    public static void sendMessageToRightStratThread(
+            Player player, Game game, String message, String stratName, @Nullable List<Button> buttons) {
+        ThreadChannel threadChannel_ = getRightStratThread(game, stratName);
+        if (threadChannel_ != null) {
+            MessageHelper.sendMessageToChannelWithButtons(threadChannel_, message, buttons);
+            return;
         }
         if (player != null) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);

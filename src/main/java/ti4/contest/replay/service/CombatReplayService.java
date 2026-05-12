@@ -1024,7 +1024,7 @@ public class CombatReplayService {
 
     private static double safeRatio(double weaker, double stronger) {
         if (stronger <= 0) return 0.0;
-        return Math.max(0.0, Math.min(1.0, weaker / stronger));
+        return Math.clamp(weaker / stronger, 0.0, 1.0);
     }
 
     private String firstNonBlank(String first, String fallback) {
@@ -1051,7 +1051,7 @@ public class CombatReplayService {
         }
     }
 
-    public record CandidateInitialSnapshot(
+    private record CandidateInitialSnapshot(
             String preReplayContextText,
             String initialRenderSnapshotJson,
             int attackerDestroyerCount,

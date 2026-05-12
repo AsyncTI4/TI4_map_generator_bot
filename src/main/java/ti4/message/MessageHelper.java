@@ -1,16 +1,16 @@
 package ti4.message;
 
-import static ti4.helpers.discord.DiscordHelper.isDiscordServerError;
-import static ti4.helpers.discord.DiscordHelper.isIgnorableError;
-import static ti4.helpers.discord.DiscordHelper.isUnknownMessageError;
+import static ti4.helpers.discord.DiscordHelper.*;
 
 import java.io.File;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -203,13 +203,14 @@ public class MessageHelper {
 
     private static void addFactionReactToMessage(Game game, Player player, Message message) {
         Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, message);
-        message.addReaction(reactionEmoji).queue(null, error -> handleFailedReaction(game, player, message, error));
-        String messageId = message.getId();
-        GameMessageManager.addReaction(game.getName(), player.getFaction(), messageId);
+        message.addReaction(reactionEmoji)
+                .queue(
+                        _ -> GameMessageManager.addReaction(game.getName(), player.getFaction(), message.getId()),
+                        error -> handleFailedReaction(game, player, message, error));
     }
 
     private static void handleFailedReaction(Game game, Player player, Message message, Throwable error) {
-        if (isUnknownMessageError(error)) {
+        if (isUnknownMessageError(error) || isUnknownEmojiError(error)) {
             return;
         }
         if (isDiscordServerError(error)) {
@@ -264,6 +265,19 @@ public class MessageHelper {
             ReactionService.progressGameIfAllPlayersHaveReacted(message.getId(), game);
         };
         splitAndSentWithAction(messageText, channel, addFactionReact, embeds, buttons);
+    }
+
+    public static void sendSCFollowMessageToChannel(MessageChannel channel, String messageText, Game game, int scNum) {
+        Consumer<Message> addFactionReact = (message) -> {
+            GameMessageManager.add(
+                    game.getName(),
+                    new GameMessage(
+                            message.getId(),
+                            GameMessageType.STRATEGY_FOLLOW,
+                            game.getLastModifiedDate(),
+                            game.getRound() + "_" + scNum));
+        };
+        splitAndSentWithAction(messageText, channel, addFactionReact);
     }
 
     public static void sendMessageToChannelWithPersistentReacts(
@@ -904,23 +918,30 @@ public class MessageHelper {
             @NotNull String storedValueKeyPrefix,
             @NotNull Message msg) {
         String storedValueKey = storedValueKeyPrefix + "_" + threadChannel.getId();
-        String previousMessageId = game.getStoredValue(storedValueKey);
-
-        if (StringUtils.isNotBlank(previousMessageId) && !previousMessageId.equals(msg.getId())) {
-            threadChannel
-                    .retrieveMessageById(previousMessageId)
-                    .queue(
-                            previousMessage ->
-                                    previousMessage.unpin().queue(Consumers.nop(), BotLogger::catchRestError),
-                            BotLogger::catchRestError);
-        }
-
         pinCardsInfoMessage(game, storedValueKey, msg);
+        CardsInfoPinCleanupService.queueStalePinnedMessageCleanup(
+                threadChannel, cardsInfoPinnedMessageIds(game, threadChannel));
     }
 
     private static void pinCardsInfoMessage(@NotNull Game game, @NotNull String storedValueKey, @NotNull Message msg) {
         game.setStoredValue(storedValueKey, msg.getId());
         msg.pin().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    private static Set<String> cardsInfoPinnedMessageIds(@NotNull Game game, @NotNull ThreadChannel threadChannel) {
+        String threadId = threadChannel.getId();
+        Set<String> messageIds = new HashSet<>();
+        addStoredMessageId(game, messageIds, "pinned_ac_info_message_id_" + threadId);
+        addStoredMessageId(game, messageIds, "pinned_so_info_message_id_" + threadId);
+        addStoredMessageId(game, messageIds, "pinned_pn_info_message_id_" + threadId);
+        return messageIds;
+    }
+
+    private static void addStoredMessageId(Game game, Set<String> messageIds, String storedValueKey) {
+        String messageId = game.getStoredValue(storedValueKey);
+        if (StringUtils.isNotBlank(messageId)) {
+            messageIds.add(messageId);
+        }
     }
 
     /**

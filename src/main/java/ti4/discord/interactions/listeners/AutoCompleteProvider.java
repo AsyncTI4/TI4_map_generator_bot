@@ -1729,6 +1729,7 @@ class AutoCompleteProvider {
             CommandAutoCompleteInteractionEvent event, Collection<T> models, ComponentSource source) {
         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
         return models.stream()
+                .filter(model -> model.getSource() != null)
                 .filter(model -> model.search(enteredValue, source))
                 .filter(model -> !model.getSource().isHiddenFromSearch())
                 .filter(model -> !(model instanceof ColorableModelInterface cm) || !cm.isDupe())
@@ -1744,6 +1745,7 @@ class AutoCompleteProvider {
             boolean limithomebrew) {
         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
         return models.stream()
+                .filter(model -> model.getSource() != null)
                 .filter(model -> model.search(enteredValue, source))
                 .filter(model -> !model.getSource().isHiddenFromSearch(source))
                 .filter(model -> !(model instanceof ColorableModelInterface cm) || !cm.isDupe())
