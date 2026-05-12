@@ -59,11 +59,10 @@ public class ButtonProcessor {
 
     public static void queue(ButtonInteractionEvent event) {
         String gameName = GameNameService.getGameNameFromChannel(event);
-        String rawComponentID = event.getButton().getCustomId();
-        String lockName = gameName == null ? "button-message-" + event.getMessageId() : gameName;
-        ExecutionLockType lockType = registry.isSave(rawComponentID) ? ExecutionLockType.WRITE : ExecutionLockType.READ;
+        String componentId = event.getButton().getCustomId();
+        ExecutionLockType lockType = registry.isSave(componentId) ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutorServiceManager.runAsyncWithLock(
-                eventToString(event, gameName), lockName, event.getMessageChannel(), () -> process(event), lockType);
+                eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event), lockType);
     }
 
     private static String eventToString(ButtonInteractionEvent event, String gameName) {
