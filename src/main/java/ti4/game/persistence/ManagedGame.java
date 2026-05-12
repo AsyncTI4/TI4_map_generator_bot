@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.JdaService;
 import ti4.game.Game;
 
 @Getter
@@ -38,7 +39,6 @@ public class ManagedGame {
     private final long endedDate;
     private final int round;
     private final Guild guild;
-    private final TextChannel mainGameChannel;
     private final TextChannel actionsChannel;
     private final TextChannel tableTalkChannel;
     private final ThreadChannel launchPostThread;
@@ -69,7 +69,6 @@ public class ManagedGame {
         endedDate = game.getEndedDate();
         round = game.getRound();
         guild = game.getGuild();
-        mainGameChannel = game.getMainGameChannel();
         actionsChannel = game.getActionsChannel();
         tableTalkChannel = game.getTableTalkChannel();
         launchPostThread = game.getLaunchPostThread();
@@ -104,6 +103,33 @@ public class ManagedGame {
 
     public boolean isActive() {
         return !hasEnded && !hasWinner && !vpGoalReached && !stale;
+    }
+
+    @Nullable
+    public TextChannel getMainGameChannel() {
+        return getActionsChannel();
+    }
+
+    @Nullable
+    public TextChannel getActionsChannel() {
+        return getCurrentTextChannel(actionsChannel);
+    }
+
+    @Nullable
+    public TextChannel getTableTalkChannel() {
+        return getCurrentTextChannel(tableTalkChannel);
+    }
+
+    @Nullable
+    public ThreadChannel getLaunchPostThread() {
+        if (launchPostThread == null) return null;
+        return JdaService.jda.getThreadChannelById(launchPostThread.getId());
+    }
+
+    @Nullable
+    private TextChannel getCurrentTextChannel(@Nullable TextChannel cachedChannel) {
+        if (cachedChannel == null) return null;
+        return JdaService.jda.getTextChannelById(cachedChannel.getId());
     }
 
     public List<String> getPlayerIds() {
