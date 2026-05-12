@@ -3702,6 +3702,14 @@ public final class AgendaHelper {
     private static void autoResolve(@Nullable ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String result = buttonID.substring(buttonID.indexOf('_') + 1);
         if (result.contains("manual")) {
+            if (game.getCurrentAgendaInfo().split("_").length < 2) {
+                event.reply(
+                                "This agenda resolution window has closed. If you still need to resolve this effect, please do so manually.")
+                        .setEphemeral(true)
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
+                return;
+            }
+
             if (result.contains("committee")) {
                 if (game.isACInDiscard("Confounding") && game.isACInDiscard("Confusing")) {
                     MessageHelper.sendMessageToChannel(
