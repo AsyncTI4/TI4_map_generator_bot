@@ -23,7 +23,6 @@ import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.helpers.thundersedge.TeHelperPromissories;
-import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
@@ -33,6 +32,7 @@ import ti4.service.breakthrough.VoidTetherService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.LoreService;
@@ -394,6 +394,7 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("ghostagent_active");
 
         game.getTacticalActionDisplacement().clear();
+        // TeHelperTechs.clearMagenStoredValues(game, game.getTileByPosition(game.getActiveSystem()));
     }
 
     public static void beginTacticalAction(Game game, Player player) {
@@ -664,7 +665,11 @@ public final class ButtonHelperTacticalAction {
                 }
                 if (!has || !magenPlayer.hasTech("md")) continue;
 
-                TeHelperTechs.resolveMagen(game, magenPlayer, activeSystem, false);
+                String id = magenPlayer.factionButtonChecker() + "useMagenDefense_" + activeSystem.getPosition();
+                Button useMagen = Buttons.red(id, "Use Magen Defense Grid", TechEmojis.WarfareTech);
+                String magenMsg = magenPlayer.getRepresentation()
+                        + " you can, and must, use _Magen Defense Grid_ to place an infantry with each of your structures in the active system.";
+                MessageHelper.sendMessageToChannelWithButton(magenPlayer.getCorrectChannel(), magenMsg, useMagen);
             }
 
             for (Player btb : game.getRealPlayers()) {
@@ -672,7 +677,11 @@ public final class ButtonHelperTacticalAction {
                 if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, btb, UnitType.Pds)
                         .contains(activeSystem)) continue;
 
-                TeHelperTechs.resolveMagen(game, btb, activeSystem, true);
+                String id = btb.factionButtonChecker() + "useMagenDefense_" + activeSystem.getPosition();
+                Button use = Buttons.red(id, "Use Black Trench Bulwark", UnitEmojis.pds);
+                String msg = btb.getRepresentation()
+                        + " you can, and must, use _Black Trench Bulwark_ to place an infantry with each of your pds in the active system.";
+                MessageHelper.sendMessageToChannelWithButton(btb.getCorrectChannel(), msg, use);
             }
 
             for (Player archive : game.getRealPlayers()) {
