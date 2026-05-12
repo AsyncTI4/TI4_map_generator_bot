@@ -1,6 +1,9 @@
 package ti4.message;
 
-import static ti4.helpers.discord.DiscordHelper.*;
+import static ti4.helpers.discord.DiscordErrorUtility.isDiscordServerError;
+import static ti4.helpers.discord.DiscordErrorUtility.isIgnorableError;
+import static ti4.helpers.discord.DiscordErrorUtility.isUnknownEmojiError;
+import static ti4.helpers.discord.DiscordErrorUtility.isUnknownMessageError;
 
 import java.io.File;
 import java.net.SocketTimeoutException;

@@ -67,6 +67,7 @@ import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.discord.DiscordErrorUtility;
 import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -685,8 +686,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     private ThreadChannel findCardsInfoThreadByIdOrName(TextChannel parentChannel, String name) {
         Long id = getCardsInfoThreadIdLong();
         if (id != null) {
-            ThreadChannel thread = DiscordChannelUtility.retrieveThreadChannelById(parentChannel.getGuild(), id)
-                    .complete();
+            ThreadChannel thread = retrieveCardsInfoThreadById(parentChannel, id);
             if (thread != null) return thread;
         }
         return DiscordChannelUtility.retrieveFirstThreadChannelByNameIgnoringCase(parentChannel, name)
@@ -700,6 +700,19 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             return Long.valueOf(idStr);
         } catch (NumberFormatException e) {
             return null;
+        }
+    }
+
+    @Nullable
+    private ThreadChannel retrieveCardsInfoThreadById(TextChannel parentChannel, Long id) {
+        try {
+            return DiscordChannelUtility.retrieveThreadChannelById(parentChannel.getGuild(), id)
+                    .complete();
+        } catch (Exception e) {
+            if (DiscordErrorUtility.isUnknownChannelError(e)) {
+                return null;
+            }
+            throw e;
         }
     }
 
