@@ -45,7 +45,8 @@ public class CardsInfoCommand extends GameStateCommand {
 
         ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
         if (cardsInfoThreadChannel == null) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Unable to find the player's cards info thread.");
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "Unable to find or create the player's cards info thread.");
             return;
         }
 
