@@ -5841,7 +5841,8 @@ public class ButtonHelper {
         for (Planet planetUnit : tile.getPlanetUnitHolders()) {
             Planet planetReal = planetUnit;
             String planet = planetReal.getName();
-            if (FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
+            if (FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)
+                    && player.getPlanetsAllianceMode().contains(planet)) {
                 List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player, false, true);
                 buttons.addAll(planetButtons);
             }

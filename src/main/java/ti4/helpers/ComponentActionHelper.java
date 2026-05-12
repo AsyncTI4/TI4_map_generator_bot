@@ -917,12 +917,12 @@ public class ComponentActionHelper {
                             "You don't have three trade goods to pay your mercenaries. And Bad Things™ happen when you shortchange mercenaries.");
                     return;
                 }
-                p1.setTg(p1.getTg() - 3);
-                MessageHelper.sendMessageToChannel(
-                        p1.getCorrectChannel(),
-                        p1.getRepresentationUnfogged() + " has spent 3 trade goods to hire mercenaries.");
                 String leaderID = game.getStoredValue("mercCommander");
-                if (leaderID != null) {
+                if (!leaderID.isEmpty()) {
+                    p1.setTg(p1.getTg() - 3);
+                    MessageHelper.sendMessageToChannel(
+                            p1.getCorrectChannel(),
+                            p1.getRepresentationUnfogged() + " has spent 3 trade goods to hire mercenaries.");
                     p1.addLeader(leaderID);
                     game.addFakeCommander(leaderID);
                     MessageHelper.sendMessageToChannel(

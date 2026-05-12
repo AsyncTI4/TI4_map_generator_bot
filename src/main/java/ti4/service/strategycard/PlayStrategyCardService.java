@@ -480,6 +480,33 @@ public class PlayStrategyCardService {
         }
     }
 
+    public static String getSCFollowSummary(Game game, int scID) {
+        StringBuilder followSummary = new StringBuilder("## __Following Summary__\n");
+        for (Player p : game.getRealPlayers()) {
+            if (p.hasFollowedSC(scID)) {
+                if (p.getSCs().contains(scID)) {
+                    if (game.getStoredValue("followedSC" + scID + "_" + game.getRound())
+                            .isEmpty()) {
+                        followSummary.append(p.getRepresentationNoPing()).append(" played the SC");
+                    } else {
+                        followSummary.append(p.getRepresentation()).append(" played the SC");
+                    }
+                }
+                if (game.getStoredValue("followedSC" + scID + "_" + game.getRound())
+                        .contains(p.getFaction())) {
+                    followSummary.append(p.getRepresentation()).append(" ✅ ");
+                } else {
+                    followSummary.append(p.getRepresentation()).append(" ❌ ");
+                }
+
+            } else {
+                followSummary.append(p.getRepresentationNoPing()).append("❓");
+            }
+            followSummary.append("\n");
+        }
+        return followSummary.toString();
+    }
+
     private static void sendAndHandleMessageResponse(
             MessageCreateData toSend,
             Game game,
@@ -633,7 +660,9 @@ public class PlayStrategyCardService {
                 String label = "Send 1 Debt";
                 scButtons.add(Buttons.gray("sendTradeHolder_debt_" + player.getFaction(), label));
             }
+
             MessageHelper.sendMessageToChannelWithButtons(m5, "These buttons will work inside the thread.", scButtons);
+            MessageHelper.sendSCFollowMessageToChannel(m5, getSCFollowSummary(game, scToPlay), game, scToPlay);
 
             if (scModel.usesAutomationForSCID("pok5trade")) {
                 if (player.hasAbility("guild_ships")) {

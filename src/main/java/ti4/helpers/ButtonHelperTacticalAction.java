@@ -685,7 +685,8 @@ public final class ButtonHelperTacticalAction {
 
             for (Player archive : game.getRealPlayers()) {
                 if (!archive.ownsUnit("tk-visionariaarchive")) continue;
-                if (activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Spacedock, archive) == 0) continue;
+                if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, archive, UnitType.Spacedock)
+                        .contains(activeSystem)) continue;
 
                 String id = player.factionButtonChecker() + "useVisionariaArchive_" + archive.getColor();
                 Button use = Buttons.red(id, "Use Visionaria Archive", MiscEmojis.tf_ability);

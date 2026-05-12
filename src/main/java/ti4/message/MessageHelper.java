@@ -1,8 +1,6 @@
 package ti4.message;
 
-import static ti4.helpers.discord.DiscordHelper.isDiscordServerError;
-import static ti4.helpers.discord.DiscordHelper.isIgnorableError;
-import static ti4.helpers.discord.DiscordHelper.isUnknownMessageError;
+import static ti4.helpers.discord.DiscordHelper.*;
 
 import java.io.File;
 import java.net.SocketTimeoutException;
@@ -264,6 +262,19 @@ public class MessageHelper {
             ReactionService.progressGameIfAllPlayersHaveReacted(message.getId(), game);
         };
         splitAndSentWithAction(messageText, channel, addFactionReact, embeds, buttons);
+    }
+
+    public static void sendSCFollowMessageToChannel(MessageChannel channel, String messageText, Game game, int scNum) {
+        Consumer<Message> addFactionReact = (message) -> {
+            GameMessageManager.add(
+                    game.getName(),
+                    new GameMessage(
+                            message.getId(),
+                            GameMessageType.STRATEGY_CARD_FOLLOW,
+                            game.getLastModifiedDate(),
+                            game.getRound() + "_" + scNum));
+        };
+        splitAndSentWithAction(messageText, channel, addFactionReact);
     }
 
     public static void sendMessageToChannelWithPersistentReacts(

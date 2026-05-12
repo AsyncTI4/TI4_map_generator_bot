@@ -1327,6 +1327,7 @@ public final class Constants {
     public static final String SPLICE_TYPE = "splice_type";
     public static final String REVERSE_SPLICE = "reverse_splice";
     public static final String START_NEW_SPLICE = "start_new_splice";
+    public static final String ADD_TO_SPLICE = "add_to_splice";
     public static final String GALVANIZE = "galvanize";
     public static final String FIX_COLORS = "fix_colors";
     public static final String DRAW_RANDOM_UNIT = "draw_random_unit";

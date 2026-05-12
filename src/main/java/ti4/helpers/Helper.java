@@ -1271,6 +1271,7 @@ public final class Helper {
         boolean xxchaBt = player.hasUnlockedBreakthrough("xxchabt");
         int bestRes = 0;
         int keleresAgent = 0;
+        List<String> planetsSpent = new ArrayList<>();
         for (String thing : spentThings) {
             boolean found = false;
             switch (thing) {
@@ -1320,6 +1321,11 @@ public final class Helper {
                         msg.append(thing).append('\n');
                     }
                 } else {
+                    if (planetsSpent.contains(thing)) {
+                        continue;
+                    } else {
+                        planetsSpent.add(thing);
+                    }
                     Tile t = game.getTileFromPlanet(planet.getName());
                     if (t != null && !t.isHomeSystem(game)) {
                         if (planet.getResources() > bestRes) {

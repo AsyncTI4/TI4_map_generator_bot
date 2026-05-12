@@ -11,5 +11,6 @@ public enum GameMessageType {
     BAG_DRAFT,
     STATUS_END,
     STATUS_SCORING,
+    STRATEGY_CARD_FOLLOW,
     VISIONARIA
 }

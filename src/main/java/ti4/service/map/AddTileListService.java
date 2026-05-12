@@ -130,8 +130,7 @@ public class AddTileListService {
                     "Press this button after every player is setup.",
                     List.of(Buttons.DEAL_2_SO));
 
-            if (!game.isFowMode()
-                    && game.getRealPlayers().size() < game.getPlayers().size()) {
+            if (!game.isFowMode() && game.getRealPlayers().size() < 3) {
                 ButtonHelper.offerPlayerSetupButtons(channel, game);
             }
         }

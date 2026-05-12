@@ -664,7 +664,7 @@ public final class ButtonHelperAgents {
 
         if ("researchagent".equalsIgnoreCase(agent)) {
             String exhaustText =
-                    player.getRepresentation() + " has used the _Research Genome_ to add 3 cards to the draft.";
+                    player.getRepresentationNoPing() + " has used the _Research Genome_ to add 3 cards to the draft.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             game.setStoredValue("researchagentSplice" + player.getFaction(), "Yes");
         }

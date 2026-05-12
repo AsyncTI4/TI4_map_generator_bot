@@ -96,7 +96,7 @@ public class ReactionService {
             text = message;
         } else if (game.isFowMode()) {
             text = "(You) " + emojiToUse.getFormatted() + " " + message;
-        } else if ("not following.".equalsIgnoreCase(message)) {
+        } else if (message.contains("following")) {
             text = player.getRepresentation(false, false) + " " + message;
         } else {
             text = player.getRepresentation() + " " + message;
@@ -242,7 +242,8 @@ public class ReactionService {
             String factionToPing = gameMessage.factionsThatReacted().getFirst();
             Player playerToPing = game.getPlayerFromColorOrFaction(factionToPing);
             if (playerToPing != null) {
-                String msg3 = playerToPing.getRepresentation(true, true) + ", a" + msg2.substring(1);
+                boolean ping = !game.getPhaseOfGame().contains("action") || game.getActivePlayer() == playerToPing;
+                String msg3 = playerToPing.getRepresentation(true, ping) + ", a" + msg2.substring(1);
                 if (game.isFowMode()) {
                     MessageHelper.sendMessageToChannel(playerToPing.getPrivateChannel(), msg3);
                 } else {

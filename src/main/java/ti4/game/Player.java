@@ -73,6 +73,9 @@ import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.message.GameMessage;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
 import ti4.model.BreakthroughModel;
@@ -101,6 +104,7 @@ import ti4.service.fow.GMService;
 import ti4.service.fow.LoreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.map.FractureService;
+import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -1919,7 +1923,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public void addLeader(String leaderID) {
-        if (!getLeaderIDs().contains(leaderID)) {
+        if (leaderID != null && !getLeaderIDs().contains(leaderID) && !leaderID.isEmpty()) {
             Leader leader = new Leader(leaderID);
             leaders.add(leader);
         }
@@ -2099,9 +2103,30 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public void addFollowedSC(Integer sc, GenericInteractionCreateEvent event) {
+        addFollowedSC(sc, event, true);
+    }
+
+    public void addFollowedSC(Integer sc, GenericInteractionCreateEvent event, boolean editSCFollow) {
         Game game = this.game;
 
         getFollowedSCs().add(sc);
+        if (editSCFollow) {
+            game.setStoredValue(
+                    "followedSC" + sc + "_" + game.getRound(),
+                    game.getStoredValue("followedSC" + sc + "_" + game.getRound()) + "_" + getFaction());
+            GameMessage gameMessage = GameMessageManager.getOne(
+                            game.getName(), GameMessageType.STRATEGY_CARD_FOLLOW, game.getRound() + "_" + sc)
+                    .orElse(null);
+            if (gameMessage != null) {
+                game.getMainGameChannel()
+                        .retrieveMessageById(gameMessage.messageId())
+                        .queue(mainMessage -> {
+                            mainMessage
+                                    .editMessage(PlayStrategyCardService.getSCFollowSummary(game, sc))
+                                    .queue();
+                        });
+            }
+        }
         if (game != null && game.getActivePlayer() != null) {
 
             if (game.isTwilightsFallMode() && (sc == 2 || sc == 6 || sc == 7)) {
