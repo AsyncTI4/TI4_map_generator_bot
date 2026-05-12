@@ -1,7 +1,10 @@
 package ti4.discord.interactions.commands.uncategorized;
 
+import java.util.List;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.commands.GameStateCommand;
 import ti4.game.Game;
@@ -24,6 +27,11 @@ public class CardsInfoCommand extends GameStateCommand {
     @Override
     public String getDescription() {
         return "Send to your `#cards-info` thread: secret objectives, action cards, and promissory notes";
+    }
+
+    @Override
+    public List<OptionData> getOptions() {
+        return List.of(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color", false, true));
     }
 
     @Override
