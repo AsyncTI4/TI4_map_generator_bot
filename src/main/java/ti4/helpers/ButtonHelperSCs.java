@@ -1489,13 +1489,15 @@ public final class ButtonHelperSCs {
                         game.getName(), GameMessageType.STRATEGY_FOLLOW, game.getRound() + "_" + scNum2)
                 .orElse(null);
         if (gameMessage != null) {
-            game.getMainGameChannel()
-                    .retrieveMessageById(gameMessage.messageId())
-                    .queue(mainMessage -> {
-                        mainMessage
-                                .editMessage(PlayStrategyCardService.getSCFollowSummary(game, scNum2))
-                                .queue();
-                    });
+            ThreadChannel chan = ButtonHelper.getRightStratThread(
+                    game, ButtonHelper.getStratName(ButtonHelper.getStratName(scNum2), game));
+            if (chan != null) {
+                chan.retrieveMessageById(gameMessage.messageId()).queue(mainMessage -> {
+                    mainMessage
+                            .editMessage(PlayStrategyCardService.getSCFollowSummary(game, scNum2))
+                            .queue();
+                });
+            }
         }
     }
 

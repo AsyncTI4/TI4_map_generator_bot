@@ -491,12 +491,13 @@ public class PlayStrategyCardService {
                     } else {
                         followSummary.append(p.getRepresentation()).append(" played the SC");
                     }
-                }
-                if (game.getStoredValue("followedSC" + scID + "_" + game.getRound())
-                        .contains(p.getFaction())) {
-                    followSummary.append(p.getRepresentation()).append(" ✅ ");
                 } else {
-                    followSummary.append(p.getRepresentation()).append(" ❌ ");
+                    if (game.getStoredValue("followedSC" + scID + "_" + game.getRound())
+                            .contains(p.getFaction())) {
+                        followSummary.append(p.getRepresentation()).append(" ✅ ");
+                    } else {
+                        followSummary.append(p.getRepresentation()).append(" ❌ ");
+                    }
                 }
 
             } else {

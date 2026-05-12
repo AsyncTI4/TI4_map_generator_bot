@@ -277,7 +277,7 @@ public class MessageHelper {
                             game.getLastModifiedDate(),
                             game.getRound() + "_" + scNum));
         };
-        splitAndSentWithAction(messageText, channel, null, null, null);
+        splitAndSentWithAction(messageText, channel, addFactionReact);
     }
 
     public static void sendMessageToChannelWithPersistentReacts(

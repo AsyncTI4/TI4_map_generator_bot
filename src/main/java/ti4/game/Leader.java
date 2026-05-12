@@ -57,7 +57,7 @@ public class Leader {
     public Leader(String id, String type) {
         this.id = id;
         this.type = StringUtils.isBlank(type) ? getTypeFromLeaderId(id) : type;
-        if (Constants.AGENT.equals(type)) {
+        if ("agent".equals(type)) {
             locked = false;
         }
     }
