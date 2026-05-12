@@ -95,7 +95,6 @@ public final class TeHelperTechs {
             if (count > 0) {
                 total += count;
                 uh.addUnit(infKey, count);
-                // game.setStoredValue("magenPlaced" + player.getFaction() + uh.getName(), String.valueOf(count));
                 String emoji = infKey.unitEmoji().emojiString();
                 String infStr = emoji.repeat(count);
                 if (count > 6) infStr += "(" + count + " total)";

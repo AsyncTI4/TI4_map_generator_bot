@@ -394,7 +394,6 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("ghostagent_active");
 
         game.getTacticalActionDisplacement().clear();
-        // TeHelperTechs.clearMagenStoredValues(game, game.getTileByPosition(game.getActiveSystem()));
     }
 
     public static void beginTacticalAction(Game game, Player player) {
