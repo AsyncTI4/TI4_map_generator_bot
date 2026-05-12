@@ -47,43 +47,75 @@ public final class TeHelperTechs {
     private static void useMagenDefenseGrid(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String regex = "useMagenDefense_" + RegexHelper.posRegex(game);
         RegexService.runMatcher(regex, buttonID, matcher -> {
-            String pos = matcher.group("pos");
-            Tile tile = game.getTileByPosition(pos);
+            Tile tile = game.getTileByPosition(matcher.group("pos"));
+            resolveMagen(game, player, tile, false);
+            ButtonHelper.deleteMessage(event);
+        });
+    }
 
-            int total = 0;
-            UnitKey infKey = Units.getUnitKey(UnitType.Infantry, player.getColorID());
+    public static void revertMagen(Game game, Tile tile) {
+        clearMagenPlacement(game, tile, true);
+    }
 
-            StringBuilder msg = new StringBuilder(
-                    player.getFactionEmoji() + " resolved _Magen Defense Grid_ at " + tile.getPosition() + ".");
+    public static void clearMagenStoredValues(Game game, Tile tile) {
+        clearMagenPlacement(game, tile, false);
+    }
+
+    private static void clearMagenPlacement(Game game, Tile tile, boolean removeInfantry) {
+        if (tile == null) return;
+        for (Player p : game.getRealPlayers()) {
+            UnitKey infKey = removeInfantry ? Units.getUnitKey(UnitType.Infantry, p.getColorID()) : null;
             for (UnitHolder uh : tile.getUnitHolders().values()) {
-                int count = uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure);
-                if (player.hasAbility("byssus")) count += uh.getUnitCount(UnitType.Mech, player);
-
-                for (String token : uh.getTokenList()) {
-                    if (player.getPlanets().contains(uh.getName()) && token.contains("superweapon")) {
-                        count++;
-                    }
-                }
-
-                if (count > 0) {
-                    total += count;
-                    uh.addUnit(infKey, count);
-                    String emoji = infKey.unitEmoji().emojiString();
-                    String infStr = emoji.repeat(count);
-                    if (count > 6) infStr += "(" + count + " total)";
-                    if (uh instanceof Space) {
-                        msg.append("\n-# > ").append(emoji.repeat(count)).append(" added to space area.");
-                    } else {
-                        msg.append("\n-# > ")
-                                .append(emoji.repeat(count))
-                                .append(" added to ")
-                                .append(Helper.getPlanetRepresentation(uh.getName(), game));
-                    }
+                String stored = game.getStoredValue("magenPlaced" + p.getFaction() + uh.getName());
+                if (!stored.isEmpty()) {
+                    if (removeInfantry) uh.removeUnit(infKey, Integer.parseInt(stored));
+                    game.removeStoredValue("magenPlaced" + p.getFaction() + uh.getName());
                 }
             }
-            ButtonHelper.deleteMessage(event);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), String.format(msg.toString(), total));
-        });
+        }
+    }
+
+    public static void resolveMagen(Game game, Player player, Tile tile, boolean bulwark) {
+        int total = 0;
+        UnitKey infKey = Units.getUnitKey(UnitType.Infantry, player.getColorID());
+        String ability = bulwark ? "_Black Trench Bulwark_" : "_Magen Defense Grid_";
+        StringBuilder msg = new StringBuilder(
+                player.getFactionEmoji() + " resolved " + ability + " on " + tile.getPosition() + ":");
+        for (UnitHolder uh : tile.getUnitHolders().values()) {
+            int count = uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure);
+            if (player.hasAbility("byssus")) count += uh.getUnitCount(UnitType.Mech, player);
+            for (String token : uh.getTokenList()) {
+                if (player.getPlanets().contains(uh.getName()) && token.contains("superweapon")) {
+                    count++;
+                }
+            }
+            if (bulwark) {
+                count = uh.getUnitCount(UnitType.Pds, player);
+            }
+            if (count > 0) {
+                total += count;
+                uh.addUnit(infKey, count);
+                String emoji = infKey.unitEmoji().emojiString();
+                String infStr = emoji.repeat(count);
+                if (count > 6) infStr += "(" + count + " total)";
+                if (uh instanceof Space) {
+                    msg.append("\n-# > ").append(infStr).append(" added to space.");
+                } else {
+                    msg.append("\n-# > ")
+                            .append(infStr)
+                            .append(" added to ")
+                            .append(Helper.getPlanetRepresentation(uh.getName(), game))
+                            .append(".");
+                }
+            }
+        }
+        if (!bulwark) {
+            player.setMagenInfantryCounter(player.getMagenInfantryCounter() + total);
+            msg.append("\n-# _Magen Defense Grid_ has placed ")
+                    .append(player.getMagenInfantryCounter())
+                    .append(" infantry this game so far.");
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg.toString());
     }
 
     // Nanomachines

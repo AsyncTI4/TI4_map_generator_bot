@@ -133,7 +133,7 @@ class TacticalActionButtonHandlers {
         if (!game.getTacticalActionDisplacement().isEmpty()) {
             TacticalActionService.reverseAllUnitMovement(event, game, player);
         }
-
+        // TODO: revert all activation effects consistently, then wire this back up
         String message =
                 "Choosing a different system to activate. Please choose the ring of the map that the system you wish to activate is located in.";
         if (!game.isFowMode()) {
