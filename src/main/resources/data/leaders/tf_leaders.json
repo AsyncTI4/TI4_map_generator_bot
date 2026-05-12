@@ -132,6 +132,7 @@
         "abilityWindow": "At the end of the status phase",
         "abilityText": "You may choose an ability owned by another player; they must either give you that ability or give you 2 other abilities. If you do, purge this card.",
         "unlockCondition": "Always Unlocked",
+        "tfNotes": "This hero is not affected by someone having bio-synthetic synergy.",
         "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/naalu_paradigm.png?raw=true",
         "source": "twilights_fall"
     },

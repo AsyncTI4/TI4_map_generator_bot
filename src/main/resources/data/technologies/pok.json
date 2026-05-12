@@ -330,6 +330,7 @@
         ],
         "source": "pok",
         "text": "When you activate a system, you may explore 1 planet in that system which contains 1 or more of your units.",
+        "notes": "Dane has said you need to control the planet in order to explore it, and that you cannot sacrifice coexisting infantry to resolve a hazardous explore.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/scanlink_drone_network.png?raw=true",
         "initials": "SDN",
         "shortName": "Scanlink Drone Net."

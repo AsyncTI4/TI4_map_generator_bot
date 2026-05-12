@@ -536,7 +536,7 @@ public final class ButtonHelperTwilightsFall {
         game.removeStoredValue("reverseSpliceOrder");
     }
 
-    private static String getSpliceOrderString(List<Player> participants) {
+    public static String getSpliceOrderString(List<Player> participants) {
         StringBuilder sb = new StringBuilder();
         int count = 1;
         for (Player p : participants) {
@@ -567,7 +567,7 @@ public final class ButtonHelperTwilightsFall {
         return players;
     }
 
-    private static void sendPlayerSpliceOptions(Game game, Player player) {
+    public static void sendPlayerSpliceOptions(Game game, Player player) {
         String type = game.getStoredValue("spliceType");
 
         List<String> cards = getSpliceCards(game);
@@ -1449,7 +1449,7 @@ public final class ButtonHelperTwilightsFall {
                 player.addTech(cardID);
                 MessageHelper.sendMessageToChannelWithEmbed(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " has acquired the ability: "
+                        player.getRepresentationNoPing() + " has acquired the ability: "
                                 + Mapper.getTech(cardID).getName(),
                         Mapper.getTech(cardID).getRepresentationEmbed());
             }
@@ -1457,7 +1457,7 @@ public final class ButtonHelperTwilightsFall {
                 player.addLeader(cardID);
                 MessageHelper.sendMessageToChannelWithEmbed(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " has acquired the genome: "
+                        player.getRepresentationNoPing() + " has acquired the genome: "
                                 + Mapper.getLeader(cardID).getName(),
                         Mapper.getLeader(cardID).getRepresentationEmbed(true));
             }
@@ -1476,7 +1476,7 @@ public final class ButtonHelperTwilightsFall {
                             buttons.add(Buttons.red("deleteButtons", "Keep the New Unit"));
                             MessageHelper.sendMessageToChannel(
                                     player.getCorrectChannel(),
-                                    player.getRepresentation() + " you automatically lost the "
+                                    player.getRepresentationNoPing() + " you automatically lost the "
                                             + u.getNameRepresentation()
                                             + " unit upgrade. If you would like to keep it and lose the newly acquired unit upgrade, please click the green button.",
                                     buttons);
@@ -1503,7 +1503,7 @@ public final class ButtonHelperTwilightsFall {
                 player.addOwnedUnitByID(cardID);
                 MessageHelper.sendMessageToChannelWithEmbed(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " has acquired the unit upgrade: "
+                        player.getRepresentationNoPing() + " has acquired the unit upgrade: "
                                 + Mapper.getUnit(cardID).getName(),
                         Mapper.getUnit(cardID).getRepresentationEmbed());
             }
@@ -1584,6 +1584,22 @@ public final class ButtonHelperTwilightsFall {
                 game.setStoredValue("savedSpliceCards", game.getStoredValue("savedSpliceCards") + "_" + card);
             }
         }
+    }
+
+    public static String addSpliceCardToSplice(Game game, String type) {
+        List<String> cards = getDeckForSplicing(game, type, 100);
+        for (String card : cards) {
+            if (game.getStoredValue("savedSpliceCards").contains(card)) {
+                continue;
+            }
+            if (game.getStoredValue("savedSpliceCards").isEmpty()) {
+                game.setStoredValue("savedSpliceCards", card);
+            } else {
+                game.setStoredValue("savedSpliceCards", game.getStoredValue("savedSpliceCards") + "_" + card);
+            }
+            return card;
+        }
+        return "nothing";
     }
 
     public static void startInauguralSplice(Game game) {

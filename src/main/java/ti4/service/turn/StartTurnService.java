@@ -341,7 +341,7 @@ public class StartTurnService {
         if (!player.isRealPlayer()) return "";
 
         StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentationUnfogged());
+        sb.append(player.getRepresentationNoPing());
         sb.append(" Please resolve these before doing anything else:\n");
 
         Map<Long, String> thingsToFollow = new LinkedHashMap<>();

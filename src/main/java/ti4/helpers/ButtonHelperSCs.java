@@ -28,6 +28,9 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
+import ti4.message.GameMessage;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.PublicObjectiveModel;
@@ -1444,7 +1447,7 @@ public final class ButtonHelperSCs {
             }
         }
         if (setStatus) {
-            player.addFollowedSC(scNum, event);
+            player.addFollowedSC(scNum, event, false);
             suffix = " **" + Helper.getSCName(scNum, game) + "**";
         }
 
@@ -1479,6 +1482,21 @@ public final class ButtonHelperSCs {
             if (game.getStoredValue(key).contains(player.getFaction() + "*")) {
                 game.setStoredValue(key, game.getStoredValue(key).replace(player.getFaction() + "*", ""));
                 Helper.resolveQueue(game);
+            }
+        }
+        int scNum2 = scNum;
+        GameMessage gameMessage = GameMessageManager.getOne(
+                        game.getName(), GameMessageType.STRATEGY_FOLLOW, game.getRound() + "_" + scNum2)
+                .orElse(null);
+        if (gameMessage != null) {
+            ThreadChannel chan = ButtonHelper.getRightStratThread(
+                    game, ButtonHelper.getStratName(ButtonHelper.getStratName(scNum2), game));
+            if (chan != null) {
+                chan.retrieveMessageById(gameMessage.messageId()).queue(mainMessage -> {
+                    mainMessage
+                            .editMessage(PlayStrategyCardService.getSCFollowSummary(game, scNum2))
+                            .queue();
+                });
             }
         }
     }

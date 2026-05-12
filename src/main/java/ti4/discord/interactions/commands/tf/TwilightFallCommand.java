@@ -19,6 +19,7 @@ public class TwilightFallCommand implements ParentCommand {
                     new FixColors(),
                     new ReverseSplice(),
                     new StartNewSplice(),
+                    new AddToSplice(),
                     new DoEdictPhase(),
                     new SetupStartingFleet(),
                     new DiscardVeiledCard())
