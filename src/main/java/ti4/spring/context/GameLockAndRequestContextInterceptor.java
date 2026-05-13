@@ -80,6 +80,7 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         lockGame(gameName, shouldSaveGame);
         try {
             var game = GameManager.getManagedGame(gameName).getGame();
+            if (game == null) throw new RuntimeException("Unable to load game: " + gameName);
             RequestContext.setGame(game);
             RequestContext.setSaveGame(shouldSaveGame);
         } catch (Exception e) {
