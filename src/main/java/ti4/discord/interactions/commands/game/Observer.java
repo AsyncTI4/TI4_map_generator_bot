@@ -80,18 +80,18 @@ class Observer extends Subcommand {
         List<GuildChannel> channels = new ArrayList<>(guild.getChannels());
 
         // ADD TO GAME's SET CHANNELS
-        GuildChannel tableTalk = game.getTableTalkChannel();
-        GuildChannel actionsChannel = game.getActionsChannel();
+        GuildChannel tableTalkChannel = game.getTableTalkChannel();
+        GuildChannel mainGameChannel = game.getMainGameChannel();
         if ("add".equals(addOrRemove)) {
-            addObserver(event, member.getUser().getId(), tableTalk, false);
-            addObserver(event, member.getUser().getId(), actionsChannel, false);
+            addObserver(event, member.getUser().getId(), tableTalkChannel, false);
+            addObserver(event, member.getUser().getId(), mainGameChannel, false);
         } else {
-            removeObserver(event, member.getUser().getId(), tableTalk, false);
-            removeObserver(event, member.getUser().getId(), actionsChannel, false);
+            removeObserver(event, member.getUser().getId(), tableTalkChannel, false);
+            removeObserver(event, member.getUser().getId(), mainGameChannel, false);
         }
 
-        channels.remove(tableTalk);
-        channels.remove(actionsChannel);
+        channels.remove(tableTalkChannel);
+        channels.remove(mainGameChannel);
 
         // ADD TO ALL OTHER CHANNELS
         for (GuildChannel channel : channels) {

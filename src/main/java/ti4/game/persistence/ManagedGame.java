@@ -18,6 +18,8 @@ import ti4.game.Game;
 @Getter
 public class ManagedGame {
 
+    private static final long SIXTY_DAYS_MILLISECONDS = 1000L * 60 * 60 * 24 * 60;
+
     // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN EASILY BALLOON THE DATA ON THE HEAP BY MEGABYTES PER FIELD
     private final String name;
     private final boolean hasEnded;
@@ -25,7 +27,6 @@ public class ManagedGame {
     private final boolean vpGoalReached;
     private final boolean fowMode;
     private final boolean factionReactMode;
-    private final boolean thundersEdgeMode;
     private final boolean twilightsFallMode;
     private final boolean colorReactMode;
     private final boolean stratReactMode;
@@ -39,12 +40,10 @@ public class ManagedGame {
     private final int round;
     private final Guild guild;
     private final TextChannel mainGameChannel;
-    private final TextChannel actionsChannel;
     private final TextChannel tableTalkChannel;
     private final ThreadChannel launchPostThread;
     private final Set<ManagedPlayer> players;
     private final Map<ManagedPlayer, Boolean> playerToIsReal;
-    private final boolean stale;
 
     public ManagedGame(Game game) {
         name = game.getName();
@@ -54,7 +53,6 @@ public class ManagedGame {
                 game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
         fowMode = game.isFowMode();
         factionReactMode = game.isBotFactionReacts();
-        thundersEdgeMode = game.isThundersEdge();
         twilightsFallMode = game.isTwilightsFallMode();
         colorReactMode = game.isBotColorReacts();
         stratReactMode = game.isBotStratReacts();
@@ -70,7 +68,6 @@ public class ManagedGame {
         round = game.getRound();
         guild = game.getGuild();
         mainGameChannel = game.getMainGameChannel();
-        actionsChannel = game.getActionsChannel();
         tableTalkChannel = game.getTableTalkChannel();
         launchPostThread = game.getLaunchPostThread();
 
@@ -81,9 +78,6 @@ public class ManagedGame {
                 .collect(Collectors.toUnmodifiableMap(
                         p -> getPlayer(p.getUserID()),
                         p -> ((p.isRealPlayer() && !p.isNpc()) || (p.isEliminated() && game.isHasEnded()))));
-
-        final long sixtyDays = 1000L * 60 * 60 * 24 * 60;
-        stale = (System.currentTimeMillis() - game.getLastModifiedDate()) > sixtyDays;
     }
 
     private static String sanitizeToNull(String str) {
@@ -103,7 +97,10 @@ public class ManagedGame {
     }
 
     public boolean isActive() {
-        return !hasEnded && !hasWinner && !vpGoalReached && !stale;
+        return !hasEnded
+                && !hasWinner
+                && !vpGoalReached
+                && (System.currentTimeMillis() - lastModifiedDate) < SIXTY_DAYS_MILLISECONDS;
     }
 
     public List<String> getPlayerIds() {
