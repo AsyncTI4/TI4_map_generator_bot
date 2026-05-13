@@ -41,11 +41,12 @@ public class RoleService {
         }
         for (ManagedGame managedGame : mapsJoined) {
             ExecutionLockManager.wrapWithLockAndRelease(managedGame.getName(), ExecutionLockType.READ, () -> {
-                Game game = managedGame.getGame();
-                String gameMessage = user.getAsMention() + " has joined the server!";
-                MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), gameMessage);
-                GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, true);
-            });
+                        Game game = managedGame.getGame();
+                        String gameMessage = user.getAsMention() + " has joined the server!";
+                        MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), gameMessage);
+                        GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, true);
+                    })
+                    .run();
         }
     }
 

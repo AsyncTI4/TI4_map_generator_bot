@@ -38,7 +38,9 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
             return false;
         }
 
-        setupGameRequestContext(gameName, shouldSaveGame, handler);
+        if (!shouldSetupGameRequestContext(handler)) return true;
+
+        setupGameRequestContext(gameName, shouldSaveGame);
         return true;
     }
 
@@ -66,21 +68,22 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         return shouldSaveGame;
     }
 
-    private void setupGameRequestContext(String gameName, boolean shouldSaveGame, Object handler) {
+    private boolean shouldSetupGameRequestContext(Object handler) {
         if (handler instanceof HandlerMethod handlerMethod) {
             SetupRequestContext annotation = handlerMethod.getMethodAnnotation(SetupRequestContext.class);
-            if (annotation != null && !annotation.value()) {
-                return;
-            }
+            return annotation == null || annotation.value();
         }
+        return true;
+    }
 
-        lockGame(gameName);
+    private void setupGameRequestContext(String gameName, boolean shouldSaveGame) {
+        lockGame(gameName, shouldSaveGame);
         try {
             var game = GameManager.getManagedGame(gameName).getGame();
             RequestContext.setGame(game);
             RequestContext.setSaveGame(shouldSaveGame);
         } catch (Exception e) {
-            unlockGame(gameName);
+            unlockGame(gameName, shouldSaveGame);
             throw e;
         }
     }
@@ -94,8 +97,8 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         }
     }
 
-    private static void lockGame(String gameName) {
-        var lockType = RequestContext.shouldSaveGame() ? ExecutionLockType.WRITE : ExecutionLockType.READ;
+    private static void lockGame(String gameName, boolean shouldSaveGame) {
+        var lockType = shouldSaveGame ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutionLockManager.lock(gameName, lockType);
     }
 
@@ -119,15 +122,15 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
                     }
                 }
 
-                unlockGame(game.getName());
+                unlockGame(game.getName(), RequestContext.shouldSaveGame());
             }
         } finally {
             RequestContext.clearContext();
         }
     }
 
-    private static void unlockGame(String gameName) {
-        var lockType = RequestContext.shouldSaveGame() ? ExecutionLockType.WRITE : ExecutionLockType.READ;
+    private static void unlockGame(String gameName, boolean shouldSaveGame) {
+        var lockType = shouldSaveGame ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutionLockManager.unlock(gameName, lockType);
     }
 }
