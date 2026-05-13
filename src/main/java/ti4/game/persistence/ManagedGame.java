@@ -141,7 +141,8 @@ public class ManagedGame {
     @Nullable
     public ThreadChannel getLaunchPostThread() {
         if (launchPostThreadId == null) return null;
-        return DiscordChannelUtility.retrieveThreadChannelById(guild, launchPostThreadId).complete();
+        return DiscordChannelUtility.retrieveThreadChannelById(guild, launchPostThreadId)
+                .complete();
     }
 
     @Nullable
