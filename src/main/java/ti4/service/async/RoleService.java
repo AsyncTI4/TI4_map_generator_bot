@@ -58,7 +58,7 @@ public class RoleService {
                     .getManager()
                     .setArchived(false)
                     .queue(
-                            success -> mapThread.addThreadMember(user).queueAfter(5, TimeUnit.SECONDS),
+                            _ -> mapThread.addThreadMember(user).queueAfter(5, TimeUnit.SECONDS),
                             BotLogger::catchRestError);
         }
 
