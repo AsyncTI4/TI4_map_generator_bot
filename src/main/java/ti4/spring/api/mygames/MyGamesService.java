@@ -21,15 +21,15 @@ class MyGamesService {
 
         return managedPlayer.getGames().stream()
                 .filter(ManagedGame::isActive)
-                .filter(managedGame -> !managedGame.getGame().isFowMode())
+                .filter(managedGame -> !managedGame.isFowMode())
                 .map(game -> toSummary(game, userId))
                 .filter(Objects::nonNull)
                 .toList();
     }
 
     private MyGameSummary toSummary(ManagedGame managedGame, String userId) {
+        // TODO We should READ lock this
         Game game = managedGame.getGame();
-        if (game == null) return null;
         Player player = game.getPlayer(userId);
         if (player == null) return null;
         return new MyGameSummary(game.getName(), player.getFaction(), player.getColorID());

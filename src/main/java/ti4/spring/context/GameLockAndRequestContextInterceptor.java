@@ -38,9 +38,7 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
             return false;
         }
 
-        boolean requestContextSetup = setupGameRequestContext(gameName, shouldSaveGame, handler);
-        if (requestContextSetup) lockGame(gameName);
-
+        setupGameRequestContext(gameName, shouldSaveGame, handler);
         return true;
     }
 
@@ -68,17 +66,23 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         return shouldSaveGame;
     }
 
-    private boolean setupGameRequestContext(String gameName, boolean shouldSaveGame, Object handler) {
+    private void setupGameRequestContext(String gameName, boolean shouldSaveGame, Object handler) {
         if (handler instanceof HandlerMethod handlerMethod) {
             SetupRequestContext annotation = handlerMethod.getMethodAnnotation(SetupRequestContext.class);
             if (annotation != null && !annotation.value()) {
-                return false;
+                return;
             }
         }
-        var game = GameManager.getManagedGame(gameName).getGame();
-        RequestContext.setGame(game);
-        RequestContext.setSaveGame(shouldSaveGame);
-        return true;
+
+        lockGame(gameName);
+        try {
+            var game = GameManager.getManagedGame(gameName).getGame();
+            RequestContext.setGame(game);
+            RequestContext.setSaveGame(shouldSaveGame);
+        } catch (Exception e) {
+            unlockGame(gameName);
+            throw e;
+        }
     }
 
     private static void rejectInactiveMutation(HttpServletResponse response) {

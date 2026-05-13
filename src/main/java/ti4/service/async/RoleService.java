@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
+import ti4.executors.ExecutionLockManager;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
@@ -38,10 +40,12 @@ public class RoleService {
             return;
         }
         for (ManagedGame managedGame : mapsJoined) {
-            String gameMessage = user.getAsMention() + " has joined the server!";
-            MessageHelper.sendMessageToChannel(managedGame.getTableTalkChannel(), gameMessage);
-            Game game = managedGame.getGame();
-            GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, true);
+            ExecutionLockManager.wrapWithLockAndRelease(managedGame.getName(), ExecutionLockType.READ, () -> {
+                Game game = managedGame.getGame();
+                String gameMessage = user.getAsMention() + " has joined the server!";
+                MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), gameMessage);
+                GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, true);
+            });
         }
     }
 
