@@ -28,7 +28,6 @@ class MyGamesService {
     }
 
     private MyGameSummary toSummary(ManagedGame managedGame, String userId) {
-        // TODO We should READ lock this
         Game game = managedGame.getGame();
         if (game == null) return null;
         Player player = game.getPlayer(userId);
