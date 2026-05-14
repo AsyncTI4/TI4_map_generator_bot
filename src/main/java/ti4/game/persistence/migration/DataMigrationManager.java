@@ -1,6 +1,8 @@
 package ti4.game.persistence.migration;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -132,7 +134,9 @@ public class DataMigrationManager {
 
             LocalDate mapCreatedOn = null;
             try {
-                mapCreatedOn = LocalDate.ofEpochDay(managedGame.getCreationDateTime());
+                mapCreatedOn = Instant.ofEpochMilli(managedGame.getCreationDateTime())
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate();
             } catch (Exception ignored) {
             }
 
