@@ -38,11 +38,11 @@ class ListDeadGames extends Subcommand {
         int channelCount = 0;
         int roleCount = 0;
         for (ManagedGame game : GameManager.getManagedGames()) {
-            LocalDate date1 = LocalDate.now();
-            LocalDate date2 = Instant.ofEpochMilli(game.getCreationDateTime())
+            LocalDate now = LocalDate.now();
+            LocalDate gameCreationDay = Instant.ofEpochMilli(game.getCreationDateTime())
                     .atZone(ZoneId.systemDefault())
                     .toLocalDate();
-            if (Math.abs(ChronoUnit.DAYS.between(date1, date2)) < 30
+            if (Math.abs(ChronoUnit.DAYS.between(now, gameCreationDay)) < 30
                     || !game.getName().contains("pbd")
                     || game.getName().contains("test")) {
                 continue;
