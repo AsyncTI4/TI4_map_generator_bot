@@ -35,10 +35,7 @@ class ListDeadGames extends Subcommand {
         int channelCount = 0;
         int roleCount = 0;
         for (ManagedGame game : GameManager.getManagedGames()) {
-            if (Helper.getDateDifference(
-                                    Helper.getDateRepresentation(game.getCreationDateTime()),
-                                    Helper.getDateRepresentation(System.currentTimeMillis()))
-                            < 30
+            if (Helper.getDateDifference(game.getCreationDateTime(), System.currentTimeMillis()) < 30
                     || !game.getName().contains("pbd")
                     || game.getName().contains("test")) {
                 continue;
