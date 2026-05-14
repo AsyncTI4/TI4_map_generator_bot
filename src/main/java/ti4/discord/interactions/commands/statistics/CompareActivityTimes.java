@@ -43,7 +43,6 @@ class CompareActivityTimes extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        StringBuilder stringBuilder = new StringBuilder();
         List<Member> members = new ArrayList<>();
         if (event.getOption(Constants.ROLE1) != null) {
             Role role = event.getOption(Constants.ROLE1).getAsRole();
