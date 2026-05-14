@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 class HelperTest {
 
     @Test
-    void getDateDifferenceFromLongsUsesCalendarDayBoundaries() {
+    void getDateDifference_acrossMidnight_returnsDayDifference() {
         long start = LocalDate.of(2026, 5, 1)
                 .atTime(23, 59)
                 .atZone(ZoneId.systemDefault())
@@ -25,7 +25,7 @@ class HelperTest {
     }
 
     @Test
-    void getDateDifferenceFromLongsMatchesWholeDayIntervals() {
+    void getDateDifference_wholeDayInterval_returnsCorrectDayCount() {
         long start = LocalDate.of(2026, 5, 1)
                 .atStartOfDay(ZoneId.systemDefault())
                 .toInstant()
