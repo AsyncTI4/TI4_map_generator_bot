@@ -1430,18 +1430,17 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         Map<String, Integer> overruleCounts = new LinkedHashMap<>();
         getStoredValueMap().keySet().stream()
                 .filter(key -> key.startsWith(OVERRULE_STATS_KEY_PREFIX))
-                .map(key -> new SimpleEntry<>(key.substring(OVERRULE_STATS_KEY_PREFIX.length()), getStoredValue(key)))
-                .filter(entry -> StringUtils.isNotBlank(entry.getValue()))
-                .forEach(entry -> overruleCounts.put(entry.getKey(), getStoredIntValue(getOverruleStatsKey(entry.getKey()), 0)));
+                .forEach(key -> {
+                    String value = getStoredValue(key);
+                    if (StringUtils.isNotBlank(value)) {
+                        overruleCounts.put(key.substring(OVERRULE_STATS_KEY_PREFIX.length()), getStoredIntValue(key, 0));
+                    }
+                });
         return overruleCounts;
     }
 
     private String getOverruleStatsKey(String faction, int strategyCard) {
         return OVERRULE_STATS_KEY_PREFIX + faction + OVERRULE_STATS_KEY_SEPARATOR + strategyCard;
-    }
-
-    private String getOverruleStatsKey(String overruleKey) {
-        return OVERRULE_STATS_KEY_PREFIX + overruleKey;
     }
 
     private int getStoredIntValue(String key, int defaultValue) {

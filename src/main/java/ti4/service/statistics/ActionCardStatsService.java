@@ -3,7 +3,6 @@ package ti4.service.statistics;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.experimental.UtilityClass;
@@ -111,14 +110,13 @@ public class ActionCardStatsService {
 
     private static void appendOverruleStats(StringBuilder message, Map<String, Integer> overruleCounts) {
         var formattedOverruleCounts = overruleCounts.entrySet().stream()
-                .map(entry -> {
+                .flatMap(entry -> {
                     String formattedKey = formatOverruleKey(entry.getKey());
                     if (formattedKey == null) {
-                        return null;
+                        return java.util.stream.Stream.empty();
                     }
-                    return Map.entry(formattedKey, entry.getValue());
+                    return java.util.stream.Stream.of(Map.entry(formattedKey, entry.getValue()));
                 })
-                .filter(Objects::nonNull)
                 .sorted(Comparator.comparingInt((Map.Entry<String, Integer> entry) -> entry.getValue())
                         .reversed()
                         .thenComparing(Map.Entry::getKey))
