@@ -62,7 +62,7 @@ class SearchWinningPath extends Subcommand {
     private static String formatGame(Game game) {
         StringBuilder sb = new StringBuilder();
         sb.append("- **").append(game.getName()).append("** ");
-        sb.append('`').append(game.getCreationDate()).append("`-`");
+        sb.append('`').append(Helper.getDateRepresentation(game.getCreationDateTime())).append("`-`");
         if (game.isHasEnded()) {
             sb.append(Helper.getDateRepresentation(game.getEndedDate()));
         } else {

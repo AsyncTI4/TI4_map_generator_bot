@@ -457,7 +457,10 @@ public class MapGenerator implements AutoCloseable {
         graphics.setFont(Storage.getFont32());
         graphics.setColor(Color.WHITE);
         String timeStamp = DateTimeHelper.getFormattedTimestamp();
-        graphics.drawString(game.getName() + " " + game.getCreationDate() + " - " + timeStamp, 0, 34);
+        graphics.drawString(
+                game.getName() + " " + Helper.getDateRepresentation(game.getCreationDateTime()) + " - " + timeStamp,
+                0,
+                34);
         int landscapeShift = (displayType == DisplayType.landscape ? mapWidth : 0);
         int y = heightForGameInfo + 60;
         int x = landscapeShift + 10;

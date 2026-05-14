@@ -88,7 +88,8 @@ public class ListSlashCommandsUsedService {
             AtomicInteger acsSabod) {
         if (useOnlyLastMonth
                 && Helper.getDateDifference(
-                                game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis()))
+                                Helper.getDateRepresentation(game.getCreationDateTime()),
+                                Helper.getDateRepresentation(System.currentTimeMillis()))
                         > 30) {
             return;
         }
@@ -100,7 +101,10 @@ public class ListSlashCommandsUsedService {
         slashCommandsUsed.addAndGet(game.getSlashCommandsRunCount());
         game.getAllSlashCommandsUsed()
                 .forEach((command, numUsed) -> slashCommands.merge(command, numUsed, Integer::sum));
-        if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1698724000011L)) >= 0) {
+        if (Helper.getDateDifference(
+                        Helper.getDateRepresentation(game.getCreationDateTime()),
+                        Helper.getDateRepresentation(1698724000011L))
+                >= 0) {
             return;
         }
         game.getAllActionCardsSabod().forEach((acName, numUsed) -> {

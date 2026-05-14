@@ -46,7 +46,7 @@ class Info extends GameStateSubcommand {
         sb.append("## Game Info:").append('\n');
         sb.append("### Name: ").append(game.getName()).append('\n');
         sb.append("Owner: ").append(game.getOwnerName()).append('\n');
-        sb.append("Created: ").append(game.getCreationDate()).append('\n');
+        sb.append("Created: ").append(Helper.getDateRepresentation(game.getCreationDateTime())).append('\n');
         sb.append("Last Modified: ")
                 .append(Helper.getDateRepresentation(game.getLastModifiedDate()))
                 .append('\n');

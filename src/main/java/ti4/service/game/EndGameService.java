@@ -331,7 +331,7 @@ public class EndGameService {
         }
         sb.append('\n');
         sb.append("**Duration:** ");
-        sb.append(game.getCreationDate())
+        sb.append(Helper.getDateRepresentation(game.getCreationDateTime()))
                 .append(" - ")
                 .append(Helper.getDateRepresentation(game.getLastModifiedDate()));
         sb.append('\n');

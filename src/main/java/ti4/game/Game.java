@@ -284,7 +284,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public Game() {
         long currentTimeMillis = System.currentTimeMillis();
-        setCreationDate(Helper.getDateRepresentation(currentTimeMillis));
         setCreationDateTime(currentTimeMillis);
         setLastModifiedDate(currentTimeMillis);
     }
