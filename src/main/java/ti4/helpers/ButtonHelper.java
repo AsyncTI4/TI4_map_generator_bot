@@ -562,7 +562,7 @@ public class ButtonHelper {
             }
             case 6 -> {
                 if (game.isTwilightsFallMode()) {
-                    threadName += "calamitus";
+                    threadName += "calamitas";
                 } else {
                     threadName += "warfare";
                 }
@@ -8318,7 +8318,7 @@ public class ButtonHelper {
             case "politics" -> "tyrannus";
             case "construction" -> "civitas";
             case "trade" -> "amicus";
-            case "warfare" -> "calamitus";
+            case "warfare" -> "calamitas";
             case "technology" -> "magus";
             case "imperial" -> "aeterna";
             default -> "action";

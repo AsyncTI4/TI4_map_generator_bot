@@ -156,7 +156,7 @@ public class FractureService {
 
             String msg = game.isFowMode()
                     ? GMService.gmPing(game)
-                    : player.getRepresentation() + ", please a system with a " + type.emoji()
+                    : player.getRepresentation() + ", please choose a system with a " + type.emoji()
                             + " to place an Ingress token.";
             buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
             MessageHelper.sendMessageToChannelWithButtons(

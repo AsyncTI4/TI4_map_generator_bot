@@ -1,19 +1,22 @@
 package ti4.discord.interactions.commands.statistics;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.buttons.handlers.game.CreateGameButtonHandler;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
-import ti4.settings.users.UserSettingsManager;
 
-class CompareAFKTimes extends Subcommand {
+class CompareActivityTimes extends Subcommand {
 
     private static final List<String> PLAYER_OPTIONS_TO_CHECK = List.of(
             Constants.PLAYER1,
@@ -25,9 +28,10 @@ class CompareAFKTimes extends Subcommand {
             Constants.PLAYER7,
             Constants.PLAYER8);
 
-    CompareAFKTimes() {
-        super(Constants.COMPARE_AFK_TIMES, "Compare different players set AFK Times");
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player @playerName").setRequired(true));
+    CompareActivityTimes() {
+        super(Constants.COMPARE_ACTIVITY_TIMES, "Compare different players set Activity Times");
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE1, "The role you want to compare"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Player @playerName"));
@@ -39,29 +43,28 @@ class CompareAFKTimes extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        StringBuilder stringBuilder = new StringBuilder();
-
+        List<Member> members = new ArrayList<>();
+        if (event.getOption(Constants.ROLE1) != null) {
+            Role role = event.getOption(Constants.ROLE1).getAsRole();
+            if (role != null) {
+                members.addAll(event.getGuild().getMembersWithRoles(role));
+            }
+        }
         PLAYER_OPTIONS_TO_CHECK.stream()
                 .map(playerOptionName -> event.getOption(playerOptionName, null, OptionMapping::getAsUser))
                 .filter(Objects::nonNull)
                 .map(User::getId)
                 .map(GameManager::getManagedPlayer)
                 .forEach(player -> {
-                    var afkTime = UserSettingsManager.get(player.getId()).getAfkHours();
-                    if (afkTime != null) {
-                        stringBuilder
-                                .append(player.getName())
-                                .append(" afk hours are: ")
-                                .append(afkTime.replace(";", ", "))
-                                .append('\n');
-                    } else {
-                        stringBuilder
-                                .append("AFK hours are not set for: ")
-                                .append(player.getName())
-                                .append('\n');
-                    }
+                    members.add(event.getGuild().getMemberById(player.getId()));
                 });
+        if (members.isEmpty()) {
+            MessageHelper.sendMessageToEventChannel(event, "No valid players or roles provided to compare.");
+            return;
+        }
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), stringBuilder.toString());
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                CreateGameButtonHandler.generateMemberListMessage(members, "Activity Times", false));
     }
 }
