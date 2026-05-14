@@ -59,7 +59,6 @@ import ti4.spring.context.SpringContext;
 public class ActionCardHelper {
     private static final String ENDED_GAME_ACTION_CARD_ERROR = "This game has ended. You cannot play action cards.";
 
-
     private static final String PINNED_AC_INFO_MESSAGE_ID = "pinned_ac_info_message_id";
 
     private static final Set<String> WAR_MACHINE_IDS = Set.of(

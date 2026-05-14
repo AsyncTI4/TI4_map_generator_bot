@@ -5,10 +5,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
 import java.util.HashMap;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.message.MessageHelper;
