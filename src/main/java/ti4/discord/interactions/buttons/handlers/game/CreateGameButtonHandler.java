@@ -202,10 +202,14 @@ public class CreateGameButtonHandler {
                 memberList.append("## Players:\n");
             }
         } else {
-            memberList
-                    .append("## Game Fun Name: ")
-                    .append(gameFunName.replace(":", ""))
-                    .append("\n\nPlayers:");
+            if (ping) {
+                memberList
+                        .append("## Game Fun Name: ")
+                        .append(gameFunName.replace(":", ""))
+                        .append("\n\nPlayers Signed Up:");
+            } else {
+                memberList.append(gameFunName.replace(":", "")).append("\n\nPlayers:");
+            }
         }
 
         StringBuilder activityList = new StringBuilder();
