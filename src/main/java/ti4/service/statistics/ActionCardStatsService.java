@@ -142,7 +142,7 @@ public class ActionCardStatsService {
             return null;
         }
         String faction = key.substring(0, separatorIndex);
-        String strategyCard = key.substring(separatorIndex + Game.OVERRULE_STATS_KEY_SEPARATOR.length());
+        String strategyCard = key.substring(separatorIndex + 1);
         if (!StringUtils.isNumeric(strategyCard)) {
             return null;
         }
