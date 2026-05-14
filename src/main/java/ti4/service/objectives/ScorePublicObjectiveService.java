@@ -30,6 +30,11 @@ import ti4.service.leader.HeroUnlockCheckService;
 public class ScorePublicObjectiveService {
 
     public static void scorePO(GenericInteractionCreateEvent event, Game game, Player player, int poID) {
+        if (game.isHasEnded()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "This game has ended. You cannot score public objectives.");
+            return;
+        }
         String both = getNameNEMoji(game, poID);
         String poName = both.split("_")[0];
         MessageChannel channel = player.getCorrectChannel();
