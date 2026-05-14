@@ -428,7 +428,8 @@ public class ButtonProcessor {
                 + "\n> Total button presses: "
                 + runtimeWarningService.getRuntimeSubmissionCount()
                 + "\n> Threshold misses: "
-                + decimalFormatter.format(thresholdMissPercent) + "%"
+                + decimalFormatter.format(thresholdMissPercent) + "% ("
+                + runtimeWarningService.getRuntimeThresholdMissCount() + ")"
                 + "\n> Average preprocessing time: "
                 + decimalFormatter.format(runtimeWarningService.getAveragePreprocessingTime()) + "ms"
                 + "\n> Average processing time: "
