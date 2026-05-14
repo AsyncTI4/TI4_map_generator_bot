@@ -14,7 +14,6 @@ import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.game.helper.GameHelper;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.logging.BotLogger;
@@ -133,7 +132,7 @@ public class DataMigrationManager {
 
             LocalDate mapCreatedOn = null;
             try {
-                mapCreatedOn = LocalDate.parse(managedGame.getCreationDate(), GameHelper.CREATION_DATE_FORMATTER);
+                mapCreatedOn = LocalDate.ofEpochDay(managedGame.getCreationDateTime());
             } catch (Exception ignored) {
             }
 

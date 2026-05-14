@@ -32,7 +32,7 @@ public class ManagedGame {
     private final boolean stratReactMode;
     private final boolean fastScFollowMode;
     private final boolean injectRules;
-    private final long creationDate;
+    private final long creationDateTime;
     private final long lastModifiedDate;
     private final String activePlayerId;
     private final long lastActivePlayerChange;
@@ -58,7 +58,7 @@ public class ManagedGame {
         stratReactMode = game.isBotStratReacts();
         fastScFollowMode = game.isFastSCFollowMode();
         injectRules = game.isInjectRulesLinks();
-        creationDate = game.getCreationDateTime();
+        creationDateTime = game.getCreationDateTime();
         lastModifiedDate = game.getLastModifiedDate();
         activePlayerId = sanitizeToNull(game.getActivePlayerID());
         lastActivePlayerChange = game.getLastActivePlayerChange() == null

@@ -1,5 +1,9 @@
 package ti4.discord.interactions.commands.bothelper;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -12,7 +16,6 @@ import ti4.discord.interactions.commands.Subcommand;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -35,9 +38,11 @@ class ListDeadGames extends Subcommand {
         int channelCount = 0;
         int roleCount = 0;
         for (ManagedGame game : GameManager.getManagedGames()) {
-            if (Helper.getDateDifference(
-                                    game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis()))
-                            < 30
+            LocalDate date1 = LocalDate.now();
+            LocalDate date2 = Instant.ofEpochMilli(game.getCreationDateTime())
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+            if (Math.abs(ChronoUnit.DAYS.between(date1, date2)) < 30
                     || !game.getName().contains("pbd")
                     || game.getName().contains("test")) {
                 continue;
