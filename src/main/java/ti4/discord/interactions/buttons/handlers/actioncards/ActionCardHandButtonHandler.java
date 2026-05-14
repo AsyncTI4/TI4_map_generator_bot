@@ -193,6 +193,12 @@ class ActionCardHandButtonHandler {
     // TODO: bake this into /ac play
     @ButtonHandler(Constants.AC_PLAY_FROM_HAND)
     static void acPlayFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+        if (game.isHasEnded()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "This game has ended. You cannot play action cards.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
         MessageChannel channel = game.getMainGameChannel();
         if (ActionCardHelper.isSabotageOrShatter(acID)) {
