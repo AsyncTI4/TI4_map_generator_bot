@@ -13,6 +13,7 @@ import ti4.service.persistence.DatabasePersistenceGate;
 public class StatisticsCommand2 implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
+                    new ActionCardStats(),
                     new TwilightsFallSpliceWinRates(),
                     new ExpeditionWinRates(),
                     new StellarConverterStatistics(),

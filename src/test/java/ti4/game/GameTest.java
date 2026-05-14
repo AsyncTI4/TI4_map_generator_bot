@@ -18,6 +18,18 @@ class GameTest {
         assertThat(game.getActionPhaseTurnOrder("doesNotExist")).isEqualTo(-1);
     }
 
+    @Test
+    void shouldTrackOverruleCountsByFactionAndStrategyCard() {
+        var game = new Game();
+        game.setStoredValue("unrelated", "value");
+
+        game.incrementOverruleCount("hacan", 5);
+        game.incrementOverruleCount("hacan", 5);
+        game.incrementOverruleCount("jolnar", 3);
+
+        assertThat(game.getAllOverruleCounts()).containsExactlyInAnyOrderEntriesOf(Map.of("hacan|5", 2, "jolnar|3", 1));
+    }
+
     private Game createThreePlayerGame() {
         var game = new Game();
         game.setName("threePlayerGame");
