@@ -118,7 +118,11 @@ class ActionCardButtonHandler {
                 }
             }
             if (hasSabo) {
-                ActionCardHelper.playAC(event, game, player, saboID, game.getActionsChannel());
+                String error = ActionCardHelper.playAC(event, game, player, saboID, game.getActionsChannel());
+                if (error != null) {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), error);
+                    return;
+                }
             } else {
                 message = "Tried to play a _Sabotage_ but found none in hand.";
                 sendReact = false;

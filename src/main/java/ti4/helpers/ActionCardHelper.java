@@ -57,6 +57,8 @@ import ti4.spring.context.SpringContext;
 
 @UtilityClass
 public class ActionCardHelper {
+    private static final String ENDED_GAME_ACTION_CARD_ERROR = "This game has ended. You cannot play action cards.";
+
 
     private static final String PINNED_AC_INFO_MESSAGE_ID = "pinned_ac_info_message_id";
 
@@ -682,6 +684,9 @@ public class ActionCardHelper {
             String acID,
             int acIndex,
             MessageChannel channel) {
+        if (game.isHasEnded()) {
+            return ENDED_GAME_ACTION_CARD_ERROR;
+        }
         MessageChannel mainGameChannel = game.getMainGameChannel() == null ? channel : game.getMainGameChannel();
         ActionCardModel actionCard = Mapper.getActionCard(acID);
         String actionCardTitle = actionCard.getName();
@@ -1911,6 +1916,9 @@ public class ActionCardHelper {
 
     public static String playAC(
             GenericInteractionCreateEvent event, Game game, Player player, String value, MessageChannel channel) {
+        if (game.isHasEnded()) {
+            return ENDED_GAME_ACTION_CARD_ERROR;
+        }
         String acID = null;
         int acIndex = -1;
         try {
