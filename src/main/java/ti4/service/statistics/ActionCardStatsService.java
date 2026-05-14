@@ -3,6 +3,7 @@ package ti4.service.statistics;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.experimental.UtilityClass;
@@ -60,8 +61,8 @@ public class ActionCardStatsService {
             overruleCounts.merge(factionAndStrategyCard, count, Integer::sum);
         });
 
-        game.getDiscardActionCards().keySet().forEach(acID -> incrementActionCardPlayCount(actionCardsPlayedCounts, acID));
-        game.getPurgedActionCards().keySet().forEach(acID -> incrementActionCardPlayCount(actionCardsPlayedCounts, acID));
+        game.getDiscardActionCards().forEach((acID, ignored) -> incrementActionCardPlayCount(actionCardsPlayedCounts, acID));
+        game.getPurgedActionCards().forEach((acID, ignored) -> incrementActionCardPlayCount(actionCardsPlayedCounts, acID));
     }
 
     private static void incrementActionCardPlayCount(Map<String, Integer> actionCardsPlayedCounts, String actionCardId) {
@@ -109,27 +110,30 @@ public class ActionCardStatsService {
     }
 
     private static void appendOverruleStats(StringBuilder message, Map<String, Integer> overruleCounts) {
-        if (overruleCounts.isEmpty()) {
+        var formattedOverruleCounts = overruleCounts.entrySet().stream()
+                .map(entry -> {
+                    String formattedKey = formatOverruleKey(entry.getKey());
+                    if (formattedKey == null) {
+                        return null;
+                    }
+                    return Map.entry(formattedKey, entry.getValue());
+                })
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingInt((Map.Entry<String, Integer> entry) -> entry.getValue())
+                        .reversed()
+                        .thenComparing(Map.Entry::getKey))
+                .toList();
+
+        if (formattedOverruleCounts.isEmpty()) {
             message.append("No Overrule data matched the selected filters.\n");
             return;
         }
 
-        boolean wroteOutput = false;
-        for (Map.Entry<String, Integer> entry : overruleCounts.entrySet().stream()
-                .sorted(Comparator.comparingInt((Map.Entry<String, Integer> entry) -> entry.getValue())
-                        .reversed()
-                        .thenComparing(Map.Entry::getKey))
-                .toList()) {
-            String formattedKey = formatOverruleKey(entry.getKey());
-            if (formattedKey == null) {
-                continue;
-            }
-            wroteOutput = true;
-            message.append("- ").append(formattedKey).append(": ").append(entry.getValue()).append('\n');
-        }
-        if (!wroteOutput) {
-            message.append("No Overrule data matched the selected filters.\n");
-        }
+        formattedOverruleCounts.forEach(entry -> message.append("- ")
+                .append(entry.getKey())
+                .append(": ")
+                .append(entry.getValue())
+                .append('\n'));
     }
 
     private static String formatOverruleKey(String key) {

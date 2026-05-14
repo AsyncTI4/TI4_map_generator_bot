@@ -1422,10 +1422,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             return;
         }
         String key = getOverruleStatsKey(faction, strategyCard);
-        int count = Optional.ofNullable(getStoredValue(key))
-                .filter(StringUtils::isNotBlank)
-                .map(Integer::parseInt)
-                .orElse(0);
+        int count = getStoredIntValue(key, 0);
         setStoredValue(key, Integer.toString(count + 1));
     }
 
@@ -1435,12 +1432,29 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 .filter(key -> key.startsWith(OVERRULE_STATS_KEY_PREFIX))
                 .map(key -> new SimpleEntry<>(key.substring(OVERRULE_STATS_KEY_PREFIX.length()), getStoredValue(key)))
                 .filter(entry -> StringUtils.isNotBlank(entry.getValue()))
-                .forEach(entry -> overruleCounts.put(entry.getKey(), Integer.parseInt(entry.getValue())));
+                .forEach(entry -> overruleCounts.put(entry.getKey(), getStoredIntValue(getOverruleStatsKey(entry.getKey()), 0)));
         return overruleCounts;
     }
 
     private String getOverruleStatsKey(String faction, int strategyCard) {
         return OVERRULE_STATS_KEY_PREFIX + faction + OVERRULE_STATS_KEY_SEPARATOR + strategyCard;
+    }
+
+    private String getOverruleStatsKey(String overruleKey) {
+        return OVERRULE_STATS_KEY_PREFIX + overruleKey;
+    }
+
+    private int getStoredIntValue(String key, int defaultValue) {
+        return Optional.ofNullable(getStoredValue(key))
+                .filter(StringUtils::isNotBlank)
+                .map(value -> {
+                    try {
+                        return Integer.parseInt(value);
+                    } catch (NumberFormatException e) {
+                        return defaultValue;
+                    }
+                })
+                .orElse(defaultValue);
     }
 
     public void resetThalnosUnits() {
