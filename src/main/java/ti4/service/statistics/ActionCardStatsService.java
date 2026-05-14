@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
@@ -133,14 +134,14 @@ public class ActionCardStatsService {
 
     private static String formatOverruleKey(String key) {
         int separatorIndex = key.indexOf(Game.OVERRULE_STATS_KEY_SEPARATOR);
-        if (separatorIndex <= 0 || separatorIndex != key.lastIndexOf(Game.OVERRULE_STATS_KEY_SEPARATOR)) {
+        if (separatorIndex < 0
+                || separatorIndex >= key.length() - 1
+                || separatorIndex != key.lastIndexOf(Game.OVERRULE_STATS_KEY_SEPARATOR)) {
             return null;
         }
         String faction = key.substring(0, separatorIndex);
         String strategyCard = key.substring(separatorIndex + Game.OVERRULE_STATS_KEY_SEPARATOR.length());
-        try {
-            Integer.parseInt(strategyCard);
-        } catch (NumberFormatException e) {
+        if (!StringUtils.isNumeric(strategyCard)) {
             return null;
         }
         String factionName = Optional.ofNullable(Mapper.getFaction(faction))
