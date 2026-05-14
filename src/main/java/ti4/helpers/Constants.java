@@ -187,7 +187,7 @@ public final class Constants {
     public static final String JOIN = "join";
     public static final String START_SCENARIO = "start_scenario";
     public static final String ADD = "add";
-    public static final String COMPARE_AFK_TIMES = "compare_afk_times";
+    public static final String COMPARE_ACTIVITY_TIMES = "compare_activity_times";
     public static final String REPLACE = "replace";
     public static final String LEAVE = "leave";
     public static final String REMOVE = "remove";

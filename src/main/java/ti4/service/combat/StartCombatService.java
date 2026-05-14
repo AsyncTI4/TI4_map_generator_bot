@@ -2100,7 +2100,7 @@ public class StartCombatService {
                         continue;
                     }
                     // Sol Commander
-                    if (p != game.getActivePlayer()
+                    if (p.getPlanetsAllianceMode().contains(unitH.getName())
                             && game.playerHasLeaderUnlockedOrAlliance(p, "solcommander")
                             && isGroundCombat) {
                         String id = p.factionButtonChecker() + "utilizeSolCommander_" + unitH.getName();

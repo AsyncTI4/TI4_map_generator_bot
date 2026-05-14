@@ -189,10 +189,18 @@ public class CreateGameButtonHandler {
     }
 
     public static String generateMemberListMessage(List<Member> members, String gameFunName) {
+        return generateMemberListMessage(members, gameFunName, true);
+    }
+
+    public static String generateMemberListMessage(List<Member> members, String gameFunName, boolean ping) {
         StringBuilder memberList = new StringBuilder();
 
         if (gameFunName == null || gameFunName.isEmpty()) {
-            memberList.append("## Players Signed Up:\n");
+            if (ping) {
+                memberList.append("## Players Signed Up:\n");
+            } else {
+                memberList.append("## Players:\n");
+            }
         } else {
             memberList
                     .append("## Game Fun Name: ")
@@ -207,11 +215,8 @@ public class CreateGameButtonHandler {
                 AverageTurnTimeService.getBean().getUserIdsToAverageTurnTimes(userIds);
         int playerNumber = 1;
         for (Member member : members) {
-            memberList
-                    .append('\n')
-                    .append(playerNumber)
-                    .append(". ")
-                    .append(member.getUser().getAsMention());
+            String mention = ping ? member.getUser().getAsMention() : member.getEffectiveName();
+            memberList.append('\n').append(playerNumber).append(". ").append(mention);
 
             ManagedPlayer managedPlayer = GameManager.getManagedPlayer(member.getId());
             int ongoingAmount = countOngoingGamesThatAffectJoinLimit(managedPlayer);

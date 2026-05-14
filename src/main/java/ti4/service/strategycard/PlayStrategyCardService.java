@@ -727,7 +727,7 @@ public class PlayStrategyCardService {
     private static void markPlayerAsAutoFollowing(
             List<Player> playersToReact, Game game, Player player, int scToPlay, GenericInteractionCreateEvent event) {
         playersToReact.add(player);
-        player.addFollowedSC(scToPlay, event);
+        player.addFollowedSC(scToPlay, event, false);
         handleAutoNoFollowForImperial(game, player, scToPlay);
     }
 
