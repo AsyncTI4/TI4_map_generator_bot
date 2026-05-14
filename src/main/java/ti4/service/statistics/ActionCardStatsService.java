@@ -19,8 +19,6 @@ import ti4.model.FactionModel;
 @UtilityClass
 public class ActionCardStatsService {
 
-    private static final String OVERRULE_SEPARATOR = "\\|";
-
     public static void queueReply(SlashCommandInteractionEvent event) {
         StatisticsPipeline.queue(event, () -> showActionCardStats(event));
     }
@@ -115,25 +113,39 @@ public class ActionCardStatsService {
             return;
         }
 
-        overruleCounts.entrySet().stream()
+        boolean wroteOutput = false;
+        for (Map.Entry<String, Integer> entry : overruleCounts.entrySet().stream()
                 .sorted(Comparator.comparingInt((Map.Entry<String, Integer> entry) -> entry.getValue())
                         .reversed()
                         .thenComparing(Map.Entry::getKey))
-                .forEach(entry -> message.append("- ")
-                        .append(formatOverruleKey(entry.getKey()))
-                        .append(": ")
-                        .append(entry.getValue())
-                        .append('\n'));
+                .toList()) {
+            String formattedKey = formatOverruleKey(entry.getKey());
+            if (formattedKey == null) {
+                continue;
+            }
+            wroteOutput = true;
+            message.append("- ").append(formattedKey).append(": ").append(entry.getValue()).append('\n');
+        }
+        if (!wroteOutput) {
+            message.append("No Overrule data matched the selected filters.\n");
+        }
     }
 
     private static String formatOverruleKey(String key) {
-        String[] parts = key.split(OVERRULE_SEPARATOR, 2);
-        if (parts.length != 2) {
-            return key;
+        int separatorIndex = key.indexOf(Game.OVERRULE_STATS_KEY_SEPARATOR);
+        if (separatorIndex <= 0 || separatorIndex != key.lastIndexOf(Game.OVERRULE_STATS_KEY_SEPARATOR)) {
+            return null;
         }
-        String factionName = Optional.ofNullable(Mapper.getFaction(parts[0]))
+        String faction = key.substring(0, separatorIndex);
+        String strategyCard = key.substring(separatorIndex + Game.OVERRULE_STATS_KEY_SEPARATOR.length());
+        try {
+            Integer.parseInt(strategyCard);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+        String factionName = Optional.ofNullable(Mapper.getFaction(faction))
                 .map(FactionModel::getFactionName)
-                .orElse(parts[0]);
-        return factionName + " -> SC " + parts[1];
+                .orElse(faction);
+        return factionName + " -> SC " + strategyCard;
     }
 }

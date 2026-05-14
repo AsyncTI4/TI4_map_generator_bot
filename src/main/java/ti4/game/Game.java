@@ -103,8 +103,8 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
 public class Game extends GameProperties implements StoredValueHelper, TwilightFallDeckFuncs {
-    private static final String OVERRULE_STATS_KEY_PREFIX = "overrule_stats_";
-    private static final String OVERRULE_STATS_KEY_SEPARATOR = "|";
+    public static final String OVERRULE_STATS_KEY_PREFIX = "overrule_stats_";
+    public static final String OVERRULE_STATS_KEY_SEPARATOR = "|";
 
 
     private static final JsonMapper mapper = JsonMapperManager.basic();
@@ -1422,7 +1422,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             return;
         }
         String key = getOverruleStatsKey(faction, strategyCard);
-        int count = Optional.of(getStoredValue(key))
+        int count = Optional.ofNullable(getStoredValue(key))
                 .filter(StringUtils::isNotBlank)
                 .map(Integer::parseInt)
                 .orElse(0);
@@ -1430,15 +1430,13 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public Map<String, Integer> getAllOverruleCounts() {
-        return getStoredValueMap().keySet().stream()
+        Map<String, Integer> overruleCounts = new LinkedHashMap<>();
+        getStoredValueMap().keySet().stream()
                 .filter(key -> key.startsWith(OVERRULE_STATS_KEY_PREFIX))
                 .map(key -> new SimpleEntry<>(key.substring(OVERRULE_STATS_KEY_PREFIX.length()), getStoredValue(key)))
                 .filter(entry -> StringUtils.isNotBlank(entry.getValue()))
-                .collect(Collectors.toMap(
-                        Entry::getKey,
-                        entry -> Integer.parseInt(entry.getValue()),
-                        Integer::sum,
-                        LinkedHashMap::new));
+                .forEach(entry -> overruleCounts.put(entry.getKey(), Integer.parseInt(entry.getValue())));
+        return overruleCounts;
     }
 
     private String getOverruleStatsKey(String faction, int strategyCard) {
