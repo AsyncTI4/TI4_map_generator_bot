@@ -21,7 +21,6 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 public class EndOldGamesCron {
 
     private static final Period AUTOMATIC_GAME_END_INACTIVITY_THRESHOLD = Period.ofMonths(2);
-    private static final Period AUTOMATIC_GAME_END_NO_REAL_PLAYERS_THRESHOLD = Period.ofWeeks(2);
 
     public static void register() {
         CronManager.schedulePeriodicallyAtTime(
@@ -47,11 +46,7 @@ public class EndOldGamesCron {
         LocalDate lastModifiedDate = Instant.ofEpochMilli(game.getLastModifiedDate())
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
-
-        Period inactivityThreshold = game.getRealPlayers().isEmpty()
-                ? AUTOMATIC_GAME_END_NO_REAL_PLAYERS_THRESHOLD
-                : AUTOMATIC_GAME_END_INACTIVITY_THRESHOLD;
-        LocalDate oldestLastModifiedDateBeforeEnding = LocalDate.now().minus(inactivityThreshold);
+        LocalDate oldestLastModifiedDateBeforeEnding = LocalDate.now().minus(AUTOMATIC_GAME_END_INACTIVITY_THRESHOLD);
 
         if (lastModifiedDate.isBefore(oldestLastModifiedDateBeforeEnding)) {
             BotLogger.info("Game: " + game.getName() + " has not been modified since ~" + lastModifiedDate
