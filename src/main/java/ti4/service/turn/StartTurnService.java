@@ -404,12 +404,28 @@ public class StartTurnService {
                 .sorted(Entry.comparingByKey())
                 .map(Entry::getValue)
                 .forEach(sb::append);
+        appendStrategyPoolReminderIfHelpful(sb, game, player);
+        return sendReminder ? sb.toString() : null;
+    }
+
+    public static void appendStrategyPoolReminderIfHelpful(StringBuilder sb, Game game, Player player) {
+        if (shouldSkipStrategyPoolReminder(game, player)) {
+            return;
+        }
         sb.append("You currently have ")
                 .append(player.getStrategicCC())
                 .append(" command token")
                 .append(player.getStrategicCC() == 1 ? "" : "s")
                 .append(" in your strategy pool.");
-        return sendReminder ? sb.toString() : null;
+    }
+
+    private static boolean shouldSkipStrategyPoolReminder(Game game, Player player) {
+        List<Integer> unfollowedSCs = player.getUnfollowedSCs();
+        return player.getStrategicCC() == 0
+                && unfollowedSCs.size() == 1
+                && game.getStrategyCardModelByInitiative(unfollowedSCs.getFirst())
+                        .map(scModel -> scModel.usesAutomationForSCID("pok1leadership"))
+                        .orElse(false);
     }
 
     public static List<Button> getStartOfTurnButtons(
@@ -567,11 +583,7 @@ public class StartTurnService {
                                         .append(scMessage.asJumpLink(game.getMainGameChannel()))
                                         .append(".\n");
                             });
-                    sb.append("You currently have ")
-                            .append(p2.getStrategicCC())
-                            .append(" command token")
-                            .append(p2.getStrategicCC() == 1 ? "" : "s")
-                            .append(" in your strategy pool.");
+                    appendStrategyPoolReminderIfHelpful(sb, game, p2);
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());
                 }
                 if (player.hasBreakthrough("deepwroughtbt") && player.isBreakthroughExhausted("deepwroughtbt")) {
