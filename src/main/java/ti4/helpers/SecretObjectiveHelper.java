@@ -30,10 +30,6 @@ public final class SecretObjectiveHelper {
 
     public static boolean scoreSO(
             GenericInteractionCreateEvent event, Game game, Player player, int soID, MessageChannel channel) {
-        if (game.isHasEnded()) {
-            MessageHelper.sendMessageToChannel(channel, "This game has ended. You cannot score secret objectives.");
-            return false;
-        }
         Set<String> alreadyScoredSO = new HashSet<>(player.getSecretsScored().keySet());
         boolean scored = game.scoreSecretObjective(player.getUserID(), soID);
         if (!scored) {
