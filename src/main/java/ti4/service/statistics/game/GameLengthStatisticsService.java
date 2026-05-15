@@ -58,9 +58,7 @@ class GameLengthStatisticsService {
         if (game.isHasEnded()
                 && game.getWinner().isPresent()
                 && game.getRealAndEliminatedPlayers().size() > 2
-                && Helper.getDateDifference(
-                                game.getEndedDateString(), Helper.getDateRepresentation(System.currentTimeMillis()))
-                        < pastDays) {
+                && Helper.getDateDifference(game.getEndedDate(), System.currentTimeMillis()) < pastDays) {
             num.getAndIncrement();
 
             long creationDateTime = game.getCreationDateTime();

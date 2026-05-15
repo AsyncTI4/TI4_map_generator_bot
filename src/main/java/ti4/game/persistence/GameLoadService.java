@@ -53,6 +53,7 @@ import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.game.helper.GameHelper;
 import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -681,7 +682,7 @@ class GameLoadService {
                     game.setShowFullComponentTextEmbeds(parseBooleanOrDefault(info, false));
                 case Constants.GAME_HAS_ENDED -> game.setHasEnded(parseBooleanOrDefault(info, false));
                 case Constants.CREATION_DATE_TIME -> game.setCreationDateTime(Long.parseLong(info));
-                case Constants.CREATION_DATE -> game.setCreationDate(info);
+                case Constants.CREATION_DATE -> game.setCreationDateTime(GameHelper.getCreationDateTimeFromLegacyDate(info));
                 case Constants.ROUND -> {
                     if (isNotBlank(info)) {
                         game.setRound(Integer.parseInt(info));

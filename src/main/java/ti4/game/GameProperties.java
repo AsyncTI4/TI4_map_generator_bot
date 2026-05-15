@@ -18,11 +18,6 @@ public class GameProperties {
     private @ExportableField String ownerID;
     private @ExportableField String ownerName = "";
 
-    // can be removed?
-    // need to migrate old creationDate only games to creationDateTime (at midnight)
-    @Deprecated
-    private @ExportableField String creationDate;
-
     private @ExportableField long creationDateTime;
 
     private @ExportableField String name; // pbdXXXX

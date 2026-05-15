@@ -5,7 +5,6 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -188,12 +187,7 @@ public class GameStatsDashboardPayload {
 
     @Deprecated
     public long getSetupTimestamp() {
-        LocalDate localDate;
-        try {
-            localDate = GameHelper.getCreationDateAsLocalDate(game);
-        } catch (DateTimeParseException e) {
-            localDate = LocalDate.now();
-        }
+        LocalDate localDate = GameHelper.getCreationDateAsLocalDate(game);
 
         int gameNameHash = game.getName().hashCode();
         int hours = Math.floorMod(gameNameHash, 24);

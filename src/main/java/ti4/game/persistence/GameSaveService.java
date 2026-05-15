@@ -415,9 +415,6 @@ class GameSaveService {
         writer.write(Constants.ADJACENCY_OVERRIDES + " " + adjacencyOverrides);
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.CREATION_DATE + " " + game.getCreationDate());
-        writer.write(System.lineSeparator());
-
         writer.write(Constants.CREATION_DATE_TIME + " " + game.getCreationDateTime());
         writer.write(System.lineSeparator());
         writer.write(Constants.STARTED_DATE + " " + game.getStartedDate());

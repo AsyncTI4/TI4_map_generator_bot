@@ -3,6 +3,10 @@ package ti4.helpers;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -596,6 +600,12 @@ public final class Helper {
         int day1 = Integer.parseInt(date1.split("_")[2]);
         int day2 = Integer.parseInt(date2.split("_")[2]);
         return (year2 - year1) * 365 + (month2 - month1) * 30 + (day2 - day1);
+    }
+
+    public static int getDateDifference(long date1, long date2) {
+        LocalDate localDate1 = Instant.ofEpochMilli(date1).atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate localDate2 = Instant.ofEpochMilli(date2).atZone(ZoneId.systemDefault()).toLocalDate();
+        return Math.toIntExact(ChronoUnit.DAYS.between(localDate1, localDate2));
     }
 
     @Deprecated

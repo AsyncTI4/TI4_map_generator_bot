@@ -4,7 +4,6 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeParseException;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -43,12 +42,7 @@ class AllNamesStatisticsService {
     }
 
     private static long getSetupTimestamp(Game game) {
-        LocalDate localDate;
-        try {
-            localDate = GameHelper.getCreationDateAsLocalDate(game);
-        } catch (DateTimeParseException e) {
-            localDate = LocalDate.now();
-        }
+        LocalDate localDate = GameHelper.getCreationDateAsLocalDate(game);
 
         int gameNameHash = game.getName().hashCode();
         int hours = Math.floorMod(gameNameHash, 24);

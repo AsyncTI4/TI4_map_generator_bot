@@ -1,6 +1,8 @@
 package ti4.game.helper;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import lombok.experimental.UtilityClass;
@@ -13,6 +15,15 @@ public class GameHelper {
             DateTimeFormatter.ofPattern("uuuu.MM.dd", Locale.ROOT);
 
     public static LocalDate getCreationDateAsLocalDate(Game game) {
-        return LocalDate.parse(game.getCreationDate(), CREATION_DATE_FORMATTER);
+        return Instant.ofEpochMilli(game.getCreationDateTime())
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+    }
+
+    public static long getCreationDateTimeFromLegacyDate(String creationDate) {
+        return LocalDate.parse(creationDate, CREATION_DATE_FORMATTER)
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli();
     }
 }

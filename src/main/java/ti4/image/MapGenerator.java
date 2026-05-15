@@ -41,6 +41,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
 import ti4.helpers.PlayerStatsHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
@@ -457,7 +458,10 @@ public class MapGenerator implements AutoCloseable {
         graphics.setFont(Storage.getFont32());
         graphics.setColor(Color.WHITE);
         String timeStamp = DateTimeHelper.getFormattedTimestamp();
-        graphics.drawString(game.getName() + " " + game.getCreationDate() + " - " + timeStamp, 0, 34);
+        graphics.drawString(
+                game.getName() + " " + Helper.getDateRepresentation(game.getCreationDateTime()) + " - " + timeStamp,
+                0,
+                34);
         int landscapeShift = (displayType == DisplayType.landscape ? mapWidth : 0);
         int y = heightForGameInfo + 60;
         int x = landscapeShift + 10;

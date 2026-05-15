@@ -1619,8 +1619,7 @@ public final class ButtonHelperSCs {
                         player.getRepresentationUnfogged() + ", please resolve **Contagion**.",
                         buttons2);
 
-                if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1711997257707L))
-                        > 0) {
+                if (Helper.getDateDifference(game.getCreationDateTime(), 1711997257707L) > 0) {
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCardsInfoThread(),
                             player.getRepresentationUnfogged()
