@@ -21,7 +21,7 @@ class MyGamesService {
 
         return managedPlayer.getGames().stream()
                 .filter(ManagedGame::isActive)
-                .filter(managedGame -> !managedGame.getGame().isFowMode())
+                .filter(managedGame -> !managedGame.isFowMode())
                 .map(game -> toSummary(game, userId))
                 .filter(Objects::nonNull)
                 .toList();

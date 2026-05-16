@@ -1,5 +1,9 @@
 package ti4.discord.interactions.commands.bothelper;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -12,7 +16,6 @@ import ti4.discord.interactions.commands.Subcommand;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -35,9 +38,11 @@ class ListDeadGames extends Subcommand {
         int channelCount = 0;
         int roleCount = 0;
         for (ManagedGame game : GameManager.getManagedGames()) {
-            if (Helper.getDateDifference(
-                                    game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis()))
-                            < 30
+            LocalDate now = LocalDate.now();
+            LocalDate gameCreationDay = Instant.ofEpochMilli(game.getCreationDateTime())
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+            if (Math.abs(ChronoUnit.DAYS.between(now, gameCreationDay)) < 30
                     || !game.getName().contains("pbd")
                     || game.getName().contains("test")) {
                 continue;
@@ -59,8 +64,7 @@ class ListDeadGames extends Subcommand {
                 continue;
             }
             if (game.isHasEnded() || milliSinceLastTurnChange > 5259600000L) {
-                if (game.getActionsChannel() != null) {
-
+                if (game.getMainGameChannel() != null) {
                     channelCount += sendMessageToChannel(game, sb, delete);
                 }
                 Guild guild = game.getGuild();
@@ -86,24 +90,24 @@ class ListDeadGames extends Subcommand {
     }
 
     private static int sendMessageToChannel(ManagedGame game, StringBuilder sb, boolean delete) {
-        var actionsChannel = game.getActionsChannel();
-        if (actionsChannel == null || !actionsChannel.getName().equalsIgnoreCase(game.getName() + "-actions")) {
+        var mainGameChannel = game.getMainGameChannel();
+        if (mainGameChannel == null || !mainGameChannel.getName().equalsIgnoreCase(game.getName() + "-actions")) {
             return 0;
         }
 
         boolean warned = false;
         int channelCount = 0;
 
-        if (JdaService.getAvailablePBDCategories().contains(actionsChannel.getParentCategory())
-                && actionsChannel.getParentCategory() != null
-                && !actionsChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
-            sb.append(actionsChannel.getJumpUrl()).append('\n');
+        if (JdaService.getAvailablePBDCategories().contains(mainGameChannel.getParentCategory())
+                && mainGameChannel.getParentCategory() != null
+                && !mainGameChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
+            sb.append(mainGameChannel.getJumpUrl()).append('\n');
             channelCount++;
             if (delete) {
-                actionsChannel.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+                mainGameChannel.delete().queue(Consumers.nop(), BotLogger::catchRestError);
             } else {
                 warned = true;
-                // MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) +
+                // MessageHelper.sendMessageToChannel(mainGameChannel, ManagedGameService.getPingAllPlayers(game) +
                 // WARNING_MESSAGE);
             }
         }
@@ -119,7 +123,7 @@ class ListDeadGames extends Subcommand {
                 if (delete) {
                     tableTalkChannel.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 } else if (!warned) {
-                    // MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) +
+                    // MessageHelper.sendMessageToChannel(mainGameChannel, ManagedGameService.getPingAllPlayers(game) +
                     // WARNING_MESSAGE);
                 }
             }
