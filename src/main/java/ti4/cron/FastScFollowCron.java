@@ -20,6 +20,7 @@ import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 import ti4.service.button.ReactionService;
 import ti4.service.strategycard.StrategyCardMessageService;
+import ti4.service.turn.StartTurnService;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
@@ -112,12 +113,8 @@ public class FastScFollowCron {
     private static void appendScMessages(Game game, Player player, GameMessage scMessage, StringBuilder sb) {
         sb.append("Message link is: ")
                 .append(scMessage.asJumpLink(game.getMainGameChannel()))
-                .append('\n')
-                .append("You currently have ")
-                .append(player.getStrategicCC())
-                .append(" command token")
-                .append(player.getStrategicCC() == 1 ? "" : "s")
-                .append(" in your strategy pool.");
+                .append('\n');
+        StartTurnService.appendStrategyPoolReminderIfHelpful(sb, game, player);
 
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
     }
