@@ -23,6 +23,7 @@ import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.game.EndedGameScoringGuardService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.leader.HeroUnlockCheckService;
 
@@ -30,9 +31,12 @@ import ti4.service.leader.HeroUnlockCheckService;
 public class ScorePublicObjectiveService {
 
     public static void scorePO(GenericInteractionCreateEvent event, Game game, Player player, int poID) {
+        MessageChannel channel = player.getCorrectChannel() == null ? event.getMessageChannel() : player.getCorrectChannel();
+        if (EndedGameScoringGuardService.sendPromptIfGameEnded(game, channel)) {
+            return;
+        }
         String both = getNameNEMoji(game, poID);
         String poName = both.split("_")[0];
-        MessageChannel channel = player.getCorrectChannel();
         String id = "";
         Map<String, Integer> revealedPublicObjectives = game.getRevealedPublicObjectives();
         for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {

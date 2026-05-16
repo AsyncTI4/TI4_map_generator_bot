@@ -19,6 +19,7 @@ import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
+import ti4.service.game.EndedGameScoringGuardService;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
@@ -30,10 +31,14 @@ public final class SecretObjectiveHelper {
 
     public static boolean scoreSO(
             GenericInteractionCreateEvent event, Game game, Player player, int soID, MessageChannel channel) {
+        MessageChannel responseChannel = channel == null ? event.getMessageChannel() : channel;
+        if (EndedGameScoringGuardService.sendPromptIfGameEnded(game, responseChannel)) {
+            return false;
+        }
         Set<String> alreadyScoredSO = new HashSet<>(player.getSecretsScored().keySet());
         boolean scored = game.scoreSecretObjective(player.getUserID(), soID);
         if (!scored) {
-            MessageHelper.sendMessageToChannel(channel, "No such Secret Objective ID found, please retry");
+            MessageHelper.sendMessageToChannel(responseChannel, "No such Secret Objective ID found, please retry");
             return false;
         }
 
