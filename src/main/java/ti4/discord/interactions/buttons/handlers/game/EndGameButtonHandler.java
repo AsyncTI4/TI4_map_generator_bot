@@ -10,8 +10,8 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.helpers.ButtonHelper;
 import ti4.message.MessageHelper;
-import ti4.service.game.EndedGameScoringGuardService;
 import ti4.service.game.EndGameService;
+import ti4.service.game.EndedGameScoringGuardService;
 
 @UtilityClass
 class EndGameButtonHandler {

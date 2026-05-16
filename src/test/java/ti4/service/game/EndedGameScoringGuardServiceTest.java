@@ -12,9 +12,9 @@ class EndedGameScoringGuardServiceTest {
         var buttons = EndedGameScoringGuardService.getButtons();
 
         assertThat(buttons).hasSize(2);
-        assertThat(buttons.getFirst().getId()).isEqualTo(EndedGameScoringGuardService.CONTINUE_PLAYING_BUTTON_ID);
+        assertThat(buttons.getFirst().getCustomId()).isEqualTo(EndedGameScoringGuardService.CONTINUE_PLAYING_BUTTON_ID);
         assertThat(buttons.getFirst().getLabel()).isEqualTo("Continue Playing");
-        assertThat(buttons.get(1).getId()).isEqualTo("deleteButtons");
+        assertThat(buttons.get(1).getCustomId()).isEqualTo("deleteButtons");
         assertThat(buttons.get(1).getLabel()).isEqualTo("Delete These Buttons");
     }
 

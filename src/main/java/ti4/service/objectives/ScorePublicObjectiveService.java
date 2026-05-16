@@ -31,7 +31,8 @@ import ti4.service.leader.HeroUnlockCheckService;
 public class ScorePublicObjectiveService {
 
     public static void scorePO(GenericInteractionCreateEvent event, Game game, Player player, int poID) {
-        MessageChannel channel = player.getCorrectChannel() == null ? event.getMessageChannel() : player.getCorrectChannel();
+        MessageChannel channel =
+                player.getCorrectChannel() == null ? event.getMessageChannel() : player.getCorrectChannel();
         if (EndedGameScoringGuardService.sendPromptIfGameEnded(game, channel)) {
             return;
         }
