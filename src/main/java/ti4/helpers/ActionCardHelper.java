@@ -59,8 +59,6 @@ import ti4.spring.context.SpringContext;
 @UtilityClass
 public class ActionCardHelper {
 
-    private static final String PINNED_AC_INFO_MESSAGE_ID = "pinned_ac_info_message_id";
-
     private static final Set<String> WAR_MACHINE_IDS = Set.of(
             "war_machine1",
             "war_machine2",
@@ -82,8 +80,7 @@ public class ActionCardHelper {
 
     public static void sendActionCardInfo(Game game, Player player) {
         // AC INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThreadAndPin(
-                game, player, PINNED_AC_INFO_MESSAGE_ID, getActionCardInfo(game, player));
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, getActionCardInfo(game, player));
         Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(
