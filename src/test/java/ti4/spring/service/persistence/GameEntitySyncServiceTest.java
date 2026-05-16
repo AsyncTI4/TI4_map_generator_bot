@@ -39,6 +39,7 @@ class GameEntitySyncServiceTest extends BaseTi4Test {
     private GameEntitySyncService gameEntitySyncService;
 
     @Test
+    @SuppressWarnings("unchecked")
     void syncPersistsGamePlayersTitlesAndPrunesRemovedUsers() {
         Game game = new Game();
         game.setName("sync-persisted-game");
