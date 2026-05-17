@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.draft.items.BlueTileDraftItem;
 import ti4.draft.items.FactionDraftItem;
@@ -25,6 +26,7 @@ import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.PatternHelper;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
 import ti4.message.componentsV2.MessageV2Editor;
@@ -237,6 +239,33 @@ public class FrankenDrazDraft extends FrankenDraft {
         });
     }
 
+    public void closePostDraftCategory(ButtonInteractionEvent event, Player player, DraftCategory category) {
+        if (!POST_DRAFT_COMPONENT_CATEGORIES.contains(category)) {
+            return;
+        }
+
+        int lookback = buildPostDraftCategoryContainers(player, category).size() * 2 + 4;
+        event.getMessage()
+                .getChannel()
+                .getHistoryAround(event.getMessage().getIdLong(), lookback)
+                .queue(
+                        messageHistory -> {
+                            if (isPostDraftCategoryMessage(event.getMessage(), player.getGame(), category)) {
+                                event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+                            }
+                            for (Message message : messageHistory.getRetrievedHistory()) {
+                                if (message.getIdLong() == event.getMessage().getIdLong()
+                                        || !message.getAuthor().isBot()) {
+                                    continue;
+                                }
+                                if (isPostDraftCategoryMessage(message, player.getGame(), category)) {
+                                    message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+                                }
+                            }
+                        },
+                        BotLogger::catchRestError);
+    }
+
     @Override
     public int getBagSize() {
         return 12;
@@ -298,7 +327,11 @@ public class FrankenDrazDraft extends FrankenDraft {
             components.addAll(item.getTextDisplays(player.getGame(), player, true));
         }
 
-        components.addAll(ActionRow.partitionOf(getApplyButtons(player, category, items)));
+        if (!isManualSetupCategory(category)) {
+            components.addAll(ActionRow.partitionOf(getApplyButtons(player, category, items)));
+        }
+        components.add(ActionRow.of(Buttons.red(
+                player.factionButtonChecker() + "frankenDrazCloseCategory;" + category.name(), "Close Category")));
         return Container.of(components);
     }
 
@@ -321,6 +354,20 @@ public class FrankenDrazDraft extends FrankenDraft {
     private static boolean isOversized(Container container) {
         return MessageV2Builder.CountComponents(container) > Message.MAX_COMPONENT_COUNT_IN_COMPONENT_TREE
                 || MessageV2Builder.CountCharacters(container) > Message.MAX_CONTENT_LENGTH_COMPONENT_V2;
+    }
+
+    private static boolean isManualSetupCategory(DraftCategory category) {
+        return category == DraftCategory.HOMESYSTEM || category == DraftCategory.STARTINGFLEET;
+    }
+
+    private static boolean isPostDraftCategoryMessage(Message message, Game game, DraftCategory category) {
+        String categoryTitle = category.title(game);
+        return message.getComponentTree().getComponents().stream()
+                .filter(Container.class::isInstance)
+                .map(Container.class::cast)
+                .map(FrankenDrazDraft::getContainerTitle)
+                .anyMatch(title ->
+                        categoryTitle.equals(title) || (title != null && title.startsWith(categoryTitle + " (")));
     }
 
     private static Predicate<Component> matchesContainerTitle(Container replacement) {

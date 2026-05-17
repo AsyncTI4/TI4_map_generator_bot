@@ -464,6 +464,15 @@ public class FrankenButtonHandler {
         }
     }
 
+    @ButtonHandler(value = "frankenDrazCloseCategory", save = false)
+    private static void closeFrankenDrazCategory(ButtonInteractionEvent event, Player player, String buttonID) {
+        if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
+            DraftCategory category = DraftCategory.valueOf(buttonID.split(";")[1]);
+            frankenDrazDraft.closePostDraftCategory(event, player, category);
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Closed " + category.toString() + ".");
+        }
+    }
+
     private static void expandFrankenDrazDraft(Game game, BagDraft draft) {
         if (draft instanceof FrankenDrazDraft frankenDrazDraft) {
             frankenDrazDraft.expandFactionPackages(game);
