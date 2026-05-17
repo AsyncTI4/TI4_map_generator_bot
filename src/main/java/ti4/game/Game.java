@@ -1876,9 +1876,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public boolean scorePublicObjective(String userID, Integer idNumber) {
-        if (isHasEnded()) {
-            return false;
-        }
         String id = "";
         for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
             if (po.getValue().equals(idNumber)) {
@@ -3170,9 +3167,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public boolean scoreSecretObjective(String userID, Integer soIDNumber) {
-        if (isHasEnded()) {
-            return false;
-        }
         Player player = getPlayer(userID);
         if (player != null) {
             Map<String, Integer> secrets = player.getSecrets();
