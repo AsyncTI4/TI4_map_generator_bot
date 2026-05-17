@@ -5,6 +5,16 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.container.Container;
+import net.dv8tion.jda.api.components.container.ContainerChildComponent;
+import net.dv8tion.jda.api.components.separator.Separator;
+import net.dv8tion.jda.api.components.separator.Separator.Spacing;
+import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.draft.items.BlueTileDraftItem;
 import ti4.draft.items.FactionDraftItem;
 import ti4.draft.items.RedTileDraftItem;
@@ -13,12 +23,29 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.PatternHelper;
 import ti4.message.MessageHelper;
+import ti4.message.componentsV2.MessageV2Builder;
 import ti4.model.FactionModel;
+import ti4.service.franken.FrankenDraftBagService;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
 
 public class FrankenDrazDraft extends FrankenDraft {
     private static final List<String> AUTO_BANNED_FACTIONS = List.of("obsidian", "firmament");
+    private static final List<DraftCategory> POST_DRAFT_COMPONENT_CATEGORIES = List.of(
+            DraftCategory.ABILITY,
+            DraftCategory.TECH,
+            DraftCategory.BREAKTHROUGH,
+            DraftCategory.AGENT,
+            DraftCategory.COMMANDER,
+            DraftCategory.HERO,
+            DraftCategory.MECH,
+            DraftCategory.FLAGSHIP,
+            DraftCategory.COMMODITIES,
+            DraftCategory.PN,
+            DraftCategory.HOMESYSTEM,
+            DraftCategory.STARTINGTECH,
+            DraftCategory.STARTINGFLEET);
+
     public FrankenDrazDraft(Game owner) {
         super(owner);
     }
@@ -154,6 +181,37 @@ public class FrankenDrazDraft extends FrankenDraft {
         }
     }
 
+    public List<DraftCategory> getPostDraftComponentCategories() {
+        return POST_DRAFT_COMPONENT_CATEGORIES;
+    }
+
+    public void sendPostDraftComponentButtons(Player player) {
+        MessageHelper.sendMessageToChannel(
+                player.getCardsInfoThread(),
+                "Choose a drafted component category to view. Additional components are added automatically. Optional Swaps will appear in their respective categories when expanded. Home systems and starting fleet must be added manually, as well as any additional or optional components added via these components. Category buttons are present for your convenience.",
+                getPostDraftCategoryButtons(player));
+    }
+
+    public void sendPostDraftCategory(Player player, DraftCategory category) {
+        if (!POST_DRAFT_COMPONENT_CATEGORIES.contains(category)) {
+            return;
+        }
+
+        ThreadChannel cardsInfoThread = player.getCardsInfoThread();
+        List<Container> containers = buildPostDraftCategoryContainers(player, category);
+        if (containers.isEmpty()) {
+            MessageHelper.sendMessageToChannel(cardsInfoThread, "You have no drafted " + categoryLabel(category) + ".");
+            return;
+        }
+
+        for (Container container : containers) {
+            MessageV2Builder builder = new MessageV2Builder(cardsInfoThread);
+            builder.append(container.withAccentColor(
+                    FrankenDraftBagService.getAccents().getFirst()));
+            builder.send();
+        }
+    }
+
     @Override
     public int getBagSize() {
         return 12;
@@ -161,6 +219,102 @@ public class FrankenDrazDraft extends FrankenDraft {
 
     private List<Player> getOwnerPlayers() {
         return getOwner().getRealPlayers();
+    }
+
+    private List<Button> getPostDraftCategoryButtons(Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (DraftCategory category : POST_DRAFT_COMPONENT_CATEGORIES) {
+            String buttonID = player.factionButtonChecker() + "frankenDrazCategory;" + category.name();
+            buttons.add(Buttons.gray(buttonID, categoryLabel(category), category.emoji(player.getGame())));
+        }
+        return buttons;
+    }
+
+    private List<Container> buildPostDraftCategoryContainers(Player player, DraftCategory category) {
+        List<DraftItem> all = player.getDraftHand().getCategory(category);
+        if (all.isEmpty()) {
+            return List.of();
+        }
+
+        List<List<DraftItem>> groups = new ArrayList<>();
+        List<DraftItem> current = new ArrayList<>();
+        for (DraftItem item : all) {
+            current.add(item);
+            Container candidate =
+                    buildPostDraftCategoryContainer(player, category, current, category.title(player.getGame()));
+            if (isOversized(candidate) && current.size() > 1) {
+                current.removeLast();
+                groups.add(current);
+                current = new ArrayList<>(List.of(item));
+            }
+        }
+        if (!current.isEmpty()) {
+            groups.add(current);
+        }
+
+        List<Container> containers = new ArrayList<>();
+        for (int i = 0; i < groups.size(); i++) {
+            String title = category.title(player.getGame());
+            if (groups.size() > 1) {
+                title += " (" + (i + 1) + "/" + groups.size() + ")";
+            }
+            containers.add(buildPostDraftCategoryContainer(player, category, groups.get(i), title));
+        }
+        return containers;
+    }
+
+    private Container buildPostDraftCategoryContainer(
+            Player player, DraftCategory category, List<DraftItem> items, String title) {
+        List<ContainerChildComponent> components = new ArrayList<>();
+        components.add(TextDisplay.of(title));
+
+        for (DraftItem item : items) {
+            if (components.size() > 1) components.add(Separator.createDivider(Spacing.LARGE));
+            components.addAll(item.getTextDisplays(player.getGame(), player, true));
+        }
+
+        components.addAll(ActionRow.partitionOf(getApplyButtons(player, category, items)));
+        return Container.of(components);
+    }
+
+    private List<Button> getApplyButtons(Player player, DraftCategory category, List<DraftItem> items) {
+        List<Button> buttons = new ArrayList<>();
+        List<String> appliedItems = player.getStoredList("appliedFrankenItems");
+        int limit = getKeptItemLimitForCategory(category);
+        int taken = player.getDraftHand().getCategoryAppliedCount(appliedItems, category);
+        boolean atLimit = taken >= limit;
+
+        for (DraftItem item : items) {
+            boolean alreadyHas = appliedItems.contains(item.getAlias());
+            Button button = item.getAddButton().withDisabled(atLimit);
+            if (alreadyHas) button = item.getRemoveButton();
+            buttons.add(button);
+        }
+        return buttons;
+    }
+
+    private static boolean isOversized(Container container) {
+        return MessageV2Builder.CountComponents(container) > Message.MAX_COMPONENT_COUNT_IN_COMPONENT_TREE
+                || MessageV2Builder.CountCharacters(container) > Message.MAX_CONTENT_LENGTH_COMPONENT_V2;
+    }
+
+    private static String categoryLabel(DraftCategory category) {
+        return switch (category) {
+            case ABILITY -> "Abilities";
+            case TECH -> "Faction Techs";
+            case BREAKTHROUGH -> "Breakthroughs";
+            case AGENT -> "Agents";
+            case COMMANDER -> "Commanders";
+            case HERO -> "Heroes";
+            case MECH -> "Mechs";
+            case FLAGSHIP -> "Flagships";
+            case COMMODITIES -> "Commodities";
+            case PN -> "Promissory Notes";
+            case HOMESYSTEM -> "Home Systems";
+            case STARTINGTECH -> "Starting Techs";
+            case STARTINGFLEET -> "Starting Fleets";
+            default -> category.toString();
+        };
     }
 
     private static boolean hasExpandedFactionComponents(DraftBag hand) {

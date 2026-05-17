@@ -30,6 +30,7 @@ import ti4.draft.DraftBag;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
+import ti4.draft.FrankenDrazDraft;
 import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.items.AgentDraftItem;
 import ti4.draft.items.FactionDraftItem;
@@ -118,13 +119,17 @@ public class FrankenDraftBagService {
             }
 
             player.setStoredValue("frankenBuilt", "n");
-            for (DraftCategory category : componentCategories) {
-                Container c = postDraftCategoryContainer(player, category);
-                if (c == null) continue;
-                MessageV2Builder builder = new MessageV2Builder(cardsInfoThread);
-                builder.append(c.withAccentColor(accents.getFirst()));
-                Collections.rotate(accents, -1);
-                builder.send();
+            if (game.getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
+                frankenDrazDraft.sendPostDraftComponentButtons(player);
+            } else {
+                for (DraftCategory category : componentCategories) {
+                    Container c = postDraftCategoryContainer(player, category);
+                    if (c == null) continue;
+                    MessageV2Builder builder = new MessageV2Builder(cardsInfoThread);
+                    builder.append(c.withAccentColor(accents.getFirst()));
+                    Collections.rotate(accents, -1);
+                    builder.send();
+                }
             }
 
             if (game.isTwilightsFallMode()) {
@@ -455,6 +460,8 @@ public class FrankenDraftBagService {
         String draftName = "Franken Draft";
         if (draft instanceof InauguralSpliceFrankenDraft) {
             draftName = "Inaugural Splice";
+        } else if (draft instanceof FrankenDrazDraft) {
+            draftName = "FrankenDraz";
         }
 
         String message;
