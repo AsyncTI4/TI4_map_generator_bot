@@ -6,8 +6,9 @@ import net.dv8tion.jda.api.requests.Response;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 @UtilityClass
-public class DiscordHelper {
+public class DiscordErrorUtility {
 
+    private static final int DISCORD_UNKNOWN_CHANNEL_ERROR_CODE = 10_003;
     private static final int DISCORD_UNKNOWN_MESSAGE_ERROR_CODE = 10_008;
     private static final int DISCORD_UNKNOWN_EMOJI_ERROR_CODE = 10_014;
     private static final int DISCORD_UNKNOWN_WEBHOOK_ERROR_CODE = 10_015;
@@ -29,8 +30,11 @@ public class DiscordHelper {
     }
 
     public static boolean isUnknownEmojiError(Throwable error) {
-        return error instanceof ErrorResponseException restError
-                && restError.getErrorCode() == DISCORD_UNKNOWN_EMOJI_ERROR_CODE;
+        return hasDiscordErrorCode(error, DISCORD_UNKNOWN_EMOJI_ERROR_CODE);
+    }
+
+    public static boolean isUnknownChannelError(Throwable error) {
+        return hasDiscordErrorCode(error, DISCORD_UNKNOWN_CHANNEL_ERROR_CODE);
     }
 
     public static boolean isIgnorableError(Throwable error) {

@@ -18,7 +18,7 @@ import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.helpers.DisplayType;
-import ti4.helpers.discord.DiscordHelper;
+import ti4.helpers.discord.DiscordErrorUtility;
 import ti4.image.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.spring.context.RequestContext;
@@ -41,6 +41,7 @@ public class GameImageController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @SetupRequestContext(save = false)
     @GetMapping("/attachment-url")
     public ResponseEntity<String> getAttachmentUrl(@PathVariable String gameName) {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
@@ -175,7 +176,7 @@ public class GameImageController {
             }
             return ResponseEntity.ok(attachmentUrl);
         } catch (Exception e) {
-            if (!DiscordHelper.isUnknownMessageError(e)) {
+            if (!DiscordErrorUtility.isUnknownMessageError(e)) {
                 BotLogger.error(
                         "Failed to fetch message " + messageId + " from channel " + channelId + " for game " + gameName,
                         e);

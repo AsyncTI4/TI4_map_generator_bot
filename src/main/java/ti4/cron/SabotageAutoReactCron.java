@@ -9,7 +9,7 @@ import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.ConsumeGameUtility;
-import ti4.helpers.discord.DiscordHelper;
+import ti4.helpers.discord.DiscordErrorUtility;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
@@ -63,7 +63,7 @@ public class SabotageAutoReactCron {
                     ReactionService.addReaction(player, false, message, null, acMessage.messageId(), game);
                     acMessage.factionsThatReacted().add(player.getFaction());
                 } catch (Exception e) {
-                    if (DiscordHelper.isUnknownMessageError(e)) {
+                    if (DiscordErrorUtility.isUnknownMessageError(e)) {
                         GameMessageManager.remove(game.getName(), acMessage.messageId());
                         continue;
                     }

@@ -1,6 +1,8 @@
 package ti4.game.persistence.migration;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +16,6 @@ import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.game.helper.GameHelper;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.logging.BotLogger;
@@ -133,7 +134,9 @@ public class DataMigrationManager {
 
             LocalDate mapCreatedOn = null;
             try {
-                mapCreatedOn = LocalDate.parse(managedGame.getCreationDate(), GameHelper.CREATION_DATE_FORMATTER);
+                mapCreatedOn = Instant.ofEpochMilli(managedGame.getCreationDateTime())
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate();
             } catch (Exception ignored) {
             }
 
