@@ -23,6 +23,7 @@ import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
+import ti4.draft.FrankenDrazDraft;
 import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.TwilightsFallFrankenDraft;
 import ti4.draft.items.FactionDraftItem;
@@ -338,9 +339,11 @@ public class FrankenButtonHandler {
                                     List.of(startStrategyPhaseButton));
                             FrankenDraftBagService.applyDraftBags(event, game, false);
                         } else {
-                            String draftType = (draft instanceof TwilightsFallFrankenDraft)
-                                    ? "Twilight's Fall Draft"
-                                    : "FrankenDraft";
+                            expandFrankenDrazDraft(game, draft);
+                            String draftType = "FrankenDraft";
+                            if (draft instanceof TwilightsFallFrankenDraft) {
+                                draftType = "Twilight's Fall Draft";
+                            }
                             String msg = game.getPing() + " the draft stage of the " + draftType + " is complete. ";
                             msg += "Use the buttons below to choose how to set up the map. ";
                             msg += "Once the map is finalized, select your components from your drafted hand.";
@@ -370,6 +373,7 @@ public class FrankenButtonHandler {
                                         List.of(startStrategyPhaseButton));
                                 FrankenDraftBagService.applyDraftBags(event, game, false);
                             } else {
+                                expandFrankenDrazDraft(game, draft);
                                 Button randomizeButton =
                                         Buttons.green("startFrankenSliceBuild", "Randomize Your Slices (Sorta)");
                                 Button mantisButton = Buttons.green("startFrankenMantisBuild", "Mantis Build Slices");
@@ -439,5 +443,19 @@ public class FrankenButtonHandler {
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
         MessageHelper.sendEphemeralMessageToEventChannel(
                 event, "Sent " + item.getShortDescription() + " components to your cards info thread.");
+    }
+
+    @ButtonHandler(value = "frankenDrazCategory", save = false)
+    private static void showFrankenDrazCategory(ButtonInteractionEvent event, Player player, String buttonID) {
+        if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
+            DraftCategory category = DraftCategory.valueOf(buttonID.split(";")[1]);
+            frankenDrazDraft.sendPostDraftCategory(player, category);
+        }
+    }
+
+    private static void expandFrankenDrazDraft(Game game, BagDraft draft) {
+        if (draft instanceof FrankenDrazDraft frankenDrazDraft) {
+            frankenDrazDraft.expandFactionPackages(game);
+        }
     }
 }
