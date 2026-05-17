@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -27,18 +28,18 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.HeroUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
 
-public final class SecretObjectiveHelper {
+@UtilityClass
+public class SecretObjectiveHelper {
 
     public static boolean scoreSO(
             GenericInteractionCreateEvent event, Game game, Player player, int soID, MessageChannel channel) {
-        MessageChannel responseChannel = channel == null ? event.getMessageChannel() : channel;
-        if (EndedGameScoringGuardService.sendPromptIfGameEnded(game, responseChannel)) {
+        if (EndedGameScoringGuardService.sendPromptIfGameEnded(game, channel)) {
             return false;
         }
         Set<String> alreadyScoredSO = new HashSet<>(player.getSecretsScored().keySet());
         boolean scored = game.scoreSecretObjective(player.getUserID(), soID);
         if (!scored) {
-            MessageHelper.sendMessageToChannel(responseChannel, "No such Secret Objective ID found, please retry");
+            MessageHelper.sendMessageToChannel(channel, "No such Secret Objective ID found, please retry");
             return false;
         }
 

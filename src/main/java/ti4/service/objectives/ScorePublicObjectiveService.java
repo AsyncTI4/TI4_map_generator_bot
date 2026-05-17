@@ -31,8 +31,7 @@ import ti4.service.leader.HeroUnlockCheckService;
 public class ScorePublicObjectiveService {
 
     public static void scorePO(GenericInteractionCreateEvent event, Game game, Player player, int poID) {
-        MessageChannel channel =
-                player.getCorrectChannel() == null ? event.getMessageChannel() : player.getCorrectChannel();
+        MessageChannel channel = player.getCorrectChannel();
         if (EndedGameScoringGuardService.sendPromptIfGameEnded(game, channel)) {
             return;
         }
@@ -51,7 +50,7 @@ public class ScorePublicObjectiveService {
             int playerProgress = ListPlayerInfoService.getPlayerProgressOnObjective(id, game, player);
             if (playerProgress < threshold) {
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
+                        channel,
                         player.getFactionEmoji() + ", the bot does not believe you meet the requirements to score "
                                 + poName + ". The bot has you at " + playerProgress + "/" + threshold
                                 + ". If this is a mistake, please report and then you can manually score via `/status po_score` with the number ID of `"
