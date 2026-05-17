@@ -19,6 +19,10 @@ public class EndedGameScoringGuardService {
         if (!game.isHasEnded()) {
             return false;
         }
+        if (game.getHighestScore() < game.getVp()) {
+            game.setHasEnded(false);
+            return false;
+        }
         if (channel != null) {
             MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, SCORING_BLOCKED_MESSAGE, getButtons());
         }

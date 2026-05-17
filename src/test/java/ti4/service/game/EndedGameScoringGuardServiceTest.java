@@ -31,9 +31,21 @@ class EndedGameScoringGuardServiceTest {
     void sendPromptIfGameEndedReturnsTrueForEndedGamesEvenWithoutChannel() {
         var game = new Game();
         game.setHasEnded(true);
+        game.setVp(0);
 
         boolean blocked = EndedGameScoringGuardService.sendPromptIfGameEnded(game, null);
 
         assertThat(blocked).isTrue();
+    }
+
+    @Test
+    void sendPromptIfGameEndedAutoClearsEndedFlagWhenNoOneHasReachedPointGoal() {
+        var game = new Game();
+        game.setHasEnded(true);
+
+        boolean blocked = EndedGameScoringGuardService.sendPromptIfGameEnded(game, null);
+
+        assertThat(blocked).isFalse();
+        assertThat(game.isHasEnded()).isFalse();
     }
 }
