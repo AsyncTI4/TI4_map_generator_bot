@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import net.dv8tion.jda.api.components.Component;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.container.Container;
@@ -14,6 +16,7 @@ import net.dv8tion.jda.api.components.separator.Separator.Spacing;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.draft.items.BlueTileDraftItem;
 import ti4.draft.items.FactionDraftItem;
@@ -24,6 +27,7 @@ import ti4.game.Player;
 import ti4.helpers.PatternHelper;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
+import ti4.message.componentsV2.MessageV2Editor;
 import ti4.model.FactionModel;
 import ti4.service.franken.FrankenDraftBagService;
 import ti4.service.milty.MiltyDraftHelper;
@@ -212,6 +216,27 @@ public class FrankenDrazDraft extends FrankenDraft {
         }
     }
 
+    public void refreshPostDraftCategory(ButtonInteractionEvent event, Player player, DraftCategory category) {
+        if (!POST_DRAFT_COMPONENT_CATEGORIES.contains(category)) {
+            return;
+        }
+
+        List<Container> containers = buildPostDraftCategoryContainers(player, category);
+        if (containers.isEmpty()) {
+            return;
+        }
+
+        MessageV2Editor editor = new MessageV2Editor();
+        for (Container container : containers) {
+            Container replacement = container.withAccentColor(
+                    FrankenDraftBagService.getAccents().getFirst());
+            editor.replace(matchesContainerTitle(replacement), replacement);
+        }
+        editor.applyAroundMessage(event.getMessage(), containers.size() * 2 + 2, changed -> {
+            if (!changed) sendPostDraftCategory(player, category);
+        });
+    }
+
     @Override
     public int getBagSize() {
         return 12;
@@ -296,6 +321,24 @@ public class FrankenDrazDraft extends FrankenDraft {
     private static boolean isOversized(Container container) {
         return MessageV2Builder.CountComponents(container) > Message.MAX_COMPONENT_COUNT_IN_COMPONENT_TREE
                 || MessageV2Builder.CountCharacters(container) > Message.MAX_CONTENT_LENGTH_COMPONENT_V2;
+    }
+
+    private static Predicate<Component> matchesContainerTitle(Container replacement) {
+        String replacementTitle = getContainerTitle(replacement);
+        return component -> component instanceof Container container
+                && replacementTitle != null
+                && replacementTitle.equals(getContainerTitle(container));
+    }
+
+    private static String getContainerTitle(Container container) {
+        if (container.getComponents().isEmpty()) {
+            return null;
+        }
+        ContainerChildComponent child = container.getComponents().getFirst();
+        if (child instanceof TextDisplay textDisplay) {
+            return textDisplay.getContent();
+        }
+        return null;
     }
 
     private static String categoryLabel(DraftCategory category) {

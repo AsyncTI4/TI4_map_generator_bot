@@ -64,7 +64,11 @@ public class FrankenButtonHandler {
         String frankenItem = buttonID.replace("frankenItemAdd", "");
         DraftItem draftItem = DraftItem.generateFromAlias(frankenItem);
         resolveFrankenItemAdd(event, player, draftItem);
-        refreshContainers(event, player);
+        if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
+            frankenDrazDraft.refreshPostDraftCategory(event, player, draftItem.getItemCategory());
+        } else {
+            refreshContainers(event, player);
+        }
     }
 
     public static void resolveFrankenItemAdd(ButtonInteractionEvent event, Player player, DraftItem item) {
@@ -96,7 +100,11 @@ public class FrankenButtonHandler {
         String frankenItem = buttonID.replace("frankenItemRemove", "");
         DraftItem draftItem = DraftItem.generateFromAlias(frankenItem);
         resolveFrankenItemRemove(event, player, draftItem);
-        refreshContainers(event, player);
+        if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
+            frankenDrazDraft.refreshPostDraftCategory(event, player, draftItem.getItemCategory());
+        } else {
+            refreshContainers(event, player);
+        }
     }
 
     public static void resolveFrankenItemRemove(ButtonInteractionEvent event, Player player, DraftItem item) {
@@ -276,7 +284,10 @@ public class FrankenButtonHandler {
     private static void refreshContainers(ButtonInteractionEvent event, Player player) {
         MessageV2Editor editor = new MessageV2Editor();
         List<Color> accents = FrankenDraftBagService.getAccents();
-        for (DraftCategory cat : FrankenDraftBagService.componentCategories) {
+        List<DraftCategory> postDraftCategories = player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft
+                ? ((FrankenDrazDraft) player.getGame().getActiveBagDraft()).getPostDraftComponentCategories()
+                : FrankenDraftBagService.componentCategories;
+        for (DraftCategory cat : postDraftCategories) {
             Container c2 = FrankenDraftBagService.postDraftCategoryContainer(player, cat);
             if (c2 == null) continue;
             c2 = c2.withAccentColor(accents.getFirst());
@@ -286,7 +297,7 @@ public class FrankenButtonHandler {
         Container summary = FrankenDraftBagService.getFrankenPlayerSummaryContainer(player);
         editor.replace(replaceContainer(summary), summary);
 
-        int limit = FrankenDraftBagService.componentCategories.size() * 2 + 4;
+        int limit = postDraftCategories.size() * 2 + 4;
         editor.applyAroundMessage(event.getMessage(), limit, null);
     }
 
