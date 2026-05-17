@@ -25,6 +25,7 @@ import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.TwilightsFallFrankenDraft;
+import ti4.draft.items.FactionDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -427,5 +428,16 @@ public class FrankenButtonHandler {
 
         FrankenDraftBagService.showPlayerBag(game, player);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler(value = "frankenFactionComponents", save = false)
+    private static void showFactionComponents(ButtonInteractionEvent event, Player player, String buttonID) {
+        String faction = buttonID.split(";")[1];
+        FactionDraftItem item = new FactionDraftItem(faction);
+        String msg =
+                "## " + item.getTitle(player.getGame()) + " Components\n" + item.getComponentList(player.getGame());
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
+        MessageHelper.sendEphemeralMessageToEventChannel(
+                event, "Sent " + item.getShortDescription() + " components to your cards info thread.");
     }
 }

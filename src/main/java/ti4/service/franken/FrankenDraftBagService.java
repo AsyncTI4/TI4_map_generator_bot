@@ -32,6 +32,7 @@ import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
 import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.items.AgentDraftItem;
+import ti4.draft.items.FactionDraftItem;
 import ti4.draft.items.HeroDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -290,7 +291,11 @@ public class FrankenDraftBagService {
             // Add each item to the container
             for (DraftItem item : all) {
                 if (components.size() > 1) components.add(Separator.createDivider(Spacing.LARGE));
-                components.addAll(item.getTextDisplays(game, player, true));
+                components.addAll(item.getTextDisplays(game, player, cat != DraftCategory.FACTION));
+                if (item instanceof FactionDraftItem) {
+                    String buttonID = player.factionButtonChecker() + "frankenFactionComponents;" + item.getItemId();
+                    components.add(ActionRow.of(Buttons.gray(buttonID, "Show Components", item.getItemEmoji())));
+                }
             }
             // Then either...
             if (!DraftItem.isDraftable(player, cat)) {
