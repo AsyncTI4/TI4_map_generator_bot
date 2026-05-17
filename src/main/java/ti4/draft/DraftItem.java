@@ -14,6 +14,7 @@ import ti4.draft.items.BlueTileDraftItem;
 import ti4.draft.items.BreakthroughDraftItem;
 import ti4.draft.items.CommanderDraftItem;
 import ti4.draft.items.CommoditiesDraftItem;
+import ti4.draft.items.FactionDraftItem;
 import ti4.draft.items.FlagshipDraftItem;
 import ti4.draft.items.HeroDraftItem;
 import ti4.draft.items.HomeSystemDraftItem;
@@ -83,6 +84,7 @@ public abstract class DraftItem {
 
     public static DraftItem generate(DraftCategory category, String itemId) {
         return switch (category) {
+            case FACTION -> new FactionDraftItem(itemId);
             case ABILITY -> new AbilityDraftItem(itemId);
             case TECH -> new TechDraftItem(itemId);
             case AGENT -> new AgentDraftItem(itemId);

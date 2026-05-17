@@ -12,6 +12,7 @@ import ti4.service.emoji.TileEmojis;
 import ti4.service.emoji.UnitEmojis;
 
 public enum DraftCategory {
+    FACTION,
     ABILITY,
     TECH,
     BREAKTHROUGH,
@@ -36,6 +37,7 @@ public enum DraftCategory {
         TI4Emoji emoji = emoji(game);
         return "## "
                 + switch (this) {
+                    case FACTION -> "Factions";
                     case ABILITY -> "Abilities";
                     case TECH -> game.isTwilightsFallMode() ? "Abilities" : "Faction Techs";
                     case AGENT -> game.isTwilightsFallMode() ? "Genomes" : "Agents";
@@ -61,6 +63,7 @@ public enum DraftCategory {
 
     public TI4Emoji emoji(Game game) {
         return switch (this) {
+            case FACTION -> FactionEmojis.Muaat;
             case ABILITY -> MiscEmojis.tf_ability;
             case TECH -> game.isTwilightsFallMode() ? MiscEmojis.tf_ability : TechEmojis.CyberneticPropulsion;
             case AGENT -> game.isTwilightsFallMode() ? MiscEmojis.tf_genome : LeaderEmojis.Agent;
