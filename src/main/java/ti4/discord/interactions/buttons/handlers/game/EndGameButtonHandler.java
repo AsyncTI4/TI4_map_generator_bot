@@ -11,6 +11,7 @@ import ti4.game.Game;
 import ti4.helpers.ButtonHelper;
 import ti4.message.MessageHelper;
 import ti4.service.game.EndGameService;
+import ti4.service.game.EndedGameScoringGuardService;
 
 @UtilityClass
 class EndGameButtonHandler {
@@ -27,5 +28,13 @@ class EndGameButtonHandler {
         buttons.add(Buttons.red("gameEnd", "Confirm to End and Delete Game"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(), "Please confirm to end and DELETE the game", buttons);
+    }
+
+    @ButtonHandler(EndedGameScoringGuardService.CONTINUE_PLAYING_BUTTON_ID)
+    public static void continuePlayingAfterEnd(ButtonInteractionEvent event, Game game) {
+        game.setHasEnded(false);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(), "This game's ended flag has been cleared. You may continue playing.");
+        ButtonHelper.deleteMessage(event);
     }
 }

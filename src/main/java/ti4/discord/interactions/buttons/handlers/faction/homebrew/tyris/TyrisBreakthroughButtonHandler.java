@@ -119,18 +119,16 @@ public class TyrisBreakthroughButtonHandler {
 
     public static void sendNonLinearTimeProgressionInfo(Game game, Player tyris, Player caller) {
         List<String> techs = getTyrisBTTechs(tyris, game);
-        String techList = techs.isEmpty()
-                ? "_(none)_"
-                : techs.stream()
-                        .map(id -> {
-                            TechnologyModel m = Mapper.getTech(id);
-                            return m != null ? "_" + m.getName() + "_" : id;
-                        })
-                        .collect(java.util.stream.Collectors.joining(", "));
-
-        String msg = tyris.getRepresentation() + "'s _Non-Linear Time Progression_ (-" + techs.size() + " resource"
-                + (techs.size() == 1 ? "" : "s") + " to spend): " + techList;
-        MessageHelper.sendMessageToChannel(caller.getCardsInfoThread(), msg);
+        StringBuilder msg = new StringBuilder("Here are the current techs on _Non-Linear Time Progression_:");
+        if (techs.isEmpty()) {
+            msg.append(" _(none)_");
+        } else {
+            for (String id : techs) {
+                TechnologyModel m = Mapper.getTech(id);
+                msg.append("\n- ").append(m != null ? "_" + m.getName() + "_" : id);
+            }
+        }
+        MessageHelper.sendMessageToChannel(caller.getCardsInfoThread(), msg.toString());
     }
 
     public static void handlePlayerPassed(Game game, Player p) {
