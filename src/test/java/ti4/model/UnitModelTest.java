@@ -1,9 +1,12 @@
 package ti4.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
@@ -39,6 +42,22 @@ class UnitModelTest extends BaseTi4Test {
             assertTrue(
                     validateAsyncID(unitModel), unitModel.getAlias() + ": invalid asyncID: " + unitModel.getAsyncId());
         }
+    }
+
+    @Test
+    void getAfbValuesApplyShrapnelTurretsWithoutRecursing() {
+        Game game = new Game();
+        Player player = new Player("user", "user", game);
+        player.setFaction("testFaction");
+        game.setStoredValue("ShrapnelTurretsFaction", "testFaction");
+
+        UnitModel unitModel = new UnitModel();
+        unitModel.setCapacityValue(1);
+        unitModel.setAfbDieCount(0);
+        unitModel.setAfbHitsOn(0);
+
+        assertEquals(2, unitModel.getAfbDieCount(player));
+        assertEquals(8, unitModel.getAfbHitsOn(player));
     }
 
     private static boolean validateFaction(UnitModel unitModel) {

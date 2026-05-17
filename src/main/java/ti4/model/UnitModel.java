@@ -208,9 +208,11 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public int getAfbDieCount(Player player) {
-        if (capacityValue > 0
-                && player.getFaction().equalsIgnoreCase(player.getGame().getStoredValue("ShrapnelTurretsFaction"))
-                && getExpectedAfbHits(player) < 0.6) {
+        return getAfbDieCount(player, true);
+    }
+
+    private int getAfbDieCount(Player player, boolean allowShrapnelTurrets) {
+        if (allowShrapnelTurrets && shouldUseShrapnelTurrets(player)) {
             return 2;
         }
         if (afbDieCount == 0
@@ -224,15 +226,26 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             UnitModel dn = player.getUnitByType(UnitType.Dreadnought);
             return Stream.of(dd, ca, dn)
                     .filter(UnitModel::getIsUpgrade)
-                    .max(Comparator.comparing(m -> m.getExpectedAfbHits(player)))
-                    .map(m -> m.getAfbDieCount(player))
+                    .max(Comparator.comparing(m -> m.getExpectedAfbHits(player, allowShrapnelTurrets)))
+                    .map(m -> m.getAfbDieCount(player, allowShrapnelTurrets))
                     .orElse(0);
         }
         return afbDieCount;
     }
 
     private double getExpectedAfbHits(Player player) {
-        return getAfbDieCount(player) * ((10 - getAfbHitsOn(player)) / 10.0d);
+        return getExpectedAfbHits(player, true);
+    }
+
+    private double getExpectedAfbHits(Player player, boolean allowShrapnelTurrets) {
+        return getAfbDieCount(player, allowShrapnelTurrets)
+                * ((10 - getAfbHitsOn(player, allowShrapnelTurrets)) / 10.0d);
+    }
+
+    private boolean shouldUseShrapnelTurrets(Player player) {
+        return capacityValue > 0
+                && player.getFaction().equalsIgnoreCase(player.getGame().getStoredValue("ShrapnelTurretsFaction"))
+                && getExpectedAfbHits(player, false) < 0.6;
     }
 
     private double getExpectedBombardHits(Player player) {
@@ -285,10 +298,12 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public int getAfbHitsOn(Player player) {
+        return getAfbHitsOn(player, true);
+    }
+
+    private int getAfbHitsOn(Player player, boolean allowShrapnelTurrets) {
         // if (player.hasRelic("metalivoidarmaments") && afbHitsOn == 0) return 6;
-        if (capacityValue > 0
-                && player.getGame().getStoredValue("ShrapnelTurretsFaction").equalsIgnoreCase(player.getFaction())
-                && getExpectedAfbHits(player) < 0.6) {
+        if (allowShrapnelTurrets && shouldUseShrapnelTurrets(player)) {
             return 8;
         }
         if (afbDieCount == 0
@@ -302,8 +317,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             UnitModel dn = player.getUnitByType(UnitType.Dreadnought);
             return Stream.of(dd, ca, dn)
                     .filter(UnitModel::getIsUpgrade)
-                    .max(Comparator.comparing(m -> m.getExpectedAfbHits(player)))
-                    .map(model -> model.getAfbHitsOn(player))
+                    .max(Comparator.comparing(m -> m.getExpectedAfbHits(player, allowShrapnelTurrets)))
+                    .map(model -> model.getAfbHitsOn(player, allowShrapnelTurrets))
                     .orElse(0);
         }
         return afbHitsOn;
