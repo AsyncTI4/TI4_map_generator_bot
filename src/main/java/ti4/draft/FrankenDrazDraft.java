@@ -187,10 +187,6 @@ public class FrankenDrazDraft extends FrankenDraft {
         }
     }
 
-    public List<DraftCategory> getPostDraftComponentCategories() {
-        return POST_DRAFT_COMPONENT_CATEGORIES;
-    }
-
     public void sendPostDraftComponentButtons(Player player) {
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),

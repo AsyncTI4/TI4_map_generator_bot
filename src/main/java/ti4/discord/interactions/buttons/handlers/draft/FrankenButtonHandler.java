@@ -284,10 +284,7 @@ public class FrankenButtonHandler {
     private static void refreshContainers(ButtonInteractionEvent event, Player player) {
         MessageV2Editor editor = new MessageV2Editor();
         List<Color> accents = FrankenDraftBagService.getAccents();
-        List<DraftCategory> postDraftCategories = player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft
-                ? ((FrankenDrazDraft) player.getGame().getActiveBagDraft()).getPostDraftComponentCategories()
-                : FrankenDraftBagService.componentCategories;
-        for (DraftCategory cat : postDraftCategories) {
+        for (DraftCategory cat : FrankenDraftBagService.componentCategories) {
             Container c2 = FrankenDraftBagService.postDraftCategoryContainer(player, cat);
             if (c2 == null) continue;
             c2 = c2.withAccentColor(accents.getFirst());
@@ -297,7 +294,7 @@ public class FrankenButtonHandler {
         Container summary = FrankenDraftBagService.getFrankenPlayerSummaryContainer(player);
         editor.replace(replaceContainer(summary), summary);
 
-        int limit = postDraftCategories.size() * 2 + 4;
+        int limit = FrankenDraftBagService.componentCategories.size() * 2 + 4;
         editor.applyAroundMessage(event.getMessage(), limit, null);
     }
 
