@@ -881,12 +881,12 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "strategic_assistance",
+        "alias": "strategic_aid",
         "name": "Strategic Aid",
         "phase": "Action",
         "window": "When you perform a strategic action",
         "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
-        "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
+        "flavorText": "Mathis was not fooled. The pageantry and endless bandying of crooked words with these witless worms was yet another scheme.",
         "source": "action_deck_2"
     },
     {
@@ -1077,7 +1077,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Explore 1 planet you control; when you would draw from the exploration deck, you may choose and resolve a card from its discard pile instead.",
-        "flavorText": "",
+        "flavorText": "As Tai announced that the expedition would continue despite safety concerns, a cadet gave an audible groan—followed by a yelp as Dart grabbed him by his Naaz. \"Any more backtalk from you and you'll get a clout in the ear!\"",
         "source": "action_deck_2"
     },
     {
@@ -1086,7 +1086,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Explore 1 planet you control; when you would draw from the exploration deck, you may choose and resolve a card from its discard pile instead.",
-        "flavorText": "",
+        "flavorText": "One of the cadets nearly fell over as they crested the lip of the ancient crater, revealing three massive, entangled ships jutting from the earth below. Tai gave a self-satisfied hmph.",
         "source": "action_deck_2"
     },
     {
@@ -1095,7 +1095,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Explore 1 planet you control; when you would draw from the exploration deck, you may choose and resolve a card from its discard pile instead.",
-        "flavorText": "",
+        "flavorText": "\"Careful!\" Tai cried as he heard what was undoubtedly a priceless relic shatter in the room next door. \"Who trained these fools?\" he grumbled. Dart didn't have the heart to remind him that they had.",
         "source": "action_deck_2"
     },
     {
@@ -1104,7 +1104,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Explore 1 planet you control; when you would draw from the exploration deck, you may choose and resolve a card from its discard pile instead.",
-        "flavorText": "",
+        "flavorText": "As they cut through the ancient structure's wall, Dart's laser-cutter illuminated a canister close to the beam. Tai squealed, \"E-e-exterrix gas!\"—as Dart ran.",
         "source": "action_deck_2"
     },
     {
@@ -1203,6 +1203,15 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "privateers",
+        "name": "Privateers",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Choose a system that contains no more than 2 of your non-fighter ships. Replace each of your ships in that system with a neutral ship of the same type to gain trade goods equal to the combined cost of those non-fighter ships.",
+        "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as a fleet of unmarked ships poured forth from the void, raining destruction upon the unsuspecting convoy.",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "propaganda_te",
         "name": "Propaganda",
         "phase": "Agenda",
@@ -1258,6 +1267,15 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "seized_research",
+        "name": "Seized Research",
+        "phase": "Any",
+        "window": "After you gain control of a planet that has a technology speciality",
+        "text": "You may gain your breakthrough if its synergy matches that speciality; otherwise, research 1 technology that matches that speciality.",
+        "flavorText": "\"So, Doc,\" Connor said, playfully pointing his blaster at the Hylar as she cringed away. \"How about we start with a little tour of Research and Development?\"",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "settlements",
         "name": "Settlements",
         "phase": "Agenda",
@@ -1294,6 +1312,43 @@
         "text": "Place each of your participating units into coexistence; the ground combat ends in a draw.",
         "notes": "This can be played if the player is already coexisting. It cannot be played if the player has no more units on the planet. The attacking player cannot choose to engage any coexisting units in combat after the combat ends in a draw.",
         "flavorText": "When the ink dried, Mot knew he would be remembered as a traitor. However, as irony would have it, he had bought the Nomad precisely what he needed—time.",
+        "source": "action_deck_2"
+    },
+
+    {
+        "alias": "sabotage1_acd2",
+        "name": "Sabotage",
+        "phase": "Any",
+        "window": "When another player plays an action card other than 'Sabotage'",
+        "text": "Cancel that action card.",
+        "flavorText": "Magmus chuckled at Elder Junn's look of concern. \"Let's see you worm your way out of this...\"",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "sabotage2_acd2",
+        "name": "Sabotage",
+        "phase": "Any",
+        "window": "When another player plays an action card other than 'Sabotage'",
+        "text": "Cancel that action card.",
+        "flavorText": "The leaked documents brought a smile to Willard's face. Schemes upon schemes, none of which would ever reach fruition. ",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "sabotage3_acd2",
+        "name": "Sabotage",
+        "phase": "Any",
+        "window": "When another player plays an action card other than 'Sabotage'",
+        "text": "Cancel that action card.",
+        "flavorText": "Communications were jammed. Supply lines were harried. Staffing officers were found dead in their bunks. The grandeur of the scheme shocked Claire to her core.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "sabotage4_acd2",
+        "name": "Sabotage",
+        "phase": "Any",
+        "window": "When another player plays an action card other than 'Sabotage'",
+        "text": "Cancel that action card.",
+        "flavorText": "The growing creature spasmed in the genetic spinner's tank as Ssruu slowly emptied poison into its feeding pouch.",
         "source": "action_deck_2"
     }
 ]
