@@ -52,7 +52,7 @@ class DeleteButtonsButtonHandler {
                         || "Done Losing Fleet Tokens".equalsIgnoreCase(buttonLabel))
                 && editedMessage.contains("command tokens have gone from")) {
 
-            String playerRep = player.getRepresentation();
+            String playerRep = player.getRepresentationNoPing();
             String finalCCs = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
             String shortCCs = editedMessage.substring(editedMessage.indexOf("command tokens have gone from "));
             shortCCs = shortCCs.replace("command tokens have gone from ", "");
@@ -317,7 +317,7 @@ class DeleteButtonsButtonHandler {
                         UnitModel producedUnit =
                                 player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
 
-                        if (producedUnit.getUnitType() == UnitType.Flagship && player.ownsUnit("creuss_flagship")) {
+                        if (producedUnit.getUnitType() == UnitType.Flagship && player.ownsUnit("ghost_flagship")) {
                             adjust = 1;
                         }
                     }

@@ -418,6 +418,7 @@ public class ListPlayerInfoService {
             case Constants.VOICE_OF_THE_COUNCIL_PO, "Shard of the Throne", "Political Censure" -> objectiveId;
             case "Shard of the Throne (1)", "Shard of the Throne (2)", "Shard of the Throne (3)" -> objectiveId;
             case "Ixthian Rex Point" -> objectiveId;
+            case "A Song Like Marrow" -> objectiveId;
             default -> null;
         };
     }

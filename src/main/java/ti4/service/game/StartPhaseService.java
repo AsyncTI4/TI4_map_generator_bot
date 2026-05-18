@@ -10,10 +10,12 @@ import java.util.StringJoiner;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.game.Game;
@@ -43,6 +45,7 @@ import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
+import ti4.logging.BotLogger;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
@@ -241,6 +244,15 @@ public class StartPhaseService {
         }
         if (game.getRound() == 1) {
             Helper.setOrder(game);
+            if (game.getActionsChannel() != null) {
+                for (ThreadChannel threadChannel : game.getActionsChannel().getThreadChannels()) {
+                    if ((!threadChannel.getName().contains("Cards Info-" + game.getName())
+                                    && threadChannel.getName().contains("Cards Info-"))
+                            || threadChannel.getName().contains("Draft Bag")) {
+                        threadChannel.getManager().setArchived(true).queue(Consumers.nop(), BotLogger::catchRestError);
+                    }
+                }
+            }
         }
         game.removeStoredValue("shouldntChangeTurnOrder");
         for (Player p2 : game.getRealPlayers()) {

@@ -900,41 +900,34 @@ public final class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + " is going to pay 2 influence to repair a ship that just used its SUSTAIN DAMAGE ability.");
+                        + " is going to pay 2 influence to repair a unit that just used its SUSTAIN DAMAGE ability.");
 
         List<Button> buttons = new ArrayList<>();
-        UnitHolder space = tile.getSpaceUnitHolder();
         List<UnitType> units = new ArrayList<>(List.of(
                 UnitType.Cavalry,
                 UnitType.Warsun,
                 UnitType.Dreadnought,
                 UnitType.Carrier,
                 UnitType.Flagship,
+                UnitType.Mech,
                 UnitType.Cruiser));
-        if (player.ownsUnit("nekro_flagship")) {
-            units = new ArrayList<>(List.of(
-                    UnitType.Cavalry,
-                    UnitType.Warsun,
-                    UnitType.Dreadnought,
-                    UnitType.Carrier,
-                    UnitType.Flagship,
-                    UnitType.Mech,
-                    UnitType.Cruiser));
-        }
-        for (Player p2 : ButtonHelper.getPlayersWithShipsInTheSystem(game, tile)) {
+        for (Player p2 : ButtonHelper.getPlayersWithUnitsInTheSystem(game, tile)) {
             for (UnitType unit : units) {
-                if (space.getDamagedUnitCount(unit, p2.getColorID()) > 0) {
-                    buttons.add(Buttons.gray(
-                            "empyreanFlagshipAbilityStep2_" + pos + "_" + p2.getFaction() + "_" + unit.getValue(),
-                            capitalize(p2.getColor()) + " " + Mapper.getUnitBaseTypeFromAsyncID(unit.getValue()),
-                            p2.getFactionEmoji()));
+                for (UnitHolder uh : tile.getUnitHolders().values()) {
+                    if (uh.getDamagedUnitCount(unit, p2.getColorID()) > 0) {
+                        buttons.add(Buttons.gray(
+                                "empyreanFlagshipAbilityStep2_" + pos + "_" + p2.getFaction() + "_" + unit.getValue()
+                                        + "_" + uh.getName(),
+                                capitalize(p2.getColor()) + " " + Mapper.getUnitBaseTypeFromAsyncID(unit.getValue()),
+                                p2.getFactionEmoji()));
+                    }
                 }
             }
         }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + " please select the ship you wish to repair (the bot did not check how recently they have been damaged).",
+                        + " please select the unit you wish to repair (the bot did not check how recently they have been damaged).",
                 buttons);
     }
 
@@ -943,6 +936,7 @@ public final class ButtonHelperFactionSpecific {
             Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         String unit = buttonID.split("_")[3];
+        String unitHolderName = buttonID.split("_")[4];
         Tile tile = game.getTileByPosition(pos);
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[2]);
         String name = "themselves.";
@@ -953,7 +947,7 @@ public final class ButtonHelperFactionSpecific {
                 event.getMessageChannel(),
                 player.getRepresentation() + " repaired a " + Mapper.getUnitBaseTypeFromAsyncID(unit) + " owned by "
                         + name + ". The influence spent will be posted in the main channel when finished.");
-        UnitHolder space = tile.getSpaceUnitHolder();
+        UnitHolder space = tile.getUnitHolders().get(unitHolderName);
         space.removeDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), p2.getColorID()), 1);
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
         Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");

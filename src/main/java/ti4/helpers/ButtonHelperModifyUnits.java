@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static ti4.helpers.discord.DiscordErrorUtility.isIgnorableError;
+import static ti4.helpers.discord.DiscordErrorUtility.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -520,6 +520,19 @@ public final class ButtonHelperModifyUnits {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         int numSustains = getNumberOfSustainableUnits(player, game, unitHolder, true, spaceCannonOffence);
         boolean noMechPowers = ButtonHelper.isLawInPlay(game, "articles_war");
+        boolean opponentCanDirectHit = true;
+        if (!spaceCannonOffence) {
+            Player opponent = null;
+            for (Player p2 : game.getRealPlayers()) {
+                if (FoWHelper.playerHasActualShipsInSystem(p2, tile) && p2 != player) {
+                    opponent = p2;
+                    break;
+                }
+            }
+            if (opponent != null) {
+                opponentCanDirectHit = opponent.getActionCards().size() > 0;
+            }
+        }
 
         Map<UnitKey, Integer> repairableUnitsByUnitKey = new TreeMap<>(new ShipRepairComparator());
         if (player.hasTech("da") && !spaceCannonOffence) {
@@ -624,7 +637,8 @@ public final class ButtonHelperModifyUnits {
                 }
 
                 if (min > 0
-                        && !stuffNotToSustain.contains(unitModel.getBaseType().toLowerCase())) {
+                        && (!stuffNotToSustain.contains(unitModel.getBaseType().toLowerCase())
+                                || !opponentCanDirectHit)) {
                     hits -= min * (player.hasTech("nes") ? 2 : 1);
                     repairableUnitsByUnitKey.computeIfPresent(unitKey, (key, value) -> value += min);
 
@@ -735,7 +749,11 @@ public final class ButtonHelperModifyUnits {
                                 .append('\n');
                     }
                     continue; // Skip to the next unit
-                } else if (isRemainingSustains && unitModel.getIsShip() && unitModel.getSustainDamage() && min > 0) {
+                } else if (isRemainingSustains
+                        && unitModel.getIsShip()
+                        && unitModel.getSustainDamage()
+                        && min > 0
+                        && opponentCanDirectHit) {
                     String stuffNotToSustain = game.getStoredValue("stuffNotToSustainFor" + player.getFaction());
                     if (stuffNotToSustain.isEmpty()) {
                         game.setStoredValue("stuffNotToSustainFor" + player.getFaction(), "warsun");
@@ -1739,7 +1757,7 @@ public final class ButtonHelperModifyUnits {
         String spaceOrPlanet;
 
         String successMessage;
-        String playerRep = player.getRepresentation();
+        String playerRep = player.getRepresentationNoPing();
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
         if ("sd".equalsIgnoreCase(unitID)) {
             if (player.hasUnit("absol_saar_spacedock")
@@ -2323,7 +2341,7 @@ public final class ButtonHelperModifyUnits {
                     UnitModel producedUnit =
                             player.getUnitsByAsyncID(unitKey2.asyncID()).getFirst();
 
-                    if (producedUnit.getUnitType() == UnitType.Flagship && player.ownsUnit("creuss_flagship")) {
+                    if (producedUnit.getUnitType() == UnitType.Flagship && player.ownsUnit("ghost_flagship")) {
                         adjust = 1;
                     }
                 }

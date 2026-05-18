@@ -1448,8 +1448,7 @@ public class StartCombatService {
             }
             List<Tile> flagshipTile =
                     CheckUnitContainmentService.getTilesContainingPlayersUnits(game, agentHolder, UnitType.Flagship);
-            if (isSpaceCombat
-                    && agentHolder.hasUnit("empyrean_flagship")
+            if (agentHolder.hasUnit("empyrean_flagship")
                     && !flagshipTile.isEmpty()
                     && FoWHelper.getAdjacentTiles(game, pos, agentHolder, false, true)
                             .contains(flagshipTile.getFirst().getPosition())) {

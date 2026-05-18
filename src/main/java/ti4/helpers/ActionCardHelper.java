@@ -411,6 +411,7 @@ public class ActionCardHelper {
                 "special_session",
                 "investments",
                 "tf-reverse",
+                "puppetsonastring",
                 "tf-manipulate",
                 "revolution",
                 "deflection",

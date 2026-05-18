@@ -139,7 +139,11 @@ public class PickStrategyCardService {
 
         if (player.isNpc()) {
             alreadyQueued = "1_2_3_4_5_6_7_8";
+            if (game.isTwilightsFallMode()) {
+                alreadyQueued = "1_3_4_5_8_2_6_7";
+            }
         }
+
         if (!alreadyQueued.isEmpty()) {
             int unpickedStrategyCard = 0;
             for (String scNum : alreadyQueued.split("_")) {

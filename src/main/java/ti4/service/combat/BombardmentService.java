@@ -64,7 +64,7 @@ public class BombardmentService {
         String best = "";
         for (String planet : getBombardablePlanets(player, game, tile)) {
             best = planet;
-            for (Player p2 : game.getRealPlayers()) {
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (ButtonHelper.getNumberOfGroundForces(p2, game.getUnitHolderFromPlanet(planet)) > 0) {
                     return best;
                 }
