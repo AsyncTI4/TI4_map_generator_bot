@@ -850,9 +850,7 @@ public class StartPhaseService {
         }
         DreamButtonHandler.offerTheWakingButtons(game);
 
-        Button draw1AC = Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.getACEmoji(game));
-        Button getCCs = Buttons.green("redistributeCCButtons", "Redistribute, Gain, & Confirm Command Tokens")
-                .withEmoji(Emoji.fromFormatted("🔺"));
+
         Button yssarilPolicy = null;
         for (Player player : game.getRealPlayers()) {
             if (IsPlayerElectedService.isPlayerElected(game, player, "minister_policy")
@@ -909,8 +907,11 @@ public class StartPhaseService {
         }
         List<Button> buttons = new ArrayList<>();
         if (game.isFowMode()) {
+            Button draw1AC = Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.getACEmoji(game));
             buttons.add(draw1AC);
         }
+        Button getCCs = Buttons.green("redistributeCCButtons", "Redistribute, Gain, & Confirm Command Tokens")
+            .withEmoji(Emoji.fromFormatted("🔺"));
         buttons.add(getCCs);
         buttons.add(passOnAbilities);
         if (yssarilPolicy != null) {
