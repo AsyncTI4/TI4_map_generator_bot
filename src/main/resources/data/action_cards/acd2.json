@@ -52,7 +52,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Give 1 promissory note to another player. Then, that player and each other player with 1 of your promissory notes in their play area gives you 1 random action card from their hand.",
-        "flavorText": "Communications were jammed. Supply lines were harried. Staffing officers were found dead in their bunks. The grandeur of the scheme shocked Claire to her core.",
+        "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
         "source": "action_deck_2"
     },
     {
@@ -61,7 +61,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Draw and reveal 2 secret objectives. Then, give 1 of those cards to another player that has less than 3 scored secret objectives, if able.",
-        "flavorText": "Suffi kissed the data drive before placing it at the drop-off. This job would pay for a long vacation.",
+        "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother,\" they said in unison.",
         "source": "action_deck_2"
     },
     {
@@ -317,7 +317,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Look at another player's action cards. Then, that player gives you 1 action card, promissory note, or secret objective from their hand.",
-        "flavorText": "The leaked documents brought a smile to Willard's face. Schemes upon schemes, none of which would ever reach fruition. ",
+        "flavorText": "Kyver waited patiently, cloaked outside the station in transparasteel plating. They loathed eliminating children, but this messiah must remain unrisen.",
         "source": "action_deck_2"
     },
     {
@@ -326,7 +326,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Remove 1 of another player's command tokens from the game board and place it in a system that contains your units.",
-        "flavorText": "Jae Mir Kan reflected on the lie he had crafted, noting not all stooges need be forged through sorcery.",
+        "flavorText": "The past flooded Ahk-Syl Siven's thoughts upon seeing the Mahact, and the memory of his essence being rewritten on a subatomic level surged involuntarily to the forefront of his consciousness.",
         "source": "action_deck_2"
     },
     {
@@ -504,7 +504,7 @@
         "phase": "Any",
         "window": "After you produce a unit",
         "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
-        "flavorText": "Tai gave a self-satisfied hmph as he looked over the recruitment reports. \"If you build it, they will come, they say.\" The Alliance's new war sun was proof enough.",
+        "flavorText": "From Umbat's hearthworld to distant suns, the shadow of his armada lengthened—stoked by their fury.",
         "source": "action_deck_2"
     },
     {
@@ -513,7 +513,7 @@
         "phase": "Any",
         "window": "After you produce a unit",
         "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
-        "flavorText": "Dart grabbed the new cadet by his Naaz. \"Any more backtalk from you and you'll get a clout in the ear!\"",
+        "flavorText": "",
         "source": "action_deck_2"
     },
     {
@@ -522,7 +522,7 @@
         "phase": "Any",
         "window": "After you produce a unit",
         "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
-        "flavorText": "The new squadron leader gasped as the simulation ended. For the fifth time today, Dart had bested them like it was cub's play.",
+        "flavorText": "",
         "source": "action_deck_2"
     },
     {
@@ -531,7 +531,7 @@
         "phase": "Any",
         "window": "After you produce a unit",
         "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
-        "flavorText": "Dart stood at the edge of the hangar, watching soldiers marching into the belly of his heavy cruiser. \"The board is set.\" Tai agreed, \"The pieces are moving.\"",
+        "flavorText": "Umbat's engineers broke into celebration as he called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
         "source": "action_deck_2"
     },
     {
