@@ -23,6 +23,7 @@ import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.StatusHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -46,6 +47,10 @@ class DeleteButtonsButtonHandler {
         String buttonLabel = event.getButton().getLabel();
         buttonID = buttonID.replace("deleteButtons_", "");
         String editedMessage = event.getMessage().getContentRaw();
+        if ("Done Redistributing Command Tokens".equalsIgnoreCase(buttonLabel)
+                && "statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
+            StatusHelper.markStatusHomeworkFinished(game, player);
+        }
         if (("Done Gaining Command Tokens".equalsIgnoreCase(buttonLabel)
                         || "Done Redistributing Command Tokens".equalsIgnoreCase(buttonLabel)
                         || "Done Losing Command Tokens".equalsIgnoreCase(buttonLabel)

@@ -15,6 +15,7 @@ import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.helpers.AgendaHelper;
+import ti4.helpers.StatusHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
@@ -290,7 +291,7 @@ public class AutoPingCron {
         if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS / 2 * game.getAutoPingSpacer())) {
             StringBuilder msg = new StringBuilder();
             for (Player player : game.getRealPlayers()) {
-                if (!game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
+                if (!StatusHelper.hasPlayerFinishedStatusHomework(game, player)) {
                     if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(
                                 player.getCorrectChannel(),

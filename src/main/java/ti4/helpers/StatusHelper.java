@@ -51,6 +51,8 @@ import ti4.settings.users.UserSettingsManager;
 @UtilityClass
 public final class StatusHelper {
 
+    private static final String STATUS_HOMEWORK_COMPLETE_KEY_PREFIX = "statusHomeworkCompleteFor";
+
     public static void announceStatusPhase(Game game) {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have passed.");
         if (game.isShowBanners()) {
@@ -147,6 +149,18 @@ public final class StatusHelper {
                 }
             }
         }
+    }
+
+    public static boolean hasPlayerFinishedStatusHomework(Game game, Player player) {
+        return "done".equals(game.getStoredValue(getStatusHomeworkCompletionKey(game, player)));
+    }
+
+    public static void markStatusHomeworkFinished(Game game, Player player) {
+        game.setStoredValue(getStatusHomeworkCompletionKey(game, player), "done");
+    }
+
+    private static String getStatusHomeworkCompletionKey(Game game, Player player) {
+        return STATUS_HOMEWORK_COMPLETE_KEY_PREFIX + player.getFaction() + "Round" + game.getRound();
     }
 
     public static void beginScoring(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
