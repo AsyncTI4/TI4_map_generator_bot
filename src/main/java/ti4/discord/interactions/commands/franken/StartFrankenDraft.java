@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.draft.FrankenDraft;
+import ti4.draft.FrankenDrazDraft;
 import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.OnePickFrankenDraft;
 import ti4.draft.OverdraftFrankenDraft;
@@ -64,6 +65,7 @@ class StartFrankenDraft extends GameStateSubcommand {
                 case OVERDRAFT -> game.setBagDraft(new OverdraftFrankenDraft(game));
                 case POWEREDONEPICK -> game.setBagDraft(new PoweredOnePickFrankenDraft(game));
                 case POWEREDOVERDRAFT -> game.setBagDraft(new PoweredOverdraftFrankenDraft(game));
+                case FRANKENDRAZ -> game.setBagDraft(new FrankenDrazDraft(game));
                 case TWILIGHTSFALL -> {
                     game.setupTwilightsFallMode(event);
                     game.setBagDraft(new TwilightsFallFrankenDraft(game));

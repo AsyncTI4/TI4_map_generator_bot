@@ -32,6 +32,7 @@ public abstract class BagDraft {
             case "overdraft_franken" -> new OverdraftFrankenDraft(game);
             case "poweredonepick_franken" -> new PoweredOnePickFrankenDraft(game);
             case "powered_overdraft_franken" -> new PoweredOverdraftFrankenDraft(game);
+            case "frankendraz" -> new FrankenDrazDraft(game);
             case "twilights_fall" -> new TwilightsFallFrankenDraft(game);
             case "inaugural_splice" -> new InauguralSpliceFrankenDraft(game);
             default -> null;
@@ -40,6 +41,10 @@ public abstract class BagDraft {
 
     BagDraft(Game owner) {
         this.owner = owner;
+    }
+
+    protected Game getOwner() {
+        return owner;
     }
 
     public abstract int getItemLimitForCategory(DraftCategory category);

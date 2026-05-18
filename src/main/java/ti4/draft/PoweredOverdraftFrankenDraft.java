@@ -18,7 +18,7 @@ public class PoweredOverdraftFrankenDraft extends FrankenDraft {
             case FLAGSHIP, MECH, BREAKTHROUGH -> 2;
             case PN, COMMODITIES, REDTILE -> 2;
             case DRAFTORDER -> 1;
-            case UNIT, PLOT, MAHACTKING -> 0;
+            case FACTION, UNIT, PLOT, MAHACTKING -> 0;
         };
     }
 

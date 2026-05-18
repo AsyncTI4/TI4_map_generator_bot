@@ -47,7 +47,7 @@ public class FrankenDraft extends BagDraft {
             case COMMODITIES, FLAGSHIP, MECH -> 2;
             case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 2;
             case DRAFTORDER -> 1;
-            case UNIT, PLOT, MAHACTKING -> 0;
+            case FACTION, UNIT, PLOT, MAHACTKING -> 0;
         };
     }
 
@@ -60,7 +60,7 @@ public class FrankenDraft extends BagDraft {
             case COMMODITIES, FLAGSHIP, MECH -> 1;
             case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 1;
             case DRAFTORDER, STARTINGFLEET -> 1;
-            case UNIT, PLOT, MAHACTKING -> 0;
+            case FACTION, UNIT, PLOT, MAHACTKING -> 0;
         };
     }
 

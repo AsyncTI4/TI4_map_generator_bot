@@ -30,8 +30,10 @@ import ti4.draft.DraftBag;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
+import ti4.draft.FrankenDrazDraft;
 import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.items.AgentDraftItem;
+import ti4.draft.items.FactionDraftItem;
 import ti4.draft.items.HeroDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -117,13 +119,17 @@ public class FrankenDraftBagService {
             }
 
             player.setStoredValue("frankenBuilt", "n");
-            for (DraftCategory category : componentCategories) {
-                Container c = postDraftCategoryContainer(player, category);
-                if (c == null) continue;
-                MessageV2Builder builder = new MessageV2Builder(cardsInfoThread);
-                builder.append(c.withAccentColor(accents.getFirst()));
-                Collections.rotate(accents, -1);
-                builder.send();
+            if (game.getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
+                frankenDrazDraft.sendPostDraftComponentButtons(player);
+            } else {
+                for (DraftCategory category : componentCategories) {
+                    Container c = postDraftCategoryContainer(player, category);
+                    if (c == null) continue;
+                    MessageV2Builder builder = new MessageV2Builder(cardsInfoThread);
+                    builder.append(c.withAccentColor(accents.getFirst()));
+                    Collections.rotate(accents, -1);
+                    builder.send();
+                }
             }
 
             if (game.isTwilightsFallMode()) {
@@ -290,7 +296,11 @@ public class FrankenDraftBagService {
             // Add each item to the container
             for (DraftItem item : all) {
                 if (components.size() > 1) components.add(Separator.createDivider(Spacing.LARGE));
-                components.addAll(item.getTextDisplays(game, player, true));
+                components.addAll(item.getTextDisplays(game, player, cat != DraftCategory.FACTION));
+                if (item instanceof FactionDraftItem) {
+                    String buttonID = player.factionButtonChecker() + "frankenFactionComponents;" + item.getItemId();
+                    components.add(ActionRow.of(Buttons.gray(buttonID, "Show Components", item.getItemEmoji())));
+                }
             }
             // Then either...
             if (!DraftItem.isDraftable(player, cat)) {
@@ -450,6 +460,8 @@ public class FrankenDraftBagService {
         String draftName = "Franken Draft";
         if (draft instanceof InauguralSpliceFrankenDraft) {
             draftName = "Inaugural Splice";
+        } else if (draft instanceof FrankenDrazDraft) {
+            draftName = "FrankenDraz";
         }
 
         String message;
