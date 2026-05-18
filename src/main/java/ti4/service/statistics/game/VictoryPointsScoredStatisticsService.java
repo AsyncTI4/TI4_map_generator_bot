@@ -2,9 +2,11 @@ package ti4.service.statistics.game;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -26,8 +28,13 @@ class VictoryPointsScoredStatisticsService {
         Map<String, Integer> relics = new HashMap<>();
 
         ConsumeGameUtility.consumeAllGames(
+                GameStatisticsFilterer.getGamesFilterForWonGame(event),
+                game -> collectScoredSecrets(game, secrets),
+                ExecutionLockType.READ);
+
+        ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event),
-                game -> listScoredVictoryPoints(game, secrets, publics, relics),
+                game -> collectScoredVictoryPoints(game, publics, relics),
                 ExecutionLockType.READ);
 
         Map<String, Integer> topThousand = secrets.entrySet().stream()
@@ -76,20 +83,25 @@ class VictoryPointsScoredStatisticsService {
         MessageHelper.sendMessageToThread(event.getChannel(), "Relics Drawn Count", sb.toString());
     }
 
-    private static void listScoredVictoryPoints(
-            Game game, Map<String, Integer> secrets, Map<String, Integer> publics, Map<String, Integer> relics) {
-        for (Player player : game.getRealPlayers()) {
+    static void collectScoredSecrets(Game game, Map<String, Integer> secrets) {
+        if (SecretObjectiveWinChanceStatisticsService.shouldIgnoreGameForSecretObjectiveStats(game)) {
+            return;
+        }
+
+        Set<String> convertedSecretIds = new HashSet<>(game.getSoToPoList());
+        for (Player player : game.getRealAndEliminatedPlayers()) {
             for (String so : player.getSecretsScored().keySet()) {
-                if (Mapper.getSecretObjective(so) != null) {
-                    String secret = Mapper.getSecretObjective(so).getName();
-                    if (secrets.containsKey(secret)) {
-                        secrets.put(secret, secrets.get(secret) + 1);
-                    } else {
-                        secrets.put(secret, 1);
-                    }
+                var secretObjective =
+                        SecretObjectiveWinChanceStatisticsService.getTrackableSecretObjective(so, convertedSecretIds);
+                if (secretObjective != null) {
+                    secrets.merge(secretObjective.getName(), 1, Integer::sum);
                 }
             }
         }
+    }
+
+    private static void collectScoredVictoryPoints(
+            Game game, Map<String, Integer> publics, Map<String, Integer> relics) {
         for (String po : game.getRevealedPublicObjectives().keySet()) {
             if (Mapper.getPublicObjective(po) != null) {
                 String publicO = Mapper.getPublicObjective(po).getName();

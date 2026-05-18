@@ -397,7 +397,7 @@ class SecretObjectiveWinChanceStatisticsService {
         return count;
     }
 
-    private static SecretObjectiveModel getTrackableSecretObjective(String secretId, Set<String> convertedSecretIds) {
+    static SecretObjectiveModel getTrackableSecretObjective(String secretId, Set<String> convertedSecretIds) {
         if (convertedSecretIds.contains(secretId)) {
             return null;
         }
