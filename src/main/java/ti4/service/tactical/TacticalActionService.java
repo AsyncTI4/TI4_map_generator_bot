@@ -24,6 +24,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.message.MessageHelper;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
@@ -158,7 +159,7 @@ public class TacticalActionService {
 
         // Core logic block: movement, token placement, after-move effects, and state flags
         FinishMovementContext ctx = executeCoreFinishMovement(event, game, player, tile);
-
+        TeHelperGeneral.checkCoexistTransfer(game);
         // UI/message block: build message and buttons
         LoreService.showSystemLore(player, game, tile.getPosition(), LoreService.TRIGGER.MOVED);
         String message = buildFinishMovementMessage(game, player, ctx);

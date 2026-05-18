@@ -346,6 +346,16 @@ public final class ButtonHelperActionCards {
         checkForPlayingSummit(game, player);
         checkForPlayingBountyContracts(game, player);
         checkForPlayingSpliceCards(game, player);
+        if (player.getPlayableActionCards().contains("puppetsonastring")) {
+            String msg =
+                    "You have _Puppets On A String_ in your hand. If you're not about to pass, you can ignore this message."
+                            + " Otherwise, you can use the preset button to automatically use it when the last player passes."
+                            + " Don't worry, you can always unset the preset later if you decide you don't want to use it.";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("resolvePreassignment_Puppets On A String", "Pre-Play Puppets On A String"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        }
     }
 
     @ButtonHandler("resolveCounterStroke")

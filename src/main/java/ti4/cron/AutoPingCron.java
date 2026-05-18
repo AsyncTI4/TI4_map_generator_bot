@@ -345,18 +345,27 @@ public class AutoPingCron {
 
             if (!game.getStoredValue("queuedWhens").contains(p2.getFaction())
                     && !game.getStoredValue("declinedWhens").contains(p2.getFaction())) {
+                List<Button> buttons = new ArrayList<>();
+
+                buttons.add(Buttons.gray("queueAWhen", "Play A \"When\""));
+                buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On \"When\"s"));
                 MessageHelper.sendMessageToChannel(
                         p2.getCardsInfoThread(),
-                        p2.getRepresentation(true, true) + ", this is a reminder to play (or pass on) your \"when\"s.");
+                        p2.getRepresentation(true, true) + ", this is a reminder to play (or pass on) your \"when\"s.",
+                        buttons);
                 continue;
             }
             if (!game.getStoredValue("queuedAfters").contains(p2.getFaction())
                     && !game.getStoredValue("declinedAfters").contains(p2.getFaction())
                     && !game.getStoredValue("queuedWhens").contains(p2.getFaction())) {
+                List<Button> buttons = new ArrayList<>();
+
+                buttons.add(Buttons.gray("queueAnAfter", "Play An \"After\""));
+                buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
                 MessageHelper.sendMessageToChannel(
                         p2.getCardsInfoThread(),
-                        p2.getRepresentation(true, true)
-                                + ", this is a reminder to play (or pass on) your \"after\"s.");
+                        p2.getRepresentation(true, true) + ", this is a reminder to play (or pass on) your \"after\"s.",
+                        buttons);
             }
             if (game.isHiddenAgendaMode() || game.isOmegaPhaseMode()) {
                 if (AgendaHelper.getPlayersWhoNeedToPreVoted(game).contains(p2)) {

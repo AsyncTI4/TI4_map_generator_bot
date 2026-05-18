@@ -804,7 +804,7 @@ public final class ButtonHelperAgents {
             List<Button> buttons = ButtonHelper.getGainCCButtons(p2);
             String message2 = p2.getRepresentation() + ", your current command tokens are " + p2.getCCRepresentation()
                     + ". Use buttons to gain command tokens.";
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(channel, message2, buttons);
             game.setStoredValue("originalCCsFor" + p2.getFaction(), p2.getCCRepresentation());
         }
         if ("keleresagent".equalsIgnoreCase(agent)) {
@@ -1084,7 +1084,7 @@ public final class ButtonHelperAgents {
             }
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
-            MessageChannel channel2 = event.getMessageChannel();
+            MessageChannel channel2 = p2.getCorrectChannel();
             if (game.isFowMode()) {
                 channel2 = p2.getPrivateChannel();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Sent buttons to the chosen player");

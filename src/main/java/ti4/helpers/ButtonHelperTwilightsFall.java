@@ -902,6 +902,7 @@ public final class ButtonHelperTwilightsFall {
                     }
                     game.setStoredValue("endTurnWhenSpliceEnds", "");
                 }
+                game.removeStoredValue("Reverse Splice");
                 game.removeStoredValue("willParticipateInSplice");
             }
             ButtonHelper.deleteMessage(event);

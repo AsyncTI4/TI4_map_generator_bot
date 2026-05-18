@@ -257,7 +257,7 @@ public final class TeHelperAgents {
                 ExhaustLeaderService.exhaustLeader(game, player, zeu);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " exhausted "
+                        player.getRepresentationNoPing() + " exhausted "
                                 + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                                 + "Z'eu ΩΩ, the Naalu" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                                 + " to remove the just-placed command token from " + tile.getRepresentationForButtons()
