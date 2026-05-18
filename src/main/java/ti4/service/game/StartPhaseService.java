@@ -810,6 +810,7 @@ public class StartPhaseService {
         game.setPhaseOfGame("statusHomework");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusHomework", System.currentTimeMillis() + "");
         GMService.logActivity(game, "**StatusHomework** Phase for Round " + game.getRound() + " started.", true);
+        StatusHelper.initializeStatusHomeworkTracking(game);
         // first do cleanup if necessary
         int playersWithSCs = 0;
         for (Player player : game.getRealPlayers()) {

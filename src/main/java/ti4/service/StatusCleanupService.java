@@ -83,7 +83,6 @@ public class StatusCleanupService {
             game.removeLaw("tk-endorse");
         }
 
-        game.setCurrentACDrawStatusInfo("");
         if (!game.isFowMode()) {
             for (Player p : game.getActionPhaseTurnOrder()) {
                 ButtonHelper.drawStatusACs(game, p, null);

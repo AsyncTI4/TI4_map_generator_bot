@@ -1340,7 +1340,7 @@ public class ButtonHelper {
 
     @ButtonHandler("drawStatusACs")
     public static void drawStatusACs(Game game, Player player, ButtonInteractionEvent event) {
-        if (game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
+        if (StatusHelper.hasPlayerDrawnStatusActionCards(game, player)) {
             if (event != null) {
                 ReactionService.addReaction(
                         event,
@@ -1412,7 +1412,7 @@ public class ButtonHelper {
             }
         }
 
-        game.setCurrentACDrawStatusInfo(game.getCurrentACDrawStatusInfo() + "_" + player.getFaction());
+        StatusHelper.markPlayerDrewStatusActionCards(game, player);
         ButtonHelperActionCards.checkForAssigningPublicDisgrace(game, player);
         ButtonHelperActionCards.checkForPlayingManipulateInvestments(game, player);
         ButtonHelperActionCards.checkForPlayingSummit(game, player);

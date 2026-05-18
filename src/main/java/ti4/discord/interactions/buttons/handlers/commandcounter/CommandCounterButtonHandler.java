@@ -140,21 +140,6 @@ public class CommandCounterButtonHandler {
             MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
         }
 
-        if (!game.isFowMode() && "statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
-            ReactionService.addReaction(event, game, player);
-            game.setStoredValue("statusHomeworkReactionFor" + player.getFaction() + "Round" + game.getRound(), "added");
-            for (Player p2 : game.getRealPlayers()) {
-                if (p2.isNpc()
-                        && game.getStoredValue(
-                                        "statusHomeworkReactionFor" + p2.getFaction() + "Round" + game.getRound())
-                                .isEmpty()) {
-                    ReactionService.addReaction(event, game, p2);
-                    game.setStoredValue(
-                            "statusHomeworkReactionFor" + p2.getFaction() + "Round" + game.getRound(), "added");
-                }
-            }
-        }
-
         if ("statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
             boolean cyber = false;
             boolean malevolency = false;

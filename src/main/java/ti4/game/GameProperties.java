@@ -67,7 +67,6 @@ public class GameProperties {
     // Transient Game Data
     private String activeSystem;
     private String currentAgendaInfo = "";
-    private String currentACDrawStatusInfo = "";
     private String latestCommand = "";
     private String latestOutcomeVotedFor = "";
     private String playersWhoHitPersistentNoAfter = "";

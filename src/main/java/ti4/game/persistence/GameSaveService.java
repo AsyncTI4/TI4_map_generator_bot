@@ -208,8 +208,6 @@ class GameSaveService {
 
         writer.write(Constants.CURRENT_AGENDA_INFO + " " + game.getCurrentAgendaInfo());
         writer.write(System.lineSeparator());
-        writer.write(Constants.CURRENT_ACDRAWSTATUS_INFO + " " + game.getCurrentACDrawStatusInfo());
-        writer.write(System.lineSeparator());
 
         // TE Expeditions
         Expeditions exp = game.getExpeditions();

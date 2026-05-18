@@ -402,7 +402,9 @@ class GameLoadService {
                     }
                 }
                 case Constants.CURRENT_AGENDA_INFO -> game.setCurrentAgendaInfo(info);
-                case Constants.CURRENT_ACDRAWSTATUS_INFO -> game.setCurrentACDrawStatusInfo(info);
+                case Constants.CURRENT_ACDRAWSTATUS_INFO -> {
+                    // Legacy field removed; old saves may still contain this line.
+                }
 
                 case Constants.LAST_ACTIVE_PLAYER_CHANGE -> {
                     if (isNotBlank(info)) {

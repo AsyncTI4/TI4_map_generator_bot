@@ -2,11 +2,13 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -28,6 +30,8 @@ import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.message.GameMessage;
+import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
@@ -51,7 +55,8 @@ import ti4.settings.users.UserSettingsManager;
 @UtilityClass
 public final class StatusHelper {
 
-    private static final String STATUS_HOMEWORK_COMPLETE_KEY_PREFIX = "statusHomeworkCompleteFor";
+    private static final String STATUS_HOMEWORK_TRACKING_ID_PREFIX = "statusHomeworkFinishedRound";
+    private static final String STATUS_HOMEWORK_AC_DRAW_TRACKING_ID_PREFIX = "statusHomeworkActionCardsRound";
 
     public static void announceStatusPhase(Game game) {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have passed.");
@@ -151,16 +156,50 @@ public final class StatusHelper {
         }
     }
 
+    public static void initializeStatusHomeworkTracking(Game game) {
+        GameMessageManager.replace(
+                game.getName(),
+                new GameMessage(
+                        STATUS_HOMEWORK_TRACKING_ID_PREFIX + game.getRound(),
+                        GameMessageType.STATUS_HOMEWORK,
+                        getNpcFactions(game),
+                        game.getLastModifiedDate()));
+        GameMessageManager.replace(
+                game.getName(),
+                new GameMessage(
+                        STATUS_HOMEWORK_AC_DRAW_TRACKING_ID_PREFIX + game.getRound(),
+                        GameMessageType.STATUS_HOMEWORK_AC_DRAW,
+                        game.getLastModifiedDate()));
+    }
+
     public static boolean hasPlayerFinishedStatusHomework(Game game, Player player) {
-        return "done".equals(game.getStoredValue(getStatusHomeworkCompletionKey(game, player)));
+        return hasTrackedStatusHomeworkReaction(game, player, GameMessageType.STATUS_HOMEWORK);
     }
 
     public static void markStatusHomeworkFinished(Game game, Player player) {
-        game.setStoredValue(getStatusHomeworkCompletionKey(game, player), "done");
+        GameMessageManager.addReaction(game.getName(), player.getFaction(), GameMessageType.STATUS_HOMEWORK);
     }
 
-    private static String getStatusHomeworkCompletionKey(Game game, Player player) {
-        return STATUS_HOMEWORK_COMPLETE_KEY_PREFIX + player.getFaction() + "Round" + game.getRound();
+    public static boolean hasPlayerDrawnStatusActionCards(Game game, Player player) {
+        return hasTrackedStatusHomeworkReaction(game, player, GameMessageType.STATUS_HOMEWORK_AC_DRAW);
+    }
+
+    public static void markPlayerDrewStatusActionCards(Game game, Player player) {
+        GameMessageManager.addReaction(game.getName(), player.getFaction(), GameMessageType.STATUS_HOMEWORK_AC_DRAW);
+    }
+
+    private static boolean hasTrackedStatusHomeworkReaction(Game game, Player player, GameMessageType messageType) {
+        return GameMessageManager.getOne(game.getName(), messageType)
+                .map(GameMessage::factionsThatReacted)
+                .orElseGet(LinkedHashSet::new)
+                .contains(player.getFaction());
+    }
+
+    private static LinkedHashSet<String> getNpcFactions(Game game) {
+        return game.getRealPlayers().stream()
+                .filter(Player::isNpc)
+                .map(Player::getFaction)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public static void beginScoring(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
