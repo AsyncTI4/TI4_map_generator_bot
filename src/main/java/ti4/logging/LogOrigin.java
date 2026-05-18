@@ -3,6 +3,7 @@ package ti4.logging;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import lombok.Getter;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -86,10 +87,12 @@ public class LogOrigin {
             case ButtonInteractionEvent bEvent ->
                 builder.append("pressed button ")
                         .append(ButtonHelper.getButtonRepresentation(bEvent.getButton()))
+                        .append(buildInteractionLocationText(bEvent.getChannel().getName(), bEvent.getMessage()))
                         .append('\n');
             case StringSelectInteractionEvent sEvent ->
                 builder.append("selected ")
                         .append(SelectionMenuProcessor.getSelectionMenuDebugText(sEvent))
+                        .append(buildInteractionLocationText(sEvent.getChannel().getName(), sEvent.getMessage()))
                         .append('\n');
             case ModalInteractionEvent mEvent ->
                 builder.append("used modal ")
@@ -102,6 +105,18 @@ public class LogOrigin {
         }
 
         return builder.toString();
+    }
+
+    @Nonnull
+    private static String buildInteractionLocationText(@Nullable String channelName, @Nullable Message message) {
+        if (message == null) {
+            return channelName == null ? "" : " in: `" + channelName + "`";
+        }
+        String messageJumpUrl = message.getJumpUrl();
+        if (channelName == null || messageJumpUrl == null) {
+            return "";
+        }
+        return " in: [" + channelName + "](" + messageJumpUrl + ")";
     }
 
     @Nonnull
