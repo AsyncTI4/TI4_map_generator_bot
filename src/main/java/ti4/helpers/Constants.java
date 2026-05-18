@@ -187,7 +187,7 @@ public final class Constants {
     public static final String JOIN = "join";
     public static final String START_SCENARIO = "start_scenario";
     public static final String ADD = "add";
-    public static final String COMPARE_AFK_TIMES = "compare_afk_times";
+    public static final String COMPARE_ACTIVITY_TIMES = "compare_activity_times";
     public static final String REPLACE = "replace";
     public static final String LEAVE = "leave";
     public static final String REMOVE = "remove";
@@ -1327,6 +1327,7 @@ public final class Constants {
     public static final String SPLICE_TYPE = "splice_type";
     public static final String REVERSE_SPLICE = "reverse_splice";
     public static final String START_NEW_SPLICE = "start_new_splice";
+    public static final String ADD_TO_SPLICE = "add_to_splice";
     public static final String GALVANIZE = "galvanize";
     public static final String FIX_COLORS = "fix_colors";
     public static final String DRAW_RANDOM_UNIT = "draw_random_unit";

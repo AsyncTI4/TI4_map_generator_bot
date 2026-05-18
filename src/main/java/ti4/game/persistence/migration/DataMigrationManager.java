@@ -1,6 +1,8 @@
 package ti4.game.persistence.migration;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +16,6 @@ import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.game.helper.GameHelper;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.logging.BotLogger;
@@ -54,6 +55,9 @@ public class DataMigrationManager {
         //         DataMigrationManager::renameGarboziaToBozgarbia_201025_withEnded);
         // migrations.put("fixMisspelledAgendaIds_200226", DataMigrationManager::fixMisspelledAgendaIds_200226);
         // migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
+        // migrations.put(
+        //         "unlockLockedAgentsBySetupState_120526",
+        //         DataMigrationManager::unlockLockedAgentsBySetupState_120526);
     }
 
     public static void runMigrations() {
@@ -130,7 +134,9 @@ public class DataMigrationManager {
 
             LocalDate mapCreatedOn = null;
             try {
-                mapCreatedOn = LocalDate.parse(managedGame.getCreationDate(), GameHelper.CREATION_DATE_FORMATTER);
+                mapCreatedOn = Instant.ofEpochMilli(managedGame.getCreationDateTime())
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate();
             } catch (Exception ignored) {
             }
 
@@ -184,5 +190,18 @@ public class DataMigrationManager {
                 "senate_sancuary", "senate_sanctuary");
 
         return MigrationHelper.replaceAgendaCards(game, List.of(game.getAgendaDeckID()), replacements);
+    }
+
+    public static Boolean unlockLockedAgentsBySetupState_120526(Game game) {
+        boolean changed = false;
+        for (Player player : game.getPlayers().values()) {
+            for (var leader : player.getLeaders()) {
+                if (leader.isLocked() && "agent".equals(leader.getType())) {
+                    leader.setLocked(false);
+                    changed = true;
+                }
+            }
+        }
+        return changed;
     }
 }

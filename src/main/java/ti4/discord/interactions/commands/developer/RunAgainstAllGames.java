@@ -5,9 +5,10 @@ import java.util.HashSet;
 import java.util.Set;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.Subcommand;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.game.persistence.GameManager;
-import ti4.game.persistence.GamesPage;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -25,53 +26,23 @@ class RunAgainstAllGames extends Subcommand {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Running custom command against all games.");
 
         Set<String> changedGames = new HashSet<>();
-        GamesPage.consumeAllGames(game -> {
-            boolean changed = makeChanges(game, event);
-            if (changed) {
-                changedGames.add(game.getName());
-                // TODO: Need to figure out how to lock here. Maybe add a "consumeAllGamesWithLock"
-                GameManager.save(game, "Developer ran custom command against this game, probably migration related.");
-            }
-        });
+        ConsumeGameUtility.consumeAllGames(
+                game -> {
+                    boolean changed = makeChanges(game);
+                    if (changed) {
+                        changedGames.add(game.getName());
+                        GameManager.save(
+                                game, "Developer ran custom command against this game, probably migration related.");
+                    }
+                },
+                ExecutionLockType.WRITE);
 
         MessageHelper.sendMessageToChannel(event.getChannel(), "Finished custom command against all games.");
         BotLogger.info("Changes made to " + changedGames.size() + " games out of " + GameManager.getGameCount()
                 + " games: " + String.join(", ", changedGames));
     }
 
-    private static boolean makeChanges(Game game, SlashCommandInteractionEvent event) {
-        if (!game.isHasEnded()) {
-            return false;
-        }
-
-        long now = System.currentTimeMillis();
-        long creationDateTime = game.getCreationDateTime();
-        long endedDate = game.getEndedDate();
-        boolean changed = false;
-
-        if (creationDateTime > now) {
-            long newCreationDateTime = now - ONE_DAY_MILLIS;
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    game.getName() + " has creationDateTime in the future. creationDateTime=" + creationDateTime
-                            + ". Setting to " + newCreationDateTime + ".");
-            game.setCreationDateTime(newCreationDateTime);
-            creationDateTime = newCreationDateTime;
-            changed = true;
-        }
-
-        if (endedDate < creationDateTime) {
-            long daysToEnd = Duration.ofMillis(endedDate - creationDateTime).toDays();
-            long newEndedDate = Math.min(creationDateTime + THIRTY_DAYS_MILLIS, now);
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    game.getName() + " ended before it started (" + daysToEnd + " days). creationDateTime="
-                            + creationDateTime + ", endedDate=" + endedDate
-                            + ". Updating end date to " + newEndedDate + ".");
-            game.setEndedDate(newEndedDate);
-            changed = true;
-        }
-
-        return changed;
+    private static boolean makeChanges(Game game) {
+        return false;
     }
 }

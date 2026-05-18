@@ -664,7 +664,7 @@ public final class ButtonHelperAgents {
 
         if ("researchagent".equalsIgnoreCase(agent)) {
             String exhaustText =
-                    player.getRepresentation() + " has used the _Research Genome_ to add 3 cards to the draft.";
+                    player.getRepresentationNoPing() + " has used the _Research Genome_ to add 3 cards to the draft.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             game.setStoredValue("researchagentSplice" + player.getFaction(), "Yes");
         }
@@ -1093,6 +1093,13 @@ public final class ButtonHelperAgents {
                     p2, game, game.getTileByPosition(game.getActiveSystem()));
             MessageHelper.sendMessageToChannel(
                     channel2, p2.getRepresentation() + ", please choose the unit you wish to galvanize.", buttons);
+        }
+        if ("obsidianagent".equalsIgnoreCase(agent)) {
+            String exhaustText = player.getRepresentation() + " has exhausted the " + ssruuClever + "_Obsidian Agent_.";
+            MessageHelper.sendMessageToChannel(channel, exhaustText);
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Just tell the relevant player to destroy the unit with the assign hits button available under the picture of the combat.");
         }
         if ("valiantagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted the " + ssruuClever + "_Valiant Genome_.";

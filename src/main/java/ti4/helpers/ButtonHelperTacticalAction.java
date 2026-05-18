@@ -678,7 +678,7 @@ public final class ButtonHelperTacticalAction {
 
             for (Player btb : game.getRealPlayers()) {
                 if (!btb.ownsUnit("tk-blacktrenchbulwark")) continue;
-                if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Pds)
+                if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, btb, UnitType.Pds)
                         .contains(activeSystem)) continue;
 
                 String id = btb.factionButtonChecker() + "useMagenDefense_" + activeSystem.getPosition();
@@ -690,7 +690,8 @@ public final class ButtonHelperTacticalAction {
 
             for (Player archive : game.getRealPlayers()) {
                 if (!archive.ownsUnit("tk-visionariaarchive")) continue;
-                if (activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Spacedock, archive) == 0) continue;
+                if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, archive, UnitType.Spacedock)
+                        .contains(activeSystem)) continue;
 
                 String id = player.factionButtonChecker() + "useVisionariaArchive_" + archive.getColor();
                 Button use = Buttons.red(id, "Use Visionaria Archive", MiscEmojis.tf_ability);

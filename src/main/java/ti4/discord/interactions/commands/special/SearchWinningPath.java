@@ -7,9 +7,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.persistence.GamesPage;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.PatternHelper;
@@ -34,14 +35,15 @@ class SearchWinningPath extends Subcommand {
                 .append(searchedPath)
                 .append('\n');
 
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event).and(game -> game.getWinner()
                         .map(winner -> hasWinningPath(game, winner, searchedPath))
                         .orElse(false)),
                 game -> {
                     foundGames.add(game.getName());
                     sb.append(formatGame(game)).append('\n');
-                });
+                },
+                ExecutionLockType.READ);
 
         if (foundGames.isEmpty()) {
             sb.append("No games match the selected path.");

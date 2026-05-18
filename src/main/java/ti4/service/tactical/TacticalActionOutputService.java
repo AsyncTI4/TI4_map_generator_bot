@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.game.Game;
@@ -35,13 +36,42 @@ import ti4.service.fow.GMService;
 public class TacticalActionOutputService {
 
     public void refreshButtonsAndMessageForChoosingTile(ButtonInteractionEvent event, Game game, Player player) {
+        refreshButtonsAndMessageForChoosingTile(event, game, player, 1);
+    }
+
+    public void refreshButtonsAndMessageForChoosingTile(
+            ButtonInteractionEvent event, Game game, Player player, int page) {
         String message = buildMessageForTacticalAction(game, player);
         List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);
         if (event == null) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, systemButtons);
-        } else {
+        } else if (systemButtons.size() <= 25) {
             MessageHelper.editMessageWithButtons(event, message, systemButtons);
+        } else {
+            MessageHelper.editMessageWithActionRowsAndFiles(
+                    event,
+                    message,
+                    Buttons.paginateButtons(
+                            getTileButtons(systemButtons),
+                            getControlButtons(systemButtons),
+                            page,
+                            player.factionButtonChecker() + "moveFromTilePage"),
+                    List.of());
         }
+    }
+
+    private List<Button> getTileButtons(List<Button> buttons) {
+        return buttons.stream()
+                .filter(TacticalActionOutputService::isTileButton)
+                .toList();
+    }
+
+    private List<Button> getControlButtons(List<Button> buttons) {
+        return buttons.stream().filter(button -> !isTileButton(button)).toList();
+    }
+
+    private boolean isTileButton(Button button) {
+        return button.getCustomId() != null && button.getCustomId().contains("tacticalMoveFrom_");
     }
 
     public void refreshButtonsAndMessageForTile(

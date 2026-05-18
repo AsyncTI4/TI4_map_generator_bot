@@ -1,7 +1,7 @@
 package ti4.game;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -1061,7 +1061,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 setMainChannelID(mainGameChannel.getId());
                 return mainGameChannel;
             }
-            // BotLogger.log("Could not retrieve MainGameChannel for " + getName(), e);
         }
         return null;
     }
@@ -1128,12 +1127,23 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return null;
     }
 
-    /**
-     * @return Guild that the ActionsChannel or MainGameChannel resides
-     */
     @Nullable
     public Guild getGuild() {
-        return getActionsChannel() == null ? null : getActionsChannel().getGuild();
+        if (JdaService.jda != null && StringUtils.isNumeric(getGuildID())) {
+            return JdaService.jda.getGuildById(getGuildID());
+        }
+
+        TextChannel actionsChannel = getActionsChannel();
+        if (actionsChannel != null) {
+            return actionsChannel.getGuild();
+        }
+
+        TextChannel tableTalkChannel = getTableTalkChannel();
+        if (tableTalkChannel != null) {
+            return tableTalkChannel.getGuild();
+        }
+
+        return null;
     }
 
     public void setCurrentReacts(String messageID, String factionsWhoReacted) {

@@ -21,7 +21,7 @@ public class StatisticsCommand implements ParentCommand {
                     new PlayerStatistics(),
                     new AverageTurnTime(),
                     new MedianTurnTime(),
-                    new CompareAFKTimes(),
+                    new CompareActivityTimes(),
                     new DiceLuck(),
                     new HitsPerTurn(),
                     new MatchmakingRatingCommand(),

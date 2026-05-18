@@ -1,7 +1,6 @@
 package ti4.service.turn;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,8 +30,8 @@ import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
+import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
-import ti4.message.GameMessageManager.GameMessage;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
@@ -52,6 +51,7 @@ import ti4.service.fow.WhisperService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.service.strategycard.StrategyCardMessageService;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -305,7 +305,7 @@ public class StartTurnService {
         }
     }
 
-    public static void reviveInfantryII(Player player) {
+    private static void reviveInfantryII(Player player) {
         Game game = player.getGame();
         if (player.getStasisInfantry() > 0 && !player.hasUnit("tf-yinclone") && player.hasInf2Tech()) {
             if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
@@ -342,7 +342,7 @@ public class StartTurnService {
         if (!player.isRealPlayer()) return "";
 
         StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentationUnfogged());
+        sb.append(player.getRepresentationNoPing());
         sb.append(" Please resolve these before doing anything else:\n");
 
         Map<Long, String> thingsToFollow = new LinkedHashMap<>();
@@ -369,10 +369,12 @@ public class StartTurnService {
 
             if (!player.hasFollowedSC(sc)) {
                 String msg = "> " + game.getSCEmojiWordRepresentation(sc);
-                String jumplink = game.getStoredValue("scPlay" + sc);
-                if (!jumplink.isEmpty()) {
-                    msg += " " + jumplink + "\n";
-                    Long id = Long.parseLong(Arrays.asList(jumplink.split("/")).getLast());
+                GameMessage scMessage = StrategyCardMessageService.getStrategyCardMessage(
+                                game.getName(), game.getRound(), sc)
+                        .orElse(null);
+                if (scMessage != null) {
+                    msg += " " + scMessage.asJumpLink(game.getMainGameChannel()) + "\n";
+                    Long id = Long.parseLong(scMessage.messageId());
                     thingsToFollow.put(id, msg);
                 } else {
                     sb.append(msg).append('\n');
@@ -403,12 +405,28 @@ public class StartTurnService {
                 .sorted(Entry.comparingByKey())
                 .map(Entry::getValue)
                 .forEach(sb::append);
+        appendStrategyPoolReminderIfHelpful(sb, game, player);
+        return sendReminder ? sb.toString() : null;
+    }
+
+    public static void appendStrategyPoolReminderIfHelpful(StringBuilder sb, Game game, Player player) {
+        if (shouldSkipStrategyPoolReminder(game, player)) {
+            return;
+        }
         sb.append("You currently have ")
                 .append(player.getStrategicCC())
                 .append(" command token")
                 .append(player.getStrategicCC() == 1 ? "" : "s")
                 .append(" in your strategy pool.");
-        return sendReminder ? sb.toString() : null;
+    }
+
+    private static boolean shouldSkipStrategyPoolReminder(Game game, Player player) {
+        List<Integer> unfollowedSCs = player.getUnfollowedSCs();
+        return player.getStrategicCC() == 0
+                && unfollowedSCs.size() == 1
+                && game.getStrategyCardModelByInitiative(unfollowedSCs.getFirst())
+                        .map(scModel -> scModel.usesAutomationForSCID("pok1leadership"))
+                        .orElse(false);
     }
 
     public static List<Button> getStartOfTurnButtons(
@@ -566,16 +584,13 @@ public class StartTurnService {
                             .append("** has been played and now it is their turn again and you haven't reacted.")
                             .append(" If you already reacted, check if your reaction got undone.");
 
-                    if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
-                        sb.append(" Message link is: ")
-                                .append(game.getStoredValue("scPlay" + sc))
-                                .append(".\n");
-                    }
-                    sb.append("You currently have ")
-                            .append(p2.getStrategicCC())
-                            .append(" command token")
-                            .append(p2.getStrategicCC() == 1 ? "" : "s")
-                            .append(" in your strategy pool.");
+                    StrategyCardMessageService.getStrategyCardMessage(game.getName(), game.getRound(), sc)
+                            .ifPresent(scMessage -> {
+                                sb.append(" Message link is: ")
+                                        .append(scMessage.asJumpLink(game.getMainGameChannel()))
+                                        .append(".\n");
+                            });
+                    appendStrategyPoolReminderIfHelpful(sb, game, p2);
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());
                 }
                 if (player.hasBreakthrough("deepwroughtbt") && player.isBreakthroughExhausted("deepwroughtbt")) {

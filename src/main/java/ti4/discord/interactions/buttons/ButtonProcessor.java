@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.contest.replay.buttons.CombatDoubleOrBustButtonIds;
 import ti4.contest.replay.buttons.CombatSideBetButtonIds;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
@@ -58,8 +59,8 @@ public class ButtonProcessor {
 
     public static void queue(ButtonInteractionEvent event) {
         String gameName = GameNameService.getGameNameFromChannel(event);
-        String rawComponentID = event.getButton().getCustomId();
-        ExecutionLockType lockType = registry.isSave(rawComponentID) ? ExecutionLockType.WRITE : ExecutionLockType.READ;
+        String componentId = event.getButton().getCustomId();
+        ExecutionLockType lockType = registry.isSave(componentId) ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutorServiceManager.runAsyncWithLock(
                 eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event), lockType);
     }
@@ -150,7 +151,9 @@ public class ButtonProcessor {
 
     private static boolean isCombatReplayButton(String buttonID) {
         return buttonID != null
-                && (buttonID.startsWith(CombatSideBetButtonIds.PREFIX) || buttonID.startsWith("combatReplayDebug_"));
+                && (buttonID.startsWith(CombatSideBetButtonIds.PREFIX)
+                        || buttonID.startsWith(CombatDoubleOrBustButtonIds.PREFIX)
+                        || buttonID.startsWith("combatReplayDebug_"));
     }
 
     private static void resolveButtonInteractionEvent(ButtonContext context) {
@@ -425,7 +428,8 @@ public class ButtonProcessor {
                 + "\n> Total button presses: "
                 + runtimeWarningService.getRuntimeSubmissionCount()
                 + "\n> Threshold misses: "
-                + decimalFormatter.format(thresholdMissPercent) + "%"
+                + decimalFormatter.format(thresholdMissPercent) + "% ("
+                + runtimeWarningService.getRuntimeThresholdMissCount() + ")"
                 + "\n> Average preprocessing time: "
                 + decimalFormatter.format(runtimeWarningService.getAveragePreprocessingTime()) + "ms"
                 + "\n> Average processing time: "

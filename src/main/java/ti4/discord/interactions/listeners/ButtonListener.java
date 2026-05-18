@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.AsyncTI4DiscordBot;
+import ti4.contest.replay.buttons.CombatDoubleOrBustButtonIds;
 import ti4.contest.replay.buttons.CombatSideBetButtonIds;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.ButtonProcessor;
@@ -63,7 +64,9 @@ class ButtonListener extends ListenerAdapter {
     private static boolean shouldShowBotIsThinking(ButtonInteractionEvent event) {
         String buttonId = event.getButton().getCustomId();
         return BUTTONS_TO_THINK_ABOUT.contains(buttonId)
-                || (buttonId != null && buttonId.startsWith(CombatSideBetButtonIds.PREFIX));
+                || (buttonId != null
+                        && (buttonId.startsWith(CombatSideBetButtonIds.PREFIX)
+                                || buttonId.startsWith(CombatDoubleOrBustButtonIds.PREFIX)));
     }
 
     /**

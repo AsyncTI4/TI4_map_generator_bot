@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -4166,18 +4163,25 @@ public final class ButtonHelperFactionSpecific {
         if (p2 == null) return;
         player.exhaustTech("tcs");
         Leader playerLeader = p2.getLeader(agent).orElse(null);
+        String agentName = agent;
+        if (Mapper.getLeader(agent) != null) {
+            agentName = Mapper.getLeader(agent).getName();
+        }
         if (playerLeader == null) {
+            if (Mapper.getRelic(agent) != null) {
+                agentName = Mapper.getRelic(agent).getName();
+            }
             if (agent.contains("titanprototype")) {
                 p2.removeExhaustedRelic("titanprototype");
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getFactionEmoji() + " exhausted _ Temporal Command Suite_ to ready " + agent
+                        player.getFactionEmoji() + " exhausted _ Temporal Command Suite_ to ready " + agentName
                                 + ", owned by " + p2.getColor() + ".");
                 if (p2 != player) {
                     MessageHelper.sendMessageToChannel(
                             p2.getCorrectChannel(),
                             p2.getRepresentationUnfogged() + ", _ Temporal Command Suite_ was exhausted by "
-                                    + player.getColor() + " to ready your " + agent + ".");
+                                    + player.getColor() + " to ready your " + agentName + ".");
                 }
                 event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             }
@@ -4201,14 +4205,14 @@ public final class ButtonHelperFactionSpecific {
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getFactionEmoji() + " exhausted _Temporal Command Suite_ to ready " + agent + ", owned by "
+                player.getFactionEmoji() + " exhausted _Temporal Command Suite_ to ready " + agentName + ", owned by "
                         + p2.getColor() + ".");
 
         if (p2 != player) {
             MessageHelper.sendMessageToChannel(
                     p2.getCorrectChannel(),
                     p2.getRepresentationUnfogged() + ", _Temporal Command Suite_ was exhausted by " + player.getColor()
-                            + " to ready your " + agent + ".");
+                            + " to ready your " + agentName + ".");
         }
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -4231,18 +4235,25 @@ public final class ButtonHelperFactionSpecific {
                 + player.getCCRepresentation() + ". Use buttons to lose a token.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         Leader playerLeader = p2.getLeader(agent).orElse(null);
+        String agentName = agent;
+        if (Mapper.getLeader(agent) != null) {
+            agentName = Mapper.getLeader(agent).getName();
+        }
         if (playerLeader == null) {
+            if (Mapper.getRelic(agent) != null) {
+                agentName = Mapper.getRelic(agent).getName();
+            }
             if (agent.contains("titanprototype")) {
                 p2.removeExhaustedRelic("titanprototype");
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getFactionEmoji() + " spent 1 command token via _ Temporal Command Suite_ to ready "
-                                + agent + ", owned by " + p2.getColor() + ".");
+                                + agentName + ", owned by " + p2.getColor() + ".");
                 if (p2 != player) {
                     MessageHelper.sendMessageToChannel(
                             p2.getCorrectChannel(),
                             p2.getRepresentationUnfogged() + ", 1 command token was spent by " + player.getColor()
-                                    + " to ready your " + agent + ".");
+                                    + " to ready your " + agentName + ".");
                 }
                 event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             }
@@ -4251,12 +4262,12 @@ public final class ButtonHelperFactionSpecific {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getFactionEmoji() + " spent 1 command token via _ Temporal Command Suite_ to ready "
-                                + agent + ", owned by " + p2.getColor() + ".");
+                                + agentName + ", owned by " + p2.getColor() + ".");
                 if (p2 != player) {
                     MessageHelper.sendMessageToChannel(
                             p2.getCorrectChannel(),
                             p2.getRepresentationUnfogged() + ", 1 command token was spent by " + player.getColor()
-                                    + " to ready your " + agent + ".");
+                                    + " to ready your " + agentName + ".");
                 }
                 event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             }
@@ -4266,14 +4277,14 @@ public final class ButtonHelperFactionSpecific {
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getFactionEmoji() + " spent 1 command token with _Temporal Command Suite_ to ready " + agent
+                player.getFactionEmoji() + " spent 1 command token with _Temporal Command Suite_ to ready " + agentName
                         + ", owned by " + p2.getColor() + ".");
 
         if (p2 != player) {
             MessageHelper.sendMessageToChannel(
                     p2.getCorrectChannel(),
                     p2.getRepresentationUnfogged() + ", 1 command token was spent by " + player.getColor()
-                            + " to ready your " + agent + ".");
+                            + " to ready your " + agentName + ".");
         }
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }

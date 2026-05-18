@@ -51,7 +51,7 @@ import ti4.settings.users.UserSettingsManager;
 @UtilityClass
 public final class StatusHelper {
 
-    public static void AnnounceStatusPhase(Game game) {
+    public static void announceStatusPhase(Game game) {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have passed.");
         if (game.isShowBanners()) {
             BannerGenerator.drawPhaseBanner(
@@ -464,8 +464,7 @@ public final class StatusHelper {
         return game.getActionPhaseTurnOrder();
     }
 
-    public static void HandleStatusPhaseMiddle(
-            GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
+    public static void handleStatusPhaseMiddle(Game game) {
         Player vaden = Helper.getPlayerFromAbility(game, "binding_debts");
         if (vaden != null) {
             for (Player p2 : vaden.getNeighbouringPlayers(true)) {

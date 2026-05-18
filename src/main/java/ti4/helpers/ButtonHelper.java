@@ -131,7 +131,6 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.PlanetService;
-import ti4.service.regex.RegexService;
 import ti4.service.tech.ShowTechDeckService;
 import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.EndTurnService;
@@ -563,7 +562,7 @@ public class ButtonHelper {
             }
             case 6 -> {
                 if (game.isTwilightsFallMode()) {
-                    threadName += "calamitus";
+                    threadName += "calamitas";
                 } else {
                     threadName += "warfare";
                 }
@@ -3464,7 +3463,7 @@ public class ButtonHelper {
                         sb.append(unitModel.getUnitEmoji()).append(' ');
                         sb.append(privateGame ? unitModel.getBaseType() : unitModel.getName());
                         sb.append(getCombatProfileForTileSummary(
-                                        tile, unitHolder, unitModel, player, combatSummaryContext))
+                                        game, tile, unitHolder, unitModel, player, combatSummaryContext))
                                 .append('\n');
                     } else {
                         sb.append(unitKey).append('\n');
@@ -3478,12 +3477,14 @@ public class ButtonHelper {
     }
 
     private static String getCombatProfileForTileSummary(
+            Game game,
             Tile tile,
             UnitHolder unitHolder,
             UnitModel unitModel,
             Player player,
             @Nullable CombatSummaryContext combatSummaryContext) {
-        if (combatSummaryContext == null
+        if (game.isFowMode()
+                || combatSummaryContext == null
                 || !combatSummaryContext.combatPlayers().contains(player)) {
             return "";
         }
@@ -3682,57 +3683,6 @@ public class ButtonHelper {
         if (event instanceof ButtonInteractionEvent bevent) {
             deleteButtonAndDeleteMessageIfEmpty(bevent, true);
         }
-    }
-
-    @ButtonHandler("useMagenDefense_")
-    private static void useMagenDefenseGrid(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String regex = "useMagenDefense_" + RegexHelper.posRegex(game);
-        RegexService.runMatcher(regex, buttonID, matcher -> {
-            String pos = matcher.group("pos");
-            Tile tile = game.getTileByPosition(pos);
-
-            int total = 0;
-            UnitKey infKey = Units.getUnitKey(UnitType.Infantry, player.getColorID());
-
-            boolean bulwark = player.hasUnit("tk-blacktrenchbulwark");
-            String ability = bulwark ? "_Black Trench Bulwark_" : "_Magen Defense Grid_";
-            StringBuilder msg = new StringBuilder(player.getFactionEmoji() + " resolved " + ability + " on "
-                    + tile.getPosition() + ", placing %s infantry (%s total so far):");
-            for (UnitHolder uh : tile.getUnitHolders().values()) {
-                int count = uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure);
-                if (player.hasAbility("byssus")) count += uh.getUnitCount(UnitType.Mech, player);
-
-                for (String token : uh.getTokenList()) {
-                    if (player.getPlanets().contains(uh.getName()) && token.contains("superweapon")) {
-                        count++;
-                    }
-                }
-                if (bulwark) {
-                    count = uh.getUnitCount(UnitType.Pds, player);
-                }
-
-                if (count > 0) {
-                    total += count;
-                    uh.addUnit(infKey, count);
-                    String emoji = infKey.unitEmoji().emojiString();
-                    String infStr = emoji.repeat(count);
-                    if (count > 6) infStr += "(" + count + " total)";
-                    if (uh instanceof Space) {
-                        msg.append("\n-# > ").append(infStr).append(" added to space.");
-                    } else {
-                        msg.append("\n-# > ")
-                                .append(infStr)
-                                .append(" added to ")
-                                .append(Helper.getPlanetRepresentation(uh.getName(), game))
-                                .append(".");
-                    }
-                }
-            }
-            player.setMagenInfantryCounter(player.getMagenInfantryCounter() + total);
-            deleteMessage(event);
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), String.format(msg.toString(), total, player.getMagenInfantryCounter()));
-        });
     }
 
     public static void deleteButtonsWithPartialID(GenericInteractionCreateEvent event, String partialID) {
@@ -5841,7 +5791,8 @@ public class ButtonHelper {
         for (Planet planetUnit : tile.getPlanetUnitHolders()) {
             Planet planetReal = planetUnit;
             String planet = planetReal.getName();
-            if (FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
+            if (FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)
+                    && player.getPlanetsAllianceMode().contains(planet)) {
                 List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player, false, true);
                 buttons.addAll(planetButtons);
             }
@@ -8357,7 +8308,7 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
-    private static String getStratName(String ogName, Game game) {
+    public static String getStratName(String ogName, Game game) {
         if (!game.isTwilightsFallMode()) {
             return ogName;
         }
@@ -8367,7 +8318,7 @@ public class ButtonHelper {
             case "politics" -> "tyrannus";
             case "construction" -> "civitas";
             case "trade" -> "amicus";
-            case "warfare" -> "calamitus";
+            case "warfare" -> "calamitas";
             case "technology" -> "magus";
             case "imperial" -> "aeterna";
             default -> "action";
@@ -8395,25 +8346,28 @@ public class ButtonHelper {
         };
     }
 
-    public static void sendMessageToRightStratThread(
-            Player player, Game game, String message, String stratName, @Nullable List<Button> buttons) {
+    public static ThreadChannel getRightStratThread(Game game, String stratName) {
         List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
         String threadName = game.getName() + "-round-" + game.getRound() + "-" + stratName.toLowerCase();
         for (ThreadChannel threadChannel_ : threadChannels) {
-            if ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName())) {
-                if (!threadChannel_.getMembers().contains(game.getGuild().getMemberById(player.getUserID()))) {
-                    continue;
-                }
-            }
             if ((threadChannel_.getName().toLowerCase().startsWith(threadName.toLowerCase())
                             || threadChannel_
                                     .getName()
                                     .toLowerCase()
                                     .equals(threadName.toLowerCase() + "WinnuHero".toLowerCase()))
                     && (!"technology".equalsIgnoreCase(stratName) || !game.isComponentAction())) {
-                MessageHelper.sendMessageToChannelWithButtons(threadChannel_, message, buttons);
-                return;
+                return threadChannel_;
             }
+        }
+        return null;
+    }
+
+    public static void sendMessageToRightStratThread(
+            Player player, Game game, String message, String stratName, @Nullable List<Button> buttons) {
+        ThreadChannel threadChannel_ = getRightStratThread(game, stratName);
+        if (threadChannel_ != null) {
+            MessageHelper.sendMessageToChannelWithButtons(threadChannel_, message, buttons);
+            return;
         }
         if (player != null) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);

@@ -1403,6 +1403,13 @@ public class StartCombatService {
                                 + "Valiant Genome",
                         FactionEmojis.Bastion));
             }
+            if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("obsidianagent")) {
+                buttons.add(Buttons.gray(
+                        factionChecker + "getAgentSelection_obsidianagent",
+                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                                + "Obsidian Agent",
+                        FactionEmojis.Obsidian));
+            }
 
             if ((!game.isFowMode() || agentHolder == p1)
                     && agentHolder.hasUnexhaustedLeader("kyroagent")
@@ -2094,7 +2101,7 @@ public class StartCombatService {
                         continue;
                     }
                     // Sol Commander
-                    if (p != game.getActivePlayer()
+                    if (p.getPlanetsAllianceMode().contains(unitH.getName())
                             && game.playerHasLeaderUnlockedOrAlliance(p, "solcommander")
                             && isGroundCombat) {
                         String id = p.factionButtonChecker() + "utilizeSolCommander_" + unitH.getName();

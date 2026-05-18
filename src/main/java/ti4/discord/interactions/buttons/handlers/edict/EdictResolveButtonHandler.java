@@ -8,7 +8,22 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.edict.resolver.*;
+import ti4.discord.interactions.buttons.handlers.edict.resolver.EdictResolver;
+import ti4.discord.interactions.buttons.handlers.edict.resolver.TfArbitrateResolver;
+import ti4.discord.interactions.buttons.handlers.edict.resolver.TfAriseResolver;
+import ti4.discord.interactions.buttons.handlers.edict.resolver.TfArtificeResolver;
+import ti4.discord.interactions.buttons.handlers.edict.resolver.TfBlessResolver;
+import ti4.discord.interactions.buttons.handlers.edict.resolver.TfCensureResolver;
+import ti4.discord.interactions.buttons.handlers.edict.resolver.TfConveneResolver;
+import ti4.discord.interactions.buttons.handlers.edict.resolver.TfExecuteResolver;
+import ti4.discord.interactions.buttons.handlers.edict.resolver.TfForetellResolver;
+import ti4.discord.interactions.buttons.handlers.edict.resolver.TfLegacyOfIxthResolver;
+import ti4.discord.interactions.buttons.handlers.edict.resolver.TfSpliceResolver;
+import ti4.discord.interactions.buttons.handlers.edict.resolver.TkCatalyzeResolver;
+import ti4.discord.interactions.buttons.handlers.edict.resolver.TkEndorseResolver;
+import ti4.discord.interactions.buttons.handlers.edict.resolver.TkEnfiladeResolver;
+import ti4.discord.interactions.buttons.handlers.edict.resolver.TkSanctuaryResolver;
+import ti4.discord.interactions.buttons.handlers.edict.resolver.TkSpoilResolver;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -65,7 +80,7 @@ public class EdictResolveButtonHandler {
         game.setStoredValue("edictResolver-" + edict, player.getFaction());
         AgendaModel model = Mapper.getAgenda(edict);
 
-        String message = player.getRepresentation() + " is resolving the _" + model.getName() + "_ edict.";
+        String message = player.getRepresentationNoPing() + " is resolving the _" + model.getName() + "_ edict.";
         MessageHelper.sendMessageToChannelWithEmbed(game.getMainGameChannel(), message, model.getRepresentationEmbed());
 
         EdictResolver handler = EDICT_HANDLERS.get(edict.toLowerCase());

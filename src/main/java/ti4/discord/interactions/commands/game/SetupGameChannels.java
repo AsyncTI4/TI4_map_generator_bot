@@ -97,31 +97,30 @@ class SetupGameChannels extends GameStateSubcommand {
         if (player == null && channel == null) {
             return;
         }
-        if (player != null && channel != null) {
-            User asUser = player.getAsUser();
-            Player player_ = game.getPlayer(asUser.getId());
-            if (player_ == null) {
-                MessageHelper.sendMessageToChannel(
-                        event.getChannel(), "Must specify game player: " + playerConstant + " is invalid.");
-                return;
-            }
-
-            // set community mode data
-            if (game.isCommunityMode()) {
-                if (role != null) {
-                    player_.setRoleIDForCommunity(role.getAsRole().getId());
-                }
-            }
-
-            // set private channel data
-            if (channel.getChannelType() != ChannelType.TEXT) {
-                MessageHelper.sendMessageToChannel(
-                        event.getChannel(), "Must specify text channel for " + channelConstant);
-                return;
-            }
-            player_.setPrivateChannelID(channel.getAsChannel().getId());
-        } else {
+        if (player == null || channel == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify player and channel");
+            return;
         }
+        User asUser = player.getAsUser();
+        Player player_ = game.getPlayer(asUser.getId());
+        if (player_ == null) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Must specify game player: " + playerConstant + " is invalid.");
+            return;
+        }
+
+        // set community mode data
+        if (game.isCommunityMode()) {
+            if (role != null) {
+                player_.setRoleIDForCommunity(role.getAsRole().getId());
+            }
+        }
+
+        // set private channel data
+        if (channel.getChannelType() != ChannelType.TEXT) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify text channel for " + channelConstant);
+            return;
+        }
+        player_.setPrivateChannelID(channel.getAsChannel().getId());
     }
 }

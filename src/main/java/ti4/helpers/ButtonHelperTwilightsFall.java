@@ -259,8 +259,10 @@ public final class ButtonHelperTwilightsFall {
         }
         manager.setPlayers(playerIDs);
 
-        for (Player p : game.getPlayers().values()) {
-            setPositionAndSendHomeFleetButtons(game, p);
+        for (Player p : game.getRealPlayers()) {
+            if (!setPositionAndSendHomeFleetButtons(game, p)) {
+                return;
+            }
 
             DraftBag bag = p.getDraftHand();
             PlayerDraft draft = manager.getPlayerDraft(p);
@@ -311,8 +313,10 @@ public final class ButtonHelperTwilightsFall {
             playerIDs.add(p.getUserID());
         }
         manager.setPlayers(playerIDs);
-        for (Player p : game.getPlayers().values()) {
-            setPositionAndSendHomeFleetButtons(game, p);
+        for (Player p : game.getRealPlayers()) {
+            if (!setPositionAndSendHomeFleetButtons(game, p)) {
+                return;
+            }
         }
 
         try {
@@ -340,15 +344,32 @@ public final class ButtonHelperTwilightsFall {
         MantisMapBuildService.initializeMapBuilding(mapBuildContext);
     }
 
-    private static void setPositionAndSendHomeFleetButtons(Game game, Player player) {
+    private static boolean setPositionAndSendHomeFleetButtons(Game game, Player player) {
         DraftBag bag = player.getDraftHand();
         PlayerDraft draft = game.getMiltyDraftManager().getPlayerDraft(player);
+        if (bag == null) {
+            MessageHelper.sendMessageToChannel(
+                    game.getActionsChannel(),
+                    player.getRepresentationUnfogged()
+                            + " does not have a drafted hand, so the Twilight's Fall map build could not start.");
+            return false;
+        }
 
         // Set draft position
-        DraftItem draftPos = bag.getCategory(DraftCategory.DRAFTORDER).getFirst();
+        List<DraftItem> draftPositions = bag.getCategory(DraftCategory.DRAFTORDER);
+        List<DraftItem> homeSystems = bag.getCategory(DraftCategory.HOMESYSTEM);
+        List<DraftItem> startingFleets = bag.getCategory(DraftCategory.STARTINGFLEET);
+        if (draftPositions.isEmpty() || homeSystems.isEmpty() || startingFleets.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    game.getActionsChannel(),
+                    player.getRepresentationUnfogged()
+                            + " is missing a drafted position, home system, or starting fleet, so the Twilight's Fall map build could not start.");
+            return false;
+        }
+        DraftItem draftPos = draftPositions.getFirst();
         int draftNum = Integer.parseInt(draftPos.getItemId());
         draft.setPosition(draftNum);
-        draft.setFaction(bag.getCategory(DraftCategory.HOMESYSTEM).getFirst().getItemId());
+        draft.setFaction(homeSystems.getFirst().getItemId());
         if (draftNum == 1) game.setSpeaker(player);
 
         // Send home system picker
@@ -356,7 +377,7 @@ public final class ButtonHelperTwilightsFall {
         List<ContainerChildComponent> hsComps = new ArrayList<>();
         hsComps.add(TextDisplay.of(DraftCategory.HOMESYSTEM.title(game)));
         player.removeStoredValue("draftedHS");
-        for (DraftItem item : bag.getCategory(DraftCategory.HOMESYSTEM)) {
+        for (DraftItem item : homeSystems) {
             if (hsComps.size() > 1) hsComps.add(Separator.createDivider(Spacing.LARGE));
             hsComps.addAll(item.getTextDisplays(game, player, false));
             String buttonID = "chooseHomeSystem_" + item.getItemId();
@@ -373,7 +394,7 @@ public final class ButtonHelperTwilightsFall {
         List<Button> fleetButtons = new ArrayList<>();
         List<ContainerChildComponent> fleetComps = new ArrayList<>();
         fleetComps.add(TextDisplay.of(DraftCategory.STARTINGFLEET.title(game)));
-        for (DraftItem item : bag.getCategory(DraftCategory.STARTINGFLEET)) {
+        for (DraftItem item : startingFleets) {
             if (fleetComps.size() > 1) fleetComps.add(Separator.createDivider(Spacing.LARGE));
             fleetComps.addAll(item.getTextDisplays(game, player, false));
             String buttonID = "chooseStartingFleet_" + item.getItemId();
@@ -385,6 +406,7 @@ public final class ButtonHelperTwilightsFall {
                 player.getRepresentation() + " after choosing your home system, choose a starting fleet");
         fleetMessageBuilder.append(Container.of(fleetComps));
         fleetMessageBuilder.send();
+        return true;
     }
 
     @ButtonHandler("chooseHomeSystem_")
@@ -536,7 +558,7 @@ public final class ButtonHelperTwilightsFall {
         game.removeStoredValue("reverseSpliceOrder");
     }
 
-    private static String getSpliceOrderString(List<Player> participants) {
+    public static String getSpliceOrderString(List<Player> participants) {
         StringBuilder sb = new StringBuilder();
         int count = 1;
         for (Player p : participants) {
@@ -567,7 +589,7 @@ public final class ButtonHelperTwilightsFall {
         return players;
     }
 
-    private static void sendPlayerSpliceOptions(Game game, Player player) {
+    public static void sendPlayerSpliceOptions(Game game, Player player) {
         String type = game.getStoredValue("spliceType");
 
         List<String> cards = getSpliceCards(game);
@@ -1449,7 +1471,7 @@ public final class ButtonHelperTwilightsFall {
                 player.addTech(cardID);
                 MessageHelper.sendMessageToChannelWithEmbed(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " has acquired the ability: "
+                        player.getRepresentationNoPing() + " has acquired the ability: "
                                 + Mapper.getTech(cardID).getName(),
                         Mapper.getTech(cardID).getRepresentationEmbed());
             }
@@ -1457,7 +1479,7 @@ public final class ButtonHelperTwilightsFall {
                 player.addLeader(cardID);
                 MessageHelper.sendMessageToChannelWithEmbed(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " has acquired the genome: "
+                        player.getRepresentationNoPing() + " has acquired the genome: "
                                 + Mapper.getLeader(cardID).getName(),
                         Mapper.getLeader(cardID).getRepresentationEmbed(true));
             }
@@ -1476,7 +1498,7 @@ public final class ButtonHelperTwilightsFall {
                             buttons.add(Buttons.red("deleteButtons", "Keep the New Unit"));
                             MessageHelper.sendMessageToChannel(
                                     player.getCorrectChannel(),
-                                    player.getRepresentation() + " you automatically lost the "
+                                    player.getRepresentationNoPing() + " you automatically lost the "
                                             + u.getNameRepresentation()
                                             + " unit upgrade. If you would like to keep it and lose the newly acquired unit upgrade, please click the green button.",
                                     buttons);
@@ -1503,7 +1525,7 @@ public final class ButtonHelperTwilightsFall {
                 player.addOwnedUnitByID(cardID);
                 MessageHelper.sendMessageToChannelWithEmbed(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " has acquired the unit upgrade: "
+                        player.getRepresentationNoPing() + " has acquired the unit upgrade: "
                                 + Mapper.getUnit(cardID).getName(),
                         Mapper.getUnit(cardID).getRepresentationEmbed());
             }
@@ -1584,6 +1606,22 @@ public final class ButtonHelperTwilightsFall {
                 game.setStoredValue("savedSpliceCards", game.getStoredValue("savedSpliceCards") + "_" + card);
             }
         }
+    }
+
+    public static String addSpliceCardToSplice(Game game, String type) {
+        List<String> cards = getDeckForSplicing(game, type, 100);
+        for (String card : cards) {
+            if (game.getStoredValue("savedSpliceCards").contains(card)) {
+                continue;
+            }
+            if (game.getStoredValue("savedSpliceCards").isEmpty()) {
+                game.setStoredValue("savedSpliceCards", card);
+            } else {
+                game.setStoredValue("savedSpliceCards", game.getStoredValue("savedSpliceCards") + "_" + card);
+            }
+            return card;
+        }
+        return "nothing";
     }
 
     public static void startInauguralSplice(Game game) {

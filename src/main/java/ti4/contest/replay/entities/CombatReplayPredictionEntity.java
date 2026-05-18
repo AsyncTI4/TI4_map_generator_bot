@@ -51,4 +51,10 @@ public class CombatReplayPredictionEntity {
 
     @Column(name = "defender_predictions_json", nullable = false, columnDefinition = "TEXT")
     private String defenderPredictionsJson;
+
+    @Column(name = "attacker_double_or_bust_json", columnDefinition = "TEXT")
+    private String attackerDoubleOrBustJson;
+
+    @Column(name = "defender_double_or_bust_json", columnDefinition = "TEXT")
+    private String defenderDoubleOrBustJson;
 }

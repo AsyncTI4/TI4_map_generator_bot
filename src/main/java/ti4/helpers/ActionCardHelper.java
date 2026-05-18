@@ -722,10 +722,10 @@ public class ActionCardHelper {
                         + " thus you no longer have your token on the _Stellar Atomics_ event card, and therefore cannot play action cards during the Agenda Phase.";
             }
         }
-        // Async leniency: reveal-window agenda cards may still be played anywhere before outcome resolution.
-        if (actionCard.getPlayTiming().isDuringAgendaReveal() && !AgendaHelper.isPreResolutionAgendaPhase(game)) {
-            return "This action card can only be played during the agenda phase before outcome resolution.";
-        }
+        // // Async leniency: reveal-window agenda cards may still be played anywhere before outcome resolution.
+        // if (actionCard.getPlayTiming().isDuringAgendaReveal() && !AgendaHelper.isPreResolutionAgendaPhase(game)) {
+        //     return "This action card can only be played during the agenda phase before outcome resolution.";
+        // }
 
         CryypterHelper.checkForAssigningYssarilEnvoy(event, game, player, acID);
         if (game.isWildWildGalaxyMode() && actionCard.getName().toLowerCase().contains("morale boost")) {

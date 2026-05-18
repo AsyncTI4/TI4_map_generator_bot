@@ -30,8 +30,10 @@ import ti4.draft.DraftBag;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
+import ti4.draft.FrankenDrazDraft;
 import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.items.AgentDraftItem;
+import ti4.draft.items.FactionDraftItem;
 import ti4.draft.items.HeroDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -39,8 +41,8 @@ import ti4.helpers.discord.ContainerHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
+import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
-import ti4.message.GameMessageManager.GameMessage;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
@@ -108,15 +110,26 @@ public class FrankenDraftBagService {
         }
 
         List<Color> accents = getAccents();
-        for (Player player : game.getPlayers().values()) {
+        for (Player player : game.getRealPlayers()) {
+            ThreadChannel cardsInfoThread = player.getCardsInfoThread();
+            if (cardsInfoThread == null) {
+                BotLogger.warning("Cannot apply Franken draft bag for " + player.getUserName() + " in game "
+                        + game.getName() + " because their cards info thread is null.");
+                continue;
+            }
+
             player.setStoredValue("frankenBuilt", "n");
-            for (DraftCategory category : componentCategories) {
-                MessageV2Builder builder = new MessageV2Builder(player.getCardsInfoThread());
-                Container c = postDraftCategoryContainer(player, category);
-                if (c == null) continue;
-                builder.append(c.withAccentColor(accents.getFirst()));
-                Collections.rotate(accents, -1);
-                builder.send();
+            if (game.getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
+                frankenDrazDraft.sendPostDraftComponentButtons(player);
+            } else {
+                for (DraftCategory category : componentCategories) {
+                    Container c = postDraftCategoryContainer(player, category);
+                    if (c == null) continue;
+                    MessageV2Builder builder = new MessageV2Builder(cardsInfoThread);
+                    builder.append(c.withAccentColor(accents.getFirst()));
+                    Collections.rotate(accents, -1);
+                    builder.send();
+                }
             }
 
             if (game.isTwilightsFallMode()) {
@@ -129,14 +142,14 @@ public class FrankenDraftBagService {
                 String msg = player.getRepresentation()
                         + ", you should only keep 2 abilities, 1 genome, and 1 unit out of those you drafted."
                         + " Instead of keeping one (or two) of those, you may use these buttons to take one (or two) of these generic technologies.";
-                MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), msg, embeds);
+                MessageHelper.sendMessageToChannelWithEmbeds(cardsInfoThread, msg, embeds);
                 buttons.add(Buttons.green("getTech_wavelength__noPay__comp", "Select Wavelength"));
                 buttons.add(Buttons.green("getTech_antimatter__noPay__comp", "Select Antimatter"));
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Get Technology", buttons);
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Get Technology", buttons);
+                MessageHelper.sendMessageToChannel(cardsInfoThread, "Get Technology", buttons);
+                MessageHelper.sendMessageToChannel(cardsInfoThread, "Get Technology", buttons);
             }
 
-            MessageV2Builder builder = new MessageV2Builder(player.getCardsInfoThread());
+            MessageV2Builder builder = new MessageV2Builder(cardsInfoThread);
             builder.append(getFrankenPlayerSummaryContainer(player));
             builder.send();
         }
@@ -283,7 +296,11 @@ public class FrankenDraftBagService {
             // Add each item to the container
             for (DraftItem item : all) {
                 if (components.size() > 1) components.add(Separator.createDivider(Spacing.LARGE));
-                components.addAll(item.getTextDisplays(game, player, true));
+                components.addAll(item.getTextDisplays(game, player, cat != DraftCategory.FACTION));
+                if (item instanceof FactionDraftItem) {
+                    String buttonID = player.factionButtonChecker() + "frankenFactionComponents;" + item.getItemId();
+                    components.add(ActionRow.of(Buttons.gray(buttonID, "Show Components", item.getItemEmoji())));
+                }
             }
             // Then either...
             if (!DraftItem.isDraftable(player, cat)) {
@@ -443,6 +460,8 @@ public class FrankenDraftBagService {
         String draftName = "Franken Draft";
         if (draft instanceof InauguralSpliceFrankenDraft) {
             draftName = "Inaugural Splice";
+        } else if (draft instanceof FrankenDrazDraft) {
+            draftName = "FrankenDraz";
         }
 
         String message;
@@ -543,6 +562,6 @@ public class FrankenDraftBagService {
         long date = game.getLastModifiedDate();
         return game.getActionsChannel()
                 .sendMessage(msg)
-                .onSuccess(m -> GameMessageManager.replace(name, m.getId(), type, date));
+                .onSuccess(m -> GameMessageManager.replace(name, new GameMessage(m.getId(), type, date)));
     }
 }
