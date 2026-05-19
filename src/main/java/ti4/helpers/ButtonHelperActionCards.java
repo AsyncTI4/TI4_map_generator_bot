@@ -2913,11 +2913,11 @@ public final class ButtonHelperActionCards {
         return buttons;
     }
 
-    public static List<Button> getCircletButtons(Game game, Player player) {
+    private static List<Button> getFrontierTokenButtons(Game game, Player player, boolean requireNoOtherPlayersShips) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
-                if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+                if (!requireNoOtherPlayersShips || !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                     buttons.add(Buttons.green(
                             "probeStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
                 }
@@ -2927,16 +2927,12 @@ public final class ButtonHelperActionCards {
         return buttons;
     }
 
+    public static List<Button> getCircletButtons(Game game, Player player) {
+        return getFrontierTokenButtons(game, player, true);
+    }
+
     public static List<Button> getFrontierTokenButtons(Game game, Player player) {
-        List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
-                buttons.add(Buttons.green(
-                        "probeStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
-            }
-        }
-        BlindSelectionService.filterForBlindPositionSelection(game, player, buttons, "probeStep2");
-        return buttons;
+        return getFrontierTokenButtons(game, player, false);
     }
 
     @ButtonHandler("resolveReverse_")
