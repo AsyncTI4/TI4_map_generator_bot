@@ -4149,7 +4149,11 @@ public class ButtonHelper {
                     } else {
                         int capUsed = unit.getCapacityUsed();
                         if (player.hasUnit("tk-boundsentinel") && unit.getUnitType() == UnitType.Mech) capUsed = 0;
-                        numInfNFightersNMechs += capUsed * entry.getValue();
+                        if ("tyris_infantry".equals(unit.getId()) || "tyris_infantry2".equals(unit.getId())) {
+                            numInfNFightersNMechs += entry.getValue() / 2;
+                        } else {
+                            numInfNFightersNMechs += capUsed * entry.getValue();
+                        }
                     }
                     if (entry.getValue() > 0) {
                         unitTypesCounted.add(unit.getBaseType());
