@@ -154,7 +154,8 @@ class ActionCardDeck2ButtonHandler {
         if (tile == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " could not resolve _Reinforcements_ because there is no active system.");
+                    player.getRepresentation()
+                            + " could not resolve _Reinforcements_ because there is no active system.");
             event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
@@ -162,7 +163,8 @@ class ActionCardDeck2ButtonHandler {
         AddUnitService.addUnits(event, tile, game, player.getColor(), "2 fighter");
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getFactionEmoji() + " placed 2 fighters in " + tile.getRepresentation() + " with _Reinforcements_.");
+                player.getFactionEmoji() + " placed 2 fighters in " + tile.getRepresentation()
+                        + " with _Reinforcements_.");
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
