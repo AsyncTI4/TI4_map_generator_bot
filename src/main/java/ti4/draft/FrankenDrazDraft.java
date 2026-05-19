@@ -1,6 +1,8 @@
 package ti4.draft;
 
+import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -192,6 +194,31 @@ public class FrankenDrazDraft extends FrankenDraft {
                 player.getCardsInfoThread(),
                 "Choose a drafted component category to view. Additional components are added automatically. Optional Swaps will appear in their respective categories when expanded. Home systems and starting fleet must be added manually, as well as any additional or optional components added via these components. Category buttons are present for your convenience.",
                 getPostDraftCategoryButtons(player));
+    }
+
+    public void sendFactionComponentCards(ButtonInteractionEvent event, Player player, String faction) {
+        FactionDraftItem item = new FactionDraftItem(faction);
+        List<DraftItem> components = item.getComponents(player.getGame());
+        if (components.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(), "## " + item.getTitle(player.getGame()) + " Components\nNone.");
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "Sent " + item.getShortDescription() + " components to your cards info thread.");
+            return;
+        }
+
+        List<Color> accents = FrankenDraftBagService.getAccents();
+        MessageV2Builder builder = new MessageV2Builder(player.getCardsInfoThread());
+        builder.append("## " + item.getTitle(player.getGame()) + " Components");
+        for (DraftItem component : components) {
+            List<ContainerChildComponent> cardComponents = new ArrayList<>();
+            cardComponents.addAll(component.getTextDisplays(player.getGame(), player, true));
+            builder.append(Container.of(cardComponents).withAccentColor(accents.getFirst()));
+            Collections.rotate(accents, -1);
+        }
+        builder.send();
+        MessageHelper.sendEphemeralMessageToEventChannel(
+                event, "Sent " + item.getShortDescription() + " components to your cards info thread.");
     }
 
     public void sendPostDraftCategory(Player player, DraftCategory category) {
