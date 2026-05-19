@@ -519,7 +519,6 @@ class ActionCardDeck2ButtonHandler {
             return;
         }
 
-        tile = FlipTileService.flipTileIfNeeded(event, tile, game);
         AddUnitService.addUnits(event, tile, game, game.getNeutralColor(), "2 dd, cr");
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannel(
