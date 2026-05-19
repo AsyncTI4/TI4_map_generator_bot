@@ -348,8 +348,7 @@ class ActionCardDeck2ButtonHandler {
         if (activeSystem == null || activeSystem.getPlanetUnitHolders().isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + ", _Freedom Fighters_ requires an active system with planets.");
+                    player.getRepresentation() + ", _Freedom Fighters_ requires an active system with planets.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -370,7 +369,8 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("resolveFreedomFightersStep2_")
-    public static void resolveFreedomFightersStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void resolveFreedomFightersStep2(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.replace("resolveFreedomFightersStep2_", "");
         Tile tile = game.getTileFromPlanet(planet);
         if (tile == null) {
