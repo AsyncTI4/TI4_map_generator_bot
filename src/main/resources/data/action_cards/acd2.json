@@ -6,6 +6,7 @@
         "window": "At the end of the status phase",
         "text": "Purge 1 public objective you have scored. Then, draw and reveal an objective from either public objective deck and place it near the other public objectives.",
         "notes": "Players do not lose points when an objective they have scored is purged.",
+        "automationID": "amendment",
         "flavorText": "Junn waddled away from the stunned hush that followed his announcements, a ghost of a smile betraying the victory he had labored years to secure.",
         "source": "action_deck_2"
     },

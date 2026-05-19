@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -31,13 +32,16 @@ import ti4.helpers.UnusedCommanderHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 import ti4.model.ExploreModel;
+import ti4.model.PublicObjectiveModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.objectives.RevealPublicObjectiveService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.unit.AddUnitService;
 
@@ -746,5 +750,99 @@ class ActionCardDeck2ButtonHandler {
                     event.getChannel(),
                     "Put _Deflection_ on **" + Helper.getSCName(Integer.parseInt(sc), game) + "**.");
         }
+    }
+
+    @ButtonHandler("resolveAmendmentStep1")
+    public static void resolveAmendmentStep1(Player player, Game game, ButtonInteractionEvent event) {
+        int acIndex = -1;
+        for (Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
+            if ("amendment".equals(ac.getKey())) {
+                acIndex = ac.getValue();
+                break;
+            }
+        }
+        if (acIndex == -1) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged() + " does not have _Amendment_ in hand.");
+            return;
+        }
+
+        game.discardActionCard(player.getUserID(), acIndex);
+        ActionCardModel actionCard = Mapper.getActionCard("amendment");
+        MessageHelper.sendMessageToChannelWithEmbed(
+                game.getMainGameChannel(),
+                player.getRepresentation() + " played the action card _Amendment_.",
+                actionCard.getRepresentationEmbed(false, true, game));
+
+        List<Button> buttons = new ArrayList<>();
+        for (Map.Entry<String, Integer> po : game.getRevealedPublicObjectives().entrySet()) {
+            String poID = po.getKey();
+            List<String> scorers = game.getScoredPublicObjectives().getOrDefault(poID, List.of());
+            if (scorers.contains(player.getUserID())) {
+                PublicObjectiveModel poModel = Mapper.getPublicObjective(poID);
+                if (poModel != null) {
+                    buttons.add(Buttons.gray(
+                            player.factionButtonChecker() + "amendmentChooseObjective_" + poID,
+                            "Purge: " + poModel.getName()));
+                }
+            }
+        }
+
+        ButtonHelper.deleteMessage(event);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged()
+                            + " has no scored public objectives to purge for _Amendment_.");
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + ", choose a public objective you have scored to purge.",
+                buttons);
+    }
+
+    @ButtonHandler("amendmentChooseObjective_")
+    public static void amendmentChooseObjective(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String poID = buttonID.replace("amendmentChooseObjective_", "");
+        PublicObjectiveModel poModel = Mapper.getPublicObjective(poID);
+        String poName = poModel != null ? poModel.getName() : poID;
+
+        List<String> scorers = new ArrayList<>(game.getScoredPublicObjectives().getOrDefault(poID, List.of()));
+        for (String userID : scorers) {
+            game.unscorePublicObjective(userID, poID);
+        }
+        game.removeRevealedObjective(poID);
+
+        MessageHelper.sendMessageToChannel(
+                game.getActionsChannel(),
+                player.getFactionEmoji() + " purged the public objective _" + poName
+                        + "_ using _Amendment_. Players do not lose points from this purge.");
+
+        List<Button> stageButtons = new ArrayList<>();
+        stageButtons.add(Buttons.green(
+                player.factionButtonChecker() + "amendmentRevealStage1", "Reveal Stage 1 Objective"));
+        stageButtons.add(Buttons.blue(
+                player.factionButtonChecker() + "amendmentRevealStage2", "Reveal Stage 2 Objective"));
+
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + ", choose which stage public objective to draw and reveal.",
+                stageButtons);
+    }
+
+    @ButtonHandler("amendmentRevealStage1")
+    public static void amendmentRevealStage1(Player player, Game game, ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+        RevealPublicObjectiveService.revealS1(game, event);
+    }
+
+    @ButtonHandler("amendmentRevealStage2")
+    public static void amendmentRevealStage2(Player player, Game game, ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+        RevealPublicObjectiveService.revealS2(game, event);
     }
 }

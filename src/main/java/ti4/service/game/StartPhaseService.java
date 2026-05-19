@@ -797,6 +797,21 @@ public class StartPhaseService {
                             + ", a reminder that this is the window to play _Ancient Burial Sites_.");
         }
 
+        if (player.getPlayableActionCards().contains("amendment")) {
+            List<Button> amendmentButtons = new ArrayList<>();
+            amendmentButtons.add(Buttons.green(
+                    player.factionButtonChecker() + "resolveAmendmentStep1",
+                    "Resolve Amendment",
+                    CardEmojis.ActionCard));
+            amendmentButtons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged()
+                            + ", a reminder that this is the window to play _Amendment_."
+                            + " Use the buttons to start the process.",
+                    amendmentButtons);
+        }
+
         for (String pn : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote("malevolency") && "malevolency".equalsIgnoreCase(pn)) {
                 boolean mahactMalev = !player.getMahactCC().isEmpty();
