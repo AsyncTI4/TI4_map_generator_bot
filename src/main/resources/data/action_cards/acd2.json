@@ -52,25 +52,15 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Give 1 promissory note to another player. Then, that player and each other player with 1 of your promissory notes in their play area gives you 1 random action card from their hand.",
-        "flavorText": "Communications were jammed. Supply lines were harried. Staffing officers were found dead in their bunks. The grandeur of the scheme shocked Claire to her core.",
+        "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
         "source": "action_deck_2"
     },
     {
         "alias": "black_market_intel",
         "name": "Black Market Intel",
         "phase": "Action",
-        "window": "When you draw 1 or more secret objectives",
-        "text": "Draw 1 additional secret objective. Then, give 1 of those cards to another player that has less than 3 scored secret objectives, if able.",
-        "flavorText": "Suffi kissed the data drive before placing it at the drop-off. This job would pay for a long vacation.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "blackmail",
-        "name": "Blackmail",
-        "phase": "Agenda",
-        "window": "After an agenda is revealed",
-        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome gives you 1 promissory note from their hand.",
-        "playTiming": "AGENDA_AFTER",
+        "window": "ACTION",
+        "text": "Draw and reveal 2 secret objectives. Then, give 1 of those cards to another player that has less than 3 scored secret objectives, if able.",
         "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother,\" they said in unison.",
         "source": "action_deck_2"
     },
@@ -327,7 +317,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Look at another player's action cards. Then, that player gives you 1 action card, promissory note, or secret objective from their hand.",
-        "flavorText": "The leaked documents brought a smile to Willard's face. Schemes upon schemes, none of which would ever reach fruition. ",
+        "flavorText": "Kyver waited patiently, cloaked outside the station in transparasteel plating. They loathed eliminating children, but this messiah must remain unrisen.",
         "source": "action_deck_2"
     },
     {
@@ -336,7 +326,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Remove 1 of another player's command tokens from the game board and place it in a system that contains your units.",
-        "flavorText": "Jae Mir Kan reflected on the lie he had crafted, noting not all stooges need be forged through sorcery.",
+        "flavorText": "The past flooded Ahk-Syl Siven's thoughts upon seeing the Mahact, and the memory of his essence being rewritten on a subatomic level surged involuntarily to the forefront of his consciousness.",
         "source": "action_deck_2"
     },
     {
@@ -511,37 +501,37 @@
     {
         "alias": "mobilization1",
         "name": "Mobilization",
-        "phase": "Action",
-        "window": "At the start of your turn",
-        "text": "Place 2 infantry from your reinforcements on a planet you control and place 2 fighters from your reinforcements in a system that contains your ships.",
-        "flavorText": "Tai gave a self-satisfied hmph as he looked over the recruitment reports. \"If you build it, they will come, they say.\" The Alliance's new war sun was proof enough.",
+        "phase": "Any",
+        "window": "After you produce a unit",
+        "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
+        "flavorText": "From Umbat's hearthworld to distant suns, the shadow of his armada lengthened—stoked by their fury.",
         "source": "action_deck_2"
     },
     {
         "alias": "mobilization2",
         "name": "Mobilization",
-        "phase": "Action",
-        "window": "At the start of your turn",
-        "text": "Place 2 infantry from your reinforcements on a planet you control and place 2 fighters from your reinforcements in a system that contains your ships.",
-        "flavorText": "Dart grabbed the new cadet by his Naaz. \"Any more backtalk from you and you'll get a clout in the ear!\"",
+        "phase": "Any",
+        "window": "After you produce a unit",
+        "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
+        "flavorText": "",
         "source": "action_deck_2"
     },
     {
         "alias": "mobilization3",
         "name": "Mobilization",
-        "phase": "Action",
-        "window": "At the start of your turn",
-        "text": "Place 2 infantry from your reinforcements on a planet you control and place 2 fighters from your reinforcements in a system that contains your ships.",
-        "flavorText": "The new squadron leader gasped as the simulation ended. For the fifth time today, Dart had bested them like it was cub's play.",
+        "phase": "Any",
+        "window": "After you produce a unit",
+        "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
+        "flavorText": "",
         "source": "action_deck_2"
     },
     {
         "alias": "mobilization4",
         "name": "Mobilization",
-        "phase": "Action",
-        "window": "At the start of your turn",
-        "text": "Place 2 infantry from your reinforcements on a planet you control and place 2 fighters from your reinforcements in a system that contains your ships.",
-        "flavorText": "Dart stood at the edge of the hangar, watching soldiers marching into the belly of his heavy cruiser. \"The board is set.\" Tai agreed, \"The pieces are moving.\"",
+        "phase": "Any",
+        "window": "After you produce a unit",
+        "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
+        "flavorText": "Umbat's engineers broke into celebration as he called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
         "source": "action_deck_2"
     },
     {
@@ -630,7 +620,7 @@
         "name": "Pivot",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Discard 1-3 action cards from your hand to draw an equal number of action cards. Then, you may discard 1 action card to draw 1 secret objective.",
+        "text": "Discard 1-3 action cards from your hand to draw an equal number of action cards. Then, you may discard 2 action cards to draw 1 secret objective.",
         "flavorText": "\"We must not become stagnant. Stagnation is what broke this galaxy,\" I48S said, barely hesitating at his patient's screams. \"Pain? Let's remove that.\"",
         "source": "action_deck_2"
     },
@@ -747,42 +737,6 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "sabotage1_acd2",
-        "name": "Sabotage",
-        "phase": "Any",
-        "window": "When another player plays an action card other than 'Sabotage'",
-        "text": "Cancel that action card.",
-        "flavorText": "Kyver waited patiently, cloaked outside the station in transparasteel plating. They loathed eliminating children, but this messiah must remain unrisen.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "sabotage2_acd2",
-        "name": "Sabotage",
-        "phase": "Any",
-        "window": "When another player plays an action card other than 'Sabotage'",
-        "text": "Cancel that action card.",
-        "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "sabotage3_acd2",
-        "name": "Sabotage",
-        "phase": "Any",
-        "window": "When another player plays an action card other than 'Sabotage'",
-        "text": "Cancel that action card.",
-        "flavorText": "The past flooded Ahk-Syl Siven's thoughts upon seeing the Mahact, and the memory of his essence being rewritten on a subatomic level surged involuntarily to the forefront of his consciousness.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "sabotage4_acd2",
-        "name": "Sabotage",
-        "phase": "Any",
-        "window": "When another player plays an action card other than 'Sabotage'",
-        "text": "Cancel that action card.",
-        "flavorText": "The growing creature spasmed in the genetic spinner's tank as Ssruu slowly emptied poison into its feeding pouch.",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "schematics_rider",
         "name": "Schematics Rider",
         "phase": "Agenda",
@@ -847,6 +801,50 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "side_project1",
+        "name": "Side Project",
+        "phase": "Action",
+        "window": "When you research a technology",
+        "text": "Gain a technology that has no prerequisites.",
+        "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
+        "automationID": "side_project",
+        "flavorText": "As the council meeting drew to a close, Suffi stood up. \"Before we adjourn, I'd like to announce that our neural enhancement project has entered the final phase of clinical trials.\"",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "side_project2",
+        "name": "Side Project",
+        "phase": "Action",
+        "window": "When you research a technology",
+        "text": "Gain a technology that has no prerequisites.",
+        "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
+        "automationID": "side_project",
+        "flavorText": "A projection showed four individuals competing in a task, with one participant fiercely outpacing the others as he interfaced with the device through thought alone. The council murmured approvingly.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "side_project3",
+        "name": "Side Project",
+        "phase": "Action",
+        "window": "When you research a technology",
+        "text": "Gain a technology that has no prerequisites.",
+        "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
+        "automationID": "side_project",
+        "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi, where did you even find the time to organize this project?\"",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "side_project4",
+        "name": "Side Project",
+        "phase": "Action",
+        "window": "When you research a technology",
+        "text": "Gain a technology that has no prerequisites.",
+        "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
+        "automationID": "side_project",
+        "flavorText": "Suffi parted her hair, revealing a small metal plate indicative of a neural implant. Xander gasped, realizing she must have had the surgery long ago. \"You did this before the trials were completed?\" Suffi shrugged. \"Before the trials even began.\"",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "silence",
         "name": "Silence",
         "phase": "Action",
@@ -880,6 +878,15 @@
         "window": "ACTION",
         "text": "Place 1 cruiser from your reinforcements in a system that does not contain planets or other players' units.",
         "flavorText": "\"To be clear,\" Tai said flatly, \"you knew this ship had no weapons, no fuel, and a faulty navigation when you purchased it. And yet,\"—he gestured—\"here we are.\"",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "strategic_aid",
+        "name": "Strategic Aid",
+        "phase": "Action",
+        "window": "When you perform a strategic action",
+        "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
+        "flavorText": "Mathis was not fooled. The pageantry and endless bandying of crooked words with these witless worms was yet another scheme.",
         "source": "action_deck_2"
     },
     {
@@ -962,6 +969,15 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "bounty",
+        "name": "Bounty",
+        "phase": "Action",
+        "window": "After you destroy another player's unit that has a cost of 3 or more",
+        "text": "Capture that unit and gain 3 trade goods.",
+        "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'ula screamed from behind her gag as she watched him reroute the ship toward Arcturus.",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "data_archive",
         "name": "Data Archive",
         "phase": "Agenda",
@@ -1030,8 +1046,8 @@
         "alias": "reconstruction",
         "name": "Reconstruction",
         "phase": "Action",
-        "window": "ACTION",
-        "text": "Ready 1 of your planets that has a trait. Then, reveal the top 3 cards of an exploration deck that matches that planet; attach each attachment that you reveal to that planet and discard the rest.",
+        "window": "After you activate a system",
+        "text": "Choose 1 planet you control in that system. Ready that planet and reveal the top 3 cards of an exploration deck that matches it; attach each attachment that you reveal to it and discard the rest.",
         "flavorText": "Tungstantus collapsed mid-step as their energy depleted. The world was far from its former glory, and they would not rest until it was a paradise once more.",
         "source": "action_deck_2"
     },
@@ -1056,56 +1072,39 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "side_project1",
-        "name": "Side Project",
-        "phase": "Action",
-        "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites.",
-        "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
-        "automationID": "side_project",
-        "flavorText": "As the council meeting drew to a close, Suffi stood up. \"Before we adjourn, I'd like to announce that our neural enhancement project has entered the final phase of clinical trials.\"",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "side_project2",
-        "name": "Side Project",
-        "phase": "Action",
-        "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites.",
-        "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
-        "automationID": "side_project",
-        "flavorText": "A projection showed four individuals competing in a task, with one participant fiercely outpacing the others as he interfaced with the device through thought alone. The council murmured approvingly.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "side_project3",
-        "name": "Side Project",
-        "phase": "Action",
-        "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites.",
-        "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
-        "automationID": "side_project",
-        "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi, where did you even find the time to organize this project?\"",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "side_project4",
-        "name": "Side Project",
-        "phase": "Action",
-        "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites.",
-        "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
-        "automationID": "side_project",
-        "flavorText": "Suffi parted her hair, revealing a small metal plate indicative of a neural implant. Xander gasped, realizing she must have had the surgery long ago. \"You did this before the trials were completed?\" Suffi shrugged. \"Before the trials even began.\"",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "survey",
+        "alias": "survey1",
         "name": "Survey",
         "phase": "Action",
         "window": "ACTION",
         "text": "Explore 1 planet you control; when you would draw from the exploration deck, you may choose and resolve a card from its discard pile instead.",
-        "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
+        "flavorText": "As Tai announced that the expedition would continue despite safety concerns, a cadet gave an audible groan—followed by a yelp as Dart grabbed him by his Naaz. \"Any more backtalk from you and you'll get a clout in the ear!\"",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "survey2",
+        "name": "Survey",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Explore 1 planet you control; when you would draw from the exploration deck, you may choose and resolve a card from its discard pile instead.",
+        "flavorText": "One of the cadets nearly fell over as they crested the lip of the ancient crater, revealing three massive, entangled ships jutting from the earth below. Tai gave a self-satisfied hmph.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "survey3",
+        "name": "Survey",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Explore 1 planet you control; when you would draw from the exploration deck, you may choose and resolve a card from its discard pile instead.",
+        "flavorText": "\"Careful!\" Tai cried as he heard what was undoubtedly a priceless relic shatter in the room next door. \"Who trained these fools?\" he grumbled. Dart didn't have the heart to remind him that they had.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "survey4",
+        "name": "Survey",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Explore 1 planet you control; when you would draw from the exploration deck, you may choose and resolve a card from its discard pile instead.",
+        "flavorText": "As they cut through the ancient structure's wall, Dart's laser-cutter illuminated a canister close to the beam. Tai squealed, \"E-e-exterrix gas!\"—as Dart ran.",
         "source": "action_deck_2"
     },
     {
@@ -1147,15 +1146,6 @@
         "window": "ACTION",
         "text": "Choose 1 non-home planet that contains ground forces and another player that does not control that planet. That player places 1 infantry from their reinforcements into coexistence on that planet.",
         "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "bounty",
-        "name": "Bounty",
-        "phase": "Action",
-        "window": "After you destroy another player's unit that has a cost of 3 or more",
-        "text": "Capture that unit and gain 3 trade goods.",
-        "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'ula screamed from behind her gag as she watched him reroute the ship toward Arcturus.",
         "source": "action_deck_2"
     },
     {
@@ -1213,6 +1203,15 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "privateers",
+        "name": "Privateers",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Choose a system that contains no more than 2 of your non-fighter ships. Replace each of your ships in that system with a neutral ship of the same type to gain trade goods equal to the combined cost of those non-fighter ships.",
+        "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as a fleet of unmarked ships poured forth from the void, raining destruction upon the unsuspecting convoy.",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "propaganda_te",
         "name": "Propaganda",
         "phase": "Agenda",
@@ -1229,15 +1228,6 @@
         "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets outside of that player's home system that contain their units.",
         "notes": "You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.",
         "flavorText": "\"Our survival hinged on the line they drew between slaughter and genocide,\" S'ula reminded her crew. \"Spit that mercy in their face.\"",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "relay_assembly",
-        "name": "Relay Assembly",
-        "phase": "Action",
-        "window": "After you produce a ship",
-        "text": "Produce up to 2 ships of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
-        "flavorText": "From Umbat's hearthworld to distant suns, the shadow of his armada lengthened—stoked by their fury. His engineers broke into celebration as he called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
         "source": "action_deck_2"
     },
     {
@@ -1277,6 +1267,15 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "seized_research",
+        "name": "Seized Research",
+        "phase": "Any",
+        "window": "After you gain control of a planet that has a technology speciality",
+        "text": "You may gain your breakthrough if its synergy matches that speciality; otherwise, research 1 technology that matches that speciality.",
+        "flavorText": "\"So, Doc,\" Connor said, playfully pointing his blaster at the Hylar as she cringed away. \"How about we start with a little tour of Research and Development?\"",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "settlements",
         "name": "Settlements",
         "phase": "Agenda",
@@ -1313,6 +1312,43 @@
         "text": "Place each of your participating units into coexistence; the ground combat ends in a draw.",
         "notes": "This can be played if the player is already coexisting. It cannot be played if the player has no more units on the planet. The attacking player cannot choose to engage any coexisting units in combat after the combat ends in a draw.",
         "flavorText": "When the ink dried, Mot knew he would be remembered as a traitor. However, as irony would have it, he had bought the Nomad precisely what he needed—time.",
+        "source": "action_deck_2"
+    },
+
+    {
+        "alias": "sabotage1_acd2",
+        "name": "Sabotage",
+        "phase": "Any",
+        "window": "When another player plays an action card other than 'Sabotage'",
+        "text": "Cancel that action card.",
+        "flavorText": "Magmus chuckled at Elder Junn's look of concern. \"Let's see you worm your way out of this...\"",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "sabotage2_acd2",
+        "name": "Sabotage",
+        "phase": "Any",
+        "window": "When another player plays an action card other than 'Sabotage'",
+        "text": "Cancel that action card.",
+        "flavorText": "The leaked documents brought a smile to Willard's face. Schemes upon schemes, none of which would ever reach fruition. ",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "sabotage3_acd2",
+        "name": "Sabotage",
+        "phase": "Any",
+        "window": "When another player plays an action card other than 'Sabotage'",
+        "text": "Cancel that action card.",
+        "flavorText": "Communications were jammed. Supply lines were harried. Staffing officers were found dead in their bunks. The grandeur of the scheme shocked Claire to her core.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "sabotage4_acd2",
+        "name": "Sabotage",
+        "phase": "Any",
+        "window": "When another player plays an action card other than 'Sabotage'",
+        "text": "Cancel that action card.",
+        "flavorText": "The growing creature spasmed in the genetic spinner's tank as Ssruu slowly emptied poison into its feeding pouch.",
         "source": "action_deck_2"
     }
 ]
