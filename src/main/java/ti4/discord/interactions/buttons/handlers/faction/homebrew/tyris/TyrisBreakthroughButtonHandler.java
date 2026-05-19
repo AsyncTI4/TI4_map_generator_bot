@@ -35,6 +35,7 @@ public class TyrisBreakthroughButtonHandler {
         if (getTyrisBTTechs(player, game).contains(techID)) return;
         String prev = game.getStoredValue(player.getFaction() + STORED_KEY_SUFFIX);
         game.setStoredValue(player.getFaction() + STORED_KEY_SUFFIX, prev.isEmpty() ? techID : prev + "," + techID);
+        player.removeTech(techID);
     }
 
     public static String removeTyrisBTTech(Player player, Game game) {
@@ -49,6 +50,7 @@ public class TyrisBreakthroughButtonHandler {
         String stored = game.getStoredValue(player.getFaction() + STORED_KEY_SUFFIX);
         stored = stored.replace("," + techID, "").replace(techID + ",", "").replace(techID, "");
         game.setStoredValue(player.getFaction() + STORED_KEY_SUFFIX, stored);
+        player.addTech(techID);
     }
 
     public static Optional<Button> getPlaceButton(Player player, Game game) {
