@@ -43,6 +43,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -1170,6 +1171,20 @@ public final class Helper {
                             "Got 1 vote for controlling Mecatol Rex while _Representative Government_ is in play.\n");
                 case "bloodPact" ->
                     msg.append("Got 4 votes from voting the same way as another _Blood Pact_ member.\n");
+            }
+        }
+        // Dreaming Throne Commander
+        if (votes > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "dreamcommander")) {
+            int count = DreamButtonHandler.getDreamCommanderVoteCount(game, player);
+            if (count > 0) {
+                votes += count;
+                if (!justVoteTotal) {
+                    msg.append("> Used Dreaming Throne Commander for ")
+                            .append(count)
+                            .append(" vote")
+                            .append(count == 1 ? "" : "s")
+                            .append(".\n");
+                }
             }
         }
         String outcome = game.getStoredValue("latestOutcomeVotedFor" + player.getFaction());

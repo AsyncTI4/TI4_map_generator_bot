@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -88,6 +89,7 @@ public class CheckDistanceHelper {
                     if (tile == null
                             || (tile.isNebula(game)
                                     && player != null
+                                    && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.hasAbility("celestial_being")
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !player.hasAbility("voidborn")
@@ -95,6 +97,7 @@ public class CheckDistanceHelper {
                                     && !ButtonHelper.isLawInPlay(game, "shared_research"))
                             || (tile.isSupernova()
                                     && player != null
+                                    && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.hasAbility("celestial_being")
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
@@ -112,6 +115,7 @@ public class CheckDistanceHelper {
                                     && FoWHelper.otherPlayersHaveMovementBlockersInSystem(player, tile, game))
                             || (tile.isAsteroidField()
                                     && player != null
+                                    && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.hasAbility("celestial_being")
                                     && !player.hasTech("amd")
                                     && !player.hasTech("wavelength")
@@ -122,7 +126,9 @@ public class CheckDistanceHelper {
                     }
                 }
                 if (!forMap) {
-                    if (tile != null && tile.isGravityRift(game)) {
+                    if (tile != null
+                            && tile.isGravityRift(game)
+                            && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)) {
                         num = -1;
                         if (game.isCosmicPhenomenaeMode()) {
                             num = -2;
