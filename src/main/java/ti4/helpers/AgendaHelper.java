@@ -2236,6 +2236,21 @@ public final class AgendaHelper {
                             }
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
+                        if (specificVote.contains("Production Rider")) {
+                            String message = identity
+                                    + ", you have a _Production Rider_ to resolve. Please choose the system in which you wish to produce up to 2 units each with cost 4 or less.";
+
+                            List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                                    game, winningR, UnitType.Spacedock);
+                            List<Button> buttons = new ArrayList<>();
+                            for (Tile tile : tiles) {
+                                Button starTile = Buttons.green(
+                                        "umbatTile_" + tile.getPosition(),
+                                        tile.getRepresentationForButtons(game, winningR));
+                                buttons.add(starTile);
+                            }
+                            MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+                        }
 
                         if (specificVote.contains("Trade Rider")) {
                             MessageHelper.sendMessageToChannel(
