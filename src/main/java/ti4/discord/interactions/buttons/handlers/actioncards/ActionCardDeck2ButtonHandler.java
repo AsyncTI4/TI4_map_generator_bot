@@ -32,15 +32,18 @@ import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.planet.FlipTileService;
+import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
 
@@ -217,6 +220,75 @@ class ActionCardDeck2ButtonHandler {
         scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), player.getRepresentation() + ", use the buttons to resolve.", scButtons);
+    }
+
+    @ButtonHandler("resolveOverthrow")
+    public static void resolveOverthrow(Player player, Game game, ButtonInteractionEvent event) {
+        List<Button> scButtons = new ArrayList<>();
+        for (Player otherPlayer : game.getRealPlayers()) {
+            if (otherPlayer == player) {
+                continue;
+            }
+            List<Integer> otherScs = new ArrayList<>(otherPlayer.getSCs());
+            Collections.sort(otherScs);
+            for (Integer sc : otherScs) {
+                if (sc == null || sc <= 0) {
+                    continue;
+                }
+                Button button = Buttons.gray(
+                        player.factionButtonChecker() + "overthrowChooseSC_" + sc,
+                        Helper.getSCName(sc, game) + " (" + otherPlayer.getFactionNameOrColor() + ")");
+                if (!game.isFowMode()) {
+                    button = button.withEmoji(Emoji.fromFormatted(otherPlayer.getFactionEmoji()));
+                }
+                scButtons.add(button);
+            }
+        }
+        if (scButtons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has no opposing strategy cards available for _Overthrow_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        scButtons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                        + ", choose a strategy card from another player's play area to resolve with _Overthrow_.",
+                scButtons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("overthrowChooseSC_")
+    public static void overthrowChooseSC(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        int sc = Integer.parseInt(buttonID.split("_")[1]);
+        ButtonHelper.deleteMessage(event);
+        if (shouldOverthrowResolvePrimaryOnly(game, player)) {
+            sendOverthrowResolutionButtons(player, game, sc, true);
+            return;
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(
+                Buttons.blue(player.factionButtonChecker() + "overthrowResolve_primary_" + sc, "Perform Primary"));
+        buttons.add(Buttons.green(
+                player.factionButtonChecker() + "overthrowResolve_secondary_" + sc, "Perform Secondary"));
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", choose whether _Overthrow_ should resolve the primary or secondary of **"
+                        + Helper.getSCName(sc, game) + "**.",
+                buttons);
+    }
+
+    @ButtonHandler("overthrowResolve_")
+    public static void overthrowResolve(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String[] idParts = buttonID.split("_");
+        boolean primary = "primary".equals(idParts[1]);
+        int sc = Integer.parseInt(idParts[2]);
+        ButtonHelper.deleteMessage(event);
+        sendOverthrowResolutionButtons(player, game, sc, primary);
     }
 
     @ButtonHandler("resolveIntrigue")
@@ -795,6 +867,126 @@ class ActionCardDeck2ButtonHandler {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     "Put _Deflection_ on **" + Helper.getSCName(Integer.parseInt(sc), game) + "**.");
+        }
+    }
+
+    private static boolean shouldOverthrowResolvePrimaryOnly(Game game, Player player) {
+        String activeSystem = game.getActiveSystem();
+        if (activeSystem == null || activeSystem.isBlank()) {
+            return false;
+        }
+        Tile tile = game.getTileByPosition(activeSystem);
+        if (tile == null || !tile.isHomeSystem(game)) {
+            return false;
+        }
+        return tile.getPlanetUnitHolders().stream().map(UnitHolder::getName).anyMatch(player::hasPlanet);
+    }
+
+    private static void sendOverthrowResolutionButtons(Player player, Game game, int sc, boolean primary) {
+        List<Button> buttons = primary
+                ? getOverthrowPrimaryButtons(player, game, sc)
+                : getOverthrowSecondaryButtons(player, game, sc);
+        String resolutionType = primary ? "primary" : "secondary";
+        StringBuilder message = new StringBuilder(player.getRepresentation())
+                .append(", resolve the ")
+                .append(resolutionType)
+                .append(" ability of **")
+                .append(Helper.getSCName(sc, game))
+                .append("**");
+
+        StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
+        String automationId = scModel == null ? "" : scModel.getBotSCAutomationID();
+        if (primary && "pok3politics".equals(automationId)) {
+            message.append(". Resolve agenda peeks manually after assigning Speaker");
+        }
+        if (primary && "pok5trade".equals(automationId)) {
+            message.append(". Gain 3 trade goods and handle transactions manually after replenishing commodities");
+        }
+
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message + " manually.");
+            return;
+        }
+        buttons.add(Buttons.red("deleteButtons", "Done resolving"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message + ".", buttons);
+    }
+
+    private static List<Button> getOverthrowPrimaryButtons(Player player, Game game, int sc) {
+        StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
+        if (scModel == null) {
+            return new ArrayList<>();
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        switch (scModel.getBotSCAutomationID()) {
+            case "pok1leadership", "anarchy1" ->
+                buttons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
+            case "pok2diplomacy", "tf2", "anarchy3", "luminous2" ->
+                buttons.add(Buttons.blue(player.factionButtonChecker() + "diploSystem", "Diplo A System"));
+            case "pok3politics", "cryypter_3" -> {
+                buttons.addAll(PlayStrategyCardService.getPoliticsAssignSpeakerButtons(game, player));
+                buttons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.getACEmoji(game)));
+            }
+            case "pok4construction", "monuments4construction" -> addOverthrowConstructionButtons(game, buttons, false);
+            case "te4construction" -> addOverthrowConstructionButtons(game, buttons, true);
+            case "pok5trade" -> buttons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
+            case "pok6warfare", "anarchy8" ->
+                buttons.add(Buttons.blue("primaryOfWarfare", "Do Warfare Primary"));
+            case "te6warfare" -> buttons.add(Buttons.blue("primaryOfTeWarfare", "Warfare Tactical Action"));
+            case "anarchy7", "tf6" -> buttons.add(Buttons.blue(
+                    player.factionButtonChecker() + "primaryOfAnarchy7", "Resolve PRODUCTION In A System"));
+            case "luminous7" -> {
+                buttons.add(Buttons.blue("primaryOfWarfare", "Do Warfare Primary"));
+                buttons.add(Buttons.blue("primaryOfLumi7", "Resolve PRODUCTION In A System"));
+            }
+            case "pok7technology", "tf7" -> buttons.add(Buttons.GET_A_FREE_TECH);
+            case "pok8imperial", "tf8" -> {
+                buttons.add(Buttons.gray("score_imperial", "Score Imperial", PlanetEmojis.Mecatol));
+                buttons.add(Buttons.gray(
+                        player.factionButtonChecker() + "scoreAnObjective", "Score A Public", CardEmojis.Public1));
+                buttons.add(Buttons.gray("sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
+            }
+        }
+        return buttons;
+    }
+
+    private static List<Button> getOverthrowSecondaryButtons(Player player, Game game, int sc) {
+        StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
+        if (scModel == null) {
+            return new ArrayList<>();
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        switch (scModel.getBotSCAutomationID()) {
+            case "pok1leadership", "anarchy1" ->
+                buttons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
+            case "pok2diplomacy", "tf2", "anarchy2", "anarchy3", "luminous1", "luminous2" ->
+                buttons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
+            case "pok3politics", "cryypter_3" ->
+                buttons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.getACEmoji(game)));
+            case "pok4construction", "te4construction", "monuments4construction" ->
+                addOverthrowConstructionButtons(game, buttons, false);
+            case "pok5trade" -> buttons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
+            case "pok6warfare", "te6warfare", "anarchy7", "anarchy8", "luminous7", "tf6" ->
+                buttons.add(Buttons.green("warfareBuild", "Build At Home"));
+            case "pok7technology", "tf7" -> buttons.add(Buttons.GET_A_TECH);
+            case "pok8imperial", "tf8" ->
+                buttons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
+        }
+        return buttons;
+    }
+
+    private static void addOverthrowConstructionButtons(Game game, List<Button> buttons, boolean includeProduction) {
+        if (includeProduction) {
+            buttons.add(Buttons.green("constructionPrimary_produce", "Use Production"));
+        }
+        buttons.add(Buttons.green("construction_spacedock", "Place 1 Space Dock", UnitEmojis.spacedock));
+        buttons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
+        if (game.isFacilitiesMode()) {
+            buttons.add(Buttons.green("construction_facility", "Place A Facility"));
+        }
+        if (game.isMonumentToTheAgesMode()) {
+            buttons.add(Buttons.green("construction_agesmonument", "Place A Monument (Cost 5 TG)"));
         }
     }
 }
