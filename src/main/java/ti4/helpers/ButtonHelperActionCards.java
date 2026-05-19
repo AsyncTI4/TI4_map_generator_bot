@@ -2927,6 +2927,17 @@ public final class ButtonHelperActionCards {
         return buttons;
     }
 
+    public static List<Button> getFrontierTokenButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
+                buttons.add(Buttons.green("probeStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+            }
+        }
+        BlindSelectionService.filterForBlindPositionSelection(game, player, buttons, "probeStep2");
+        return buttons;
+    }
+
     @ButtonHandler("resolveReverse_")
     public static void resolveReverse(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String acName = buttonID.replace("resolveReverse_", "");
