@@ -24,6 +24,7 @@ import ti4.discord.interactions.commands.event.EventCommand;
 import ti4.discord.interactions.commands.explore.ExploreCommand;
 import ti4.discord.interactions.commands.fow.FOWCommand;
 import ti4.discord.interactions.commands.franken.FrankenCommand;
+import ti4.discord.interactions.commands.frankendraz.FrankenDrazCommand;
 import ti4.discord.interactions.commands.game.GameCommand;
 import ti4.discord.interactions.commands.help.HelpCommand;
 import ti4.discord.interactions.commands.installation.InstallationCommand;
@@ -124,6 +125,7 @@ public class SlashCommandManager {
                     new InstallationCommand(),
                     new MiltyCommand(),
                     new FrankenCommand(),
+                    new FrankenDrazCommand(),
                     new CaptureCommand(),
                     new GenericButtonCommand(),
                     new DiscordantStarsCommand(),
