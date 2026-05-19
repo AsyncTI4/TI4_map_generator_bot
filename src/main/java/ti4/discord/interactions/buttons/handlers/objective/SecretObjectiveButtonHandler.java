@@ -162,20 +162,7 @@ class SecretObjectiveButtonHandler {
             return;
         }
 
-        if (game.isAcd2() && game.getPlayerFromColorOrFaction("bastion") != null) {
-            List<String> bastionSabotageCards =
-                    List.of("sabotage1_acd2", "sabotage2_acd2", "sabotage3_acd2", "sabotage4_acd2");
-            List<String> cardsToAdd = bastionSabotageCards.stream()
-                    .filter(card -> !game.getActionCards().contains(card))
-                    .toList();
-            if (!cardsToAdd.isEmpty()) {
-                game.getActionCards().addAll(cardsToAdd);
-                game.shuffleActionCards();
-                MessageHelper.sendMessageToChannel(
-                        game.getMainGameChannel(),
-                        "4 Sabotage cards have been added to the action card deck due to **Last Bastion** being in the game.");
-            }
-        }
+        game.ensureBastionAcd2SabotagesIncluded();
 
         DrawSecretService.dealSOToAll(event, 2, game);
         ButtonHelper.deleteMessage(event);
