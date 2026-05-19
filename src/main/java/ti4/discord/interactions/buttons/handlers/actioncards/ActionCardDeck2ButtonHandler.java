@@ -31,8 +31,13 @@ import ti4.helpers.UnusedCommanderHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.BreakthroughModel;
 import ti4.model.ExploreModel;
+import ti4.model.LeaderModel;
+import ti4.model.RelicModel;
+import ti4.model.TechnologyModel;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -46,6 +51,7 @@ class ActionCardDeck2ButtonHandler {
 
     private static final String ALLIANCE_RIDER_CURRENT_ALLY = "allianceRiderCurrentAlly";
     private static final String ALLIANCE_RIDER_PURGED_ALLIES = "allianceRiderPurgedAllies";
+    private static final String OVERTIME_SUMMARY = "overtimeSummary";
 
     @ButtonHandler("resolveOracle")
     public static void resolveOracle(Player player, Game game, ButtonInteractionEvent event) {
@@ -221,6 +227,88 @@ class ActionCardDeck2ButtonHandler {
         AgendaHelper.drawAgenda(2, true, game, player);
         AgendaHelper.drawAgenda(2, game, player);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler("resolveOvertime")
+    public static void resolveOvertime(Player player, Game game, ButtonInteractionEvent event) {
+        int maxSpend = Math.min(2, Math.min(player.getTg(), getOvertimeReadyButtons(game, player, 1).size()));
+        if (maxSpend < 1) {
+            String reason = player.getTg() < 1
+                    ? " has no trade goods to spend for _Overtime_."
+                    : " has no exhausted components to ready for _Overtime_.";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + reason);
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("overtimeSpend_1", "Spend 1 Trade Good"));
+        if (maxSpend > 1) {
+            buttons.add(Buttons.green("overtimeSpend_2", "Spend 2 Trade Goods"));
+        }
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", choose how many trade goods to spend for _Overtime_.",
+                buttons);
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler("overtimeSpend_")
+    public static void resolveOvertimeSpend(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        int spend = Integer.parseInt(buttonID.split("_")[1]);
+        if (player.getTg() < spend || getOvertimeReadyButtons(game, player, spend).size() < spend) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " can no longer spend that much for _Overtime_. Please resolve it again.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        player.setTg(player.getTg() - spend);
+        game.setStoredValue(
+                overtimeSummaryKey(player),
+                player.getRepresentation() + " spent " + spend + " trade good" + (spend == 1 ? "" : "s")
+                        + " with _Overtime_");
+        sendOvertimeReadyPrompt(player, game, spend);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("overtimeReady_")
+    public static void resolveOvertimeReady(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String[] buttonParts = buttonID.split("_", 4);
+        if (buttonParts.length < 4) {
+            return;
+        }
+
+        int remaining = Integer.parseInt(buttonParts[1]);
+        String type = buttonParts[2];
+        String detail = buttonParts[3];
+        String readyItem = readyOvertimeComponent(game, player, type, detail);
+        if (readyItem == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " could not ready that component for _Overtime_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String summary = game.getStoredValue(overtimeSummaryKey(player));
+        if (summary.isEmpty()) {
+            summary = player.getRepresentation() + " resolved _Overtime_";
+        }
+        summary = summary.contains(" and readied ") ? summary + ", " + readyItem : summary + " and readied " + readyItem;
+        game.setStoredValue(overtimeSummaryKey(player), summary);
+        ButtonHelper.deleteMessage(event);
+
+        if (remaining > 1) {
+            sendOvertimeReadyPrompt(player, game, remaining - 1);
+            return;
+        }
+
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), summary + ".");
+        clearOvertimeState(game, player);
     }
 
     @ButtonHandler("resolveAncientTradeRoutes")
@@ -699,6 +787,114 @@ class ActionCardDeck2ButtonHandler {
             return new ArrayList<>();
         }
         return new ArrayList<>(List.of(storedValue.split(",")));
+    }
+
+    private static void sendOvertimeReadyPrompt(Player player, Game game, int remaining) {
+        List<Button> buttons = getOvertimeReadyButtons(game, player, remaining);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), game.getStoredValue(overtimeSummaryKey(player)) + ".");
+            clearOvertimeState(game, player);
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                game.getStoredValue(overtimeSummaryKey(player)) + ". Choose " + remaining + " more component"
+                        + (remaining == 1 ? "" : "s") + " to ready.",
+                buttons);
+    }
+
+    private static List<Button> getOvertimeReadyButtons(Game game, Player player, int remaining) {
+        List<Button> buttons = new ArrayList<>();
+
+        String prefix = "overtimeReady_" + remaining + "_planet_";
+        for (String planet : player.getExhaustedPlanets()) {
+            buttons.add(Buttons.green(prefix + planet, "Ready " + Helper.getPlanetRepresentation(planet, game)));
+        }
+
+        prefix = "overtimeReady_" + remaining + "_breakthrough_";
+        for (String bt : player.getBreakthroughIDs()) {
+            if (player.isBreakthroughExhausted(bt) && player.isBreakthroughUnlocked(bt)) {
+                BreakthroughModel btModel = Mapper.getBreakthrough(bt);
+                buttons.add(Buttons.blue(
+                        prefix + bt, "Ready " + btModel.getName() + " Breakthrough", player.getFactionEmoji()));
+            }
+        }
+
+        prefix = "overtimeReady_" + remaining + "_leader_";
+        for (Leader leader : player.getLeaders()) {
+            if (leader.isExhausted()) {
+                String leaderName = leader.getLeaderModel().map(LeaderModel::getName).orElse(leader.getId());
+                buttons.add(Buttons.gray(
+                        prefix + leader.getId(),
+                        "Ready " + leaderName + (Constants.AGENT.equals(leader.getType()) ? " Agent" : " Leader")));
+            }
+        }
+
+        prefix = "overtimeReady_" + remaining + "_relic_";
+        for (String relic : player.getExhaustedRelics()) {
+            RelicModel model = Mapper.getRelic(relic);
+            buttons.add(Buttons.red(prefix + relic, "Ready " + model.getName() + " Relic", ExploreEmojis.Relic));
+        }
+
+        prefix = "overtimeReady_" + remaining + "_tech_";
+        for (String tech : player.getExhaustedTechs()) {
+            TechnologyModel model = Mapper.getTech(tech);
+            buttons.add(Buttons.green(prefix + tech, "Ready " + model.getName() + " Technology"));
+        }
+
+        prefix = "overtimeReady_" + remaining + "_legendary_";
+        for (String planet : player.getExhaustedPlanetsAbilities()) {
+            buttons.add(Buttons.blue(
+                    prefix + planet, "Ready " + Mapper.getPlanet(planet).getName() + " Ability", MiscEmojis.LegendaryPlanet));
+        }
+
+        return buttons;
+    }
+
+    private static String readyOvertimeComponent(Game game, Player player, String type, String detail) {
+        switch (type) {
+            case "planet" -> {
+                player.refreshPlanet(detail);
+                return Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(detail, game);
+            }
+            case "breakthrough" -> {
+                player.setBreakthroughExhausted(detail, false);
+                return player.getBreakthroughModel(detail).getNameRepresentation();
+            }
+            case "leader" -> {
+                Leader leader = player.getLeaderByID(detail).orElse(null);
+                if (leader == null) {
+                    return null;
+                }
+                RefreshLeaderService.refreshLeader(player, leader, game);
+                return leader.getLeaderModel().map(LeaderModel::getNameRepresentation).orElse(detail);
+            }
+            case "relic" -> {
+                player.removeExhaustedRelic(detail);
+                return Mapper.getRelic(detail).getNameRepresentation();
+            }
+            case "tech" -> {
+                player.refreshTech(detail);
+                CommanderUnlockCheckService.checkPlayer(player, "kolume");
+                return Mapper.getTech(detail).getNameRepresentation();
+            }
+            case "legendary" -> {
+                player.refreshPlanetAbility(detail);
+                return Mapper.getPlanet(detail).getLegendaryNameRepresentation();
+            }
+            default -> {
+                return null;
+            }
+        }
+    }
+
+    private static String overtimeSummaryKey(Player player) {
+        return OVERTIME_SUMMARY + "_" + player.getFaction();
+    }
+
+    private static void clearOvertimeState(Game game, Player player) {
+        game.setStoredValue(overtimeSummaryKey(player), "");
     }
 
     @ButtonHandler("brutalOccupationStep2_")
