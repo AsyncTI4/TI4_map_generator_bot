@@ -1073,6 +1073,11 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("lost_treatise".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveLostTreatise", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("jamming".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.factionButtonChecker() + "resolveSignalJammingStep1", buttonLabel));
