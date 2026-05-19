@@ -496,7 +496,8 @@ class ActionCardDeck2ButtonHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", spend 3 resources and choose a technology to gain with _Ubiquity_.",
+                player.getRepresentationUnfogged()
+                        + ", spend 3 resources and choose a technology to gain with _Ubiquity_.",
                 ListTechService.getTechButtons(techs, player, "free"));
 
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
@@ -522,8 +523,10 @@ class ActionCardDeck2ButtonHandler {
     }
 
     private static boolean isTechOwnedByEnoughPlayers(Game game, TechnologyModel tech) {
-        long techOwners =
-                game.getRealPlayers().stream().filter(player -> player.hasTech(tech.getAlias())).count();
+        long techOwners = game.getRealPlayers().stream()
+                .filter(player -> !player.isEliminated())
+                .filter(player -> player.hasTech(tech.getAlias()))
+                .count();
         return tech.getRequirements().orElse("").length() < techOwners;
     }
 
