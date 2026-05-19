@@ -31,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.cron.AutoPingCron;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -3580,6 +3581,12 @@ public final class AgendaHelper {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "augerscommander")) {
             int count = player.getTechs().size() / 2;
             additionalVotesAndSources.put(FactionEmojis.augers + "Ilyxum Commander", count);
+        }
+
+        // Dreaming Throne Commander
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "dreamcommander")) {
+            int count = DreamButtonHandler.getDreamCommanderVoteCount(game, player);
+            additionalVotesAndSources.put(FactionEmojis.dream + "Dreaming Throne Commander", count);
         }
 
         // Ghoti Wayfarer Tech
