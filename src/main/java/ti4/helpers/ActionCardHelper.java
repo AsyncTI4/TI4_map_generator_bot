@@ -1283,6 +1283,11 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
             }
 
+            if ("freedom_fighters".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveFreedomFighters", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("simulacrum".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveSimulacrum", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
