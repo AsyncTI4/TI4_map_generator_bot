@@ -1073,6 +1073,16 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("opportunists".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveOpportunists", buttonLabel));
+                if (game.getActiveSystem().isEmpty()) {
+                    MessageHelper.sendMessageToChannel(
+                            channel2, "The active system is currently non-existent, so this card cannot be automated.");
+                } else {
+                    MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+                }
+            }
+
             if ("jamming".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.factionButtonChecker() + "resolveSignalJammingStep1", buttonLabel));

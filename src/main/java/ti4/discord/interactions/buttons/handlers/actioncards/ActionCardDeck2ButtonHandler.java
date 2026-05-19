@@ -509,6 +509,25 @@ class ActionCardDeck2ButtonHandler {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
+    @ButtonHandler("resolveOpportunists")
+    public static void resolveOpportunists(Player player, Game game, ButtonInteractionEvent event) {
+        Tile tile = game.getTileByPosition(game.getActiveSystem());
+        if (tile == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not find the active system for _Opportunists_.");
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+
+        tile = FlipTileService.flipTileIfNeeded(event, tile, game);
+        AddUnitService.addUnits(event, tile, game, game.getNeutralColor(), "2 dd, cr");
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " added 1 neutral cruiser and 2 neutral destroyers to "
+                        + tile.getRepresentationForButtons(game, player) + ".");
+    }
+
     private static List<TechnologyModel> getUbiquityTechs(Game game, Player player) {
         List<TechnologyModel> techs = new ArrayList<>();
         Set<String> seenTechs = new HashSet<>();
