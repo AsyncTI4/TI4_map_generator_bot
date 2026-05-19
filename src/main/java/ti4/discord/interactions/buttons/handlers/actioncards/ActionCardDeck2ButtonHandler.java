@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -27,6 +28,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.UnusedCommanderHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
@@ -35,6 +37,7 @@ import ti4.model.ExploreModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
@@ -72,6 +75,141 @@ class ActionCardDeck2ButtonHandler {
                 event.getMessageChannel(),
                 "Sent _Oracle_ results to " + player.getFactionEmojiOrColor()
                         + " `#cards-info` thread and shuffled the secret objective deck.");
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler("resolveBlackMarketIntel")
+    public static void resolveBlackMarketIntel(Player player, Game game, ButtonInteractionEvent event) {
+        List<String> revealedSecretIds = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            String secretId = game.drawSecretObjective(player.getUserID());
+            if (secretId != null) {
+                revealedSecretIds.add(secretId);
+            }
+        }
+
+        boolean drewExtraSecret = false;
+        if (player.hasAbility("plausible_deniability") && game.drawSecretObjective(player.getUserID()) != null) {
+            drewExtraSecret = true;
+        }
+        game.setStoredValue(getBlackMarketIntelPlausibleDeniabilityKey(player), drewExtraSecret ? "true" : "");
+
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
+
+        if (revealedSecretIds.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), player.getRepresentationNoPing() + " could not draw any secret objectives.");
+            clearBlackMarketIntelPlausibleDeniability(game, player);
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+
+        List<MessageEmbed> revealedEmbeds = new ArrayList<>();
+        for (String secretId : revealedSecretIds) {
+            var secretObjective = Mapper.getSecretObjective(secretId);
+            if (secretObjective != null) {
+                revealedEmbeds.add(secretObjective.getRepresentationEmbed(true));
+            }
+        }
+        String message = player.getRepresentationNoPing() + " drew and revealed "
+                + revealedSecretIds.size()
+                + " secret objective"
+                + (revealedSecretIds.size() == 1 ? "" : "s")
+                + " for _Black Market Intel_.";
+        if (drewExtraSecret) {
+            message += " They also drew 1 additional secret objective due to **Plausible Deniability**.";
+        }
+        MessageHelper.sendMessageToChannelWithEmbeds(event.getMessageChannel(), message, revealedEmbeds);
+
+        List<Button> buttons = getBlackMarketIntelSecretButtons(player, revealedSecretIds);
+        if (buttons.isEmpty() || getBlackMarketIntelEligibleRecipients(game, player).isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + " has no eligible player to receive a revealed secret objective from _Black Market Intel_.");
+            if (drewExtraSecret) {
+                SecretObjectiveHelper.sendSODiscardButtons(player);
+            }
+            clearBlackMarketIntelPlausibleDeniability(game, player);
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", choose which revealed secret objective to give away with _Black Market Intel_.",
+                buttons);
+        if (drewExtraSecret) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    "After resolving _Black Market Intel_, return 1 secret objective to the deck for **Plausible Deniability**.");
+        }
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler("blackMarketIntelStep2_")
+    public static void resolveBlackMarketIntelStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String identifierText = buttonID.substring("blackMarketIntelStep2_".length());
+        int secretIdentifier = Integer.parseInt(identifierText);
+        String secretId = getSecretIdByIdentifier(player, secretIdentifier);
+        if (secretId == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not find that secret objective for _Black Market Intel_.");
+            return;
+        }
+
+        List<Button> buttons = getBlackMarketIntelRecipientButtons(game, player, secretIdentifier);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + " has no eligible player to receive _"
+                            + Mapper.getSecretObjective(secretId).getName() + "_ from _Black Market Intel_.");
+            if (shouldResolveBlackMarketIntelPlausibleDeniability(game, player)) {
+                SecretObjectiveHelper.sendSODiscardButtons(player);
+            }
+            clearBlackMarketIntelPlausibleDeniability(game, player);
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", choose who receives _"
+                        + Mapper.getSecretObjective(secretId).getName() + "_ from _Black Market Intel_.",
+                buttons);
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler("blackMarketIntelGive_")
+    public static void resolveBlackMarketIntelGive(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String[] parts = buttonID.substring("blackMarketIntelGive_".length()).split("_", 2);
+        if (parts.length < 2) {
+            return;
+        }
+        int secretIdentifier = Integer.parseInt(parts[0]);
+        Player recipient = game.getPlayerFromColorOrFaction(parts[1]);
+        String secretId = getSecretIdByIdentifier(player, secretIdentifier);
+        if (recipient == null || secretId == null || recipient == player || recipient.getSoScored() >= 3) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not resolve _Black Market Intel_ for that target.");
+            return;
+        }
+
+        player.removeSecret(secretIdentifier);
+        recipient.setSecret(secretId);
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, recipient);
+
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + " gave _" + Mapper.getSecretObjective(secretId).getName() + "_ to "
+                        + recipient.getRepresentationNoPing() + " using _Black Market Intel_.");
+        if (shouldResolveBlackMarketIntelPlausibleDeniability(game, player)) {
+            SecretObjectiveHelper.sendSODiscardButtons(player);
+        }
+        clearBlackMarketIntelPlausibleDeniability(game, player);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
@@ -699,6 +837,67 @@ class ActionCardDeck2ButtonHandler {
             return new ArrayList<>();
         }
         return new ArrayList<>(List.of(storedValue.split(",")));
+    }
+
+    private static List<Button> getBlackMarketIntelSecretButtons(Player player, List<String> revealedSecretIds) {
+        List<Button> buttons = new ArrayList<>();
+        for (String secretId : revealedSecretIds) {
+            Integer secretIdentifier = player.getSecretsUnscored().get(secretId);
+            if (secretIdentifier == null) {
+                continue;
+            }
+            buttons.add(Buttons.green(
+                    "blackMarketIntelStep2_" + secretIdentifier,
+                    "Give (" + secretIdentifier + ") " + Mapper.getSecretObjective(secretId).getName()));
+        }
+        return buttons;
+    }
+
+    private static List<Player> getBlackMarketIntelEligibleRecipients(Game game, Player player) {
+        return game.getRealPlayers().stream()
+                .filter(otherPlayer -> otherPlayer != player)
+                .filter(otherPlayer -> otherPlayer.getSoScored() < 3)
+                .toList();
+    }
+
+    private static List<Button> getBlackMarketIntelRecipientButtons(Game game, Player player, int secretIdentifier) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player otherPlayer : getBlackMarketIntelEligibleRecipients(game, player)) {
+            if (game.isFowMode()) {
+                buttons.add(Buttons.gray(
+                        "blackMarketIntelGive_" + secretIdentifier + "_" + otherPlayer.getFaction(),
+                        otherPlayer.getColor()));
+            } else {
+                Button button = Buttons.gray(
+                        "blackMarketIntelGive_" + secretIdentifier + "_" + otherPlayer.getFaction(),
+                        otherPlayer.getFactionModel().getShortName());
+                String factionEmojiString = otherPlayer.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        return buttons;
+    }
+
+    private static String getSecretIdByIdentifier(Player player, int secretIdentifier) {
+        for (Map.Entry<String, Integer> secret : player.getSecretsUnscored().entrySet()) {
+            if (secret.getValue().equals(secretIdentifier)) {
+                return secret.getKey();
+            }
+        }
+        return null;
+    }
+
+    private static String getBlackMarketIntelPlausibleDeniabilityKey(Player player) {
+        return "blackMarketIntelPd_" + player.getFaction();
+    }
+
+    private static boolean shouldResolveBlackMarketIntelPlausibleDeniability(Game game, Player player) {
+        return "true".equals(game.getStoredValue(getBlackMarketIntelPlausibleDeniabilityKey(player)));
+    }
+
+    private static void clearBlackMarketIntelPlausibleDeniability(Game game, Player player) {
+        game.setStoredValue(getBlackMarketIntelPlausibleDeniabilityKey(player), "");
     }
 
     @ButtonHandler("brutalOccupationStep2_")
