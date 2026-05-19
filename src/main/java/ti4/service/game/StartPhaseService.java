@@ -863,7 +863,9 @@ public class StartPhaseService {
         for (Player player : game.getRealPlayers()) {
             sendStatusReminders(game, player);
         }
-        DreamButtonHandler.offerTheWakingButtons(game);
+        if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("the_waking"))) {
+            DreamButtonHandler.offerTheWakingButtons(game);
+        }
 
         Button yssarilPolicy = null;
         for (Player player : game.getRealPlayers()) {
