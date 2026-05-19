@@ -32,6 +32,8 @@ import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
@@ -39,6 +41,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.planet.FlipTileService;
+import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
@@ -478,6 +481,50 @@ class ActionCardDeck2ButtonHandler {
         MessageHelper.sendMessageToChannel(
                 event.getChannel(), player.getFactionEmoji() + " readied every planet with a technology specialty.");
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler(value = "ubiquity", save = false)
+    public static void resolveUbiquity(Player player, Game game, ButtonInteractionEvent event) {
+        List<TechnologyModel> techs = getUbiquityTechs(game, player);
+        if (techs.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has no eligible technologies to gain with _Ubiquity_.");
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", spend 3 resources and choose a technology to gain with _Ubiquity_.",
+                ListTechService.getTechButtons(techs, player, "free"));
+
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
+        buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", use these buttons to pay the 3 resources for _Ubiquity_.",
+                buttons);
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    private static List<TechnologyModel> getUbiquityTechs(Game game, Player player) {
+        List<TechnologyModel> techs = new ArrayList<>();
+        Set<String> seenTechs = new HashSet<>();
+        for (TechnologyType techType : TechnologyType.mainFive) {
+            for (TechnologyModel tech : ListTechService.getAllTechOfAType(game, techType.toString(), player)) {
+                if (seenTechs.add(tech.getAlias()) && isTechOwnedByEnoughPlayers(game, tech)) {
+                    techs.add(tech);
+                }
+            }
+        }
+        return techs;
+    }
+
+    private static boolean isTechOwnedByEnoughPlayers(Game game, TechnologyModel tech) {
+        long techOwners =
+                game.getRealPlayers().stream().filter(player -> player.hasTech(tech.getAlias())).count();
+        return tech.getRequirements().orElse("").length() < techOwners;
     }
 
     @ButtonHandler("strandedShipStep1")
