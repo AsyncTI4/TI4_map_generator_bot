@@ -19,6 +19,7 @@ import ti4.game.Leader;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -270,14 +271,14 @@ class ActionCardDeck2ButtonHandler {
         }
 
         List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.blue(player.factionButtonChecker() + "overthrowResolve_primary_" + sc, "Perform Primary"));
         buttons.add(
-                Buttons.blue(player.factionButtonChecker() + "overthrowResolve_primary_" + sc, "Perform Primary"));
-        buttons.add(Buttons.green(
-                player.factionButtonChecker() + "overthrowResolve_secondary_" + sc, "Perform Secondary"));
+                Buttons.green(player.factionButtonChecker() + "overthrowResolve_secondary_" + sc, "Perform Secondary"));
         buttons.add(Buttons.red("deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", choose whether _Overthrow_ should resolve the primary or secondary of **"
+                player.getRepresentation()
+                        + ", choose whether _Overthrow_ should resolve the primary or secondary of **"
                         + Helper.getSCName(sc, game) + "**.",
                 buttons);
     }
@@ -883,9 +884,8 @@ class ActionCardDeck2ButtonHandler {
     }
 
     private static void sendOverthrowResolutionButtons(Player player, Game game, int sc, boolean primary) {
-        List<Button> buttons = primary
-                ? getOverthrowPrimaryButtons(player, game, sc)
-                : getOverthrowSecondaryButtons(player, game, sc);
+        List<Button> buttons =
+                primary ? getOverthrowPrimaryButtons(player, game, sc) : getOverthrowSecondaryButtons(player, game, sc);
         String resolutionType = primary ? "primary" : "secondary";
         StringBuilder message = new StringBuilder(player.getRepresentation())
                 .append(", resolve the ")
@@ -930,11 +930,11 @@ class ActionCardDeck2ButtonHandler {
             case "pok4construction", "monuments4construction" -> addOverthrowConstructionButtons(game, buttons, false);
             case "te4construction" -> addOverthrowConstructionButtons(game, buttons, true);
             case "pok5trade" -> buttons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
-            case "pok6warfare", "anarchy8" ->
-                buttons.add(Buttons.blue("primaryOfWarfare", "Do Warfare Primary"));
+            case "pok6warfare", "anarchy8" -> buttons.add(Buttons.blue("primaryOfWarfare", "Do Warfare Primary"));
             case "te6warfare" -> buttons.add(Buttons.blue("primaryOfTeWarfare", "Warfare Tactical Action"));
-            case "anarchy7", "tf6" -> buttons.add(Buttons.blue(
-                    player.factionButtonChecker() + "primaryOfAnarchy7", "Resolve PRODUCTION In A System"));
+            case "anarchy7", "tf6" ->
+                buttons.add(Buttons.blue(
+                        player.factionButtonChecker() + "primaryOfAnarchy7", "Resolve PRODUCTION In A System"));
             case "luminous7" -> {
                 buttons.add(Buttons.blue("primaryOfWarfare", "Do Warfare Primary"));
                 buttons.add(Buttons.blue("primaryOfLumi7", "Resolve PRODUCTION In A System"));
