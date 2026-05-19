@@ -2931,7 +2931,8 @@ public final class ButtonHelperActionCards {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
-                buttons.add(Buttons.green("probeStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+                buttons.add(Buttons.green(
+                        "probeStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
             }
         }
         BlindSelectionService.filterForBlindPositionSelection(game, player, buttons, "probeStep2");
