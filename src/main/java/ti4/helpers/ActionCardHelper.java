@@ -1327,6 +1327,12 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "ship"), codedButtons);
             }
 
+            if ("false_flag".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveFalseFlagStep1", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "player and systems"), codedButtons);
+            }
+
             if ("refit".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveRefitTroops", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
