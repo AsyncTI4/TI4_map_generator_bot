@@ -61,6 +61,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Draw and reveal 2 secret objectives. Then, give 1 of those cards to another player that has less than 3 scored secret objectives, if able.",
+        "automationID": "black_market_intel",
         "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother,\" they said in unison.",
         "source": "action_deck_2"
     },
