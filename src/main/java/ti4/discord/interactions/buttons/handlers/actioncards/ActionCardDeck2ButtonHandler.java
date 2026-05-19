@@ -793,8 +793,7 @@ class ActionCardDeck2ButtonHandler {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged()
-                            + " has no scored public objectives to purge for _Amendment_.");
+                    player.getRepresentationUnfogged() + " has no scored public objectives to purge for _Amendment_.");
             return;
         }
         MessageHelper.sendMessageToChannelWithButtons(
@@ -822,10 +821,10 @@ class ActionCardDeck2ButtonHandler {
                         + "_ using _Amendment_. Players do not lose points from this purge.");
 
         List<Button> stageButtons = new ArrayList<>();
-        stageButtons.add(Buttons.green(
-                player.factionButtonChecker() + "amendmentRevealStage1", "Reveal Stage 1 Objective"));
-        stageButtons.add(Buttons.blue(
-                player.factionButtonChecker() + "amendmentRevealStage2", "Reveal Stage 2 Objective"));
+        stageButtons.add(
+                Buttons.green(player.factionButtonChecker() + "amendmentRevealStage1", "Reveal Stage 1 Objective"));
+        stageButtons.add(
+                Buttons.blue(player.factionButtonChecker() + "amendmentRevealStage2", "Reveal Stage 2 Objective"));
 
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
