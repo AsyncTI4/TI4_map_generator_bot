@@ -35,7 +35,7 @@ sideBets:
   afbWhiffSelectionBias: 2.0
   roundOneWhiffSelectionBias: 3.0
   roundOneSlamSelectionBias: 3.0
-  winnerOneHpPayoutMultiplier: 0.75
+  winnerOneHpPayoutMultiplier: 0.5625
   dynamicPayoutTiers: "0.20:4,0.10:5,0.05:8,0.025:12,0.01:20,0.005:30"
 
 initialIndividualPoints: 100

@@ -66,8 +66,8 @@ class CombatReplayServiceTest {
                 "muaat",
                 4);
 
-        assertEquals(2.2033, blowoutScore, 0.0001);
-        assertEquals(3.6705, squeakerScore, 0.0001);
+        assertEquals(2.1117, blowoutScore, 0.0001);
+        assertEquals(2.6971, squeakerScore, 0.0001);
         assertTrue(squeakerScore > blowoutScore);
     }
 
@@ -84,6 +84,37 @@ class CombatReplayServiceTest {
                 candidate, initialStats, attackerRemaining, defenderRemaining, "yin", 2);
 
         assertEquals(attackerWinScore, defenderWinScore, 0.0001);
+    }
+
+    @Test
+    void promotionScoreUsesFlatCloseSurvivalBonus() {
+        CombatCandidateEntity candidate = candidate("sol", "yin");
+        CombatReplayService.InitialCombatStats initialStats = initialStats(12, 12, 20, 20);
+
+        double oneHpScore = CombatReplayService.computePromotionScore(
+                candidate,
+                initialStats,
+                new LazaxCombatSupport.FleetStrength(4.0, 1.0, 0.0),
+                new LazaxCombatSupport.FleetStrength(0.0, 0.0, 0.0),
+                "sol",
+                3);
+        double fourHpScore = CombatReplayService.computePromotionScore(
+                candidate,
+                initialStats,
+                new LazaxCombatSupport.FleetStrength(4.0, 4.0, 0.0),
+                new LazaxCombatSupport.FleetStrength(0.0, 0.0, 0.0),
+                "sol",
+                3);
+        double fiveHpScore = CombatReplayService.computePromotionScore(
+                candidate,
+                initialStats,
+                new LazaxCombatSupport.FleetStrength(4.0, 5.0, 0.0),
+                new LazaxCombatSupport.FleetStrength(0.0, 0.0, 0.0),
+                "sol",
+                3);
+
+        assertEquals(oneHpScore, fourHpScore, 0.0001);
+        assertEquals(0.2, fourHpScore - fiveHpScore, 0.0001);
     }
 
     @Test
@@ -108,8 +139,8 @@ class CombatReplayServiceTest {
         double snapshotScore = CombatReplayService.computePromotionScore(
                 candidate, replaySnapshotStats, attackerRemaining, defenderRemaining, "hacan", 3);
 
-        assertEquals(2.2074, staleScore, 0.0001);
-        assertEquals(0.9888, snapshotScore, 0.0001);
+        assertEquals(2.1386, staleScore, 0.0001);
+        assertEquals(0.9199, snapshotScore, 0.0001);
         assertTrue(snapshotScore < staleScore);
     }
 
