@@ -92,6 +92,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
+import ti4.service.actioncard.KnownActionCardsService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.DeepgloomService;
 import ti4.service.breakthrough.ValefarZService;
@@ -1185,6 +1186,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             }
         }
         actionCards.remove(idToRemove);
+        KnownActionCardsService.forgetCardFromKnownHands(game, this, idToRemove);
     }
 
     public void removePromissoryNote(Integer identifier) {
