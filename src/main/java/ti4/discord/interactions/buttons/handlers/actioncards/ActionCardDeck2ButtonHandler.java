@@ -230,13 +230,11 @@ class ActionCardDeck2ButtonHandler {
         int maxSpend = Math.min(
                 2,
                 Math.min(
-                        player.getTg(),
-                        EmelparService.getReadyComponentButtons(game, player, "")
-                                .size()));
+                        player.getTg(), getOvertimeReadyButtons(game, player, 1).size()));
         if (maxSpend < 1) {
             String reason = player.getTg() < 1
                     ? " has no trade goods to spend for _Overtime_."
-                    : " has no exhausted components to ready for _Overtime_.";
+                    : " has no exhausted non-strategy-card components to ready for _Overtime_.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + reason);
             event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             return;
@@ -259,13 +257,12 @@ class ActionCardDeck2ButtonHandler {
     public static void resolveOvertimeSpend(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         int spend = Integer.parseInt(buttonID.split("_")[1]);
         if (player.getTg() < spend
-                || EmelparService.getReadyComponentButtons(game, player, "overtimeReady_" + spend + "_")
-                                .size()
-                        < spend) {
+                || getOvertimeReadyButtons(game, player, spend).size() < spend) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + " can no longer spend that much for _Overtime_. Please resolve it again.");
+                            + " can no longer spend that much for _Overtime_ because they do not have enough exhausted"
+                            + " non-strategy-card components. Please resolve it again.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -795,8 +792,7 @@ class ActionCardDeck2ButtonHandler {
     }
 
     private static void sendOvertimeReadyPrompt(Player player, Game game, int remaining) {
-        List<Button> buttons =
-                EmelparService.getReadyComponentButtons(game, player, "overtimeReady_" + remaining + "_");
+        List<Button> buttons = getOvertimeReadyButtons(game, player, remaining);
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), game.getStoredValue(overtimeSummaryKey(player)) + ".");
@@ -805,9 +801,13 @@ class ActionCardDeck2ButtonHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                game.getStoredValue(overtimeSummaryKey(player)) + ". Choose " + remaining + " more component"
-                        + (remaining == 1 ? "" : "s") + " to ready.",
+                game.getStoredValue(overtimeSummaryKey(player)) + ". Choose " + remaining
+                        + " more non-strategy-card component" + (remaining == 1 ? "" : "s") + " to ready.",
                 buttons);
+    }
+
+    private static List<Button> getOvertimeReadyButtons(Game game, Player player, int remaining) {
+        return EmelparService.getReadyComponentButtons(game, player, "overtimeReady_" + remaining + "_");
     }
 
     private static String readyOvertimeComponent(Game game, Player player, String type, String detail) {
