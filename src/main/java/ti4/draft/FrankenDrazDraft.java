@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.draft.items.BlueTileDraftItem;
 import ti4.draft.items.FactionDraftItem;
 import ti4.draft.items.RedTileDraftItem;
@@ -196,6 +197,14 @@ public class FrankenDrazDraft extends FrankenDraft {
                 getPostDraftCategoryButtons(player));
     }
 
+    @ButtonHandler(value = "frankenFactionComponents", save = false)
+    private static void showFactionComponents(ButtonInteractionEvent event, Player player, String buttonID) {
+        if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
+            String faction = buttonID.split(";")[1];
+            frankenDrazDraft.sendFactionComponentCards(event, player, faction);
+        }
+    }
+
     public void sendFactionComponentCards(ButtonInteractionEvent event, Player player, String faction) {
         FactionDraftItem item = new FactionDraftItem(faction);
         List<DraftItem> components = item.getComponents(player.getGame());
@@ -219,6 +228,14 @@ public class FrankenDrazDraft extends FrankenDraft {
         builder.send();
         MessageHelper.sendEphemeralMessageToEventChannel(
                 event, "Sent " + item.getShortDescription() + " components to your cards info thread.");
+    }
+
+    @ButtonHandler(value = "frankenDrazCategory", save = false)
+    private static void showFrankenDrazCategory(ButtonInteractionEvent event, Player player, String buttonID) {
+        if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
+            DraftCategory category = DraftCategory.valueOf(buttonID.split(";")[1]);
+            frankenDrazDraft.sendPostDraftCategory(player, category);
+        }
     }
 
     public void sendPostDraftCategory(Player player, DraftCategory category) {
@@ -260,6 +277,15 @@ public class FrankenDrazDraft extends FrankenDraft {
         editor.applyAroundMessage(event.getMessage(), containers.size() * 2 + 2, changed -> {
             if (!changed) sendPostDraftCategory(player, category);
         });
+    }
+
+    @ButtonHandler(value = "frankenDrazCloseCategory", save = false)
+    private static void closeFrankenDrazCategory(ButtonInteractionEvent event, Player player, String buttonID) {
+        if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
+            DraftCategory category = DraftCategory.valueOf(buttonID.split(";")[1]);
+            frankenDrazDraft.closePostDraftCategory(event, player, category);
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Closed " + category.toString() + ".");
+        }
     }
 
     public void closePostDraftCategory(ButtonInteractionEvent event, Player player, DraftCategory category) {
