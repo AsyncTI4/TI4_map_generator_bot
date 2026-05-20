@@ -1147,7 +1147,7 @@ class ActionCardDeck2ButtonHandler {
 
         List<String> scorers = new ArrayList<>(game.getScoredPublicObjectives().getOrDefault(poID, List.of()));
         if (!scorers.isEmpty()) {
-            String purgedObjectiveName = getPurgedObjectiveName(game, poName);
+            String purgedObjectiveName = poName + " (PURGED)";
             Integer purgedObjectiveId = game.addCustomPO(purgedObjectiveName, poPoints);
             for (String userID : scorers) {
                 game.scorePublicObjective(userID, purgedObjectiveId);
@@ -1185,17 +1185,5 @@ class ActionCardDeck2ButtonHandler {
     public static void amendmentRevealStage2(Player player, Game game, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
         RevealPublicObjectiveService.revealS2(game, event);
-    }
-
-    private static String getPurgedObjectiveName(Game game, String objectiveName) {
-        String baseName = objectiveName + " (PURGED)";
-        String purgedName = baseName;
-        int duplicateCount = 2;
-        while (game.getRevealedPublicObjectives().containsKey(purgedName)
-                || game.getCustomPublicVP().containsKey(purgedName)) {
-            purgedName = baseName + " " + duplicateCount;
-            duplicateCount++;
-        }
-        return purgedName;
     }
 }
