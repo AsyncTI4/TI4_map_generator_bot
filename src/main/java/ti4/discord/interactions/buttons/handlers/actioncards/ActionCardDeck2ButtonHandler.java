@@ -51,6 +51,8 @@ class ActionCardDeck2ButtonHandler {
 
     private static final String ALLIANCE_RIDER_CURRENT_ALLY = "allianceRiderCurrentAlly";
     private static final String ALLIANCE_RIDER_PURGED_ALLIES = "allianceRiderPurgedAllies";
+    private static final String SETTLEMENTS_PLANETS = "settlementsPlanets_";
+    private static final String SETTLEMENTS_REMAINING = "settlementsRemaining_";
 
     @ButtonHandler("resolveOracle")
     public static void resolveOracle(Player player, Game game, ButtonInteractionEvent event) {
@@ -445,6 +447,58 @@ class ActionCardDeck2ButtonHandler {
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " placed 1 infantry on "
                         + Helper.getPlanetRepresentation(planet, game) + " via _Freedom Fighters_.");
+    }
+
+    @ButtonHandler("resolveSettlements")
+    public static void resolveSettlements(Player player, Game game, ButtonInteractionEvent event) {
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        sendSettlementsButtons(player, game);
+    }
+
+    @ButtonHandler("resolveSettlementsStep2_")
+    public static void resolveSettlementsStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.replace("resolveSettlementsStep2_", "");
+        List<String> eligiblePlanets = getSettlementsPlanets(game, player);
+        int remaining = getSettlementsRemaining(game, player);
+        if (remaining < 1 || !eligiblePlanets.contains(planet)) {
+            clearSettlementsState(game, player);
+            ButtonHelper.deleteMessage(event);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", _Settlements_ no longer has any saved eligible planets to use.");
+            return;
+        }
+
+        Tile tile = game.getTileFromPlanet(planet);
+        if (tile == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not resolve _Settlements_ for that planet.");
+            return;
+        }
+
+        game.setStoredValue("coexistFlag", "yes");
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + planet);
+        game.removeStoredValue("coexistFlag");
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " placed 1 infantry into coexistence on "
+                        + Helper.getPlanetRepresentation(planet, game) + " via _Settlements_.");
+
+        remaining -= 1;
+        ButtonHelper.deleteMessage(event);
+        if (remaining < 1) {
+            clearSettlementsState(game, player);
+            return;
+        }
+
+        game.setStoredValue(SETTLEMENTS_REMAINING + player.getFaction(), Integer.toString(remaining));
+        sendSettlementsButtons(player, game);
+    }
+
+    @ButtonHandler("resolveSettlementsDone")
+    public static void resolveSettlementsDone(Player player, Game game, ButtonInteractionEvent event) {
+        clearSettlementsState(game, player);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("resolveSimulacrum")
@@ -953,5 +1007,60 @@ class ActionCardDeck2ButtonHandler {
                     event.getChannel(),
                     "Put _Deflection_ on **" + Helper.getSCName(Integer.parseInt(sc), game) + "**.");
         }
+    }
+
+    private static void sendSettlementsButtons(Player player, Game game) {
+        List<String> eligiblePlanets = getSettlementsPlanets(game, player);
+        int remaining = getSettlementsRemaining(game, player);
+        if (eligiblePlanets.isEmpty() || remaining < 1) {
+            clearSettlementsState(game, player);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", there are no saved _Settlements_ placements remaining.");
+            return;
+        }
+
+        List<Button> buttons = new ArrayList<>(eligiblePlanets.stream()
+                .map(planet -> Buttons.green(
+                        "resolveSettlementsStep2_" + planet, Helper.getPlanetRepresentation(planet, game)))
+                .toList());
+        buttons.add(Buttons.red("resolveSettlementsDone", "Done placing infantry"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", use the buttons to place "
+                        + remaining + " infantry from reinforcements into coexistence with _Settlements_.",
+                buttons);
+    }
+
+    private static List<String> getSettlementsPlanets(Game game, Player player) {
+        String storedPlanets = game.getStoredValue(SETTLEMENTS_PLANETS + player.getFaction());
+        if (storedPlanets.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<String> planets = new ArrayList<>();
+        for (String planet : storedPlanets.split(";")) {
+            if (!planet.isBlank()) {
+                planets.add(planet);
+            }
+        }
+        return planets;
+    }
+
+    private static int getSettlementsRemaining(Game game, Player player) {
+        String remaining = game.getStoredValue(SETTLEMENTS_REMAINING + player.getFaction());
+        if (remaining.isEmpty()) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(remaining);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    private static void clearSettlementsState(Game game, Player player) {
+        game.removeStoredValue(SETTLEMENTS_PLANETS + player.getFaction());
+        game.removeStoredValue(SETTLEMENTS_REMAINING + player.getFaction());
     }
 }

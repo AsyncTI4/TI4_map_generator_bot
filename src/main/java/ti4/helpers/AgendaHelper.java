@@ -2090,6 +2090,41 @@ public final class AgendaHelper {
                             ButtonHelper.checkFleetInEveryTile(p2, game);
                         }
                     }
+                    if (winningR != null && specificVote.contains("Settlements")) {
+                        List<String> eligiblePlanets = new ArrayList<>();
+                        for (Player voter : getWinningVoters(winner, game)) {
+                            for (String planetName : voter.getPlanets()) {
+                                Planet planet = game.getUnitHolderFromPlanet(planetName);
+                                if (planet == null
+                                        || planet.isHomePlanet(game)
+                                        || planet.isSpaceStation()
+                                        || planet.getTokenList().contains("dmz")
+                                        || planet.getTokenList().contains("dmz_large")) {
+                                    continue;
+                                }
+                                if (!eligiblePlanets.contains(planetName)) {
+                                    eligiblePlanets.add(planetName);
+                                }
+                            }
+                        }
+                        if (eligiblePlanets.isEmpty()) {
+                            MessageHelper.sendMessageToChannel(
+                                    winningR.getCorrectChannel(),
+                                    winningR.getRepresentation()
+                                            + ", there are no eligible non-home planets for _Settlements_.");
+                        } else {
+                            game.setStoredValue(
+                                    "settlementsPlanets_" + winningR.getFaction(), String.join(";", eligiblePlanets));
+                            game.setStoredValue("settlementsRemaining_" + winningR.getFaction(), "2");
+                            MessageHelper.sendMessageToChannelWithButtons(
+                                    winningR.getCorrectChannel(),
+                                    winningR.getRepresentation()
+                                            + ", your _Settlements_ prediction was correct. Use the button to place up to 2 infantry into coexistence.",
+                                    List.of(Buttons.green(
+                                            winningR.factionButtonChecker() + "resolveSettlements",
+                                            "Resolve Settlements")));
+                        }
+                    }
                     if (winningR != null
                             && (specificVote.contains("Rider")
                                     || (winningR.hasAbility("future_sight")
