@@ -154,7 +154,12 @@ public class FrankenButtonHandler {
         player.setStoredValue(key, "y");
 
         Container c = player.getRepresentationContainer();
-        MessageV2Builder tabletalk = new MessageV2Builder(game.getTableTalkChannel(), true);
+        MessageChannel factionSummaryChannel = game.getTableTalkChannel();
+        boolean pinFactionSummary = factionSummaryChannel != null;
+        if (factionSummaryChannel == null) {
+            factionSummaryChannel = event.getMessageChannel();
+        }
+        MessageV2Builder tabletalk = new MessageV2Builder(factionSummaryChannel, pinFactionSummary);
         tabletalk.append(c);
         tabletalk.send();
 
@@ -164,11 +169,14 @@ public class FrankenButtonHandler {
         }
 
         MessageChannel channel = game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel();
-        MessageV2Builder builder = new MessageV2Builder(channel);
+        if (channel == null) {
+            channel = event.getMessageChannel();
+        }
         ButtonHelper.deleteMessage(event);
         if (game.isTwilightsFallMode()) {
             return;
         }
+        MessageV2Builder builder = new MessageV2Builder(channel);
         builder.append(game.getPing() + " Every player has chosen their components! Press this button to continue.");
         builder.append(Buttons.DEAL_2_SO);
         builder.send();
