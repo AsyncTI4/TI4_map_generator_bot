@@ -612,27 +612,20 @@ class ActionCardDeck2ButtonHandler {
 
     private static List<Button> getReconstructionTraitButtons(Game game, Planet planet) {
         String planetId = planet.getName();
-        String planetRepresentation = Helper.getPlanetRepresentation(planetId, game);
         List<Button> buttons = new ArrayList<>();
         Set<String> explorationTraits = new HashSet<>(planet.getPlanetTypes());
         for (String trait : explorationTraits) {
             if ("cultural".equals(trait)) {
                 buttons.add(Buttons.blue(
-                        "reconstructionStep3_" + planetId + "_" + trait,
-                        "Reveal Top 3 Cultural Cards For " + planetRepresentation,
-                        ExploreEmojis.Cultural));
+                        "reconstructionStep3_" + planetId + "_" + trait, "Cultural", ExploreEmojis.Cultural));
             }
             if ("industrial".equals(trait)) {
                 buttons.add(Buttons.green(
-                        "reconstructionStep3_" + planetId + "_" + trait,
-                        "Reveal Top 3 Industrial Cards For " + planetRepresentation,
-                        ExploreEmojis.Industrial));
+                        "reconstructionStep3_" + planetId + "_" + trait, "Industrial", ExploreEmojis.Industrial));
             }
             if ("hazardous".equals(trait)) {
                 buttons.add(Buttons.red(
-                        "reconstructionStep3_" + planetId + "_" + trait,
-                        "Reveal Top 3 Hazardous Cards For " + planetRepresentation,
-                        ExploreEmojis.Hazardous));
+                        "reconstructionStep3_" + planetId + "_" + trait, "Hazardous", ExploreEmojis.Hazardous));
             }
         }
         return buttons;
