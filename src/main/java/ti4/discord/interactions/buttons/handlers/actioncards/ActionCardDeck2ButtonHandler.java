@@ -374,7 +374,7 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("resolveCacheStep2_")
-    public static void resolveCacheStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void resolveCacheStep2(Player player, Game game, String buttonID) {
         String planetName = buttonID.split("_")[1];
         Planet planet = game.getPlanetsInfo().get(planetName);
         if (planet == null || !player.hasPlanet(planetName) || planet.isHomePlanet(game)) {
