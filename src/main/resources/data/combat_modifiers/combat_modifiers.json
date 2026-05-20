@@ -201,6 +201,20 @@
         ]
     },
     {
+        "alias": "plus1_1combat_all",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "scope": "",
+        "forCombatAbility": "combatround",
+        "persistenceType": "ONE_COMBAT",
+        "related": [
+            {
+                "type": "action_cards",
+                "alias": "shock_troops"
+            }
+        ]
+    },
+    {
         "alias": "minus1_mod_pds_off_opponent_antimatter",
         "type": "mods",
         "value": "-1",

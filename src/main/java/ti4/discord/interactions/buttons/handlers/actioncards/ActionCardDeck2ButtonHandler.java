@@ -20,12 +20,15 @@ import ti4.game.Leader;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
+import ti4.helpers.DiceHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.UnusedCommanderHelper;
@@ -152,6 +155,26 @@ class ActionCardDeck2ButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
 
+    @ButtonHandler("resolveReinforcements")
+    public static void resolveReinforcements(Player player, Game game, ButtonInteractionEvent event) {
+        Tile tile = game.getTileByPosition(game.getActiveSystem());
+        if (tile == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " could not resolve _Reinforcements_ because there is no active system.");
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "2 fighter");
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getFactionEmoji() + " placed 2 fighters in " + tile.getRepresentation()
+                        + " with _Reinforcements_.");
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
     @ButtonHandler("resolveSisterShip")
     public static void resolveSisterShip(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -190,6 +213,44 @@ class ActionCardDeck2ButtonHandler {
         //            buttons.add(Buttons.red("getDamageButtons_" + game.getActiveSystem() + "_" + "combat", "Assign
         // Hit" + (hits == 1 ? "" : "s")));
         //        }
+    }
+
+    @ButtonHandler("resolveHostileWorld")
+    public static void resolveHostileWorld(Player player, Game game, ButtonInteractionEvent event) {
+        List<DiceHelper.Die> rolls = DiceHelper.rollDice(6, 3);
+        int hits = DiceHelper.countSuccesses(rolls);
+        StringBuilder message = new StringBuilder(player.getRepresentation())
+                .append(" rolled for _Hostile World_.\n")
+                .append(DiceHelper.formatDiceOutput(rolls));
+        String loreQuip = getHostileWorldLoreQuip(hits);
+        if (loreQuip != null) {
+            message.append("\n").append(loreQuip);
+        }
+        if (hits > 0) {
+            String activeSystem = game.getActiveSystem();
+            if (activeSystem == null || activeSystem.isEmpty()) {
+                message.append("\nCould not find the active system, so assign the hits manually.");
+            } else {
+                List<Button> buttons = List.of(Buttons.red(
+                        "getDamageButtons_" + activeSystem + "_groundcombat", "Assign Hit" + (hits == 1 ? "" : "s")));
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
+                event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+                return;
+            }
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    private static String getHostileWorldLoreQuip(int hits) {
+        return switch (hits) {
+            case 0 -> "\"Must've been the wind.\" - Guard, _Skyrim_.";
+            case 1 -> "\"Get off my lawn.\" — Walt Kowalski, _Gran Torino_";
+            case 2 -> "\"Watch out for that first step, it's a doozy!\" - Ned Ryerson, _Groundhog Day_";
+            case 3 ->
+                "\"One does not simply walk into Mordor.\" - Boromir, _The Lord of the Rings: The Fellowship of the Ring_";
+            default -> null;
+        };
     }
 
     @ButtonHandler("resolveFlawlessStrategy")
@@ -318,7 +379,7 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("resolveCacheStep2_")
-    public static void resolveCacheStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void resolveCacheStep2(Player player, Game game, String buttonID) {
         String planetName = buttonID.split("_")[1];
         Planet planet = game.getPlanetsInfo().get(planetName);
         if (planet == null || !player.hasPlanet(planetName) || planet.isHomePlanet(game)) {
@@ -344,6 +405,175 @@ class ActionCardDeck2ButtonHandler {
                 player.getRepresentation() + " exhausted "
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game)
                         + " and gained " + tgGain + " trade good" + (tgGain == 1 ? "" : "s") + " from _Cache_.");
+    }
+
+    @ButtonHandler("resolveFreedomFighters")
+    public static void resolveFreedomFighters(Player player, Game game, ButtonInteractionEvent event) {
+        Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
+        if (activeSystem == null || activeSystem.getPlanetUnitHolders().isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", _Freedom Fighters_ requires an active system with planets.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<Button> buttons = new ArrayList<>(activeSystem.getPlanetUnitHolders().stream()
+                .map(planet -> Buttons.green(
+                        "resolveFreedomFightersStep2_" + planet.getName(),
+                        Helper.getPlanetRepresentation(planet.getName(), game)))
+                .toList());
+        buttons.add(Buttons.red("deleteButtons", "Done placing infantry"));
+
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                        + ", use the buttons to place up to 1 infantry from reinforcements on each planet in the active system.",
+                buttons);
+    }
+
+    @ButtonHandler("resolveFreedomFightersStep2_")
+    public static void resolveFreedomFightersStep2(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.replace("resolveFreedomFightersStep2_", "");
+        Tile tile = game.getTileFromPlanet(planet);
+        if (tile == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not resolve _Freedom Fighters_ for that planet.");
+            return;
+        }
+
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + planet);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " placed 1 infantry on "
+                        + Helper.getPlanetRepresentation(planet, game) + " via _Freedom Fighters_.");
+    }
+
+    @ButtonHandler("resolveRefugees")
+    public static void resolveRefugees(Player player, Game game, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2 == player || getRefugeesPlanets(game, p2).isEmpty()) {
+                continue;
+            }
+            if (game.isFowMode()) {
+                buttons.add(Buttons.gray("resolveRefugeesStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Buttons.gray(
+                        "resolveRefugeesStep2_" + p2.getFaction(),
+                        p2.getFactionModel().getShortName());
+                String factionEmojiString = p2.getFactionEmoji();
+                buttons.add(button.withEmoji(Emoji.fromFormatted(factionEmojiString)));
+            }
+        }
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), player.getRepresentation() + " has no valid _Refugees_ targets.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        buttons.add(Buttons.red("deleteButtons", "Done"));
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", choose which player's planets to place infantry on.",
+                buttons);
+    }
+
+    @ButtonHandler("resolveRefugeesStep2_")
+    public static void resolveRefugeesStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player target = game.getPlayerFromColorOrFaction(buttonID.replace("resolveRefugeesStep2_", ""));
+        if (target == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not find the selected player for _Refugees_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        sendRefugeesPlanetButtons(player, game, target, 2);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveRefugeesStep3_")
+    public static void resolveRefugeesStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String[] payload = buttonID.replace("resolveRefugeesStep3_", "").split("_", 3);
+        if (payload.length < 3) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Refugees_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        Player target = game.getPlayerFromColorOrFaction(payload[0]);
+        int infantryRemaining = Integer.parseInt(payload[1]);
+        String planet = payload[2];
+        Tile tile = game.getTileFromPlanet(planet);
+        if (target == null || tile == null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Refugees_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        game.setStoredValue("coexistFlag", "yes");
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + planet);
+        game.removeStoredValue("coexistFlag");
+        ButtonHelperAbilities.oceanBoundCheck(game);
+
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " placed 1 infantry into coexistence on "
+                        + Helper.getPlanetRepresentation(planet, game) + " via _Refugees_.");
+
+        ButtonHelper.deleteMessage(event);
+        if (infantryRemaining > 1) {
+            sendRefugeesPlanetButtons(player, game, target, infantryRemaining - 1);
+        }
+    }
+
+    private static void sendRefugeesPlanetButtons(Player player, Game game, Player target, int infantryRemaining) {
+        List<String> eligiblePlanets = getRefugeesPlanets(game, target);
+        if (eligiblePlanets.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Could not find any eligible planets for _Refugees_ outside " + target.getRepresentationUnfogged()
+                            + "'s home system.");
+            return;
+        }
+
+        List<Button> buttons = new ArrayList<>(eligiblePlanets.stream()
+                .map(planet -> Buttons.green(
+                        "resolveRefugeesStep3_" + target.getFaction() + "_" + infantryRemaining + "_" + planet,
+                        Helper.getPlanetRepresentation(planet, game)))
+                .toList());
+        buttons.add(Buttons.red("deleteButtons", "Done"));
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", choose where to place "
+                        + (infantryRemaining == 1 ? "your last infantry" : "an infantry")
+                        + " for _Refugees_ on " + target.getRepresentationUnfogged() + "'s worlds.",
+                buttons);
+    }
+
+    private static List<String> getRefugeesPlanets(Game game, Player target) {
+        Set<String> planets = new HashSet<>();
+        Tile homeSystem = target.getHomeSystemTile();
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile == null || tile == homeSystem) {
+                continue;
+            }
+            for (UnitHolder unitHolder : tile.getPlanetUnitHolders()) {
+                if (ButtonHelper.getPlayersWithUnitsOnAPlanet(game, unitHolder).contains(target)) {
+                    planets.add(unitHolder.getName());
+                }
+            }
+        }
+        List<String> eligiblePlanets = new ArrayList<>(planets);
+        Collections.sort(eligiblePlanets);
+        return eligiblePlanets;
     }
 
     @ButtonHandler("resolveSimulacrum")
@@ -513,6 +743,24 @@ class ActionCardDeck2ButtonHandler {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
+    @ButtonHandler("resolveOpportunists")
+    public static void resolveOpportunists(Player player, Game game, ButtonInteractionEvent event) {
+        Tile tile = game.getTileByPosition(game.getActiveSystem());
+        if (tile == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not find the active system for _Opportunists_.");
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+
+        AddUnitService.addUnits(event, tile, game, game.getNeutralColor(), "2 dd, cr");
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " added 1 neutral cruiser and 2 neutral destroyers to "
+                        + tile.getRepresentationForButtons(game, player) + ".");
+    }
+
     private static List<TechnologyModel> getUbiquityTechs(Game game, Player player) {
         List<TechnologyModel> techs = new ArrayList<>();
         Set<String> seenTechs = new HashSet<>();
@@ -532,6 +780,40 @@ class ActionCardDeck2ButtonHandler {
                 .filter(player -> player.hasTech(tech.getAlias()))
                 .count();
         return tech.getRequirements().orElse("").length() < techOwners;
+    }
+
+    @ButtonHandler("resolveLostTreatise")
+    public static void resolveLostTreatise(Player player, Game game, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green(player.factionButtonChecker() + "resolveLostTreatiseRedistribute", "Redistribute"));
+        buttons.add(Buttons.green(player.factionButtonChecker() + "resolveLostTreatiseFleet", "Gain 1 Fleet Token"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", choose how to resolve _Lost Treatise_.",
+                buttons);
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler("resolveLostTreatiseRedistribute")
+    public static void resolveLostTreatiseRedistribute(Player player, Game game, ButtonInteractionEvent event) {
+        ButtonHelperStats.sendGainCCButtons(game, player, true);
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler("resolveLostTreatiseFleet")
+    public static void resolveLostTreatiseFleet(Player player, Game game, ButtonInteractionEvent event) {
+        int oldFleetCC = player.getFleetCC();
+        player.setFleetCC(oldFleetCC + 1);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getFactionEmoji() + " gained a command token in their fleet pool (" + oldFleetCC + "->"
+                        + player.getFleetCC() + ") using _Lost Treatise_.");
+        if (ButtonHelper.isLawInPlay(game, "regulations") && player.getEffectiveFleetCC() > 4) {
+            String msg = player.getRepresentation() + ", reminder that _Fleet Regulations_ is a";
+            msg += " law in play, which is limiting fleet pool to 4 tokens.";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        }
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("strandedShipStep1")
