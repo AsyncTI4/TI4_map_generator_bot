@@ -2261,6 +2261,20 @@ public final class AgendaHelper {
                             ButtonHelperAbilities.pillageCheck(winningR, game);
                             ButtonHelperAgents.resolveArtunoCheck(winningR, 5);
                         }
+                        if (specificVote.contains("Frontier Rider")) {
+                            ButtonHelperStats.replenishComms(event, game, winningR, true);
+                            List<Button> buttons = ButtonHelperActionCards.getFrontierTokenButtons(game, winningR);
+                            String message = identity
+                                    + ", due to having a winning _Frontier Rider_, your commodities have been replenished"
+                                    + " and you may explore a frontier token on the game board.";
+                            if (buttons.isEmpty()) {
+                                MessageHelper.sendMessageToChannel(
+                                        channel, message + " There are no frontier tokens available to explore.");
+                            } else {
+                                MessageHelper.sendMessageToChannelWithButtons(
+                                        channel, message + " Choose the system you wish to explore.", buttons);
+                            }
+                        }
                         if (specificVote.contains("Relic Rider")) {
                             MessageHelper.sendMessageToChannel(
                                     channel,
