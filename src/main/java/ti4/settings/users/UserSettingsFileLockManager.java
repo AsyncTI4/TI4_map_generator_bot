@@ -1,6 +1,8 @@
 package ti4.settings.users;
 
-import java.util.concurrent.ConcurrentHashMap;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
@@ -8,10 +10,13 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 final class UserSettingsFileLockManager {
 
-    private static final ConcurrentHashMap<String, ReentrantReadWriteLock> locks = new ConcurrentHashMap<>();
+    private static final int LOCK_EXPIRE_AFTER_ACCESS_TIME_MINUTES = 20;
+    private static final Cache<String, ReentrantReadWriteLock> locks = Caffeine.newBuilder()
+            .expireAfterAccess(LOCK_EXPIRE_AFTER_ACCESS_TIME_MINUTES, TimeUnit.MINUTES)
+            .build();
 
     private static ReentrantReadWriteLock getLock(String userId) {
-        return locks.computeIfAbsent(userId, _ -> new ReentrantReadWriteLock());
+        return locks.get(userId, _ -> new ReentrantReadWriteLock());
     }
 
     public static void wrapWithWriteLock(String userId, Runnable runnable) {
