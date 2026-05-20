@@ -456,7 +456,8 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("resolveSettlementsStep2_")
-    public static void resolveSettlementsStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void resolveSettlementsStep2(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.replace("resolveSettlementsStep2_", "");
         List<String> eligiblePlanets = getSettlementsPlanets(game, player);
         int remaining = getSettlementsRemaining(game, player);
@@ -1027,8 +1028,8 @@ class ActionCardDeck2ButtonHandler {
         buttons.add(Buttons.red("resolveSettlementsDone", "Done placing infantry"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", use the buttons to place "
-                        + remaining + " infantry from reinforcements into coexistence with _Settlements_.",
+                player.getRepresentation() + ", use the buttons to place " + remaining
+                        + " infantry from reinforcements into coexistence with _Settlements_.",
                 buttons);
     }
 
