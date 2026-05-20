@@ -26,7 +26,6 @@ import ti4.draft.DraftItem;
 import ti4.draft.FrankenDrazDraft;
 import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.TwilightsFallFrankenDraft;
-import ti4.draft.items.FactionDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -444,13 +443,10 @@ public class FrankenButtonHandler {
 
     @ButtonHandler(value = "frankenFactionComponents", save = false)
     private static void showFactionComponents(ButtonInteractionEvent event, Player player, String buttonID) {
-        String faction = buttonID.split(";")[1];
-        FactionDraftItem item = new FactionDraftItem(faction);
-        String msg =
-                "## " + item.getTitle(player.getGame()) + " Components\n" + item.getComponentList(player.getGame());
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
-        MessageHelper.sendEphemeralMessageToEventChannel(
-                event, "Sent " + item.getShortDescription() + " components to your cards info thread.");
+        if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
+            String faction = buttonID.split(";")[1];
+            frankenDrazDraft.sendFactionComponentCards(event, player, faction);
+        }
     }
 
     @ButtonHandler(value = "frankenDrazCategory", save = false)

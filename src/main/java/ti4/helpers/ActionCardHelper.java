@@ -1068,6 +1068,21 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("ubiquity".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "ubiquity", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("lost_treatise".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveLostTreatise", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("opportunists".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveOpportunists", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("jamming".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.factionButtonChecker() + "resolveSignalJammingStep1", buttonLabel));
@@ -1249,6 +1264,11 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("reinforcements".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveReinforcements", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("chain_reaction".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveChainReaction", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
@@ -1276,6 +1296,11 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveCache", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
+            }
+
+            if ("freedom_fighters".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveFreedomFighters", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
             if ("simulacrum".equals(automationID)) {
