@@ -458,8 +458,9 @@ class ActionCardDeck2ButtonHandler {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("resolveRefugeesStep2_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button =
-                        Buttons.gray("resolveRefugeesStep2_" + p2.getFaction(), p2.getFactionModel().getShortName());
+                Button button = Buttons.gray(
+                        "resolveRefugeesStep2_" + p2.getFaction(),
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 buttons.add(button.withEmoji(Emoji.fromFormatted(factionEmojiString)));
             }
@@ -533,8 +534,8 @@ class ActionCardDeck2ButtonHandler {
         if (eligiblePlanets.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "Could not find any eligible planets for _Refugees_ outside "
-                            + target.getRepresentationUnfogged() + "'s home system.");
+                    "Could not find any eligible planets for _Refugees_ outside " + target.getRepresentationUnfogged()
+                            + "'s home system.");
             return;
         }
 
