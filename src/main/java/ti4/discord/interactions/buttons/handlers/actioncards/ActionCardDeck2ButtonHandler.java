@@ -206,8 +206,7 @@ class ActionCardDeck2ButtonHandler {
                 message.append("\nCould not find the active system, so assign the hits manually.");
             } else {
                 List<Button> buttons = List.of(Buttons.red(
-                        "getDamageButtons_" + activeSystem + "_groundcombat",
-                        "Assign Hit" + (hits == 1 ? "" : "s")));
+                        "getDamageButtons_" + activeSystem + "_groundcombat", "Assign Hit" + (hits == 1 ? "" : "s")));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
                 event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 return;
@@ -221,7 +220,8 @@ class ActionCardDeck2ButtonHandler {
         return switch (hits) {
             case 1 -> "\"Get off my lawn.\" — Walt Kowalski, _Gran Torino_";
             case 2 -> "\"Watch out for that first step, it's a doozy!\" - Ned Ryerson, _Groundhog Day_";
-            case 3 -> "\"One does not simply walk into Mordor.\" - Boromir, _The Lord of the Rings: The Fellowship of the Ring_";
+            case 3 ->
+                "\"One does not simply walk into Mordor.\" - Boromir, _The Lord of the Rings: The Fellowship of the Ring_";
             default -> null;
         };
     }
