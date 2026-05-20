@@ -1106,9 +1106,7 @@ class ActionCardDeck2ButtonHandler {
                 ? "Someone played the action card _Amendment_."
                 : player.getRepresentation() + " played the action card _Amendment_.";
         MessageHelper.sendMessageToChannelWithEmbed(
-                game.getMainGameChannel(),
-                actionCardPlayMessage,
-                actionCard.getRepresentationEmbed(false, true, game));
+                game.getMainGameChannel(), actionCardPlayMessage, actionCard.getRepresentationEmbed(false, true, game));
 
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Integer> po : game.getRevealedPublicObjectives().entrySet()) {
@@ -1143,7 +1141,8 @@ class ActionCardDeck2ButtonHandler {
         String poID = buttonID.replace("amendmentChooseObjective_", "");
         PublicObjectiveModel poModel = Mapper.getPublicObjective(poID);
         String poName = poModel != null ? poModel.getName() : poID;
-        int poPoints = poModel != null ? poModel.getPoints() : game.getCustomPublicVP().getOrDefault(poID, 0);
+        int poPoints =
+                poModel != null ? poModel.getPoints() : game.getCustomPublicVP().getOrDefault(poID, 0);
 
         List<String> scorers = new ArrayList<>(game.getScoredPublicObjectives().getOrDefault(poID, List.of()));
         if (!scorers.isEmpty()) {
@@ -1159,8 +1158,7 @@ class ActionCardDeck2ButtonHandler {
                 ? "A public objective was purged using _Amendment_. Players do not lose points from this purge."
                 : player.getRepresentationNoPing() + " purged the public objective _" + poName
                         + "_ using _Amendment_. Players do not lose points from this purge.";
-        MessageHelper.sendMessageToChannel(
-                game.getActionsChannel(), objectivePurgeMessage);
+        MessageHelper.sendMessageToChannel(game.getActionsChannel(), objectivePurgeMessage);
 
         List<Button> stageButtons = new ArrayList<>();
         stageButtons.add(
