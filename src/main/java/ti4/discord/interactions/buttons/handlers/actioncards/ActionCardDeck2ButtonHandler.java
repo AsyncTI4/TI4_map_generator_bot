@@ -31,14 +31,20 @@ import ti4.helpers.UnusedCommanderHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.BreakthroughModel;
 import ti4.model.ExploreModel;
+import ti4.model.LeaderModel;
+import ti4.model.PlanetModel;
+import ti4.model.RelicModel;
+import ti4.model.TechnologyModel;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
-import ti4.service.planet.EmelparService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.unit.AddUnitService;
 
@@ -807,15 +813,101 @@ class ActionCardDeck2ButtonHandler {
     }
 
     private static List<Button> getOvertimeReadyButtons(Game game, Player player, int remaining) {
-        return EmelparService.getReadyComponentButtons(game, player, "overtimeReady_" + remaining + "_");
+        List<Button> buttons = new ArrayList<>();
+        String prefix = "overtimeReady_" + remaining + "_";
+
+        String componentPrefix = prefix + "planet_";
+        for (String planet : player.getExhaustedPlanets()) {
+            buttons.add(Buttons.green(componentPrefix + planet, Helper.getPlanetRepresentation(planet, game)));
+        }
+
+        componentPrefix = prefix + "breakthrough_";
+        for (String bt : player.getBreakthroughIDs()) {
+            if (player.isBreakthroughExhausted(bt) && player.isBreakthroughUnlocked(bt)) {
+                BreakthroughModel btModel = Mapper.getBreakthrough(bt);
+                String label = "Ready " + btModel.getName() + " Breakthrough";
+                buttons.add(Buttons.blue(componentPrefix + bt, label, player.getFactionEmoji()));
+            }
+        }
+
+        componentPrefix = prefix + "leader_";
+        for (Leader leader : player.getLeaders()) {
+            if (leader.isExhausted()) {
+                String leaderName =
+                        leader.getLeaderModel().map(LeaderModel::getName).orElse(leader.getId());
+                buttons.add(Buttons.gray(
+                        componentPrefix + leader.getId(),
+                        "Ready " + leaderName + (Constants.AGENT.equals(leader.getType()) ? " Agent" : " Leader"),
+                        LeaderEmojis.getLeaderTypeEmoji(leader.getType())));
+            }
+        }
+
+        componentPrefix = prefix + "relic_";
+        for (String relic : player.getExhaustedRelics()) {
+            RelicModel model = Mapper.getRelic(relic);
+            buttons.add(
+                    Buttons.red(componentPrefix + relic, "Ready " + model.getName() + " Relic", ExploreEmojis.Relic));
+        }
+
+        componentPrefix = prefix + "tech_";
+        for (String tech : player.getExhaustedTechs()) {
+            TechnologyModel model = Mapper.getTech(tech);
+            buttons.add(Buttons.green(
+                    componentPrefix + tech,
+                    "Ready " + model.getName() + "Technology",
+                    model.getCondensedReqsEmojis(true)));
+        }
+
+        componentPrefix = prefix + "legendary_";
+        for (String planet : player.getExhaustedPlanetsAbilities()) {
+            PlanetModel model = Mapper.getPlanet(planet);
+            buttons.add(Buttons.blue(
+                    componentPrefix + planet, "Ready " + model.getName() + " Ability", MiscEmojis.LegendaryPlanet));
+        }
+
+        return buttons;
     }
 
     private static String readyOvertimeComponent(Game game, Player player, String type, String detail) {
-        String readyItem = EmelparService.readyComponent(game, player, type, detail);
-        if ("tech".equals(type) && readyItem != null) {
-            CommanderUnlockCheckService.checkPlayer(player, "kolume");
+        switch (type) {
+            case "planet" -> {
+                player.refreshPlanet(detail);
+                return Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(detail, game);
+            }
+            case "breakthrough" -> {
+                player.setBreakthroughExhausted(detail, false);
+                return player.getBreakthroughModel(detail).getNameRepresentation();
+            }
+            case "leader" -> {
+                Leader leader = player.getLeaderByID(detail).orElse(null);
+                if (leader == null) {
+                    return null;
+                }
+                leader.setExhausted(false);
+                return leader.getLeaderModel()
+                        .map(LeaderModel::getNameRepresentation)
+                        .orElse(detail);
+            }
+            case "relic" -> {
+                RelicModel model = Mapper.getRelic(detail);
+                player.removeExhaustedRelic(detail);
+                return ExploreEmojis.Relic + " " + model.getName();
+            }
+            case "tech" -> {
+                player.refreshTech(detail);
+                CommanderUnlockCheckService.checkPlayer(player, "kolume");
+                TechnologyModel model = Mapper.getTech(detail);
+                return model.getNameRepresentation();
+            }
+            case "legendary" -> {
+                PlanetModel model = Mapper.getPlanet(detail);
+                player.refreshPlanetAbility(detail);
+                return model.getLegendaryNameRepresentation();
+            }
+            default -> {
+                return null;
+            }
         }
-        return readyItem;
     }
 
     private static String overtimeSummaryKey(Player player) {
