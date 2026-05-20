@@ -1053,6 +1053,7 @@
         "name": "Reconstruction",
         "phase": "Action",
         "window": "After you activate a system",
+        "automationID": "reconstruction",
         "text": "Choose 1 planet you control in that system. Ready that planet and reveal the top 3 cards of an exploration deck that matches it; attach each attachment that you reveal to it and discard the rest.",
         "flavorText": "Tungstantus collapsed mid-step as their energy depleted. The world was far from its former glory, and they would not rest until it was a paradise once more.",
         "source": "action_deck_2"

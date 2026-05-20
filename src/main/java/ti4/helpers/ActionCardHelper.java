@@ -1068,6 +1068,12 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("reconstruction".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveReconstruction", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "planet in the active system"), codedButtons);
+            }
+
             if ("ubiquity".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "ubiquity", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
