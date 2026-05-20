@@ -1466,11 +1466,8 @@ public class ButtonHelperHeroes {
         buttonID = buttonID.replace("augerHeroSwap.", "");
         String id = substringAfter(buttonID, ".");
         String num = substringBefore(buttonID, ".");
-        if ("1".equalsIgnoreCase(num)) {
-            game.swapPublicObjectiveOut(1, 0, id);
-        } else {
-            game.swapPublicObjectiveOut(2, 0, id);
-        }
+        int stage = "1".equalsIgnoreCase(num) ? 1 : 2;
+        putAugerHeroObjectiveNext(game, stage, id);
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " put "
@@ -1483,22 +1480,58 @@ public class ButtonHelperHeroes {
     @ButtonHandler("augersHeroStart_")
     public static void augersHeroResolution(Player player, Game game, String buttonID) {
         List<Button> buttons = new ArrayList<>();
-        if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
-            for (int x = 0; x < 3; x++) {
-                String obj = game.getTopPublicObjective(1);
-                PublicObjectiveModel po = Mapper.getPublicObjective(obj);
-                buttons.add(Buttons.green("augerHeroSwap.1." + obj, "Put " + po.getName() + " As The Next Objective"));
-            }
-        } else {
-            for (int x = 0; x < 3; x++) {
-                String obj = game.getTopPublicObjective(2);
-                PublicObjectiveModel po = Mapper.getPublicObjective(obj);
-                buttons.add(Buttons.green("augerHeroSwap.2." + obj, "Put " + po.getName() + " As The Next Objective"));
-            }
+        int stage = "1".equalsIgnoreCase(buttonID.split("_")[1]) ? 1 : 2;
+        List<String> drawnObjectives = drawAugerHeroObjectives(game, stage);
+        if (drawnObjectives.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged() + " had no objective cards available to draw from that deck.");
+            return;
+        }
+        for (String obj : drawnObjectives) {
+            PublicObjectiveModel po = Mapper.getPublicObjective(obj);
+            buttons.add(Buttons.green(
+                    "augerHeroSwap." + stage + "." + obj, "Put " + po.getName() + " As The Next Objective"));
         }
         buttons.add(Buttons.red("deleteButtons", "Decline to change the next objective"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(), player.getRepresentationUnfogged() + " use buttons to resolve", buttons);
+    }
+
+    static List<String> drawAugerHeroObjectives(Game game, int stage1Or2) {
+        List<String> objectiveDeck = getPublicObjectiveDeck(game, stage1Or2);
+        List<String> drawnObjectives = new ArrayList<>();
+        int drawCount = Math.min(3, objectiveDeck.size());
+        for (int x = 0; x < drawCount; x++) {
+            drawnObjectives.add(game.getTopPublicObjective(stage1Or2));
+        }
+        objectiveDeck.addAll(drawnObjectives);
+        return drawnObjectives;
+    }
+
+    static void putAugerHeroObjectiveNext(Game game, int stage1Or2, String id) {
+        List<String> objectiveDeck = getPublicObjectiveDeck(game, stage1Or2);
+        objectiveDeck.remove(id);
+        if (shouldUsePeekableObjectiveSlot(game, stage1Or2)) {
+            List<String> peekableObjectives = getPeekableObjectiveDeck(game, stage1Or2);
+            String removedObjective = peekableObjectives.set(0, id);
+            objectiveDeck.add(removedObjective);
+            return;
+        }
+        objectiveDeck.add(0, id);
+    }
+
+    private static boolean shouldUsePeekableObjectiveSlot(Game game, int stage1Or2) {
+        return !getPeekableObjectiveDeck(game, stage1Or2).isEmpty()
+                && !containsIgnoreCase(game.getPhaseOfGame(), "agenda");
+    }
+
+    private static List<String> getPublicObjectiveDeck(Game game, int stage1Or2) {
+        return stage1Or2 == 1 ? game.getPublicObjectives1() : game.getPublicObjectives2();
+    }
+
+    private static List<String> getPeekableObjectiveDeck(Game game, int stage1Or2) {
+        return stage1Or2 == 1 ? game.getPublicObjectives1Peekable() : game.getPublicObjectives2Peekable();
     }
 
     @ButtonHandler("poisonHeroInitiation")
