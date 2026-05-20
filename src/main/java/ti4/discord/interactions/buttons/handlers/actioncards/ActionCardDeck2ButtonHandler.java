@@ -231,7 +231,10 @@ class ActionCardDeck2ButtonHandler {
 
     @ButtonHandler("resolveOvertime")
     public static void resolveOvertime(Player player, Game game, ButtonInteractionEvent event) {
-        int maxSpend = Math.min(2, Math.min(player.getTg(), getOvertimeReadyButtons(game, player, 1).size()));
+        int maxSpend = Math.min(
+                2,
+                Math.min(
+                        player.getTg(), getOvertimeReadyButtons(game, player, 1).size()));
         if (maxSpend < 1) {
             String reason = player.getTg() < 1
                     ? " has no trade goods to spend for _Overtime_."
@@ -257,7 +260,8 @@ class ActionCardDeck2ButtonHandler {
     @ButtonHandler("overtimeSpend_")
     public static void resolveOvertimeSpend(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         int spend = Integer.parseInt(buttonID.split("_")[1]);
-        if (player.getTg() < spend || getOvertimeReadyButtons(game, player, spend).size() < spend) {
+        if (player.getTg() < spend
+                || getOvertimeReadyButtons(game, player, spend).size() < spend) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
@@ -298,7 +302,8 @@ class ActionCardDeck2ButtonHandler {
         if (summary.isEmpty()) {
             summary = player.getRepresentation() + " resolved _Overtime_";
         }
-        summary = summary.contains(" and readied ") ? summary + ", " + readyItem : summary + " and readied " + readyItem;
+        summary =
+                summary.contains(" and readied ") ? summary + ", " + readyItem : summary + " and readied " + readyItem;
         game.setStoredValue(overtimeSummaryKey(player), summary);
         ButtonHelper.deleteMessage(event);
 
@@ -824,7 +829,8 @@ class ActionCardDeck2ButtonHandler {
         prefix = "overtimeReady_" + remaining + "_leader_";
         for (Leader leader : player.getLeaders()) {
             if (leader.isExhausted()) {
-                String leaderName = leader.getLeaderModel().map(LeaderModel::getName).orElse(leader.getId());
+                String leaderName =
+                        leader.getLeaderModel().map(LeaderModel::getName).orElse(leader.getId());
                 buttons.add(Buttons.gray(
                         prefix + leader.getId(),
                         "Ready " + leaderName + (Constants.AGENT.equals(leader.getType()) ? " Agent" : " Leader")));
@@ -846,7 +852,9 @@ class ActionCardDeck2ButtonHandler {
         prefix = "overtimeReady_" + remaining + "_legendary_";
         for (String planet : player.getExhaustedPlanetsAbilities()) {
             buttons.add(Buttons.blue(
-                    prefix + planet, "Ready " + Mapper.getPlanet(planet).getName() + " Ability", MiscEmojis.LegendaryPlanet));
+                    prefix + planet,
+                    "Ready " + Mapper.getPlanet(planet).getName() + " Ability",
+                    MiscEmojis.LegendaryPlanet));
         }
 
         return buttons;
@@ -868,7 +876,9 @@ class ActionCardDeck2ButtonHandler {
                     return null;
                 }
                 RefreshLeaderService.refreshLeader(player, leader, game);
-                return leader.getLeaderModel().map(LeaderModel::getNameRepresentation).orElse(detail);
+                return leader.getLeaderModel()
+                        .map(LeaderModel::getNameRepresentation)
+                        .orElse(detail);
             }
             case "relic" -> {
                 player.removeExhaustedRelic(detail);
