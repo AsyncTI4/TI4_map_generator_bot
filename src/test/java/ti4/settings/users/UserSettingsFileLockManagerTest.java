@@ -18,8 +18,7 @@ class UserSettingsFileLockManagerTest {
         assertTrue(runBlockingScenario(
                 releaseLatch ->
                         () -> UserSettingsFileLockManager.wrapWithWriteLock("user-1", () -> awaitLatch(releaseLatch)),
-                () -> UserSettingsFileLockManager.wrapWithReadLock("user-1", () -> {
-                })));
+                () -> UserSettingsFileLockManager.wrapWithReadLock("user-1", () -> {})));
     }
 
     @Test
@@ -27,11 +26,11 @@ class UserSettingsFileLockManagerTest {
         assertTrue(runBlockingScenario(
                 releaseLatch ->
                         () -> UserSettingsFileLockManager.wrapWithReadLock("user-1", () -> awaitLatch(releaseLatch)),
-                () -> UserSettingsFileLockManager.wrapWithWriteLock("user-1", () -> {
-                })));
+                () -> UserSettingsFileLockManager.wrapWithWriteLock("user-1", () -> {})));
     }
 
-    private static boolean runBlockingScenario(LockingTaskFactory firstTaskFactory, Runnable blockedTask) throws Exception {
+    private static boolean runBlockingScenario(LockingTaskFactory firstTaskFactory, Runnable blockedTask)
+            throws Exception {
         ExecutorService executor = Executors.newFixedThreadPool(2);
         CountDownLatch firstTaskStarted = new CountDownLatch(1);
         CountDownLatch releaseFirstTask = new CountDownLatch(1);

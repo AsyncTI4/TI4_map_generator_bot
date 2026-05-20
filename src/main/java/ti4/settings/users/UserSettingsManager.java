@@ -62,8 +62,7 @@ public class UserSettingsManager {
     }
 
     private static void writeFileWithoutLock(UserSettings userSettings) throws IOException {
-        PersistenceManager.writeObjectToJsonFile(
-                USER_SETTINGS_PATH, userSettings.getUserId() + ".json", userSettings);
+        PersistenceManager.writeObjectToJsonFile(USER_SETTINGS_PATH, userSettings.getUserId() + ".json", userSettings);
     }
 
     public static List<UserSettings> getAllUserSettings() {
