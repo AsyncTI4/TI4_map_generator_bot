@@ -35,6 +35,7 @@ import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.statistics.AverageTurnTimeService;
+import ti4.spring.service.statistics.matchmaking.MatchmakingGameQualityEstimator;
 
 @UtilityClass
 public class CreateGameButtonHandler {
@@ -212,9 +213,17 @@ public class CreateGameButtonHandler {
             }
         }
 
-        StringBuilder activityList = new StringBuilder();
+        List<String> userIds = members.stream().map(Member::getId).toList();
+        var matchmakingGameQuality = MatchmakingGameQualityEstimator.getBean().estimate(userIds);
+        memberList
+                .append("> Lobby Skill Rating: `")
+                .append(matchmakingGameQuality.skillRating())
+                .append("`\n")
+                .append("> Skill Rating Difference: `")
+                .append(matchmakingGameQuality.skillDifference())
+                .append("`");
 
-        var userIds = members.stream().map(Member::getId).toList();
+        StringBuilder activityList = new StringBuilder();
         Map<String, Long> userIdsToAverageTurnTimes =
                 AverageTurnTimeService.getBean().getUserIdsToAverageTurnTimes(userIds);
         int playerNumber = 1;
