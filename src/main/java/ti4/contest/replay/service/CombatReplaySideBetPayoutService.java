@@ -90,9 +90,20 @@ public class CombatReplaySideBetPayoutService {
     private int dynamicPayout(CombatSideBetType betType, double probability) {
         double adjustedProbability = Math.min(1.0, probability * selectionBiasMultiplier(betType));
         for (PayoutTier tier : dynamicPayoutTiers()) {
-            if (adjustedProbability >= tier.minimumProbability()) return Math.min(tier.payout(), maxDynamicPayout());
+            if (adjustedProbability >= tier.minimumProbability()) {
+                return boundedDynamicPayout(betType, tier.payout());
+            }
         }
-        return maxDynamicPayout();
+        return boundedDynamicPayout(betType, maxDynamicPayout());
+    }
+
+    private int boundedDynamicPayout(CombatSideBetType betType, int payout) {
+        int minimumPayout =
+                switch (betType) {
+                    case ROUND_ONE_WHIFF -> 20;
+                    default -> 1;
+                };
+        return Math.min(maxDynamicPayout(), Math.max(minimumPayout, payout));
     }
 
     private double selectionBiasMultiplier(CombatSideBetType betType) {

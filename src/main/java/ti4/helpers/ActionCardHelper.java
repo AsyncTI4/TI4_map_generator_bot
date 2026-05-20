@@ -1275,6 +1275,11 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("overtime".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveOvertime", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("chain_reaction".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveChainReaction", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);

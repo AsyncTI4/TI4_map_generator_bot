@@ -48,6 +48,8 @@ import ti4.service.combat.CombatUnitSelectionHelper;
 public class CombatReplayService {
 
     private static final Pattern SYSTEM_TILE_PATTERN = Pattern.compile("-system-([^-]+)-");
+    private static final double ENDING_TENSION_SURVIVAL_THRESHOLD = 0.20;
+    private static final double ENDING_TENSION_CLOSE_FIGHT_SCORE = 0.2;
     private static final Set<CombatCandidateStatus> OPEN_CANDIDATE_STATUSES =
             EnumSet.of(CombatCandidateStatus.TRACKING, CombatCandidateStatus.PENDING_RESOLUTION);
     private static final ThreadLocal<PreInteractionSnapshot> preInteractionSnapshot = new ThreadLocal<>();
@@ -647,8 +649,13 @@ public class CombatReplayService {
         double winnerSurvivalRatio = safeRatio(winnerRemainingHp, winnerInitialHp);
         double roundScore = Math.sqrt(Math.max(0, roundsObserved)) * sizeFactor;
         double openingBalanceScore = 0.9 * Math.pow(strengthRatio, 3.0);
-        double endingTensionScore = winnerRemainingHp <= 0 ? 0.0 : 5.0 * Math.exp(-6.0 * winnerSurvivalRatio);
+        double endingTensionScore = endingTensionScore(winnerRemainingHp, winnerSurvivalRatio);
         return roundScore + openingBalanceScore + endingTensionScore;
+    }
+
+    private static double endingTensionScore(double winnerRemainingHp, double winnerSurvivalRatio) {
+        if (winnerRemainingHp <= 0 || winnerSurvivalRatio <= 0) return 0.0;
+        return winnerSurvivalRatio <= ENDING_TENSION_SURVIVAL_THRESHOLD ? ENDING_TENSION_CLOSE_FIGHT_SCORE : 0.0;
     }
 
     public static double computeDrawPromotionScore(InitialCombatStats initialStats, int roundsObserved) {
