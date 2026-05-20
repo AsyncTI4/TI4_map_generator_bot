@@ -37,10 +37,10 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
-import ti4.service.explore.ExploreService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.planet.PlanetService;
 import ti4.service.unit.AddUnitService;
@@ -491,7 +491,8 @@ class ActionCardDeck2ButtonHandler {
         if (activeSystem == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " could not resolve _Reconstruction_ because there is no active system.");
+                    player.getRepresentation()
+                            + " could not resolve _Reconstruction_ because there is no active system.");
             return;
         }
 
@@ -512,7 +513,8 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("reconstructionStep2_")
-    public static void resolveReconstructionStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void resolveReconstructionStep2(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.replace("reconstructionStep2_", "");
         Planet planetHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -543,13 +545,13 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("reconstructionStep3_")
-    public static void resolveReconstructionStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void resolveReconstructionStep3(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String info = buttonID.replace("reconstructionStep3_", "");
         int splitIndex = info.lastIndexOf('_');
         if (splitIndex < 0) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " could not resolve _Reconstruction_.");
+                    player.getCorrectChannel(), player.getRepresentation() + " could not resolve _Reconstruction_.");
             return;
         }
         String planet = info.substring(0, splitIndex);
@@ -601,7 +603,8 @@ class ActionCardDeck2ButtonHandler {
         for (Planet planet : activeSystem.getPlanetUnitHolders()) {
             if (player.getPlanets().contains(planet.getName())) {
                 buttons.add(Buttons.gray(
-                        "reconstructionStep2_" + planet.getName(), Helper.getPlanetRepresentation(planet.getName(), game)));
+                        "reconstructionStep2_" + planet.getName(),
+                        Helper.getPlanetRepresentation(planet.getName(), game)));
             }
         }
         return buttons;
