@@ -195,8 +195,8 @@ class ActionCardDeck2ButtonHandler {
             return;
         }
 
-        String spendMessage = player.getRepresentation() + " spent 3 trade goods " + player.gainTG(-3)
-                + " to resolve _Overtime_.";
+        String spendMessage =
+                player.getRepresentation() + " spent 3 trade goods " + player.gainTG(-3) + " to resolve _Overtime_.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), spendMessage);
         sendOvertimeButtons(player, game, 2);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -305,8 +305,7 @@ class ActionCardDeck2ButtonHandler {
         for (String relic : player.getExhaustedRelics()) {
             RelicModel relicModel = Mapper.getRelic(relic);
             buttons.add(Buttons.red(
-                    prefix + "relic_" + remainingComponents + "_" + relic,
-                    "Ready " + relicModel.getName() + " Relic"));
+                    prefix + "relic_" + remainingComponents + "_" + relic, "Ready " + relicModel.getName() + " Relic"));
         }
 
         for (String tech : player.getExhaustedTechs()) {
@@ -349,7 +348,9 @@ class ActionCardDeck2ButtonHandler {
                     yield null;
                 }
                 RefreshLeaderService.refreshLeader(player, leader, game);
-                yield leader.getLeaderModel().map(LeaderModel::getNameRepresentation).orElse(componentId);
+                yield leader.getLeaderModel()
+                        .map(LeaderModel::getNameRepresentation)
+                        .orElse(componentId);
             }
             case "relic" -> {
                 if (!player.getExhaustedRelics().contains(componentId)) {
