@@ -355,6 +355,7 @@
         "window": "After you commit units to land on a non-home planet in the active system",
         "text": "Place up to 1 infantry from your reinforcements on each planet in that system.",
         "notes": "These infantry cannot be targeted by PDS.",
+        "automationID": "freedom_fighters",
         "flavorText": "Harrugh had brought them supplies and hope. On the promised day, they would repay him with their determination for liberation.",
         "source": "action_deck_2"
     },
@@ -1163,6 +1164,7 @@
         "phase": "Action",
         "window": "After you lose a space combat",
         "text": "Place 1 neutral cruiser and 2 neutral destroyers in that system; space combat is resolved in that system if it contains non-neutral ships.",
+        "automationID": "opportunists",
         "flavorText": "\"Them void-rats cost an arm and a leg,\" Ipswitch said with disgust. \"Ah, well. Not my arm or my leg.\"",
         "source": "action_deck_2"
     },
