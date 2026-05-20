@@ -34,58 +34,112 @@ public class EmelparService {
     }
 
     public List<Button> getReadyComponentButtons(Game game, Player player) {
-        List<Button> buttons = new ArrayList<>();
+        List<Button> buttons = getReadyComponentButtons(game, player, "emelparReady_", true);
+        if (!game.isFowMode()) {
+            buttons.add(Buttons.gray("getOtherFactionsEmelpar", "Ready Another Player's Components"));
+        }
+        return buttons;
+    }
 
-        String prefix = "emelparReady_planet_" + player.getFaction() + "_";
+    public List<Button> getReadyComponentButtons(Game game, Player player, String prefix) {
+        return getReadyComponentButtons(game, player, prefix, false);
+    }
+
+    private static List<Button> getReadyComponentButtons(
+            Game game, Player player, String prefix, boolean includeOwningFactionInButtonId) {
+        List<Button> buttons = new ArrayList<>();
+        String ownerPrefix = includeOwningFactionInButtonId ? player.getFaction() + "_" : "";
+
+        String componentPrefix = prefix + "planet_" + ownerPrefix;
         for (String planet : player.getExhaustedPlanets()) {
-            buttons.add(Buttons.green(prefix + planet, Helper.getPlanetRepresentation(planet, game)));
+            buttons.add(Buttons.green(componentPrefix + planet, Helper.getPlanetRepresentation(planet, game)));
         }
 
-        prefix = "emelparReady_breakthrough_" + player.getFaction() + "_";
+        componentPrefix = prefix + "breakthrough_" + ownerPrefix;
         for (String bt : player.getBreakthroughIDs()) {
             if (player.isBreakthroughExhausted(bt) && player.isBreakthroughUnlocked(bt)) {
                 BreakthroughModel btModel = Mapper.getBreakthrough(bt);
                 String label = "Ready " + btModel.getName() + " Breakthrough";
-                buttons.add(Buttons.blue(prefix + bt, label, player.getFactionEmoji()));
+                buttons.add(Buttons.blue(componentPrefix + bt, label, player.getFactionEmoji()));
             }
         }
 
-        prefix = "emelparReady_leader_" + player.getFaction() + "_";
+        componentPrefix = prefix + "leader_" + ownerPrefix;
         for (Leader leader : player.getLeaders()) {
             if (leader.isExhausted()) {
                 String leaderName =
                         leader.getLeaderModel().map(LeaderModel::getName).orElse(leader.getId());
                 buttons.add(Buttons.gray(
-                        prefix + leader.getId(),
+                        componentPrefix + leader.getId(),
                         "Ready " + leaderName + (Constants.AGENT.equals(leader.getType()) ? " Agent" : " Leader"),
                         LeaderEmojis.getLeaderTypeEmoji(leader.getType())));
             }
         }
 
-        prefix = "emelparReady_relic_" + player.getFaction() + "_";
+        componentPrefix = prefix + "relic_" + ownerPrefix;
         for (String relic : player.getExhaustedRelics()) {
             RelicModel model = Mapper.getRelic(relic);
-            buttons.add(Buttons.red(prefix + relic, "Ready " + model.getName() + " Relic", ExploreEmojis.Relic));
+            buttons.add(
+                    Buttons.red(componentPrefix + relic, "Ready " + model.getName() + " Relic", ExploreEmojis.Relic));
         }
 
-        prefix = "emelparReady_tech_" + player.getFaction() + "_";
+        componentPrefix = prefix + "tech_" + ownerPrefix;
         for (String tech : player.getExhaustedTechs()) {
             TechnologyModel model = Mapper.getTech(tech);
             buttons.add(Buttons.green(
-                    prefix + tech, "Ready " + model.getName() + "Technology", model.getCondensedReqsEmojis(true)));
+                    componentPrefix + tech,
+                    "Ready " + model.getName() + "Technology",
+                    model.getCondensedReqsEmojis(true)));
         }
 
-        prefix = "emelparReady_legendary_" + player.getFaction() + "_";
+        componentPrefix = prefix + "legendary_" + ownerPrefix;
         for (String planet : player.getExhaustedPlanetsAbilities()) {
             PlanetModel model = Mapper.getPlanet(planet);
-            buttons.add(
-                    Buttons.blue(prefix + planet, "Ready " + model.getName() + " Ability", MiscEmojis.LegendaryPlanet));
+            buttons.add(Buttons.blue(
+                    componentPrefix + planet, "Ready " + model.getName() + " Ability", MiscEmojis.LegendaryPlanet));
         }
-        if (!game.isFowMode()) {
-            buttons.add(Buttons.gray("getOtherFactionsEmelpar", "Ready Another Player's Components"));
-        }
-
         return buttons;
+    }
+
+    public static String readyComponent(Game game, Player player, String type, String detail) {
+        switch (type) {
+            case "planet" -> {
+                player.refreshPlanet(detail);
+                return Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(detail, game);
+            }
+            case "breakthrough" -> {
+                player.setBreakthroughExhausted(detail, false);
+                return player.getBreakthroughModel(detail).getNameRepresentation();
+            }
+            case "leader" -> {
+                Leader leader = player.getLeaderByID(detail).orElse(null);
+                if (leader == null) {
+                    return null;
+                }
+                leader.setExhausted(false);
+                return leader.getLeaderModel()
+                        .map(LeaderModel::getNameRepresentation)
+                        .orElse(detail);
+            }
+            case "relic" -> {
+                RelicModel model = Mapper.getRelic(detail);
+                player.removeExhaustedRelic(detail);
+                return ExploreEmojis.Relic + " " + model.getName();
+            }
+            case "tech" -> {
+                player.refreshTech(detail);
+                TechnologyModel model = Mapper.getTech(detail);
+                return model.getNameRepresentation();
+            }
+            case "legendary" -> {
+                PlanetModel model = Mapper.getPlanet(detail);
+                player.refreshPlanetAbility(detail);
+                return model.getLegendaryNameRepresentation();
+            }
+            default -> {
+                return null;
+            }
+        }
     }
 
     @ButtonHandler(value = "getOtherFactionsEmelpar", save = false)
@@ -126,8 +180,7 @@ public class EmelparService {
         String regex = "emelparReady_planet_" + RegexHelper.unitHolderRegex(game, "planet");
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String planet = matcher.group("planet");
-            player2.refreshPlanet(planet);
-            String readyItem = Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game);
+            String readyItem = readyComponent(game, player2, "planet", planet);
             postSummary(event, player, readyItem);
         });
     }
@@ -139,8 +192,7 @@ public class EmelparService {
         buttonID = buttonID.replace(player2.getFaction() + "_", "");
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String bt = matcher.group("breakthrough");
-            player2.setBreakthroughExhausted(bt, false);
-            String readyItem = player2.getBreakthroughModel(bt).getNameRepresentation();
+            String readyItem = readyComponent(game, player2, "breakthrough", bt);
             postSummary(event, player, readyItem);
         });
     }
@@ -152,12 +204,8 @@ public class EmelparService {
         buttonID = buttonID.replace(player2.getFaction() + "_", "");
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String leaderID = matcher.group("leader");
-            Leader leader = player2.getLeaderByID(leaderID).orElse(null);
-            if (leader != null) {
-                leader.setExhausted(false);
-                String readyMsg = leader.getLeaderModel()
-                        .map(LeaderModel::getNameRepresentation)
-                        .orElse(leaderID);
+            String readyMsg = readyComponent(game, player2, "leader", leaderID);
+            if (readyMsg != null) {
                 postSummary(event, player, readyMsg);
             }
         });
@@ -170,9 +218,7 @@ public class EmelparService {
         buttonID = buttonID.replace(player2.getFaction() + "_", "");
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String relicID = matcher.group("relic");
-            RelicModel model = Mapper.getRelic(relicID);
-            player2.removeExhaustedRelic(relicID);
-            String readyMsg = ExploreEmojis.Relic + " " + model.getName();
+            String readyMsg = readyComponent(game, player2, "relic", relicID);
             postSummary(event, player, readyMsg);
         });
     }
@@ -184,9 +230,7 @@ public class EmelparService {
         buttonID = buttonID.replace(player2.getFaction() + "_", "");
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String techID = matcher.group("tech");
-            player2.refreshTech(techID);
-            TechnologyModel model = Mapper.getTech(techID);
-            String readyMsg = model.getNameRepresentation();
+            String readyMsg = readyComponent(game, player2, "tech", techID);
             postSummary(event, player, readyMsg);
         });
     }
@@ -198,9 +242,7 @@ public class EmelparService {
         buttonID = buttonID.replace(player2.getFaction() + "_", "");
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String planet = matcher.group("planet");
-            PlanetModel model = Mapper.getPlanet(planet);
-            player2.refreshPlanetAbility(planet);
-            String readyMsg = model.getLegendaryNameRepresentation();
+            String readyMsg = readyComponent(game, player2, "legendary", planet);
             postSummary(event, player, readyMsg);
         });
     }

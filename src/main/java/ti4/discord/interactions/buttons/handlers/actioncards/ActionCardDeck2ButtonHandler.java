@@ -31,18 +31,14 @@ import ti4.helpers.UnusedCommanderHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.BreakthroughModel;
 import ti4.model.ExploreModel;
-import ti4.model.LeaderModel;
-import ti4.model.RelicModel;
-import ti4.model.TechnologyModel;
 import ti4.service.emoji.CardEmojis;
-import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.planet.EmelparService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.unit.AddUnitService;
 
@@ -234,7 +230,9 @@ class ActionCardDeck2ButtonHandler {
         int maxSpend = Math.min(
                 2,
                 Math.min(
-                        player.getTg(), getOvertimeReadyButtons(game, player, 1).size()));
+                        player.getTg(),
+                        EmelparService.getReadyComponentButtons(game, player, "")
+                                .size()));
         if (maxSpend < 1) {
             String reason = player.getTg() < 1
                     ? " has no trade goods to spend for _Overtime_."
@@ -261,7 +259,9 @@ class ActionCardDeck2ButtonHandler {
     public static void resolveOvertimeSpend(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         int spend = Integer.parseInt(buttonID.split("_")[1]);
         if (player.getTg() < spend
-                || getOvertimeReadyButtons(game, player, spend).size() < spend) {
+                || EmelparService.getReadyComponentButtons(game, player, "overtimeReady_" + spend + "_")
+                                .size()
+                        < spend) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
@@ -795,7 +795,8 @@ class ActionCardDeck2ButtonHandler {
     }
 
     private static void sendOvertimeReadyPrompt(Player player, Game game, int remaining) {
-        List<Button> buttons = getOvertimeReadyButtons(game, player, remaining);
+        List<Button> buttons =
+                EmelparService.getReadyComponentButtons(game, player, "overtimeReady_" + remaining + "_");
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), game.getStoredValue(overtimeSummaryKey(player)) + ".");
@@ -809,94 +810,12 @@ class ActionCardDeck2ButtonHandler {
                 buttons);
     }
 
-    private static List<Button> getOvertimeReadyButtons(Game game, Player player, int remaining) {
-        List<Button> buttons = new ArrayList<>();
-
-        String prefix = "overtimeReady_" + remaining + "_planet_";
-        for (String planet : player.getExhaustedPlanets()) {
-            buttons.add(Buttons.green(prefix + planet, "Ready " + Helper.getPlanetRepresentation(planet, game)));
-        }
-
-        prefix = "overtimeReady_" + remaining + "_breakthrough_";
-        for (String bt : player.getBreakthroughIDs()) {
-            if (player.isBreakthroughExhausted(bt) && player.isBreakthroughUnlocked(bt)) {
-                BreakthroughModel btModel = Mapper.getBreakthrough(bt);
-                buttons.add(Buttons.blue(
-                        prefix + bt, "Ready " + btModel.getName() + " Breakthrough", player.getFactionEmoji()));
-            }
-        }
-
-        prefix = "overtimeReady_" + remaining + "_leader_";
-        for (Leader leader : player.getLeaders()) {
-            if (leader.isExhausted()) {
-                String leaderName =
-                        leader.getLeaderModel().map(LeaderModel::getName).orElse(leader.getId());
-                buttons.add(Buttons.gray(
-                        prefix + leader.getId(),
-                        "Ready " + leaderName + (Constants.AGENT.equals(leader.getType()) ? " Agent" : " Leader")));
-            }
-        }
-
-        prefix = "overtimeReady_" + remaining + "_relic_";
-        for (String relic : player.getExhaustedRelics()) {
-            RelicModel model = Mapper.getRelic(relic);
-            buttons.add(Buttons.red(prefix + relic, "Ready " + model.getName() + " Relic", ExploreEmojis.Relic));
-        }
-
-        prefix = "overtimeReady_" + remaining + "_tech_";
-        for (String tech : player.getExhaustedTechs()) {
-            TechnologyModel model = Mapper.getTech(tech);
-            buttons.add(Buttons.green(prefix + tech, "Ready " + model.getName() + " Technology"));
-        }
-
-        prefix = "overtimeReady_" + remaining + "_legendary_";
-        for (String planet : player.getExhaustedPlanetsAbilities()) {
-            buttons.add(Buttons.blue(
-                    prefix + planet,
-                    "Ready " + Mapper.getPlanet(planet).getName() + " Ability",
-                    MiscEmojis.LegendaryPlanet));
-        }
-
-        return buttons;
-    }
-
     private static String readyOvertimeComponent(Game game, Player player, String type, String detail) {
-        switch (type) {
-            case "planet" -> {
-                player.refreshPlanet(detail);
-                return Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(detail, game);
-            }
-            case "breakthrough" -> {
-                player.setBreakthroughExhausted(detail, false);
-                return player.getBreakthroughModel(detail).getNameRepresentation();
-            }
-            case "leader" -> {
-                Leader leader = player.getLeaderByID(detail).orElse(null);
-                if (leader == null) {
-                    return null;
-                }
-                RefreshLeaderService.refreshLeader(player, leader, game);
-                return leader.getLeaderModel()
-                        .map(LeaderModel::getNameRepresentation)
-                        .orElse(detail);
-            }
-            case "relic" -> {
-                player.removeExhaustedRelic(detail);
-                return Mapper.getRelic(detail).getNameRepresentation();
-            }
-            case "tech" -> {
-                player.refreshTech(detail);
-                CommanderUnlockCheckService.checkPlayer(player, "kolume");
-                return Mapper.getTech(detail).getNameRepresentation();
-            }
-            case "legendary" -> {
-                player.refreshPlanetAbility(detail);
-                return Mapper.getPlanet(detail).getLegendaryNameRepresentation();
-            }
-            default -> {
-                return null;
-            }
+        String readyItem = EmelparService.readyComponent(game, player, type, detail);
+        if ("tech".equals(type) && readyItem != null) {
+            CommanderUnlockCheckService.checkPlayer(player, "kolume");
         }
+        return readyItem;
     }
 
     private static String overtimeSummaryKey(Player player) {
