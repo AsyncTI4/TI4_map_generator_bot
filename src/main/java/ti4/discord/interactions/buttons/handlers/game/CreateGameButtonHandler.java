@@ -214,14 +214,7 @@ public class CreateGameButtonHandler {
         }
 
         List<String> userIds = members.stream().map(Member::getId).toList();
-        var matchmakingGameQuality = MatchmakingGameQualityEstimator.getBean().estimate(userIds);
-        memberList
-                .append("> Lobby Skill Rating: `")
-                .append(matchmakingGameQuality.skillRating())
-                .append("`\n")
-                .append("> Skill Rating Difference: `")
-                .append(matchmakingGameQuality.skillDifference())
-                .append("`");
+        BotLogger.info(MatchmakingGameQualityEstimator.getBean().buildLobbyRatingLogMessage(userIds));
 
         StringBuilder activityList = new StringBuilder();
         Map<String, Long> userIdsToAverageTurnTimes =

@@ -48,6 +48,19 @@ class MatchmakingGameQualityEstimatorTest {
         assertThat(quality.skillDifference()).isEqualTo(MatchmakingSkillLevel.UNKNOWN);
     }
 
+    @Test
+    void buildsLobbyRatingLogMessageWithQualityAndPlayerRatings() {
+        List<MatchmakingRating> ratings = buildRatings();
+
+        String logMessage = MatchmakingGameQualityEstimator.buildLobbyRatingLogMessage(ratings, List.of("p2", "p4", "p8"));
+
+        assertThat(logMessage).contains("Lobby Skill Rating: `MEDIUM`");
+        assertThat(logMessage).contains("Skill Rating Difference: `MEDIUM`");
+        assertThat(logMessage).contains("- `player2` (`p2`): `20.000` (`100.0%` calibrated)");
+        assertThat(logMessage).contains("- `player4` (`p4`): `30.000` (`100.0%` calibrated)");
+        assertThat(logMessage).contains("- `p8`: `UNKNOWN`");
+    }
+
     @NotNull
     private static List<MatchmakingRating> buildRatings() {
         return List.of(

@@ -37,6 +37,19 @@ public class MatchmakingGameQualityEstimator {
         return estimate(ratings, lobbyUserIds);
     }
 
+    @Transactional(readOnly = true)
+    public String buildLobbyRatingLogMessage(List<String> lobbyUserIds) {
+        if (lobbyUserIds.isEmpty()) {
+            return buildLobbyRatingLogMessage(List.of(), List.of());
+        }
+
+        List<PlayerEntity> players =
+                playerEntityRepository.findAllWithUsersAndGamesByCompletedSixPlayerNonAllianceGame(false);
+        List<MatchmakingGame> games = MatchmakingGame.getMatchmakingGames(players);
+        List<MatchmakingRating> ratings = TrueSkillMatchmakingRatingService.calculateRatings(games);
+        return buildLobbyRatingLogMessage(ratings, lobbyUserIds);
+    }
+
     static MatchmakingGameQuality estimate(List<MatchmakingRating> ratings, List<String> lobbyUserIds) {
         if (lobbyUserIds.isEmpty()) {
             return MatchmakingGameQuality.unknown();
@@ -68,6 +81,31 @@ public class MatchmakingGameQualityEstimator {
                 : MatchmakingSkillLevel.UNKNOWN;
 
         return new MatchmakingGameQuality(skillRating, skillDifference);
+    }
+
+    static String buildLobbyRatingLogMessage(List<MatchmakingRating> ratings, List<String> lobbyUserIds) {
+        MatchmakingGameQuality quality = estimate(ratings, lobbyUserIds);
+        Map<String, MatchmakingRating> ratingsByUserId = ratings.stream()
+                .collect(Collectors.toMap(MatchmakingRating::userId, rating -> rating, (existing, replacement) -> existing));
+        String playerRatings = lobbyUserIds.stream()
+                .map(userId -> formatPlayerRating(userId, ratingsByUserId.get(userId)))
+                .collect(Collectors.joining("\n"));
+        return """
+                Lobby matchmaking summary:
+                > Lobby Skill Rating: `%s`
+                > Skill Rating Difference: `%s`
+                > Player Ratings:
+                %s
+                """
+                .formatted(quality.skillRating(), quality.skillDifference(), playerRatings);
+    }
+
+    private static String formatPlayerRating(String userId, MatchmakingRating rating) {
+        if (rating == null) {
+            return "- `%s`: `UNKNOWN`".formatted(userId);
+        }
+        return "- `%s` (`%s`): `%.3f` (`%.1f%%` calibrated)"
+                .formatted(rating.username(), userId, rating.rating(), rating.calibrationPercent());
     }
 
     private static boolean hasEnoughKnownRatings(int knownRatingCount, int lobbySize, int minimumKnownRatings) {
