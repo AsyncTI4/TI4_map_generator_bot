@@ -149,6 +149,26 @@ class ActionCardDeck2ButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
 
+    @ButtonHandler("resolveReinforcements")
+    public static void resolveReinforcements(Player player, Game game, ButtonInteractionEvent event) {
+        Tile tile = game.getTileByPosition(game.getActiveSystem());
+        if (tile == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " could not resolve _Reinforcements_ because there is no active system.");
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "2 fighter");
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getFactionEmoji() + " placed 2 fighters in " + tile.getRepresentation()
+                        + " with _Reinforcements_.");
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
     @ButtonHandler("resolveSisterShip")
     public static void resolveSisterShip(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
