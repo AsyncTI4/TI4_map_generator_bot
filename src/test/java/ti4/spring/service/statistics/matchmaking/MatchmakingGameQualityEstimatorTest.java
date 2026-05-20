@@ -52,7 +52,8 @@ class MatchmakingGameQualityEstimatorTest {
     void buildsLobbyRatingLogMessageWithQualityAndPlayerRatings() {
         List<MatchmakingRating> ratings = buildRatings();
 
-        String logMessage = MatchmakingGameQualityEstimator.buildLobbyRatingLogMessage(ratings, List.of("p2", "p4", "p8"));
+        String logMessage =
+                MatchmakingGameQualityEstimator.buildLobbyRatingLogMessage(ratings, List.of("p2", "p4", "p8"));
 
         assertThat(logMessage).contains("Lobby Skill Rating: `MEDIUM`");
         assertThat(logMessage).contains("Skill Rating Difference: `MEDIUM`");

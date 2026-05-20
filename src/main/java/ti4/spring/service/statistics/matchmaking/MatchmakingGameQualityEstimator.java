@@ -86,7 +86,8 @@ public class MatchmakingGameQualityEstimator {
     static String buildLobbyRatingLogMessage(List<MatchmakingRating> ratings, List<String> lobbyUserIds) {
         MatchmakingGameQuality quality = estimate(ratings, lobbyUserIds);
         Map<String, MatchmakingRating> ratingsByUserId = ratings.stream()
-                .collect(Collectors.toMap(MatchmakingRating::userId, rating -> rating, (existing, replacement) -> existing));
+                .collect(Collectors.toMap(
+                        MatchmakingRating::userId, rating -> rating, (existing, replacement) -> existing));
         String playerRatings = lobbyUserIds.stream()
                 .map(userId -> formatPlayerRating(userId, ratingsByUserId.get(userId)))
                 .collect(Collectors.joining("\n"));
@@ -96,8 +97,7 @@ public class MatchmakingGameQualityEstimator {
                 > Skill Rating Difference: `%s`
                 > Player Ratings:
                 %s
-                """
-                .formatted(quality.skillRating(), quality.skillDifference(), playerRatings);
+                """.formatted(quality.skillRating(), quality.skillDifference(), playerRatings);
     }
 
     private static String formatPlayerRating(String userId, MatchmakingRating rating) {
