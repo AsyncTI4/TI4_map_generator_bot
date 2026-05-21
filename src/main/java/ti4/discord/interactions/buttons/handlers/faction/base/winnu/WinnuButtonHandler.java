@@ -4,6 +4,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
+import ti4.game.GameStats;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
@@ -38,7 +39,7 @@ class WinnuButtonHandler {
         boolean isOverrule = buttonID.contains("overrule");
         PlayStrategyCardService.playSC(event, sc, game, game.getMainGameChannel(), player, true, isOverrule);
         if (isOverrule) {
-            game.getGameStats().incrementOverruleCount(player.getFaction(), sc);
+            game.getGameStats().recordAcPlayWithTarget(GameStats.OVERRULE, Helper.getSCName(sc, game));
         }
         if (isOverrule && sc == 5 && !game.isFowMode()) {
             MessageHelper.sendMessageToChannel(

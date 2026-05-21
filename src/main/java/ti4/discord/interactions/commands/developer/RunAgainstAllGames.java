@@ -48,6 +48,6 @@ class RunAgainstAllGames extends Subcommand {
         // These are already loaded into GameStats during deserialization of old game files,
         // so returning true for any game that has stats data forces a re-save in the new format.
         return !game.getGameStats().getSlashCommandsUsed().isEmpty()
-                || !game.getGameStats().getActionCardsSabotaged().isEmpty();
+                || !game.getGameStats().getAcPlayStats().isEmpty();
     }
 }

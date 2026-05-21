@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
+import ti4.game.GameStats;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -103,8 +104,8 @@ public class ListSlashCommandsUsedService {
         if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1698724000011L)) >= 0) {
             return;
         }
-        game.getGameStats().getActionCardsSabotaged().forEach((acName, numUsed) -> {
-            acsSabod.addAndGet(numUsed);
+        acsSabod.addAndGet(game.getGameStats().getTotalPlays(GameStats.SABOTAGE));
+        game.getGameStats().getCountPerTarget(GameStats.SABOTAGE).forEach((acName, numUsed) -> {
             actionCards.merge(acName, numUsed, Integer::sum);
         });
         for (String acID : game.getDiscardActionCards().keySet()) {

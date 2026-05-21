@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
+import ti4.game.GameStats;
 import ti4.testUtils.BaseTi4Test;
 
 class GameSaveServiceTest extends BaseTi4Test {
@@ -14,8 +15,8 @@ class GameSaveServiceTest extends BaseTi4Test {
             Game game = harness.load();
             game.setLatestOutcomeVotedFor("testOutcome");
             game.getGameStats().incrementSpecificSlashCommandCount("/statistics2 action_card_stats");
-            game.getGameStats().setSpecificActionCardSaboCount("Sabotage", 4);
-            game.getGameStats().setOverruleCount("hacan", 5, 2);
+            game.getGameStats().recordAcPlayWithTarget(GameStats.SABOTAGE, "Divert Funding");
+            game.getGameStats().recordAcPlayWithTarget(GameStats.OVERRULE, "leadership");
 
             boolean saved = GameSaveService.save(game, "test");
             assertThat(saved).isTrue();
@@ -24,8 +25,10 @@ class GameSaveServiceTest extends BaseTi4Test {
             assertThat(reloaded).isNotNull();
             assertThat(reloaded.getLatestOutcomeVotedFor()).isEqualTo("testOutcome");
             assertThat(reloaded.getGameStats().getSlashCommandsUsed()).containsEntry("/statistics2 action_card_stats", 1);
-            assertThat(reloaded.getGameStats().getActionCardsSabotaged()).containsEntry("Sabotage", 4);
-            assertThat(reloaded.getGameStats().getFlattenedOverruleCounts()).containsEntry("hacan|5", 2);
+            assertThat(reloaded.getGameStats().getCountPerTarget(GameStats.SABOTAGE)).containsEntry("Divert Funding", 1);
+            assertThat(reloaded.getGameStats().getTotalPlays(GameStats.SABOTAGE)).isEqualTo(1);
+            assertThat(reloaded.getGameStats().getCountPerTarget(GameStats.OVERRULE)).containsEntry("leadership", 1);
+            assertThat(reloaded.getGameStats().getTotalPlays(GameStats.OVERRULE)).isEqualTo(1);
         }
     }
 }

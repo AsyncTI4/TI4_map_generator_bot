@@ -3,11 +3,9 @@ package ti4.service.statistics;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
@@ -16,7 +14,6 @@ import ti4.game.persistence.ConsumeGameUtility;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
-import ti4.model.FactionModel;
 
 @UtilityClass
 public class ActionCardStatsService {
@@ -51,15 +48,15 @@ public class ActionCardStatsService {
             Map<String, Integer> overruleCounts,
             AtomicInteger totalSabotages,
             AtomicInteger totalOverrules) {
-        game.getGameStats().getActionCardsSabotaged().forEach((actionCardName, count) -> {
-            totalSabotages.addAndGet(count);
-            sabotageCounts.merge(actionCardName, count, Integer::sum);
-        });
+        totalSabotages.addAndGet(game.getGameStats().getTotalPlays(GameStats.SABOTAGE));
+        game.getGameStats()
+                .getCountPerTarget(GameStats.SABOTAGE)
+                .forEach((acName, count) -> sabotageCounts.merge(acName, count, Integer::sum));
 
-        game.getGameStats().getFlattenedOverruleCounts().forEach((factionAndStrategyCard, count) -> {
-            totalOverrules.addAndGet(count);
-            overruleCounts.merge(factionAndStrategyCard, count, Integer::sum);
-        });
+        totalOverrules.addAndGet(game.getGameStats().getTotalPlays(GameStats.OVERRULE));
+        game.getGameStats()
+                .getCountPerTarget(GameStats.OVERRULE)
+                .forEach((scName, count) -> overruleCounts.merge(scName, count, Integer::sum));
 
         game.getDiscardActionCards().forEach((acID, ignored) -> incrementActionCardPlayCount(actionCardsPlayedCounts, acID));
         game.getPurgedActionCards().forEach((acID, ignored) -> incrementActionCardPlayCount(actionCardsPlayedCounts, acID));
@@ -110,46 +107,19 @@ public class ActionCardStatsService {
     }
 
     private static void appendOverruleStats(StringBuilder message, Map<String, Integer> overruleCounts) {
-        var formattedOverruleCounts = overruleCounts.entrySet().stream()
-                .flatMap(entry -> {
-                    String formattedKey = formatOverruleKey(entry.getKey());
-                    if (formattedKey == null) {
-                        return java.util.stream.Stream.empty();
-                    }
-                    return java.util.stream.Stream.of(Map.entry(formattedKey, entry.getValue()));
-                })
-                .sorted(Comparator.comparingInt((Map.Entry<String, Integer> entry) -> entry.getValue())
-                        .reversed()
-                        .thenComparing(Map.Entry::getKey))
-                .toList();
-
-        if (formattedOverruleCounts.isEmpty()) {
+        if (overruleCounts.isEmpty()) {
             message.append("No Overrule data matched the selected filters.\n");
             return;
         }
 
-        formattedOverruleCounts.forEach(entry -> message.append("- ")
-                .append(entry.getKey())
-                .append(": ")
-                .append(entry.getValue())
-                .append('\n'));
-    }
-
-    private static String formatOverruleKey(String key) {
-        int separatorIndex = key.indexOf(GameStats.OVERRULE_STATS_KEY_SEPARATOR);
-        if (separatorIndex < 0
-                || separatorIndex >= key.length() - 1
-                || separatorIndex != key.lastIndexOf(GameStats.OVERRULE_STATS_KEY_SEPARATOR)) {
-            return null;
-        }
-        String faction = key.substring(0, separatorIndex);
-        String strategyCard = key.substring(separatorIndex + 1);
-        if (!StringUtils.isNumeric(strategyCard)) {
-            return null;
-        }
-        String factionName = Optional.ofNullable(Mapper.getFaction(faction))
-                .map(FactionModel::getFactionName)
-                .orElse(faction);
-        return factionName + " -> SC " + strategyCard;
+        overruleCounts.entrySet().stream()
+                .sorted(Comparator.comparingInt((Map.Entry<String, Integer> entry) -> entry.getValue())
+                        .reversed()
+                        .thenComparing(Map.Entry::getKey))
+                .forEach(entry -> message.append("- ")
+                        .append(entry.getKey())
+                        .append(": ")
+                        .append(entry.getValue())
+                        .append('\n'));
     }
 }

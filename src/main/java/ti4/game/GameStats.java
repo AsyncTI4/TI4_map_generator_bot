@@ -1,30 +1,39 @@
 package ti4.game;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 
 @Getter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GameStats {
-    public static final String OVERRULE_STATS_KEY_PREFIX = "overrule_stats_";
-    public static final String OVERRULE_STATS_KEY_SEPARATOR = "|";
+    public static final String SABOTAGE = "Sabotage";
+    public static final String OVERRULE = "Overrule";
 
     private Map<String, Integer> slashCommandsUsed = new HashMap<>();
-    private Map<String, Integer> actionCardsSabotaged = new HashMap<>();
-    private Map<String, Map<Integer, Integer>> overruleCounts = new HashMap<>();
+    private Map<String, AcPlayStats> acPlayStats = new HashMap<>();
 
     public void setSlashCommandsUsed(Map<String, Integer> slashCommandsUsed) {
         this.slashCommandsUsed = slashCommandsUsed == null ? new HashMap<>() : slashCommandsUsed;
     }
 
-    public void setActionCardsSabotaged(Map<String, Integer> actionCardsSabotaged) {
-        this.actionCardsSabotaged = actionCardsSabotaged == null ? new HashMap<>() : actionCardsSabotaged;
+    public void setAcPlayStats(Map<String, AcPlayStats> acPlayStats) {
+        this.acPlayStats = acPlayStats == null ? new HashMap<>() : acPlayStats;
     }
 
-    public void setOverruleCounts(Map<String, Map<Integer, Integer>> overruleCounts) {
-        this.overruleCounts = overruleCounts == null ? new HashMap<>() : overruleCounts;
+    // Migration: old actionCardsSabotaged JSON field from a previous save format
+    @JsonSetter("actionCardsSabotaged")
+    public void migrateActionCardsSabotaged(Map<String, Integer> old) {
+        if (old == null || old.isEmpty()) {
+            return;
+        }
+        AcPlayStats stats = acPlayStats.computeIfAbsent(SABOTAGE, _ -> new AcPlayStats());
+        old.forEach((target, count) -> {
+            stats.setTotalPlays(stats.getTotalPlays() + count);
+            stats.getCountPerTarget().merge(target, count, Integer::sum);
+        });
     }
 
     public int getSlashCommandsRunCount() {
@@ -39,44 +48,51 @@ public class GameStats {
         slashCommandsUsed.put(command, count);
     }
 
-    public void setSpecificActionCardSaboCount(String actionCardName, int count) {
-        actionCardsSabotaged.put(actionCardName, count);
+    public void recordAcPlay(String acName) {
+        acPlayStats.computeIfAbsent(acName, _ -> new AcPlayStats()).recordPlay();
     }
 
-    public void incrementActionCardSaboCount(String actionCardName) {
-        actionCardsSabotaged.merge(actionCardName, 1, Integer::sum);
+    public void recordAcPlayWithTarget(String acName, String target) {
+        acPlayStats.computeIfAbsent(acName, _ -> new AcPlayStats()).recordPlayWithTarget(target);
     }
 
-    public void incrementOverruleCount(String faction, int strategyCard) {
-        if (StringUtils.isBlank(faction)) {
-            return;
+    public int getTotalPlays(String acName) {
+        AcPlayStats stats = acPlayStats.get(acName);
+        return stats == null ? 0 : stats.getTotalPlays();
+    }
+
+    public Map<String, Integer> getCountPerTarget(String acName) {
+        AcPlayStats stats = acPlayStats.get(acName);
+        return stats == null ? Map.of() : stats.getCountPerTarget();
+    }
+
+    // Migration from ACS_SABOD legacy text format
+    public void setSpecificActionCardSaboCount(String acName, int count) {
+        AcPlayStats stats = acPlayStats.computeIfAbsent(SABOTAGE, _ -> new AcPlayStats());
+        stats.setTotalPlays(stats.getTotalPlays() + count);
+        stats.getCountPerTarget().merge(acName, count, Integer::sum);
+    }
+
+    @Getter
+    public static class AcPlayStats {
+        private int totalPlays;
+        private Map<String, Integer> countPerTarget = new HashMap<>();
+
+        public void setTotalPlays(int totalPlays) {
+            this.totalPlays = totalPlays;
         }
-        overruleCounts.computeIfAbsent(faction, _ -> new HashMap<>()).merge(strategyCard, 1, Integer::sum);
-    }
 
-    public void setOverruleCount(String faction, int strategyCard, int count) {
-        if (StringUtils.isBlank(faction) || count <= 0) {
-            return;
+        public void setCountPerTarget(Map<String, Integer> countPerTarget) {
+            this.countPerTarget = countPerTarget == null ? new HashMap<>() : countPerTarget;
         }
-        overruleCounts.computeIfAbsent(faction, _ -> new HashMap<>()).put(strategyCard, count);
-    }
 
-    public Map<String, Integer> getFlattenedOverruleCounts() {
-        Map<String, Integer> flattened = new LinkedHashMap<>();
-        overruleCounts.forEach((faction, countsByStrategyCard) -> {
-            if (StringUtils.isBlank(faction) || countsByStrategyCard == null) {
-                return;
-            }
-            countsByStrategyCard.forEach((strategyCard, count) -> {
-                if (strategyCard != null && count != null && count > 0) {
-                    flattened.put(formatOverruleKey(faction, strategyCard), count);
-                }
-            });
-        });
-        return flattened;
-    }
+        public void recordPlay() {
+            totalPlays++;
+        }
 
-    public static String formatOverruleKey(String faction, int strategyCard) {
-        return faction + OVERRULE_STATS_KEY_SEPARATOR + strategyCard;
+        public void recordPlayWithTarget(String target) {
+            totalPlays++;
+            countPerTarget.merge(target, 1, Integer::sum);
+        }
     }
 }

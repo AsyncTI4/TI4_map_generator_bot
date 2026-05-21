@@ -19,16 +19,21 @@ class GameTest {
     }
 
     @Test
-    void shouldTrackOverruleCountsByFactionAndStrategyCard() {
+    void shouldTrackAcPlaysWithTargets() {
         var game = new Game();
         game.setStoredValue("unrelated", "value");
 
-        game.getGameStats().incrementOverruleCount("hacan", 5);
-        game.getGameStats().incrementOverruleCount("hacan", 5);
-        game.getGameStats().incrementOverruleCount("jolnar", 3);
+        game.getGameStats().recordAcPlayWithTarget(GameStats.OVERRULE, "leadership");
+        game.getGameStats().recordAcPlayWithTarget(GameStats.OVERRULE, "leadership");
+        game.getGameStats().recordAcPlayWithTarget(GameStats.OVERRULE, "politics");
+        game.getGameStats().recordAcPlayWithTarget(GameStats.SABOTAGE, "Divert Funding");
 
-        assertThat(game.getGameStats().getFlattenedOverruleCounts())
-                .containsExactlyInAnyOrderEntriesOf(Map.of("hacan|5", 2, "jolnar|3", 1));
+        assertThat(game.getGameStats().getCountPerTarget(GameStats.OVERRULE))
+                .containsExactlyInAnyOrderEntriesOf(Map.of("leadership", 2, "politics", 1));
+        assertThat(game.getGameStats().getTotalPlays(GameStats.OVERRULE)).isEqualTo(3);
+        assertThat(game.getGameStats().getCountPerTarget(GameStats.SABOTAGE))
+                .containsExactlyInAnyOrderEntriesOf(Map.of("Divert Funding", 1));
+        assertThat(game.getGameStats().getTotalPlays(GameStats.SABOTAGE)).isEqualTo(1);
         assertThat(game.getStoredValueMap()).containsOnlyKeys("unrelated");
     }
 
