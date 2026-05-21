@@ -519,9 +519,6 @@ class GameLoadService {
                         }
                     }
                 }
-                case Constants.SLASH_COMMAND_STRING -> {
-                    // Slash command counts are now tracked in SQLite; ignore data from old game files.
-                }
                 case Constants.ACS_SABOD -> {
                     StringTokenizer voteInfo = new StringTokenizer(info, ":");
                     while (voteInfo.hasMoreTokens()) {

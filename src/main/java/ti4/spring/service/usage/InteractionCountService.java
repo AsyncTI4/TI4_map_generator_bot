@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.logging.BotLogger;
+import ti4.spring.context.SpringContext;
 
 @Service
 public class InteractionCountService {
@@ -17,6 +18,10 @@ public class InteractionCountService {
 
     public InteractionCountService(InteractionCountRepository repository) {
         this.repository = repository;
+    }
+
+    public static InteractionCountService get() {
+        return SpringContext.getBean(InteractionCountService.class);
     }
 
     @Transactional

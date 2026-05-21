@@ -87,7 +87,7 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
                 logSlashCommand(event);
                 command.execute(event);
                 command.postExecute(event);
-                SpringContext.getBean(InteractionCountService.class).incrementSlashCommand(event.getCommandString());
+                InteractionCountService.get().incrementSlashCommand(event.getCommandString());
                 if (!isModalCommand(event) && !resolvedCommand.isEphemeral(event)) {
                     event.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
                 }

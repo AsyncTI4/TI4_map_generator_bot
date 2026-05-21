@@ -1,22 +1,10 @@
 package ti4.service.statistics;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.executors.ExecutionLockType;
-import ti4.game.Game;
-import ti4.game.persistence.ConsumeGameUtility;
-import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.helpers.SortHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
-import ti4.model.ActionCardModel;
-import ti4.spring.context.SpringContext;
 import ti4.spring.service.usage.InteractionCountService;
 
 @UtilityClass
@@ -27,93 +15,17 @@ public class ListSlashCommandsUsedService {
     }
 
     private static void listSlashCommandsUsed(SlashCommandInteractionEvent event) {
-        AtomicInteger buttonsPressed = new AtomicInteger();
-        AtomicInteger acsSabod = new AtomicInteger();
-        AtomicInteger largestAmountOfButtonsIn1Game = new AtomicInteger();
-        AtomicReference<String> largestGame = new AtomicReference<>("");
-        boolean useOnlyLastMonth =
-                event.getOption(Constants.ONLY_LAST_MONTH, Boolean.FALSE, OptionMapping::getAsBoolean);
-        Map<String, Integer> actionCards = new HashMap<>();
-        Map<String, Integer> actionCardsPlayed = new HashMap<>();
+        InteractionCountService service = InteractionCountService.get();
+        long total = service.getTotalSlashCommandCount();
+        Map<String, Long> slashCommands = service.getSlashCommandCounts();
 
-        ConsumeGameUtility.consumeAllGames(
-                game -> consumeGame(
-                        game,
-                        useOnlyLastMonth,
-                        actionCards,
-                        actionCardsPlayed,
-                        largestGame,
-                        largestAmountOfButtonsIn1Game,
-                        buttonsPressed,
-                        acsSabod),
-                ExecutionLockType.READ);
-
-        InteractionCountService interactionCountService = SpringContext.getBean(InteractionCountService.class);
-        long slashCommandsUsed = interactionCountService.getTotalSlashCommandCount();
-        Map<String, Long> slashCommands = interactionCountService.getSlashCommandCounts();
-
-        StringBuilder longMsg = new StringBuilder("The number of button pressed so far recorded is " + buttonsPressed
-                + ". The largest number of buttons pressed in a single game is " + largestAmountOfButtonsIn1Game
-                + " in game " + largestGame + ". The number of slash commands used is " + slashCommandsUsed
-                + ". The number of action cards Sabo'd is " + acsSabod
-                + ". The following is the recorded frequency of slash commands \n");
-        Map<String, Long> sortedMapAsc = SortHelper.sortByLongValue(slashCommands, false);
-        for (Map.Entry<String, Long> entry : sortedMapAsc.entrySet()) {
-            longMsg.append(entry.getKey()).append(": ").append(entry.getValue()).append(" \n");
+        StringBuilder msg = new StringBuilder("The number of slash commands used is " + total
+                + ". The following is the recorded frequency of slash commands:\n");
+        Map<String, Long> sorted = SortHelper.sortByLongValue(slashCommands, false);
+        for (Map.Entry<String, Long> entry : sorted.entrySet()) {
+            msg.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
         }
-        longMsg.append(
-                "\n The number of times an action card has been Sabo'd is also being tracked. The following is their recorded frequency \n");
-        Map<String, Integer> sortedMapAscACs = SortHelper.sortByValue(actionCards, false);
-        for (Map.Entry<String, Integer> entry : sortedMapAscACs.entrySet()) {
-            String command = entry.getKey();
-            longMsg.append(command)
-                    .append(": ")
-                    .append(entry.getValue())
-                    .append(" out of ")
-                    .append(actionCardsPlayed.get(command))
-                    .append(" times played")
-                    .append(" \n");
-        }
-        MessageHelper.sendMessageToChannel(event.getChannel(), longMsg.toString());
-    }
-
-    private static void consumeGame(
-            Game game,
-            boolean useOnlyLastMonth,
-            Map<String, Integer> actionCards,
-            Map<String, Integer> actionCardsPlayed,
-            AtomicReference<String> largestGame,
-            AtomicInteger largestAmountOfButtonsIn1Game,
-            AtomicInteger buttonsPressed,
-            AtomicInteger acsSabod) {
-        if (useOnlyLastMonth
-                && Helper.getDateDifference(
-                                game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis()))
-                        > 30) {
-            return;
-        }
-        if (game.getButtonPressCount() > largestAmountOfButtonsIn1Game.get()) {
-            largestGame.set(game.getName());
-            largestAmountOfButtonsIn1Game.set(game.getButtonPressCount());
-        }
-        buttonsPressed.addAndGet(game.getButtonPressCount());
-        if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1698724000011L)) >= 0) {
-            return;
-        }
-        game.getAllActionCardsSabod().forEach((acName, numUsed) -> {
-            acsSabod.addAndGet(numUsed);
-            actionCards.merge(acName, numUsed, Integer::sum);
-        });
-        for (String acID : game.getDiscardActionCards().keySet()) {
-            ActionCardModel ac = Mapper.getActionCard(acID);
-            String acName = ac.getName();
-            actionCardsPlayed.merge(acName, 1, Integer::sum);
-        }
-        for (String acID : game.getPurgedActionCards().keySet()) {
-            ActionCardModel ac = Mapper.getActionCard(acID);
-            String acName = ac.getName();
-            actionCardsPlayed.merge(acName, 1, Integer::sum);
-        }
+        MessageHelper.sendMessageToChannel(event.getChannel(), msg.toString());
     }
 }
 

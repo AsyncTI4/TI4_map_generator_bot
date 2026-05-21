@@ -424,7 +424,7 @@ public class ButtonProcessor {
     private static void trackButtonHandler(String handlerId) {
         RollbarManager.put("button_handler_id", handlerId);
         if (handlerId != null) {
-            SpringContext.getBean(InteractionCountService.class).incrementButtonHandler(handlerId);
+            InteractionCountService.get().incrementButtonHandler(handlerId);
         }
     }
 
