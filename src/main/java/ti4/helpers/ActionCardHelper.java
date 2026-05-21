@@ -357,11 +357,14 @@ public class ActionCardHelper {
                         .append("_ `(")
                         .append(Helper.leftpad("" + ac.getValue(), 3))
                         .append(")`\n> ")
-                        .append(actionCard.hasWildText(game) ? actionCard.getWildWildWindow() : actionCard.getWindow())
-                        .append(": ")
-                        .append(actionCard.hasWildText(game) ? actionCard.getWildWildText() : actionCard.getText())
+                        .append(actionCard.getRepresentationJustText((game)))
                         .append('\n');
                 if (actionCard.getNotes() != null) {
+                    if (game != null
+                            && game.isTwilightKart()
+                            && actionCard.getID().equalsIgnoreCase("tf-starflare")) {
+                        continue;
+                    }
                     sb.append("> -# [").append(actionCard.getNotes()).append("]\n");
                 }
             }
@@ -760,7 +763,7 @@ public class ActionCardHelper {
         boolean actionCardIsCancelable = isActionCardCancelable(actionCard) && !twinned;
 
         String pingGame = actionCardIsCancelable ? game.getPing() + ", " : "";
-        String message = pingGame + (game.isFowMode() ? "someone" : player.getRepresentation());
+        String message = pingGame + (game.isFowMode() ? "someone" : player.getRepresentationNoPing());
         message += fromGarbozia ? " purged " : " played ";
         message += "the action card _" + actionCardTitle + "_";
         message += fromGarbozia ? " using _Dok 'N Pic's Salvage Yard_." : ".";

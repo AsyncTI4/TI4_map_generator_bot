@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -500,7 +501,7 @@ public final class ButtonHelperTacticalAction {
         if (FOWPlusService.isVoid(game, pos)) {
             tile = FOWPlusService.voidTile(pos);
         }
-        StringBuilder message = new StringBuilder(player.getRepresentationUnfogged() + " activated "
+        StringBuilder message = new StringBuilder(player.getRepresentationNoPing() + " activated "
                 + tile.getRepresentationForButtons(game, player) + ".");
 
         if (!game.isFowMode()) {
@@ -695,7 +696,7 @@ public final class ButtonHelperTacticalAction {
                 if (player != archive) {
                     msg += " If you do, " + archive.getRepresentationNoPing() + " will also draw 1 ability.";
                 }
-                msg += "-# You currently have " + player.getTg() + " trade goods.";
+                msg += "\n-# You currently have " + player.getTg() + " trade goods.";
 
                 List<Button> buttons = List.of(use, Buttons.DONE_DELETE_BUTTONS.withLabel("Decline"));
                 MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(archive.getCorrectChannel(), msg, buttons);
@@ -816,7 +817,7 @@ public final class ButtonHelperTacticalAction {
         // Send buttons to move
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", please choose the first system you wish to move from.",
+                player.getRepresentationNoPing() + ", please choose the first system you wish to move from.",
                 systemButtons);
 
         // Resolve other abilities

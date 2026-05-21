@@ -1881,7 +1881,7 @@ public final class ButtonHelperAbilities {
         Player pillaged = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " officially declined to **Pillage** "
+                player.getRepresentationNoPing() + " officially declined to **Pillage** "
                         + pillaged.getRepresentationNoPing() + ". How very generous of them!");
         ButtonHelper.deleteMessage(event);
     }
