@@ -89,7 +89,7 @@ public class SliceGenerationSettings extends SettingsMenu {
         List<String> historicIDs = new ArrayList<>(List.of("slice"));
         if (json != null
                 && json.has("menuId")
-                && historicIDs.contains(json.get("menuId").asText(""))) {
+                && historicIDs.contains(json.get("menuId").asString(""))) {
             numSlices.initialize(json.get("numSlices"));
             numFactions.initialize(json.get("numFactions"));
             minimumRes.initialize(json.get("minimumRes"));

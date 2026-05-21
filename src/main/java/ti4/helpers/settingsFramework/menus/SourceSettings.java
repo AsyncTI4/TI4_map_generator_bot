@@ -88,7 +88,7 @@ public class SourceSettings extends SettingsMenu {
         List<String> historicIDs = new ArrayList<>(List.of("source"));
         if (json != null
                 && json.has("menuId")
-                && historicIDs.contains(json.get("menuId").asText(""))) {
+                && historicIDs.contains(json.get("menuId").asString(""))) {
             base.initialize(json.get("base"));
             pok.initialize(json.get("pok"));
             codexes.initialize(json.get("codexes"));
