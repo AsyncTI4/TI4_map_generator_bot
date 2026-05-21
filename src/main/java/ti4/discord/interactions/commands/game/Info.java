@@ -345,7 +345,7 @@ class Info extends GameStateSubcommand {
                 .append('`')
                 .append('\n');
         sb.append("SlashCommands used: `")
-                .append(game.getSlashCommandsRunCount())
+                .append(game.getGameStats().getSlashCommandsRunCount())
                 .append('`')
                 .append('\n');
 

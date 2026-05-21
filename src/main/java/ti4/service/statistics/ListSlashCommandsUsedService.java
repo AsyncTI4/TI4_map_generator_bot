@@ -97,13 +97,13 @@ public class ListSlashCommandsUsedService {
             largestAmountOfButtonsIn1Game.set(game.getButtonPressCount());
         }
         buttonsPressed.addAndGet(game.getButtonPressCount());
-        slashCommandsUsed.addAndGet(game.getSlashCommandsRunCount());
-        game.getAllSlashCommandsUsed()
+        slashCommandsUsed.addAndGet(game.getGameStats().getSlashCommandsRunCount());
+        game.getGameStats().getSlashCommandsUsed()
                 .forEach((command, numUsed) -> slashCommands.merge(command, numUsed, Integer::sum));
         if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1698724000011L)) >= 0) {
             return;
         }
-        game.getAllActionCardsSabod().forEach((acName, numUsed) -> {
+        game.getGameStats().getActionCardsSabotaged().forEach((acName, numUsed) -> {
             acsSabod.addAndGet(numUsed);
             actionCards.merge(acName, numUsed, Integer::sum);
         });

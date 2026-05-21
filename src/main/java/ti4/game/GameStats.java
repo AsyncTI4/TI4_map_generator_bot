@@ -43,6 +43,10 @@ public class GameStats {
         actionCardsSabotaged.put(actionCardName, count);
     }
 
+    public void incrementActionCardSaboCount(String actionCardName) {
+        actionCardsSabotaged.merge(actionCardName, 1, Integer::sum);
+    }
+
     public void incrementOverruleCount(String faction, int strategyCard) {
         if (StringUtils.isBlank(faction)) {
             return;

@@ -50,12 +50,7 @@ class ActionCardButtonHandler {
         }
         String message = game.getPing() + ", the action card _" + acName + "_ played by " + target
                 + " has been canceled by " + player.getRepresentationUnfogged() + " with ";
-        Integer count = game.getAllActionCardsSabod().get(acName);
-        if (count == null) {
-            game.setSpecificActionCardSaboCount(acName, 1);
-        } else {
-            game.setSpecificActionCardSaboCount(acName, 1 + count);
-        }
+        game.getGameStats().incrementActionCardSaboCount(acName);
         GameMessageManager.remove(game.getName(), event.getMessageId());
         boolean sendReact = true;
         if ("empy".equalsIgnoreCase(type)) {

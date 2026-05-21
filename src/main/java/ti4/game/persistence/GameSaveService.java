@@ -420,7 +420,7 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.BUTTON_PRESS_COUNT + " " + game.getButtonPressCount());
         writer.write(System.lineSeparator());
-        writer.write(Constants.SLASH_COMMAND_COUNT + " " + game.getSlashCommandsRunCount());
+        writer.write(Constants.SLASH_COMMAND_COUNT + " " + game.getGameStats().getSlashCommandsRunCount());
         writer.write(System.lineSeparator());
         writer.write(Constants.GAME_CUSTOM_NAME + " " + game.getCustomName());
         writer.write(System.lineSeparator());

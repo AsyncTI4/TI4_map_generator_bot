@@ -38,7 +38,7 @@ class WinnuButtonHandler {
         boolean isOverrule = buttonID.contains("overrule");
         PlayStrategyCardService.playSC(event, sc, game, game.getMainGameChannel(), player, true, isOverrule);
         if (isOverrule) {
-            game.incrementOverruleCount(player.getFaction(), sc);
+            game.getGameStats().incrementOverruleCount(player.getFaction(), sc);
         }
         if (isOverrule && sc == 5 && !game.isFowMode()) {
             MessageHelper.sendMessageToChannel(

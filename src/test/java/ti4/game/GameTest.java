@@ -23,11 +23,12 @@ class GameTest {
         var game = new Game();
         game.setStoredValue("unrelated", "value");
 
-        game.incrementOverruleCount("hacan", 5);
-        game.incrementOverruleCount("hacan", 5);
-        game.incrementOverruleCount("jolnar", 3);
+        game.getGameStats().incrementOverruleCount("hacan", 5);
+        game.getGameStats().incrementOverruleCount("hacan", 5);
+        game.getGameStats().incrementOverruleCount("jolnar", 3);
 
-        assertThat(game.getAllOverruleCounts()).containsExactlyInAnyOrderEntriesOf(Map.of("hacan|5", 2, "jolnar|3", 1));
+        assertThat(game.getGameStats().getFlattenedOverruleCounts())
+                .containsExactlyInAnyOrderEntriesOf(Map.of("hacan|5", 2, "jolnar|3", 1));
         assertThat(game.getStoredValueMap()).containsOnlyKeys("unrelated");
     }
 

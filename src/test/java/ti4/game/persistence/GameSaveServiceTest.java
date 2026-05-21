@@ -13,9 +13,9 @@ class GameSaveServiceTest extends BaseTi4Test {
         try (var harness = TestGameHarness.forDefaultMap()) {
             Game game = harness.load();
             game.setLatestOutcomeVotedFor("testOutcome");
-            game.incrementSpecificSlashCommandCount("/statistics2 action_card_stats");
-            game.setSpecificActionCardSaboCount("Sabotage", 4);
-            game.setOverruleCount("hacan", 5, 2);
+            game.getGameStats().incrementSpecificSlashCommandCount("/statistics2 action_card_stats");
+            game.getGameStats().setSpecificActionCardSaboCount("Sabotage", 4);
+            game.getGameStats().setOverruleCount("hacan", 5, 2);
 
             boolean saved = GameSaveService.save(game, "test");
             assertThat(saved).isTrue();
@@ -23,9 +23,9 @@ class GameSaveServiceTest extends BaseTi4Test {
             Game reloaded = harness.load();
             assertThat(reloaded).isNotNull();
             assertThat(reloaded.getLatestOutcomeVotedFor()).isEqualTo("testOutcome");
-            assertThat(reloaded.getAllSlashCommandsUsed()).containsEntry("/statistics2 action_card_stats", 1);
-            assertThat(reloaded.getAllActionCardsSabod()).containsEntry("Sabotage", 4);
-            assertThat(reloaded.getAllOverruleCounts()).containsEntry("hacan|5", 2);
+            assertThat(reloaded.getGameStats().getSlashCommandsUsed()).containsEntry("/statistics2 action_card_stats", 1);
+            assertThat(reloaded.getGameStats().getActionCardsSabotaged()).containsEntry("Sabotage", 4);
+            assertThat(reloaded.getGameStats().getFlattenedOverruleCounts()).containsEntry("hacan|5", 2);
         }
     }
 }

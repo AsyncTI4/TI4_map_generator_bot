@@ -793,7 +793,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public int getSlashCommandsRunCount() {
-        return gameStats().getSlashCommandsRunCount();
+        return getGameStats().getSlashCommandsRunCount();
     }
 
     // This is presently only used to determine if an AC is NOT playable.
@@ -1378,12 +1378,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return thalnosUnits.getOrDefault(unit, 0);
     }
 
-    public Map<String, Integer> getAllSlashCommandsUsed() {
-        return gameStats().getSlashCommandsUsed();
-    }
-
-    public Map<String, Integer> getAllActionCardsSabod() {
-        return gameStats().getActionCardsSabotaged();
+    public void setSpecificThalnosUnit(String unit, int count) {
+        thalnosUnits.put(unit, count);
     }
 
     @Override
@@ -1394,43 +1390,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 && !"twilights_fall_sc".equals(getScSetID());
     }
 
-    public void setSpecificThalnosUnit(String unit, int count) {
-        thalnosUnits.put(unit, count);
-    }
-
-    public void incrementSpecificSlashCommandCount(String fullCommandName) {
-        gameStats().incrementSpecificSlashCommandCount(fullCommandName);
-    }
-
-    public void setSpecificSlashCommandCount(String command, int count) {
-        gameStats().setSpecificSlashCommandCount(command, count);
-    }
-
-    public void setSpecificActionCardSaboCount(String acName, int count) {
-        gameStats().setSpecificActionCardSaboCount(acName, count);
-    }
-
-    public void incrementOverruleCount(String faction, int strategyCard) {
-        gameStats().incrementOverruleCount(faction, strategyCard);
-    }
-
-    public void setOverruleCount(String faction, int strategyCard, int count) {
-        gameStats().setOverruleCount(faction, strategyCard, count);
-    }
-
-    public Map<String, Integer> getAllOverruleCounts() {
-        return gameStats().getFlattenedOverruleCounts();
-    }
-
     public void resetThalnosUnits() {
         thalnosUnits = new HashMap<>();
-    }
-
-    private GameStats gameStats() {
-        if (getGameStats() == null) {
-            setGameStats(new GameStats());
-        }
-        return getGameStats();
     }
 
     public void updateActivePlayer(Player player) {

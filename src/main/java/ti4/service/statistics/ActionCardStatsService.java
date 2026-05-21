@@ -51,12 +51,12 @@ public class ActionCardStatsService {
             Map<String, Integer> overruleCounts,
             AtomicInteger totalSabotages,
             AtomicInteger totalOverrules) {
-        game.getAllActionCardsSabod().forEach((actionCardName, count) -> {
+        game.getGameStats().getActionCardsSabotaged().forEach((actionCardName, count) -> {
             totalSabotages.addAndGet(count);
             sabotageCounts.merge(actionCardName, count, Integer::sum);
         });
 
-        game.getAllOverruleCounts().forEach((factionAndStrategyCard, count) -> {
+        game.getGameStats().getFlattenedOverruleCounts().forEach((factionAndStrategyCard, count) -> {
             totalOverrules.addAndGet(count);
             overruleCounts.merge(factionAndStrategyCard, count, Integer::sum);
         });
