@@ -344,10 +344,6 @@ class Info extends GameStateSubcommand {
                 .append(game.getButtonPressCount())
                 .append('`')
                 .append('\n');
-        sb.append("SlashCommands used: `")
-                .append(game.getSlashCommandsRunCount())
-                .append('`')
-                .append('\n');
 
         return sb;
     }

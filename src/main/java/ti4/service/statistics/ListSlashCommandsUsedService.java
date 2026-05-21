@@ -16,6 +16,8 @@ import ti4.helpers.SortHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.usage.InteractionCountService;
 
 @UtilityClass
 public class ListSlashCommandsUsedService {
@@ -26,37 +28,37 @@ public class ListSlashCommandsUsedService {
 
     private static void listSlashCommandsUsed(SlashCommandInteractionEvent event) {
         AtomicInteger buttonsPressed = new AtomicInteger();
-        AtomicInteger slashCommandsUsed = new AtomicInteger();
         AtomicInteger acsSabod = new AtomicInteger();
         AtomicInteger largestAmountOfButtonsIn1Game = new AtomicInteger();
         AtomicReference<String> largestGame = new AtomicReference<>("");
         boolean useOnlyLastMonth =
                 event.getOption(Constants.ONLY_LAST_MONTH, Boolean.FALSE, OptionMapping::getAsBoolean);
-        Map<String, Integer> slashCommands = new HashMap<>();
         Map<String, Integer> actionCards = new HashMap<>();
         Map<String, Integer> actionCardsPlayed = new HashMap<>();
 
         ConsumeGameUtility.consumeAllGames(
-                game -> listSlashCommandsUsed(
+                game -> consumeGame(
                         game,
                         useOnlyLastMonth,
-                        slashCommands,
                         actionCards,
                         actionCardsPlayed,
                         largestGame,
                         largestAmountOfButtonsIn1Game,
                         buttonsPressed,
-                        slashCommandsUsed,
                         acsSabod),
                 ExecutionLockType.READ);
+
+        InteractionCountService interactionCountService = SpringContext.getBean(InteractionCountService.class);
+        long slashCommandsUsed = interactionCountService.getTotalSlashCommandCount();
+        Map<String, Long> slashCommands = interactionCountService.getSlashCommandCounts();
 
         StringBuilder longMsg = new StringBuilder("The number of button pressed so far recorded is " + buttonsPressed
                 + ". The largest number of buttons pressed in a single game is " + largestAmountOfButtonsIn1Game
                 + " in game " + largestGame + ". The number of slash commands used is " + slashCommandsUsed
                 + ". The number of action cards Sabo'd is " + acsSabod
                 + ". The following is the recorded frequency of slash commands \n");
-        Map<String, Integer> sortedMapAsc = SortHelper.sortByValue(slashCommands, false);
-        for (Map.Entry<String, Integer> entry : sortedMapAsc.entrySet()) {
+        Map<String, Long> sortedMapAsc = SortHelper.sortByLongValue(slashCommands, false);
+        for (Map.Entry<String, Long> entry : sortedMapAsc.entrySet()) {
             longMsg.append(entry.getKey()).append(": ").append(entry.getValue()).append(" \n");
         }
         longMsg.append(
@@ -75,16 +77,14 @@ public class ListSlashCommandsUsedService {
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg.toString());
     }
 
-    private static void listSlashCommandsUsed(
+    private static void consumeGame(
             Game game,
             boolean useOnlyLastMonth,
-            Map<String, Integer> slashCommands,
             Map<String, Integer> actionCards,
             Map<String, Integer> actionCardsPlayed,
             AtomicReference<String> largestGame,
             AtomicInteger largestAmountOfButtonsIn1Game,
             AtomicInteger buttonsPressed,
-            AtomicInteger slashCommandsUsed,
             AtomicInteger acsSabod) {
         if (useOnlyLastMonth
                 && Helper.getDateDifference(
@@ -97,9 +97,6 @@ public class ListSlashCommandsUsedService {
             largestAmountOfButtonsIn1Game.set(game.getButtonPressCount());
         }
         buttonsPressed.addAndGet(game.getButtonPressCount());
-        slashCommandsUsed.addAndGet(game.getSlashCommandsRunCount());
-        game.getAllSlashCommandsUsed()
-                .forEach((command, numUsed) -> slashCommands.merge(command, numUsed, Integer::sum));
         if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1698724000011L)) >= 0) {
             return;
         }
@@ -119,3 +116,4 @@ public class ListSlashCommandsUsedService {
         }
     }
 }
+

@@ -43,6 +43,7 @@ import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
+import ti4.spring.service.usage.InteractionCountService;
 
 @UtilityClass
 public class ButtonProcessor {
@@ -169,7 +170,10 @@ public class ButtonProcessor {
         if (!CombatContestSettings.isEnabledStatic() && isCombatReplayButton(buttonID)) return;
 
         // Check the list of ButtonHandlers first
-        if (registry.handle(buttonID, context)) return;
+        if (registry.handle(buttonID, context)) {
+            trackButtonHandler(registry.findHandlerKey(buttonID));
+            return;
+        }
 
         // TODO Convert all else..if..startsWith to use @ButtonHandler
         if (false) {
@@ -419,6 +423,9 @@ public class ButtonProcessor {
 
     private static void trackButtonHandler(String handlerId) {
         RollbarManager.put("button_handler_id", handlerId);
+        if (handlerId != null) {
+            SpringContext.getBean(InteractionCountService.class).incrementButtonHandler(handlerId);
+        }
     }
 
     public static String getButtonProcessingStatistics() {

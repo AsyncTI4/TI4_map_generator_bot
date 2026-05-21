@@ -520,18 +520,7 @@ class GameLoadService {
                     }
                 }
                 case Constants.SLASH_COMMAND_STRING -> {
-                    StringTokenizer commandCounts = new StringTokenizer(info, ":");
-                    while (commandCounts.hasMoreTokens()) {
-                        StringTokenizer dataInfoTokens = new StringTokenizer(commandCounts.nextToken(), ",");
-                        String commandName = null;
-                        if (dataInfoTokens.hasMoreTokens()) {
-                            commandName = dataInfoTokens.nextToken();
-                        }
-                        if (dataInfoTokens.hasMoreTokens()) {
-                            String dataInfo = dataInfoTokens.nextToken();
-                            game.setSpecificSlashCommandCount(commandName, Integer.parseInt(dataInfo));
-                        }
-                    }
+                    // Slash command counts are now tracked in SQLite; ignore data from old game files.
                 }
                 case Constants.ACS_SABOD -> {
                     StringTokenizer voteInfo = new StringTokenizer(info, ":");
