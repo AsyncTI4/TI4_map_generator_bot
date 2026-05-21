@@ -103,10 +103,6 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
 public class Game extends GameProperties implements StoredValueHelper, TwilightFallDeckFuncs {
-    public static final String OVERRULE_STATS_KEY_PREFIX = "overrule_stats_";
-    public static final String OVERRULE_STATS_KEY_SEPARATOR = "|";
-
-
     private static final JsonMapper mapper = JsonMapperManager.basic();
 
     // TODO (Jazz): Sort through these and add to GameProperties
@@ -130,9 +126,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     // TODO (Jazz): These should be easily added to GameProperties
     @Getter
     private Map<String, Integer> thalnosUnits = new HashMap<>();
-
-    private final Map<String, Integer> slashCommandsUsed = new HashMap<>();
-    private final Map<String, Integer> actionCardsSabotaged = new HashMap<>();
 
     @Getter
     private Map<String, String> currentAgendaVotes = new HashMap<>();
@@ -800,7 +793,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public int getSlashCommandsRunCount() {
-        return slashCommandsUsed.values().stream().mapToInt(Integer::intValue).sum();
+        return gameStats().getSlashCommandsRunCount();
     }
 
     // This is presently only used to determine if an AC is NOT playable.
@@ -1386,11 +1379,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public Map<String, Integer> getAllSlashCommandsUsed() {
-        return slashCommandsUsed;
+        return gameStats().getSlashCommandsUsed();
     }
 
     public Map<String, Integer> getAllActionCardsSabod() {
-        return actionCardsSabotaged;
+        return gameStats().getActionCardsSabotaged();
     }
 
     @Override
@@ -1406,58 +1399,38 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void incrementSpecificSlashCommandCount(String fullCommandName) {
-        slashCommandsUsed.merge(fullCommandName, 1, (oldValue, newValue) -> oldValue + 1);
+        gameStats().incrementSpecificSlashCommandCount(fullCommandName);
     }
 
     public void setSpecificSlashCommandCount(String command, int count) {
-        slashCommandsUsed.put(command, count);
+        gameStats().setSpecificSlashCommandCount(command, count);
     }
 
     public void setSpecificActionCardSaboCount(String acName, int count) {
-        actionCardsSabotaged.put(acName, count);
+        gameStats().setSpecificActionCardSaboCount(acName, count);
     }
 
     public void incrementOverruleCount(String faction, int strategyCard) {
-        if (StringUtils.isBlank(faction)) {
-            return;
-        }
-        String key = getOverruleStatsKey(faction, strategyCard);
-        int count = getStoredIntValue(key, 0);
-        setStoredValue(key, Integer.toString(count + 1));
+        gameStats().incrementOverruleCount(faction, strategyCard);
+    }
+
+    public void setOverruleCount(String faction, int strategyCard, int count) {
+        gameStats().setOverruleCount(faction, strategyCard, count);
     }
 
     public Map<String, Integer> getAllOverruleCounts() {
-        Map<String, Integer> overruleCounts = new LinkedHashMap<>();
-        getStoredValueMap().keySet().stream()
-                .filter(key -> key.startsWith(OVERRULE_STATS_KEY_PREFIX))
-                .forEach(key -> {
-                    String value = getStoredValue(key);
-                    if (StringUtils.isNotBlank(value)) {
-                        overruleCounts.put(key.substring(OVERRULE_STATS_KEY_PREFIX.length()), getStoredIntValue(key, 0));
-                    }
-                });
-        return overruleCounts;
-    }
-
-    private String getOverruleStatsKey(String faction, int strategyCard) {
-        return OVERRULE_STATS_KEY_PREFIX + faction + OVERRULE_STATS_KEY_SEPARATOR + strategyCard;
-    }
-
-    private int getStoredIntValue(String key, int defaultValue) {
-        return Optional.ofNullable(getStoredValue(key))
-                .filter(StringUtils::isNotBlank)
-                .map(value -> {
-                    try {
-                        return Integer.parseInt(value);
-                    } catch (NumberFormatException e) {
-                        return defaultValue;
-                    }
-                })
-                .orElse(defaultValue);
+        return gameStats().getFlattenedOverruleCounts();
     }
 
     public void resetThalnosUnits() {
         thalnosUnits = new HashMap<>();
+    }
+
+    private GameStats gameStats() {
+        if (getGameStats() == null) {
+            setGameStats(new GameStats());
+        }
+        return getGameStats();
     }
 
     public void updateActivePlayer(Player player) {

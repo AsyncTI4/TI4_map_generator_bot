@@ -278,20 +278,8 @@ class GameSaveService {
         writer.write(Constants.THALNOS_UNITS + " " + sb16);
         writer.write(System.lineSeparator());
 
-        Map<String, Integer> slashCommands = game.getAllSlashCommandsUsed();
-        StringBuilder sb10 = new StringBuilder();
-        for (Map.Entry<String, Integer> entry : slashCommands.entrySet()) {
-            sb10.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
-        }
-        writer.write(Constants.SLASH_COMMAND_STRING + " " + sb10);
-        writer.write(System.lineSeparator());
-
-        Map<String, Integer> acSabod = game.getAllActionCardsSabod();
-        StringBuilder sb11 = new StringBuilder();
-        for (Map.Entry<String, Integer> entry : acSabod.entrySet()) {
-            sb11.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
-        }
-        writer.write(Constants.ACS_SABOD + " " + sb11);
+        String gameStats = mapper.writeValueAsString(game.getGameStats());
+        writer.write(Constants.GAME_STATS + " " + gameStats);
         writer.write(System.lineSeparator());
 
         String displacedUnits = mapper.writeValueAsString(game.getTacticalActionDisplacement());

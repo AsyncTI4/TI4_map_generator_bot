@@ -46,9 +46,11 @@ import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.draft.BagDraft;
 import ti4.game.Game;
+import ti4.game.GameStats;
 import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -501,10 +503,17 @@ class GameLoadService {
                         }
                         if (dataInfoTokens.hasMoreTokens()) {
                             String dataInfo = dataInfoTokens.nextToken();
-                            game.setStoredValue(outcome, dataInfo);
+                            if (outcome != null
+                                    && outcome.startsWith(GameStats.OVERRULE_STATS_KEY_PREFIX)
+                                    && isNotBlank(dataInfo)) {
+                                migrateLegacyOverruleStat(game, outcome, dataInfo);
+                            } else {
+                                game.setStoredValue(outcome, dataInfo);
+                            }
                         }
                     }
                 }
+                case Constants.GAME_STATS -> game.setGameStats(mapper.readValue(info, GameStats.class));
                 case Constants.THALNOS_UNITS -> {
                     StringTokenizer thalnosInfoTokens = new StringTokenizer(info, ":");
                     while (thalnosInfoTokens.hasMoreTokens()) {
@@ -784,6 +793,21 @@ class GameLoadService {
             data.put(id, val);
         }
         return data;
+    }
+
+    private static void migrateLegacyOverruleStat(Game game, String key, String value) {
+        String legacyKey = StringHelper.unescape(key);
+        String overruleKey = legacyKey.substring(GameStats.OVERRULE_STATS_KEY_PREFIX.length());
+        int separatorIndex = overruleKey.indexOf(GameStats.OVERRULE_STATS_KEY_SEPARATOR);
+        if (separatorIndex < 0 || separatorIndex >= overruleKey.length() - 1) {
+            return;
+        }
+        String faction = overruleKey.substring(0, separatorIndex);
+        String strategyCard = overruleKey.substring(separatorIndex + 1);
+        if (isBlank(faction) || !StringUtils.isNumeric(strategyCard) || !StringUtils.isNumeric(value)) {
+            return;
+        }
+        game.setOverruleCount(faction, Integer.parseInt(strategyCard), Integer.parseInt(value));
     }
 
     private static Map<String, Boolean> getParsedStrBoolMap(String tokenizer) {

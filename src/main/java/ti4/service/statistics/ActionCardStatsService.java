@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
+import ti4.game.GameStats;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -135,10 +136,10 @@ public class ActionCardStatsService {
     }
 
     private static String formatOverruleKey(String key) {
-        int separatorIndex = key.indexOf(Game.OVERRULE_STATS_KEY_SEPARATOR);
+        int separatorIndex = key.indexOf(GameStats.OVERRULE_STATS_KEY_SEPARATOR);
         if (separatorIndex < 0
                 || separatorIndex >= key.length() - 1
-                || separatorIndex != key.lastIndexOf(Game.OVERRULE_STATS_KEY_SEPARATOR)) {
+                || separatorIndex != key.lastIndexOf(GameStats.OVERRULE_STATS_KEY_SEPARATOR)) {
             return null;
         }
         String faction = key.substring(0, separatorIndex);

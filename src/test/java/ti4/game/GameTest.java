@@ -28,6 +28,7 @@ class GameTest {
         game.incrementOverruleCount("jolnar", 3);
 
         assertThat(game.getAllOverruleCounts()).containsExactlyInAnyOrderEntriesOf(Map.of("hacan|5", 2, "jolnar|3", 1));
+        assertThat(game.getStoredValueMap()).containsOnlyKeys("unrelated");
     }
 
     private Game createThreePlayerGame() {
