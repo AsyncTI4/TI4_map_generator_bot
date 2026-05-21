@@ -30,9 +30,9 @@ public class UnusedCommanderHelper {
                 commanderName = "kelerescommander";
             }
             if (game.getFactions().contains(faction.getAlias())
-                    || (faction.getAlias().equalsIgnoreCase("obsidian")
+                    || ("obsidian".equalsIgnoreCase(faction.getAlias())
                             && game.getFactions().contains("firmament"))
-                    || (faction.getAlias().equalsIgnoreCase("firmament")
+                    || ("firmament".equalsIgnoreCase(faction.getAlias())
                             && game.getFactions().contains("obsidian"))
                     || (game.isMinorFactionsMode() && game.getTile(faction.getHomeSystem()) != null)
                     || (Helper.getPlayerFromLeader(game, commanderName) != null)

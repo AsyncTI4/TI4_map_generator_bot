@@ -360,9 +360,7 @@ public class ActionCardHelper {
                         .append(actionCard.getRepresentationJustText((game)))
                         .append('\n');
                 if (actionCard.getNotes() != null) {
-                    if (game != null
-                            && game.isTwilightKart()
-                            && actionCard.getID().equalsIgnoreCase("tf-starflare")) {
+                    if (game != null && game.isTwilightKart() && "tf-starflare".equalsIgnoreCase(actionCard.getID())) {
                         continue;
                     }
                     sb.append("> -# [").append(actionCard.getNotes()).append("]\n");
