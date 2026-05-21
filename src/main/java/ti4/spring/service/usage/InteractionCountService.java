@@ -26,7 +26,9 @@ public class InteractionCountService {
     @Transactional
     public void incrementSlashCommand(String commandName) {
         try {
-            repository.incrementCount(commandName, LocalDate.now().toString());
+            String today = LocalDate.now().toString();
+            repository.insertIfAbsent(commandName, today);
+            repository.incrementExisting(commandName, today);
         } catch (Exception e) {
             BotLogger.error("Failed to increment slash command count for: " + commandName, e);
         }

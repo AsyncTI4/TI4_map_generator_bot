@@ -10,10 +10,15 @@ public interface SlashCommandCountRepository extends JpaRepository<SlashCommandC
 
     @Modifying
     @Query(
-            value =
-                    "INSERT INTO slash_command_count (name, date, count) VALUES (:name, :date, 1) ON CONFLICT(name, date) DO UPDATE SET count = count + 1",
+            value = "INSERT OR IGNORE INTO slash_command_count (name, date, count) VALUES (:name, :date, 0)",
             nativeQuery = true)
-    void incrementCount(@Param("name") String name, @Param("date") String date);
+    void insertIfAbsent(@Param("name") String name, @Param("date") String date);
+
+    @Modifying
+    @Query(
+            value = "UPDATE slash_command_count SET count = count + 1 WHERE name = :name AND date = :date",
+            nativeQuery = true)
+    void incrementExisting(@Param("name") String name, @Param("date") String date);
 
     @Query(value = "SELECT name, SUM(count) as total FROM slash_command_count GROUP BY name", nativeQuery = true)
     List<Object[]> sumAllByName();
