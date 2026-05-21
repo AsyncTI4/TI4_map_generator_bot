@@ -66,7 +66,7 @@ public class ActionCardStatsService {
             Map<String, Integer> actionCardsPlayedCounts,
             Map<String, Integer> overruleCounts,
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
-        if (game.getStartedDate() >= PLAYER_TRACKING_START_MILLIS) {
+        if (game.getCreationDateTime() >= PLAYER_TRACKING_START_MILLIS) {
             for (ActionCardPlay actionCardPlay : game.getGameStats().getActionCardPlays()) {
                 trackedPlayCounts.merge(actionCardPlay.getActionCard(), 1, Integer::sum);
             }
@@ -168,7 +168,7 @@ public class ActionCardStatsService {
 
     static void accumulateActionCardPlayToWinCorrelation(
             Game game, Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
-        if (game.getStartedDate() < PLAYER_TRACKING_START_MILLIS) {
+        if (game.getCreationDateTime() < PLAYER_TRACKING_START_MILLIS) {
             return;
         }
 
