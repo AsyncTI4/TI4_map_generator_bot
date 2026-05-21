@@ -57,7 +57,7 @@ public class MahactKingDraftableSettings extends SettingsMenu {
         // Load JSON if applicable
         if (!(json == null
                 || !json.has("menuId")
-                || !MENU_ID.equals(json.get("menuId").asText("")))) {
+                || !MENU_ID.equals(json.get("menuId").asString("")))) {
             numFactions.initialize(json.get("numFactions"));
             banFactions.initialize(json.get("banFactions"));
             priFactions.initialize(json.get("priFactions"));

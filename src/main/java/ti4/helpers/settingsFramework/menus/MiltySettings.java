@@ -68,7 +68,7 @@ public class MiltySettings extends SettingsMenu {
         List<String> historicIDs = List.of("milty", "main");
         if (json != null
                 && json.has("menuId")
-                && historicIDs.contains(json.get("menuId").asText(""))) {
+                && historicIDs.contains(json.get("menuId").asString(""))) {
             draftMode.initialize(json.get("draftMode"));
         }
 

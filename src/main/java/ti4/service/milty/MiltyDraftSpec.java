@@ -2,6 +2,7 @@ package ti4.service.milty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
 import ti4.game.Game;
 import ti4.helpers.settingsFramework.menus.GameSettings;
@@ -18,6 +19,7 @@ public class MiltyDraftSpec {
     public List<String> playerIDs, bannedFactions, priorityFactions, playerDraftOrder;
     public MapTemplateModel template;
     public List<Source.ComponentSource> tileSources, factionSources;
+    public Map<Source.ComponentSource, int[]> sourceConstraints;
     public Integer numSlices, numFactions;
 
     // slice generation settings
@@ -85,6 +87,7 @@ public class MiltyDraftSpec {
         SourceSettings sources = settings.getSourceSettings();
         specs.tileSources = sources.getTileSources();
         specs.factionSources = sources.getFactionSources();
+        specs.sourceConstraints = pfSettings.getFactionSourceSettings().getConstraintMap();
 
         if (sliceSettings.getParsedSlices() != null) {
             specs.presetSlices = sliceSettings.getParsedSlices();

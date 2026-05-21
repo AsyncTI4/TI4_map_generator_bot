@@ -91,7 +91,7 @@ public class DraftSystemSettings extends SettingsMenu {
         // Load JSON if applicable
         if (json != null
                 && json.has("menuId")
-                && MENU_ID.equals(json.get("menuId").asText(""))) {
+                && MENU_ID.equals(json.get("menuId").asString(""))) {
             draftOrchestrator.initialize(json.get("draftOrchestrator"));
             draftablesList.initialize(json.get("draftablesList"));
             preset = json.get("preset") != null ? json.get("preset").asText(null) : null;
