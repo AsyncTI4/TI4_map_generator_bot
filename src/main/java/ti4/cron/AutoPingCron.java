@@ -288,9 +288,11 @@ public class AutoPingCron {
 
     private static void statusHomeworkPing(Game game, long milliSinceLastPing) {
         if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS / 2 * game.getAutoPingSpacer())) {
+
             StringBuilder msg = new StringBuilder();
             for (Player player : game.getRealPlayers()) {
-                if (!game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
+                if (game.getStoredValue("statusHomeworkReactionFor" + player.getFaction() + "Round" + game.getRound())
+                        .isEmpty()) {
                     if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(
                                 player.getCorrectChannel(),

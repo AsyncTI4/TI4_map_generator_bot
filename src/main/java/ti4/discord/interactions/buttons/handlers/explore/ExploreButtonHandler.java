@@ -90,7 +90,7 @@ class ExploreButtonHandler {
             return;
         }
 
-        String message = player.getRepresentation() + " is using a mech to resolve _Volatile Fuel Source_.";
+        String message = player.getRepresentationNoPing() + " is using a mech to resolve _Volatile Fuel Source_.";
         message +=
                 " Please gain 1 command token. Your current command tokens are " + player.getCCRepresentation() + ".";
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
@@ -148,7 +148,7 @@ class ExploreButtonHandler {
         }
 
         PlanetService.refreshPlanet(player, planetID);
-        String message = player.getRepresentation() + " is using a mech to resolve _Expedition_. ";
+        String message = player.getRepresentationNoPing() + " is using a mech to resolve _Expedition_. ";
         message += Helper.getPlanetRepresentation(planetID, game) + " has been readied.";
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         ButtonHelper.deleteMessage(event);
@@ -184,7 +184,7 @@ class ExploreButtonHandler {
             return;
         }
 
-        String message = player.getRepresentation() + " is using a mech to resolve _Core Mine_.";
+        String message = player.getRepresentationNoPing() + " is using a mech to resolve _Core Mine_.";
         message += " Gained 1 trade good " + player.gainTG(1, true) + ".";
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
@@ -233,7 +233,7 @@ class ExploreButtonHandler {
 
         AddUnitService.addUnits(
                 event, game.getTileFromPlanet(planetID), game, player.getColor(), placedUnit + " " + planetID);
-        String message = player.getRepresentation() + " is using a mech to resolve _War Forge Ruins_.";
+        String message = player.getRepresentationNoPing() + " is using a mech to resolve _War Forge Ruins_.";
         message += " Placing " + placedUnit + " on " + Helper.getPlanetRepresentation(planetID, game) + ".";
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         ButtonHelper.deleteMessage(event);
