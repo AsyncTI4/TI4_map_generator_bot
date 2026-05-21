@@ -51,7 +51,7 @@ class ActionCardButtonHandler {
         }
         String message = game.getPing() + ", the action card _" + acName + "_ played by " + target
                 + " has been canceled by " + player.getRepresentationUnfogged() + " with ";
-        game.getGameStats().recordAcPlayWithTarget(GameStats.SABOTAGE, acName);
+        game.getGameStats().recordAcPlayWithTarget(GameStats.SABOTAGE, player, acName);
         GameMessageManager.remove(game.getName(), event.getMessageId());
         boolean sendReact = true;
         if ("empy".equalsIgnoreCase(type)) {

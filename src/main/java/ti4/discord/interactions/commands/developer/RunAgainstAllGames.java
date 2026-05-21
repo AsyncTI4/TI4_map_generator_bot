@@ -46,6 +46,6 @@ class RunAgainstAllGames extends Subcommand {
         // Migration: move old action-card sabotage stats from text-based persistence (ACS_SABOD)
         // into the GameStats JSON object. These are loaded during deserialization of old game files,
         // so returning true for any game with AC play stats forces a re-save in the new format.
-        return !game.getGameStats().getAcPlayStats().isEmpty();
+        return !game.getGameStats().getActionCardPlays().isEmpty();
     }
 }

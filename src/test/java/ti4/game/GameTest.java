@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import ti4.helpers.Constants;
+import ti4.json.JsonMapperManager;
 
 class GameTest {
 
@@ -19,22 +20,38 @@ class GameTest {
     }
 
     @Test
-    void shouldTrackAcPlaysWithTargets() {
+    void shouldTrackAcPlaysWithPlayersAndOptionalTargets() {
         var game = new Game();
         game.setStoredValue("unrelated", "value");
+        var player = createPlayer("player1", Set.of(), game);
 
-        game.getGameStats().recordAcPlayWithTarget(GameStats.OVERRULE, "leadership");
-        game.getGameStats().recordAcPlayWithTarget(GameStats.OVERRULE, "leadership");
-        game.getGameStats().recordAcPlayWithTarget(GameStats.OVERRULE, "politics");
-        game.getGameStats().recordAcPlayWithTarget(GameStats.SABOTAGE, "Divert Funding");
+        game.getGameStats().recordAcPlayWithTarget(GameStats.OVERRULE, player, "leadership");
+        game.getGameStats().recordAcPlayWithTarget(GameStats.OVERRULE, player, "leadership");
+        game.getGameStats().recordAcPlayWithTarget(GameStats.OVERRULE, player, "politics");
+        game.getGameStats().recordAcPlay(GameStats.SABOTAGE, player);
 
         assertThat(game.getGameStats().getCountPerTarget(GameStats.OVERRULE))
                 .containsExactlyInAnyOrderEntriesOf(Map.of("leadership", 2, "politics", 1));
         assertThat(game.getGameStats().getTotalPlays(GameStats.OVERRULE)).isEqualTo(3);
-        assertThat(game.getGameStats().getCountPerTarget(GameStats.SABOTAGE))
-                .containsExactlyInAnyOrderEntriesOf(Map.of("Divert Funding", 1));
+        assertThat(game.getGameStats().getCountPerTarget(GameStats.SABOTAGE)).isEmpty();
         assertThat(game.getGameStats().getTotalPlays(GameStats.SABOTAGE)).isEqualTo(1);
+        assertThat(game.getGameStats().getActionCardPlays())
+                .extracting(GameStats.ActionCardPlay::getPlayerId)
+                .containsOnly("player1");
         assertThat(game.getStoredValueMap()).containsOnlyKeys("unrelated");
+    }
+
+    @Test
+    void shouldOnlySerializeNonEmptyTargetsForActionCardPlays() {
+        var game = new Game();
+        var player = createPlayer("player1", Set.of(), game);
+
+        game.getGameStats().recordAcPlayWithTarget(GameStats.OVERRULE, player, "leadership");
+        game.getGameStats().recordAcPlay(GameStats.SABOTAGE, player);
+
+        var json = JsonMapperManager.basic().valueToTree(game.getGameStats()).get("actionCardPlays");
+        assertThat(json.get(0).get("target").asText()).isEqualTo("leadership");
+        assertThat(json.get(1).has("target")).isFalse();
     }
 
     private Game createThreePlayerGame() {

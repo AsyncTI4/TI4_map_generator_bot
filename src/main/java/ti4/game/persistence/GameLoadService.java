@@ -531,6 +531,7 @@ class GameLoadService {
                         }
                         if (dataInfoTokens.hasMoreTokens()) {
                             String dataInfo = dataInfoTokens.nextToken();
+                            // TODO Remove this legacy ACS_SABOD migration path once all game files have been migrated.
                             game.getGameStats().setSpecificActionCardSaboCount(outcome, Integer.parseInt(dataInfo));
                         }
                     }

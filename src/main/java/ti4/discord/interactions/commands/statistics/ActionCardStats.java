@@ -8,7 +8,7 @@ import ti4.service.statistics.ActionCardStatsService;
 class ActionCardStats extends Subcommand {
 
     ActionCardStats() {
-        super(Constants.ACTION_CARD_STATS, "Action card Sabotage and Overrule statistics");
+        super(Constants.ACTION_CARD_STATS, "Action card play statistics");
         addOptions(GameStatisticsFilterer.gameStatsFilters());
     }
 
