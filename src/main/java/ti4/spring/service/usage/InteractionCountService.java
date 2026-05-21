@@ -13,9 +13,9 @@ import ti4.spring.context.SpringContext;
 @Service
 public class InteractionCountService {
 
-    private final InteractionCountRepository repository;
+    private final SlashCommandCountRepository repository;
 
-    public InteractionCountService(InteractionCountRepository repository) {
+    public InteractionCountService(SlashCommandCountRepository repository) {
         this.repository = repository;
     }
 

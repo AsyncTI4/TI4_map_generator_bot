@@ -18,7 +18,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "slash_command_count", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "date"}))
-public class InteractionCountEntity {
+public class SlashCommandCountEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +33,7 @@ public class InteractionCountEntity {
     @Column(name = "count", nullable = false)
     private long count;
 
-    public InteractionCountEntity(String name, LocalDate date, long count) {
+    public SlashCommandCountEntity(String name, LocalDate date, long count) {
         this.name = name;
         this.date = date;
         this.count = count;
@@ -43,7 +43,7 @@ public class InteractionCountEntity {
     public boolean equals(Object other) {
         if (this == other) return true;
         if (other == null || getClass() != other.getClass()) return false;
-        InteractionCountEntity that = (InteractionCountEntity) other;
+        SlashCommandCountEntity that = (SlashCommandCountEntity) other;
         return Objects.equals(name, that.name) && Objects.equals(date, that.date);
     }
 
