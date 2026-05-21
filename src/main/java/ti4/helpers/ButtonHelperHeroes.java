@@ -1484,7 +1484,7 @@ public class ButtonHelperHeroes {
     public static void augersHeroResolution(Player player, Game game, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
-            if(game.getPublicObjectives1Peekable().isEmpty()){
+            if (game.getPublicObjectives1Peekable().isEmpty()) {
                 game.setUpPeekableObjectives(1, 1);
             }
             for (int x = 0; x < 3; x++) {

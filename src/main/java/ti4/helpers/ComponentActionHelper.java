@@ -2,9 +2,6 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.lang3.function.Consumers;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -12,6 +9,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
@@ -77,7 +75,9 @@ public class ComponentActionHelper {
                 if ("lgf".equals(tech) && !p1.controlsMecatol(false)) {
                     continue;
                 }
-                if ("tf-fabrication".equalsIgnoreCase(tech) || "tf-orbitaldrop".equalsIgnoreCase(tech) || "tf-stalltactics".equalsIgnoreCase(tech)) {
+                if ("tf-fabrication".equalsIgnoreCase(tech)
+                        || "tf-orbitaldrop".equalsIgnoreCase(tech)
+                        || "tf-stalltactics".equalsIgnoreCase(tech)) {
                     continue;
                 }
                 Button tButton = Buttons.red(factionChecker + "exhaustTech_" + tech, "Exhaust " + techName, techEmoji);

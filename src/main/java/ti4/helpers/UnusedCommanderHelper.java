@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.image.Mapper;
@@ -31,8 +30,10 @@ public class UnusedCommanderHelper {
                 commanderName = "kelerescommander";
             }
             if (game.getFactions().contains(faction.getAlias())
-                    || (faction.getAlias().equalsIgnoreCase("obsidian") && game.getFactions().contains("firmament"))
-                    || (faction.getAlias().equalsIgnoreCase("firmament") && game.getFactions().contains("obsidian"))
+                    || (faction.getAlias().equalsIgnoreCase("obsidian")
+                            && game.getFactions().contains("firmament"))
+                    || (faction.getAlias().equalsIgnoreCase("firmament")
+                            && game.getFactions().contains("obsidian"))
                     || (game.isMinorFactionsMode() && game.getTile(faction.getHomeSystem()) != null)
                     || (Helper.getPlayerFromLeader(game, commanderName) != null)
                     || commanders.contains(commanderName)
