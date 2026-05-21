@@ -10,27 +10,45 @@ public interface SlashCommandCountRepository extends JpaRepository<SlashCommandC
 
     @Modifying
     @Query(
-            value = "INSERT OR IGNORE INTO slash_command_count (name, date, count) VALUES (:name, :date, 0)",
+            value =
+                    "INSERT INTO slash_command_count (name, date, count) "
+                            + "SELECT :name, :date, 1 "
+                            + "WHERE NOT EXISTS (SELECT 1 FROM slash_command_count WHERE name = :name AND date = :date)",
             nativeQuery = true)
-    void insertIfAbsent(@Param("name") String name, @Param("date") String date);
+    int insertCount(@Param("name") String name, @Param("date") String date);
 
     @Modifying
     @Query(
-            value = "UPDATE slash_command_count SET count = count + 1 WHERE name = :name AND date = :date",
+            value =
+                    "UPDATE slash_command_count "
+                            + "SET count = count + 1 "
+                            + "WHERE id = (SELECT id FROM slash_command_count WHERE name = :name AND date = :date ORDER BY id LIMIT 1)",
             nativeQuery = true)
-    void incrementExisting(@Param("name") String name, @Param("date") String date);
+    int incrementExisting(@Param("name") String name, @Param("date") String date);
 
-    @Query(value = "SELECT name, SUM(count) as total FROM slash_command_count GROUP BY name", nativeQuery = true)
+    @Query(
+            value =
+                    "SELECT name, SUM(day_total) AS total "
+                            + "FROM (SELECT name, date, MAX(count) AS day_total FROM slash_command_count GROUP BY name, date) grouped_counts "
+                            + "GROUP BY name",
+            nativeQuery = true)
     List<Object[]> sumAllByName();
 
     @Query(
-            value = "SELECT name, SUM(count) as total FROM slash_command_count WHERE date >= :since GROUP BY name",
+            value =
+                    "SELECT name, SUM(day_total) AS total "
+                            + "FROM (SELECT name, date, MAX(count) AS day_total FROM slash_command_count WHERE date >= :since GROUP BY name, date) grouped_counts "
+                            + "GROUP BY name",
             nativeQuery = true)
     List<Object[]> sumByNameSince(@Param("since") String since);
 
-    @Query(value = "SELECT SUM(count) FROM slash_command_count", nativeQuery = true)
+    @Query(value = "SELECT SUM(day_total) FROM (SELECT MAX(count) AS day_total FROM slash_command_count GROUP BY name, date)", nativeQuery = true)
     Long sumAllCounts();
 
-    @Query(value = "SELECT SUM(count) FROM slash_command_count WHERE date >= :since", nativeQuery = true)
+    @Query(
+            value =
+                    "SELECT SUM(day_total) "
+                            + "FROM (SELECT MAX(count) AS day_total FROM slash_command_count WHERE date >= :since GROUP BY name, date)",
+            nativeQuery = true)
     Long sumCountsSince(@Param("since") String since);
 }

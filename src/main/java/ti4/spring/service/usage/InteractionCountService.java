@@ -24,11 +24,13 @@ public class InteractionCountService {
     }
 
     @Transactional
-    public void incrementSlashCommand(String commandName) {
+    public synchronized void incrementSlashCommand(String commandName) {
         try {
             String today = LocalDate.now().toString();
-            repository.insertIfAbsent(commandName, today);
-            repository.incrementExisting(commandName, today);
+            int updatedRows = repository.incrementExisting(commandName, today);
+            if (updatedRows == 0) {
+                repository.insertCount(commandName, today);
+            }
         } catch (Exception e) {
             BotLogger.error("Failed to increment slash command count for: " + commandName, e);
         }
