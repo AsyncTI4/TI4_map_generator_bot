@@ -63,7 +63,7 @@ public class MiltySliceDraftableSettings extends SettingsMenu {
         // Verify this is the correct JSON node and continue initialization
         if (json != null
                 && json.has("menuId")
-                && MENU_ID.equals(json.get("menuId").asText(""))) {
+                && MENU_ID.equals(json.get("menuId").asString(""))) {
             minimumRes.initialize(json.get("minimumRes"));
             minimumInf.initialize(json.get("minimumInf"));
             totalValue.initialize(json.get("totalValue"));
