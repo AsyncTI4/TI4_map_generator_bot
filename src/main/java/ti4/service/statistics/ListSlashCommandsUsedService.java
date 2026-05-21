@@ -32,6 +32,6 @@ public class ListSlashCommandsUsedService {
         for (Map.Entry<String, Long> entry : sorted.entrySet()) {
             msg.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), msg.toString());
+        MessageHelper.sendMessageToThread(event.getChannel(), "Slash Commands Used", msg.toString());
     }
 }
