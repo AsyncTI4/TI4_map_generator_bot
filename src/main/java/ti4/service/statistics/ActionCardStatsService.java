@@ -5,7 +5,6 @@ import java.time.ZoneOffset;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -37,9 +36,6 @@ public class ActionCardStatsService {
         Map<String, Integer> actionCardsPlayedCounts = new HashMap<>();
         Map<String, Integer> overruleCounts = new HashMap<>();
         Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts = new HashMap<>();
-        AtomicInteger totalTrackedPlays = new AtomicInteger();
-        AtomicInteger totalSabotages = new AtomicInteger();
-        AtomicInteger totalOverrules = new AtomicInteger();
 
         ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event),
@@ -49,10 +45,7 @@ public class ActionCardStatsService {
                         sabotageCounts,
                         actionCardsPlayedCounts,
                         overruleCounts,
-                        playToWinCorrelationCounts,
-                        totalTrackedPlays,
-                        totalSabotages,
-                        totalOverrules),
+                        playToWinCorrelationCounts),
                 ExecutionLockType.READ);
 
         MessageHelper.sendMessageToThread(
@@ -63,10 +56,7 @@ public class ActionCardStatsService {
                         sabotageCounts,
                         actionCardsPlayedCounts,
                         overruleCounts,
-                        playToWinCorrelationCounts,
-                        totalTrackedPlays,
-                        totalSabotages,
-                        totalOverrules));
+                        playToWinCorrelationCounts));
     }
 
     private static void accumulateActionCardStats(
@@ -75,21 +65,17 @@ public class ActionCardStatsService {
             Map<String, Integer> sabotageCounts,
             Map<String, Integer> actionCardsPlayedCounts,
             Map<String, Integer> overruleCounts,
-            Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
-            AtomicInteger totalTrackedPlays,
-            AtomicInteger totalSabotages,
-            AtomicInteger totalOverrules) {
-        for (ActionCardPlay actionCardPlay : game.getGameStats().getActionCardPlays()) {
-            trackedPlayCounts.merge(actionCardPlay.getActionCard(), 1, Integer::sum);
-            totalTrackedPlays.incrementAndGet();
+            Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
+        if (game.getStartedDate() >= PLAYER_TRACKING_START_MILLIS) {
+            for (ActionCardPlay actionCardPlay : game.getGameStats().getActionCardPlays()) {
+                trackedPlayCounts.merge(actionCardPlay.getActionCard(), 1, Integer::sum);
+            }
         }
 
-        totalSabotages.addAndGet(game.getGameStats().getTotalPlays(GameStats.SABOTAGE));
         game.getGameStats()
                 .getCountPerTarget(GameStats.SABOTAGE)
                 .forEach((acName, count) -> sabotageCounts.merge(acName, count, Integer::sum));
 
-        totalOverrules.addAndGet(game.getGameStats().getTotalPlays(GameStats.OVERRULE));
         game.getGameStats()
                 .getCountPerTarget(GameStats.OVERRULE)
                 .forEach((scName, count) -> overruleCounts.merge(scName, count, Integer::sum));
@@ -104,10 +90,8 @@ public class ActionCardStatsService {
     private static void incrementActionCardPlayCount(
             Map<String, Integer> actionCardsPlayedCounts, String actionCardId) {
         ActionCardModel actionCardModel = Mapper.getActionCard(actionCardId);
-        if (actionCardModel == null) {
-            return;
-        }
-        actionCardsPlayedCounts.merge(actionCardModel.getName(), 1, Integer::sum);
+        String name = actionCardModel != null ? actionCardModel.getName() : actionCardId;
+        actionCardsPlayedCounts.merge(name, 1, Integer::sum);
     }
 
     private static String buildMessage(
@@ -115,16 +99,8 @@ public class ActionCardStatsService {
             Map<String, Integer> sabotageCounts,
             Map<String, Integer> actionCardsPlayedCounts,
             Map<String, Integer> overruleCounts,
-            Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
-            AtomicInteger totalTrackedPlays,
-            AtomicInteger totalSabotages,
-            AtomicInteger totalOverrules) {
+            Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
         StringBuilder message = new StringBuilder();
-        message.append("Recorded tracked action card plays: ")
-                .append(totalTrackedPlays.get())
-                .append('\n');
-        message.append("Recorded Sabotages: ").append(totalSabotages.get()).append('\n');
-        message.append("Recorded Overrules: ").append(totalOverrules.get()).append("\n\n");
         message.append("**Tracked action card plays**\n");
         appendTrackedPlayStats(message, trackedPlayCounts);
         message.append("\n**Action card play-to-win correlation**\n");
