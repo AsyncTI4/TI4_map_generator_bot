@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.helpers.Helper;
+import ti4.spring.context.SpringContext;
 import ti4.spring.service.persistence.PlayerEntity;
 import ti4.spring.service.persistence.PlayerEntityRepository;
 
@@ -19,6 +20,18 @@ import ti4.spring.service.persistence.PlayerEntityRepository;
 public class UserGameInfoService {
 
     private final PlayerEntityRepository playerEntityRepository;
+
+    @Transactional(readOnly = true)
+    public List<Integer> getUsersThreeFastestDaysToComplete6PlayerGames(String userId) {
+        List<PlayerEntity> players = playerEntityRepository.findAllWithGamesByUserIdEquals(userId);
+        return players.stream()
+            .map(PlayerEntity::getGame)
+            .map(game ->
+                (int) Duration.ofMillis(game.getEndedEpochMilliseconds() - game.getCreationEpochMilliseconds()).toDays())
+            .sorted()
+            .limit(3)
+            .toList();
+    }
 
     @Transactional(readOnly = true)
     public String getUserGameInfo(List<User> users) {
@@ -111,6 +124,10 @@ public class UserGameInfoService {
             index++;
         }
         return sb.toString();
+    }
+
+    public static UserGameInfoService get() {
+        return SpringContext.getBean(UserGameInfoService.class);
     }
 
     private static class UserGameStatsAccumulator {
