@@ -1,6 +1,7 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -881,7 +882,7 @@ public final class ButtonHelperAbilities {
                         + player.getTg() + " to "
                         + (player.getTg() + 1) + ".";
             } else {
-                pillagedMessage += " This number of times you have been **Pillage**'d this game is "
+                pillagedMessage += " The number of times you have been **Pillage**'d this game is "
                         + pillaged.getPillageCounter() + ".";
             }
             player.setTg(player.getTg() + 1);

@@ -31,10 +31,6 @@ public class HandlerRegistry<C extends ListenerContext> {
         return true;
     }
 
-    public String findHandlerKey(String componentId) {
-        return findMatchedKey(componentId);
-    }
-
     private Handler<C> findHandler(String componentId) {
         if (componentId == null) return null;
         String key = findMatchedKey(componentId);

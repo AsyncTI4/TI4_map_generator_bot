@@ -35,4 +35,3 @@ public class ListSlashCommandsUsedService {
         MessageHelper.sendMessageToChannel(event.getChannel(), msg.toString());
     }
 }
-

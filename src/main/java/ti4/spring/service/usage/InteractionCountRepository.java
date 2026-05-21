@@ -15,9 +15,7 @@ public interface InteractionCountRepository extends JpaRepository<InteractionCou
             nativeQuery = true)
     void incrementCount(@Param("name") String name, @Param("date") String date);
 
-    @Query(
-            value = "SELECT name, SUM(count) as total FROM slash_command_count GROUP BY name",
-            nativeQuery = true)
+    @Query(value = "SELECT name, SUM(count) as total FROM slash_command_count GROUP BY name", nativeQuery = true)
     List<Object[]> sumAllByName();
 
     @Query(

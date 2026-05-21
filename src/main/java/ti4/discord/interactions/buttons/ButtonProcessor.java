@@ -169,10 +169,7 @@ public class ButtonProcessor {
         if (!CombatContestSettings.isEnabledStatic() && isCombatReplayButton(buttonID)) return;
 
         // Check the list of ButtonHandlers first
-        if (registry.handle(buttonID, context)) {
-            trackButtonHandler(registry.findHandlerKey(buttonID));
-            return;
-        }
+        if (registry.handle(buttonID, context)) return;
 
         // TODO Convert all else..if..startsWith to use @ButtonHandler
         if (false) {
