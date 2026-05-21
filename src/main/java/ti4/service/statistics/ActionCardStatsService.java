@@ -206,9 +206,9 @@ public class ActionCardStatsService {
 
             PlayToWinCorrelationCount count =
                     playToWinCorrelationCounts.computeIfAbsent(actionCardPlay.getActionCard(), _ -> new PlayToWinCorrelationCount());
-            count.total++;
+            count.incrementTotal();
             if (winningPlayerId.equals(actionCardPlay.getPlayerId())) {
-                count.wins++;
+                count.incrementWins();
             }
         }
     }
@@ -244,6 +244,14 @@ public class ActionCardStatsService {
     static class PlayToWinCorrelationCount {
         private int total;
         private int wins;
+
+        void incrementTotal() {
+            total++;
+        }
+
+        void incrementWins() {
+            wins++;
+        }
 
         double getWinRate() {
             return total == 0 ? 0 : (double) wins / total;

@@ -33,8 +33,8 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
         StringBuilder message = new StringBuilder();
         Map<String, ActionCardStatsService.PlayToWinCorrelationCount> counts = new HashMap<>();
         var count = new ActionCardStatsService.PlayToWinCorrelationCount();
-        count.total++;
-        count.wins++;
+        count.incrementTotal();
+        count.incrementWins();
         counts.put(GameStats.OVERRULE, count);
 
         ActionCardStatsService.appendPlayToWinCorrelationStats(message, counts);
