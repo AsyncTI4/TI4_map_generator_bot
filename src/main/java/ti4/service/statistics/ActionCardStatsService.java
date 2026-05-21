@@ -220,7 +220,7 @@ public class ActionCardStatsService {
             StringBuilder message, Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
         message.append("_Only includes games started on or after ")
                 .append(PLAYER_TRACKING_START_DATE)
-                .append("; per-player tracking started after that date._\n");
+                .append("; per-player tracking started on that date._\n");
         if (playToWinCorrelationCounts.isEmpty()) {
             message.append("No eligible action card play-to-win correlation data matched the selected filters.\n");
             return;
