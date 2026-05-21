@@ -23,14 +23,14 @@ public class UserGameInfoService {
 
     @Transactional(readOnly = true)
     public List<Integer> getUsersThreeFastestDaysToComplete6PlayerGames(String userId) {
-        List<PlayerEntity> players = playerEntityRepository.findAllWithGamesByUserIdEquals(userId);
-        return players.stream()
-            .map(PlayerEntity::getGame)
-            .map(game ->
-                (int) Duration.ofMillis(game.getEndedEpochMilliseconds() - game.getCreationEpochMilliseconds()).toDays())
-            .sorted()
-            .limit(3)
-            .toList();
+        return playerEntityRepository.findAllWithGamesByUserIdEquals(userId).stream()
+                .map(PlayerEntity::getGame)
+                .map(game ->
+                        (int) Duration.ofMillis(game.getEndedEpochMilliseconds() - game.getCreationEpochMilliseconds())
+                                .toDays())
+                .sorted()
+                .limit(3)
+                .toList();
     }
 
     @Transactional(readOnly = true)
