@@ -1,7 +1,7 @@
 package ti4.game;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,7 +73,8 @@ public class GameStats {
     public Map<String, AcPlayStats> getAcPlayStats() {
         Map<String, AcPlayStats> acPlayStats = new HashMap<>();
         for (ActionCardPlay actionCardPlay : actionCardPlays) {
-            acPlayStats.computeIfAbsent(actionCardPlay.getActionCard(), _ -> new AcPlayStats())
+            acPlayStats
+                    .computeIfAbsent(actionCardPlay.getActionCard(), _ -> new AcPlayStats())
                     .recordPlayWithTarget(actionCardPlay.getTarget());
         }
         return acPlayStats;

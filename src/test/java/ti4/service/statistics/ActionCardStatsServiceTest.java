@@ -39,9 +39,7 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
 
         ActionCardStatsService.appendPlayToWinCorrelationStats(message, counts);
 
-        assertThat(message)
-                .contains("2026-05-22")
-                .contains("Overrule: 100.0% (1/1 plays by the eventual winner)");
+        assertThat(message).contains("2026-05-22").contains("Overrule: 100.0% (1/1 plays by the eventual winner)");
     }
 
     private static Game buildEligibleGame() {
@@ -49,7 +47,10 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
         game.setName("eligible-action-card-stats");
         game.setVp(1);
         game.setHasEnded(true);
-        game.setStartedDate(LocalDate.of(2026, 5, 23).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli());
+        game.setStartedDate(LocalDate.of(2026, 5, 23)
+                .atStartOfDay(ZoneOffset.UTC)
+                .toInstant()
+                .toEpochMilli());
 
         Player winner = game.addPlayer("winner", "Winner");
         winner.setFaction("arborec");
@@ -68,7 +69,10 @@ class ActionCardStatsServiceTest extends BaseTi4Test {
     private static Game buildPreTrackingGame() {
         Game game = buildEligibleGame();
         game.setName("pretracking-action-card-stats");
-        game.setStartedDate(LocalDate.of(2026, 5, 21).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli());
+        game.setStartedDate(LocalDate.of(2026, 5, 21)
+                .atStartOfDay(ZoneOffset.UTC)
+                .toInstant()
+                .toEpochMilli());
         return game;
     }
 }

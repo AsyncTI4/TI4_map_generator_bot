@@ -94,12 +94,15 @@ public class ActionCardStatsService {
                 .getCountPerTarget(GameStats.OVERRULE)
                 .forEach((scName, count) -> overruleCounts.merge(scName, count, Integer::sum));
 
-        game.getDiscardActionCards().forEach((acID, ignored) -> incrementActionCardPlayCount(actionCardsPlayedCounts, acID));
-        game.getPurgedActionCards().forEach((acID, ignored) -> incrementActionCardPlayCount(actionCardsPlayedCounts, acID));
+        game.getDiscardActionCards()
+                .forEach((acID, ignored) -> incrementActionCardPlayCount(actionCardsPlayedCounts, acID));
+        game.getPurgedActionCards()
+                .forEach((acID, ignored) -> incrementActionCardPlayCount(actionCardsPlayedCounts, acID));
         accumulateActionCardPlayToWinCorrelation(game, playToWinCorrelationCounts);
     }
 
-    private static void incrementActionCardPlayCount(Map<String, Integer> actionCardsPlayedCounts, String actionCardId) {
+    private static void incrementActionCardPlayCount(
+            Map<String, Integer> actionCardsPlayedCounts, String actionCardId) {
         ActionCardModel actionCardModel = Mapper.getActionCard(actionCardId);
         if (actionCardModel == null) {
             return;
@@ -204,8 +207,8 @@ public class ActionCardStatsService {
                 continue;
             }
 
-            PlayToWinCorrelationCount count =
-                    playToWinCorrelationCounts.computeIfAbsent(actionCardPlay.getActionCard(), _ -> new PlayToWinCorrelationCount());
+            PlayToWinCorrelationCount count = playToWinCorrelationCounts.computeIfAbsent(
+                    actionCardPlay.getActionCard(), _ -> new PlayToWinCorrelationCount());
             count.incrementTotal();
             if (winningPlayerId.equals(actionCardPlay.getPlayerId())) {
                 count.incrementWins();

@@ -24,10 +24,14 @@ class GameSaveServiceTest extends BaseTi4Test {
             Game reloaded = harness.load();
             assertThat(reloaded).isNotNull();
             assertThat(reloaded.getLatestOutcomeVotedFor()).isEqualTo("testOutcome");
-            assertThat(reloaded.getGameStats().getCountPerTarget(GameStats.SABOTAGE)).containsEntry("Divert Funding", 1);
-            assertThat(reloaded.getGameStats().getTotalPlays(GameStats.SABOTAGE)).isEqualTo(1);
-            assertThat(reloaded.getGameStats().getCountPerTarget(GameStats.OVERRULE)).containsEntry("leadership", 1);
-            assertThat(reloaded.getGameStats().getTotalPlays(GameStats.OVERRULE)).isEqualTo(1);
+            assertThat(reloaded.getGameStats().getCountPerTarget(GameStats.SABOTAGE))
+                    .containsEntry("Divert Funding", 1);
+            assertThat(reloaded.getGameStats().getTotalPlays(GameStats.SABOTAGE))
+                    .isEqualTo(1);
+            assertThat(reloaded.getGameStats().getCountPerTarget(GameStats.OVERRULE))
+                    .containsEntry("leadership", 1);
+            assertThat(reloaded.getGameStats().getTotalPlays(GameStats.OVERRULE))
+                    .isEqualTo(1);
             assertThat(reloaded.getGameStats().getActionCardPlays())
                     .extracting(GameStats.ActionCardPlay::getPlayerId)
                     .containsOnly(player.getStatsTrackedUserID());
