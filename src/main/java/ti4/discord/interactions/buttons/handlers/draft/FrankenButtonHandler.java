@@ -23,6 +23,7 @@ import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
+import ti4.draft.FrankenDrazDraft;
 import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.TwilightsFallFrankenDraft;
 import ti4.game.Game;
@@ -62,7 +63,11 @@ public class FrankenButtonHandler {
         String frankenItem = buttonID.replace("frankenItemAdd", "");
         DraftItem draftItem = DraftItem.generateFromAlias(frankenItem);
         resolveFrankenItemAdd(event, player, draftItem);
-        refreshContainers(event, player);
+        if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
+            frankenDrazDraft.refreshPostDraftCategory(event, player, draftItem.getItemCategory());
+        } else {
+            refreshContainers(event, player);
+        }
     }
 
     public static void resolveFrankenItemAdd(ButtonInteractionEvent event, Player player, DraftItem item) {
@@ -94,7 +99,11 @@ public class FrankenButtonHandler {
         String frankenItem = buttonID.replace("frankenItemRemove", "");
         DraftItem draftItem = DraftItem.generateFromAlias(frankenItem);
         resolveFrankenItemRemove(event, player, draftItem);
-        refreshContainers(event, player);
+        if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
+            frankenDrazDraft.refreshPostDraftCategory(event, player, draftItem.getItemCategory());
+        } else {
+            refreshContainers(event, player);
+        }
     }
 
     public static void resolveFrankenItemRemove(ButtonInteractionEvent event, Player player, DraftItem item) {
@@ -156,13 +165,13 @@ public class FrankenButtonHandler {
 
         MessageChannel channel = game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel();
         MessageV2Builder builder = new MessageV2Builder(channel);
+        ButtonHelper.deleteMessage(event);
         if (game.isTwilightsFallMode()) {
             return;
         }
         builder.append(game.getPing() + " Every player has chosen their components! Press this button to continue.");
         builder.append(Buttons.DEAL_2_SO);
         builder.send();
-        ButtonHelper.deleteMessage(event);
     }
 
     private static void applyFrankenItemToPlayer(ButtonInteractionEvent event, Player player, DraftItem item) {
@@ -337,9 +346,13 @@ public class FrankenButtonHandler {
                                     List.of(startStrategyPhaseButton));
                             FrankenDraftBagService.applyDraftBags(event, game, false);
                         } else {
-                            String draftType = (draft instanceof TwilightsFallFrankenDraft)
-                                    ? "Twilight's Fall Draft"
-                                    : "FrankenDraft";
+                            if (draft instanceof FrankenDrazDraft frankenDrazDraft) {
+                                frankenDrazDraft.expandFactionPackages(game);
+                            }
+                            String draftType = "FrankenDraft";
+                            if (draft instanceof TwilightsFallFrankenDraft) {
+                                draftType = "Twilight's Fall Draft";
+                            }
                             String msg = game.getPing() + " the draft stage of the " + draftType + " is complete. ";
                             msg += "Use the buttons below to choose how to set up the map. ";
                             msg += "Once the map is finalized, select your components from your drafted hand.";
@@ -369,6 +382,9 @@ public class FrankenButtonHandler {
                                         List.of(startStrategyPhaseButton));
                                 FrankenDraftBagService.applyDraftBags(event, game, false);
                             } else {
+                                if (draft instanceof FrankenDrazDraft frankenDrazDraft) {
+                                    frankenDrazDraft.expandFactionPackages(game);
+                                }
                                 Button randomizeButton =
                                         Buttons.green("startFrankenSliceBuild", "Randomize Your Slices (Sorta)");
                                 Button mantisButton = Buttons.green("startFrankenMantisBuild", "Mantis Build Slices");

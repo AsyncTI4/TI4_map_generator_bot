@@ -10,10 +10,12 @@ import java.util.StringJoiner;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.game.Game;
@@ -43,6 +45,7 @@ import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
+import ti4.logging.BotLogger;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
@@ -241,6 +244,15 @@ public class StartPhaseService {
         }
         if (game.getRound() == 1) {
             Helper.setOrder(game);
+            if (game.getActionsChannel() != null) {
+                for (ThreadChannel threadChannel : game.getActionsChannel().getThreadChannels()) {
+                    if ((!threadChannel.getName().contains("Cards Info-" + game.getName())
+                                    && threadChannel.getName().contains("Cards Info-"))
+                            || threadChannel.getName().contains("Draft Bag")) {
+                        threadChannel.getManager().setArchived(true).queue(Consumers.nop(), BotLogger::catchRestError);
+                    }
+                }
+            }
         }
         game.removeStoredValue("shouldntChangeTurnOrder");
         for (Player p2 : game.getRealPlayers()) {
@@ -785,6 +797,21 @@ public class StartPhaseService {
                             + ", a reminder that this is the window to play _Ancient Burial Sites_.");
         }
 
+        if (player.getPlayableActionCards().contains("amendment")) {
+            List<Button> amendmentButtons = new ArrayList<>();
+            amendmentButtons.add(Buttons.green(
+                    player.factionButtonChecker() + "resolveAmendmentStep1",
+                    "Resolve Amendment",
+                    CardEmojis.ActionCard));
+            amendmentButtons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged()
+                            + ", a reminder that this is the window to play _Amendment_."
+                            + " Use the buttons to start the process.",
+                    amendmentButtons);
+        }
+
         for (String pn : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote("malevolency") && "malevolency".equalsIgnoreCase(pn)) {
                 boolean mahactMalev = !player.getMahactCC().isEmpty();
@@ -836,11 +863,10 @@ public class StartPhaseService {
         for (Player player : game.getRealPlayers()) {
             sendStatusReminders(game, player);
         }
-        DreamButtonHandler.offerTheWakingButtons(game);
+        if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("the_waking"))) {
+            DreamButtonHandler.offerTheWakingButtons(game);
+        }
 
-        Button draw1AC = Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.getACEmoji(game));
-        Button getCCs = Buttons.green("redistributeCCButtons", "Redistribute, Gain, & Confirm Command Tokens")
-                .withEmoji(Emoji.fromFormatted("🔺"));
         Button yssarilPolicy = null;
         for (Player player : game.getRealPlayers()) {
             if (IsPlayerElectedService.isPlayerElected(game, player, "minister_policy")
@@ -897,8 +923,12 @@ public class StartPhaseService {
         }
         List<Button> buttons = new ArrayList<>();
         if (game.isFowMode()) {
+            Button draw1AC =
+                    Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.getACEmoji(game));
             buttons.add(draw1AC);
         }
+        Button getCCs = Buttons.green("redistributeCCButtons", "Redistribute, Gain, & Confirm Command Tokens")
+                .withEmoji(Emoji.fromFormatted("🔺"));
         buttons.add(getCCs);
         buttons.add(passOnAbilities);
         if (yssarilPolicy != null) {

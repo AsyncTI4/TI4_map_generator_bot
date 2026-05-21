@@ -97,13 +97,20 @@ public class CombatRollService {
             if (game.getStoredValue("assignedBombardment" + player.getFaction()).isEmpty()) {
                 BombardmentService.autoAssignAllBombardmentToAPlanet(player, game);
             }
+            boolean hasValidBombardment = false;
             for (String planet : BombardmentService.getBombardablePlanets(player, game, tile)) {
                 if (game.getStoredValue("assignedBombardment" + player.getFaction())
                         .contains(planet)) {
                     game.setStoredValue("bombardmentTarget" + player.getFaction(), planet);
                     secondHalfOfCombatRoll(
                             player, game, event, tile, unitHolderName, CombatRollType.bombardment, false);
+                    hasValidBombardment = true;
                 }
+            }
+            if (!hasValidBombardment) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "No valid bombardment target found. Please assign bombardment to a planet using the buttons and try again.");
             }
             return 0;
         }

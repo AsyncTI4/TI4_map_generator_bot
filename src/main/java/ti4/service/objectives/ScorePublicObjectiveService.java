@@ -23,6 +23,7 @@ import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.game.EndedGameScoringGuardService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.leader.HeroUnlockCheckService;
 
@@ -30,14 +31,12 @@ import ti4.service.leader.HeroUnlockCheckService;
 public class ScorePublicObjectiveService {
 
     public static void scorePO(GenericInteractionCreateEvent event, Game game, Player player, int poID) {
-        if (game.isHasEnded()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), "This game has ended. You cannot score public objectives.");
+        MessageChannel channel = player.getCorrectChannel();
+        if (EndedGameScoringGuardService.sendPromptIfGameEnded(game, channel)) {
             return;
         }
         String both = getNameNEMoji(game, poID);
         String poName = both.split("_")[0];
-        MessageChannel channel = player.getCorrectChannel();
         String id = "";
         Map<String, Integer> revealedPublicObjectives = game.getRevealedPublicObjectives();
         for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
@@ -51,7 +50,7 @@ public class ScorePublicObjectiveService {
             int playerProgress = ListPlayerInfoService.getPlayerProgressOnObjective(id, game, player);
             if (playerProgress < threshold) {
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
+                        channel,
                         player.getFactionEmoji() + ", the bot does not believe you meet the requirements to score "
                                 + poName + ". The bot has you at " + playerProgress + "/" + threshold
                                 + ". If this is a mistake, please report and then you can manually score via `/status po_score` with the number ID of `"

@@ -18,7 +18,7 @@ public class PoweredFrankenDraft extends FrankenDraft {
             case FLAGSHIP, MECH, BREAKTHROUGH -> 2;
             case PN, COMMODITIES, REDTILE -> 2;
             case DRAFTORDER -> 1;
-            case UNIT, PLOT, MAHACTKING -> 0;
+            case FACTION, UNIT, PLOT, MAHACTKING -> 0;
         };
     }
 
@@ -32,7 +32,7 @@ public class PoweredFrankenDraft extends FrankenDraft {
             case COMMODITIES, FLAGSHIP, MECH, PN -> 1;
             case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 1;
             case DRAFTORDER, STARTINGFLEET, STARTINGTECH, HOMESYSTEM -> 1;
-            case UNIT, PLOT, MAHACTKING -> 0;
+            case FACTION, UNIT, PLOT, MAHACTKING -> 0;
         };
     }
 

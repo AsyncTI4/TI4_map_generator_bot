@@ -43,11 +43,9 @@ class RunAgainstAllGames extends Subcommand {
     }
 
     private static boolean makeChanges(Game game) {
-        // Migration: move slashCommandsUsed and actionCardsSabotaged from old text-based
-        // persistence format (SLASH_COMMAND_STRING / ACS_SABOD lines) to the GameStats JSON object.
-        // These are already loaded into GameStats during deserialization of old game files,
-        // so returning true for any game that has stats data forces a re-save in the new format.
-        return !game.getGameStats().getSlashCommandsUsed().isEmpty()
-                || !game.getGameStats().getAcPlayStats().isEmpty();
+        // Migration: move old action-card sabotage stats from text-based persistence (ACS_SABOD)
+        // into the GameStats JSON object. These are loaded during deserialization of old game files,
+        // so returning true for any game with AC play stats forces a re-save in the new format.
+        return !game.getGameStats().getAcPlayStats().isEmpty();
     }
 }

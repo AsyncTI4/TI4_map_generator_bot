@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.ArvaxiBreakthroughButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.SecretObjectiveHelper;
@@ -44,6 +45,7 @@ public class TeHelperBreakthroughs {
             case "nokarbt" -> TeHelperActionCards.beginPirates(game, player, "resolveNokarBt", 0, false);
             case "dihmohnbt" -> DSHelperBreakthroughs.dihmohnBTExhaust(game, player);
             case "cheiranbt" -> DSHelperBreakthroughs.cheiranBTExhaust(game, player);
+            case "dreambt" -> DreamButtonHandler.postDreamBtMoveNexusButtons(event, game, player);
             default -> {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),

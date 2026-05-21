@@ -41,6 +41,7 @@ public class GameImageController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @SetupRequestContext(save = false)
     @GetMapping("/attachment-url")
     public ResponseEntity<String> getAttachmentUrl(@PathVariable String gameName) {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);

@@ -57,7 +57,6 @@ import ti4.spring.context.SpringContext;
 
 @UtilityClass
 public class ActionCardHelper {
-    private static final String ENDED_GAME_ACTION_CARD_ERROR = "This game has ended. You cannot play action cards.";
 
     private static final String PINNED_AC_INFO_MESSAGE_ID = "pinned_ac_info_message_id";
 
@@ -412,6 +411,7 @@ public class ActionCardHelper {
                 "special_session",
                 "investments",
                 "tf-reverse",
+                "puppetsonastring",
                 "tf-manipulate",
                 "revolution",
                 "deflection",
@@ -683,9 +683,6 @@ public class ActionCardHelper {
             String acID,
             int acIndex,
             MessageChannel channel) {
-        if (game.isHasEnded()) {
-            return ENDED_GAME_ACTION_CARD_ERROR;
-        }
         MessageChannel mainGameChannel = game.getMainGameChannel() == null ? channel : game.getMainGameChannel();
         ActionCardModel actionCard = Mapper.getActionCard(acID);
         String actionCardTitle = actionCard.getName();
@@ -1071,6 +1068,27 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("reconstruction".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveReconstruction", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "planet in the active system"), codedButtons);
+            }
+
+            if ("ubiquity".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "ubiquity", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("lost_treatise".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveLostTreatise", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("opportunists".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveOpportunists", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("jamming".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.factionButtonChecker() + "resolveSignalJammingStep1", buttonLabel));
@@ -1252,8 +1270,23 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("reinforcements".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveReinforcements", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("overtime".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveOvertime", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("chain_reaction".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveChainReaction", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("hostile_world".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveHostileWorld", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
@@ -1279,6 +1312,16 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveCache", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
+            }
+
+            if ("freedom_fighters".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveFreedomFighters", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("refugees".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveRefugees", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
             if ("simulacrum".equals(automationID)) {
@@ -1309,6 +1352,12 @@ public class ActionCardHelper {
 
             if ("summit".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveSummit", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("compounding_interests".equals(automationID)) {
+                codedButtons.add(
+                        Buttons.green(player.factionButtonChecker() + "resolveCompoundingInterests", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
@@ -1915,9 +1964,6 @@ public class ActionCardHelper {
 
     public static String playAC(
             GenericInteractionCreateEvent event, Game game, Player player, String value, MessageChannel channel) {
-        if (game.isHasEnded()) {
-            return ENDED_GAME_ACTION_CARD_ERROR;
-        }
         String acID = null;
         int acIndex = -1;
         try {

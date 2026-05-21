@@ -22,6 +22,7 @@ import ti4.logging.RollbarManager;
 import ti4.service.SusSlashCommandService;
 import ti4.service.game.GameNameService;
 import ti4.spring.context.SpringContext;
+import ti4.spring.service.usage.InteractionCountService;
 
 class SlashCommandListener extends ListenerAdapter implements CommandListener {
 
@@ -86,6 +87,7 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
                 logSlashCommand(event);
                 command.execute(event);
                 command.postExecute(event);
+                InteractionCountService.get().incrementSlashCommand(event.getFullCommandName());
                 if (!isModalCommand(event) && !resolvedCommand.isEphemeral(event)) {
                     event.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
                 }

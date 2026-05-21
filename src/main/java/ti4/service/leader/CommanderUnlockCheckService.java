@@ -3,6 +3,7 @@ package ti4.service.leader;
 import java.util.List;
 import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -272,6 +273,10 @@ public class CommanderUnlockCheckService {
                         + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser", false);
                 shouldBeUnlocked = (num >= 7);
             }
+
+            // BEANS
+            case "dream" ->
+                shouldBeUnlocked = (DreamButtonHandler.getNexusTokenTiles(game).size() >= 3);
         }
         if (shouldBeUnlocked) {
             UnlockLeaderService.unlockLeader(faction + "commander", game, player);

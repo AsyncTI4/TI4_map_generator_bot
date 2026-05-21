@@ -57,6 +57,7 @@ public final class Constants {
     public static final String DRAFT_QUEUE = "franken_items_to_draft";
     public static final String SHOW_GAME = "show_game";
     public static final String ONLY_LAST_MONTH = "only_last_month";
+    public static final String LAST_N_DAYS = "last_n_days";
     public static final String FOWGM = "fowgm";
     public static final String FRACTURE = "fracture";
     public static final String TEMPORARY_PING_DISABLE = "temporary_ping_disable";
@@ -110,8 +111,6 @@ public final class Constants {
     public static final String HOMEBREW_SC_MODE = "homebrew_sc_mode";
     public static final String SPIN_MODE = "spin_mode";
     public static final String BUTTON_PRESS_COUNT = "button_press_count";
-    public static final String SLASH_COMMAND_COUNT = "slash_command_count";
-    public static final String SLASH_COMMAND_STRING = "slash_command_string";
     public static final String ACS_SABOD = "acs_sabod";
     public static final String ABSOL_MODE = "absol_mode";
     public static final String PROMISES_PROMISES = "promises_promises";
@@ -187,7 +186,7 @@ public final class Constants {
     public static final String JOIN = "join";
     public static final String START_SCENARIO = "start_scenario";
     public static final String ADD = "add";
-    public static final String COMPARE_AFK_TIMES = "compare_afk_times";
+    public static final String COMPARE_ACTIVITY_TIMES = "compare_activity_times";
     public static final String REPLACE = "replace";
     public static final String LEAVE = "leave";
     public static final String REMOVE = "remove";
@@ -1062,6 +1061,7 @@ public final class Constants {
     public static final String INCLUDE_OPTIONS = "include_options";
     public static final String CARDS_INFO = "cards_info";
     public static final String FRANKEN = "franken";
+    public static final String FRANKENDRAZ = "frankendraz";
     public static final String SHOW_GAME_AS_PLAYER = "show_game_as";
     public static final String CHECK_PRIVATE_COMMUNICATIONS = "check_private_communications";
 

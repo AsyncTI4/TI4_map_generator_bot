@@ -521,20 +521,6 @@ class GameLoadService {
                         }
                     }
                 }
-                case Constants.SLASH_COMMAND_STRING -> {
-                    StringTokenizer commandCounts = new StringTokenizer(info, ":");
-                    while (commandCounts.hasMoreTokens()) {
-                        StringTokenizer dataInfoTokens = new StringTokenizer(commandCounts.nextToken(), ",");
-                        String commandName = null;
-                        if (dataInfoTokens.hasMoreTokens()) {
-                            commandName = dataInfoTokens.nextToken();
-                        }
-                        if (dataInfoTokens.hasMoreTokens()) {
-                            String dataInfo = dataInfoTokens.nextToken();
-                            game.getGameStats().setSpecificSlashCommandCount(commandName, Integer.parseInt(dataInfo));
-                        }
-                    }
-                }
                 case Constants.ACS_SABOD -> {
                     StringTokenizer voteInfo = new StringTokenizer(info, ":");
                     while (voteInfo.hasMoreTokens()) {

@@ -1067,15 +1067,6 @@
         "source": "deprecated"
     },
     {
-        "alias": "strategic_assistance",
-        "name": "Strategic Aid",
-        "phase": "Action",
-        "window": "When you perform a strategic action",
-        "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
-        "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
-        "source": "deprecated"
-    },
-    {
         "alias": "miraculous_escape",
         "name": "Miraculous Escape",
         "phase": "Any",
@@ -1657,12 +1648,12 @@
         "source": "deprecated"
     },
     {
-        "alias": "strategic_aid",
+        "alias": "strategic_assistance",
         "name": "Strategic Aid",
         "phase": "Action",
         "window": "When you perform a strategic action",
         "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
-        "flavorText": "Mathis was not fooled. The pageantry and endless bandying of crooked words with these witless worms was yet another scheme.",
+        "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
         "source": "deprecated"
     },
     {
@@ -1672,6 +1663,34 @@
         "window": "After you resolve the primary ability of your strategy card",
         "text": "Remove 1 of another player's command tokens from the game board and place it in their strategy pool. Then, gain 1 command token.",
         "flavorText": "Gambit? The magi laughed. Hardly.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "survey",
+        "name": "Survey",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Explore 1 planet you control; when you would draw from the exploration deck, you may choose and resolve a card from its discard pile instead.",
+        "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "relay_assembly",
+        "name": "Relay Assembly",
+        "phase": "Action",
+        "window": "After you produce a ship",
+        "text": "Produce up to 2 ships of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
+        "flavorText": "From Umbat's hearthworld to distant suns, the shadow of his armada lengthened—stoked by their fury. His engineers broke into celebration as he called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "blackmail",
+        "name": "Blackmail",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome gives you 1 promissory note from their hand.",
+        "playTiming": "AGENDA_AFTER",
+        "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother,\" they said in unison.",
         "source": "deprecated"
     }
 ]

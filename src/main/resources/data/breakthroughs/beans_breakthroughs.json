@@ -8,7 +8,7 @@
             "WARFARE",
             "BIOTIC"
         ],
-        "text": "At the start of your turn, you may exhaust this card to move 1 nexus token into a system that contains a planet you control. \n\nWhen you win a combat as the defender in a system that contains a nexus token, you may remove your command token from that system and return it to your reinforcements.",
+        "text": "ACTION: At the start of your turn, you may exhaust this card to move 1 nexus token into a system that contains a planet you control. \n\nWhen you win a combat as the defender in a system that contains a nexus token, you may remove your command token from that system and return it to your reinforcements.",
         "source": "beans"
     },
     {

@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -325,6 +326,10 @@ public class TacticalActionOutputService {
         if (player.hasAbility("celestial_guides")) {
             game.setStoredValue("possiblyUsedRift", "");
         }
+        if (distance > moveValue && player.hasTech("bedreamneg")) {
+            output.append(
+                    " starting system containing a nexus token gives +1 to move value with Non-Euclidean Geometries.");
+        }
         return output.toString();
     }
 
@@ -345,6 +350,7 @@ public class TacticalActionOutputService {
         int baseMoveValue = model.getMoveValue();
         if (baseMoveValue == 0) return 0;
         if (tile.isNebula(game)
+                && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                 && !player.hasAbility("voidborn")
                 && !player.hasAbility("celestial_being")
                 && !player.hasTech("absol_amd")
@@ -375,6 +381,9 @@ public class TacticalActionOutputService {
             bonusMoveValue += MobilizationEngineHandler.getMoveMod(game, player, model);
         }
         if (player.hasAbility("slipstream") && (tileHasWormhole || (movingFromHome && !game.isTwilightsFallMode()))) {
+            bonusMoveValue++;
+        }
+        if (player.hasTech("bedreamneg") && DreamButtonHandler.tileContainsNexusToken(game, tile, true)) {
             bonusMoveValue++;
         }
         if (game.isCallOfTheVoidMode() && activeSystem.getPosition().contains("frac")) {

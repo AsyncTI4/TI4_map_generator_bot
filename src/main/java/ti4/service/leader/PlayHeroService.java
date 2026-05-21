@@ -14,6 +14,7 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.edict.EdictPhaseHandler;
 import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecButtonHandlers;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.onyxxa.OnyxxaHeroButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.xan.XanHeroButtonHandler;
 import ti4.game.Game;
@@ -209,6 +210,7 @@ public class PlayHeroService {
             }
             case "onyxxahero" -> OnyxxaHeroButtonHandler.postInitialButtons(game, player);
             case "xanhero" -> XanHeroButtonHandler.postInitialButtons(game, player);
+            case "dreamhero" -> DreamButtonHandler.postDreamHeroButtons(game, player);
             case "tyrishero" ->
                 game.setStoredValue("tyrisHeroRound" + game.getRound() + "_" + player.getFaction(), "true");
             case "mirvedahero" -> {

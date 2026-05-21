@@ -31,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.cron.AutoPingCron;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -2235,6 +2236,21 @@ public final class AgendaHelper {
                             }
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
+                        if (specificVote.contains("Production Rider")) {
+                            String message = identity
+                                    + ", you have a _Production Rider_ to resolve. Please choose the system in which you wish to produce up to 2 units each with cost 4 or less.";
+
+                            List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                                    game, winningR, UnitType.Spacedock);
+                            List<Button> buttons = new ArrayList<>();
+                            for (Tile tile : tiles) {
+                                Button starTile = Buttons.green(
+                                        "umbatTile_" + tile.getPosition(),
+                                        tile.getRepresentationForButtons(game, winningR));
+                                buttons.add(starTile);
+                            }
+                            MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+                        }
 
                         if (specificVote.contains("Trade Rider")) {
                             MessageHelper.sendMessageToChannel(
@@ -2244,6 +2260,20 @@ public final class AgendaHelper {
                                             + winningR.gainTG(5) + ".");
                             ButtonHelperAbilities.pillageCheck(winningR, game);
                             ButtonHelperAgents.resolveArtunoCheck(winningR, 5);
+                        }
+                        if (specificVote.contains("Frontier Rider")) {
+                            ButtonHelperStats.replenishComms(event, game, winningR, true);
+                            List<Button> buttons = ButtonHelperActionCards.getFrontierTokenButtons(game, winningR);
+                            String message = identity
+                                    + ", due to having a winning _Frontier Rider_, your commodities have been replenished"
+                                    + " and you may explore a frontier token on the game board.";
+                            if (buttons.isEmpty()) {
+                                MessageHelper.sendMessageToChannel(
+                                        channel, message + " There are no frontier tokens available to explore.");
+                            } else {
+                                MessageHelper.sendMessageToChannelWithButtons(
+                                        channel, message + " Choose the system you wish to explore.", buttons);
+                            }
                         }
                         if (specificVote.contains("Relic Rider")) {
                             MessageHelper.sendMessageToChannel(
@@ -3580,6 +3610,12 @@ public final class AgendaHelper {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "augerscommander")) {
             int count = player.getTechs().size() / 2;
             additionalVotesAndSources.put(FactionEmojis.augers + "Ilyxum Commander", count);
+        }
+
+        // Dreaming Throne Commander
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "dreamcommander")) {
+            int count = DreamButtonHandler.getDreamCommanderVoteCount(game, player);
+            additionalVotesAndSources.put(FactionEmojis.dream + "Dreaming Throne Commander", count);
         }
 
         // Ghoti Wayfarer Tech

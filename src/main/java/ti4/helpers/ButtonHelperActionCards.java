@@ -346,6 +346,16 @@ public final class ButtonHelperActionCards {
         checkForPlayingSummit(game, player);
         checkForPlayingBountyContracts(game, player);
         checkForPlayingSpliceCards(game, player);
+        if (player.getPlayableActionCards().contains("puppetsonastring")) {
+            String msg =
+                    "You have _Puppets On A String_ in your hand. If you're not about to pass, you can ignore this message."
+                            + " Otherwise, you can use the preset button to automatically use it when the last player passes."
+                            + " Don't worry, you can always unset the preset later if you decide you don't want to use it.";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("resolvePreassignment_Puppets On A String", "Pre-Play Puppets On A String"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        }
     }
 
     @ButtonHandler("resolveCounterStroke")
@@ -375,6 +385,18 @@ public final class ButtonHelperActionCards {
                 + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveCompoundingInterests")
+    public static void resolveCompoundingInterests(Game game, Player player, ButtonInteractionEvent event) {
+        int tgGain = ButtonHelper.getTilesWithYourCC(player, game, event).size();
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                player.getRepresentationNoPing() + " gained " + tgGain + " trade good" + (tgGain == 1 ? "" : "s")
+                        + " due to _Compounding Interests_ " + player.gainTG(tgGain) + ".");
+        ButtonHelperAbilities.pillageCheck(player, game);
+        ButtonHelperAgents.resolveArtunoCheck(player, tgGain);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -2891,11 +2913,11 @@ public final class ButtonHelperActionCards {
         return buttons;
     }
 
-    public static List<Button> getCircletButtons(Game game, Player player) {
+    private static List<Button> getFrontierTokenButtons(Game game, Player player, boolean requireNoOtherPlayersShips) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
-                if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+                if (!requireNoOtherPlayersShips || !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                     buttons.add(Buttons.green(
                             "probeStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
                 }
@@ -2903,6 +2925,14 @@ public final class ButtonHelperActionCards {
         }
         BlindSelectionService.filterForBlindPositionSelection(game, player, buttons, "probeStep2");
         return buttons;
+    }
+
+    public static List<Button> getCircletButtons(Game game, Player player) {
+        return getFrontierTokenButtons(game, player, true);
+    }
+
+    public static List<Button> getFrontierTokenButtons(Game game, Player player) {
+        return getFrontierTokenButtons(game, player, false);
     }
 
     @ButtonHandler("resolveReverse_")

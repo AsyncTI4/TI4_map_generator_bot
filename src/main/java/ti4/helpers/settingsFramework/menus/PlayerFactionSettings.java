@@ -35,6 +35,7 @@ public class PlayerFactionSettings extends SettingsMenu {
     private ListSetting<Player> gamePlayers;
     private final ListSetting<FactionModel> banFactions;
     private final ListSetting<FactionModel> priFactions;
+    private final FactionSourceSettings factionSourceSettings;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -94,17 +95,24 @@ public class PlayerFactionSettings extends SettingsMenu {
         List<String> historicIDs = new ArrayList<>(List.of("players"));
         if (json != null
                 && json.has("menuId")
-                && historicIDs.contains(json.get("menuId").asText(""))) {
+                && historicIDs.contains(json.get("menuId").asString(""))) {
             presetDraftOrder.initialize(json.get("presetDraftOrder"));
             gamePlayers.initialize(json.get("gamePlayers"));
             banFactions.initialize(json.get("banFactions"));
             priFactions.initialize(json.get("priFactions"));
         }
+
+        factionSourceSettings = new FactionSourceSettings(json, this);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Overridden Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
+    @Override
+    protected List<SettingsMenu> categories() {
+        return List.of(factionSourceSettings);
+    }
+
     @Override
     public List<SettingInterface> settings() {
         List<SettingInterface> ls = new ArrayList<>();

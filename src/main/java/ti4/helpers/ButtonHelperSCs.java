@@ -375,9 +375,6 @@ public final class ButtonHelperSCs {
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("aeterna").orElse(null);
         }
-        if (!player.getFollowedSCs().contains(scModel.getInitiative())) {
-            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), game, event);
-        }
         if (!game.getPhaseOfGame().contains("agenda")
                 && !used
                 && (scModel.usesAutomationForSCID("pok8imperial") || scModel.usesAutomationForSCID("tf8"))
@@ -391,6 +388,9 @@ public final class ButtonHelperSCs {
             }
             String message = deductCC(game, player, scNum);
             ReactionService.addReaction(event, game, player, message);
+        }
+        if (!player.getFollowedSCs().contains(scModel.getInitiative())) {
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), game, event);
         }
         boolean used2 = addUsedSCPlayer(messageID + "so", game, player);
         if (used2) return;

@@ -12,12 +12,7 @@ public class GameStats {
     public static final String SABOTAGE = "Sabotage";
     public static final String OVERRULE = "Overrule";
 
-    private Map<String, Integer> slashCommandsUsed = new HashMap<>();
     private Map<String, AcPlayStats> acPlayStats = new HashMap<>();
-
-    public void setSlashCommandsUsed(Map<String, Integer> slashCommandsUsed) {
-        this.slashCommandsUsed = slashCommandsUsed == null ? new HashMap<>() : slashCommandsUsed;
-    }
 
     public void setAcPlayStats(Map<String, AcPlayStats> acPlayStats) {
         this.acPlayStats = acPlayStats == null ? new HashMap<>() : acPlayStats;
@@ -34,18 +29,6 @@ public class GameStats {
             stats.setTotalPlays(stats.getTotalPlays() + count);
             stats.getCountPerTarget().merge(target, count, Integer::sum);
         });
-    }
-
-    public int getSlashCommandsRunCount() {
-        return slashCommandsUsed.values().stream().mapToInt(Integer::intValue).sum();
-    }
-
-    public void incrementSpecificSlashCommandCount(String fullCommandName) {
-        slashCommandsUsed.merge(fullCommandName, 1, Integer::sum);
-    }
-
-    public void setSpecificSlashCommandCount(String command, int count) {
-        slashCommandsUsed.put(command, count);
     }
 
     public void recordAcPlay(String acName) {

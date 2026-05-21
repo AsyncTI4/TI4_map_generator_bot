@@ -108,7 +108,7 @@ public class GameSettings extends SettingsMenu {
         List<String> historicIDs = new ArrayList<>(List.of("game"));
         if (json != null
                 && json.has("menuId")
-                && historicIDs.contains(json.get("menuId").asText(""))) {
+                && historicIDs.contains(json.get("menuId").asString(""))) {
             pointTotal.initialize(json.get("pointTotal"));
             stage1s.initialize(json.get("stage1s"));
             stage2s.initialize(json.get("stage2s"));
