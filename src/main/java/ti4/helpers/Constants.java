@@ -57,6 +57,7 @@ public final class Constants {
     public static final String DRAFT_QUEUE = "franken_items_to_draft";
     public static final String SHOW_GAME = "show_game";
     public static final String ONLY_LAST_MONTH = "only_last_month";
+    public static final String LAST_N_DAYS = "last_n_days";
     public static final String FOWGM = "fowgm";
     public static final String FRACTURE = "fracture";
     public static final String TEMPORARY_PING_DISABLE = "temporary_ping_disable";

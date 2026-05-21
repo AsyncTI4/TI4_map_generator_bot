@@ -1,8 +1,10 @@
 package ti4.spring.service.usage;
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.logging.BotLogger;
@@ -10,9 +12,6 @@ import ti4.spring.context.SpringContext;
 
 @Service
 public class InteractionCountService {
-
-    public static final String SLASH_COMMAND = "SLASH_COMMAND";
-    public static final String BUTTON_HANDLER = "BUTTON_HANDLER";
 
     private final InteractionCountRepository repository;
 
@@ -27,38 +26,23 @@ public class InteractionCountService {
     @Transactional
     public void incrementSlashCommand(String commandName) {
         try {
-            repository.incrementCount(SLASH_COMMAND, commandName);
+            repository.incrementCount(commandName, LocalDate.now().toString());
         } catch (Exception e) {
             BotLogger.error("Failed to increment slash command count for: " + commandName, e);
         }
     }
 
-    @Transactional
-    public void incrementButtonHandler(String handlerId) {
-        try {
-            repository.incrementCount(BUTTON_HANDLER, handlerId);
-        } catch (Exception e) {
-            BotLogger.error("Failed to increment button handler count for: " + handlerId, e);
+    public long getTotalSlashCommandCount(@Nullable LocalDate since) {
+        Long total = since == null ? repository.sumAllCounts() : repository.sumCountsSince(since.toString());
+        return total == null ? 0L : total;
+    }
+
+    public Map<String, Long> getSlashCommandCounts(@Nullable LocalDate since) {
+        List<Object[]> rows = since == null ? repository.sumAllByName() : repository.sumByNameSince(since.toString());
+        Map<String, Long> result = new HashMap<>();
+        for (Object[] row : rows) {
+            result.put((String) row[0], ((Number) row[1]).longValue());
         }
-    }
-
-    public long getTotalSlashCommandCount() {
-        Long total = repository.sumCountByType(SLASH_COMMAND);
-        return total == null ? 0L : total;
-    }
-
-    public long getTotalButtonHandlerCount() {
-        Long total = repository.sumCountByType(BUTTON_HANDLER);
-        return total == null ? 0L : total;
-    }
-
-    public Map<String, Long> getSlashCommandCounts() {
-        return repository.findAllByType(SLASH_COMMAND).stream()
-                .collect(Collectors.toMap(InteractionCountEntity::getName, InteractionCountEntity::getCount));
-    }
-
-    public Map<String, Long> getButtonHandlerCounts() {
-        return repository.findAllByType(BUTTON_HANDLER).stream()
-                .collect(Collectors.toMap(InteractionCountEntity::getName, InteractionCountEntity::getCount));
+        return result;
     }
 }

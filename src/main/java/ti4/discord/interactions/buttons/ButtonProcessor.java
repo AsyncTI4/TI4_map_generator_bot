@@ -43,7 +43,6 @@ import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
-import ti4.spring.service.usage.InteractionCountService;
 
 @UtilityClass
 public class ButtonProcessor {
@@ -423,9 +422,6 @@ public class ButtonProcessor {
 
     private static void trackButtonHandler(String handlerId) {
         RollbarManager.put("button_handler_id", handlerId);
-        if (handlerId != null) {
-            InteractionCountService.get().incrementButtonHandler(handlerId);
-        }
     }
 
     public static String getButtonProcessingStatistics() {

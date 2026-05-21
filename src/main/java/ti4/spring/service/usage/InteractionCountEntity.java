@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import java.time.LocalDate;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,25 +17,25 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "interaction_count", uniqueConstraints = @UniqueConstraint(columnNames = {"type", "name"}))
+@Table(name = "slash_command_count", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "date"}))
 public class InteractionCountEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "type", nullable = false)
-    private String type;
-
     @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "date", nullable = false)
+    private LocalDate date;
 
     @Column(name = "count", nullable = false)
     private long count;
 
-    public InteractionCountEntity(String type, String name, long count) {
-        this.type = type;
+    public InteractionCountEntity(String name, LocalDate date, long count) {
         this.name = name;
+        this.date = date;
         this.count = count;
     }
 
@@ -43,11 +44,11 @@ public class InteractionCountEntity {
         if (this == other) return true;
         if (other == null || getClass() != other.getClass()) return false;
         InteractionCountEntity that = (InteractionCountEntity) other;
-        return Objects.equals(type, that.type) && Objects.equals(name, that.name);
+        return Objects.equals(name, that.name) && Objects.equals(date, that.date);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, name);
+        return Objects.hash(name, date);
     }
 }
