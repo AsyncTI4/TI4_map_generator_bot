@@ -128,7 +128,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     @Getter
     private Map<String, Integer> thalnosUnits = new HashMap<>();
 
-    private final Map<String, Integer> slashCommandsUsed = new HashMap<>();
     private final Map<String, Integer> actionCardsSabotaged = new HashMap<>();
 
     @Getter
@@ -796,10 +795,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         setButtonPressCount(getButtonPressCount() + 1);
     }
 
-    public int getSlashCommandsRunCount() {
-        return slashCommandsUsed.values().stream().mapToInt(Integer::intValue).sum();
-    }
-
     // This is presently only used to determine if an AC is NOT playable.
     // Therefore, the method name is now inaccurate
     public boolean isACInDiscard(String name) {
@@ -1382,10 +1377,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return thalnosUnits.getOrDefault(unit, 0);
     }
 
-    public Map<String, Integer> getAllSlashCommandsUsed() {
-        return slashCommandsUsed;
-    }
-
     public Map<String, Integer> getAllActionCardsSabod() {
         return actionCardsSabotaged;
     }
@@ -1400,14 +1391,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public void setSpecificThalnosUnit(String unit, int count) {
         thalnosUnits.put(unit, count);
-    }
-
-    public void incrementSpecificSlashCommandCount(String fullCommandName) {
-        slashCommandsUsed.merge(fullCommandName, 1, (oldValue, newValue) -> oldValue + 1);
-    }
-
-    public void setSpecificSlashCommandCount(String command, int count) {
-        slashCommandsUsed.put(command, count);
     }
 
     public void setSpecificActionCardSaboCount(String acName, int count) {

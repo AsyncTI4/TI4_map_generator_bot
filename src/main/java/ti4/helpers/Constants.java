@@ -57,6 +57,7 @@ public final class Constants {
     public static final String DRAFT_QUEUE = "franken_items_to_draft";
     public static final String SHOW_GAME = "show_game";
     public static final String ONLY_LAST_MONTH = "only_last_month";
+    public static final String LAST_N_DAYS = "last_n_days";
     public static final String FOWGM = "fowgm";
     public static final String FRACTURE = "fracture";
     public static final String TEMPORARY_PING_DISABLE = "temporary_ping_disable";
@@ -110,8 +111,6 @@ public final class Constants {
     public static final String HOMEBREW_SC_MODE = "homebrew_sc_mode";
     public static final String SPIN_MODE = "spin_mode";
     public static final String BUTTON_PRESS_COUNT = "button_press_count";
-    public static final String SLASH_COMMAND_COUNT = "slash_command_count";
-    public static final String SLASH_COMMAND_STRING = "slash_command_string";
     public static final String ACS_SABOD = "acs_sabod";
     public static final String ABSOL_MODE = "absol_mode";
     public static final String PROMISES_PROMISES = "promises_promises";
