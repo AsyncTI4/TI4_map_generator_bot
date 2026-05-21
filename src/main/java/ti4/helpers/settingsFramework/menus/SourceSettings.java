@@ -38,6 +38,7 @@ public class SourceSettings extends SettingsMenu {
     private final BooleanSetting eronous;
     private final BooleanSetting actionCardDeck2;
     private final BooleanSetting teDemo;
+    private final BooleanSetting whispers;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -63,6 +64,7 @@ public class SourceSettings extends SettingsMenu {
                 "Ignis Aurora Mod",
                 game.getTechnologyDeckID().toLowerCase().contains("baldrick"));
         eronous = new BooleanSetting("Eronous", "Eronous Tiles", false);
+        whispers = new BooleanSetting("WhispersVoid", "Whispers from the Void", false);
         actionCardDeck2 = new BooleanSetting("ActionCardDeck2", "Action Card Deck 2", game.isAcd2());
         // Emojis
         base.setEmoji(SourceEmojis.TI4BaseGame);
@@ -96,6 +98,7 @@ public class SourceSettings extends SettingsMenu {
             absol.initialize(json.get("absol"));
             ignis.initialize(json.get("ignis"));
             eronous.initialize(json.get("eronous"));
+            whispers.initialize(json.get("whispers"));
             actionCardDeck2.initialize(json.get("actionCardDeck2"));
         }
         base.setEditable(false);
@@ -117,6 +120,7 @@ public class SourceSettings extends SettingsMenu {
         ls.add(absol);
         ls.add(ignis);
         ls.add(eronous);
+        ls.add(whispers);
         ls.add(actionCardDeck2);
         return ls;
     }
@@ -161,6 +165,7 @@ public class SourceSettings extends SettingsMenu {
         if (teDemo.isVal()) sources.add(ComponentSource.thunders_edge);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
         if (ignis.isVal()) sources.add(ComponentSource.ignis_aurora);
+        if (whispers.isVal()) sources.add(ComponentSource.balacasi);
         return sources;
     }
 
