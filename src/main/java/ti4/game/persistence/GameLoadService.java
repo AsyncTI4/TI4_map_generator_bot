@@ -521,21 +521,6 @@ class GameLoadService {
                         }
                     }
                 }
-                case Constants.ACS_SABOD -> {
-                    StringTokenizer voteInfo = new StringTokenizer(info, ":");
-                    while (voteInfo.hasMoreTokens()) {
-                        StringTokenizer dataInfoTokens = new StringTokenizer(voteInfo.nextToken(), ",");
-                        String outcome = null;
-                        if (dataInfoTokens.hasMoreTokens()) {
-                            outcome = dataInfoTokens.nextToken();
-                        }
-                        if (dataInfoTokens.hasMoreTokens()) {
-                            String dataInfo = dataInfoTokens.nextToken();
-                            // TODO Remove this legacy ACS_SABOD migration path once all game files have been migrated.
-                            game.getGameStats().setSpecificActionCardSaboCount(outcome, Integer.parseInt(dataInfo));
-                        }
-                    }
-                }
                 case Constants.DISPLACED_UNITS_ACTIVATION_NEW -> {
                     Map<String, Map<UnitKey, List<Integer>>> displacedUnits =
                             mapper.readValue(info, new TypeReference<>() {});
