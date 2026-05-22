@@ -1532,12 +1532,17 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         User userById = getUser();
         if (userById == null) return super.getUserName();
 
-        Member member = JdaService.guildPrimary.getMemberById(getUserID());
+        Member member = getMember();
         if (member == null) {
-            setUserName(userById.getName());
-        } else {
-            setUserName(member.getEffectiveName());
+            member = JdaService.guildPrimary.getMemberById(getUserID());
         }
+
+        if (member != null) {
+            setUserName(member.getEffectiveName());
+        } else {
+            setUserName(userById.getName());
+        }
+
         return super.getUserName();
     }
 
