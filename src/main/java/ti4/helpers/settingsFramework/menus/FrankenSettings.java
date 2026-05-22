@@ -67,24 +67,25 @@ public class FrankenSettings extends SettingsMenu {
         force = new BooleanSetting("Force", "Force overwrite existing player setups", false);
 
         Set<String> empty = new HashSet<>();
-        bannedFactions = new ListSetting<FactionModel>(
-                "BannedFactions",
-                "Banned Factions",
-                "Ban faction",
-                "Unban faction",
-                legalFactionOptions(game),
-                empty,
-                empty) {
-            @Override
-            protected String shortValue() {
-                return effectiveBannedFactionSummary();
-            }
+        bannedFactions =
+                new ListSetting<FactionModel>(
+                        "BannedFactions",
+                        "Banned Factions",
+                        "Ban faction",
+                        "Unban faction",
+                        legalFactionOptions(game),
+                        empty,
+                        empty) {
+                    @Override
+                    protected String shortValue() {
+                        return effectiveBannedFactionSummary();
+                    }
 
-            @Override
-            protected String longValue() {
-                return effectiveBannedFactionSummary();
-            }
-        };
+                    @Override
+                    protected String longValue() {
+                        return effectiveBannedFactionSummary();
+                    }
+                };
         bannedFactions.setGetEmoji(FactionModel::getFactionEmoji);
         bannedFactions.setShow(FactionModel::getFactionName);
 
@@ -206,7 +207,9 @@ public class FrankenSettings extends SettingsMenu {
     }
 
     static boolean isMenuJson(JsonNode json, String menuId) {
-        return json != null && json.has("menuId") && menuId.equals(json.get("menuId").asString(""));
+        return json != null
+                && json.has("menuId")
+                && menuId.equals(json.get("menuId").asString(""));
     }
 
     private static Map<String, String> draftModeOptions() {
@@ -400,7 +403,11 @@ class FrankenComponentBanSettings extends SettingsMenu {
                 componentAction.add() ? "Choose components to ban: " : "Choose components to unban: ");
         message.append(COMPONENT_TYPES.get(componentAction.componentType()));
         if (messageCount > 1) {
-            message.append(" (").append(messageIndex + 1).append("/").append(messageCount).append(")");
+            message.append(" (")
+                    .append(messageIndex + 1)
+                    .append("/")
+                    .append(messageCount)
+                    .append(")");
         }
         for (int groupIndex = firstGroup; groupIndex < lastGroup; groupIndex++) {
             message.append("\n- List ")
@@ -493,7 +500,8 @@ class FrankenComponentBanSettings extends SettingsMenu {
             return sources;
         }
         for (String type : COMPONENT_TYPES.keySet()) {
-            for (Map.Entry<String, Set<String>> entry : frankenSettings.selectedBanListSources(type).entrySet()) {
+            for (Map.Entry<String, Set<String>> entry :
+                    frankenSettings.selectedBanListSources(type).entrySet()) {
                 sources.put(componentKey(type, entry.getKey()), entry.getValue());
             }
         }
@@ -546,11 +554,7 @@ class FrankenComponentBanSettings extends SettingsMenu {
         switch (type) {
             case Constants.ABILITY ->
                 addFactionComponents(
-                        options,
-                        type,
-                        factions,
-                        FactionModel::getAbilities,
-                        FrankenComponentBanSettings::abilityName);
+                        options, type, factions, FactionModel::getAbilities, FrankenComponentBanSettings::abilityName);
             case Constants.BREAKTHROUGH ->
                 addFactionComponents(
                         options,
@@ -560,11 +564,7 @@ class FrankenComponentBanSettings extends SettingsMenu {
                         FrankenComponentBanSettings::breakthroughName);
             case Constants.LEADER ->
                 addFactionComponents(
-                        options,
-                        type,
-                        factions,
-                        FactionModel::getLeaders,
-                        FrankenComponentBanSettings::leaderName);
+                        options, type, factions, FactionModel::getLeaders, FrankenComponentBanSettings::leaderName);
             case Constants.PROMISSORY_NOTE_ID ->
                 addFactionComponents(
                         options,
@@ -574,11 +574,7 @@ class FrankenComponentBanSettings extends SettingsMenu {
                         FrankenComponentBanSettings::promissoryName);
             case Constants.TECH ->
                 addFactionComponents(
-                        options,
-                        type,
-                        factions,
-                        FactionModel::getFactionTech,
-                        FrankenComponentBanSettings::techName);
+                        options, type, factions, FactionModel::getFactionTech, FrankenComponentBanSettings::techName);
             case Constants.TILE_NAME ->
                 Mapper.getTileRepresentations().forEach((id, name) -> addOption(options, type, id, name, id));
             case Constants.UNIT_ID ->
@@ -618,7 +614,8 @@ class FrankenComponentBanSettings extends SettingsMenu {
         }
     }
 
-    private static void addOption(Map<String, String> options, String type, String id, String name, String labelSuffix) {
+    private static void addOption(
+            Map<String, String> options, String type, String id, String name, String labelSuffix) {
         if (id == null || id.isBlank() || name == null || name.isBlank()) {
             return;
         }
@@ -631,7 +628,9 @@ class FrankenComponentBanSettings extends SettingsMenu {
     }
 
     private static List<String> unitIds(FactionModel faction) {
-        return faction.getUnits().stream().filter(FrankenComponentBanSettings::isMechOrFlagship).toList();
+        return faction.getUnits().stream()
+                .filter(FrankenComponentBanSettings::isMechOrFlagship)
+                .toList();
     }
 
     private static boolean isMechOrFlagship(String id) {
@@ -683,9 +682,7 @@ class FrankenComponentBanSettings extends SettingsMenu {
 
     private static boolean playableFactionHasComponent(
             Game game, String id, Function<FactionModel, List<String>> componentIds) {
-        return playableFactions(game).stream()
-                .map(componentIds)
-                .anyMatch(ids -> ids != null && ids.contains(id));
+        return playableFactions(game).stream().map(componentIds).anyMatch(ids -> ids != null && ids.contains(id));
     }
 
     private static String componentKey(String type, String id) {
