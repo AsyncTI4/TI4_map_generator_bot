@@ -132,5 +132,4 @@ class RunAgainstAllGames extends Subcommand {
     }
 
     private record UndoFileInfo(String latestCommand, List<GameStats.ActionCardPlay> actionCardPlays) {}
-    }
 }
