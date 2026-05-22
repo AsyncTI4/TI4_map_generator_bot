@@ -43,6 +43,9 @@ class RunAgainstAllGames extends Subcommand {
     }
 
     private static boolean makeChanges(Game game) {
-        return false;
+        // Migration: move old action-card sabotage stats from text-based persistence (ACS_SABOD)
+        // into the GameStats JSON object. These are loaded during deserialization of old game files,
+        // so returning true for any game with AC play stats forces a re-save in the new format.
+        return !game.getGameStats().getActionCardPlays().isEmpty();
     }
 }

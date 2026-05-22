@@ -527,6 +527,7 @@ public final class Constants {
     public static final String CURRENT_ACDRAWSTATUS_INFO = "current_acdrawstatus_info";
     public static final String AGENDA_VOTE_INFO = "agenda_vote_info";
     public static final String CHECK_REACTS_INFO = "check_reacts_info";
+    public static final String GAME_STATS = "game_stats";
     public static final String PLAYER_STORED_VALUES = "player_stored_values";
     public static final String THALNOS_UNITS = "thalnos_units";
     public static final String DISPLACED_UNITS_SYSTEM = "displaced_units_system";
@@ -1349,6 +1350,7 @@ public final class Constants {
     public static final String FACTION_RECORD_OF_TECH = "faction_record_of_tech";
     public static final String FACTION_RECORD_OF_SCPICK = "faction_record_of_scpick";
     public static final String FACTION_TOP_COLORS = "faction_top_colors";
+    public static final String ACTION_CARD_STATS = "action_card_stats";
     public static final String SPENDS = "spends";
     public static final String TOP_LIMIT = "top_limit";
     public static final String MINIMUM_NUMBER_OF_TURNS = "minimum_number_of_turns";

@@ -103,7 +103,6 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
 public class Game extends GameProperties implements StoredValueHelper, TwilightFallDeckFuncs {
-
     private static final JsonMapper mapper = JsonMapperManager.basic();
 
     // TODO (Jazz): Sort through these and add to GameProperties
@@ -127,8 +126,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     // TODO (Jazz): These should be easily added to GameProperties
     @Getter
     private Map<String, Integer> thalnosUnits = new HashMap<>();
-
-    private final Map<String, Integer> actionCardsSabotaged = new HashMap<>();
 
     @Getter
     private Map<String, String> currentAgendaVotes = new HashMap<>();
@@ -1377,8 +1374,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return thalnosUnits.getOrDefault(unit, 0);
     }
 
-    public Map<String, Integer> getAllActionCardsSabod() {
-        return actionCardsSabotaged;
+    public void setSpecificThalnosUnit(String unit, int count) {
+        thalnosUnits.put(unit, count);
     }
 
     @Override
@@ -1387,14 +1384,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 && !"base_game".equals(getScSetID())
                 && !"te".equals(getScSetID())
                 && !"twilights_fall_sc".equals(getScSetID());
-    }
-
-    public void setSpecificThalnosUnit(String unit, int count) {
-        thalnosUnits.put(unit, count);
-    }
-
-    public void setSpecificActionCardSaboCount(String acName, int count) {
-        actionCardsSabotaged.put(acName, count);
     }
 
     public void resetThalnosUnits() {

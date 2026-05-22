@@ -49,6 +49,7 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import ti4.draft.BagDraft;
 import ti4.game.Game;
+import ti4.game.GameStats;
 import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -505,6 +506,7 @@ class GameLoadService {
                         }
                     }
                 }
+                case Constants.GAME_STATS -> game.setGameStats(mapper.readValue(info, GameStats.class));
                 case Constants.THALNOS_UNITS -> {
                     StringTokenizer thalnosInfoTokens = new StringTokenizer(info, ":");
                     while (thalnosInfoTokens.hasMoreTokens()) {
@@ -529,7 +531,8 @@ class GameLoadService {
                         }
                         if (dataInfoTokens.hasMoreTokens()) {
                             String dataInfo = dataInfoTokens.nextToken();
-                            game.setSpecificActionCardSaboCount(outcome, Integer.parseInt(dataInfo));
+                            // TODO Remove this legacy ACS_SABOD migration path once all game files have been migrated.
+                            game.getGameStats().setSpecificActionCardSaboCount(outcome, Integer.parseInt(dataInfo));
                         }
                     }
                 }
