@@ -1,6 +1,5 @@
 package ti4.discord.interactions.commands.developer;
 
-import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -9,13 +8,11 @@ import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.game.persistence.GameManager;
+import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
 class RunAgainstAllGames extends Subcommand {
-
-    private static final long ONE_DAY_MILLIS = Duration.ofDays(1).toMillis();
-    private static final long THIRTY_DAYS_MILLIS = Duration.ofDays(30).toMillis();
 
     RunAgainstAllGames() {
         super("run_against_all_games", "Runs this custom code against all games.");
@@ -43,9 +40,8 @@ class RunAgainstAllGames extends Subcommand {
     }
 
     private static boolean makeChanges(Game game) {
-        // Migration: move old action-card sabotage stats from text-based persistence (ACS_SABOD)
-        // into the GameStats JSON object. These are loaded during deserialization of old game files,
-        // so returning true for any game with AC play stats forces a re-save in the new format.
-        return !game.getGameStats().getActionCardPlays().isEmpty();
+        return game.getGameStats()
+                .getActionCardPlays()
+                .removeIf(play -> !Mapper.isValidActionCard(play.getActionCard()));
     }
 }
