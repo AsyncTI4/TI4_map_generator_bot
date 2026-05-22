@@ -21,7 +21,7 @@ import ti4.model.ActionCardModel;
 
 @UtilityClass
 public class ActionCardStatsService {
-    private static final LocalDate PLAYER_TRACKING_START_DATE = LocalDate.of(2026, 5, 22);
+    private static final LocalDate PLAYER_TRACKING_START_DATE = LocalDate.of(2026, 5, 23);
 
     public static void queueReply(SlashCommandInteractionEvent event) {
         StatisticsPipeline.queue(event, () -> showActionCardStats(event));
