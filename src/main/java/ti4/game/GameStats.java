@@ -13,8 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GameStats {
-    public static final String SABOTAGE = "Sabotage";
-    public static final String OVERRULE = "Overrule";
+    public static final String SABOTAGE = "sabo1";
+    public static final String OVERRULE = "overrule";
 
     private List<ActionCardPlay> actionCardPlays = new ArrayList<>();
 
