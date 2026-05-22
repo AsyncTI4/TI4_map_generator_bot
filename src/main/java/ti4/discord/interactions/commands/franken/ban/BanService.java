@@ -21,6 +21,12 @@ public class BanService implements IBanService {
             return "Successfully banned ability: " + Mapper.getAbility(id).getName() + ".\n";
         });
 
+        BAN_APPLIERS.put(Constants.BAN_FACTION, (game, id) -> {
+            if (isBlank(id) || !Mapper.getFactionIDs().contains(id)) return "";
+            appendStoredValue(game, "bannedFactions", id);
+            return "Successfully banned " + Mapper.getFaction(id).getFactionName() + ".\n";
+        });
+
         BAN_APPLIERS.put(Constants.BREAKTHROUGH, (game, id) -> {
             if (isBlank(id) || Mapper.getBreakthrough(id) == null) return "";
             appendStoredValue(game, "bannedBreakthroughs", id);
@@ -130,6 +136,7 @@ public class BanService implements IBanService {
 
     private static void appendStoredValue(Game game, String key, String value) {
         String prev = game.getStoredValue(key);
+        if (List.of(prev.split(Constants.FIN_SEPARATOR)).contains(value)) return;
         game.setStoredValue(key, prev.isEmpty() ? value : prev + Constants.FIN_SEPARATOR + value);
     }
 }
