@@ -1,5 +1,6 @@
 package ti4.game;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.ArrayList;
@@ -7,15 +8,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
-@Getter
+@JsonAutoDetect(
+        fieldVisibility = JsonAutoDetect.Visibility.ANY,
+        getterVisibility = JsonAutoDetect.Visibility.NONE,
+        setterVisibility = JsonAutoDetect.Visibility.NONE,
+        isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GameStats {
     public static final String SABOTAGE = "Sabotage";
     public static final String OVERRULE = "Overrule";
 
-    private final List<ActionCardPlay> actionCardPlays = new ArrayList<>();
+    @Getter
+    @Setter
+    private List<ActionCardPlay> actionCardPlays = new ArrayList<>();
 
     public void recordAcPlay(String acName, Player player) {
         actionCardPlays.add(new ActionCardPlay(acName, getTrackedPlayerId(player), null));
