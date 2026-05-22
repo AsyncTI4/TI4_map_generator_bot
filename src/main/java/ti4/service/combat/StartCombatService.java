@@ -24,6 +24,7 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.ArvaxiCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -1169,6 +1170,12 @@ public class StartCombatService {
                 break;
             }
         }
+        if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("control_network"))) {
+            for (Player rollingPlayer : ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition())) {
+                spaceCannonButtons.addAll(NetrunnersAbilitiesHandler.getControlNetworkSpaceCannonButtons(
+                        game, rollingPlayer, tile, CombatRollType.SpaceCannonOffence, "space"));
+            }
+        }
         return spaceCannonButtons;
     }
 
@@ -2270,6 +2277,10 @@ public class StartCombatService {
                         buttons.add(Buttons.gray(
                                 "combatRoll_" + tile.getPosition() + "_" + unitH.getName() + "_spacecannondefence",
                                 "Roll SPACE CANNON Defence for " + nameOfHolder));
+                        if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("control_network"))) {
+                            buttons.addAll(NetrunnersAbilitiesHandler.getControlNetworkSpaceCannonButtons(
+                                    game, nonActive, tile, CombatRollType.SpaceCannonDefence, unitH.getName()));
+                        }
                     }
                 }
             }
