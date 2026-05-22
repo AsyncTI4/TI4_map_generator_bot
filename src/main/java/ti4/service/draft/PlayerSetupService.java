@@ -496,9 +496,10 @@ public class PlayerSetupService {
         }
 
         if (!game.isFowMode()) {
-            StringBuilder sb = TitlesHelper.getPlayerTitles(player.getUserID(), player.getUserName(), false);
+            String username = player.getUserName();
+            StringBuilder sb = TitlesHelper.getPlayerTitles(player.getUserID(), username, false);
             if (!sb.toString().contains("No titles yet")) {
-                String msg = "In previous games, " + player.getUserName() + " has earned the titles of: \n" + sb;
+                String msg = "In previous games, " + username + " has earned the titles of: \n" + sb;
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
             }
         }
