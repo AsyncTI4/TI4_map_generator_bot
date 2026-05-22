@@ -2009,6 +2009,7 @@ public class ActionCardHelper {
     }
 
     static void recordTrackedActionCardPlay(Game game, Player player, String actionCardName) {
+        // Sabo and Overrule are tracked at separate points to track their targets
         if (!GameStats.SABOTAGE.equals(actionCardName) && !GameStats.OVERRULE.equals(actionCardName)) {
             game.getGameStats().recordAcPlay(actionCardName, player);
         }
