@@ -52,6 +52,7 @@ import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
+import ti4.helpers.settingsFramework.menus.FrankenSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
@@ -683,6 +684,15 @@ class GameSaveService {
         } else if (game.getDraftSystemSettingsJson() != null) {
             // default to the already stored value, if we failed to read it previously
             writer.write(Constants.DRAFT_SYSTEM_SETTINGS + " " + game.getDraftSystemSettingsJson());
+            writer.write(System.lineSeparator());
+        }
+
+        FrankenSettings frankenSettings = game.getFrankenSettingsUnsafe();
+        if (frankenSettings != null) {
+            writer.write(Constants.FRANKEN_DRAFT_SETTINGS + " " + frankenSettings.json());
+            writer.write(System.lineSeparator());
+        } else if (game.getFrankenSettingsJson() != null) {
+            writer.write(Constants.FRANKEN_DRAFT_SETTINGS + " " + game.getFrankenSettingsJson());
             writer.write(System.lineSeparator());
         }
 

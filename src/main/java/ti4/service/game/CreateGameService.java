@@ -290,6 +290,12 @@ public class CreateGameService {
                 "If you want to start a Twilight's Fall Game (alternate game mode included in Thunder's Edge) use this button",
                 tfOptions);
 
+        Button frankenButton = Buttons.green("frankenSetup", "Start Franken Setup");
+        MessageHelper.sendMessageToChannelWithButton(
+                actionsChannel,
+                "If you want to start a Franken game (alternate homebrew game mode) use this button",
+                frankenButton);
+
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("chooseExp_newPoK", "New PoK"));
         buttons.add(Buttons.gray("chooseExp_oldPoK", "Old PoK"));

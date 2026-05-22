@@ -114,6 +114,11 @@ public final class ModalListener extends ListenerAdapter {
                 game.initializeDraftSystemSettings().parseInput(context);
                 return;
             }
+            String frankenNavPart = ".*_franken[._].*";
+            if (modalID.matches(frankenNavPart)) {
+                game.initializeFrankenSettings().parseInput(context);
+                return;
+            }
             game.initializeMiltySettings().parseInput(context);
         }
     }

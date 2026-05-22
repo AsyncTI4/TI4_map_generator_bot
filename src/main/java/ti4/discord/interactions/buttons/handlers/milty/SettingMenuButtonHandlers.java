@@ -17,6 +17,11 @@ class SettingMenuButtonHandlers {
             game.initializeDraftSystemSettings().parseButtonInput(event);
             return;
         }
+        String frankenNavPart = ".*_franken[._].*";
+        if (event.getCustomId().matches(frankenNavPart)) {
+            game.initializeFrankenSettings().parseButtonInput(event);
+            return;
+        }
 
         game.initializeMiltySettings().parseButtonInput(event);
     }

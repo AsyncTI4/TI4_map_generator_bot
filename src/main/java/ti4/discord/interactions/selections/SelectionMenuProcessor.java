@@ -106,6 +106,12 @@ public final class SelectionMenuProcessor {
             deleteMsg(event);
             return;
         }
+        String frankenNavPart = ".*_franken[._].*";
+        if (event.getCustomId().matches(frankenNavPart)) {
+            game.initializeFrankenSettings().parseSelectionInput(event);
+            deleteMsg(event);
+            return;
+        }
 
         game.initializeMiltySettings().parseSelectionInput(event);
         deleteMsg(event);

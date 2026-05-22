@@ -69,6 +69,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
 import ti4.helpers.settingsFramework.menus.DeckSettings;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
+import ti4.helpers.settingsFramework.menus.FrankenSettings;
 import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.GameSetupSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
@@ -260,6 +261,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     @Setter
     @Getter
+    private String frankenSettingsJson;
+
+    @Setter
+    @Getter
     private String draftString;
 
     @Setter
@@ -267,6 +272,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     @Setter
     private DraftSystemSettings draftSystemSettings;
+
+    @Setter
+    private FrankenSettings frankenSettings;
 
     @Getter
     @Setter
@@ -493,6 +501,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         draftString = null;
         draftSystemSettings = null;
         draftSystemSettingsJson = null;
+        frankenSettings = null;
+        frankenSettingsJson = null;
     }
 
     @NotNull
@@ -583,6 +593,33 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
         return draftSystemSettings;
+    }
+
+    public FrankenSettings getFrankenSettingsUnsafe() {
+        return frankenSettings;
+    }
+
+    public FrankenSettings initializeFrankenSettings() {
+        if (frankenSettings == null) {
+            if (frankenSettingsJson != null) {
+                try {
+                    JsonNode json = mapper.readTree(frankenSettingsJson);
+                    frankenSettings = new FrankenSettings(this, json);
+                } catch (Exception e) {
+                    BotLogger.error(
+                            new LogOrigin(this),
+                            "Failed loading franken draft settings for `" + getName() + "` "
+                                    + Constants.jabberwockyPing(),
+                            e);
+                    MessageHelper.sendMessageToChannel(
+                            getActionsChannel(), "Franken draft settings failed to load. Resetting to default.");
+                    frankenSettings = new FrankenSettings(this, null);
+                }
+            } else {
+                frankenSettings = new FrankenSettings(this, null);
+            }
+        }
+        return frankenSettings;
     }
 
     public void setPurgedPN(String purgedPN) {
