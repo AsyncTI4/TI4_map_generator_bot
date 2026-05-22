@@ -15,7 +15,6 @@ import ti4.game.persistence.ConsumeGameUtility;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
-import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -53,23 +52,15 @@ class RunAgainstAllGames extends Subcommand {
     private static boolean makeChanges(Game game) {
         boolean changed = false;
 
-        // TODO: Remove after actionCardPlays migration is confirmed complete.
-        // If actionCardPlays was wiped by a bad migration, restore from the most recent undo that has data.
-        if (game.getGameStats().getActionCardPlays().isEmpty()) {
-            List<GameStats.ActionCardPlay> playsFromUndo = findActionCardPlaysFromUndos(game);
-            if (!playsFromUndo.isEmpty()) {
-                game.getGameStats().setActionCardPlays(playsFromUndo);
-                changed = true;
-            }
+        List<GameStats.ActionCardPlay> playsFromUndo = findActionCardPlaysFromUndos(game);
+        if (!playsFromUndo.isEmpty()) {
+            game.getGameStats().setActionCardPlays(playsFromUndo);
+            changed = true;
         }
 
-        boolean removedInvalid = game.getGameStats()
-                .getActionCardPlays()
-                .removeIf(play -> !Mapper.isValidActionCard(play.getActionCard()));
-        return changed || removedInvalid;
+        return changed;
     }
 
-    // TODO: Remove after actionCardPlays migration is confirmed complete.
     private static List<GameStats.ActionCardPlay> findActionCardPlaysFromUndos(Game game) {
         String gameName = game.getName();
         List<Integer> undoNumbers = GameUndoNameService.getSortedUndoNumbers(gameName);
@@ -84,7 +75,7 @@ class RunAgainstAllGames extends Subcommand {
             for (int i = undoNumbers.size() - 1; i >= 0; i--) {
                 UndoFileInfo undoFileInfo = readUndoFileInfo(gameName, undoNumbers.get(i));
                 if (undoFileInfo != null && BAD_MIGRATION_REASON.equals(undoFileInfo.latestCommand())) {
-                    if (i <= 0) {
+                    if (i == 0) {
                         return List.of();
                     }
                     targetUndoNumber = undoNumbers.get(i - 1);
