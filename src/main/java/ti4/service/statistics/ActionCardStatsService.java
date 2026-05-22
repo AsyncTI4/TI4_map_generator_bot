@@ -1,7 +1,6 @@
 package ti4.service.statistics;
 
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,9 +21,7 @@ import ti4.model.ActionCardModel;
 
 @UtilityClass
 public class ActionCardStatsService {
-    static final LocalDate PLAYER_TRACKING_START_DATE = LocalDate.of(2026, 5, 22);
-    private static final long PLAYER_TRACKING_START_MILLIS =
-            PLAYER_TRACKING_START_DATE.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+    private static final LocalDate PLAYER_TRACKING_START_DATE = LocalDate.of(2026, 5, 23);
 
     public static void queueReply(SlashCommandInteractionEvent event) {
         StatisticsPipeline.queue(event, () -> showActionCardStats(event));
@@ -66,10 +63,8 @@ public class ActionCardStatsService {
             Map<String, Integer> actionCardsPlayedCounts,
             Map<String, Integer> overruleCounts,
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
-        if (game.getCreationDateTime() >= PLAYER_TRACKING_START_MILLIS) {
-            for (ActionCardPlay actionCardPlay : game.getGameStats().getActionCardPlays()) {
-                trackedPlayCounts.merge(actionCardPlay.getActionCard(), 1, Integer::sum);
-            }
+        for (ActionCardPlay actionCardPlay : game.getGameStats().getActionCardPlays()) {
+            trackedPlayCounts.merge(actionCardPlay.getActionCard(), 1, Integer::sum);
         }
 
         game.getGameStats()
@@ -101,13 +96,16 @@ public class ActionCardStatsService {
             Map<String, Integer> overruleCounts,
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
         StringBuilder message = new StringBuilder();
-        message.append("**Tracked action card plays**\n");
+        message.append("_We started tracking these on ")
+                .append(PLAYER_TRACKING_START_DATE)
+                .append("_\n");
+        message.append("\n**Action card plays**\n");
         appendTrackedPlayStats(message, trackedPlayCounts);
         message.append("\n**Action card play-to-win correlation**\n");
         appendPlayToWinCorrelationStats(message, playToWinCorrelationCounts);
         message.append("**Sabotage targets**\n");
         appendSabotageStats(message, sabotageCounts, actionCardsPlayedCounts);
-        message.append("\n**Overrule choices**\n");
+        message.append("\n**Overrule targets**\n");
         appendOverruleStats(message, overruleCounts);
         return message.toString();
     }
@@ -166,12 +164,8 @@ public class ActionCardStatsService {
                         .append('\n'));
     }
 
-    static void accumulateActionCardPlayToWinCorrelation(
+    private static void accumulateActionCardPlayToWinCorrelation(
             Game game, Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
-        if (game.getCreationDateTime() < PLAYER_TRACKING_START_MILLIS) {
-            return;
-        }
-
         Player winner = game.getWinner().orElse(null);
         if (winner == null) {
             return;
@@ -192,11 +186,8 @@ public class ActionCardStatsService {
         }
     }
 
-    static void appendPlayToWinCorrelationStats(
+    private static void appendPlayToWinCorrelationStats(
             StringBuilder message, Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
-        message.append("_Only includes games started on or after ")
-                .append(PLAYER_TRACKING_START_DATE)
-                .append("; per-player tracking started on that date._\n");
         if (playToWinCorrelationCounts.isEmpty()) {
             message.append("No eligible action card play-to-win correlation data matched the selected filters.\n");
             return;

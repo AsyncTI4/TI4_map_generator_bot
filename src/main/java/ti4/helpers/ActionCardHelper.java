@@ -27,6 +27,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.ArvaxiA
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
+import ti4.game.GameStats;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -753,6 +754,7 @@ public class ActionCardHelper {
                 game.discardActionCard(player.getUserID(), acIndex);
             }
         }
+        recordTrackedActionCardPlay(game, player, actionCardTitle);
 
         boolean actionCardIsCancelable = isActionCardCancelable(actionCard) && !twinned;
 
@@ -2004,6 +2006,13 @@ public class ActionCardHelper {
             return "No such Action Card ID found, please retry";
         }
         return resolveActionCard(event, game, player, acID, acIndex, channel);
+    }
+
+    static void recordTrackedActionCardPlay(Game game, Player player, String actionCardName) {
+        // Sabo and Overrule are tracked at separate points to track their targets
+        if (!GameStats.SABOTAGE.equals(actionCardName) && !GameStats.OVERRULE.equals(actionCardName)) {
+            game.getGameStats().recordAcPlay(actionCardName, player);
+        }
     }
 
     private static String getGarboziaACIdentByAlias(Game game, Player player, String key) {

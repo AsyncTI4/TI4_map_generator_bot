@@ -8,7 +8,6 @@ import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.game.persistence.GameManager;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -40,8 +39,6 @@ class RunAgainstAllGames extends Subcommand {
     }
 
     private static boolean makeChanges(Game game) {
-        return game.getGameStats()
-                .getActionCardPlays()
-                .removeIf(play -> !Mapper.isValidActionCard(play.getActionCard()));
+        return false;
     }
 }
