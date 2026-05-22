@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
+import ti4.game.GameStats;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.game.persistence.GameManager;
 import ti4.image.Mapper;
@@ -40,8 +41,12 @@ class RunAgainstAllGames extends Subcommand {
     }
 
     private static boolean makeChanges(Game game) {
-        return game.getGameStats()
-                .getActionCardPlays()
-                .removeIf(play -> !Mapper.isValidActionCard(play.getActionCard()));
+        return game.getGameStats().getActionCardPlays().removeIf(play -> !isValidAcPlay(play.getActionCard()));
+    }
+
+    private static boolean isValidAcPlay(String actionCard) {
+        return GameStats.SABOTAGE.equals(actionCard)
+                || GameStats.OVERRULE.equals(actionCard)
+                || Mapper.isValidActionCard(actionCard);
     }
 }
