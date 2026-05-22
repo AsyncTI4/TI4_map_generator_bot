@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -29,6 +30,7 @@ import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.EidolonMaximumService;
 import ti4.service.breakthrough.VoidTetherService;
+import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -343,10 +345,14 @@ public final class ButtonHelperTacticalAction {
                                 + " with Space Cannon Offence coverage in this system.\n"
                                 + "Please resolve those before continuing, or float the window if irrelevant.");
             }
-            List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
-            spaceCannonButtons.add(
-                    Buttons.red("declinePDS_" + tile.getTileID() + "_" + player.getFaction(), "Decline PDS"));
             for (Player playerWithPds : playersWithPds2) {
+                List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
+                spaceCannonButtons.add(
+                        Buttons.red("declinePDS_" + tile.getTileID() + "_" + player.getFaction(), "Decline PDS"));
+                if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasAbility("control_network"))) {
+                    spaceCannonButtons.addAll(NetrunnersAbilitiesHandler.getControlNetworkSpaceCannonButtons(
+                            game, playerWithPds, tile, CombatRollType.SpaceCannonOffence, "space"));
+                }
                 MessageHelper.sendMessageToChannelWithButtons(
                         playerWithPds.getCorrectChannel(),
                         title + playerWithPds.getRepresentationUnfogged() + ", you have SPACE CANNON coverage in "

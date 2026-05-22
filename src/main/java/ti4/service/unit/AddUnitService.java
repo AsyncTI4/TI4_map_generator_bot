@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -35,6 +36,9 @@ public class AddUnitService {
             tile = FlipTileService.flipTileIfNeeded(tile, game);
             AddPlanetToPlayAreaService.addPlanetToPlayArea(
                     event, tile, unit.uh().getName(), game);
+            if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("system_breach"))) {
+                NetrunnersAbilitiesHandler.resolveSystemBreach(game, unit.unitKey(), unit.getTotalRemoved());
+            }
 
             String color = unit.unitKey().colorID();
             handleFogOfWar(tile, color, game, unit.unitKey() + " " + unit.getTotalRemoved());
@@ -55,6 +59,9 @@ public class AddUnitService {
             tile.getUnitHolders().get(parsedUnit.location()).addUnitsWithStates(parsedUnit.unitKey(), states);
             tile = FlipTileService.flipTileIfNeeded(tile, game);
             AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.location(), game);
+            if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("system_breach"))) {
+                NetrunnersAbilitiesHandler.resolveSystemBreach(game, parsedUnit.unitKey(), states.size());
+            }
         }
 
         handleFogOfWar(tile, color, game, unitList);
@@ -68,6 +75,9 @@ public class AddUnitService {
             tile.addUnit(parsedUnit.location(), parsedUnit.unitKey(), parsedUnit.count());
             tile = FlipTileService.flipTileIfNeeded(tile, game);
             AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.location(), game);
+            if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("system_breach"))) {
+                NetrunnersAbilitiesHandler.resolveSystemBreach(game, parsedUnit.unitKey(), parsedUnit.count());
+            }
         }
 
         handleFogOfWar(tile, color, game, unitList);
@@ -142,6 +152,9 @@ public class AddUnitService {
             tile.addUnit(parsedUnit.location(), parsedUnit.unitKey(), parsedUnit.count());
             tile = FlipTileService.flipTileIfNeeded(tile, game);
             AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.location(), game);
+            if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasAbility("system_breach"))) {
+                NetrunnersAbilitiesHandler.resolveSystemBreach(game, parsedUnit.unitKey(), parsedUnit.count());
+            }
             if (!first) {
                 unitListBuilder.append(", ");
             }

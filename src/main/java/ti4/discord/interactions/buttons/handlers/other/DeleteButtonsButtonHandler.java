@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -357,6 +358,9 @@ class DeleteButtonsButtonHandler {
             }
             player.resetSpentThings();
             game.removeStoredValue("producedUnitCostFor" + player.getFaction());
+            if (player.hasAbility("control_network")) {
+                NetrunnersAbilitiesHandler.cleanupControlNetworkProduction(game, player);
+            }
             if (player.hasAbility("amalgamation")) {
                 game.removeStoredValue("amalgAmount");
             }
