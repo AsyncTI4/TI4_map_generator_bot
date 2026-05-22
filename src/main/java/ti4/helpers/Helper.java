@@ -44,6 +44,7 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -1618,6 +1619,14 @@ public final class Helper {
         }
         int cost = calculateCostOfProducedUnits(player, game, true);
         int unitCount = calculateCostOfProducedUnits(player, game, false);
+        if (player.hasAbility("control_network")) {
+            String controlNetworkMessage =
+                    NetrunnersAbilitiesHandler.getControlNetworkProductionMessage(game, player, tile, cost, unitCount);
+            if (!controlNetworkMessage.isEmpty()) {
+                msg.append(controlNetworkMessage);
+                return msg.toString();
+            }
+        }
         if (unitCount <= 1) {
             msg.append("For a cost of ")
                     .append(cost)
