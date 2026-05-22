@@ -5,21 +5,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
-import ti4.draft.FrankenDraft;
-import ti4.draft.FrankenDrazDraft;
-import ti4.draft.InauguralSpliceFrankenDraft;
-import ti4.draft.OnePickFrankenDraft;
-import ti4.draft.OverdraftFrankenDraft;
-import ti4.draft.PoweredFrankenDraft;
-import ti4.draft.PoweredOnePickFrankenDraft;
-import ti4.draft.PoweredOverdraftFrankenDraft;
-import ti4.draft.TwilightsFallFrankenDraft;
 import ti4.game.Game;
-import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
-import ti4.service.franken.FrankenDraftBagService;
 import ti4.service.franken.FrankenDraftMode;
+import ti4.service.franken.FrankenDraftStartService;
 
 class StartFrankenDraft extends GameStateSubcommand {
 
@@ -37,15 +27,6 @@ class StartFrankenDraft extends GameStateSubcommand {
         Game game = getGame();
 
         boolean force = event.getOption(Constants.FORCE, Boolean.FALSE, OptionMapping::getAsBoolean);
-        if (!force
-                && game.getPlayers().values().stream().anyMatch(Player::isRealPlayer)
-                && !game.isTwilightsFallMode()) {
-            String message =
-                    "There are players that are currently set up already. Please rerun the command with the force option set to True to overwrite them.";
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-            return;
-        }
-
         String draftOption = event.getOption(Constants.DRAFT_MODE, "", OptionMapping::getAsString);
         FrankenDraftMode draftMode = FrankenDraftMode.fromString(draftOption);
         if (!"".equals(draftOption) && draftMode == null) {
@@ -53,30 +34,9 @@ class StartFrankenDraft extends GameStateSubcommand {
             return;
         }
 
-        FrankenDraftBagService.setUpFrankenFactions(game, event, force);
-        FrankenDraftBagService.clearPlayerHands(game);
-
-        if (draftMode == null) {
-            game.setBagDraft(new FrankenDraft(game));
-        } else {
-            switch (draftMode) {
-                case POWERED -> game.setBagDraft(new PoweredFrankenDraft(game));
-                case ONEPICK -> game.setBagDraft(new OnePickFrankenDraft(game));
-                case OVERDRAFT -> game.setBagDraft(new OverdraftFrankenDraft(game));
-                case POWEREDONEPICK -> game.setBagDraft(new PoweredOnePickFrankenDraft(game));
-                case POWEREDOVERDRAFT -> game.setBagDraft(new PoweredOverdraftFrankenDraft(game));
-                case FRANKENDRAZ -> game.setBagDraft(new FrankenDrazDraft(game));
-                case TWILIGHTSFALL -> {
-                    game.setupTwilightsFallMode(event);
-                    game.setBagDraft(new TwilightsFallFrankenDraft(game));
-                }
-                case INAUGURALSPLICE -> {
-                    game.setupTwilightsFallMode(event);
-                    game.setBagDraft(new InauguralSpliceFrankenDraft(game));
-                }
-            }
+        String error = FrankenDraftStartService.startFrankenDraft(event, game, force, draftMode);
+        if (error != null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error);
         }
-
-        FrankenDraftBagService.startDraft(game);
     }
 }
