@@ -450,6 +450,7 @@ public class PromissoryNoteHelper {
         }
         if ("fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
+            ButtonHelperCommanders.resolveNekroCommanderCheck(player, "ws", game);
             CommanderUnlockCheckService.checkPlayer(player, "mirveda");
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -458,6 +459,7 @@ public class PromissoryNoteHelper {
         }
         if ("sigma_fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
+            ButtonHelperCommanders.resolveNekroCommanderCheck(player, "ws", game);
             CommanderUnlockCheckService.checkPlayer(player, "mirveda");
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

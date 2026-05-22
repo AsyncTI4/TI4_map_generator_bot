@@ -1281,7 +1281,10 @@ public final class ButtonHelperFactionSpecific {
         } else {
             MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
         }
-        if (player.hasUnit("tf-productionbiomes")) {
+        if (player.hasUnit("tf-productionbiomes")
+                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                        .contains(tile)
+                && player.getStrategicCC() > 0) {
             String msg2 = player.getRepresentation()
                     + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
                     + " If you do, you will also choose another player, who will gain 2 trade goods.";

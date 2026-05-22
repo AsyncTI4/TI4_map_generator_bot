@@ -636,11 +636,10 @@ public class Tile {
                     || p.ownsUnit("sigma_creuss_flagship_1")
                     || p.ownsUnit("sigma_creuss_flagship_2")) {
                 ghostFlagshipColor = p.getColor();
-                break;
+                if (getSpaceUnitHolder().getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
+                    whs2.add(WormholeModel.Wormhole.DELTA);
+                }
             }
-        }
-        if (getSpaceUnitHolder().getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
-            whs2.add(WormholeModel.Wormhole.DELTA);
         }
         return whs2;
     }

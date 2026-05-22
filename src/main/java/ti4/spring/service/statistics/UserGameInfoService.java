@@ -25,9 +25,11 @@ public class UserGameInfoService {
     public List<Integer> getUsersThreeFastestDaysToComplete6PlayerGames(String userId) {
         return playerEntityRepository.findAllWithGamesByUserIdEquals(userId).stream()
                 .map(PlayerEntity::getGame)
+                .filter(game -> game.getPlayerCount() == 6)
                 .map(game ->
                         (int) Duration.ofMillis(game.getEndedEpochMilliseconds() - game.getCreationEpochMilliseconds())
                                 .toDays())
+                .filter(days -> days > 0)
                 .sorted()
                 .limit(3)
                 .toList();
@@ -42,7 +44,7 @@ public class UserGameInfoService {
         return toResultString(users, statsByUserId);
     }
 
-    private static Map<String, UserGameStatsAccumulator> buildUserStats(List<PlayerEntity> players) {
+    public static Map<String, UserGameStatsAccumulator> buildUserStats(List<PlayerEntity> players) {
         Map<String, UserGameStatsAccumulator> statsByUserId = new HashMap<>();
         for (PlayerEntity player : players) {
             UserGameStatsAccumulator stats = statsByUserId.computeIfAbsent(
