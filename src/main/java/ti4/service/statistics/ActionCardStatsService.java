@@ -96,14 +96,11 @@ public class ActionCardStatsService {
             Map<String, Integer> overruleCounts,
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
         StringBuilder message = new StringBuilder();
-        message.append("_We started tracking these on ")
-                .append(PLAYER_TRACKING_START_DATE)
-                .append("_\n");
         message.append("\n**Action card plays**\n");
         appendTrackedPlayStats(message, trackedPlayCounts);
         message.append("\n**Action card play-to-win correlation**\n");
         appendPlayToWinCorrelationStats(message, playToWinCorrelationCounts);
-        message.append("**Sabotage targets**\n");
+        message.append("\n**Sabotage targets**\n");
         appendSabotageStats(message, sabotageCounts, actionCardsPlayedCounts);
         message.append("\n**Overrule targets**\n");
         appendOverruleStats(message, overruleCounts);

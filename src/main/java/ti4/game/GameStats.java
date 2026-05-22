@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -64,6 +65,7 @@ public class GameStats {
         return StringUtils.isBlank(target) ? null : target;
     }
 
+    @EqualsAndHashCode
     @Getter
     private static class AcPlayStats {
         private int totalPlays;
@@ -77,6 +79,7 @@ public class GameStats {
         }
     }
 
+    @EqualsAndHashCode
     @Getter
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class ActionCardPlay {
