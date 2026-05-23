@@ -62,8 +62,9 @@ class RunAgainstAllGames extends Subcommand {
         changed |= game.getActionCards().removeIf(ACTION_CARDS_TO_REMOVE::contains);
         changed |= game.getDiscardActionCards().keySet().removeIf(ACTION_CARDS_TO_REMOVE::contains);
         changed |= game.getDiscardACStatus().keySet().removeIf(ACTION_CARDS_TO_REMOVE::contains);
-        changed |= game.getGameStats().getActionCardPlays().removeIf(
-                actionCardPlay -> ACTION_CARDS_TO_REMOVE.contains(actionCardPlay.getActionCard()));
+        changed |= game.getGameStats()
+                .getActionCardPlays()
+                .removeIf(actionCardPlay -> ACTION_CARDS_TO_REMOVE.contains(actionCardPlay.getActionCard()));
         for (Player player : game.getRealPlayers()) {
             changed |= player.getActionCards().keySet().removeIf(ACTION_CARDS_TO_REMOVE::contains);
         }
