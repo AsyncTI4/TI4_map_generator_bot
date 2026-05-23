@@ -363,6 +363,22 @@ public class MessageHelper {
         sendFileUploadToChannel(channel, fileUpload);
     }
 
+    public static void sendFileToThread(MessageChannel channel, String threadName, File file) {
+        if (channel instanceof MessageChannelUnion union) {
+            sendFileToThread(union, threadName, file);
+        } else {
+            sendFileToChannel(channel, file);
+        }
+    }
+
+    public static void sendFileToThread(MessageChannelUnion channel, String threadName, File file) {
+        if (file == null) {
+            BotLogger.error("File null");
+            return;
+        }
+        sendFileUploadToThread(channel, threadName, FileUpload.fromData(file));
+    }
+
     public static void sendFileUploadToChannel(MessageChannel channel, FileUpload fileUpload) {
         sendFileUploadToChannel(channel, fileUpload, null);
     }
@@ -379,6 +395,27 @@ public class MessageHelper {
                         error -> BotLogger.error(
                                 getRestActionFailureMessage(channel, "Failed to send File to Channel", null, error),
                                 error));
+    }
+
+    public static void sendFileUploadToThread(MessageChannelUnion channel, String threadName, FileUpload fileUpload) {
+        if (channel == null || threadName == null || fileUpload == null || threadName.isEmpty()) {
+            return;
+        }
+        if (channel instanceof TextChannel) {
+            channel.asTextChannel()
+                    .createThreadChannel(threadName)
+                    .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
+                    .queueAfter(
+                            500,
+                            TimeUnit.MILLISECONDS,
+                            t -> sendFileUploadToChannel(t, fileUpload),
+                            error -> BotLogger.error(
+                                    "Error creating thread channel: " + threadName + " in channel: "
+                                            + channel.getAsMention(),
+                                    error));
+        } else if (channel instanceof ThreadChannel) {
+            sendFileUploadToChannel(channel, fileUpload);
+        }
     }
 
     public static void sendEphemeralFileInResponseToButtonPress(

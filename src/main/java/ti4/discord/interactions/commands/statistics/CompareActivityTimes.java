@@ -14,7 +14,7 @@ import ti4.discord.interactions.buttons.handlers.game.CreateGameButtonHandler;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
-import ti4.message.MessageHelper;
+import ti4.service.statistics.StatisticsThreadHelper;
 
 class CompareActivityTimes extends Subcommand {
 
@@ -59,12 +59,12 @@ class CompareActivityTimes extends Subcommand {
                     members.add(event.getGuild().getMemberById(player.getId()));
                 });
         if (members.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "No valid players or roles provided to compare.");
+            StatisticsThreadHelper.sendMessage(event, "No valid players or roles provided to compare.");
             return;
         }
 
-        MessageHelper.sendMessageToChannel(
-                event.getChannel(),
+        StatisticsThreadHelper.sendMessage(
+                event,
                 CreateGameButtonHandler.generateMemberListMessage(members, "Activity Times", false));
     }
 }

@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.Subcommand;
-import ti4.message.MessageHelper;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
+import ti4.service.statistics.StatisticsThreadHelper;
 
 class SurveyResults extends Subcommand {
 
@@ -39,7 +39,7 @@ class SurveyResults extends Subcommand {
                 + generateQuestionResult("## Question #4: Winmaking\n", question4Data)
                 + generateQuestionResult("## Question #5: Meta Preferences\n", question5Data);
 
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
+        StatisticsThreadHelper.sendMessage(event, result);
     }
 
     private void incrementCount(Map<String, Integer> map, String key) {

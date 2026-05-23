@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
 import ti4.game.persistence.ConsumeGameUtility;
-import ti4.message.MessageHelper;
+import ti4.service.statistics.StatisticsThreadHelper;
 
 @UtilityClass
 class GameCountStatisticsService {
@@ -17,6 +17,6 @@ class GameCountStatisticsService {
         ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event), game -> count.getAndIncrement(), ExecutionLockType.READ);
 
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Game count: " + count.get());
+        StatisticsThreadHelper.sendMessage(event, "Game count: " + count.get());
     }
 }

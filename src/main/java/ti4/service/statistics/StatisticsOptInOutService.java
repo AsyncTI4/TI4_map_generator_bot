@@ -11,7 +11,8 @@ public final class StatisticsOptInOutService {
         statisticsOpIn.setPlayerDiscordId(event.getUser().getId());
         statisticsOpIn.setExcludeFromAsyncStats(true);
 
-        UltimateStatisticsWebsiteHelper.sendStatisticsOptIn(statisticsOpIn, event.getChannel());
+        UltimateStatisticsWebsiteHelper.sendStatisticsOptIn(
+                statisticsOpIn, event.getChannel(), StatisticsThreadHelper.getThreadName(event));
     }
 
     public static void optIn(SlashCommandInteractionEvent event) {
@@ -25,7 +26,8 @@ public final class StatisticsOptInOutService {
         statisticsOpIn.setShowOpponents(getOption(event, "opponents"));
         statisticsOpIn.setShowGames(getOption(event, "games"));
 
-        UltimateStatisticsWebsiteHelper.sendStatisticsOptIn(statisticsOpIn, event.getChannel());
+        UltimateStatisticsWebsiteHelper.sendStatisticsOptIn(
+                statisticsOpIn, event.getChannel(), StatisticsThreadHelper.getThreadName(event));
     }
 
     private static boolean getOption(SlashCommandInteractionEvent event, String optionName) {

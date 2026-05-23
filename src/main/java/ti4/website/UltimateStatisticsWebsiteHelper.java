@@ -52,16 +52,26 @@ public class UltimateStatisticsWebsiteHelper {
     }
 
     public static void sendStatisticsOptIn(StatisticOptIn request, MessageChannel channel) {
+        sendStatisticsOptIn(request, channel, null);
+    }
+
+    public static void sendStatisticsOptIn(StatisticOptIn request, MessageChannel channel, String threadName) {
         sendJson(
                 request,
                 PLAYER_SETTINGS_URL,
                 channel,
+                threadName,
                 PLAYER_SETTINGS_SUCCESS_MESSAGE,
                 PLAYER_SETTINGS_FAILURE_MESSAGE);
     }
 
     private static void sendJson(
-            Object request, String url, MessageChannel channel, String successMessage, String failureMessage) {
+            Object request,
+            String url,
+            MessageChannel channel,
+            String threadName,
+            String successMessage,
+            String failureMessage) {
         try {
             String json = JsonMapperManager.basic().writeValueAsString(request);
 
@@ -78,16 +88,16 @@ public class UltimateStatisticsWebsiteHelper {
                     .thenAccept(response -> {
                         if (response == null) return;
                         if (response.statusCode() == 200) {
-                            MessageHelper.sendMessageToChannel(channel, successMessage);
+                            sendResponseMessage(channel, threadName, successMessage);
                             return;
                         }
                         if (response.statusCode() >= 400) {
-                            handleErrorResponse(response, channel, failureMessage);
+                            handleErrorResponse(response, channel, threadName, failureMessage);
                         }
                     })
                     .exceptionally(e -> {
                         logHttpError(url, json, e);
-                        MessageHelper.sendMessageToChannel(channel, failureMessage);
+                        sendResponseMessage(channel, threadName, failureMessage);
                         return null;
                     });
         } catch (Exception e) {
@@ -95,7 +105,7 @@ public class UltimateStatisticsWebsiteHelper {
                     LAZIK_DISCORD_NOTIFICATION + " An exception occurred while sending a request to TI4 "
                             + "Ultimate Stats: " + url,
                     e);
-            MessageHelper.sendMessageToChannel(channel, failureMessage);
+            sendResponseMessage(channel, threadName, failureMessage);
         }
     }
 
@@ -107,7 +117,7 @@ public class UltimateStatisticsWebsiteHelper {
     }
 
     private static void handleErrorResponse(
-            HttpResponse<String> response, MessageChannel channel, String failureMessage) {
+            HttpResponse<String> response, MessageChannel channel, String threadName, String failureMessage) {
         String body = response.body();
         BotLogger.error(LAZIK_DISCORD_NOTIFICATION + " " + failureMessage + "\n```" + body + "```");
         try {
@@ -116,12 +126,20 @@ public class UltimateStatisticsWebsiteHelper {
             String detail = node.path("problemDetails").path("detail").asText();
             if (!title.isEmpty() || !detail.isEmpty()) {
                 String details = detail.isEmpty() ? title : title + " - " + detail;
-                MessageHelper.sendMessageToChannel(channel, String.format("%s (%s)", failureMessage, details));
+                sendResponseMessage(channel, threadName, String.format("%s (%s)", failureMessage, details));
                 return;
             }
         } catch (Exception e) {
             BotLogger.error("Failed to parse TI4 Ultimate error response", e);
         }
-        MessageHelper.sendMessageToChannel(channel, failureMessage);
+        sendResponseMessage(channel, threadName, failureMessage);
+    }
+
+    private static void sendResponseMessage(MessageChannel channel, String threadName, String message) {
+        if (threadName == null || threadName.isBlank()) {
+            MessageHelper.sendMessageToChannel(channel, message);
+            return;
+        }
+        MessageHelper.sendMessageToThread(channel, threadName, message);
     }
 }

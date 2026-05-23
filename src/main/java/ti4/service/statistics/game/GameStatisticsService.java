@@ -5,8 +5,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
-import ti4.message.MessageHelper;
 import ti4.service.statistics.StatisticsPipeline;
+import ti4.service.statistics.StatisticsThreadHelper;
 
 @UtilityClass
 public class GameStatisticsService {
@@ -15,7 +15,7 @@ public class GameStatisticsService {
         String statisticToShow = event.getOption(Constants.GAME_STATISTIC, null, OptionMapping::getAsString);
         GameStatTypes statType = GameStatTypes.fromString(statisticToShow);
         if (statType == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not determine stat type.");
+            StatisticsThreadHelper.sendMessage(event, "Could not determine stat type.");
             return;
         }
         StatisticsPipeline.queue(event, () -> getGameStatistics(event, statType));
@@ -47,7 +47,7 @@ public class GameStatisticsService {
                 case SECRET_OBJECTIVE_WIN_CHANCE ->
                     SecretObjectiveWinChanceStatisticsService.showSecretObjectiveWinChance(event);
                 case ENDING_ROUND_PHASE -> EndingRoundPhaseStatisticsService.showEndingRoundPhaseStatistics(event);
-                default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statType);
+                default -> StatisticsThreadHelper.sendMessage(event, "Unknown Statistic: " + statType);
             }
         } catch (Exception e) {
             BotLogger.error("Failed to process statistic: " + statType, e);

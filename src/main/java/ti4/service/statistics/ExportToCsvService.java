@@ -25,14 +25,15 @@ public class ExportToCsvService {
     private void exportToCsv(SlashCommandInteractionEvent event) {
         int playerCount = event.getOption(GameStatisticsFilterer.PLAYER_COUNT_FILTER, 6, OptionMapping::getAsInt);
         StringBuilder output = new StringBuilder(header(playerCount));
+        int outputLengthBeforeGames = output.length();
 
         ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event),
                 game -> output.append(System.lineSeparator()).append(gameToCsv(game)),
                 ExecutionLockType.READ);
 
-        if (output.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No games found matching filter.");
+        if (output.length() == outputLengthBeforeGames) {
+            StatisticsThreadHelper.sendMessage(event, "No games found matching filter.");
             return;
         }
 
@@ -40,9 +41,9 @@ public class ExportToCsvService {
         try (PrintWriter pw = new PrintWriter(outputCSV, StandardCharsets.UTF_8)) {
             pw.print(output);
             pw.close();
-            MessageHelper.sendFileToChannel(event.getChannel(), outputCSV);
+            StatisticsThreadHelper.sendFile(event, outputCSV);
         } catch (Exception e) {
-            MessageHelper.sendMessageToEventChannel(event, "Something broke. Ping jazz");
+            StatisticsThreadHelper.sendMessage(event, "Something broke. Ping jazz");
         }
     }
 

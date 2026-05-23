@@ -29,7 +29,11 @@ public class FactionRecordOfStrategyCardPickService {
     private void getFactionStrategyCardPickRecord(SlashCommandInteractionEvent event) {
         StringBuilder text = new StringBuilder();
         for (int x = 1; x < 7; x++) {
-            text.append(getSCPick(event, x));
+            String scPick = getSCPick(event, x);
+            if (scPick == null) {
+                return;
+            }
+            text.append(scPick);
         }
         MessageHelper.sendMessageToThread(event.getChannel(), "Strategy Card Pick Record", text.toString());
     }
@@ -38,8 +42,8 @@ public class FactionRecordOfStrategyCardPickService {
         String faction = event.getOption(Constants.FACTION, "", OptionMapping::getAsString);
         FactionModel factionM = Mapper.getFaction(faction);
         if (factionM == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No faction known as " + faction);
-            return "UNKNOWN FACTION";
+            StatisticsThreadHelper.sendMessage(event, "No faction known as " + faction);
+            return null;
         }
         Map<String, Integer> scsPicked = new HashMap<>();
         Map<String, Integer> custodians = new HashMap<>();

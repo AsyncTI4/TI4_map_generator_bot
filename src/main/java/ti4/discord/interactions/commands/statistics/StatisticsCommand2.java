@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.discord.interactions.commands.ParentCommand;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.message.MessageHelper;
 import ti4.service.persistence.DatabasePersistenceGate;
+import ti4.service.statistics.StatisticsThreadHelper;
 
 public class StatisticsCommand2 implements ParentCommand {
 
@@ -40,7 +40,7 @@ public class StatisticsCommand2 implements ParentCommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         if (DatabasePersistenceGate.isDisabled()) {
-            MessageHelper.sendMessageToEventChannel(
+            StatisticsThreadHelper.sendMessage(
                     event, "Statistics are temporarily unavailable while database maintenance is in progress.");
             return;
         }

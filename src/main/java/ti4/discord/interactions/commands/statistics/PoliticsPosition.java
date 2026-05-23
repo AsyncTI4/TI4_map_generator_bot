@@ -11,8 +11,8 @@ import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.helpers.Constants;
-import ti4.message.MessageHelper;
 import ti4.service.game.ManagedGameService;
+import ti4.service.statistics.StatisticsThreadHelper;
 
 class PoliticsPosition extends Subcommand {
 
@@ -90,6 +90,6 @@ class PoliticsPosition extends Subcommand {
         msg += "Games won: " + gamesWon + "\n";
         msg += "Games with custodians: " + gamesWithCustodians + "\n";
         msg += "Games with Imperial or Leadership in Round 5: " + gamesWith8Or1 + "\n";
-        MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+        StatisticsThreadHelper.sendMessage(event, msg);
     }
 }

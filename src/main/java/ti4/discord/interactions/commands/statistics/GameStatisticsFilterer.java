@@ -17,8 +17,8 @@ import ti4.game.Game;
 import ti4.game.helper.GameHelper;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.message.MessageHelper;
 import ti4.model.Source.ComponentSource;
+import ti4.service.statistics.StatisticsThreadHelper;
 import ti4.service.map.FractureService;
 
 @UtilityClass
@@ -121,8 +121,8 @@ public class GameStatisticsFilterer {
         try {
             return LocalDate.parse(startedAfterDate, STARTED_AFTER_FILTER_FORMATTER);
         } catch (Exception e) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
+            StatisticsThreadHelper.sendMessage(
+                    event,
                     "Unable to parse date '" + startedAfterDate + "'. Use format 'YYYY-MM-DD' instead.");
             return null;
         }

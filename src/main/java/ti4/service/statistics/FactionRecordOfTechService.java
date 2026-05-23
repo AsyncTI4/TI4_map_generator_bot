@@ -29,15 +29,17 @@ public class FactionRecordOfTechService {
 
     private void getFactionRecordOfTech(SlashCommandInteractionEvent event) {
         String text = getTechResearched(event);
-        MessageHelper.sendMessageToThread(event.getChannel(), "Technology Acquisition Record", text);
+        if (text != null) {
+            MessageHelper.sendMessageToThread(event.getChannel(), "Technology Acquisition Record", text);
+        }
     }
 
     private String getTechResearched(SlashCommandInteractionEvent event) {
         String faction = event.getOption(Constants.FACTION, "", OptionMapping::getAsString);
         FactionModel factionModel = Mapper.getFaction(faction);
         if (factionModel == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No faction known as " + faction);
-            return "UNKNOWN FACTION";
+            StatisticsThreadHelper.sendMessage(event, "No faction known as " + faction);
+            return null;
         }
         Map<String, Integer> techsResearched = new HashMap<>();
         AtomicInteger gamesThatHadThem = new AtomicInteger();
