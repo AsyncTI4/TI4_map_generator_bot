@@ -35,10 +35,11 @@ class DeleteUserMessages extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        User user = event.getOption(Constants.USER).getAsUser();
-        int count = event.getOption(Constants.COUNT).getAsInt();
         MessageChannel channel = resolveTargetChannel(event);
         if (channel == null) return;
+
+        User user = event.getOption(Constants.USER).getAsUser();
+        int count = event.getOption(Constants.COUNT).getAsInt();
 
         List<Message> messagesToDelete = findMostRecentMessagesByUser(channel, user.getId(), count);
         if (messagesToDelete.isEmpty()) {
@@ -47,16 +48,16 @@ class DeleteUserMessages extends Subcommand {
             return;
         }
 
-        int deletedCount = deleteMessages(messagesToDelete);
-        MessageHelper.sendMessageToEventChannel(
-                event,
-                "Deleted "
-                        + deletedCount
-                        + " message(s) from "
-                        + user.getAsMention()
-                        + " in <#"
-                        + channel.getId()
-                        + ">.");
+        try {
+            channel.purgeMessages(messagesToDelete);
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    "Deleted " + messagesToDelete.size() + " message(s) from " + user.getAsMention() + " in <#"
+                            + channel.getId() + ">.");
+        } catch (Exception e) {
+            BotLogger.catchRestError(e);
+            MessageHelper.sendMessageToChannel(channel, "An error occurred while deleting messages.");
+        }
     }
 
     private static MessageChannel resolveTargetChannel(SlashCommandInteractionEvent event) {
@@ -88,18 +89,5 @@ class DeleteUserMessages extends Subcommand {
                     .getRetrievedHistory();
         }
         return messages;
-    }
-
-    private static int deleteMessages(List<Message> messages) {
-        int deleted = 0;
-        for (Message message : messages) {
-            try {
-                message.delete().complete();
-                deleted++;
-            } catch (Exception e) {
-                BotLogger.catchRestError(e);
-            }
-        }
-        return deleted;
     }
 }
