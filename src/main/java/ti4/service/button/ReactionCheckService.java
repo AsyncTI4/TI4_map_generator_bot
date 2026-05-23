@@ -118,7 +118,7 @@ public class ReactionCheckService {
                     + " Please press one of the buttons below anyways though - don't worry, it won't reveal anything, it will just run cleanup.";
         }
         if (game.getRound() < 4 || !game.getPublicObjectives1Peekable().isEmpty()) {
-            if (game.isTwilightsFallMode()
+            if (!game.isDiscordantStarsMode()
                     && game.getPublicObjectives1Peekable().size() > 1
                     && !game.getPublicObjectives1Peeked().isEmpty()) {
                 for (int loc = 1; loc <= game.getPublicObjectives1Peekable().size(); loc++) {
@@ -139,7 +139,7 @@ public class ReactionCheckService {
             if ("456".equalsIgnoreCase(game.getStoredValue("homebrewMode"))) {
                 buttons.add(draw2Stage2);
             } else {
-                if (game.isTwilightsFallMode()
+                if (!game.isDiscordantStarsMode()
                         && game.getPublicObjectives1Peekable().isEmpty()
                         && !game.getPublicObjectives2Peeked().isEmpty()) {
                     for (int loc = 1; loc <= game.getPublicObjectives2Peekable().size(); loc++) {
