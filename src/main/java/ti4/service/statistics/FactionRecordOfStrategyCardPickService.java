@@ -42,7 +42,7 @@ public class FactionRecordOfStrategyCardPickService {
         String faction = event.getOption(Constants.FACTION, "", OptionMapping::getAsString);
         FactionModel factionM = Mapper.getFaction(faction);
         if (factionM == null) {
-            StatisticsThreadHelper.sendMessage(event, "No faction known as " + faction);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No faction known as " + faction);
             return null;
         }
         Map<String, Integer> scsPicked = new HashMap<>();

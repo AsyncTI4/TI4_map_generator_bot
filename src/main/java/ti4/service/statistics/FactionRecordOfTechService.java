@@ -38,7 +38,7 @@ public class FactionRecordOfTechService {
         String faction = event.getOption(Constants.FACTION, "", OptionMapping::getAsString);
         FactionModel factionModel = Mapper.getFaction(faction);
         if (factionModel == null) {
-            StatisticsThreadHelper.sendMessage(event, "No faction known as " + faction);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No faction known as " + faction);
             return null;
         }
         Map<String, Integer> techsResearched = new HashMap<>();

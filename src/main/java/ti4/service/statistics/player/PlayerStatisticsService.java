@@ -4,9 +4,9 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.helpers.Constants;
+import ti4.message.MessageHelper;
 import ti4.service.statistics.PlayerStatTypes;
 import ti4.service.statistics.StatisticsPipeline;
-import ti4.service.statistics.StatisticsThreadHelper;
 
 @UtilityClass
 public class PlayerStatisticsService {
@@ -15,7 +15,7 @@ public class PlayerStatisticsService {
         String statisticToShow = event.getOption(Constants.PLAYER_STATISTIC, null, OptionMapping::getAsString);
         PlayerStatTypes statType = PlayerStatTypes.fromString(statisticToShow);
         if (statType == null) {
-            StatisticsThreadHelper.sendMessage(event, "Unknown Statistic: " + statisticToShow);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
             return;
         }
         StatisticsPipeline.queue(event, () -> getPlayerStatistics(event, statType));
@@ -26,7 +26,7 @@ public class PlayerStatisticsService {
             case PLAYER_WIN_PERCENT -> PlayerWinPercentStatisticsService.showPlayerWinPercent(event);
             case PLAYER_WIN_PERFORMANCE -> PlayerExpectedWinDeltaStatisticsService.showPlayerExpectedWinDelta(event);
             case PLAYER_GAME_COUNT -> PlayerGameCountStatisticsService.showPlayerGameCount(event);
-            default -> StatisticsThreadHelper.sendMessage(event, "Unknown Statistic: " + statType);
+            default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statType);
         }
     }
 }

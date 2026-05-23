@@ -9,7 +9,7 @@ import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.game.persistence.ManagedPlayer;
 import ti4.logging.BotLogger;
-import ti4.service.statistics.StatisticsThreadHelper;
+import ti4.message.MessageHelper;
 
 @UtilityClass
 public class CommunityStatisticsService {
@@ -38,7 +38,7 @@ public class CommunityStatisticsService {
             output += "\n> Active game count: " + activeGames;
             output += "\n> Lifetime player count: " + allPlayers;
             output += "\n> Active player count: " + activePlayers;
-            StatisticsThreadHelper.sendMessage(event, output);
+            MessageHelper.sendMessageToChannel(event.getChannel(), output);
         } catch (Exception e) {
             BotLogger.error(event, "error", e);
         }

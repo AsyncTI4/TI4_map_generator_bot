@@ -13,6 +13,7 @@ import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.ConsumeGameUtility;
+import ti4.message.MessageHelper;
 
 @UtilityClass
 public class ExportToCsvService {
@@ -32,7 +33,7 @@ public class ExportToCsvService {
                 ExecutionLockType.READ);
 
         if (output.length() == outputLengthBeforeGames) {
-            StatisticsThreadHelper.sendMessage(event, "No games found matching filter.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No games found matching filter.");
             return;
         }
 
@@ -42,7 +43,7 @@ public class ExportToCsvService {
             pw.close();
             StatisticsThreadHelper.sendFile(event, outputCSV);
         } catch (Exception e) {
-            StatisticsThreadHelper.sendMessage(event, "Something broke. Ping jazz");
+            MessageHelper.sendMessageToEventChannel(event, "Something broke. Ping jazz");
         }
     }
 
