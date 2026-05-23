@@ -63,7 +63,7 @@ class DeleteUserMessages extends Subcommand {
         OptionMapping channelOption = event.getOption(Constants.CHANNEL);
         if (channelOption == null) return event.getChannel();
         GuildChannelUnion channel = channelOption.getAsChannel();
-        if (channel instanceof MessageChannel messageChannel) return messageChannel;
+        if (channel.getType().isMessage()) return channel.asGuildMessageChannel();
         MessageHelper.sendMessageToEventChannel(event, "The selected channel must support messages.");
         return null;
     }
@@ -74,7 +74,7 @@ class DeleteUserMessages extends Subcommand {
                 channel.getHistory().retrievePast(HISTORY_BATCH_SIZE).complete();
         int scanned = 0;
 
-        while (!batch.isEmpty() && messages.size() < count && scanned < MAX_HISTORY_SCAN) {
+        while (!batch.isEmpty() && messages.size() < count) {
             scanned += batch.size();
             for (Message message : batch) {
                 if (userId.equals(message.getAuthor().getId())) {
