@@ -13,6 +13,8 @@ public class FrankenDrazCommand implements ParentCommand {
                     new FrankenDrazAddFaction(),
                     new FrankenDrazRemoveFaction(),
                     new FrankenDrazSwapFaction(),
+                    new FrankenDrazSetKeptComponentLimit(),
+                    new FrankenDrazFactionLimit(),
                     new FrankenDrazHelp())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
