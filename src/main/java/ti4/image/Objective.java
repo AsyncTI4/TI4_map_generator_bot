@@ -105,7 +105,7 @@ public record Objective(
                                     Mapper.getSecretObjectivesJustNames().get(name);
                             return nameOfPO != null ? nameOfPO : name;
                         },
-                        (key1, key2) -> key1,
+                        (key1, _) -> key1,
                         LinkedHashMap::new));
     }
 
@@ -156,10 +156,10 @@ public record Objective(
     private static List<String> getPeekPlayerIDs(Game game, String objectiveKey) {
         if (game.getPublicObjectives1Peeked().containsKey(objectiveKey)) {
             return new LinkedHashMap<>(game.getPublicObjectives1Peeked()).get(objectiveKey);
-        } else if (game.getPublicObjectives2Peeked().containsKey(objectiveKey)) {
-            return new LinkedHashMap<>(game.getPublicObjectives2Peeked()).get(objectiveKey);
-        } else {
-            return new ArrayList<>();
         }
+        if (game.getPublicObjectives2Peeked().containsKey(objectiveKey)) {
+            return new LinkedHashMap<>(game.getPublicObjectives2Peeked()).get(objectiveKey);
+        }
+        return new ArrayList<>();
     }
 }
