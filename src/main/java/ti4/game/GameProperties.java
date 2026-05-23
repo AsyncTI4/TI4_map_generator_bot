@@ -167,6 +167,7 @@ public class GameProperties {
     private @ExportableField boolean fastSCFollowMode;
     private @ExportableField boolean extraSecretMode;
     private @ExportableField boolean votcMode;
+    private @ExportableField boolean speakerChoosesObjective;
     private @ExportableField boolean reverseSpeakerOrder;
     private @ExportableField boolean twilightKart;
 

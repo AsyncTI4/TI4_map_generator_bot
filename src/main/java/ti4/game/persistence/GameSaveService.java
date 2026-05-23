@@ -500,6 +500,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.TWILIGHTS_FALL_MODE + " " + game.isTwilightsFallMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.SPEAKER_CHOOSES_OBJECTIVE + " " + game.isSpeakerChoosesObjective());
+        writer.write(System.lineSeparator());
         writer.write(Constants.LIGHT_FOG_MODE + " " + game.isLightFogMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.CPTI_EXPLORE_MODE + " " + game.isCptiExploreMode());

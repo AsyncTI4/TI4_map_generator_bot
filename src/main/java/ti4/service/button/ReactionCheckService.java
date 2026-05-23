@@ -118,9 +118,8 @@ public class ReactionCheckService {
                     + " Please press one of the buttons below anyways though - don't worry, it won't reveal anything, it will just run cleanup.";
         }
         if (game.getRound() < 4 || !game.getPublicObjectives1Peekable().isEmpty()) {
-            if (game.isTwilightsFallMode()
-                    && game.getPublicObjectives1Peekable().size() > 1
-                    && !game.getPublicObjectives1Peeked().isEmpty()) {
+            if (game.shouldSpeakerChooseObjective(
+                    game.getPublicObjectives1Peekable(), game.getPublicObjectives1Peeked())) {
                 for (int loc = 1; loc <= game.getPublicObjectives1Peekable().size(); loc++) {
                     String id = game.getSpeaker().factionButtonChecker() + "reveal_stage_1position_" + loc;
                     String label = "Reveal Stage 1, Position " + loc;
@@ -139,9 +138,9 @@ public class ReactionCheckService {
             if ("456".equalsIgnoreCase(game.getStoredValue("homebrewMode"))) {
                 buttons.add(draw2Stage2);
             } else {
-                if (game.isTwilightsFallMode()
-                        && game.getPublicObjectives1Peekable().isEmpty()
-                        && !game.getPublicObjectives2Peeked().isEmpty()) {
+                if (game.getPublicObjectives1Peekable().isEmpty()
+                        && game.shouldSpeakerChooseObjective(
+                                game.getPublicObjectives2Peekable(), game.getPublicObjectives2Peeked())) {
                     for (int loc = 1; loc <= game.getPublicObjectives2Peekable().size(); loc++) {
                         String id = game.getSpeaker().factionButtonChecker() + "reveal_stage_2position_" + loc;
                         String label = "Reveal Stage 2, Position " + loc;
@@ -180,7 +179,7 @@ public class ReactionCheckService {
         if (tfWarning) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
-                    "Since this game is in Twilight's Fall mode and there are multiple objectives available to be picked from, some of which have been peeked at, the buttons will specify the position of the card they will reveal. The speaker gets to pick which one they reveal, per the rules.");
+                    "There are multiple public objectives available to reveal, and some have been peeked at. The buttons specify the position of the card they will reveal so the speaker can choose which one to flip.");
         }
     }
 

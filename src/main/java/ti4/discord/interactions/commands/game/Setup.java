@@ -26,6 +26,10 @@ class Setup extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_CUSTOM_NAME, "Custom description"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TIGL_GAME, "True to mark the game as TIGL"));
         addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                Constants.SPEAKER_CHOOSES_OBJECTIVE,
+                "True to let the speaker choose which peeked public objective to reveal"));
+        addOptions(new OptionData(
                 OptionType.INTEGER, Constants.AUTO_PING, "Hours between auto pings. Min 1. Enter 0 to turn off."));
     }
 
@@ -107,6 +111,11 @@ class Setup extends GameStateSubcommand {
             }
         }
 
+        OptionMapping speakerChoosesObjective = event.getOption(Constants.SPEAKER_CHOOSES_OBJECTIVE);
+        if (speakerChoosesObjective != null) {
+            game.setSpeakerChoosesObjective(speakerChoosesObjective.getAsBoolean());
+        }
+
         String customGameName = event.getOption(Constants.GAME_CUSTOM_NAME, null, OptionMapping::getAsString);
         if (customGameName != null) {
             game.setCustomName(customGameName);
@@ -122,7 +131,8 @@ class Setup extends GameStateSubcommand {
                 && scCountPerPlayer == null
                 && maxSOCount == null
                 && vpOption == null
-                && playerCount == null) {
+                && playerCount == null
+                && speakerChoosesObjective == null) {
             CreateGameService.presentSetupToPlayers(game);
         }
     }

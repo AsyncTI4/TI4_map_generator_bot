@@ -182,6 +182,7 @@ public final class Constants {
     public static final String PLAYER_COUNT_FOR_MAP = "player_count_for_map";
     public static final String SC_COUNT_FOR_MAP = "sc_count_for_map";
     public static final String VP_COUNT = "vp_count";
+    public static final String SPEAKER_CHOOSES_OBJECTIVE = "speaker_chooses_objective";
     public static final String JOIN = "join";
     public static final String START_SCENARIO = "start_scenario";
     public static final String ADD = "add";

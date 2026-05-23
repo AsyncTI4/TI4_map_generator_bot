@@ -2,6 +2,7 @@ package ti4.game;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -52,6 +53,26 @@ class GameTest {
         var json = JsonMapperManager.basic().valueToTree(game.getGameStats()).get("actionCardPlays");
         assertThat(json.get(0).get("target").asText()).isEqualTo("leadership");
         assertThat(json.get(1).has("target")).isFalse();
+    }
+
+    @Test
+    void shouldOnlyOfferSpeakerObjectiveChoiceWhenFeatureEnabledAndThereIsARealChoice() {
+        var game = new Game();
+        var peekedObjectives = Map.of("obj1", List.of("player1"));
+
+        assertThat(game.shouldSpeakerChooseObjective(List.of("obj1", "obj2"), peekedObjectives))
+                .isFalse();
+
+        game.setSpeakerChoosesObjective(true);
+        assertThat(game.shouldSpeakerChooseObjective(List.of("obj1", "obj2"), peekedObjectives))
+                .isTrue();
+        assertThat(game.shouldSpeakerChooseObjective(List.of("obj1"), peekedObjectives))
+                .isFalse();
+
+        game.setSpeakerChoosesObjective(false);
+        game.setTwilightsFallMode(true);
+        assertThat(game.shouldSpeakerChooseObjective(List.of("obj1", "obj2"), peekedObjectives))
+                .isTrue();
     }
 
     private Game createThreePlayerGame() {
