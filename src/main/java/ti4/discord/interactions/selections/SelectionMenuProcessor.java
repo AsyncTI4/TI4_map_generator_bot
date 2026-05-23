@@ -12,6 +12,7 @@ import ti4.discord.interactions.routing.SelectionHandler;
 import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
+import ti4.helpers.settingsFramework.menus.FrankenSettings;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.logging.RollbarManager;
@@ -103,6 +104,11 @@ public final class SelectionMenuProcessor {
         String draftSystemNavPart = ".*_draft[._].*";
         if (event.getCustomId().matches(draftSystemNavPart)) {
             game.initializeDraftSystemSettings().parseSelectionInput(event);
+            deleteMsg(event);
+            return;
+        }
+        if (FrankenSettings.isFrankenMenuComponent(event.getCustomId())) {
+            game.initializeFrankenSettings().parseSelectionInput(event);
             deleteMsg(event);
             return;
         }
