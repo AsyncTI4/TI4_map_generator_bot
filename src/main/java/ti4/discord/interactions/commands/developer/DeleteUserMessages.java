@@ -5,7 +5,7 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.channel.unions.ChannelUnion;
+import net.dv8tion.jda.api.entities.channel.unions.GuildChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -19,7 +19,7 @@ class DeleteUserMessages extends Subcommand {
 
     private static final int HISTORY_BATCH_SIZE = 100;
     private static final int MAX_DELETE_COUNT = 500;
-    private static final int MAX_HISTORY_SCAN = 5_000;
+    private static final int MAX_HISTORY_SCAN = 5000;
 
     DeleteUserMessages() {
         super("delete_user_messages", "Delete the last N messages from a user in a channel.");
@@ -29,7 +29,8 @@ class DeleteUserMessages extends Subcommand {
                         .setRequired(true)
                         .setMinValue(1)
                         .setMaxValue(MAX_DELETE_COUNT),
-                new OptionData(OptionType.CHANNEL, Constants.CHANNEL, "Channel to clean (defaults to current channel)"));
+                new OptionData(
+                        OptionType.CHANNEL, Constants.CHANNEL, "Channel to clean (defaults to current channel)"));
     }
 
     @Override
@@ -42,12 +43,7 @@ class DeleteUserMessages extends Subcommand {
         List<Message> messagesToDelete = findMostRecentMessagesByUser(channel, user.getId(), count);
         if (messagesToDelete.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(
-                    event,
-                    "No recent messages found for "
-                            + user.getAsMention()
-                            + " in <#"
-                            + channel.getId()
-                            + ">.");
+                    event, "No recent messages found for " + user.getAsMention() + " in <#" + channel.getId() + ">.");
             return;
         }
 
@@ -66,7 +62,7 @@ class DeleteUserMessages extends Subcommand {
     private static MessageChannel resolveTargetChannel(SlashCommandInteractionEvent event) {
         OptionMapping channelOption = event.getOption(Constants.CHANNEL);
         if (channelOption == null) return event.getChannel();
-        ChannelUnion channel = channelOption.getAsChannel();
+        GuildChannelUnion channel = channelOption.getAsChannel();
         if (channel instanceof MessageChannel messageChannel) return messageChannel;
         MessageHelper.sendMessageToEventChannel(event, "The selected channel must support messages.");
         return null;
@@ -74,7 +70,8 @@ class DeleteUserMessages extends Subcommand {
 
     private static List<Message> findMostRecentMessagesByUser(MessageChannel channel, String userId, int count) {
         List<Message> messages = new ArrayList<>(count);
-        List<Message> batch = channel.getHistory().retrievePast(HISTORY_BATCH_SIZE).complete();
+        List<Message> batch =
+                channel.getHistory().retrievePast(HISTORY_BATCH_SIZE).complete();
         int scanned = 0;
 
         while (!batch.isEmpty() && messages.size() < count && scanned < MAX_HISTORY_SCAN) {
