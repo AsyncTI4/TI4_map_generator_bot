@@ -1647,7 +1647,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public boolean shouldSpeakerChooseObjective(List<String> peekableObjectives) {
-        return (isTwilightsFallMode() || isSpeakerChoosesObjective()) && peekableObjectives.size() > 1;
+        return isSpeakerChoosesObjective() && peekableObjectives.size() > 1;
     }
 
     public boolean revealSpecificStage1(String id) {
