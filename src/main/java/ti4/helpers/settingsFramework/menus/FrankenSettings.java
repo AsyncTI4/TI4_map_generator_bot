@@ -168,7 +168,7 @@ public class FrankenSettings extends SettingsMenu {
     private static String frankenNotes() {
         return "\n\n"
                 + "**Notes:**\n"
-                + "> Use the game options and homebrew settings above to enable homebrew. DS auto includes BR, if you want to play without them, add the BR ban list.\n"
+                + "> Use the game options and homebrew settings above to enable homebrew. DS auto includes BR, if you want to play without them, add the BR ban list.\n\n"
                 + "> Due to discord message limits, component bans must be handled manually via slash command. The ban list options have popular component bans.";
     }
 
