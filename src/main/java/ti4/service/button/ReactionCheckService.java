@@ -118,7 +118,7 @@ public class ReactionCheckService {
                     + " Please press one of the buttons below anyways though - don't worry, it won't reveal anything, it will just run cleanup.";
         }
         if (game.getRound() < 4 || !game.getPublicObjectives1Peekable().isEmpty()) {
-            if (game.shouldSpeakerChooseObjective(game.getPublicObjectives1Peekable())) {
+            if (game.isSpeakerChoosesObjective()) {
                 for (int loc = 1; loc <= game.getPublicObjectives1Peekable().size(); loc++) {
                     String id = game.getSpeaker().factionButtonChecker() + "reveal_stage_1position_" + loc;
                     String label = "Reveal Stage 1, Position " + loc;
@@ -137,8 +137,7 @@ public class ReactionCheckService {
             if ("456".equalsIgnoreCase(game.getStoredValue("homebrewMode"))) {
                 buttons.add(draw2Stage2);
             } else {
-                if (game.getPublicObjectives1Peekable().isEmpty()
-                        && game.shouldSpeakerChooseObjective(game.getPublicObjectives2Peekable())) {
+                if (game.getPublicObjectives1Peekable().isEmpty() && game.isSpeakerChoosesObjective()) {
                     for (int loc = 1; loc <= game.getPublicObjectives2Peekable().size(); loc++) {
                         String id = game.getSpeaker().factionButtonChecker() + "reveal_stage_2position_" + loc;
                         String label = "Reveal Stage 2, Position " + loc;
