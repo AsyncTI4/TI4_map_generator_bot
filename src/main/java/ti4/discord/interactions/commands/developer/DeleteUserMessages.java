@@ -1,5 +1,6 @@
 package ti4.discord.interactions.commands.developer;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Message;
@@ -20,6 +21,7 @@ class DeleteUserMessages extends Subcommand {
     private static final int HISTORY_BATCH_SIZE = 100;
     private static final int MAX_DELETE_COUNT = 500;
     private static final int MAX_HISTORY_SCAN = 5000;
+    private static final int MINIMUM_MESSAGE_AGE_SECONDS = 30;
 
     DeleteUserMessages() {
         super("delete_user_messages", "Delete the last N messages from a user in a channel.");
@@ -40,8 +42,9 @@ class DeleteUserMessages extends Subcommand {
 
         User user = event.getOption(Constants.USER).getAsUser();
         int count = event.getOption(Constants.COUNT).getAsInt();
+        OffsetDateTime newestDeletionTime = OffsetDateTime.now().minusSeconds(MINIMUM_MESSAGE_AGE_SECONDS);
 
-        List<Message> messagesToDelete = findMostRecentMessagesByUser(channel, user.getId(), count);
+        List<Message> messagesToDelete = findMostRecentMessagesByUser(channel, user.getId(), count, newestDeletionTime);
         if (messagesToDelete.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(
                     event, "No recent messages found for " + user.getAsMention() + " in <#" + channel.getId() + ">.");
@@ -69,7 +72,8 @@ class DeleteUserMessages extends Subcommand {
         return null;
     }
 
-    private static List<Message> findMostRecentMessagesByUser(MessageChannel channel, String userId, int count) {
+    private static List<Message> findMostRecentMessagesByUser(
+            MessageChannel channel, String userId, int count, OffsetDateTime newestDeletionTime) {
         List<Message> messages = new ArrayList<>(count);
         List<Message> batch =
                 channel.getHistory().retrievePast(HISTORY_BATCH_SIZE).complete();
@@ -78,7 +82,8 @@ class DeleteUserMessages extends Subcommand {
         while (!batch.isEmpty() && messages.size() < count) {
             scanned += batch.size();
             for (Message message : batch) {
-                if (userId.equals(message.getAuthor().getId())) {
+                if (userId.equals(message.getAuthor().getId())
+                        && !message.getTimeCreated().isAfter(newestDeletionTime)) {
                     messages.add(message);
                     if (messages.size() >= count) break;
                 }
