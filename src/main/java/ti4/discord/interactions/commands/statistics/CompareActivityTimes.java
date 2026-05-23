@@ -61,9 +61,12 @@ class CompareActivityTimes extends Subcommand {
             return;
         }
 
-        MessageHelper.sendMessageToThread(
-                event.getChannel(),
-                "Compare Activity Times",
-                CreateGameButtonHandler.generateMemberListMessage(members, "Activity Times", false));
+        String message = CreateGameButtonHandler.generateMemberListMessage(members, "Activity Times", false);
+
+        if (members.size() <= 10) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+            return;
+        }
+        MessageHelper.sendMessageToThread(event.getChannel(), "Compare Activity Times", message);
     }
 }
