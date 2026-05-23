@@ -14,6 +14,7 @@ import ti4.discord.interactions.routing.ModalHandler;
 import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
+import ti4.helpers.settingsFramework.menus.FrankenSettings;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.logging.RollbarManager;
@@ -114,8 +115,7 @@ public final class ModalListener extends ListenerAdapter {
                 game.initializeDraftSystemSettings().parseInput(context);
                 return;
             }
-            String frankenNavPart = ".*_franken[._].*";
-            if (modalID.matches(frankenNavPart)) {
+            if (FrankenSettings.isFrankenMenuComponent(modalID)) {
                 game.initializeFrankenSettings().parseInput(context);
                 return;
             }

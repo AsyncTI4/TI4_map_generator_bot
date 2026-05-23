@@ -1,8 +1,10 @@
 package ti4.discord.interactions.commands.franken.ban;
 
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiFunction;
 import ti4.game.Game;
 import ti4.game.Tile;
@@ -136,7 +138,9 @@ public class BanService implements IBanService {
 
     private static void appendStoredValue(Game game, String key, String value) {
         String prev = game.getStoredValue(key);
-        if (List.of(prev.split(Constants.FIN_SEPARATOR)).contains(value)) return;
-        game.setStoredValue(key, prev.isEmpty() ? value : prev + Constants.FIN_SEPARATOR + value);
+        Set<String> values = new LinkedHashSet<>();
+        if (!prev.isEmpty()) values.addAll(List.of(prev.split(Constants.FIN_SEPARATOR)));
+        if (!values.add(value)) return;
+        game.setStoredValue(key, String.join(Constants.FIN_SEPARATOR, values));
     }
 }

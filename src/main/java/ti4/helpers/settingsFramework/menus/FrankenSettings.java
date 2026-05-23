@@ -212,6 +212,18 @@ public class FrankenSettings extends SettingsMenu {
                 && menuId.equals(json.get("menuId").asString(""));
     }
 
+    public static boolean isFrankenMenuComponent(String componentId) {
+        return isFrankenMenuComponent(componentId, "jmfA_franken")
+                || isFrankenMenuComponent(componentId, "jmfN_franken");
+    }
+
+    private static boolean isFrankenMenuComponent(String componentId, String prefix) {
+        return componentId != null
+                && (componentId.equals(prefix)
+                        || componentId.startsWith(prefix + "_")
+                        || componentId.startsWith(prefix + "."));
+    }
+
     private static Map<String, String> draftModeOptions() {
         Map<String, String> options = new LinkedHashMap<>();
         options.put(STANDARD_DRAFT, STANDARD_DRAFT);
@@ -525,7 +537,7 @@ class FrankenComponentBanSettings extends SettingsMenu {
         });
     }
 
-    private static boolean isValidComponent(Game game, String type, String id) {
+    static boolean isValidComponent(Game game, String type, String id) {
         return switch (type) {
             case Constants.ABILITY ->
                 Mapper.getAbility(id) != null && playableFactionHasComponent(game, id, FactionModel::getAbilities);
@@ -548,7 +560,7 @@ class FrankenComponentBanSettings extends SettingsMenu {
         };
     }
 
-    private static Set<Entry<String, String>> componentOptions(Game game, String type) {
+    static Set<Entry<String, String>> componentOptions(Game game, String type) {
         Map<String, String> options = new LinkedHashMap<>();
         List<FactionModel> factions = playableFactions(game);
         switch (type) {
