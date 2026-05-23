@@ -46,9 +46,7 @@ class CompareActivityTimes extends Subcommand {
         List<Member> members = new ArrayList<>();
         if (event.getOption(Constants.ROLE1) != null) {
             Role role = event.getOption(Constants.ROLE1).getAsRole();
-            if (role != null) {
-                members.addAll(event.getGuild().getMembersWithRoles(role));
-            }
+            members.addAll(event.getGuild().getMembersWithRoles(role));
         }
         PLAYER_OPTIONS_TO_CHECK.stream()
                 .map(playerOptionName -> event.getOption(playerOptionName, null, OptionMapping::getAsUser))
@@ -63,8 +61,9 @@ class CompareActivityTimes extends Subcommand {
             return;
         }
 
-        MessageHelper.sendMessageToChannel(
+        MessageHelper.sendMessageToThread(
                 event.getChannel(),
+                "Compare Activity Times",
                 CreateGameButtonHandler.generateMemberListMessage(members, "Activity Times", false));
     }
 }
