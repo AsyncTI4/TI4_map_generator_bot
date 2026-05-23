@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.Subcommand;
+import ti4.service.statistics.StatisticsThreadHelper;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
-import ti4.service.statistics.StatisticsThreadHelper;
 
 class SurveyResults extends Subcommand {
 

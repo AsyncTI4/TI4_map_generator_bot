@@ -64,7 +64,6 @@ class CompareActivityTimes extends Subcommand {
         }
 
         StatisticsThreadHelper.sendMessage(
-                event,
-                CreateGameButtonHandler.generateMemberListMessage(members, "Activity Times", false));
+                event, CreateGameButtonHandler.generateMemberListMessage(members, "Activity Times", false));
     }
 }

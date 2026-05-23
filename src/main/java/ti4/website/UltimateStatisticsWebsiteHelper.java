@@ -66,6 +66,11 @@ public class UltimateStatisticsWebsiteHelper {
     }
 
     private static void sendJson(
+            Object request, String url, MessageChannel channel, String successMessage, String failureMessage) {
+        sendJson(request, url, channel, null, successMessage, failureMessage);
+    }
+
+    private static void sendJson(
             Object request,
             String url,
             MessageChannel channel,
