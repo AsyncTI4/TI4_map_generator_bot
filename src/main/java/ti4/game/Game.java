@@ -1618,32 +1618,30 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public String peekAtStage1(int place, Player player) {
         String objective = peekAtObjective(publicObjectives1Peekable, place);
-
-        if (publicObjectives1Peeked.containsKey(objective)
-                && !publicObjectives1Peeked.get(objective).contains(player.getUserID())) {
-            publicObjectives1Peeked.get(objective).add(player.getUserID());
-        } else {
-            List<String> list = new ArrayList<>();
-            list.add(player.getUserID());
-            publicObjectives1Peeked.put(objective, list);
-        }
+        trackPeekedObjective(publicObjectives1Peeked, objective, player);
 
         return objective;
     }
 
     public String peekAtStage2(int place, Player player) {
         String objective = peekAtObjective(publicObjectives2Peekable, place);
-
-        if (publicObjectives2Peeked.containsKey(objective)
-                && !publicObjectives2Peeked.get(objective).contains(player.getUserID())) {
-            publicObjectives2Peeked.get(objective).add(player.getUserID());
-        } else {
-            List<String> list = new ArrayList<>();
-            list.add(player.getUserID());
-            publicObjectives2Peeked.put(objective, list);
-        }
+        trackPeekedObjective(publicObjectives2Peeked, objective, player);
 
         return objective;
+    }
+
+    public void peekAtAllUnrevealedPublicObjectives(Player player) {
+        publicObjectives1Peekable.forEach(
+                objective -> trackPeekedObjective(publicObjectives1Peeked, objective, player));
+        publicObjectives2Peekable.forEach(
+                objective -> trackPeekedObjective(publicObjectives2Peeked, objective, player));
+    }
+
+    private void trackPeekedObjective(Map<String, List<String>> peekedObjectives, String objective, Player player) {
+        List<String> playerIds = peekedObjectives.computeIfAbsent(objective, key -> new ArrayList<>());
+        if (!playerIds.contains(player.getUserID())) {
+            playerIds.add(player.getUserID());
+        }
     }
 
     public boolean revealSpecificStage1(String id) {
