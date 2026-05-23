@@ -30,7 +30,8 @@ class BanServiceTest extends BaseTi4Test {
         banService.applyBanList(game, FrankenBanList.Blue_Reverie);
         banService.applyBanList(game, FrankenBanList.Blue_Reverie);
 
-        List<String> bannedFactions = List.of(game.getStoredValue("bannedFactions").split(Constants.FIN_SEPARATOR));
+        List<String> bannedFactions =
+                List.of(game.getStoredValue("bannedFactions").split(Constants.FIN_SEPARATOR));
         assertThat(bannedFactions)
                 .containsExactly("atokera", "belkosea", "qhet", "pharadn", "toldar", "uydai")
                 .doesNotHaveDuplicates();
