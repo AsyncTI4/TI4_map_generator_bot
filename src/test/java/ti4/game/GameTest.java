@@ -58,21 +58,16 @@ class GameTest {
     @Test
     void shouldOnlyOfferSpeakerObjectiveChoiceWhenFeatureEnabledAndThereIsARealChoice() {
         var game = new Game();
-        var peekedObjectives = Map.of("obj1", List.of("player1"));
 
-        assertThat(game.shouldSpeakerChooseObjective(List.of("obj1", "obj2"), peekedObjectives))
-                .isFalse();
+        assertThat(game.shouldSpeakerChooseObjective(List.of("obj1", "obj2"))).isFalse();
 
         game.setSpeakerChoosesObjective(true);
-        assertThat(game.shouldSpeakerChooseObjective(List.of("obj1", "obj2"), peekedObjectives))
-                .isTrue();
-        assertThat(game.shouldSpeakerChooseObjective(List.of("obj1"), peekedObjectives))
-                .isFalse();
+        assertThat(game.shouldSpeakerChooseObjective(List.of("obj1", "obj2"))).isTrue();
+        assertThat(game.shouldSpeakerChooseObjective(List.of("obj1"))).isFalse();
 
         game.setSpeakerChoosesObjective(false);
         game.setTwilightsFallMode(true);
-        assertThat(game.shouldSpeakerChooseObjective(List.of("obj1", "obj2"), peekedObjectives))
-                .isTrue();
+        assertThat(game.shouldSpeakerChooseObjective(List.of("obj1", "obj2"))).isTrue();
     }
 
     private Game createThreePlayerGame() {

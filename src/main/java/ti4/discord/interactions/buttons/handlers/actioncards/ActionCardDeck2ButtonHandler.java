@@ -68,6 +68,7 @@ class ActionCardDeck2ButtonHandler {
 
     @ButtonHandler("resolveOracle")
     public static void resolveOracle(Player player, Game game, ButtonInteractionEvent event) {
+        game.setSpeakerChoosesObjective(true);
         List<MessageEmbed> embeds = new ArrayList<>();
 
         for (String objectiveId : game.getPublicObjectives1Peekable()) {

@@ -44,6 +44,7 @@ public class TfForetellResolver implements EdictResolver {
 
     @ButtonHandler("foretellPeak_")
     private static void foretellPeak(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        game.setSpeakerChoosesObjective(true);
         String stage = buttonID.split("_")[1];
         int location = Integer.parseInt(buttonID.split("_")[2]);
         if ("1".equalsIgnoreCase(stage)) {

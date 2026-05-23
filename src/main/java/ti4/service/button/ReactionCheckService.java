@@ -118,8 +118,7 @@ public class ReactionCheckService {
                     + " Please press one of the buttons below anyways though - don't worry, it won't reveal anything, it will just run cleanup.";
         }
         if (game.getRound() < 4 || !game.getPublicObjectives1Peekable().isEmpty()) {
-            if (game.shouldSpeakerChooseObjective(
-                    game.getPublicObjectives1Peekable(), game.getPublicObjectives1Peeked())) {
+            if (game.shouldSpeakerChooseObjective(game.getPublicObjectives1Peekable())) {
                 for (int loc = 1; loc <= game.getPublicObjectives1Peekable().size(); loc++) {
                     String id = game.getSpeaker().factionButtonChecker() + "reveal_stage_1position_" + loc;
                     String label = "Reveal Stage 1, Position " + loc;
@@ -139,8 +138,7 @@ public class ReactionCheckService {
                 buttons.add(draw2Stage2);
             } else {
                 if (game.getPublicObjectives1Peekable().isEmpty()
-                        && game.shouldSpeakerChooseObjective(
-                                game.getPublicObjectives2Peekable(), game.getPublicObjectives2Peeked())) {
+                        && game.shouldSpeakerChooseObjective(game.getPublicObjectives2Peekable())) {
                     for (int loc = 1; loc <= game.getPublicObjectives2Peekable().size(); loc++) {
                         String id = game.getSpeaker().factionButtonChecker() + "reveal_stage_2position_" + loc;
                         String label = "Reveal Stage 2, Position " + loc;
@@ -179,7 +177,7 @@ public class ReactionCheckService {
         if (tfWarning) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
-                    "There are multiple public objectives available to reveal, and some have been peeked at. The buttons specify the position of the card they will reveal so the speaker can choose which one to flip.");
+                    "There are multiple public objectives available to reveal. The buttons specify the position of the card they will reveal so the speaker can choose which one to flip.");
         }
     }
 
