@@ -1,7 +1,8 @@
 package ti4.service.actioncard;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
-import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageReaction;
@@ -168,22 +169,31 @@ public class SabotageService {
     }
 
     private static boolean allSabotagesAreDiscarded(Game game, Player player) {
-        return Mapper.getDeck(game.getAcDeckID()).getCardIDs().stream()
-                .filter(ALL_SABOTAGE_CARD_ALIASES::contains)
-                .allMatch(alias -> isActionCardNotPlayable(game, player, alias));
+        return (game.isAcd2() && doSabotageRemovalBackwardsCompatabilityCheck(game, player))
+                || Mapper.getDeck(game.getAcDeckID()).getCardIDs().stream()
+                        .filter(ALL_SABOTAGE_CARD_ALIASES::contains)
+                        .allMatch(alias -> isActionCardNotPlayable(game, player, alias));
+    }
+
+    private static boolean doSabotageRemovalBackwardsCompatabilityCheck(Game game, Player player) {
+        // Sabotages were removed from ACD2 on this date. We should check old games.
+        // This can be removed later on.
+        long cutoff = ZonedDateTime.of(2026, 5, 19, 21, 0, 0, 0, ZoneId.of("America/New_York"))
+                .toInstant()
+                .toEpochMilli();
+
+        boolean isBeforeCutoff = game.getCreationDateTime() < cutoff;
+        return isBeforeCutoff
+                && ACD2_SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
     }
 
     private static boolean isActionCardNotPlayable(Game game, Player player, String acAlias) {
-        // this first condition could go away if getDiscardACStatus starts correctly tracking discarded ACs
-        if (ActionCardHelper.getGarboziaActionCards(game).containsKey(acAlias)) {
-            return false;
+        ActionCardHelper.ACStatus status = game.getDiscardACStatus().get(acAlias);
+        if (status == ActionCardHelper.ACStatus.garbozia) {
+            return !player.hasPlanet("garbozia");
         }
-        return game.getDiscardActionCards().containsKey(acAlias)
-                || game.getDiscardACStatus().entrySet().stream()
-                        .filter(entry ->
-                                entry.getValue() != ActionCardHelper.ACStatus.garbozia || !player.hasPlanet("garbozia"))
-                        .map(Map.Entry::getKey)
-                        .anyMatch(acAlias::equals);
+        // this first condition could go away if getDiscardACStatus starts correctly tracking discarded ACs
+        return game.getDiscardActionCards().containsKey(acAlias) || status != null;
     }
 
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {
