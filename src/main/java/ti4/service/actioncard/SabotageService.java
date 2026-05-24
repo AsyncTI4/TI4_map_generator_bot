@@ -168,23 +168,19 @@ public class SabotageService {
         return null;
     }
 
+    private static final long ACD2_SABOTAGE_REMOVAL_CUTOFF = ZonedDateTime.of(
+                    2026, 5, 19, 21, 0, 0, 0, ZoneId.of("America/New_York"))
+            .toInstant()
+            .toEpochMilli();
+
     private static boolean allSabotagesAreDiscarded(Game game, Player player) {
-        return (game.isAcd2() && doSabotageRemovalBackwardsCompatabilityCheck(game, player))
-                || Mapper.getDeck(game.getAcDeckID()).getCardIDs().stream()
-                        .filter(ALL_SABOTAGE_CARD_ALIASES::contains)
-                        .allMatch(alias -> isActionCardNotPlayable(game, player, alias));
-    }
+        if (game.isAcd2() && game.getCreationDateTime() < ACD2_SABOTAGE_REMOVAL_CUTOFF) {
+            return ACD2_SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
+        }
 
-    private static boolean doSabotageRemovalBackwardsCompatabilityCheck(Game game, Player player) {
-        // Sabotages were removed from ACD2 on this date. We should check old games.
-        // This can be removed later on.
-        long cutoff = ZonedDateTime.of(2026, 5, 19, 21, 0, 0, 0, ZoneId.of("America/New_York"))
-                .toInstant()
-                .toEpochMilli();
-
-        boolean isBeforeCutoff = game.getCreationDateTime() < cutoff;
-        return isBeforeCutoff
-                && ACD2_SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
+        return Mapper.getDeck(game.getAcDeckID()).getCardIDs().stream()
+                .filter(ALL_SABOTAGE_CARD_ALIASES::contains)
+                .allMatch(alias -> isActionCardNotPlayable(game, player, alias));
     }
 
     private static boolean isActionCardNotPlayable(Game game, Player player, String acAlias) {
