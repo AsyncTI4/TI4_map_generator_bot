@@ -2252,6 +2252,17 @@ public final class AgendaHelper {
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
 
+                        if (specificVote.contains("Project Rider")) {
+                            List<Button> buttons = List.of(Buttons.green(
+                                    winningR.factionButtonChecker() + "resolveProjectRiderReward",
+                                    "Resolve Project Rider"));
+                            MessageHelper.sendMessageToChannelWithButtons(
+                                    channel,
+                                    identity
+                                            + ", you have a _Project Rider_ to resolve. Use the button to retrieve the action cards you selected when you played it.",
+                                    buttons);
+                        }
+
                         if (specificVote.contains("Trade Rider")) {
                             MessageHelper.sendMessageToChannel(
                                     channel,

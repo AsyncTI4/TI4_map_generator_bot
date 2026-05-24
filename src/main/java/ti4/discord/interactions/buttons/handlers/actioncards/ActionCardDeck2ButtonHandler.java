@@ -65,6 +65,8 @@ class ActionCardDeck2ButtonHandler {
 
     private static final String ALLIANCE_RIDER_CURRENT_ALLY = "allianceRiderCurrentAlly";
     private static final String ALLIANCE_RIDER_PURGED_ALLIES = "allianceRiderPurgedAllies";
+    private static final String PROJECT_RIDER_SELECTED_CARDS_PREFIX = "projectRiderSelectedCards_";
+    private static final int PROJECT_RIDER_MAX_SELECTIONS = 2;
 
     @ButtonHandler("resolveOracle")
     public static void resolveOracle(Player player, Game game, ButtonInteractionEvent event) {
@@ -1370,12 +1372,179 @@ class ActionCardDeck2ButtonHandler {
                         + Mapper.getLeader(allyCommander).getName() + ".");
     }
 
+    @ButtonHandler("resolveProjectRider")
+    public static void resolveProjectRider(Player player, Game game, ButtonInteractionEvent event) {
+        game.setStoredValue(getProjectRiderSelectionKey(player), "");
+        ButtonHelper.deleteMessage(event);
+
+        if (getProjectRiderSelectableCards(game, List.of()).isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has no action cards in the discard pile to choose for _Project Rider_.");
+            return;
+        }
+
+        sendProjectRiderSelectionButtons(player, game);
+    }
+
+    @ButtonHandler("projectRiderSelect_")
+    public static void resolveProjectRiderSelect(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String acId = buttonID.replace("projectRiderSelect_", "");
+        List<String> selectedCards = new ArrayList<>(getProjectRiderSelections(game, player));
+        if (selectedCards.contains(acId)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " already selected _" + Mapper.getActionCard(acId).getName()
+                            + "_ for _Project Rider_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (!isProjectRiderCardSelectable(game, acId)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " cannot select that action card because it is no longer in the discard pile.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (selectedCards.size() >= PROJECT_RIDER_MAX_SELECTIONS) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " already selected the maximum number of cards for _Project Rider_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        selectedCards.add(acId);
+        setProjectRiderSelections(game, player, selectedCards);
+        ButtonHelper.deleteMessage(event);
+
+        if (selectedCards.size() >= PROJECT_RIDER_MAX_SELECTIONS
+                || getProjectRiderSelectableCards(game, selectedCards).isEmpty()) {
+            sendProjectRiderSelectionSummary(player, selectedCards);
+            return;
+        }
+
+        sendProjectRiderSelectionButtons(player, game);
+    }
+
+    @ButtonHandler("projectRiderDone")
+    public static void resolveProjectRiderDone(Player player, Game game, ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+        sendProjectRiderSelectionSummary(player, getProjectRiderSelections(game, player));
+    }
+
+    @ButtonHandler("resolveProjectRiderReward")
+    public static void resolveProjectRiderReward(Player player, Game game, ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+        List<String> selectedCards = new ArrayList<>(getProjectRiderSelections(game, player));
+        game.setStoredValue(getProjectRiderSelectionKey(player), "");
+        if (selectedCards.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " had no action cards selected for _Project Rider_.");
+            return;
+        }
+
+        List<String> retrievedCards = new ArrayList<>();
+        List<String> unavailableCards = new ArrayList<>();
+        for (String acId : selectedCards) {
+            Integer acIndex = game.getDiscardActionCards().get(acId);
+            if (acIndex == null || !isProjectRiderCardSelectable(game, acId) || !game.pickActionCard(player.getUserID(), acIndex)) {
+                unavailableCards.add(Mapper.getActionCard(acId).getName());
+                continue;
+            }
+            retrievedCards.add(Mapper.getActionCard(acId).getName());
+        }
+
+        if (!retrievedCards.isEmpty()) {
+            ActionCardHelper.sendActionCardInfo(game, player);
+            ButtonHelper.checkACLimit(game, player);
+        }
+
+        StringBuilder message = new StringBuilder(player.getRepresentationUnfogged()).append(" resolved _Project Rider_.");
+        if (retrievedCards.isEmpty()) {
+            message.append(" None of the selected action cards were still available in the discard pile.");
+        } else {
+            message.append(" Retrieved ").append(formatProjectRiderCardNames(retrievedCards)).append(" from the discard pile.");
+        }
+        if (!unavailableCards.isEmpty()) {
+            message.append(" These selected cards were unavailable: ")
+                    .append(formatProjectRiderCardNames(unavailableCards))
+                    .append(".");
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
+    }
+
     private static List<String> getStoredCommanderList(Game game, String storageKey) {
         String storedValue = game.getStoredValue(storageKey);
         if (storedValue.isBlank()) {
             return new ArrayList<>();
         }
         return new ArrayList<>(List.of(storedValue.split(",")));
+    }
+
+    private static void sendProjectRiderSelectionButtons(Player player, Game game) {
+        List<String> selectedCards = getProjectRiderSelections(game, player);
+        List<Button> buttons = new ArrayList<>();
+        for (String acId : getProjectRiderSelectableCards(game, selectedCards)) {
+            buttons.add(Buttons.green("projectRiderSelect_" + acId, Mapper.getActionCard(acId).getName()));
+        }
+        buttons.add(Buttons.blue(player.factionButtonChecker() + "projectRiderDone", "Done"));
+
+        String selectionSummary = selectedCards.isEmpty()
+                ? "No cards selected yet."
+                : "Current selection: " + formatProjectRiderCardIds(selectedCards) + ".";
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", choose up to 2 action cards for _Project Rider_. "
+                        + selectionSummary,
+                buttons);
+    }
+
+    private static void sendProjectRiderSelectionSummary(Player player, List<String> selectedCards) {
+        String summary = selectedCards.isEmpty()
+                ? "selected no action cards"
+                : "selected " + formatProjectRiderCardIds(selectedCards);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " " + summary + " for _Project Rider_.");
+    }
+
+    private static List<String> getProjectRiderSelections(Game game, Player player) {
+        String storedValue = game.getStoredValue(getProjectRiderSelectionKey(player));
+        if (storedValue.isBlank()) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(List.of(storedValue.split(",")));
+    }
+
+    private static void setProjectRiderSelections(Game game, Player player, List<String> selectedCards) {
+        game.setStoredValue(getProjectRiderSelectionKey(player), String.join(",", selectedCards));
+    }
+
+    private static String getProjectRiderSelectionKey(Player player) {
+        return PROJECT_RIDER_SELECTED_CARDS_PREFIX + player.getUserID();
+    }
+
+    private static List<String> getProjectRiderSelectableCards(Game game, List<String> selectedCards) {
+        return game.getDiscardActionCards().keySet().stream()
+                .filter(acId -> isProjectRiderCardSelectable(game, acId))
+                .filter(acId -> !selectedCards.contains(acId))
+                .toList();
+    }
+
+    private static boolean isProjectRiderCardSelectable(Game game, String acId) {
+        return game.getDiscardActionCards().containsKey(acId) && game.getDiscardACStatus().get(acId) == null;
+    }
+
+    private static String formatProjectRiderCardIds(List<String> actionCards) {
+        return formatProjectRiderCardNames(actionCards.stream()
+                .map(acId -> Mapper.getActionCard(acId).getName())
+                .toList());
+    }
+
+    private static String formatProjectRiderCardNames(List<String> actionCards) {
+        return actionCards.stream().map(name -> "_" + name + "_").collect(java.util.stream.Collectors.joining(", "));
     }
 
     @ButtonHandler("brutalOccupationStep2_")
