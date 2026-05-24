@@ -1771,7 +1771,8 @@ public class ActionCardHelper {
                     }
                 }
                 if ("public_support".equals(automationID)) {
-                    codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolvePublicSupport", buttonLabel));
+                    codedButtons.add(
+                            Buttons.green(player.factionButtonChecker() + "resolvePublicSupport", buttonLabel));
                     MessageHelper.sendMessageToChannelWithButtons(
                             channel2, introMsg + String.format(targetMsg, "outcome"), codedButtons);
                     for (Player p2 : game.getRealPlayers()) {

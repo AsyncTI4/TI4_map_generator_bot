@@ -1315,7 +1315,8 @@ public final class AgendaHelper {
                 game.setCurrentAgendaVote(winner, existingData);
                 int publicSupportCount = getPublicSupportCountForOutcome(game, winner);
                 if (publicSupportCount > 0
-                        && game.getStoredValue("publicSupportDrawn" + player.getFaction()).isEmpty()) {
+                        && game.getStoredValue("publicSupportDrawn" + player.getFaction())
+                                .isEmpty()) {
                     ActionCardHelper.drawActionCards(player, publicSupportCount);
                     game.setStoredValue("publicSupportDrawn" + player.getFaction(), winner);
                 }
@@ -3155,7 +3156,7 @@ public final class AgendaHelper {
         return winner.toString();
     }
 
-    static String getAgendaOutcomeName(Game game, String outcome, boolean capitalize) {
+    public static String getAgendaOutcomeName(Game game, String outcome, boolean capitalize) {
         String agendaDetails = game.getCurrentAgendaInfo();
         if (StringUtils.countMatches(agendaDetails, "_") > 1) {
             agendaDetails = agendaDetails.split("_")[1];
@@ -3553,21 +3554,6 @@ public final class AgendaHelper {
         if (getVoteCountFromPlanets(game, player) == 0) {
             return additionalVotesAndSources;
         }
-
-        public static int getPublicSupportCountForOutcome(Game game, String outcome) {
-            if (outcome == null || outcome.isEmpty()) {
-                return 0;
-            }
-
-            String voteInfo = game.getCurrentAgendaVotes().get(outcome);
-            if (voteInfo == null || voteInfo.isEmpty()) {
-                return 0;
-            }
-
-            return (int) List.of(voteInfo.split(";")).stream()
-                    .filter(vote -> vote.contains("Public Support"))
-                    .count();
-        }
         // Argent Zeal
         if (player.hasAbility("zeal")
                 || (game.isOrdinianC1Mode() && player == ButtonHelper.getPlayerWhoControlsCoatl(game))) {
@@ -3646,6 +3632,21 @@ public final class AgendaHelper {
         }
 
         return additionalVotesAndSources;
+    }
+
+    public static int getPublicSupportCountForOutcome(Game game, String outcome) {
+        if (outcome == null || outcome.isEmpty()) {
+            return 0;
+        }
+
+        String voteInfo = game.getCurrentAgendaVotes().get(outcome);
+        if (voteInfo == null || voteInfo.isEmpty()) {
+            return 0;
+        }
+
+        return (int) List.of(voteInfo.split(";")).stream()
+                .filter(vote -> vote.contains("Public Support"))
+                .count();
     }
 
     public static EmbedBuilder buildAgendaEmbed(AgendaModel agenda) {

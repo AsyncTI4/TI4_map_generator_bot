@@ -157,7 +157,8 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("resolvePublicSupportPlanet_")
-    public static void resolvePublicSupportPlanet(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void resolvePublicSupportPlanet(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String factionOrColor = buttonID.replace("resolvePublicSupportPlanet_", "");
         Player planetOwner = game.getPlayerFromColorOrFaction(factionOrColor);
         if (planetOwner == null) {
@@ -166,9 +167,11 @@ class ActionCardDeck2ButtonHandler {
             return;
         }
 
-        List<Button> buttons = VoteButtonHandler.getPlanetOutcomeButtons(planetOwner, game, "resolvePublicSupportStep2", null);
+        List<Button> buttons =
+                VoteButtonHandler.getPlanetOutcomeButtons(planetOwner, game, "resolvePublicSupportStep2", null);
         if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "That player has no legal planets to choose.");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "That player has no legal planets to choose.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -181,7 +184,8 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("resolvePublicSupportStep2_")
-    public static void resolvePublicSupportStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void resolvePublicSupportStep2(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String outcome = buttonID.replace("resolvePublicSupportStep2_", "");
         String identifier = game.isFowMode() ? player.getColor() : player.getFaction();
         String existingData = game.getCurrentAgendaVotes().getOrDefault(outcome, "");
@@ -199,7 +203,8 @@ class ActionCardDeck2ButtonHandler {
                 + StringUtils.capitalize(outcomeName)
                 + "\".";
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), voteMessage);
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), AgendaHelper.getSummaryOfVotes(game, true) + "\n \n");
+        MessageHelper.sendMessageToChannel(
+                game.getMainGameChannel(), AgendaHelper.getSummaryOfVotes(game, true) + "\n \n");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -414,7 +419,11 @@ class ActionCardDeck2ButtonHandler {
         String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
         if (agendaDetails.contains("For")) {
             return VoteButtonHandler.getForAgainstOutcomeButtons(
-                    game, null, "resolvePublicSupportStep2", game.getCurrentAgendaInfo().split("_")[2], null);
+                    game,
+                    null,
+                    "resolvePublicSupportStep2",
+                    game.getCurrentAgendaInfo().split("_")[2],
+                    null);
         }
         if (agendaDetails.contains("Player") || agendaDetails.contains("player")) {
             return VoteButtonHandler.getPlayerOutcomeButtons(game, null, "resolvePublicSupportStep2", null);
