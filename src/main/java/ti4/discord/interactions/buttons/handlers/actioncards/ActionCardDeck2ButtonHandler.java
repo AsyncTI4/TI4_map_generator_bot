@@ -650,7 +650,8 @@ class ActionCardDeck2ButtonHandler {
     public static void resolveLiberation(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = player.getExhaustedPlanets().stream()
                 .filter(player::hasPlanet)
-                .map(planet -> Buttons.green("resolveLiberationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)))
+                .map(planet ->
+                        Buttons.green("resolveLiberationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)))
                 .toList();
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
