@@ -1490,6 +1490,7 @@ public final class AgendaHelper {
         if (winner == null) {
             winner = getWinner(game);
         }
+        game.setStoredValue("currentAgendaWinner", winner);
         if (!game.isHiddenAgendaMode()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), getSummaryOfVotes(game, true) + "\n \n");
         } else {
@@ -4115,6 +4116,7 @@ public final class AgendaHelper {
         game.setPlayersWhoHitPersistentNoAfter("");
         game.setPlayersWhoHitPersistentNoWhen("");
         game.setLatestOutcomeVotedFor("");
+        game.removeStoredValue("currentAgendaWinner");
         for (Player p2 : game.getRealPlayers()) {
             game.setStoredValue("latestOutcomeVotedFor" + p2.getFaction(), "");
             game.setStoredValue("preVoting" + p2.getFaction(), "");

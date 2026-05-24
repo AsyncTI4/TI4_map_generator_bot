@@ -3,6 +3,7 @@ package ti4.discord.interactions.buttons.handlers.actioncards;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -14,6 +15,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
+import org.apache.commons.lang3.math.NumberUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -22,6 +24,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -65,6 +68,7 @@ class ActionCardDeck2ButtonHandler {
 
     private static final String ALLIANCE_RIDER_CURRENT_ALLY = "allianceRiderCurrentAlly";
     private static final String ALLIANCE_RIDER_PURGED_ALLIES = "allianceRiderPurgedAllies";
+    private static final String PUBLIC_OUTRAGE = "Public Outrage";
 
     @ButtonHandler("resolveOracle")
     public static void resolveOracle(Player player, Game game, ButtonInteractionEvent event) {
@@ -834,6 +838,96 @@ class ActionCardDeck2ButtonHandler {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
+    @ButtonHandler("resolvePublicOutrage")
+    public static void resolvePublicOutrage(Player player, Game game, ButtonInteractionEvent event) {
+        String winningOutcome = game.getStoredValue("currentAgendaWinner");
+        if (StringUtils.isBlank(winningOutcome)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " cannot resolve _Public Outrage_ until the agenda winner is known.");
+            return;
+        }
+
+        List<String> storedCandidates = getStoredPublicOutrageCandidates(player, game);
+        if (!storedCandidates.isEmpty()) {
+            ButtonHelper.deleteMessage(event);
+            sendPublicOutrageChoiceButtons(player, game, storedCandidates);
+            return;
+        }
+
+        if (!hasPublicOutragePrediction(player, game, winningOutcome)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " did not predict the winning outcome with _Public Outrage_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<String> candidateEntries = getPublicOutrageCandidateEntries(player, game, winningOutcome);
+        if (candidateEntries.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(),
+                    player.getRepresentationNoPing() + " resolved _Public Outrage_, but no random action cards were "
+                            + "revealed from the winning voters.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        game.setStoredValue(
+                getPublicOutrageCandidatesStoreKey(player),
+                game.getCurrentAgendaInfo() + "#" + String.join(";", candidateEntries));
+
+        StringBuilder revealMessage = new StringBuilder(player.getRepresentationNoPing())
+                .append(" predicted the winning outcome with _Public Outrage_. The following action cards were revealed:");
+        for (String candidateEntry : candidateEntries) {
+            String[] parts = candidateEntry.split("\\|", 3);
+            if (parts.length < 3) {
+                continue;
+            }
+            Player revealedPlayer = game.getPlayerFromColorOrFaction(parts[0]);
+            revealMessage.append("\n- ")
+                    .append(revealedPlayer == null ? parts[0] : revealedPlayer.getRepresentationNoPing())
+                    .append(": _")
+                    .append(getActionCardName(parts[2]))
+                    .append("_");
+        }
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), revealMessage.toString());
+        ButtonHelper.deleteMessage(event);
+
+        if (candidateEntries.size() == 1) {
+            String[] parts = candidateEntries.getFirst().split("\\|", 3);
+            if (parts.length == 3 && NumberUtils.isDigits(parts[1])) {
+                completePublicOutrage(player, game, candidateEntries, parts[0], Integer.parseInt(parts[1]));
+            }
+            return;
+        }
+
+        sendPublicOutrageChoiceButtons(player, game, candidateEntries);
+    }
+
+    @ButtonHandler("resolvePublicOutrageStep2_")
+    public static void resolvePublicOutrageStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String payload = buttonID.replace("resolvePublicOutrageStep2_", "");
+        String[] parts = payload.split("_", 2);
+        if (parts.length < 2 || !NumberUtils.isDigits(parts[1])) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Public Outrage_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<String> candidateEntries = getStoredPublicOutrageCandidates(player, game);
+        if (candidateEntries.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has no revealed _Public Outrage_ cards to choose from.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        completePublicOutrage(player, game, candidateEntries, parts[0], Integer.parseInt(parts[1]));
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("armsDealStep2_")
     public static void resolveArmsDealStep2(Game game, ButtonInteractionEvent event, String buttonID) {
         String faction = buttonID.split("_")[1];
@@ -1524,5 +1618,219 @@ class ActionCardDeck2ButtonHandler {
     public static void amendmentRevealStage2(Player player, Game game, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
         RevealPublicObjectiveService.revealS2(game, event);
+    }
+
+    private static void sendPublicOutrageChoiceButtons(Player player, Game game, List<String> candidateEntries) {
+        List<Button> buttons = new ArrayList<>();
+        for (String candidateEntry : candidateEntries) {
+            String[] parts = candidateEntry.split("\\|", 3);
+            if (parts.length < 3 || !NumberUtils.isDigits(parts[1])) {
+                continue;
+            }
+
+            Player revealedPlayer = game.getPlayerFromColorOrFaction(parts[0]);
+            String label = getActionCardName(parts[2]);
+            if (revealedPlayer != null && !game.isFowMode()) {
+                label += " (" + revealedPlayer.getFactionModel().getShortName() + ")";
+            }
+            buttons.add(Buttons.green("resolvePublicOutrageStep2_" + parts[0] + "_" + parts[1], label));
+        }
+
+        if (buttons.isEmpty()) {
+            game.removeStoredValue(getPublicOutrageCandidatesStoreKey(player));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Public Outrage_.");
+            return;
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", choose which revealed action card to take with _Public Outrage_.",
+                buttons);
+    }
+
+    private static List<String> getStoredPublicOutrageCandidates(Player player, Game game) {
+        String storedCandidates = game.getStoredValue(getPublicOutrageCandidatesStoreKey(player));
+        if (StringUtils.isBlank(storedCandidates)) {
+            return List.of();
+        }
+
+        String[] storedParts = storedCandidates.split("#", 2);
+        if (storedParts.length < 2 || !StringUtils.equals(storedParts[0], game.getCurrentAgendaInfo())) {
+            game.removeStoredValue(getPublicOutrageCandidatesStoreKey(player));
+            return List.of();
+        }
+
+        List<String> candidateEntries = new ArrayList<>();
+        for (String candidateEntry : storedParts[1].split(";")) {
+            if (StringUtils.isNotBlank(candidateEntry)) {
+                candidateEntries.add(candidateEntry);
+            }
+        }
+        return candidateEntries;
+    }
+
+    private static List<String> getPublicOutrageCandidateEntries(Player player, Game game, String winningOutcome) {
+        Map<String, String> revealedCards = new LinkedHashMap<>();
+        String voteInfo = game.getCurrentAgendaVotes().getOrDefault(winningOutcome, "");
+        if (StringUtils.isBlank(voteInfo)) {
+            return List.of();
+        }
+
+        for (String specificVote : voteInfo.split(";")) {
+            if (StringUtils.isBlank(specificVote) || !specificVote.contains("_")) {
+                continue;
+            }
+            String identifier = specificVote.substring(0, specificVote.indexOf('_'));
+            String vote = specificVote.substring(specificVote.indexOf('_') + 1);
+            if (!NumberUtils.isDigits(vote)) {
+                continue;
+            }
+
+            Player revealedPlayer = game.getPlayerFromColorOrFaction(identifier);
+            if (revealedPlayer == null
+                    || revealedPlayer == player
+                    || revealedPlayer.getActionCards().isEmpty()
+                    || revealedCards.containsKey(revealedPlayer.getFaction())) {
+                continue;
+            }
+
+            List<String> actionCards = new ArrayList<>(revealedPlayer.getActionCards().keySet());
+            Collections.shuffle(actionCards);
+            String actionCardAlias = actionCards.getFirst();
+            Integer actionCardIdentifier = revealedPlayer.getActionCards().get(actionCardAlias);
+            if (actionCardIdentifier != null) {
+                revealedCards.put(revealedPlayer.getFaction(), actionCardIdentifier + "|" + actionCardAlias);
+            }
+        }
+
+        List<String> candidateEntries = new ArrayList<>();
+        for (Map.Entry<String, String> entry : revealedCards.entrySet()) {
+            candidateEntries.add(entry.getKey() + "|" + entry.getValue());
+        }
+        return candidateEntries;
+    }
+
+    private static boolean hasPublicOutragePrediction(Player player, Game game, String winningOutcome) {
+        String predictionInfo = game.getCurrentAgendaVotes().getOrDefault(winningOutcome, "");
+        if (StringUtils.isBlank(predictionInfo)) {
+            return false;
+        }
+
+        String identifier = game.isFowMode() ? player.getColor() : player.getFaction();
+        if (StringUtils.isBlank(identifier)) {
+            return false;
+        }
+
+        for (String specificVote : predictionInfo.split(";")) {
+            if ((identifier + "_" + PUBLIC_OUTRAGE).equals(specificVote)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void completePublicOutrage(
+            Player player, Game game, List<String> candidateEntries, String chosenOwnerKey, int chosenIdentifier) {
+        String chosenAlias = null;
+        Player chosenOwner = null;
+        List<String> discardedCardNames = new ArrayList<>();
+        Set<Player> affectedPlayers = new HashSet<>();
+
+        for (String candidateEntry : candidateEntries) {
+            String[] parts = candidateEntry.split("\\|", 3);
+            if (parts.length < 3 || !NumberUtils.isDigits(parts[1])) {
+                continue;
+            }
+
+            Player revealedPlayer = game.getPlayerFromColorOrFaction(parts[0]);
+            int revealedIdentifier = Integer.parseInt(parts[1]);
+            String actionCardAlias = parts[2];
+            if (revealedPlayer == null || !hasActionCard(revealedPlayer, actionCardAlias, revealedIdentifier)) {
+                game.removeStoredValue(getPublicOutrageCandidatesStoreKey(player));
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " could not finish _Public Outrage_; resolve it manually.");
+                return;
+            }
+
+            affectedPlayers.add(revealedPlayer);
+            if (parts[0].equals(chosenOwnerKey) && revealedIdentifier == chosenIdentifier) {
+                chosenOwner = revealedPlayer;
+                chosenAlias = actionCardAlias;
+            }
+        }
+
+        if (chosenOwner == null || StringUtils.isBlank(chosenAlias)) {
+            game.removeStoredValue(getPublicOutrageCandidatesStoreKey(player));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Public Outrage_.");
+            return;
+        }
+
+        for (String candidateEntry : candidateEntries) {
+            String[] parts = candidateEntry.split("\\|", 3);
+            if (parts.length < 3 || !NumberUtils.isDigits(parts[1])) {
+                continue;
+            }
+
+            Player revealedPlayer = game.getPlayerFromColorOrFaction(parts[0]);
+            if (revealedPlayer == null) {
+                continue;
+            }
+
+            int revealedIdentifier = Integer.parseInt(parts[1]);
+            String actionCardAlias = parts[2];
+            if (parts[0].equals(chosenOwnerKey) && revealedIdentifier == chosenIdentifier) {
+                revealedPlayer.removeActionCard(revealedIdentifier);
+                player.setActionCard(actionCardAlias);
+            } else {
+                game.discardActionCard(revealedPlayer.getUserID(), revealedIdentifier);
+                discardedCardNames.add("_" + getActionCardName(actionCardAlias) + "_");
+                MessageHelper.sendMessageToChannel(
+                        revealedPlayer.getCardsInfoThread(),
+                        "# " + revealedPlayer.getRepresentation() + " had the revealed action card _"
+                                + getActionCardName(actionCardAlias)
+                                + "_ discarded by _Public Outrage_.");
+            }
+        }
+
+        ActionCardHelper.sendActionCardInfo(game, player);
+        ButtonHelper.checkACLimit(game, player);
+        for (Player affectedPlayer : affectedPlayers) {
+            ActionCardHelper.sendActionCardInfo(game, affectedPlayer);
+        }
+
+        MessageHelper.sendMessageToChannel(
+                chosenOwner.getCardsInfoThread(),
+                "# " + chosenOwner.getRepresentation() + " lost the action card _" + getActionCardName(chosenAlias)
+                        + "_ to _Public Outrage_.");
+        MessageHelper.sendMessageToChannel(
+                player.getCardsInfoThread(),
+                "# " + player.getRepresentation() + " gained the action card _" + getActionCardName(chosenAlias)
+                        + "_ from _Public Outrage_.");
+
+        StringBuilder resolutionMessage = new StringBuilder(player.getRepresentationNoPing())
+                .append(" resolved _Public Outrage_, taking _")
+                .append(getActionCardName(chosenAlias))
+                .append("_ from ")
+                .append(chosenOwner.getRepresentationNoPing());
+        if (!discardedCardNames.isEmpty()) {
+            resolutionMessage.append(" and discarding ").append(String.join(", ", discardedCardNames));
+        }
+        resolutionMessage.append(".");
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), resolutionMessage.toString());
+        game.removeStoredValue(getPublicOutrageCandidatesStoreKey(player));
+    }
+
+    private static boolean hasActionCard(Player player, String actionCardAlias, int actionCardIdentifier) {
+        return Integer.valueOf(actionCardIdentifier).equals(player.getActionCards().get(actionCardAlias));
+    }
+
+    private static String getActionCardName(String actionCardAlias) {
+        ActionCardModel actionCardModel = Mapper.getActionCard(actionCardAlias);
+        return actionCardModel == null ? actionCardAlias : actionCardModel.getName();
+    }
+
+    private static String getPublicOutrageCandidatesStoreKey(Player player) {
+        return "publicOutrageCandidates_" + player.getUserID();
     }
 }
