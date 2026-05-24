@@ -309,6 +309,11 @@ public class CreateGameService {
 
                 -# Please realize that these are broad overviews and that some small components may not fit perfectly into these categories.""";
         MessageHelper.sendMessageToChannelWithButtons(actionsChannel, expMsg, buttons);
+        Button baseGameModeButton = Buttons.green("setupBaseGameMode", "Set Base Game Mode");
+        MessageHelper.sendMessageToChannelWithButton(
+                actionsChannel,
+                "Use this button to set the game to the base game with PoK strategy cards.",
+                baseGameModeButton);
     }
 
     private static void introductionToBotMapUpdatesThread(Game game) {
