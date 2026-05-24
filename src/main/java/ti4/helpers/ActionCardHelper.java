@@ -1071,6 +1071,12 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("liberation".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveLiberation", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
+            }
+
             if ("reconstruction".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveReconstruction", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
