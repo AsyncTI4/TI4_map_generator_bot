@@ -729,9 +729,8 @@ public class StartCombatService {
         List<Button> spaceCannonButtons = getSpaceCannonButtons(game, activePlayer, tile);
         if (game.getRealPlayers().stream().anyMatch(player -> player.hasUnit("netrunners_flagship"))) {
             for (Player player : game.getRealPlayers()) {
-                String empMessage =
-                        NetrunnersUnitsHandler.getEmpSpaceCannonBlockMessage(
-                                player, tile, CombatRollType.SpaceCannonOffence);
+                String empMessage = NetrunnersUnitsHandler.getEmpSpaceCannonBlockMessage(
+                        player, tile, CombatRollType.SpaceCannonOffence);
                 if (!empMessage.isEmpty()) {
                     pdsMessage.append(empMessage).append('\n');
                 }
