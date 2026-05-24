@@ -839,6 +839,7 @@ public final class Constants {
     public static final String REVEAL_STAGE2 = "po_reveal_stage2";
     public static final String SCORE_OBJECTIVE = "po_score";
     public static final String UNSCORE_OBJECTIVE = "po_unscore";
+    public static final String UNREVEAL_OBJECTIVE = "po_unreveal";
     public static final String SHUFFLE_OBJECTIVE_BACK = "po_shuffle_back";
     public static final String PO_ID = "public_id";
     public static final String PO_NAME = "public_name";
