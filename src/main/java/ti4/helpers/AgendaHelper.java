@@ -1294,21 +1294,7 @@ public final class AgendaHelper {
                                         && !game.getLaws().containsKey("absol_government")))
                         && (player.ownsPromissoryNote("sigma_blood_pact")
                                 || player.getPromissoryNotesInPlayArea().contains("sigma_blood_pact"))) {
-                    List<Player> winnners = new ArrayList<>();
-                    for (Entry<String, String> entry : outcomes.entrySet()) {
-                        if (entry.getKey().equalsIgnoreCase(winner)) {
-                            StringTokenizer vote_info = new StringTokenizer(entry.getValue(), ";");
-
-                            while (vote_info.hasMoreTokens()) {
-                                String specificVote = vote_info.nextToken();
-                                String faction = specificVote.substring(0, specificVote.indexOf('_'));
-                                Player p = game.getPlayerFromColorOrFaction(faction.toLowerCase());
-                                if (p != null && !winnners.contains(p)) {
-                                    winnners.add(p);
-                                }
-                            }
-                        }
-                    }
+                    List<Player> winnners = getWinningVoters(winner, game);
                     for (Player p2 : winnners) {
                         if (p2 == player) {
                             continue;
@@ -1327,6 +1313,12 @@ public final class AgendaHelper {
                     existingData += ";" + identifier + "_" + votes;
                 }
                 game.setCurrentAgendaVote(winner, existingData);
+                int publicSupportCount = getPublicSupportCountForOutcome(game, winner);
+                if (publicSupportCount > 0
+                        && game.getStoredValue("publicSupportDrawn" + player.getFaction()).isEmpty()) {
+                    ActionCardHelper.drawActionCards(player, publicSupportCount);
+                    game.setStoredValue("publicSupportDrawn" + player.getFaction(), winner);
+                }
                 if (!game.isHiddenAgendaMode()) {
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(), Helper.buildSpentThingsMessageForVoting(player, game, false));
@@ -2409,6 +2401,7 @@ public final class AgendaHelper {
                     if (loser != null
                             && !specificVote.contains("Rider")
                             && !specificVote.contains("Sanction")
+                            && !specificVote.contains("Public Support")
                             && !specificVote.contains("Ability")) {
                         if (!losers.contains(loser)) {
                             losers.add(loser);
@@ -2436,6 +2429,7 @@ public final class AgendaHelper {
                         if (!losers.contains(loser)
                                 && !specificVote.contains("Rider")
                                 && !specificVote.contains("Sanction")
+                                && !specificVote.contains("Public Support")
                                 && !specificVote.contains("Radiance")
                                 && !specificVote.contains("Unity")
                                 && !specificVote.contains("Ability")) {
@@ -2574,6 +2568,11 @@ public final class AgendaHelper {
             if (!game.getScoredPublicObjectives().get("Stellar Atomics").contains(player.getUserID())) {
                 voteCount = 0;
             }
+        }
+
+        if (voteCount > 0) {
+            String chosenOutcome = game.getStoredValue("latestOutcomeVotedFor" + player.getFaction());
+            voteCount += getPublicSupportCountForOutcome(game, chosenOutcome) * 3;
         }
 
         return new int[] {voteCount, hasXxchaHero, hasXxchaAlliance};
@@ -3112,6 +3111,7 @@ public final class AgendaHelper {
                         || vote.contains("Radiance")
                         || vote.contains("Unity Algorithm")
                         || vote.contains("Tarrock")
+                        || vote.contains("Public Support")
                         || vote.contains("Hero")) {
                     voteSummBuilder.append(";").append(specificVote);
                 } else if (!faction2.equals(faction)) {
@@ -3552,6 +3552,21 @@ public final class AgendaHelper {
 
         if (getVoteCountFromPlanets(game, player) == 0) {
             return additionalVotesAndSources;
+        }
+
+        public static int getPublicSupportCountForOutcome(Game game, String outcome) {
+            if (outcome == null || outcome.isEmpty()) {
+                return 0;
+            }
+
+            String voteInfo = game.getCurrentAgendaVotes().get(outcome);
+            if (voteInfo == null || voteInfo.isEmpty()) {
+                return 0;
+            }
+
+            return (int) List.of(voteInfo.split(";")).stream()
+                    .filter(vote -> vote.contains("Public Support"))
+                    .count();
         }
         // Argent Zeal
         if (player.hasAbility("zeal")
@@ -4118,6 +4133,7 @@ public final class AgendaHelper {
         for (Player p2 : game.getRealPlayers()) {
             game.setStoredValue("latestOutcomeVotedFor" + p2.getFaction(), "");
             game.setStoredValue("preVoting" + p2.getFaction(), "");
+            game.removeStoredValue("publicSupportDrawn" + p2.getFaction());
         }
         GameMessageManager.remove(game.getName(), GameMessageType.AGENDA_WHEN);
         GameMessageManager.remove(game.getName(), GameMessageType.AGENDA_AFTER);

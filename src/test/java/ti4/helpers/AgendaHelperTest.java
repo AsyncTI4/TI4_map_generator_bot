@@ -60,6 +60,21 @@ class AgendaHelperTest extends BaseTi4Test {
     }
 
     @Test
+    void buildSpentThingsMessageForVotingAddsPublicSupportVotes() {
+        Game game = new Game();
+        Player player = playerWithFaction(game, "arborec");
+        game.setCurrentAgendaInfo("agenda_For");
+        game.setStoredValue("latestOutcomeVotedFor" + player.getFaction(), "for");
+        game.setCurrentAgendaVote("for", "hacan_Public Support");
+        player.addSpentThing("specialVotes_2");
+
+        assertThat(Helper.buildSpentThingsMessageForVoting(player, game, false))
+                .contains("additional votes from _Public Support_")
+                .contains("total of **5** votes");
+        assertThat(Helper.buildSpentThingsMessageForVoting(player, game, true)).isEqualTo("5");
+    }
+
+    @Test
     void getSummaryOfVotesFormatsStrategyCardOutcomeWithEmoji() {
         Game game = new Game();
         Player player = playerWithFaction(game, "arborec");
@@ -81,6 +96,18 @@ class AgendaHelperTest extends BaseTi4Test {
 
         String summary = AgendaHelper.getSummaryOfVotes(game, true);
         assertThat(summary).contains("Construction: 10");
+    }
+
+    @Test
+    void getWinningVotersIgnoresPublicSupportEntries() {
+        Game game = new Game();
+        Player arborec = playerWithFaction(game, "arborec");
+        Player hacan = playerWithFaction(game, "hacan");
+        hacan.setUserID("otherUser");
+        game.setPlayers(Map.of(arborec.getUserID(), arborec, hacan.getUserID(), hacan));
+        game.setCurrentAgendaVote("for", "arborec_Public Support;hacan_4");
+
+        assertThat(AgendaHelper.getWinningVoters("for", game)).containsExactly(hacan);
     }
 
     @Test

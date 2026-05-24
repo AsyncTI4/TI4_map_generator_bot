@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -127,6 +128,79 @@ class ActionCardDeck2ButtonHandler {
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", please choose the planet you wish to put 1 PDS on.",
                 buttons);
+    }
+
+    @ButtonHandler("resolvePublicSupport")
+    public static void resolvePublicSupport(Player player, Game game, ButtonInteractionEvent event) {
+        if (StringUtils.isBlank(game.getCurrentAgendaInfo())) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " could not resolve _Public Support_ because no agenda is active.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<Button> buttons = getPublicSupportOutcomeButtons(game);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " could not find any legal outcomes for _Public Support_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", choose the outcome _Public Support_ will apply to.",
+                buttons);
+    }
+
+    @ButtonHandler("resolvePublicSupportPlanet_")
+    public static void resolvePublicSupportPlanet(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String factionOrColor = buttonID.replace("resolvePublicSupportPlanet_", "");
+        Player planetOwner = game.getPlayerFromColorOrFaction(factionOrColor);
+        if (planetOwner == null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not find that player's planets.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<Button> buttons = VoteButtonHandler.getPlanetOutcomeButtons(planetOwner, game, "resolvePublicSupportStep2", null);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "That player has no legal planets to choose.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", choose the planet outcome _Public Support_ will apply to.",
+                buttons);
+    }
+
+    @ButtonHandler("resolvePublicSupportStep2_")
+    public static void resolvePublicSupportStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String outcome = buttonID.replace("resolvePublicSupportStep2_", "");
+        String identifier = game.isFowMode() ? player.getColor() : player.getFaction();
+        String existingData = game.getCurrentAgendaVotes().getOrDefault(outcome, "");
+        String publicSupportEntry = identifier + "_Public Support";
+        if (existingData.isEmpty()) {
+            existingData = publicSupportEntry;
+        } else if (!existingData.contains(publicSupportEntry)) {
+            existingData += ";" + publicSupportEntry;
+        }
+        game.setCurrentAgendaVote(outcome, existingData);
+
+        String outcomeName = AgendaHelper.getAgendaOutcomeName(game, outcome, true);
+        String voteMessage = player.getRepresentationNoPing()
+                + " chose to apply _Public Support_ to the outcome \""
+                + StringUtils.capitalize(outcomeName)
+                + "\".";
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), voteMessage);
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), AgendaHelper.getSummaryOfVotes(game, true) + "\n \n");
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("defenseInstallationStep2_")
@@ -334,6 +408,33 @@ class ActionCardDeck2ButtonHandler {
         }
 
         return buttons;
+    }
+
+    private static List<Button> getPublicSupportOutcomeButtons(Game game) {
+        String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
+        if (agendaDetails.contains("For")) {
+            return VoteButtonHandler.getForAgainstOutcomeButtons(
+                    game, null, "resolvePublicSupportStep2", game.getCurrentAgendaInfo().split("_")[2], null);
+        }
+        if (agendaDetails.contains("Player") || agendaDetails.contains("player")) {
+            return VoteButtonHandler.getPlayerOutcomeButtons(game, null, "resolvePublicSupportStep2", null);
+        }
+        if (agendaDetails.contains("Planet") || agendaDetails.contains("planet")) {
+            return VoteButtonHandler.getPlayerOutcomeButtons(game, null, "resolvePublicSupportPlanet", null);
+        }
+        if (agendaDetails.contains("Secret") || agendaDetails.contains("secret")) {
+            return VoteButtonHandler.getSecretOutcomeButtons(game, null, "resolvePublicSupportStep2");
+        }
+        if (agendaDetails.contains("Strategy") || agendaDetails.contains("strategy")) {
+            return VoteButtonHandler.getStrategyOutcomeButtons(game, null, "resolvePublicSupportStep2");
+        }
+        if (agendaDetails.contains("unit upgrade")) {
+            return VoteButtonHandler.getUnitUpgradeOutcomeButtons(game, null, "resolvePublicSupportStep2");
+        }
+        if (agendaDetails.contains("Unit") || agendaDetails.contains("unit")) {
+            return VoteButtonHandler.getUnitOutcomeButtons(game, null, "resolvePublicSupportStep2");
+        }
+        return VoteButtonHandler.getLawOutcomeButtons(game, null, "resolvePublicSupportStep2");
     }
 
     private static String readyOvertimeComponent(Player player, Game game, String type, String componentId) {

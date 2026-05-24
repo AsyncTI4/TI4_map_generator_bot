@@ -1189,6 +1189,18 @@ public final class Helper {
             }
         }
         String outcome = game.getStoredValue("latestOutcomeVotedFor" + player.getFaction());
+        int publicSupportCount = AgendaHelper.getPublicSupportCountForOutcome(game, outcome);
+        if (votes > 0 && publicSupportCount > 0) {
+            int publicSupportVotes = publicSupportCount * 3;
+            votes += publicSupportVotes;
+            if (!justVoteTotal) {
+                msg.append("> Got ")
+                        .append(publicSupportVotes)
+                        .append(" additional vote")
+                        .append(publicSupportVotes == 1 ? "" : "s")
+                        .append(" from _Public Support_.\n");
+            }
+        }
         String formattedOutcome = AgendaHelper.getAgendaOutcomeName(game, outcome, true);
         boolean isSecretOutcome = game.getCurrentAgendaInfo().contains("Secret")
                 && Mapper.getSecretObjectivesJustNames().containsKey(outcome);

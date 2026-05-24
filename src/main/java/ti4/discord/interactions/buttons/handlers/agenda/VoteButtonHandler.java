@@ -282,7 +282,7 @@ public class VoteButtonHandler {
         return strategyButtons;
     }
 
-    private static List<Button> getPlanetOutcomeButtons(Player player, Game game, String prefix, String rider) {
+    public static List<Button> getPlanetOutcomeButtons(Player player, Game game, String prefix, String rider) {
         List<Button> planetOutcomeButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets());
         for (String planet : planets) {
