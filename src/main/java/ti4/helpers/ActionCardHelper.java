@@ -1367,9 +1367,7 @@ public class ActionCardHelper {
             if ("public_outrage".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolvePublicOutrage", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
-                        channel2,
-                        introMsg + " Use this button after the agenda winner is determined.",
-                        codedButtons);
+                        channel2, introMsg + " Use this button after the agenda winner is determined.", codedButtons);
             }
 
             if ("scuttle".equals(automationID)) {

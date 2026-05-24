@@ -878,14 +878,16 @@ class ActionCardDeck2ButtonHandler {
                 game.getCurrentAgendaInfo() + "#" + String.join(";", candidateEntries));
 
         StringBuilder revealMessage = new StringBuilder(player.getRepresentationNoPing())
-                .append(" predicted the winning outcome with _Public Outrage_. The following action cards were revealed:");
+                .append(
+                        " predicted the winning outcome with _Public Outrage_. The following action cards were revealed:");
         for (String candidateEntry : candidateEntries) {
             String[] parts = candidateEntry.split("\\|", 3);
             if (parts.length < 3) {
                 continue;
             }
             Player revealedPlayer = game.getPlayerFromColorOrFaction(parts[0]);
-            revealMessage.append("\n- ")
+            revealMessage
+                    .append("\n- ")
                     .append(revealedPlayer == null ? parts[0] : revealedPlayer.getRepresentationNoPing())
                     .append(": _")
                     .append(getActionCardName(parts[2]))
@@ -906,7 +908,8 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("resolvePublicOutrageStep2_")
-    public static void resolvePublicOutrageStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void resolvePublicOutrageStep2(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String payload = buttonID.replace("resolvePublicOutrageStep2_", "");
         String[] parts = payload.split("_", 2);
         if (parts.length < 2 || !NumberUtils.isDigits(parts[1])) {
@@ -1644,7 +1647,8 @@ class ActionCardDeck2ButtonHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", choose which revealed action card to take with _Public Outrage_.",
+                player.getRepresentationUnfogged()
+                        + ", choose which revealed action card to take with _Public Outrage_.",
                 buttons);
     }
 
@@ -1694,7 +1698,8 @@ class ActionCardDeck2ButtonHandler {
                 continue;
             }
 
-            List<String> actionCards = new ArrayList<>(revealedPlayer.getActionCards().keySet());
+            List<String> actionCards =
+                    new ArrayList<>(revealedPlayer.getActionCards().keySet());
             Collections.shuffle(actionCards);
             String actionCardAlias = actionCards.getFirst();
             Integer actionCardIdentifier = revealedPlayer.getActionCards().get(actionCardAlias);
@@ -1822,7 +1827,8 @@ class ActionCardDeck2ButtonHandler {
     }
 
     private static boolean hasActionCard(Player player, String actionCardAlias, int actionCardIdentifier) {
-        return Integer.valueOf(actionCardIdentifier).equals(player.getActionCards().get(actionCardAlias));
+        return Integer.valueOf(actionCardIdentifier)
+                .equals(player.getActionCards().get(actionCardAlias));
     }
 
     private static String getActionCardName(String actionCardAlias) {
