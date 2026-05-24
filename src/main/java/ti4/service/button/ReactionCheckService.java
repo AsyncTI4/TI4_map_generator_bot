@@ -180,7 +180,7 @@ public class ReactionCheckService {
         if (tfWarning) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
-                    "Since this game is in Twilight's Fall mode and there are multiple objectives available to be picked from, some of which have been peeked at, the buttons will specify the position of the card they will reveal. The speaker gets to pick which one they reveal, per the rules.");
+                    "Since multiple unrevealed objectives are available and at least one has been peeked at, the buttons specify the position of the card they will reveal. The speaker gets to pick which one to reveal, per the rules.");
         }
     }
 
