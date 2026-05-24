@@ -634,11 +634,31 @@ class ActionCardDeck2ButtonHandler {
 
     @ButtonHandler("resolveArbitration")
     public static void resolveArbitration(Player player, Game game, ButtonInteractionEvent event) {
-        List<Button> buttons = getArbitrationPlanetButtons(game, player);
+        List<Button> buttons = getArbitrationOwnerButtons(game, player);
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " has no eligible planets for _Arbitration_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", choose which player's planets to inspect for _Arbitration_.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("arbitrationOwner_")
+    public static void resolveArbitrationOwner(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String owner = buttonID.replace("arbitrationOwner_", "");
+        List<Button> buttons = getArbitrationPlanetButtons(game, player, owner);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has no eligible planets for _Arbitration_ in that category.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -653,7 +673,11 @@ class ActionCardDeck2ButtonHandler {
     @ButtonHandler("arbitrationPlanet_")
     public static void resolveArbitrationPlanet(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String planet = buttonID.replace("arbitrationPlanet_", "");
+        String[] buttonParts = buttonID.split("_", 3);
+        if (buttonParts.length < 3) {
+            return;
+        }
+        String planet = buttonParts[2];
         List<Button> buttons = getArbitrationTargetButtons(game, player, planet);
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -719,24 +743,57 @@ class ActionCardDeck2ButtonHandler {
         return techs;
     }
 
-    private static List<Button> getArbitrationPlanetButtons(Game game, Player player) {
+    private static List<Button> getArbitrationOwnerButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player owner : game.getRealPlayers()) {
+            if (owner == player || getArbitrationPlanetButtons(game, player, owner.getFaction()).isEmpty()) {
+                continue;
+            }
+            if (game.isFowMode()) {
+                buttons.add(Buttons.gray(player.factionButtonChecker() + "arbitrationOwner_" + owner.getFaction(),
+                        owner.getColor()));
+            } else {
+                Button button = Buttons.gray(
+                        player.factionButtonChecker() + "arbitrationOwner_" + owner.getFaction(),
+                        owner.getFactionModel().getShortName());
+                buttons.add(button.withEmoji(Emoji.fromFormatted(owner.getFactionEmoji())));
+            }
+        }
+
+        if (!getArbitrationPlanetButtons(game, player, "neutralUnits").isEmpty()) {
+            buttons.add(Buttons.gray(player.factionButtonChecker() + "arbitrationOwner_neutralUnits", "Neutral Units"));
+        }
+        return buttons;
+    }
+
+    private static List<Button> getArbitrationPlanetButtons(Game game, Player player, String owner) {
         List<String> planets = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (tile.isHomeSystem(game)) {
                 continue;
             }
-            tile.getPlanetUnitHolders().stream()
-                    .filter(planet -> planet.hasGroundForces(game))
-                    .map(Planet::getName)
-                    .forEach(planets::add);
+            for (Planet planet : tile.getPlanetUnitHolders()) {
+                if (!isArbitrationPlanetInCategory(game, planet, owner) || getArbitrationTargetButtons(game, player, planet.getName()).isEmpty()) {
+                    continue;
+                }
+                planets.add(planet.getName());
+            }
         }
 
         Collections.sort(planets);
         return planets.stream()
                 .map(planet -> Buttons.green(
-                        player.factionButtonChecker() + "arbitrationPlanet_" + planet,
+                        player.factionButtonChecker() + "arbitrationPlanet_" + owner + "_" + planet,
                         Helper.getPlanetRepresentation(planet, game)))
                 .toList();
+    }
+
+    private static boolean isArbitrationPlanetInCategory(Game game, Planet planet, String owner) {
+        if ("neutralUnits".equals(owner)) {
+            return planet.hasGroundForces(game.getNeutral());
+        }
+        Player planetOwner = game.getPlanetOwner(planet.getName());
+        return planetOwner != null && owner.equals(planetOwner.getFaction()) && planet.hasGroundForces(game);
     }
 
     private static List<Button> getArbitrationTargetButtons(Game game, Player player, String planet) {
