@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -349,7 +350,10 @@ public final class ButtonHelperTacticalAction {
                 List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
                 spaceCannonButtons.add(
                         Buttons.red("declinePDS_" + tile.getTileID() + "_" + player.getFaction(), "Decline PDS"));
-                if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasAbility("control_network"))) {
+                if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasAbility("control_network"))
+                        && (!game.getRealPlayers().stream().anyMatch(player_ -> player_.hasUnit("netrunners_flagship"))
+                                || !NetrunnersUnitsHandler.empBlocksSpaceCannonAgainstOpponent(
+                                        game, playerWithPds, tile, CombatRollType.SpaceCannonOffence))) {
                     spaceCannonButtons.addAll(NetrunnersAbilitiesHandler.getControlNetworkSpaceCannonButtons(
                             game, playerWithPds, tile, CombatRollType.SpaceCannonOffence, "space"));
                 }
