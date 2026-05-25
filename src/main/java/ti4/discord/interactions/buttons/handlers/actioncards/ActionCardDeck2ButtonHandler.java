@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -648,15 +649,18 @@ class ActionCardDeck2ButtonHandler {
 
     @ButtonHandler("resolveLiberation")
     public static void resolveLiberation(Player player, Game game, ButtonInteractionEvent event) {
-        List<Button> buttons = player.getExhaustedPlanets().stream()
-                .filter(player::hasPlanet)
+        Tile activeSystem = game.getTileByPosition(game.getCurrentActiveSystem());
+        Stream<String> liberationPlanets = activeSystem == null
+                ? player.getPlanets().stream()
+                : activeSystem.getPlanetUnitHolders().stream().map(Planet::getName);
+        List<Button> buttons = liberationPlanets
                 .map(planet ->
                         Buttons.green("resolveLiberationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)))
                 .toList();
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " has no exhausted planets to target with _Liberation_.");
+                    player.getRepresentation() + " has no planets to target with _Liberation_.");
             ButtonHelper.deleteMessage(event);
             return;
         }
