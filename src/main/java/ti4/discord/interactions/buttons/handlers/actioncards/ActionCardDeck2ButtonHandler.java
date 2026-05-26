@@ -746,12 +746,14 @@ class ActionCardDeck2ButtonHandler {
     private static List<Button> getArbitrationOwnerButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Player owner : game.getRealPlayers()) {
-            if (owner == player || getArbitrationPlanetButtons(game, player, owner.getFaction()).isEmpty()) {
+            if (owner == player
+                    || getArbitrationPlanetButtons(game, player, owner.getFaction())
+                            .isEmpty()) {
                 continue;
             }
             if (game.isFowMode()) {
-                buttons.add(Buttons.gray(player.factionButtonChecker() + "arbitrationOwner_" + owner.getFaction(),
-                        owner.getColor()));
+                buttons.add(Buttons.gray(
+                        player.factionButtonChecker() + "arbitrationOwner_" + owner.getFaction(), owner.getColor()));
             } else {
                 Button button = Buttons.gray(
                         player.factionButtonChecker() + "arbitrationOwner_" + owner.getFaction(),
@@ -773,7 +775,9 @@ class ActionCardDeck2ButtonHandler {
                 continue;
             }
             for (Planet planet : tile.getPlanetUnitHolders()) {
-                if (!isArbitrationPlanetInCategory(game, planet, owner) || getArbitrationTargetButtons(game, player, planet.getName()).isEmpty()) {
+                if (!isArbitrationPlanetInCategory(game, planet, owner)
+                        || getArbitrationTargetButtons(game, player, planet.getName())
+                                .isEmpty()) {
                     continue;
                 }
                 planets.add(planet.getName());
