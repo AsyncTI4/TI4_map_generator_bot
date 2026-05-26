@@ -3,7 +3,6 @@ package ti4.service.actioncard;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageReaction;
@@ -170,54 +169,18 @@ public class SabotageService {
     }
 
     private static final long ACD2_SABOTAGE_REMOVAL_CUTOFF = ZonedDateTime.of(
-                    2026, 5, 19, 0, 0, 0, 0, ZoneId.of("America/New_York"))
+                    2026, 5, 19, 21, 0, 0, 0, ZoneId.of("America/New_York"))
             .toInstant()
             .toEpochMilli();
 
     private static boolean allSabotagesAreDiscarded(Game game, Player player) {
-        Set<String> sabotageCardAliases = getSabotageCardAliasesToCheck(game);
-        return sabotageCardAliases.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
-    }
-
-    private static Set<String> getSabotageCardAliasesToCheck(Game game) {
-        Set<String> trackedSabotages = getTrackedSabotageCardAliases(game);
-        if (hasTrackedActionCardState(game)) {
-            return trackedSabotages;
-        }
-
         if (game.isAcd2() && game.getCreationDateTime() < ACD2_SABOTAGE_REMOVAL_CUTOFF) {
-            return ACD2_SABOTAGE_CARD_ALIASES;
+            return ACD2_SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
         }
 
-        Set<String> deckSabotages = new HashSet<>();
-        Mapper.getDeck(game.getAcDeckID()).getCardIDs().stream()
+        return Mapper.getDeck(game.getAcDeckID()).getCardIDs().stream()
                 .filter(ALL_SABOTAGE_CARD_ALIASES::contains)
-                .forEach(deckSabotages::add);
-        return deckSabotages;
-    }
-
-    private static Set<String> getTrackedSabotageCardAliases(Game game) {
-        Set<String> actionCards = new HashSet<>();
-        if (game.getActionCards() != null) {
-            actionCards.addAll(game.getActionCards());
-        }
-        actionCards.addAll(game.getDiscardActionCards().keySet());
-        actionCards.addAll(game.getDiscardACStatus().keySet());
-        for (Player player : game.getPlayers().values()) {
-            actionCards.addAll(player.getActionCards().keySet());
-        }
-
-        Set<String> trackedSabotages = new HashSet<>();
-        actionCards.stream().filter(ALL_SABOTAGE_CARD_ALIASES::contains).forEach(trackedSabotages::add);
-        return trackedSabotages;
-    }
-
-    private static boolean hasTrackedActionCardState(Game game) {
-        if (game.getActionCards() != null) return true;
-        if (!game.getDiscardActionCards().isEmpty()) return true;
-        if (!game.getDiscardACStatus().isEmpty()) return true;
-        return game.getPlayers().values().stream()
-                .anyMatch(player -> !player.getActionCards().isEmpty());
+                .allMatch(alias -> isActionCardNotPlayable(game, player, alias));
     }
 
     private static boolean isActionCardNotPlayable(Game game, Player player, String acAlias) {
