@@ -67,6 +67,7 @@ class ActionCardDeck2ButtonHandler {
     private static final String ALLIANCE_RIDER_CURRENT_ALLY = "allianceRiderCurrentAlly";
     private static final String ALLIANCE_RIDER_PURGED_ALLIES = "allianceRiderPurgedAllies";
     private static final String PROJECT_RIDER_SELECTED_CARDS_PREFIX = "projectRiderSelectedCards_";
+    private static final String PROJECT_RIDER_PICK_PREFIX = "projectRiderPickFromDiscard_";
     private static final int PROJECT_RIDER_MAX_SELECTIONS = 2;
 
     @ButtonHandler("resolveOracle")
@@ -1378,7 +1379,7 @@ class ActionCardDeck2ButtonHandler {
         game.setStoredValue(getProjectRiderSelectionKey(player), "");
         ButtonHelper.deleteMessage(event);
 
-        if (getProjectRiderSelectableCards(game, List.of()).isEmpty()) {
+        if (getProjectRiderSelectableCards(game).isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
@@ -1386,13 +1387,38 @@ class ActionCardDeck2ButtonHandler {
             return;
         }
 
-        sendProjectRiderSelectionButtons(player, game);
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green(player.factionButtonChecker() + "projectRiderCardPick_1", "Card #1"));
+        buttons.add(Buttons.green(player.factionButtonChecker() + "projectRiderCardPick_2", "Card #2"));
+        buttons.add(Buttons.blue(player.factionButtonChecker() + "projectRiderDone", "Done"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", choose up to 2 action cards in the discard pile for _Project Rider_.",
+                buttons);
     }
 
-    @ButtonHandler("projectRiderSelect_")
-    public static void resolveProjectRiderSelect(
+    @ButtonHandler("projectRiderCardPick_")
+    public static void resolveProjectRiderCardPick(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String acId = buttonID.replace("projectRiderSelect_", "");
+        if (buttonID.length() > "projectRiderCardPick_".length()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + " is choosing a card from discard for _Project Rider_.");
+        }
+        ActionCardHelper.pickACardFromDiscardStep1(
+                game,
+                player,
+                PROJECT_RIDER_PICK_PREFIX,
+                player.getRepresentationUnfogged()
+                        + ", choose an action card from the discard pile for _Project Rider_.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("projectRiderPickFromDiscard_")
+    public static void resolveProjectRiderPickFromDiscard(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String acId = buttonID.replace(PROJECT_RIDER_PICK_PREFIX, "");
         List<String> selectedCards = new ArrayList<>(getProjectRiderSelections(game, player));
         if (selectedCards.contains(acId)) {
             MessageHelper.sendMessageToChannel(
@@ -1421,14 +1447,7 @@ class ActionCardDeck2ButtonHandler {
         selectedCards.add(acId);
         setProjectRiderSelections(game, player, selectedCards);
         ButtonHelper.deleteMessage(event);
-
-        if (selectedCards.size() >= PROJECT_RIDER_MAX_SELECTIONS
-                || getProjectRiderSelectableCards(game, selectedCards).isEmpty()) {
-            sendProjectRiderSelectionSummary(player, selectedCards);
-            return;
-        }
-
-        sendProjectRiderSelectionButtons(player, game);
+        sendProjectRiderSelectionSummary(player, selectedCards);
     }
 
     @ButtonHandler("projectRiderDone")
@@ -1492,25 +1511,6 @@ class ActionCardDeck2ButtonHandler {
         return new ArrayList<>(List.of(storedValue.split(",")));
     }
 
-    private static void sendProjectRiderSelectionButtons(Player player, Game game) {
-        List<String> selectedCards = getProjectRiderSelections(game, player);
-        List<Button> buttons = new ArrayList<>();
-        for (String acId : getProjectRiderSelectableCards(game, selectedCards)) {
-            buttons.add(Buttons.green(
-                    "projectRiderSelect_" + acId, Mapper.getActionCard(acId).getName()));
-        }
-        buttons.add(Buttons.blue(player.factionButtonChecker() + "projectRiderDone", "Done"));
-
-        String selectionSummary = selectedCards.isEmpty()
-                ? "No cards selected yet."
-                : "Current selection: " + formatProjectRiderCardIds(selectedCards) + ".";
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", choose up to 2 action cards for _Project Rider_. "
-                        + selectionSummary,
-                buttons);
-    }
-
     private static void sendProjectRiderSelectionSummary(Player player, List<String> selectedCards) {
         String summary = selectedCards.isEmpty()
                 ? "selected no action cards"
@@ -1536,10 +1536,9 @@ class ActionCardDeck2ButtonHandler {
         return PROJECT_RIDER_SELECTED_CARDS_PREFIX + player.getUserID();
     }
 
-    private static List<String> getProjectRiderSelectableCards(Game game, List<String> selectedCards) {
+    private static List<String> getProjectRiderSelectableCards(Game game) {
         return game.getDiscardActionCards().keySet().stream()
                 .filter(acId -> isProjectRiderCardSelectable(game, acId))
-                .filter(acId -> !selectedCards.contains(acId))
                 .toList();
     }
 
