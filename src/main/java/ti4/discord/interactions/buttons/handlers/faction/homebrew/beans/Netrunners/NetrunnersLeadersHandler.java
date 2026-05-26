@@ -317,7 +317,8 @@ public class NetrunnersLeadersHandler {
                 .filter(netrunner -> !playersWithPds.contains(netrunner))
                 .filter(netrunner -> game.playerHasLeaderUnlockedOrAlliance(netrunner, COMMANDER_ID))
                 .filter(netrunner -> canUseSpaceCannonAgainstActivePlayer(activePlayer, game, tile, netrunner))
-                .filter(netrunner -> !getCommanderSpaceCannonUnits(game, netrunner, tile).isEmpty())
+                .filter(netrunner ->
+                        !getCommanderSpaceCannonUnits(game, netrunner, tile).isEmpty())
                 .toList();
     }
 
@@ -399,7 +400,8 @@ public class NetrunnersLeadersHandler {
         };
         model.setSpaceCannonHitsOn(pds.model().getSpaceCannonHitsOn(owner));
         model.setSpaceCannonDieCount(pds.model().getSpaceCannonDieCount(owner));
-        model.setName("Seize: " + owner.getColorDisplayName() + " " + pds.model().getName());
+        model.setName(
+                "Seize: " + owner.getColorDisplayName() + " " + pds.model().getName());
         model.setAsyncId(COMMANDER_FAKE_UNIT_ID + owner.getFaction());
         model.setId(COMMANDER_FAKE_UNIT_ID + owner.getFaction());
         model.setBaseType("pds");
