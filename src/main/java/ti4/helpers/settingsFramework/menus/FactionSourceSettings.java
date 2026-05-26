@@ -24,7 +24,8 @@ public class FactionSourceSettings extends SettingsMenu {
             ComponentSource.thunders_edge,
             ComponentSource.eronous,
             ComponentSource.ignis_aurora,
-            ComponentSource.balacasi);
+            ComponentSource.balacasi,
+            ComponentSource.beans);
 
     private final IntegerRangeSetting base;
     private final IntegerRangeSetting pok;
@@ -33,6 +34,7 @@ public class FactionSourceSettings extends SettingsMenu {
     private final IntegerRangeSetting eronous;
     private final IntegerRangeSetting ignisAurora;
     private final IntegerRangeSetting whispers;
+    private final IntegerRangeSetting deepreaches;
 
     FactionSourceSettings(JsonNode json, SettingsMenu parent) {
         super(
@@ -53,6 +55,7 @@ public class FactionSourceSettings extends SettingsMenu {
         int eronousCount = countFactions(ComponentSource.eronous);
         int ignisCount = countFactions(ComponentSource.ignis_aurora);
         int balacasiCount = countFactions(ComponentSource.balacasi);
+        int beansCount = countFactions(ComponentSource.beans);
 
         base = new IntegerRangeSetting(
                 "FactionBase", "Base Game factions", 0, 0, baseCount, baseCount, 0, baseCount, 1);
@@ -74,6 +77,8 @@ public class FactionSourceSettings extends SettingsMenu {
                 0,
                 balacasiCount,
                 1);
+        deepreaches = new IntegerRangeSetting(
+                "FactionDeepReaches", "Deep Reaches factions", 0, 0, beansCount, beansCount, 0, beansCount, 1);
 
         if (json != null && json.has("factionSourceSettings")) json = json.get("factionSourceSettings");
         if (json != null
@@ -86,6 +91,7 @@ public class FactionSourceSettings extends SettingsMenu {
             eronous.initialize(json.get("eronous"));
             ignisAurora.initialize(json.get("ignisAurora"));
             whispers.initialize(json.get("whispers"));
+            deepreaches.initialize(json.get("deepreaches"));
         }
     }
 
@@ -135,6 +141,7 @@ public class FactionSourceSettings extends SettingsMenu {
             case eronous -> eronous;
             case ignis_aurora -> ignisAurora;
             case balacasi -> whispers;
+            case beans -> deepreaches;
             default -> null;
         };
     }
