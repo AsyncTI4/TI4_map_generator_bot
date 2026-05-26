@@ -1401,11 +1401,6 @@ class ActionCardDeck2ButtonHandler {
     @ButtonHandler("projectRiderCardPick_")
     public static void resolveProjectRiderCardPick(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        if (buttonID.length() > "projectRiderCardPick_".length()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " is choosing a card from discard for _Project Rider_.");
-        }
         ActionCardHelper.pickACardFromDiscardStep1(
                 game,
                 player,

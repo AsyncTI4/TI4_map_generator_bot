@@ -2152,7 +2152,8 @@ public class ActionCardHelper {
             if (!isDiscardActionCardPickable(game, acStringID)) {
                 continue;
             }
-            buttons.add(Buttons.green(buttonPrefix + acStringID, Mapper.getActionCard(acStringID).getName()));
+            buttons.add(Buttons.green(
+                    buttonPrefix + acStringID, Mapper.getActionCard(acStringID).getName()));
         }
         buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
         if (buttons.size() > 25) {
