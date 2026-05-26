@@ -45,6 +45,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersUnitsHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
@@ -1620,6 +1621,10 @@ public final class Helper {
         }
         int cost = calculateCostOfProducedUnits(player, game, true);
         int unitCount = calculateCostOfProducedUnits(player, game, false);
+        String siphonIIDiscountMessage = "";
+        if (player.hasTech("benetrunnerssd")) {
+            siphonIIDiscountMessage = NetrunnersFactionTechsHandler.getSiphonIIDiscountMessage(game, player);
+        }
         if (player.hasAbility("control_network")) {
             String controlNetworkMessage =
                     NetrunnersAbilitiesHandler.getControlNetworkProductionMessage(game, player, tile, cost, unitCount);
@@ -1705,6 +1710,7 @@ public final class Helper {
                         .append(".");
             }
         }
+        msg.append(siphonIIDiscountMessage);
         return msg.toString();
     }
 
@@ -2148,6 +2154,9 @@ public final class Helper {
         }
         totalUnits += numInf + numFF;
         if (wantCost) {
+            if (player.hasTech("benetrunnerssd")) {
+                cost = NetrunnersFactionTechsHandler.applySiphonIIDiscount(game, player, cost);
+            }
             return cost;
         } else {
             return totalUnits;
