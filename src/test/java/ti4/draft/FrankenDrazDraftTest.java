@@ -67,6 +67,36 @@ class FrankenDrazDraftTest extends BaseTi4Test {
     }
 
     @Test
+    void factionLimitChangesFactionPackageCountAndBagSize() {
+        Game game = setupGame(6);
+        FrankenDrazDraft draft = new FrankenDrazDraft(game);
+        game.setBagDraft(draft);
+        game.setStoredValue(FrankenDrazDraft.FACTION_LIMIT_KEY, "4");
+
+        List<DraftBag> bags = assertDoesNotThrow(() -> draft.generateBags(game));
+
+        assertEquals(4, draft.getItemLimitForCategory(DraftCategory.FACTION));
+        assertEquals(10, draft.getBagSize());
+        assertEquals(10, game.getFrankenBagSize());
+        assertNotNull(bags);
+        for (DraftBag bag : bags) {
+            assertEquals(4, bag.getCategoryCount(DraftCategory.FACTION));
+            assertEquals(10, bag.Contents.size());
+        }
+    }
+
+    @Test
+    void factionLimitCanBeConfiguredBeforeDraftStarts() {
+        Game game = new Game();
+        game.setStoredValue(FrankenDrazDraft.FACTION_LIMIT_KEY, "5");
+
+        FrankenDrazDraft draft = new FrankenDrazDraft(game);
+
+        assertEquals(5, draft.getItemLimitForCategory(DraftCategory.FACTION));
+        assertEquals(11, draft.getBagSize());
+    }
+
+    @Test
     void generateBagsAutoBansObsidianAndFirmament() {
         Game game = setupGame(6);
         FrankenDrazDraft draft = new FrankenDrazDraft(game);
@@ -133,6 +163,21 @@ class FrankenDrazDraftTest extends BaseTi4Test {
         addMapSetupItems(player.getDraftHand());
 
         assertFalse(draft.isDraftStageComplete());
+    }
+
+    @Test
+    void unlimitedKeptComponentsRemovesPositiveFrankenDrazLimits() {
+        Game game = new Game();
+        FrankenDrazDraft draft = new FrankenDrazDraft(game);
+
+        assertEquals(4, draft.getKeptItemLimitForCategory(DraftCategory.ABILITY));
+        assertEquals(0, draft.getKeptItemLimitForCategory(DraftCategory.FACTION));
+
+        game.setStoredValue(FrankenDrazDraft.UNLIMITED_KEPT_COMPONENTS_KEY, "true");
+
+        assertEquals(Integer.MAX_VALUE, draft.getKeptItemLimitForCategory(DraftCategory.ABILITY));
+        assertEquals(Integer.MAX_VALUE, draft.getKeptItemLimitForCategory(DraftCategory.TECH));
+        assertEquals(0, draft.getKeptItemLimitForCategory(DraftCategory.FACTION));
     }
 
     private static Game setupGame(int players) {

@@ -73,7 +73,7 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
         // Load JSON if applicable
         if (!(json == null
                 || !json.has("menuId")
-                || !MENU_ID.equals(json.get("menuId").asText("")))) {
+                || !MENU_ID.equals(json.get("menuId").asString("")))) {
             numPackages.initialize(json.get("numPackages"));
             banFactions.initialize(json.get("banFactions"));
 

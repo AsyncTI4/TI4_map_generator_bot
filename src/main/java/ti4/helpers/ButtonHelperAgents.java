@@ -2501,7 +2501,9 @@ public final class ButtonHelperAgents {
         if (buttonID.contains("combat")) {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         } else {
-            ButtonHelper.deleteMessage(event);
+            if (!buttonID.contains("_hero")) {
+                ButtonHelper.deleteMessage(event);
+            }
         }
 
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);

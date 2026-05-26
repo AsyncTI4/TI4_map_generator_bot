@@ -161,7 +161,13 @@ public enum FrankenBanList {
                                     "classified_developments",
                                     "data_recovery",
                                     "honor_bound",
-                                    "prescience"))));
+                                    "prescience")))),
+
+    Blue_Reverie(
+            "Blue Reverie",
+            "Removes BR factions.",
+            Map.ofEntries(Map.entry(
+                    Constants.BAN_FACTION, List.of("atokera", "belkosea", "qhet", "pharadn", "toldar", "uydai"))));
 
     private final String id;
 

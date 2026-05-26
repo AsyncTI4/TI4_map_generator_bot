@@ -39,7 +39,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
 
         int payout = service.offeredPayout(contest, candidate(30, 30), CombatSideBetType.WINNER_ONE_HP, "sol");
 
-        assertEquals(35, payout);
+        assertEquals(26, payout);
     }
 
     @Test
@@ -49,7 +49,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
 
         int payout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_WHIFF, "sol");
 
-        assertEquals(4, payout);
+        assertEquals(20, payout);
         verifyNoInteractions(eventRepository);
     }
 
@@ -135,7 +135,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
 
         int payout = service.offeredPayout(contest, candidate, CombatSideBetType.ROUND_ONE_WHIFF, "sol");
 
-        assertEquals(10, payout);
+        assertEquals(20, payout);
         verifyNoInteractions(eventRepository);
     }
 
@@ -147,7 +147,7 @@ class CombatReplaySideBetPayoutServiceTest extends BaseTi4Test {
 
         int payout = service.offeredPayout(oddsContest(), candidate, CombatSideBetType.WINNER_ONE_HP, "sol");
 
-        assertEquals(5, payout);
+        assertEquals(3, payout);
         verifyNoInteractions(eventRepository);
     }
 

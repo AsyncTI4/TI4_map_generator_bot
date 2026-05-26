@@ -27,6 +27,7 @@ public class DeveloperCommand implements ParentCommand {
                     new ProduceNucleusGenStats(),
                     new AnnounceActiveGames(),
                     new DatabasePersistence(),
+                    new DeleteUserMessages(),
                     new RunSql())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

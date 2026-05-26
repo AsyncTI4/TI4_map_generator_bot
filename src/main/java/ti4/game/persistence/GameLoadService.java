@@ -49,6 +49,7 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import ti4.draft.BagDraft;
 import ti4.game.Game;
+import ti4.game.GameStats;
 import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -505,6 +506,7 @@ class GameLoadService {
                         }
                     }
                 }
+                case Constants.GAME_STATS -> game.setGameStats(mapper.readValue(info, GameStats.class));
                 case Constants.THALNOS_UNITS -> {
                     StringTokenizer thalnosInfoTokens = new StringTokenizer(info, ":");
                     while (thalnosInfoTokens.hasMoreTokens()) {
@@ -516,34 +518,6 @@ class GameLoadService {
                         if (dataInfoTokens.hasMoreTokens()) {
                             String dataInfo = dataInfoTokens.nextToken();
                             game.setSpecificThalnosUnit(outcome, Integer.parseInt(dataInfo));
-                        }
-                    }
-                }
-                case Constants.SLASH_COMMAND_STRING -> {
-                    StringTokenizer commandCounts = new StringTokenizer(info, ":");
-                    while (commandCounts.hasMoreTokens()) {
-                        StringTokenizer dataInfoTokens = new StringTokenizer(commandCounts.nextToken(), ",");
-                        String commandName = null;
-                        if (dataInfoTokens.hasMoreTokens()) {
-                            commandName = dataInfoTokens.nextToken();
-                        }
-                        if (dataInfoTokens.hasMoreTokens()) {
-                            String dataInfo = dataInfoTokens.nextToken();
-                            game.setSpecificSlashCommandCount(commandName, Integer.parseInt(dataInfo));
-                        }
-                    }
-                }
-                case Constants.ACS_SABOD -> {
-                    StringTokenizer voteInfo = new StringTokenizer(info, ":");
-                    while (voteInfo.hasMoreTokens()) {
-                        StringTokenizer dataInfoTokens = new StringTokenizer(voteInfo.nextToken(), ",");
-                        String outcome = null;
-                        if (dataInfoTokens.hasMoreTokens()) {
-                            outcome = dataInfoTokens.nextToken();
-                        }
-                        if (dataInfoTokens.hasMoreTokens()) {
-                            String dataInfo = dataInfoTokens.nextToken();
-                            game.setSpecificActionCardSaboCount(outcome, Integer.parseInt(dataInfo));
                         }
                     }
                 }
@@ -727,6 +701,7 @@ class GameLoadService {
                 case Constants.DRAFT_MANAGER -> game.setDraftString(info); // We will parse this later
                 case Constants.DRAFT_SYSTEM_SETTINGS ->
                     game.setDraftSystemSettingsJson(info); // We will parse this later
+                case Constants.FRANKEN_DRAFT_SETTINGS -> game.setFrankenSettingsJson(info); // We will parse this later
                 case Constants.GAME_TAGS -> game.setTags(getCardList(info));
                 case Constants.TIGL_RANK -> {
                     TIGLHelper.TIGLRank rank = TIGLHelper.TIGLRank.fromString(info);

@@ -1,8 +1,10 @@
 package ti4.discord.interactions.commands.franken.ban;
 
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiFunction;
 import ti4.game.Game;
 import ti4.game.Tile;
@@ -19,6 +21,12 @@ public class BanService implements IBanService {
             if (isBlank(id) || Mapper.getAbility(id) == null) return "";
             appendStoredValue(game, "bannedAbilities", id);
             return "Successfully banned ability: " + Mapper.getAbility(id).getName() + ".\n";
+        });
+
+        BAN_APPLIERS.put(Constants.BAN_FACTION, (game, id) -> {
+            if (isBlank(id) || !Mapper.getFactionIDs().contains(id)) return "";
+            appendStoredValue(game, "bannedFactions", id);
+            return "Successfully banned " + Mapper.getFaction(id).getFactionName() + ".\n";
         });
 
         BAN_APPLIERS.put(Constants.BREAKTHROUGH, (game, id) -> {
@@ -130,6 +138,9 @@ public class BanService implements IBanService {
 
     private static void appendStoredValue(Game game, String key, String value) {
         String prev = game.getStoredValue(key);
-        game.setStoredValue(key, prev.isEmpty() ? value : prev + Constants.FIN_SEPARATOR + value);
+        Set<String> values = new LinkedHashSet<>();
+        if (!prev.isEmpty()) values.addAll(List.of(prev.split(Constants.FIN_SEPARATOR)));
+        if (!values.add(value)) return;
+        game.setStoredValue(key, String.join(Constants.FIN_SEPARATOR, values));
     }
 }

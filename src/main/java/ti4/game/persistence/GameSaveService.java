@@ -52,6 +52,7 @@ import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
+import ti4.helpers.settingsFramework.menus.FrankenSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
@@ -278,20 +279,8 @@ class GameSaveService {
         writer.write(Constants.THALNOS_UNITS + " " + sb16);
         writer.write(System.lineSeparator());
 
-        Map<String, Integer> slashCommands = game.getAllSlashCommandsUsed();
-        StringBuilder sb10 = new StringBuilder();
-        for (Map.Entry<String, Integer> entry : slashCommands.entrySet()) {
-            sb10.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
-        }
-        writer.write(Constants.SLASH_COMMAND_STRING + " " + sb10);
-        writer.write(System.lineSeparator());
-
-        Map<String, Integer> acSabod = game.getAllActionCardsSabod();
-        StringBuilder sb11 = new StringBuilder();
-        for (Map.Entry<String, Integer> entry : acSabod.entrySet()) {
-            sb11.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
-        }
-        writer.write(Constants.ACS_SABOD + " " + sb11);
+        String gameStats = mapper.writeValueAsString(game.getGameStats());
+        writer.write(Constants.GAME_STATS + " " + gameStats);
         writer.write(System.lineSeparator());
 
         String displacedUnits = mapper.writeValueAsString(game.getTacticalActionDisplacement());
@@ -431,8 +420,6 @@ class GameSaveService {
         writer.write(Constants.ROUND + " " + game.getRound());
         writer.write(System.lineSeparator());
         writer.write(Constants.BUTTON_PRESS_COUNT + " " + game.getButtonPressCount());
-        writer.write(System.lineSeparator());
-        writer.write(Constants.SLASH_COMMAND_COUNT + " " + game.getSlashCommandsRunCount());
         writer.write(System.lineSeparator());
         writer.write(Constants.GAME_CUSTOM_NAME + " " + game.getCustomName());
         writer.write(System.lineSeparator());
@@ -697,6 +684,15 @@ class GameSaveService {
         } else if (game.getDraftSystemSettingsJson() != null) {
             // default to the already stored value, if we failed to read it previously
             writer.write(Constants.DRAFT_SYSTEM_SETTINGS + " " + game.getDraftSystemSettingsJson());
+            writer.write(System.lineSeparator());
+        }
+
+        FrankenSettings frankenSettings = game.getFrankenSettingsUnsafe();
+        if (frankenSettings != null) {
+            writer.write(Constants.FRANKEN_DRAFT_SETTINGS + " " + frankenSettings.json());
+            writer.write(System.lineSeparator());
+        } else if (game.getFrankenSettingsJson() != null) {
+            writer.write(Constants.FRANKEN_DRAFT_SETTINGS + " " + game.getFrankenSettingsJson());
             writer.write(System.lineSeparator());
         }
 

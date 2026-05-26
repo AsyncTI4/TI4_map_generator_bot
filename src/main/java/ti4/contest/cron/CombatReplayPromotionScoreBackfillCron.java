@@ -64,10 +64,16 @@ public class CombatReplayPromotionScoreBackfillCron {
         int updated = 0;
         int skipped = 0;
         for (CombatCandidateEntity candidate : candidateRepository.findByStatus(CombatCandidateStatus.RESOLVED)) {
-            if (recomputePromotionScore(candidate)) {
-                updated++;
-            } else {
+            try {
+                if (recomputePromotionScore(candidate)) {
+                    updated++;
+                } else {
+                    skipped++;
+                }
+            } catch (Exception e) {
                 skipped++;
+                BotLogger.warning(
+                        "Skipped combat replay promotion-score backfill for candidate " + candidate.getId() + ".", e);
             }
         }
 

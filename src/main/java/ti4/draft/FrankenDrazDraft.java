@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.draft.items.BlueTileDraftItem;
 import ti4.draft.items.FactionDraftItem;
 import ti4.draft.items.RedTileDraftItem;
@@ -38,6 +39,10 @@ import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
 
 public class FrankenDrazDraft extends FrankenDraft {
+    public static final String UNLIMITED_KEPT_COMPONENTS_KEY = "frankenDrazUnlimitedKeptComponents";
+    public static final String FACTION_LIMIT_KEY = "frankenDrazFactionLimit";
+
+    private static final int DEFAULT_FACTION_LIMIT = 6;
     private static final List<String> AUTO_BANNED_FACTIONS = List.of("obsidian", "firmament");
     private static final List<DraftCategory> POST_DRAFT_COMPONENT_CATEGORIES = List.of(
             DraftCategory.ABILITY,
@@ -61,7 +66,7 @@ public class FrankenDrazDraft extends FrankenDraft {
     @Override
     public int getItemLimitForCategory(DraftCategory category) {
         return switch (category) {
-            case FACTION -> 6;
+            case FACTION -> getFactionLimit(getOwner());
             case BLUETILE -> 3;
             case REDTILE -> 2;
             case DRAFTORDER -> 1;
@@ -71,15 +76,32 @@ public class FrankenDrazDraft extends FrankenDraft {
 
     @Override
     public int getKeptItemLimitForCategory(DraftCategory category) {
-        return switch (category) {
-            case ABILITY -> 4;
-            case TECH, BLUETILE -> 3;
-            case REDTILE -> 2;
-            case COMMODITIES, FLAGSHIP, MECH, PN -> 1;
-            case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 1;
-            case DRAFTORDER, STARTINGFLEET, STARTINGTECH, HOMESYSTEM -> 1;
-            case FACTION, UNIT, PLOT, MAHACTKING -> 0;
-        };
+        int limit =
+                switch (category) {
+                    case ABILITY -> 4;
+                    case TECH, BLUETILE -> 3;
+                    case REDTILE -> 2;
+                    case COMMODITIES, FLAGSHIP, MECH, PN -> 1;
+                    case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 1;
+                    case DRAFTORDER, STARTINGFLEET, STARTINGTECH, HOMESYSTEM -> 1;
+                    case FACTION, UNIT, PLOT, MAHACTKING -> 0;
+                };
+        if (limit > 0 && hasUnlimitedKeptComponents(getOwner())) {
+            return Integer.MAX_VALUE;
+        }
+        return limit;
+    }
+
+    public static boolean hasUnlimitedKeptComponents(Game game) {
+        return "true".equals(game.getStoredValue(UNLIMITED_KEPT_COMPONENTS_KEY));
+    }
+
+    public static int getFactionLimit(Game game) {
+        String storedLimit = game.getStoredValue(FACTION_LIMIT_KEY);
+        if (!storedLimit.isEmpty()) {
+            return Integer.parseInt(storedLimit);
+        }
+        return DEFAULT_FACTION_LIMIT;
     }
 
     @Override
@@ -196,6 +218,14 @@ public class FrankenDrazDraft extends FrankenDraft {
                 getPostDraftCategoryButtons(player));
     }
 
+    @ButtonHandler(value = "frankenFactionComponents", save = false)
+    private static void showFactionComponents(ButtonInteractionEvent event, Player player, String buttonID) {
+        if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
+            String faction = buttonID.split(";")[1];
+            frankenDrazDraft.sendFactionComponentCards(event, player, faction);
+        }
+    }
+
     public void sendFactionComponentCards(ButtonInteractionEvent event, Player player, String faction) {
         FactionDraftItem item = new FactionDraftItem(faction);
         List<DraftItem> components = item.getComponents(player.getGame());
@@ -219,6 +249,14 @@ public class FrankenDrazDraft extends FrankenDraft {
         builder.send();
         MessageHelper.sendEphemeralMessageToEventChannel(
                 event, "Sent " + item.getShortDescription() + " components to your cards info thread.");
+    }
+
+    @ButtonHandler(value = "frankenDrazCategory", save = false)
+    private static void showFrankenDrazCategory(ButtonInteractionEvent event, Player player, String buttonID) {
+        if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
+            DraftCategory category = DraftCategory.valueOf(buttonID.split(";")[1]);
+            frankenDrazDraft.sendPostDraftCategory(player, category);
+        }
     }
 
     public void sendPostDraftCategory(Player player, DraftCategory category) {
@@ -262,6 +300,15 @@ public class FrankenDrazDraft extends FrankenDraft {
         });
     }
 
+    @ButtonHandler(value = "frankenDrazCloseCategory", save = false)
+    private static void closeFrankenDrazCategory(ButtonInteractionEvent event, Player player, String buttonID) {
+        if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
+            DraftCategory category = DraftCategory.valueOf(buttonID.split(";")[1]);
+            frankenDrazDraft.closePostDraftCategory(event, player, category);
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Closed " + category.toString() + ".");
+        }
+    }
+
     public void closePostDraftCategory(ButtonInteractionEvent event, Player player, DraftCategory category) {
         if (!POST_DRAFT_COMPONENT_CATEGORIES.contains(category)) {
             return;
@@ -291,7 +338,7 @@ public class FrankenDrazDraft extends FrankenDraft {
 
     @Override
     public int getBagSize() {
-        return 12;
+        return getFactionLimit(getOwner()) + 6;
     }
 
     private List<Player> getOwnerPlayers() {

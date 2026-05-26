@@ -1,7 +1,8 @@
 package ti4.service.actioncard;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
-import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageReaction;
@@ -60,8 +61,6 @@ public class SabotageService {
 
         if (player.getAcCount() == 0) return false;
 
-        if (game.isAcd2()) return !allAcd2SabotagesAreDiscarded(game, player);
-        if (game.isTwilightsFallMode()) return !allShattersAreDiscarded(game, player);
         return !allSabotagesAreDiscarded(game, player);
     }
 
@@ -102,8 +101,6 @@ public class SabotageService {
     }
 
     public static boolean isSaboAllowed(Game game, Player player) {
-        if (game.isAcd2() && allAcd2SabotagesAreDiscarded(game, player)) return false;
-        if (game.isTwilightsFallMode() && allShattersAreDiscarded(game, player)) return false;
         if (allSabotagesAreDiscarded(game, player)) return false;
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
@@ -132,11 +129,8 @@ public class SabotageService {
     }
 
     public static String noSaboReason(Game game, Player player) {
-        if (game.isTwilightsFallMode() && allShattersAreDiscarded(game, player)) {
-            return "All _Shatter_ cards are in the discard.";
-        }
-
-        if ((game.isAcd2() && allAcd2SabotagesAreDiscarded(game, player)) || allSabotagesAreDiscarded(game, player)) {
+        if (allSabotagesAreDiscarded(game, player)) {
+            if (game.isTwilightsFallMode()) return "All _Shatter_ cards are in the discard.";
             return "All _Sabotages_ are in the discard.";
         }
 
@@ -174,29 +168,28 @@ public class SabotageService {
         return null;
     }
 
+    private static final long ACD2_SABOTAGE_REMOVAL_CUTOFF = ZonedDateTime.of(
+                    2026, 5, 19, 21, 0, 0, 0, ZoneId.of("America/New_York"))
+            .toInstant()
+            .toEpochMilli();
+
     private static boolean allSabotagesAreDiscarded(Game game, Player player) {
-        return SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
-    }
+        if (game.isAcd2() && game.getCreationDateTime() < ACD2_SABOTAGE_REMOVAL_CUTOFF) {
+            return ACD2_SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
+        }
 
-    private static boolean allShattersAreDiscarded(Game game, Player player) {
-        return SHATTER_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
-    }
-
-    private static boolean allAcd2SabotagesAreDiscarded(Game game, Player player) {
-        return ACD2_SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
+        return Mapper.getDeck(game.getAcDeckID()).getCardIDs().stream()
+                .filter(ALL_SABOTAGE_CARD_ALIASES::contains)
+                .allMatch(alias -> isActionCardNotPlayable(game, player, alias));
     }
 
     private static boolean isActionCardNotPlayable(Game game, Player player, String acAlias) {
-        // this first condition could go away if getDiscardACStatus starts correctly tracking discarded ACs
-        if (ActionCardHelper.getGarboziaActionCards(game).containsKey(acAlias)) {
-            return false;
+        ActionCardHelper.ACStatus status = game.getDiscardACStatus().get(acAlias);
+        if (status == ActionCardHelper.ACStatus.garbozia) {
+            return !player.hasPlanet("garbozia");
         }
-        return game.getDiscardActionCards().containsKey(acAlias)
-                || game.getDiscardACStatus().entrySet().stream()
-                        .filter(entry ->
-                                entry.getValue() != ActionCardHelper.ACStatus.garbozia || !player.hasPlanet("garbozia"))
-                        .map(Map.Entry::getKey)
-                        .anyMatch(acAlias::equals);
+        // this first condition could go away if getDiscardACStatus starts correctly tracking discarded ACs
+        return game.getDiscardActionCards().containsKey(acAlias) || status != null;
     }
 
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {

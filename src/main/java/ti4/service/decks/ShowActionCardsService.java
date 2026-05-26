@@ -64,7 +64,7 @@ public class ShowActionCardsService {
                 showFullText ? null : Buttons.green("ACShowDiscardFullText", "Show Full Text"));
     }
 
-    public static String getActionCardDiscardPileText(Game game, boolean showFullText) {
+    private static String getActionCardDiscardPileText(Game game, boolean showFullText) {
         List<Entry<String, Integer>> discards = game.getDiscardActionCards().entrySet().stream()
                 .filter(x -> game.getDiscardACStatus().get(x.getKey()) == null)
                 .toList();

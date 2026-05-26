@@ -184,7 +184,7 @@ public class CombatContestSettings {
         private double afbWhiffSelectionBias = 2.0;
         private double roundOneWhiffSelectionBias = 3.0;
         private double roundOneSlamSelectionBias = 1.5;
-        private double winnerOneHpPayoutMultiplier = 0.75;
+        private double winnerOneHpPayoutMultiplier = 0.5625;
         private String dynamicPayoutTiers = "0.20:4,0.10:5,0.05:8,0.025:12,0.01:20,0.005:30";
     }
 }

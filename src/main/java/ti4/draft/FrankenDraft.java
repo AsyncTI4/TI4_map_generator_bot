@@ -88,7 +88,9 @@ public class FrankenDraft extends BagDraft {
         "neutral",
         "kaltrim",
         "xin",
-        "sarcosa"
+        "sarcosa",
+        "firmament",
+        "obsidian"
     };
 
     private static List<FactionModel> getDraftableFactionsForGame(Game game) {

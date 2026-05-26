@@ -75,7 +75,9 @@ public class ComponentActionHelper {
                 if ("lgf".equals(tech) && !p1.controlsMecatol(false)) {
                     continue;
                 }
-                if ("tf-fabrication".equalsIgnoreCase(tech) || "tf-orbitaldrop".equalsIgnoreCase(tech)) {
+                if ("tf-fabrication".equalsIgnoreCase(tech)
+                        || "tf-orbitaldrop".equalsIgnoreCase(tech)
+                        || "tf-stalltactics".equalsIgnoreCase(tech)) {
                     continue;
                 }
                 Button tButton = Buttons.red(factionChecker + "exhaustTech_" + tech, "Exhaust " + techName, techEmoji);

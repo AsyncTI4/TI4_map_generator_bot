@@ -290,6 +290,12 @@ public class CreateGameService {
                 "If you want to start a Twilight's Fall Game (alternate game mode included in Thunder's Edge) use this button",
                 tfOptions);
 
+        Button frankenButton = Buttons.green("frankenSetup", "Start Franken Setup");
+        MessageHelper.sendMessageToChannelWithButton(
+                actionsChannel,
+                "If you want to start a Franken game (alternate homebrew game mode) use this button",
+                frankenButton);
+
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("chooseExp_newPoK", "New PoK"));
         buttons.add(Buttons.gray("chooseExp_oldPoK", "Old PoK"));
@@ -303,6 +309,11 @@ public class CreateGameService {
 
                 -# Please realize that these are broad overviews and that some small components may not fit perfectly into these categories.""";
         MessageHelper.sendMessageToChannelWithButtons(actionsChannel, expMsg, buttons);
+        Button baseGameModeButton = Buttons.green("setupBaseGameMode", "Set Base Game Mode");
+        MessageHelper.sendMessageToChannelWithButton(
+                actionsChannel,
+                "Use this button to set the game to the base game with PoK strategy cards.",
+                baseGameModeButton);
     }
 
     private static void introductionToBotMapUpdatesThread(Game game) {

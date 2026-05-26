@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.helpers.Helper;
+import ti4.spring.context.SpringContext;
 import ti4.spring.service.persistence.PlayerEntity;
 import ti4.spring.service.persistence.PlayerEntityRepository;
 
@@ -21,6 +22,20 @@ public class UserGameInfoService {
     private final PlayerEntityRepository playerEntityRepository;
 
     @Transactional(readOnly = true)
+    public List<Integer> getUsersThreeFastestDaysToComplete6PlayerGames(String userId) {
+        return playerEntityRepository.findAllWithGamesByUserIdEquals(userId).stream()
+                .map(PlayerEntity::getGame)
+                .filter(game -> game.getPlayerCount() == 6)
+                .map(game ->
+                        (int) Duration.ofMillis(game.getEndedEpochMilliseconds() - game.getCreationEpochMilliseconds())
+                                .toDays())
+                .filter(days -> days > 0)
+                .sorted()
+                .limit(3)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public String getUserGameInfo(List<User> users) {
         List<String> userIds = users.stream().map(User::getId).toList();
         List<PlayerEntity> players = playerEntityRepository.findAllWithUsersAndGamesByUserIdIn(userIds);
@@ -29,7 +44,7 @@ public class UserGameInfoService {
         return toResultString(users, statsByUserId);
     }
 
-    private static Map<String, UserGameStatsAccumulator> buildUserStats(List<PlayerEntity> players) {
+    public static Map<String, UserGameStatsAccumulator> buildUserStats(List<PlayerEntity> players) {
         Map<String, UserGameStatsAccumulator> statsByUserId = new HashMap<>();
         for (PlayerEntity player : players) {
             UserGameStatsAccumulator stats = statsByUserId.computeIfAbsent(
@@ -111,6 +126,10 @@ public class UserGameInfoService {
             index++;
         }
         return sb.toString();
+    }
+
+    public static UserGameInfoService get() {
+        return SpringContext.getBean(UserGameInfoService.class);
     }
 
     private static class UserGameStatsAccumulator {

@@ -11,6 +11,8 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -29,6 +31,7 @@ import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.EidolonMaximumService;
 import ti4.service.breakthrough.VoidTetherService;
+import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -343,10 +346,17 @@ public final class ButtonHelperTacticalAction {
                                 + " with Space Cannon Offence coverage in this system.\n"
                                 + "Please resolve those before continuing, or float the window if irrelevant.");
             }
-            List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
-            spaceCannonButtons.add(
-                    Buttons.red("declinePDS_" + tile.getTileID() + "_" + player.getFaction(), "Decline PDS"));
             for (Player playerWithPds : playersWithPds2) {
+                List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
+                spaceCannonButtons.add(
+                        Buttons.red("declinePDS_" + tile.getTileID() + "_" + player.getFaction(), "Decline PDS"));
+                if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasAbility("control_network"))
+                        && (!game.getRealPlayers().stream().anyMatch(player_ -> player_.hasUnit("netrunners_flagship"))
+                                || !NetrunnersUnitsHandler.empBlocksSpaceCannonAgainstOpponent(
+                                        game, playerWithPds, tile, CombatRollType.SpaceCannonOffence))) {
+                    spaceCannonButtons.addAll(NetrunnersAbilitiesHandler.getControlNetworkSpaceCannonButtons(
+                            game, playerWithPds, tile, CombatRollType.SpaceCannonOffence, "space"));
+                }
                 MessageHelper.sendMessageToChannelWithButtons(
                         playerWithPds.getCorrectChannel(),
                         title + playerWithPds.getRepresentationUnfogged() + ", you have SPACE CANNON coverage in "
@@ -505,7 +515,7 @@ public final class ButtonHelperTacticalAction {
         if (FOWPlusService.isVoid(game, pos)) {
             tile = FOWPlusService.voidTile(pos);
         }
-        StringBuilder message = new StringBuilder(player.getRepresentationUnfogged() + " activated "
+        StringBuilder message = new StringBuilder(player.getRepresentationNoPing() + " activated "
                 + tile.getRepresentationForButtons(game, player) + ".");
 
         if (!game.isFowMode()) {
@@ -700,7 +710,7 @@ public final class ButtonHelperTacticalAction {
                 if (player != archive) {
                     msg += " If you do, " + archive.getRepresentationNoPing() + " will also draw 1 ability.";
                 }
-                msg += "-# You currently have " + player.getTg() + " trade goods.";
+                msg += "\n-# You currently have " + player.getTg() + " trade goods.";
 
                 List<Button> buttons = List.of(use, Buttons.DONE_DELETE_BUTTONS.withLabel("Decline"));
                 MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(archive.getCorrectChannel(), msg, buttons);
@@ -829,7 +839,7 @@ public final class ButtonHelperTacticalAction {
         // Send buttons to move
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", please choose the first system you wish to move from.",
+                player.getRepresentationNoPing() + ", please choose the first system you wish to move from.",
                 systemButtons);
 
         // Resolve other abilities

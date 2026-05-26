@@ -69,6 +69,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
 import ti4.helpers.settingsFramework.menus.DeckSettings;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
+import ti4.helpers.settingsFramework.menus.FrankenSettings;
 import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.GameSetupSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
@@ -103,7 +104,6 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
 public class Game extends GameProperties implements StoredValueHelper, TwilightFallDeckFuncs {
-
     private static final JsonMapper mapper = JsonMapperManager.basic();
 
     // TODO (Jazz): Sort through these and add to GameProperties
@@ -127,9 +127,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     // TODO (Jazz): These should be easily added to GameProperties
     @Getter
     private Map<String, Integer> thalnosUnits = new HashMap<>();
-
-    private final Map<String, Integer> slashCommandsUsed = new HashMap<>();
-    private final Map<String, Integer> actionCardsSabotaged = new HashMap<>();
 
     @Getter
     private Map<String, String> currentAgendaVotes = new HashMap<>();
@@ -264,6 +261,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     @Setter
     @Getter
+    private String frankenSettingsJson;
+
+    @Setter
+    @Getter
     private String draftString;
 
     @Setter
@@ -271,6 +272,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     @Setter
     private DraftSystemSettings draftSystemSettings;
+
+    @Setter
+    private FrankenSettings frankenSettings;
 
     @Getter
     @Setter
@@ -497,6 +501,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         draftString = null;
         draftSystemSettings = null;
         draftSystemSettingsJson = null;
+        frankenSettings = null;
+        frankenSettingsJson = null;
     }
 
     @NotNull
@@ -587,6 +593,33 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
         return draftSystemSettings;
+    }
+
+    public FrankenSettings getFrankenSettingsUnsafe() {
+        return frankenSettings;
+    }
+
+    public FrankenSettings initializeFrankenSettings() {
+        if (frankenSettings == null) {
+            if (frankenSettingsJson != null) {
+                try {
+                    JsonNode json = mapper.readTree(frankenSettingsJson);
+                    frankenSettings = new FrankenSettings(this, json);
+                } catch (Exception e) {
+                    BotLogger.error(
+                            new LogOrigin(this),
+                            "Failed loading franken draft settings for `" + getName() + "` "
+                                    + Constants.jabberwockyPing(),
+                            e);
+                    MessageHelper.sendMessageToChannel(
+                            getActionsChannel(), "Franken draft settings failed to load. Resetting to default.");
+                    frankenSettings = new FrankenSettings(this, null);
+                }
+            } else {
+                frankenSettings = new FrankenSettings(this, null);
+            }
+        }
+        return frankenSettings;
     }
 
     public void setPurgedPN(String purgedPN) {
@@ -794,10 +827,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public void increaseButtonPressCount() {
         setButtonPressCount(getButtonPressCount() + 1);
-    }
-
-    public int getSlashCommandsRunCount() {
-        return slashCommandsUsed.values().stream().mapToInt(Integer::intValue).sum();
     }
 
     // This is presently only used to determine if an AC is NOT playable.
@@ -1382,12 +1411,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return thalnosUnits.getOrDefault(unit, 0);
     }
 
-    public Map<String, Integer> getAllSlashCommandsUsed() {
-        return slashCommandsUsed;
-    }
-
-    public Map<String, Integer> getAllActionCardsSabod() {
-        return actionCardsSabotaged;
+    public void setSpecificThalnosUnit(String unit, int count) {
+        thalnosUnits.put(unit, count);
     }
 
     @Override
@@ -1396,22 +1421,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 && !"base_game".equals(getScSetID())
                 && !"te".equals(getScSetID())
                 && !"twilights_fall_sc".equals(getScSetID());
-    }
-
-    public void setSpecificThalnosUnit(String unit, int count) {
-        thalnosUnits.put(unit, count);
-    }
-
-    public void incrementSpecificSlashCommandCount(String fullCommandName) {
-        slashCommandsUsed.merge(fullCommandName, 1, (oldValue, newValue) -> oldValue + 1);
-    }
-
-    public void setSpecificSlashCommandCount(String command, int count) {
-        slashCommandsUsed.put(command, count);
-    }
-
-    public void setSpecificActionCardSaboCount(String acName, int count) {
-        actionCardsSabotaged.put(acName, count);
     }
 
     public void resetThalnosUnits() {
@@ -1609,32 +1618,30 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public String peekAtStage1(int place, Player player) {
         String objective = peekAtObjective(publicObjectives1Peekable, place);
-
-        if (publicObjectives1Peeked.containsKey(objective)
-                && !publicObjectives1Peeked.get(objective).contains(player.getUserID())) {
-            publicObjectives1Peeked.get(objective).add(player.getUserID());
-        } else {
-            List<String> list = new ArrayList<>();
-            list.add(player.getUserID());
-            publicObjectives1Peeked.put(objective, list);
-        }
+        trackPeekedObjective(publicObjectives1Peeked, objective, player);
 
         return objective;
     }
 
     public String peekAtStage2(int place, Player player) {
         String objective = peekAtObjective(publicObjectives2Peekable, place);
-
-        if (publicObjectives2Peeked.containsKey(objective)
-                && !publicObjectives2Peeked.get(objective).contains(player.getUserID())) {
-            publicObjectives2Peeked.get(objective).add(player.getUserID());
-        } else {
-            List<String> list = new ArrayList<>();
-            list.add(player.getUserID());
-            publicObjectives2Peeked.put(objective, list);
-        }
+        trackPeekedObjective(publicObjectives2Peeked, objective, player);
 
         return objective;
+    }
+
+    public void peekAtAllUnrevealedPublicObjectives(Player player) {
+        publicObjectives1Peekable.forEach(
+                objective -> trackPeekedObjective(publicObjectives1Peeked, objective, player));
+        publicObjectives2Peekable.forEach(
+                objective -> trackPeekedObjective(publicObjectives2Peeked, objective, player));
+    }
+
+    private void trackPeekedObjective(Map<String, List<String>> peekedObjectives, String objective, Player player) {
+        List<String> playerIds = peekedObjectives.computeIfAbsent(objective, key -> new ArrayList<>());
+        if (!playerIds.contains(player.getUserID())) {
+            playerIds.add(player.getUserID());
+        }
     }
 
     public boolean revealSpecificStage1(String id) {
@@ -1763,6 +1770,37 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             Collections.shuffle(publicObjectives2);
         }
         return true;
+    }
+
+    public boolean unrevealPublicObjective(Integer idNumber) {
+        String id = "";
+        for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+            if (po.getValue().equals(idNumber)) {
+                id = po.getKey();
+                break;
+            }
+        }
+        if (id.isEmpty()) return false;
+
+        PublicObjectiveModel publicObjective = Mapper.getPublicObjective(id);
+        if (publicObjective == null) return false;
+
+        revealedPublicObjectives.remove(id);
+        if (publicObjective.getPoints() == 1) {
+            unrevealPublicObjective(id, publicObjectives1Peekable, publicObjectives1Peeked);
+        } else if (publicObjective.getPoints() == 2) {
+            unrevealPublicObjective(id, publicObjectives2Peekable, publicObjectives2Peeked);
+        }
+        return true;
+    }
+
+    private void unrevealPublicObjective(
+            String id, List<String> peekableObjectives, Map<String, List<String>> peekedObjectives) {
+        if (!peekableObjectives.contains(id)) {
+            peekableObjectives.addFirst(id);
+        }
+        peekedObjectives.put(
+                id, getRealPlayers().stream().map(Player::getUserID).toList());
     }
 
     public void shuffleObjectiveDeck(int stage) {

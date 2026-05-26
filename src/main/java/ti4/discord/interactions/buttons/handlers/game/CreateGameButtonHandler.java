@@ -28,13 +28,13 @@ import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.game.persistence.ManagedPlayer;
-import ti4.helpers.DateTimeHelper;
 import ti4.helpers.SearchGameHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.statistics.AverageTurnTimeService;
+import ti4.spring.service.statistics.UserGameInfoService;
 
 @UtilityClass
 public class CreateGameButtonHandler {
@@ -235,13 +235,16 @@ public class CreateGameButtonHandler {
             } else {
                 memberList.append(' ').append(completedGames).append(" games completed. ");
             }
-            if (userIdsToAverageTurnTimes.containsKey(member.getUser().getId())) {
-                long averageTurnTime =
-                        userIdsToAverageTurnTimes.get(member.getUser().getId());
-                memberList
-                        .append(" `")
-                        .append(DateTimeHelper.getTimeRepresentationToSeconds(averageTurnTime))
-                        .append("` average turn time.");
+            List<Integer> threeFastestDays = UserGameInfoService.get()
+                    .getUsersThreeFastestDaysToComplete6PlayerGames(
+                            member.getUser().getId());
+            if (threeFastestDays.size() > 0) {
+                memberList.append(" (");
+                for (int i = 0; i < threeFastestDays.size(); i++) {
+                    memberList.append("`").append(threeFastestDays.get(i)).append("`");
+                    if (i != threeFastestDays.size() - 1) memberList.append(", ");
+                }
+                memberList.append(" fastest 6 player game length(s) in days) ");
             }
             var userSettings = UserSettingsManager.get(member.getId());
             String activeHoursSummary = userSettings.summarizeActiveHoursEmoji(userSettings.getActiveHours());

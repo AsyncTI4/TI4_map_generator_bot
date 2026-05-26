@@ -23,6 +23,16 @@ public interface PlayerEntityRepository extends JpaRepository<PlayerEntity, Long
     List<PlayerEntity> findAllWithUsersAndGamesByUserIdIn(@Param("userIds") List<String> userIds);
 
     @Query("""
+        SELECT p FROM PlayerEntity p
+                JOIN FETCH p.user u
+                JOIN FETCH p.game g
+                WHERE u.id = (:userId)
+                        AND g.completed IS TRUE
+                        AND g.playerCount = 6
+        """)
+    List<PlayerEntity> findAllWithGamesByUserIdEquals(@Param("userId") String userId);
+
+    @Query("""
             SELECT p FROM PlayerEntity p
             JOIN FETCH p.user u
             JOIN FETCH p.game g

@@ -27,6 +27,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.ArvaxiA
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
+import ti4.game.GameStats;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -143,11 +144,11 @@ public class ActionCardHelper {
 
     public static Map<String, Integer> getGarboziaActionCards(Game game) {
         Map<String, Integer> cards = new HashMap<>();
-        for (Entry<String, ACStatus> discard : game.getDiscardACStatus().entrySet()) {
-            if (discard.getValue() != ACStatus.garbozia) continue;
-            Integer ident = game.getDiscardActionCards().get(discard.getKey());
-            cards.put(discard.getKey(), ident);
-        }
+        game.getDiscardACStatus().forEach((acAlias, status) -> {
+            if (status == ActionCardHelper.ACStatus.garbozia) {
+                cards.put(acAlias, game.getDiscardActionCards().get(acAlias));
+            }
+        });
         return cards;
     }
 
@@ -356,11 +357,12 @@ public class ActionCardHelper {
                         .append("_ `(")
                         .append(Helper.leftpad("" + ac.getValue(), 3))
                         .append(")`\n> ")
-                        .append(actionCard.hasWildText(game) ? actionCard.getWildWildWindow() : actionCard.getWindow())
-                        .append(": ")
-                        .append(actionCard.hasWildText(game) ? actionCard.getWildWildText() : actionCard.getText())
+                        .append(actionCard.getRepresentationJustText((game)))
                         .append('\n');
                 if (actionCard.getNotes() != null) {
+                    if (game != null && game.isTwilightKart() && "tf-starflare".equalsIgnoreCase(actionCard.getID())) {
+                        continue;
+                    }
                     sb.append("> -# [").append(actionCard.getNotes()).append("]\n");
                 }
             }
@@ -752,11 +754,12 @@ public class ActionCardHelper {
                 game.discardActionCard(player.getUserID(), acIndex);
             }
         }
+        recordTrackedActionCardPlay(game, player, actionCardTitle);
 
         boolean actionCardIsCancelable = isActionCardCancelable(actionCard) && !twinned;
 
         String pingGame = actionCardIsCancelable ? game.getPing() + ", " : "";
-        String message = pingGame + (game.isFowMode() ? "someone" : player.getRepresentation());
+        String message = pingGame + (game.isFowMode() ? "someone" : player.getRepresentationNoPing());
         message += fromGarbozia ? " purged " : " played ";
         message += "the action card _" + actionCardTitle + "_";
         message += fromGarbozia ? " using _Dok 'N Pic's Salvage Yard_." : ".";
@@ -875,21 +878,25 @@ public class ActionCardHelper {
                 } else {
                     MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
                     StringBuilder noSabosMessage = new StringBuilder("> " + SabotageService.noSaboReason(game, player));
-                    boolean it = false, watcher = false, triune = false;
-                    for (Player p : game.getRealPlayers()) {
-                        if (p == player) continue;
-                        if (!it && (game.isFowMode() || p.hasTechReady("it"))) {
-                            noSabosMessage.append(
-                                    "\n> A player may have access to **Instinct Training**, so watch out.");
-                            it = true;
-                        }
-                        if (!watcher && (game.isFowMode() || p.hasUnit("empyrean_mech"))) {
-                            noSabosMessage.append("\n> A player may have access to a Watcher mech, so 𝓌𝒶𝓉𝒸𝒽 out.");
-                            watcher = true;
-                        }
-                        if (!triune && (game.isFowMode() || p.hasUnit("tf-triune"))) {
-                            noSabosMessage.append("\n> A player may have access to 3 Triune fighters, so watch out.");
-                            triune = true;
+                    if (!game.isFowMode()) {
+                        boolean instinctTraining = false, watcher = false, triune = false;
+                        for (Player p : game.getRealPlayers()) {
+                            if (p == player) continue;
+                            if (!instinctTraining && p.hasTechReady("it")) {
+                                noSabosMessage.append(
+                                        "\n> A player may have access to **Instinct Training**, so watch out.");
+                                instinctTraining = true;
+                            }
+                            if (!watcher && p.hasUnit("empyrean_mech")) {
+                                noSabosMessage.append(
+                                        "\n> A player may have access to a Watcher mech, so 𝓌𝒶𝓉𝒸𝒽 out.");
+                                watcher = true;
+                            }
+                            if (!triune && p.hasUnit("tf-triune")) {
+                                noSabosMessage.append(
+                                        "\n> A player may have access to 3 Triune fighters, so watch out.");
+                                triune = true;
+                            }
                         }
                     }
                     MessageHelper.sendMessageToChannel(mainGameChannel, noSabosMessage.toString());
@@ -1066,6 +1073,18 @@ public class ActionCardHelper {
             if ("innovation".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "innovation", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("liberation".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveLiberation", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
+            }
+
+            if ("reconstruction".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveReconstruction", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "planet in the active system"), codedButtons);
             }
 
             if ("ubiquity".equals(automationID)) {
@@ -1269,6 +1288,11 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("overtime".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveOvertime", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("chain_reaction".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveChainReaction", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
@@ -1305,6 +1329,11 @@ public class ActionCardHelper {
 
             if ("freedom_fighters".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveFreedomFighters", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("refugees".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveRefugees", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
@@ -1987,6 +2016,13 @@ public class ActionCardHelper {
             return "No such Action Card ID found, please retry";
         }
         return resolveActionCard(event, game, player, acID, acIndex, channel);
+    }
+
+    static void recordTrackedActionCardPlay(Game game, Player player, String actionCardName) {
+        // Sabo and Overrule are tracked at separate points to track their targets
+        if (!GameStats.SABOTAGE.equals(actionCardName) && !GameStats.OVERRULE.equals(actionCardName)) {
+            game.getGameStats().recordAcPlay(actionCardName, player);
+        }
     }
 
     private static String getGarboziaACIdentByAlias(Game game, Player player, String key) {

@@ -20,10 +20,12 @@ class FrankenDrazHelp extends Subcommand {
 
                 After the draft is complete, each player gets category buttons in their cards info thread. Open a category to view the drafted components and choose which ones to add to the faction. Home systems and starting fleets are informational and must still be set up manually (for now).
 
-                The limits for components follow powered franken limits. (4 abilities, 3 faction techs, 1 of everything else)
+                The limits for components follow powered franken limits by default. (4 abilities, 3 faction techs, 1 of everything else)
 
                 Use the following post-draft commands in case of any issues:
 
+                `/frankendraz faction_limit`
+                `/frankendraz set_kept_component_limit`
                 `/frankendraz add_faction`
                 `/frankendraz remove_faction`
                 `/frankendraz swap_faction`

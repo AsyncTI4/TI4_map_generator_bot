@@ -4088,7 +4088,7 @@ public class ButtonHelper {
                 }
             }
 
-            for (Player p2 : game.getRealPlayers()) {
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (player.getAllianceMembers().contains(p2.getFaction())) {
                     Map<UnitModel, Integer> unitsByQuantity2 = getAllUnits(capChecker, p2);
                     for (Map.Entry<UnitModel, Integer> entry : unitsByQuantity2.entrySet()) {
@@ -4126,6 +4126,7 @@ public class ButtonHelper {
         Map<UnitModel, Integer> unitsByQuantity = getAllUnits(spaceHolder, player);
         for (Map.Entry<UnitModel, Integer> entry : unitsByQuantity.entrySet()) {
             UnitModel unit = entry.getKey();
+            if (entry.getValue() <= 0) continue;
             if (!unitTypesCounted.contains(unit.getBaseType())) {
                 if ("fighter".equalsIgnoreCase(unit.getBaseType())
                         || "infantry".equalsIgnoreCase(unit.getBaseType())

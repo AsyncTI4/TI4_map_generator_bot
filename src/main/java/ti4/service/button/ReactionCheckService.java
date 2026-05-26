@@ -118,7 +118,7 @@ public class ReactionCheckService {
                     + " Please press one of the buttons below anyways though - don't worry, it won't reveal anything, it will just run cleanup.";
         }
         if (game.getRound() < 4 || !game.getPublicObjectives1Peekable().isEmpty()) {
-            if (game.isTwilightsFallMode()
+            if (!game.isDiscordantStarsMode()
                     && game.getPublicObjectives1Peekable().size() > 1
                     && !game.getPublicObjectives1Peeked().isEmpty()) {
                 for (int loc = 1; loc <= game.getPublicObjectives1Peekable().size(); loc++) {
@@ -139,7 +139,7 @@ public class ReactionCheckService {
             if ("456".equalsIgnoreCase(game.getStoredValue("homebrewMode"))) {
                 buttons.add(draw2Stage2);
             } else {
-                if (game.isTwilightsFallMode()
+                if (!game.isDiscordantStarsMode()
                         && game.getPublicObjectives1Peekable().isEmpty()
                         && !game.getPublicObjectives2Peeked().isEmpty()) {
                     for (int loc = 1; loc <= game.getPublicObjectives2Peekable().size(); loc++) {
@@ -180,7 +180,7 @@ public class ReactionCheckService {
         if (tfWarning) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
-                    "Since this game is in Twilight's Fall mode and there are multiple objectives available to be picked from, some of which have been peeked at, the buttons will specify the position of the card they will reveal. The speaker gets to pick which one they reveal, per the rules.");
+                    "Since multiple unrevealed objectives are available and at least one has been peeked at, the buttons specify the position of the card they will reveal. The speaker gets to pick which one to reveal, per the rules.");
         }
     }
 

@@ -24,6 +24,18 @@ public class SortHelper {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, LinkedHashMap::new));
     }
 
+    public static Map<String, Long> sortByLongValue(Map<String, Long> unsortMap, boolean order) {
+        List<Map.Entry<String, Long>> list = new ArrayList<>(unsortMap.entrySet());
+
+        Comparator<Map.Entry<String, Long>> comparator =
+                Comparator.comparing(Map.Entry<String, Long>::getValue).thenComparing(Map.Entry::getKey);
+
+        list.sort(order ? comparator : comparator.reversed());
+
+        return list.stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, LinkedHashMap::new));
+    }
+
     public static void sortButtonsByTitle(List<Button> buttons) {
         buttons.sort(Comparator.comparing(Button::getLabel, String.CASE_INSENSITIVE_ORDER));
     }
