@@ -169,7 +169,7 @@ public class SabotageService {
     }
 
     private static final long ACD2_SABOTAGE_REMOVAL_CUTOFF = ZonedDateTime.of(
-                    2026, 5, 19, 21, 0, 0, 0, ZoneId.of("America/New_York"))
+                    2026, 5, 19, 0, 0, 0, 0, ZoneId.of("America/New_York"))
             .toInstant()
             .toEpochMilli();
 
