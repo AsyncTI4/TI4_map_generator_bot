@@ -1,7 +1,9 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners;
 
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -16,12 +18,18 @@ import ti4.game.Leader;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 
 @UtilityClass
@@ -32,6 +40,8 @@ public class NetrunnersLeadersHandler {
     private static final String AGENT_BUTTON_PREFIX = "netrunnersAgent_";
     private static final String CHOOSE_TARGET_BUTTON_ID = "netrunnersAgentChooseTarget";
     private static final String TARGET_PICKER_MESSAGE = "choose a player to use **Overclock** on.";
+    private static final String COMMANDER_ID = "netrunnerscommander";
+    private static final String COMMANDER_FAKE_UNIT_ID = "netrunnerscommanderpds";
 
     public static List<Button> getOverclockButtons(Game game, Player producingPlayer, Tile productionTile) {
         if (producingPlayer == null
@@ -286,5 +296,119 @@ public class NetrunnersLeadersHandler {
                         .anyMatch(player -> player.getPlanets().contains(planet.getName()));
     }
 
+    public static void checkCommanderUnlock(Game game, UnitKey unitKey) {
+        if (game == null || unitKey == null || unitKey.unitType() != UnitType.Pds) {
+            return;
+        }
+
+        Player player = game.getPlayerByColorID(unitKey.colorID()).orElse(null);
+        if (player != null && player.hasLeader(COMMANDER_ID)) {
+            CommanderUnlockCheckService.checkPlayer(player, "netrunners");
+        }
+    }
+
+    public static List<Player> getCommanderSpaceCannonPlayers(
+            Player activePlayer, Game game, String tilePos, List<Player> playersWithPds) {
+        Tile tile = game.getTileByPosition(tilePos);
+        if (tile == null || tile.isScar(game)) {
+            return List.of();
+        }
+        return game.getRealPlayers().stream()
+                .filter(netrunner -> !playersWithPds.contains(netrunner))
+                .filter(netrunner -> game.playerHasLeaderUnlockedOrAlliance(netrunner, COMMANDER_ID))
+                .filter(netrunner -> canUseSpaceCannonAgainstActivePlayer(activePlayer, game, tile, netrunner))
+                .filter(netrunner -> !getCommanderSpaceCannonUnits(game, netrunner, tile).isEmpty())
+                .toList();
+    }
+
+    public static Map<UnitModel, Integer> getCommanderSpaceCannonUnits(Game game, Player netrunner, Tile targetTile) {
+        if (targetTile == null || targetTile.isScar(game)) {
+            return Map.of();
+        }
+
+        Map<UnitModel, Integer> units = new LinkedHashMap<>();
+        for (Player owner : game.getRealPlayersExcludingThis(netrunner)) {
+            if (netrunner.getDebtTokenCount(owner.getColor(), NetrunnersAbilitiesHandler.SYSTEM_BREACH_POOL) < 1) {
+                continue;
+            }
+            BorrowedPds pds = getBestBorrowedPds(game, netrunner, owner, targetTile);
+            if (pds != null) {
+                units.put(getCommanderPdsModel(netrunner, owner, pds), 1);
+            }
+        }
+        return units;
+    }
+
+    private static boolean canUseSpaceCannonAgainstActivePlayer(
+            Player activePlayer, Game game, Tile tile, Player rollingPlayer) {
+        if (rollingPlayer == activePlayer || activePlayer.getAllianceMembers().contains(rollingPlayer.getFaction())) {
+            return FoWHelper.otherPlayersHaveShipsInSystem(activePlayer, tile, game);
+        }
+        return true;
+    }
+
+    private static BorrowedPds getBestBorrowedPds(Game game, Player netrunner, Player owner, Tile targetTile) {
+        return game.getTileMap().values().stream()
+                .filter(pdsTile -> isCommanderPdsTileUsable(game, netrunner, targetTile, pdsTile))
+                .flatMap(pdsTile -> pdsTile.getUnitHolders().values().stream()
+                        .flatMap(unitHolder -> getBorrowedPds(owner, pdsTile, unitHolder).stream()))
+                .filter(pds -> isCommanderPdsInRange(game, netrunner, owner, targetTile, pds))
+                .max(Comparator.comparingInt(pds -> getPdsScore(owner, pds.model())))
+                .orElse(null);
+    }
+
+    private static boolean isCommanderPdsTileUsable(Game game, Player netrunner, Tile targetTile, Tile pdsTile) {
+        return pdsTile != null
+                && !pdsTile.isScar(game)
+                && (targetTile.getPosition().equals(pdsTile.getPosition())
+                        || !TeHelperUnits.affectedByQuietus(game, netrunner, pdsTile));
+    }
+
+    private static List<BorrowedPds> getBorrowedPds(Player owner, Tile tile, UnitHolder unitHolder) {
+        return unitHolder.getUnits().entrySet().stream()
+                .filter(entry -> entry.getValue() > 0)
+                .map(Map.Entry::getKey)
+                .filter(unitKey -> unitKey.unitType() == UnitType.Pds)
+                .filter(owner::unitBelongsToPlayer)
+                .map(owner::getUnitFromUnitKey)
+                .filter(Objects::nonNull)
+                .filter(model -> model.getSpaceCannonDieCount(owner) > 0)
+                .map(model -> new BorrowedPds(tile, model))
+                .toList();
+    }
+
+    private static boolean isCommanderPdsInRange(
+            Game game, Player netrunner, Player owner, Tile targetTile, BorrowedPds pds) {
+        return targetTile.getPosition().equals(pds.tile().getPosition())
+                || (FoWHelper.getAdjacentTiles(game, targetTile.getPosition(), netrunner, false, true)
+                                .contains(pds.tile().getPosition())
+                        && (pds.model().getDeepSpaceCannon(owner)
+                                || game.playerHasLeaderUnlockedOrAlliance(netrunner, "mirvedacommander")));
+    }
+
+    private static int getPdsScore(Player owner, UnitModel model) {
+        return model.getSpaceCannonDieCount(owner) * (11 - model.getSpaceCannonHitsOn(owner));
+    }
+
+    private static UnitModel getCommanderPdsModel(Player netrunner, Player owner, BorrowedPds pds) {
+        UnitModel model = new UnitModel() {
+            @Override
+            public UnitType getUnitType() {
+                return UnitType.Pds;
+            }
+        };
+        model.setSpaceCannonHitsOn(pds.model().getSpaceCannonHitsOn(owner));
+        model.setSpaceCannonDieCount(pds.model().getSpaceCannonDieCount(owner));
+        model.setName("Seize: " + owner.getColorDisplayName() + " " + pds.model().getName());
+        model.setAsyncId(COMMANDER_FAKE_UNIT_ID + owner.getFaction());
+        model.setId(COMMANDER_FAKE_UNIT_ID + owner.getFaction());
+        model.setBaseType("pds");
+        model.setFaction(netrunner.getFaction());
+        model.setDeepSpaceCannon(pds.model().getDeepSpaceCannon(owner));
+        return model;
+    }
+
     private record OverclockTarget(Player producingPlayer, Tile productionTile, Planet planet) {}
+
+    private record BorrowedPds(Tile tile, UnitModel model) {}
 }

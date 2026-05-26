@@ -187,8 +187,8 @@
     "name": "Seize",
     "title": "Sabateur",
     "abilityWindow": "During \"Space Cannon Offense\":",
-    "abilityText": "You may treat 1 PDS on the game board that is owned by a player whose control token is on your faction sheet as if you controlled it.",
-    "unlockCondition": "Remove 2 different player's control tokens from your faction sheet.",
+    "abilityText": "You may treat 1 of each player's PDS on the game board whose control token is on your faction sheet as if you controlled it.",
+    "unlockCondition": "Have 4 of your PDS units on the game board.",
     "source": "beans"
   },
   {
