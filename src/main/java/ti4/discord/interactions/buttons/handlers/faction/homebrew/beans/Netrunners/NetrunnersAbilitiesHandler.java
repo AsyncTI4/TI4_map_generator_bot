@@ -33,7 +33,7 @@ public class NetrunnersAbilitiesHandler {
     public static final String SYSTEM_BREACH_ABILITY = "system_breach";
     public static final String CONTROL_NETWORK_ABILITY = "control_network";
     public static final String RANSOMWARE_ABILITY = "ransomware";
-    private static final String SYSTEM_BREACH_POOL = "hackerman";
+    public static final String SYSTEM_BREACH_POOL = "hackerman";
     private static final String CONTROL_NETWORK_PRODUCTION_TILE = "controlNetworkProductionTile";
     private static final String CONTROL_NETWORK_PRODUCTION_LIMIT = "controlNetworkProductionLimit";
     private static final String CONTROL_NETWORK_PRODUCTION_TARGET = "controlNetworkProductionTarget";

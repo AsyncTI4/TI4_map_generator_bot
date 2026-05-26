@@ -345,7 +345,7 @@
     "source": "beans",
     "faction": "netrunners",
     "productionValue": "+2",
-    "basicProduciton": "res",
+    "basicProduction": "res",
     "capacityValue": 3,
     "isStructure": true,
     "ability": "This unit's PRODUCTION value is equal to 2 more than this planet's resource value. \n\nUp to 3 fighters in this system do not count against capacity."
