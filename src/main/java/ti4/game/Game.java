@@ -1772,6 +1772,37 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return true;
     }
 
+    public boolean unrevealPublicObjective(Integer idNumber) {
+        String id = "";
+        for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+            if (po.getValue().equals(idNumber)) {
+                id = po.getKey();
+                break;
+            }
+        }
+        if (id.isEmpty()) return false;
+
+        PublicObjectiveModel publicObjective = Mapper.getPublicObjective(id);
+        if (publicObjective == null) return false;
+
+        revealedPublicObjectives.remove(id);
+        if (publicObjective.getPoints() == 1) {
+            unrevealPublicObjective(id, publicObjectives1Peekable, publicObjectives1Peeked);
+        } else if (publicObjective.getPoints() == 2) {
+            unrevealPublicObjective(id, publicObjectives2Peekable, publicObjectives2Peeked);
+        }
+        return true;
+    }
+
+    private void unrevealPublicObjective(
+            String id, List<String> peekableObjectives, Map<String, List<String>> peekedObjectives) {
+        if (!peekableObjectives.contains(id)) {
+            peekableObjectives.addFirst(id);
+        }
+        peekedObjectives.put(
+                id, getRealPlayers().stream().map(Player::getUserID).toList());
+    }
+
     public void shuffleObjectiveDeck(int stage) {
         if (stage == 1) {
             Collections.shuffle(publicObjectives1);

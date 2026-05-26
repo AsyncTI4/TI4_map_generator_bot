@@ -105,7 +105,7 @@
         "name": "Control Network",
         "faction": "netrunners",
         "window": "At any time:",
-        "windowEffect": "Before a player whose control token is on your faction sheet rolls dice for SPACE CANNON, you may remove 1 of those tokens to apply -1 to those dice. You may remove a player's control token from your faction sheet to use the PRODUCTION ability of a space dock controlled by that player that you are blockading as if it were your own to produce ships in the active system.",
+        "windowEffect": "Before a player whose control token is on your faction sheet rolls dice for SPACE CANNON, you may remove 1 of those tokens to apply -1 to those dice. While you are the active player, you may remove a player's control token from your faction sheet to use the PRODUCTION ability of a space dock controlled by that player that you are blockading as if it were your own to produce ships.",
         "source": "beans"
     },
     {

@@ -2251,6 +2251,13 @@ public final class AgendaHelper {
                             }
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
+                        if (specificVote.contains("Defense Rider")) {
+                            String message = identity
+                                    + ", you have a _Defense Rider_ to resolve. Please choose up to 2 planets on which you wish to place PDS.";
+                            List<Button> buttons = List.of(Buttons.green(
+                                    winningR.factionButtonChecker() + "resolveDefenseRider", "Resolve Defense Rider"));
+                            MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+                        }
 
                         if (specificVote.contains("Project Rider")) {
                             List<Button> buttons = List.of(Buttons.green(

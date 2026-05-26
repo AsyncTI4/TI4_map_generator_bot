@@ -144,11 +144,11 @@ public class ActionCardHelper {
 
     public static Map<String, Integer> getGarboziaActionCards(Game game) {
         Map<String, Integer> cards = new HashMap<>();
-        for (Entry<String, ACStatus> discard : game.getDiscardACStatus().entrySet()) {
-            if (discard.getValue() != ACStatus.garbozia) continue;
-            Integer ident = game.getDiscardActionCards().get(discard.getKey());
-            cards.put(discard.getKey(), ident);
-        }
+        game.getDiscardACStatus().forEach((acAlias, status) -> {
+            if (status == ActionCardHelper.ACStatus.garbozia) {
+                cards.put(acAlias, game.getDiscardActionCards().get(acAlias));
+            }
+        });
         return cards;
     }
 
@@ -878,21 +878,25 @@ public class ActionCardHelper {
                 } else {
                     MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
                     StringBuilder noSabosMessage = new StringBuilder("> " + SabotageService.noSaboReason(game, player));
-                    boolean it = false, watcher = false, triune = false;
-                    for (Player p : game.getRealPlayers()) {
-                        if (p == player) continue;
-                        if (!it && (game.isFowMode() || p.hasTechReady("it"))) {
-                            noSabosMessage.append(
-                                    "\n> A player may have access to **Instinct Training**, so watch out.");
-                            it = true;
-                        }
-                        if (!watcher && (game.isFowMode() || p.hasUnit("empyrean_mech"))) {
-                            noSabosMessage.append("\n> A player may have access to a Watcher mech, so 𝓌𝒶𝓉𝒸𝒽 out.");
-                            watcher = true;
-                        }
-                        if (!triune && (game.isFowMode() || p.hasUnit("tf-triune"))) {
-                            noSabosMessage.append("\n> A player may have access to 3 Triune fighters, so watch out.");
-                            triune = true;
+                    if (!game.isFowMode()) {
+                        boolean instinctTraining = false, watcher = false, triune = false;
+                        for (Player p : game.getRealPlayers()) {
+                            if (p == player) continue;
+                            if (!instinctTraining && p.hasTechReady("it")) {
+                                noSabosMessage.append(
+                                        "\n> A player may have access to **Instinct Training**, so watch out.");
+                                instinctTraining = true;
+                            }
+                            if (!watcher && p.hasUnit("empyrean_mech")) {
+                                noSabosMessage.append(
+                                        "\n> A player may have access to a Watcher mech, so 𝓌𝒶𝓉𝒸𝒽 out.");
+                                watcher = true;
+                            }
+                            if (!triune && p.hasUnit("tf-triune")) {
+                                noSabosMessage.append(
+                                        "\n> A player may have access to 3 Triune fighters, so watch out.");
+                                triune = true;
+                            }
                         }
                     }
                     MessageHelper.sendMessageToChannel(mainGameChannel, noSabosMessage.toString());
@@ -1074,6 +1078,12 @@ public class ActionCardHelper {
             if ("innovation".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "innovation", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("liberation".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveLiberation", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
             }
 
             if ("reconstruction".equals(automationID)) {

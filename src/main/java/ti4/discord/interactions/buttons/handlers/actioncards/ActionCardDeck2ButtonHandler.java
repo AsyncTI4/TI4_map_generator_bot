@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -145,6 +146,44 @@ class ActionCardDeck2ButtonHandler {
                         + ".");
     }
 
+    @ButtonHandler("resolveDefenseRider")
+    public static void resolveDefenseRider(Player player, Game game, ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+        sendDefenseRiderButtons(player, game, 2);
+    }
+
+    @ButtonHandler("resolveDefenseRiderStep2_")
+    public static void resolveDefenseRiderStep2(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String payload = buttonID.replace("resolveDefenseRiderStep2_", "");
+        String[] parts = payload.split("_", 2);
+        if (parts.length < 2) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Defense Rider_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        int remaining;
+        try {
+            remaining = Integer.parseInt(parts[0]);
+        } catch (NumberFormatException e) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Defense Rider_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String planet = parts[1];
+        AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "pds " + planet);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " put 1 PDS on " + Helper.getPlanetRepresentation(planet, game)
+                        + " with _Defense Rider_.");
+        ButtonHelper.deleteMessage(event);
+        if (remaining > 1) {
+            sendDefenseRiderButtons(player, game, remaining - 1);
+        }
+    }
+
     @ButtonHandler("resolveBoardingParty")
     public static void resolveBoardingParty(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -281,6 +320,27 @@ class ActionCardDeck2ButtonHandler {
         String message = remainingComponents > 1
                 ? player.getRepresentationUnfogged() + ", choose a component to ready with _Overtime_."
                 : player.getRepresentationUnfogged() + ", you may ready 1 more component with _Overtime_.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+    }
+
+    private static void sendDefenseRiderButtons(Player player, Game game, int remainingPds) {
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getPlanets()) {
+            buttons.add(Buttons.green(
+                    "resolveDefenseRiderStep2_" + remainingPds + "_" + planet,
+                    Helper.getPlanetRepresentation(planet, game)));
+        }
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has no planets available for _Defense Rider_.");
+            return;
+        }
+        buttons.add(Buttons.red("deleteButtons", "Done"));
+
+        String message = remainingPds > 1
+                ? player.getRepresentationUnfogged() + ", choose a planet to place a PDS on with _Defense Rider_."
+                : player.getRepresentationUnfogged() + ", you may place 1 more PDS with _Defense Rider_.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
@@ -648,6 +708,63 @@ class ActionCardDeck2ButtonHandler {
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " placed 1 infantry on "
                         + Helper.getPlanetRepresentation(planet, game) + " via _Freedom Fighters_.");
+    }
+
+    @ButtonHandler("resolveLiberation")
+    public static void resolveLiberation(Player player, Game game, ButtonInteractionEvent event) {
+        Tile activeSystem = game.getTileByPosition(game.getCurrentActiveSystem());
+        Stream<String> liberationPlanets = activeSystem == null
+                ? player.getPlanets().stream()
+                : activeSystem.getPlanetUnitHolders().stream().map(Planet::getName);
+        List<Button> buttons = liberationPlanets
+                .map(planet ->
+                        Buttons.green("resolveLiberationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)))
+                .toList();
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has no planets to target with _Liberation_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", choose the planet you just gained for _Liberation_.",
+                buttons);
+    }
+
+    @ButtonHandler("resolveLiberationStep2_")
+    public static void resolveLiberationStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.replace("resolveLiberationStep2_", "");
+        Tile tile = game.getTileFromPlanet(planet);
+        if (tile == null || !player.hasPlanet(planet)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not resolve _Liberation_ for that planet.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "2 inf " + planet);
+        PlanetService.refreshPlanet(player, planet);
+
+        List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(
+                game, ButtonHelper.getUnitHolderFromPlanetName(planet, game), player);
+        if (buttons != null && !buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getFactionEmoji() + ", please press the button to explore "
+                            + Helper.getPlanetRepresentation(planet, game) + ".",
+                    buttons);
+        }
+
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " placed 2 infantry on and readied "
+                        + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game)
+                        + " via _Liberation_.");
     }
 
     @ButtonHandler("resolveRefugees")
