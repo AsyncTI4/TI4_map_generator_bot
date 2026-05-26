@@ -31,20 +31,20 @@ public class GameManager {
     private static final ConcurrentMap<String, ManagedPlayer> userIdToManagedPlayer = new ConcurrentHashMap<>();
     private static final AtomicInteger latestPbdNumber = new AtomicInteger();
 
-    private static final CountDownLatch GAME_NAMES_LOADED_LATCH = new CountDownLatch(1);
-    private static final AtomicBoolean WARMUP_STARTED = new AtomicBoolean(false);
-    private static final CountDownLatch WARMUP_FINISHED_LATCH = new CountDownLatch(1);
+    private static final CountDownLatch gameNamesLoadedLatch = new CountDownLatch(1);
+    private static final AtomicBoolean warmupStarted = new AtomicBoolean(false);
+    private static final CountDownLatch warmupFinishedLatch = new CountDownLatch(1);
     private static final int WAIT_FOR_WARMUP_TIMEOUT_SECONDS = 40;
 
     public static void warmup() {
-        if (!WARMUP_STARTED.compareAndSet(false, true)) {
+        if (!warmupStarted.compareAndSet(false, true)) {
             return;
         }
 
         try {
             gameNames.addAll(GameLoadService.loadGameNames());
             resetLatestPbdNumberFrom(0);
-            GAME_NAMES_LOADED_LATCH.countDown();
+            gameNamesLoadedLatch.countDown();
             BotLogger.info("LOADED " + gameNames.size() + " GAME NAMES");
         } catch (Exception e) {
             BotLogger.critical("Failed to warmup due to error while loading game names. Shutting down.", e);
@@ -60,7 +60,7 @@ public class GameManager {
                         Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2)) {
                     gameNames.forEach(name -> executorService.submit(() -> getManagedGame(name)));
                 }
-                WARMUP_FINISHED_LATCH.countDown();
+                warmupFinishedLatch.countDown();
                 BotLogger.info("FINISHED BUILDING MANAGED GAMES");
                 if (JdaService.jda != null) {
                     JdaService.updatePresence();
@@ -90,12 +90,12 @@ public class GameManager {
     }
 
     public static boolean isValid(String gameName) {
-        waitFor(GAME_NAMES_LOADED_LATCH);
+        waitFor(gameNamesLoadedLatch);
         return gameName != null && gameNames.contains(gameName);
     }
 
     public static void save(Game game, String reason) {
-        waitFor(GAME_NAMES_LOADED_LATCH);
+        waitFor(gameNamesLoadedLatch);
         boolean wasActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
                 .map(ManagedGame::isActive)
                 .orElse(false);
@@ -115,7 +115,7 @@ public class GameManager {
     }
 
     public static boolean delete(String gameName) {
-        waitFor(WARMUP_FINISHED_LATCH);
+        waitFor(warmupFinishedLatch);
         if (!GameSaveService.delete(gameName)) {
             return false;
         }
@@ -125,7 +125,7 @@ public class GameManager {
 
     @Nullable
     public static Game undo(Game game) {
-        waitFor(GAME_NAMES_LOADED_LATCH);
+        waitFor(gameNamesLoadedLatch);
         Game undo = GameUndoService.undo(game);
         return handleUndo(undo);
     }
@@ -146,14 +146,14 @@ public class GameManager {
 
     @Nullable
     public static Game undo(Game game, int undoIndex) {
-        waitFor(GAME_NAMES_LOADED_LATCH);
+        waitFor(gameNamesLoadedLatch);
         Game undo = GameUndoService.undo(game, undoIndex);
         return handleUndo(undo);
     }
 
     @Nullable
     public static Game reload(String gameName) {
-        waitFor(GAME_NAMES_LOADED_LATCH);
+        waitFor(gameNamesLoadedLatch);
         Game game = GameLoadService.load(gameName);
         if (game == null) {
             game = GameUndoService.loadUndoForMissingGame(gameName);
@@ -164,17 +164,17 @@ public class GameManager {
     }
 
     public static List<String> getGameNames() {
-        waitFor(GAME_NAMES_LOADED_LATCH);
+        waitFor(gameNamesLoadedLatch);
         return List.copyOf(gameNames);
     }
 
     public static int getGameCount() {
-        waitFor(GAME_NAMES_LOADED_LATCH);
+        waitFor(gameNamesLoadedLatch);
         return gameNames.size();
     }
 
     public static long getActiveGameCount() {
-        waitFor(GAME_NAMES_LOADED_LATCH);
+        waitFor(gameNamesLoadedLatch);
         return gameNameToManagedGame.values().stream()
                 .filter(ManagedGame::isActive)
                 .count();
@@ -183,7 +183,7 @@ public class GameManager {
     @Nullable
     public static ManagedGame getManagedGame(String gameName) {
         if (!isValid(gameName)) return null;
-        waitFor(GAME_NAMES_LOADED_LATCH);
+        waitFor(gameNamesLoadedLatch);
         return gameNameToManagedGame.computeIfAbsent(gameName, _ -> {
             Game game = GameLoadService.load(gameName);
             if (game == null) {
@@ -195,17 +195,17 @@ public class GameManager {
     }
 
     public static List<ManagedGame> getManagedGames() {
-        waitFor(WARMUP_FINISHED_LATCH);
+        waitFor(warmupFinishedLatch);
         return List.copyOf(gameNameToManagedGame.values());
     }
 
     public static ManagedPlayer getManagedPlayer(String playerId) {
-        waitFor(WARMUP_FINISHED_LATCH);
+        waitFor(warmupFinishedLatch);
         return userIdToManagedPlayer.get(playerId);
     }
 
     public static Set<ManagedPlayer> getManagedPlayers() {
-        waitFor(WARMUP_FINISHED_LATCH);
+        waitFor(warmupFinishedLatch);
         return Set.copyOf(userIdToManagedPlayer.values());
     }
 
@@ -234,12 +234,12 @@ public class GameManager {
     }
 
     public static int getLatestPbdNumber() {
-        waitFor(GAME_NAMES_LOADED_LATCH);
+        waitFor(gameNamesLoadedLatch);
         return latestPbdNumber.get();
     }
 
     public static int getAndIncrementLatestPbdNumber() {
-        waitFor(GAME_NAMES_LOADED_LATCH);
+        waitFor(gameNamesLoadedLatch);
         return latestPbdNumber.incrementAndGet();
     }
 
