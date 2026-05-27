@@ -26,6 +26,7 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperStats;
@@ -414,7 +415,7 @@ class ActionCardDeck2ButtonHandler {
     @ButtonHandler("resolveExplorationRider")
     public static void resolveExplorationRider(Player player, Game game, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
-        sendExplorationRiderButtons(player, game, 3, Set.of());
+        ButtonHelperActionCards.sendExplorationRiderButtons(player, game, 3, Set.of());
     }
 
     @ButtonHandler("resolveExplorationRiderStep2_")
@@ -440,11 +441,11 @@ class ActionCardDeck2ButtonHandler {
         }
 
         Set<String> selectedPlanets =
-                decodeExplorationRiderPlanets(payload.substring(firstSeparator + 1, secondSeparator));
+                ButtonHelperActionCards.decodeExplorationRiderPlanets(payload.substring(firstSeparator + 1, secondSeparator));
         String planet = payload.substring(secondSeparator + 1, lastSeparator);
         String trait = payload.substring(lastSeparator + 1);
         Tile tile = game.getTileFromPlanet(planet);
-        if (tile == null || !isExplorationRiderEligiblePlanet(player, game, planet, selectedPlanets)) {
+        if (tile == null || !ButtonHelperActionCards.isExplorationRiderEligiblePlanet(player, game, planet, selectedPlanets)) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Exploration Rider_.");
             ButtonHelper.deleteMessage(event);
             return;
@@ -454,7 +455,7 @@ class ActionCardDeck2ButtonHandler {
         ButtonHelper.deleteMessage(event);
         ExploreService.explorePlanet(event, tile, planet, trait, player, false, game, 1, false);
         if (remainingExplores > 1) {
-            sendExplorationRiderButtons(player, game, remainingExplores - 1, selectedPlanets);
+            ButtonHelperActionCards.sendExplorationRiderButtons(player, game, remainingExplores - 1, selectedPlanets);
         }
     }
 
@@ -478,7 +479,7 @@ class ActionCardDeck2ButtonHandler {
             return;
         }
 
-        Set<String> selectedPlanets = decodeExplorationRiderPlanets(payload.substring(separator + 1));
+        Set<String> selectedPlanets = ButtonHelperActionCards.decodeExplorationRiderPlanets(payload.substring(separator + 1));
         ActionCardHelper.drawActionCards(player, 1);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
@@ -486,116 +487,8 @@ class ActionCardDeck2ButtonHandler {
                 player.getRepresentationUnfogged()
                         + " drew 1 action card instead of exploring with _Exploration Rider_ via breakthrough.");
         if (remainingExplores > 1) {
-            sendExplorationRiderButtons(player, game, remainingExplores - 1, selectedPlanets);
+            ButtonHelperActionCards.sendExplorationRiderButtons(player, game, remainingExplores - 1, selectedPlanets);
         }
-    }
-
-    private static void sendExplorationRiderButtons(
-            Player player, Game game, int remainingExplores, Set<String> selectedPlanets) {
-        List<Button> buttons = getExplorationRiderButtons(player, game, remainingExplores, selectedPlanets);
-        if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " has no eligible non-cultural planets left for _Exploration Rider_.");
-            return;
-        }
-
-        buttons.add(Buttons.red("deleteButtons", "Done"));
-        String message = selectedPlanets.isEmpty()
-                ? player.getRepresentationUnfogged()
-                        + ", choose a non-cultural planet to explore with _Exploration Rider_."
-                : player.getRepresentationUnfogged() + ", choose "
-                        + (remainingExplores == 1
-                                ? "1 more different non-cultural planet"
-                                : "another different non-cultural planet")
-                        + " to explore with _Exploration Rider_.";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-    }
-
-    private static List<Button> getExplorationRiderButtons(
-            Player player, Game game, int remainingExplores, Set<String> selectedPlanets) {
-        List<Button> buttons = new ArrayList<>();
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        Collections.sort(planets);
-        String selectedPlanetsValue = encodeExplorationRiderPlanets(selectedPlanets);
-        for (String planetId : planets) {
-            Planet planet = game.getPlanetsInfo().get(planetId);
-            if (planet == null || !isExplorationRiderEligiblePlanet(player, game, planetId, selectedPlanets)) {
-                continue;
-            }
-            buttons.addAll(
-                    getExplorationRiderPlanetButtons(player, game, remainingExplores, selectedPlanetsValue, planet));
-        }
-        if (!buttons.isEmpty() && player.hasUnlockedBreakthrough("augersbt")) {
-            buttons.add(Buttons.green(
-                    "resolveExplorationRiderDrawAc_" + remainingExplores + "_" + selectedPlanetsValue,
-                    "Draw 1 Action Card Instead With Breakthrough",
-                    FactionEmojis.augers));
-        }
-        return buttons;
-    }
-
-    private static List<Button> getExplorationRiderPlanetButtons(
-            Player player, Game game, int remainingExplores, String selectedPlanetsValue, Planet planet) {
-        String planetId = planet.getName();
-        String planetRepresentation = Helper.getPlanetRepresentation(planetId, game);
-        List<Button> buttons = new ArrayList<>();
-        Set<String> explorationTraits = new HashSet<>(planet.getPlanetTypes());
-        for (String trait : explorationTraits.stream()
-                .filter(trait -> List.of("industrial", "hazardous").contains(trait))
-                .sorted()
-                .toList()) {
-            String buttonId = "resolveExplorationRiderStep2_" + remainingExplores + "_" + selectedPlanetsValue + "_"
-                    + planetId + "_" + trait;
-            String buttonLabel = "Explore " + planetRepresentation
-                    + (explorationTraits.size() > 1 ? " As " + StringUtils.capitalize(trait) : "");
-            buttons.add(getExplorationRiderButton(buttonId, buttonLabel, trait));
-            if (player.hasUnlockedBreakthrough("kolleccbt") && player.hasReadyBreakthrough("kolleccbt")) {
-                String breakthroughButtonId = "resolveExplorationRiderStep2_" + remainingExplores + "_"
-                        + selectedPlanetsValue + "_" + planetId + "_" + trait + "kolleccbt";
-                String breakthroughLabel =
-                        "Explore " + trait + " Discard On " + planetRepresentation + " With Breakthrough";
-                buttons.add(Buttons.gray(breakthroughButtonId, breakthroughLabel, ExploreEmojis.getTraitEmoji(trait)));
-            }
-        }
-        return buttons;
-    }
-
-    private static Button getExplorationRiderButton(String buttonId, String buttonLabel, String trait) {
-        return switch (trait) {
-            case "industrial" -> Buttons.green(buttonId, buttonLabel, ExploreEmojis.Industrial);
-            case "hazardous" -> Buttons.red(buttonId, buttonLabel, ExploreEmojis.Hazardous);
-            default -> Buttons.gray(buttonId, buttonLabel, ExploreEmojis.getTraitEmoji(trait));
-        };
-    }
-
-    private static boolean isExplorationRiderEligiblePlanet(
-            Player player, Game game, String planetId, Set<String> selectedPlanets) {
-        if (selectedPlanets.contains(planetId) || !player.getPlanets().contains(planetId)) {
-            return false;
-        }
-        Planet planet = game.getPlanetsInfo().get(planetId);
-        if (planet == null) {
-            return false;
-        }
-        String originalPlanetType = planet.getOriginalPlanetType();
-        return "industrial".equalsIgnoreCase(originalPlanetType) || "hazardous".equalsIgnoreCase(originalPlanetType);
-    }
-
-    private static String encodeExplorationRiderPlanets(Set<String> selectedPlanets) {
-        if (selectedPlanets.isEmpty()) {
-            return "";
-        }
-        List<String> planets = new ArrayList<>(selectedPlanets);
-        Collections.sort(planets);
-        return String.join(",", planets);
-    }
-
-    private static Set<String> decodeExplorationRiderPlanets(String selectedPlanets) {
-        if (selectedPlanets.isBlank()) {
-            return new HashSet<>();
-        }
-        return new HashSet<>(List.of(selectedPlanets.split(",")));
     }
 
     @ButtonHandler("resolveHostileWorld")

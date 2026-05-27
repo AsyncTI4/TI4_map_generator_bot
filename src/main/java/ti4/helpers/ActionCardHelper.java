@@ -1066,10 +1066,6 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("exploration_rider".equals(automationID)) {
-                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveExplorationRider", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
-            }
 
             if ("innovation".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "innovation", buttonLabel));
