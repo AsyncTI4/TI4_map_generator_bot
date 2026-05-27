@@ -2299,6 +2299,12 @@ public final class AgendaHelper {
                                     identity + " due to having a winning _Relic Rider_, you have gained a Relic.");
                             RelicHelper.drawRelicAndNotify(winningR, event, game);
                         }
+                        if (specificVote.contains("Exploration Rider")) {
+                            String message = identity
+                                    + ", you have a winning _Exploration Rider_. Choose a non-cultural planet to explore.";
+                            MessageHelper.sendMessageToChannel(channel, message);
+                            ButtonHelperActionCards.sendExplorationRiderButtons(winningR, game, 3, Set.of());
+                        }
                         if (specificVote.contains("Radiance")) {
                             List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(
                                     game, winningR, UnitType.Mech);
