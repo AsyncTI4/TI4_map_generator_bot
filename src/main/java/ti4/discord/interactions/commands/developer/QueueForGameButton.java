@@ -19,8 +19,7 @@ class QueueForGameButton extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         List<Button> buttons = List.of(
-                Buttons.green(QUEUE_BUTTON_ID, "Queue for Game"),
-                Buttons.red(LEAVE_QUEUE_BUTTON_ID, "Leave Queue"));
+                Buttons.green(QUEUE_BUTTON_ID, "Queue for Game"), Buttons.red(LEAVE_QUEUE_BUTTON_ID, "Leave Queue"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 "You can use this button to queue for a game. Specify what game qualities you're looking for as well as the time frame you're willing to stay in queue.",

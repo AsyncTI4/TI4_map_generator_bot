@@ -94,7 +94,8 @@ class QueueForGameButtonHandler {
 
     @ButtonHandler(value = LEAVE_QUEUE_BUTTON_ID, save = false)
     public static void leaveQueue(ButtonInteractionEvent event) {
-        SpringContext.getBean(QueueForGameService.class).leaveQueue(event.getUser().getId());
+        SpringContext.getBean(QueueForGameService.class)
+                .leaveQueue(event.getUser().getId());
         MessageHelper.sendEphemeralMessageToEventChannel(event, "You have left the matchmaking queue.");
     }
 
