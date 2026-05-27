@@ -257,6 +257,42 @@ public class DreamButtonHandler {
 
     // Xal'thuun, the Dreaming Throne agent
 
+    public static Button getDreamAgentCardsInfoButton(Player dreamPlayer) {
+        return Buttons.gray(
+                dreamPlayer.factionButtonChecker() + "dream_agent_select_player",
+                "Use agent on someone else",
+                FactionEmojis.dream);
+    }
+
+    @ButtonHandler("dream_agent_select_player")
+    public static void offerDreamAgentTargetButtons(ButtonInteractionEvent event, Game game, Player dreamPlayer) {
+        if (!dreamPlayer.hasUnexhaustedLeader("dreamagent")) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "**Xal'thuun** is no longer available.");
+            return;
+        }
+        if (getDreamAgentAnomalyTiles(game).isEmpty()) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "There are no valid non-home anomalies to choose.");
+            return;
+        }
+
+        List<Button> buttons = game.getRealPlayers().stream()
+                .filter(target -> !target.getFaction().equalsIgnoreCase(dreamPlayer.getFaction()))
+                .map(target -> Buttons.gray(
+                        dreamPlayer.factionButtonChecker() + "dream_agent_offer_" + target.getFaction() + "_"
+                                + dreamPlayer.getFaction(),
+                        target.getColorDisplayName(),
+                        target.fogSafeEmoji()))
+                .toList();
+        if (buttons.isEmpty()) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "No eligible players were found for **Xal'thuun**.");
+            return;
+        }
+
+        MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                event, dreamPlayer.getRepresentationUnfogged() + ", choose a player for **Xal'thuun**.", buttons);
+    }
+
     public static void offerDreamAgentButtons(Game game, Player activePlayer, Player dreamPlayer) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray(
@@ -265,11 +301,9 @@ public class DreamButtonHandler {
                 FactionEmojis.dream));
         buttons.add(Buttons.red("deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
-                dreamPlayer.getCardsInfoThread(),
+                game.getActionsChannel(),
                 dreamPlayer.getRepresentation()
-                        + " may exhaust **Xal'thuun**, the Dreaming Throne agent, to let "
-                        + activePlayer.getRepresentationNoPing()
-                        + " choose a non-home anomaly to ignore during this tactical action.",
+                        + " you may exhaust **Xal'thuun**, the Dreaming Throne agent, to choose a non-home anomaly to ignore during this tactical action.",
                 buttons);
     }
 
@@ -279,6 +313,10 @@ public class DreamButtonHandler {
         Player activePlayer = game.getPlayerFromColorOrFaction(parts[0]);
         Player dreamPlayer = parts.length > 1 ? game.getPlayerFromColorOrFaction(parts[1]) : player;
         Player dreamAgentOwner = dreamPlayer == null ? player : dreamPlayer;
+        if (!dreamAgentOwner.hasUnexhaustedLeader("dreamagent")) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "**Xal'thuun** is no longer available.");
+            return;
+        }
         if (activePlayer == null) {
             activePlayer = game.getActivePlayer();
         }

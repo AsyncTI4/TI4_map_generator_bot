@@ -829,10 +829,8 @@ public final class ButtonHelperTacticalAction {
         }
         if (!game.isL1Hero()
                 && !DreamButtonHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
-            for (Player dreamPlayer : game.getRealPlayers()) {
-                if (dreamPlayer.hasUnexhaustedLeader("dreamagent")) {
-                    DreamButtonHandler.offerDreamAgentButtons(game, player, dreamPlayer);
-                }
+            if (player.hasUnexhaustedLeader("dreamagent")) {
+                DreamButtonHandler.offerDreamAgentButtons(game, player, player);
             }
         }
 

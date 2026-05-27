@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.commands.CommandHelper;
@@ -78,6 +79,10 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("netrunnersagent")) {
             buttons.add(NetrunnersLeadersHandler.getOverclockCardsInfoButton(player));
+        }
+        if (player.hasUnexhaustedLeader("dreamagent")
+                && !DreamButtonHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
+            buttons.add(DreamButtonHandler.getDreamAgentCardsInfoButton(player));
         }
         if (player.hasAbility("intrigue")) {
             buttons.add(Buttons.blue("startIntrigueCard", "Pay For Intrigue Card", FactionEmojis.xin));
