@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersFactionTechsHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -479,6 +480,9 @@ public final class StatusHelper {
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
+        }
+        if (game.getRealPlayers().stream().anyMatch(player -> player.hasTech("benetrunnersdm"))) {
+            NetrunnersFactionTechsHandler.resolveDataMining(game);
         }
         if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("ransomware"))) {
             NetrunnersAbilitiesHandler.offerRansomwareButtons(game);

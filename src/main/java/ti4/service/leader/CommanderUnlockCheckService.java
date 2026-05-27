@@ -277,6 +277,8 @@ public class CommanderUnlockCheckService {
             // BEANS
             case "dream" ->
                 shouldBeUnlocked = (DreamButtonHandler.getNexusTokenTiles(game).size() >= 3);
+            case "netrunners" ->
+                shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false) >= 4);
         }
         if (shouldBeUnlocked) {
             UnlockLeaderService.unlockLeader(faction + "commander", game, player);
