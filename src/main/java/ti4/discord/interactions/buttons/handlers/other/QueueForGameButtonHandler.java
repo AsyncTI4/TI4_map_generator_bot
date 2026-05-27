@@ -115,10 +115,7 @@ class QueueForGameButtonHandler {
                         restrictions,
                         maxQueueTime);
 
-        MessageHelper.sendMessageToEventChannel(
-                event,
-                event.getUser().getAsMention()
-                        + " has been added to the matchmaking queue with your selected preferences.");
+        MessageHelper.sendEphemeralMessageToEventChannel(event, "You have been added to the matchmaking queue.");
     }
 
     private static StringSelectMenu buildMultiSelect(
