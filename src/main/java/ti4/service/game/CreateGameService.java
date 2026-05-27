@@ -309,10 +309,10 @@ public class CreateGameService {
 
                 -# Please realize that these are broad overviews and that some small components may not fit perfectly into these categories.""";
         MessageHelper.sendMessageToChannelWithButtons(actionsChannel, expMsg, buttons);
-        Button baseGameModeButton = Buttons.green("setupBaseGameMode", "Set Base Game Mode");
+        Button baseGameModeButton = Buttons.green("setupBaseGameMode", "Setup Base Game Only");
         MessageHelper.sendMessageToChannelWithButton(
                 actionsChannel,
-                "Use this button to set the game to the base game with PoK strategy cards.",
+                "Use the below button to set the game to the base game with PoK strategy cards.\n\n**NOTE: Do not press the button below unless you intend to play the base game only, no expansions.**",
                 baseGameModeButton);
     }
 
