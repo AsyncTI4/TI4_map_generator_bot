@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersUnitsHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -44,6 +45,9 @@ public class AddUnitService {
                 NetrunnersUnitsHandler.offerDeployMechWithStructure(
                         event, game, tile, unit.unitKey(), unit.uh().getName(), unit.getTotalRemoved());
             }
+            if (game.getRealPlayers().stream().anyMatch(player -> player.hasLeader("netrunnerscommander"))) {
+                NetrunnersLeadersHandler.checkCommanderUnlock(game, unit.unitKey());
+            }
 
             String color = unit.unitKey().colorID();
             handleFogOfWar(tile, color, game, unit.unitKey() + " " + unit.getTotalRemoved());
@@ -71,6 +75,9 @@ public class AddUnitService {
                 NetrunnersUnitsHandler.offerDeployMechWithStructure(
                         event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), states.size());
             }
+            if (game.getRealPlayers().stream().anyMatch(player -> player.hasLeader("netrunnerscommander"))) {
+                NetrunnersLeadersHandler.checkCommanderUnlock(game, parsedUnit.unitKey());
+            }
         }
 
         handleFogOfWar(tile, color, game, unitList);
@@ -90,6 +97,9 @@ public class AddUnitService {
             if (game.getRealPlayers().stream().anyMatch(player -> player.hasUnit("netrunners_mech"))) {
                 NetrunnersUnitsHandler.offerDeployMechWithStructure(
                         event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), parsedUnit.count());
+            }
+            if (game.getRealPlayers().stream().anyMatch(player -> player.hasLeader("netrunnerscommander"))) {
+                NetrunnersLeadersHandler.checkCommanderUnlock(game, parsedUnit.unitKey());
             }
         }
 
@@ -171,6 +181,9 @@ public class AddUnitService {
             if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasUnit("netrunners_mech"))) {
                 NetrunnersUnitsHandler.offerDeployMechWithStructure(
                         event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), parsedUnit.count());
+            }
+            if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasLeader("netrunnerscommander"))) {
+                NetrunnersLeadersHandler.checkCommanderUnlock(game, parsedUnit.unitKey());
             }
             if (!first) {
                 unitListBuilder.append(", ");

@@ -56,6 +56,7 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.PhantomEnergyHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.TyrisBreakthroughButtonHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
@@ -7632,6 +7633,11 @@ public class ButtonHelper {
                     }
                 }
             }
+        }
+        if (game.getRealPlayers().stream()
+                .anyMatch(player_ -> game.playerHasLeaderUnlockedOrAlliance(player_, "netrunnerscommander"))) {
+            playersWithPds2.addAll(
+                    NetrunnersLeadersHandler.getCommanderSpaceCannonPlayers(player, game, tilePos, playersWithPds2));
         }
         return playersWithPds2;
     }

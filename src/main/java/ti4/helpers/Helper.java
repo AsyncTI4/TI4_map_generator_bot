@@ -46,6 +46,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.Mobiliz
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersFactionTechsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersUnitsHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
@@ -1320,6 +1321,7 @@ public final class Helper {
                     && !thing.contains("ghostbt")
                     && !thing.contains("tyrisbt")
                     && !thing.contains("dwsDiscount")
+                    && !NetrunnersLeadersHandler.isOverclockSpentThing(thing)
                     && !thing.contains("aida")
                     && !thing.contains("commander")
                     && !thing.contains("agent")
@@ -1432,6 +1434,10 @@ public final class Helper {
                             .append(MiscEmojis.Resources_1)
                             .append('\n');
                     res += 1;
+                }
+                if (NetrunnersLeadersHandler.isOverclockSpentThing(thing)) {
+                    msg.append(NetrunnersLeadersHandler.getOverclockSpentMessage(game, thing));
+                    res += NetrunnersLeadersHandler.getOverclockSpentResources(thing);
                 }
                 if (thing.contains("boon")) {
                     msg.append("> Used Boon Relic ").append(ExploreEmojis.Relic).append('\n');
