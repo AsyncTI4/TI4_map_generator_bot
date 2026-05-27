@@ -2,32 +2,34 @@ package ti4.spring.service.statistics.matchmaking;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ti4.spring.service.persistence.UserEntity;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "matchmaking_queue", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id"}))
+@Table(name = "matchmaking_queue", uniqueConstraints = @UniqueConstraint(columnNames = "user_id"))
 public class MatchmakingQueueEntryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "user_id", nullable = false)
-    private String userId;
-
-    @Column(name = "username", nullable = false)
-    private String username;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
     @Column(name = "queued_at_utc", nullable = false)
     private LocalDateTime queuedAtUtc;
@@ -45,5 +47,5 @@ public class MatchmakingQueueEntryEntity {
     private String restrictionsCsv;
 
     @Column(name = "max_queue_time_minutes", nullable = false)
-    private int maxQueueTimeMinutes;
+    private int maxQueueTimeHours;
 }

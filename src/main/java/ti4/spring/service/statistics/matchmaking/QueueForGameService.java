@@ -5,25 +5,19 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.logging.BotLogger;
 import ti4.service.persistence.DatabasePersistenceGate;
+import ti4.spring.service.persistence.UserEntity;
 
 @Service
 public class QueueForGameService {
 
     private static final String CSV_SEPARATOR = ";";
-    private static final Map<String, Integer> MAX_QUEUE_TIME_TO_MINUTES = Map.of(
-            "1 hour", 60,
-            "4 hours", 240,
-            "8 hours", 480,
-            "24 hours", 1440,
-            "48 hours", 2880,
-            "1 week", 10_080);
+    private static final int DEFAULT_MAX_QUEUE_TIME_HOURS = 8;
 
     private final MatchmakingQueueEntryRepository repository;
 
@@ -46,16 +40,26 @@ public class QueueForGameService {
         repository.deleteByUserId(userId);
 
         MatchmakingQueueEntryEntity entry = new MatchmakingQueueEntryEntity();
-        entry.setUserId(userId);
-        entry.setUsername(username);
+        entry.setUser(new UserEntity(userId, username));
         entry.setQueuedAtUtc(LocalDateTime.now(ZoneOffset.UTC));
         entry.setExpansionsCsv(toCsv(expansions));
         entry.setPlayerCountsCsv(toCsv(playerCounts));
         entry.setVictoryPointsCsv(toCsv(victoryPoints));
         entry.setRestrictionsCsv(toCsv(restrictions));
-        entry.setMaxQueueTimeMinutes(MAX_QUEUE_TIME_TO_MINUTES.getOrDefault(maxQueueTime, 480));
+        entry.setMaxQueueTimeHours(parseHours(maxQueueTime));
 
         repository.save(entry);
+    }
+
+    private static int parseHours(String maxQueueTime) {
+        if (maxQueueTime == null) return DEFAULT_MAX_QUEUE_TIME_HOURS;
+        StringBuilder hours = new StringBuilder();
+        for (char c : maxQueueTime.trim().toCharArray()) {
+            if (Character.isDigit(c)) hours.append(c);
+            else break;
+        }
+        if (hours.isEmpty()) return DEFAULT_MAX_QUEUE_TIME_HOURS;
+        return Integer.parseInt(hours.toString());
     }
 
     @Transactional
@@ -68,7 +72,7 @@ public class QueueForGameService {
 
         List<MatchmakingQueueEntryEntity> expired = entries.stream()
                 .filter(entry -> entry.getQueuedAtUtc()
-                        .plusMinutes(entry.getMaxQueueTimeMinutes())
+                        .plusMinutes(entry.getMaxQueueTimeHours())
                         .isBefore(now))
                 .toList();
         if (!expired.isEmpty()) {
