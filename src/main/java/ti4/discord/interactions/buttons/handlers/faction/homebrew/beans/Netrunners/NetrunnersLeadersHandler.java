@@ -9,6 +9,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
@@ -22,15 +23,20 @@ import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.unit.AddUnitService;
+import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.DestroyUnitService;
 
 @UtilityClass
 public class NetrunnersLeadersHandler {
@@ -42,6 +48,8 @@ public class NetrunnersLeadersHandler {
     private static final String TARGET_PICKER_MESSAGE = "choose a player to use **Overclock** on.";
     private static final String COMMANDER_ID = "netrunnerscommander";
     private static final String COMMANDER_FAKE_UNIT_ID = "netrunnerscommanderpds";
+    private static final String HERO_CHOOSE_STRUCTURE_PREFIX = "netrunnersHeroChooseStructure_";
+    private static final String HERO_DESTROY_STRUCTURE_PREFIX = "netrunnersHeroDestroyStructure_";
 
     public static List<Button> getOverclockButtons(Game game, Player producingPlayer, Tile productionTile) {
         if (producingPlayer == null
@@ -288,12 +296,106 @@ public class NetrunnersLeadersHandler {
     private static boolean isEligibleOverclockPlanet(
             Game game, Player producingPlayer, Tile productionTile, Planet planet) {
         Tile planetTile = game.getTileFromPlanet(planet.getName());
+        Player planetOwner = game.getPlanetOwner(planet.getName());
         return planet.getResources() >= 1
                 && planetTile != null
+                && planetOwner != null
+                && planetOwner != producingPlayer
                 && FoWHelper.getAdjacentTiles(game, productionTile.getPosition(), producingPlayer, false, true)
-                        .contains(planetTile.getPosition())
-                && game.getRealPlayersExcludingThis(producingPlayer).stream()
-                        .anyMatch(player -> player.getPlanets().contains(planet.getName()));
+                        .contains(planetTile.getPosition());
+    }
+
+    public static void startRevolution(Game game, Player netrunner) {
+        if (!isNetrunnersPlayer(netrunner)) {
+            return;
+        }
+
+        List<Player> targets = getRevolutionTargets(game, netrunner);
+        if (targets.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    netrunner.getCorrectChannel(),
+                    netrunner.getRepresentation()
+                            + " used **Digital Uprising**, but no players with control tokens in the **"
+                            + NetrunnersAbilitiesHandler.SYSTEM_BREACH_POOL
+                            + "** pool have structures on non-home planets to destroy.");
+            return;
+        }
+
+        String targetPings =
+                String.join(" ", targets.stream().map(Player::getRepresentation).toList());
+        List<Button> buttons = targets.stream()
+                .map(target -> Buttons.red(
+                        target.factionButtonChecker() + HERO_CHOOSE_STRUCTURE_PREFIX + netrunner.getFaction(),
+                        "Destroy a structure",
+                        FactionEmojis.netrunners))
+                .toList();
+        MessageHelper.sendMessageToChannelWithButtons(
+                netrunner.getCorrectChannel(),
+                netrunner.getRepresentation() + " used **Digital Uprising**. "
+                        + targetPings
+                        + ", use your button to choose and destroy 1 structure you own on a non-home planet.",
+                buttons);
+    }
+
+    @ButtonHandler(HERO_CHOOSE_STRUCTURE_PREFIX)
+    public static void offerRevolutionStructureButtons(
+            Game game, Player target, ButtonInteractionEvent event, String buttonID) {
+        Player netrunner = game.getPlayerFromColorOrFaction(buttonID.replace(HERO_CHOOSE_STRUCTURE_PREFIX, ""));
+        if (!isRevolutionTarget(game, netrunner, target)) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "You do not have an eligible structure to destroy for **Digital Uprising**.");
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
+            return;
+        }
+
+        List<Button> buttons = getRevolutionStructureButtons(game, netrunner, target);
+        MessageChannel channel =
+                target.getCardsInfoThread() == null ? target.getCorrectChannel() : target.getCardsInfoThread();
+        MessageHelper.sendMessageToChannelWithButtons(
+                channel,
+                target.getRepresentationUnfogged()
+                        + ", choose 1 structure you own on a non-home planet to destroy for **Digital Uprising**.",
+                buttons);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
+    }
+
+    @ButtonHandler(HERO_DESTROY_STRUCTURE_PREFIX)
+    public static void resolveRevolutionStructure(
+            Game game, Player target, ButtonInteractionEvent event, String buttonID) {
+        String[] parts = buttonID.replace(HERO_DESTROY_STRUCTURE_PREFIX, "").split("_", 4);
+        if (parts.length < 4) {
+            return;
+        }
+
+        Player netrunner = game.getPlayerFromColorOrFaction(parts[0]);
+        Tile tile = game.getTileByPosition(parts[1]);
+        UnitType unitType = getUnitType(parts[2]);
+        String unitHolderName = parts[3];
+        RevolutionStructure structure = getRevolutionStructure(target, tile, unitHolderName, unitType);
+        if (!isRevolutionTarget(game, netrunner, target) || structure == null) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "That structure is no longer eligible for **Digital Uprising**.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        DestroyUnitService.destroyUnit(event, tile, game, structure.unitKey(), 1, structure.unitHolder(), false);
+        AddUnitService.addUnits(event, tile, game, netrunner.getColor(), "2 inf " + unitHolderName);
+        StartCombatService.groundCombatCheck(game, structure.unitHolder(), tile, event);
+        ButtonHelper.deleteMessage(event);
+
+        MessageHelper.sendMessageToChannel(
+                game.getActionsChannel(),
+                target.getRepresentation() + " destroyed 1 " + getStructureName(target, structure)
+                        + " on " + Helper.getPlanetRepresentation(unitHolderName, game)
+                        + " for " + netrunner.getRepresentation(false, true)
+                        + "'s **Digital Uprising**. Added 2 "
+                        + netrunner.getFactionEmojiOrColor()
+                        + " infantry to that planet. Resolve ground combat if able.");
+        if (!game.isFowMode()) {
+            ButtonHelper.updateMap(
+                    game, event, "Digital Uprising on " + Helper.getPlanetRepresentation(unitHolderName, game));
+        }
     }
 
     public static void checkCommanderUnlock(Game game, UnitKey unitKey) {
@@ -349,7 +451,7 @@ public class NetrunnersLeadersHandler {
     }
 
     private static BorrowedPds getBestBorrowedPds(Game game, Player netrunner, Player owner, Tile targetTile) {
-        return game.getTileMap().values().stream()
+        return CheckUnitContainmentService.getTilesContainingPlayersUnits(game, owner, UnitType.Pds).stream()
                 .filter(pdsTile -> isCommanderPdsTileUsable(game, netrunner, targetTile, pdsTile))
                 .flatMap(pdsTile -> pdsTile.getUnitHolders().values().stream()
                         .flatMap(unitHolder -> getBorrowedPds(owner, pdsTile, unitHolder).stream()))
@@ -366,11 +468,8 @@ public class NetrunnersLeadersHandler {
     }
 
     private static List<BorrowedPds> getBorrowedPds(Player owner, Tile tile, UnitHolder unitHolder) {
-        return unitHolder.getUnits().entrySet().stream()
-                .filter(entry -> entry.getValue() > 0)
-                .map(Map.Entry::getKey)
+        return unitHolder.getUnitKeysForPlayer(owner).stream()
                 .filter(unitKey -> unitKey.unitType() == UnitType.Pds)
-                .filter(owner::unitBelongsToPlayer)
                 .map(owner::getUnitFromUnitKey)
                 .filter(Objects::nonNull)
                 .filter(model -> model.getSpaceCannonDieCount(owner) > 0)
@@ -389,6 +488,101 @@ public class NetrunnersLeadersHandler {
 
     private static int getPdsScore(Player owner, UnitModel model) {
         return model.getSpaceCannonDieCount(owner) * (11 - model.getSpaceCannonHitsOn(owner));
+    }
+
+    private static List<Player> getRevolutionTargets(Game game, Player netrunner) {
+        return game.getRealPlayersExcludingThis(netrunner).stream()
+                .filter(target -> isRevolutionTarget(game, netrunner, target))
+                .toList();
+    }
+
+    private static boolean isRevolutionTarget(Game game, Player netrunner, Player target) {
+        return isNetrunnersPlayer(netrunner)
+                && target != null
+                && netrunner.getDebtTokenCount(target.getColor(), NetrunnersAbilitiesHandler.SYSTEM_BREACH_POOL) > 0
+                && !getRevolutionStructures(game, target).isEmpty();
+    }
+
+    private static boolean isNetrunnersPlayer(Player player) {
+        return player != null && "netrunners".equals(player.getFaction());
+    }
+
+    private static List<Button> getRevolutionStructureButtons(Game game, Player netrunner, Player target) {
+        return getRevolutionStructures(game, target).stream()
+                .map(structure -> Buttons.red(
+                        target.factionButtonChecker() + HERO_DESTROY_STRUCTURE_PREFIX
+                                + netrunner.getFaction() + "_"
+                                + structure.tile().getPosition() + "_"
+                                + structure.unitKey().unitTypeVal() + "_"
+                                + structure.unitHolder().getName(),
+                        getStructureName(target, structure) + " on "
+                                + Helper.getPlanetRepresentation(
+                                        structure.unitHolder().getName(), game),
+                        structure.unitKey().unitEmoji()))
+                .toList();
+    }
+
+    private static List<RevolutionStructure> getRevolutionStructures(Game game, Player target) {
+        if (game == null) {
+            return List.of();
+        }
+        return game.getTileMap().values().stream()
+                .filter(tile -> !tile.isHomeSystem(game))
+                .flatMap(tile -> tile.getPlanetUnitHolders().stream()
+                        .flatMap(unitHolder -> getRevolutionStructures(target, tile, unitHolder).stream()))
+                .toList();
+    }
+
+    private static List<RevolutionStructure> getRevolutionStructures(Player target, Tile tile, UnitHolder unitHolder) {
+        if (target == null || unitHolder == null) {
+            return List.of();
+        }
+        return unitHolder.getUnitKeysForPlayer(target).stream()
+                .filter(unitKey -> isStructure(target, unitKey))
+                .map(unitKey -> new RevolutionStructure(tile, unitHolder, unitKey))
+                .toList();
+    }
+
+    private static UnitType getUnitType(String unitType) {
+        if (unitType == null) {
+            return null;
+        }
+        UnitType type = Units.findUnitType(unitType);
+        if (type != null) {
+            return type;
+        }
+        try {
+            return UnitType.valueOf(unitType);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    private static RevolutionStructure getRevolutionStructure(
+            Player target, Tile tile, String unitHolderName, UnitType unitType) {
+        if (target == null || tile == null || unitType == null) {
+            return null;
+        }
+        UnitHolder unitHolder = tile.getUnitHolders().get(unitHolderName);
+        if (unitHolder == null || !(unitHolder instanceof Planet)) {
+            return null;
+        }
+        return getRevolutionStructures(target, tile, unitHolder).stream()
+                .filter(structure -> structure.unitKey().unitType() == unitType)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private static boolean isStructure(Player target, UnitKey unitKey) {
+        UnitModel model = target.getUnitFromUnitKey(unitKey);
+        return model == null
+                ? unitKey.unitType() == UnitType.Pds || unitKey.unitType() == UnitType.Spacedock
+                : model.getIsStructure();
+    }
+
+    private static String getStructureName(Player target, RevolutionStructure structure) {
+        UnitModel model = target.getUnitFromUnitKey(structure.unitKey());
+        return model == null ? structure.unitKey().humanReadableName() : model.getName();
     }
 
     private static UnitModel getCommanderPdsModel(Player netrunner, Player owner, BorrowedPds pds) {
@@ -413,4 +607,6 @@ public class NetrunnersLeadersHandler {
     private record OverclockTarget(Player producingPlayer, Tile productionTile, Planet planet) {}
 
     private record BorrowedPds(Tile tile, UnitModel model) {}
+
+    private record RevolutionStructure(Tile tile, UnitHolder unitHolder, UnitKey unitKey) {}
 }
