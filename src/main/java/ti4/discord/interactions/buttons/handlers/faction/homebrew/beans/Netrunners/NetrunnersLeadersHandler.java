@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -282,27 +283,28 @@ public class NetrunnersLeadersHandler {
             return null;
         }
 
-        return FoWHelper.getAdjacentTiles(game, productionTile.getPosition(), producingPlayer, false, true).stream()
+        Set<String> adjacentTilePositions =
+                FoWHelper.getAdjacentTiles(game, productionTile.getPosition(), producingPlayer, false, true);
+        return adjacentTilePositions.stream()
                 .map(game::getTileByPosition)
                 .filter(Objects::nonNull)
                 .flatMap(tile -> tile.getUnitHolders().values().stream())
                 .filter(Planet.class::isInstance)
                 .map(Planet.class::cast)
-                .filter(planet -> isEligibleOverclockPlanet(game, producingPlayer, productionTile, planet))
+                .filter(planet -> isEligibleOverclockPlanet(game, producingPlayer, adjacentTilePositions, planet))
                 .max(Comparator.comparingInt(Planet::getResources))
                 .orElse(null);
     }
 
     private static boolean isEligibleOverclockPlanet(
-            Game game, Player producingPlayer, Tile productionTile, Planet planet) {
+            Game game, Player producingPlayer, Set<String> adjacentTilePositions, Planet planet) {
         Tile planetTile = game.getTileFromPlanet(planet.getName());
         Player planetOwner = game.getPlanetOwner(planet.getName());
         return planet.getResources() >= 1
                 && planetTile != null
                 && planetOwner != null
                 && planetOwner != producingPlayer
-                && FoWHelper.getAdjacentTiles(game, productionTile.getPosition(), producingPlayer, false, true)
-                        .contains(planetTile.getPosition());
+                && adjacentTilePositions.contains(planetTile.getPosition());
     }
 
     public static void startRevolution(Game game, Player netrunner) {
