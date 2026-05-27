@@ -50,7 +50,6 @@ import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
-import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
@@ -503,12 +502,13 @@ class ActionCardDeck2ButtonHandler {
             return;
         }
 
-        Set<String> selectedPlanets =
-                ButtonHelperActionCards.decodeExplorationRiderPlanets(payload.substring(firstSeparator + 1, secondSeparator));
+        Set<String> selectedPlanets = ButtonHelperActionCards.decodeExplorationRiderPlanets(
+                payload.substring(firstSeparator + 1, secondSeparator));
         String planet = payload.substring(secondSeparator + 1, lastSeparator);
         String trait = payload.substring(lastSeparator + 1);
         Tile tile = game.getTileFromPlanet(planet);
-        if (tile == null || !ButtonHelperActionCards.isExplorationRiderEligiblePlanet(player, game, planet, selectedPlanets)) {
+        if (tile == null
+                || !ButtonHelperActionCards.isExplorationRiderEligiblePlanet(player, game, planet, selectedPlanets)) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Exploration Rider_.");
             ButtonHelper.deleteMessage(event);
             return;
@@ -542,7 +542,8 @@ class ActionCardDeck2ButtonHandler {
             return;
         }
 
-        Set<String> selectedPlanets = ButtonHelperActionCards.decodeExplorationRiderPlanets(payload.substring(separator + 1));
+        Set<String> selectedPlanets =
+                ButtonHelperActionCards.decodeExplorationRiderPlanets(payload.substring(separator + 1));
         ActionCardHelper.drawActionCards(player, 1);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
