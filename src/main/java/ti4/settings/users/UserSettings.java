@@ -44,6 +44,11 @@ public class UserSettings {
     private String takebackPref = "No Preference";
     private String metaPref = "No Preference";
     private String trackRecord = "";
+    private List<String> queueForGameExpansions;
+    private List<String> queueForGamePlayerCounts;
+    private List<String> queueForGameVictoryPointGoals;
+    private List<String> queueForGameRestrictions;
+    private String queueForGameMaxQueueTime;
 
     UserSettings(String userId) {
         this.userId = userId;
@@ -51,6 +56,22 @@ public class UserSettings {
 
     public List<String> getPreferredColors() {
         return Objects.requireNonNullElse(preferredColors, Collections.emptyList());
+    }
+
+    public List<String> getQueueForGameExpansions() {
+        return Objects.requireNonNullElse(queueForGameExpansions, Collections.emptyList());
+    }
+
+    public List<String> getQueueForGamePlayerCounts() {
+        return Objects.requireNonNullElse(queueForGamePlayerCounts, Collections.emptyList());
+    }
+
+    public List<String> getQueueForGameVictoryPointGoals() {
+        return Objects.requireNonNullElse(queueForGameVictoryPointGoals, Collections.emptyList());
+    }
+
+    public List<String> getQueueForGameRestrictions() {
+        return Objects.requireNonNullElse(queueForGameRestrictions, Collections.emptyList());
     }
 
     public void addAfkHour(String hour) {

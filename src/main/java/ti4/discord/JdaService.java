@@ -46,6 +46,7 @@ import ti4.cron.LogCacheStatsCron;
 import ti4.cron.LongExecutionHistoryCron;
 import ti4.cron.OldUndoFileCleanupCron;
 import ti4.cron.PersistToSqlCron;
+import ti4.cron.QueueForGameCron;
 import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
@@ -330,6 +331,7 @@ public class JdaService {
         TechSummaryCron.register();
         SabotageAutoReactCron.register();
         FastScFollowCron.register();
+        QueueForGameCron.register();
         CloseLaunchThreadsCron.register();
         if (CombatContestSettings.isEnabledStatic()) {
             CombatReplaySelectionCron.register();

@@ -28,6 +28,7 @@ public class DeveloperCommand implements ParentCommand {
                     new AnnounceActiveGames(),
                     new DatabasePersistence(),
                     new DeleteUserMessages(),
+                    new QueueForGameButton(),
                     new RunSql())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

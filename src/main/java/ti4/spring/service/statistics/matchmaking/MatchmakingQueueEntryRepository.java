@@ -1,0 +1,13 @@
+package ti4.spring.service.statistics.matchmaking;
+
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
+
+public interface MatchmakingQueueEntryRepository extends JpaRepository<MatchmakingQueueEntryEntity, Long> {
+
+    List<MatchmakingQueueEntryEntity> findAllByOrderByQueuedAtUtcAsc();
+
+    @Transactional
+    void deleteByUserId(String userId);
+}
